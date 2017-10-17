@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.triphase.signer.processors;
 
 import java.io.IOException;
@@ -128,7 +137,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Generamos el mensaje para la configuracion de la operacion
 		final TriphaseData triphaseData = new TriphaseData();
 
-		final Map<String, String> signConfig = new ConcurrentHashMap<String, String>();
+		final Map<String, String> signConfig = new ConcurrentHashMap<>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(presign));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
 		if (!omitContent) {
@@ -295,7 +304,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final TriphaseData triphaseData = new TriphaseData();
 
-		final Map<String, String> signConfig = new ConcurrentHashMap<String, String>();
+		final Map<String, String> signConfig = new ConcurrentHashMap<>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, presignB64);
 		signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.toString(true));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.toString(true));

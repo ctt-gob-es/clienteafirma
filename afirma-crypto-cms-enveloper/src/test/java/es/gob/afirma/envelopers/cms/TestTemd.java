@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -32,6 +33,7 @@ public final class TestTemd {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void createEnvelopePkcs11Fnmt() throws Exception {
 
 		final byte[] content ="Hola mundo".getBytes(); //$NON-NLS-1$
@@ -111,6 +113,7 @@ public final class TestTemd {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void createEnvelopeCapi() throws Exception {
 
 		final byte[] content ="Hola mundo".getBytes(); //$NON-NLS-1$

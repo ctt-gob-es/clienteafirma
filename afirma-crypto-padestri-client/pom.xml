@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-padestri-client</artifactId>
 	<name>afirma-crypto-padestri</name>
+	<description>Modulo con el componente cliente para la generacion de firmas PDF/PAdES trifasicas</description>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
 	<dependencies>

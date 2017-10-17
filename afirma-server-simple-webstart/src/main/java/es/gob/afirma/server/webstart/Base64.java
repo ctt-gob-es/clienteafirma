@@ -44,7 +44,7 @@ import java.io.IOException;
  * @author rob@iharder.net
  * @version 2.3.7
  */
-public final class Base64 {
+final class Base64 {
 
 /* ********  P U B L I C   F I E L D S  ******** */
 

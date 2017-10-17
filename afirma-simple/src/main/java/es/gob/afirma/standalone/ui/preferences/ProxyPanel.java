@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.preferences;
 
 import java.awt.Cursor;
@@ -107,9 +116,7 @@ final class ProxyPanel extends JPanel{
 
 		this.proxyCheckBox.setMnemonic('U');
 		this.proxyCheckBox.setSelected(PreferencesManager.getBoolean(
-				PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED,
-				false
-			)
+				PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED)
 		);
 		this.proxyCheckBox.addItemListener(
 			e -> {
@@ -257,28 +264,16 @@ final class ProxyPanel extends JPanel{
 		c.gridx++;
 		this.add(this.autodetectProxyBtn, c);
 
-		this.hostTF.setText(PreferencesManager.get(
-				PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST,
-				"" //$NON-NLS-1$
-			)
+		this.hostTF.setText(PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST)
 		);
-		this.portTF.setText(PreferencesManager.get(
-				PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT,
-				"" //$NON-NLS-1$
-			)
+		this.portTF.setText(PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT)
 		);
-		this.usernameProxy.setText(PreferencesManager.get(
-				PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME,
-				"" //$NON-NLS-1$
-			)
+		this.usernameProxy.setText(PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME)
 		);
 
 		enableComponents(this.proxyCheckBox.isSelected());
 
-		final String cipheredPwd = PreferencesManager.get(
-			PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD,
-			"" //$NON-NLS-1$
-		);
+		final String cipheredPwd = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
 
 		char[] pwd;
 		try {

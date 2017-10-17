@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone.ui;
@@ -167,7 +166,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         c.gridy = 4;
         final JCheckBox hideDniWaitScreen = new JCheckBox(
     		SimpleAfirmaMessages.getString("DNIeWaitPanel.8"), //$NON-NLS-1$
-    		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false)
+    		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN)
 		);
         hideDniWaitScreen.addChangeListener(
     		new ChangeListener() {

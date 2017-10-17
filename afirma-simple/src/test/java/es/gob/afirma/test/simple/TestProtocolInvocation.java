@@ -40,7 +40,7 @@ public class TestProtocolInvocation {
 	/** Prueba de protocolo con firma de hash. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Requiere de servidor remoto y UI
+	@Ignore // Requiere de servidor remoto y UI
 	public void testSignHash() {
 		SimpleAfirma.main(new String[] { LINE_SIGN_HASH });
 	}
@@ -49,7 +49,7 @@ public class TestProtocolInvocation {
 	 * @throws Exception En cualquier error */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Necesita UI
+	@Ignore // Necesita UI
 	public void testService() throws Exception {
 		new Thread(
 			new Runnable() {
@@ -72,8 +72,7 @@ public class TestProtocolInvocation {
 	}
 
 	/** Prueba de apertura de firma con el visor.
-	 * @param args No se usa.
-	 * @throws Exception Error al cargar el recurso de prueba. */
+	 * @param args No se usa. */
 	public static void main(final String[] args) {
 
 		new Thread(

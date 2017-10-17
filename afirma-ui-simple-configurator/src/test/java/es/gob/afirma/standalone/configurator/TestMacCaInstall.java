@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
@@ -29,6 +30,7 @@ public final class TestMacCaInstall {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Necesita macOS
 	public void testCommandInstall() throws Exception {
 
 		final File f = new File(TestMacCaInstall.class.getResource("/SSL_CERT.cer").toURI()); //$NON-NLS-1$

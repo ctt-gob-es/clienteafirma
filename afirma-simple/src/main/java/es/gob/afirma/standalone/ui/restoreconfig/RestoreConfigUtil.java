@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.restoreconfig;
 
 import java.io.BufferedOutputStream;
@@ -20,7 +29,7 @@ import java.util.logging.Logger;
 final class RestoreConfigUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
+
 	static final String CERT_ALIAS = "SocketAutoFirma"; //$NON-NLS-1$
 
 	static final String CERT_ALIAS_BROWSER = "AutoFirma ROOT"; //$NON-NLS-1$

@@ -7,8 +7,6 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 
-import es.gob.afirma.keystores.filters.PolicyIdFilter;
-
 /** Pruebas del filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestPolicyIdFilter {

@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone;
@@ -70,14 +69,12 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
 
         // Cargamos las preferencias establecidas
-        setDefaultLocale(
-    		buildLocale(
-				PreferencesManager.get(
-					SimpleAfirma.PREFERENCES_LOCALE,
-					Locale.getDefault().toString()
-				)
-			)
-		);
+        String defaultLocale = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = Locale.getDefault().toString();
+		}
+        setDefaultLocale(buildLocale(defaultLocale));
+
 
         if (asApplet) {
             this.container = this;
@@ -141,7 +138,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     public static void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);
-            PreferencesManager.put(SimpleAfirma.PREFERENCES_LOCALE, l.toString());
+            PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, l.toString());
             SimpleAfirmaMessages.changeLocale();
         }
     }

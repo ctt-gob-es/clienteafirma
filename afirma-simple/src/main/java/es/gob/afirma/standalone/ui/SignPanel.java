@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone.ui;
@@ -55,7 +54,6 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -223,10 +221,7 @@ public final class SignPanel extends JPanel {
         if (DataAnalizerUtil.isPDF(data)) {
         	signPanelFileType = SignPanelFileType.PDF;
         	this.signer = AOSignerFactory.getSigner(
-        		PreferencesManager.get(
-    				PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF,
-    				AOSignConstants.SIGN_FORMAT_PADES
-				)
+        		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
     		);
         }
         // Comprobamos si es una factura electronica
@@ -242,30 +237,21 @@ public final class SignPanel extends JPanel {
         	}
         	signPanelFileType = SignPanelFileType.FACTURAE;
         	this.signer = AOSignerFactory.getSigner(
-            		PreferencesManager.get(
-        				PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE,
-        				AOSignConstants.SIGN_FORMAT_FACTURAE
-    				)
+            		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE)
         		);
         }
         // Comprobamos si es un OOXML
         else if (DataAnalizerUtil.isOOXML(data)) {
         	signPanelFileType = SignPanelFileType.OOXML;
         	this.signer = AOSignerFactory.getSigner(
-	    		PreferencesManager.get(
-    				PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML,
-    				AOSignConstants.SIGN_FORMAT_OOXML
-				)
+	    		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML)
     		);
         }
         // Comprobamos si es un ODF
         else if (DataAnalizerUtil.isODF(data)) {
         	signPanelFileType = SignPanelFileType.ODF;
         	this.signer = AOSignerFactory.getSigner(
-	    		PreferencesManager.get(
-    				PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF,
-    				AOSignConstants.SIGN_FORMAT_ODF
-				)
+	    		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF)
     		);
         }
         // Comprobamos si es un fichero de firma CAdES o XAdES (los PDF, facturas, OOXML y ODF pasaran por las condiciones anteriores)
@@ -282,20 +268,14 @@ public final class SignPanel extends JPanel {
         else if (DataAnalizerUtil.isXML(data)) {
         	signPanelFileType = SignPanelFileType.XML;
         	this.signer = AOSignerFactory.getSigner(
-        		PreferencesManager.get(
-    				PREFERENCE_GENERAL_DEFAULT_FORMAT_XML,
-    				AOSignConstants.SIGN_FORMAT_XADES
-				)
+        		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML)
     		);
         }
         // Cualquier otro tipo de fichero
         else {
             signPanelFileType = SignPanelFileType.BINARY;
             this.signer = AOSignerFactory.getSigner(
-	    		PreferencesManager.get(
-    				PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN,
-    				AOSignConstants.SIGN_FORMAT_CADES
-				)
+	    		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN)
     		);
         }
 
@@ -677,10 +657,10 @@ public final class SignPanel extends JPanel {
 
     static List<? extends CertificateFilter> getCertFilters() {
     	final List<CertificateFilter> filters = new ArrayList<>();
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false)) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false)) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
     		filters.add(new PseudonymFilter());
     	}
     	if (filters.size() > 1) {

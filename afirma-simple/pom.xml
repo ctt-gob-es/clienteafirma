@@ -3,13 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-simpleafirma</artifactId>
 	<name>afirma-ui-simpleafirma</name>
-	<version>1.6-SNAPSHOT</version>
+	<description>Aplicacion AutoFirma</description>
+	<packaging>jar</packaging>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.6</version>
+	</parent>
 
 	<properties>
-        <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
         <afirma.keytool.alias>codesign</afirma.keytool.alias>
         <afirma.keytool.password>afirma</afirma.keytool.password>
@@ -44,12 +49,6 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core-keystores</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-keystores-single</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
@@ -180,13 +179,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob</groupId>
+			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
 			<version>1.4</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>es.gob</groupId>
+			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-ui</artifactId>
 			<version>1.4</version>
 		</dependency>
@@ -201,13 +200,6 @@
 			<groupId>javax.help</groupId>
 			<artifactId>javahelp</artifactId>
 			<version>2.0.05</version>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
@@ -251,11 +243,6 @@
 		 	 <systemPath>${java.home}/lib/javaws.jar</systemPath>
 		 </dependency>
 	</dependencies>
-	
-	<scm>
-		<connection>scm:svn:https://github.com/ctt-gob-es/clienteafirma/trunk/afirma-simple</connection>
-		<url>https://github.com/ctt-gob-es/clienteafirma/trunk/afirma-simple</url>
-	</scm>
 
 	<profiles>
 	

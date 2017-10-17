@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-validation</artifactId>
 	<name>afirma-crypto-validation</name>
-	
+	<description>Modulo para la validacion del core de firma de firmas ASN.1 y XML</description>
+	<packaging>jar</packaging>
+
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
 	<dependencies>
@@ -74,9 +76,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>es.gob.afirma</groupId>
+			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-itext</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 		
 	</dependencies>

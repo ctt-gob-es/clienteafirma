@@ -68,10 +68,9 @@ public class TestINC189027 {
 			);
 		}
 		catch(final AOFormatFileException e) {
-			return;
-		}
 
-		Assert.fail("Deberia haber saltado un AOFormatFileException"); //$NON-NLS-1$
+			Assert.fail("La contrafirmas de firmas CAdES-T debe estar soportada: " + e); //$NON-NLS-1$
+		}
 
 //		final File tempFile = File.createTempFile("CAdES-T-Countersign", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 //		System.out.println("El resultado de la contrafirma de CAdES-T se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
@@ -108,10 +107,9 @@ public class TestINC189027 {
 			);
 		}
 		catch(final AOFormatFileException e) {
+			Assert.fail("Deberia haber cofirmado correctamente la firmas CAdES-T: " + e); //$NON-NLS-1$
 			return;
 		}
-
-		Assert.fail("Deberia haber saltado un AOFormatFileException"); //$NON-NLS-1$
 
 //		final File tempFile = File.createTempFile("CAdES-T-Cosign", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 //		System.out.println("El resultado de la cofirma de CAdES-T se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$

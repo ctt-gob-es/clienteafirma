@@ -1,10 +1,19 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
-import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
+import es.gob.afirma.core.misc.protocol.UrlParametersToGetCurrentLog;
 
 final class ProtocolInvocationLauncherGetCurrentLog {
 
@@ -16,7 +25,7 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 		// No instanciable
 	}
 
-	static String processGetCurrentLog(final UrlParametersToLoad options, final boolean bySocket) throws SocketOperationException {
+	static String processGetCurrentLog(final UrlParametersToGetCurrentLog options, final boolean bySocket) throws SocketOperationException {
 
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
@@ -27,13 +36,8 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 
 		// Preparamos el buffer para enviar el resultado
 		final String dataToSend;
-
-		// Intentamos extraer la informacion de cada objecto File obtenidos en el
-		// paso anterior
 		try {
-
 			dataToSend = getCurrentLog();
-
 		} catch (final IOException e) {
 			LOGGER.severe("Error al obtener el registro de log acumulado hasta la ejecucion actual: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_24);
@@ -50,7 +54,7 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 	/** Obtiene, en formato XML, el registro acumulado de la ejecuci&oacute;n actual.
 	 * @return String que contiene el registro de log acumulado hasta la ejecuci&oacute;n actual.
 	 * @throws IOException Si no hay registro o este no se puede leer. */
-	public static String getCurrentLog() throws IOException {
+	private static String getCurrentLog() throws IOException {
 		return LogManager.getLogFile();
 	}
 

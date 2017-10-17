@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\carlos.gamuci\Documents\Afirma\SVN_GitHub\clienteafirma\afirma-simple\target\AutoFirma.jar</jar>
-  <outfile>C:\Users\carlos.gamuci\Desktop\AutoFirma.exe</outfile>
+  <jar>AutoFirma.jar</jar>
+  <outfile>AutoFirma.exe</outfile>
   <errTitle>Error: Se ha superado el tiempo de espera antes de recibir peticiones.</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -22,7 +22,7 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Xms512m -Xmx8g -DdisableSslChecks=true</opt>
+    <opt>-Xms512m -Xmx8g</opt>
   </jre>
   <splash>
     <file>splash.bmp</file>

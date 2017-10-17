@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-keystores-capiaddressbook</artifactId>
 	<name>afirma-keystores-capiaddressbook</name>
+	<description>Modulo el acceso al almacen de certificados de terceros (Libreta de direcciones) de Windows</description>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
 	<dependencies>

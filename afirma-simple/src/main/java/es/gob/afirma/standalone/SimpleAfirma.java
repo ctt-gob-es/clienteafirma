@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone;
@@ -94,9 +93,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
 
-    /** Clave de la preferencia para el guardado del idioma por defecto. */
-    public static final String PREFERENCES_LOCALE = "default.locale"; //$NON-NLS-1$
-
     /** Inicio (en min&uacute;sculas) de una ruta que invoca a la aplicaci&oacute;n por protocolo. */
     private static final String PROTOCOL_URL_START_LOWER_CASE = "afirma://"; //$NON-NLS-1$
 
@@ -166,12 +162,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	void initialize(final File preSelectedFile) {
 
         // Cargamos las preferencias establecidas
-        setDefaultLocale(buildLocale(PreferencesManager.get(PREFERENCES_LOCALE, Locale.getDefault().toString())));
+		String defaultLocale = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = Locale.getDefault().toString();
+		}
+        setDefaultLocale(buildLocale(defaultLocale));
 
         // Una excepcion en un constructor no siempre deriva en un objeto nulo,
         // por eso usamos un booleano para ver si fallo, en vez de una comprobacion
         // de igualdad a null
-        boolean showDNIeScreen = preSelectedFile == null && !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false);
+        boolean showDNIeScreen = preSelectedFile == null && !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
 	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
@@ -387,7 +387,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     public static void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);
-            PreferencesManager.put(PREFERENCES_LOCALE, l.toString());
+            PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, l.toString());
             SimpleAfirmaMessages.changeLocale();
         }
     }
@@ -489,7 +489,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
        	ProxyUtil.setProxySettings();
 
 		// Google Analytics
-		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, true) &&
+		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS) &&
 			!Boolean.getBoolean(DO_NOT_SEND_ANALYTICS) &&
 				!Boolean.parseBoolean(System.getenv(DO_NOT_SEND_ANALYTICS_ENV))
 		) {
@@ -524,7 +524,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Comprobamos actualizaciones si estan habilitadas y estamos en Windows
         if (updatesEnabled && Platform.OS.WINDOWS.equals(Platform.getOS()) &&
-        		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
+        		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
 			Updater.checkForUpdates(null);
 		}
 		else {
@@ -643,7 +643,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Pregunta al usuario si desea cerrar la aplicaci&oacute;n.
      * @return <code>true</code> si el usuario responde que s&iacute;, <code>false</code> en caso contrario */
     public boolean askForClosing() {
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false)) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE)) {
     		closeApplication(0);
             return true;
     	}

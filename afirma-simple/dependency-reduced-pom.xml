@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>afirma-client</artifactId>
+    <groupId>es.gob.afirma</groupId>
+    <version>1.6</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>es.gob.afirma</groupId>
   <artifactId>afirma-ui-simpleafirma</artifactId>
   <name>afirma-ui-simpleafirma</name>
-  <version>1.6-SNAPSHOT</version>
-  <scm>
-    <connection>scm:svn:https://github.com/ctt-gob-es/clienteafirma/trunk/afirma-simple</connection>
-    <url>https://github.com/ctt-gob-es/clienteafirma/trunk/afirma-simple</url>
-  </scm>
+  <description>Aplicacion AutoFirma</description>
   <profiles>
     <profile>
       <id>env-dev</id>
@@ -57,6 +57,10 @@
                   <target>1.8</target>
                   <fork>true</fork>
                   <compilerArgument>-XDignore.symbol.file</compilerArgument>
+                  <compilerArgs>
+                    <arg>-Xbootclasspath:C:\Program Files\Java\jdk1.8.0_121\jre/lib/jsse.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/rt.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/jce.jar</arg>
+                  </compilerArgs>
+                  <debug>false</debug>
                 </configuration>
               </execution>
               <execution>
@@ -70,6 +74,10 @@
                   <target>1.8</target>
                   <fork>true</fork>
                   <compilerArgument>-XDignore.symbol.file</compilerArgument>
+                  <compilerArgs>
+                    <arg>-Xbootclasspath:C:\Program Files\Java\jdk1.8.0_121\jre/lib/jsse.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/rt.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/jce.jar</arg>
+                  </compilerArgs>
+                  <debug>false</debug>
                 </configuration>
               </execution>
             </executions>
@@ -78,6 +86,10 @@
               <target>1.8</target>
               <fork>true</fork>
               <compilerArgument>-XDignore.symbol.file</compilerArgument>
+              <compilerArgs>
+                <arg>-Xbootclasspath:C:\Program Files\Java\jdk1.8.0_121\jre/lib/jsse.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/rt.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/jce.jar</arg>
+              </compilerArgs>
+              <debug>false</debug>
             </configuration>
           </plugin>
           <plugin>
@@ -200,7 +212,6 @@
     <afirma.keytool.alias>codesign</afirma.keytool.alias>
     <afirma.keytool.password>afirma</afirma.keytool.password>
     <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
-    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
   </properties>
 </project>
 

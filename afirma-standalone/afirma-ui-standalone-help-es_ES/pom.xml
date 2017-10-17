@@ -8,9 +8,8 @@
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
-		<relativePath>../../../../pom.xml</relativePath>
+		<artifactId>afirma-standalone</artifactId>
+		<version>2.2</version>
 	</parent>
 
 </project>

@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone;
 
 import java.awt.GraphicsEnvironment;
@@ -145,7 +154,7 @@ public final class AutoFirmaUtil {
 
 	/**
 	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Windows.
-	 * @return Directorio de instalaci&oaucte;n.
+	 * @return Directorio de instalaci&oacute;n.
 	 */
 	public static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
@@ -154,7 +163,7 @@ public final class AutoFirmaUtil {
 
 	/**
 	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Linux.
-	 * @return Directorio de instalaci&oaucte;n.
+	 * @return Directorio de instalaci&oacute;n.
 	 */
 	public static File getLinuxAlternativeAppDir() {
 		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
@@ -163,7 +172,7 @@ public final class AutoFirmaUtil {
 
 	/**
 	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas macOS.
-	 * @return Directorio de instalaci&oaucte;n.
+	 * @return Directorio de instalaci&oacute;n.
 	 */
 	public static File getMacOsXAlternativeAppDir() {
 		final String userDir = System.getenv("HOME"); //$NON-NLS-1$

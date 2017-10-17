@@ -41,7 +41,7 @@ public final class TestXMLdSig {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
-    private static final Properties[] XMLDSIG_MODES;
+    private static final Properties[] XMLDSIG_CONFIGS;
 
     private static final Properties ENVELOPED_WITHOUT_XPATH_EXTRAPARAMS = new Properties();
     static {
@@ -79,7 +79,7 @@ public final class TestXMLdSig {
         p6.setProperty("encoding", "Base64"); //$NON-NLS-1$ //$NON-NLS-2$
 
 
-        XMLDSIG_MODES = new Properties[] {
+        XMLDSIG_CONFIGS = new Properties[] {
                 p1, p2, p3, p4, p5, p6
         };
     }
@@ -88,8 +88,8 @@ public final class TestXMLdSig {
     private final static String[] ALGOS = new String[] {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
@@ -97,7 +97,7 @@ public final class TestXMLdSig {
             "PFActivoFirSHA256.pfx", //$NON-NLS-1$
             "base64.b64", //$NON-NLS-1$
             "sample-class-attributes.xml", //$NON-NLS-1$
-            "xmlwithremotestyle.xml" //$NON-NLS-1$
+            //"xmlwithremotestyle.xml" //$NON-NLS-1$
     };
 
     /** Prueba de firma Enveloped sin transformaci&oacute;n XPath y sin <i>canonicalizaci&oacute;n</i>.
@@ -154,7 +154,7 @@ public final class TestXMLdSig {
 
         String prueba;
 
-        for (final Properties extraParams : XMLDSIG_MODES) {
+        for (final Properties extraParams : XMLDSIG_CONFIGS) {
             for (final String algo : ALGOS) {
                 for (final String filename : TEST_FILES_DATA) {
 
@@ -222,7 +222,7 @@ public final class TestXMLdSig {
 
                     AOTreeModel tree = signer.getSignersStructure(result, false);
                     Assert.assertEquals("Los datos del nodo raiz no son los esperados", "Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
-                    Assert.assertEquals("El firmante encontrado en la firma no es el esperado", "ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
+                    Assert.assertEquals("El firmante encontrado en la firma no es el esperado", "FISICO ACTIVO PRUEBA", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
 
                     tree = signer.getSignersStructure(result, true);
                     Assert.assertEquals("Los datos del nodo raiz no son los esperados", "Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -249,7 +249,7 @@ public final class TestXMLdSig {
         final AOSigner signer = new AOXMLDSigSigner();
 
         String prueba;
-        for (final Properties extraParams : XMLDSIG_MODES) {
+        for (final Properties extraParams : XMLDSIG_CONFIGS) {
         	for (final String algo : ALGOS) {
         		for(final String filename : TEST_FILES_DATA) {
 
@@ -319,7 +319,7 @@ public final class TestXMLdSig {
         final AOSigner signer = new AOXMLDSigSigner();
 
         String prueba;
-        for (final Properties extraParams : XMLDSIG_MODES) {
+        for (final Properties extraParams : XMLDSIG_CONFIGS) {
         	for (final String algo : ALGOS) {
         		for(final String filename : TEST_FILES_DATA) {
 

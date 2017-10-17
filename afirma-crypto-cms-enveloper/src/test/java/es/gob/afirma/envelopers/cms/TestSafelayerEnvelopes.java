@@ -4,6 +4,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -20,6 +21,7 @@ public final class TestSafelayerEnvelopes {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void openSafelayerEnvelope() throws Exception {
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$

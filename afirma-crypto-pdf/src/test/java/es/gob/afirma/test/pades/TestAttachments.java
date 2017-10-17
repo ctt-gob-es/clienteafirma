@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -56,6 +57,7 @@ public class TestAttachments {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testAttachmentSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-keystores-single</artifactId>
 	<name>afirma-keystores-single</name>
-
+	<description>Modulo para el uso de certificados en fichero (.cer/.p7s)</description>
+	<packaging>jar</packaging>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
 	<dependencies>

@@ -4,17 +4,44 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
-	<version>1.6-SNAPSHOT</version>
 	<artifactId>afirma-client</artifactId>
+	<version>1.6</version>
 	<packaging>pom</packaging>
+	
 	<name>afirma-client</name>
+	<description>Cliente @firma</description>
+	<url>https://administracionelectronica.gob.es/ctt/clienteafirma</url>
+	
+	<developers>
+		<developer>
+			<name>Secretaría General de Administración Digital</name>
+			<email>soporte.afirma@correo.gob.es</email>
+			<organization>Gobierno de España</organization>
+			<organizationUrl>https://administracionelectronica.gob.es</organizationUrl>
+		</developer>
+	</developers>
+	
+	<licenses>
+		<license>
+			<name>GPL-v2.0</name>
+			<url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
+		</license>
+		<license>
+			<name>EUPL-v1.1</name>
+			<url>http://joinup.ec.europa.eu/system/files/ES/EUPL%20v.1.1%20-%20Licencia.pdf</url>
+		</license>
+	</licenses>
 
+	<scm>
+		<connection>scm:git:https://github.com/ctt-gob-es/clienteafirma.git</connection>
+		<developerConnection>scm:git:ssh://github.com/ctt-gob-es/clienteafirma.git</developerConnection>
+		<url>https://github.com/ctt-gob-es/clienteafirma</url>
+	</scm>
+	
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
 
-	<description>Librerías del núcleo de afirma</description>
-	
 	<modules>
 		<module>afirma-core</module>
 		<module>afirma-core-keystores</module>
@@ -47,12 +74,19 @@
 		<module>afirma-core-massive</module>
 		<module>afirma-server-triphase-signer-core</module>
 		<module>afirma-server-triphase-signer-document</module>
+		
+		<!-- Aplicaciones -->
+		<module>afirma-ui-miniapplet</module>
+		<module>afirma-simple</module>
+		<module>afirma-ui-simple-configurator</module>
+		<module>afirma-ui-simple-webstart</module>
+		
+		<!-- Servicios -->
+		<module>afirma-server-simple-webstart</module>
+		<module>afirma-server-triphase-signer</module>
+		<module>afirma-signature-retriever</module>
+		<module>afirma-signature-storage</module>
 	</modules>
-
-	<scm>
-		<connection>scm:git:https://github.com/ctt-gob-es/clienteafirma</connection>
-		<url>https://github.com/ctt-gob-es/clienteafirma</url>
-	</scm>
 
 	<dependencies>
 		<dependency>
@@ -62,17 +96,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
-	<licenses>
-		<license>
-			<name>GPL-v2.0</name>
-			<url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
-		</license>
-		<license>
-			<name>EUPL-v1.1</name>
-			<url>http://joinup.ec.europa.eu/system/files/ES/EUPL%20v.1.1%20-%20Licencia.pdf</url>
-		</license>
-	</licenses>
 	
 	<build>
 		<plugins>

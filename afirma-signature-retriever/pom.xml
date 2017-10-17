@@ -3,12 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
-	<packaging>war</packaging>
 	<artifactId>afirma-signature-retriever</artifactId>
 	<name>afirma-signature-retriever</name>
-	<version>1.6-SNAPSHOT</version>
+	<description>Servicio para la recuperacion de datos de servidor</description>
+	<packaging>war</packaging>
 
+
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.6</version>
+	</parent>
+	
 	<dependencies>
 		<dependency>
     		<groupId>javax.servlet</groupId>
@@ -17,12 +23,7 @@
     		<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	
-	<scm>
-		<connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-mobile/server/afirma-signature-retriever/trunk</connection>
-		<url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-mobile/server/afirma-signature-retriever/trunk</url>
-	</scm>
-	
+		
 	<build>
 		<plugins>
 			<plugin>

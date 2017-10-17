@@ -2,15 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-server-triphase-signer</artifactId>
 	<name>afirma-server-triphase-signer</name>
-	<version>1.6-SNAPSHOT</version>
+	<description>Servicio de firma trifasica</description>
 	<packaging>war</packaging>
-
-	<properties>
-		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-	</properties>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.6</version>
+	</parent>
 	
 	<dependencies>
 		<dependency>
@@ -37,20 +38,9 @@
     		<version>2.5</version>
     		<scope>provided</scope>
 		</dependency>
-		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
 	
-	<scm>
-		<connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-web/server/afirma-server-triphase-signer/trunk</connection>
-		<url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-web/server/afirma-server-triphase-signer/trunk</url>
-	</scm>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -58,8 +48,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<fork>true</fork>
 					<compilerArgs>
 						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>

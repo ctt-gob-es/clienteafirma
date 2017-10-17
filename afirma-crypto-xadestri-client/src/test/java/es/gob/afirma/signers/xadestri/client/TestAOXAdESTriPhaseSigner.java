@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.signers.xadestri.client;
@@ -19,6 +18,7 @@ import java.util.Properties;
 
 import javax.xml.crypto.dsig.DigestMethod;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -88,7 +88,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-//	@Ignore // Necesita un servidor trifasico
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaFirmaXAdESASiCS() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
@@ -116,6 +116,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaFirmaXAdESDetached() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(
@@ -152,6 +153,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaCofirmaXAdESDetached() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
@@ -190,6 +192,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaXAdESDetached() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
@@ -220,6 +223,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaDeCofirmaXAdESDetached() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma-xades-detached.xml"); //$NON-NLS-1$
@@ -250,6 +254,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaCofirmadeContrafirmaXAdESDetached() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-detached.xml"); //$NON-NLS-1$
@@ -288,6 +293,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaDeContrafirmaXAdESDetached() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-detached.xml"); //$NON-NLS-1$
@@ -318,6 +324,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaFirmaXAdESEnveloping() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(
@@ -354,6 +361,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaCofirmaXAdESEnveloping() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-enveloping.xml"); //$NON-NLS-1$
@@ -392,6 +400,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaXAdESEnveloping() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-enveloping.xml"); //$NON-NLS-1$
@@ -422,6 +431,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaDeCofirmaXAdESEnveloping() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma-xades-enveloping.xml"); //$NON-NLS-1$
@@ -511,6 +521,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaCofirmadeContrafirmaXAdESEnveloping() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloping.xml"); //$NON-NLS-1$
@@ -549,6 +560,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaDeContrafirmaXAdESEnveloping() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloping.xml"); //$NON-NLS-1$
@@ -579,6 +591,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaFirmaXAdESEnveloped() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(
@@ -615,6 +628,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaCofirmaXAdESEnveloped() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-enveloped.xml"); //$NON-NLS-1$
@@ -653,6 +667,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaXAdESEnveloped() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-enveloped.xml"); //$NON-NLS-1$
@@ -683,6 +698,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaDeCofirmaXAdESEnveloped() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma-xades-enveloped.xml"); //$NON-NLS-1$
@@ -713,6 +729,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaCofirmadeContrafirmaXAdESEnveloped() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloped.xml"); //$NON-NLS-1$
@@ -751,6 +768,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaContrafirmaDeContrafirmaXAdESEnveloped() throws Exception {
 
 		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloped.xml"); //$NON-NLS-1$
@@ -781,7 +799,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-//	@Ignore // Necesita un servidor trifasico
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaFirmaXAdES() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
@@ -809,7 +827,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-//	@Ignore // Necesita un servidor trifasico
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaCofirmaXAdESManifest() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(SIGNATURE_FILENAME));

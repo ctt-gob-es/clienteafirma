@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.signers.xadestri.client;
@@ -16,6 +15,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -42,7 +42,7 @@ public class TestAOFacturaETriPhaseSigner {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-//	@Ignore // Necesita un servidor trifasico
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaFirmaFacturaE() throws Exception {
 
 		final Properties config0 = new Properties();

@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.test.pades;
@@ -20,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.aowagie.text.pdf.PdfReader;
@@ -133,6 +133,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testTimestampedSignatureAndDocument() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -211,6 +212,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testTimestampedSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

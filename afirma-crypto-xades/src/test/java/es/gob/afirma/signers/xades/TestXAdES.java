@@ -368,7 +368,7 @@ public final class TestXAdES {
     /** Pruebas de cofirmacon Manifest.
      * @throws Exception Cuando ocurre un error */
     @SuppressWarnings("static-method")
-	@Test(expected=es.gob.afirma.core.AOUnsupportedSignFormatException.class)
+	@Test
     public void testCoSignManifest() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;

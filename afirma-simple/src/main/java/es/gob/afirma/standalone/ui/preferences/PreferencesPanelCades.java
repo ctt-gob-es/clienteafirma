@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
@@ -141,7 +150,7 @@ final class PreferencesPanelCades extends JPanel {
 	    this.cadesImplicit.setMnemonic('i');
 	    this.cadesImplicit.addItemListener(modificationListener);
 	    this.cadesImplicit.addKeyListener(keyListener);
-	    this.cadesImplicit.setEnabled(this.blocked);
+	    this.cadesImplicit.setEnabled(!this.blocked);
 	    signatureMode.add(this.cadesImplicit);
 
 	    c.gridy++;
@@ -224,7 +233,7 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.cadesImplicit.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_CADES_IMPLICIT, true));
+		this.cadesImplicit.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
 
         final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -246,6 +255,8 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void loadDefaultPreferences() {
+
+		this.cadesImplicit.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_IMPLICIT));
 
 		final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -272,15 +283,16 @@ final class PreferencesPanelCades extends JPanel {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getCadesPreferedPolicy() {
 
-		if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null) == null) {
+		if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER) == null ||
+				PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER).isEmpty()) {
 			return null;
 		}
 		try {
 			return new AdESPolicy(
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH, null),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, null),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, null)
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER)
 					);
 		}
 		catch (final Exception e) {
@@ -309,17 +321,17 @@ final class PreferencesPanelCades extends JPanel {
 			// blocked = false, luego se pueden alterar las propiedades:
 			// devolvemos las preferencias por defecto
 			try {
-
-				if (PreferencesManager.getPreference(PREFERENCE_CADES_POLICY_IDENTIFIER, null) == null
-						|| "".equals(PreferencesManager.getPreference(PREFERENCE_CADES_POLICY_IDENTIFIER, null))) { //$NON-NLS-1$
+				// Si, por defecto, no debe haber ninguna politica configurada, hacemos eso
+				if (PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER) == null
+						|| PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER).isEmpty()) {
 					this.cadesPolicyDlg.loadPolicy(null);
 				} else {
 
 					this.cadesPolicyDlg
-							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH, null),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, null),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, null)));
+							.loadPolicy(new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER),
+									PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_HASH),
+									PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
+									PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_QUALIFIER)));
 				}
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$

@@ -10,6 +10,7 @@ import java.security.Security;
 import java.security.Signature;
 import java.util.Enumeration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.AOKeyStore;
@@ -32,7 +33,7 @@ public final class TestPkcs11 {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore //Dependiente del PKCS#11
+	@Ignore //Dependiente del PKCS#11
 	public void testPkcs11() throws Exception {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		AOKeyStore.PKCS11,
@@ -58,7 +59,7 @@ public final class TestPkcs11 {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Dependiente del PKCS#11
+	@Ignore // Dependiente del PKCS#11
 	public void testRawPkcs11() throws Exception {
 
         final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$

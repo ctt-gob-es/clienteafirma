@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.restoreconfig;
 
 import java.awt.Frame;
@@ -13,7 +22,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
  *
  */
 public final class RestoreConfigDialog extends JDialog {
-	
+
 	/**
 	 * Attribute that represents the serial version.
 	 */
@@ -22,7 +31,7 @@ public final class RestoreConfigDialog extends JDialog {
 	/** Constructor del panel de preferencias.
 	 * @param parent padre del panel de preferencias.
 	 * @param modal modal del panel de preferencias.
-	 */ 
+	 */
 	public RestoreConfigDialog(final Frame parent, final boolean modal) {
 		super(parent, modal);
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.20")); //$NON-NLS-1$
@@ -32,7 +41,7 @@ public final class RestoreConfigDialog extends JDialog {
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
-	
+
 	/** Muestra el di&aacute;logo de restauraci&oacute;n de configuraci&oacute;n.
 	 * @param parent Componente padre del panel de preferencias.
 	 * @param modal Modalidad del panel de preferencias.

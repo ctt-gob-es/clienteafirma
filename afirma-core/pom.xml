@@ -5,18 +5,20 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-core</artifactId>
 	<name>afirma-core</name>
-
+	<description>Code del Cliente @firma</description>
+	<packaging>jar</packaging>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 	
 	<dependencies>
 		<dependency>
-			<groupId>es.gob.afirma</groupId>
+			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-jmimemagic</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.3</version>
 		</dependency>
 	</dependencies>
 </project>

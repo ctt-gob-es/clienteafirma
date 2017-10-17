@@ -10,6 +10,7 @@ import java.nio.channels.FileChannel;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -29,6 +30,7 @@ public final class HashTest {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testHashPerformanceClassic() throws Exception {
 		final long time = System.currentTimeMillis();
 		final MessageDigest md = MessageDigest.getInstance("SHA-512"); //$NON-NLS-1$
@@ -51,6 +53,7 @@ public final class HashTest {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testHashPerformanceStreamed() throws Exception {
 		final long time = System.currentTimeMillis();
 		final MessageDigest md = MessageDigest.getInstance("SHA-512"); //$NON-NLS-1$

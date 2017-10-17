@@ -3,13 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-simpleafirma-webstart</artifactId>
 	<name>afirma-ui-simpleafirma-webstart</name>
-	<version>1.6-SNAPSHOT</version>
+	<description>Envoltura para la publicacion de Autofirma como aplicacion WebStart</description>
+	<packaging>jar</packaging>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.6</version>
+	</parent>
 
 	<properties>
-		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
 		<afirma.keytool.password>afirma</afirma.keytool.password>
@@ -151,7 +156,7 @@
 							</excludes>
 						</filter>
 						<filter>
-							<artifact>net.java.xades:jxades</artifact>
+							<artifact>es.uji.crypto.xades:jxades</artifact>
 							<excludes>
 								<exclude>TrustRootCACertificates/**</exclude>
 								<exclude>*.*</exclude>

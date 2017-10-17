@@ -16,8 +16,7 @@ public final class TestWaitForConnection {
 	private static final int PORT = 6629;
 
 	/** Main para pruebas.
-	 * @param args No se usa.
-	 * @throws Exception En cualquier error no controlado. */
+	 * @param args No se usa. */
 	public static void main(final String[] args) {
 		new Thread(
 			new Runnable() {

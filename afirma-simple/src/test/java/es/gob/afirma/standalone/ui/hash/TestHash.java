@@ -26,8 +26,7 @@ public final class TestHash {
 	}
 
 	/** Prueba de generaci&oacute;n de huellas de directorio con GUI.
-	 * @param args No se usa.
-	 * @throws Exception en cualquier error. */
+	 * @param args No se usa. */
 	public static void main(final String[] args) {
 		try {
 			CreateHashFiles.doHashProcess(

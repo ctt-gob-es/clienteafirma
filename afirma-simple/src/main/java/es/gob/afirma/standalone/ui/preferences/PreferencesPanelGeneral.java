@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN;
@@ -86,17 +95,17 @@ final class PreferencesPanelGeneral extends JPanel {
 	}
 
 	/** Atributo para gestionar el bloqueo de propiedades. */
-	private boolean unprotected = true;
+	private boolean blocked;
 
 	PreferencesPanelGeneral(final KeyListener keyListener,
 			                final ItemListener modificationListener,
 			                final DisposableInterface di,
 			                final PreferencesPanel prefPanel,
-			                final boolean unprotected) {
+			                final boolean blocked) {
 		this.disposableInterface = di;
 		this.preferencesPanel = prefPanel;
 
-		this.unprotected = unprotected;
+		this.blocked = blocked;
 
 		createUI(keyListener, modificationListener);
 	}
@@ -123,10 +132,10 @@ final class PreferencesPanelGeneral extends JPanel {
 	void loadPreferences() {
 
 		this.signarureAlgorithms.setSelectedItem(
-			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA") //$NON-NLS-1$
+			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
 		);
-		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
-		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
+		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
+		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 
 		if (
 			Boolean.getBoolean(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK) ||
@@ -137,7 +146,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			this.checkForUpdates.setEnabled(false);
 		}
 		else {
-			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_UPDATECHECK, true));
+			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_UPDATECHECK));
 		}
 
 		if (Boolean.getBoolean(SimpleAfirma.DO_NOT_SEND_ANALYTICS) ||
@@ -146,30 +155,29 @@ final class PreferencesPanelGeneral extends JPanel {
 			this.sendAnalytics.setEnabled(false);
 		}
 		else {
-			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS, true));
+			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS));
 		}
 
 		// Formatos por defecto
-		this.pdfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, PADES));
-		this.ooxmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML, OOXML));
-		this.facturaeFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE, FACTURAE));
-		this.odfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, ODF));
-		this.xmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, XADES));
-		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, CADES));
+		this.pdfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF));
+		this.ooxmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML));
+		this.facturaeFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE));
+		this.odfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF));
+		this.xmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML));
+		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN));
 	}
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
 	 * desde un fichero externo de preferencias.
-	 * @param unprotected {@code true} Si las opciones de configuraci&oacute;n sensibles
+	 * @param blocked {@code true} Si las opciones de configuraci&oacute;n sensibles
 	 *                    a ello est&aacute;n protegidas y no pueden ser modificadas,
 	 *                    {@code false} en caso contrario. */
 	void loadDefaultPreferences() {
 
-
-		this.avoidAskForClose.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
-		this.hideDniStartScreen.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
-		this.checkForUpdates.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_UPDATECHECK, true));
-		this.sendAnalytics.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_USEANALYTICS, true));
+		this.avoidAskForClose.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
+		this.hideDniStartScreen.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
+		this.checkForUpdates.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_UPDATECHECK));
+		this.sendAnalytics.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_USEANALYTICS));
 
 		// Para las preferencias susceptibles de ser protegidas, comprobamos la
 		// preferencia unprotected antes de cargar su valor por defecto.
@@ -177,24 +185,24 @@ final class PreferencesPanelGeneral extends JPanel {
 		// configuracion pueda ser alterada por parte del usuario mediante el
 		// interfaz grafico. Este comportamiento se generaliza para el boton de
 		// restaurar las preferencias por defecto.
-		if (!isUnprotected()) {
+		if (!isBlocked()) {
 			this.signarureAlgorithms
-					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA") //$NON-NLS-1$
+					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
 			);
 
 			// Formatos por defecto
 			this.pdfFilesCombo
-					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, PADES));
+					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF));
 			this.ooxmlFilesCombo
-					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML, OOXML));
+					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML));
 			this.facturaeFilesCombo.setSelectedItem(
-					PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE, FACTURAE));
+					PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE));
 			this.odfFilesCombo
-					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, ODF));
+					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF));
 			this.xmlFilesCombo
-					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, XADES));
+					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML));
 			this.binFilesCombo
-					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, CADES));
+					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN));
 		}
 	}
 
@@ -246,7 +254,7 @@ final class PreferencesPanelGeneral extends JPanel {
 						return;
 					}
 					try {
-						PreferencesPlistHandler.importPreferencesFromUrl(url, isUnprotected());
+						PreferencesPlistHandler.importPreferencesFromUrl(url, isBlocked());
 					}
 					catch(final Exception e) {
 						LOGGER.log(
@@ -282,7 +290,7 @@ final class PreferencesPanelGeneral extends JPanel {
 						// Operacion cancelada por el usuario
 						return;
 					}
-					PreferencesPlistHandler.importPreferences(configFilePath, getParent(), isUnprotected());
+					PreferencesPlistHandler.importPreferences(configFilePath, getParent(), isBlocked());
 				}
 				AOUIFactory.showMessageDialog(
 						getParent(),
@@ -297,7 +305,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanel.112") //$NON-NLS-1$
 		);
 
-		//importConfigFromFileButton.setEnabled(unprotected);
+		importConfigFromFileButton.setEnabled(!this.blocked);
 
 		final JButton restoreConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.135") //$NON-NLS-1$
@@ -317,7 +325,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
 
-		//restoreConfigFromFileButton.setEnabled(unprotected);
+		restoreConfigFromFileButton.setEnabled(!this.blocked);
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -410,7 +418,7 @@ final class PreferencesPanelGeneral extends JPanel {
 				}
 			)
 		);
-		this.signarureAlgorithms.setEnabled(!isUnprotected());
+		this.signarureAlgorithms.setEnabled(!isBlocked());
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
 
 		signGeneralPanel.add(signatureAgorithmPanel, c);
@@ -461,7 +469,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
 	 * @param modificationListener Listener para la detecci&oacute;n de cambio de configuraci&oacute;n.
 	 * @param keyListener Listener para la detecci&oacute;n del uso de teclas para el cierre de la pantalla.
-	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
+	 * @param blocked <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
 	 *                    <code>false</code> para limitar las preferencias que puede modificar.
 	 * @return Panel con los componentes de configuraci&oacute;n. */
 	private JPanel createSignatureFormatPanel(
@@ -487,7 +495,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		pdfFilesLabel.setLabelFor(this.pdfFilesCombo);
 		this.pdfFilesCombo.addItemListener(modificationListener);
 		this.pdfFilesCombo.addKeyListener(keyListener);
-		this.pdfFilesCombo.setEnabled(!isUnprotected());
+		this.pdfFilesCombo.setEnabled(!isBlocked());
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(pdfFilesLabel, c);
@@ -501,7 +509,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		ooxmlFilesLabel.setLabelFor(this.ooxmlFilesCombo);
 		this.ooxmlFilesCombo.addItemListener(modificationListener);
 		this.ooxmlFilesCombo.addKeyListener(keyListener);
-		this.ooxmlFilesCombo.setEnabled(!isUnprotected());
+		this.ooxmlFilesCombo.setEnabled(!isBlocked());
 
 		c.gridx = 0;
 		c.weightx = 0;
@@ -516,7 +524,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		facturaeFilesLabel.setLabelFor(this.facturaeFilesCombo);
 		this.facturaeFilesCombo.addItemListener(modificationListener);
 		this.facturaeFilesCombo.addKeyListener(keyListener);
-		this.facturaeFilesCombo.setEnabled(!isUnprotected());
+		this.facturaeFilesCombo.setEnabled(!isBlocked());
 
 		c.gridx = 0;
 		c.weightx = 0;
@@ -531,7 +539,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		xmlFilesLabel.setLabelFor(this.xmlFilesCombo);
 		this.xmlFilesCombo.addItemListener(modificationListener);
 		this.xmlFilesCombo.addKeyListener(keyListener);
-		this.xmlFilesCombo.setEnabled(!isUnprotected());
+		this.xmlFilesCombo.setEnabled(!isBlocked());
 
 		c.gridx = 0;
 		c.weightx = 0;
@@ -546,7 +554,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		odfFilesLabel.setLabelFor(this.odfFilesCombo);
 		this.odfFilesCombo.addItemListener(modificationListener);
 		this.odfFilesCombo.addKeyListener(keyListener);
-		this.odfFilesCombo.setEnabled(!isUnprotected());
+		this.odfFilesCombo.setEnabled(!isBlocked());
 
 		c.gridx = 0;
 		c.weightx = 0;
@@ -561,7 +569,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		binFilesLabel.setLabelFor(this.binFilesCombo);
 		this.binFilesCombo.addItemListener(modificationListener);
 		this.binFilesCombo.addKeyListener(keyListener);
-		this.binFilesCombo.setEnabled(!isUnprotected());
+		this.binFilesCombo.setEnabled(!isBlocked());
 
 		c.gridx = 0;
 		c.weightx = 0;
@@ -648,17 +656,21 @@ final class PreferencesPanelGeneral extends JPanel {
     	}
     }
 
-    /** Indica si hay campos protegidos o no.
-	 * @return <code>true</code> si no hay campos protegidos,
-	 *         <code>false</code> en caso contrario. */
-	public boolean isUnprotected() {
-		return this.unprotected;
+    /**
+	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
+	 * @return {@code true} si est&aacute; bloqueado y no permite la edici&oacute;n,
+	 * {@code false} en caso contrario.
+	 */
+	public boolean isBlocked() {
+		return this.blocked;
 	}
 
-	/** Indica si se deben proteger ciertas opciones de configuraci&oacute;n.
-	 * @param unprotected <code>true</code> para dejar desprotegidas todas las opciones,
-	 *                    <code>false</code> para proteger las opciones adecuadas. */
-	public void setUnprotected(final boolean unprotected) {
-		this.unprotected = unprotected;
+	/**
+	 * Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
+	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
+	 * {@code false} en caso contrario.
+	 */
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 }

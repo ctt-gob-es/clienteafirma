@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.cert.signvalidation.SignValider;
@@ -46,6 +47,7 @@ public class ValidateSignatureTest {
 	 * @throws IOException En errores de tratamiento de datos. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testValidateXMLSign() throws IOException {
 
 			final String signaturePath = XMLDSIG_ENVELOPED;

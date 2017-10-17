@@ -1,8 +1,17 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_QUALIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
@@ -332,8 +341,8 @@ final class PreferencesPanelXades extends JPanel {
 		final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 		if (xadesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
-			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, xadesPolicy.getPolicyIdentifierHash());
-			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, xadesPolicy.getPolicyIdentifierHashAlgorithm());
+			PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH, xadesPolicy.getPolicyIdentifierHash());
+			PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH_ALGORITHM, xadesPolicy.getPolicyIdentifierHashAlgorithm());
 			if (xadesPolicy.getPolicyQualifier() != null) {
 				PreferencesManager.put(PREFERENCE_XADES_POLICY_QUALIFIER, xadesPolicy.getPolicyQualifier().toString());
 			}
@@ -343,8 +352,8 @@ final class PreferencesPanelXades extends JPanel {
 		}
 		else {
 			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
-			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
-			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_HASH);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_HASH_ALGORITHM);
 			PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 		}
 		this.xadesPolicyDlg.saveCurrentPolicy();
@@ -352,17 +361,17 @@ final class PreferencesPanelXades extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.xadesSignatureProductionCity.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")); //$NON-NLS-1$
+		this.xadesSignatureProductionCity.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY));
 		this.xadesSignatureProductionProvince.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE)
 		);
 		this.xadesSignatureProductionPostalCode.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE)
 		);
 		this.xadesSignatureProductionCountry.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY)
 		);
-		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "")); //$NON-NLS-1$
+		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
 
 		final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
         xadesPolicies.add(
@@ -379,13 +388,10 @@ final class PreferencesPanelXades extends JPanel {
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
     		currentPolicy,
-    		isUnprotected()
+    		isBlocked()
 		);
 
-		final String previousSubFormat = PreferencesManager.get(
-				PREFERENCE_XADES_SIGN_FORMAT,
-				AOSignConstants.SIGN_FORMAT_XADES_DETACHED
-			);
+		final String previousSubFormat = PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT);
 
 		// Si la politica de firma es la de la AGE, eliminamos el formato Enveloping del listado,
 		// ya que no esta soportado, y evitamos que se establezca este si era el que estaba configurado
@@ -407,22 +413,21 @@ final class PreferencesPanelXades extends JPanel {
 	}
 
 	void loadDefaultPreferences() {
-		this.xadesSignatureProductionCity.setText(PreferencesManager.getPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")); //$NON-NLS-1$
+		this.xadesSignatureProductionCity.setText(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY));
 		this.xadesSignatureProductionProvince.setText(
-			PreferencesManager.getPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
+			PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE)
 		);
 		this.xadesSignatureProductionPostalCode.setText(
-			PreferencesManager.getPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
+			PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE)
 		);
 		this.xadesSignatureProductionCountry.setText(
-			PreferencesManager.getPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
+			PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY)
 		);
-		this.xadesSignerClaimedRole.setText(PreferencesManager.getPreference(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "")); //$NON-NLS-1$
+		this.xadesSignerClaimedRole.setText(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
 
 		// unprotected: true -> no puedo modificarla, cargo la que estaba
-		if (isUnprotected()) {
-			this.xadesSignFormat.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_XADES_SIGN_FORMAT,
-					AOSignConstants.SIGN_FORMAT_XADES_DETACHED));
+		if (isBlocked()) {
+			this.xadesSignFormat.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGN_FORMAT));
 		}
 
 		final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
@@ -437,7 +442,7 @@ final class PreferencesPanelXades extends JPanel {
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
     		getXadesDefaultPolicy(),
-    		isUnprotected()
+    		isBlocked()
 		);
 
         this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
@@ -454,15 +459,16 @@ final class PreferencesPanelXades extends JPanel {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getXadesPreferedPolicy() {
 
-		if (PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null) == null) {
+		if (PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER) == null ||
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER).isEmpty()) {
 			return null;
 		}
 		try {
 			return new AdESPolicy(
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null),
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, null),
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER, null)
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER),
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH),
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER)
 				);
 		}
 		catch (final Exception e) {
@@ -479,7 +485,7 @@ final class PreferencesPanelXades extends JPanel {
 
 		loadXadesPolicy();
 
-		if (isUnprotected()) {
+		if (isBlocked()) {
 
 			// unprotected = true, luego no pueden alterarse las
 			// propiedades:
@@ -493,16 +499,16 @@ final class PreferencesPanelXades extends JPanel {
 			// devolvemos las preferencias por defecto
 			try {
 
-				if (PreferencesManager.getPreference(PREFERENCE_XADES_POLICY_IDENTIFIER, null) == null
-						|| "".equals(PreferencesManager.getPreference(PREFERENCE_XADES_POLICY_IDENTIFIER, null))) { //$NON-NLS-1$
+				if (PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER) == null
+						|| PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER).isEmpty()) {
 					this.xadesPolicyDlg.loadPolicy(null);
 				} else {
 
 					this.xadesPolicyDlg
-							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null),
-									PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, null),
-									PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-									PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER, null)));
+							.loadPolicy(new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER),
+									PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_HASH),
+									PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
+									PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_QUALIFIER)));
 				}
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
@@ -531,19 +537,21 @@ final class PreferencesPanelXades extends JPanel {
 	}
 
 	/**
-	 * M&eacute;todo getter del atributo unprotected
-	 * @return the unprotected
+	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
+	 * @return {@code true} si est&aacute; bloqueado y no permite la edici&oacute;n,
+	 * {@code false} en caso contrario.
 	 */
-	public boolean isUnprotected() {
+	public boolean isBlocked() {
 		return this.blocked;
 	}
 
 	/**
-	 * M&eacute;todo setter del atributo unprotected
-	 * @param unprotected the unprotected to set
+	 * Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
+	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
+	 * {@code false} en caso contrario.
 	 */
-	public void setUnprotected(boolean unprotected) {
-		this.blocked = unprotected;
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 
 
@@ -557,7 +565,7 @@ final class PreferencesPanelXades extends JPanel {
 			xadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_XADES_AGE_1_9));
 
-			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(), isUnprotected());
+			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(), isBlocked());
 		}
 	}
 
@@ -584,9 +592,9 @@ final class PreferencesPanelXades extends JPanel {
 
 				if (xadesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
-					PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH,
+					PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH,
 							xadesPolicy.getPolicyIdentifierHash());
-					PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
+					PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH_ALGORITHM,
 							xadesPolicy.getPolicyIdentifierHashAlgorithm());
 					if (xadesPolicy.getPolicyQualifier() != null) {
 						PreferencesManager.put(PREFERENCE_XADES_POLICY_QUALIFIER,
@@ -618,8 +626,8 @@ final class PreferencesPanelXades extends JPanel {
 
 				} else {
 					PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
-					PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
-					PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+					PreferencesManager.remove(PREFERENCE_XADES_POLICY_HASH);
+					PreferencesManager.remove(PREFERENCE_XADES_POLICY_HASH_ALGORITHM);
 					PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 
 					final String previousSubFormat = (String) this.xadesSignFormat.getSelectedItem();

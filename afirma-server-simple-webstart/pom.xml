@@ -3,15 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
-	<packaging>war</packaging>
 	<artifactId>afirma-server-simpleafirma-webstart</artifactId>
 	<name>afirma-server-simpleafirma-webstart</name>
-	<version>1.6-SNAPSHOT</version>
-
-	<properties>
-		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-	</properties>
+	<description>Servicio para la generacion de ficheros de despliegue JNLP con parametros</description>
+	<packaging>war</packaging>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.6</version>
+	</parent>
 	
 	<dependencies>
 		
@@ -31,8 +32,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -40,9 +41,9 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>  
-					<archive>  
+					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor> 
-					</archive> 
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>

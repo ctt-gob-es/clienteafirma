@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -46,6 +47,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void doDirectPost() throws Exception {
 		final URL u = new URL(TEST_POST_URL);
 		final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
@@ -80,6 +82,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testDataDownloaderFile() throws Exception {
 		final byte[] data = DataDownloader.downloadData(
 			"file://c:/Windows/WindowsUpdate.log" //$NON-NLS-1$
@@ -91,6 +94,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testDataDownloaderInvalidUrl() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			"http://dasdasdasd.asd?kaka=caca", //$NON-NLS-1$
@@ -103,6 +107,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testPost() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			TEST_POST,
@@ -118,6 +123,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testGet() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			TEST_GET,

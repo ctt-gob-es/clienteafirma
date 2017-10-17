@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-keystores-filters</artifactId>
 	<name>afirma-keystores-filters</name>
-
+ 	<description>Modulo para construccion de filtros de certificados</description>
+	<packaging>jar</packaging>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
 	<dependencies>

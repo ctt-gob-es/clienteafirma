@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.updater;
 
 import java.awt.Desktop;
@@ -12,7 +21,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -20,7 +28,10 @@ public final class Updater {
 
 	private static String version = null;
 	private static String currentVersion = null;
-	private static String updateSite = "https://github.com/ctt-gob-es/clienteafirma/"; //$NON-NLS-1$
+	private static String updateSite = null;
+
+	private static final String PREFERENCE_UPDATE_URL_VERSION = "url"; //$NON-NLS-1$
+	private static final String PREFERENCE_UPDATE_URL_SITE = "updateSite"; //$NON-NLS-1$
 
 	/** Variable de entorno que hay que establecer (a nivel de sistema operativo o como propiedad de Java a
 	 * nivel de JVM) a <code>true</code> para evitar la comprobaci&oacute;n de disponibilidad de
@@ -79,13 +90,11 @@ public final class Updater {
 
 		// Configuramos la URL del fichero de version a partir del fichero interno o,
 		// si esta configurada, preferentemente de la variable de registro
-		String url = updaterProperties.getProperty("url"); //$NON-NLS-1$
-		url = PreferencesManager.get(PreferencesManager.PREFERENCE_UPDATE_URL_VERSION, url);
+		final String url = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_VERSION);
 
 		// Configuramos la URL del sitio de actualizacion a partir del fichero interno o,
 		// si esta configurada, preferentemente de la variable de registro
-		updateSite = updaterProperties.getProperty("updateSite"); //$NON-NLS-1$
-		updateSite = PreferencesManager.get(PreferencesManager.PREFERENCE_UPDATE_URL_SITE, updateSite);
+		updateSite = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_SITE);
 
 		if (url == null) {
 			LOGGER.warning(

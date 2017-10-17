@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.signers.padestri.client;
@@ -20,6 +19,7 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -83,7 +83,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
-	//@Ignore
+	@Ignore
 	public void testFirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -111,6 +111,7 @@ public class TestPdfTriphase {
 	 * el portafirmas del MinHAP.
 	 * @throws Exception Cuando ocurre cualquier error. */
 	@Test
+	@Ignore
 	public void testFirmaParamsPortafirmas() throws Exception {
 
 		final AOSigner signer = new AOPDFTriPhaseSigner();
@@ -143,7 +144,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
 	 * @throws Exception */
 	@Test
-	//@Ignore
+	@Ignore
 	public void firmaConAdjunto() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -191,7 +192,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
-//	@Ignore
+	@Ignore
 	public void cofirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 

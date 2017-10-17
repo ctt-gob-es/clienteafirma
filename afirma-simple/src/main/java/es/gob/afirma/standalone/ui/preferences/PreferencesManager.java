@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone.ui.preferences;
@@ -18,7 +17,7 @@ import java.util.prefs.Preferences;
 /** Nombre de las preferencias de configuraci&oacute;n del programa.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PreferencesManager {
-	
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Objecto general de preferencias donde se guarda la configuraci&oacute;n de la
@@ -30,7 +29,7 @@ public final class PreferencesManager {
 
 		properties = new Properties();
 		try {
-						
+
 			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties" //$NON-NLS-1$
 			));
 		} catch (final Exception e) {
@@ -47,6 +46,9 @@ public final class PreferencesManager {
 
 	//**************************************************************************************************************************
 	//**************** PREFERENCIAS GENERALES **********************************************************************************
+
+    /** Idioma por defecto. */
+    public static final String PREFERENCES_LOCALE = "default.locale"; //$NON-NLS-1$
 
 	/** Configuraci&oacute;n de <i>proxy</i> seleccionada.
 	 * Un valor de <code>true</code> en esta preferencia indica que debe usarse el <i>proxy</i> configurado,
@@ -70,8 +72,8 @@ public final class PreferencesManager {
 	 * mediante interfaz gr&aacute;fico, apareciendo de forma deshabilitada (solo para consulta).
 	 * Un valor de <code>false</code> habilitar&aacute; que cualquier opci&oacute;n de configuraci&oacute;n pueda ser
 	 * alterada por parte del usuario mediante el interfaz gr&aacute;fico. */
-	public static final String PREFERENCE_GENERAL_UNPROTECTED = "preferencesUnprotected"; //$NON-NLS-1$
-	
+	public static final String PREFERENCE_GENERAL_BLOCKED = "preferencesBlocked"; //$NON-NLS-1$
+
 	/** Evitar la confirmaci&oacute;n al cerrar la aplicaci&oacute;n o no.
 	 * Un valor de <code>true</code> en esta preferencia permitir&aacute; cerrar la aplicaci&oacute;n sin ning&uacute;n di&aacute;logo
 	 * de advertencia. Un valor de <code>false</code> har&aacute; que se muestre un di&aacute;logo para que el usuario confirme que
@@ -187,7 +189,7 @@ public final class PreferencesManager {
 	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER = "xadesPolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para XAdES. Debe estar en base64.*/
-	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER_HASH = "xadesPolicyIdentifierHash"; //$NON-NLS-1$
+	public static final String PREFERENCE_XADES_POLICY_HASH = "xadesPolicyIdentifierHash"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para XAdES.
 	 * Esta preferencia debe tener uno de estos valores:
@@ -197,7 +199,7 @@ public final class PreferencesManager {
 	 *  <li>SHA-384</li>
 	 *  <li>SHA-256</li>
 	 * </ul> */
-	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "xadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
+	public static final String PREFERENCE_XADES_POLICY_HASH_ALGORITHM = "xadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
 	/** Calificador de la pol&iacute;tica de firma para XAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_XADES_POLICY_QUALIFIER = "xadesPolicyQualifier"; //$NON-NLS-1$
@@ -253,7 +255,7 @@ public final class PreferencesManager {
 	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER = "padesPolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para PAdES. Debe estar en base64.*/
-	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER_HASH = "padesPolicyIdentifierHash"; //$NON-NLS-1$
+	public static final String PREFERENCE_PADES_POLICY_HASH = "padesPolicyIdentifierHash"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para PAdES.
 	 *  Esta preferencia debe tener uno de estos valores:
@@ -263,7 +265,7 @@ public final class PreferencesManager {
 	 *  <li>SHA-384</li>
 	 *  <li>SHA-256</li>
 	 * </ul> */
-	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "padesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
+	public static final String PREFERENCE_PADES_POLICY_HASH_ALGORITHM = "padesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
 	/** Calificador de la pol&iacute;tica de firma para PAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_PADES_POLICY_QUALIFIER = "padesPolicyQualifier"; //$NON-NLS-1$
@@ -377,62 +379,38 @@ public final class PreferencesManager {
 	//**************** FIN PREFERENCIAS DE HUELLAS DIGITALES *******************************************************************
 	//**************************************************************************************************************************
 
-
-	//******************************************************************************************************************
-	//**************** PREFERENCIAS DE ACTUALIZACION *******************************************************************
-
-	/** Preferencia que designa la URL del fichero remoto con el n&uacute;mero de la versi&oacute;n m&aacute;s reciente de AutoFirma. */
-	public static final String PREFERENCE_UPDATE_URL_VERSION = "updater.url.version"; //$NON-NLS-1$
-
-	/** Preferencia que designa la URL de la web para la actualizaci&oacute;n de AutoFirma. */
-	public static final String PREFERENCE_UPDATE_URL_SITE = "updater.url.site"; //$NON-NLS-1$
-
-	//**************** FIN PREFERENCIAS DE ACTUALIZACION ***************************************************************
-	//******************************************************************************************************************
-
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
-	public static String get(final String key, final String def) {
-				
-		return preferences.get(key, def);
+	public static String get(final String key) {
+
+		return preferences.get(key, getDefaultPreference(key));
 	}
-	
+
 	/**
 	 * Recupera el valor de una cadena de texto almacenada en un fichero de propiedades.
 	 *  @param key Clave del valor que queremos recuperar.
-	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
-	public static String getPreference(final String key, final String def) {
-		return properties.getProperty(key, def);
+	public static String getDefaultPreference(final String key) {
+		return properties.getProperty(key);
 	}
 
 	/** Recupera el valor {@code true} o {@code false} almacenado entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
-	public static boolean getBoolean(final String key, final boolean def) {
-		return preferences.getBoolean(key, def);
+	public static boolean getBoolean(final String key) {
+		return preferences.getBoolean(key, getBooleanDefaultPreference(key));
 	}
-	
+
 	/**
 	 * Recupera el valor de una cadena de texto almacenada en un fichero de propiedades.
 	 *  @param key Clave del valor que queremos recuperar.
-	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
-	public static boolean getBooleanPreference(final String key, final boolean def) {
-		
-		boolean valor = def;
-						
-		if (properties.getProperty(key) != null) {
+	public static boolean getBooleanDefaultPreference(final String key) {
+		return Boolean.parseBoolean(properties.getProperty(key));
 
-			valor = Boolean.parseBoolean(properties.getProperty(key));
-		}
-		return valor;
-		
 	}
 
 	/** Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
@@ -473,34 +451,34 @@ public final class PreferencesManager {
 	public static void flush() throws BackingStoreException {
 		preferences.flush();
 	}
-	
+
 	/**
 	 * Comprueba si la preferencia se puede bloquear
 	 * @param key Clave de la preferencia
 	 * @return {@code true} Si es una preferencia bloqueable, {@code false} en caso contrario
 	 */
 	public static boolean isProtectedPreference(final String key) {
-		return (key.equals(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM) || key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
+		return key.equals(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM) || key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN)
 				|| key.equals(PREFERENCE_XADES_POLICY_IDENTIFIER)
-				|| key.equals(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH)
-				|| key.equals(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM)
+				|| key.equals(PREFERENCE_XADES_POLICY_HASH)
+				|| key.equals(PREFERENCE_XADES_POLICY_HASH_ALGORITHM)
 				|| key.equals(PREFERENCE_XADES_POLICY_QUALIFIER)
 				|| key.equals(PREFERENCE_XADES_SIGN_FORMAT)
 				|| key.equals(PREFERENCE_PADES_FORMAT)
 				|| key.equals(PREFERENCE_PADES_POLICY_IDENTIFIER)
-				|| key.equals(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH)
-				|| key.equals(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM)
+				|| key.equals(PREFERENCE_PADES_POLICY_HASH)
+				|| key.equals(PREFERENCE_PADES_POLICY_HASH_ALGORITHM)
 				|| key.equals(PREFERENCE_PADES_POLICY_QUALIFIER)
 				|| key.equals(PREFERENCE_CADES_POLICY_IDENTIFIER)
 				|| key.equals(PREFERENCE_CADES_POLICY_HASH)
 				|| key.equals(PREFERENCE_CADES_POLICY_HASH_ALGORITHM)
 				|| key.equals(PREFERENCE_CADES_POLICY_QUALIFIER)
 				|| key.equals(PREFERENCE_CADES_IMPLICIT)
-				|| key.equals(PREFERENCE_FACTURAE_POLICY));
+				|| key.equals(PREFERENCE_FACTURAE_POLICY);
 	}
 }

@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.hash;
 
 import java.awt.Container;
@@ -174,10 +183,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 			}
 		);
 		this.hashAlgorithms.setSelectedItem(
-			PreferencesManager.get(
-				PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM,
-				"SHA-256" //$NON-NLS-1$
-			)
+			PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM)
 		);
 		this.hashAlgorithms.addKeyListener(this);
 
@@ -199,10 +205,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		);
 		this.hashFormats.setSelectedItem(
 			HashFormat.fromString(
-				PreferencesManager.get(
-					PreferencesManager.PREFERENCE_CREATE_HASH_FORMAT,
-					HashFormat.getDefaultFormat().toString()
-				)
+				PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_FORMAT)
 			)
 		);
 		this.hashFormats.addKeyListener(this);
@@ -219,10 +222,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 				}
 		);
 		this.copyToClipBoardCheckBox.setSelected(
-			PreferencesManager.getBoolean(
-				PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD,
-				true
-			)
+			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD)
 		);
 		this.copyToClipBoardCheckBox.addKeyListener(this);
 

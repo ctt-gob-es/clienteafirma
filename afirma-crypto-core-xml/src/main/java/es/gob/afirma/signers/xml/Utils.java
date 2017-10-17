@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.signers.xml;
@@ -366,15 +365,17 @@ public final class Utils {
                                           final URI uri,
                                           final String externallyDetachedHashAlgorithm,
                                           final boolean xades) {
-        if (!mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT) && !mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
+        if (!mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_IMPLICIT) &&
+        	!mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {
             throw new UnsupportedOperationException("El modo de firma '" + mode + "' no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (xades) { // XAdES
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
+            if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
+            	&& mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {
                 throw new UnsupportedOperationException("El formato Enveloped es incompatible con el modo de firma explicito"); //$NON-NLS-1$
             }
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+            if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
             	if ( uri == null && externallyDetachedHashAlgorithm == null) {
             		throw new UnsupportedOperationException(
             				"La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
@@ -389,31 +390,37 @@ public final class Utils {
             		LOGGER.warning("Se ignorara el parametro 'precalculatedHashAlgorithm' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
             	}
             }
-            if (!format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED) && !format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
-                && !format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
-                && !format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+            if (!format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
+            	&& !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
+                && !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
+                && !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
                 throw new UnsupportedOperationException("El formato de firma '" + format + "' no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         else { // XMLDSig
 
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
+            if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
+            	&& mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {
                 throw new UnsupportedOperationException("No se puede realizar una firma enveloped sobre un contenido explicito"); //$NON-NLS-1$
             }
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT)) {
+            if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)
+            	&& mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_IMPLICIT)) {
                 throw new UnsupportedOperationException(
             		"No se puede realizar una firma XML Externally Detached con contenido Implicito" //$NON-NLS-1$
                 );
             }
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && uri == null && externallyDetachedHashAlgorithm == null) {
+            if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)
+            	&& uri == null
+            	&& externallyDetachedHashAlgorithm == null) {
                 throw new UnsupportedOperationException("La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
                 );
             }
 
             // Formatos y modos soportados
-            if (!format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED) && !format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
-                && !format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)
-                && !format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)) {
+            if (!format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED)
+            	&& !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
+                && !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)
+                && !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)) {
                 throw new UnsupportedOperationException("El formato de firma '" + format + "' no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 

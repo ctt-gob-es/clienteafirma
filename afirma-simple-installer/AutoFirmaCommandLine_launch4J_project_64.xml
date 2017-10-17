@@ -22,14 +22,14 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Xms512m -Xmx8g -DdisableSslChecks=true</opt>
+    <opt>-Xms512m -Xmx8g</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.6.0.3</fileVersion>
+    <fileVersion>1.6.0.0</fileVersion>
     <txtFileVersion>1.6.0</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.6.0.3</productVersion>
+    <productVersion>1.6.0.0</productVersion>
     <txtProductVersion>1.6.0</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>

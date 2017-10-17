@@ -6,6 +6,7 @@ import java.security.Security;
 import java.util.Enumeration;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook;
@@ -19,7 +20,7 @@ public class KeyStoreAddressBookTest {
 	 * en su carga o al listar los certificados. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Necesita CAPI
+	@Ignore // Necesita CAPI
 	public void pruebaProveedorDeAccesoLibretaDirecciones() throws Exception {
 
 		if (System.getProperty("os.name").contains("indows")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -43,7 +44,7 @@ public class KeyStoreAddressBookTest {
 	 * en su carga o al listar los certificados. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Necesita CAPI
+	@Ignore // Necesita CAPI
 	public void pruebaProveedorDeAccesoCA() throws Exception {
 
 		if (System.getProperty("os.name").contains("indows")) { //$NON-NLS-1$ //$NON-NLS-2$

@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -48,7 +49,7 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
 		final byte[] sign;
@@ -88,7 +89,7 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de los nodos hoja de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
 		final byte[] sign;
 		try (

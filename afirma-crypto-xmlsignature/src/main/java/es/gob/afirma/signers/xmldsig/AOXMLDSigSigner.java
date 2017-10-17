@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation,
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.signers.xmldsig;
@@ -77,7 +76,6 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
-import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
@@ -1121,7 +1119,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             try {
             	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	signContext.setURIDereferencer(
-        			new CustomUriDereferencer()
+        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
     			);
             }
             catch (final Exception e) {
@@ -1554,7 +1552,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             try {
             	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	signContext.setURIDereferencer(
-        			new CustomUriDereferencer()
+        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
     			);
             }
             catch (final Exception e) {
@@ -2183,7 +2181,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             try {
             	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	signContext.setURIDereferencer(
-        			new CustomUriDereferencer()
+        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
     			);
             }
             catch (final Exception e) {

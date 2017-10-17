@@ -4,13 +4,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-miniapplet-deploy</artifactId>
-	<name>afirma-ui-miniapplet-deploy</name>
 	<packaging>war</packaging>
-
+	<name>afirma-ui-miniapplet-deploy</name>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
   <build>

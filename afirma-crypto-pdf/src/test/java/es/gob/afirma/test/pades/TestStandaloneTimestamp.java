@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -33,6 +34,7 @@ public final class TestStandaloneTimestamp {
      * @throws Exception en cualquier error. */
     @SuppressWarnings("static-method")
     @Test
+    @Ignore
 	public void testTimestampCosignedPdf() throws Exception {
     	final byte[] inPdf = AOUtil.getDataFromInputStream(
 			TestStandaloneTimestamp.class.getResourceAsStream("/cosigned.pdf") //$NON-NLS-1$

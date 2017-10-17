@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_FACTURAE_POLICY_IDENTIFIER;
@@ -87,13 +96,13 @@ final class PreferencesPanelFacturaE extends JPanel {
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
 	 */
-	private boolean unprotected = true;
+	private boolean blocked = true;
 
 	PreferencesPanelFacturaE(final KeyListener keyListener,
 							 final ModificationListener modificationListener,
-							 final boolean unprotected) {
+							 final boolean blocked) {
 
-		this.unprotected = unprotected;
+		this.blocked = blocked;
 		createUI(keyListener, modificationListener);
 	}
 
@@ -325,38 +334,23 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 	void loadPreferences() {
 		this.facturaeRol.setSelectedItem(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNER_ROLE,
-				FACTURAE_ROL_EMISOR
-			)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE)
 		);
 
 		this.facturaeSignatureProductionCity.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY)
 		);
 
 		this.facturaeSignatureProductionProvince.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE)
 		);
 
 		this.facturaeSignatureProductionPostalCode.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE)
 		);
 
 		this.facturaeSignatureProductionCountry.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY)
 		);
 		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
 
@@ -382,7 +376,7 @@ final class PreferencesPanelFacturaE extends JPanel {
     		false,
     		false,
     		false,
-    		this.unprotected
+    		this.blocked
 		);
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -397,38 +391,23 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 	void loadDefaultPreferences() {
 		this.facturaeRol.setSelectedItem(
-			PreferencesManager.getPreference(
-				PREFERENCE_FACTURAE_SIGNER_ROLE,
-				FACTURAE_ROL_EMISOR
-			)
+			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNER_ROLE)
 		);
 
 		this.facturaeSignatureProductionCity.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY)
 		);
 
 		this.facturaeSignatureProductionProvince.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE)
 		);
 
 		this.facturaeSignatureProductionPostalCode.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE)
 		);
 
 		this.facturaeSignatureProductionCountry.setText(
-			PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY,
-				"" //$NON-NLS-1$
-			)
+			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY)
 		);
 
 		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
@@ -455,7 +434,7 @@ final class PreferencesPanelFacturaE extends JPanel {
     		false,
     		false,
     		false,
-    		this.unprotected
+    		this.blocked
 		);
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -473,15 +452,14 @@ final class PreferencesPanelFacturaE extends JPanel {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getFacturaEPreferedPolicy() {
 
-		if (PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "").equals(POLICY_FACTURAE_30_NAME)) { //$NON-NLS-1$
+		final String policy = PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY);
+		if (policy.equals(POLICY_FACTURAE_30_NAME)) {
 			return POLICY_FACTURAE_30;
 		}
-		else if (PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "").equals(POLICY_FACTURAE_31_NAME)) { //$NON-NLS-1$
+		else if (policy.equals(POLICY_FACTURAE_31_NAME)) {
 			return POLICY_FACTURAE_31;
 		}
-		else {
-			return null;
-		}
+		return null;
 	}
 
 	/** Obtiene la configuraci&oacute;n de politica de firma FacturaE establecida por defecto.
@@ -490,7 +468,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 		AdESPolicy adesPolicy = null;
 
-		if (isUnprotected()) {
+		if (isBlocked()) {
 
 			// unprotected = true, luego no pueden alterarse las
 			// propiedades:
@@ -503,11 +481,11 @@ final class PreferencesPanelFacturaE extends JPanel {
 			// unprotected = false, luego se pueden alterar las propiedades:
 			// devolvemos las preferencias por defecto
 
-			if (PreferencesManager.getPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "") //$NON-NLS-1$
-					.equals(POLICY_FACTURAE_30_NAME)) {
+			final String policy = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY);
+			if (policy.equals(POLICY_FACTURAE_30_NAME)) {
 				adesPolicy = POLICY_FACTURAE_30;
-			} else if (PreferencesManager.getPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "") //$NON-NLS-1$
-					.equals(POLICY_FACTURAE_31_NAME)) {
+			}
+			else if (policy.equals(POLICY_FACTURAE_31_NAME)) {
 				adesPolicy = POLICY_FACTURAE_31;
 			}
 		}
@@ -531,18 +509,20 @@ final class PreferencesPanelFacturaE extends JPanel {
 	}
 
 	/**
-	 * M&eacute;todo getter del atributo unprotected
-	 * @return the unprotected
+	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
+	 * @return {@code true} si est&aacute; bloqueado y no permite la edici&oacute;n,
+	 * {@code false} en caso contrario.
 	 */
-	public boolean isUnprotected() {
-		return this.unprotected;
+	public boolean isBlocked() {
+		return this.blocked;
 	}
 
 	/**
-	 * M&eacute;todo setter del atributo unprotected
-	 * @param unprotected the unprotected to set
+	 * Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
+	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
+	 * {@code false} en caso contrario.
 	 */
-	public void setUnprotected(boolean unprotected) {
-		this.unprotected = unprotected;
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 }

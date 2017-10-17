@@ -11,9 +11,11 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -216,15 +218,24 @@ public final class TestCountersign {
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
-		final byte[] countersign = signer.countersign(
-			sign,
-			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-			CounterSignTarget.TREE,
-			null,
-			pke.getPrivateKey(),
-			pke.getCertificateChain(),
-			config
-		);
+
+		byte[] countersign;
+		try {
+			countersign = signer.countersign(
+					sign,
+					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+					CounterSignTarget.TREE,
+					null,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					config
+					);
+		}
+		catch (final AOFormatFileException e) {
+			return;
+		}
+
+		Assert.fail("No se soporta la contrafirma de firmas CAdES-A"); //$NON-NLS-1$
 
 		final File tempFile = File.createTempFile("CountersignCadesA", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 

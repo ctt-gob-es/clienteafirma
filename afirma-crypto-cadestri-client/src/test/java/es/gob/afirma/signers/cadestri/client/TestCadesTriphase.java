@@ -51,7 +51,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void testTriPhaseSignCAdESASiCS() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESASiCSTriPhaseSigner();
 
@@ -85,7 +85,7 @@ public final class TestCadesTriphase {
 	/** Prueba de firma CAdES trif&aacute;sica.
 	 * @throws Exception en cualquier error. */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void testTriPhaseSignCAdES() throws Exception {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
@@ -149,7 +149,7 @@ public final class TestCadesTriphase {
 	/** Prueba de contrafirma CAdES trif&aacute;sica.
 	 * @throws Exception en cualquier error. */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void contrafirma() throws Exception {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 

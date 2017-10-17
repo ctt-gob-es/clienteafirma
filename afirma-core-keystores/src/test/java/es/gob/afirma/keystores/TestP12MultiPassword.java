@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.keystores;
@@ -13,6 +12,7 @@ package es.gob.afirma.keystores;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
@@ -25,6 +25,7 @@ public class TestP12MultiPassword {
 	 * @throws Exception Si ocurre cualquier problema */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testPkcs12StoreWithMultiplePasswords() throws Exception {
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 

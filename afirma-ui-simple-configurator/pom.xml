@@ -3,14 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-simpleafirma-configurator</artifactId>
 	<name>afirma-ui-simpleafirma-configurator</name>
-	<version>1.6-SNAPSHOT</version>
-
-	<properties>
-        <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-	</properties>
+	<description>Aplicacion auxiliar de instalacion de AutoFirma</description>
+	<packaging>jar</packaging>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.6</version>
+	</parent>
 
 	<dependencies>
 	    
@@ -46,19 +48,7 @@
 		 	<systemPath>${java.home}/lib/javaws.jar</systemPath>
 		</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
-
-	<scm>
-		<connection>scm:svn:https://github.com/ctt-gob-es/clienteafirma/trunk/afirma-ui-simple-configurator</connection>
-		<url>https://github.com/ctt-gob-es/clienteafirma/trunk/afirma-ui-simple-configurator</url>
-	</scm>
 
 	<build>
 		<plugins>

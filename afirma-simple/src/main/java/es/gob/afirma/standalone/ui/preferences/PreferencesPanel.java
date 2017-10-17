@@ -4,8 +4,7 @@
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
- * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone.ui.preferences;
@@ -51,14 +50,14 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 
 	void createUI(final int selectedTabIndex) {
 
-		final boolean unprotected = PreferencesManager.getBooleanPreference(PreferencesManager.PREFERENCE_GENERAL_UNPROTECTED, true);
+		final boolean blocked = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_BLOCKED);
 
-		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, unprotected);
-		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, unprotected);
-		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, unprotected);
-		//this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, unprotected);
-		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, unprotected);
-		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, unprotected);
+		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, blocked);
+		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, blocked);
+		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, blocked);
+		//this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, blocked);
+		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, blocked);
+		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, blocked);
 
 		this.tabbedPane.addKeyListener(this);
 

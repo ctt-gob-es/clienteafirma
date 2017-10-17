@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.protocol;
 
 import java.io.BufferedInputStream;
@@ -65,7 +74,7 @@ final class ProtocolInvocationLauncherSign {
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					options.getMinimumVersion(), Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion()))); 
+					options.getMinimumVersion(), Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_21);
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_21);
@@ -87,7 +96,7 @@ final class ProtocolInvocationLauncherSign {
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_06);
 			}
 		}
-		
+
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
@@ -432,7 +441,7 @@ final class ProtocolInvocationLauncherSign {
 	 * propiedad {@code mode} con el valor {@code explicit}. Esta no es una
 	 * firma correcta, pero por compatibilidad con los tipos de firmas del
 	 * Applet pesado se ha incluido aqu&iacute;.
-	 * 
+	 *
 	 * @param format
 	 *            Formato declarado para la firma.
 	 * @param config

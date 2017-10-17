@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-cades-multi</artifactId>
 	<name>afirma-crypto-cades-multi</name>
-	
+	<description>Modulo para la generacion de multifirmas CAdES</description>
+	<packaging>jar</packaging>
+
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
+		<version>1.6</version>
 	</parent>
 
 	<dependencies>

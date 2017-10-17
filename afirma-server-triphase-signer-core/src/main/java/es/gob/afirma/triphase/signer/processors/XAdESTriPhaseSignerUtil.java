@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.triphase.signer.processors;
 
 import java.io.ByteArrayInputStream;
@@ -18,8 +27,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 
 final class XAdESTriPhaseSignerUtil {
 
@@ -183,7 +192,7 @@ final class XAdESTriPhaseSignerUtil {
 	 */
 	private static List<List<String>> getCommonContentDelimiters(final List<String> uris, final Document doc) {
 		final String encoding = doc.getInputEncoding();
-		final List<List<String>> ret = new ArrayList<List<String>>();
+		final List<List<String>> ret = new ArrayList<>();
 		for (final String uriValue : uris) {
 			final Node node = CustomUriDereferencer.getNodeByInternalUriReference(uriValue, doc);
 			if (node != null) {
@@ -244,7 +253,7 @@ final class XAdESTriPhaseSignerUtil {
 
 		final Element signDoc = doc.getDocumentElement();
 
-		final List<Node> signatureNodes = new ArrayList<Node>();
+		final List<Node> signatureNodes = new ArrayList<>();
 		if (signDoc.getNodeName().equals("Signature") || signDoc.getNodeName().endsWith(":Signature")) { //$NON-NLS-1$ //$NON-NLS-2$
 			signatureNodes.add(signDoc);
 		}
@@ -255,7 +264,7 @@ final class XAdESTriPhaseSignerUtil {
         }
 
         // Por cada firma buscamos sus referencias
-        final List<String> unmutableReferences = new ArrayList<String>();
+        final List<String> unmutableReferences = new ArrayList<>();
         for(final Node sigs : signatureNodes) {
         	//final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
         	final NodeList rf = ((Element) sigs).getElementsByTagName("ds:Reference"); //$NON-NLS-1$
@@ -302,7 +311,7 @@ final class XAdESTriPhaseSignerUtil {
 		if (!xml.contains("<") || !xml.contains(">")) { //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IllegalArgumentException("La entrada no tiene ninguna etiqueta XML"); //$NON-NLS-1$return xml;
 		}
-		final List<String> ret = new ArrayList<String>(2);
+		final List<String> ret = new ArrayList<>(2);
 		ret.add(xml.substring(0, xml.indexOf(">") + 1).trim()); //$NON-NLS-1$
 		ret.add(xml.substring(xml.lastIndexOf("<")).trim()); //$NON-NLS-1$
 		return ret;

@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS;
@@ -57,7 +66,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 	PreferencesPanelKeyStores(final KeyListener keyListener,
 							  final ModificationListener modificationListener,
-							  final boolean unprotected) {
+							  final boolean blocked) {
 
 		// Obtenemos primero la lista de almacenes disponibles para asignarla al JComboBox
 		final AOKeyStore[] defaultStores;
@@ -241,8 +250,8 @@ final class PreferencesPanelKeyStores extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.onlySignature.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false));
-		this.onlyAlias.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false));
+		this.onlySignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS));
+		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS));
 		this.defaultStore.setSelectedItem(
 			SimpleKeyStoreManager.getDefaultKeyStoreType()
 		);

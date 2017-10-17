@@ -5,16 +5,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>
 	<artifactId>afirma-standalone</artifactId>
+	<version>2.2</version>
 	<name>afirma-standalone</name>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+		<version>1.6</version>
 	</parent>
 
-	<description>Componentes escritorio (version full) de afirma</description>
+	<description>Componentes escritorio de afirma</description>
 
 	<properties>
         <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
@@ -25,4 +25,5 @@
 		<module>afirma-ui-standalone-help-en_UK</module>
 		<module>afirma-ui-standalone-help-es_ES</module>
 	</modules>
+
 </project>

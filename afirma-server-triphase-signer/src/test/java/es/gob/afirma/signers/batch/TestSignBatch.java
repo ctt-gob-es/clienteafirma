@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -60,7 +61,7 @@ public final class TestSignBatch {
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
 			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
 			"  <signsaver>\r\n" + //$NON-NLS-1$
-			"   <class>es.gob.afirma.signers.batch.FaultySingSaver</class>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.FaultySignSaver</class>\r\n" + //$NON-NLS-1$
 			"   <config>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpGaWxlTmFtZT1DXDpcXFVzZXJzXFx0b21hc1xcQXBwRGF0YVxcTG9jYWxcXFRlbXBcXEZJUk1BMS54bWwNCg==</config>\r\n" + //$NON-NLS-1$
 			"  </signsaver>\r\n" + //$NON-NLS-1$
 			" </singlesign>\r\n" + //$NON-NLS-1$
@@ -80,6 +81,7 @@ public final class TestSignBatch {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore //Requiere servicio servidor
 	public void testXmlParse() throws Exception {
 		System.out.println(new SignBatchSerial(SAMPLE_BATCH_XML.getBytes()));
 	}
@@ -174,6 +176,7 @@ public final class TestSignBatch {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore //Requiere servicio servidor
 	public void testCustomBatch() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -239,6 +242,7 @@ public final class TestSignBatch {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore //Requiere servicio servidor
 	public void testConcurrentCustomBatch() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -291,6 +295,7 @@ public final class TestSignBatch {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore //Requiere servicio servidor
 	public void testCustomBatchWithError() throws Exception {
 
 		//Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.signers.pades.enhancer.afirmaplatform;
 
 import java.io.ByteArrayInputStream;
@@ -107,9 +116,9 @@ class ClientHandler extends BasicHandler {
 			doc = ((org.apache.axis.message.SOAPEnvelope) msg.getSOAPPart().getEnvelope()).getAsDocument();
 			//Securizacion de la peticion SOAP segon la opcion de seguridad configurada
 			if (this.securityOption.equals(USERNAMEOPTION.toUpperCase())) {
-				secMsg = this.createUserNameToken(doc);
+				secMsg = createUserNameToken(doc);
 			} else if (this.securityOption.equals(CERTIFICATEOPTION.toUpperCase())) {
-				secMsg = this.createBinarySecurityToken(doc);
+				secMsg = createBinarySecurityToken(doc);
 			} else {
 				secMsg = msgContext.getMessage();
 			}
@@ -214,7 +223,7 @@ class ClientHandler extends BasicHandler {
 		//Insercion del tag wsse:Security y BinarySecurityToken
 		wsSecHeader = new WSSecHeader(null, false);
 		wsSecSignature = new WSSecSignature();
-		crypto = CryptoFactory.getInstance("org.apache.ws.security.components.crypto.Merlin", this.initializateCryptoProperties()); //$NON-NLS-1$
+		crypto = CryptoFactory.getInstance("org.apache.ws.security.components.crypto.Merlin", initializateCryptoProperties()); //$NON-NLS-1$
 		//Indicacion para que inserte el tag BinarySecurityToken
 		wsSecSignature.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 		wsSecSignature.setUserInfo(this.keystoreCertAlias, this.keystoreCertPassword);

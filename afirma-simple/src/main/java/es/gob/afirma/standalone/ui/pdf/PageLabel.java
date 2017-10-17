@@ -1,3 +1,12 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
+ */
+
 package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.AlphaComposite;
@@ -12,6 +21,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
+import java.lang.reflect.Method;
 import java.util.EventListener;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -35,14 +45,24 @@ final class PageLabel extends JLabel {
 	private static boolean TRANSLUCENCY_CAPABLE;
 	static {
 		final GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+		// Compatibilidad con Java 9
 		try {
-			TRANSLUCENCY_CAPABLE = com.sun.awt.AWTUtilities.isTranslucencyCapable(config);
+			final Method isTranslucencyCapableMethod = GraphicsConfiguration.class.getMethod("isTranslucencyCapable"); //$NON-NLS-1$
+			TRANSLUCENCY_CAPABLE = ((Boolean) isTranslucencyCapableMethod.invoke(config)).booleanValue();
 		}
-		catch(final Exception | Error e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-				"No ha sido posible determinar si el sistema sorporta superficies translucidas, se asume que si: " + e //$NON-NLS-1$
-			);
-			TRANSLUCENCY_CAPABLE = true;
+		catch (final Exception e) {
+			// Compatibilidad con Java 8 y anteriores
+			try {
+				final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities"); //$NON-NLS-1$
+				final Method isTranslucencyCapableMethod = awtUtilitiesClass.getMethod("isTranslucencyCapable", GraphicsConfiguration.class); //$NON-NLS-1$
+				TRANSLUCENCY_CAPABLE = ((Boolean) isTranslucencyCapableMethod.invoke(null, config)).booleanValue();
+			}
+			catch(final Exception | Error e2) {
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"No ha sido posible determinar si el sistema sorporta superficies translucidas, se asume que si: " + e //$NON-NLS-1$
+						);
+				TRANSLUCENCY_CAPABLE = true;
+			}
 		}
 	}
 

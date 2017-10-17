@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.security.MessageDigest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /** Pruebas de sellos de tiempo.
@@ -20,6 +21,7 @@ public class TestTsp {
 	 * @throws Exception En cualquier error */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void TestRfc3161TokenHttp() throws Exception {
 
 		final CMSTimestamper cmsTsp = new CMSTimestamper(
