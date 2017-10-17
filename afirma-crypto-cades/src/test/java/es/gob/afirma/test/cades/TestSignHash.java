@@ -28,6 +28,8 @@ public class TestSignHash {
 
 	PrivateKeyEntry pke = null;
 
+	/** Carga el almac&eacute;n de claves.
+	 * @throws Exception En cualquier error. */
 	@Before
 	public void loadResources() throws Exception {
 
