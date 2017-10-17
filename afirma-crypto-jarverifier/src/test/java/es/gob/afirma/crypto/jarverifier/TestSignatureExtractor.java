@@ -20,18 +20,15 @@ public class TestSignatureExtractor {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testExtractSigningCertificatesFromJar() {
-
-		final InputStream jarIs = TestSignatureExtractor.class.getResourceAsStream("/HolaMundo.jar"); //$NON-NLS-1$
-
-		byte[] signature = null;
-		try {
+		final byte[] signature;
+		try (
+			final InputStream jarIs = TestSignatureExtractor.class.getResourceAsStream("/HolaMundo.jar"); //$NON-NLS-1$
+		) {
 			signature = JarSignatureCertExtractor.getJarSignature(jarIs);
 		}
-		catch (final Exception e) {
-			Assert.fail("No se pudo extraer la firma del JAR: " + e); //$NON-NLS-1$
-		}
-		finally {
-			try { jarIs.close(); } catch (final Exception ex) { /* No hacemos nada */ }
+		catch (final Exception ioe) {
+			Assert.fail("No se pudo extraer la firma del JAR: " + ioe); //$NON-NLS-1$
+			return;
 		}
 
 		Assert.assertNotNull("No se ha podido extraer la firma del JAR", signature); //$NON-NLS-1$

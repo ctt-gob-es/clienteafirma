@@ -274,7 +274,7 @@ public class GenerateAllSigns {
 	}
 
     private static Map<String, byte[]> loadFiles() throws IOException {
-    	final ConcurrentHashMap<String, byte[]> files = new ConcurrentHashMap<String, byte[]>();
+    	final ConcurrentHashMap<String, byte[]> files = new ConcurrentHashMap<>();
     	for (final String[] formatsFiles : FORMATS_FILES) {
     		if (!files.contains(formatsFiles[1])) {
 				files.put(
@@ -287,17 +287,20 @@ public class GenerateAllSigns {
 	}
 
     private static byte[] loadFile(final String path) throws IOException {
-		final InputStream fis = new FileInputStream(path);
-		final byte[] data = AOUtil.getDataFromInputStream(fis);
-		fis.close();
-		return data;
+    		try (
+			final InputStream fis = new FileInputStream(path);
+		) {
+    			return AOUtil.getDataFromInputStream(fis);
+    		}
     }
 
     private static void saveSign(final byte[] signData, final String filename) throws IOException {
-    	final File signFile = new File(SIGNS_PATH + filename);
-    	final OutputStream fos = new FileOutputStream(signFile);
-    	fos.write(signData);
-    	fos.flush();
-    	fos.close();
+	    	final File signFile = new File(SIGNS_PATH + filename);
+	    	try (
+			final OutputStream fos = new FileOutputStream(signFile);
+		) {
+	    		fos.write(signData);
+	    		fos.flush();
+	    	}
     }
 }

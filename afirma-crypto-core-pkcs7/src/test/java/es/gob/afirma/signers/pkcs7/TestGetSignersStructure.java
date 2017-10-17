@@ -101,12 +101,13 @@ public class TestGetSignersStructure {
 		int n;
 		final byte[] buffer = new byte[1024];
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final InputStream is = TestGetSignersStructure.class.getResourceAsStream("/" + filename); //$NON-NLS-1$
-		while ((n = is.read(buffer)) > 0) {
-			baos.write(buffer, 0, n);
+		try (
+			final InputStream is = TestGetSignersStructure.class.getResourceAsStream("/" + filename); //$NON-NLS-1$
+		) {
+			while ((n = is.read(buffer)) > 0) {
+				baos.write(buffer, 0, n);
+			}
 		}
-		is.close();
-
 		return baos.toByteArray();
 	}
 }

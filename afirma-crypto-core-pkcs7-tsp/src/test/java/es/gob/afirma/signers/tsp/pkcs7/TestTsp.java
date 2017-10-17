@@ -39,10 +39,12 @@ public class TestTsp {
 			"SHA-256", //$NON-NLS-1$
 			null
 		);
-		final OutputStream fos = new FileOutputStream(File.createTempFile("TSP_", ".asn1")); //$NON-NLS-1$ //$NON-NLS-2$
-		fos.write(tspToken);
-		fos.flush();
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(File.createTempFile("TSP_", ".asn1")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+			fos.write(tspToken);
+			fos.flush();
+		}
 		System.out.println(new String(tspToken));
 	}
 

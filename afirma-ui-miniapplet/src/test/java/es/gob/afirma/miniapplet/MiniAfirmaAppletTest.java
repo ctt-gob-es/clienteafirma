@@ -75,7 +75,7 @@ public final class MiniAfirmaAppletTest {
 	}
 
 	/** Prueba de firma de fichero grande y obtenci&oacute;n del resultado en porciones.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore // Necesita GUI y almacen por defecto
@@ -122,9 +122,11 @@ public final class MiniAfirmaAppletTest {
 		final String signatureB64 = sb.substring(sb.indexOf("|") + 1); //$NON-NLS-1$
 
 		final File o = File.createTempFile("LARGE", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		final OutputStream fos = new FileOutputStream(o);
-		fos.write(Base64.decode(signatureB64));
-		fos.flush();
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(o);
+		) {
+			fos.write(Base64.decode(signatureB64));
+			fos.flush();
+		}
 	}
 }

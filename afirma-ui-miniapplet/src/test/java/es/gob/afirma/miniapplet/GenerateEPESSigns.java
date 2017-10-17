@@ -184,7 +184,7 @@ public class GenerateEPESSigns {
 
     private static Map<String, byte[]> loadFiles() throws IOException {
     	byte[] data;
-    	final ConcurrentHashMap<String, byte[]> files = new ConcurrentHashMap<String, byte[]>();
+    	final ConcurrentHashMap<String, byte[]> files = new ConcurrentHashMap<>();
     	for (final String[] config : CONFIGS) {
     		if (!files.contains(config[3])) {
 				data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(config[3]));
@@ -195,12 +195,12 @@ public class GenerateEPESSigns {
 	}
 
     private static void saveSign(final byte[] signData, final String filename) throws IOException {
-
-    	final File signFile = File.createTempFile(filename, null);
-    	System.out.println("Fichero para comprobacion manual: " + signFile.getAbsolutePath()); //$NON-NLS-1$
-
-    	final FileOutputStream fos = new FileOutputStream(signFile);
-    	fos.write(signData);
-    	fos.close();
+	    	final File signFile = File.createTempFile(filename, null);
+	    	System.out.println("Fichero para comprobacion manual: " + signFile.getAbsolutePath()); //$NON-NLS-1$
+	    	try (
+			final FileOutputStream fos = new FileOutputStream(signFile);
+		) {
+	    		fos.write(signData);
+	    	}
     }
 }

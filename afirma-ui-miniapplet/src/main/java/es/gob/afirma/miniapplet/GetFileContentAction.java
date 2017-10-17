@@ -50,19 +50,20 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      * @throws IOException Cuando se produce un error al leer el fichero. */
 	@Override
 	public byte[] run() throws IOException {
-		final InputStream is = new FileInputStream(AOUIFactory.getLoadFiles(
-			this.title,
-			null,
-			null,
-			this.exts,
-			this.desc,
-			false,
-			false,
-			null,
-			this.parent
-		)[0]);
-    	final byte[] data = AOUtil.getDataFromInputStream(is);
-    	is.close();
-    	return data;
+		try (
+			final InputStream is = new FileInputStream(AOUIFactory.getLoadFiles(
+				this.title,
+				null,
+				null,
+				this.exts,
+				this.desc,
+				false,
+				false,
+				null,
+				this.parent
+			)[0]);
+		) {
+			return AOUtil.getDataFromInputStream(is);
+		}
 	}
 }

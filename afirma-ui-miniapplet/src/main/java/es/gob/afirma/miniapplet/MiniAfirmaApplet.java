@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -893,22 +894,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
 				!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
 			) {
-			new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
-						tracker.trackPageView(
-								getCodeBase().toString(),
-								"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
-								getCodeBase().getHost().toString()
-								);
-					}
-					catch(final Exception e) {
-						LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
-					}
+			new Thread(() -> {
+				try {
+					final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+					final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+					tracker.trackPageView(
+							getCodeBase().toString(),
+							"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
+							getCodeBase().getHost().toString()
+							);
+				}
+				catch(final Exception e) {
+					LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
 				}
 			}).start();
 		}
@@ -992,11 +989,12 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		// Mostramos la traza de error a traves del log
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final PrintWriter writer = new PrintWriter(baos);
-		e.printStackTrace(writer);
-		writer.flush();
-		writer.close();
-
+		try (
+			final PrintWriter writer = new PrintWriter(baos);
+		) {
+			e.printStackTrace(writer);
+			writer.flush();
+		}
 		LOGGER.severe(new String(baos.toByteArray()));
 	}
 
@@ -1316,12 +1314,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** Recupera el identificador del numero de version del MiniApplet a partir de su Manifest.
 	 * @return Identificador de la versi&oacute;n. */
 	static String getVersion() {
-		try {
+		try (
 			final InputStream manifestIs = MiniAfirmaApplet.class.getClassLoader().getResourceAsStream("miniapplet.version"); //$NON-NLS-1$
+		) {
 			final Properties metadata = new Properties();
 			metadata.load(manifestIs);
-			manifestIs.close();
-
 			return metadata.getProperty("version", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final Exception e) {
@@ -1330,11 +1327,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 	}
 
-	/**
-	 * Establece las propiedades del sistema indicadas como argumentos y separadas por '-D'.
+	/** Establece las propiedades del sistema indicadas como argumentos y separadas por '-D'.
 	 * Las propiedades deben establecerse como clave=valor.
-	 * @param systemProperties Texto con las propiedades que establecer.
-	 */
+	 * @param systemProperties Texto con las propiedades que establecer. */
 	private static void setSystemProperties(final String systemProperties) {
 
 		LOGGER.info("setSystemProperties: " + systemProperties); //$NON-NLS-1$
@@ -1444,20 +1439,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		try {
 
 			return Base64.encode(
-					AccessController.doPrivileged(
-							new PrivilegedExceptionAction<byte[]>() {
-								@Override
-								public byte[] run() throws Exception {
-									return BatchSigner.sign(
-											batchB64,
-											batchPreSignerUrl,
-											batchPostSignerUrl,
-											pke.getCertificateChain(),
-											pke.getPrivateKey()
-											).getBytes("utf-8"); //$NON-NLS-1$
-								}
-							})
-					);
+				AccessController.doPrivileged(
+					(PrivilegedExceptionAction<byte[]>) () -> BatchSigner.sign(
+						batchB64,
+						batchPreSignerUrl,
+						batchPostSignerUrl,
+						pke.getCertificateChain(),
+						pke.getPrivateKey()
+					).getBytes(StandardCharsets.UTF_8.name())
+				)
+			);
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof CertificateEncodingException) {
