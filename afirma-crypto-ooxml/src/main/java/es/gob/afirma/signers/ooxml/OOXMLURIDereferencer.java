@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -81,7 +82,7 @@ public final class OOXMLURIDereferencer implements URIDereferencer {
 
         String uri = uriReference.getURI();
         try {
-            uri = URLDecoder.decode(uri, "UTF-8"); //$NON-NLS-1$
+            uri = URLDecoder.decode(uri, StandardCharsets.UTF_8.name());
         }
         catch (final UnsupportedEncodingException e) {
             Logger.getLogger("es.gob.afirma").warning("No se puede decodificar la URI '" + uri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

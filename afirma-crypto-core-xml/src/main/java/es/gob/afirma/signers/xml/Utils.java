@@ -16,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -551,7 +552,9 @@ public final class Utils {
         final Map<String, String> xmlProps = props != null ? props : new Hashtable<String, String>(0);
 
         // La codificacion por defecto sera UTF-8
-        final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8"; //$NON-NLS-1$
+        final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ?
+        		xmlProps.get(OutputKeys.ENCODING) :
+        			StandardCharsets.UTF_8.name();
 
         // Primero creamos un writer
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -15,8 +15,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -25,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -150,100 +149,97 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		checkButton.setEnabled(false);
 		checkButton.addKeyListener(this);
 		checkButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					try {
-						// Se crea la ventana de espera.
-						final CommonWaitDialog dialog = new CommonWaitDialog(
-							parent,
-							SimpleAfirmaMessages.getString("CreateHashFiles.21"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
-						);
+			e -> {
+				try {
+					// Se crea la ventana de espera.
+					final CommonWaitDialog dialog = new CommonWaitDialog(
+						parent,
+						SimpleAfirmaMessages.getString("CreateHashFiles.21"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
+					);
 
-						// Arrancamos el proceso en un hilo aparte
-						final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					// Arrancamos el proceso en un hilo aparte
+					final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
-							@Override
-							protected Void doInBackground() throws Exception {
-								setReportXML(new HashMap<String, List<String>>());
-								checkHashXML(Paths.get(getDirectorioText()), getXMLText());
-								return null;
-							}
-							@Override
-							protected void done() {
-								super.done();
-								dialog.dispose();
-							}
-						};
-						worker.execute();
-
-						if (CreateHashFiles.getSize(new File(getDirectorioText().toString())) > SIZE_WAIT) {
-							// Se muestra la ventana de espera
-							dialog.setVisible(true);
+						@Override
+						protected Void doInBackground() throws Exception {
+							setReportXML(new HashMap<String, List<String>>());
+							checkHashXML(Paths.get(getDirectorioText()), getXMLText());
+							return null;
 						}
+						@Override
+						protected void done() {
+							super.done();
+							dialog.dispose();
+						}
+					};
+					worker.execute();
 
-						worker.get();
-						if (!(getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
-							  getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
-							  getReportXML().containsKey("CheckHashFiles.10"))) { //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										CheckHashFiles.this,
-										SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
-										SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
-										JOptionPane.INFORMATION_MESSAGE
-									);
-						}
-						else {
-							AOUIFactory.showMessageDialog(
-								CheckHashFiles.this, SimpleAfirmaMessages.getString("CheckHashFiles.18"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("CheckHashFiles.17"), //$NON-NLS-1$
-								JOptionPane.WARNING_MESSAGE
-							);
-						}
-						final String ext = SimpleAfirmaMessages.getString("CheckHashFiles.20"); //$NON-NLS-1$
-						AOUIFactory.getSaveDataToFile(
-							generateXMLReport(
-								getReportXML(),
-								getAlgorithm(),
-								getIsRecursive()
-							).getBytes(),
-							SimpleAfirmaMessages.getString("CheckHashFiles.15"), //$NON-NLS-1$ ,,,
-							null,
-							new java.io.File(SimpleAfirmaMessages.getString("CheckHashFiles.16")).getName() + ext, //$NON-NLS-1$
-							new String[] { ext },
-							SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-							parent
-						);
-						checkButton.setEnabled(false);
-						CheckHashFiles.this.setVisible(false);
-						CheckHashFiles.this.dispose();
+					if (CreateHashFiles.getSize(new File(getDirectorioText().toString())) > SIZE_WAIT) {
+						// Se muestra la ventana de espera
+						dialog.setVisible(true);
 					}
-					catch (final OutOfMemoryError ooe) {
-						AOUIFactory.showErrorMessage(
-							parent,
-							SimpleAfirmaMessages.getString("CreateHashFiles.2"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
-						);
-						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-							"Fichero demasiado grande: " + ooe //$NON-NLS-1$
+
+					worker.get();
+					if (!(getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
+						  getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
+						  getReportXML().containsKey("CheckHashFiles.10"))) { //$NON-NLS-1$
+								AOUIFactory.showMessageDialog(
+									CheckHashFiles.this,
+									SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
+									SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
+									JOptionPane.INFORMATION_MESSAGE
+								);
+					}
+					else {
+						AOUIFactory.showMessageDialog(
+							CheckHashFiles.this, SimpleAfirmaMessages.getString("CheckHashFiles.18"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("CheckHashFiles.17"), //$NON-NLS-1$
+							JOptionPane.WARNING_MESSAGE
 						);
 					}
-					catch (final AOCancelledOperationException ex) {
-						// Operacion cancelada por el usuario
-					}
-					catch (final Exception ex) {
-						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-							"No ha sido posible comprobar las huellas digitales: " + ex //$NON-NLS-1$
-						);
-						AOUIFactory.showErrorMessage(
-							CheckHashFiles.this,
-							SimpleAfirmaMessages.getString("CheckHashDialog.6"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
-						);
-					}
+					final String ext = SimpleAfirmaMessages.getString("CheckHashFiles.20"); //$NON-NLS-1$
+					AOUIFactory.getSaveDataToFile(
+						generateXMLReport(
+							getReportXML(),
+							getAlgorithm(),
+							getIsRecursive()
+						).getBytes(),
+						SimpleAfirmaMessages.getString("CheckHashFiles.15"), //$NON-NLS-1$ ,,,
+						null,
+						new java.io.File(SimpleAfirmaMessages.getString("CheckHashFiles.16")).getName() + ext, //$NON-NLS-1$
+						new String[] { ext },
+						SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						parent
+					);
+					checkButton.setEnabled(false);
+					CheckHashFiles.this.setVisible(false);
+					CheckHashFiles.this.dispose();
+				}
+				catch (final OutOfMemoryError ooe) {
+					AOUIFactory.showErrorMessage(
+						parent,
+						SimpleAfirmaMessages.getString("CreateHashFiles.2"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
+					);
+				}
+				catch (final AOCancelledOperationException ex1) {
+					// Operacion cancelada por el usuario
+				}
+				catch (final Exception ex2) {
+					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+						"No ha sido posible comprobar las huellas digitales: " + ex2 //$NON-NLS-1$
+					);
+					AOUIFactory.showErrorMessage(
+						CheckHashFiles.this,
+						SimpleAfirmaMessages.getString("CheckHashDialog.6"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CheckHashDialog.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
 				}
 			}
 		);
@@ -260,35 +256,30 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		xmlExamineButton.setMnemonic('E');
 		xmlExamineButton.setEnabled(true);
 		xmlExamineButton.addKeyListener(this);
-		xmlExamineButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(
-				final ActionEvent e) {
-					try {
-						setXMLText(
-							AOUIFactory.getLoadFiles(
-								SimpleAfirmaMessages.getString("CreateHashDialog.5"), //$NON-NLS-1$
-								null,
-								null,
-								new String[] { "hashfiles" }, //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("CheckHashFiles.19"), //$NON-NLS-1$
-								false,
-								false,
-								AutoFirmaUtil.getDefaultDialogsIcon(),
-								CheckHashFiles.this
-							)[0].getAbsolutePath()
-						);
-						final String hashFile = getXMLText();
-						if (!(hashFile == null) && !hashFile.isEmpty()) {
-							checkButton.setEnabled(true);
-						}
-					}
-					catch (final AOCancelledOperationException ex) {
-						// Operacion cancelada por el usuario
-					}
+		xmlExamineButton.addActionListener(e -> {
+			try {
+				setXMLText(
+					AOUIFactory.getLoadFiles(
+						SimpleAfirmaMessages.getString("CreateHashDialog.5"), //$NON-NLS-1$
+						null,
+						null,
+						new String[] { "hashfiles" }, //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CheckHashFiles.19"), //$NON-NLS-1$
+						false,
+						false,
+						AutoFirmaUtil.getDefaultDialogsIcon(),
+						CheckHashFiles.this
+					)[0].getAbsolutePath()
+				);
+				final String hashFile = getXMLText();
+				if (!(hashFile == null) && !hashFile.isEmpty()) {
+					checkButton.setEnabled(true);
 				}
 			}
+			catch (final AOCancelledOperationException ex) {
+				// Operacion cancelada por el usuario
+			}
+		}
 		);
 
 		this.directory.setEditable(false);
@@ -302,35 +293,30 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		directoryExamineButton.setMnemonic('X');
 		directoryExamineButton.setEnabled(true);
 		directoryExamineButton.addKeyListener(this);
-		directoryExamineButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(
-				final ActionEvent e) {
-					try {
-						setDirectorioText(
-							AOUIFactory.getLoadFiles(
-								SimpleAfirmaMessages.getString("CreateHashDialog.5"), //$NON-NLS-1$
-								null,
-								null,
-								null,
-								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
-								true,
-								false,
-								AutoFirmaUtil.getDefaultDialogsIcon(),
-								CheckHashFiles.this
-							)[0].getAbsolutePath()
-						);
-						final String hashFile = getXMLText();
-						if (!(hashFile == null) && !hashFile.isEmpty()) {
-							checkButton.setEnabled(true);
-						}
-					}
-					catch (final AOCancelledOperationException ex) {
-						// Operacion cancelada por el usuario
-					}
+		directoryExamineButton.addActionListener(e -> {
+			try {
+				setDirectorioText(
+					AOUIFactory.getLoadFiles(
+						SimpleAfirmaMessages.getString("CreateHashDialog.5"), //$NON-NLS-1$
+						null,
+						null,
+						null,
+						SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
+						true,
+						false,
+						AutoFirmaUtil.getDefaultDialogsIcon(),
+						CheckHashFiles.this
+					)[0].getAbsolutePath()
+				);
+				final String hashFile = getXMLText();
+				if (!(hashFile == null) && !hashFile.isEmpty()) {
+					checkButton.setEnabled(true);
 				}
 			}
+			catch (final AOCancelledOperationException ex) {
+				// Operacion cancelada por el usuario
+			}
+		}
 		);
 
 		final JButton exitButton = new JButton(SimpleAfirmaMessages.getString("CheckHashFiles.12") //$NON-NLS-1$
@@ -342,12 +328,9 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		exitButton.setMnemonic('C');
 		exitButton.addKeyListener(this);
 		exitButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					CheckHashFiles.this.setVisible(false);
-					CheckHashFiles.this.dispose();
-				}
+			e -> {
+				CheckHashFiles.this.setVisible(false);
+				CheckHashFiles.this.dispose();
 			}
 		);
 		exitButton.getAccessibleContext().setAccessibleDescription(
@@ -750,7 +733,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1"); //$NON-NLS-1$
 		}
 		else {
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 		}
 
 		transformer.transform(new DOMSource(doc), new StreamResult(sw));

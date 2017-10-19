@@ -23,6 +23,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -45,7 +47,7 @@ public final class AOUtil {
             "http", "https", "file", "urn" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     };
 
-    private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+    private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
 
     /** Crea una URI a partir de un nombre de fichero local o una URL.
@@ -457,9 +459,11 @@ public final class AOUtil {
     	if (base64 == null || base64.isEmpty()) {
     		return p;
     	}
-    	p.load(new InputStreamReader(
-    			new ByteArrayInputStream(Base64.decode(base64)),
-    			DEFAULT_ENCODING)
+    	p.load(
+		new InputStreamReader(
+    			new ByteArrayInputStream(Base64.decode(base64)
+		),
+		DEFAULT_ENCODING)
     	);
 
     	return p;

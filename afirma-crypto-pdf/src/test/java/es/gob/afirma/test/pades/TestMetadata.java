@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
@@ -42,7 +43,7 @@ public final class TestMetadata {
 
     private static final String PROCESSING_INSTRUCTION_SUFFIX = "?>"; //$NON-NLS-1$
 
-    private static final String DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
+    private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
 	private static final String NEW_HISTORY_LIST_ITEM = "<rdf:li rdf:parseType=\"Resource\">\n" + //$NON-NLS-1$
 			"  <stEvt:action>signed</stEvt:action>\n" + //$NON-NLS-1$
@@ -114,7 +115,7 @@ public final class TestMetadata {
 		n.appendChild(node);
 
 		final Map<String, String> props = new ConcurrentHashMap<>(1);
-		props.put("encoding", "utf-8"); //$NON-NLS-1$ //$NON-NLS-2$
+		props.put("encoding", DEFAULT_ENCODING); //$NON-NLS-1$
 
 		String xmlString = new String(
 			writeXml(doc.getDocumentElement()),

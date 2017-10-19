@@ -12,6 +12,7 @@ package es.gob.afirma.core.misc.protocol;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 
 final class ProtocolInvocationUriParserUtil {
 
-	static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
+	static final String DEFAULT_URL_ENCODING = StandardCharsets.UTF_8.name();
 
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable

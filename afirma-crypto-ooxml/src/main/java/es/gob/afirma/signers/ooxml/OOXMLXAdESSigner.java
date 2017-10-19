@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.Provider;
@@ -251,7 +252,7 @@ final class OOXMLXAdESSigner {
     private static byte[] writeXML(final Node node) {
 
         // La codificacion por defecto sera UTF-8
-        final String xmlEncoding = "UTF-8"; //$NON-NLS-1$
+        final String xmlEncoding = StandardCharsets.UTF_8.name();
 
         // Primero creamos un writer
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

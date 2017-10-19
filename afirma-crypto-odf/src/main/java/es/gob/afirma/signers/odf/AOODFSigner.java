@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -718,13 +718,13 @@ public final class AOODFSigner implements AOSigner {
     }
 
     private static void writeXML(final OutputStream outStream, final Node node, final boolean indent) {
-        writeXML(new BufferedWriter(new OutputStreamWriter(outStream, Charset.forName("UTF-8"))), node, indent); //$NON-NLS-1$
+        writeXML(new BufferedWriter(new OutputStreamWriter(outStream, StandardCharsets.UTF_8)), node, indent);
     }
 
     private static void writeXML(final Writer writer, final Node node, final boolean indent) {
         try {
             final Transformer serializer = TransformerFactory.newInstance().newTransformer();
-            serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
+            serializer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 
             if (indent) {
                 serializer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$

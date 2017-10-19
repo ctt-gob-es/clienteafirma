@@ -15,13 +15,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -159,13 +158,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		this.examineButton.setMnemonic('X');
 		this.examineButton.addKeyListener(this);
 		this.examineButton.addActionListener(
-			new ActionListener() {
-				/** {@inheritDoc} */
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					openSelectedFile();
-				}
-			}
+			ae -> openSelectedFile()
 		);
 		this.examineButton.setEnabled(true);
 		this.selectedFile.setEditable(false);
@@ -181,26 +174,17 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		);
 		this.hashAlgorithms.addKeyListener(this);
 		this.hashAlgorithms.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					PreferencesManager.put(
-						PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM,
-						getSelectedHashAlgorithm()
-					);
-				}
-			}
+			e -> PreferencesManager.put(
+				PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM,
+				getSelectedHashAlgorithm()
+			)
 		);
 
 		this.recursive.addKeyListener(this);
-		this.recursive.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(
-				final ActionEvent actionEvent) {
-					final AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-					CreateHashFiles.this.isRecursiveSelected = abstractButton.getModel().isSelected();
-				}
-			}
+		this.recursive.addActionListener(actionEvent -> {
+			final AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+			CreateHashFiles.this.isRecursiveSelected = abstractButton.getModel().isSelected();
+		}
 		);
 		this.recursive.setMnemonic('R');
 
@@ -208,26 +192,19 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		this.generateButton.setText(SimpleAfirmaMessages.getString("CreateHashDialog.4")); //$NON-NLS-1$
 		this.generateButton.setMnemonic('G');
 		this.generateButton.addKeyListener(this);
-		this.generateButton.addActionListener(new ActionListener() {
+		this.generateButton.addActionListener(ae -> {
 
-			/** {@inheritDoc} */
-			@Override
-			public void actionPerformed(
+			doHashProcess(
+				parent,
+				getFileTextField().getText(),
+				getSelectedHashAlgorithm(),
+				CreateHashFiles.this.isRecursiveSelected
+			);
 
-				final ActionEvent ae) {
+			CreateHashFiles.this.setVisible(false);
+			CreateHashFiles.this.dispose();
 
-					doHashProcess(
-						parent,
-						getFileTextField().getText(),
-						getSelectedHashAlgorithm(),
-						CreateHashFiles.this.isRecursiveSelected
-					);
-
-					CreateHashFiles.this.setVisible(false);
-					CreateHashFiles.this.dispose();
-
-				}
-			}
+		}
 		);
 		this.generateButton.setEnabled(false);
 
@@ -241,12 +218,9 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		exitButton.setMnemonic('C');
 		exitButton.addKeyListener(this);
 		exitButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					CreateHashFiles.this.setVisible(false);
-					CreateHashFiles.this.dispose();
-				}
+			e -> {
+				CreateHashFiles.this.setVisible(false);
+				CreateHashFiles.this.dispose();
 			}
 		);
 		exitButton.getAccessibleContext().setAccessibleDescription(
@@ -492,7 +466,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1"); //$NON-NLS-1$
 		}
 		else {
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 		}
 
 		transformer.transform(

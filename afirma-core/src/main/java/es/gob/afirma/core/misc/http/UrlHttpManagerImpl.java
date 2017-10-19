@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.Proxy;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -247,13 +248,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		if (urlParameters != null) {
 			conn.setRequestProperty(
-				"Content-Length", String.valueOf(urlParameters.getBytes("UTF-8").length) //$NON-NLS-1$ //$NON-NLS-2$
+				"Content-Length", String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length) //$NON-NLS-1$
 			);
 			conn.setDoOutput(true);
 			try (
 				final OutputStream os = conn.getOutputStream();
 			) {
-				os.write(urlParameters.getBytes("UTF-8")); //$NON-NLS-1$
+				os.write(urlParameters.getBytes(StandardCharsets.UTF_8));
 			}
 		}
 

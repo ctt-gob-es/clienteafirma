@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public final class TestDataDownloader {
 		try (
 			final OutputStream os = conn.getOutputStream();
 		) {
-			os.write(TEST_POST_BODY.getBytes("UTF-8")); //$NON-NLS-1$
+			os.write(TEST_POST_BODY.getBytes(StandardCharsets.UTF_8));
 		}
 
 		conn.connect();

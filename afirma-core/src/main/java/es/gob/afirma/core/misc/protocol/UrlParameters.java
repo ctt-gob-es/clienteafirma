@@ -11,6 +11,7 @@ package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -54,7 +55,7 @@ public abstract class UrlParameters {
 	protected static final String KEYSTORE_PARAM = "ksb64"; //$NON-NLS-1$
 
 	/** Codificaci&oacute;n por defecto. */
-	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
 	private byte[] data = null;
 	private String fileId = null;

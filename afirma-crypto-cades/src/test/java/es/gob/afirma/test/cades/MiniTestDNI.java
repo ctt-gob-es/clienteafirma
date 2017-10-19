@@ -12,6 +12,7 @@ package es.gob.afirma.test.cades;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
@@ -55,7 +56,10 @@ public final class MiniTestDNI {
 
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(DNI_SIGN_ALIAS, new KeyStore.PasswordProtection(DNI_PIN));
 
-        final P7ContentSignerParameters p7ContentSignerParameters = new P7ContentSignerParameters(TEXTO_FIRMAR.getBytes("UTF-8"), "SHA1withRSA");  //$NON-NLS-1$ //$NON-NLS-2$
+        final P7ContentSignerParameters p7ContentSignerParameters = new P7ContentSignerParameters(
+        		TEXTO_FIRMAR.getBytes(StandardCharsets.UTF_8),
+        		"SHA1withRSA" //$NON-NLS-1$
+    		);
 
         final boolean omitContent = false;
         final byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar.
