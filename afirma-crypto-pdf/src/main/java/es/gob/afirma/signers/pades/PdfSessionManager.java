@@ -105,7 +105,7 @@ public final class PdfSessionManager {
 		}
 		else {
 			try {
-				page = Integer.parseInt(pageStr);
+				page = Integer.parseInt(pageStr.trim());
 			}
 			catch (final Exception e) {
 				LOGGER.warning(
@@ -130,7 +130,7 @@ public final class PdfSessionManager {
 		int certificationLevel;
 		try {
 			certificationLevel = extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL)) :
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL).trim()) :
 					UNDEFINED;
 		}
 		catch(final Exception e) {
@@ -141,7 +141,7 @@ public final class PdfSessionManager {
 		int pdfVersion;
 		try {
 			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION)) :
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION).trim()) :
 					PDF_MAX_VERSION;
 		}
 		catch(final Exception e) {
@@ -174,7 +174,7 @@ public final class PdfSessionManager {
 		int layer2FontFamily;
 		try {
 			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY)) :
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim()) :
 					-1;
 		}
 		catch(final Exception e) {
@@ -185,7 +185,7 @@ public final class PdfSessionManager {
 		int layer2FontSize;
 		try {
 			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE)) :
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim()) :
 					-1;
 		}
 		catch(final Exception e) {
@@ -196,7 +196,7 @@ public final class PdfSessionManager {
 		int layer2FontStyle;
 		try {
 			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE)) :
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim()) :
 					-1;
 		}
 		catch(final Exception e) {

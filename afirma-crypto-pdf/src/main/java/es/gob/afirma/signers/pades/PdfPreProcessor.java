@@ -152,7 +152,7 @@ public final class PdfPreProcessor {
 
 		int pageNum;
 		try {
-			pageNum = Integer.parseInt(imagePage);
+			pageNum = Integer.parseInt(imagePage.trim());
 		}
 		catch(final NumberFormatException e) {
 			throw new IOException(

@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfArray;
@@ -429,29 +428,29 @@ public final class PdfUtil {
      * @param prefix Prefijo de las propiedades de coordenada en el conjunto
      * @return Rect&aacute;ngulo que define una posici&oacute;n de un elemento en una p&aacute;gina del PDF */
     public static com.aowagie.text.Rectangle getPositionOnPage(final Properties extraParams, final String prefix) {
-    	if (extraParams == null || prefix == null) {
-    		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
-    		return null;
-    	}
-    	if (extraParams.getProperty(prefix + "PositionOnPageLowerLeftX") != null && //$NON-NLS-1$
-    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
+	    	if (extraParams == null || prefix == null) {
+	    		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
+	    		return null;
+	    	}
+	    	if (extraParams.getProperty(prefix + "PositionOnPageLowerLeftX") != null && //$NON-NLS-1$
+	    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
 			extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null && //$NON-NLS-1$
 			extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null //$NON-NLS-1$
 		) {
 	        try {
-	            return new Rectangle(
-            		Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX")), //$NON-NLS-1$
-                     Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY")), //$NON-NLS-1$
-                     Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX")), //$NON-NLS-1$
-                     Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightY")) //$NON-NLS-1$
+	            return new com.aowagie.text.Rectangle(
+	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX").trim()), //$NON-NLS-1$
+	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY").trim()), //$NON-NLS-1$
+	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX").trim()), //$NON-NLS-1$
+	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightY").trim()) //$NON-NLS-1$
 	            );
 	        }
 	        catch (final Exception e) {
-	        	LOGGER.severe(
-        			"Se ha indicado una posicion invalida para el elemento grafico '" + prefix + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
-    			);
+	        		LOGGER.severe(
+	    				"Se ha indicado una posicion invalida para el elemento grafico '" + prefix + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 	        }
-    	}
-    	return null;
+	    	}
+	    	return null;
     }
 }

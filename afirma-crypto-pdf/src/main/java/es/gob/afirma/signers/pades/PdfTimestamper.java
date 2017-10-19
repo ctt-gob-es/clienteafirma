@@ -94,7 +94,7 @@ public final class PdfTimestamper {
         		int pdfVersion;
         		try {
         			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null ?
-        				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION)) :
+        				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION).trim()) :
         					PDF_MAX_VERSION;
         		}
         		catch(final Exception e) {
