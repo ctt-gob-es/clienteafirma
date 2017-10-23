@@ -13,6 +13,7 @@
 	</parent>
 	
 	<dependencies>
+	
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-xml</artifactId>
@@ -23,6 +24,34 @@
   			<groupId>es.uji.crypto.xades</groupId>
   			<artifactId>jxades</artifactId>
   			<version>0.2.0</version>
+		</dependency>
+
+		<!-- Para el sellado de tiempo -->		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-core-pkcs7-tsp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!--  Canonicalizador para el sello de tiempo -->
+		<dependency>
+	    		<groupId>com.io7m.xom</groupId>
+	    		<artifactId>xom</artifactId>
+	    		<version>1.2.10</version>
+	    		<exclusions>
+					<exclusion>
+						<groupId>xalan</groupId>
+						<artifactId>xalan</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+					</exclusion>
+	    		</exclusions>
 		</dependency>
 
 	</dependencies>

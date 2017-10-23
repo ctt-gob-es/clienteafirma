@@ -408,8 +408,19 @@ public final class AOXAdESSigner implements AOSigner {
                        final PrivateKey key,
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
-
-    	return XAdESSigner.sign(data, algorithm, key, certChain, xParams);
+    		// La firma generada con el AOSigner se le pasa al sellador de tiempo,
+    		// pero este solo estampara un sello si asi se le ha indicado en los
+    		// parametros adicionales, no haciendo nada en caso contrario
+    		return XAdESTspUtil.timestampXAdES(
+			XAdESSigner.sign(
+				data,
+				algorithm,
+				key,
+				certChain,
+				xParams
+			),
+			xParams
+		);
     }
 
     /** Comprueba si la firma es <i>detached</i>. Previamente debe haberse comprobado que el XML se
@@ -639,7 +650,7 @@ public final class AOXAdESSigner implements AOSigner {
                          final Certificate[] certChain,
                          final Properties xParams) throws AOException {
 
-    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, xParams);
+    		return XAdESCoSigner.cosign(sign, algorithm, key, certChain, xParams);
     }
 
     /** Cofirma datos en formato XAdES.
@@ -676,12 +687,10 @@ public final class AOXAdESSigner implements AOSigner {
                          final PrivateKey key,
                          final Certificate[] certChain,
                          final Properties extraParams) throws AOException {
-
-    	if (!isSign(sign)) {
-    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
-    	}
-
-    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, extraParams);
+	    	if (!isSign(sign)) {
+	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
+	    	}
+	    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** Contrafirma firmas en formato XAdES.
@@ -722,11 +731,10 @@ public final class AOXAdESSigner implements AOSigner {
                               final PrivateKey key,
                               final Certificate[] certChain,
                               final Properties xParams) throws AOException {
-    	if (!isSign(sign)) {
-    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
-    	}
-
-    	return XAdESCounterSigner.countersign(
+	    	if (!isSign(sign)) {
+	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
+	    	}
+	    	return XAdESCounterSigner.countersign(
 			sign,
 			algorithm,
 			targetType,
@@ -739,11 +747,13 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
-
-    	if (!isSign(sign)) {
-    		throw new AOInvalidFormatException("Los datos indicados no son una firma XAdES compatible"); //$NON-NLS-1$
-    	}
+	public AOTreeModel getSignersStructure(final byte[] sign,
+			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+	    	if (!isSign(sign)) {
+	    		throw new AOInvalidFormatException(
+    				"Los datos indicados no son una firma XAdES compatible" //$NON-NLS-1$
+			);
+	    	}
 
         // Obtenemos el arbol del documento
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
