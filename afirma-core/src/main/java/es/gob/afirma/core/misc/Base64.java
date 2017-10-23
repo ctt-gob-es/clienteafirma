@@ -1,6 +1,8 @@
 package es.gob.afirma.core.misc;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -81,7 +83,7 @@ public final class Base64 {
     private static final byte NEW_LINE = (byte)'\n';
 
     /** Preferred encoding. */
-    private static final String PREFERRED_ENCODING = "US-ASCII"; //$NON-NLS-1$
+    private static final Charset PREFERRED_ENCODING = StandardCharsets.US_ASCII;
 
     private static final byte WHITE_SPACE_ENC = -9; // Indicates white space in encoding
     private static final byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
@@ -309,15 +311,7 @@ public final class Base64 {
      */
     private static String encodeBytes( final byte[] source, final int off, final int len, final int options ) {
         final byte[] encoded = encodeBytesToBytes( source, off, len, options );
-
-        // Return value according to relevant encoding.
-        try {
-            return new String( encoded, PREFERRED_ENCODING );
-        }   // end try
-        catch (final java.io.UnsupportedEncodingException uue) {
-            return new String( encoded );
-        }   // end catch
-
+        return new String( encoded, PREFERRED_ENCODING );
     }   // end encodeBytes
 
     /**
@@ -617,13 +611,7 @@ public final class Base64 {
         if( str == null ){
             throw new IllegalArgumentException("Input string was null"); //$NON-NLS-1$
         }
-        byte[] bytes;
-        try {
-            bytes = str.getBytes(PREFERRED_ENCODING);
-        }
-        catch(final java.io.UnsupportedEncodingException uee ) {
-            bytes = str.getBytes();
-        }
+        final byte[] bytes = str.getBytes(PREFERRED_ENCODING);
         return decode( bytes, 0, bytes.length, urlSafe);
     }
 

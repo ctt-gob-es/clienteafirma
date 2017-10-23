@@ -32,8 +32,7 @@ public final class TestAOUtil {
 		System.out.println(AOUtil.createURI("c:\\kaka\\naca\\/das des\\a.txt")); //$NON-NLS-1$
 	}
 
-    /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
-     * @throws Exception En cualquier error. */
+    /** Prueba para el getCN(), reconstruido para prescindir de <code>javax.naming</code>. */
     @SuppressWarnings("static-method")
 	@Test
     public void testGetCN() {

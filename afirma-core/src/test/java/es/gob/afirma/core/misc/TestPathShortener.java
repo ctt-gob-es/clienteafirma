@@ -5,8 +5,7 @@ package es.gob.afirma.core.misc;
 public final class TestPathShortener {
 
 	/** Main para prueba directa.
-	 * @param args No se usa.
-	 * @throws Exception EnN cualquier error. */
+	 * @param args No se usa. */
 	public static void main(final String args[]) {
 
 		final String t = "C:\\Documents and Settings\\All Users\\Application Data\\Apple Computer\\iTunes\\SC Info\\SC Info.txt"; //$NON-NLS-1$
