@@ -51,7 +51,6 @@ public final class AOKeyStoreManagerFactory {
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso (por ejemplo, al introducir la contrase&ntilde;a)
      * @throws AOKeystoreAlternativeException Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
-     * @throws AOKeyStoreManagerException Si hay fallos obteniendo el almac&eacute;n solicitado.
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n &uacute;nicamente disponible para
      *                                               un sistema operativo distinto del actual
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
