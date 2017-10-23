@@ -16,9 +16,8 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-/**
- * Configuraci&oacute;n para la gesti&oacute;n del almacenamiento temporal de ficheros en servidor.
- */
+/** Configuraci&oacute;n para la gesti&oacute;n del almacenamiento temporal
+ * de ficheros en servidor. */
 public class RetrieveConfig {
 
 	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
@@ -66,10 +65,10 @@ public class RetrieveConfig {
 	 * @throws IOException Cuanto ocurre un error durante la lectura del fichero. */
 	public void load(final String path) throws FileNotFoundException, IOException {
 		if (path != null) {
- 			try {
+ 			try (
  				final InputStream is = RetrieveConfig.class.getClassLoader().getResourceAsStream(path);
+			) {
 				this.config.load(is);
-				is.close();
 			}
  			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
@@ -79,16 +78,16 @@ public class RetrieveConfig {
 		}
 	}
 
-	/**
-	 * Recupera el directorio configurado para la creaci&oacute;n de ficheros temporales o el por defecto.
+	/** Recupera el directorio configurado para la creaci&oacute;n de ficheros temporales o el por defecto.
 	 * @return Directorio temporal.
-	 * @throws NullPointerException Cuando no se indicala ruta del directorio temporal ni se puede obtener
-	 * del sistema.
-	 */
+	 * @throws NullPointerException Cuando no se indica la ruta del directorio temporal ni se puede obtener
+	 *                              del sistema. */
 	public File getTempDir() {
 		File tmpDir = new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR).trim());
 		if (!tmpDir.exists() ||!tmpDir.canRead()) {
-			Logger.getLogger("es.gob.afirma").warning("El directorio temporal indicado en el fichero de propiedades no existe, se usara el por defecto"); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"El directorio temporal indicado en el fichero de propiedades no existe, se usara el por defecto" //$NON-NLS-1$
+			);
 			tmpDir = new File(DEFAULT_TMP_DIR);
 			if (!tmpDir.exists() ||!tmpDir.canRead()) {
 				throw new IllegalStateException("No se ha podido definir un directorio temporal"); //$NON-NLS-1$
@@ -97,15 +96,14 @@ public class RetrieveConfig {
 		return tmpDir;
 	}
 
-	/**
-	 * Recupera el tiempo en milisegundos que puede almacenarse un fichero antes de considerarse caducado.
+	/** Recupera el tiempo en milisegundos que puede almacenarse un fichero antes de considerarse caducado.
 	 * @return Tiempo m&aacute;ximo en milisegundos que puede tardarse en recoger un fichero antes de que
-	 * caduque.
-	 */
+	 * caduque. */
 	public long getExpirationTime() {
 		try {
 			return this.config.containsKey(EXPIRATION_TIME_KEY) ?
-					Long.parseLong(this.config.getProperty(EXPIRATION_TIME_KEY)) : DEFAULT_EXPIRATION_TIME;
+				Long.parseLong(this.config.getProperty(EXPIRATION_TIME_KEY)) :
+					DEFAULT_EXPIRATION_TIME;
 		}
 		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$

@@ -41,7 +41,7 @@ final class ErrorManager {
 	static final String ERROR_MISSING_SYNTAX_VERSION	 = "ERR-20"; //$NON-NLS-1$
 
 
-	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
+	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
 		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado codigo de operacion"); //$NON-NLS-1$
 		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "Codigo de operacion no soportado"); //$NON-NLS-1$
