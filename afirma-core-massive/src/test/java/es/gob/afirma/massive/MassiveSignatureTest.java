@@ -2,6 +2,7 @@ package es.gob.afirma.massive;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -109,22 +110,19 @@ public class MassiveSignatureTest {
 
 	private static void saveData(final byte[] data, final String filename) {
 		if (MassiveSignatureTest.MANUAL_DEBUG) {
-			try {
+			try (
 				final java.io.FileOutputStream fos = new java.io.FileOutputStream(
-						MassiveSignatureTest.path + File.separator + filename);
-
+					MassiveSignatureTest.path + File.separator + filename
+				);
+			) {
 				Logger.getLogger("es.gob.afirma").info("Guardamos el fichero: " + //$NON-NLS-1$ //$NON-NLS-2$
-						MassiveSignatureTest.path + File.separator + filename);
+				MassiveSignatureTest.path + File.separator + filename);
 				fos.write(data);
-				try {
-					fos.flush();
-					fos.close();
-				} catch (final Exception e) {
-					// Ignoramos los errores
-				}
-			} catch (final Exception e) {
+				fos.flush();
+			}
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-								"Error al guardar el fichero " + MassiveSignatureTest.path + File.separator + filename); //$NON-NLS-1$
+					"Error al guardar el fichero '" + MassiveSignatureTest.path + File.separator + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -159,9 +157,12 @@ public class MassiveSignatureTest {
 						if (format[0].equals(file[0])) {
 
 							final String fullpath = MassiveSignatureTest.getResourcePath(file[1]);
-							final FileInputStream fis = new FileInputStream(fullpath);
-							final byte[] data = AOUtil.getDataFromInputStream(fis);
-							fis.close();
+							final byte[] data;
+							try (
+								final InputStream fis = new FileInputStream(fullpath);
+							) {
+								data = AOUtil.getDataFromInputStream(fis);
+							}
 
 							final MassiveSignatureHelper massive = new MassiveSignatureHelper(config);
 							byte[] signature = massive.signFile(fullpath);
