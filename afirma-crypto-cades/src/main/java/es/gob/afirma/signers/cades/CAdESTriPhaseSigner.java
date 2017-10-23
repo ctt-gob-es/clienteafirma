@@ -37,7 +37,7 @@ import org.spongycastle.asn1.cms.SignerInfo;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 import org.spongycastle.cms.CMSProcessable;
 import org.spongycastle.cms.CMSProcessableByteArray;
 
@@ -239,9 +239,9 @@ public final class CAdESTriPhaseSigner {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
         }
 
-        final TBSCertificateStructure tbsCertificateStructure;
+        final TBSCertificate tbsCertificateStructure;
         try {
-            tbsCertificateStructure = TBSCertificateStructure.getInstance(
+            tbsCertificateStructure = TBSCertificate.getInstance(
         		ASN1Primitive.fromByteArray(
     				((X509Certificate) signerCertificateChain[0]).getTBSCertificate()
 				)

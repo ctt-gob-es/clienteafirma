@@ -45,7 +45,7 @@ import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -166,8 +166,12 @@ final class GenSignedData {
         // raiz de la secuencia de SignerInfo
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final TBSCertificate tbs = TBSCertificate.getInstance(
+    		ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate())
+		);
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
+    		X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
+		);
 
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 

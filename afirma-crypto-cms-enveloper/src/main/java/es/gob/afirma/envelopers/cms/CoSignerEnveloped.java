@@ -52,7 +52,7 @@ import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x500.style.RFC4519Style;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -149,8 +149,12 @@ final class CoSignerEnveloped {
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final TBSCertificate tbs = TBSCertificate.getInstance(
+    		ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate())
+		);
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
+    		X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
+		);
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // // ATRIBUTOS
@@ -282,8 +286,12 @@ final class CoSignerEnveloped {
             SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final TBSCertificate tbs = TBSCertificate.getInstance(
+    		ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate())
+		);
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
+    		X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
+		);
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // // ATRIBUTOS

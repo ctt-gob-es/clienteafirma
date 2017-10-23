@@ -132,7 +132,7 @@ public final class TestCosign {
 			);
 		}
 		catch(final AOFormatFileException e) {
-			Assert.fail("Se ha indicado que la firma no puede ser cofirmada"); //$NON-NLS-1$
+			Assert.fail("Se ha indicado que la firma no puede ser cofirmada: " + e); //$NON-NLS-1$
 			return;
 		}
 

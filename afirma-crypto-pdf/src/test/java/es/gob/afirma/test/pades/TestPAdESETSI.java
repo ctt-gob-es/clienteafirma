@@ -59,7 +59,7 @@ public final class TestPAdESETSI {
            );
         }
         catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica"); //$NON-NLS-1$ //$NON-NLS-2$
+            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         p1.setProperty("policyIdentifierHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("signReason", "test"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -85,7 +85,7 @@ public final class TestPAdESETSI {
            );
         }
         catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica"); //$NON-NLS-1$ //$NON-NLS-2$
+            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         p4.setProperty("policyIdentifierHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 

@@ -76,7 +76,7 @@ import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
@@ -215,7 +215,7 @@ final class Utils {
 
         for (final X509Certificate element : certDest) {
 
-        	final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(element.getTBSCertificate()));
+        	final TBSCertificate tbs = TBSCertificate.getInstance(ASN1Primitive.fromByteArray(element.getTBSCertificate()));
 
             // creamos el recipiente con los datos del destinatario.
             final KeyTransRecipientInfo keyTransRecipientInfo = new KeyTransRecipientInfo(
@@ -565,15 +565,14 @@ final class Utils {
         byte[] encryptedKey = null;
 
         // Obtenemos los datos del certificado destino
-        IssuerAndSerialNumber isse;
-        TBSCertificateStructure tbs = null;
-
-        tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(userCert.getTBSCertificate()));
+        final TBSCertificate tbs = TBSCertificate.getInstance(ASN1Primitive.fromByteArray(userCert.getTBSCertificate()));
         // Obtenemos el Isuer & serial number
-        isse = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final IssuerAndSerialNumber isse = new IssuerAndSerialNumber(
+    		X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
+		);
 
         // Obtenemos los recipientInfo
-        RecipientInfo reci = null;
+        RecipientInfo reci;
         while (elementRecipient.hasMoreElements()) {
             // obtengo los recipientInfo
             final ASN1Sequence intermedio = (ASN1Sequence) elementRecipient.nextElement();

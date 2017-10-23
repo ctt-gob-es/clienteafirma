@@ -20,6 +20,7 @@ final class JarSignatureCertExtractorMessages {
 			.getBundle(BUNDLE_NAME);
 
 	private JarSignatureCertExtractorMessages() {
+		// Vacio
 	}
 
 	static String getString(final String key) {

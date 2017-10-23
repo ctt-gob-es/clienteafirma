@@ -54,7 +54,7 @@ public final class TestCAdES {
 				DATA.add(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(dataFile)));
 			}
 			catch (final IOException e) {
-				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
+				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas '" + dataFile + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				DATA.add(null);
 			}
 		}

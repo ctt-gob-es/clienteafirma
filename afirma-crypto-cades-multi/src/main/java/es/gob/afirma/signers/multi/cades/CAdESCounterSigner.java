@@ -44,7 +44,7 @@ import org.spongycastle.asn1.cms.SignerInfo;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
@@ -542,7 +542,7 @@ final class CAdESCounterSigner {
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
+        final TBSCertificate tbs = TBSCertificate.getInstance(
     		ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate())
 		);
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(

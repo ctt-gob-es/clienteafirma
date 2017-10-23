@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -174,19 +175,19 @@ public class TestPdfTriphase {
 	}
 
 	private static String loadFileOnBase64(final String filename) throws Exception {
-		final InputStream is = ClassLoader.getSystemResourceAsStream(filename);
-		final byte[] encoded = AOUtil.getDataFromInputStream(is);
-		is.close();
-
-		return Base64.encode(encoded, true);
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+		) {
+			return Base64.encode(AOUtil.getDataFromInputStream(is), true);
+		}
 	}
 
 	private static byte[] loadFile(final String filename) throws Exception {
-		final InputStream is = ClassLoader.getSystemResourceAsStream(filename);
-		final byte[] encoded = AOUtil.getDataFromInputStream(is);
-		is.close();
-
-		return encoded;
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+		) {
+			return AOUtil.getDataFromInputStream(is);
+		}
 	}
 
 	/** Prueba de firma trif&aacute;sica normal.
@@ -232,10 +233,11 @@ public class TestPdfTriphase {
 
 	private static File savePdfTempFile(final byte[] content) throws IOException {
 		final File tempFile = File.createTempFile("test", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(content);
-		fos.close();
-
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(content);
+		}
 		return tempFile;
 	}
 }

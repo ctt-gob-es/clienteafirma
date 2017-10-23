@@ -45,7 +45,7 @@ import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSProcessable;
 import org.spongycastle.cms.CMSProcessableByteArray;
@@ -63,7 +63,7 @@ import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Clase que implementa la cofirma digital CADES SignedData La
+/** Implementa la cofirma digital CADES SignedData. La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
  * crear un mensaje SignedData de SpongyCastle pero con la
  * peculiaridad de que es una Cofirma.
@@ -224,7 +224,7 @@ final class CAdESCoSigner {
 		final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
 
 		// Identificador del firmante ISSUER AND SERIAL-NUMBER
-		final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
+		final TBSCertificate tbs = TBSCertificate.getInstance(
 			ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate())
 		);
 		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
@@ -416,8 +416,12 @@ final class CAdESCoSigner {
 		final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
 		// Identificador del firmante ISSUER AND SERIAL-NUMBER
-		final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+		final TBSCertificate tbs = TBSCertificate.getInstance(
+			ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate())
+		);
+		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
+			X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
+		);
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
 		// digEncryptionAlgorithm

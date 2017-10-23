@@ -222,14 +222,14 @@ public final class TestCountersign {
 		byte[] countersign;
 		try {
 			countersign = signer.countersign(
-					sign,
-					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-					CounterSignTarget.TREE,
-					null,
-					pke.getPrivateKey(),
-					pke.getCertificateChain(),
-					config
-					);
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				CounterSignTarget.TREE,
+				null,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config
+			);
 		}
 		catch (final AOFormatFileException e) {
 			return;

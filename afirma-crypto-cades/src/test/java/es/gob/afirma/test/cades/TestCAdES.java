@@ -34,9 +34,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESValidator;
 
-
-/**
- * Pruebas del m&oacute;dulo CAdES de Afirma.
+/** Pruebas del m&oacute;dulo CAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdES {
 
@@ -56,7 +54,7 @@ public final class TestCAdES {
 				DATA.add(AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(dataFile)));
 			}
 			catch (final IOException e) {
-				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
+				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas '" + dataFile + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				DATA.add(null);
 			}
 		}
@@ -134,10 +132,8 @@ public final class TestCAdES {
 		}
 	}
 
-	/**
-	 * Prueba de firma convencional.
-	 * @throws Exception en cualquier error
-	 */
+	/** Prueba de firma convencional.
+	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testSignature() throws Exception {

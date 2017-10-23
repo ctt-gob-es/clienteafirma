@@ -156,15 +156,13 @@ public final class TestFacturaE {
 
     }
 
-    /**
-     * Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)
+    /** Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)
      * de la firma XAdES contiene atributos. Busca el nodo con el namespace
      * indicado.
      * @param sign Firma.
      * @param namespace Espacio de nombres a utilizar.
      * @return {@code false} si se encuentra el nodo UnsignedSignatureProperties
-     * vac&iacute;o, {@code true} en caso contrario.
-     */
+     * vac&iacute;o, {@code true} en caso contrario. */
     private static boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
 
         final Document document;
@@ -173,7 +171,7 @@ public final class TestFacturaE {
             newDocumentBuilder().parse(sign);
         }
         catch (final Exception e) {
-            System.out.println("No es una firma valida"); //$NON-NLS-1$
+            System.out.println("No es una firma valida: " + e); //$NON-NLS-1$
             return false;
         }
 

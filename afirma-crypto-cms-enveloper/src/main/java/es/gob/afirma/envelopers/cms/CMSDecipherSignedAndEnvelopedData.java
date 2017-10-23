@@ -47,8 +47,6 @@ public final class CMSDecipherSignedAndEnvelopedData {
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * SignedAndEnvelopData.
-     * @param cmsData Datos del tipo SignedAndEnvelopData para obtener los datos
-     *                cifrados.
      * @param keyEntry Clave privada del certificado usado para descifrar el
      *                 contenido.
      * @return El contenido descifrado del SignedAndEnvelopData.
@@ -67,14 +65,14 @@ public final class CMSDecipherSignedAndEnvelopedData {
      * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
      * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
     public byte[] decipher(final PrivateKeyEntry keyEntry) throws IOException,
-                                                                                             CertificateEncodingException,
-                                                                                             AOException,
-                                                                                             InvalidKeyException,
-                                                                                             NoSuchAlgorithmException,
-                                                                                             NoSuchPaddingException,
-                                                                                             InvalidAlgorithmParameterException,
-                                                                                             IllegalBlockSizeException,
-                                                                                             BadPaddingException {
+                                                                  CertificateEncodingException,
+                                                                  AOException,
+                                                                  InvalidKeyException,
+                                                                  NoSuchAlgorithmException,
+                                                                  NoSuchPaddingException,
+                                                                  InvalidAlgorithmParameterException,
+                                                                  IllegalBlockSizeException,
+                                                                  BadPaddingException {
         // Contendra el contenido a tratar.
         final SignedAndEnvelopedData sigAndEnveloped;
         final Enumeration<?> elementRecipient;
