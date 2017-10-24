@@ -165,6 +165,7 @@ public final class RetrieveService extends HttpServlet {
 				final InputStream fis = new FileInputStream(inFile);
 			) {
 				out.println(new String(getDataFromInputStream(fis)));
+				fis.close();
 				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
