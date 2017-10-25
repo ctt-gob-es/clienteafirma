@@ -110,16 +110,13 @@ final class XAdESTriPhaseSignerUtil {
 		return base.getBytes(docBase.getXmlEncoding());
 	}
 
-	/**
-	 * Elimina de una firma XML el contenido de los nodos referenciados por la propia firma.
+	/** Elimina de una firma XML el contenido de los nodos referenciados por la propia firma.
 	 * En caso de tratarse una firma de Manifest, no hace nada.<br>
 	 * @param xml XML de firma sin los nodos referenciados. En el caso de firma de manifest,
 	 * devuelve la propia entrada.
 	 * @param xmlEncoding Encoding del XML.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
-	 * @return Cadena de texto con la firma con el contenido de los nodos referenciados
-	 * sustituidos por cadenas predefinidas con
-	 */
+	 * @return XML sin el contenido referenciado. */
 	static byte[] removeCommonParts(final byte[] xml, final String xmlEncoding, final Properties extraParams) {
 
 		if (xml == null || xml.length < 1) {
@@ -149,8 +146,9 @@ final class XAdESTriPhaseSignerUtil {
 		if (doc.getXmlEncoding() != null) {
 			try {
 				ret = new String(xml, doc.getXmlEncoding());
-			} catch (final UnsupportedEncodingException e) {
-				LOGGER.warning("Error en la codificacion declarada por el XML: " + doc.getXmlEncoding()); //$NON-NLS-1$
+			}
+			catch (final UnsupportedEncodingException e) {
+				LOGGER.warning("Error en la codificacion declarada por el XML (" + doc.getXmlEncoding() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		if (ret == null) {
@@ -184,12 +182,10 @@ final class XAdESTriPhaseSignerUtil {
 		return ret.getBytes();
 	}
 
-	/**
-	 * Obtiene los nodos delimitadores de todos nodos referenciados por las firmas XML del documento.
+	/** Obtiene los nodos delimitadores de todos nodos referenciados por las firmas XML del documento.
 	 * @param uris Listado de referencias.
 	 * @param doc Documento de firma XML al que pertenecen las referencias.
-	 * @return Listado de
-	 */
+	 * @return Listado de nodos. */
 	private static List<List<String>> getCommonContentDelimiters(final List<String> uris, final Document doc) {
 		final String encoding = doc.getInputEncoding();
 		final List<List<String>> ret = new ArrayList<>();
@@ -199,34 +195,34 @@ final class XAdESTriPhaseSignerUtil {
 				if (encoding != null) {
 					try {
 						ret.add(
-								getFirstTagPair(
-										removeXmlHeader(
-												new String(
-														Utils.writeXML(node, null, null, null),
-														encoding
-														)
-												)
-										)
-								);
+							getFirstTagPair(
+								removeXmlHeader(
+									new String(
+										Utils.writeXML(node, null, null, null),
+										encoding
+									)
+								)
+							)
+						);
 					}
 					catch (final UnsupportedEncodingException e) {
 						ret.add(
-								getFirstTagPair(
-										removeXmlHeader(
-												new String(Utils.writeXML(node, null, null, null))
-												)
-										)
-								);
+							getFirstTagPair(
+								removeXmlHeader(
+									new String(Utils.writeXML(node, null, null, null))
+								)
+							)
+						);
 					}
 				}
 				else {
 					ret.add(
-							getFirstTagPair(
-									removeXmlHeader(
-											new String(Utils.writeXML(node, null, null, null))
-											)
-									)
-							);
+						getFirstTagPair(
+							removeXmlHeader(
+								new String(Utils.writeXML(node, null, null, null))
+							)
+						)
+					);
 				}
 			}
 		}
@@ -243,12 +239,10 @@ final class XAdESTriPhaseSignerUtil {
 		);
 	}
 
-	/**
-	 * Devuelve todas las referencias, que no apunten a "SignedProperties", de
+	/** Devuelve todas las referencias, que no apunten a "SignedProperties", de
 	 * los nodos "Signature" con los identificadores indicados.
 	 * @param doc Documento de firma electr&oacute;nica.
-	 * @return Listado de referencias.
-	 */
+	 * @return Listado de referencias. */
 	private static List<String> getInmutableReferences(final Document doc) {
 
 		final Element signDoc = doc.getDocumentElement();
@@ -282,12 +276,10 @@ final class XAdESTriPhaseSignerUtil {
         return unmutableReferences;
 	}
 
-	/**
-	 * Elimina de la cadena de texto proporcionada la cabecera de XML si empezaba
+	/** Elimina de la cadena de texto proporcionada la cabecera de XML si empezaba
 	 * por ella.
 	 * @param xml Texto XML.
-	 * @return Texto XML sin cabecera.
-	 */
+	 * @return Texto XML sin cabecera. */
 	private static String removeXmlHeader(final String xml) {
 		if (xml == null) {
 			throw new IllegalArgumentException("La entrada no puede ser nula"); //$NON-NLS-1$
@@ -298,12 +290,10 @@ final class XAdESTriPhaseSignerUtil {
 		return xml.substring(xml.indexOf("?>") + "?>".length(), xml.length()).trim(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/**
-	 * Construye una lista con la etiqueta XML del nodo por el que empieza el texto XML y la
+	/** Construye una lista con la etiqueta XML del nodo por el que empieza el texto XML y la
 	 * etiqueta del nodo XML con la que termina.
 	 * @param xml Texto XML.
-	 * @return Listado de 2 elementos: la primera y &uacute;ltima etiqueta del XML.
-	 */
+	 * @return Listado de 2 elementos: la primera y &uacute;ltima etiqueta del XML. */
 	private static List<String> getFirstTagPair(final String xml) {
 		if (xml == null) {
 			throw new IllegalArgumentException("La entrada no puede ser nula"); //$NON-NLS-1$

@@ -14,7 +14,7 @@ import java.util.Hashtable;
 
 final class ErrorManager {
 
-	private static final Dictionary<Integer, String> errorMessages = new Hashtable<Integer, String>();
+	private static final Dictionary<Integer, String> errorMessages = new Hashtable<>();
 	static {
 		errorMessages.put(Integer.valueOf(1), "No se ha indicado la operacion a realizar"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(2), "No se ha indicado el identificador del documento"); //$NON-NLS-1$

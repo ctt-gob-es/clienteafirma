@@ -25,8 +25,7 @@ import es.gob.afirma.core.misc.AOUtil;
 final class TempStoreFileSystem implements TempStore {
 
 	/** N&uacute;mero de recuperaciones de fichero que realizaremos antes de iniciar un
-	 * proceso de limpieza de temporales caducados.
-	 */
+	 * proceso de limpieza de temporales caducados. */
 	private static final int RETRIEVES_BEFORE_CLEANING = 100;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -54,19 +53,23 @@ final class TempStoreFileSystem implements TempStore {
 
 	@Override
 	public void store(final byte[] dataToSave, final String filename) throws IOException {
-		final OutputStream fos = new FileOutputStream(
-			new File(
-				BatchConfigManager.getTempDir(),
-				filename
-			)
-		);
-		final BufferedOutputStream bos = new BufferedOutputStream(
-			fos,
-			dataToSave.length
-		);
-		bos.write(dataToSave);
-		bos.flush();
-		bos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(
+				new File(
+					BatchConfigManager.getTempDir(),
+					filename
+				)
+			);
+		) {
+			final BufferedOutputStream bos = new BufferedOutputStream(
+				fos,
+				dataToSave.length
+			);
+			bos.write(dataToSave);
+			bos.flush();
+			// Cerramos explicitamente
+			bos.close();
+		}
 	}
 
 	@Override

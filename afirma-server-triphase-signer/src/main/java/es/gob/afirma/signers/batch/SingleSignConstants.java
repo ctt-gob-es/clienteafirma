@@ -32,13 +32,15 @@ public final class SingleSignConstants {
 	private static final Properties config;
 
 	static {
-		try {
+		try (
 			final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+		) {
 			if (configIs == null) {
 				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
 			}
 			config = new Properties();
 			config.load(configIs);
+			// Cerramos explicitamente
 			configIs.close();
 		}
 		catch(final Exception e) {

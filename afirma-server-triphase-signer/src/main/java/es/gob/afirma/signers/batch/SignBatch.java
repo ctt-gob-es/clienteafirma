@@ -217,7 +217,7 @@ public abstract class SignBatch {
 		}
 
 		final NodeList childNodes = n.getChildNodes();
-		final List<SingleSign> ret = new ArrayList<SingleSign>();
+		final List<SingleSign> ret = new ArrayList<>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			ret.add(new SingleSign(childNodes.item(idx), charset));

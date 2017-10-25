@@ -49,7 +49,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 	private static final Integer KEY_SIZE_2048 = Integer.valueOf(2048);
 	private static final Integer KEY_SIZE_4096 = Integer.valueOf(4096);
 
-	private static final Map<Integer, Integer> P1_SIZES = new HashMap<Integer, Integer>(3);
+	private static final Map<Integer, Integer> P1_SIZES = new HashMap<>(3);
 	static {
 		P1_SIZES.put(KEY_SIZE_1024, PKCS1_DEFAULT_SIZE_1024);
 		P1_SIZES.put(KEY_SIZE_2048, PKCS1_DEFAULT_SIZE_2048);
@@ -120,7 +120,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 		// Si no existe ya, guardamos el par de PKCS#1 falso y datos a firmar
 		if (this.registry) {
-			final Map<String, String> signConfig = new HashMap<String, String>();
+			final Map<String, String> signConfig = new HashMap<>();
 			signConfig.put(PARAM_PRE, Base64.encode(data));
 			signConfig.put(PARAM_DUMMY_PK1, Base64.encode(dummyData));
 			this.triphaseData.addSignOperation(

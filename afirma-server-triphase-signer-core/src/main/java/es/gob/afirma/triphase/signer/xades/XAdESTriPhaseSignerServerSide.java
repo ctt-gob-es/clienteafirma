@@ -139,7 +139,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		// Miramos si la entrada es un XML que ya contenga firmas (almacenando los ID para luego localizar cual es la firma
 		// nueva y no confundirla con las antiguas), y si lo es cual es su codificacion con un Document.getXmlEncoding()
-		final List<String> previousSignaturesIds = new ArrayList<String>();
+		final List<String> previousSignaturesIds = new ArrayList<>();
 		Document xml = null;
 		String xmlEncoding = XML_DEFAULT_ENCODING;
 		try {
@@ -157,13 +157,8 @@ public final class XAdESTriPhaseSignerServerSide {
 			}
 		}
 		catch(final Exception e) {
-			LOGGER.info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$
+			LOGGER.info("El documento a firmar no es XML, por lo que no contiene firmas previas: " + e);  //$NON-NLS-1$
 		}
-
-
-
-
-
 
 		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
 			LOGGER.severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$
@@ -350,7 +345,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		// Recogemos el signedInfo de cada firma cuyo identificador no este en la lista de excluidos (excludedIds)
-		final List<byte[]> signedInfos = new ArrayList<byte[]>();
+		final List<byte[]> signedInfos = new ArrayList<>();
 		for (int i = 0; i < signatureNodeList.getLength(); i++) {
 
 			final Node currentNode = signatureNodeList.item(i);

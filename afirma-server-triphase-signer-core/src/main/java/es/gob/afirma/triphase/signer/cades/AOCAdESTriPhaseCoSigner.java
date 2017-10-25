@@ -41,7 +41,7 @@ import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.x509.TBSCertificate;
 import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSProcessable;
 import org.spongycastle.cms.CMSProcessableByteArray;
@@ -175,8 +175,12 @@ public final class AOCAdESTriPhaseCoSigner {
 		final ASN1OctetString asn1sign = new DEROctetString(pkcs1sign);
 
 		// Identificador del firmante ISSUER AND SERIAL-NUMBER
-		final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+		final TBSCertificate tbs = TBSCertificate.getInstance(
+			ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate())
+		);
+		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
+			X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
+		);
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
 		// digEncryptionAlgorithm
@@ -200,7 +204,7 @@ public final class AOCAdESTriPhaseCoSigner {
 
 		ASN1Set certificates = null;
 		if (signerCertificateChain.length != 0) {
-			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+			final List<ASN1Encodable> ce = new ArrayList<>();
 			for (final X509Certificate element : signerCertificateChain) {
 				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
 			}

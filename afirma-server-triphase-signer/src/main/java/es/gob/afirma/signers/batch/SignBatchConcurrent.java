@@ -54,7 +54,7 @@ public final class SignBatchConcurrent extends SignBatch {
 	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
 		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
-		final Collection<Callable<String>> callables = new ArrayList<Callable<String>>(this.signs.size());
+		final Collection<Callable<String>> callables = new ArrayList<>(this.signs.size());
 
 		for (final SingleSign ss : this.signs) {
 			final Callable<String> callable = ss.getPreProcessCallable(certChain, this.algorithm);
@@ -112,7 +112,7 @@ public final class SignBatchConcurrent extends SignBatch {
 		}
 
 		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
-		final Collection<Callable<CallableResult>> callables = new ArrayList<Callable<CallableResult>>(this.signs.size());
+		final Collection<Callable<CallableResult>> callables = new ArrayList<>(this.signs.size());
 
 		for (final SingleSign ss : this.signs) {
 			final Callable<CallableResult> callable = ss.getPostProcessCallable(
@@ -202,7 +202,7 @@ public final class SignBatchConcurrent extends SignBatch {
 
 		final TempStore ts = TempStoreFactory.getTempStore();
 
-		final Collection<Callable<CallableResult>> saveCallables = new ArrayList<Callable<CallableResult>>(this.signs.size());
+		final Collection<Callable<CallableResult>> saveCallables = new ArrayList<>(this.signs.size());
 		for (final SingleSign ss : this.signs) {
 			final Callable<CallableResult> callable = ss.getSaveCallable(
 				ts, getId()
