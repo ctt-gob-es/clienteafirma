@@ -65,9 +65,11 @@ public class TestAOFacturaETriPhaseSigner {
 		);
 
 		final File tempFile = File.createTempFile("xades-facturae-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(result);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(result);
+		}
 
 		System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 

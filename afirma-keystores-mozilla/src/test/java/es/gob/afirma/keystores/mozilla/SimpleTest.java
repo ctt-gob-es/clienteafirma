@@ -134,6 +134,9 @@ public final class SimpleTest {
 					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 		}
 		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"No se ha podido cargar el proveedor sin precargar las dependencias: " + e //$NON-NLS-1$
+			);
 			// No se ha podido cargar el proveedor sin precargar las dependencias
 			// Cargamos las dependencias necesarias para la correcta carga
 			// del almacen (en Mac se crean enlaces simbolicos)
@@ -150,6 +153,9 @@ public final class SimpleTest {
 						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
+				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+					"Fallo del intento de carga del proveedor: " + e2 //$NON-NLS-1$
+				);
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
 				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$

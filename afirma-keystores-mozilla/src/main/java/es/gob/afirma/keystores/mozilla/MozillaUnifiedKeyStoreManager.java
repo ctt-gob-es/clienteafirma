@@ -83,7 +83,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
+				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
 				// En caso de haber detectado una tarjeta preferida pero haberse cancelado su uso,
 				// permitiremos utilizar el resto de modulos a excepcion de los PKCS#11 que tambien
 				// controlen las tarjetas preferidas, ya que se supone que no se desean utilizar
@@ -136,7 +136,9 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 							continue;
 						}
 						catch(final Exception e) {
-							LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+							LOGGER.warning(
+								"No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex + ", " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							);
 							continue;
 						}
 					}

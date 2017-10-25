@@ -88,7 +88,7 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
                 return false;
             }
 
-            final Set<String> childs = new HashSet<String>(3);
+            final Set<String> childs = new HashSet<>(3);
             childs.add("FileHeader"); //$NON-NLS-1$
             childs.add("Parties"); //$NON-NLS-1$
             childs.add("Invoices"); //$NON-NLS-1$

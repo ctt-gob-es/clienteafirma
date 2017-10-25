@@ -1,6 +1,7 @@
 package es.gob.afirma.signers.xadestri.client;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -51,9 +52,12 @@ public final class TestXAdESTriWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesEnveloping-useManifestBinary-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final OutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+		}
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
@@ -84,9 +88,12 @@ public final class TestXAdESTriWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesEnveloping-useManifestXML-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final OutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+        }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
@@ -118,9 +125,12 @@ public final class TestXAdESTriWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesEnveloped-useManifestXML-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final OutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+        }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 }

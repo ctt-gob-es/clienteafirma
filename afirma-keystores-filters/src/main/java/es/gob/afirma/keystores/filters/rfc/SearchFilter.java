@@ -161,8 +161,8 @@ final class SearchFilter implements AttrFilter {
         }
         catch  (final Exception e) {
             throw new InvalidSearchFilterException("Unable to parse " + //$NON-NLS-1$
-                    "character " + this.pos + " in \""+ //$NON-NLS-1$ //$NON-NLS-2$
-                    this.filter + "\""); //$NON-NLS-1$
+                "character " + this.pos + " in \""+ //$NON-NLS-1$ //$NON-NLS-2$
+                    this.filter + "\": " + e); //$NON-NLS-1$
         }
 
         return stringFilter;
@@ -575,9 +575,10 @@ final class SearchFilter implements AttrFilter {
              // at this point, pend should be pointing at '}'
              try {
                  param = Integer.parseInt(expr.substring(pstart, pend));
-             } catch (final NumberFormatException e) {
+             }
+             catch (final NumberFormatException e) {
                  throw new InvalidSearchFilterException(
-                     "integer expected inside {}: " + expr); //$NON-NLS-1$
+                     "integer expected inside {}: '" + expr + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
              }
 
              if (param >= args.length) {
