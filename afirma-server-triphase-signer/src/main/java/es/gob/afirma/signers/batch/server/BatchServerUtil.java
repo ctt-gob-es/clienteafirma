@@ -55,7 +55,7 @@ final class BatchServerUtil {
 
 		final String[] certs = unDoUrlSafe(certListUrlSafeBase64).split(";"); //$NON-NLS-1$
 		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
-		final List<X509Certificate> ret = new ArrayList<X509Certificate>(certs.length);
+		final List<X509Certificate> ret = new ArrayList<>(certs.length);
 		for (final String cert : certs) {
 			ret.add(
 				(X509Certificate) cf.generateCertificate(

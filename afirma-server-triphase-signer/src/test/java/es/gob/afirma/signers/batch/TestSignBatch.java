@@ -155,7 +155,7 @@ public final class TestSignBatch {
 			ssv4
 		);
 
-		final List<SingleSign> signs = new ArrayList<SingleSign>();
+		final List<SingleSign> signs = new ArrayList<>();
 		signs.add(ss1);
 		signs.add(ss2);
 		signs.add(ss3);
