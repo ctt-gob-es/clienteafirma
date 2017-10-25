@@ -65,10 +65,10 @@ final class StorageConfig {
 	 * @throws IOException Cuando ocurre un error durante la lectura del fichero. */
 	void load(final String path) throws FileNotFoundException, IOException {
 		if (path != null) {
- 			try {
- 				final InputStream is = StorageConfig.class.getClassLoader().getResourceAsStream(path);
+ 			try (
+				final InputStream is = StorageConfig.class.getClassLoader().getResourceAsStream(path);
+			) {
 				this.config.load(is);
-				is.close();
 			}
  			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
@@ -92,7 +92,8 @@ final class StorageConfig {
 	long getExpirationTime() {
 		try {
 			return this.config.containsKey(EXPIRATION_TIME_KEY) ?
-					Long.parseLong(this.config.getProperty(EXPIRATION_TIME_KEY)) : DEFAULT_EXPIRATION_TIME;
+				Long.parseLong(this.config.getProperty(EXPIRATION_TIME_KEY)) :
+					DEFAULT_EXPIRATION_TIME;
 		}
 		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
