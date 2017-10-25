@@ -60,11 +60,11 @@ final class TempStoreFileSystem implements TempStore {
 					filename
 				)
 			);
-		) {
 			final BufferedOutputStream bos = new BufferedOutputStream(
 				fos,
 				dataToSave.length
 			);
+		) {
 			bos.write(dataToSave);
 			bos.flush();
 			// Cerramos explicitamente
@@ -90,16 +90,20 @@ final class TempStoreFileSystem implements TempStore {
 			}
 		}
 
-		final InputStream fis = new FileInputStream(
+		final byte[] ret;
+		try (
+			final InputStream fis = new FileInputStream(
 				new File(
-						BatchConfigManager.getTempDir(),
-						filename
-						)
-				);
-		final InputStream bis = new BufferedInputStream(fis);
-		final byte[] ret = AOUtil.getDataFromInputStream(bis);
-		bis.close();
-		fis.close();
+					BatchConfigManager.getTempDir(),
+					filename
+				)
+			);
+			final InputStream bis = new BufferedInputStream(fis);
+		) {
+			ret = AOUtil.getDataFromInputStream(bis);
+			bis.close();
+			fis.close();
+		}
 		return ret;
 	}
 
