@@ -850,9 +850,12 @@ public final class ServiceInvocationManager {
 		int protocolVersion = 1;
 		if (protocolId != null) {
 			try {
-				protocolVersion = Integer.parseInt(protocolId);
+				protocolVersion = Integer.parseInt(protocolId.trim());
 			}
 			catch (final Exception e) {
+				LOGGER.info(
+					"El ID de protocolo indicado no es un numero entero (" + protocolId + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				protocolVersion = -1;
 			}
 		}

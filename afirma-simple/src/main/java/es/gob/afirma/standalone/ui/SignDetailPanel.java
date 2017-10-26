@@ -13,8 +13,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,29 +87,14 @@ public final class SignDetailPanel extends JPanel {
                 Logger.getLogger("es.gob.afirma").severe("No se tienen permisos de lectura del fichero indicado");  //$NON-NLS-1$//$NON-NLS-2$
             }
             else {
-                InputStream fis = null;
-                InputStream bis = null;
-                try {
-                    fis = new FileInputStream(signFile);
-                    bis = new BufferedInputStream(fis);
+                try (
+            		InputStream fis = new FileInputStream(signFile);
+            		InputStream bis = new BufferedInputStream(fis);
+        		) {
                     sig = AOUtil.getDataFromInputStream(bis);
                 }
                 catch (final IOException e) {
                     Logger.getLogger("es.gob.afirma").severe("No se ha podido leer el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-                finally {
-                    try {
-                        if (fis != null) {
-                            fis.close();
-                        }
-                    }
-                    catch (final Exception e) { /* Ignoramos los errores */ }
-                    try {
-                        if (bis != null) {
-                            bis.close();
-                        }
-                    }
-                    catch (final Exception e) { /* Ignoramos los errores */ }
                 }
             }
         }
@@ -126,12 +109,7 @@ public final class SignDetailPanel extends JPanel {
         this.returnButton.setMnemonic('m');
         this.returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         returnPanel.add(this.returnButton);
-        this.returnButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent ae) {
-                goToBack();
-            }
-        });
+        this.returnButton.addActionListener(ae -> goToBack());
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {

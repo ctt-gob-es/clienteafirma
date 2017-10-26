@@ -638,6 +638,7 @@ final class PreferencesPanelGeneral extends JPanel {
 						}
 					}
 					catch (final GeneralSecurityException e) {
+						LOGGER.severe("Error cifrando la contrasena del Proxy: " + e); //$NON-NLS-1$
 						JOptionPane.showMessageDialog(container, SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
 						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
 					}
@@ -670,7 +671,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
 	 * {@code false} en caso contrario.
 	 */
-	public void setBlocked(boolean blocked) {
+	public void setBlocked(final boolean blocked) {
 		this.blocked = blocked;
 	}
 }

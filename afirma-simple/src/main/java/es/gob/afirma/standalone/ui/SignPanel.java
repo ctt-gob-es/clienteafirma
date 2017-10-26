@@ -197,6 +197,9 @@ public final class SignPanel extends JPanel {
 	            data = AOUtil.getDataFromInputStream(fis);
 	        }
 	        catch(final OutOfMemoryError e) {
+	        	LOGGER.warning(
+        			"No hay memoria suficiente para leer el fichero '" + file.getAbsolutePath() + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+    			);
 	        	AOUIFactory.showErrorMessage(
 	                 SignPanel.this,
 	                 SimpleAfirmaMessages.getString("SignPanel.26"), //$NON-NLS-1$
@@ -326,7 +329,7 @@ public final class SignPanel extends JPanel {
      * @param defaultType Tipo por defecto.
      * @return Tipo de firma que se debe ejecutar.
      */
-    private static String getSignatureName(AOSigner signer) {
+    private static String getSignatureName(final AOSigner signer) {
 
     	for (final String[] signatureType : signersTypeRelation) {
     		Class<?> c;

@@ -250,7 +250,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 		// de la operacion para obtener la configuracion final
 		try {
 			options.expandExtraParams();
-		} catch (final IncompatiblePolicyException e1) {
+		}
+		catch (final IncompatiblePolicyException e1) {
+			LOGGER.info("Se ha indicado una politica no compatible: " + e1); //$NON-NLS-1$
 			if (!bySocket) {
 				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_23);
 			}

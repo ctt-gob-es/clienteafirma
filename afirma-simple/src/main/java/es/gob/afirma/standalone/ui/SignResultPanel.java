@@ -27,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.HyperlinkEvent;
 
 import es.gob.afirma.cert.signvalidation.SignValidity;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -141,24 +140,24 @@ final class SignResultPanel extends JPanel {
 
         final EditorFocusManager editorFocusManager = new EditorFocusManager(
     		this.descTextLabel,
-    		new EditorFocusManagerAction() {
-	            @Override
-	            public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-	                try {
-	                    if (he.getURL() != null) {
-	                        Desktop.getDesktop().browse(he.getURL().toURI());
-	                    }
-	                }
-	                catch (final Exception e) {
-	                	AOUIFactory.showErrorMessage(
-	                        SignResultPanel.this,
-	                        SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-	                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                        JOptionPane.ERROR_MESSAGE
-	                    );
-	                }
-	            }
-	        }
+    		(he, linkIndex) -> {
+			    try {
+			        if (he.getURL() != null) {
+			            Desktop.getDesktop().browse(he.getURL().toURI());
+			        }
+			    }
+			    catch (final Exception e) {
+			    	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"Error abriendo el fichero: " + e //$NON-NLS-1$
+					);
+			    	AOUIFactory.showErrorMessage(
+			            SignResultPanel.this,
+			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			            JOptionPane.ERROR_MESSAGE
+			        );
+			    }
+			}
 		);
 
         this.descTextLabel.addFocusListener(editorFocusManager);

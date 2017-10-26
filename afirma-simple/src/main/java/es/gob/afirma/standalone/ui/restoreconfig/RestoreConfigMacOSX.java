@@ -101,7 +101,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static File sslCerFile;
 
 	@Override
-	public void restore(RestoreConfigPanel configPanel) {
+	public void restore(final RestoreConfigPanel configPanel) {
 
 		userDirs = getSystemUsersHomes();
 
@@ -420,10 +420,11 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
 		}
 		catch (final MozillaProfileNotFoundException e) {
+			LOGGER.warning("No se ha encontrado el perfil de Mozilla en macOS: " + e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.12")); //$NON-NLS-1$
 		}
 		catch (final AOException e1) {
-			LOGGER.info("La configuracion de NSS para Mac OS X ha fallado: " + e1); //$NON-NLS-1$
+			LOGGER.warning("La configuracion de NSS para macOS X ha fallado: " + e1); //$NON-NLS-1$
 		}
 
 		// Se instalan los certificados en el almacen de Apple

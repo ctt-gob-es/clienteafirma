@@ -18,12 +18,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -163,29 +162,29 @@ final class SignPanelFilePanel extends JPanel {
         c.anchor = GridBagConstraints.NORTHEAST;
 
         openFileButton.setMnemonic('v');
-        openFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(
-        		final ActionEvent ae) {
-                    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
-                        new VisorFirma(false, null).initialize(false, file);
-                    }
-                    else {
-                        try {
-                            Desktop.getDesktop().open(file);
-                        }
-                        catch (final IOException e) {
-                        	AOUIFactory.showErrorMessage(
-                                SignPanelFilePanel.this,
-                                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
-                                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
-                            );
-                            return;
-                        }
-                    }
-                }
-            }
+        openFileButton.addActionListener(
+    		ae -> {
+			    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
+			        new VisorFirma(false, null).initialize(false, file);
+			    }
+			    else {
+			        try {
+			            Desktop.getDesktop().open(file);
+			        }
+			        catch (final IOException e) {
+			        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			    			"Error abriendo el fichero: " + e //$NON-NLS-1$
+						);
+			        	AOUIFactory.showErrorMessage(
+			                SignPanelFilePanel.this,
+			                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
+			                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			                JOptionPane.ERROR_MESSAGE
+			            );
+			            return;
+			        }
+			    }
+			}
 		);
         this.add(openFileButton, c);
         pathLabel.setLabelFor(openFileButton);

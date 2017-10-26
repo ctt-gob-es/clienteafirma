@@ -60,6 +60,7 @@ final class ShowFileLinkAction {
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {
+            	Logger.getLogger("es.gob.afirma").warning("Error intentado abrir el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             	AOUIFactory.showErrorMessage(
                     null,
                     SimpleAfirmaMessages.getString("ShowFileLinkAction.2") + " '" + ext + "'",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -90,7 +91,7 @@ final class ShowFileLinkAction {
 				);
 			}
             catch (final AOCancelledOperationException e) {
-				Logger.getLogger("es.gob.afirma").warning("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+				Logger.getLogger("es.gob.afirma").info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
         }
     }

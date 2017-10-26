@@ -112,10 +112,10 @@ final class ProtocolInvocationLauncherSign {
 		if (options.getData() == null) {
 
 			final String dialogTilte = Operation.SIGN.equals(options.getOperation())
-					? ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
+				? ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
 					ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
 			final String fileExts = options.getExtraParams() != null
-					? options.getExtraParams().getProperty("filenameExts", null) : //$NON-NLS-1$
+				? options.getExtraParams().getProperty("filenameExts", null) : //$NON-NLS-1$
 					null;
 			final String fileDesc = fileExts == null ? ProtocolMessages.getString("ProtocolLauncher.27") : //$NON-NLS-1$
 					String.format(ProtocolMessages.getString("ProtocolLauncher.32"), //$NON-NLS-1$
@@ -130,7 +130,8 @@ final class ProtocolInvocationLauncherSign {
 				selectedDataFile = AOUIFactory.getLoadFiles(dialogTilte, null, null,
 						fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
 						fileDesc, false, false, AutoFirmaUtil.getDefaultDialogsIcon(), null)[0];
-			} catch (final AOCancelledOperationException e) {
+			}
+			catch (final AOCancelledOperationException e) {
 				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket) {
 					throw new SocketOperationException(getResultCancel());
@@ -169,26 +170,33 @@ final class ProtocolInvocationLauncherSign {
 				if (DataAnalizerUtil.isPDF(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_PADES);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_PADES);
-				} else if (DataAnalizerUtil.isFacturae(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isFacturae(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_FACTURAE);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_FACTURAE);
-				} else if (DataAnalizerUtil.isXML(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isXML(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_XADES);
-				} else if (DataAnalizerUtil.isODF(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isODF(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_ODF);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_ODF);
-				} else if (DataAnalizerUtil.isOOXML(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isOOXML(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_OOXML);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_OOXML);
-				} else {
+				}
+				else {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_CADES);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_CADES);
 				}
-			} else {
+			}
+			else {
 				try {
 					signer = AOSignerFactory.getSigner(options.getData());
-				} catch (final IOException e) {
+				}
+				catch (final IOException e) {
 					LOGGER.severe("No se han podido analizar los datos para determinar si son una firma: " + e //$NON-NLS-1$
 					);
 					// signer sera null
@@ -196,7 +204,8 @@ final class ProtocolInvocationLauncherSign {
 			}
 
 			if (signer == null) {
-				LOGGER.severe("Los datos no se corresponden con una firma electronica o no se pudieron analizar" //$NON-NLS-1$
+				LOGGER.severe(
+					"Los datos no se corresponden con una firma electronica o no se pudieron analizar" //$NON-NLS-1$
 				);
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_17);
 				if (!bySocket) {
@@ -211,7 +220,7 @@ final class ProtocolInvocationLauncherSign {
 		// abandone el soporte de XAdES explicitas)
 		if (options.getOperation() == Operation.SIGN && isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
 			LOGGER.warning(
-					"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
 			);
 			try {
 				options.setData(MessageDigest.getInstance("SHA1").digest(options.getData())); //$NON-NLS-1$
@@ -227,7 +236,9 @@ final class ProtocolInvocationLauncherSign {
 		// de la operacion para obtener la configuracion final
 		try {
 			options.expandExtraParams();
-		} catch (final IncompatiblePolicyException e1) {
+		}
+		catch (final IncompatiblePolicyException e1) {
+			LOGGER.info("Se ha indicado una politica no compatible: " + e1); //$NON-NLS-1$
 			if (!bySocket) {
 				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_23);
 			}

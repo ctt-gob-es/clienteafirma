@@ -111,6 +111,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			restoreProtocolRegistry(appDir.getAbsoluteFile(), workingDirectory.getAbsoluteFile());
 		}
 		catch (final Exception e) {
+			LOGGER.warning("Error restaurando los valores del protocolo 'afirma': " + e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.25")); //$NON-NLS-1$
 		}
 
@@ -321,9 +322,13 @@ final class RestoreConfigWindows implements RestoreConfig {
 			// Elimino certutil tras su uso
 			RestoreConfigFirefox.removeConfigurationFiles(installDir);
 
-		} catch (final IOException | KeyStoreException e) {
+		}
+		catch (final IOException | KeyStoreException e) {
+			LOGGER.warning("Error instalando el certifiado raiz: " + e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.31", installDir.getAbsolutePath())); //$NON-NLS-1$
-		} catch (final MozillaProfileNotFoundException e) {
+		}
+		catch (final MozillaProfileNotFoundException e) {
+			LOGGER.warning("No se ha encontrado el perfil de Mozilla en Windows: " + e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
 		}
 	}
@@ -556,14 +561,16 @@ final class RestoreConfigWindows implements RestoreConfig {
 					batFile.getAbsolutePath()
 			});
 			result = process.waitFor();
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error durante la ejecucion del proceso de restauracion del protocolo \"afirma\": " + e, e); //$NON-NLS-1$
 		}
 
 		// Esperamos 1 segundo para poder eliminar los ficheros
 		try {
 			Thread.sleep(1000);
-		} catch (final InterruptedException e) {
+		}
+		catch (final InterruptedException e) {
 			// No hacemos nada
 		}
 

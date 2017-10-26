@@ -187,6 +187,9 @@ public final class Updater {
 					newVersionAvailable = isNewVersionAvailable();
 				}
 				catch (final Exception e) {
+					LOGGER.info(
+						"No se ha podido comprobar la disponibilidad de nueva version: " + e //$NON-NLS-1$
+					);
 					return;
 				}
 				if (newVersionAvailable) {
