@@ -93,6 +93,7 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 			LOGGER.severe("No se ha configurado una URL de servicio OCSP valida: " + e); //$NON-NLS-1$
 			return ValidationResult.SERVER_ERROR;
 		}
+		LOGGER.info("Se usara el siguiente OCSP para validar el certificado: " + responderUrl); //$NON-NLS-1$
 		final byte[] rawOcspResponse;
 		try {
 			rawOcspResponse = OcspHelper.sendOcspRequest(responderUrl, ocspRequest);

@@ -135,19 +135,19 @@ public enum ValidationResult {
 			case CODE_EXPIRED:
 				throw new CertificateExpiredException();
 			case CODE_REVOKED:
-				throw new CertificateException("Certificado revocado"); //$NON-NLS-1$
+				throw new CertificateRevokedException("Certificado revocado"); //$NON-NLS-1$
 			case CODE_UNKNOWN:
-				throw new CertificateException("Validez del certificado desconocida"); //$NON-NLS-1$
+				throw new CertificateUnknownStatusException("Validez del certificado desconocida"); //$NON-NLS-1$
 			case CODE_SERVER_ERROR:
-				throw new CertificateException("Error interno o del servidor al validar el certificado"); //$NON-NLS-1$
+				throw new CertificateServerErrorException("Error interno o del servidor al validar el certificado"); //$NON-NLS-1$
 			case CODE_UNAUTHORIZED:
-				throw new CertificateException("No autorizado"); //$NON-NLS-1$
+				throw new CertificateUnauthorizedException("No autorizado"); //$NON-NLS-1$
 			case CODE_MALFORMED_REQUEST:
-				throw new CertificateException("Peticion OCSP mal formada"); //$NON-NLS-1$
+				throw new CertificateMalformedOcspRequestException("Peticion OCSP mal formada"); //$NON-NLS-1$
 			case CODE_SIG_REQUIRED:
-				throw new CertificateException("La peticion OCSP no esta firmada"); //$NON-NLS-1$
+				throw new CertificateUnsignedOcspRequestException("La peticion OCSP no esta firmada"); //$NON-NLS-1$
 			case CODE_CANNOT_DOWNLOAD_CRL:
-				throw new CertificateException("No se ha podido descargar la lista de certificados revocados"); //$NON-NLS-1$
+				throw new CertificateCannotDownloadCrlException("No se ha podido descargar la lista de certificados revocados"); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException(
 					"El codigo de resultado debe estar comprendido entre 0 y 11: " + this.resultCode //$NON-NLS-1$

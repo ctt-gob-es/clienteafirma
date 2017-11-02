@@ -43,21 +43,6 @@ public final class TestCertValidation {
 		vr.check();
 	}
 
-	/** Prueba de certificados DNIe.
-	 * @throws Exception En cualquier error. */
-	@SuppressWarnings("static-method")
-	@Test
-	@Ignore
-	public void testDnie() throws Exception {
-		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-			TestCertValidation.class.getResourceAsStream("/certMinHAP.cer") //$NON-NLS-1$
-		);
-		final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
-			cert
-		).validateCertificate();
-		vr.check();
-	}
-
 	/** Prueba de certificados gen&eacute;ricos.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")

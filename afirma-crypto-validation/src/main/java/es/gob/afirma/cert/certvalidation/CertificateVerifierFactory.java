@@ -65,12 +65,13 @@ public final class CertificateVerifierFactory {
 		String crc = getIssuerIdentifier(cert);
 		LOGGER.info("Identificador del emisor del certificado: " + crc); //$NON-NLS-1$
 
+		final String validationClass = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
+
 		if (p.getProperty(crc + ".validation.properties") == null) { //$NON-NLS-1$
 			crc = "default"; //$NON-NLS-1$
 		}
 
 		final String validationProperties = p.getProperty(crc + ".validation.properties"); //$NON-NLS-1$
-		final String validationClass = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
 
 		final CertificateVerificable certVerif;
 		if ("ocsp".equalsIgnoreCase(validationClass)) { //$NON-NLS-1$

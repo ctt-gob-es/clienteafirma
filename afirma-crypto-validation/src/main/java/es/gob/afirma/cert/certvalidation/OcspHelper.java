@@ -50,6 +50,7 @@ import org.spongycastle.cert.ocsp.OCSPReqBuilder;
 import org.spongycastle.cert.ocsp.OCSPResp;
 import org.spongycastle.cert.ocsp.RespID;
 import org.spongycastle.cert.ocsp.RevokedStatus;
+import org.spongycastle.cert.ocsp.SingleResp;
 import org.spongycastle.cert.ocsp.UnknownStatus;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.operator.DigestCalculator;
@@ -261,7 +262,8 @@ final class OcspHelper {
 		final OCSPResp ocspResponse = new OCSPResp(resp);
 
 		if (ocspResponse.getStatus() == OCSPResp.SUCCESSFUL) {
-			final CertificateStatus certificateStatus = ((BasicOCSPResp) ocspResponse.getResponseObject()).getResponses()[0].getCertStatus();
+			final SingleResp[] responses = ((BasicOCSPResp) ocspResponse.getResponseObject()).getResponses();
+			final CertificateStatus certificateStatus = responses[0].getCertStatus();
 			if (certificateStatus == CertificateStatus.GOOD) {
 				return ValidationResult.VALID;
 			}
