@@ -70,7 +70,7 @@ public final class TestFnmtCertValidation {
 				System.out.println();
 				continue;
 			}
-			Assert.fail();
+			Assert.fail("Deberia estar revocado"); //$NON-NLS-1$
 		}
 	}
 
