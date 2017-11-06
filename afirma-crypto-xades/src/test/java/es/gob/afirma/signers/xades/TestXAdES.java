@@ -506,11 +506,13 @@ public final class TestXAdES {
 	@Test
     public void testCounterSignManifes() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+    		CERT_ALIAS,
+    		new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
 
         final AOSigner signer = new AOXAdESSigner();
 
