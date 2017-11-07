@@ -207,10 +207,10 @@ public enum AOKeyStore {
             }
         }
         try {
-        	return valueOf(name);
+        		return valueOf(name);
         }
         catch(final Exception e) {
-        	Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido(" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         return null;
     }
