@@ -143,13 +143,22 @@ public enum AOKeyStore {
 		null,
 		null
 	),
-    /** Conjunto de tarjetas conocidas. */
+    /** Conjunto de tarjetas conocidas, accedidas v&iacute;a PKCS#11. */
     KNOWN_SMARTCARDS(
-    	"Tarjetas inteligentes conocidas", //$NON-NLS-1$
+    	"Tarjetas inteligentes conocidas mediante PKCS#11", //$NON-NLS-1$
     	15,
     	"SMARTCARDS", //$NON-NLS-1$
     	null,
-    	null);
+    	null
+	),
+    /** Conjunto de tarjetas soportadas por JMultiCard. */
+    JMULTICARD(
+    	"Tarjetas inteligentes soportadas en JMultiCard", //$NON-NLS-1$
+    	16,
+    	"JMULTICARD", //$NON-NLS-1$
+    	null,
+    	null
+	);
 
     private final String name;
     private final int ordinal;
@@ -176,24 +185,24 @@ public enum AOKeyStore {
 
     /** Obtiene el nombre del proveedor de seguridad que da acceso al almac&eacute;n de
      * claves y certificados.
-     * @return Nombre del proveedor */
+     * @return Nombre del proveedor. */
     public String getProviderName() {
         return this.providerName;
     }
 
     /** Obtiene el n&uacute;mero interno del n del almac&eacute;n de claves.
-     * @return N&uacute;mero interno del almac&eacute;n de claves */
+     * @return N&uacute;mero interno del almac&eacute;n de claves. */
     public int getOrdinal() {
         return this.ordinal;
     }
 
     /** Obtiene el Nombre del almac&eacute;n de claves.
-     * @return Nombre del almac&eacute;n de claves */
+     * @return Nombre del almac&eacute;n de claves. */
     public String getName() {
         return this.name;
     }
 
-    /** Recupera el repositorio con el nombre indicado. Si no existe un keystore con
+    /** Recupera el repositorio con el nombre indicado. Si no existe un <code>KeyStore</code> con
      * ese nombre, se devuelve <code>null</code>.
      * @param name Nombre del repositorio que se desea recuperar.
      * @return KeyStore Repositorio de certificados. */
@@ -207,18 +216,18 @@ public enum AOKeyStore {
             }
         }
         try {
-        		return valueOf(name);
+        	return valueOf(name);
         }
         catch(final Exception e) {
-        		Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        	Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         return null;
     }
 
 	/** Obtiene el <i>PasswordCallback</i> necesario para usar una clave del almac&eacute;n despu&eacute;s
 	 * de haberlo abierto.
-	 * @param parent Componente padre para la modalidad
-	 * @return <i>PasswordCallback</i> necesario para usar una cave del almac&eacute;n */
+	 * @param parent Componente padre para la modalidad.
+	 * @return <i>PasswordCallback</i> necesario para usar una cave del almac&eacute;n. */
 	public PasswordCallback getCertificatePasswordCallback(final Object parent) {
 		if (this.certificatePasswordCallback instanceof UIPasswordCallback) {
 			((UIPasswordCallback)this.certificatePasswordCallback).setParent(parent);
@@ -227,8 +236,8 @@ public enum AOKeyStore {
 	}
 
 	/** Obtiene el <i>PasswordCallback</i> necesario para abrir el almac&eacute;n.
-	 * @param parent Componente padre para la modalidad
-	 * @return <i>PasswordCallback</i> necesario para abrir el almac&eacute;n */
+	 * @param parent Componente padre para la modalidad.
+	 * @return <i>PasswordCallback</i> necesario para abrir el almac&eacute;n. */
 	public PasswordCallback getStorePasswordCallback(final Object parent) {
 		if (this.certificatePasswordCallback instanceof UIPasswordCallback) {
 			((UIPasswordCallback)this.certificatePasswordCallback).setParent(parent);

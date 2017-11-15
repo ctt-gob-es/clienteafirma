@@ -94,13 +94,12 @@ public final class KeyStoreUtilities {
         }
 		buffer.append("\r\n") //$NON-NLS-1$
 
-        // Ignoramos la descripcion que se nos proporciona, ya que el
-        // proveedor PKCS#11 de Sun
-        // falla si llegan espacios o caracteres raros
-              .append("name=") //$NON-NLS-1$
-              .append(name != null ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
-              // El showInfo debe ser false para mantener la compatibilidad con el PKCS#11 de los dispositivos Clauer
-              .append("\r\nshowInfo=false\r\n"); //$NON-NLS-1$
+	        // Ignoramos la descripcion que se nos proporciona, ya que el
+	        // proveedor PKCS#11 de Sun falla si llegan espacios o caracteres raros
+            .append("name=") //$NON-NLS-1$
+            .append(name != null ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
+            // El showInfo debe ser false para mantener la compatibilidad con el PKCS#11 de los dispositivos Clauer
+            .append("\r\nshowInfo=false\r\n"); //$NON-NLS-1$
 
         if (slot != null) {
             buffer.append("slot=").append(slot).append("\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -125,23 +124,18 @@ public final class KeyStoreUtilities {
      * certificados (como claves de estas &uacute;ltimas). Se aplicar&aacute;n los
      * filtros de certificados sobre todos ellos y se devolver&aacute;n aquellos
      * certificados que cumplan con los filtros definidos.
-     * @param aliases
-     *        Alias de los certificados entre los que el usuario debe
-     *        seleccionar uno
-     * @param ksm
-     *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
-     *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
-     *        otra cosa que no sean certificados X.509 (como claves de cifrado)
-     * @param checkPrivateKeys
-     *        Indica si se debe comprobar que el certificado tiene clave
-     *        privada o no, para no mostrar aquellos que carezcan de ella
-     * @param showExpiredCertificates
-     *        Indica si se deben o no mostrar los certificados caducados o
-     *        a&uacute;n no v&aacute;lidos
-     * @param certFilters
-     *        Filtros a aplicar sobre los certificados.
+     * @param aliases Alias de los certificados entre los que el usuario debe
+     *                seleccionar uno
+     * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *            otra cosa que no sean certificados X.509 (como claves de cifrado)
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                a&uacute;n no v&aacute;lidos
+     * @param certFilters Filtros a aplicar sobre los certificados.
      * @return Mapa que asocia los alias reales de los certificados que han pasados los
-     * filtros con un nombre mas amistoso. */
+     *         filtros con un nombre mas amistoso. */
     public static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
                                                                final KeyStoreManager ksm,
                                                                final boolean checkPrivateKeys,
@@ -166,17 +160,19 @@ public final class KeyStoreUtilities {
                 try {
                     tmpCert = ksm.getCertificate(al);
                 }
-                catch (final AOCancelledOperationException e) {
+                catch (
+            		final AOCancelledOperationException e
+        		) {
                 	throw e;
                 }
                 catch (final RuntimeException e) {
-
                 	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
-                	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                		"es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                		"es.gob.jmulticard.jse.provider.BadPasswordProviderException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                		"es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getClass().getName())) { //$NON-NLS-1$
-                			throw e;
+                	if (
+            			e instanceof es.gob.jmulticard.ui.passwordcallback.CancelledOperationException ||
+                		e instanceof es.gob.jmulticard.card.AuthenticationModeLockedException ||
+                		e instanceof es.gob.jmulticard.jse.provider.BadPasswordProviderException
+            		) {
+            			throw e;
                 	}
                     LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
                     continue;
@@ -505,68 +501,66 @@ public final class KeyStoreUtilities {
     				case TextOutputCallback.INFORMATION:
     					LOGGER.info("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
     					AOUIFactory.showMessageDialog(
-    							this.parentComponent,
-    							toc.getMessage(),
-    							KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
-    							JOptionPane.INFORMATION_MESSAGE
-    							);
+							this.parentComponent,
+							toc.getMessage(),
+							KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
+							JOptionPane.INFORMATION_MESSAGE
+						);
     					break;
     				case TextOutputCallback.ERROR:
     					LOGGER.severe("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
     					AOUIFactory.showMessageDialog(
-    							this.parentComponent,
-    							toc.getMessage(),
-    							KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
-    							JOptionPane.ERROR_MESSAGE
-    							);
+							this.parentComponent,
+							toc.getMessage(),
+							KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
     					break;
     				case TextOutputCallback.WARNING:
     					LOGGER.warning("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
     					AOUIFactory.showMessageDialog(
-    							this.parentComponent,
-    							toc.getMessage(),
-    							KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
-    							JOptionPane.WARNING_MESSAGE
-    							);
+							this.parentComponent,
+							toc.getMessage(),
+							KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
+							JOptionPane.WARNING_MESSAGE
+						);
     					break;
     				default:
     					LOGGER.warning(
-    							"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
-    							);
+							"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
+						);
     				}
     			}
     			else if (callback instanceof NameCallback) {
     				final Object name = AOUIFactory.showInputDialog(
-    						this.parentComponent,
-    						KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
-    						KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
-    						JOptionPane.WARNING_MESSAGE,
-    						null,
-    						null,
+						this.parentComponent,
+						KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
+						KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
+						JOptionPane.WARNING_MESSAGE,
+						null,
+						null,
     						null
-    						);
+					);
     				if (name != null) {
     					((NameCallback)callback).setName(name.toString());
     				}
     				throw new UnsupportedCallbackException(
-    						callback,
-    						"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
-    						);
+						callback,
+						"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
+					);
     			}
     			else {
     				throw new UnsupportedCallbackException(
-    						callback,
-    						"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
-    						);
+						callback,
+						"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
+					);
     			}
     		}
     	}
 
-    	/**
-    	 * Indica si se cancelo el di&aacute;logo de inserci&oacute;n de PIN.
+    	/** Indica si se cancel&oacute; el di&aacute;logo de inserci&oacute;n de PIN.
     	 * @return {@code true} si se cancel&oacute; el di&aacute;logo de
-    	 * inserci&oacute;n de PIN, {@code false} en caso contrario.
-    	 */
+    	 *         inserci&oacute;n de PIN, {@code false} en caso contrario. */
 		public boolean isCancelled() {
 			return this.cancelled;
 		}

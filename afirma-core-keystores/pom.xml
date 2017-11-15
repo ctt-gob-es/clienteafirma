@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-core-keystores</artifactId>
 	<name>afirma-core-keystores</name>
-	<description>Modulo core para la gestion de almacenes de claves</description>
+	<description>Modulo central para la gestion de almacenes de claves</description>
 	<packaging>jar</packaging>
 	
 	<parent>
@@ -15,11 +15,25 @@
 	</parent>
 	
 	<dependencies>
+	
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma.jmulticard</groupId>
+			<artifactId>jmulticard-jse</artifactId>
+			<version>1.4</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma.jmulticard</groupId>
+			<artifactId>jmulticard-ui</artifactId>
+			<version>1.4</version>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>
@@ -28,7 +42,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.1</version>
+					<version>3.7.0</version>
 					<configuration>
 						<fork>true</fork>
 						<compilerArgument>-XDignore.symbol.file</compilerArgument>

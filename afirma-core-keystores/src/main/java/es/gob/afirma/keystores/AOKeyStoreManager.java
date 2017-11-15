@@ -32,6 +32,7 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.jmulticard.card.AuthenticationModeLockedException;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
@@ -274,18 +275,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	try {
     		return (X509Certificate) this.ks.getCertificate(alias);
     	}
+    	catch(final AuthenticationModeLockedException e) {
+			throw new SmartCardLockedException("Tarjeta inteligente bloqueada: " + e, e); //$NON-NLS-1$
+    	}
+    	catch(final es.gob.jmulticard.ui.passwordcallback.CancelledOperationException e) {
+    		throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java: " + e, e); //$NON-NLS-1$
+    	}
     	catch(final Exception e) {
-
-    		if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName())) { //$NON-NLS-1$
-    			LOGGER.warning("Tarjeta bloqueada: " + e); //$NON-NLS-1$
-    			throw new SmartCardLockedException("Tarjeta inteligente bloqueada", e); //$NON-NLS-1$
-    		}
-
-    		if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-    			LOGGER.info("Se cancelo uso de la tarjeta a traves del driver Java: " + e); //$NON-NLS-1$
-    			throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java", e); //$NON-NLS-1$
-    		}
-
     		LOGGER.severe(
 				"Error intentando recuperar el certificado con el alias '" + alias + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
