@@ -133,7 +133,7 @@ public enum AOKeyStore {
 		13,
 		"CERES", //$NON-NLS-1$
 		null, // Al igual que en el DNIe el PIN se pide al firmar
-		null // Sin password para el almacen en si
+		null  // Sin password para el almacen en si
 	),
     /** DNIe con controlador nativo Java. */
     DNIEJAVA(
@@ -151,11 +151,11 @@ public enum AOKeyStore {
     	null,
     	null
 	),
-    /** Conjunto de tarjetas soportadas por JMultiCard. */
-    JMULTICARD(
-    	"Tarjetas inteligentes soportadas en JMultiCard", //$NON-NLS-1$
+    /** G&amp;D SmartCafe con Applet PKCS#15. */
+    SMARTCAFE(
+    	"G&D SmartCafe con Applet PKCS#15", //$NON-NLS-1$
     	16,
-    	"JMULTICARD", //$NON-NLS-1$
+    	"GDSCPKCS15", //$NON-NLS-1$
     	null,
     	null
 	);

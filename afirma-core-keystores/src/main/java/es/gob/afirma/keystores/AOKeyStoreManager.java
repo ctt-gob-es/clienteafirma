@@ -182,6 +182,14 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	case SINGLE:
         		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
         		break;
+        	case SMARTCAFE:
+                // En el "params" debemos traer los parametros:
+                // [0] -parent: Componente padre para la modalidad
+        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
+        		this.ks = AOKeyStoreManagerHelperFullJava.initSmartCafeJava(
+    				getParentComponent()
+				);
+            	break;
         	case CERES:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
@@ -278,7 +286,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	catch(final AuthenticationModeLockedException e) {
 			throw new SmartCardLockedException("Tarjeta inteligente bloqueada: " + e, e); //$NON-NLS-1$
     	}
-    	catch(final es.gob.jmulticard.ui.passwordcallback.CancelledOperationException e) {
+    	catch(final es.gob.jmulticard.CancelledOperationException e) {
     		throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java: " + e, e); //$NON-NLS-1$
     	}
     	catch(final Exception e) {

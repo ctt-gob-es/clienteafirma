@@ -52,6 +52,9 @@ public final class KeyStoreUtilities {
 	private static final String DISABLE_CERES_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_CERES_NATIVE_DRIVER"; //$NON-NLS-1$
 	private static final String DISABLE_CERES_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver"; //$NON-NLS-1$
 
+	private static final String DISABLE_GYDSC_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_GYDSC_NATIVE_DRIVER"; //$NON-NLS-1$
+	private static final String DISABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableGYDSCNativeDriver"; //$NON-NLS-1$
+
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
     }
@@ -168,7 +171,7 @@ public final class KeyStoreUtilities {
                 catch (final RuntimeException e) {
                 	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
                 	if (
-            			e instanceof es.gob.jmulticard.ui.passwordcallback.CancelledOperationException ||
+            			e instanceof es.gob.jmulticard.CancelledOperationException ||
                 		e instanceof es.gob.jmulticard.card.AuthenticationModeLockedException ||
                 		e instanceof es.gob.jmulticard.jse.provider.BadPasswordProviderException
             		) {
@@ -301,7 +304,8 @@ public final class KeyStoreUtilities {
 	 * @return Devuelve {@code true} cuando se ha detectado alguno de los almacenes preferentes,
 	 *         {@code false} en caso contrario.
 	 * @throws AOCancelledOperationException Cuando se cancela la carga del almac&eacute;n. */
-	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
+	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm,
+			                                           final Object parentComponent) {
 		// Anadimos el controlador Java del DNIe SIEMPRE excepto a menos que se indique lo contrario
 		// mediante una variable de entorno de sistema operativo o una propiedad Java
 		if (
@@ -316,7 +320,7 @@ public final class KeyStoreUtilities {
 				throw e;
 			}
 			catch (final Exception e) {
-				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + e); //$NON-NLS-1$
+				LOGGER.info("No se ha encontrado un DNIe: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -336,9 +340,29 @@ public final class KeyStoreUtilities {
 				throw e;
 			}
 			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
+				LOGGER.info("No se ha encontrado una tarjeta CERES: " + ex); //$NON-NLS-1$
 			}
 		}
+
+		// Anadimos el controlador Java de G&D SmartCafe SIEMPRE a menos que el sistema sea Linux o
+		// se indique lo contrario mediante una variable de entorno de sistema operativo o
+		// una propiedad Java
+		if (
+			!Boolean.getBoolean(DISABLE_GYDSC_NATIVE_DRIVER) &&
+			!Boolean.parseBoolean(System.getenv(DISABLE_GYDSC_NATIVE_DRIVER_ENV))
+		) {
+			try {
+				aksm.addKeyStoreManager(getSmartCafeKeyStoreManager(parentComponent));
+				return true; // Si instancia SmartCafe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+			}
+			catch (final AOCancelledOperationException e) {
+				throw e;
+			}
+			catch (final Exception ex) {
+				LOGGER.info("No se ha encontrado una tarjeta G&D SmartCafe: " + ex); //$NON-NLS-1$
+			}
+		}
+
 		return false;
 	}
 
@@ -361,10 +385,23 @@ public final class KeyStoreUtilities {
 			AOKeyStore.CERES, // Store
 			null,             // Lib (null)
 			null,             // Description (null)
-			null,             // PasswordCallback (no hay en la carga, hay en la firma
+			null,             // PasswordCallback (no hay en la carga, hay en la firma)
 			parentComponent   // Parent
 		);
 		LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+		tmpKsm.setPreferred(true);
+		return tmpKsm;
+	}
+
+	private static AOKeyStoreManager getSmartCafeKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			AOKeyStore.SMARTCAFE, // Store
+			null,                 // Lib (null)
+			null,                 // Description (null)
+			null,                 // PasswordCallback (no hay en la carga, hay en la firma)
+			parentComponent       // Parent
+		);
+		LOGGER.info("La tarjeta SmartCafe ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
 		tmpKsm.setPreferred(true);
 		return tmpKsm;
 	}
@@ -465,10 +502,8 @@ public final class KeyStoreUtilities {
         return null;
     }
 
-    /**
-     * Manejador para la gestion de la contrase&ntilde;a (y otros di&aacute;logos)
-     * de un almacen de claves.
-     */
+    /** Manejador para la gesti&oacute;n de la contrase&ntilde;a (y otros di&aacute;logos)
+     * de un almac&eacute;n de claves. */
     private static class PasswordCallbackHandler implements CallbackHandler {
 
     	private final Object parentComponent;

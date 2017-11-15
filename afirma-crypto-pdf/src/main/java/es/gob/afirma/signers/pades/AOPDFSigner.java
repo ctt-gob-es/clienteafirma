@@ -159,7 +159,7 @@ public final class AOPDFSigner implements AOSigner {
 			);
         }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
         		throw new AOCancelledOperationException();
         	}
             throw new AOException("Error durante la firma PAdES: " + e, e); //$NON-NLS-1$

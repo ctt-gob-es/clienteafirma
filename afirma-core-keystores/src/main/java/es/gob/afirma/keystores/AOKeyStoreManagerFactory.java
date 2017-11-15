@@ -137,6 +137,10 @@ public final class AOKeyStoreManagerFactory {
         	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
 
+        if (AOKeyStore.SMARTCAFE.equals(store)) {
+        	return new AggregatedKeyStoreManager(getSmartCafeJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        }
+
         throw new AOKeystoreAlternativeException(
              getAlternateKeyStoreType(store),
              "La plataforma de navegador '"  //$NON-NLS-1$
@@ -225,6 +229,23 @@ public final class AOKeyStoreManagerFactory {
 			parentComponent
 		);
     }
+
+	private static AOKeyStoreManager getSmartCafeJavaKeyStoreManager(final PasswordCallback pssCallback,
+			                                                     final boolean forceReset,
+			                                                     final Object parentComponent) throws AOKeystoreAlternativeException,
+	                                                                                                  IOException {
+		final AOKeyStoreManager ksm = new AOKeyStoreManager();
+		try {
+			ksm.init(AOKeyStore.SMARTCAFE, null, pssCallback, new Object[] { parentComponent }, forceReset);
+		}
+		catch (final AOKeyStoreManagerException e) {
+			throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(AOKeyStore.PKCS12),
+				"Error al inicializar el modulo G&D SmartCafe 100% Java: " + e, e //$NON-NLS-1$
+			);
+		}
+		ksm.setPreferred(true);
+		return ksm;
+	}
 
 	private static AOKeyStoreManager getCeresJavaKeyStoreManager(final PasswordCallback pssCallback,
 			                                                     final boolean forceReset,

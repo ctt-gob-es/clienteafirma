@@ -207,7 +207,7 @@ public final class AOCAdESSigner implements AOSigner {
             );
         }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.card.dnie.CancelledSignOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
         		throw new AOCancelledOperationException();
         	}
             throw new AOException("Error generando la firma CAdES: " + e, e); //$NON-NLS-1$

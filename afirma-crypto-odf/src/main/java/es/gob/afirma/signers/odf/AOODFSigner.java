@@ -460,7 +460,7 @@ public final class AOODFSigner implements AOSigner {
             throw new AOFormatFileException("Estructura de archivo no valida '" + fullPath + "': " + saxex); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
         		throw new AOCancelledOperationException();
         	}
             throw new AOException("No ha sido posible generar la firma ODF: " + e, e); //$NON-NLS-1$

@@ -1230,7 +1230,7 @@ public final class XAdESSigner {
 			);
 		}
 		catch (final Exception e) {
-        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
         		throw new AOCancelledOperationException();
         	}
 			throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$

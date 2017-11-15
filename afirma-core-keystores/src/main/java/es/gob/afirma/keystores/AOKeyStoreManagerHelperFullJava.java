@@ -48,6 +48,22 @@ final class AOKeyStoreManagerHelperFullJava {
 		);
 	}
 
+	/** Inicializa el almac&eacute;n 100% Java para tarjeta G&amp;D SmartCafe.
+	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
+	 *                        de PIN.
+	 * @return <code>KeyStore</code> inicializado.
+	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
+	 * @throws IOException Si hay problemas en la lectura de datos. */
+	static KeyStore initSmartCafeJava(final Object parentComponent) throws AOKeyStoreManagerException,
+                                                                       IOException {
+		return init(
+			AOKeyStore.SMARTCAFE,
+			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			new es.gob.jmulticard.jse.provider.gide.SmartCafeProvider(),
+			parentComponent
+		);
+	}
+
 	/** Inicializa el almac&eacute;n 100% Java para DNIe.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
 	 *                        de PIN.
