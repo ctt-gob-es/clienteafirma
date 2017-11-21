@@ -118,12 +118,6 @@ final class SignPanelFilePanel extends JPanel {
         // Definimos aqui el boton para poder crear una politica de foco si fuese necesario
         final JButton openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
 
-        if (signer instanceof AOPDFSigner) {
-            this.pdfVisible.setMnemonic('H');
-            detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-            detailPanel.add(this.pdfVisible);
-        }
-
         // Establecemos la configuracion de color
         Color bgColor = Color.WHITE;
         // Configuramos los colores
@@ -132,6 +126,13 @@ final class SignPanelFilePanel extends JPanel {
         }
         setBackground(bgColor);
         detailPanel.setBackground(bgColor);
+
+        if (signer instanceof AOPDFSigner) {
+            this.pdfVisible.setMnemonic('H');
+            this.pdfVisible.setBackground(bgColor);
+            detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+            detailPanel.add(this.pdfVisible);
+        }
 
     	final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
