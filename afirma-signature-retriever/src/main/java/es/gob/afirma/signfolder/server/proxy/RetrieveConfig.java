@@ -20,6 +20,8 @@ import java.util.logging.Logger;
  * de ficheros en servidor. */
 public class RetrieveConfig {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+
 	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
 	static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
 
@@ -39,7 +41,7 @@ public class RetrieveConfig {
 			DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"El directorio temporal no ha podido determinarse por la variable de entorno 'java.io.tmpdir': " + e //$NON-NLS-1$
 			);
 			try {
@@ -47,14 +49,14 @@ public class RetrieveConfig {
 			}
 			catch (final Exception e1) {
 				DEFAULT_TMP_DIR = null;
-				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				LOGGER.warning(
 					"No se ha podido cargar un directorio temporal por defecto, se debera configurar expresamente en el fichero de propiedades: "  + e1 //$NON-NLS-1$
 				);
 			}
 		}
 	}
 
-	/** Crear el objeto de configuracion para el servicio de almacenamiento. */
+	/** Crear el objeto de configuraci&oacute;n para el servicio de almacenamiento. */
 	public RetrieveConfig() {
 		this.config = new Properties();
 	}
@@ -62,7 +64,7 @@ public class RetrieveConfig {
 	/** Carga el fichero indicado.
 	 * @param path Ruta del fichero de configuraci&oacute;n (si existe).
 	 * @throws FileNotFoundException Cuando no se encuentra el fichero de configuraci&oacute;n.
-	 * @throws IOException Cuanto ocurre un error durante la lectura del fichero. */
+	 * @throws IOException Cuando ocurre un error durante la lectura del fichero. */
 	public void load(final String path) throws FileNotFoundException, IOException {
 		if (path != null) {
  			try (
@@ -71,7 +73,7 @@ public class RetrieveConfig {
 				this.config.load(is);
 			}
  			catch (final IOException e) {
-				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				LOGGER.severe(
 					"No se ha podido cargar el fichero con las propiedades: " + e.toString() //$NON-NLS-1$
 				);
 			}
@@ -85,7 +87,7 @@ public class RetrieveConfig {
 	public File getTempDir() {
 		File tmpDir = new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR).trim());
 		if (!tmpDir.exists() ||!tmpDir.canRead()) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"El directorio temporal indicado en el fichero de propiedades no existe, se usara el por defecto" //$NON-NLS-1$
 			);
 			tmpDir = new File(DEFAULT_TMP_DIR);
@@ -98,7 +100,7 @@ public class RetrieveConfig {
 
 	/** Recupera el tiempo en milisegundos que puede almacenarse un fichero antes de considerarse caducado.
 	 * @return Tiempo m&aacute;ximo en milisegundos que puede tardarse en recoger un fichero antes de que
-	 * caduque. */
+	 *         caduque. */
 	public long getExpirationTime() {
 		try {
 			return this.config.containsKey(EXPIRATION_TIME_KEY) ?
@@ -106,7 +108,7 @@ public class RetrieveConfig {
 					DEFAULT_EXPIRATION_TIME;
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"Tiempo de expiracion invalido en el fichero de configuracion, se usara " + DEFAULT_EXPIRATION_TIME + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			return DEFAULT_EXPIRATION_TIME;
