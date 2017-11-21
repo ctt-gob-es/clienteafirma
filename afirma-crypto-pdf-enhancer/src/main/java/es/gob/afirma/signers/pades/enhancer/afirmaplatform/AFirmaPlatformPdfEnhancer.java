@@ -22,7 +22,7 @@ import org.apache.axis.client.Service;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
-/** A&ntilde;ade sello de tiempo a un PDF firmado mediante la Plataforma Afirma. */
+/** A&ntilde;ade sello de tiempo a un PDF firmado mediante la Plataforma &#64;firma. */
 final class AFirmaPlatformPdfEnhancer {
    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
    private static final String CABECERA = "[TestClient]:"; //$NON-NLS-1$
@@ -108,12 +108,10 @@ final class AFirmaPlatformPdfEnhancer {
 	   final String base64Sign = responseXml.substring(indexStart, indexEnd);
 
 	   return Base64.decode(base64Sign);
-
    }
 
    static String upgradeSign(final String dssXml) {
 
-	  String ret;
       try {
 
          final Properties prop = new Properties();
@@ -161,14 +159,13 @@ final class AFirmaPlatformPdfEnhancer {
 		call.setTimeout(Integer.valueOf(prop.getProperty("webservices.timeout"))); //$NON-NLS-1$
         call.setClientHandlers(reqHandler, null);
 
-        ret = (String) call.invoke(new Object[] {dssXml});
+        return (String) call.invoke(new Object[] {dssXml});
       }
       catch (final Exception e) {
     	 LOGGER.severe(AFirmaPlatformPdfEnhancer.CABECERA + e.toString());
          return null;
       }
 
-      return ret;
    }
 
 }
