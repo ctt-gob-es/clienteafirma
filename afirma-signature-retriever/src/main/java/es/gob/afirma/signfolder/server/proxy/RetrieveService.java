@@ -40,7 +40,7 @@ public final class RetrieveService extends HttpServlet {
 	/** Nombre del par&aacute;metro con el identificador del fichero temporal. */
 	private static final String PARAMETER_NAME_ID = "id"; //$NON-NLS-1$
 
-	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute; utilizada. */
+	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute;n utilizada. */
 	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$

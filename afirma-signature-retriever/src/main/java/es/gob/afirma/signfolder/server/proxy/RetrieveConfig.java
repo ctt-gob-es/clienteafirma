@@ -22,7 +22,7 @@ public class RetrieveConfig {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
+	/** Clave para la configuraci&oacute;n del directorio para la creaci&oacute;n de ficheros temporales. */
 	static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
 
 	/** Directorio temporal por defecto. */
