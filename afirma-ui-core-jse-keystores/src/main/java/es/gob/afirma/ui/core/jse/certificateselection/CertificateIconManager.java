@@ -15,6 +15,15 @@ import javax.swing.ImageIcon;
 
 final class CertificateIconManager {
 
+	private static final ImageIcon ICON_ACCV_NORMAL = new ImageIcon(
+		CertificateSelectionPanel.class.getClassLoader().getResource("resources/accvicon.png") //$NON-NLS-1$
+	);
+	private static final ImageIcon ICON_ACCV_WARNING = new ImageIcon(
+		CertificateSelectionPanel.class.getClassLoader().getResource("resources/accvicon_w.png") //$NON-NLS-1$
+	);
+	private static final ImageIcon ICON_ACCV_ERROR = new ImageIcon(
+		CertificateSelectionPanel.class.getClassLoader().getResource("resources/accvicon_e.png") //$NON-NLS-1$
+	);
 	private static final ImageIcon ICON_CNP_NORMAL = new ImageIcon(
 		CertificateSelectionPanel.class.getClassLoader().getResource("resources/cnpicon.png") //$NON-NLS-1$
 	);
@@ -52,6 +61,14 @@ final class CertificateIconManager {
 		CertificateSelectionPanel.class.getClassLoader().getResource("resources/fnmticon_e.png") //$NON-NLS-1$
 	);
 	static {
+
+		ICON_ACCV_NORMAL.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.22")); //$NON-NLS-1$
+		ICON_ACCV_NORMAL.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.22")); //$NON-NLS-1$
+		ICON_ACCV_WARNING.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.23")); //$NON-NLS-1$
+		ICON_ACCV_WARNING.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.23")); //$NON-NLS-1$
+		ICON_ACCV_ERROR.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.24")); //$NON-NLS-1$
+		ICON_ACCV_ERROR.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.24")); //$NON-NLS-1$
+
 		ICON_DNIE_NORMAL.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
 		ICON_DNIE_NORMAL.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
 		ICON_DNIE_WARNING.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
@@ -81,10 +98,22 @@ final class CertificateIconManager {
 		ICON_FNMT_ERROR.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.21")); //$NON-NLS-1$
 	}
 
+	/** Indica si un certificado ha sido emitido por ACCV.
+	 * @param certificate Certificado.
+	 * @return {@code true} si el certificado ha sido emitido por ACCV, {@code false}
+	 *         en caso contrario. */
+	private static boolean isAccvCert(final X509Certificate certificate) {
+		if (certificate == null) {
+			return false;
+		}
+		final String issuer = certificate.getIssuerX500Principal().toString().toUpperCase();
+		return issuer.contains("O=Generalitat Valenciana") && issuer.contains("OU=PKIGVA"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 	/** Indica si un certificado pertenece a un DNIe.
 	 * @param certificate Certificado.
-	 * @return Devuelve {@code true} si el certificado pertenece a un DNIe, {@code false}
-	 * en caso contrario. */
+	 * @return {@code true} si el certificado pertenece a un DNIe, {@code false}
+	 *         en caso contrario. */
 	private static boolean isDNIeCert(final X509Certificate certificate) {
 		if (certificate == null) {
 			return false;
@@ -95,8 +124,8 @@ final class CertificateIconManager {
 
 	/** Indica si un certificado est&aacute; emitido por el Cuerpo Nacional de Polic&iacute;a.
 	 * @param certificate Certificado.
-	 * @return Devuelve {@code true} si el certificado est&aacute; emitido por el CNP, {@code false}
-	 * en caso contrario. */
+	 * @return {@code true} si el certificado est&aacute; emitido por el CNP, {@code false}
+	 *         en caso contrario. */
 	private static boolean isCnpCert(final X509Certificate certificate) {
 		if (certificate == null) {
 			return false;
@@ -107,8 +136,8 @@ final class CertificateIconManager {
 
 	/** Indica si un certificado est&aacute; emitido por FNMT-RCM.
 	 * @param certificate Certificado.
-	 * @return Devuelve {@code true} si el certificado est&aacute; emitido por FNMT-RCM, {@code false}
-	 * en caso contrario. */
+	 * @return {@code true} si el certificado est&aacute; emitido por FNMT-RCM, {@code false}
+	 *         en caso contrario. */
 	private static boolean isFnmtCert(final X509Certificate certificate) {
 		if (certificate == null) {
 			return false;
@@ -118,6 +147,9 @@ final class CertificateIconManager {
 	}
 
 	static ImageIcon getNormalIcon(final X509Certificate certificate) {
+		if (isAccvCert(certificate)) {
+			return ICON_ACCV_NORMAL;
+		}
 		if (isDNIeCert(certificate)) {
 			return ICON_DNIE_NORMAL;
 		}
@@ -131,6 +163,9 @@ final class CertificateIconManager {
 	}
 
 	static ImageIcon getWarningIcon(final X509Certificate certificate) {
+		if (isAccvCert(certificate)) {
+			return ICON_ACCV_WARNING;
+		}
 		if (isDNIeCert(certificate)) {
 			return ICON_DNIE_WARNING;
 		}
@@ -144,6 +179,9 @@ final class CertificateIconManager {
 	}
 
 	static ImageIcon getErrorIcon(final X509Certificate certificate) {
+		if (isAccvCert(certificate)) {
+			return ICON_ACCV_ERROR;
+		}
 		if (isDNIeCert(certificate)) {
 			return ICON_DNIE_ERROR;
 		}
