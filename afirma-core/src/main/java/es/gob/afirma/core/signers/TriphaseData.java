@@ -244,9 +244,34 @@ public final class TriphaseData {
 			throw new IOException("Error al cargar el fichero XML: " + e, e); //$NON-NLS-1$
 		}
 
-		final Element rootElement = doc.getDocumentElement();
-		final NodeList childNodes = rootElement.getChildNodes();
+		return parser(doc.getDocumentElement());
+	}
 
+	/** Obtiene una sesi&oacute;n de firma trif&aacute;sica a partir del nodo
+	 * XML que lo describe.
+	 * Un ejemplo de XML podr&iacute;a ser el siguiente:
+	 * <pre>
+	 * &lt;xml&gt;
+	 *  &lt;firmas format="XAdES"&gt;
+	 *   &lt;firma Id="001"&gt;
+	 *    &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
+	 *    &lt;param n="PRE"&gt;MYICXDAYBgkqhkiG9[...]w0BA=&lt;/param&gt;
+	 *    &lt;param n="NEED_DATA"&gt;true&lt;/param&gt;
+	 *    &lt;param n="PK1"&gt;EMijB9pJ0lj27Xqov[...]RnCM=&lt;/param&gt;
+	 *   &lt;/firma&gt;
+	 *  &lt;/firmas&gt;
+	 * &lt;/xml&gt;
+	 * </pre>
+	 * @param xml Elemento XML con la informaci&oacute;n del mensaje.
+	 * @return Mensaje de datos.
+	 * @throws IOException Cuando hay problemas en el tratamiento de datos. */
+	public static TriphaseData parser(final Element xml) throws IOException {
+
+		if (xml == null) {
+			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
+		}
+
+		final NodeList childNodes = xml.getChildNodes();
 
 		final int idx = nextNodeElementIndex(childNodes, 0);
 		final Node rootSignsNode = childNodes.item(idx);
