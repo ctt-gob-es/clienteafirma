@@ -24,10 +24,10 @@ public final class UrlParametersToLoad extends UrlParameters {
 	private static final String TITLE_PARAM = "title"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada que indica las extensiones de ficheros permitidos. */
-	private static final String EXTENSIONS_PARAM = "extensions"; //$NON-NLS-1$
+	private static final String EXTENSIONS_PARAM = "exts"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada que indica la descripcion del tipo de fichero. */
-	private static final String DESCRIPTION_PARAM = "description"; //$NON-NLS-1$
+	private static final String DESCRIPTION_PARAM = "desc"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada que indica la ruta por defecto. */
 	private static final String FILEPATH_PARAM = "filePath"; //$NON-NLS-1$
