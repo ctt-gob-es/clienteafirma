@@ -40,7 +40,7 @@ public interface CertificateVerificable {
 
 	/** Valida el emisor del certificado X.509v3.
 	 * @param cert Certificado a validar.
-	 * @exception CertificateException, SignatureException Si el certificado o la firma no son v&aacute;lidos.
+	 * @throws CertificateException Si el certificado o la firma no son v&aacute;lidos.
 	 * @throws SignatureException Fallo en la verificaci&oacute;n del emisor. */
 	void verifyIssuer(final X509Certificate cert) throws CertificateException, SignatureException;
 
