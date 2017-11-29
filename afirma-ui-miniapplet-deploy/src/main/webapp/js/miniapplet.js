@@ -14,9 +14,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.5";
+		var VERSION = "1.6";
 
-		var JAR_NAME = 'miniapplet-full_1_5.jar';
+		var JAR_NAME = 'miniapplet-full_1_6.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -1557,8 +1557,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op", loadId);
 				data.title = generateDataKeyValue("title", title);
-				data.extensions = generateDataKeyValue("extensions", extensions);
-				data.description = generateDataKeyValue("description", description);
+				data.extensions = generateDataKeyValue("exts", extensions);
+				data.description = generateDataKeyValue("desc", description);
 				data.filePath = generateDataKeyValue("filePath", filePath);
 				data.multiload = generateDataKeyValue("multiload", multiload);
 				return data;
@@ -2085,8 +2085,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.op = generateDataKeyValue ("op", "save");
 				data.title = generateDataKeyValue ("title", title);
 				data.filename = generateDataKeyValue ("filename", filename);
-				data.extension = generateDataKeyValue ("extension", extension);
-				data.description = generateDataKeyValue ("description", description);
+				data.extension = generateDataKeyValue ("exts", extension);
+				data.description = generateDataKeyValue ("desc", description);
 				data.dat = generateDataKeyValue ("dat",  dataB64 == "" ? null : dataB64);
 				
 				return data;
