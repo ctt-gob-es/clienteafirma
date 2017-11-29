@@ -37,7 +37,7 @@ public interface TriPhasePreProcessor {
 	 * @param algorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
-	 * @param session Prefirma.
+	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
 	 * @return Firma completa.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
@@ -72,7 +72,7 @@ public interface TriPhasePreProcessor {
 	 * @param algorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
-	 * @param session Precofirma.
+	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
 	 * @return Cofirma completa.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
@@ -108,7 +108,7 @@ public interface TriPhasePreProcessor {
 	 * @param algorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
-	 * @param session Precontrafirma.
+	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
 	 * @param targets Objetivo de la contrafirma.
 	 * @return Contrafirma completa.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.

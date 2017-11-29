@@ -134,10 +134,13 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
+		final TriSign signConfig = triphaseData.getSign(0);
+
+		// Comprobamos que se incluyan todos los parametros necesarios para la postfirma
+		checkSession(signConfig);
+
 		// Preparo la fecha de firma
 		final GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-
-		final TriSign signConfig = triphaseData.getSign(0);
 
 		try {
 			cal.setTimeInMillis(Long.parseLong(signConfig.getProperty(PROPERTY_NAME_SIGN_TIME)));
@@ -169,6 +172,27 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Postfirma PAdES - Firma - FIN"); //$NON-NLS-1$
 
 		return postsign;
+	}
+
+	/**
+	 * Comprueba que la configuracion proporcionada para realizar la postfirma incluya
+	 * todos los datos obligatorios para la operaci&oacute;n.
+	 * @param sessionConfig Configuraci&oacute;n de firma.
+	 * @throws AOException Cuando falta alg&uacute;n par&aacute;metro obligatorio.
+	 */
+	private static void checkSession(TriSign sessionConfig) throws AOException {
+
+		final String[] params = new String[] {
+			PROPERTY_NAME_PRESIGN,
+			PROPERTY_NAME_PKCS1_SIGN,
+			PROPERTY_NAME_PDF_UNIQUE_ID,
+			PROPERTY_NAME_SIGN_TIME
+		};
+		for (final String param : params) {
+			if (sessionConfig.getProperty(param) == null) {
+				throw new AOException("No se ha proporcionado un parametro obligatorio para la postfirma PAdES: " + param); //$NON-NLS-1$
+			}
+		}
 	}
 
 	@Override
