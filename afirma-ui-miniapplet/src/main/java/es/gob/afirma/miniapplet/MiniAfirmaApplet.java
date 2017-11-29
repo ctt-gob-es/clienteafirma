@@ -894,18 +894,21 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
 				!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
 			) {
-			new Thread(() -> {
-				try {
-					final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-					final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
-					tracker.trackPageView(
-							getCodeBase().toString(),
-							"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
-							getCodeBase().getHost().toString()
-							);
-				}
-				catch(final Exception e) {
-					LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+						tracker.trackPageView(
+								getCodeBase().toString(),
+								"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
+								getCodeBase().getHost().toString()
+								);
+					}
+					catch(final Exception e) {
+						LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+					}
 				}
 			}).start();
 		}
@@ -1440,15 +1443,22 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 			return Base64.encode(
 				AccessController.doPrivileged(
-					(PrivilegedExceptionAction<byte[]>) () -> BatchSigner.sign(
-						batchB64,
-						batchPreSignerUrl,
-						batchPostSignerUrl,
-						pke.getCertificateChain(),
-						pke.getPrivateKey()
-					).getBytes(StandardCharsets.UTF_8.name())
-				)
-			);
+						new PrivilegedExceptionAction<byte[]>() {
+
+							@Override
+							public byte[] run() throws Exception {
+
+								return BatchSigner.sign(
+										batchB64,
+										batchPreSignerUrl,
+										batchPostSignerUrl,
+										pke.getCertificateChain(),
+										pke.getPrivateKey()
+									).getBytes(StandardCharsets.UTF_8.name());
+							}
+
+						}
+				));
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof CertificateEncodingException) {
