@@ -128,7 +128,7 @@ final class ProtocolInvocationLauncherSelectCert {
 				}
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
+				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket) {
 					throw new SocketOperationException(getResultCancel());
 				}

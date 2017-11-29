@@ -23,6 +23,7 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -174,36 +175,14 @@ final class PreferencesPanelGeneral extends JPanel {
 	 *                    {@code false} en caso contrario. */
 	void loadDefaultPreferences() {
 
-		this.avoidAskForClose.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
-		this.hideDniStartScreen.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
-		this.checkForUpdates.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_UPDATECHECK));
-		this.sendAnalytics.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_GENERAL_USEANALYTICS));
-
-		// Para las preferencias susceptibles de ser protegidas, comprobamos la
-		// preferencia unprotected antes de cargar su valor por defecto.
-		// Un valor unprotected a false habilitara que cualquier opcion de
-		// configuracion pueda ser alterada por parte del usuario mediante el
-		// interfaz grafico. Este comportamiento se generaliza para el boton de
-		// restaurar las preferencias por defecto.
-		if (!isBlocked()) {
-			this.signarureAlgorithms
-					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
-			);
-
-			// Formatos por defecto
-			this.pdfFilesCombo
-					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF));
-			this.ooxmlFilesCombo
-					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML));
-			this.facturaeFilesCombo.setSelectedItem(
-					PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE));
-			this.odfFilesCombo
-					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF));
-			this.xmlFilesCombo
-					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML));
-			this.binFilesCombo
-					.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN));
+		try {
+			PreferencesManager.clearAll();
 		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: e"); //$NON-NLS-1$
+		}
+		loadPreferences();
+		getDisposableInterface().disposeInterface();
 	}
 
 	void createUI(final KeyListener keyListener,
@@ -318,7 +297,6 @@ final class PreferencesPanelGeneral extends JPanel {
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
 				loadDefaultPreferences();
-
 			}
 		});
 		restoreConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
@@ -330,7 +308,9 @@ final class PreferencesPanelGeneral extends JPanel {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
+		importConfigFromFileButton.setPreferredSize(new Dimension(280, 28));
 		panel.add(importConfigFromFileButton);
+		restoreConfigFromFileButton.setPreferredSize(new Dimension(280, 28));
 		panel.add(restoreConfigFromFileButton);
 
 		signConfigPanel.add(panel, signConstraint);
