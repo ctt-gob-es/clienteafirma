@@ -40,7 +40,7 @@ final class ErrorManager {
 	static final String ERROR_CONFIGURATION_FILE_PROBLEM = "ERR-19"; //$NON-NLS-1$
 	static final String ERROR_MISSING_SYNTAX_VERSION	 = "ERR-20"; //$NON-NLS-1$
 
-	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
+	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
 		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado codigo de operacion"); //$NON-NLS-1$
 		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "Codigo de operacion no soportado"); //$NON-NLS-1$
@@ -76,7 +76,6 @@ final class ErrorManager {
 	static String genError(final String number, final String msg) {
 		final String resultMsg = msg != null ? msg : ERRORS.get(number);
 		return new StringBuilder(number).append(ERROR_SEPARATOR).
-			append(resultMsg != null ? resultMsg :
-				GENERIC_ERROR).toString();
+				append(resultMsg != null ? resultMsg : GENERIC_ERROR).toString();
 	}
 }

@@ -24,8 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Servicio de almacenamiento temporal de firmas.
- * &Uacute;til para servir de intermediario en comunicaci&oacute;n
- * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
+ * &Uacute;til para servir de intermediario en comunicaci&oacute;n * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class RetrieveService extends HttpServlet {
 
@@ -40,7 +39,7 @@ public final class RetrieveService extends HttpServlet {
 	/** Nombre del par&aacute;metro con el identificador del fichero temporal. */
 	private static final String PARAMETER_NAME_ID = "id"; //$NON-NLS-1$
 
-	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute;n utilizada. */
+	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute; utilizada. */
 	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$
@@ -56,15 +55,12 @@ public final class RetrieveService extends HttpServlet {
 		}
 		catch (final IOException e) {
 			CONFIG = null;
-			LOGGER.log(
-				Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM), e
-			);
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM), e);
 		}
 	}
 
 	@Override
-	protected void service(final HttpServletRequest request,
-			               final HttpServletResponse response) throws ServletException, IOException {
+	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
 		LOGGER.info("== INICIO DE LA RECUPERACION =="); //$NON-NLS-1$
 
@@ -74,37 +70,34 @@ public final class RetrieveService extends HttpServlet {
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
-		try (
-			final PrintWriter out = response.getWriter();
-		) {
-			if (operation == null) {
-				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
-				out.flush();
-				return;
-			}
-			if (syntaxVersion == null) {
-				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
-				out.flush();
-				return;
-			}
-
-			if (OPERATION_RETRIEVE.equalsIgnoreCase(operation)) {
-				retrieveSign(out, request, CONFIG);
-			}
-			else {
-				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
-			}
+		final PrintWriter out = response.getWriter();
+		if (operation == null) {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
 			out.flush();
-			LOGGER.info("== FIN DE LA RECUPERACION =="); //$NON-NLS-1$
-
-			// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
-			LOGGER.info("Limpiamos el directorio temporal"); //$NON-NLS-1$
-			removeExpiredFiles(CONFIG);
-			LOGGER.info("Fin de la limpieza"); //$NON-NLS-1$
+			return;
 		}
+		if (syntaxVersion == null) {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
+			out.flush();
+			return;
+		}
+
+		if (OPERATION_RETRIEVE.equalsIgnoreCase(operation)) {
+			retrieveSign(out, request, CONFIG);
+		}
+		else {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
+		}
+		out.flush();
+		LOGGER.info("== FIN DE LA RECUPERACION =="); //$NON-NLS-1$
+
+		// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
+		LOGGER.info("Limpiamos el directorio temporal"); //$NON-NLS-1$
+		removeExpiredFiles(CONFIG);
+		LOGGER.info("Fin de la limpieza"); //$NON-NLS-1$
 	}
 
 	/** Recupera la firma del servidor.
@@ -132,24 +125,16 @@ public final class RetrieveService extends HttpServlet {
 		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead() || isExpired(inFile, config.getExpirationTime())) {
 
 			if (!inFile.exists()) {
-				LOGGER.warning(
-					"El fichero con el identificador '" + id + "' no existe: " + inFile.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				LOGGER.warning("El fichero con el identificador '" + id + "' no existe: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (!inFile.isFile()) {
-				LOGGER.warning(
-					"El archivo con el identificador '" + id + "' no es un fichero: " + inFile.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (!inFile.canRead()) {
-				LOGGER.warning(
-					"El fichero con el identificador '" + id + "' no tiene permisos de lectura: " + inFile.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
-				LOGGER.warning(
-					"El fichero con el identificador '" + id + "' esta caducado: " + inFile.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			out.println(
@@ -161,9 +146,8 @@ public final class RetrieveService extends HttpServlet {
 			}
 		}
 		else {
-			try (
+			try {
 				final InputStream fis = new FileInputStream(inFile);
-			) {
 				out.println(new String(getDataFromInputStream(fis)));
 				fis.close();
 				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$

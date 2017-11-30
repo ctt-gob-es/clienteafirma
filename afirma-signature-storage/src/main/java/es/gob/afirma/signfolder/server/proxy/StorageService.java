@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
@@ -23,9 +22,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
@@ -66,17 +67,12 @@ public final class StorageService extends HttpServlet {
 		}
 		catch (final IOException e) {
 			CONFIG = null;
-			LOGGER.log(
-				Level.SEVERE,
-				ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM),
-				e
-			);
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM), e);
 		}
 	}
 
 	@Override
-	protected void service(final HttpServletRequest request,
-			               final HttpServletResponse response) throws ServletException, IOException {
+	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
 		LOGGER.info(" == INICIO GUARDADO == "); //$NON-NLS-1$
 
@@ -84,16 +80,15 @@ public final class StorageService extends HttpServlet {
 		int n;
 		final byte[] buffer = new byte[1024];
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try (
-			final InputStream sis = request.getInputStream();
-		) {
-			while ((n = sis.read(buffer)) > 0) {
-				baos.write(buffer, 0, n);
-			}
+		final ServletInputStream sis = request.getInputStream();
+		while ((n = sis.read(buffer)) > 0) {
+			baos.write(buffer, 0, n);
 		}
+		baos.close();
+		sis.close();
 
 		// Separamos los parametros y sus valores
-		final Hashtable<String, String> params = new Hashtable<>();
+		final Hashtable<String, String> params = new Hashtable<String, String>();
 		final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
 		for (final String param : urlParams) {
 			final int equalsPos = param.indexOf('=');
@@ -108,30 +103,26 @@ public final class StorageService extends HttpServlet {
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
-		try (
-			final PrintWriter out = response.getWriter();
-		) {
-			if (operation == null) {
-				LOGGER.warning("No se ha indicado codigo de operacion"); //$NON-NLS-1$
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
-				out.flush();
-				return;
-			}
-			if (syntaxVersion == null) {
-				LOGGER.warning("No se ha indicado la version del formato de llamada"); //$NON-NLS-1$
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
-				out.flush();
-				return;
-			}
-
-			if (OPERATION_STORE.equalsIgnoreCase(operation)) {
-				storeSign(out, params, StorageService.CONFIG);
-			}
-			else {
-				out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
-			}
+		final PrintWriter out = response.getWriter();
+		if (operation == null) {
+			LOGGER.warning("No se ha indicado codigo de operacion"); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
 			out.flush();
+			return;
 		}
+		if (syntaxVersion == null) {
+			LOGGER.warning("No se ha indicado la version del formato de llamada"); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
+			out.flush();
+			return;
+		}
+
+		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
+			storeSign(out, params, StorageService.CONFIG);
+		} else {
+			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
+		}
+		out.flush();
 		LOGGER.info("== FIN DEL GUARDADO =="); //$NON-NLS-1$
 	}
 
@@ -140,9 +131,7 @@ public final class StorageService extends HttpServlet {
 	 * @param params Par&aacute;metros de la psetici&oacute;n.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
-	private static void storeSign(final PrintWriter out,
-			                      final Hashtable<String, String> params,
-			                      final StorageConfig config) throws IOException {
+	private static void storeSign(final PrintWriter out, final Hashtable<String, String> params, final StorageConfig config) throws IOException {
 
 		final String id = params.get(PARAMETER_NAME_ID);
 		if (id == null) {
@@ -165,16 +154,14 @@ public final class StorageService extends HttpServlet {
 		}
 
 		final File outFile = new File(config.getTempDir(), id);
-		try (
+		try {
 			final OutputStream fos = new FileOutputStream(outFile);
-			final OutputStream bos = new BufferedOutputStream(fos);
-		) {
+			final BufferedOutputStream bos = new BufferedOutputStream(fos);
 			bos.write(dataText.getBytes());
 			bos.flush();
 			bos.close();
 			fos.close();
-		}
-		catch (final IOException e) {
+		} catch (final IOException e) {
 			LOGGER.severe("No se ha podido generar el fichero temporal para el envio de datos a la web: " + e); //$NON-NLS-1$
 			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB));
 			return;
