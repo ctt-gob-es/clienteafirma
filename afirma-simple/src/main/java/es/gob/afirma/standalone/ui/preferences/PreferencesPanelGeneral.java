@@ -609,21 +609,40 @@ final class PreferencesPanelGeneral extends JPanel {
 				else {
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST, host);
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, port);
-					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, proxyDlg.getUsername());
 
-					try {
-						final String cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
-						if (cipheredPwd != null) {
-							PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
+					// Si no se establece usuario, nos aseguramos de eliminar el actual. Si se establece, lo guardamos.
+					if (proxyDlg.getUsername() == null || proxyDlg.getUsername().isEmpty()) {
+						PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
+					}
+					else {
+						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, proxyDlg.getUsername());
+					}
+
+					// Si no se establece contrasena, nos aseguramos de eliminar la actual. Si se establece,
+					// la guardamos cifrada.
+					if (proxyDlg.getPassword() == null || proxyDlg.getPassword().length == 0) {
+						PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
+					}
+					else {
+						try {
+							final String cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
+							if (cipheredPwd != null) {
+								PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
+							}
+						}
+						catch (final GeneralSecurityException e) {
+							LOGGER.severe("Error cifrando la contrasena del Proxy: " + e); //$NON-NLS-1$
+							JOptionPane.showMessageDialog(container, SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
+							PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
 						}
 					}
-					catch (final GeneralSecurityException e) {
-						LOGGER.severe("Error cifrando la contrasena del Proxy: " + e); //$NON-NLS-1$
-						JOptionPane.showMessageDialog(container, SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
-						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
-					}
 				}
-
+			}
+			else {
+				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST);
+				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT);
+				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
+				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
 			}
 
 			PreferencesManager.putBoolean(
