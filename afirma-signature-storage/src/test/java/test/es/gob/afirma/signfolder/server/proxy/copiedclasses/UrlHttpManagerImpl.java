@@ -40,6 +40,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -242,16 +243,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				"Content-Length", String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length) //$NON-NLS-1$
 			);
 			conn.setDoOutput(true);
-			try (
-				final OutputStream os = conn.getOutputStream();
-			) {
-				os.write(urlParameters.getBytes(StandardCharsets.UTF_8));
-			}
-		}
-		else {
-			conn.setRequestProperty(
-				"Content-Length", "0" //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			final OutputStream os = conn.getOutputStream();
+			os.write(urlParameters.getBytes(StandardCharsets.UTF_8));
+			os.close();
 		}
 
 		conn.connect();
@@ -272,11 +266,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		final byte[] data;
-		try (
-			final InputStream is = conn.getInputStream();
-		) {
-			data = AOUtil.getDataFromInputStream(is);
-		}
+		final InputStream is = conn.getInputStream();
+		data = AOUtil.getDataFromInputStream(is);
+		is.close();
 
 		if (disableSslChecks && uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
@@ -330,7 +322,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		);
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(
-			(hostname, session) -> true
+			new HostnameVerifier() {
+				@Override
+				public boolean verify(final String hostname, final SSLSession session) {
+					return true;
+				}
+			}
 		);
 	}
 
@@ -361,14 +358,14 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final KeyStore keystore = KeyStore.getInstance(
 			keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE
 		);
-		try (
-			final InputStream fis = new FileInputStream(f);
-		) {
-			keystore.load(
-				fis,
-				keyStorePassword != null ? keyStorePassword.toCharArray() : null
-			);
-		}
+
+		final InputStream fis = new FileInputStream(f);
+		keystore.load(
+			fis,
+			keyStorePassword != null ? keyStorePassword.toCharArray() : null
+		);
+		fis.close();
+
 		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KEYMANAGER_INSTANCE);
 		keyFac.init(
 			keystore,

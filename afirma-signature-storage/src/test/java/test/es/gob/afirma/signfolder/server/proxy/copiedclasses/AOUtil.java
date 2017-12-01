@@ -14,19 +14,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -349,91 +345,6 @@ public final class AOUtil {
             stringbuffer.append(HEX_CHARS[abyte0[j] & 0xf]);
         }
         return stringbuffer.toString();
-    }
-
-    /** Carga una librer&iacute;a nativa del sistema.
-     * @param path Ruta a la libreria de sistema.
-     * @throws IOException Si ocurre alg&uacute;n problema durante la carga */
-    public static void loadNativeLibrary(final String path) throws IOException {
-        if (path == null) {
-            LOGGER.warning("No se puede cargar una biblioteca nula"); //$NON-NLS-1$
-            return;
-        }
-        final int pos = path.lastIndexOf('.');
-        final File file = new File(path);
-        final File tempLibrary =
-            File.createTempFile(pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
-                pos < 1 || pos == path.length() - 1 ? null : path.substring(pos));
-
-        // Copiamos el fichero
-        copyFile(file, tempLibrary);
-
-        // Pedimos borrar los temporales cuando se cierre la JVM
-        if (tempLibrary != null) {
-            tempLibrary.deleteOnExit();
-        }
-
-        LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
-        System.load(tempLibrary != null ? tempLibrary.getAbsolutePath() : path);
-
-    }
-
-    /** Copia un fichero.
-     * @param source Fichero origen con el contenido que queremos copiar.
-     * @param dest Fichero destino de los datos.
-     * @throws IOException SI ocurre algun problema durante la copia */
-    public static void copyFile(final File source, final File dest) throws IOException {
-        if (source == null || dest == null) {
-            throw new IllegalArgumentException("Ni origen ni destino de la copia pueden ser nulos"); //$NON-NLS-1$
-        }
-        try (
-	        final FileInputStream is = new FileInputStream(source);
-	        final FileOutputStream os = new FileOutputStream(dest);
-	        final FileChannel in = is.getChannel();
-	        final FileChannel out = os.getChannel();
-    	) {
-        	final MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
-        	out.write(buf);
-        }
-    }
-
-    /** Genera una lista de cadenas compuesta por los fragmentos de texto
-     * separados por la cadena de separaci&oacute;n indicada. No soporta
-     * expresiones regulares. Por ejemplo:<br>
-     * <ul>
-     * <li><b>Texto:</b> foo$bar$foo$$bar$</li>
-     * <li><b>Separado:</b> $</li>
-     * <li><b>Resultado:</b> "foo", "bar", "foo", "", "bar", ""</li>
-     * </ul>
-     * @param text
-     *        Texto que deseamos dividir.
-     * @param sp
-     *        Separador entre los fragmentos de texto.
-     * @return Listado de fragmentos de texto entre separadores.
-     * @throws NullPointerException
-     *         Cuando alguno de los par&aacute;metros de entrada es {@code null}. */
-    public static String[] split(final String text, final String sp) {
-
-        final ArrayList<String> parts = new ArrayList<>();
-        int i = 0;
-        int j = 0;
-        while (i != text.length() && (j = text.indexOf(sp, i)) != -1) {
-            if (i == j) {
-                parts.add(""); //$NON-NLS-1$
-            }
-            else {
-                parts.add(text.substring(i, j));
-            }
-            i = j + sp.length();
-        }
-        if (i == text.length()) {
-            parts.add(""); //$NON-NLS-1$
-        }
-        else {
-            parts.add(text.substring(i));
-        }
-
-        return parts.toArray(new String[0]);
     }
 
 	/** Convierte un objeto de propiedades en una cadena Base64 URL SAFE.
