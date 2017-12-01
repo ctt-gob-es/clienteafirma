@@ -43,15 +43,15 @@ final class ErrorManager {
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
-		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado c\u00F3ndigo de operaci\u00F3nn"); //$NON-NLS-1$
-		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3ndigo de operaci\u00F3nn no soportado"); //$NON-NLS-1$
-		ERRORS.put(ERROR_MISSING_DATA, "No se han proporcionado los datos de la operaci\u00F3nn"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado c\u00F3ndigo de operaci\u00F3n"); //$NON-NLS-1$
+		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3ndigo de operaci\u00F3n no soportado"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_DATA, "No se han proporcionado los datos de la operaci\u00F3n"); //$NON-NLS-1$
 		ERRORS.put(ERROR_BAD_XML, "Se ha recibido un XML mal formado"); //$NON-NLS-1$
 		ERRORS.put(ERROR_BAD_CERTIFICATE, "Se ha recibido un certificado corrupto"); //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_DATA_ID, "No se ha proporcionado un identificador para los datos"); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_DATA_ID, "El identificador para los datos es inv\u00E1lido"); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_DATA, "Los datos solicitados o enviados son inv\u00E1lidos"); //$NON-NLS-1$
-		ERRORS.put(ERROR_MISSING_SERVLET, "No se ha proporcionado el Servlet para la comunicaci\u00F3nn de los datos"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_SERVLET, "No se ha proporcionado el Servlet para la comunicaci\u00F3n de los datos"); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_SERVLET, "La ruta del Servlet es inv\u00E1lida"); //$NON-NLS-1$
 		ERRORS.put(ERROR_NOT_SUPPORTED_FORMAT, "Se ha configurado un formato de firma no soportado"); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANCELLED_OPERATION, "Operaci\u00F3n cancelada"); //$NON-NLS-1$
