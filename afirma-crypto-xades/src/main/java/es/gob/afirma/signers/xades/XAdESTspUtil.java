@@ -66,8 +66,16 @@ final class XAdESTspUtil {
 		if (extraParams == null) {
 			return xml;
 		}
-		final TsaParams tsaParams = new TsaParams(extraParams);
-		if (tsaParams.getTsaUrl() == null) {
+
+		TsaParams tsaParams;
+		try {
+			tsaParams = new TsaParams(extraParams);
+		}
+		catch (final Exception e) {
+			tsaParams = null;
+		}
+
+		if (tsaParams == null) {
 			return xml;
 		}
 

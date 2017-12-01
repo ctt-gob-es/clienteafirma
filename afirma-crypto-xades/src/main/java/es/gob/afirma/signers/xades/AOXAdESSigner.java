@@ -408,19 +408,19 @@ public final class AOXAdESSigner implements AOSigner {
                        final PrivateKey key,
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
-    		// La firma generada con el AOSigner se le pasa al sellador de tiempo,
-    		// pero este solo estampara un sello si asi se le ha indicado en los
-    		// parametros adicionales, no haciendo nada en caso contrario
-    		return XAdESTspUtil.timestampXAdES(
-			XAdESSigner.sign(
-				data,
-				algorithm,
-				key,
-				certChain,
-				xParams
-			),
-			xParams
-		);
+		// La firma generada con el AOSigner se le pasa al sellador de tiempo,
+		// pero este solo estampara un sello si asi se le ha indicado en los
+		// parametros adicionales, no haciendo nada en caso contrario
+    	return XAdESTspUtil.timestampXAdES(
+    			XAdESSigner.sign(
+    					data,
+    					algorithm,
+    					key,
+    					certChain,
+    					xParams
+    					),
+    			xParams
+    			);
     }
 
     /** Comprueba si la firma es <i>detached</i>. Previamente debe haberse comprobado que el XML se
