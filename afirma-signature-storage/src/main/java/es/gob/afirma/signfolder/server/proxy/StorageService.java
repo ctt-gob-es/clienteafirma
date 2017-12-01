@@ -88,7 +88,7 @@ public final class StorageService extends HttpServlet {
 		sis.close();
 
 		// Separamos los parametros y sus valores
-		final Hashtable<String, String> params = new Hashtable<String, String>();
+		final Hashtable<String, String> params = new Hashtable<>();
 		final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
 		for (final String param : urlParams) {
 			final int equalsPos = param.indexOf('=');
@@ -119,7 +119,8 @@ public final class StorageService extends HttpServlet {
 
 		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
 			storeSign(out, params, StorageService.CONFIG);
-		} else {
+		}
+		else {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
 		}
 		out.flush();
@@ -142,11 +143,16 @@ public final class StorageService extends HttpServlet {
 
 		LOGGER.info("Se solicita guardar un fichero con el identificador: " + id); //$NON-NLS-1$
 
-		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
-		String dataText = URLDecoder.decode(params.get(PARAMETER_NAME_DATA), DEFAULT_ENCODING);
-		if (dataText == null) {
+		final String data = params.get(PARAMETER_NAME_DATA);
+		String dataText;
+		if (data == null || data.isEmpty()) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA));
+			// Si no se indican los datos, se transmite el error en texto plano
+			// a traves del fichero generado
 			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA);
+		}
+		else {
+			dataText = URLDecoder.decode(data, DEFAULT_ENCODING);
 		}
 
 		if (!config.getTempDir().exists()) {
