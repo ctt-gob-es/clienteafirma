@@ -23,14 +23,12 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -414,10 +412,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     public static void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final File helpFile = new File(APPLICATION_HOME + "\\AutoFirmaV2.chm"); //$NON-NLS-1$
+            final File helpVersionFile = new File(APPLICATION_HOME + "\\help.version"); //$NON-NLS-1$
             // Si el fichero no existe lo creamos
-            if (!helpFile.exists()) {
+            if (!helpFile.exists() || HelpResourceManager.isDifferentHelpFile(helpVersionFile)) {
 	            try {
-	            	HelpResourceManager.createWindowsHelpResources(helpFile);
+	            	HelpResourceManager.createWindowsHelpResources(helpFile, helpVersionFile);
 	            }
 	            catch(final Exception e) {
 	                LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
@@ -429,6 +428,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			}
             catch (final IOException e) {
 				LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
+				JavaHelp.showHelp();
 			}
             return;
         }
@@ -725,25 +725,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     private static String version = null;
 
-	/** Recupera el identificador del numero de version del MiniApplet a partir de su Manifest.
-	 * @return Identificador de la versi&oacute;n. */
+	/** Recupera el identificador del numero de version de la aplicaci&oacute;n.
+	 * @return Texto descriptivo de la versi&oacute;n. */
 	public static String getVersion() {
 
 		if (version != null) {
 			return version;
 		}
 
-		try (
-			final InputStream manifestIs = SimpleAfirma.class.getClassLoader().getResourceAsStream("properties/updater.properties"); //$NON-NLS-1$
-		) {
-			final Properties metadata = new Properties();
-			metadata.load(manifestIs);
-			version = metadata.getProperty("currentVersionText." + Platform.getOS(), ""); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		catch (final Exception e) {
-			LOGGER.warning("No se ha podido identificar el numero de version de AutoFirma a partir del Manifest: " + e); //$NON-NLS-1$
-			version = ""; //$NON-NLS-1$
-		}
+		version = Updater.getCurrentVersionText();
 
 		return version;
 	}

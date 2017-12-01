@@ -72,11 +72,17 @@ public final class Updater {
 
 	/** Obtiene la versi&oacute;n actual del aplicativo.
 	 * @return Versi&oacute;n actual del aplicativo. */
-	private static String getCurrentVersion() {
+	public static String getCurrentVersion() {
 		if (currentVersion == null) {
 			currentVersion = updaterProperties.getProperty("currentVersion." + Platform.getOS(), "0"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return currentVersion;
+	}
+
+	/** Obtiene el texto descriptivo de la versi&oacute;n actual del aplicativo.
+	 * @return Texto descriptivo de la versi&oacute;n actual del aplicativo. */
+	public static String getCurrentVersionText() {
+		return updaterProperties.getProperty("currentVersionText." + Platform.getOS(), "0"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** Obtiene la &uacute;ltima versi&oacute;n disponible del programa.
