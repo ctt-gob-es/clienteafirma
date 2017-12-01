@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
- * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s */
+ * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s. */
 public final class StorageService extends HttpServlet {
 
 	private static final long serialVersionUID = -3272368448371213403L;
@@ -38,7 +38,7 @@ public final class StorageService extends HttpServlet {
 	/** Codificaci&oacute;n de texto. */
 	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
-	/** Log para registrar las acciones del servicio. */
+	/** <i>Log</i> para registrar las acciones del servicio. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
 	/** Nombre del par&aacute;metro con la operaci&oacute;n realizada. */
@@ -47,7 +47,7 @@ public final class StorageService extends HttpServlet {
 	/** Nombre del par&aacute;metro con el identificador del fichero temporal. */
 	private static final String PARAMETER_NAME_ID = "id"; //$NON-NLS-1$
 
-	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute; utilizada. */
+	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute;n utilizada. */
 	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	/** Nombre del par&aacute;metro con los datos a firmar. */
@@ -128,7 +128,7 @@ public final class StorageService extends HttpServlet {
 
 	/** Almacena una firma en servidor.
 	 * @param out Respuesta a la petici&oacute;n.
-	 * @param params Par&aacute;metros de la psetici&oacute;n.
+	 * @param params Par&aacute;metros de la petici&oacute;n.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void storeSign(final PrintWriter out, final Hashtable<String, String> params, final StorageConfig config) throws IOException {

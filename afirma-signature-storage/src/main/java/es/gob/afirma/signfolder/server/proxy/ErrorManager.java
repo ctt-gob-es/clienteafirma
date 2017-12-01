@@ -16,7 +16,7 @@ final class ErrorManager {
 
 	private static final String ERROR_SEPARATOR = ":="; //$NON-NLS-1$
 
-	private static final String GENERIC_ERROR = "Error generico"; //$NON-NLS-1$
+	private static final String GENERIC_ERROR = "Error gen\u00E9rico"; //$NON-NLS-1$
 
 	static final String ERROR_MISSING_OPERATION_NAME     = "ERR-00"; //$NON-NLS-1$
 	static final String ERROR_UNSUPPORTED_OPERATION_NAME = "ERR-01"; //$NON-NLS-1$
@@ -42,25 +42,25 @@ final class ErrorManager {
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
-		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado codigo de operacion"); //$NON-NLS-1$
-		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "Codigo de operacion no soportado"); //$NON-NLS-1$
-		ERRORS.put(ERROR_MISSING_DATA, "No se han proporcionado los datos de la operacion"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado c\u00F3ndigo de operaci\u00F3nn"); //$NON-NLS-1$
+		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3ndigo de operaci\u00F3nn no soportado"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_DATA, "No se han proporcionado los datos de la operaci\u00F3nn"); //$NON-NLS-1$
 		ERRORS.put(ERROR_BAD_XML, "Se ha recibido un XML mal formado"); //$NON-NLS-1$
 		ERRORS.put(ERROR_BAD_CERTIFICATE, "Se ha recibido un certificado corrupto"); //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_DATA_ID, "No se ha proporcionado un identificador para los datos"); //$NON-NLS-1$
-		ERRORS.put(ERROR_INVALID_DATA_ID, "El identificador para los datos es invalido"); //$NON-NLS-1$
-		ERRORS.put(ERROR_INVALID_DATA, "Los datos solicitados o enviados son invalidos"); //$NON-NLS-1$
-		ERRORS.put(ERROR_MISSING_SERVLET, "No se ha proporcionado el sevlet para la comunicacion de los datos"); //$NON-NLS-1$
-		ERRORS.put(ERROR_INVALID_SERVLET, "La ruta del servlet es invalida"); //$NON-NLS-1$
+		ERRORS.put(ERROR_INVALID_DATA_ID, "El identificador para los datos es inv\u00E1lido"); //$NON-NLS-1$
+		ERRORS.put(ERROR_INVALID_DATA, "Los datos solicitados o enviados son inv\u00E1lidos"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_SERVLET, "No se ha proporcionado el Servlet para la comunicaci\u00F3nn de los datos"); //$NON-NLS-1$
+		ERRORS.put(ERROR_INVALID_SERVLET, "La ruta del Servlet es inv\u00E1lida"); //$NON-NLS-1$
 		ERRORS.put(ERROR_NOT_SUPPORTED_FORMAT, "Se ha configurado un formato de firma no soportado"); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANCELLED_OPERATION, "Operaci\u00F3n cancelada"); //$NON-NLS-1$
 		ERRORS.put(ERROR_CODING_BASE64, "Error en la codificaci\u00F3n del base 64"); //$NON-NLS-1$
 		ERRORS.put(ERROR_PKE, "No se seleccion\u00F3 certificado de firma"); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGNING, "Ocurri\u00F3 un error en la operaci\u00F3n de firma"); //$NON-NLS-1$
-		ERRORS.put(ERROR_INVALID_CIPHER_KEY, "La clave de cifrado proporcionada no es valida"); //$NON-NLS-1$
+		ERRORS.put(ERROR_INVALID_CIPHER_KEY, "La clave de cifrado proporcionada no es v\u00E1lida"); //$NON-NLS-1$
 		ERRORS.put(ERROR_CIPHERING, "Error durante el proceso de cifrado de los datos"); //$NON-NLS-1$
 		ERRORS.put(ERROR_NO_CERT_SELECTED, "El usuario no seleccion\u00F3 ning\u00FAn certificado "); //$NON-NLS-1$
-		ERRORS.put(ERROR_COMMUNICATING_WITH_WEB, "No se ha podido enviar la firma generada a la web de origen"); //$NON-NLS-1$
+		ERRORS.put(ERROR_COMMUNICATING_WITH_WEB, "No se ha podido enviar la firma generada a la Web de origen"); //$NON-NLS-1$
 		ERRORS.put(ERROR_CONFIGURATION_FILE_PROBLEM, "Error de configuraci\u00F3n de la aplicaci\u00F3n"); //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_SYNTAX_VERSION, "No se ha indicado la versi\u00F3n de la sintaxis de la operaci\u00F3n"); //$NON-NLS-1$
 	}

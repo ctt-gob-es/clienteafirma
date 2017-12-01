@@ -80,7 +80,7 @@ final class StorageConfig {
 
 	/** Recupera el directorio configurado para la creaci&oacute;n de ficheros temporales o el por defecto.
 	 * @return Directorio temporal.
-	 * @throws NullPointerException Cuando no se indicala ruta del directorio temporal ni se puede obtener
+	 * @throws NullPointerException Cuando no se indica la ruta del directorio temporal ni se puede obtener
 	 * del sistema. */
 	File getTempDir() {
 		return new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR).trim());
@@ -88,7 +88,7 @@ final class StorageConfig {
 
 	/** Recupera el tiempo en milisegundos que puede almacenarse un fichero antes de considerarse caducado.
 	 * @return Tiempo m&aacute;ximo en milisegundos que puede tardarse en recoger un fichero antes de que
-	 * caduque. */
+	 *         caduque. */
 	long getExpirationTime() {
 		try {
 			return this.config.containsKey(EXPIRATION_TIME_KEY) ?
