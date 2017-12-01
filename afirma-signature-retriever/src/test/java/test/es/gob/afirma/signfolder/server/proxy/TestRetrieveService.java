@@ -1,6 +1,7 @@
 package test.es.gob.afirma.signfolder.server.proxy;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import test.es.gob.afirma.signfolder.server.proxy.copiedclasses.HttpError;
@@ -12,13 +13,14 @@ import test.es.gob.afirma.signfolder.server.proxy.copiedclasses.UrlHttpMethod;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestRetrieveService {
 
-	private static final String SERVICE_URL = "http://localhost:8080/afirma-signature-retriever/RetrieveService"; //$NON-NLS-1$
+	//private static final String SERVICE_URL = "http://localhost:8080/afirma-signature-retriever/RetrieveService"; //$NON-NLS-1$
+	private static final String SERVICE_URL = "http://localhost:56499/afirma-signature-retriever/RetrieveService"; //$NON-NLS-1$
 
 	/** Prueba de recuperaci&oacute;n de un texto simple.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // No ejecutamos de forma automatica
+	@Ignore // No ejecutamos de forma automatica
 	public void testRetrieveSimpleText() throws Exception {
 		final UrlHttpManager mgr = new UrlHttpManagerImpl();
 		byte[] res;
