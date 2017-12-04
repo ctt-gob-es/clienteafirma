@@ -77,7 +77,7 @@ final class PreferencesPanelCades extends JPanel {
 						  final ModificationListener modificationListener,
 						  final boolean blocked) {
 
-		this.blocked = blocked;
+		setBlocked(blocked);
 		createUI(keyListener, modificationListener);
 	}
 
@@ -127,7 +127,7 @@ final class PreferencesPanelCades extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
 		);
 
-		policyConfigButton.setEnabled(!this.blocked);
+		policyConfigButton.setEnabled(!isBlocked());
 		policyConfigPanel.add(this.policyLabel);
 		policyConfigPanel.add(policyConfigButton);
 
@@ -150,7 +150,7 @@ final class PreferencesPanelCades extends JPanel {
 	    this.cadesImplicit.setMnemonic('i');
 	    this.cadesImplicit.addItemListener(modificationListener);
 	    this.cadesImplicit.addKeyListener(keyListener);
-	    this.cadesImplicit.setEnabled(!this.blocked);
+	    this.cadesImplicit.setEnabled(!isBlocked());
 	    signatureMode.add(this.cadesImplicit);
 
 	    c.gridy++;
@@ -247,7 +247,7 @@ final class PreferencesPanelCades extends JPanel {
     		SIGN_FORMAT_CADES,
     		cadesPolicies,
     		getCadesPreferedPolicy(),
-    		this.blocked
+    		isBlocked()
         );
 
         revalidate();
@@ -270,7 +270,7 @@ final class PreferencesPanelCades extends JPanel {
         		SIGN_FORMAT_CADES,
         		cadesPolicies,
         		getCadesDefaultPolicy(),
-        		this.blocked
+        		isBlocked()
     		);
 
 		this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicyName());
@@ -309,17 +309,12 @@ final class PreferencesPanelCades extends JPanel {
 
 		loadCadesPolicy();
 
-		if (this.blocked) {
-
-			// blocked = true, luego no pueden alterarse las propiedades:
-			// devolvemos las preferencias almacenadas actualmente
-
+		// Si la interfaz esta bloqueada, establecemos el valor que estuviese definido
+		if (isBlocked()) {
 			adesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
-
-		} else {
-
-			// blocked = false, luego se pueden alterar las propiedades:
-			// devolvemos las preferencias por defecto
+		}
+		// Si no, establecemos la configuracion por defecto
+		else {
 			try {
 				// Si, por defecto, no debe haber ninguna politica configurada, hacemos eso
 				if (PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER) == null
@@ -355,7 +350,7 @@ final class PreferencesPanelCades extends JPanel {
 			cadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_CADES_PADES_AGE_1_9));
 
-			this.cadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), this.blocked);
+			this.cadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), isBlocked());
 		}
 	}
 
@@ -422,4 +417,21 @@ final class PreferencesPanelCades extends JPanel {
 
 	}
 
+	/**
+	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
+	 * @return {@code true} si est&aacute; bloqueado y no permite la edici&oacute;n,
+	 * {@code false} en caso contrario.
+	 */
+	public boolean isBlocked() {
+		return this.blocked;
+	}
+
+	/**
+	 * Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
+	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
+	 * {@code false} en caso contrario.
+	 */
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
+	}
 }

@@ -9,9 +9,9 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_QUALIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
@@ -95,7 +95,7 @@ final class PreferencesPanelXades extends JPanel {
 						  final ModificationListener modificationListener,
 						  final boolean blocked) {
 
-		this.blocked = blocked;
+		setBlocked(blocked);
 		createUI(keyListener, modificationListener);
 	}
 
@@ -146,7 +146,7 @@ final class PreferencesPanelXades extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
 		);
 
-		policyConfigButton.setEnabled(!this.blocked);
+		policyConfigButton.setEnabled(!isBlocked());
 		policyConfigPanel.add(this.policyLabel);
 		policyConfigPanel.add(policyConfigButton);
 
@@ -241,7 +241,7 @@ final class PreferencesPanelXades extends JPanel {
         this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(modificationListener);
         this.xadesSignFormat.addKeyListener(keyListener);
-        this.xadesSignFormat.setEnabled(!this.blocked);
+        this.xadesSignFormat.setEnabled(!isBlocked());
 
         final JLabel xadesFormatLabel = new JLabel(
 				SimpleAfirmaMessages.getString("PreferencesPanel.15") //$NON-NLS-1$
@@ -425,8 +425,8 @@ final class PreferencesPanelXades extends JPanel {
 		);
 		this.xadesSignerClaimedRole.setText(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
 
-		// unprotected: true -> no puedo modificarla, cargo la que estaba
-		if (isBlocked()) {
+		// Solo establecemos la opcion por defecto si la interfaz no esta bloqueada
+		if (!isBlocked()) {
 			this.xadesSignFormat.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGN_FORMAT));
 		}
 
@@ -446,7 +446,7 @@ final class PreferencesPanelXades extends JPanel {
 		);
 
         this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-        this.xadesSignFormat.setEnabled(!this.blocked);
+        this.xadesSignFormat.setEnabled(!isBlocked());
 
 		this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicyName());
 
@@ -485,18 +485,12 @@ final class PreferencesPanelXades extends JPanel {
 
 		loadXadesPolicy();
 
+		// Si la interfaz esta bloqueada, devolvemos lo que ya esta seleccionado
 		if (isBlocked()) {
-
-			// unprotected = true, luego no pueden alterarse las
-			// propiedades:
-			// devolvemos las preferencias almacenadas actualmente
-
 			adesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
-
-		} else {
-
-			// unprotected = false, luego se pueden alterar las propiedades:
-			// devolvemos las preferencias por defecto
+		}
+		// Si no, devolvemos la ocnfiguracion por defecto
+		else {
 			try {
 
 				if (PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER) == null

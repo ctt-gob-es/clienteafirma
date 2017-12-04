@@ -102,7 +102,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 							 final ModificationListener modificationListener,
 							 final boolean blocked) {
 
-		this.blocked = blocked;
+		setBlocked(blocked);
 		createUI(keyListener, modificationListener);
 	}
 
@@ -376,7 +376,7 @@ final class PreferencesPanelFacturaE extends JPanel {
     		false,
     		false,
     		false,
-    		this.blocked
+    		isBlocked()
 		);
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -434,7 +434,7 @@ final class PreferencesPanelFacturaE extends JPanel {
     		false,
     		false,
     		false,
-    		this.blocked
+    		isBlocked()
 		);
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -468,19 +468,12 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 		AdESPolicy adesPolicy = null;
 
+		// Si la interfaz esta bloqueada, establecemos el valor que estuviese definido
 		if (isBlocked()) {
-
-			// unprotected = true, luego no pueden alterarse las
-			// propiedades:
-			// devolvemos las preferencias almacenadas actualmente
-
 			adesPolicy = this.facturaePolicyPanel.getSelectedPolicy();
-
-		} else {
-
-			// unprotected = false, luego se pueden alterar las propiedades:
-			// devolvemos las preferencias por defecto
-
+		}
+		// Si no, establecemos la configuracion por defecto
+		else {
 			final String policy = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY);
 			if (policy.equals(POLICY_FACTURAE_30_NAME)) {
 				adesPolicy = POLICY_FACTURAE_30;

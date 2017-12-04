@@ -10,9 +10,9 @@
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_FORMAT;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_QUALIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
@@ -99,9 +99,9 @@ final class PreferencesPanelPades extends JPanel {
 
 	PreferencesPanelPades(final KeyListener keyListener,
 						  final ModificationListener modificationListener,
-						  final boolean unprotected) {
+						  final boolean blocked) {
 
-		this.blocked = unprotected;
+		setBlocked(blocked);
 		createUI(keyListener, modificationListener);
 	}
 
@@ -128,7 +128,7 @@ final class PreferencesPanelPades extends JPanel {
 		this.padesBasicFormat.setModel(padesFormatModel);
 		this.padesBasicFormat.addItemListener(modificationListener);
 		this.padesBasicFormat.addKeyListener(keyListener);
-		this.padesBasicFormat.setEnabled(!this.blocked);
+		this.padesBasicFormat.setEnabled(!isBlocked());
 
         loadPreferences();
 
@@ -137,9 +137,9 @@ final class PreferencesPanelPades extends JPanel {
         // Si hay establecida una politica de firma el formato de firma estara bloqueado a PAdES-BES
         if(this.padesPolicyDlg.getSelectedPolicy() != null) {
 	        this.padesBasicFormat.removeAllItems();
-			this.padesBasicFormat.addItem(PADES_FORMAT_BES_TEXT);
-			this.padesBasicFormat.addItem(PADES_FORMAT_BASIC_TEXT);
-			this.padesBasicFormat.setSelectedItem(PADES_FORMAT_BES_TEXT);
+			this.padesBasicFormat.addItem(new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT));
+			this.padesBasicFormat.addItem(new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT));
+			this.padesBasicFormat.setSelectedIndex(0);
 			this.padesBasicFormat.setEnabled(false);
 		}
 
@@ -385,7 +385,9 @@ final class PreferencesPanelPades extends JPanel {
 			PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
 		}
 
-		PreferencesManager.put(PREFERENCE_PADES_FORMAT, this.padesBasicFormat.getSelectedItem().toString());
+		final ComboBoxModel<Object> m = this.padesBasicFormat.getModel();
+		final Object o = m.getElementAt(this.padesBasicFormat.getSelectedIndex());
+		PreferencesManager.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) o).getValue());
 
 		final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 		if (padesPolicy != null) {
@@ -417,7 +419,7 @@ final class PreferencesPanelPades extends JPanel {
         final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
         final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT);
 		for (int i = 0; i < padesFormatModel.getSize(); i++) {
-			if (padesFormatModel.getElementAt(i).toString().equals(selectedValue)) {
+			if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
 				this.padesBasicFormat.setSelectedIndex(i);
 				break;
 			}
@@ -435,7 +437,7 @@ final class PreferencesPanelPades extends JPanel {
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesPreferedPolicy(),
-    		this.blocked
+    		isBlocked()
 		);
 
 //        final GridBagConstraints c = new GridBagConstraints();
@@ -467,12 +469,10 @@ final class PreferencesPanelPades extends JPanel {
 			this.padesBasicFormat.setSelectedIndex(0);
 		}
 
-        final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
-
-        // unprotected: true -> no puedo modificarla, cargo la que estaba
-		if (isBlocked()) {
+        // Solo se reestablece el valor al por defecto, si no se ha bloqueado la edicion de la interfaz
+		if (!isBlocked()) {
 			final String selectedValue = PreferencesManager.getDefaultPreference(PREFERENCE_PADES_FORMAT);
-
+			final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
 			for (int i = 0; i < padesFormatModel.getSize(); i++) {
 				if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
 					this.padesBasicFormat.setSelectedIndex(i);
@@ -495,7 +495,7 @@ final class PreferencesPanelPades extends JPanel {
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesDefaultPolicy(),
-    		this.blocked
+    		isBlocked()
 		);
 
 		this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicyName());
@@ -541,19 +541,13 @@ final class PreferencesPanelPades extends JPanel {
 
 		loadPadesPolicy();
 
+		// Si la interfaz esta bloqueada, establecemos el valor que estuviese definido
 		if (isBlocked()) {
-
-			// unprotected = true, luego no pueden alterarse las
-			// propiedades:
-			// devolvemos las preferencias almacenadas actualmente
-
 			adesPolicy = this.padesPolicyDlg.getSelectedPolicy();
-
-		} else {
+		}
+		// Si no, devolvemos la configuracion por defecto
+		else {
 			try {
-				// unprotected = false, luego se pueden alterar las propiedades:
-				// devolvemos las preferencias por defecto
-
 				if (PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER) == null
 						|| PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER).isEmpty()) {
 					this.padesPolicyDlg.loadPolicy(null);
@@ -603,7 +597,7 @@ final class PreferencesPanelPades extends JPanel {
 			padesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_CADES_PADES_AGE_1_9));
 
-			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(), this.blocked);
+			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(), isBlocked());
 		}
 	}
 
@@ -650,9 +644,9 @@ final class PreferencesPanelPades extends JPanel {
 					// Para cualquier politica definida se usa PAdES-BES como formato de firma
 
 					this.padesBasicFormat.removeAllItems();
-					this.padesBasicFormat.addItem(new String(PADES_FORMAT_BES_TEXT));
-					this.padesBasicFormat.addItem(new String(PADES_FORMAT_BASIC_TEXT));
-					this.padesBasicFormat.setSelectedItem(new String(PADES_FORMAT_BES_TEXT));
+					this.padesBasicFormat.addItem(new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT));
+					this.padesBasicFormat.addItem(new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT));
+					this.padesBasicFormat.setSelectedIndex(0);
 					this.padesBasicFormat.setEnabled(false);
 
 				} else {
