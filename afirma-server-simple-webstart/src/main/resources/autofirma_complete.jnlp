@@ -25,7 +25,7 @@
 	<resources>
 		<j2se version="1.8+"/> 
 		<!--jar href="AutoFirma-splash.jar" version="1.0" download="progress"/-->
-		<jar href="AutoFirmaWS_Complete.jar" version="1.5" main="true"/>
+		<jar href="AutoFirmaWS_Complete.jar" version="1.6" main="true"/>
 		<property name="jnlp.versionEnabled" value="true"/>
 	</resources> 
 	<application-desc main-class="es.gob.afirma.standalone.ws.AutoFirmaWebStart">

@@ -13,7 +13,7 @@
 	<update check="timeout" policy="always"/>
 	<resources>
 		<j2se version="1.8+"/> 
-		<jar href="%CODEBASE%AutoFirmaWS__V1.5.jar" size="29100616" />
+		<jar href="%CODEBASE%AutoFirmaWS__V1.6.jar" size="29100616" />
 	</resources>
 	<application-desc main-class="es.gob.afirma.standalone.ws.AutoFirmaProtocolWebStart">
 		%ARGUMENT%
