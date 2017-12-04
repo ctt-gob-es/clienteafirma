@@ -63,6 +63,39 @@ public final class TestStorageService {
 			UrlHttpMethod.POST
 		);
 		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$
+
+		// Ahora igual pero con GET
+
+		res = mgr.readUrl(
+			SERVICE_URL,
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-00")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-20")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=put&v=PEDO", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-05")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=put&v=PEDO&id=PIS.txt", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=put&v=PEDO&id=CACA.txt&dat=CULO", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$
 	}
 
 }

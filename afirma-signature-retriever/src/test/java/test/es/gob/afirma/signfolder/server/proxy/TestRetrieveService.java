@@ -23,7 +23,33 @@ public final class TestRetrieveService {
 	@Ignore // No ejecutamos de forma automatica
 	public void testRetrieveSimpleText() throws Exception {
 		final UrlHttpManager mgr = new UrlHttpManagerImpl();
-		byte[] res;
+		byte[] res = mgr.readUrl(
+			SERVICE_URL,
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-00")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-20")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=get&v=PEDO&id=PIS", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertTrue(new String(res).startsWith("ERR-06")); //$NON-NLS-1$
+		res = mgr.readUrl(
+			SERVICE_URL + "?op=get&v=PEDO&id=CACA.txt", //$NON-NLS-1$
+			UrlHttpMethod.GET
+		);
+		Assert.assertEquals("CULO", new String(res).trim()); //$NON-NLS-1$
+
+		// Ahora todo de nuevo pero con POST
 		try {
 			res = mgr.readUrl(
 				SERVICE_URL,
@@ -49,20 +75,10 @@ public final class TestRetrieveService {
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=get&v=PEDO", //$NON-NLS-1$
-			UrlHttpMethod.POST
-		);
-		Assert.assertTrue(new String(res).startsWith("ERR-05")); //$NON-NLS-1$
-		res = mgr.readUrl(
 			SERVICE_URL + "?op=get&v=PEDO&id=PIS", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-06")); //$NON-NLS-1$
-		res = mgr.readUrl(
-			SERVICE_URL + "?op=get&v=PEDO&id=CACA.txt", //$NON-NLS-1$
-			UrlHttpMethod.POST
-		);
-		Assert.assertEquals("CULO", new String(res).trim()); //$NON-NLS-1$
 	}
 
 }
