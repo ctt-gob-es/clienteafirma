@@ -158,7 +158,16 @@ public enum AOKeyStore {
     	"GDSCPKCS15", //$NON-NLS-1$
     	null,
     	null
+	),
+    /** Tarjeta CERES 430 con controlador nativo Java. */
+	CERES_430(
+		"Tarjeta FNMT-RCM CERES 4.30 o superior", //$NON-NLS-1$
+		17,
+		"CERES430", //$NON-NLS-1$
+		null, // Al igual que en el DNIe el PIN se pide al firmar
+		null  // Sin password para el almacen en si
 	);
+
 
     private final String name;
     private final int ordinal;

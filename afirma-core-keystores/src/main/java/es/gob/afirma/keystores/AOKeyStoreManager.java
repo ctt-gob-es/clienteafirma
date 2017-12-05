@@ -198,6 +198,14 @@ public class AOKeyStoreManager implements KeyStoreManager {
     				getParentComponent()
 				);
             	break;
+        	case CERES_430:
+                // En el "params" debemos traer los parametros:
+                // [0] -parent: Componente padre para la modalidad
+        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
+        		this.ks = AOKeyStoreManagerHelperFullJava.initCeres430Java(
+    				getParentComponent()
+				);
+            	break;
         	case DNIEJAVA:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad

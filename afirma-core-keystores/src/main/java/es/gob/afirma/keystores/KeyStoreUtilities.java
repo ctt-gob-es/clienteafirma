@@ -314,7 +314,7 @@ public final class KeyStoreUtilities {
 		) {
 			try {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
-				return true; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
 			catch (final AOCancelledOperationException e) {
 				throw e;
@@ -332,9 +332,22 @@ public final class KeyStoreUtilities {
 			!Boolean.parseBoolean(System.getenv(DISABLE_CERES_NATIVE_DRIVER_ENV)) &&
 			!Platform.OS.LINUX.equals(Platform.getOS())
 		) {
+			// Tarjeta CERES 430
+			try {
+				aksm.addKeyStoreManager(getCeres430KeyStoreManager(parentComponent));
+				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
+			}
+			catch (final AOCancelledOperationException e) {
+				throw e;
+			}
+			catch (final Exception e) {
+				LOGGER.info("No se ha encontrado una tarjeta CERES 430: " + e); //$NON-NLS-1$
+			}
+
+			// Otras tarjetas CERES
 			try {
 				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
-				return true; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
 			catch (final AOCancelledOperationException e) {
 				throw e;
@@ -378,6 +391,19 @@ public final class KeyStoreUtilities {
 			tmpKsm.setPreferred(true);
 
 			return tmpKsm;
+	}
+
+	private static AOKeyStoreManager getCeres430KeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			AOKeyStore.CERES_430, // Store
+			null,             // Lib (null)
+			null,             // Description (null)
+			null,             // PasswordCallback (no hay en la carga, hay en la firma)
+			parentComponent   // Parent
+		);
+		LOGGER.info("La tarjeta CERES 430 ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+		tmpKsm.setPreferred(true);
+		return tmpKsm;
 	}
 
 	private static AOKeyStoreManager getCeresKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {

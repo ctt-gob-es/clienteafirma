@@ -48,6 +48,22 @@ final class AOKeyStoreManagerHelperFullJava {
 		);
 	}
 
+	/** Inicializa el almac&eacute;n 100% Java para tarjetas CERES 4.30 y superiores.
+	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
+	 *                        de PIN.
+	 * @return <code>KeyStore</code> inicializado.
+	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
+	 * @throws IOException Si hay problemas en la lectura de datos. */
+	static KeyStore initCeres430Java(final Object parentComponent) throws AOKeyStoreManagerException,
+                                                                       IOException {
+		return init(
+			AOKeyStore.CERES_430,
+			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			new es.gob.jmulticard.jse.provider.Ceres430Provider(),
+			parentComponent
+		);
+	}
+
 	/** Inicializa el almac&eacute;n 100% Java para tarjeta G&amp;D SmartCafe.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
 	 *                        de PIN.
@@ -72,7 +88,7 @@ final class AOKeyStoreManagerHelperFullJava {
 	 * @throws IOException Si hay problemas en la lectura de datos. */
     static KeyStore initDnieJava(final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                          IOException {
-		return init(
+    	return init(
 			AOKeyStore.DNIEJAVA,
 			buildLoadStoreParameter(new DnieCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.DnieProvider(),
