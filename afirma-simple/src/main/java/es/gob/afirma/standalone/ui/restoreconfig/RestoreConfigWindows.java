@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -74,11 +75,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
 		// Verifica si se tiene permisos para escribir en el directorio de instalacion
+		boolean usingAlternativeDirectory;
 		File workingDirectory;
 		if(Files.isWritable(appDir.toPath())) {
 			workingDirectory = appDir;
+			usingAlternativeDirectory = false;
 		} else {
 			workingDirectory = AutoFirmaUtil.getWindowsAlternativeAppDir();
+			usingAlternativeDirectory = true;
 		}
 
 		LOGGER.info("Ruta de trabajo:  " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
@@ -103,6 +107,24 @@ final class RestoreConfigWindows implements RestoreConfig {
 		if (sslRoot != null) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
 			installRootCAMozillaKeystore(configPanel, sslRoot, workingDirectory);
+		}
+
+		// Si no se han creado directamente los certificados en el directorio alternativo
+		// y este existe, lo copiamos ahora
+		if (!usingAlternativeDirectory) {
+			final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+			if (alternativeDir.exists()) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.36")); //$NON-NLS-1$
+				try {
+					Files.copy(
+							new File(workingDirectory, SSL_KEYSTORE_FILENAME).toPath(),
+							new File(alternativeDir, SSL_KEYSTORE_FILENAME).toPath(),
+							StandardCopyOption.REPLACE_EXISTING);
+				} catch (final IOException e) {
+					LOGGER.warning("No se ha podido copiar el almacen del certificado SSL al directorio alternativo de instalacion: " + e); //$NON-NLS-1$
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.37")); //$NON-NLS-1$
+				}
+			}
 		}
 
 		// Registramos el protocolo afirma

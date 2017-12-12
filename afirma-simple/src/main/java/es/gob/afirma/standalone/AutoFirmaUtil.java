@@ -124,19 +124,7 @@ public final class AutoFirmaUtil {
 	public static File getApplicationDirectory() {
 
 		if (isJnlpDeployment()) {
-			if (Platform.getOS() == Platform.OS.WINDOWS) {
-				final File appDir = getWindowsAlternativeAppDir();
-				if (appDir.isDirectory() || appDir.mkdirs()) {
-					return appDir;
-				}
-			}
-			else if (Platform.getOS() == Platform.OS.MACOSX) {
-				final File appDir = getMacOsXAlternativeAppDir();
-				if (appDir.isDirectory() || appDir.mkdirs()) {
-					return appDir;
-				}
-			}
-			return new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+			return getJNLPApplicationDirectory();
 		}
 
 		// Identificamos el directorio de instalacion
@@ -150,6 +138,27 @@ public final class AutoFirmaUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Obtiene el directorio de aplicaci&oacute;n que corresponde cuando se
+	 * ejecuta la aplicaci&oacute;n mediante un despliegue es JNLP.
+	 * @return Directorio de aplicaci&oacute;n.
+	 */
+	public static File getJNLPApplicationDirectory() {
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			final File appDir = getWindowsAlternativeAppDir();
+			if (appDir.isDirectory() || appDir.mkdirs()) {
+				return appDir;
+			}
+		}
+		else if (Platform.getOS() == Platform.OS.MACOSX) {
+			final File appDir = getMacOsXAlternativeAppDir();
+			if (appDir.isDirectory() || appDir.mkdirs()) {
+				return appDir;
+			}
+		}
+		return new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 	}
 
 	/**

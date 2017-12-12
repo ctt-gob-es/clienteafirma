@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -112,10 +113,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Verifica si se tiene permisos para escribir en el directorio de instalacion
 		// y establece como directorio de trabajo otro distinto en caso de no tenerlos
 		File workingDir;
+		boolean usingAlternativeDirectory;
 		if(Files.isWritable(appDir.toPath())) {
 			workingDir = appDir;
+			usingAlternativeDirectory = false;
 		} else {
 			workingDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
+			usingAlternativeDirectory = true;
 			if (!workingDir.isDirectory() && !workingDir.mkdirs()) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.1")); //$NON-NLS-1$
 				LOGGER.severe("No se puede utilizar el directorio alternativo de trabajo por no ser un directorio y no poder crearse"); //$NON-NLS-1$
@@ -133,6 +137,24 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Iniciamos la restauracion de los certificados SSL
 		restoreSslCertificates(appDir, workingDir, configPanel);
+
+		// Si no se han creado directamente los certificados en el directorio alternativo
+		// y este existe, lo copiamos ahora
+		if (!usingAlternativeDirectory) {
+			final File alternativeDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
+			if (alternativeDir.exists()) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.17")); //$NON-NLS-1$
+				try {
+					Files.copy(
+							new File(workingDir, KS_FILENAME).toPath(),
+							new File(alternativeDir, KS_FILENAME).toPath(),
+							StandardCopyOption.REPLACE_EXISTING);
+				} catch (final IOException e) {
+					LOGGER.warning("No se ha podido copiar el almacen del certificado SSL al directorio alternativo de instalacion: " + e); //$NON-NLS-1$
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.18")); //$NON-NLS-1$
+				}
+			}
+		}
 
 		// Iniciamos la restauracion de la confianza de Chrome en el protocolo afirma
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$

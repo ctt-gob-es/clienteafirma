@@ -99,7 +99,7 @@ public final class HelpResourceManager {
 
 	/**
 	 * Indica si un fichero con la versi&oacute;n de la ayuda de la aplicaci&oacute;n
-	 * tiene una versión que no se corresponde con la actual.
+	 * tiene una versi&oacute;n que no se corresponde con la actual.
 	 * @param helpVersionFile Fichero con la versi&oacute;n de la ayuda.
 	 * @return {@code true} si el fichero de version indicado no se corresponde con el
 	 * de la versi&oacute;n actual. {@code false} en caso contrario.
