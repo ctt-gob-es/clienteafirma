@@ -237,11 +237,13 @@ final class RestoreConfigFirefox {
 			return;
 		}
 
+		final String certUtilPath = getCertUtilPath(workingDir);
+
 		for ( final String userDir : usersDirs) {
 			final File file = new File(escapePath(userDir) + LINUX_CHROME_PATH);
 			if( file.isDirectory()) {
 				final String[] certutilCommands = new String[] {
-						CERTUTIL_EXE, // 0
+						certUtilPath, // 0
 						"-d", //$NON-NLS-1$ // 1
 						"sql:" + escapePath(userDir) + LINUX_CHROME_PATH, //$NON-NLS-1$ // 2
 						"-A", //$NON-NLS-1$ // 3
@@ -374,7 +376,7 @@ final class RestoreConfigFirefox {
 			return;
 		}
 
-		final File certutilFile = new File(targetDir, DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
+		final File certutilFile = new File(getCertUtilPath(targetDir));
 
 		if (!certutilFile.exists() || !certutilFile.isFile() || !certutilFile.canExecute()) {
 			throw new IOException("No se encuentra o no se puede leer el ejecutable para la instalacion en Firefox"); //$NON-NLS-1$
@@ -456,10 +458,10 @@ final class RestoreConfigFirefox {
 	}
 
 	/** Obtiene el path para la llamada a CertUtil.
-	 * @param certUtilAbsolutePath Ruta del ejecutable CertUtil.
+	 * @param workingDir Ruta en la que buscar el ejecutable CertUtil.
 	 * @return Referencia a CertUtil.
 	 * @throws IOException Se lanza cuando hay un problema con el fichero CertUtil. */
-	public static String getCertUtilPath(final String certUtilAbsolutePath) throws IOException {
+	public static String getCertUtilPath(final File workingDir) throws IOException {
 
 		String certUtilPath = null;
 
@@ -468,7 +470,8 @@ final class RestoreConfigFirefox {
 			certUtilPath = CERTUTIL_EXE;
 		}
 		else {
-			final File certutilFile = new File(certUtilAbsolutePath);
+			final File certutilFile = new File(workingDir.getAbsolutePath() + File.separator +
+					DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
 
 			if (!certutilFile.exists() || !certutilFile.isFile()) {
 				throw new IOException("No se encuentra el ejecutable CertUtil para la instalacion en Firefox"); //$NON-NLS-1$
@@ -500,10 +503,7 @@ final class RestoreConfigFirefox {
 			                                    final Set<File> profilesDir) throws IOException,
 	                                                                                KeyStoreException {
 
-		final String certutilExe = workingDir.getAbsolutePath() + File.separator +
-				DIR_CERTUTIL + File.separator + CERTUTIL_EXE;
-
-		final String certUtilPath = getCertUtilPath(certutilExe);
+		final String certUtilPath = getCertUtilPath(workingDir);
 		boolean error = false;
 
 		if ( Platform.OS.MACOSX.equals(Platform.getOS()) && certUtilPath != null) {
@@ -513,7 +513,7 @@ final class RestoreConfigFirefox {
 
 		File certificateFile = certFile;
 		if (certificateFile == null) {
-			certificateFile = new File(new File(certutilExe).getParentFile().getParentFile(), SSL_ROOT_CERTIFICATE_FILENAME);
+			certificateFile = new File(workingDir, SSL_ROOT_CERTIFICATE_FILENAME);
 		}
 
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
@@ -728,19 +728,7 @@ final class RestoreConfigFirefox {
 	 * @throws GeneralSecurityException Cuando no se puede ejecutar. */
 	private static void executeCertUtilToDelete(final File targetDir) throws IOException, GeneralSecurityException {
 
-		String certutilExe;
-		// En linux se tiene certutil como dependencia
-		if(!Platform.getOS().equals(Platform.OS.LINUX)) {
-			final File certutilFile = new File(targetDir, DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
-
-			if (!certutilFile.exists() || !certutilFile.isFile() || !certutilFile.canExecute()) {
-				throw new IOException("No se encuentra o no se puede leer el ejecutable para la instalacion en Firefox"); //$NON-NLS-1$
-			}
-			certutilExe = certutilFile.getAbsolutePath();
-		}
-		else {
-			certutilExe = CERTUTIL_EXE;
-		}
+		final String certUtilPath = getCertUtilPath(targetDir);
 
 		//Se obtienen todos los usuarios para los que se va a desinstalar el certificado en Firefox
 		final File usersBaseDir = new File(USERS_WINDOWS_PATH);
@@ -776,7 +764,7 @@ final class RestoreConfigFirefox {
 					}
 
 					final String[] certutilCommands = new String[] {
-							"\"" + certutilExe + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+							"\"" + certUtilPath + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-D", //$NON-NLS-1$
 							"-d", //$NON-NLS-1$
 							"\"" + profileDir.getAbsolutePath() + "\"", //$NON-NLS-1$ //$NON-NLS-2$
@@ -840,6 +828,7 @@ final class RestoreConfigFirefox {
 	 * @throws IOException Cuando ocurre un error al descomprimir o copiar.
 	 */
 	static void copyConfigurationFiles(final File workingDir) throws IOException {
+
 		final File certutil = new File(workingDir, DIR_CERTUTIL);
 		if (!certutil.exists()) {
 			uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, workingDir);
@@ -883,18 +872,15 @@ final class RestoreConfigFirefox {
 			}
 			else {
 				while ((entry = zipIs.getNextEntry()) != null) {
+					final File outFile = new File(outDir, entry.getName());
 					if (entry.isDirectory()) {
-						new File(outDir, entry.getName()).mkdirs();
+						outFile.mkdirs();
 					}
 					else {
-						try (
-								final FileOutputStream outFis = new FileOutputStream(
-										new File(
-												outDir,
-												entry.getName()
-												)
-										);
-								) {
+						if (!outFile.getParentFile().exists()) {
+							outFile.getParentFile().mkdirs();
+						}
+						try (final FileOutputStream outFis = new FileOutputStream(outFile);) {
 							while ((n = zipIs.read(buffer)) > 0) {
 								outFis.write(buffer, 0, n);
 							}

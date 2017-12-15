@@ -15,6 +15,7 @@ import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Frame;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -25,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
@@ -158,6 +161,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     }
 
 	void initialize(final File preSelectedFile) {
+
+		LOGGER.info(" ========== initialize");
 
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCES_LOCALE);
@@ -512,13 +517,17 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	final Image icon = Toolkit.getDefaultToolkit().getImage(SimpleAfirma.class.getResource("/resources/logo_cliente_256.png")); //$NON-NLS-1$
         	try {
-	            com.apple.eawt.Application.getApplication().setDockIconImage(
-	        		Toolkit.getDefaultToolkit().getImage(SimpleAfirma.class.getResource("/resources/logo_cliente_256.png")) //$NON-NLS-1$);
-	    		);
+        		settingDockMacIconWithJava8(icon);
         	}
         	catch(final Exception | Error e) {
-        		LOGGER.warning("No ha sido posible establecer el icono del Dock de OS X: " + e); //$NON-NLS-1$
+        		try {
+        			settingDockMacIconWithJava9(icon);
+        		}
+        		catch (Exception | Error e2) {
+        			LOGGER.warning("No ha sido posible establecer el icono del Dock de OS X: " + e); //$NON-NLS-1$
+				}
         	}
         }
 
@@ -548,6 +557,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
         			printSystemInfo();
 
+        			LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
+
     				final SimpleAfirma saf = new SimpleAfirma();
 
     				final OS os = Platform.getOS();
@@ -574,6 +585,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 							);
 	    				}
     				}
+
     				// En Linux, para evitar los problemas con los iconos hay que cambiar a bajo nivel el nombre de la ventana:
     				// http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6528430
     				if (OS.LINUX.equals(os)) {
@@ -587,7 +599,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
     					}
     				}
-
    					saf.initialize(null);
     			}
     			else {
@@ -607,6 +618,28 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		LOGGER.log(Level.SEVERE, "Error global en la aplicacion: " + e, e); //$NON-NLS-1$
     	}
     }
+
+    private static void settingDockMacIconWithJava8(Image icon) throws ClassNotFoundException,
+    		NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+    		InvocationTargetException {
+		final Class<?> applicationClass = Class.forName("com.apple.eawt.Application"); //$NON-NLS-1$
+		final Method getApplicationMethod = applicationClass.getMethod("getApplication"); //$NON-NLS-1$
+		final Object applicationObject = getApplicationMethod.invoke(null);
+		final Method setDockIconImageMethod = applicationClass.getMethod("setDockIconImage", Image.class); //$NON-NLS-1$
+		setDockIconImageMethod.invoke(applicationObject, icon);
+    }
+
+    private static void settingDockMacIconWithJava9(Image icon) throws ClassNotFoundException,
+		    NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+		    InvocationTargetException {
+
+    	final Class<?> taskbarClass = Class.forName("java.awt.Taskbar"); //$NON-NLS-1$
+    	final Method getTaskbarMethod = taskbarClass.getMethod("getTaskbar"); //$NON-NLS-1$
+    	final Object taskbarObject = getTaskbarMethod.invoke(null);
+    	final Method setIconImageMethod = taskbarClass.getMethod("setIconImage", Image.class); //$NON-NLS-1$
+    	setIconImageMethod.invoke(taskbarObject, icon);
+    }
+
 
 	private static boolean isSimpleAfirmaAlreadyRunning() {
     	final File appDir = new File(APPLICATION_HOME);
@@ -742,16 +775,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	private static void printSystemInfo() {
 
     	// Logs de informacion basica
-       	LOGGER.info("Resolucion DPI de pantalla: " + AutoFirmaUtil.getDPI()); //$NON-NLS-1$
-		LOGGER.info("Sistema operativo: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.info("Version del SO: " + System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.info("Version de Java: " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
-		LOGGER.info("Java Vendor: " + System.getProperty("java.vm.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.info("Localizacion por defecto: " + Locale.getDefault()); //$NON-NLS-1$
-		LOGGER.info("Tamano actual en memoria: " + Runtime.getRuntime().totalMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.info("Tamano maximo de memoria: " + Runtime.getRuntime().maxMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
-		LOGGER.info("Memoria actualmente libre: " + Runtime.getRuntime().freeMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
+		final StringBuilder info = new StringBuilder(370)
+       	.append("Resolucion DPI de pantalla: ").append(AutoFirmaUtil.getDPI()) //$NON-NLS-1$
+		.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
+		.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
+		.append("\nVersion de Java: ").append(System.getProperty("java.version")) //$NON-NLS-1$ //$NON-NLS-2$
+		.append("\nArquitectura del JRE: ").append(Platform.getJavaArch()) //$NON-NLS-1$
+		.append("\nJava Vendor: ").append(System.getProperty("java.vm.vendor")) //$NON-NLS-1$ //$NON-NLS-2$
+		.append("\nLocalizacion por defecto: ").append(Locale.getDefault()) //$NON-NLS-1$
+		.append("\nTamano actual en memoria: ").append(Runtime.getRuntime().totalMemory()/(1024*1024)).append("MB") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("\nTamano maximo de memoria: ").append(Runtime.getRuntime().maxMemory()/(1024*1024)).append("MB") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("\nMemoria actualmente libre: ").append(Runtime.getRuntime().freeMemory()/(1024*1024)).append("MB"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		LOGGER.info(info.toString());
 	}
 
 	/** Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de comandos.

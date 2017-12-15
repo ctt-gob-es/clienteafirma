@@ -10,7 +10,9 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.EventObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +32,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.MainMenu;
+import es.gob.afirma.standalone.ui.OSXHandler;
 
 /** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
  * por protocolo y bajo un entorno compatible <code>Swing</code>.
@@ -68,6 +71,11 @@ public final class ProtocolInvocationLauncher {
         return launch(urlString, false);
     }
 
+    @SuppressWarnings({ "unused", "static-method" })
+	void showAbout(EventObject event) {
+    	MainMenu.showAbout(null);
+    }
+
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
      * @param urlString URL de invocaci&oacute;n por protocolo.
      * @param bySocket Si se establece a <code>true</code> se usa una comuicaci&oacute;n de vuelta mediante conexi&oacute;n
@@ -78,14 +86,13 @@ public final class ProtocolInvocationLauncher {
         // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
         // aparece en la invocacion por protocolo
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-        	try {
-	            com.apple.eawt.Application.getApplication().setAboutHandler(
-	                 ae -> MainMenu.showAbout(null)
-	            );
-        	}
-        	catch(final Exception | Error e) {
-        		LOGGER.warning("No ha sido posible establecer el menu 'Acerca de...' de OS X: " + e); //$NON-NLS-1$
-        	}
+	    	try {
+	    		final Method aboutMethod = ProtocolInvocationLauncher.class.getDeclaredMethod("showAbout", new Class[]{EventObject.class}); //$NON-NLS-1$
+	    		OSXHandler.setAboutHandler(null, aboutMethod);
+	    	}
+	    	catch (final Exception e) {
+	    		LOGGER.warning("No ha sido posible establecer el menu 'Acerca de...' de OS X: " + e); //$NON-NLS-1$
+			}
         }
 
         if (urlString == null) {

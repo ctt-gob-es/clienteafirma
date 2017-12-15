@@ -89,12 +89,14 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 	}
 
-	/** Configurador de AutoFirma. */
+	/** Configurador de AutoFirma.
+	* @param args Argumentos para configurar la ejecuci&oacute;n del proceso. */
 	public AutoFirmaConfigurator(final String[] args) {
 		this(new ConfigArgs(args));
 	}
 
-	/** Configurador de AutoFirma. */
+	/** Configurador de AutoFirma.
+	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso. */
 	public AutoFirmaConfigurator(final ConfigArgs config) {
 
 		this.config = config;

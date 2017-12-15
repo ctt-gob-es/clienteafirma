@@ -346,7 +346,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		}
 		catch (final IOException | KeyStoreException e) {
-			LOGGER.warning("Error instalando el certifiado raiz: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error instalando el certificado raiz: " + e, e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.31", installDir.getAbsolutePath())); //$NON-NLS-1$
 		}
 		catch (final MozillaProfileNotFoundException e) {

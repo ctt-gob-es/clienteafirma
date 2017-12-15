@@ -14,6 +14,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.EventObject;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -43,8 +45,8 @@ public final class MainMenu extends JMenuBar {
 
     private static final long serialVersionUID = -8361808353554036015L;
 
-    private final JMenuItem firmarMenuItem = new JMenuItem();
-    private final JMenuItem abrirMenuItem = new JMenuItem();
+    private final JMenuItem firmarMenuItem;
+    private final JMenuItem abrirMenuItem;
 
     private final JFrame parent;
     JFrame getParentComponent() {
@@ -97,6 +99,10 @@ public final class MainMenu extends JMenuBar {
     public MainMenu(final JFrame p, final SimpleAfirma s) {
         this.saf = s;
         this.parent = p;
+
+        this.firmarMenuItem = new JMenuItem();
+        this.abrirMenuItem = new JMenuItem();
+
         // Importante: No cargar en un invokeLater, da guerra
         createUI();
     }
@@ -230,12 +236,10 @@ public final class MainMenu extends JMenuBar {
 		huellaMenu.add(huellaFileMenu);
 		huellaMenu.add(huellaDirMenu);
 
-
         if (!isMac) {
         	huellaMenu.setMnemonic('H');
         	createHashFileMenuItem.setMnemonic('l');
         }
-
 
         // En Mac OS X el salir lo gestiona el propio OS
         if (!isMac) {
@@ -291,9 +295,8 @@ public final class MainMenu extends JMenuBar {
         // En Mac OS X el menu es "Preferencias" dentro de la opcion principal
         else {
         	try {
-        		com.apple.eawt.Application.getApplication().setPreferencesHandler(
-	        		pe -> showPreferences()
-	    		);
+        		final Method showPreferencesMethod = getClass().getDeclaredMethod("showPreferences", new Class[]{EventObject.class}); //$NON-NLS-1$
+        		OSXHandler.setPreferencesHandler(this, showPreferencesMethod);
         	}
         	catch(final Exception | Error e) {
         		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
@@ -346,22 +349,20 @@ public final class MainMenu extends JMenuBar {
         // Acciones especificas de Mac OS X
         else {
         	try {
-        		com.apple.eawt.Application.getApplication().setAboutHandler(
-	        		ae -> showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent())
-	    		);
-	            com.apple.eawt.Application.getApplication().setQuitHandler(
-	        		(qe, qr) -> {
-					    if (!exitApplication()) {
-					        qr.cancelQuit();
-					    }
-					}
-	    		);
+        		final Method aboutMethod = getClass().getDeclaredMethod("showAbout", new Class[]{EventObject.class}); //$NON-NLS-1$
+        		OSXHandler.setAboutHandler(this, aboutMethod);
         	}
-        	catch(final Exception | Error e) {
-        		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-    				"No ha sido posible establecer las teclas rapidas ('Acerca de...' y 'Salir') de OS X: " + e //$NON-NLS-1$
-				);
+        	catch (final Exception e) {
+        		e.printStackTrace();
+			}
+
+        	try {
+        		final Method exitApplicationMethod = getClass().getDeclaredMethod("exitApplication", new Class[]{EventObject.class, Object.class}); //$NON-NLS-1$
+        		OSXHandler.setQuitHandler(this, exitApplicationMethod);
         	}
+        	catch (final Exception e) {
+        		e.printStackTrace();
+			}
         }
     }
 
@@ -381,6 +382,13 @@ public final class MainMenu extends JMenuBar {
         }
     }
 
+    /**
+     * @param event
+     */
+    void showPreferences(EventObject event) {
+    	showPreferences();
+    }
+
     void showPreferences() {
         PreferencesDialog.show(MainMenu.this.getParentComponent(), true);
     }
@@ -392,6 +400,11 @@ public final class MainMenu extends JMenuBar {
     	RestoreConfigDialog.show(MainMenu.this.getParentComponent(), true);
     }
 
+    @SuppressWarnings("unused")
+	void showAbout(EventObject event) {
+    	showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent());
+    }
+
     /** Muestra en OS X el men&uacute; "Acerca de...".
      * @param parentComponent Componente padre para la modalidad. */
     public static void showAbout(final Component parentComponent) {
@@ -401,6 +414,11 @@ public final class MainMenu extends JMenuBar {
             SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
             JOptionPane.PLAIN_MESSAGE
         );
+    }
+
+    @SuppressWarnings("unused")
+	boolean exitApplication(EventObject event, Object response) {
+    	return this.saf.askForClosing();
     }
 
     boolean exitApplication() {

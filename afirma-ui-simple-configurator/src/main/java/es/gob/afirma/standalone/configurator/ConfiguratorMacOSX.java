@@ -30,8 +30,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,6 +49,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
+import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 
 /** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
@@ -479,33 +478,24 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
 	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
 	 * @return El objeto que da como resultado el <i>script</i>.
-	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>. */
-	private static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException {
+	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
+	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n del script. */
+	private static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
-		if (se == null) {
-			LOGGER.severe("No se ha podido instanciar el motor AppleScript"); //$NON-NLS-1$
-			throw new IOException("No se ha podido instanciar el motor AppleScript"); //$NON-NLS-1$
-		}
+		final AppleScript script = new AppleScript(new File(path), delete);
 
 		LOGGER.info("Path del script: " + path); //$NON-NLS-1$
 		try {
 			Object o;
 			if (administratorMode) {
-				o = se.eval("do shell script \"" + path + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
+				o = script.runAsAdministrator();
 			}
 			else {
-				o = se.eval("do shell script \"" + path + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (delete){
-				final File scriptInstall = new File(path);
-				if (scriptInstall.exists()){
-					scriptInstall.delete();
-				}
+				o = script.run();
 			}
 			return o;
 		}
-		catch (final ScriptException e) {
+		catch (final IOException e) {
 			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
 		}
 	}
@@ -652,7 +642,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			}
 			userDirs = dirs.toArray(new String[dirs.size()]);
 		}
-		catch (final IOException e) {
+		catch (final IOException | InterruptedException e) {
 			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
 			userDirs = null;
 		}

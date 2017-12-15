@@ -180,7 +180,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			RestoreConfigFirefox.copyConfigurationFiles(workingDir);
 		} catch (final IOException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.17")); //$NON-NLS-1$
-			LOGGER.severe("No se pudo copiar certUtil al directorio de trabajo. Se omitira la instalacion de los certificados: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "No se pudo copiar certUtil al directorio de trabajo. Se omitira la instalacion de los certificados: " + e, e); //$NON-NLS-1$
 			return;
 		}
 

@@ -43,6 +43,12 @@ public class AutoFirmaConfiguratorJNLP {
 //		installerService.installSucceeded(false);
 //	}
 
+	/**
+	 * Inicia el proceso de configuraci&oacute;n de la aplicaci&oacute;n.
+	 * @param args Argumentos de configuraci&oacute;n.
+	 * @throws ConfigurationException Cuando se produce alg&uacute;n error durante la
+	 * configuraci&oacute;n.
+	 */
 	public static void configure(final String[] args) throws ConfigurationException {
 
 		// Solo es necesario configurar algo cuando la aplicacion se va a comunicar a traves de sockets
@@ -66,6 +72,13 @@ public class AutoFirmaConfiguratorJNLP {
 		}
 	}
 
+	/**
+	 * Indica si la aplicaci&oacute;n se comunicar&aacute; con el navegador web
+	 * a trav&eacute;s de sockets.
+	 * @param args Opciones de configuraci&oacute;n recibidas.
+	 * @return {@code true} si la aplicaci&opacute;n utilizar&aacute; la comunicaci&oacute;n
+	 * por sockets, {@code false} en caso contrario.
+	 */
 	public static boolean isRequestBySocket(final String[] args) {
 		return args != null && args.length > 0 && args[0].startsWith("afirma://") && //$NON-NLS-1$
 				(args[0].indexOf("ports=") != -1 || args[0].indexOf("op=install") != -1); //$NON-NLS-1$ //$NON-NLS-2$

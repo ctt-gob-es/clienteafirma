@@ -37,12 +37,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import javax.script.ScriptEngine;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
+import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 
 /** Gestor de la invocaci&oacute;n por <i>socket</i>. */
@@ -123,27 +122,24 @@ public final class ServiceInvocationManager {
 	 * no hace nada. */
 	public static void closeMacService() {
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
-		final String script =
-			"do shell script \""  //$NON-NLS-1$
-			+ "kill -9 $(ps -ef | grep " + idSession + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
-			+ "\" " //$NON-NLS-1$
-		;
-		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+		final AppleScript script = new AppleScript(
+				"kill -9 $(ps -ef | grep " + idSession + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
+				);
 		try {
-			se.eval(script);
+			script.run();
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se ha podido cerrar la aplicacion: " + e); //$NON-NLS-1$
 		}
 	}
 
-	/** Coge el foco del sistema en macOS. En el resto del sistemas no hace nada. */
+	/** Coge el foco del sistema en macOS. En el resto de sistemas no hace nada. */
 	public static void focusApplication() {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			final String script = "tell me to activate"; //$NON-NLS-1$
-			final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+			final String scriptCode = "tell me to activate"; //$NON-NLS-1$
+			final AppleScript script = new AppleScript(scriptCode);
 			try {
-				se.eval(script);
+				script.run();
 			}
 			catch (final Exception e) {
 				LOGGER.warning("Fallo cogiendo el foco en macOS: " + e); //$NON-NLS-1$
@@ -176,6 +172,8 @@ public final class ServiceInvocationManager {
 					"No se encuentra el almacen para el cifrado de la comunicacion SSL" //$NON-NLS-1$
 				);
 			}
+
+			LOGGER.info("Se utilizara el siguiente almacen para establecer el socket SSL: " + sslKeyStoreFile.getAbsolutePath()); //$NON-NLS-1$
 
 			// pass del fichero
 			final char ksPass[] = KSPASS.toCharArray();
@@ -277,6 +275,7 @@ public final class ServiceInvocationManager {
 	private static File getKeyStoreFile() {
 
 		File appDir = AutoFirmaUtil.getApplicationDirectory();
+
 		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
 			return new File(appDir, KEYSTORE_NAME);
 		}

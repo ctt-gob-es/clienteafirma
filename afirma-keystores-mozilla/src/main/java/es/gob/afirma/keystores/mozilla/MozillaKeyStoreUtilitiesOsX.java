@@ -14,11 +14,9 @@ import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 
 /** Utilidades para la gesti&oacute;n de almacenes de claves Mozilla NSS en Apple OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -96,15 +94,8 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
-			final ScriptEngine se = getAppleScriptEngine();
-			if (se != null) {
-				se.eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			else {
-				LOGGER.severe(
-					"No se ha podido instanciar el motor AppleScript para crear los enlaces simbolicos para NSS" //$NON-NLS-1$
-				);
-			}
+			final AppleScript script = new AppleScript(sb.toString());
+			script.runAsAdministrator();
 		}
 		catch(final Exception e) {
 			LOGGER.log(Level.SEVERE, "No se han podido crear los enlaces simbolicos para NSS: " + e, e); //$NON-NLS-1$
@@ -121,21 +112,6 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		catch(final UnsatisfiedLinkError e) {
 			throw new AOException("La configuracion de NSS para Mac OS X ha fallado: " + e); //$NON-NLS-1$
 		}
-	}
-
-	/** Obtiene el motor de <i>script</i> <code>AppleScript</code>.
-	 * @return Motor de <i>script</i> <code>AppleScript</code>. */
-	public static ScriptEngine getAppleScriptEngine() {
-
-		// Probamos las dos formas de instanciar el motor AppleScript
-
-		// Nuevo nombre desde OS X Yosemite: AppleScriptEngine
-		final ScriptEngine se = new ScriptEngineManager().getEngineByName("AppleScriptEngine"); //$NON-NLS-1$
-		if (se != null) {
-			return se;
-		}
-		// Nombre en versiones antiguas de OS X
-		return new ScriptEngineManager().getEngineByName("AppleScript"); //$NON-NLS-1$
 	}
 
 	static String getSystemNSSLibDirMacOsX() throws FileNotFoundException {
