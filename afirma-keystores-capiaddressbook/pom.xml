@@ -19,7 +19,7 @@
 			<groupId>sunmscapi</groupId>
 			<artifactId>sunmscapi</artifactId>
 			<version>1.6</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
