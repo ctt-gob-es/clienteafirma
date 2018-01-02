@@ -67,12 +67,9 @@ public final class Utils {
     }
 
     /** A&ntilde;ade la cabecera de hoja de estilo a un XML dado.
-     * @param xml
-     *        XML origen
-     * @param tpy
-     *        Tipo de hoja de estilo
-     * @param href
-     *        Reeferncia a la hoja de estilo
+     * @param xml XML origen.
+     * @param tpy Tipo de hoja de estilo.
+     * @param href Referencia a la hoja de estilo.
      * @return XML con la cabecera de declaraci&oacute;n de hoja de estilo
      *         a&ntilde;adida */
     private static String addStyleSheetHeader(final String xml, final String tpy, final String href) {
@@ -89,24 +86,22 @@ public final class Utils {
                    href
                    + "\"?>"; //$NON-NLS-1$
         }
-        return xml.replaceFirst(">", //$NON-NLS-1$
-                                ">\r\n<?xml-stylesheet type=\"" + //$NON-NLS-1$
-                                        type
-                                        + "\" href=\"" + //$NON-NLS-1$
-                                        href
-                                        + "\"?>" //$NON-NLS-1$
+        return xml.replaceFirst(
+    		">", //$NON-NLS-1$
+            ">\r\n<?xml-stylesheet type=\"" + //$NON-NLS-1$
+                type
+                + "\" href=\"" + //$NON-NLS-1$
+                href
+                + "\"?>" //$NON-NLS-1$
         );
     }
 
     /** A&ntilde;ade transformaciones seg&uacute; la sintaxis de
-     * par&aacute;metros adicionales en fichero de propiedades del Cliente @firma
+     * par&aacute;metros adicionales en fichero de propiedades del Cliente &#64;firma
      * a una lista pre-existente.
-     * @param transforms
-     *        Lista a la que a&ntilde;adir las transformaciones
-     * @param xParams
-     *        Informaci&oacute;n sobre las transformaciones a a&ntilde;adir
-     * @param xmlSignaturePrefix
-     *        Prefijo XMLDSig */
+     * @param transforms Lista a la que a&ntilde;adir las transformaciones.
+     * @param xParams Informaci&oacute;n sobre las transformaciones a a&ntilde;adir.
+     * @param xmlSignaturePrefix Prefijo XMLDSig. */
     public static void addCustomTransforms(final List<Transform> transforms, final Properties xParams, final String xmlSignaturePrefix) {
 
         final List<Transform> transformList = transforms != null ? transforms : new ArrayList<Transform>();
@@ -191,8 +186,8 @@ public final class Utils {
         }
     }
 
-    /** Obtiene de un nodo de referencia de tipo <i>Object</i> la lista de
-     * transformaciones definidas. Si no tiene transfgormaciones definidas,
+    /** Obtiene, de un nodo de referencia de tipo <i>Object</i>, la lista de
+     * transformaciones definidas. Si no tiene transformaciones definidas
      * devuelve {@code null}.
      * @param referenceNode Nodo de tipo referencia.
      * @param namespacePrefix Prefijo del espacio de nombres de la firma (opcional).
@@ -231,9 +226,8 @@ public final class Utils {
     }
 
     /** Recupera el identificador del algoritmo de un nodo de
-     * transformaci&oacute;n. Si no existe el atributo de algoritmo, se devuelve {@code null}.
-     * @param transformNode
-     *        Nodo de transformaci&oacute;n.
+     * transformaci&oacute;n. Si no existe el atributo de algoritmo se devuelve {@code null}.
+     * @param transformNode Nodo de transformaci&oacute;n.
      * @return Algoritmo de transformaci&oacute;n. */
     private static String getTransformAlgorithm(final Node transformNode) {
         if (transformNode == null) {
@@ -247,17 +241,16 @@ public final class Utils {
     }
 
     /** Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
-     * de las transformaciones XPATH y XPATH2, se devolveran los
-     * par&aacute;metros especificados y, en las transformacion Base64,
+     * de las transformaciones XPATH y XPATH2 se devolver&aacute;n los
+     * par&aacute;metros especificados y en las transformaciones Base64,
      * Enveloped y de Canonicalizaci&oacute;n (que no reciben par&aacute;metros)
      * se devolver&aacute; {@code null}, al igual que cuando no se reconozca el
      * tipo de transformaci&oacute;n.
      * @param transformNode Nodo de transformaci&oacute;n.
-     * @param namespacePrefix Prefijo del espacio de nombres XML
+     * @param namespacePrefix Prefijo del espacio de nombres XML.
      * @return Par&aacute;metros de la transformaci&oacute;n.
-     * @throws InvalidAlgorithmParameterException
-     *         Cuando no se especifiquen correctamente los
-     *         par&aacute;mnetros de las transformaciones XPATH y XPATH2. */
+     * @throws InvalidAlgorithmParameterException Cuando no se especifiquen correctamente los
+     *                                            par&aacute;mnetros de las transformaciones XPATH y XPATH2. */
     private static TransformParameterSpec getTransformParameterSpec(final Node transformNode,
     		                                                        final String namespacePrefix) throws InvalidAlgorithmParameterException {
 
@@ -349,18 +342,13 @@ public final class Utils {
 
     /** Comprueba si hay alguna incorrecci&oacute;n en los par&aacute;metros
      * principales de firma.
-     * @param format
-     *        Formato de firma
-     * @param mode
-     *        Modo de firma
-     * @param uri
-     *        URI del objeto a firmar
-     * @param externallyDetachedHashAlgorithm
-     *        Algoritmo de huella digital en el caso de estar esta
-     *        pre-calculada
-     * @param xades
-     *        <code>true</code> si la firma es XAdES, <code>false</code> si
-     *        es XMLDSig */
+     * @param format Formato de firma.
+     * @param mode Modo de firma.
+     * @param uri URI del objeto a firmar.
+     * @param externallyDetachedHashAlgorithm Algoritmo de huella digital en el caso de estar esta
+     *                                        pre-calculada
+     * @param xades <code>true</code> si la firma es XAdES, <code>false</code> si
+     *              es XMLDSig. */
     public static void checkIllegalParams(final String format,
                                           final String mode,
                                           final URI uri,
@@ -431,9 +419,8 @@ public final class Utils {
 
     /** Intenta determinar la URL de declaraci&oacute;n de espacio de nombres de
      * XAdES de una firma XAdES.
-     * @param el
-     *        Firma XAdES
-     * @return URL de la declaraci&oacute;n del espacio de nombres */
+     * @param el Firma XAdES.
+     * @return URL de la declaraci&oacute;n del espacio de nombres. */
     public static String guessXAdESNamespaceURL(final Node el) {
 
         final String latest = "\"http://uri.etsi.org/01903#\""; //$NON-NLS-1$
@@ -443,7 +430,7 @@ public final class Utils {
 
         final String signatureText = new String(writeXML(el, null, null, null));
 
-        final int numLatest = countSubstring(signatureText, latest);
+        final int numLatest   = countSubstring(signatureText, latest);
         final int numXades122 = countSubstring(signatureText, xades122);
         final int numXades132 = countSubstring(signatureText, xades132);
         final int numXades141 = countSubstring(signatureText, xades141);
@@ -466,8 +453,8 @@ public final class Utils {
     }
 
     /** Intenta determinar el prefijo del espacio de nombres de XAdES.
-     * @param el Firma XAdES
-     * @return Prefijo del espacio de nombres */
+     * @param el Firma XAdES.
+     * @return Prefijo del espacio de nombres. */
     public static String guessXAdESNamespacePrefix(final Element el) {
         final String signatureText = new String(writeXML(el, null, null, null));
 
@@ -492,8 +479,8 @@ public final class Utils {
     }
 
     /** Intenta determinar el prefijo del espacio de nombres de la firma XMLDSig.
-     * @param el Firma XMLDSig
-     * @return Prefijo del espacio de nombres */
+     * @param el Firma XMLDSig.
+     * @return Prefijo del espacio de nombres. */
     public static String guessXmlDSigNamespacePrefix(final Element el) {
 
         final String signatureText = new String(Utils.writeXML(el, null, null, null));
@@ -536,17 +523,13 @@ public final class Utils {
     }
 
     /** Escribe un XML como texto.
-     * @param node
-     *        Nodo XML que queremos pasar a texto
-     * @param props
-     *        Propiedades del XML (<i>version</i>, <i>encoding</i>,
-     *        <i>standalone</i>)
-     * @param styleHref
-     *        Referencia (enlace) a la hoja de estilo del XML (puede ser
-     *        nulo)
-     * @param styleType
-     *        Tipo de la hoja de estilo del XML (puede ser nulo)
-     * @return Cadena de texto con el XML en forma de array de octetos */
+     * @param node Nodo XML que queremos pasar a texto.
+     * @param props Propiedades del XML (<i>version</i>, <i>encoding</i>,
+     *              <i>standalone</i>).
+     * @param styleHref Referencia (enlace) a la hoja de estilo del XML (puede ser
+     *                  nulo).
+     * @param styleType Tipo de la hoja de estilo del XML (puede ser nulo).
+     * @return Cadena de texto con el XML en forma de array de octetos. */
     public static byte[] writeXML(final Node node, final Map<String, String> props, final String styleHref, final String styleType) {
 
         final Map<String, String> xmlProps = props != null ? props : new Hashtable<String, String>(0);
@@ -651,16 +634,14 @@ public final class Utils {
     }
 
     /** Obtiene el CN del certificado de una firma.
-     * @param signature
-     *        Nodo de firma.
+     * @param signature Nodo de firma.
      * @return CN del certificado de firma. */
     public static String getStringInfoNode(final Element signature) {
         return AOUtil.getCN(Utils.getCertificate(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0))); //$NON-NLS-1$
     }
 
     /** Genera un certificado X.509 a partir de un nodo de certificado de firma.
-     * @param certificateNode
-     *        Nodo "X509Certificate" de la firma.
+     * @param certificateNode Nodo "X509Certificate" de la firma.
      * @return Certificado de firma. */
     public static X509Certificate getCertificate(final Node certificateNode) {
         return createCert(certificateNode.getTextContent().trim().replace("\r", "").replace("\n", "").replace(" ", "").replace("\t", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
@@ -669,10 +650,8 @@ public final class Utils {
     /** Recupera el identificador (id) de la firma sobre la que se ha realizado
      * una contrafirma. Si no se encuentra la firma a la que se referencia se
      * devuelve cadena vac&iacute;a.
-     * @param signature
-     *        Nodo de la contrafirma.
-     * @param signatureValues
-     *        Listado con todos los SignatureValue del documento de firma.
+     * @param signature Nodo de la contrafirma.
+     * @param signatureValues Listado con todos los SignatureValue del documento de firma.
      * @return Identificador de la firma (Signature) referenciada. */
     public static String getCounterSignerReferenceId(final Element signature, final NodeList signatureValues) {
         // Tomamos la URI de la primera referencia (la del objeto firmado),
@@ -690,9 +669,8 @@ public final class Utils {
     }
 
     /** Crea un X509Certificate a partir de un certificado en Base64.
-     * @param b64Cert
-     *        Certificado en Base64. No debe incluir <i>Bag Attributes</i>
-     * @return Certificado X509 o <code>null</code> si no se pudo crear */
+     * @param b64Cert Certificado en Base64. No debe incluir <i>Bag Attributes</i>.
+     * @return Certificado X509 o <code>null</code> si no se pudo crear. */
     public static X509Certificate createCert(final String b64Cert) {
         if (b64Cert == null || b64Cert.isEmpty()) {
             LOGGER.severe("Se ha proporcionado una cadena nula o vacia, se devolvera null"); //$NON-NLS-1$
@@ -740,8 +718,7 @@ public final class Utils {
     private static final String XMLDSIG = "XMLDSig"; //$NON-NLS-1$
 
     /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
-     * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache.
-     */
+     * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache. */
     public static void installXmlDSigProvider(final boolean forceApacheProvider) {
 
     	final Provider provider = Security.getProvider(XMLDSIG);
