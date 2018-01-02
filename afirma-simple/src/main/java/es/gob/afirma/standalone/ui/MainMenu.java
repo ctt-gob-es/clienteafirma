@@ -382,10 +382,7 @@ public final class MainMenu extends JMenuBar {
         }
     }
 
-    /**
-     * @param event
-     */
-    void showPreferences(EventObject event) {
+    void showPreferences(final EventObject event) {
     	showPreferences();
     }
 
@@ -393,15 +390,12 @@ public final class MainMenu extends JMenuBar {
         PreferencesDialog.show(MainMenu.this.getParentComponent(), true);
     }
 
-    /**
-     * Method that show the restore dialog panel.
-     */
     void showRestoreConfig() {
     	RestoreConfigDialog.show(MainMenu.this.getParentComponent(), true);
     }
 
     @SuppressWarnings("unused")
-	void showAbout(EventObject event) {
+	void showAbout(final EventObject event) {
     	showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent());
     }
 
@@ -417,7 +411,7 @@ public final class MainMenu extends JMenuBar {
     }
 
     @SuppressWarnings("unused")
-	boolean exitApplication(EventObject event, Object response) {
+	boolean exitApplication(final EventObject event, final Object response) {
     	return this.saf.askForClosing();
     }
 

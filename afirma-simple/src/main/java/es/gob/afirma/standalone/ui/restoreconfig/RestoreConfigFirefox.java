@@ -197,14 +197,10 @@ final class RestoreConfigFirefox {
 
 	}
 
-	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
-	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
-	 * @param targetDir Directorio de instalaci&oacute;n del sistema
-	 * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
-	 *  <ul>
-	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	 * </ul>
-	 */
+	/** Genera el <i>script</i> que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+	 * En Linux genera el <i>script</i> que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+	 * @param targetDir Directorio de instalaci&oacute;n del sistema.
+	 * @param usersDirs Directorio donde estan las carpetas de los usuarios. */
 	static void removeAppExecutionWarningInChrome(final File targetDir, final List<String> usersDirs) {
 
 		for ( final String userDir : usersDirs) {
@@ -223,15 +219,14 @@ final class RestoreConfigFirefox {
 		}
 	}
 
-	/**
-	 * Instala el certificado en el almacen del sistema de LINUX (el usado por Chrome).
-	 * @param workingDir Directorio en el que se encuentra el subdirectorio de certutil.
+	/** Instala el certificado en el almac&eacute;n del sistema de Linux (el usado por Chrome).
+	 * @param workingDir Directorio en el que se encuentra el subdirectorio de <code>certutil</code>.
 	 * @param rootCertFile Fichero del certificado ra&iacute;z a instalar.
-	 * @param Listado de directorios de usuario.
-	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
-	 */
-	static void installRootCAChromeKeyStore(final File workingDir, final File rootCertFile, final List<String> usersDirs )
-			throws IOException {
+	 * @param usersDirs Listado de directorios de usuario.
+	 * @throws IOException Cuando ocurre un error en el tratamiento de datos. */
+	static void installRootCAChromeKeyStore(final File workingDir,
+			                                final File rootCertFile,
+			                                final List<String> usersDirs ) throws IOException {
 
 		if ( !Platform.OS.LINUX.equals(Platform.getOS()) ) {
 			return;
@@ -260,25 +255,21 @@ final class RestoreConfigFirefox {
 		}
 	}
 
-	/**
-	 * Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows
+	/** Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows.
 	 * @param targetDir Directorio de la aplicaci&oacute;n en el que ya se encuentra el certificado.
-	 * @throws MozillaProfileNotFoundException
-	 * @throws IOException
-	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n.
-	 */
+	 * @throws MozillaProfileNotFoundException Si no se encuentra el directorio de perfil de usuario de Mozilla Firefox.
+	 * @throws IOException Cuando hay un error escribiendo o leyendo datos.
+	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n. */
 	static void installRootCAMozillaKeyStore(final File targetDir) throws MozillaProfileNotFoundException, IOException, KeyStoreException {
 		installRootCAMozillaKeyStore(targetDir, null);
 	}
 
-	/**
-	 * Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows
+	/** Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows.
 	 * @param targetDir Directorio de la aplicaci&oacute;n.
 	 * @param certFile Fichero con el certificado a instalar.
-	 * @throws MozillaProfileNotFoundException
-	 * @throws IOException
-	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n.
-	 */
+	 * @throws MozillaProfileNotFoundException Si no se encuentra el perfil de usuario de Mozilla Firefox.
+	 * @throws IOException Cuando hay errores leyendo o escribiendo datos.
+	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n. */
 	static void installRootCAMozillaKeyStore(final File targetDir, final File certFile)
 			throws MozillaProfileNotFoundException, IOException, KeyStoreException {
 		final ArrayList<File> firefoxProfilesDir = getFirefoxProfilesDir();
@@ -295,22 +286,18 @@ final class RestoreConfigFirefox {
 		}
 	}
 
-	/**
-	 * Genera el script de instalaci&oacute; del certificado en firefox para MacOSX y LINUX.
-	 * En ambos casos, es necesario crear un script intermedio con el comando certutil y sus argumentos
+	/** Genera el <i>script</i> de instalaci&oacute; del certificado en Firefox para MacOSX y LINUX.
+	 * En ambos casos, es necesario crear un <i>script</i> intermedio con el comando <code>certutil</code> y sus argumentos
 	 * y posteriormente ejecutarlo como un comando de consola.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
 	 * @param certFile Fichero del certificado que debemos instalar.
-	 * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
-	 *  <ul>
-	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	 * <li>En MacOSX contiene la ruta del script a ejecutar.</li>
-	 * </ul>
+	 * @param usersDirs Listado de carpetas de los usuarios.
 	 * @throws MozillaProfileNotFoundException No se ha encontrado el directorio de perfiles de Mozilla.
-	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n.
-	 */
-	static void installRootCAMozillaKeyStore(final File targetDir, final File certFile, final List<String> usersDirs )
-			throws MozillaProfileNotFoundException, KeyStoreException {
+	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n. */
+	static void installRootCAMozillaKeyStore(final File targetDir,
+			                                 final File certFile,
+			                                 final List<String> usersDirs ) throws MozillaProfileNotFoundException,
+	                                                                               KeyStoreException {
 
 		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
 		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
@@ -340,12 +327,11 @@ final class RestoreConfigFirefox {
 	}
 
 
-	/**
-	 * Genera y ejecuta el script de desinstalaci&oacute;n del certificado de firefox
-	 * para MacOSX
-	 * @param targetDir
-	 * @throws IOException
-	 */
+	/** Genera y ejecuta el <i>script</i> de desinstalaci&oacute;n del certificado de Firefox
+	 * para macOS.
+	 * @param targetDir Directorio bajo el que se encuentra <code>certutil</code>.
+	 * @param usersDirs Listado con los directorios de los usuarios del sistema.
+	 * @throws IOException Cuando hay errores leyendo o escribiendo datos. */
 	static void generateUninstallScriptMac(final File targetDir, final List<String> usersDirs) throws IOException {
 
 		final StringBuilder sb = new StringBuilder(RestoreConfigMacOSX.OSX_GET_USERS_COMMAND);
@@ -353,7 +339,8 @@ final class RestoreConfigFirefox {
 
 		try {
 			RestoreConfigMacOSX.writeScriptFile(scriptFile.getAbsolutePath(), sb, true);
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.log(Level.WARNING, " Ha ocurrido un error al generar el script de desinstalacion: " + e, e); //$NON-NLS-1$
 		}
 		RestoreConfigMacOSX.addExexPermissionsToFile(scriptFile);
@@ -491,13 +478,12 @@ final class RestoreConfigFirefox {
 		return certUtilPath;
 	}
 
-	/** Ejecuta la utilidad Mozilla CertUtil para la instalaci&oacute;n del certificado ra&iacute;z de  confianza en Firefox.
-	 * @param certUtilReference Ruta de certutil o null si ya se encuentra en el PATH.
-	 * @param targetDir Directorio en el que se encuentra el certificado a importar.
+	/** Ejecuta la utilidad Mozilla CertUtil para la instalaci&oacute;n del certificado ra&iacute;z de confianza en Firefox.
+	 * @param workingDir Ruta en la que buscar el ejecutable <code>certutil</code>.
+	 * @param certFile Certificado ra&iacute;z.
 	 * @param profilesDir Listado de directorios de perfiles de usuario de Mozilla Firefox.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
-	 * @throws KeyStoreException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore.
-	 */
+	 * @throws KeyStoreException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore. */
 	private static void executeCertUtilToImport(final File workingDir,
 			                                    final File certFile,
 			                                    final Set<File> profilesDir) throws IOException,
@@ -999,11 +985,10 @@ final class RestoreConfigFirefox {
 	}
 
 
-	/**
-	 * Ejecuta un comando de consola
-	 * @param commands Nombre del comando y argumentos
-	 * @return {@code true} si la ejecuci&oacute;n devolvioacute; alg&uacute;n error {@code false} en caso contrario
-	 */
+	/** Ejecuta un comando de consola.
+	 * @param command Nombre del comando y sus argumentos
+	 * @return {@code true} si la ejecuci&oacute;n devolvioacute; alg&uacute;n error {@code false} en caso contrario.
+	 * @throws IOException Si hay problemas ejecutando el comando. */
 	private static boolean execCommand(final String[] command) throws IOException {
 
 		LOGGER.info("Se ejecutara el siguiente comando:\n" + Arrays.toString(command)); //$NON-NLS-1$
@@ -1012,17 +997,16 @@ final class RestoreConfigFirefox {
 		// cualquier salida como un error
 		final StringBuffer buffer = new StringBuffer();
 		try (
-				final InputStream resIs = process.getInputStream();
-				final BufferedReader resReader = new BoundedBufferedReader(
-						new InputStreamReader(resIs),
-						256, // Maximo 256 lineas de salida
-						1024 // Maximo 1024 caracteres por linea
-						);
-				) {
+			final InputStream resIs = process.getInputStream();
+			final BufferedReader resReader = new BoundedBufferedReader(
+					new InputStreamReader(resIs),
+					256, // Maximo 256 lineas de salida
+					1024 // Maximo 1024 caracteres por linea
+					);
+			) {
 			String line;
 			while ((line = resReader.readLine()) != null) {
 				buffer.append(line).append("\n"); //$NON-NLS-1$
-
 			}
 			if (buffer.length() > 0) {
 				LOGGER.info("Salida estandar:\n" + buffer.toString()); //$NON-NLS-1$
@@ -1032,17 +1016,16 @@ final class RestoreConfigFirefox {
 
 		buffer.setLength(0);
 		try (
-				final InputStream errIs = process.getErrorStream();
-				final BufferedReader errReader = new BoundedBufferedReader(
-						new InputStreamReader(errIs),
-						256, // Maximo 256 lineas de salida
-						1024 // Maximo 1024 caracteres por linea
-						);
-				) {
+		final InputStream errIs = process.getErrorStream();
+		final BufferedReader errReader = new BoundedBufferedReader(
+				new InputStreamReader(errIs),
+				256, // Maximo 256 lineas de salida
+				1024 // Maximo 1024 caracteres por linea
+				);
+		) {
 			String line;
 			while ((line = errReader.readLine()) != null) {
 				buffer.append(line).append("\n"); //$NON-NLS-1$
-
 			}
 			if (buffer.length() > 0) {
 				LOGGER.info("Salida de error:\n" + buffer.toString()); //$NON-NLS-1$

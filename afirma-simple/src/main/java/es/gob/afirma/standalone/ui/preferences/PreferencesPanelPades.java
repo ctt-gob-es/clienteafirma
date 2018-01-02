@@ -24,8 +24,6 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -161,12 +159,7 @@ final class PreferencesPanelPades extends JPanel {
 
 		policyConfigButton.setMnemonic('P');
 		policyConfigButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					changePadesPolicyDlg(getParent());
-				}
-			}
+			ae -> changePadesPolicyDlg(getParent())
 		);
 		policyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
@@ -294,18 +287,15 @@ final class PreferencesPanelPades extends JPanel {
 	 	final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147")); //$NON-NLS-1$
 
 	 	restoreConfigButton.setMnemonic('R');
-	 	restoreConfigButton.addActionListener(new ActionListener() {
-	 		@Override
-	 		public void actionPerformed(final ActionEvent ae) {
-	 			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.155"), //$NON-NLS-1$
-	 					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-	 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+	 	restoreConfigButton.addActionListener(ae -> {
+			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.155"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-	 				loadDefaultPreferences();
+				loadDefaultPreferences();
 
-	 			}
-	 		}
-	 	});
+			}
+		});
 	 	restoreConfigButton.getAccessibleContext().setAccessibleDescription(
 	 			SimpleAfirmaMessages.getString("PreferencesPanel.136")); //$NON-NLS-1$
 
@@ -449,15 +439,8 @@ final class PreferencesPanelPades extends JPanel {
         repaint();
 	}
 
-	/**
-	 * Carga las opciones de configuraci&oacute;n por defecto del panel de
-	 * firmas PAdES desde un fichero externo de preferencias.
-	 *
-	 * @param blocked
-	 *            {@code true} Si las opciones de configuraci&oacute;n sensibles
-	 *            a ello est&aacute;n protegidas y no pueden ser modificadas,
-	 *            {@code false} en caso contrario
-	 */
+	/** Carga las opciones de configuraci&oacute;n por defecto del panel de
+	 * firmas PAdES desde un fichero externo de preferencias. */
 	void loadDefaultPreferences() {
 
 		this.padesSignReason.setText(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_SIGN_REASON));
@@ -526,15 +509,9 @@ final class PreferencesPanelPades extends JPanel {
 		}
 	}
 
-	/**
-	 * Obtiene la configuraci&oacute;n de pol&iacute;tica de firma PAdES por
+	/** Obtiene la configuraci&oacute;n de pol&iacute;tica de firma PAdES por
 	 * defecto desde el fichero de preferencias.
-	 * @param blocked
-	 *            {@code true} Si las opciones de configuraci&oacute;n sensibles
-	 *            a ello est&aacute;n protegidas y no pueden ser modificadas,
-	 *            {@code false} en caso contrario
-	 * @return Pol&iacute;tica de firma configurada.
-	 */
+	 * @return Pol&iacute;tica de firma configurada. */
 	private AdESPolicy getPadesDefaultPolicy() {
 
 		AdESPolicy adesPolicy = null;
@@ -551,17 +528,21 @@ final class PreferencesPanelPades extends JPanel {
 				if (PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER) == null
 						|| PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER).isEmpty()) {
 					this.padesPolicyDlg.loadPolicy(null);
-				} else {
+				}
+				else {
 					this.padesPolicyDlg.loadPolicy(
-							new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER),
-									PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_HASH),
-									PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
-									PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_QUALIFIER)));
+						new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER),
+							PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_HASH),
+							PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
+							PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_QUALIFIER)
+						)
+					);
 				}
 
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
-						.severe("Error al recuperar la politica PAdES guardada en fichero de preferencias: " + e); //$NON-NLS-1$
+					.severe("Error al recuperar la politica PAdES guardada en fichero de preferencias: " + e); //$NON-NLS-1$
 
 			}
 		}
@@ -569,44 +550,35 @@ final class PreferencesPanelPades extends JPanel {
 		return adesPolicy;
 	}
 
-	/**
-	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
+	/** Indica si el panel permite o no la edici&oacute;n de sus valores.
 	 * @return {@code true} si est&aacute; bloqueado y no permite la edici&oacute;n,
-	 * {@code false} en caso contrario.
-	 */
+	 * {@code false} en caso contrario. */
 	public boolean isBlocked() {
 		return this.blocked;
 	}
 
-	/**
-	 * Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
+	/** Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
 	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
-	 * {@code false} en caso contrario.
-	 */
-	public void setBlocked(boolean blocked) {
+	 * {@code false} en caso contrario. */
+	public void setBlocked(final boolean blocked) {
 		this.blocked = blocked;
 	}
 
-	/**
-	 * Carga el panel de pol&iacute;tica con las preferencias guardadas
-	 */
+	/** Carga el panel de pol&iacute;tica con las preferencias guardadas. */
 	private void loadPadesPolicy() {
 		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.padesPolicyDlg == null) {
 			final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
-			padesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-					POLICY_CADES_PADES_AGE_1_9));
-
+			padesPolicies.add(
+				new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+				POLICY_CADES_PADES_AGE_1_9)
+			);
 			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(), isBlocked());
 		}
 	}
 
-	/**
-	 * Di&aacute;logo para cambiar la configuraci&oacute;n de la pol&iacute;tica
-	 *
-	 * @param container
-	 *            Contenedor en el que se define el di&aacute;logo.
-	 */
+	/** Di&aacute;logo para cambiar la configuraci&oacute;n de la pol&iacute;tica.
+	 * @param container Contenedor en el que se define el di&aacute;logo. */
 	public void changePadesPolicyDlg(final Container container) {
 
 		// Cursor en espera

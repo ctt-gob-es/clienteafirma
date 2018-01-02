@@ -322,17 +322,13 @@ public final class SignPanel extends JPanel {
         this.signButton.requestFocusInWindow();
     }
 
-    /**
-     * Identifica el tipo de firma asociado a un firmador. Si no identifica el firmado,
+    /** Identifica el tipo de firma asociado a un firmador. Si no identifica el firmador,
      * devuelte el tipo por defecto.
-     * @param signer Firmardor.
-     * @param defaultType Tipo por defecto.
-     * @return Tipo de firma que se debe ejecutar.
-     */
+     * @param signer Firmador.
+     * @return Tipo de firma que se debe ejecutar. */
     private static String getSignatureName(final AOSigner signer) {
-
     	for (final String[] signatureType : signersTypeRelation) {
-    		Class<?> c;
+    		final Class<?> c;
     		try {
     			c = Class.forName(signatureType[0]);
     		}

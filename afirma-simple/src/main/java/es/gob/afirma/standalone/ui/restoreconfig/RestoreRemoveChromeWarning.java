@@ -229,10 +229,11 @@ final public class RestoreRemoveChromeWarning {
 	}
 
 	/** Genera los comandos que desregistran el esquema "afirma" como un
-	 * protocolo de confiable en Chrome. (Repetido en ConfiguratorLinux)
+	 * protocolo de confianza en Chrome. (Repetido en ConfiguratorLinux)
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @throws IOException */
+	 * @return Lista con los arrays que contienen los nombres de los comandos y sus
+	 *         par&aacute;metros.
+	 * @throws IOException Si hay problemas escribiendo o leyendo los datos. */
 	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
@@ -311,8 +312,9 @@ final public class RestoreRemoveChromeWarning {
 	/** Genera los scripts que registran el esquema "afirma" como un
 	 * protocolo de confiable en Chrome. (Repetido en ConfiguratorLinux)
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @throws IOException */
+	 * @return Lista con los arrays que contienen los nombres de los comandos y sus
+	 *         par&aacute;metros.
+	 * @throws IOException Si hay problemas leyendo o escribiendo los datos. */
 	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
@@ -419,13 +421,15 @@ final public class RestoreRemoveChromeWarning {
 		return commandList;
 	}
 
-	/** Genera los scripts que registran el esquema "afirma" como un
-	 * protocolo de confiable en Chrome. (Repetido en ConfiguratorMacOSX)
-	 * @param appDir Directorio de instalaci&oacute;n del sistema
+	/** Genera los <i>scripts</i> que registran el esquema "afirma" como un
+	 * protocolo de confianza en Chrome. (Repetido en <code>ConfiguratorMacOSX</code>).
+	 * @param appDir Directorio de instalaci&oacute;n del sistema.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @throws IOException */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallMac(final File appDir, final String userDir) throws IOException {
-
+	 * @return Lista con los arrays que contienen los nombres de los comandos y sus
+	 *         par&aacute;metros.
+	 * @throws IOException Si hay problemas leyendo o escribiendo datos. */
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallMac(final File appDir,
+			                                                                                    final String userDir) throws IOException {
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
 		final String[] endIfStatement = new String[] {
@@ -498,7 +502,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba
@@ -513,7 +518,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero. (Repetido en
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] getIfNotContainsStringCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba
@@ -528,7 +534,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para confirmar si existe el fichero con el que se va a trabajar.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] getIfFileFoundCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba
@@ -542,7 +549,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para reemplazar el fichero original por el temporal con el que se estaba trabajando.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] copyConfigurationFile(final String userDir, final String browserPath) {
 		// Comando para sobreescribir el fichero de configuracion
 		final String[] commandCopy = new String[] {
@@ -554,9 +562,10 @@ final public class RestoreRemoveChromeWarning {
 		return commandCopy;
 	}
 
-	/** Genera los scripts para eliminar el protocolo afirma.
+	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] deleteProtocolInPreferencesFile1(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -572,7 +581,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para eliminar el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] deleteProtocolInPreferencesFile2(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -586,7 +596,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para incluir el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] addProtocolInPreferencesFileMac(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -601,7 +612,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] correctProtocolInPreferencesFileMac(final String userDir, final String browserPath) {
 
 		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
@@ -616,7 +628,8 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts para incluir el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] addProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -631,9 +644,11 @@ final public class RestoreRemoveChromeWarning {
 		return commandInstall1;
 	}
 
-	/** Genera los scripts para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
+	/** Genera los <i>scripts</i> para eliminar la coma en caso de que sea el &uacute;nico protocolo definido
+	 * en el fichero de preferencias.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] correctProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
 		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
@@ -647,11 +662,13 @@ final public class RestoreRemoveChromeWarning {
 	}
 
 
-	/** Genera los scripts para eliminar el protocolo afirma del fichero.
+	/** Genera los <i>scripts</i> para eliminar el protocolo afirma del fichero de preferencias.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile1(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
+	 * @param commandList Lista de comandos a la que a&ntilde;adir el <i>script</i> generado. */
+	private static void removeProtocolInPreferencesFile1(final String userDir,
+			                                             final String browserPath,
+			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall1 = new String[] {
@@ -666,11 +683,13 @@ final public class RestoreRemoveChromeWarning {
 
 	}
 
-	/** Genera los scripts para eliminar el protocolo afirma del fichero.
+	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code> del fichero de preferencias.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile2(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
+	 * @param commandList Lista de comandos a la que a&ntilde;adir los <i>scripts</i> generados. */
+	private static void removeProtocolInPreferencesFile2(final String userDir,
+			                                             final String browserPath,
+			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall1 = new String[] {
@@ -683,11 +702,13 @@ final public class RestoreRemoveChromeWarning {
 
 	}
 
-	/** Genera los scripts para eliminar la sintaxis que define los protocolos de confianza si no existe ninguno.
+	/** Genera los <i>scripts</i> para eliminar la sintaxis que define los protocolos de confianza si no existe ninguno.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile3(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
+	 * @param commandList Lista de comandos a la que a&ntilde;adir el <i>script</i> generado. */
+	private static void removeProtocolInPreferencesFile3(final String userDir,
+			                                             final String browserPath,
+			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall1 = new String[] {

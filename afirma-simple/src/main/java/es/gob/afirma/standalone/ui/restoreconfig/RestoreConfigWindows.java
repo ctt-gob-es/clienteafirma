@@ -246,86 +246,86 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 	}
 
-	/**
-	 * Instala el certificado ra&iacute;z CA de AutoFirma
-	 *  en el almac&eacute;n ra&iacute;z de Windows
-	 *  @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
-	 *  @param cer El certificado a instalar
-	 */
+	/** Instala el certificado ra&iacute;z CA de AutoFirma
+	 * en el almac&eacute;n ra&iacute;z de Windows.
+	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
+	 * @param certFile El certificado a instalar. */
 	private static void installRootCAWindowsKeystore(final RestoreConfigPanel configPanel, final CertificateFile certFile) {
 
-		KeyStore ks;
+		final KeyStore ks;
 		try {
 			ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
 			ks.load(null, null);
-		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+		}
+		catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			LOGGER.severe("No se ha podido cargar el almacen de certificados de confianza de Windows: " + e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.20")); //$NON-NLS-1$
 			return;
 		}
 
-			// Comprobamos si el certificado ya esta instalado en el almacen
+		// Comprobamos si el certificado ya esta instalado en el almacen
+		try {
+			final Certificate currentCert = ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER);
+			if (currentCert != null && currentCert.equals(certFile.getCert())) {
+				LOGGER.info("El certificado raiz ya se encontraba instalado en el almacen del sistema"); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
+				return;
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo comprobar si el certificado ya estaba en el almacen: " + e); //$NON-NLS-1$
+		}
+
+		// Antes de la instalacion, intentamos desinstalar cualquier otro certificado con el
+		// mismo alias que se encuentre en el almacen
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.22")); //$NON-NLS-1$
+		try {
+			while (ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER) != null) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.35")); //$NON-NLS-1$
+				ks.deleteEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER);
+			}
+		}
+		catch (final KeyStoreException ke) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.34")); //$NON-NLS-1$
+			LOGGER.info("No se ha podido eliminar alguna importacion previa del certificado raiz del almacen de Windows: " + ke.getMessage()); //$NON-NLS-1$
+		}
+
+		// Instalamos el certificado
+		boolean installed = false;
+		do {
 			try {
-				final Certificate currentCert = ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER);
-				if (currentCert != null && currentCert.equals(certFile.getCert())) {
-					LOGGER.info("El certificado raiz ya se encontraba instalado en el almacen del sistema"); //$NON-NLS-1$
-					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
+				ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, certFile.getCert());
+				installed = true;
+			}
+			catch (final KeyStoreException e) {
+				LOGGER.warning(
+					"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
+				);
+				final int result = JOptionPane.showConfirmDialog(
+					null,
+					SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE
+				);
+				if (result == JOptionPane.CANCEL_OPTION) {
+					LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.32")); //$NON-NLS-1$
 					return;
 				}
 			}
-			catch (final Exception e) {
-				LOGGER.warning("No se pudo comprobar si el certificado ya estaba en el almacen: " + e); //$NON-NLS-1$
-			}
-
-			// Antes de la instalacion, intentamos desinstalar cualquier otro certificado con el
-			// mismo alias que se encuentre en el almacen
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.22")); //$NON-NLS-1$
-			try {
-				while (ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER) != null) {
-					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.35")); //$NON-NLS-1$
-					ks.deleteEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER);
-				}
-			} catch (final KeyStoreException ke) {
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.34")); //$NON-NLS-1$
-				LOGGER.info("No se ha podido eliminar alguna importacion previa del certificado raiz del almacen de Windows: " + ke.getMessage()); //$NON-NLS-1$
-			}
-
-			// Instalamos el certificado
-			boolean installed = false;
-			do {
-				try {
-					ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, certFile.getCert());
-					installed = true;
-				}
-				catch (final KeyStoreException e) {
-					LOGGER.warning(
-							"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
-							);
-					final int result = JOptionPane.showConfirmDialog(
-							null,
-							SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
-							JOptionPane.OK_CANCEL_OPTION,
-							JOptionPane.WARNING_MESSAGE
-							);
-					if (result == JOptionPane.CANCEL_OPTION) {
-						LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
-						configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.32")); //$NON-NLS-1$
-						return;
-					}
-				}
-			}
-			while (!installed);
+		}
+		while (!installed);
 	}
 
-	/**
-	 * Instala el certificado ra&iacute;z CA de AutoFirma
-	 *  en el almac&eacute;n ra&iacute;z de Mozilla
+	/** Instala el certificado ra&iacute;z CA de AutoFirma
+	 * en el almac&eacute;n ra&iacute;z de Mozilla.
 	 *  @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 *  @param certFile El certificado a instalar.
-	 */
-	private static void installRootCAMozillaKeystore(final RestoreConfigPanel configPanel, final CertificateFile certFile, final File installDir) {
-
+	 *  @param installDir Directorio de instalaci&oacute;n. */
+	private static void installRootCAMozillaKeystore(final RestoreConfigPanel configPanel,
+			                                         final CertificateFile certFile,
+			                                         final File installDir) {
 		try {
 			// Obligamos a que se cierre Firefox antes de manipular el
 			// certificado en su almacen
@@ -515,12 +515,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 	}
 
 
-	/**
-	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
-	 * como paso previo a volver a generarlos
-	 * @param installDir Ruta del directorio de la aplicaci&oacute;n
-	 * @throws IOException
-	 */
+	/** Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
+	 * como paso previo a volver a generarlos.
+	 * @param installDir Ruta del directorio de la aplicaci&oacute;n.
+	 * @throws IOException Si hay problemas borrando los ficheros. */
 	private static void deleteCertificatesFromDisk(final File installDir) throws IOException {
 
 		if (checkSSLKeyStoreGenerated(installDir)) {
@@ -600,7 +598,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 		try {
 			Files.delete(exeFile.toPath());
 			Files.delete(batFile.toPath());
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.warning("No se pudo eliminar el ejecutable para el registro del protocolo \"afirma\": " + e); //$NON-NLS-1$
 		}
 

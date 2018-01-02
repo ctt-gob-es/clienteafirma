@@ -51,28 +51,27 @@ public class OSXHandler implements InvocationHandler {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /**
-     * Each OSXHandler has the name of the EAWT method it intends to listen for (handleAbout, for
+    /** Each OSXHandler has the name of the EAWT method it intends to listen for (handleAbout, for
      * example), the Object that will ultimately perform the task, and the Method to be called on
-     * that Object
-     */
-    protected OSXHandler(String proxySignature, Object target, Method handler) {
+     * that Object.
+     * @param proxySignature Nombre del m&eacute;todo EAWT.
+     * @param target Objeto que implementa el m&eacute;todo.
+     * @param handler El propio m&eacute;todo. */
+    protected OSXHandler(final String proxySignature, final Object target, final Method handler) {
         this.proxySignature = proxySignature;
         this.targetObject = target;
         this.targetMethod = handler;
     }
 
-    /**
-     * Pass this method an Object and Method equipped to perform application shutdown logic The
+    /** Pass this method an Object and Method equipped to perform application shutdown logic The
      * QuitResponse may be used to respond to a request to quit the application.
      * @param target Objeto que dispone del m&eacute;todo de cierre.
-     * @param quitHandler M&eacute;todo que ejecutar para el cierre de la aplicaci&oacute;n.
-     */
-    public static void setQuitHandler(Object target, Method quitHandler) {
+     * @param quitHandler M&eacute;todo que ejecutar para el cierre de la aplicaci&oacute;n. */
+    public static void setQuitHandler(final Object target, final Method quitHandler) {
         final OSXHandler adapter = new OSXHandler("handleQuitRequestWith", target, quitHandler) { //$NON-NLS-1$
 
             @Override
-			public boolean callTarget(Object appleEvent, Object response) {
+			public boolean callTarget(final Object appleEvent, final Object response) {
                 if (appleEvent != null) {
                     try {
                         this.targetMethod.invoke(this.targetObject, new Object[] { appleEvent, response });
@@ -117,11 +116,11 @@ public class OSXHandler implements InvocationHandler {
      * @param target Objeto que dispone del m&eacute;todo para mostrar el Acerca de.
      * @param aboutHandler M&eacute;todo que mostrar el di&aacute;logo "Acerca de".
      */
-    public static void setAboutHandler(Object target, Method aboutHandler) {
+    public static void setAboutHandler(final Object target, final Method aboutHandler) {
         final OSXHandler adapter = new OSXHandler("handleAbout", target, aboutHandler) { //$NON-NLS-1$
 
             @Override
-			public boolean callTarget(Object appleEvent) {
+			public boolean callTarget(final Object appleEvent) {
                 if (appleEvent != null) {
                     try {
                         this.targetMethod.invoke(this.targetObject, new Object[] { appleEvent });
@@ -166,11 +165,11 @@ public class OSXHandler implements InvocationHandler {
      * @param target Objeto que dispone del m&eacute;todo para mostrar el di&aacute;logo de preferencias.
      * @param prefsHandler M&eacute;todo que ejecutar para mostrar el di&aacute;logo de preferencias.
      */
-    public static void setPreferencesHandler(Object target, Method prefsHandler) {
+    public static void setPreferencesHandler(final Object target, final Method prefsHandler) {
         final OSXHandler adapter = new OSXHandler("handlePreferences", target, prefsHandler) { //$NON-NLS-1$
 
             @Override
-			public boolean callTarget(Object appleEvent) {
+			public boolean callTarget(final Object appleEvent) {
                 if (appleEvent != null) {
                     try {
                         this.targetMethod.invoke(this.targetObject, new Object[] { appleEvent });
@@ -214,7 +213,7 @@ public class OSXHandler implements InvocationHandler {
      * every time an AppEvent method is invoked
      */
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         // All of the AppEvent methods are void; return null regardless of what happens
         if (isCorrectMethod(method, args)) {
             if (args.length == 1) {
@@ -226,15 +225,13 @@ public class OSXHandler implements InvocationHandler {
         return null;
     }
 
-    /**
-     * Override this method to perform any operations on the event that comes with the various
+    /** Override this method to perform any operations on the event that comes with the various
      * callbacks See setFileHandler above for an example
      * @param appleEvent Evento que desencadena la llamada.
      * @return Indica si la operaci&oacute;n finaliz&oacute; correctamente o no.
      * @throws IllegalAccessException Se intenta ejecutar un metodo no accesible.
-     * @throws InvocationTargetException Error de ejecuci&oacuten;n intento de del m&eacute;todo indicado.
-     */
-    public boolean callTarget(Object appleEvent) throws InvocationTargetException, IllegalAccessException {
+     * @throws InvocationTargetException Error de ejecuci&oacute;n intento de del m&eacute;todo indicado. */
+    public boolean callTarget(final Object appleEvent) throws InvocationTargetException, IllegalAccessException {
         final Object result = this.targetMethod.invoke(this.targetObject, (Object[]) null);
         if (result == null) {
             return true;
@@ -242,16 +239,14 @@ public class OSXHandler implements InvocationHandler {
         return Boolean.parseBoolean(result.toString());
     }
 
-    /**
-     * Override this method to perform any operations on the event that comes with the various
+    /** Override this method to perform any operations on the event that comes with the various
      * callbacks See setQuitHandler above for an example.
      * @param appleEvent Evento que desencadena la llamada.
      * @param response Respuesta de la llamada.
      * @return Indica si la operaci&oacute;n finaliz&oacute; correctamente o no.
      * @throws IllegalAccessException Se intenta ejecutar un metodo no accesible.
-     * @throws InvocationTargetException Error de ejecuci&oacuten;n intento de del m&eacute;todo indicado.
-     */
-    public boolean callTarget(Object appleEvent, Object response) throws InvocationTargetException, IllegalAccessException {
+     * @throws InvocationTargetException Error de ejecuci&oacute;n intento de del m&eacute;todo indicado. */
+    public boolean callTarget(final Object appleEvent, final Object response) throws InvocationTargetException, IllegalAccessException {
         final Object result = this.targetMethod.invoke(this.targetObject, (Object[]) null);
         if (result == null) {
             return true;
@@ -259,11 +254,13 @@ public class OSXHandler implements InvocationHandler {
         return Boolean.parseBoolean(result.toString());
     }
 
-    /**
-     * Compare the method that was called to the intended method when the OSXHandler instance was
-     * created (e.g. handleAbout, handleQuitRequestWith, openFiles etc.)
-     */
-    protected boolean isCorrectMethod(Method method, Object[] args) {
+    /** Compare the method that was called to the intended method when the OSXHandler instance was
+     * created (e.g. handleAbout, handleQuitRequestWith, openFiles etc.).
+     * @param method M&eacute;todo a comprobar.
+     * @param args Par&aacute;metros del m&eacute;todo.
+     * @return <code>true</code> si el m&eacute;todo es correcto, <code>false</code> en caso
+     *         contrario. */
+    protected boolean isCorrectMethod(final Method method, final Object[] args) {
         return this.targetMethod != null && this.proxySignature.equals(method.getName()) && args.length > 0;
     }
 

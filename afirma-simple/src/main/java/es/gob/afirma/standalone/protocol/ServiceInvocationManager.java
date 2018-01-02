@@ -57,10 +57,10 @@ public final class ServiceInvocationManager {
 	 * su valor. */
 	private static final int BUFFERED_SECURITY_RANGE = 36;
 
-	/** N&uacte;mero m&aacute;ximo de intentos de lectura consecutivos en el buffer sin que se encuentren datos. */
+	/** N&uacute;mero m&aacute;ximo de intentos de lectura consecutivos en el <i>buffer</i> sin que se encuentren datos. */
 	private static final int MAX_READING_BUFFER_TRIES = 10;
 
-	/** Tiempo de espera de cada socket en milisegundos. */
+	/** Tiempo de espera de cada <i>socket</i> en milisegundos. */
 	private static int SOCKET_TIMEOUT = 90000;
 
 	/** M&aacute;ximo numero de caracteres que podemos enviar en una respuesta. */

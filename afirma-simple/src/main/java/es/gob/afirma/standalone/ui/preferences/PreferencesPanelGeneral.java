@@ -169,10 +169,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	}
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
-	 * desde un fichero externo de preferencias.
-	 * @param blocked {@code true} Si las opciones de configuraci&oacute;n sensibles
-	 *                    a ello est&aacute;n protegidas y no pueden ser modificadas,
-	 *                    {@code false} en caso contrario. */
+	 * desde un fichero externo de preferencias. */
 	void loadDefaultPreferences() {
 
 		try {
@@ -449,12 +446,9 @@ final class PreferencesPanelGeneral extends JPanel {
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
 	 * @param modificationListener Listener para la detecci&oacute;n de cambio de configuraci&oacute;n.
 	 * @param keyListener Listener para la detecci&oacute;n del uso de teclas para el cierre de la pantalla.
-	 * @param blocked <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
-	 *                    <code>false</code> para limitar las preferencias que puede modificar.
 	 * @return Panel con los componentes de configuraci&oacute;n. */
-	private JPanel createSignatureFormatPanel(
-			final ItemListener modificationListener,
-			final KeyListener keyListener) {
+	private JPanel createSignatureFormatPanel(final ItemListener modificationListener,
+		 	                                  final KeyListener keyListener) {
 
 		final JPanel signatureDefaultsFormats = new JPanel(new GridBagLayout());
 		signatureDefaultsFormats.setBorder(

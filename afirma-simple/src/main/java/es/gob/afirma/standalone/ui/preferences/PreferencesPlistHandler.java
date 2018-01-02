@@ -80,7 +80,7 @@ final class PreferencesPlistHandler {
 	 *        {@code false} en caso contrario
 	 * @throws IOException Si hay problemas con la descarga del fichero de preferencias.
 	 * @throws InvalidPreferencesFileException Si las preferencias no son v&aacute;lidas por cualquier motivo.
-	 * @throws AOInvalidFormatException Si no se puede obtener informac&6oacute;n sobre la firma de las preferencias. */
+	 * @throws AOInvalidFormatException Si no se puede obtener informac&oacute;n sobre la firma de las preferencias. */
 	static void importPreferencesFromUrl(final String url, final boolean unprotected) throws IOException, InvalidPreferencesFileException, AOInvalidFormatException {
 		if (url == null){
 			throw new IllegalStateException("La URL de descarga del fichero de configuracion no puede ser nula"); //$NON-NLS-1$

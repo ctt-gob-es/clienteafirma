@@ -57,13 +57,9 @@ public class IntermediateServerUtil {
 		send(url);
 	}
 
-	/**
-	 * Env&iacute;a datos al servidor intermedio.
-	 * @param data Buffer con los datos a enviar.
-	 * @param storageServiceUrl URL del servicio de guardado.
-	 * @param id Identificador a asignar a los datos a subir al servidor.
-	 * @throws IOException
-	 */
+	/** Env&iacute;a datos al servidor intermedio.
+	 * @param url URL del servicio de guardado.
+	 * @throws IOException Si hay problemas durante el env&iacute;o. */
 	private static void send(final StringBuilder url) throws IOException {
 
 		// Llamamos al servicio para guardar los datos

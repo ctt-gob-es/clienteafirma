@@ -14,8 +14,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.logging.Logger;
@@ -113,11 +111,9 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 		add(buttonsPanel, c);
 	}
 
-	/**
-	 * Clase que construye el objeto gr&aacute;fico que representa el panel
-	 * donde se ubican los botones de la ventana de restauraci&oacute;n
-	 * @return
-	 */
+	/** Construye el objeto gr&aacute;fico que representa el panel
+	 * donde se ubican los botones de la ventana de restauraci&oacute;n.
+	 * @return Panel donde se ubican los botones de la ventana de restauraci&oacute;n. */
 	private JPanel createButtonsPanel() {
 
 		final JPanel panel = new JPanel();
@@ -130,13 +126,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 		);
 		closeButton.addKeyListener(this);
 		closeButton.addActionListener(
-			new ActionListener() {
-			    /** {@inheritDoc} */
-	            @Override
-	            public void actionPerformed(final ActionEvent ae) {
-	            	disposeInterface();
-	            }
-	        }
+			ae -> disposeInterface()
 		);
 
 		final JButton restoreButton = new JButton(SimpleAfirmaMessages.getString("RestoreConfigPanel.1")); //$NON-NLS-1$
@@ -145,27 +135,17 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 				SimpleAfirmaMessages.getString("RestoreConfigPanel.2") //$NON-NLS-1$
 		);
 		restoreButton.addKeyListener(this);
-		restoreButton.addActionListener(new ActionListener() {
-			/** {@inheritDoc} */
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
+		restoreButton.addActionListener(ae -> {
 
-				// Limpiamos el area de texto antes de comenzar con la restauracion
-				// para eliminar posibles mensajes de ejecuciones anteriores.
-				RestoreConfigPanel.this.taskOutput.setText(null);
-				// Deshabilito el boton mientras el proceso se esta ejecutando
-				restoreButton.setEnabled(false);
-				new Thread(new Runnable() {
+			// Limpiamos el area de texto antes de comenzar con la restauracion
+			// para eliminar posibles mensajes de ejecuciones anteriores.
+			RestoreConfigPanel.this.taskOutput.setText(null);
+			// Deshabilito el boton mientras el proceso se esta ejecutando
+			restoreButton.setEnabled(false);
+			new Thread(() -> new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this)).start();
 
-					@Override
-					public void run() {
-						new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this);
-					}
-				}).start();
+			restoreButton.setEnabled(true);
 
-				restoreButton.setEnabled(true);
-
-			}
 		});
 
 
@@ -181,10 +161,8 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 		return panel;
 	}
 
-	/**
-	 * Devuelve la ventana desde donde se abri&oacute; la ventana actual
-	 * @return
-	 */
+	/** Devuelve la ventana desde donde se abri&oacute; la ventana actual.
+	 * @return Ventana desde donde se abri&oacute; la ventana actual. */
 	Window getParentWindow() {
 		return this.window;
 	}
@@ -219,14 +197,11 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	 */
 	public void appendMessage(final String message) {
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				RestoreConfigPanel.this.taskOutput.setText(
-						RestoreConfigPanel.this.taskOutput.getText() + message + newline);
-				RestoreConfigPanel.this.taskOutput.setCaretPosition(
-						RestoreConfigPanel.this.taskOutput.getDocument().getLength());
-			}
+		SwingUtilities.invokeLater(() -> {
+			RestoreConfigPanel.this.taskOutput.setText(
+					RestoreConfigPanel.this.taskOutput.getText() + message + newline);
+			RestoreConfigPanel.this.taskOutput.setCaretPosition(
+					RestoreConfigPanel.this.taskOutput.getDocument().getLength());
 		});
 	}
 

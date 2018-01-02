@@ -124,14 +124,12 @@ final class CertUtil {
 		}
 	}
 
-	/**
-	 * Genera un certificado ra&iacute;z y un certificado SSL a partir de &eacute;l.
+	/** Genera un certificado ra&iacute;z y un certificado SSL a partir de &eacute;l.
 	 * @param sslCertificateAlias Alias del certificado SSL.
 	 * @param storePassword Contrase&ntilde;a del almac&eacute;n.
 	 * @return Conjunto con ambos certificados.
-	 * @throws IOException
-	 * @throws GeneralSecurityException
-	 */
+	 * @throws IOException Cuando hay errores leyendo o escribiendo datos.
+	 * @throws GeneralSecurityException Si faltan permisos para alguna operaci&oacute;n necesaria. */
 	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws IOException, GeneralSecurityException {
 
 		Security.addProvider(new BouncyCastleProvider());
@@ -291,7 +289,7 @@ final class CertUtil {
 	 * @return Certificado cargad0.
 	 * @throws IOException Cuando no se puede cargar el certificado.
 	 */
-	static X509Certificate loadCertificate(File certFile) throws IOException {
+	static X509Certificate loadCertificate(final File certFile) throws IOException {
 		X509Certificate cert;
 		try (InputStream is = new FileInputStream(certFile)) {
 			cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is); //$NON-NLS-1$

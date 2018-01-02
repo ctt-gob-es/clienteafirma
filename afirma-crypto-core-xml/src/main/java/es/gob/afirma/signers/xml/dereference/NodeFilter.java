@@ -24,12 +24,10 @@ import org.w3c.dom.Node;
 interface NodeFilter {
 
     /** Tells if a node must be output in c14n.
-     * @param n
+     * @param n The node.
      * @return 1 if the node should be output.
      *         0 if node must not be output,
-     *         -1 if the node and all it's child must not be output.
-     *
-     */
+     *         -1 if the node and all it's child must not be output. */
     int isNodeInclude(Node n);
 
     /**
@@ -37,12 +35,11 @@ interface NodeFilter {
      * The caller must assured that this method is always call
      * in document order. The implementations can use this
      * restriction to optimize the transformation.
-     * @param n
+     * @param n The node.
      * @param level the relative level in the tree
      * @return 1 if the node should be output.
      *         0 if node must not be output,
-     *         -1 if the node and all it's child must not be output.
-     */
+     *         -1 if the node and all it's child must not be output. */
     int isNodeIncludeDO(Node n, int level);
 
 }

@@ -48,7 +48,7 @@ final class RestoreConfigLinux implements RestoreConfig {
     static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
 
 	@Override
-	public void restore(RestoreConfigPanel configPanel) {
+	public void restore(final RestoreConfigPanel configPanel) {
 
 		final File appDir = RestoreConfigUtil.getApplicationDirectory();
 
@@ -298,11 +298,9 @@ final class RestoreConfigLinux implements RestoreConfig {
 		return new File(certsDir, FILE_AUTOFIRMA_CERTIFICATE).exists();
 	}
 
-	/**
-	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
-	 * como paso previo a volver a generarlos
-	 * @param certsDir Ruta del directorio con los certificados.
-	 */
+	/** Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
+	 * como paso previo a volver a generarlos.
+	 * @param certsDir Ruta del directorio con los certificados. */
 	private static void deleteInstalledCertificates(final File certsDir) {
 
 		if (checkSSLKeyStoreGenerated(certsDir)) {
@@ -315,9 +313,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 	}
 
-	/**
-	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
-	 */
+	/** Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace. */
 	private static void closeFirefox() {
 
 		while (isProcessRunningLinux("/usr/lib/firefox/firefox").booleanValue()) { //$NON-NLS-1$
@@ -380,14 +376,12 @@ final class RestoreConfigLinux implements RestoreConfig {
 		return isRunning;
 	}
 
-	/**
-	 * Restaura la configuraci&oacute;n del protocolo afirma en Linux
+	/** Restaura la configuraci&oacute;n del protocolo afirma en Linux
 	 * @param workingDir Directorio en el que se puedan copiar ficheros.
-	 * @throws RuntimeException
-	 */
-	private static void restoreProtocolHandler(final File workingDir) throws IOException, RuntimeException {
+	 * @throws IOException Si hay problemas leyendo o escribiendo datos. */
+	private static void restoreProtocolHandler(final File workingDir) throws IOException {
 
-		byte[] configFileContent;
+		final byte[] configFileContent;
 		try (InputStream is = RestoreConfigLinux.class.getResourceAsStream("/linux/" + PROTOCOL_HANDLER_CONFIG_FILE)) { //$NON-NLS-1$
 			configFileContent = AOUtil.getDataFromInputStream(is);
 		}
@@ -401,7 +395,8 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		try {
 			RestoreConfigUtil.installFile(configFileContent, configFile);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			LOGGER.warning("No se pudo copiar a disco el fichero de configuracion " + PROTOCOL_HANDLER_CONFIG_FILE); //$NON-NLS-1$
 			throw new IOException("No se pudo copiar a disco el fichero de configuracion ", e); //$NON-NLS-1$
 		}
