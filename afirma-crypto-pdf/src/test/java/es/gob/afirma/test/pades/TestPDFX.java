@@ -35,19 +35,18 @@ public final class TestPDFX {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRevSignature() throws Exception {
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_A1B_SIGNED));
-		final AOPDFSigner signer = new AOPDFSigner();
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_A1B_SIGNED));
+		final AOPDFSigner signer = new AOPDFSigner();
+
         final Properties extraParams = new Properties();
         extraParams.put("alwaysCreateRevision", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        byte[] resPdf;
-
-        resPdf = signer.sign(
+        final byte[] resPdf = signer.sign(
     		testPdf,
     		DEFAULT_SIGNATURE_ALGORITHM,
     		pke.getPrivateKey(),
