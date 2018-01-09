@@ -194,6 +194,7 @@
 			<groupId>com.apple</groupId>
 			<artifactId>applejavaextensions</artifactId>
 			<version>1.5.4</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
