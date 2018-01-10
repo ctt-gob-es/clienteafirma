@@ -614,12 +614,13 @@ final class PreferencesPanelGeneral extends JPanel {
 
 					// Si no se establece contrasena, nos aseguramos de eliminar la actual. Si se establece,
 					// la guardamos cifrada.
-					if (proxyDlg.getPassword() == null || proxyDlg.getPassword().length == 0) {
+					final char[] password = proxyDlg.getPassword();
+					if (password == null || password.length == 0) {
 						PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
 					}
 					else {
 						try {
-							final String cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
+							final String cipheredPwd = ProxyUtil.cipherPassword(password);
 							if (cipheredPwd != null) {
 								PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
 							}

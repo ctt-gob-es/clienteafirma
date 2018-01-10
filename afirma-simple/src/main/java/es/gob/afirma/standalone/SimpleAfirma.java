@@ -162,8 +162,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	void initialize(final File preSelectedFile) {
 
-		LOGGER.info(" ========== initialize");
-
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
