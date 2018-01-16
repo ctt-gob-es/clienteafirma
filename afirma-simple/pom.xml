@@ -236,13 +236,6 @@
 			<version>4.4.0</version>
 		</dependency>
 
-		<dependency>
-		 	 <groupId>javax.jnlp</groupId>
-		 	 <artifactId>jnlp-api</artifactId>
-		 	 <version>8.0</version>
-		 	 <scope>system</scope>
-		 	 <systemPath>${java.home}/lib/javaws.jar</systemPath>
-		 </dependency>
 	</dependencies>
 
 	<profiles>

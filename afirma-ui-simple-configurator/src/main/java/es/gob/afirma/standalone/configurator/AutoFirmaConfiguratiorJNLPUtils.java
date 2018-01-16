@@ -12,6 +12,7 @@ package es.gob.afirma.standalone.configurator;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 
 /**
  * Funciones de utilidad para dar soporte al despliegue JNLP.
@@ -41,7 +42,9 @@ public class AutoFirmaConfiguratiorJNLPUtils {
 
 		if (!jnlpDeploymentIdentified) {
 			try {
-				extendedService = javax.jnlp.ServiceManager.lookup("javax.jnlp.ExtendedService"); //$NON-NLS-1$
+				final Class<?> serviceManagerClass = Class.forName("javax.jnlp.ServiceManager"); //$NON-NLS-1$
+				final Method lookupMethod = serviceManagerClass.getMethod("lookup", String.class); //$NON-NLS-1$
+				extendedService = lookupMethod.invoke(null, "javax.jnlp.ExtendedService"); //$NON-NLS-1$
 			} catch (final Throwable e) {
 				extendedService = null;
 			}
@@ -69,8 +72,23 @@ public class AutoFirmaConfiguratiorJNLPUtils {
 	 * @throws java.lang.NoClassDefFoundError Si no nos encontramos en un entorno JNLP.
 	 */
 	public static OutputStream selectFileToWrite(final File outFile, final boolean append) throws IOException {
-		return ((javax.jnlp.ExtendedService) getJnlpExtendedService())
-				.openFile(outFile).getOutputStream(append);
+
+		// La siguiente llamada es equivalente a:
+		// return ((javax.jnlp.ExtendedService) getJnlpExtendedService())
+		// 		.openFile(outFile).getOutputStream(append);
+		// Devuelve un OutputStream para la salida del fichero.
+		try {
+			final Object serviceObject = getJnlpExtendedService();
+			final Method openFileMethod = serviceObject.getClass().getMethod("openFile", File.class); //$NON-NLS-1$
+
+			final Object fileContentsObject = openFileMethod.invoke(serviceObject, outFile);
+			final Method getOutputStreamMethod = fileContentsObject.getClass().getMethod("getOutputStream", Boolean.TYPE); //$NON-NLS-1$
+
+			return (OutputStream) getOutputStreamMethod.invoke(openFileMethod, Boolean.valueOf(append));
+		}
+		catch (final Exception e) {
+			throw new IOException("No se ha podido obtener el flujo de salida del fichero", e); //$NON-NLS-1$
+		}
 	}
 
 }
