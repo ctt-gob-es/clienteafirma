@@ -333,6 +333,9 @@ public final class AOPDFSigner implements AOSigner {
     		pdfReader = new PdfReader(sign);
     	}
     	catch (final BadPasswordException e) {
+    		LOGGER.info(
+				"El PDF necesita contrasena: " + e //$NON-NLS-1$
+			);
     		try {
     			pdfReader = new PdfReader(
 					sign,
@@ -368,7 +371,6 @@ public final class AOPDFSigner implements AOSigner {
     	}
 
     	final List<String> names = af.getSignatureNames();
-    	final Object pkcs1Object = null;
     	for (final String signatureName : names) {
 
     		// Comprobamos si es una firma o un sello
@@ -454,8 +456,7 @@ public final class AOPDFSigner implements AOSigner {
         return false;
     }
 
-    @SuppressWarnings("unused")
-    private boolean isPdfFile(final byte[] data) {
+    private static boolean isPdfFile(final byte[] data) {
 
         byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
