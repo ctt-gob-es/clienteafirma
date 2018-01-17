@@ -11,7 +11,6 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -88,7 +87,7 @@ public final class AOPDFSigner implements AOSigner {
      *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute;a un documento PDF
      *  igualmente cifrado y protegido con contrase&ntilde;a..
      * </p>
-     * @param inPDF Documento PDF a firmar
+     * @param inPDF Documento PDF a firmar.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -97,9 +96,9 @@ public final class AOPDFSigner implements AOSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param key Clave privada a usar para firmar
-     * @param certChain Cadena de certificados del firmante
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Documento PDF firmado en formato PAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
      * @throws IOException Cuando hay errores en el tratamiento de datos. */
@@ -112,8 +111,6 @@ public final class AOPDFSigner implements AOSigner {
 			                                            IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
-
-        checkIText();
 
         final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ?
     		new X509Certificate[] { (X509Certificate) certChain[0] } :
@@ -173,8 +170,8 @@ public final class AOPDFSigner implements AOSigner {
 				certificateChain,
 				interSign,
 				pre,
-				null,
-				null
+				null, // SignEnhancer
+				null  // EnhancerConfig (si le llega null usa los ExtraParams)
 			);
 		}
         catch (final NoSuchAlgorithmException e) {
@@ -203,9 +200,9 @@ public final class AOPDFSigner implements AOSigner {
      *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute; un documento PDF
      *  igualmente cifrado y protegido con contrase&ntilde;a.
      * </p>
-     * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
+     * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>.
      * @param data Se ignora el valor de este par&aacute;metro. <b>El documento PDF debe proporcionarse mediante el par&aacute;tro <code>sign</code></b>.
-     * @param sign Documento PDF a firmar
+     * @param sign Documento PDF a firmar.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -214,12 +211,12 @@ public final class AOPDFSigner implements AOSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param key Clave privada a usar para firmar
-     * @param certChain Cadena de certificados del firmante
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @return Documento PDF firmado en formato PAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException En caso de errores de entrada / salida */
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @return Documento PDF firmado en formato PAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException En caso de errores de entrada / salida. */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
@@ -260,12 +257,12 @@ public final class AOPDFSigner implements AOSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param key Clave privada a usar para firmar
-     * @param certChain Cadena de certificados del firmante
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @return Documento PDF firmado en formato PAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException En caso de errores de entrada / salida */
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @return Documento PDF firmado en formato PAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException En caso de errores de entrada / salida. */
     @Override
 	public byte[] cosign(final byte[] sign,
 			             final String algorithm,
@@ -317,11 +314,10 @@ public final class AOPDFSigner implements AOSigner {
      * La propia estructura de firma se considera el nodo ra&iacute;z, la firma y cofirmas
      * pender&aacute;n directamentede de este.
      * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
-     * @param asSimpleSignInfo
-     *        Si es <code>true</code> se devuelve un &aacute;rbol con la
-     *        informaci&oacute;n b&aacute;sica de cada firma individual
-     *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
-     *        titulares certificados.
+     * @param asSimpleSignInfo Si es <code>true</code> se devuelve un &aacute;rbol con la
+     *                         informaci&oacute;n b&aacute;sica de cada firma individual
+     *                         mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code>
+     *                         un &aacute;rbol con los nombres (CN X.500) de los titulares certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     @Override
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
@@ -372,7 +368,7 @@ public final class AOPDFSigner implements AOSigner {
     	}
 
     	final List<String> names = af.getSignatureNames();
-    	Object pkcs1Object = null;
+    	final Object pkcs1Object = null;
     	for (final String signatureName : names) {
 
     		// Comprobamos si es una firma o un sello
@@ -406,22 +402,12 @@ public final class AOPDFSigner implements AOSigner {
 					pcks7.getSignDate().getTime()
 				);
 
-    			// Extraemos el PKCS1 de la firma
-    			try {
-    				// iText antiguo
-    				final Field digestField = Class.forName("com.aowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
-    				digestField.setAccessible(true);
-    				pkcs1Object = digestField.get(pcks7);
+    			// Extraemos el PKCS#1 de la firma
+    			final byte[] pkcs1 = pcks7.getPkcs1();
+    			if (pkcs1 != null) {
+    				ssi.setPkcs1(pkcs1);
     			}
-    			catch (final Exception e) {
-    				LOGGER.severe(
-						"No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
-					);
-    				continue;
-    			}
-    			if (pkcs1Object instanceof byte[]) {
-    				ssi.setPkcs1((byte[]) pkcs1Object);
-    			}
+
     			root.add(new AOTreeNode(ssi));
     		}
     		else {
@@ -433,8 +419,9 @@ public final class AOPDFSigner implements AOSigner {
     }
 
     /** Comprueba que los datos proporcionados sean un documento PDF.
-     * @param data Datos a comprobar
-     * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario */
+     * @param data Datos a comprobar.
+     * @return <code>true</code> si los datos proporcionados son un documento PDF,
+     *         <code>false</code> en caso contrario. */
     @Override
 	public boolean isSign(final byte[] data) {
         if (data == null) {
@@ -469,8 +456,6 @@ public final class AOPDFSigner implements AOSigner {
 
     @SuppressWarnings("unused")
     private boolean isPdfFile(final byte[] data) {
-
-    	checkIText();
 
         byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
@@ -587,16 +572,6 @@ public final class AOPDFSigner implements AOSigner {
     		if (filter != null) {
     			config.setProperty(PdfExtraParams.SIGNATURE_SUBFILTER, filter.substring(filter.indexOf('/') + 1));
     		}
-    	}
-    }
-
-    @SuppressWarnings("static-method")
-	private void checkIText() {
-    	try {
-    		PdfReader.isAfirmaModifiedItext();
-    	}
-    	catch(final Exception e) {
-    		throw new InvalidITextException(e);
     	}
     }
 

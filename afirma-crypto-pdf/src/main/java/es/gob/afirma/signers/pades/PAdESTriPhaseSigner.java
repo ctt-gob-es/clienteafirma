@@ -241,10 +241,10 @@ public final class PAdESTriPhaseSigner {
      * @param pkcs1Signature Resultado de la firma PKCS#1 v1.5 de los datos de la pre-firma.
      * @param preSign Resultado de la pre-firma
      * @param enhancer Manejador para la generaci&oacute;n de nuevos modos de firma (con
-     * sello de tiempo, archivo longevo, etc.)
+     *                 sello de tiempo, archivo longevo, etc.)
      * @param enhancerConfig Configuraci&oacute;n para generar el nuevo modo de firma.
-     * @return PDF firmado
-     * @throws AOException en caso de cualquier tipo de error
+     * @return PDF firmado.
+     * @throws AOException en caso de cualquier tipo de error.
      * @throws IOException Cuando ocurre algun error en la conversi&oacute;n o generaci&oacute;n
      *                     de estructuras.
      * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo. */
@@ -326,7 +326,10 @@ public final class PAdESTriPhaseSigner {
         //***************************************************
 
         if (enhancer != null) {
-        	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
+        	completeCAdESSignature = enhancer.enhance(
+    			completeCAdESSignature,
+    			enhancerConfig != null ? enhancerConfig : extraParams
+			);
         }
 
         return new PdfSignResult(

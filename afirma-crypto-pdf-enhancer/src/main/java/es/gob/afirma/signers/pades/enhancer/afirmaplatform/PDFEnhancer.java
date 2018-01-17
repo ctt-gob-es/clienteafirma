@@ -23,7 +23,7 @@ import es.gob.afirma.signers.pades.SignEnhancer;
  *   alta en la plataforma y cumplir los requisitos establecidos).
  *  </li>
  *  <li>
- *   <code>signType</code>: Tipo de firma: "A": Archivo longevo, "T": Con sello de tiempo...
+ *   <code>signType</code>: Tipo de firma: "<b>A</b>": Archivo longevo, "<b>T</b>": Con sello de tiempo...
  *  </li>
  * </ul> */
 public final class PDFEnhancer implements SignEnhancer {
@@ -43,7 +43,5 @@ public final class PDFEnhancer implements SignEnhancer {
 			options.getProperty(SIGN_TYPE_OPTION)
 		);
 	}
-
-
 
 }

@@ -22,8 +22,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.aowagie.text.pdf.PdfReader;
-
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -478,13 +476,6 @@ public class TestPAdES {
         	System.out.println("Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
         			tempFile.getAbsolutePath());
         }
-    }
-
-    /** Prueba de la verificaci&oacute;n de la versi&oacute:n de iText. */
-    @SuppressWarnings("static-method")
-	@Test
-    public void testItextVersion() {
-    	PdfReader.isAfirmaModifiedItext();
     }
 
     /** Prueba de la verificaci&oacute;n de la versi&oacute:n de iText.

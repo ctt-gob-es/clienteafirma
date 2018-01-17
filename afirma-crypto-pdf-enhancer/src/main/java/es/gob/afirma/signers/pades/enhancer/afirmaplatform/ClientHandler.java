@@ -52,38 +52,38 @@ final class ClientHandler extends BasicHandler {
 	static final String DIGESTPASSWORD = "DIGEST"; //$NON-NLS-1$
 	static final String TEXTPASSWORD = "TEXT"; //$NON-NLS-1$
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	// Opciones de seguridad
 
 	/** Opci&oacute;n de seguridad del objeto actual. */
-	private String securityOption = null;
+	private final String securityOption;
 
 	/** Usuario para el <i>token</i> de seguridad <code>UserNameToken</code>. */
-	private String usernameTokenName = null;
+	private final String usernameTokenName;
 
 	/** Password para la etiqueta de seguridad <code>UserNameToken</code>. */
-	private String usernameTokenPassword = null;
+	private final String usernameTokenPassword;
 
 	/** Tipo de contrase&ntilde;a para el <code>UserNameTokenPassword</code>. */
-	private String usernameTokenPasswordType = null;
+	private final String usernameTokenPasswordType;
 
 	/** Localizaci&oacute;n del <code>KeyStore</code> con certificado y clave privada de usuario. */
-	private String keystoreLocation = null;
+	private final String keystoreLocation;
 
 	/** Tipo de <code>KeyStore</code>. */
-	private String keystoreType = null;
+	private final String keystoreType;
 
 	/** Clave del <code>KeyStore</code>. */
-	private String keystorePassword = null;
+	private final String keystorePassword;
 
 	/** Alias del certificado usado para firmar la etiqueta <code>soapBody</code> de la petici&oacute;n y
 	 * que ser&aacute; alojado en la etiqueta <code>BinarySecurityToken</code>. */
-	private String keystoreCertAlias = null;
+	private final String keystoreCertAlias;
 
 	/** Contrase&ntilde;a del certificado usado para firmar la etiqueta <code>soapBody</code> de la
 	 * petici&oacute;n y que ser&aacute; alojado en la etiqueta <code>BinarySecurityToken</code>. */
-	private String keystoreCertPassword = null;
+	private final String keystoreCertPassword;
 
 	/** Inicializa el atributo <code>securityOption</code>.
 	 * @param config Propiedades de configuraci&oacute;n. */
@@ -118,12 +118,12 @@ final class ClientHandler extends BasicHandler {
 	public void invoke(final MessageContext msgContext) throws AxisFault {
 
 		try {
-			//Obtencion del documento XML que representa la peticion SOAP
+			// Obtencion del documento XML que representa la peticion SOAP
 			final SOAPMessage msg = msgContext.getCurrentMessage();
 
 			final Document doc = ((org.apache.axis.message.SOAPEnvelope) msg.getSOAPPart().getEnvelope()).getAsDocument();
 
-			//Aseguramiento de la peticion SOAP segon la opcion de seguridad configurada
+			// Aseguramiento de la peticion SOAP segun la opcion de seguridad configurada
 			final SOAPMessage secMsg;
 			if (this.securityOption.equals(USERNAMEOPTION.toUpperCase())) {
 				secMsg = createUserNameToken(doc);
@@ -136,7 +136,7 @@ final class ClientHandler extends BasicHandler {
 			}
 
 			if (!this.securityOption.equals(NONEOPTION.toUpperCase())) {
-				//Modificacion de la peticion SOAP
+				// Modificacion de la peticion SOAP
 				((SOAPPart) msgContext.getRequestMessage().getSOAPPart()).setCurrentMessage(secMsg.getSOAPPart().getEnvelope(), SOAPPart.FORM_SOAPENVELOPE);
 			}
 		}
@@ -177,7 +177,7 @@ final class ClientHandler extends BasicHandler {
 		wsSecHeader.insertSecurityHeader(soapEnvelopeRequest);
 		wsSecUsernameToken.prepare(soapEnvelopeRequest);
 
-		// Aoadimos una marca de tiempo inidicando la fecha de creacion del tag
+		// Anadimos una marca de tiempo inidicando la fecha de creacion del tag
 		wsSecUsernameToken.addCreated();
 		wsSecUsernameToken.addNonce();
 
@@ -197,10 +197,12 @@ final class ClientHandler extends BasicHandler {
 		return mf.createMessage(null, new ByteArrayInputStream(secSOAPReq.getBytes()));
 	}
 
-	/** Asegura, mediante la etiqueta BinarySecurityToken y firma, una petici&oacute;n SOAP no securizada.
-	 * @param soapEnvelopeRequest Documento XML que representa la petici&oacute;n SOAP sin securizar.
-	 * @return Un mensaje SOAP que contiene la petici&oacute;n SOAP de entrada securizada
-	 *         mediante la etiqueta BinarySecurityToken.
+	/** Asegura, mediante la etiqueta <code>BinarySecurityToken</code> y firma,
+	 * una petici&oacute;n SOAP no segura.
+	 * @param soapEnvelopeRequest Documento XML que representa la
+	 *                            petici&oacute;n SOAP sin asegurar.
+	 * @return Un mensaje SOAP que contiene la petici&oacute;n SOAP de entrada asegurada
+	 *         mediante la etiqueta <code>BinarySecurityToken</code>.
      * @throws TransformerException Si hay problemas con las transformaciones XML.
      * @throws IOException Si hay problemas en el tratamiento de datos.
      * @throws SOAPException Si hay problemas en el servicio Web. */
@@ -210,7 +212,10 @@ final class ClientHandler extends BasicHandler {
 		//Insercion del tag wsse:Security y BinarySecurityToken
 		final WSSecHeader wsSecHeader = new WSSecHeader(null, false);
 		final WSSecSignature wsSecSignature = new WSSecSignature();
-		final Crypto crypto = CryptoFactory.getInstance("org.apache.ws.security.components.crypto.Merlin", initializateCryptoProperties()); //$NON-NLS-1$
+		final Crypto crypto = CryptoFactory.getInstance(
+			"org.apache.ws.security.components.crypto.Merlin", //$NON-NLS-1$
+			initializateCryptoProperties()
+		);
 
 		//Indicacion para que inserte el tag BinarySecurityToken
 		wsSecSignature.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -228,7 +233,7 @@ final class ClientHandler extends BasicHandler {
 		final StreamResult streamResult = new StreamResult(baos);
 		TransformerFactory.newInstance().newTransformer().transform(source, streamResult);
 		final String secSOAPReq = new String(baos.toByteArray());
-		LOGGER.info("SOAP Request: " + secSOAPReq); //$NON-NLS-1$
+		LOGGER.info("Peticion SOAP: " + secSOAPReq); //$NON-NLS-1$
 
 		//Creacion de un nuevo mensaje SOAP a partir del mensaje SOAP securizado formado
 		final MessageFactory mf = new org.apache.axis.soap.MessageFactoryImpl();
@@ -237,8 +242,8 @@ final class ClientHandler extends BasicHandler {
 
 	/** Establece el conjunto de propiedades con el que ser&aacute; inicializado el
 	 * gestor criptogr&aacute;fico de WSS4J.
-	 * @return Devuelve el conjunto de propiedades con el que ser&aacute; inicializado
-	 *        el gestor criptogr&aacute;fico de WSS4J. */
+	 * @return Conjunto de propiedades con el que ser&aacute; inicializado
+	 *         el gestor criptogr&aacute;fico de WSS4J. */
 	private Properties initializateCryptoProperties() {
 		final Properties res = new Properties();
 		res.put("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"); //$NON-NLS-1$ //$NON-NLS-2$

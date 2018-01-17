@@ -59,7 +59,7 @@ public final class TestGetSignersStructure {
 			Exception raised = null;
 			AOTreeModel tree = null;
 			try {
-				tree = signer.getSignersStructure(testPdf, false);
+				tree = signer.getSignersStructure(testPdf, true);
 			}
 			catch(final Exception e) {
 				raised = e;
