@@ -21,6 +21,12 @@
 			<artifactId>afirma-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma.jmulticard</groupId>
+			<artifactId>jmulticard</artifactId>
+			<version>1.4</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
