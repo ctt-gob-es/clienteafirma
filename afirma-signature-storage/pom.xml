@@ -16,6 +16,12 @@
 
 	<dependencies>
 		<dependency>
+    		<groupId>es.gob.afirma</groupId>
+    		<artifactId>afirma-core</artifactId>
+    		<version>1.6</version>
+    		<scope>test</scope>
+		</dependency>
+		<dependency>
     		<groupId>javax.servlet</groupId>
     		<artifactId>servlet-api</artifactId>
     		<version>2.5</version>

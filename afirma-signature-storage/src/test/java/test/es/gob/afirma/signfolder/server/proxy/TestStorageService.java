@@ -4,10 +4,11 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import test.es.gob.afirma.signfolder.server.proxy.copiedclasses.HttpError;
-import test.es.gob.afirma.signfolder.server.proxy.copiedclasses.UrlHttpManager;
-import test.es.gob.afirma.signfolder.server.proxy.copiedclasses.UrlHttpManagerImpl;
-import test.es.gob.afirma.signfolder.server.proxy.copiedclasses.UrlHttpMethod;
+import es.gob.afirma.core.misc.http.HttpError;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
+
 
 /** Pruebas del servicio de almacenamiento en servidor intermedio.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -22,7 +23,7 @@ public final class TestStorageService {
 	@Test
 	@Ignore // No ejecutamos de forma automatica
 	public void testStoreSimpleText() throws Exception {
-		final UrlHttpManager mgr = new UrlHttpManagerImpl();
+		final UrlHttpManager mgr = UrlHttpManagerFactory.getInstalledManager();
 		byte[] res;
 		try {
 			res = mgr.readUrl(
