@@ -86,7 +86,6 @@ final class ConfiguratorMacOSX implements Configurator {
     /** Directorios de los usuarios del sistema. */
     private static String[] userDirs = null;
 
-
 	@Override
 	public void configure(final Console console) throws IOException, GeneralSecurityException {
 
@@ -94,20 +93,16 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		console.print(Messages.getString("ConfiguratorMacOSX.2")); //$NON-NLS-1$
 
-		final File appDir = getApplicationDirectory();
+		final File resourcesDir = getResourcesDirectory();
 
-		console.print(Messages.getString("ConfiguratorMacOSX.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+		console.print(Messages.getString("ConfiguratorMacOSX.3") + resourcesDir.getAbsolutePath()); //$NON-NLS-1$
 
 		// Creamos los nuevos certificados SSL y los instalamos en los almacenes de confianza,
 		// eliminando versiones anteriores si es necesario
-		if (!checkSSLKeyStoreGenerated(appDir)) {
-			configureSSL(appDir, console);
-		}
-		else {
-			console.print(Messages.getString("ConfiguratorMacOSX.18")); //$NON-NLS-1$
-		}
+		configureSSL(resourcesDir, console);
 
-		createScriptsRemoveChromeWarnings(appDir, userDirs);
+		// Eliminamos los warnings de Chrome
+		createScriptsRemoveChromeWarnings(resourcesDir, userDirs);
 
 		console.print(Messages.getString("ConfiguratorMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado"); //$NON-NLS-1$
@@ -118,16 +113,6 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
 	private static boolean checkSSLKeyStoreGenerated(final File appDir) {
-
-		// En caso de tratarse de un despliegue JNLP, probamos primeramente
-		// a buscar el almacen en el directorio de instalacion por defecto
-		// de AutoFirma para evitar tener que volver a generarlo
-		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
-			final File defaultDir = getDefaultInstallationDir();
-			if (new File(defaultDir, KS_FILENAME).exists()) {
-				return true;
-			}
-		}
 		return new File(appDir, KS_FILENAME).exists();
 	}
 
@@ -165,15 +150,6 @@ final class ConfiguratorMacOSX implements Configurator {
 				LOGGER.warning("No se pudieron crear los scripts para registrar el esquema 'afirma' en Chrome: " + e); //$NON-NLS-1$
 			}
 		}
-	}
-
-	/**
-	 * Devuelve el directorio en el que com&uacute;nmente se instala
-	 * AutoFirma en este sistema operativo.
-	 * @return Directorio por defecto de creaci&oacute;n del almac&eacute;n de claves SSL.
-	 */
-	private static File getDefaultInstallationDir() {
-		return new File("/Applications/AutoFirma.app/Contents/Resources/JAR"); //$NON-NLS-1$
 	}
 
 	/**
@@ -329,7 +305,15 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		LOGGER.info("Desinstalacion del certificado raiz de los almacenes de MacOSX"); //$NON-NLS-1$
 
-		uninstallProcess(getApplicationDirectory());
+		File resourcesDir;
+		try {
+			resourcesDir = getResourcesDirectory();
+		} catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "No se pudo obtener el directorio de recursos de la aplicacion", e); //$NON-NLS-1$
+			return;
+		}
+
+		uninstallProcess(resourcesDir);
 	}
 
 	/**
@@ -339,7 +323,12 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static void uninstallProcess(final File appDir) {
 		try {
 			uninstallRootCAMacOSXKeyStore();
+		}
+		catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "No se ha podido generar el script para la desinstalacion del almacen del sistema", e); //$NON-NLS-1$
+		}
 
+		try {
 			final String[] usersHomes = getSystemUsersHomes();
 			ConfiguratorFirefoxMac.createScriptToUnistallFromMozillaKeyStore(appDir, usersHomes, new File(mac_script_path));
 		}
@@ -448,19 +437,16 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	private static File getApplicationDirectory() {
+	private static File getResourcesDirectory() throws IOException {
 
-		// Devuelve un directorio que utilizar como directorio de instalacion cuando
-		// se realiza un despliegue JNLP, que no cuenta con permisos elevados
-		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
-			final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-			final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
-			if (appDir.isDirectory() || appDir.mkdirs()) {
-				return appDir;
-			}
+		// Devuelve un directorio en el que copiar y generar los recursos
+		// necesarios por la aplicacion
+		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
+		final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+		if (!appDir.isDirectory() && !appDir.mkdirs()) {
+			throw new IOException("No se ha podido generar el directorio de recursos de la aplicacion: " + appDir.getAbsolutePath()); //$NON-NLS-1$
 		}
-
-		return ConfiguratorUtil.getApplicationDirectory();
+		return appDir;
 	}
 
 	private static byte[] hexStringToByteArray(final String s) {

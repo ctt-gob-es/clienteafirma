@@ -101,11 +101,19 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 		this.config = config;
 
+		final boolean jnlpDeployment = this.config.isJnlpInstance();
+		if (jnlpDeployment) {
+			LOGGER.info("Se configurara la aplicacion en modo JNLP"); //$NON-NLS-1$
+		}
+		else {
+			LOGGER.info("Se configurara la aplicacion en modo nativo"); //$NON-NLS-1$
+		}
+
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(this.config.isJnlpInstance());
+			this.configurator = new ConfiguratorWindows(jnlpDeployment);
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-		    this.configurator = new ConfiguratorLinux();
+		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
             this.configurator = new ConfiguratorMacOSX();
@@ -194,6 +202,25 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		closeApplication(0);
 	}
 
+	/** Inicia el proceso de configuraci&oacute;n.
+	 * @param args No usa par&aacute;metros. */
+	public static void main(final String[] args) {
+
+		final ConfigArgs config = new ConfigArgs(args);
+		final AutoFirmaConfigurator configurator = new AutoFirmaConfigurator(config);
+
+		// Iniciamos la configuracion
+		try {
+			configurator.configure();
+		}
+		catch (final Exception | Error e) {
+			configurator.closeApplication(-1, config.isNeedKeep());
+		}
+
+		configurator.closeApplication(0, config.isNeedKeep());
+	}
+
+
 	/** Operaciones admitidas. */
 	private static enum Operation {
 		INSTALLATION,
@@ -242,24 +269,4 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			return this.jnlpInstance;
 		}
 	}
-
-
-	/** Inicia el proceso de configuraci&oacute;n.
-	 * @param args No usa par&aacute;metros. */
-	public static void main(final String[] args) {
-
-		final ConfigArgs config = new ConfigArgs(args);
-		final AutoFirmaConfigurator configurator = new AutoFirmaConfigurator(config);
-
-		// Iniciamos la configuracion
-		try {
-			configurator.configure();
-		}
-		catch (final Exception e) {
-			configurator.closeApplication(-1, config.isNeedKeep());
-		}
-
-		configurator.closeApplication(0, config.isNeedKeep());
-	}
-
 }

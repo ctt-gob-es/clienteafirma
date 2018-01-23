@@ -43,12 +43,18 @@ final class ConfiguratorLinux implements Configurator {
     private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
+	private final boolean jnlpInstance;
+
+    public ConfiguratorLinux(final boolean jnlpInstance) {
+		this.jnlpInstance = jnlpInstance;
+	}
+
     @Override
     public void configure(final Console window) throws IOException, GeneralSecurityException {
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.2")); //$NON-NLS-1$
 
-        final File appDir = getApplicationDirectory();
+        final File appDir = getApplicationDirectory(this.jnlpInstance);
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
@@ -104,11 +110,11 @@ final class ConfiguratorLinux implements Configurator {
         return new File(appConfigDir, KS_FILENAME).exists();
     }
 
-	private static File getApplicationDirectory() {
+	private static File getApplicationDirectory(final boolean jnlpDeployment) {
 
 		// Devolver un directorio que utilizar como directorio de instalacion cuando
 		// se realice un despliegue JNLP
-		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+		if (jnlpDeployment) {
 			try {
 				return getIntApplicationDirectory();
 			} catch (final IOException e) {

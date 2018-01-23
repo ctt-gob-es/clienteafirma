@@ -38,7 +38,12 @@ final class ConfiguratorFirefoxWindows {
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
 	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
 
+	private static final String ENV_VARIABLE_ALLUSERSPROFILE = "ALLUSERSPROFILE"; //$NON-NLS-1$
+	private static final String ENV_VARIABLE_PUBLIC = "PUBLIC"; //$NON-NLS-1$
+	private static final String ENV_VARIABLE_SYSTEMDRIVE = "SystemDrive"; //$NON-NLS-1$
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 
 	private static String PROFILES_INI_RELATIVE_PATH;
 	private static String USERS_PATH;
@@ -49,7 +54,7 @@ final class ConfiguratorFirefoxWindows {
 		if (isWindowsXP()) {
 			PROFILES_INI_RELATIVE_PATH = "Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 			try {
-				USERS_PATH = new File(System.getenv("ALLUSERSPROFILE")).getParentFile().getAbsolutePath() + File.separator; //$NON-NLS-1$
+				USERS_PATH = new File(System.getenv(ENV_VARIABLE_ALLUSERSPROFILE)).getParentFile().getAbsolutePath() + File.separator;
 			}
 			catch (final Exception e) {
 				LOGGER.warning("No se ha podido identificar el directorio base sobre el que se instalan los perfiles de Mozilla. Se buscara en 'C:/Documents and Settings': " + e); //$NON-NLS-1$
@@ -58,15 +63,20 @@ final class ConfiguratorFirefoxWindows {
 		}
 		else {
 			PROFILES_INI_RELATIVE_PATH = "AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
-			try {
-				USERS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath() + File.separator; //$NON-NLS-1$;
+			final String publicUserHome = System.getenv(ENV_VARIABLE_PUBLIC);
+			if (publicUserHome != null) {
+				USERS_PATH = new File(publicUserHome).getParentFile().getAbsolutePath() + File.separator;
 			}
-			catch (final Exception e) {
-				LOGGER.warning("No se ha podido identificar el directorio de usuarios. Se buscara en 'C:/Users': " + e); //$NON-NLS-1$
-				USERS_PATH = "C:\\Users\\"; //$NON-NLS-1$
+			else {
+				try {
+					USERS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath() + File.separator; //$NON-NLS-1$;
+				}
+				catch (final Exception e) {
+					LOGGER.warning("No se ha podido identificar el directorio de usuarios. Se buscara en 'C:/Users': " + e); //$NON-NLS-1$
+					USERS_PATH = System.getenv(ENV_VARIABLE_SYSTEMDRIVE) + "\\Users\\"; //$NON-NLS-1$
+				}
 			}
 		}
-
 	}
 
 	private ConfiguratorFirefoxWindows() {
@@ -113,7 +123,7 @@ final class ConfiguratorFirefoxWindows {
 		}
 
 		window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
-		removeCertUtilFromDisk(appDir);
+		//removeCertUtilFromDisk(appDir);
 	}
 
 	/**
@@ -151,7 +161,7 @@ final class ConfiguratorFirefoxWindows {
 			}
 		}
 
-		removeCertUtilFromDisk(appDir);
+		//removeCertUtilFromDisk(appDir);
 	}
 
 	/** Comprueba si certutil existe y si puede ejecutarse.
@@ -333,14 +343,14 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	/** Elimina de un directorio certutil y sus dependencias.
-	 * @param targetDir Directorio en el que se encuentra certutil. */
-	private static void removeCertUtilFromDisk(final File targetDir) {
-		if (!targetDir.isDirectory()) {
-			return;
-		}
-		ConfiguratorUtil.deleteDir(new File(targetDir, CERTUTIL_DIR));
-	}
+//	/** Elimina de un directorio certutil y sus dependencias.
+//	 * @param targetDir Directorio en el que se encuentra certutil. */
+//	private static void removeCertUtilFromDisk(final File targetDir) {
+//		if (!targetDir.isDirectory()) {
+//			return;
+//		}
+//		ConfiguratorUtil.deleteDir(new File(targetDir, CERTUTIL_DIR));
+//	}
 
 	/**
 	 * Recupera todos los directorios de perfil de Mozilla del sistema.

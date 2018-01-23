@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
@@ -26,9 +27,11 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String PARAMETER_UNISTALL = "-uninstall"; //$NON-NLS-1$
 	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
 	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
+
+	/** Indica que la operacion que se debe realizar es la de desinstalaci&oacute;n. */
+	public static final String PARAMETER_UNINSTALL = "-uninstall"; //$NON-NLS-1$
 
 	private Configurator configurator;
 
@@ -37,7 +40,22 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)) {
+			if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+				final File appDir = new File (System.getenv("HOME"), "Library/Application Support/AutoFirma"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (appDir.isDirectory() && appDir.canWrite() || appDir.mkdirs()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, appDir.getAbsolutePath());
+				}
+				else if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
+				}
+				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
+				}
+				else {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+				}
+			}
+			else if (Platform.getOS().equals(Platform.OS.LINUX)) {
 				if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
 				}
@@ -61,10 +79,10 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	public AutoFirmaConfiguratorSilent() {
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(true);
+			this.configurator = new ConfiguratorWindows(false);
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-		    this.configurator = new ConfiguratorLinux();
+		    this.configurator = new ConfiguratorLinux(false);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
             this.configurator = new ConfiguratorMacOSX();
@@ -81,7 +99,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
-	public void configureAutoFirma() throws GeneralSecurityException, ConfigurationException, IOException {
+	public void configure() throws GeneralSecurityException, ConfigurationException, IOException {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
@@ -95,15 +113,15 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			this.configurator.configure(this.mainScreen);
 		}
 		catch (final IOException e) {
-			LOGGER.severe("Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra", e); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final ConfigurationException e) {
-			LOGGER.severe("Error al generar las claves de cifrado SSL. El configurador se detendra: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error al generar las claves de cifrado SSL. El configurador se detendra", e); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final GeneralSecurityException e) {
-			LOGGER.severe("Error en la importacion de la CA de confianza o la limpieza del almacen: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en la importacion de la CA de confianza o la limpieza del almacen", e); //$NON-NLS-1$
 			throw e;
 		}
 	}
@@ -137,6 +155,11 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
         System.exit(exitCode);
     }
 
+	@Override
+	public void close() {
+		closeApplication(0);
+	}
+
     /** Inicia el proceso de configuraci&oacute;n.
 	 * @param args No usa par&aacute;metros. */
 	public static void main(final String[] args) {
@@ -144,7 +167,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		final AutoFirmaConfiguratorSilent configurator = new AutoFirmaConfiguratorSilent();
 
 		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
-		if (args != null && args.length > 0 && PARAMETER_UNISTALL.equalsIgnoreCase(args[0])) {
+		if (args != null && args.length > 0 && PARAMETER_UNINSTALL.equalsIgnoreCase(args[0])) {
 			configurator.uninstall();
 			configurator.closeApplication(0);
 			return;
@@ -152,31 +175,16 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 		// Iniciamos la configuracion
 		try {
-			configurator.configureAutoFirma();
+			configurator.configure();
 		}
-		catch (final Exception e) {
-			LOGGER.info("Error en la configuracion de AutoFirma: " + e); //$NON-NLS-1$
+		catch (final Exception | Error e) {
 			ConsoleManager.showErrorMessage(
 				configurator.getParentComponent(),
 				Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
 			);
 			configurator.closeApplication(-1);
 		}
-		catch (final Error e) {
-			LOGGER.info("Capturado error no controlado: " + e); //$NON-NLS-1$
-			e.printStackTrace();
-			ConsoleManager.showErrorMessage(
-				configurator.getParentComponent(),
-				Messages.getString("AutoFirmaConfigurator.1") //$NON-NLS-1$
-			);
-			configurator.closeApplication(-2);
-		}
 
 		configurator.closeApplication(0);
-	}
-
-	@Override
-	public void close() {
-		closeApplication(0);
 	}
 }

@@ -26,6 +26,8 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+
+
 /** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de AutoFirma. */
 final class ConfiguratorWindows implements Configurator {
 
@@ -54,11 +56,11 @@ final class ConfiguratorWindows implements Configurator {
 
 		window.print(Messages.getString("ConfiguratorWindows.2")); //$NON-NLS-1$
 
-		final File appDir = getApplicationDirectory();
+		final File appDir = getApplicationDirectory(this.jnlpInstance);
 
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
-		if (!checkSSLKeyStoreGenerated(appDir)) {
+		if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
 			window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
 			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
 				ConfiguratorUtil.CERT_ALIAS,
@@ -86,7 +88,7 @@ final class ConfiguratorWindows implements Configurator {
 				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-			if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+			if (this.jnlpInstance) {
 				JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
 				window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
 				importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
@@ -109,11 +111,11 @@ final class ConfiguratorWindows implements Configurator {
 	 * seg&uacute;n si est&aacute; instalada o si se trata de un despliegue JNLP.
 	 * @return Directorio en el que se almacenan los recursos de la aplicaci&oacute;n.
 	 */
-	private static File getApplicationDirectory() {
+	private static File getApplicationDirectory(final boolean jnlpDeployment) {
 
 		// Si el despliegue es JNLP seleccionamos un directorio de Windows en el que
 		// se puedan crear los ficheros sin permisos especiales
-		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+		if (jnlpDeployment) {
 			final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
 			final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
 			if (appDir.isDirectory() || appDir.mkdirs()) {
@@ -131,12 +133,13 @@ final class ConfiguratorWindows implements Configurator {
 	 * el directorio indicado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
-	private static boolean checkSSLKeyStoreGenerated(final File appDir) {
+	private static boolean checkSSLKeyStoreGenerated(final File appDir, final boolean jnlpDeployment) {
 
+		/*
 		// En caso de tratarse de un despliegue JNLP, probamos primeramente
 		// a buscar el almacen en el directorio de instalacion por defecto
 		// de AutoFirma para evitar tener que volver a generarlo
-		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+		if (jnlpDeployment) {
 			final File[] defaultDirs = getDefaultInstallationDirs();
 			for (final File defaultDir : defaultDirs) {
 				if (new File(defaultDir, KS_FILENAME).exists()) {
@@ -144,6 +147,7 @@ final class ConfiguratorWindows implements Configurator {
 				}
 			}
 		}
+		*/
 		return new File(appDir, KS_FILENAME).exists();
 	}
 
@@ -176,7 +180,8 @@ final class ConfiguratorWindows implements Configurator {
 		uninstallRootCAWindowsKeyStore(CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
-		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(getApplicationDirectory());
+		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(
+				getApplicationDirectory(this.jnlpInstance));
 
 		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
 		configureChrome(null, false);
