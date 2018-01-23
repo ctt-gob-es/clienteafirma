@@ -49,7 +49,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
-import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.SmartCardException;
 import es.gob.afirma.keystores.filters.CertFilterManager;
@@ -926,33 +925,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		LOGGER.info("Tamano actual en memoria: " + Runtime.getRuntime().totalMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Tamano maximo de memoria: " + Runtime.getRuntime().maxMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Memoria actualmente libre: " + Runtime.getRuntime().freeMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void start() {
-		super.start();
-		if (
-			!Boolean.getBoolean("es.gob.afirma.doNotModifyJreTrustStore") && //$NON-NLS-1$
-			!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotModifyJreTrustStore")) //$NON-NLS-1$
-		) {
-			try {
-				AccessController.doPrivileged(
-					new PrivilegedExceptionAction<Void>() {
-						@Override
-						public Void run() throws Exception {
-							JarSignatureCertExtractor.insertJarSignerOnCACerts(this);
-							return null;
-						}
-					}
-				);
-			}
-			catch (final Exception e) {
-				LOGGER.warning(
-					"No se ha podido insertar la cadena de confianza del certificado de firma del applet en el almacen de confianza de Java: " + e //$NON-NLS-1$
-				);
-			}
-		}
 	}
 
 	/** {@inheritDoc} */

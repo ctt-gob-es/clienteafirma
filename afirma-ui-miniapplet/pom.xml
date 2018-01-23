@@ -50,12 +50,6 @@
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-jarverifier</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cades</artifactId>
 			<version>${project.version}</version>
 		</dependency>
