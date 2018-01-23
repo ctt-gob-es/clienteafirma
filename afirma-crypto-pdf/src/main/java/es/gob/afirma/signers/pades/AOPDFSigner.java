@@ -118,7 +118,7 @@ public final class AOPDFSigner implements AOSigner {
 
     	final GregorianCalendar signTime = PdfUtil.getSignTime(extraParams.getProperty(PdfExtraParams.SIGN_TIME));
 
-        // Sello de stiempo
+        // Sello de tiempo
         byte[] data;
 		try {
 			data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);

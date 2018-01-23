@@ -181,7 +181,7 @@ public final class PAdESTriPhaseSigner {
 
         final PdfTriPhaseSession ptps = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
 
-	    // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
+	    // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificate, y en cualquier
 	    // otro caso deberia usarse SigningCertificateV2
 	    boolean signingCertificateV2;
 	    if (extraParams.containsKey(PdfExtraParams.SIGNING_CERTIFICATE_V2)) {
