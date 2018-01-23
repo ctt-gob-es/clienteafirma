@@ -32,10 +32,8 @@ public class RestoreConfigManager {
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			this.configurator = new RestoreConfigWindows();
-
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-
 		    this.configurator = new RestoreConfigLinux();
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){

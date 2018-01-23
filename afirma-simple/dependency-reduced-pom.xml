@@ -189,6 +189,12 @@
   </profiles>
   <dependencies>
     <dependency>
+      <groupId>com.apple</groupId>
+      <artifactId>applejavaextensions</artifactId>
+      <version>1.5.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
@@ -199,13 +205,6 @@
           <groupId>org.hamcrest</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>javax.jnlp</groupId>
-      <artifactId>jnlp-api</artifactId>
-      <version>8.0</version>
-      <scope>system</scope>
-      <systemPath>${java.home}/lib/javaws.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
