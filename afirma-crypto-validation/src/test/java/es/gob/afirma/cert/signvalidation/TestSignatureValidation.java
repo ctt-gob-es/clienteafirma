@@ -15,6 +15,7 @@ public class TestSignatureValidation {
 	private static final String DATA_TXT_FILE = "txt"; //$NON-NLS-1$
 	private static final String PADES_FILE = "pades.pdf"; //$NON-NLS-1$
 	private static final String PADES_EPES_FILE = "pades_epes.pdf"; //$NON-NLS-1$
+	private static final String XADES_EPES_FILE = "xades_epes_detached.xsig"; //$NON-NLS-1$
 
 	/** Prueba de validaci&oacute;n de firma CAdES.
 	 * @throws Exception En cualquier error. */
@@ -80,6 +81,19 @@ public class TestSignatureValidation {
 		) {
 			final byte[] pades = AOUtil.getDataFromInputStream(is);
 			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades));
+		}
+	}
+
+	/** Prueba de validaci&oacute;n de firma PAdES-EPES.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testXadesEpesValidation() throws Exception {
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(XADES_EPES_FILE);
+		) {
+			final byte[] signature = AOUtil.getDataFromInputStream(is);
+			System.out.println(SignValiderFactory.getSignValider(signature).validate(signature));
 		}
 	}
 }
