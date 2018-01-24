@@ -89,15 +89,42 @@ final class AFirmaPlatformPdfEnhancer {
    private static final String SIGN_FIELD = "%%SIGN%%"; //$NON-NLS-1$
    private static final String RETURN_TYPE_FIELD = "%%RETURNTYPE%%"; //$NON-NLS-1$
 
-   static byte[] upgradeSign(final byte[] sign, final String applicationName, final String returnSignType) throws IOException {
-	   final String responseXml = upgradeSign(new String(
+   static byte[] upgradeSign(final byte[] sign,
+		                     final String applicationName,
+		                     final String returnSignType) throws IOException {
+
+	   if (applicationName == null || applicationName.isEmpty()) {
+		   throw new IllegalArgumentException(
+			   "El nombre de aplicacion en la plataforma AFirma no puede ser nulo" //$NON-NLS-1$
+		   );
+	   }
+	   if (sign == null) {
+		   throw new IllegalArgumentException(
+			   "La firma a mejorar no puede ser nula" //$NON-NLS-1$
+		   );
+	   }
+	   if (returnSignType == null || returnSignType.isEmpty()) {
+		   throw new IllegalArgumentException(
+			   "El formato de destino de la mejora de firma no puede ser nulo ni vacio" //$NON-NLS-1$
+		   );
+	   }
+
+
+	   final String xmlTemplate = new String(
 		   AOUtil.getDataFromInputStream(
 			   AFirmaPlatformPdfEnhancer.class.getResourceAsStream("signUpgradeTemplate.xml") //$NON-NLS-1$
 		   )
-	   ).replace(APP_NAME_FIELD, applicationName).replace(SIGN_FIELD, Base64.encode(sign)).replace(RETURN_TYPE_FIELD, returnSignType));
+	   );
 
+	   final String responseXml = upgradeSign(
+		   xmlTemplate.replace(APP_NAME_FIELD, applicationName).replace(SIGN_FIELD, Base64.encode(sign)
+	   ).replace(RETURN_TYPE_FIELD, returnSignType));
+
+	   if (responseXml == null || responseXml.isEmpty()) {
+		   throw new IOException("Error en la invocacion al servicio de mejora, la respuesta es nula o vacia"); //$NON-NLS-1$
+	   }
 	   if (!responseXml.contains("urn:oasis:names:tc:dss:1.0:resultmajor:Success")) { //$NON-NLS-1$
-		   throw new IOException("Error devuelto por el servidor"); //$NON-NLS-1$
+		   throw new IOException("Error devuelto por el servidor: " + responseXml); //$NON-NLS-1$
 	   }
 
 	   final String signFindTagStart = "<![CDATA["; //$NON-NLS-1$

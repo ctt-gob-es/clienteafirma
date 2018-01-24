@@ -26,6 +26,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
@@ -40,7 +41,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
  * en un sistema con al menos alguna de las siguientes restricciones:</p>
  * <ul>
  *  <li>
- *   El sistema no es compatible con el Cliente @firma. En este caso, dado que el 95% del c&oacute;digo se
+ *   El sistema no es compatible con el Cliente &#64;firma. En este caso, dado que el 95% del c&oacute;digo se
  *   ejecuta en un sistema externo, solo es necesario portar el 5% restante.
  *  </li>
  *  <li>

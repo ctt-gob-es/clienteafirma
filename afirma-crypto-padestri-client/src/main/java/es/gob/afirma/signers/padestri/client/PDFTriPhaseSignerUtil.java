@@ -145,7 +145,7 @@ final class PDFTriPhaseSignerUtil {
                              final Certificate[] certChain,
                              final String documentId,
                              final Properties extraParams) throws AOException {
-							 final byte[] triSignFinalResult;
+		final byte[] triSignFinalResult;
 		try {
 			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServerUrl).append(HTTP_CGI).

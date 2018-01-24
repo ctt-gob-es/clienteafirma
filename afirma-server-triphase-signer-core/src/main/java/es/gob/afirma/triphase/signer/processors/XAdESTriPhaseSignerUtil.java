@@ -174,8 +174,11 @@ final class XAdESTriPhaseSignerUtil {
 		if (doc.getXmlEncoding() != null) {
 			try {
 				return ret.getBytes(doc.getXmlEncoding());
-			} catch (final UnsupportedEncodingException e) {
-				LOGGER.warning("Error en la codificacion declarada por el XML: " + doc.getXmlEncoding()); //$NON-NLS-1$
+			}
+			catch (final UnsupportedEncodingException e) {
+				LOGGER.warning(
+					"Error en la codificacion declarada por el XML ('" + doc.getXmlEncoding() + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 			}
 		}
 

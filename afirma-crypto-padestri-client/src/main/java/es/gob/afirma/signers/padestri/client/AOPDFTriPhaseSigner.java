@@ -40,6 +40,12 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
 	private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
 
+	/** Tama&ntilde;o m&iacute;nimo de un PDF.
+	 * <a href="https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf">
+	 * https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf
+	 * </a>. */
+	private static final int PDF_MIN_FILE_SIZE = 70;
+
 	@Override
 	public byte[] sign(final byte[] data,
 			           final String algorithm,
@@ -77,12 +83,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// ---------
 
 		final byte[] preSignResult = PDFTriPhaseSignerUtil.doPresign(signServerUrl, algorithm, certChain, documentId, extraParams);
-
 		try {
 			LOGGER.info("Recibido el XML de prefirma PAdES:\n" + new String(Base64.decode(new String(preSignResult), true))); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
-			// Se ignora
+			LOGGER.warning("La prefirma no esta en el formato esperado: " + e); //$NON-NLS-1$
 		}
 
 		// ----------
@@ -98,8 +103,14 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// POSTFIRMA
 		// ---------
 
-		return PDFTriPhaseSignerUtil.doPostSign(preResultAsBase64, signServerUrl, algorithm, certChain, documentId, extraParams);
-
+		return PDFTriPhaseSignerUtil.doPostSign(
+			preResultAsBase64,
+			signServerUrl,
+			algorithm,
+			certChain,
+			documentId,
+			extraParams
+		);
 
 	}
 
@@ -190,15 +201,21 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	}
 
 	private static boolean isPdfFile(final byte[] data) {
-		byte[] buffer = new byte[PDF_FILE_HEADER.length()];
+		if (data == null || data.length < PDF_MIN_FILE_SIZE) {
+			return false;
+		}
+		final byte[] buffer = new byte[PDF_FILE_HEADER.length()];
 		try {
 			new ByteArrayInputStream(data).read(buffer);
 		}
 		catch (final Exception e) {
-			buffer = null;
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"El contenido parece corrupto o truncado: " + e //$NON-NLS-1$
+			);
+			return false;
 		}
 		// Comprobamos que cuente con una cabecera PDF
-		if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) {
+		if (!PDF_FILE_HEADER.equals(new String(buffer))) {
 			return false;
 		}
 		return true;

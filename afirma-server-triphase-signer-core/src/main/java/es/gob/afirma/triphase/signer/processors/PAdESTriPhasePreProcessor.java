@@ -25,6 +25,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.PdfSignResult;
@@ -165,8 +166,8 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			cert,
 			Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
 			signResult,
-			null,
-			null
+			AOPDFSigner.getSignEnhancer(), // SignEnhancer
+			AOPDFSigner.getSignEnhancerConfig()  // EnhancerConfig (si le llega null usa los ExtraParams)
 		);
 
 		LOGGER.info("Postfirma PAdES - Firma - FIN"); //$NON-NLS-1$
@@ -174,13 +175,11 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		return postsign;
 	}
 
-	/**
-	 * Comprueba que la configuracion proporcionada para realizar la postfirma incluya
+	/** Comprueba que la configuraci&oacute;n proporcionada para realizar la <i>postfirma</i> incluya
 	 * todos los datos obligatorios para la operaci&oacute;n.
 	 * @param sessionConfig Configuraci&oacute;n de firma.
-	 * @throws AOException Cuando falta alg&uacute;n par&aacute;metro obligatorio.
-	 */
-	private static void checkSession(TriSign sessionConfig) throws AOException {
+	 * @throws AOException Cuando falta alg&uacute;n par&aacute;metro obligatorio. */
+	private static void checkSession(final TriSign sessionConfig) throws AOException {
 
 		final String[] params = new String[] {
 			PROPERTY_NAME_PRESIGN,
@@ -190,7 +189,9 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		};
 		for (final String param : params) {
 			if (sessionConfig.getProperty(param) == null) {
-				throw new AOException("No se ha proporcionado un parametro obligatorio para la postfirma PAdES: " + param); //$NON-NLS-1$
+				throw new AOException(
+					"No se ha proporcionado un parametro obligatorio para la postfirma PAdES: " + param //$NON-NLS-1$
+				);
 			}
 		}
 	}

@@ -12,7 +12,7 @@ package es.gob.afirma.signers.pades.enhancer.afirmaplatform;
 import java.io.IOException;
 import java.util.Properties;
 
-import es.gob.afirma.signers.pades.SignEnhancer;
+import es.gob.afirma.core.signers.SignEnhancer;
 
 /** Clase para la mejora de las firmas PDF a trav&eacute;s del servicio de actualizaci&oacute;n de
  * la plataforma &#64;firma.

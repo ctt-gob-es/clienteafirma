@@ -81,6 +81,20 @@ public class TestPdfTriphase {
 		this.data = loadFile(PDF_FILENAME);
 	}
 
+	/** Prueba de validaci&oacute;n de formato.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testFormat() throws Exception {
+		Assert.assertTrue(
+			new AOPDFTriPhaseSigner().isValidDataFile(
+				AOUtil.getDataFromInputStream(
+					TestPdfTriphase.class.getResourceAsStream("/TEST_PDF.pdf") //$NON-NLS-1$
+				)
+			)
+		);
+	}
+
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception En cualquier error. */
 	@Test

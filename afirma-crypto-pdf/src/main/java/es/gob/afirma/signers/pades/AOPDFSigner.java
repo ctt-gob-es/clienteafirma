@@ -37,6 +37,7 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -68,6 +69,49 @@ public final class AOPDFSigner implements AOSigner {
 
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
+
+	/** Tama&ntilde;o m&iacute;nimo de un PDF.
+	 * <a href="https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf">
+	 *   https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf
+	 * </a>. */
+	private static final int PDF_MIN_FILE_SIZE = 70;
+
+	private static SignEnhancer enhancer = null;
+	private static Properties enhancerConfig;
+	static {
+		enhancerConfig = new Properties();
+		String enhancerClassName = null;
+		try {
+			enhancerConfig.load(
+				AOPDFSigner.class.getResourceAsStream("/enhancer.properties") //$NON-NLS-1$
+			);
+			enhancerClassName = enhancerConfig.getProperty("enhancerClassFile"); //$NON-NLS-1$
+			if (enhancerClassName != null) {
+				enhancer = (SignEnhancer) Class.forName(enhancerClassName).getConstructor().newInstance();
+				LOGGER.info("Se usara el siguiente mejorador de firmas: " + enhancerClassName); //$NON-NLS-1$
+			}
+		}
+		catch(final ClassNotFoundException e) {
+			LOGGER.warning(
+				"Se ha configurado la clase de mejora '" + enhancerClassName + "', pero esta no se encuentra: " + e  //$NON-NLS-1$//$NON-NLS-2$
+			);
+		}
+		catch (final Exception e) {
+			LOGGER.info("No hay un mejorador de firmas correctamente instalado: " + e); //$NON-NLS-1$
+		}
+	}
+
+	/** Obtiene el mejorador de firmas por defecto.
+	 * @return Mejorador de firmas por defecto. */
+	public static SignEnhancer getSignEnhancer() {
+		return enhancer;
+	}
+
+	/** Obtiene la configuraci&oacute;n del mejorador de firmas por defecto.
+	 * @return Configuraci&oacute;n del mejorador de firmas por defecto. */
+	public static Properties getSignEnhancerConfig() {
+		return enhancerConfig;
+	}
 
     /** Firma un documento PDF en formato PAdES.
      * <p>
@@ -170,8 +214,8 @@ public final class AOPDFSigner implements AOSigner {
 				certificateChain,
 				interSign,
 				pre,
-				null, // SignEnhancer
-				null  // EnhancerConfig (si le llega null usa los ExtraParams)
+				getSignEnhancer(), // SignEnhancer
+				getSignEnhancerConfig()  // EnhancerConfig (si le llega null usa los ExtraParams)
 			);
 		}
         catch (final NoSuchAlgorithmException e) {
@@ -457,17 +501,22 @@ public final class AOPDFSigner implements AOSigner {
     }
 
     private static boolean isPdfFile(final byte[] data) {
-
-        byte[] buffer = new byte[PDF_FILE_HEADER.length()];
+		if (data == null || data.length < PDF_MIN_FILE_SIZE) {
+			return false;
+		}
+        final byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
             new ByteArrayInputStream(data).read(buffer);
         }
         catch (final Exception e) {
-            buffer = null;
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"El contenido parece corrupto o truncado: " + e //$NON-NLS-1$
+			);
+			return false;
         }
 
         // Comprobamos que cuente con una cabecera PDF
-        if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) {
+        if (!PDF_FILE_HEADER.equals(new String(buffer))) {
             return false;
         }
 
@@ -476,7 +525,7 @@ public final class AOPDFSigner implements AOSigner {
             new PdfReader(data);
         }
         catch (final BadPasswordException e) {
-            LOGGER.warning("El PDF esta protegido con contrasena, se toma como PDF valido"); //$NON-NLS-1$
+            LOGGER.warning("El PDF esta protegido con contrasena, se toma como PDF valido: " + e); //$NON-NLS-1$
             return true;
         }
         catch (final Exception e) {

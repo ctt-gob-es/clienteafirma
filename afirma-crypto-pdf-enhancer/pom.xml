@@ -22,12 +22,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-pdf</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
 			<version>1.3</version>

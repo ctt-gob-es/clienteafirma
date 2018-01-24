@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.pades;
+package es.gob.afirma.core.signers;
 
 import java.io.IOException;
 import java.util.Properties;
