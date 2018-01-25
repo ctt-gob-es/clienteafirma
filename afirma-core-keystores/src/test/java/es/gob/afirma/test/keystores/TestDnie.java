@@ -18,11 +18,11 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreUtilities;
-import es.gob.jmulticard.AOUtil;
 
 /** Pruebas espec&iacute;ficas para el almac&eacute;n DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
