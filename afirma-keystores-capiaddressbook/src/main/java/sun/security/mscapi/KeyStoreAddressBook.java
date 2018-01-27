@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -114,11 +115,20 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     private java.lang.reflect.Method loadKeysOrCertificateChains;
 
-    private final KeyStore.MY nativeWrapper;
+    private final Object nativeWrapper;
 
     KeyStoreAddressBook(final String storeName) {
 
-        this.nativeWrapper = new KeyStore.MY();
+    	try {
+	    	final Class<?> keyStoreMyClass = Class.forName("sun.security.mscapi.KeyStore$MY"); //$NON-NLS-1$
+
+	    	// Esto equivale a {@code new KeyStore.MY()}.
+	    	this.nativeWrapper = keyStoreMyClass.getConstructor().newInstance();
+    	}
+    	catch (final Exception e) {
+    		 Logger.getLogger("es.gob.afirma").severe("No se han encontrado las clases de SunMSCapi: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+    		 throw new RuntimeException("No se han encontrado las clases de SunMSCapi", e); //$NON-NLS-1$
+		}
 
         try {
             this.nativeWrapper.getClass();
@@ -471,10 +481,33 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @throws KeyStoreException Si hay problemas tratando el almac&eacute;n. */
     private void loadKeysOrCertificateChains(final String name, final Collection<KeyEntry> ntries) throws KeyStoreException {
         try {
+        	// Los ultimos MSCapi no incluyen este metodo, asi que en caso de error
+        	// acudimos a un modo alternativo
             this.loadKeysOrCertificateChains.invoke(this.nativeWrapper, name, ntries);
         }
         catch (final Exception e) {
-            throw new KeyStoreException(e);
+            try {
+
+            	// Cargamos las entradas, accedemos al campo que las contiene y componemos
+            	// el objeto resultado con sus valores
+                this.loadKeysOrCertificateChains.invoke(this.nativeWrapper, name);
+
+                final java.lang.reflect.Field entriesField = this.nativeWrapper.getClass().
+                		getSuperclass().getDeclaredField("entries"); //$NON-NLS-1$
+                entriesField.setAccessible(true);
+                final HashMap<String,?> coll = (HashMap<String,?>) entriesField.get(this.nativeWrapper);
+                final Iterator<String> it = coll.keySet().iterator();
+                while (it.hasNext()) {
+                	final String alias = it.next();
+                	final Object keyEntryObject = coll.get(alias);
+                	final Method getCertificateChainMethod = keyEntryObject.getClass().getDeclaredMethod("getCertificateChain"); //$NON-NLS-1$
+                	getCertificateChainMethod.setAccessible(true);
+                	ntries.add(new KeyEntry(alias, (X509Certificate[]) getCertificateChainMethod.invoke(keyEntryObject)));
+                }
+            }
+            catch (final Exception e2) {
+            	throw new KeyStoreException(e);
+            }
         }
     }
 }
