@@ -1,0 +1,2 @@
+for /f "delims=|" %%f in ('dir /b .') do "../java32/jre/bin/keytool" -importcert -noprompt -keystore ../java32/jre/lib/security/cacerts -storetype JKS -storepass changeit -alias %%f -file %%f
+for /f "delims=|" %%f in ('dir /b .') do "../java32/jre/bin/keytool" -importcert -noprompt -keystore ../java64/jre/lib/security/cacerts -storetype JKS -storepass changeit -alias %%f -file %%f

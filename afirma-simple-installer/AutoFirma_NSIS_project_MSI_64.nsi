@@ -55,7 +55,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirmaGenerator.exe
+OutFile AutoFirma64\AutoFirmaGenerator.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -129,9 +129,9 @@ Section "Programa" sPrograma
 	File /r java64\jre
 	
 	;Incluimos todos los ficheros que componen nuestra aplicacion
-	File  AutoFirma.exe
-	File  AutoFirmaConfigurador.exe
-	File  AutoFirmaCommandLine.exe
+	File  AutoFirma64\AutoFirma.exe
+	File  AutoFirma64\AutoFirmaConfigurador.exe
+	File  AutoFirma64\AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -235,7 +235,6 @@ Section "Programa" sPrograma
 	;${If} $0 != success
 	  ;MessageBox MB_OK "Error en la importación: $0"
 	;${EndIf}
-
 	
 	;Se actualiza la variable PATH con la ruta de instalacion
 	Push "$PROGRAMFILES64\AutoFirma\AutoFirma"

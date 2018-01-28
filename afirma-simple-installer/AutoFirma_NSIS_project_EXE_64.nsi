@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma_64_v1_6_0_installer.exe
+OutFile AutoFirma64/AutoFirma_64_v1_6_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -183,9 +183,9 @@ Section "Programa" sPrograma
 	File /r java64\jre
 	
 	;Copiamos todos los ficheros que componen nuestra aplicacion
-	File  AutoFirma.exe
-	File  AutoFirmaConfigurador.exe
-	File  AutoFirmaCommandLine.exe
+	File  AutoFirma64\AutoFirma.exe
+	File  AutoFirma64\AutoFirmaConfigurador.exe
+	File  AutoFirma64\AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -285,12 +285,14 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
 
+	
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
 	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 
+	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
 	; Eliminamos los certificados de versiones previas del sistema
@@ -565,18 +567,40 @@ Section "uninstall"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 	SetShellVarContext all
 
+   ; ==== Desinstalador EXE - INICIO ====
+   
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
-
+	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
-	
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
+
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalación de AutoFirma.' IDOK loopChrome
+	
+	; ==== Desinstalador EXE - FIN ====
+	
+	; ==== Desinstalador MSI - INICIO ====
+   
+	;Se fuerza el cierre de Firefox y Chrome si estan abiertos
+	
+;	loopFirefox:
+;	${nsProcess::FindProcess} "firefox.exe" $R2
+;	StrCmp $R2 0 0 +4
+;	${nsProcess::KillProcess} "firefox.exe" $R0
+;	Goto loopFirefox
 
+;	loopChrome:
+;	${nsProcess::FindProcess} "chrome.exe" $R3
+;	StrCmp $R3 0 0 +4
+;	${nsProcess::KillProcess} "chrome.exe" $R0
+;	Goto loopChrome
+	
+	; ==== Desinstalador MSI - FIN ====
+	
 	${nsProcess::Unload}
 	
 	Sleep 2000

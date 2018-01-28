@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>AutoFirma.jar</jar>
-  <outfile>AutoFirma.exe</outfile>
+  <jar>jar\AutoFirma.jar</jar>
+  <outfile>AutoFirma64\AutoFirma.exe</outfile>
   <errTitle>Error: Se ha superado el tiempo de espera antes de recibir peticiones.</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>

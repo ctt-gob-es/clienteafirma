@@ -46,7 +46,7 @@
 		   EmbedCab="yes" />
 		<DirectoryRef Id="$(var.ProjectName)">
             <Component Id="$(var.ProjectName)Generator.exe" Guid="*">
-                <File Id="$(var.ProjectName)Generator.exe" Source="$(var.ProjectName)Generator.exe" KeyPath="yes" Checksum="yes"/>
+                <File Id="$(var.ProjectName)Generator.exe" Source="AutoFirma64\$(var.ProjectName)Generator.exe" KeyPath="yes" Checksum="yes"/>
             </Component>
 			<!-- no_ejecutar es el desinstalador. Se le asigna ese nombre para que los usuarios no lo ejecuten manualmente.
 			Lo hacemos permanente para asegurarnos de que no se elimina antes de que la CustomAction lo ejecute -->

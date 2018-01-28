@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma_32_v1_6_0_installer.exe
+OutFile AutoFirma32/AutoFirma_32_v1_6_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -174,9 +174,9 @@ Section "Programa" sPrograma
 	File /r java32\jre
 	
 	;Copiamos todos los ficheros que componen nuestra aplicacion
-	File  AutoFirma.exe
-	File  AutoFirmaConfigurador.exe
-	File  AutoFirmaCommandLine.exe
+	File  AutoFirma32\AutoFirma.exe
+	File  AutoFirma32\AutoFirmaConfigurador.exe
+	File  AutoFirma32\AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -558,6 +558,8 @@ Section "uninstall"
 
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
 
+	; ==== Desinstalador EXE - INICIO ====
+	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
@@ -568,6 +570,25 @@ Section "uninstall"
 	StrCmp $R3 0 0 +2
 		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
 
+	; ==== Desinstalador MSI - INICIO ====
+   
+	;Se fuerza el cierre de Firefox y Chrome si estan abiertos
+	
+;	loopFirefox:
+;	${nsProcess::FindProcess} "firefox.exe" $R2
+;	StrCmp $R2 0 0 +4
+;	${nsProcess::KillProcess} "firefox.exe" $R0
+;	Goto loopFirefox
+
+;	loopChrome:
+;	${nsProcess::FindProcess} "chrome.exe" $R3
+;	StrCmp $R3 0 0 +4
+;	${nsProcess::KillProcess} "chrome.exe" $R0
+;	Goto loopChrome
+	
+	; ==== Desinstalador MSI - FIN ====
+		
+		
 	${nsProcess::Unload}
 	
 	Sleep 2000
