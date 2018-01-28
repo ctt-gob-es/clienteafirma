@@ -494,7 +494,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			// Si estamos claramente en un sistema movil o que no permite la ejecucion de Java,
 			// cargamos directamente el Cliente JavaScript
-			if (isAndroid() || isIOS() || isWindowsRT() || isChrome() || isEdge()) {
+			if (isAndroid() || isIOS() || isWindowsRT() || isChrome() || isFirefox() || isEdge()) {
 				cargarAppAfirma(base, defaultKeyStore);
 				return;
 			}
