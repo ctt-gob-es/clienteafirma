@@ -76,7 +76,7 @@ public class AutoFirmaConfiguratorJNLP {
 	 * Indica si la aplicaci&oacute;n se comunicar&aacute; con el navegador web
 	 * a trav&eacute;s de sockets.
 	 * @param args Opciones de configuraci&oacute;n recibidas.
-	 * @return {@code true} si la aplicaci&opacute;n utilizar&aacute; la comunicaci&oacute;n
+	 * @return {@code true} si la aplicaci&oacute;n utilizar&aacute; la comunicaci&oacute;n
 	 * por sockets, {@code false} en caso contrario.
 	 */
 	public static boolean isRequestBySocket(final String[] args) {
