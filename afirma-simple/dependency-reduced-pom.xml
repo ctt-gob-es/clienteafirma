@@ -38,7 +38,7 @@
       </build>
     </profile>
     <profile>
-      <id>env-deploy</id>
+      <id>env-install</id>
       <build>
         <finalName>AutoFirma</finalName>
         <plugins>
@@ -57,10 +57,6 @@
                   <target>1.8</target>
                   <fork>true</fork>
                   <compilerArgument>-XDignore.symbol.file</compilerArgument>
-                  <compilerArgs>
-                    <arg>-Xbootclasspath:C:\Program Files\Java\jdk1.8.0_121\jre/lib/jsse.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/rt.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/jce.jar</arg>
-                  </compilerArgs>
-                  <debug>false</debug>
                 </configuration>
               </execution>
               <execution>
@@ -74,10 +70,6 @@
                   <target>1.8</target>
                   <fork>true</fork>
                   <compilerArgument>-XDignore.symbol.file</compilerArgument>
-                  <compilerArgs>
-                    <arg>-Xbootclasspath:C:\Program Files\Java\jdk1.8.0_121\jre/lib/jsse.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/rt.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/jce.jar</arg>
-                  </compilerArgs>
-                  <debug>false</debug>
                 </configuration>
               </execution>
             </executions>
@@ -86,10 +78,6 @@
               <target>1.8</target>
               <fork>true</fork>
               <compilerArgument>-XDignore.symbol.file</compilerArgument>
-              <compilerArgs>
-                <arg>-Xbootclasspath:C:\Program Files\Java\jdk1.8.0_121\jre/lib/jsse.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/rt.jar;C:\Program Files\Java\jdk1.8.0_121\jre/lib/jce.jar</arg>
-              </compilerArgs>
-              <debug>false</debug>
             </configuration>
           </plugin>
           <plugin>
@@ -188,12 +176,6 @@
     </profile>
   </profiles>
   <dependencies>
-    <dependency>
-      <groupId>com.apple</groupId>
-      <artifactId>applejavaextensions</artifactId>
-      <version>1.5.4</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -38,55 +38,20 @@
 		<url>https://github.com/ctt-gob-es/clienteafirma</url>
 	</scm>
 	
+	<distributionManagement>
+	  <snapshotRepository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	  <repository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	  </repository>
+	</distributionManagement>
+	
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
-
-	<modules>
-		<module>afirma-core</module>
-		<module>afirma-core-keystores</module>
-		<module>afirma-crypto-batch-client</module>
-		<module>afirma-crypto-cadestri-client</module>
-		<module>afirma-crypto-cipher</module>
-		<module>afirma-crypto-core-pkcs7</module>
-		<module>afirma-crypto-cades</module>
-		<module>afirma-crypto-cades-multi</module>
-		<module>afirma-crypto-cms</module>
-		<module>afirma-crypto-cms-enveloper</module>
-		<module>afirma-crypto-core-pkcs7-tsp</module>
-		<module>afirma-crypto-core-xml</module>
-		<module>afirma-crypto-odf</module>
-		<module>afirma-crypto-padestri-client</module>
-		<module>afirma-crypto-pdf-enhancer</module>
-		<module>afirma-crypto-validation</module>
-		<module>afirma-crypto-xades</module>
-		<module>afirma-crypto-xadestri-client</module>
-		<module>afirma-crypto-xmlsignature</module>
-		<module>afirma-crypto-ooxml</module>
-		<module>afirma-crypto-jarverifier</module>
-		<module>afirma-keystores-capiaddressbook</module>
-		<module>afirma-keystores-filters</module>
-		<module>afirma-keystores-mozilla</module>
-		<module>afirma-keystores-single</module>
-		<module>afirma-ui-core-jse</module>
-		<module>afirma-ui-core-jse-keystores</module>
-		<module>afirma-crypto-pdf</module>
-		<module>afirma-core-massive</module>
-		<module>afirma-server-triphase-signer-core</module>
-		<module>afirma-server-triphase-signer-document</module>
-		
-		<!-- Aplicaciones -->
-		<module>afirma-ui-miniapplet</module>
-		<module>afirma-simple</module>
-		<module>afirma-ui-simple-configurator</module>
-		<module>afirma-ui-simple-webstart</module>
-		
-		<!-- Servicios -->
-		<module>afirma-server-simple-webstart</module>
-		<module>afirma-server-triphase-signer</module>
-		<module>afirma-signature-retriever</module>
-		<module>afirma-signature-storage</module>
-	</modules>
 
 	<dependencies>
 		<dependency>
@@ -97,31 +62,225 @@
 		</dependency>
 	</dependencies>
 	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<fork>true</fork>
-					<compilerArgs>
--						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
--					</compilerArgs>
-					<debug>false</debug>
-				</configuration>
-			</plugin>
+	<profiles>
+		<!-- ===== Construccion por defecto ===== -->
+		<profile>
+			<id>env-dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+      		</activation>
+			
+			<modules>
+				<module>afirma-core</module>
+				<module>afirma-core-keystores</module>
+				<module>afirma-crypto-batch-client</module>
+				<module>afirma-crypto-cadestri-client</module>
+				<module>afirma-crypto-cipher</module>
+				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cades</module>
+				<module>afirma-crypto-cades-multi</module>
+				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cms-enveloper</module>
+				<module>afirma-crypto-core-pkcs7-tsp</module>
+				<module>afirma-crypto-core-xml</module>
+				<module>afirma-crypto-odf</module>
+				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-enhancer</module>
+				<module>afirma-crypto-validation</module>
+				<module>afirma-crypto-xades</module>
+				<module>afirma-crypto-xadestri-client</module>
+				<module>afirma-crypto-xmlsignature</module>
+				<module>afirma-crypto-ooxml</module>
+				<module>afirma-crypto-jarverifier</module>
+				<module>afirma-keystores-capiaddressbook</module>
+				<module>afirma-keystores-filters</module>
+				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-single</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				<module>afirma-crypto-pdf</module>
+				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+			</modules>
+			
+      		<build>
+       			<plugins>
+	
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.6.1</version>
+						<configuration>
+							<source>1.7</source>
+							<target>1.7</target>
+							<fork>true</fork>
+							<compilerArgs>
+								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
+							</compilerArgs>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<tagNameFormat>${project.name}_@{project.version}</tagNameFormat>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+				</plugins>
+			</build>
+	    </profile>
+
+		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
+		<profile>
+			<id>env-install</id>
+			<activation>
+				<property>
+				  <name>env</name>
+				  <value>install</value>
+				</property>
+			</activation>
+			
+			<modules>
+				<!-- Aplicaciones -->
+				<module>afirma-ui-miniapplet</module>
+				<module>afirma-ui-simple-webstart</module>
+				<module>afirma-simple</module>
+				<module>afirma-ui-simple-configurator</module>
+
+				
+				<!-- Servicios -->
+				<module>afirma-server-simple-webstart</module>
+				<module>afirma-server-triphase-signer</module>
+				<module>afirma-signature-retriever</module>
+				<module>afirma-signature-storage</module>
+			</modules>
+			
+			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo -->
+			
+		</profile>
+		
+		<!-- ===== Construccion para despliegue en el repositorio de artefactos ===== -->
+		<profile>
+			<id>env-deploy</id>
+			<activation>
+				<property>
+				  <name>env</name>
+				  <value>deploy</value>
+				</property>
+			</activation>
+			
+			<modules>
+				<module>afirma-core</module>
+				<module>afirma-core-keystores</module>
+				<module>afirma-crypto-batch-client</module>
+				<module>afirma-crypto-cadestri-client</module>
+				<module>afirma-crypto-cipher</module>
+				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cades</module>
+				<module>afirma-crypto-cades-multi</module>
+				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cms-enveloper</module>
+				<module>afirma-crypto-core-pkcs7-tsp</module>
+				<module>afirma-crypto-core-xml</module>
+				<module>afirma-crypto-odf</module>
+				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-enhancer</module>
+				<module>afirma-crypto-validation</module>
+				<module>afirma-crypto-xades</module>
+				<module>afirma-crypto-xadestri-client</module>
+				<module>afirma-crypto-xmlsignature</module>
+				<module>afirma-crypto-ooxml</module>
+				<module>afirma-crypto-jarverifier</module>
+				<module>afirma-keystores-capiaddressbook</module>
+				<module>afirma-keystores-filters</module>
+				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-single</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				<module>afirma-crypto-pdf</module>
+				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+				
+				<!-- Aplicaciones -->
+				<module>afirma-ui-miniapplet</module>
+				<module>afirma-simple</module>
+				<module>afirma-ui-simple-configurator</module>
+				<module>afirma-ui-simple-webstart</module>
+				
+				<!-- Servicios -->
+				<module>afirma-server-simple-webstart</module>
+				<module>afirma-server-triphase-signer</module>
+				<module>afirma-signature-retriever</module>
+				<module>afirma-signature-storage</module>
+			</modules>
+			
+			<build>
+				<plugins>
+					<plugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+					  <artifactId>maven-source-plugin</artifactId>
+					  <version>2.2.1</version>
+					  <executions>
+						<execution>
+						  <id>attach-sources</id>
+						  <goals>
+							<goal>jar-no-fork</goal>
+						  </goals>
+						</execution>
+					  </executions>
+					</plugin>
+					<plugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+					  <artifactId>maven-javadoc-plugin</artifactId>
+					  <version>2.9.1</version>
+					  <executions>
+						<execution>
+						  <id>attach-javadocs</id>
+						  <goals>
+							<goal>jar</goal>
+						  </goals>
+						</execution>
+					  </executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.6.1</version>
+						<configuration>
+							<source>1.7</source>
+							<target>1.7</target>
+							<fork>true</fork>
+							<compilerArgs>
+		-						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
+		-					</compilerArgs>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>2.5.3</version>
+						<configuration>
+							<tagNameFormat>${project.name}_@{project.version}</tagNameFormat>
+						</configuration>
+					</plugin>
+
+					<plugin>
+					  <groupId>org.apache.maven.plugins</groupId>
+					  <artifactId>maven-gpg-plugin</artifactId>
+					  <version>1.5</version>
+					  <executions>
+						<execution>
+						  <id>sign-artifacts</id>
+						  <phase>verify</phase>
+						  <goals>
+							<goal>sign</goal>
+						  </goals>
+						</execution>
+					  </executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
 </project>

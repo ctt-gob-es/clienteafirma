@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-core-xml</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-core-xml</name>
 	<description>Modulo con las funciones core para la generacion de firmas XML</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

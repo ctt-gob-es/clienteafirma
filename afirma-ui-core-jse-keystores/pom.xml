@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-core-jse-keystores</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>afirma-ui-core-jse-keystores</name>
 	<description>Modulo con las interfaces del dialogo de seleccion de certificados</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

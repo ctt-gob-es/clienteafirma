@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-keystores-capiaddressbook</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-keystores-capiaddressbook</name>
 	<description>Modulo el acceso al almacen de certificados de terceros (Libreta de direcciones) de Windows</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -14,12 +15,4 @@
 		<version>1.6</version>
 	</parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>sunmscapi</groupId>
-			<artifactId>sunmscapi</artifactId>
-			<version>1.6</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
 </project>

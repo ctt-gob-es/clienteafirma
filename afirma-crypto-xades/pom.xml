@@ -4,7 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-xades</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>afirma-crypto-xades</name>
+	<description>Modulo para la generacion de firmas XAdES</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

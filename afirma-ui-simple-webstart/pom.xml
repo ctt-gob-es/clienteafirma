@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-simpleafirma-webstart</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>afirma-ui-simpleafirma-webstart</name>
 	<description>Envoltura para la publicacion de Autofirma como aplicacion WebStart</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -19,15 +20,89 @@
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
 		<afirma.keytool.password>afirma</afirma.keytool.password>
 		<afirma.jar.name>AutoFirmaWS</afirma.jar.name>
-		<afirma.legible.version>V1.6</afirma.legible.version>
+		<afirma.legible.version>V${project.version}</afirma.legible.version>
 	</properties>
 
 	<profiles>
-	
+
 		<profile>
 			<id>env-dev</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
+	      	</activation>
+
+			<dependencies>
+				<dependency>
+					 <groupId>es.gob.afirma</groupId>
+					 <artifactId>afirma-ui-simpleafirma</artifactId>
+					 <version>${project.version}</version>
+					 <exclusions>
+						<exclusion>
+							<groupId>es.gob.afirma</groupId>
+							<artifactId>afirma-core-massive</artifactId>
+						</exclusion>
+						<exclusion>
+							<groupId>es.gob.afirma</groupId>
+							<artifactId>afirma-keystores-capiaddressbook</artifactId>
+						</exclusion>
+						<exclusion>
+							<groupId>com.github.markusbernhardt</groupId>
+							<artifactId>proxy-vole</artifactId>
+						</exclusion>
+						<exclusion>
+							<groupId>javax.help</groupId>
+							<artifactId>javahelp</artifactId>
+						</exclusion>
+						<exclusion>
+							<groupId>org.apache.pdfbox</groupId>
+							<artifactId>pdfbox</artifactId>
+						</exclusion>
+						<exclusion>
+							<groupId>net.java.dev.jna</groupId>
+							<artifactId>jna</artifactId>
+						</exclusion>
+					 </exclusions>
+				</dependency>
+				 
+				<dependency>
+					 <groupId>es.gob.afirma</groupId>
+					 <artifactId>afirma-ui-simpleafirma-configurator</artifactId>
+					 <version>${project.version}</version>
+				</dependency>
+
+				<dependency>
+					<groupId>javax.jnlp</groupId>
+					<artifactId>jnlp-api</artifactId>
+					<version>8.0</version>
+					<scope>system</scope>
+					<systemPath>${java.home}/lib/javaws.jar</systemPath>
+				</dependency>
+			</dependencies>
+		
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.1</version>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+							<fork>true</fork>
+							<compilerArgument>-XDignore.symbol.file</compilerArgument>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	
+		<profile>
+			<id>env-install</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>install</value>
+				</property>
 	      	</activation>
 
 		<dependencies>

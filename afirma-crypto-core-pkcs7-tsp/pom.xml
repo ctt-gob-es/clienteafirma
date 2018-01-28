@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-core-pkcs7-tsp</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-core-pkcs7-tsp</name>
 	<description>Modulo con las funciones para la agregacion de sellos de tiempo a firmas ASN.1</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-simpleafirma</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>afirma-ui-simpleafirma</name>
 	<description>Aplicacion AutoFirma</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -191,13 +192,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.apple</groupId>
-			<artifactId>applejavaextensions</artifactId>
-			<version>1.5.4</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.help</groupId>
 			<artifactId>javahelp</artifactId>
 			<version>2.0.05</version>
@@ -275,11 +269,11 @@
 	    </profile>
 	    
 	    <profile>
-	      <id>env-deploy</id>
+	      <id>env-install</id>
 	      <activation>
 	        <property>
 	          <name>env</name>
-	          <value>deploy</value>
+	          <value>install</value>
 	        </property>
 	      </activation>
 
@@ -344,9 +338,8 @@
 							</filter>
 						</filters>
 					</configuration>
-					
 				</plugin>
-				
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>

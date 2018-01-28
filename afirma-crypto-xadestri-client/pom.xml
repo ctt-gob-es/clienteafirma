@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-xadestri-client</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-xadestri-client</name>
 	<description>Modulo con el componente cliente para la generacion de firmas XAdES trifasicas</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

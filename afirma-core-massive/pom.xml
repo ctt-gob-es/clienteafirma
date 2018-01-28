@@ -4,10 +4,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-core-massive</artifactId>
-	<name>afirma-core-massive</name>
-	<description>Modulo con funciones de utilidad para la firma masiva de documentos</description>
 	<packaging>jar</packaging>
 
+	<name>afirma-core-massive</name>
+	<description>Modulo con funciones de utilidad para la firma masiva de documentos</description>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>

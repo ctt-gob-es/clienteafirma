@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-odf</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-odf</name>
 	<description>Modulo para la generacion de firmas ODF</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

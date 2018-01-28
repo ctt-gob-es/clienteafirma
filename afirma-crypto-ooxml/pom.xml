@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-ooxml</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-ooxml</name>
 	<description>Modulo para la generacion de firmas OOXML</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

@@ -4,10 +4,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-cms</artifactId>
-	<name>afirma-crypto-cms</name>
-	<description>Modulo para la generacion de firmas CMS</description>
 	<packaging>jar</packaging>
 
+	<name>afirma-crypto-cms</name>
+	<description>Modulo para la generacion de firmas CMS</description>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>

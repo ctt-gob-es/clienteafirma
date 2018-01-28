@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-core-keystores</artifactId>
+	<packaging>jar</packaging>
+		
 	<name>afirma-core-keystores</name>
 	<description>Modulo central para la gestion de almacenes de claves</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -41,7 +42,7 @@
 		</dependency>
 		
 	</dependencies>
-	
+	<!--
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -57,4 +58,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	-->
 </project>

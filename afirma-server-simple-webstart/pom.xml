@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-server-simpleafirma-webstart</artifactId>
+	<packaging>war</packaging>
+	
 	<name>afirma-server-simpleafirma-webstart</name>
 	<description>Servicio para la generacion de ficheros de despliegue JNLP con parametros</description>
-	<packaging>war</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

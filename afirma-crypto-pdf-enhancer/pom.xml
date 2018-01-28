@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-pdf-enhancer</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-pdf-enhancer</name>
 	<description>Modulo para actualizacion de firmas PAdES a formatos longevos</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

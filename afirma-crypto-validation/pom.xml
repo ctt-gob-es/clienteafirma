@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-validation</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-validation</name>
 	<description>Modulo para la validacion del core de firma de firmas ASN.1 y XML</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -82,23 +83,5 @@
 		</dependency>
 		
 	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<fork>true</fork>
-					<compilerArgs>
--						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
--					</compilerArgs>
-					<debug>false</debug>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+
 </project>

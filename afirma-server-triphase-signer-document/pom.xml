@@ -3,32 +3,15 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-server-triphase-signer-document</artifactId>
-	<name>afirma-server-triphase-signer-document</name>
-	<description>Modulo con la interfaz para la generacion de gestores de documentos para la firma trifasica</description>
 	<packaging>jar</packaging>
 
+	<name>afirma-server-triphase-signer-document</name>
+	<description>Modulo con la interfaz para la generacion de gestores de documentos para la firma trifasica</description>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
 		<version>1.6</version>
 	</parent>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<fork>true</fork>
-					<compilerArgs>
--						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
--					</compilerArgs>
-					<debug>false</debug>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+
 </project>

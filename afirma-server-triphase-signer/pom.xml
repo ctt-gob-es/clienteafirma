@@ -3,9 +3,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-server-triphase-signer</artifactId>
+	<packaging>war</packaging>
+	
 	<name>afirma-server-triphase-signer</name>
 	<description>Servicio de firma trifasica</description>
-	<packaging>war</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

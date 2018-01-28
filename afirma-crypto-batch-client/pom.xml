@@ -4,10 +4,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-batch-client</artifactId>
-	<name>afirma-crypto-batch-client</name>
-	<description>Modulo cliente para la ejecucion de firmas por lotes</description>
 	<packaging>jar</packaging>
 
+	<name>afirma-crypto-batch-client</name>
+	<description>Modulo cliente para la ejecucion de firmas por lotes</description>
+	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>

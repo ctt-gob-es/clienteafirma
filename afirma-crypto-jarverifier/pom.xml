@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-crypto-jarverifier</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-crypto-jarverifier</name>
 	<description>Modulo para la comprobacion de la firma de un JAR</description>
-	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>

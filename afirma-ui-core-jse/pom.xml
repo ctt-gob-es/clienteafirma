@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-core-jse</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>afirma-ui-core-jse</name>
 	<description>Modulo con las interfaces graficas genericas del Cliente @firma</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

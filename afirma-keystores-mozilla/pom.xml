@@ -4,9 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-keystores-mozilla</artifactId>
+	<packaging>jar</packaging>
+
 	<name>afirma-keystores-mozilla</name>
 	<description>Modulo para el acceso al almacen de claves de Firefox</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -27,20 +28,5 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.1</version>
-					<configuration>
-						<fork>true</fork>
-						<compilerArgument>-XDignore.symbol.file</compilerArgument>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+
 </project>

@@ -3,9 +3,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-server-triphase-signer-core</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>afirma-server-triphase-signer-core</name>
 	<description>Modulo con la logica de firma trifasica</description>
-	<packaging>jar</packaging>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -40,22 +41,4 @@
 
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<fork>true</fork>
-					<compilerArgs>
--						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
--					</compilerArgs>
-					<debug>false</debug>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>
