@@ -71,18 +71,18 @@ public final class MozillaKeyStoreUtilities {
 		"TIF_P11.dll"//$NON-NLS-1$
 	};
 
-	/**
-	 * M&oacute;dulos de los que se conoce el nombre de su biblioteca para que se agregue
+	/** M&oacute;dulos de los que se conoce el nombre de su biblioteca para que se agregue
 	 * junto al listado de m&oacute;dulos configurados en Mozilla Firefox para intentar
 	 * cargarlos. Las propiedades establecidas para cada uno de ellos son:
-	 * - Nombre descriptivo de la biblioteca
-	 * - Nombre del fichero de la biblioteca
-	 * - Si se desea o no que se intente su carga aunque no se encuentre su blioteca en
-	 *   el sistema.
+	 * <ul>
+	 *  <li>Nombre descriptivo de la biblioteca.</li>
+	 *  <li>Nombre del fichero de la biblioteca.</li>
+	 *  <li>Si se desea o no que se intente su carga aunque no se encuentre su blioteca en
+	 *      el sistema.</li>
+	 * </ul>
 	 * Este &uacute;ltimo par&aacute;metro es necesario para la carga de las bibliotecas de la FNMT
 	 * ya que Java nos oculta el nombre de fichero en el directorio de 64 bits, pero lo necesita para
-	 * la carga.
-	 */
+	 * la carga. */
 	private enum KnownModule {
 		ATOS_CARDOS("Atos CardOS (preinstalado)", "siecap11.dll", Platform.OS.WINDOWS, false), //$NON-NLS-1$ //$NON-NLS-2$
 		FNMT_64("FNMT-RCM Modulo PKCS#11 64bits", "FNMT_P11_x64.dll", Platform.OS.WINDOWS, true), //$NON-NLS-1$ //$NON-NLS-2$
@@ -126,8 +126,8 @@ public final class MozillaKeyStoreUtilities {
 	/** Crea las l&iacute;neas de configuraci&oacute;n para el uso de las
 	 * bibliotecas NSS como m&oacute;dulo PKCS#11 por el proveedor de Sun.
 	 * @param userProfileDirectory Directorio donde se encuentra el perfil de
-	 *                             usuario de Mozilla Firefox
-	 * @param libDir Directorio que contiene las bibliotecas NSS
+	 *                             usuario de Mozilla Firefox.
+	 * @param libDir Directorio que contiene las bibliotecas NSS.
 	 * @return Fichero con las propiedades de configuracion del proveedor
 	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a NSS. */
 	static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
@@ -204,10 +204,9 @@ public final class MozillaKeyStoreUtilities {
 
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
 	 * Services</i>) del sistema.
-	 * @return Directorio de las bibliotecas NSS del sistema
-	 * @throws FileNotFoundException
-	 *         Si no se puede encontrar NSS en el sistema
-     * @throws IOException En caso de errores de lectura/escritura */
+	 * @return Directorio de las bibliotecas NSS del sistema.
+	 * @throws FileNotFoundException Si no se puede encontrar NSS en el sistema.
+     * @throws IOException En caso de errores de lectura/escritura. */
 	public static String getSystemNSSLibDir() throws IOException {
 
 		if (nssLibDir != null) {
@@ -254,8 +253,8 @@ public final class MozillaKeyStoreUtilities {
 
 		if (nssLibDir == null) {
 			throw new FileNotFoundException(
-					"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
-				);
+				"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
+			);
 		}
 
 		return nssLibDir;
@@ -273,7 +272,7 @@ public final class MozillaKeyStoreUtilities {
 	 *                            base de datos de m&oacute;dulos de Mozilla (<i>secmod.db</i>), si se
 	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
-	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla NSS / Firefox */
+	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla NSS / Firefox. */
 	static Map<String, String> getMozillaPKCS11Modules(final boolean excludePreferredModules,
 			                                           final boolean includeKnownModules) {
 		if (!excludePreferredModules) {
@@ -529,7 +528,7 @@ public final class MozillaKeyStoreUtilities {
 
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
-	 * @throws IOException Cuando hay errores de entrada / salida */
+	 * @throws IOException Cuando hay errores de entrada / salida. */
 	public static String getMozillaUserProfileDirectory() throws IOException {
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return getMozillaUserProfileDirectoryWindows(
@@ -555,9 +554,9 @@ public final class MozillaKeyStoreUtilities {
 	}
 
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
-	 * @param iniPath Ruta al fichero de perfiles de Firefox
-	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
-	 * @throws IOException Cuando hay errores de entrada / salida */
+	 * @param iniPath Ruta al fichero de perfiles de Firefox.
+	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox.
+	 * @throws IOException Cuando hay errores de entrada / salida. */
 	public static String getMozillaUserProfileDirectoryWindows(final String iniPath) throws IOException {
 		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
 			new File(iniPath)
@@ -580,9 +579,13 @@ public final class MozillaKeyStoreUtilities {
 			ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 		}
 		catch (final Exception e) {
+
 			// No se ha podido cargar el proveedor sin precargar las dependencias
 			// Cargamos las dependencias necesarias para la correcta carga
 			// del almacen (en Mac se crean enlaces simbolicos)
+
+			LOGGER.warning("NSS no se ha podido iniciar sin precargar sus dependencias: " + e); //$NON-NLS-1$
+
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				MozillaKeyStoreUtilitiesOsX.configureMacNSS(nssDirectory);
 			}
@@ -601,14 +604,15 @@ public final class MozillaKeyStoreUtilities {
 		return ret;
 	}
 
-	private static Provider loadNssJava8(final String nssDirectory, final String p11NSSConfigFileContents) throws AOException,
-	                                                                                                              InstantiationException,
-	                                                                                                              IllegalAccessException,
-	                                                                                                              IllegalArgumentException,
-	                                                                                                              InvocationTargetException,
-	                                                                                                              NoSuchMethodException,
-	                                                                                                              SecurityException,
-	                                                                                                              ClassNotFoundException {
+	private static Provider loadNssJava8(final String nssDirectory,
+			                             final String p11NSSConfigFileContents) throws AOException,
+	                                                                                   InstantiationException,
+	                                                                                   IllegalAccessException,
+	                                                                                   IllegalArgumentException,
+	                                                                                   InvocationTargetException,
+	                                                                                   NoSuchMethodException,
+	                                                                                   SecurityException,
+	                                                                                   ClassNotFoundException {
 		try {
 			return (Provider) Class.forName(SUN_PKCS11_PROVIDER_CLASSNAME)
 				.getConstructor(InputStream.class)
@@ -635,11 +639,23 @@ public final class MozillaKeyStoreUtilities {
 						.newInstance(new ByteArrayInputStream(p11NSSConfigFileContents.getBytes()));
 			}
 			catch (final Exception e2) {
+				LOGGER.warning("Ha fallado el segundo intento de carga de NSS: " + e2); //$NON-NLS-1$
+
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
-				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
-				return (Provider) Class.forName(SUN_PKCS11_PROVIDER_CLASSNAME)
-					.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFileContents.getBytes()));
+				// las bibliotecas necesarias se hayan cargado tras el ultimo intento.
+				//
+				// Si los anteriores intentos se hubiesen hecho en modo compartido (SHARED), en este
+				// ultimo intento se hace de forma normal. Esto resuelve el problema que se da por
+				// la instalacion de G&D SafeSign, que configura el modo SHARED aunque no se use, lo
+				// que lleva a engano al mecanismo de deteccion.
+
+				return (Provider) Class.forName(SUN_PKCS11_PROVIDER_CLASSNAME).getConstructor(
+					InputStream.class
+				).newInstance(
+					new ByteArrayInputStream(
+						p11NSSConfigFileContents.replace("sql:/", "").getBytes() //$NON-NLS-1$ //$NON-NLS-2$
+					)
+				);
 			}
 		}
 	}
@@ -725,7 +741,9 @@ public final class MozillaKeyStoreUtilities {
 
 	private static boolean isModuleIncluded(final Map<String, String> externalStores, final String moduleName) {
 		if (externalStores == null || moduleName == null) {
-			throw new IllegalArgumentException("Ni la lista de almacenes ni el modulo a comprobar pueden ser nulos"); //$NON-NLS-1$
+			throw new IllegalArgumentException(
+				"Ni la lista de almacenes ni el modulo a comprobar pueden ser nulos" //$NON-NLS-1$
+			);
 		}
 		for (final String key : externalStores.keySet()) {
 			if (externalStores.get(key).toLowerCase().endsWith(moduleName.toLowerCase())) {
@@ -769,7 +787,7 @@ public final class MozillaKeyStoreUtilities {
 			else {
 				LOGGER.warning("Se eliminara el modulo '" + key //$NON-NLS-1$
 					+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
-					+ table.get(key));
+						+ table.get(key));
 			}
 		}
 

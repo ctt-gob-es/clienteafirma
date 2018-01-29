@@ -50,10 +50,16 @@ public final class KeyStoreUtilities {
 	public static final String DISABLE_DNIE_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver"; //$NON-NLS-1$
 
 	private static final String DISABLE_CERES_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_CERES_NATIVE_DRIVER"; //$NON-NLS-1$
-	private static final String DISABLE_CERES_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver"; //$NON-NLS-1$
+
+	/** Nombre de la propiedad Java (a nivel de JVM) que debe establecerse a <code>true</code>
+	 * si se desea <b>no</b> usar el controlador Java de tarjetas FNMT CERES interno del programa. */
+	public static final String DISABLE_CERES_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver"; //$NON-NLS-1$
 
 	private static final String DISABLE_GYDSC_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_GYDSC_NATIVE_DRIVER"; //$NON-NLS-1$
-	private static final String DISABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableGYDSCNativeDriver"; //$NON-NLS-1$
+
+	/** Nombre de la propiedad Java (a nivel de JVM) que debe establecerse a <code>true</code>
+	 * si se desea <b>no</b> usar el controlador Java de tarjetas G&amp;D SmartCafe interno del programa. */
+	public static final String DISABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableGYDSCNativeDriver"; //$NON-NLS-1$
 
     private KeyStoreUtilities() {
         // No permitimos la instanciacion

@@ -29,7 +29,7 @@ public final class SimpleTest {
      * @throws Exception En cualquier error. */
     public static void main(final String[] args) throws Exception {
     	System.out.println(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory());
-		//SimpleTest.testDirectNssUsage();
+    	//new SimpleTest().testDirectNssUsage();
     	new SimpleTest().testKeyStoreManagerCreation();
     }
 
@@ -39,6 +39,20 @@ public final class SimpleTest {
     @Test
     @Ignore // Necesita NSS
     public void testKeyStoreManagerCreation() throws Exception {
+
+    	System.setProperty(
+			KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER,
+			"true" //$NON-NLS-1$
+		);
+    	System.setProperty(
+			KeyStoreUtilities.DISABLE_CERES_NATIVE_DRIVER,
+			"true" //$NON-NLS-1$
+		);
+    	System.setProperty(
+			KeyStoreUtilities.DISABLE_GYDSC_NATIVE_DRIVER,
+			"true" //$NON-NLS-1$
+		);
+
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     	    AOKeyStore.MOZ_UNI, // Store
     	    null, // Lib
@@ -52,6 +66,12 @@ public final class SimpleTest {
     	for (final String alias : aliases) {
     		System.out.println(AOUtil.getCN(ksm.getCertificate(alias)));
     	}
+
+    	if (aliases.length < 1) {
+    		System.out.println("No hay certificados"); //$NON-NLS-1$
+    		return;
+    	}
+
     	System.out.println("============="); //$NON-NLS-1$
 
     	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
@@ -100,8 +120,8 @@ public final class SimpleTest {
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$
 			loadNSS(
-				"C:\\Users\\tomas\\AppData\\Local\\Temp\\nss", //$NON-NLS-1$
-				KeyStoreUtilities.getShort("C:\\Users\\tomas\\AppData\\Local\\Temp\\moznProf").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				KeyStoreUtilities.getShort("c:\\program files (x86)\\mozilla firefox"), //$NON-NLS-1$
+				KeyStoreUtilities.getShort("C:\\Users\\tgarciameras\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\9xk45g11.default").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			)
 		);
     	keyStore.load(null, new char[0]);
