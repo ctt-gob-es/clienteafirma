@@ -200,9 +200,9 @@
 				
 				<!-- Aplicaciones -->
 				<module>afirma-ui-miniapplet</module>
+				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
-				<module>afirma-ui-simple-webstart</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-simple-webstart</module>
