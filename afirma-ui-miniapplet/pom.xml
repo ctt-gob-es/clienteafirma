@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6</version>
+		<version>1.7-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -172,7 +172,7 @@
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
-			<version>1.4</version>
+			<version>1.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

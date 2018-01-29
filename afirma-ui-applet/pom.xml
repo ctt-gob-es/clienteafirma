@@ -5,13 +5,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-applet</artifactId>
+	<version>3.3.2</version>
+	<packaging>jar</packaging>
+	
 	<name>afirma-ui-applet</name>
+	<description>Modulo del applet Cliente @firma original.</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client-base</artifactId>
-		<version>1.6</version>
-		<relativePath>../../../../pom.xml</relativePath>
+		<artifactId>afirma-client</artifactId>
+		<version>1.7-SNAPSHOT</version>
 	</parent>
 	
 	<properties>
@@ -155,7 +158,7 @@
 		<dependency>
 			<groupId>es.gob.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
-			<version>1.4</version>
+			<version>1.5-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
@@ -171,7 +174,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.6</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<phase>package</phase>

@@ -4,14 +4,16 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-applet-deploy</artifactId>
-	<name>afirma-ui-applet-deploy</name>
+	<version>3.3.2</version>
 	<packaging>war</packaging>
+	
+	<name>afirma-ui-applet-deploy</name>
+	<description>Modulo con los ficheros de despliegue del antiguo applet Cliente @firma</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client-base</artifactId>
-		<version>1.6</version>
-		<relativePath>../../../../pom.xml</relativePath>
+		<artifactId>afirma-client</artifactId>
+		<version>1.7-SNAPSHOT</version>
 	</parent>
 	
 </project>
