@@ -1,7 +1,6 @@
 package test.es.gob.afirma.signfolder.server.proxy;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.http.HttpError;
@@ -9,19 +8,20 @@ import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 
-
 /** Pruebas del servicio de almacenamiento en servidor intermedio.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestStorageService {
 
-	//private static final String SERVICE_URL = "http://localhost:8080/afirma-signature-storage/StorageService"; //$NON-NLS-1$
-	private static final String SERVICE_URL = "http://localhost:56499/afirma-signature-storage/StorageService"; //$NON-NLS-1$
+	private static final String SERVICE_SCHEME = "http"; //$NON-NLS-1$
+	private static final String SERVICE_HOST = "localhost"; //$NON-NLS-1$
+	private static final String SERVICE_PORT = "8080"; //$NON-NLS-1$
+
+	private static final String SERVICE_URL = SERVICE_SCHEME + "://" + SERVICE_HOST + ":" + SERVICE_PORT + "/afirma-signature-storage/StorageService"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	/** Prueba de almac&eacute;n de un texto simple.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // No ejecutamos de forma automatica
 	public void testStoreSimpleText() throws Exception {
 		final UrlHttpManager mgr = UrlHttpManagerFactory.getInstalledManager();
 		byte[] res;
@@ -76,7 +76,10 @@ public final class TestStorageService {
 			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
-		Assert.assertTrue(new String(res).startsWith("ERR-20")); //$NON-NLS-1$
+		Assert.assertTrue(
+			"Se esperaba ERR-20, pero se ha obtenido el codigo : " + new String(res), //$NON-NLS-1$
+			new String(res).startsWith("ERR-20") //$NON-NLS-1$
+		);
 		res = mgr.readUrl(
 			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
 			UrlHttpMethod.GET

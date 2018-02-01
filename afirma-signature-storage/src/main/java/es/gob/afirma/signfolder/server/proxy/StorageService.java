@@ -76,29 +76,46 @@ public final class StorageService extends HttpServlet {
 
 		LOGGER.info(" == INICIO GUARDADO == "); //$NON-NLS-1$
 
-		// Leemos la entrada
-		int n;
-		final byte[] buffer = new byte[1024];
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final ServletInputStream sis = request.getInputStream();
-		while ((n = sis.read(buffer)) > 0) {
-			baos.write(buffer, 0, n);
-		}
-		baos.close();
-		sis.close();
+		final String operation;
+		final String syntaxVersion;
+		final String id;
+		final String data;
 
-		// Separamos los parametros y sus valores
-		final Hashtable<String, String> params = new Hashtable<String, String>();
-		final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
-		for (final String param : urlParams) {
-			final int equalsPos = param.indexOf('=');
-			if (equalsPos != -1) {
-				params.put(param.substring(0, equalsPos), param.substring(equalsPos + 1));
+		if (request.getMethod().equalsIgnoreCase("GET")) { //$NON-NLS-1$
+			operation     = request.getParameter(PARAMETER_NAME_OPERATION);
+			syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
+			id            = request.getParameter(PARAMETER_NAME_ID);
+			data          = request.getParameter(PARAMETER_NAME_DATA);
+		}
+		else {
+
+			// Leemos la entrada
+			int n;
+			final byte[] buffer = new byte[1024];
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			final ServletInputStream sis = request.getInputStream();
+			while ((n = sis.read(buffer)) > 0) {
+				baos.write(buffer, 0, n);
 			}
+			baos.close();
+			sis.close();
+
+			// Separamos los parametros y sus valores
+			final Hashtable<String, String> params = new Hashtable<String, String>();
+			final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
+			for (final String param : urlParams) {
+				final int equalsPos = param.indexOf('=');
+				if (equalsPos != -1) {
+					params.put(param.substring(0, equalsPos), param.substring(equalsPos + 1));
+				}
+			}
+
+			operation     = params.get(PARAMETER_NAME_OPERATION);
+			syntaxVersion = params.get(PARAMETER_NAME_SYNTAX_VERSION);
+			id            = params.get(PARAMETER_NAME_ID);
+			data          = params.get(PARAMETER_NAME_DATA);
 		}
 
-		final String operation = params.get(PARAMETER_NAME_OPERATION);
-		final String syntaxVersion = params.get(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
@@ -118,7 +135,7 @@ public final class StorageService extends HttpServlet {
 		}
 
 		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
-			storeSign(out, params, StorageService.CONFIG);
+			storeSign(out, id, data, StorageService.CONFIG);
 		}
 		else {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
@@ -129,12 +146,14 @@ public final class StorageService extends HttpServlet {
 
 	/** Almacena una firma en servidor.
 	 * @param out Respuesta a la petici&oacute;n.
-	 * @param params Par&aacute;metros de la petici&oacute;n.
+	 * @param id Identificador de los datos a almacenar.
+	 * @param data Datos a almacenar.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
-	private static void storeSign(final PrintWriter out, final Hashtable<String, String> params, final StorageConfig config) throws IOException {
-
-		final String id = params.get(PARAMETER_NAME_ID);
+	private static void storeSign(final PrintWriter out,
+								  final String id,
+								  final String data,
+								  final StorageConfig config) throws IOException {
 		if (id == null) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID));
@@ -143,7 +162,6 @@ public final class StorageService extends HttpServlet {
 
 		LOGGER.info("Se solicita guardar un fichero con el identificador: " + id); //$NON-NLS-1$
 
-		final String data = params.get(PARAMETER_NAME_DATA);
 		String dataText;
 		if (data == null || data.isEmpty()) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA));
