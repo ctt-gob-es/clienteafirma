@@ -83,17 +83,16 @@ final class ConfiguratorFirefoxWindows {
 		// No instanciable
 	}
 
-	/**
-	 * Instala un certificado en el almac&eacute;n de autoridades de confianza de Firefox de
+	/** Instala un certificado en el almac&eacute;n de autoridades de confianza de Firefox de
 	 * todos los perfiles de todos los usuarios del sistema.
 	 * @param appDir Directorio de instalaci&oacute;n.
+	 * @param window Consola de instaci&oacute;n donde escribir los mensajes.
 	 * @throws MozillaProfileNotFoundException Cuando no se encuentran perfiles de usuario en los que
-	 * instalar el certificado.
-	 * @throws IOException Cuando se produce algun error durante la instalaci&oacute;n.
-	 */
-	static void installCACertOnMozillaKeyStores(final File appDir, final Console window) throws MozillaProfileNotFoundException,
-	                                                                      IOException {
-
+	 *                                         instalar el certificado.
+	 * @throws IOException Cuando se produce algun error durante la instalaci&oacute;n. */
+	static void installCACertOnMozillaKeyStores(final File appDir,
+			                                    final Console window) throws MozillaProfileNotFoundException,
+	                                                                         IOException {
 		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
 		if (mozillaProfileDirs == null || mozillaProfileDirs.length == 0) {
 			throw new MozillaProfileNotFoundException("No se han encontrado perfiles de Mozilla en el sistema"); //$NON-NLS-1$
@@ -126,11 +125,9 @@ final class ConfiguratorFirefoxWindows {
 		//removeCertUtilFromDisk(appDir);
 	}
 
-	/**
-	 * Desinstala un certificado de los almac&eacute;nes de autoridades de confianza
+	/** Desinstala un certificado de los almacenes de autoridades de confianza
 	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 */
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n. */
 	static void uninstallRootCAMozillaKeyStore(final File appDir) {
 
 		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
@@ -148,7 +145,8 @@ final class ConfiguratorFirefoxWindows {
 
 		try {
 			checkCertUtil(appDir);
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.warning("No se pudo encontrar certutil en disco o verificar su funcionamiento: " + e); //$NON-NLS-1$
 		}
 
@@ -180,11 +178,9 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	/**
-	 * Instala un certificado de CA en el almacen de un perfil de Mozilla.
+	/** Instala un certificado de CA en el almac&eacute;n de un perfil de Mozilla.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @param profilesDir Directorio del perfil de Mozilla.
-	 */
+	 * @param profilesDir Directorio del perfil de Mozilla. */
 	private static void importCACertOnMozillaKeyStore (final File appDir,
 			                                           final File profilesDir) {
 		boolean installed = false;
@@ -199,20 +195,21 @@ final class ConfiguratorFirefoxWindows {
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.WARNING,
-						"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Firefox: " + e, //$NON-NLS-1$
-						e);
+					"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Firefox: " + e, //$NON-NLS-1$
+					e
+				);
 				final int result = JOptionPane.showConfirmDialog(
-						null,
-						Messages.getString("ConfiguratorWindows.10"), //$NON-NLS-1$
-						Messages.getString("ConfiguratorWindows.1"), //$NON-NLS-1$
-						JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE
-						);
+					null,
+					Messages.getString("ConfiguratorWindows.10"), //$NON-NLS-1$
+					Messages.getString("ConfiguratorWindows.1"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE
+				);
 				if (result == JOptionPane.CANCEL_OPTION) {
 					cancelled = true;
 					LOGGER.warning(
-							"El usuario cancelo la instalacion del certificado SSL para el socket en Firefox: " + e //$NON-NLS-1$
-							);
+						"El usuario cancelo la instalacion del certificado SSL para el socket en Firefox: " + e //$NON-NLS-1$
+					);
 				}
 			}
 		} while (!installed && !cancelled);
@@ -224,8 +221,7 @@ final class ConfiguratorFirefoxWindows {
 	 * @param appDir Directorio en el que se encuentra el certificado a importar.
 	 * @param profileDir Directorio de perfil de Mozilla.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
-	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore.
-	 */
+	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore. */
 	private static void executeCertUtilToImport(final File appDir,
 			                                    final File profileDir)
 			                                    		throws IOException, GeneralSecurityException {
@@ -264,6 +260,7 @@ final class ConfiguratorFirefoxWindows {
 	/** Ejecuta la aplicacion Mozilla CertUtil para eliminar el certificado de confianza ra&iacute;z
 	 * SSL de Firefox.
 	 * @param appDir Directorio padre en el que se encuentra el directorio de certUtil.
+	 * @param profileDir Directorio de perfil de Mozilla.
 	 * @throws IOException Cuando no se encuentra o puede leer alguno de los ficheros necesarios.
 	 * @throws GeneralSecurityException Cuando no se puede ejecutar. */
 	private static void uninstallCACertFromMozillaKeyStore(final File appDir, final File profileDir) throws IOException, GeneralSecurityException {

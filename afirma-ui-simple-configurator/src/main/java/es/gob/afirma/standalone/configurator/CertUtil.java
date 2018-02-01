@@ -59,19 +59,21 @@ import org.spongycastle.operator.OperatorCreationException;
 import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 
-/** Utilidades para la creaci&oacute;n de certificados X.509.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+/** Utilidades para la creaci&oacute;n de certificados X&#46;509.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 final class CertUtil {
 
 	private static final int KEY_SIZE = 2048;
 
 	private static final String PROVIDER = "SC"; //$NON-NLS-1$
 
+	private static final String DEFAULT_LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
 	static final String ROOT_CERTIFICATE_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
 
-	static class CertPack {
+	static final class CertPack {
 
 		private final Certificate sslCert;
 		private final PrivateKey prK;
@@ -118,24 +120,24 @@ final class CertUtil {
 		}
 	}
 
-	/**
-	 * Genera una tupla con un certificado de CA y un certificado SSL emitido por el para la comunicaci&oacute;n con el
-	 * equipo local.
+	/** Genera una tupla con un certificado de CA y un certificado SSL emitido por &eacute;l
+	 * para la comunicaci&oacute;n con el equipo local.
 	 * @param sslCertificateAlias Alias con el que identificar el certificado SSL
-	 * @param storePassword
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateException
-	 * @throws IOException
-	 */
-	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws NoSuchAlgorithmException, CertificateException, IOException {
-
+	 * @param storePassword Contrase&ntilde;a del almac&eacute;n de claves a generar.
+	 * @return Tupla con un certificado de CA y un certificado SSL
+	 * @throws NoSuchAlgorithmException Si no se soporta un algoritmo necesario.
+	 * @throws CertificateException Si no se puede generar el certificado.
+	 * @throws IOException El cualquier otro tipo de problema. */
+	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias,
+			                                   final String storePassword) throws NoSuchAlgorithmException,
+	                                                                              CertificateException,
+	                                                                              IOException {
 		Security.addProvider(new BouncyCastleProvider());
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
-				ROOT_CERTIFICATE_PRINCIPAL
+			ROOT_CERTIFICATE_PRINCIPAL
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			"127.0.0.1", //$NON-NLS-1$
+			DEFAULT_LOCALHOST,
 			caCertificatePrivateKeyEntry
 		);
 		return new CertPack(
@@ -144,17 +146,14 @@ final class CertUtil {
 			sslCertificateAlias,
 			storePassword.toCharArray()
 		);
-
 	}
 
-	/**
-	 * Genera un certificado de CA apto para la emisi&oacute;n de un certificado SSL.
+	/** Genera un certificado de CA apto para la emisi&oacute;n de un certificado SSL.
 	 * @param subjectPrincipal Principal del subject del certificado.
 	 * @return Entrada con el certificado y su conjunto de claves.
 	 * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo de generaci&oacute;n de claves.
 	 * @throws CertificateException Cuando ocurre un error en la codificacion del certificado.
-	 * @throws IOException Cuando ocurre un error al generar el certificado.
-	 */
+	 * @throws IOException Cuando ocurre un error al generar el certificado. */
 	private static PrivateKeyEntry generateCaCertificate(final String subjectPrincipal) throws NoSuchAlgorithmException,
                                                                                                CertificateException,
                                                                                                IOException {
@@ -178,8 +177,9 @@ final class CertUtil {
 		//Se incluyen los atributos del certificado CA
 		DigestCalculator digCalc = null;
 		try {
-			digCalc = new BcDigestCalculatorProvider()
-			        .get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+			digCalc = new BcDigestCalculatorProvider().get(
+				new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1)
+			);
 		}
 		catch (final OperatorCreationException e) {
 			throw new IOException("No se ha podido inicializar el operador de cifrado: " + e, e); //$NON-NLS-1$
@@ -187,11 +187,19 @@ final class CertUtil {
         final X509ExtensionUtils x509ExtensionUtils = new X509ExtensionUtils(digCalc);
 
         final byte[] encoded = keyPair.getPublic().getEncoded();
-        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(encoded));
-		generator.addExtension(Extension.subjectKeyIdentifier, false,
-				x509ExtensionUtils.createSubjectKeyIdentifier(subjectPublicKeyInfo));
-	    generator.addExtension(Extension.basicConstraints, true,
-	            new BasicConstraints(true));
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(
+    		ASN1Sequence.getInstance(encoded)
+		);
+		generator.addExtension(
+			Extension.subjectKeyIdentifier,
+			false,
+			x509ExtensionUtils.createSubjectKeyIdentifier(subjectPublicKeyInfo)
+		);
+	    generator.addExtension(
+    		Extension.basicConstraints,
+    		true,
+	        new BasicConstraints(true)
+        );
 
 	    final KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
 	            | KeyUsage.digitalSignature | KeyUsage.keyEncipherment
@@ -222,7 +230,7 @@ final class CertUtil {
 
         //Definicion de propiedades del certificado
         return new PrivateKeyEntry(
-        		keyPair.getPrivate(),
+    		keyPair.getPrivate(),
 			new Certificate[] {
 				cert
 			}
@@ -231,7 +239,6 @@ final class CertUtil {
 
 	private static PrivateKeyEntry generateSslCertificate(final String cn,
 			                                              final PrivateKeyEntry issuerKeyEntry) {
-
 		// Generamos las claves...
 		X509Certificate cert;
 		KeyPair pair;

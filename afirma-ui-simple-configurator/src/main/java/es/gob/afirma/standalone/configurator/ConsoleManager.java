@@ -34,14 +34,12 @@ final class ConsoleManager {
 	private static final boolean headless = getHeadLess();
 	private static final java.io.Console con = System.console();
 
-	/**
-	 * Recupera una consola para la notificaci&oacute;n del estado del proceso
+	/** Recupera una consola para la notificaci&oacute;n del estado del proceso
 	 * de configuraci&oacute;n. La selecci&oacute;n se realizar&aacute; en base
 	 * al entorno de ejecuci&oacute;n.
 	 * @param cl Escuchador que reaccionar&aacute; ante los mensajes de la consola.
-	 * Si se indica {@code null} se usar&aacute; un consola sin entorno gr&aacute;fico.
-	 * @return
-	 */
+	 *           Si se indica {@code null} se usar&aacute; un consola sin entorno gr&aacute;fico.
+	 * @return Cconsola para la notificaci&oacute;n del estado del proceso. */
 	static Console getConsole(final ConsoleListener cl) {
 		if (headless || cl == null) {
 			if (con != null) {

@@ -207,6 +207,7 @@ final class ConfiguratorFirefoxMac {
 
 	/** Obtiene una referencia a una instancia de CertUtil v&aacute;lida para su ejecuci&oacute;n.
 	 * @param appDir Ruta del ejecutable CertUtil.
+	 * @param scriptFile <i>Script</i> para exportar el <code>LD_LIBRARY_PATH</code>.
 	 * @return certutilFile Fichero ejecutable CertUtil.
 	 * @throws IOException Se lanza cuando CertUtil no existe o no se puede ejecutar. */
 	private static File prepareCertUtil(final File appDir, final File scriptFile) throws IOException {
@@ -245,12 +246,10 @@ final class ConfiguratorFirefoxMac {
 		return certutilFile;
 	}
 
-	/**
-	 * Obtiene los directorios de perfil de Mozilla del sistema.
+	/** Obtiene los directorios de perfil de Mozilla del sistema.
 	 * @param userDirs Directorios de los usuarios de los que obtener los perfiles.
 	 * @return Listado de directorios de perfil.
-	 * @throws MozillaProfileNotFoundException Cuando no se encuentran directorios de perfil.
-	 */
+	 * @throws MozillaProfileNotFoundException Cuando no se encuentran directorios de perfil. */
 	private static File[] getMozillaUsersProfiles(final String[] userDirs) throws MozillaProfileNotFoundException {
 
 		// Obtenemos el listado de ficheros "profiles.ini"
