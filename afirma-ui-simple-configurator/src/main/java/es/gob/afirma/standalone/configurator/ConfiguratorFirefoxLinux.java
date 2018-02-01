@@ -255,11 +255,10 @@ final class ConfiguratorFirefoxLinux {
 		}
 	}
 
-	/** Escribe en disco los scripts de instalaci&oacute;n y desinstalaci&oacute;n para un almac&eacute;n
-	 * de claves a partir del comando de instalaci&oacute;n.
+	/** Escribe en disco los <i>scripts</i> de instalaci&oacute;n y desinstalaci&oacute;n para
+	 * un almac&eacute;n de claves a partir del comando de instalaci&oacute;n.
+	 * @param scriptFile Fichero donde guardar los <i>script</i>.
 	 * @param commands Comando para la instalaci&oacute;n del certificado en un almac&eacute;n.
-	 * @param profileReference Referencia al perfil de Mozilla.
-	 * @param certDir Directorio en el que se encuentra el certificado.
 	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
 	private static void createScript(final String[] commands, final File scriptFile)
 			throws IOException {
@@ -270,10 +269,10 @@ final class ConfiguratorFirefoxLinux {
 		ConfiguratorUtil.writeScript(script, scriptFile);
 	}
 
-	/** Obtiene todos los perfiles de Mozilla para los usuarios indicado
+	/** Obtiene todos los perfiles de Mozilla para los usuarios indicado.
 	 * @param userDirs Directorios de usuario.
 	 * @return Listado de directorios de perfil de Mozilla. */
-	private static List<File> getProfiles(final String[] userDirs){
+	private static List<File> getProfiles(final String[] userDirs) {
 
 		final List <File> mozillaProfilesIniPaths = getMozillaProfilesIniPaths(userDirs);
 		if (mozillaProfilesIniPaths == null || mozillaProfilesIniPaths.isEmpty()) {
@@ -326,19 +325,17 @@ final class ConfiguratorFirefoxLinux {
 		return profilesIniFiles;
 	}
 
-	/** Comprueba si certutil existe y si puede ejecutarse.
+	/** Comprueba si <code>CertUtil</code> existe y si puede ejecutarse.
+	 * @param certutil <code>CertUtil</code> a comprobar.
 	 * @throws IOException Cuando hay un problema con el ejecutable CertUtil. */
 	private static void checkCertUtil(final String certutil) throws IOException {
-
 		new ProcessBuilder(certutil).start();
 	}
 
-	/**
-	 * Escapa una ruta de fichero para poder utilizarla como parte de un
+	/** <i>Escapa</i> una ruta de fichero para poder utilizarla como parte de un
 	 * comando de consola.
-	 * @param path Ruta a escapar.
-	 * @return Ruta escapada.
-	 */
+	 * @param path Ruta a <i>escapar</i>.
+	 * @return Ruta <i>escapada</i>. */
 	private static String escapePath(final String path) {
 		if (path == null) {
 			throw new IllegalArgumentException(

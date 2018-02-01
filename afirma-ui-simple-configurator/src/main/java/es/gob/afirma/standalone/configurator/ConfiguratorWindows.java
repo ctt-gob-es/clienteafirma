@@ -106,9 +106,10 @@ final class ConfiguratorWindows implements Configurator {
 		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
 	}
 
-	/**
-	 * Recupera el directorio de la aplicaci&oacute;n, que podr&aacute; variar
+	/** Recupera el directorio de la aplicaci&oacute;n, que podr&aacute; variar
 	 * seg&uacute;n si est&aacute; instalada o si se trata de un despliegue JNLP.
+	 * @param jnlpDeployment <code>true</code> si se trata de un despliegue JNLP,
+	 *                       <code>false</code> en caso contrario.
 	 * @return Directorio en el que se almacenan los recursos de la aplicaci&oacute;n.
 	 */
 	private static File getApplicationDirectory(final boolean jnlpDeployment) {
@@ -133,7 +134,8 @@ final class ConfiguratorWindows implements Configurator {
 	 * el directorio indicado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
-	private static boolean checkSSLKeyStoreGenerated(final File appDir, final boolean jnlpDeployment) {
+	private static boolean checkSSLKeyStoreGenerated(final File appDir,
+			                                         final boolean jnlpDeployment) {
 
 		/*
 		// En caso de tratarse de un despliegue JNLP, probamos primeramente

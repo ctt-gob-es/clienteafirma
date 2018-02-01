@@ -216,15 +216,15 @@ final class ConfiguratorMacOSX implements Configurator {
 		final String[] userHomes = getSystemUsersHomes();
 		try {
 			ConfiguratorFirefoxMac.createScriptToInstallOnMozillaKeyStore(appDir, userHomes, new File(mac_script_path));
-
 			LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
 			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
 		}
 		catch (final MozillaProfileNotFoundException e) {
+			LOGGER.severe("Perfil de Mozilla no encontrado: " + e); //$NON-NLS-1$
 			console.print(Messages.getString("ConfiguratorMacOSX.12")); //$NON-NLS-1$
 		}
 		catch (final AOException e1) {
-			LOGGER.info("La configuracion de NSS para Mac OS X ha fallado: " + e1); //$NON-NLS-1$
+			LOGGER.severe("La configuracion de NSS para Mac OS X ha fallado: " + e1); //$NON-NLS-1$
 		}
 		finally {
 			if (sslCerFile != null) {
@@ -271,9 +271,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		final String cmdKs = OSX_SEC_KS_CERT_COMMAND.replace(
 			"%KEYCHAIN%", //$NON-NLS-1$
 			KEYCHAIN_PATH
-			).replace(
-				"%CERT%", //$NON-NLS-1$
-				sslCerFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
+		).replace(
+			"%CERT%", //$NON-NLS-1$
+			sslCerFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
 		);
 		LOGGER.info("Comando de instalacion del certificado SSL en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
 		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(cmdKs), mac_script_path, true);
@@ -305,10 +305,11 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		LOGGER.info("Desinstalacion del certificado raiz de los almacenes de MacOSX"); //$NON-NLS-1$
 
-		File resourcesDir;
+		final File resourcesDir;
 		try {
 			resourcesDir = getResourcesDirectory();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "No se pudo obtener el directorio de recursos de la aplicacion", e); //$NON-NLS-1$
 			return;
 		}
@@ -316,10 +317,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		uninstallProcess(resourcesDir);
 	}
 
-	/**
-	 * Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
+	/** Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
 	 * de confianza SSL de los almacenes del sistema.
-	 */
+	 * @param appDir Directorio de instalaci&oacute;n. */
 	private static void uninstallProcess(final File appDir) {
 		try {
 			uninstallRootCAMacOSXKeyStore();
@@ -340,11 +340,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	/**
-	 * Genera el script de desinstalaci&oacute;n del llavero OS X mediante AppleScript del certificado generado
-	 * y elimina los links simb&oacute;licos.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
-	 */
+	/** Genera el <i>script</i> de desinstalaci&oacute;n del llavero macOS mediante AppleScript
+	 * del certificado generado y elimina los links simb&oacute;licos.
+	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	private static void uninstallRootCAMacOSXKeyStore() throws IOException {
 		LOGGER.info("Desinstalamos los certificados y eliminamos los enlaces simbolicos"); //$NON-NLS-1$
 		// Creamos comandos para eliminar enlaces simbolicos de firefox y certificados del llavero
@@ -500,10 +498,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	/**
-	 * Detecta si el proceso de Firefox est&aacute; abierto.
-	 * @return
-	 */
+	/** Detecta si el proceso de Firefox est&aacute; abierto.
+	 * @return <code>true</code> si el proceso de Firefox est&aacute; abierto,
+	 *         <code>false</code> en caso contrario. */
 	private static boolean isFirefoxOpen() {
 
 		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa de Firefox
@@ -544,12 +541,10 @@ final class ConfiguratorMacOSX implements Configurator {
 		return new File(appDir, TRUST_SETTINGS_FILE).exists();
 	}
 
-	/**
-	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
+	/** Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
 	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
-	 * @throws IOException
-	 */
+	 * @throws IOException En cualquier error. */
 	private static void deleteTrustTemplate(final File appDir) throws IOException {
 
 		if (checkTrutsTemplateInstalled(appDir)) {
@@ -564,19 +559,20 @@ final class ConfiguratorMacOSX implements Configurator {
 
 	}
 
-	/**
-     * Copia un recurso desde dentro del jar hacia una ruta externa
-     *
-     * @param pathToResource Carpeta del recurso dentro del jar
-     * @param resourceName Nombre del recurso a copiar
-     * @param destinationPath Ruta externa destino
-     * @return Ruta completa del recurso copiado
-     * @throws Exception
-     */
-    private static String exportResource(final String pathToResource, final String resourceName, final String destinationPath) throws Exception {
+	/** Copia un recurso desde dentro del JAR hacia una ruta externa.
+     * @param pathToResource Carpeta del recurso dentro del JAR.
+     * @param resourceName Nombre del recurso a copiar.
+     * @param destinationPath Ruta externa destino.
+     * @return Ruta completa del recurso copiado.
+     * @throws IOException En cualquier error. */
+    private static String exportResource(final String pathToResource,
+    		                             final String resourceName,
+    		                             final String destinationPath) throws IOException {
 
     	final File outFile = new File(destinationPath + resourceName);
-        try (final InputStream stream = ConfiguratorMacOSX.class.getResourceAsStream(pathToResource + resourceName);) {
+        try (
+    		final InputStream stream = ConfiguratorMacOSX.class.getResourceAsStream(pathToResource + resourceName);
+		) {
 
             if (stream == null) {
                 throw new IOException("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar."); //$NON-NLS-1$ //$NON-NLS-2$
@@ -592,8 +588,6 @@ final class ConfiguratorMacOSX implements Configurator {
             		resStreamOut.write(buffer, 0, readBytes);
             	}
             }
-        } catch (final Exception ex) {
-            throw ex;
         }
 
         return outFile.getAbsolutePath();
@@ -636,10 +630,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		return userDirs;
 	}
 
-	/**
-	 * Crea un fichero de script para la obtenci&oacute;n de los usuarios del sistema.
-	 * @throws IOException Cuando no se pueda crear el fichero de script.
-	 */
+	/** Crea un fichero de <i>script</i> para la obtenci&oacute;n de los usuarios del sistema.
+	 * @return <i>Script</i> para la obtenci&oacute;n de los usuarios del sistema.
+	 * @throws IOException Cuando no se pueda crear el fichero de <i>script</i>. */
 	private static File createGetUsersScript() throws IOException {
 		final StringBuilder script = new StringBuilder(GET_USERS_COMMAND);
 		final File scriptFile = File.createTempFile(GET_USER_SCRIPTS_NAME, SCRIPT_EXT);
@@ -653,11 +646,11 @@ final class ConfiguratorMacOSX implements Configurator {
 		return scriptFile;
 	}
 
-	/** Genera los scripts que registran el esquema "afirma" como un
+	/** Genera los <i>scripts</i> que registran el esquema "afirma" como un
 	 * protocolo de confiable en Chrome.
 	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @throws IOException */
+	 * @throws IOException En cualquier error. */
 	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir, final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
@@ -742,9 +735,12 @@ final class ConfiguratorMacOSX implements Configurator {
 		return ifStatement;
 	}
 
-	/** Genera los scripts para reemplazar el fichero original por el temporal con el que se estaba trabajando.
+	/** Genera los <i>scripts</i> para reemplazar el fichero original por el temporal con
+	 * el que se estaba trabajando.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para reemplazar el fichero original por el temporal con
+	 *         el que se estaba trabajando. */
 	private static String[] copyConfigurationFile(final String userDir, final String browserPath) {
 		// Comando para sobreescribir el fichero de configuracion
 		final String[] commandCopy = new String[] {
@@ -756,10 +752,10 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandCopy;
 	}
 
-
-	/** Genera los scripts para eliminar el protocolo afirma.
+	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>. */
 	private static String[] deleteProtocolInPreferencesFile1(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -773,10 +769,12 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandInstall1;
 	}
 
-	/** Genera los scripts para eliminar el protocolo afirma.
+	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
-	private static String[] deleteProtocolInPreferencesFile2(final String userDir, final String browserPath) {
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>. */
+	private static String[] deleteProtocolInPreferencesFile2(final String userDir,
+			                                                 final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
 		final String[] commandInstall1 = new String[] {
@@ -787,9 +785,10 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandInstall1;
 	}
 
-	/** Genera los scripts para eliminar el protocolo afirma.
+	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>.*/
 	private static String[] addProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -802,9 +801,10 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandInstall1;
 	}
 
-	/** Genera los scripts para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
+	/** Genera los <i>scripts</i> para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para eliminar la coma en caso de que sea el unico protocolo definido en el fichero. */
 	private static String[] correctProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
 		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
@@ -818,11 +818,9 @@ final class ConfiguratorMacOSX implements Configurator {
 	}
 
 
-	/**
-	 * Escapa rutas de fichero para poder usarlas como parte de un script.
+	/** <i>Escapa</i> rutas de fichero para poder usarlas como parte de un <i>script</i>.
 	 * @param path Ruta de fichero.
-	 * @return Ruta escapada.
-	 */
+	 * @return Ruta <i>escapada</i>. */
 	private static String escapePath(final String path) {
 		if (path == null) {
 			throw new IllegalArgumentException(

@@ -73,22 +73,30 @@ final class ConfiguratorLinux implements Configurator {
 
            //Generacion del certificado pfx
             ConfiguratorUtil.installFile(
-            		certPack.getPkcs12(),
-            		new File(appDir, KS_FILENAME));
+        		certPack.getPkcs12(),
+        		new File(appDir, KS_FILENAME)
+    		);
 
-          //Generacion del certificado raiz .cer
+            //Generacion del certificado raiz .cer
             ConfiguratorUtil.installFile(
-            		certPack.getCaCertificate().getEncoded(),
-            		new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
+        		certPack.getCaCertificate().getEncoded(),
+        		new File(appDir, FILE_AUTOFIRMA_CERTIFICATE)
+    		);
 
             try {
                 LOGGER.info(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
-                ConfiguratorFirefoxLinux.createScriptsToSystemKeyStore(appDir, usersDirs,
-                		new File(appDir, ConfiguratorLinux.INSTALL_SCRIPT_NAME),
-                		new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME));
-                ConfiguratorFirefoxLinux.createScriptsToMozillaKeyStore(appDir, usersDirs,
-                		new File(appDir, ConfiguratorLinux.INSTALL_SCRIPT_NAME),
-                		new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME));
+                ConfiguratorFirefoxLinux.createScriptsToSystemKeyStore(
+            		appDir,
+            		usersDirs,
+            		new File(appDir, ConfiguratorLinux.INSTALL_SCRIPT_NAME),
+            		new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME)
+        		);
+                ConfiguratorFirefoxLinux.createScriptsToMozillaKeyStore(
+            		appDir,
+            		usersDirs,
+                	new File(appDir, ConfiguratorLinux.INSTALL_SCRIPT_NAME),
+                	new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME)
+            	);
               }
             catch(final MozillaProfileNotFoundException e) {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.12")); //$NON-NLS-1$
@@ -125,13 +133,11 @@ final class ConfiguratorLinux implements Configurator {
 		return ConfiguratorUtil.getApplicationDirectory();
 	}
 
-	/**
-	 * Obtiene un directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
+	/** Obtiene un directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
 	 * @return Directorio de aplicaci&oacute;n.
-	 * @throws IOException
-	 */
+	 * @throws IOException EN cualquier error. */
 	private static File getIntApplicationDirectory() throws IOException {
-		String userHome = null;
+		final String userHome;
 		try {
 			userHome = System.getProperty("user.home"); //$NON-NLS-1$
 		}
@@ -141,7 +147,6 @@ final class ConfiguratorLinux implements Configurator {
 		if (userHome == null) {
 			throw new IOException("No se encuentra definido el directorio del usuario"); //$NON-NLS-1$
 		}
-
 		final File appDir = new File(userHome, ALTERNATIVE_APP_SUBDIR);
 		if (!appDir.isDirectory() && !appDir.mkdirs()) {
 			throw new IOException("No ha podido crearse el directorio para los ficheros de aplicacion"); //$NON-NLS-1$
@@ -190,13 +195,11 @@ final class ConfiguratorLinux implements Configurator {
 		}
 	}
 
-    /** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome.
+    /** Genera el <i>script</i> que elimina la advertencia al ejecutar AutoFirma desde Chrome.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
-	 * @param targetDir Directorio de instalaci&oacute;n del sistema
-	 *  <ul>
-	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	 * </ul>
-	 */
+	 * @param targetDir Directorio de instalaci&oacute;n del sistema.
+     *                  En LINUX contiene el contenido del script a ejecutar.
+     * @param usersDirs Lista de directorios de los usuarios del sistema. */
 	private static void createScriptsRemoveChromeWarnings(final File targetDir, final String[] usersDirs) {
 		for (final String userDir : usersDirs) {
 
@@ -247,13 +250,13 @@ final class ConfiguratorLinux implements Configurator {
 	}
 
 	/** Genera los comandos que desregistran el esquema "afirma" como un
-	 * protocolo de confiable en Chrome.
+	 * protocolo de confianza en Chrome.
 	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @throws IOException */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(final File appDir, final String userDir) throws IOException {
-
+	 * @return Lista de comandos que desregistran el esquema "afirma" en Chrome.
+	 * @throws IOException En cualquier error. */
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(final File appDir,
+			                                                                                   final String userDir) throws IOException {
 		final ArrayList<String[]> commandList = new ArrayList<>();
 
 		// Final del if
@@ -331,9 +334,10 @@ final class ConfiguratorLinux implements Configurator {
 	 * protocolo de confiable en Chrome.
 	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @return Lista de comandos que desregistran el esquema "afirma" en Chrome.
 	 * @throws IOException Cuando se produce un error de entrada/salida. */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir, final String userDir) throws IOException {
-
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir,
+			                                                                                 final String userDir) throws IOException {
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
 		final String[] endIfStatement = new String[] {
@@ -440,15 +444,16 @@ final class ConfiguratorLinux implements Configurator {
 
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return Scripts para confirmar si existen protocolos definidos en el fichero. */
 	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba
 		final String[] ifStatement = new String[] {
-				"if ! ", //$NON-NLS-1$
-				"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
-				escapePath(userDir + browserPath),
-				"; then", //$NON-NLS-1$
+			"if ! ", //$NON-NLS-1$
+			"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
+			escapePath(userDir + browserPath),
+			"; then", //$NON-NLS-1$
 		};
 		return ifStatement;
 	}
@@ -514,11 +519,13 @@ final class ConfiguratorLinux implements Configurator {
 	}
 
 
-	/** Genera los scripts para eliminar el protocolo afirma del fichero.
+	/** Genera los <i>scripts</i> para eliminar el protocolo afirma del fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile1(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
+	 * @param commandList lista donde a&ntilde;adir los comandos del <i>script</i>. */
+	private static void removeProtocolInPreferencesFile1(final String userDir,
+			                                             final String browserPath,
+			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall1 = new String[] {
@@ -530,7 +537,6 @@ final class ConfiguratorLinux implements Configurator {
 		};
 
 		commandList.add(commandUninstall1);
-
 	}
 
 	/** Genera los scripts para eliminar el protocolo afirma del fichero.
