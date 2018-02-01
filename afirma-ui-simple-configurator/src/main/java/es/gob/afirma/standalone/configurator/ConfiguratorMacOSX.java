@@ -116,14 +116,14 @@ final class ConfiguratorMacOSX implements Configurator {
 		return new File(appDir, KS_FILENAME).exists();
 	}
 
-	 /** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome.
-	  * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
-	  * @param targetDir Directorio de instalaci&oacute;n del sistema
-	  *  <ul>
-	  * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	  * </ul>
-	  */
-	private static void createScriptsRemoveChromeWarnings(final File targetDir, final String[] usersDirs) {
+	 /** Genera el <i>script</i> que elimina el warning al ejecutar AutoFirma desde Chrome.
+	  * En linux genera el <i>script</i> que hay que ejecutar para realizar la
+	  * instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+	  * @param targetDir Directorio de instalaci&oacute;n del sistema.
+	  *        En LINUX contiene el contenido del script a ejecutar.
+	  * @param usersDirs Directorios de los usuarios del sistema. */
+	private static void createScriptsRemoveChromeWarnings(final File targetDir,
+			                                              final String[] usersDirs) {
 		for (final String userDir : usersDirs) {
 
 			// Generamos el script de instalacion
@@ -152,13 +152,15 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	/**
-	 * Genera e instala los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
+	/** Genera e instala los certificados SSL para la comunicaci&oacute;n con la
+	 * aplicaci&oacute;n.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param console Consola sobre la que escribir los mensajes de instalaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en el proceso de instalaci&oacute;n.
-	 * @throws GeneralSecurityException Cuando ocurre un error al generar el certificado SSL.
-	 */
-	private static void configureSSL(final File appDir, final Console console) throws IOException, GeneralSecurityException {
+	 * @throws GeneralSecurityException Cuando ocurre un error al generar el certificado SSL. */
+	private static void configureSSL(final File appDir,
+			                         final Console console) throws IOException,
+	                                                               GeneralSecurityException {
 		console.print(Messages.getString("ConfiguratorMacOSX.5")); //$NON-NLS-1$
 
 		// Generamos un fichero que utilizaremos para guardar y ejecutar AppleScripts
@@ -233,10 +235,13 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
+	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de Apple en
+	 * el <i>script</i> de instalaci&oacute;n.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException, IOException {
+	 * @throws IOException Cuando hay un error en la creaci&oacute;n del fichero. */
+	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException,
+	                                                                                 IOException {
 
 		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
 		final File certFile = new File(appDir, MACOSX_CERTIFICATE);
@@ -541,7 +546,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		return new File(appDir, TRUST_SETTINGS_FILE).exists();
 	}
 
-	/** Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
+	/** Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
 	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
 	 * @throws IOException En cualquier error. */
@@ -650,8 +655,11 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * protocolo de confiable en Chrome.
 	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @return <i>Scripts</i> que registran el esquema "afirma" como un
+	 * protocolo de confiable en Chrome.
 	 * @throws IOException En cualquier error. */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir, final String userDir) throws IOException {
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir,
+			                                                                                 final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
@@ -720,9 +728,10 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandList;
 	}
 
-	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero.
+	/** Genera los <i>scripts</i> para confirmar si existen protocolos definidos en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para confirmar si existen protocolos definidos en el fichero.*/
 	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba

@@ -458,9 +458,10 @@ final class ConfiguratorLinux implements Configurator {
 		return ifStatement;
 	}
 
-	/** Genera los scripts para confirmar si existe el fichero con el que se va a trabajar.
+	/** Genera los <i>scripts</i> para confirmar si existe el fichero con el que se va a trabajar.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para confirmar si existe el fichero con el que se va a trabajar. */
 	private static String[] getIfFileFoundCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba
@@ -472,23 +473,25 @@ final class ConfiguratorLinux implements Configurator {
 		return ifStatement;
 	}
 
-	/** Genera los scripts para reemplazar el fichero original por el temporal con el que se estaba trabajando.
+	/** Genera los <i>scripts</i> para reemplazar el fichero original por el temporal
+	 * con el que se estaba trabajando.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para reemplazar el fichero original por el temporal
+	 *         con el que se estaba trabajando. */
 	private static String[] copyConfigurationFile(final String userDir, final String browserPath) {
 		// Comando para sobreescribir el fichero de configuracion
-		final String[] commandCopy = new String[] {
+		return new String[] {
 				"\\cp", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 		};
-
-		return commandCopy;
 	}
 
-	/** Genera los scripts para eliminar el protocolo afirma.
+	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>scripts</i> para eliminar el protocolo <code>afirma</code> en Chrome. */
 	private static String[] addProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
 		// Comando para agregar la confianza del esquema 'afirma' en Chrome
@@ -503,9 +506,12 @@ final class ConfiguratorLinux implements Configurator {
 		return commandInstall1;
 	}
 
-	/** Genera los scripts para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
+	/** Genera los <i>scripts</i> para eliminar la coma en caso de que sea el
+	 * &uacute;nico protocolo definido en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+	 * @return <i>Scripts</i> para eliminar la coma en caso de que sea el
+	 * &uacute;nico protocolo definido en el fichero. */
 	private static String[] correctProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
 		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
@@ -539,11 +545,14 @@ final class ConfiguratorLinux implements Configurator {
 		commandList.add(commandUninstall1);
 	}
 
-	/** Genera los scripts para eliminar el protocolo afirma del fichero.
+	/** Genera los <i>scripts</i> para eliminar el protocolo
+	 * <code>afirma</code> del fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile2(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
+	 * @param commandList lista donde a&ntilde;adir los comandos del <i>script</i>. */
+	private static void removeProtocolInPreferencesFile2(final String userDir,
+			                                             final String browserPath,
+			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall2 = new String[] {
@@ -551,16 +560,17 @@ final class ConfiguratorLinux implements Configurator {
 				"'s/\\\"afirma\\\":false//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-
 		commandList.add(commandUninstall2);
-
 	}
 
-	/** Genera los scripts para eliminar la sintaxis que define los protocolos de confianza si no existe ninguno.
+	/** Genera los <i>scripts</i> para eliminar la sintaxis que define los protocolos
+	 * de confianza si no existe ninguno.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile3(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
+	 * @param commandList lista donde a&ntilde;adir los comandos del <i>script</i>. */
+	private static void removeProtocolInPreferencesFile3(final String userDir,
+			                                             final String browserPath,
+			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall3 = new String[] {
@@ -568,16 +578,12 @@ final class ConfiguratorLinux implements Configurator {
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{}},//g'", //$NON-NLS-1$ Se elimina la lista vacia de protocolos
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-
 		commandList.add(commandUninstall3);
-
 	}
 
-	/**
-	 * Escapa rutas de fichero para poder usarlas como parte de un script.
+	/** <i>Escapa</i> rutas de fichero para poder usarlas como parte de un <i>script</i>.
 	 * @param path Ruta de fichero.
-	 * @return Ruta escapada.
-	 */
+	 * @return Ruta <i>escapada</i>. */
 	private static String escapePath(final String path) {
 		if (path == null) {
 			throw new IllegalArgumentException(
