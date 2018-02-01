@@ -43,8 +43,8 @@ final class ErrorManager {
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
-		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado c\u00F3ndigo de operaci\u00F3n"); //$NON-NLS-1$
-		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3ndigo de operaci\u00F3n no soportado"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_OPERATION_NAME, "No se ha indicado c\u00F3digo de operaci\u00F3n"); //$NON-NLS-1$
+		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3digo de operaci\u00F3n no soportado"); //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_DATA, "No se han proporcionado los datos de la operaci\u00F3n"); //$NON-NLS-1$
 		ERRORS.put(ERROR_BAD_XML, "Se ha recibido un XML mal formado"); //$NON-NLS-1$
 		ERRORS.put(ERROR_BAD_CERTIFICATE, "Se ha recibido un certificado corrupto"); //$NON-NLS-1$

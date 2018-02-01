@@ -1,6 +1,7 @@
 package test.es.gob.afirma.signfolder.server.proxy;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.http.HttpError;
@@ -22,6 +23,7 @@ public final class TestStorageService {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // No ejecutamos de forma automatica
 	public void testStoreSimpleText() throws Exception {
 		final UrlHttpManager mgr = UrlHttpManagerFactory.getInstalledManager();
 		byte[] res;
