@@ -218,7 +218,7 @@ final class ProtocolInvocationLauncherBatch {
 				IntermediateServerUtil.sendData(batchResult, options.getStorageServletUrl().toString(), options.getId());
 			}
 			catch (final Exception e) {
-				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
 				if (!bySocket){
 					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_11);

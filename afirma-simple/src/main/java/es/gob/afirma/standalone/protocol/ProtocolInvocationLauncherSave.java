@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -73,7 +74,7 @@ final class ProtocolInvocationLauncherSave {
 				IntermediateServerUtil.sendData(RESULT_OK, options.getStorageServletUrl().toString(), options.getId());
 			}
 			catch (final Exception e) {
-				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
 			}
