@@ -12,7 +12,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 
 /** Pruebas de las utilidades de certificados.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestCertUtil {
 
 	/** para pruebas sin JUnit.
@@ -28,13 +28,15 @@ public final class TestCertUtil {
 	@Test
 	@Ignore
 	public void testSslpkcs12Generation() throws Exception {
-		final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
-            "AutoFirma", //$NON-NLS-1$
-            "12341234" //$NON-NLS-1$
+		final CertPack certPack = CertUtil.getCertPackForHostSsl(
+            "tomcat",          // Alias del certificado SSL //$NON-NLS-1$
+            "12341234",        // Contrasena del PKCS#12 //$NON-NLS-1$
+            "34.251.104.141",  // IP del host SSL //$NON-NLS-1$
+            "cn=ca-clavefirma" // Nombre de la CA SSL //$NON-NLS-1$
         );
 		final byte[] p12Bytes = certPack.getPkcs12();
 		try (
-			OutputStream fos = new FileOutputStream(
+			final OutputStream fos = new FileOutputStream(
 				File.createTempFile("PKCS12_SSL_", ".P12") //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		) {
@@ -43,7 +45,7 @@ public final class TestCertUtil {
 		}
 		final byte[] caCert = certPack.getCaCertificate().getEncoded();
 		try (
-			OutputStream fos = new FileOutputStream(
+			final OutputStream fos = new FileOutputStream(
 				File.createTempFile("CA_SSL_", ".cer") //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		) {
@@ -65,12 +67,14 @@ public final class TestCertUtil {
 		System.out.println(AOUtil.hexify(cp.getPkcs12(), true));
 
 		try (
-			OutputStream fos = new FileOutputStream(File.createTempFile("SSLCERT_", ".cer")) //$NON-NLS-1$ //$NON-NLS-2$
+			final OutputStream fos = new FileOutputStream(File.createTempFile("SSLCERT_", ".cer")) //$NON-NLS-1$ //$NON-NLS-2$
 		) {
 			fos.write(cp.getSslCertificate().getEncoded());
 		}
 
-		try ( OutputStream fos = new FileOutputStream(File.createTempFile("CACERT_", ".cer")) ) { //$NON-NLS-1$ //$NON-NLS-2$
+		try (
+			final OutputStream fos = new FileOutputStream(File.createTempFile("CACERT_", ".cer")) //$NON-NLS-1$ //$NON-NLS-2$
+		) {
 			fos.write(cp.getCaCertificate().getEncoded());
 		}
 	}
