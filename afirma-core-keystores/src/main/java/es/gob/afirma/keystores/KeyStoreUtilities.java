@@ -55,11 +55,11 @@ public final class KeyStoreUtilities {
 	 * si se desea <b>no</b> usar el controlador Java de tarjetas FNMT CERES interno del programa. */
 	public static final String DISABLE_CERES_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver"; //$NON-NLS-1$
 
-	private static final String DISABLE_GYDSC_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_GYDSC_NATIVE_DRIVER"; //$NON-NLS-1$
+	private static final String ENABLE_GYDSC_NATIVE_DRIVER_ENV = "AFIRMA_NSS_ENABLE_GYDSC_NATIVE_DRIVER"; //$NON-NLS-1$
 
 	/** Nombre de la propiedad Java (a nivel de JVM) que debe establecerse a <code>true</code>
 	 * si se desea <b>no</b> usar el controlador Java de tarjetas G&amp;D SmartCafe interno del programa. */
-	public static final String DISABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableGYDSCNativeDriver"; //$NON-NLS-1$
+	public static final String ENABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.enableGYDSCNativeDriver"; //$NON-NLS-1$
 
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
@@ -347,7 +347,7 @@ public final class KeyStoreUtilities {
 				throw e;
 			}
 			catch (final Exception e) {
-				LOGGER.info("No se ha encontrado una tarjeta CERES 430: " + e); //$NON-NLS-1$
+				LOGGER.info("No se ha encontrado una tarjeta CERES 4.30 o superior: " + e); //$NON-NLS-1$
 			}
 
 			// Otras tarjetas CERES
@@ -363,12 +363,12 @@ public final class KeyStoreUtilities {
 			}
 		}
 
-		// Anadimos el controlador Java de G&D SmartCafe SIEMPRE a menos que el sistema sea Linux o
-		// se indique lo contrario mediante una variable de entorno de sistema operativo o
+		// Anadimos el controlador Java de G&D SmartCafe SOLO si se ha indicado asi
+		// mediante una variable de entorno de sistema operativo o
 		// una propiedad Java
 		if (
-			!Boolean.getBoolean(DISABLE_GYDSC_NATIVE_DRIVER) &&
-			!Boolean.parseBoolean(System.getenv(DISABLE_GYDSC_NATIVE_DRIVER_ENV))
+			Boolean.getBoolean(ENABLE_GYDSC_NATIVE_DRIVER) ||
+			Boolean.parseBoolean(System.getenv(ENABLE_GYDSC_NATIVE_DRIVER_ENV))
 		) {
 			try {
 				aksm.addKeyStoreManager(getSmartCafeKeyStoreManager(parentComponent));
