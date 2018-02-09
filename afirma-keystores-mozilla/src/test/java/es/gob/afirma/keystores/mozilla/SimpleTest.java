@@ -49,8 +49,8 @@ public final class SimpleTest {
 			"true" //$NON-NLS-1$
 		);
     	System.setProperty(
-			KeyStoreUtilities.DISABLE_GYDSC_NATIVE_DRIVER,
-			"true" //$NON-NLS-1$
+			KeyStoreUtilities.ENABLE_GYDSC_NATIVE_DRIVER,
+			"false" //$NON-NLS-1$
 		);
 
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
