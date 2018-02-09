@@ -167,7 +167,6 @@ public final class MozillaKeyStoreUtilities {
 			.append("\""); //$NON-NLS-1$
 
 		return buffer.toString();
-
 	}
 
 	static String getNssPathFromCompatibilityFile() throws IOException {
@@ -403,19 +402,19 @@ public final class MozillaKeyStoreUtilities {
 		// /lib, que se da en Fedora
 		if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
 			dependList = new String[] {
-				"/lib/libmozglue.so", //$NON-NLS-1$
-				"/usr/lib/libmozglue.so", //$NON-NLS-1$
-				LIB_NSPR4_SO,
-				"/lib/libplds4.so", //$NON-NLS-1$
-				"/usr/lib/libplds4.so", //$NON-NLS-1$
-				"/lib/libplc4.so", //$NON-NLS-1$
-				"/usr/lib/libplc4.so", //$NON-NLS-1$
-				"/lib/libnssutil3.so", //$NON-NLS-1$
-				"/usr/lib/libnssutil3.so", //$NON-NLS-1$
-				"/lib/libsqlite3.so", //$NON-NLS-1$
-				"/usr/lib/libsqlite3.so", //$NON-NLS-1$
-				"/lib/libmozsqlite3.so", //$NON-NLS-1$
-				"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
+					"/lib/libmozglue.so", //$NON-NLS-1$
+					"/usr/lib/libmozglue.so", //$NON-NLS-1$
+					LIB_NSPR4_SO,
+					"/lib/libplds4.so", //$NON-NLS-1$
+					"/usr/lib/libplds4.so", //$NON-NLS-1$
+					"/lib/libplc4.so", //$NON-NLS-1$
+					"/usr/lib/libplc4.so", //$NON-NLS-1$
+					"/lib/libnssutil3.so", //$NON-NLS-1$
+					"/usr/lib/libnssutil3.so", //$NON-NLS-1$
+					"/lib/libsqlite3.so", //$NON-NLS-1$
+					"/usr/lib/libsqlite3.so", //$NON-NLS-1$
+					"/lib/libmozsqlite3.so", //$NON-NLS-1$
+					"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
 			};
 		}
 		else {
@@ -424,15 +423,16 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		for (final String libPath : dependList) {
-			try {
-				if (new File(libPath).exists()) {
+			if (new File(libPath).exists()) {
+				try {
 					System.load(libPath);
 				}
-			}
-			catch (final Error e) {
-				LOGGER.warning(
-					"Error al cargar la biblioteca " + libPath + " para el acceso al almacen de claves de Mozilla: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				catch (final Error e) {
+					LOGGER.log(Level.WARNING,
+							"Error al cargar la biblioteca " + libPath + " para el acceso al almacen de claves de Mozilla: " + e, //$NON-NLS-1$ //$NON-NLS-2$
+							e
+							);
+				}
 			}
 		}
 	}
@@ -564,8 +564,9 @@ public final class MozillaKeyStoreUtilities {
 		return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
 	}
 
-	private static Provider loadNssJava9(final String nssDirectory, final String p11NSSConfigFileContents) throws IOException,
-	                                                                                                              AOException {
+	private static Provider loadNssJava9(final String nssDirectory, final String p11NSSConfigFileContents)
+				throws IOException, AOException {
+
 		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
 		final File f = File.createTempFile("pkcs11_nss_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
 		try (
@@ -573,6 +574,7 @@ public final class MozillaKeyStoreUtilities {
 		) {
 			fos.write(p11NSSConfigFileContents.getBytes());
 		}
+
 		Provider ret;
 		try {
 			final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
@@ -597,7 +599,22 @@ public final class MozillaKeyStoreUtilities {
 				ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 			}
 			catch (final Exception ex) {
-				throw new AOException("Ocurrio un error al configurar el proveedor de acceso a NSS", ex); //$NON-NLS-1$
+
+				// Realizamos un ultimo intento configurando NSS para que utilice la base de
+				// datos Berkeley en lugar de SQLite
+				try (
+					final OutputStream fos = new FileOutputStream(f);
+				) {
+					fos.write(p11NSSConfigFileContents.replace("sql:/", "").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				try {
+					final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
+					ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
+				}
+				catch (final Exception ex2) {
+					throw new AOException("Ocurrio un error al configurar el proveedor de acceso a NSS", ex2); //$NON-NLS-1$
+				}
 			}
 		}
 		f.delete();
@@ -692,7 +709,8 @@ public final class MozillaKeyStoreUtilities {
 			nssDirectory
 		);
 
-		// Quitamos el directorio del usuario del registro, para evitar que contenga datos personales
+		// Mostramos la configuracion de NSS, susyituyendo la ruta del usuario del
+		// registro para evitar mostrar datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final Provider p = AOUtil.isJava9orNewer() ?
