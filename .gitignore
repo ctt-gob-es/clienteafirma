@@ -16,6 +16,9 @@ local.properties
 .loadpath
 .recommenders
 
+# Maven Shade plugin
+dependency-reduced-pom.xml
+
 # Eclipse Core
 .project
 
