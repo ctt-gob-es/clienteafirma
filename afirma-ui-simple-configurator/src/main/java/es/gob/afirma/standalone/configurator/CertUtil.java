@@ -7,10 +7,6 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-//In latest Java 8, there are some changes with respect to the source code structure. Now you need to use below command to compile the source code to remove the errors ad warnings:
-//javac -XDignore.symbol.file
-//When javac is compiling code it doesn't link against rt.jar by default in latest Java 8. Instead it uses special symbol file lib/ct.sym with class stubs. The option -XDignore.symbol.file is to ignore the symbol file so that it will link against rt.jar.
-
 package es.gob.afirma.standalone.configurator;
 
 import java.io.ByteArrayOutputStream;
@@ -129,15 +125,39 @@ final class CertUtil {
 	 * @throws CertificateException Si no se puede generar el certificado.
 	 * @throws IOException El cualquier otro tipo de problema. */
 	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias,
-			                                   final String storePassword) throws NoSuchAlgorithmException,
+			                           final String storePassword) throws NoSuchAlgorithmException,
 	                                                                              CertificateException,
 	                                                                              IOException {
-		Security.addProvider(new BouncyCastleProvider());
-		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
+		return getCertPackForHostSsl(
+			sslCertificateAlias,
+			storePassword,
+			DEFAULT_LOCALHOST,
 			ROOT_CERTIFICATE_PRINCIPAL
 		);
+	}
+
+	/** Genera una tupla con un certificado de CA y un certificado SSL emitido por &eacute;l
+	 * para la comunicaci&oacute;n.
+	 * @param sslCertificateAlias Alias con el que identificar el certificado SSL.
+	 * @param storePassword Contrase&ntilde;a del almac&eacute;n de claves a generar.
+	 * @param host Nombre de <i>host</i> SSL.
+	 * @param rootName Principal X&#46;500 de la CA a crear (por ejemplo <i>CN=Nombre</i>).
+	 * @return Tupla con un certificado de CA y un certificado SSL.
+	 * @throws NoSuchAlgorithmException Si no se soporta un algoritmo necesario.
+	 * @throws CertificateException Si no se puede generar el certificado.
+	 * @throws IOException El cualquier otro tipo de problema. */
+	static CertPack getCertPackForHostSsl(final String sslCertificateAlias,
+			                      final String storePassword,
+			                      final String host,
+			                      final String rootName) throws NoSuchAlgorithmException,
+	                                                                    CertificateException,
+	                                                                    IOException {
+		Security.addProvider(new BouncyCastleProvider());
+		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
+			rootName
+		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			DEFAULT_LOCALHOST,
+			host,
 			caCertificatePrivateKeyEntry
 		);
 		return new CertPack(
@@ -201,17 +221,24 @@ final class CertUtil {
 	        new BasicConstraints(true)
         );
 
-	    final KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
-	            | KeyUsage.digitalSignature | KeyUsage.keyEncipherment
-	            | KeyUsage.dataEncipherment | KeyUsage.cRLSign);
+	    final KeyUsage usage = new KeyUsage(
+    		KeyUsage.keyCertSign      |
+    		KeyUsage.digitalSignature |
+    		KeyUsage.keyEncipherment  |
+    		KeyUsage.dataEncipherment |
+    		KeyUsage.cRLSign
+		);
 	    generator.addExtension(Extension.keyUsage, false, usage);
 
 	    final ASN1EncodableVector purposes = new ASN1EncodableVector();
 	    purposes.add(KeyPurposeId.id_kp_serverAuth);
 	    purposes.add(KeyPurposeId.id_kp_clientAuth);
 	    purposes.add(KeyPurposeId.anyExtendedKeyUsage);
-	    generator.addExtension(Extension.extendedKeyUsage, false,
-	            new DERSequence(purposes));
+	    generator.addExtension(
+    		Extension.extendedKeyUsage,
+    		false,
+	        new DERSequence(purposes)
+        );
 
 	    //Firma del CA con su propia clave privada (autofirmado)
 	    X509Certificate cert = null;
@@ -240,8 +267,8 @@ final class CertUtil {
 	private static PrivateKeyEntry generateSslCertificate(final String cn,
 			                                              final PrivateKeyEntry issuerKeyEntry) {
 		// Generamos las claves...
-		X509Certificate cert;
-		KeyPair pair;
+		final X509Certificate cert;
+		final KeyPair pair;
 		try {
 			final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
 			keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
@@ -250,7 +277,9 @@ final class CertUtil {
 			//Generamos el generador de certificados
 			final Date expirationDate = new Date();
 			expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
-			final X500Name issuerDN = new JcaX509CertificateHolder((X509Certificate) issuerKeyEntry.getCertificate()).getSubject();
+			final X500Name issuerDN = new JcaX509CertificateHolder(
+				(X509Certificate) issuerKeyEntry.getCertificate()
+			).getSubject();
 
 			final X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
 				issuerDN,
@@ -263,19 +292,37 @@ final class CertUtil {
 
 			//Incluimos los atributos del certifiado
 			final JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
-			certBuilder.addExtension(Extension.subjectKeyIdentifier, false, extUtils.createSubjectKeyIdentifier(pair.getPublic()));
-			certBuilder.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
-			certBuilder.addExtension(Extension.authorityKeyIdentifier, false, extUtils.createAuthorityKeyIdentifier(issuerKeyEntry.getCertificate().getPublicKey()));
+			certBuilder.addExtension(
+				Extension.subjectKeyIdentifier,
+				false,
+				extUtils.createSubjectKeyIdentifier(pair.getPublic())
+			);
+			certBuilder.addExtension(
+				Extension.basicConstraints,
+				false,
+				new BasicConstraints(false)
+			);
+			certBuilder.addExtension(
+				Extension.authorityKeyIdentifier,
+				false,
+				extUtils.createAuthorityKeyIdentifier(
+					issuerKeyEntry.getCertificate().getPublicKey()
+				)
+			);
 
 			final List<GeneralName> altNames = new ArrayList<>();
 			altNames.add(new GeneralName(GeneralName.iPAddress, cn));
 			if (altNames.size() > 0) {
-				final GeneralNames subjectAltName = new GeneralNames(altNames.toArray(new GeneralName [altNames.size()]));
+				final GeneralNames subjectAltName = new GeneralNames(
+					altNames.toArray(new GeneralName [altNames.size()])
+				);
 				certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
 			}
 
 			//Firma del certificado SSL con la clave privada del CA
-			final ContentSigner caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
+			final ContentSigner caSigner = new JcaContentSignerBuilder(
+				SIGNATURE_ALGORITHM
+			).setProvider(PROVIDER).build(
 				issuerKeyEntry.getPrivateKey()
 			);
 			cert = new JcaX509CertificateConverter().setProvider(PROVIDER)
