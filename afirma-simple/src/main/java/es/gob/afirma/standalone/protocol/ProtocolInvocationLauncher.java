@@ -332,7 +332,7 @@ public final class ProtocolInvocationLauncher {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
                     catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -342,7 +342,7 @@ public final class ProtocolInvocationLauncher {
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
                     }
                     catch (final IOException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -402,7 +402,7 @@ public final class ProtocolInvocationLauncher {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
                     catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -412,7 +412,7 @@ public final class ProtocolInvocationLauncher {
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
                     }
                     catch (final IOException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
