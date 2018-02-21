@@ -152,7 +152,11 @@ public final class CustomUriDereferencer implements URIDereferencer {
 					);
 				}
 				try {
-					return getStreamData(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(externalContent)));
+					return getStreamData(
+						DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+							new ByteArrayInputStream(externalContent)
+						)
+					);
 				}
 				catch (final ParserConfigurationException e1) {
 					throw new URIReferenceException(
@@ -178,7 +182,12 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
             // Derreferenciacion de todo el XML en firmas enveloped
             if ("".equals(uriValue)) { //$NON-NLS-1$
-            	return getStreamData(doc);
+            	try {
+					return getStreamData(doc);
+				}
+            	catch (final IOException e1) {
+					throw new URIReferenceException("Error obteniendo los octetos del XML: " + e1, e1); //$NON-NLS-1$
+				}
             }
 
             final Node targetNode = getNodeByInternalUriReference(uriValue, doc);
@@ -187,7 +196,12 @@ public final class CustomUriDereferencer implements URIDereferencer {
             	throw new URIReferenceException(e);
             }
 
-            return getStreamData(targetNode);
+            try {
+				return getStreamData(targetNode);
+			}
+            catch (final IOException e1) {
+            	throw new URIReferenceException("Error obteniendo los octetos del XML: " + e1, e1); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -204,7 +218,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
     	return getElementById(doc, id);
 	}
 
-	private static Data getStreamData(final Node targetNode) throws URIReferenceException {
+	private static Data getStreamData(final Node targetNode) throws IOException {
 		try {
 			final Class<?> xmlSignatureInputClass = getXmlSignatureInputClass();
 			final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);
@@ -220,10 +234,10 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			return (Data) nodeSetDataConstructor.newInstance(in);
 		}
 		catch (final Exception ioe) {
-			throw new URIReferenceException(ioe);
+			throw new IOException(ioe);
 		}
 		catch (final Error ioe) {
-			throw new URIReferenceException(ioe);
+			throw new IOException(ioe);
 		}
 	}
 

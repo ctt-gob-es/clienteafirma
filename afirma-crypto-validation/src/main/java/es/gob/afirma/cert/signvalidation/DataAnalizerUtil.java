@@ -13,6 +13,8 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.Base64;
@@ -28,6 +30,8 @@ import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 /** Utilidad para el an&aacute;lisis de ficheros de datos.
  * @author Carlos Gamuci. */
 public final class DataAnalizerUtil {
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
     private DataAnalizerUtil() {
         // No permitimos la instanciacion
@@ -186,11 +190,12 @@ public final class DataAnalizerUtil {
      * @return Devuelve {@code true} si los datos son ODF. */
     public static boolean isODF(final byte[] data) {
         try {
-            return new AOODFSigner().isValidDataFile(data);
+       		return new AOODFSigner().isValidDataFile(data);
         }
         catch(final Exception e) {
-            return false;
+        	LOGGER.log(Level.WARNING, "Ocurrio un error al analizar los datos: " + e); //$NON-NLS-1$
         }
+        return false;
     }
 
     /**
@@ -203,8 +208,9 @@ public final class DataAnalizerUtil {
             return new AOODFSigner().isSign(data);
         }
         catch(final Exception e) {
-            return false;
+        	LOGGER.log(Level.WARNING, "Ocurrio un error al analizar los datos: " + e); //$NON-NLS-1$
         }
+        return false;
     }
 
     /** Comprueba si los datos introducidos se corresponden a un documento OOXML.
@@ -212,11 +218,12 @@ public final class DataAnalizerUtil {
      * @return Devuelve {@code true} si los datos son OOXML. */
     public static boolean isOOXML(final byte[] data) {
         try {
-            return new AOOOXMLSigner().isValidDataFile(data);
+        	return new AOOOXMLSigner().isValidDataFile(data);
         }
         catch(final Exception e) {
-            return false;
+        	LOGGER.log(Level.WARNING, "Ocurrio un error al analizar los datos: " + e); //$NON-NLS-1$
         }
+        return false;
     }
 
     /**
@@ -229,7 +236,8 @@ public final class DataAnalizerUtil {
             return new AOOOXMLSigner().isSign(data);
         }
         catch(final Exception e) {
-            return false;
+        	LOGGER.log(Level.WARNING, "Ocurrio un error al analizar los datos: " + e); //$NON-NLS-1$
         }
+        return false;
     }
 }

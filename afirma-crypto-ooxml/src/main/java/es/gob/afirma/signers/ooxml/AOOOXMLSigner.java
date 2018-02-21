@@ -24,6 +24,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.OfficeAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -45,6 +46,8 @@ public final class AOOOXMLSigner implements AOSigner {
     private static final String EXTENSION_PPTX = ".pptx"; //$NON-NLS-1$
     private static final String EXTENSION_PPSX = ".ppsx"; //$NON-NLS-1$
     private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
+
+	private static final String MIMETYPE_ZIP = "application/zip"; //$NON-NLS-1$
 
     /** Consutruye un firmador OOXML, comprobando que se cuente con un JRE adecuado. */
     public AOOOXMLSigner() {
@@ -94,6 +97,12 @@ public final class AOOOXMLSigner implements AOSigner {
      *         contrario.
      * @throws IOException Cuando hay problemas en el tratamiento de los datos. */
     private static boolean isOOXMLFile(final byte[] data) throws IOException {
+
+    	// Si no es un ZIP, no se trata de un OOXML
+    	if (!isZipData(data)) {
+    		return false;
+    	}
+
     	try (
 	        final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
 		) {
@@ -112,6 +121,16 @@ public final class AOOOXMLSigner implements AOSigner {
 	        }
     	}
         return true;
+    }
+
+    /**
+     * Comprueba si unos datos tienen formato ZIP.
+     * @param data Datos a comprobar.
+     * @return {@code true} si los datos son un ZIP, {@code false} en caso contrario.
+     * @throws IOException Cuando no se pueden analizar los datos.
+     */
+    private static boolean isZipData(final byte[] data) throws IOException {
+    	return MIMETYPE_ZIP.equals(new MimeHelper(data).getMimeType());
     }
 
     /** { {@inheritDoc} */

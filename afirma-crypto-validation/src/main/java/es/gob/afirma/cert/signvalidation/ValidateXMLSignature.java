@@ -149,7 +149,7 @@ public final class ValidateXMLSignature implements SignValider {
             try {
             	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	context.setURIDereferencer(
-        			new CustomUriDereferencer()
+            			new CustomUriDereferencer()
     			);
             }
             catch (final Exception e) {

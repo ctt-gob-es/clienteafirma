@@ -195,6 +195,7 @@ final class ProtocolInvocationLauncherSign {
 			else {
 				try {
 					signer = AOSignerFactory.getSigner(options.getData());
+					options.setSignFormat(AOSignerFactory.getSignFormat(signer));
 				}
 				catch (final IOException e) {
 					LOGGER.severe("No se han podido analizar los datos para determinar si son una firma: " + e //$NON-NLS-1$

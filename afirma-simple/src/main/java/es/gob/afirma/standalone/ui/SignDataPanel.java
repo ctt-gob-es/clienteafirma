@@ -11,7 +11,6 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,9 +49,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import es.gob.afirma.cert.certvalidation.CertificateVerificable;
-import es.gob.afirma.cert.certvalidation.CertificateVerifierFactory;
-import es.gob.afirma.cert.certvalidation.ValidationResult;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -80,7 +76,7 @@ final class SignDataPanel extends JPanel {
     private final JLabel filePathText = new JLabel();
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
-    private JButton validateCertButton = null;
+    private final JButton validateCertButton = null;
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -228,76 +224,75 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
 
-	            CertificateVerificable cfv = null;
-	            try {
-	            	cfv = CertificateVerifierFactory.getCertificateVerifier(cert);
-	            }
-	            catch(final Exception e) {
-	            	LOGGER.warning("No se ha podido cargar el verificador de certificados: " + e); //$NON-NLS-1$
-	            }
-
-	            if (cfv != null) {
-	            	final CertificateVerificable cf = cfv;
-	            	this.validateCertButton = new JButton();
-	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
-	                this.validateCertButton.setText(SimpleAfirmaMessages.getString("SignDataPanel.15")); //$NON-NLS-1$
-	                this.validateCertButton.setMnemonic('c');
-	                this.validateCertButton.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.16")); //$NON-NLS-1$
-	                this.validateCertButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.17")); //$NON-NLS-1$
-	                this.validateCertButton.getAccessibleContext()
-	                .setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.18")); //$NON-NLS-1$
-	                this.validateCertButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent ae) {
-						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-							final ValidationResult vr = cf.validateCertificate(cert);
-							String validationMessage;
-							int validationMessageType = JOptionPane.ERROR_MESSAGE;
-							switch(vr) {
-								case VALID:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.19"); //$NON-NLS-1$
-									validationMessageType = JOptionPane.INFORMATION_MESSAGE;
-									break;
-								case EXPIRED:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.32"); //$NON-NLS-1$
-									break;
-								case REVOKED:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.33"); //$NON-NLS-1$
-									break;
-								case NOT_YET_VALID:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.34"); //$NON-NLS-1$
-									break;
-								case CA_NOT_SUPPORTED:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.35"); //$NON-NLS-1$
-									break;
-								case CORRUPT:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.36"); //$NON-NLS-1$
-									break;
-								case SERVER_ERROR:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.37"); //$NON-NLS-1$
-									break;
-								case UNKNOWN:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.38"); //$NON-NLS-1$
-									break;
-								default:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.11");  //$NON-NLS-1$
-							}
-							AOUIFactory.showMessageDialog(
-								SignDataPanel.this,
-								validationMessage,
-								SimpleAfirmaMessages.getString("SignDataPanel.39"),  //$NON-NLS-1$
-								validationMessageType
-							);
-
-						    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
-						}
-					});
-	            }
+//	            CertificateVerificable cfv = null;
+//	            try {
+//	            	cfv = CertificateVerifierFactory.getCertificateVerifier(cert);
+//	            }
+//	            catch(final Exception e) {
+//	            	LOGGER.warning("No se ha podido cargar el verificador de certificados: " + e); //$NON-NLS-1$
+//	            }
+//
+//	            if (cfv != null) {
+//	            	final CertificateVerificable cf = cfv;
+//	            	this.validateCertButton = new JButton();
+//	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
+//	                this.validateCertButton.setText(SimpleAfirmaMessages.getString("SignDataPanel.15")); //$NON-NLS-1$
+//	                this.validateCertButton.setMnemonic('c');
+//	                this.validateCertButton.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.16")); //$NON-NLS-1$
+//	                this.validateCertButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.17")); //$NON-NLS-1$
+//	                this.validateCertButton.getAccessibleContext()
+//	                .setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.18")); //$NON-NLS-1$
+//	                this.validateCertButton.addActionListener(new ActionListener() {
+//						@Override
+//						public void actionPerformed(final ActionEvent ae) {
+//						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+//
+//							final ValidationResult vr = cf.validateCertificate(cert);
+//							String validationMessage;
+//							int validationMessageType = JOptionPane.ERROR_MESSAGE;
+//							switch(vr) {
+//								case VALID:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.19"); //$NON-NLS-1$
+//									validationMessageType = JOptionPane.INFORMATION_MESSAGE;
+//									break;
+//								case EXPIRED:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.32"); //$NON-NLS-1$
+//									break;
+//								case REVOKED:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.33"); //$NON-NLS-1$
+//									break;
+//								case NOT_YET_VALID:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.34"); //$NON-NLS-1$
+//									break;
+//								case CA_NOT_SUPPORTED:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.35"); //$NON-NLS-1$
+//									break;
+//								case CORRUPT:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.36"); //$NON-NLS-1$
+//									break;
+//								case SERVER_ERROR:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.37"); //$NON-NLS-1$
+//									break;
+//								case UNKNOWN:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.38"); //$NON-NLS-1$
+//									break;
+//								default:
+//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.11");  //$NON-NLS-1$
+//							}
+//							AOUIFactory.showMessageDialog(
+//								SignDataPanel.this,
+//								validationMessage,
+//								SimpleAfirmaMessages.getString("SignDataPanel.39"),  //$NON-NLS-1$
+//								validationMessageType
+//							);
+//
+//						    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//
+//						}
+//					});
+//	            }
 
             }
-
             certDescPanel = new JPanel();
             certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             certDescPanel.setLayout(new BoxLayout(certDescPanel, BoxLayout.X_AXIS));

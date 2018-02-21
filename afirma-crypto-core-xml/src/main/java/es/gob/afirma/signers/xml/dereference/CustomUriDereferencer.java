@@ -11,10 +11,11 @@ package es.gob.afirma.signers.xml.dereference;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.Data;
-import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
@@ -40,12 +41,58 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
 	private static final String ID = "Id"; //$NON-NLS-1$
 
+	private static final String DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME = "com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput"; //$NON-NLS-1$
+	private static final String DEFAULT_APACHE_XML_SIGNATURE_INPUT_CLASSNAME =               "org.apache.xml.security.signature.XMLSignatureInput"; //$NON-NLS-1$
+
+	private static final String DEFAULT_SUN_OCTET_STREAM_DATA =           "org.jcp.xml.dsig.internal.dom.ApacheOctetStreamData"; //$NON-NLS-1$
+	private static final String DEFAULT_APACHE_OCTET_STREAM_DATA = "org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData"; //$NON-NLS-1$
+
+	private static final String DEFAULT_SUN_NODESET_DATA =           "org.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
+	private static final String DEFAULT_APACHE_NODESET_DATA = "org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
+
 	private final URIDereferencer defaultUriDereferencer;
 
 	/** Crea un dereferenciador a medida que act&uacute;a solo cuando falla el dereferenciador por defecto. */
 	public CustomUriDereferencer() {
 		this.defaultUriDereferencer = XMLSignatureFactory.getInstance("DOM").getURIDereferencer(); //$NON-NLS-1$
 	}
+
+	private static Class<?> getNodesetDataClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_NODESET_DATA);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_NODESET_DATA);
+		}
+		catch (final Error e) {
+			return Class.forName(DEFAULT_SUN_NODESET_DATA);
+		}
+	}
+	
+	private static Class<?> getOctetStreamDataClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_OCTET_STREAM_DATA);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
+		}
+		catch (final Error e) {
+			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
+		}
+	}
+
+	private static Class<?> getXmlSignatureInputClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_XML_SIGNATURE_INPUT_CLASSNAME);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
+		}
+		catch (final Error e) {
+			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
+		}
+	}
+
 
 	@Override
 	public Data dereference(final URIReference domRef, final XMLCryptoContext context) throws URIReferenceException {
@@ -137,11 +184,26 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	}
 
 	private static Data getStreamData(final Node targetNode) throws IOException {
-		final XMLSignatureInput xi = new XMLSignatureInput(targetNode);
-		if (xi.isOctetStream()) {
-			return new OctetStreamData(xi.getOctetStream(), xi.getSourceURI(), xi.getMIMEType());
+		try {
+			final Class<?> xmlSignatureInputClass = getXmlSignatureInputClass();
+			final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);
+			final Object in = xmlSignatureInputConstructor.newInstance(targetNode);
+
+			final Method isOctetStreamMethod = xmlSignatureInputClass.getMethod("isOctetStream"); //$NON-NLS-1$
+			if (((Boolean) isOctetStreamMethod.invoke(in)).booleanValue()) {
+				final Class<?> octetStreamDataClass = getOctetStreamDataClass();
+				final Constructor<?> octetStreamDataConstructor = octetStreamDataClass.getConstructor(in.getClass());
+				return (Data) octetStreamDataConstructor.newInstance(in);
+			}
+			final Constructor<?> nodeSetDataConstructor = getNodesetDataClass().getConstructor(in.getClass());
+			return (Data) nodeSetDataConstructor.newInstance(in);
 		}
-		return new ApacheNodeSetData(xi);
+		catch (final Exception ioe) {
+			throw new IOException(ioe);
+		}
+		catch (final Error ioe) {
+			throw new IOException(ioe);
+		}
 	}
 
 	/** Busca el primer nodo de un documento XML que tenga un atributo con nombre

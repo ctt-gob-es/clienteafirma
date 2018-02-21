@@ -113,6 +113,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		certDialog.setBackground(Color.WHITE);
 		certDialog.setModal(true);
+		certDialog.setAlwaysOnTop(true);
 
 		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
 			this.optionPane,

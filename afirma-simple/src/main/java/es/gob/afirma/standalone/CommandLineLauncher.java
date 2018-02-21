@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone;
 
-import java.awt.Image;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Console;
@@ -26,14 +25,11 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -54,7 +50,6 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
-import es.gob.afirma.standalone.ui.CertValidationUi;
 import es.gob.afirma.standalone.ui.hash.HashHelper;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
@@ -241,40 +236,7 @@ final class CommandLineLauncher {
  		if (inputFile == null) {
  			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5"));  //$NON-NLS-1$
  		}
-
- 		// Comprobamos si lo que nos piden validar es un certificado...
- 		X509Certificate cert;
- 		try (
- 			final InputStream bis = new BufferedInputStream(
- 				new FileInputStream(inputFile)
- 			);
- 		) {
- 			cert = DataAnalizerUtil.isCertificate(AOUtil.getDataFromInputStream(bis));
- 		}
- 		catch (final Exception e) {
- 			cert = null;
- 		}
-
- 		// Si no es un certificado asumimos que es una firma
- 		if (cert == null) {
- 			new VisorFirma(true, null).initialize(false, inputFile);
- 		}
-
- 		// Y si es certificado lo validamos como tal
- 		else {
- 			Image icon;
- 			try {
- 				icon = ImageIO.read(
- 					CommandLineLauncher.class.getResource(
- 						"/resources/certificate_16.png"  //$NON-NLS-1$
- 					)
- 				);
- 			}
- 			catch (final IOException e) {
- 				icon = null;
- 			}
- 			CertValidationUi.validateCert(cert, null, null, icon);
- 		}
+ 		new VisorFirma(true, null).initialize(false, inputFile);
  	}
 
 	/** Mostramos el panel de firmas. Se usara la configuraci&oacute;n de firma establecida

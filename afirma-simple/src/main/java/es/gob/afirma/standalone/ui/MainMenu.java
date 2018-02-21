@@ -32,6 +32,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.VisorFirma;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
 import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
 import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
@@ -272,8 +273,20 @@ public final class MainMenu extends JMenuBar {
 		);
 		restoreConfigMenuItem.addActionListener(ae -> showRestoreConfig());
 
-		// toolsMenu.addSeparator();
 		toolsMenu.add(restoreConfigMenuItem);
+
+
+
+        final JMenuItem validateSignMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
+        validateSignMenu.setAccelerator(
+        		KeyStroke.getKeyStroke(KeyEvent.VK_V,
+        				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        validateSignMenu.getAccessibleContext().setAccessibleDescription(
+        		SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
+		validateSignMenu.setMnemonic(KeyEvent.VK_V);
+		validateSignMenu.addActionListener(ae -> viewSignature(this));
+		toolsMenu.add(validateSignMenu);
+
 		this.add(toolsMenu);
 
         if (!isMac) {
@@ -397,6 +410,27 @@ public final class MainMenu extends JMenuBar {
     @SuppressWarnings("unused")
 	void showAbout(final EventObject event) {
     	showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent());
+    }
+
+    /**
+     * Permite la selecci&oacute;n de un fichero de firma y muestra su contenido en
+     * el visor.
+     * @param parentComponent Componente padre sobre el que mostrar el
+     */
+    static void viewSignature(Object parentComponent) {
+    	final File[] file = AOUIFactory.getLoadFiles(
+    			SimpleAfirmaMessages.getString("MainMenu.35"), //$NON-NLS-1$
+    			null,
+    			null,
+    			new String[] {"csig", "xsig", "pdf", "sig", "p7s"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    			SimpleAfirmaMessages.getString("MainMenu.36"), //$NON-NLS-1$
+    			false,
+    			false,
+    			null,
+    			parentComponent);
+    	if (file != null && file.length > 0 && file[0] != null && file[0].isFile()) {
+    		new VisorFirma(false, null).initialize(false, file[0]);
+    	}
     }
 
     /** Muestra en OS X el men&uacute; "Acerca de...".

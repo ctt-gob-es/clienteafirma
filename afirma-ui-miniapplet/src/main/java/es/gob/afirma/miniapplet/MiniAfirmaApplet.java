@@ -47,6 +47,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -208,7 +209,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, dataBinary, null);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
-				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
+				signatureFormat = AOSignerFactory.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
 			}
 
@@ -383,7 +384,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			String signatureFormat = format;
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
-				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
+				signatureFormat = AOSignerFactory.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
 			}
 
@@ -512,7 +513,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			String signatureFormat = format;
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
-				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
+				signatureFormat = AOSignerFactory.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
 			}
 

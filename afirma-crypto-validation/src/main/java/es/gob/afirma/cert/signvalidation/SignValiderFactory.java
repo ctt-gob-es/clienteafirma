@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public final class SignValiderFactory {
 
 	/* Listado de los validadores de firma soportados y los identificadores de formato de firma asociados. */
-	private static final String SIGNER_VLIDER_CLASS_BINARY 	= "es.gob.afirma.cert.signvalidation.ValidateBinarySignature"; //$NON-NLS-1$
+	private static final String SIGNER_VALIDER_CLASS_BINARY 	= "es.gob.afirma.cert.signvalidation.ValidateBinarySignature"; //$NON-NLS-1$
 	private static final String SIGNER_VALIDER_CLASS_PDF   	= "es.gob.afirma.cert.signvalidation.ValidatePdfSignature"; //$NON-NLS-1$
 	private static final String SIGNER_VALIDER_CLASS_XML	= "es.gob.afirma.cert.signvalidation.ValidateXMLSignature"; //$NON-NLS-1$
 
@@ -55,7 +55,7 @@ public final class SignValiderFactory {
         	return null;
         }
         else  {
-        	validerClassName = SIGNER_VLIDER_CLASS_BINARY;
+        	validerClassName = SIGNER_VALIDER_CLASS_BINARY;
         }
 		try {
         	return (SignValider) Class.forName(validerClassName).getDeclaredConstructor().newInstance();

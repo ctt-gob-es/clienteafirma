@@ -155,4 +155,17 @@ public final class AOSignerFactory {
 		return formats;
 	}
 
+	/** Funci&oacute;n para obtener el nombre del formato de firma en base al manejador de firma.
+	 * @param signer Manejador de firma.
+	 * @return Nombre del formato de firma preferente del que se encarga el manejador o {@code null} si no
+	 * se reconoce. */
+	public static String getSignFormat(final AOSigner signer) {
+		final String signerClassname = signer.getClass().getName();
+		for (final String[] signerInfo : SIGNERS_CLASSES) {
+			if (signerClassname.equals(signerInfo[1])) {
+				return signerInfo[0];
+			}
+		}
+		return null;
+	}
 }

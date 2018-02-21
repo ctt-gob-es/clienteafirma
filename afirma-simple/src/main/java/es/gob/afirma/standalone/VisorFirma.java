@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dialog.ModalityType;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
@@ -41,7 +42,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     private Window window;
     private Container container = null;
     private JPanel currentPanel;
-    private final Frame parentComponent;
+    private final Object parentComponent;
 
     private final boolean standalone;
 
@@ -53,7 +54,7 @@ public class VisorFirma extends JApplet implements WindowListener {
      *                   <code>false</code> si se ha arrancado desde otra aplicaci&oacute;n Java.
      * @param parent Componente padre. Si no es nulo, se crea el visor como un di&aacute;logo modal respecto
      *               a &eacute;l. */
-    public VisorFirma(final boolean standalone, final Frame parent) {
+    public VisorFirma(final boolean standalone, final Object parent) {
         this.standalone = standalone;
         LookAndFeelManager.applyLookAndFeel();
         this.parentComponent = parent;
@@ -93,7 +94,19 @@ public class VisorFirma extends JApplet implements WindowListener {
 	            this.container = mainScreen;
             }
             else {
-            	final JDialog dialog = new JDialog(this.parentComponent);
+            	JDialog dialog;
+            	if (this.parentComponent instanceof Frame) {
+            		dialog = new JDialog((Frame) this.parentComponent);
+            	}
+            	else if (this.parentComponent instanceof Window) {
+            		dialog = new JDialog((Window) this.parentComponent);
+            	}
+            	else if (this.parentComponent instanceof Dialog) {
+            		dialog = new JDialog((Dialog) this.parentComponent);
+            	}
+            	else {
+            		dialog = new JDialog();
+            	}
             	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
             	dialog.setSize(780, 500);
             	dialog.setResizable(false);

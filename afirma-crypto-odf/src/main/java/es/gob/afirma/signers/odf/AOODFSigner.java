@@ -71,6 +71,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -89,6 +90,8 @@ public final class AOODFSigner implements AOSigner {
 	private static final String EXTENSION_ODP = ".odp"; //$NON-NLS-1$
 	private static final String EXTENSION_ODS = ".ods"; //$NON-NLS-1$
 	private static final String EXTENSION_ODF = ".odf"; //$NON-NLS-1$
+
+	private static final String MIMETYPE_ZIP = "application/zip"; //$NON-NLS-1$
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -666,6 +669,17 @@ public final class AOODFSigner implements AOSigner {
     @Override
 	public boolean isValidDataFile(final byte[] data) {
 
+    	// Si no es un ZIP, no se trata de un ODF
+    	try {
+    		if (!isZipData(data)) {
+    			return false;
+    		}
+    	}
+    	catch (final Exception e) {
+    		LOGGER.warning("No se pudo comprobar si los datos son un ZIP: " + e); //$NON-NLS-1$
+			return false;
+		}
+
     	final File odfFile;
     	try {
     		odfFile = createTempFile(data);
@@ -690,6 +704,16 @@ public final class AOODFSigner implements AOSigner {
         // Sera valido si el mimetype coincide con alguno de los formatos ODF
         // soportados
         return mimetype != null && SUPPORTED_FORMATS.contains(mimetype);
+    }
+
+    /**
+     * Comprueba si unos datos tienen formato ZIP.
+     * @param data Datos a comprobar.
+     * @return {@code true} si los datos son un ZIP, {@code false} en caso contrario.
+     * @throws IOException Cuando no se pueden analizar los datos.
+     */
+    private static boolean isZipData(final byte[] data) throws IOException {
+    	return MIMETYPE_ZIP.equals(new MimeHelper(data).getMimeType());
     }
 
     /** {@inheritDoc} */
