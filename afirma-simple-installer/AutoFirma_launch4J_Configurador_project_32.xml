@@ -28,18 +28,18 @@
     <opt>-Xms512m -Xmx1g -DdisableSslChecks=true</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.2.0.0</fileVersion>
-    <txtFileVersion>1.2</txtFileVersion>
+    <fileVersion>1.2.1.0</fileVersion>
+    <txtFileVersion>1.2.1</txtFileVersion>
     <fileDescription>Configurador AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.2.0.0</productVersion>
-    <txtProductVersion>1.2</txtProductVersion>
+    <productVersion>1.2.1.0</productVersion>
+    <txtProductVersion>1.2.1</txtProductVersion>
     <productName>Configurador AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>Configurador AutoFirma</internalName>
     <originalFilename>AutoFirmaConfigurador.exe</originalFilename>
     <trademarks></trademarks>
-    <language>ENGLISH_US</language>
+    <language>CASTILIAN_SPANISH</language>
   </versionInfo>
   <messages>
     <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>
