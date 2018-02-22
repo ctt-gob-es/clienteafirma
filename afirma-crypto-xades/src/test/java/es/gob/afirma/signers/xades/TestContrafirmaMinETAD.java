@@ -21,21 +21,18 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 
 /**
  * Test para la comprobaci&oacute;n de las contrafirmas sobre firmas generadas por
- * la IGAE.
+ * el MinETAD.
  * @author Carlos Gamuci
  */
-public class TestContrafirmaIgae {
+public class TestContrafirmaMinETAD {
 
 	private static final String[] SIGNATURE_FILES = new String[] {
-		"firmaIgae.xsig.xml", //$NON-NLS-1$
-		"firmaAfirma.xsig" //$NON-NLS-1$
+		"firmaMinetad.xsig" //$NON-NLS-1$
 	};
 
     private static final String CERT_PATH = "CATCERT CIUTADANIA PF CPIXSA-2.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "persona física de la peça de proves"; //$NON-NLS-1$
-
-
+    private static final String CERT_ALIAS = "persona fÃ­sica de la peÃ§a de proves"; //$NON-NLS-1$
 
     /**
      * Prueba a contrafirmar una firma generada por la IGAE.
@@ -48,7 +45,7 @@ public class TestContrafirmaIgae {
      */
     @SuppressWarnings("static-method")
 	@Test
-    public void testContrafirmaXAdESDeFirmasDeIgae() throws IOException, KeyStoreException, AOException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException {
+    public void testContrafirmaXAdESDeFirmasDeMinetad() throws IOException, KeyStoreException, AOException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException {
 
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
     	final PrivateKeyEntry pke;
@@ -65,7 +62,7 @@ public class TestContrafirmaIgae {
     	for (final String signFile : SIGNATURE_FILES) {
 
         	System.out.println("\nContrafirma XAdES Detached con el algoritmo '" + //$NON-NLS-1$
-        			algorithm + "' sobre la firma de la IGAE '" + signFile + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        			algorithm + "' sobre la firma del MinETAD '" + signFile + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
     		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(signFile));
 

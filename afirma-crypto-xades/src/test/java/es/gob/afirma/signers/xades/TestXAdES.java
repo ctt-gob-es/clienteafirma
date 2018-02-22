@@ -39,7 +39,6 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.xml.Utils;
 
 /** Pruebas del m&oacute;dulo XAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -781,7 +780,7 @@ public final class TestXAdES {
             return false;
         }
 
-        final String xadesNamespace = namespace != null ? namespace : Utils.guessXAdESNamespaceURL(document.getFirstChild());
+        final String xadesNamespace = namespace != null ? namespace : XAdESUtil.guessXAdESNamespaceURL(document.getFirstChild());
 
         final NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
         for (int i = 0; i < upNodes.getLength(); i++) {

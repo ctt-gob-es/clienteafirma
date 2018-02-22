@@ -15,6 +15,8 @@ import java.util.List;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 
+import org.w3c.dom.Element;
+
 import es.gob.afirma.signers.xml.Utils;
 
 /** Utilidades espec&iacute;ficas para XMLDSig. */
@@ -84,5 +86,34 @@ final class XmlDSigUtil {
             }
         }
         return newList;
+    }
+
+
+    /** Intenta determinar el prefijo del espacio de nombres de la firma XMLDSig.
+     * @param el Firma XMLDSig.
+     * @return Prefijo del espacio de nombres. */
+    static String guessXmlDSigNamespacePrefix(final Element el) {
+
+        final String signatureText = new String(Utils.writeXML(el, null, null, null));
+
+        final int numEmpty = Utils.countSubstring(signatureText, "<Signature"); //$NON-NLS-1$
+        final int numDs = Utils.countSubstring(signatureText, "<ds:Signature"); //$NON-NLS-1$
+        final int numDsig = Utils.countSubstring(signatureText, "<dsig:Signature"); //$NON-NLS-1$
+        final int numDsig11 = Utils.countSubstring(signatureText, "<dsig11:Signature"); //$NON-NLS-1$
+
+        // Prioridad: ds > "" > dsig > dsig11
+        if (numDs >= numEmpty && numDs >= numDsig && numDs >= numDsig11) {
+            return "ds"; //$NON-NLS-1$
+        }
+        if (numEmpty >= numDs && numEmpty >= numDsig && numEmpty >= numDsig11) {
+            return ""; //$NON-NLS-1$
+        }
+        if (numDsig >= numEmpty && numDsig >= numDs && numDsig >= numDsig11) {
+            return "dsig"; //$NON-NLS-1$
+        }
+        if (numDsig11 >= numEmpty && numDsig11 >= numDsig && numDsig11 >= numDs) {
+            return "dsig11"; //$NON-NLS-1$
+        }
+        return "ds"; //$NON-NLS-1$
     }
 }

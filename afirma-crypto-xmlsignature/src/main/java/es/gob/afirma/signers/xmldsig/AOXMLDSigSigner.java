@@ -2214,7 +2214,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             root = this.doc.getDocumentElement();
 
             // Identificamos el prefijo que se utiliza en los nodos de firma
-            final String xmlDSigNSPrefix = Utils.guessXmlDSigNamespacePrefix(root);
+            final String xmlDSigNSPrefix = XmlDSigUtil.guessXmlDSigNamespacePrefix(root);
             completePrefix = "".equals(xmlDSigNSPrefix) ? "" : xmlDSigNSPrefix + ":"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             // Si el documento tiene como nodo raiz el nodo de firma, se agrega

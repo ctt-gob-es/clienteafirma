@@ -41,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.xml.Utils;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndicationImpl;
@@ -365,4 +366,64 @@ public final class XAdESUtil {
 		return originalXMLProperties;
 	}
 
+	 /** Intenta determinar el prefijo del espacio de nombres de XAdES.
+     * @param el Firma XAdES.
+     * @return Prefijo del espacio de nombres o nulo si no se ha
+     * establecido prefijo o si no se encuentra el espacio de nombres. */
+    static String guessXAdESNamespacePrefix(final Element el) {
+        final String signatureText = new String(Utils.writeXML(el, null, null, null));
+
+        // Buscamos los espacios de nombres declarados en la firma y despues vemos
+        // si alguno es el de XAdES. En cuanto se detecta uno, se utiliza ese
+        int idx = 0;
+        String ns = null;
+        while (ns == null && (idx = signatureText.indexOf(" xmlns:", idx)) != -1) { //$NON-NLS-1$
+        	final int eqIdx = signatureText.indexOf("=", idx); //$NON-NLS-1$
+        	if (eqIdx != -1) {
+        		final String xadesNsPrefix = signatureText.substring(
+        				eqIdx,
+        				Math.min(eqIdx + "=\"http://uri.etsi.org/".length(), signatureText.length())); //$NON-NLS-1$
+        		if ("=\"http://uri.etsi.org/".equals(xadesNsPrefix)) { //$NON-NLS-1$
+        			ns = signatureText.substring(idx + " xmlns:".length(), eqIdx); //$NON-NLS-1$
+        		}
+        	}
+        	idx++;
+        }
+        return ns;
+    }
+
+    /** Intenta determinar la URL de declaraci&oacute;n de espacio de nombres de
+     * XAdES de una firma XAdES.
+     * @param el Firma XAdES.
+     * @return URL de la declaraci&oacute;n del espacio de nombres. */
+    static String guessXAdESNamespaceURL(final Node el) {
+
+        final String latest = "\"http://uri.etsi.org/01903#\""; //$NON-NLS-1$
+        final String xades122 = "\"http://uri.etsi.org/01903/v1.2.2#\""; //$NON-NLS-1$
+        final String xades132 = "\"http://uri.etsi.org/01903/v1.3.2#\""; //$NON-NLS-1$
+        final String xades141 = "\"http://uri.etsi.org/01903/v1.4.1#\""; //$NON-NLS-1$
+
+        final String signatureText = new String(Utils.writeXML(el, null, null, null));
+
+        final int numLatest   = Utils.countSubstring(signatureText, latest);
+        final int numXades122 = Utils.countSubstring(signatureText, xades122);
+        final int numXades132 = Utils.countSubstring(signatureText, xades132);
+        final int numXades141 = Utils.countSubstring(signatureText, xades141);
+
+        // Prioridad: xades132 > latest > xades141 > xades122
+        if (numXades132 >= numLatest && numXades132 >= numXades141 && numXades132 >= numXades122) {
+            return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (numLatest >= numXades132 && numLatest >= numXades141 && numLatest >= numXades122) {
+            return latest.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (numXades141 >= numLatest && numXades141 >= numXades132 && numXades141 >= numXades122) {
+            return xades141.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (numXades122 >= numXades132 && numXades122 >= numLatest && numXades122 >= numXades141) {
+            return xades122.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+        return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    }
 }
