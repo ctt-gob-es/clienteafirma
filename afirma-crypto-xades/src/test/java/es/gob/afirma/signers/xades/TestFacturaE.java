@@ -33,7 +33,6 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.xml.Utils;
 
 /**
  * Pruebas del m&oacute;dulo XAdES de Afirma para facturas electr&oacute;nicas.
@@ -175,7 +174,7 @@ public final class TestFacturaE {
             return false;
         }
 
-        final String xadesNamespace = namespace != null ? namespace : Utils.guessXAdESNamespaceURL(document.getFirstChild());
+        final String xadesNamespace = namespace != null ? namespace : XAdESUtil.guessXAdESNamespaceURL(document.getFirstChild());
 
         final NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
         for (int i = 0; i < upNodes.getLength(); i++) {

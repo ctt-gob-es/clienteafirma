@@ -790,7 +790,7 @@ public final class AOXAdESSigner implements AOSigner {
         		new AOTreeNode(
     				asSimpleSignInfo ?
 						Utils.getSimpleSignInfoNode(
-							Utils.guessXAdESNamespaceURL(
+							XAdESUtil.guessXAdESNamespaceURL(
 								signDoc.getDocumentElement()
 							),
                             signature

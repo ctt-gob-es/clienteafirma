@@ -157,7 +157,7 @@ public final class XAdESCounterSigner {
 
 		try {
 			if (targetType == CounterSignTarget.TREE) {
-				XAdESCounterSigner.countersignTree(
+				countersignTree(
 					root,
 					key,
 					certChain,
@@ -167,7 +167,7 @@ public final class XAdESCounterSigner {
 			    );
 			}
 			else if (targetType == CounterSignTarget.LEAFS) {
-				XAdESCounterSigner.countersignLeafs(
+				countersignLeafs(
 					root,
 					key,
 					certChain,
@@ -177,7 +177,7 @@ public final class XAdESCounterSigner {
 				);
 			}
 			else if (targetType == CounterSignTarget.NODES) {
-				XAdESCounterSigner.countersignNodes(
+				countersignNodes(
 					root,
 					targets,
 					key,
@@ -188,7 +188,7 @@ public final class XAdESCounterSigner {
 				);
 			}
 			else if (targetType == CounterSignTarget.SIGNERS) {
-				XAdESCounterSigner.countersignSigners(
+				countersignSigners(
 					root,
 					targets,
 					key,
@@ -220,7 +220,7 @@ public final class XAdESCounterSigner {
 				doc = newdoc;
 			}
 			catch (final Exception e) {
-				XAdESCounterSigner.LOGGER.info(
+				LOGGER.info(
 					"No se ha eliminado el nodo padre '<AFIRMA>': " + e //$NON-NLS-1$
 				);
 			}
@@ -264,7 +264,7 @@ public final class XAdESCounterSigner {
 
 				// y crea sus contrafirmas
 				if (numCounterSigns == 0) {
-					XAdESCounterSigner.cs(signature, key, certChain, extraParams, algorithm, doc);
+					cs(signature, key, certChain, extraParams, algorithm, doc);
 					numSignatures++;
 					i++;
 				}
@@ -323,7 +323,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		try {
 			for (final Element node : nodes) {
-				XAdESCounterSigner.cs(node, key, certChain, extraParams, algorithm, doc);
+				cs(node, key, certChain, extraParams, algorithm, doc);
 			}
 		} catch (final Exception e) {
 			throw new AOException(
@@ -369,7 +369,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		final Iterator<Element> i = nodes.iterator();
 		while (i.hasNext()) {
-			XAdESCounterSigner.cs(i.next(), key, certChain, extraParams, algorithm, doc);
+			cs(i.next(), key, certChain, extraParams, algorithm, doc);
 		}
 	}
 
@@ -401,7 +401,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		try {
 			for (int i = 0; i < numSignatures; i++) {
-				XAdESCounterSigner.cs(
+				cs(
 					nodes[i],
 					key,
 					certChain,
@@ -431,7 +431,7 @@ public final class XAdESCounterSigner {
 			               final String algorithm,
 			               final Document doc) throws AOException {
 
-	    final String sigPrefix = Utils.guessXAdESNamespacePrefix(signature);
+	    String sigPrefix = XAdESUtil.guessXAdESNamespacePrefix(signature);
 
 		if (doc == null) {
 			throw new IllegalArgumentException(
@@ -452,41 +452,45 @@ public final class XAdESCounterSigner {
 		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
 
-		// crea un nodo CounterSignature
-		final Element counterSignature = doc.createElement(
-				sigPrefix + ":CounterSignature"); //$NON-NLS-1$
-
-		// recupera o crea un nodo UnsignedSignatureProperties
-		final NodeList usp = signature.getElementsByTagNameNS(
-			"*", "UnsignedSignatureProperties" //$NON-NLS-1$ //$NON-NLS-2$
-		);
-
-		Element unsignedSignatureProperties;
-
-		if (usp.getLength() == 0) {
-			unsignedSignatureProperties = doc.createElement(
-				sigPrefix + ":UnsignedSignatureProperties" //$NON-NLS-1$
-			);
-		}
-		else {
-			unsignedSignatureProperties = (Element) usp.item(0);
-		}
-
-		unsignedSignatureProperties.appendChild(counterSignature);
-
-		// recupera o crea un nodo UnsignedProperties
+		// Buscamos un nodo UnsignedProperties
 		final NodeList up = signature.getElementsByTagNameNS(
 				"*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Usamos el nodo encontrado y su prefijo o creamos uno si no existia
 		final Element unsignedProperties;
 		if (up.getLength() == 0) {
 			unsignedProperties = doc.createElement(
-				sigPrefix + ":UnsignedProperties" //$NON-NLS-1$
+				addNSPrefix(sigPrefix, "UnsignedProperties") //$NON-NLS-1$
 			);
 		}
 		else {
 			unsignedProperties = (Element) up.item(0);
+			sigPrefix = unsignedProperties.getPrefix();
 		}
 
+		// Buscamos un nodo UnsignedSignatureProperties
+		final NodeList usp = signature.getElementsByTagNameNS(
+			"*", "UnsignedSignatureProperties" //$NON-NLS-1$ //$NON-NLS-2$
+		);
+
+		// Usamos el nodo encontrado y su prefijo o creamos uno si no existia
+		Element unsignedSignatureProperties;
+		if (usp.getLength() == 0) {
+			unsignedSignatureProperties = doc.createElement(
+					addNSPrefix(sigPrefix, "UnsignedSignatureProperties") //$NON-NLS-1$
+			);
+		}
+		else {
+			unsignedSignatureProperties = (Element) usp.item(0);
+			sigPrefix = unsignedSignatureProperties.getPrefix();
+		}
+
+		// Crea un nodo CounterSignature
+		final Element counterSignature = doc.createElement(
+				addNSPrefix(sigPrefix, "CounterSignature")); //$NON-NLS-1$
+
+		// Apilamos los nodos para crear bajo ellos la contrafirma
+		unsignedSignatureProperties.appendChild(counterSignature);
 		unsignedProperties.appendChild(unsignedSignatureProperties);
 
 		// inserta el nuevo nodo en QualifyingProperties
@@ -529,7 +533,7 @@ public final class XAdESCounterSigner {
 					"#" + signatureValue.getAttribute("Id"), //$NON-NLS-1$ //$NON-NLS-2$
 					digestMethod,
 					transformList,
-					XAdESCounterSigner.CSURI,
+					CSURI,
 					referenceId
 				)
 			);
@@ -633,6 +637,20 @@ public final class XAdESCounterSigner {
 		catch (final Exception e) {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Agrega al nombre de un nodo el prefijo indicado.
+	 * @param prefix Prefijo que se debe agregar.
+	 * @param nodeName Nombre del nodo.
+	 * @return Nombre del nodo con el prefijo agregado o s&oacute;lo el nombre del nodo
+	 * si el prefijo era {@code null} o cadena vac&iacute;a.
+	 */
+	private static String addNSPrefix(final String prefix, final String nodeName) {
+		if (prefix == null || prefix.isEmpty()) {
+			return nodeName;
+		}
+		return prefix + ":" + nodeName; //$NON-NLS-1$
 	}
 
 	private XAdESCounterSigner() {
