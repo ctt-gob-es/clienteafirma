@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
-/** Case de utilidad para la descarga de datos.
+/** Utilidades para la descarga de datos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class DataDownloader {
 
