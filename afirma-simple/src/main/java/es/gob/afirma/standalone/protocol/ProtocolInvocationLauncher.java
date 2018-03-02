@@ -34,7 +34,7 @@ import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidE
 import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.OSXHandler;
 
-/** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
+/** Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n
  * por protocolo y bajo un entorno compatible <code>Swing</code>.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class ProtocolInvocationLauncher {
@@ -62,7 +62,6 @@ public final class ProtocolInvocationLauncher {
 		ProtocolInvocationLauncher.stickyKeyEntry = stickyKeyEntry;
 	}
 
-
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
      * Este m&eacute;todo usa siempre comunicaci&oacute;n mediante servidor intermedio, nunca localmente.
      * @param urlString URL de invocaci&oacute;n por protocolo.
@@ -72,7 +71,7 @@ public final class ProtocolInvocationLauncher {
     }
 
     @SuppressWarnings({ "unused", "static-method" })
-	void showAbout(EventObject event) {
+	void showAbout(final EventObject event) {
     	MainMenu.showAbout(null);
     }
 
@@ -83,7 +82,7 @@ public final class ProtocolInvocationLauncher {
      *                 para esta comunicaci&oacute;n de vuelta.
      * @return Resultado de la operaci&oacute;n. */
     public static String launch(final String urlString, final boolean bySocket)  {
-        // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
+        // En macOS sobrecargamos el "Acerca de..." del sistema operativo, que tambien
         // aparece en la invocacion por protocolo
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 	    	try {
@@ -137,7 +136,7 @@ public final class ProtocolInvocationLauncher {
                         xmlBatchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
                     catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
+                        LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -210,7 +209,7 @@ public final class ProtocolInvocationLauncher {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
                     catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -227,7 +226,7 @@ public final class ProtocolInvocationLauncher {
                 }
                 // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
                 catch (final SocketOperationException e) {
-                    LOGGER.severe("Error en la operacion de guardado: " + e); //$NON-NLS-1$
+                    LOGGER.log(Level.SEVERE, "Error en la operacion de guardado: " + e, e); //$NON-NLS-1$
                     if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
                         sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
                     }
@@ -270,7 +269,7 @@ public final class ProtocolInvocationLauncher {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
                     catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -331,20 +330,15 @@ public final class ProtocolInvocationLauncher {
                     try {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
-                    catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
+                    catch(final InvalidEncryptedDataLengthException | IOException e) {
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
                     catch(final DecryptionException e) {
-                        LOGGER.severe("Error al descifrar" + e); //$NON-NLS-1$
+                        LOGGER.log(Level.SEVERE, "Error al descifrar" + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
-                    }
-                    catch (final IOException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
-                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
-                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
                     params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
                 }
@@ -383,8 +377,9 @@ public final class ProtocolInvocationLauncher {
         }
 
         // Se solicita una operacion de carga/multicarga
-        else if (urlString.startsWith("afirma://load?") //$NON-NLS-1$
-        		) {
+        else if (
+    		urlString.startsWith("afirma://load?") //$NON-NLS-1$
+		) {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga/multicarga"); //$NON-NLS-1$
 
             try {
@@ -401,8 +396,8 @@ public final class ProtocolInvocationLauncher {
                     try {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
-                    catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
+                    catch(final InvalidEncryptedDataLengthException | IOException e) {
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -410,11 +405,6 @@ public final class ProtocolInvocationLauncher {
                         LOGGER.severe("Error al descifrar" + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
-                    }
-                    catch (final IOException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
-                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
-                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
                     params = ProtocolInvocationUriParser.getParametersToLoad(xmlData);
                 }
@@ -470,8 +460,8 @@ public final class ProtocolInvocationLauncher {
                     try {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
                     }
-                    catch(final InvalidEncryptedDataLengthException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                    catch(final InvalidEncryptedDataLengthException | IOException e) {
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
@@ -479,11 +469,6 @@ public final class ProtocolInvocationLauncher {
                         LOGGER.severe("Error al descifrar" + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
-                    }
-                    catch (final IOException e) {
-                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
-                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
-                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
                     params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(xmlData);
                 }
@@ -511,26 +496,25 @@ public final class ProtocolInvocationLauncher {
         }
         else {
         	LOGGER.severe(
-        			"La operacion indicada en la URL no esta soportada: " +  //$NON-NLS-1$
-        					urlString.substring(0, Math.min(30, urlString.length())) + "..."); //$NON-NLS-1$
+    			"La operacion indicada en la URL no esta soportada: " +  //$NON-NLS-1$
+    					urlString.substring(0, Math.min(30, urlString.length())) + "..." //$NON-NLS-1$
+			);
             ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_04);
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_04);
         }
         throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
     }
 
-    /**
-     * Env&iacute;a una cadena de texto al servidor intermedio.
+    /** Env&iacute;a una cadena de texto al servidor intermedio.
      * @param data Cadena de texto.
      * @param serviceUrl URL del servicio de env&iacute;o de datos.
-     * @param id Identificador del mensaje en el servidor.
-     */
-	public static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
-
+     * @param id Identificador del mensaje en el servidor. */
+	private static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
 		try {
 			IntermediateServerUtil.sendData(data, serviceUrl, id);
-		} catch (final IOException e) {
-			LOGGER.severe("Error al enviar los datos del error al servidor intermedio: " + e); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "Error al enviar los datos del error al servidor intermedio: " + e, e); //$NON-NLS-1$
 		}
 	}
 

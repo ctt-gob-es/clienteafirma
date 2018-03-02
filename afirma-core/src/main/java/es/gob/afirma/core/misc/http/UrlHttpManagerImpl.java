@@ -188,7 +188,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final URL uri = new URL(request != null ? request : url);
 
 		final boolean disableSslChecks = Boolean.parseBoolean(
-				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "true")); //$NON-NLS-1$
+				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "true") //$NON-NLS-1$
+		);
 
 		if (disableSslChecks && uri.getProtocol().equals(HTTPS)) {
 			try {
@@ -295,6 +296,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
+		LOGGER.info(
+			"Habilitadas comprobaciones SSL" //$NON-NLS-1$
+		);
 	}
 
 	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
@@ -340,6 +344,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 					return true;
 				}
 			}
+		);
+		LOGGER.info(
+			"Deshabilitadas comprobaciones SSL" //$NON-NLS-1$
 		);
 	}
 
