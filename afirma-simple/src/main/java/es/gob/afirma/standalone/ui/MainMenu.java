@@ -167,6 +167,17 @@ public final class MainMenu extends JMenuBar {
 		);
         menuArchivo.add(this.firmarMenuItem);
 
+        final JMenuItem validateSignMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
+        validateSignMenu.setAccelerator(
+        		KeyStroke.getKeyStroke(KeyEvent.VK_V,
+        				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        validateSignMenu.getAccessibleContext().setAccessibleDescription(
+        		SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
+		validateSignMenu.setMnemonic(KeyEvent.VK_V);
+		validateSignMenu.addActionListener(ae -> viewSignature(this));
+		menuArchivo.add(validateSignMenu);
+
+
         final JMenu toolsMenu = new JMenu(
     		SimpleAfirmaMessages.getString("MainMenu.32") //$NON-NLS-1$
 		);
@@ -274,18 +285,6 @@ public final class MainMenu extends JMenuBar {
 		restoreConfigMenuItem.addActionListener(ae -> showRestoreConfig());
 
 		toolsMenu.add(restoreConfigMenuItem);
-
-
-
-        final JMenuItem validateSignMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
-        validateSignMenu.setAccelerator(
-        		KeyStroke.getKeyStroke(KeyEvent.VK_V,
-        				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        validateSignMenu.getAccessibleContext().setAccessibleDescription(
-        		SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
-		validateSignMenu.setMnemonic(KeyEvent.VK_V);
-		validateSignMenu.addActionListener(ae -> viewSignature(this));
-		toolsMenu.add(validateSignMenu);
 
 		this.add(toolsMenu);
 
