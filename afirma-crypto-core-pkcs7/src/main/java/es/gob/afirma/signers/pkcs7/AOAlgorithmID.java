@@ -20,7 +20,10 @@ public final class AOAlgorithmID {
 
     private static final String OID_SHA1   = "1.3.14.3.2.26"; //$NON-NLS-1$
     private static final String OID_SHA512 = "2.16.840.1.101.3.4.2.3"; //$NON-NLS-1$
-    private static final String OID_SHA256 = "2.16.840.1.101.3.4.2.1"; //$NON-NLS-1$
+
+    /** OID del algoritmo de huella SHA-256. */
+    public static final String OID_SHA256 = "2.16.840.1.101.3.4.2.1"; //$NON-NLS-1$
+
     private static final String OID_SHA384 = "2.16.840.1.101.3.4.2.2"; //$NON-NLS-1$
     private static final String OID_RSA    = "1.2.840.113549.1.1.1"; //$NON-NLS-1$
 
