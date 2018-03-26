@@ -23,20 +23,17 @@ public final class TestFirewall {
 	 * @throws Exception En cualquier error no controlado. */
 	public static void main(final String[] args) throws Exception {
 		new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-					try {
-						createSocket(PORT);
-					}
-					catch (final IOException e) {
-						System.out.println(
-							"Error creando el servicio servidor en el puerto " + PORT //$NON-NLS-1$
-						);
-						e.printStackTrace();
-					}
-
+			() -> {
+				try {
+					createSocket(PORT);
 				}
+				catch (final IOException e) {
+					System.out.println(
+						"Error creando el servicio servidor en el puerto " + PORT //$NON-NLS-1$
+					);
+					e.printStackTrace();
+				}
+
 			}
 		).start();
 		Thread.sleep(3000);
@@ -49,7 +46,7 @@ public final class TestFirewall {
 				);
 			}
 			catch(final SocketTimeoutException | java.net.ConnectException ste) {
-				System.out.println("No se ha podido conectar"); //$NON-NLS-1$
+				System.out.println("No se ha podido conectar: " + ste); //$NON-NLS-1$
 				System.exit(-2);
 			}
 			try ( final InputStream is = s.getInputStream(); ) {

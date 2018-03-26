@@ -170,7 +170,25 @@ public final class CAdESUtils {
         // No permitimos la instanciacion
     }
 
-    /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035:
+    /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035.
+     * Es importante rese&ntilde;ar que la estructura <code>ESSCertIDv2</code> tiene la siguiente estructura:
+     * <pre>
+     *  ESSCertIDv2 ::=  SEQUENCE {
+     *   hashAlgorithm AlgorithmIdentifier DEFAULT {algorithm id-sha256},
+     *   certHash Hash,
+     *   issuerSerial IssuerSerial OPTIONAL
+     *  }
+     * </pre>
+     * En <code>DER</code> un campo marcado como <code>DEFAULT</code> no debe codificarse, debe dejarse ausente:
+     * <a href="http://www.oss.com/asn1/resources/asn1-faq.html#default">http://www.oss.com/asn1/resources/asn1-faq.html#default</a>.<br>
+     * Dado que el <code>SignedData</code> debe codificarse en <code>DER</code>, si el algoritmo de huella es SHA-256, el campo de OID de
+     * algoritmo debe estar ausente.<br>
+     * Citando la especificaci&oacute;n "ETSI TS 102 778-3"  (PDF Advanced Electronic Signature Profiles;Part 3: PAdES Enhanced - PAdES-BES
+     * and PAdES-EPES Profiles) en su apartado "4.2 b"):<br>
+     * <i>
+     *  b) A <b>DER-encoded</b> SignedData object as specified in CMS (RFC 3852 [4]) shall be included as the PDF signature in the entry with the
+     *  key Content of the signature dictionary as described in ISO 32000-1 [1], clause 12.8.1.
+     * </i>
      * @param cert Certificado del firmante.
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar.
      * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
@@ -184,9 +202,14 @@ public final class CAdESUtils {
     		                                         final String digestAlgorithmName,
                                                      final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
     		                                                                                                      NoSuchAlgorithmException {
-
     	// ALGORITMO DE HUELLA DIGITAL
-        final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
+    	final String hashOid = AOAlgorithmID.getOID(digestAlgorithmName);
+    	// Si es SHA-256 ponemos el OID a null para que no incluya el campo (y tome su
+    	// valor por defecto).
+        final AlgorithmIdentifier digestAlgorithmOID =
+    		AOAlgorithmID.OID_SHA256.equals(hashOid) ?
+				null :
+					SigUtils.makeAlgId(hashOid);
 
         // INICIO SINGING CERTIFICATE-V2
 
@@ -366,7 +389,7 @@ public final class CAdESUtils {
      * </pre>
      *
      * @param cert Certificado del firmante.
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar.
      * @param data Datos firmados.
      * @param policy Pol&iacute;tica de firma.
      * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
