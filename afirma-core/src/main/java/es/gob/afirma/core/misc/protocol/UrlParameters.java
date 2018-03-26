@@ -32,6 +32,12 @@ public abstract class UrlParameters {
 	/** Par&aacute;metro de entrada con los datos a firmar. */
 	protected static final String DATA_PARAM = "dat"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada que indica si los datos a firmar vienen comrpimidos en GZIP,
+	 * pero hay que firmarlos descomprimidos.
+	 * La compresi&oacute;n en GZIP permite reducir el uso de servidor intermedio haciendo que
+	 * quepan m&aacute;s datos en la URL de invocaci&oacute;n. */
+	private static final String GZIPPED_DATA_PARAM = "gzip"; //$NON-NLS-1$
+
 	/** Par&aacute;metro de entrada con el servlet remoto de recuperaci&oacute;n de datos. */
 	private static final String RETRIEVE_SERVLET_PARAM = "rtservlet"; //$NON-NLS-1$
 
@@ -233,7 +239,12 @@ public abstract class UrlParameters {
 			}
 			try {
 				setData(
-					DataDownloader.downloadData(dataPrm)
+					DataDownloader.downloadData(
+						dataPrm,
+						// Boolean.parseBoolean() da false con null y en general con cualquier cosa que
+						// no sea la cadena "true"
+						Boolean.parseBoolean(params.get(GZIPPED_DATA_PARAM))
+					)
 				);
 			}
 			catch (final Exception e) {
