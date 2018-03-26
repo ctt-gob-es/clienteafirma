@@ -33,7 +33,7 @@ public class TestContrafirmaIgae {
 
     private static final String CERT_PATH = "CATCERT CIUTADANIA PF CPIXSA-2.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "persona física de la peça de proves"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "persona f\u00EDsica de la pe\u00E7a de proves"; //$NON-NLS-1$
 
 
 

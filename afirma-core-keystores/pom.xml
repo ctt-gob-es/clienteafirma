@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.7-SNAPSHOT</version>
+		<version>1.6.2</version>
 	</parent>
 	
 	<dependencies>
@@ -26,19 +26,19 @@
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.4</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.4</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-ui</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.4</version>
 		</dependency>
 		
 	</dependencies>

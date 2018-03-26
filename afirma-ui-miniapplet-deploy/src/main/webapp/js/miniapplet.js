@@ -14,9 +14,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.6";
+		var VERSION = "1.6.2";
 
-		var JAR_NAME = 'miniapplet-full_1_6.jar';
+		var JAR_NAME = 'miniapplet-full_1_6_2.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -761,12 +761,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			if (clientType == TYPE_APPLET) {
 				try {
-					
 					var filenameDataBase64Pair = buildData(clienteFirma.getFileNameContentBase64(title, extensions, description, filePath));
-					var sepPos = filenameDataBase64Pair.indexOf('|');
 					if (successCallback == undefined || successCallback == null) {
-						return filenameDataBase64Pair.substring(sepPos + 1);
+						return filenameDataBase64Pair;
 					}
+					var sepPos = filenameDataBase64Pair.indexOf('|');
 					successCallback(filenameDataBase64Pair.substring(0, sepPos), filenameDataBase64Pair.substring(sepPos + 1));
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {

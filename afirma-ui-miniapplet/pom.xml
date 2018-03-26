@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.7-SNAPSHOT</version>
+		<version>1.6.2</version>
 	</parent>
 
 	<properties>
@@ -20,7 +20,7 @@
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
 		<afirma.keytool.password>afirma</afirma.keytool.password>
 		<afirma.jar.name>miniapplet-full</afirma.jar.name>
-		<afirma.legible.version>1_6</afirma.legible.version>
+		<afirma.legible.version>1_6_2</afirma.legible.version>
 	</properties>
 
 	<dependencies>
@@ -118,19 +118,19 @@
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-jmimemagic</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-juniversalchardet</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-oro</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 		</dependency>
 
 		<dependency>
@@ -172,7 +172,7 @@
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.4</version>
 		</dependency>
 
 		<dependency>

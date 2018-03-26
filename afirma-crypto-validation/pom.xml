@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.7-SNAPSHOT</version>
+		<version>1.6.2</version>
 	</parent>
 
 	<dependencies>
@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-itext</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 		</dependency>
 		
 	</dependencies>
