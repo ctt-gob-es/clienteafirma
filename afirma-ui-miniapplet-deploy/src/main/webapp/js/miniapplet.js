@@ -1210,7 +1210,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					dataB64 = null;
 				}
 
-				if (dataB64 != null && !isValidUrl(dataB64)) {
+				if (dataB64 != null && !isValidUrl(dataB64)  && format!="XAdES") {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
 
