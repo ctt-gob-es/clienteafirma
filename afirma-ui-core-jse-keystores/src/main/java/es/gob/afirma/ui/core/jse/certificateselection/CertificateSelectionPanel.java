@@ -69,7 +69,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	JScrollPane sPane;
 
-	private int selectedIndex;
+	private int selectedIndex = -1;
 
 	private NameCertificateBean[] certificateBeans;
 
@@ -218,6 +218,18 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			textMessage.setPreferredSize(new Dimension(370, 40));
 			this.add(textMessage, c);
 		}
+		else if (this.certificateBeans.length == 0) {
+			c.insets = new Insets(0, 15, 4, 15);
+			c.gridy++;
+
+			final JTextPane textMessage = new JTextPane();
+			textMessage.setOpaque(false);
+			textMessage.setText("No se han encontrado certificados v\u00E1lidos en el almac\u00E9n. Inserte una tarjeta inteligente en el lector y pulse Recargar, o cargue un almac\u00E9n externo."); //$NON-NLS-1$
+			textMessage.setFont(TEXT_FONT);
+			textMessage.setBorder(null);
+			textMessage.setPreferredSize(new Dimension(370, 40));
+			this.add(textMessage, c);
+		}
 
 		c.insets = new Insets(4, 15, 8, 15);
 		c.gridy++;
@@ -242,8 +254,13 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.setCellRenderer(new CertListCellRendered());
 		this.certList.setListData(certLines.toArray(new CertificateLine[certLines.size()]));
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
+
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
+			this.selectedIndex = 0;
+		}
+		else {
+			this.selectedIndex = -1;
 		}
 
 		this.sPane = new JScrollPane(
@@ -256,9 +273,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		final CertLinkMouseListener mouseListener = new CertLinkMouseListener();
 		this.certList.addMouseMotionListener(mouseListener);
 		this.certList.addMouseListener(mouseListener);
-
-		this.certList.setSelectedIndex(0);
-		this.selectedIndex = 0;
 
 		this.sPane.setBorder(null);
 		this.sPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));

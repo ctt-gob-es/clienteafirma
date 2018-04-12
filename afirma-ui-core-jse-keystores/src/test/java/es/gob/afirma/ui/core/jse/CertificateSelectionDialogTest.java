@@ -4,7 +4,6 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 
 
 /**
@@ -23,15 +22,30 @@ public class CertificateSelectionDialogTest {
 	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
 
+//		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+//				AOKeyStore.PKCS12,
+//				ClassLoader.getSystemResource(CERT_PATH).toString().replace("file:/", ""), //$NON-NLS-1$ //$NON-NLS-2$
+//				null,
+//				new CachePasswordCallback(CERT_PASS.toCharArray()),
+//				null);
+
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				AOKeyStore.PKCS12,
-				ClassLoader.getSystemResource(CERT_PATH).toString().replace("file:/", ""), //$NON-NLS-1$ //$NON-NLS-2$
+				AOKeyStore.WINDOWS,
 				null,
-				new CachePasswordCallback(CERT_PASS.toCharArray()),
+				null,
+				null,
 				null);
 
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, false);
-		final String alias = dialog.show();
+		String alias;
+		try {
+			alias = dialog.show();
+		}
+		catch (final Exception e) {
+			System.err.println("Error: " + e);
+			e.printStackTrace();
+			return;
+		}
 
 		System.out.println("Certificado:\n" + ksm.getCertificate(alias)); //$NON-NLS-1$
 	}

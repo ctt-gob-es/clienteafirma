@@ -144,7 +144,8 @@ public class JSEUIManager implements AOUIManager {
             parent = (Component) c;
         }
 
-        pane.createDialog(parent, JSEUIMessages.getString("JSEUIManager.24")).setVisible(true); //$NON-NLS-1$
+        final JDialog dialog = pane.createDialog(parent, JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
+        dialog.setVisible(true);
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {

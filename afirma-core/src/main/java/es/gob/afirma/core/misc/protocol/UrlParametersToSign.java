@@ -282,11 +282,6 @@ public final class UrlParametersToSign extends UrlParameters {
 	 * @throws IncompatiblePolicyException Cuando se hayan proporcionado par&aacute;metros
 	 * incompatibles con la pol&iacute;tica de firma configurada. */
 	public void expandExtraParams() throws IncompatiblePolicyException {
-
-		LOGGER.info(" ================ Expandimos las propiedades: ");
-		LOGGER.info(" ================ Formato: " + getSignatureFormat());
-		LOGGER.info(" ================ ExtraParams inicial: " + getExtraParams().toString());
-
 		setExtraParams(
 				ExtraParamsProcessor.expandProperties(
 				getExtraParams(),
@@ -294,8 +289,5 @@ public final class UrlParametersToSign extends UrlParameters {
 				getSignatureFormat()
 			)
 		);
-
-		LOGGER.info(" ================ ExtraParams final: " + getExtraParams().toString());
-
 	}
 }

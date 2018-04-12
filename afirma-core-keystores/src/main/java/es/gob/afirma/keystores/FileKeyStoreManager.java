@@ -9,6 +9,7 @@
 
 package es.gob.afirma.keystores;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -28,6 +29,8 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 
 	/** Contiene una copia de la contrase&ntilde;a que se uso para inicializar el almac&eacute;n. */
 	private PasswordCallback cachePasswordCallback;
+
+	private String keystoreFile = null;
 
 	/** Inicializa un almac&eacute;n de claves y certificados de tipo fichero.
 	 * @param store Flujo de datos hacia el propio almac&eacute;n (fichero)
@@ -134,4 +137,18 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
     }
 
 
+	protected void setKeyStoreFile(String pkcs12File) {
+		this.keystoreFile = pkcs12File;
+	}
+
+	@Override
+	public void refresh() throws IOException {
+		// Para recargar el almacen, volvemos a cargar el fichero indicado.
+		// El metodo de inicializacion ya se encarga de cerrar el fichero.
+		try {
+			setKeyStore(init(new FileInputStream(this.keystoreFile), this.cachePasswordCallback));
+		} catch (final AOKeyStoreManagerException e) {
+			throw new IOException("Error al recargar el almacen PKCS#12", e); //$NON-NLS-1$
+		}
+	}
 }

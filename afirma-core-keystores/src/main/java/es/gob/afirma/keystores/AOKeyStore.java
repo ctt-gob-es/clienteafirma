@@ -248,8 +248,8 @@ public enum AOKeyStore {
 	 * @param parent Componente padre para la modalidad.
 	 * @return <i>PasswordCallback</i> necesario para abrir el almac&eacute;n. */
 	public PasswordCallback getStorePasswordCallback(final Object parent) {
-		if (this.certificatePasswordCallback instanceof UIPasswordCallback) {
-			((UIPasswordCallback)this.certificatePasswordCallback).setParent(parent);
+		if (this.storePasswordCallback instanceof UIPasswordCallback) {
+			((UIPasswordCallback)this.storePasswordCallback).setParent(parent);
 		}
 		return this.storePasswordCallback;
 	}

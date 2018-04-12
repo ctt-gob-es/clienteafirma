@@ -255,7 +255,7 @@ public final class ServiceInvocationManager {
             LOGGER.severe("Error con el keyStore: " + e); //$NON-NLS-1$
 		}
         catch(final NoSuchAlgorithmException e){
-            LOGGER.severe("Error con el algorimto del  certificado: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error con el algoritmo del  certificado: " + e); //$NON-NLS-1$
         }
         catch(final CertificateException e){
             LOGGER.severe("Error con el certificado: " + e); //$NON-NLS-1$

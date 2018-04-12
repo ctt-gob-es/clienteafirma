@@ -204,7 +204,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public String show() throws AOCertificatesNotFoundException {
+	public String show() {
 
 		final NameCertificateBean[] namedCertificates = getNameCertificates();
 
@@ -215,16 +215,10 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			return this.selectedAlias;
 		}
 
-		//TODO: Esto es temporal. La siguiente version del dialogo permitira que no haya
-		// certificados y mostrara el boton de actualizar por si el usuario quiere cargar
-		// certificados en tarjeta
-		if (namedCertificates == null || namedCertificates.length < 1) {
-			throw new AOCertificatesNotFoundException(
-				"No se han encontrado certificados en el almacen acordes a los filtros establecidos" //$NON-NLS-1$
-			);
-		}
-
+		// Mostramos el dialogo de seleccion de certificados
 		this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
+
+		// Si devuelve null, es que el usuario cancelo el dialogo
 		if (this.selectedAlias == null) {
 			throw new AOCancelledOperationException("No se ha seleccionado certificado"); //$NON-NLS-1$
 		}

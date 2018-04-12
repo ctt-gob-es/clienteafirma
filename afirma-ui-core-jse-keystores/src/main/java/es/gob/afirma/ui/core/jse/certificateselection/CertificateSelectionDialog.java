@@ -101,19 +101,21 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		this.disableSelection = disableCertificateSelection;
 	}
 
+	JDialog certDialog = null;
+
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
 	 * cancela el di&aacute;logo o cierra sin seleccionar. */
 	public String showDialog() {
 
-		final JDialog certDialog = this.optionPane.createDialog(
+		this.certDialog = this.optionPane.createDialog(
 			this.parent,
 			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
 		);
 
-		certDialog.setBackground(Color.WHITE);
-		certDialog.setModal(true);
-		certDialog.setAlwaysOnTop(true);
+		this.certDialog.setBackground(Color.WHITE);
+		this.certDialog.setModal(true);
+		this.certDialog.setAlwaysOnTop(true);
 
 		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
 			this.optionPane,
@@ -122,18 +124,20 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 
-		certDialog.setVisible(true);
+		this.certDialog.setVisible(true);
 
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
+
+		// Si el usuario cancelo el dialogo, lo cerramos
 		if (this.optionPane.getValue() == null || ((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
-			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
-			certDialog.dispose();
+			this.certDialog.dispose();
 			return null;
 		}
 
 		final String selectedAlias = this.csd.getSelectedCertificateAlias();
 
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
-		certDialog.dispose();
+		this.certDialog.dispose();
+		this.certDialog = null;
 
 		return selectedAlias;
 	}
@@ -188,6 +192,23 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
+		}
+
+		this.certDialog.pack();
+//		// Cerramos el dialogo mostrado
+//		closeDialog();
+//
+//		// Volvemos a mostrar el dialogo, que ya se habra redimensionado
+//		// segun el nuevo contenido
+//		showDialog();
+	}
+
+	/**
+	 * Oculta el di&aacute;logo.
+	 */
+	private void closeDialog() {
+		if (this.certDialog != null) {
+			this.certDialog.dispose();
 		}
 	}
 

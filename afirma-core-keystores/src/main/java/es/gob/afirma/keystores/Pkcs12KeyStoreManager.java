@@ -19,6 +19,8 @@ import javax.security.auth.callback.PasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class Pkcs12KeyStoreManager extends FileKeyStoreManager {
 
+	private PasswordCallback passwordCallBack = null;
+
 	Pkcs12KeyStoreManager() {
 		setKeyStoreType(AOKeyStore.PKCS12);
 	}
@@ -31,7 +33,8 @@ public final class Pkcs12KeyStoreManager extends FileKeyStoreManager {
                      final Object[] params,
                      final boolean forceReset) throws AOKeyStoreManagerException,
                                                       IOException {
-		setKeyStore(init(store, pssCallBack));
-	}
 
+		this.passwordCallBack = pssCallBack;
+		setKeyStore(init(store, this.passwordCallBack));
+	}
 }

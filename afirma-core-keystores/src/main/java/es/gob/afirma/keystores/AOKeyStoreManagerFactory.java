@@ -204,8 +204,11 @@ public final class AOKeyStoreManagerFactory {
     		                                                  final boolean forceReset,
     		                                                  final Object parentComponent) throws IOException,
     		                                                  						               AOKeystoreAlternativeException {
+    	final FileKeyStoreManager p12Ksm = new Pkcs12KeyStoreManager();
+    	p12Ksm.setKeyStoreFile(lib);
+
     	return addFileKeyStoreManager(
-			new Pkcs12KeyStoreManager(),
+    			p12Ksm,
 			new String[] {
                 "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
             },
@@ -222,8 +225,11 @@ public final class AOKeyStoreManagerFactory {
     														final boolean forceReset,
     														final Object parentComponent) throws IOException,
     															                                 AOKeystoreAlternativeException {
+    	final FileKeyStoreManager javaKsm = new JavaKeyStoreManager();
+    	javaKsm.setKeyStoreFile(lib);
+
     	return addFileKeyStoreManager(
-			new JavaKeyStoreManager(),
+    		javaKsm,
 			new String[] {
                 "jks" //$NON-NLS-1$
             },
