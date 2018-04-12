@@ -32,7 +32,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
-	
+
 	/** Par&aacute;metro de entrada que nos dice si tenemos que usar un provatekeyentry fijado o fijar uno nuevo. */
 	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
 
@@ -40,10 +40,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 	private String batchPostSignerUrl = null;
 
 	private String minimumVersion;
-	
+
 	/**
 	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
-	 * el primer certificado seleccionado para todas las operaciones. 
+	 * el primer certificado seleccionado para todas las operaciones.
 	 */
 	private boolean sticky;
 
@@ -56,10 +56,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 	void setBatchPresignerUrl(final String url) {
 		this.batchPreSignerUrl = url;
 	}
-	
+
 	/**
 	 * Obtiene la opci&oacute;n de configuraci&oacute;n sticky
-	 * 
+	 *
 	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
 	 *         debe pedir siempre que el usuario elija uno ({@code false})
@@ -87,7 +87,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	void setBatchPostsignerUrl(final String url) {
 		this.batchPostSignerUrl = url;
 	}
-	
+
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
 		// idSession para el service Web. Con socket no se usa
@@ -135,7 +135,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
 		setDefaultKeyStoreLib(UrlParameters.getDefaultKeyStoreLib(params));
-				
+
 		setBatchPostsignerUrl(
 			validateURL(
 				params.get(PARAM_BATCH_POSTSIGNER)
@@ -170,22 +170,26 @@ public final class UrlParametersForBatch extends UrlParameters {
 			props = params.get(PROPERTIES_PARAM);
 		}
 
-		if (props != null) {
+		if (props != null && !props.isEmpty()) {
 			try {
 				setExtraParams(AOUtil.base642Properties(props));
 			}
-			catch ( final Exception e) {
+			catch (final Exception e) {
+				LOGGER.severe(
+					"Las propiedades adicionales indicadas en el parametro '" + PROPERTIES_PARAM + "' no se han podido cargar: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				setExtraParams(new Properties());
 			}
 		}
 		else {
 			setExtraParams(new Properties());
 		}
-		
+
 		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
 			setSticky(Boolean.parseBoolean(params.get(STICKY_PARAM)));
-		} else {
+		}
+		else {
 			setSticky(false);
 		}
 

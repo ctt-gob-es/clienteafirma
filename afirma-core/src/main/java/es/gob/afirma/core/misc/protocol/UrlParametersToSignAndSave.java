@@ -264,11 +264,14 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 			props = params.get(PROPERTIES_PARAM);
 		}
 
-		if (props != null) {
+		if (props != null && !props.isEmpty()) {
 			try {
 				setExtraParams(AOUtil.base642Properties(props));
 			}
 			catch (final Exception e) {
+				LOGGER.severe(
+					"Las propiedades adicionales indicadas en el parametro '" + PROPERTIES_PARAM + "' no se han podido cargar: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				setExtraParams(new Properties());
 			}
 		}

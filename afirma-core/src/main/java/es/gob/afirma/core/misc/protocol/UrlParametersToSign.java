@@ -251,11 +251,14 @@ public final class UrlParametersToSign extends UrlParameters {
 		if (params.containsKey(PROPERTIES_PARAM)) {
 			props = params.get(PROPERTIES_PARAM);
 		}
-		if (props != null) {
+		if (props != null && !props.isEmpty()) {
 			try {
 				setExtraParams(AOUtil.base642Properties(props));
 			}
 			catch (final Exception e) {
+				LOGGER.severe(
+					"Las propiedades adicionales indicadas en el parametro '" + PROPERTIES_PARAM + "' no se han podido cargar: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				setExtraParams(new Properties());
 			}
 		}
@@ -276,17 +279,12 @@ public final class UrlParametersToSign extends UrlParameters {
 
 	}
 
-	/** Expande los extraParams configurados en la URL que lo permitran. Por ejemplo,
-	 * la politica de firma establecida mediante "expPolicy" se expandir&aacute; a los
+	/** Expande los <code>extraParams</code> configurados en la URL que lo permitran. Por ejemplo,
+	 * la pol&iacute;tica de firma establecida mediante "expPolicy" se expandir&aacute; a los
 	 * valores correspondientes de la pol&iacute;tica.
 	 * @throws IncompatiblePolicyException Cuando se hayan proporcionado par&aacute;metros
-	 * incompatibles con la pol&iacute;tica de firma configurada. */
+	 *                                     incompatibles con la pol&iacute;tica de firma configurada. */
 	public void expandExtraParams() throws IncompatiblePolicyException {
-
-		LOGGER.info(" ================ Expandimos las propiedades: ");
-		LOGGER.info(" ================ Formato: " + getSignatureFormat());
-		LOGGER.info(" ================ ExtraParams inicial: " + getExtraParams().toString());
-
 		setExtraParams(
 				ExtraParamsProcessor.expandProperties(
 				getExtraParams(),
@@ -294,8 +292,5 @@ public final class UrlParametersToSign extends UrlParameters {
 				getSignatureFormat()
 			)
 		);
-
-		LOGGER.info(" ================ ExtraParams final: " + getExtraParams().toString());
-
 	}
 }
