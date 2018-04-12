@@ -80,11 +80,11 @@ public class JSEUIManager implements AOUIManager {
 	public static final String PREFERENCE_DIRECTORY = "currentDir"; //$NON-NLS-1$
 
 	/** Pregunta al usuario por una contrase&ntilde;a.
-     * @param text Texto que se muestra en el di&aacute;logo para pedir la contrase&ntilde;a
-     * @param c Componente padre (para la modalidad)
-     * @return Contrase&ntilde;a introducida por el usuario
+     * @param text Texto que se muestra en el di&aacute;logo para pedir la contrase&ntilde;a.
+     * @param c Componente padre (para la modalidad).
+     * @return Contrase&ntilde;a introducida por el usuario.
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso de solicitud de
-     *         contrase&ntilde;a */
+     *         contrase&ntilde;a. */
     @Override
 	public final char[] getPassword(final String text, final Object c) {
         return getPassword(text, null, null, false, c);
@@ -92,25 +92,31 @@ public class JSEUIManager implements AOUIManager {
 
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
      * @param text Texto con el que se solicitar&aacute; la entrada de texto al
-     *             usuario (<i>prompt</i>)
+     *             usuario (<i>prompt</i>).
      * @param imageIcon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
      * 			   {@code null} para no mostrar icono.
-     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a
+     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a.
      * @param beep <code>true</code> si se desea un sonido de advertencia al
      *             introducir un caracter no v&aacute;lido, <code>false</code> en
-     *             caso contrario
-     * @param c Componente padre (para la modalidad)
-     * @return Array de caracteres del texto introducido como contrase&ntilde;a
-     * @throws AOCancelledOperationException
-     *         Cuando el usuario cancela o cierra el di&aacute;logo */
+     *             caso contrario.
+     * @param c Componente padre (para la modalidad).
+     * @return Array de caracteres del texto introducido como contrase&ntilde;a.
+     * @throws AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo. */
     @Override
-	public final char[] getPassword(final String text, final Object imageIcon, final String charSet, final boolean beep, final Object c) {
+	public final char[] getPassword(final String text,
+			                        final Object imageIcon,
+			                        final String charSet,
+			                        final boolean beep,
+			                        final Object c) {
+
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
         }
         final JLabel lbText = new JLabel(text != null ? text : JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
-        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
+        lbText.setMinimumSize(
+    		new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height)
+		);
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
 
@@ -124,10 +130,7 @@ public class JSEUIManager implements AOUIManager {
         constraints.gridy = 1;
         panel.add(pwd, constraints);
 
-        Icon icon = null;
-        if (imageIcon instanceof javax.swing.Icon) {
-        	icon = (javax.swing.Icon) imageIcon;
-        }
+        final Icon icon = imageIcon instanceof javax.swing.Icon ? (javax.swing.Icon) imageIcon : null;
 
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, icon) {
             private static final long serialVersionUID = -3012522768561175760L;
@@ -139,10 +142,7 @@ public class JSEUIManager implements AOUIManager {
             }
         };
 
-        Component parent = null;
-        if (c instanceof Component) {
-            parent = (Component) c;
-        }
+        final Component parent = c instanceof Component ? (Component) c : null;
 
         pane.createDialog(parent, JSEUIMessages.getString("JSEUIManager.24")).setVisible(true); //$NON-NLS-1$
 
@@ -162,24 +162,32 @@ public class JSEUIManager implements AOUIManager {
     /** {@inheritDoc} */
     @Override
 	public final Object showInputDialog(final Object parentComponent,
-                                  final Object message,
-                                  final String title,
-                                  final int messageType,
-                                  final Object icon,
-                                  final Object[] selectionValues,
-                                  final Object initialSelectionValue) {
-        Component parent = null;
-        if (parentComponent instanceof Component) {
-            parent = (Component) parentComponent;
-        }
-        Icon dialogIcon = null;
-        if (icon instanceof Icon) {
-            dialogIcon = (Icon) icon;
-        }
+                                        final Object message,
+                                        final String title,
+                                        final int messageType,
+                                        final Object icon,
+                                        final Object[] selectionValues,
+                                        final Object initialSelectionValue) {
+
+    	final Component parent = parentComponent instanceof Component ? (Component) parentComponent : null;
+        final Icon dialogIcon = icon instanceof Icon ? (Icon) icon : null;
         if (selectionValues == null) {
-        	return JOptionPane.showInputDialog(parent, message, title, messageType);
+        	return JOptionPane.showInputDialog(
+    			parent,
+    			message,
+    			title,
+    			messageType
+			);
         }
-        return JOptionPane.showInputDialog(parent, message, title, messageType, dialogIcon, selectionValues, initialSelectionValue);
+        return JOptionPane.showInputDialog(
+    		parent,
+    		message,
+    		title,
+    		messageType,
+    		dialogIcon,
+    		selectionValues,
+    		initialSelectionValue
+		);
     }
 
     /** {@inheritDoc} */
@@ -187,10 +195,7 @@ public class JSEUIManager implements AOUIManager {
 	public final String showCertificateSelectionDialog(final Object parentComponent,
     												   final KeyStoreDialogManager ksdm) {
 
-    	Component parent = null;
-    	if (parentComponent instanceof Component) {
-    		parent = (Component) parentComponent;
-    	}
+    	final Component parent = parentComponent instanceof Component ? (Component) parentComponent : null;
 
     	try {
     		final Class<?> csdClass = Class.forName(
@@ -235,10 +240,10 @@ public class JSEUIManager implements AOUIManager {
         /** Crea un nuevo filtro para campo de entrada de texto.
          * @param acceptedchars Cadena que debe contener todos los caracteres aceptados.
          *                      Cualquier caracter no incluido en esta cadena ser&aacute;
-         *                      considerado inv&aacute;lido
+         *                      considerado inv&aacute;lido.
          * @param beepOnError <code>true</code> si desea que se reproduzca un sonido
          *                    cuando el usuario introduce un caracter no v&aacute;lido,
-         *        			  false en caso contrario */
+         *        			  false en caso contrario. */
         JTextFieldFilter(final String acceptedchars, final boolean beepOnError) {
             this.beep = beepOnError;
             this.acceptedChars = acceptedchars;
@@ -265,7 +270,7 @@ public class JSEUIManager implements AOUIManager {
 
     }
 
-    /** Filtro de caracteres ASCCI imprimibles. */
+    /** Filtro de caracteres ASCII imprimibles. */
     public static final class JTextFieldASCIIFilter extends PlainDocument {
 
         private static final long serialVersionUID = 1979726487852842735L;
@@ -273,17 +278,18 @@ public class JSEUIManager implements AOUIManager {
         private boolean beep = false;
 
         /** Crea un nuevo filtro para campo de entrada de texto.
-         * @param beepOnError
-         *        <code>true</code> si desea que se reproduzca un sonido
-         *        cuando el usuario introduce un caracter no v&aacute;lido,
-         *        false en caso contrario */
+         * @param beepOnError <code>true</code> si desea que se reproduzca un sonido
+         *                    cuando el usuario introduce un caracter no v&aacute;lido,
+         *                    false en caso contrario. */
         public JTextFieldASCIIFilter(final boolean beepOnError) {
             this.beep = beepOnError;
         }
 
         /** {@inheritDoc} */
         @Override
-        public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
+        public void insertString(final int offset,
+        		                 final String str,
+        		                 final AttributeSet attr) throws BadLocationException {
             if (str == null) {
                 return;
             }
@@ -308,11 +314,14 @@ public class JSEUIManager implements AOUIManager {
 			                           final String title,
 			                           final int optionType,
 			                           final int messageType) {
-        Component parent = null;
-        if (parentComponent instanceof Component) {
-            parent = (Component) parentComponent;
-        }
-        return JOptionPane.showConfirmDialog(parent, message, title, optionType, messageType);
+
+        return JOptionPane.showConfirmDialog(
+    		parentComponent instanceof Component ? (Component) parentComponent : null,
+    		message,
+    		title,
+    		optionType,
+    		messageType
+		);
     }
 
     @Override
@@ -320,11 +329,13 @@ public class JSEUIManager implements AOUIManager {
    								  final Object message,
    								  final String title,
    								  final int messageType) {
-    	Component parent = null;
-    	if (parentComponent instanceof Component) {
-    		parent = (Component) parentComponent;
-    	}
-    	JOptionPane.showMessageDialog(parent, message, title, messageType);
+
+    	JOptionPane.showMessageDialog(
+			parentComponent instanceof Component ? (Component) parentComponent : null,
+			message,
+			title,
+			messageType
+		);
     }
 
     @Override
@@ -333,15 +344,14 @@ public class JSEUIManager implements AOUIManager {
 								  final String title,
 								  final int messageType,
 								  final Object icon) {
-        Component parent = null;
-        if (parentComponent instanceof Component) {
-            parent = (Component) parentComponent;
-        }
-        Icon dialogIcon = null;
-        if (icon instanceof Icon) {
-            dialogIcon = (Icon) icon;
-        }
-        JOptionPane.showMessageDialog(parent, message, title, messageType, dialogIcon);
+
+        JOptionPane.showMessageDialog(
+    		parentComponent instanceof Component ? (Component) parentComponent : null,
+    		message,
+    		title,
+    		messageType,
+    		icon instanceof Icon ? (Icon) icon : null
+		);
     }
 
     /** {@inheritDoc} */
@@ -407,18 +417,16 @@ public class JSEUIManager implements AOUIManager {
     /** {@inheritDoc} */
     @Override
 	public File[] getLoadFiles(final String dialogTitle,
-								    final String currentDir,
-								    final String filename,
-                                    final String[] extensions,
-                                    final String description,
-                                    final boolean selectDirectory,
-                                    final boolean multiSelect,
-                                    final Object icon,
-                                    final Object parent) {
-        Component parentComponent = null;
-        if (parent instanceof Component) {
-            parentComponent = (Component) parent;
-        }
+							   final String currentDir,
+							   final String filename,
+                               final String[] extensions,
+                               final String description,
+                               final boolean selectDirectory,
+                               final boolean multiSelect,
+                               final Object icon,
+                               final Object parent) {
+
+        final Component parentComponent = parent instanceof Component ? (Component) parent : null;
 
         final JFileChooser jfc;
         if (icon instanceof Image) {
@@ -478,15 +486,11 @@ public class JSEUIManager implements AOUIManager {
 			                   final String[] exts,
 			                   final String description,
 			                   final Object parent) throws IOException {
-
         if (data == null) {
             throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
         }
 
-        Component parentComponent = null;
-        if (parent instanceof Component) {
-            parentComponent = (Component) parent;
-        }
+        final Component parentComponent = parent instanceof Component ? (Component) parent : null;
 
         final File resultFile = null;
         boolean tryAgain = true;
@@ -585,8 +589,8 @@ public class JSEUIManager implements AOUIManager {
                     put(PREFERENCE_DIRECTORY, fileChooser.getCurrentDirectory().getPath());
                     return file;
 
-			default:
-				throw new IOException("Error al seleccionar el fichero: " + returnCode); //$NON-NLS-1$
+            	default:
+            		throw new IOException("Error al seleccionar el fichero: " + returnCode); //$NON-NLS-1$
             }
         }
 
@@ -628,9 +632,8 @@ public class JSEUIManager implements AOUIManager {
     }
 
     /** Filtra los ficheros por extensi&oacute;n para los di&aacute;logos de
-     * carga y guardado. Se declara como p&uacute;blico para que pueda ser usado
-     * tambi&eacute;n por el interfaz de aplicaci&oacute;n de escritorio. No
-     * usamos <code>FileNameExtensionFilter</code> directamente para
+     * carga y guardado.
+     * No usamos <code>FileNameExtensionFilter</code> directamente para
      * compatibilizar con Java 1.4. */
     private static final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
@@ -638,11 +641,9 @@ public class JSEUIManager implements AOUIManager {
         private final String description;
 
         /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
-         * @param exts
-         *        Extensiones de fichero permitidas
-         * @param desc
-         *        Descripci&oacute;n del tipo de fichero correspondiente a
-         *        las extensiones */
+         * @param exts Extensiones de fichero permitidas
+         * @param desc Descripci&oacute;n del tipo de fichero correspondiente a
+         *             las extensiones */
         public ExtFilter(final String[] exts, final String desc) {
             if (exts == null || exts.length < 1) {
                 throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
@@ -676,7 +677,7 @@ public class JSEUIManager implements AOUIManager {
         /** Devuelve la extensi&oacute;n de un fichero.
          * @param f Fichero del cual queremos conocer la extensi&oacute;n
          * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
-         *         tiene extensi&oacute;n */
+         *         tiene extensi&oacute;n. */
         private static String getExtension(final File f) {
             final String s = f.getName();
             final int i = s.lastIndexOf('.');
@@ -691,16 +692,14 @@ public class JSEUIManager implements AOUIManager {
     public void showErrorMessage(final Object parent, final Object message, final String title, final int messageType) {
         final String buttonTxt = JSEUIMessages.getString("JSEUIManager.1"); //$NON-NLS-1$
         JOptionPane.showOptionDialog(
-                parent instanceof Component ? (Component) parent : null,
-                message,
-                title,
-                JOptionPane.OK_OPTION,
-                messageType,
-                null,
-                new String[] {
-            		buttonTxt
-                },
-                buttonTxt
+            parent instanceof Component ? (Component) parent : null,
+            message,
+            title,
+            JOptionPane.OK_OPTION,
+            messageType,
+            null,
+            new String[] { buttonTxt },
+            buttonTxt
         );
     }
 }
