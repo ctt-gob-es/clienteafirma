@@ -209,12 +209,13 @@ public class JSEUIManager implements AOUIManager {
     		return result instanceof String ? (String) result : null;
     	}
     	catch (final InvocationTargetException e) {
-    		LOGGER.severe("Ocurrio un error al extraer el certificado seleccionado: " + e); //$NON-NLS-1$
+    		LOGGER.severe("Se genero un error en el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
+    		System.out.println(e.getCause());
     		if (e.getCause() instanceof RuntimeException) {
     			throw (RuntimeException) e.getCause();
     		}
     		throw new IllegalStateException(
-				"Error durante la extraccion del certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
+				"No se encontraron certificados en el almacen o se produjo un error durante la extraccion del certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
 			);
     	}
     	catch (final Exception e) {

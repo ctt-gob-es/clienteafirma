@@ -17,6 +17,11 @@ public final class AOCertificatesNotFoundException extends AOException {
 
     private static final long serialVersionUID = -6996346324337434742L;
 
+    /** Crea la excepci&oacute;n con el mensaje por defecto. */
+    public AOCertificatesNotFoundException() {
+        super("No hay certificados en el almacen"); //$NON-NLS-1$
+    }
+
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
@@ -24,9 +29,12 @@ public final class AOCertificatesNotFoundException extends AOException {
         super(msg);
     }
 
-    /** Crea la excepci&oacute;n con el mensaje por defecto. */
-    public AOCertificatesNotFoundException() {
-        super("No hay certificados en el almacen"); //$NON-NLS-1$
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n.
+     * @param cause
+     * 		  Motivo que origin&oacute; el error. */
+    public AOCertificatesNotFoundException(final String msg, final Throwable cause) {
+        super(msg, cause);
     }
-
 }

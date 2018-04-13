@@ -204,7 +204,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public String show() {
+	public String show() throws AOCertificatesNotFoundException {
 
 		final NameCertificateBean[] namedCertificates = getNameCertificates();
 
@@ -216,7 +216,12 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		}
 
 		// Mostramos el dialogo de seleccion de certificados
-		this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
+		try {
+			this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
+		}
+		catch (final IllegalStateException e) {
+			throw new AOCertificatesNotFoundException("No se han encontrado certificados validos en el almacen", e); //$NON-NLS-1$
+		}
 
 		// Si devuelve null, es que el usuario cancelo el dialogo
 		if (this.selectedAlias == null) {

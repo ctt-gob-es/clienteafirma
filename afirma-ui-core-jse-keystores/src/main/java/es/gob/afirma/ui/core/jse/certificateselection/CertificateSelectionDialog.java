@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
  * @author Carlos Gamuci
@@ -105,8 +106,10 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
-	 * cancela el di&aacute;logo o cierra sin seleccionar. */
-	public String showDialog() {
+	 * cancela el di&aacute;logo o cierra sin seleccionar.
+	 * @throws AOCertificatesNotFoundException Cuando no el usuario cierra el
+	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
+	public String showDialog() throws AOCertificatesNotFoundException {
 
 		this.certDialog = this.optionPane.createDialog(
 			this.parent,
@@ -127,6 +130,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		this.certDialog.setVisible(true);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
+
+		// Si en el dialogo mostrado, no habia ningun certificado, independientemente del modo de
+		// cerrar el dialogo, consideramos que el problema es que el usuario no tiene certificados
+		// validos
+		if (this.csd.getShowedCertsCount() == 0) {
+			throw new AOCertificatesNotFoundException("No habia certificados validos en el almacen del usuario"); //$NON-NLS-1$
+		}
 
 		// Si el usuario cancelo el dialogo, lo cerramos
 		if (this.optionPane.getValue() == null || ((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
@@ -193,23 +203,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
 		}
-
 		this.certDialog.pack();
-//		// Cerramos el dialogo mostrado
-//		closeDialog();
-//
-//		// Volvemos a mostrar el dialogo, que ya se habra redimensionado
-//		// segun el nuevo contenido
-//		showDialog();
-	}
-
-	/**
-	 * Oculta el di&aacute;logo.
-	 */
-	private void closeDialog() {
-		if (this.certDialog != null) {
-			this.certDialog.dispose();
-		}
 	}
 
 	/** Cambia el almac&eacute;n de claves actual.
