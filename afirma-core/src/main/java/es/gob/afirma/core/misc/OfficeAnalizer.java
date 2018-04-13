@@ -183,20 +183,22 @@ public final class OfficeAnalizer {
 
     /** Indica si un fichero tiene la estructura de un documento OOXML.
      * @param document Fichero a analizar.
-     * @return Devuelve <code>true</code> si el fichero era un OOXML, <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas leyendo el fichero. */
-    public static boolean isOOXMLDocument(final byte[] document) throws IOException {
+     * @return Devuelve <code>true</code> si el fichero era un OOXML, <code>false</code> en caso contrario. */
+    public static boolean isOOXMLDocument(final byte[] document) {
     	try (
 			final ZipFile zipFile = AOFileUtils.createTempZipFile(document);
 		) {
     		return isOOXMLFile(zipFile);
     	}
+    	catch(final Exception e) {
+    		LOGGER.info("El fichero no ha podido abrirse como ZIP para comprobar si es OOXML: " + e); //$NON-NLS-1$
+    		return false;
+    	}
     }
 
     /** Indica si un fichero Zip tiene la estructura de un documento OOXML
      * soportado.
-     * @param zipFile
-     *        Fichero zip que deseamos comprobar.
+     * @param zipFile Fichero Zip que deseamos comprobar.
      * @return Devuelve <code>true</code> si el fichero era un OOXML soportado, <code>false</code> en caso contrario. */
     private static boolean isOOXMLFile(final ZipFile zipFile) {
         // Comprobamos si estan todos los ficheros principales del documento
@@ -217,6 +219,7 @@ public final class OfficeAnalizer {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(contentTypeIs);
         }
         catch (final Exception e) {
+        	LOGGER.warning("No se ha podido analizar el XML de ContentTypes de OOXML: " + e); //$NON-NLS-1$
             return null;
         }
 
@@ -305,6 +308,9 @@ public final class OfficeAnalizer {
             contentTypeData = new String(AOUtil.getDataFromInputStream(contentTypeIs));
         }
         catch (final Exception e) {
+        	LOGGER.warning(
+    			"No se ha podido obtener el tipo de contenido ODF del flujo de entrada: " + e //$NON-NLS-1$
+			);
             return null;
         }
         if (ODF_MIMETYPES.contains(contentTypeData)) {
