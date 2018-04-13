@@ -12,6 +12,7 @@ package es.gob.afirma.standalone.protocol;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -189,6 +190,23 @@ final class ProtocolInvocationLauncherSelectCert {
 					"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
 			dataToSend = Base64.encode(certEncoded, true);
+		}
+
+		if (options.getStorageServletUrl() != null) {
+			// Enviamos el certificado al servicio remoto de intercambio
+			try {
+				IntermediateServerUtil.sendData(dataToSend, options.getStorageServletUrl().toString(), options.getId());
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
+			}
+		}
+		else {
+			LOGGER.info(
+				"Se omite el envio por red del resultado por no haberse proporcionado una URL de destino" //$NON-NLS-1$
+			);
 		}
 
 		return dataToSend;

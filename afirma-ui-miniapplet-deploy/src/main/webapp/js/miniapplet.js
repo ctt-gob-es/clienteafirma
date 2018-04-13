@@ -14,9 +14,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.6.2";
+		var VERSION = "1.6.3";
 
-		var JAR_NAME = 'miniapplet-full_1_6_2.jar';
+		var JAR_NAME = 'miniapplet-full_1_6_3.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -2310,7 +2310,44 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Implementada en el applet Java de firma
 			 */
 			function selectCertificate (extraParams, successCallback, errorCallback) {
-				throwException("java.lang.UnsupportedOperationException", "La operacion de seleccion de certificados no esta soportada");
+			
+				var idSession = generateNewIdSession();
+				var cipherKey = generateCipherKey();
+
+				var opId = "selectcert";
+				
+				var i = 0;
+				var params = new Array();
+				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
+				params[i++] = {key:"op", value:opId};
+				
+				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				if (defaultKeyStore != null &&
+						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
+																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+				if (storageServletAddress != null &&
+						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
+				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+			
+				var url = buildUrl(opId, params);
+
+				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
+				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
+				if (isURLTooLong(url)) {
+					if (storageServletAddress == null || storageServletAddress == undefined) {
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						return;
+					}
+					else if (retrieverServletAddress == null || retrieverServletAddress == undefined) {
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para la recuperacion de datos");
+						return;
+					}
+					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, signId, params, successCallback, errorCallback)
+				}
+				else {
+					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				}
 			}
 			
 			/**
