@@ -30,13 +30,6 @@ public class CertificateSelectionDialogTest {
 				new CachePasswordCallback(CERT_PASS.toCharArray()),
 				null);
 
-//		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-//				AOKeyStore.WINDOWS,
-//				null,
-//				null,
-//				null,
-//				null);
-
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, false);
 		String alias;
 		try {

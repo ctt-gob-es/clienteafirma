@@ -77,17 +77,20 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private NameCertificateBean[] certificateBeans;
 
+	private final String dialogSubHeadline;
+
 	CertificateSelectionPanel(final NameCertificateBean[] el,
 			                  final CertificateSelectionDialog selectionDialog,
 			                  final String dialogHeadline,
 			                  final String dialogSubHeadline,
 				              final boolean showControlButons,
 				              final boolean allowExternalStores) {
+
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
+		this.dialogSubHeadline = dialogSubHeadline;
 		createUI(
 			selectionDialog,
 			dialogHeadline,
-			dialogSubHeadline,
 			showControlButons,
 			allowExternalStores
 		);
@@ -95,7 +98,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private void createUI(final CertificateSelectionDialog selectionDialog,
 			              final String dialogHeadline,
-			              final String dialogSubHeadline,
 			              final boolean showControlButons,
 			              final boolean allowExternalStores) {
 
@@ -212,34 +214,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.textMessagePanel.setLayout(new GridBagLayout());
 		this.textMessagePanel.setOpaque(false);
 		this.textMessagePanel.setBorder(null);
-		this.textMessagePanel.setPreferredSize(new Dimension(370, 40));
 		this.add(this.textMessagePanel, c);
-
-		// Mostramos un texto de cabecera si corresponde
-		if (this.certificateBeans.length <= 1) {
-			String msg;
-			if (this.certificateBeans.length == 1) {
-				msg = dialogSubHeadline != null ?
-						dialogSubHeadline :
-							CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1"); //$NON-NLS-1$
-			}
-			else {
-				msg = "No se han encontrado certificados v\u00E1lidos en el almac\u00E9n. Inserte una tarjeta inteligente en el lector y pulse Recargar, o cargue un almac\u00E9n externo.";
-			}
-
-			final JTextPane textMessage = new JTextPane();
-			textMessage.setOpaque(false);
-			textMessage.setText(msg);
-			textMessage.setFont(TEXT_FONT);
-			textMessage.setBorder(null);
-
-			final GridBagConstraints tmC = new GridBagConstraints();
-			tmC.fill = GridBagConstraints.BOTH;
-			tmC.weightx = 1.0;
-			tmC.weighty = 1.0;
-
-			this.textMessagePanel.add(textMessage, tmC);
-		}
 
 		c.insets = new Insets(4, 15, 8, 15);
 		c.gridy++;
@@ -255,18 +230,89 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certListPanel.setBorder(null);
 
 
-		CertificateLine certLine;
-		final List<CertificateLine> certLines = new ArrayList<>();
-		for (final NameCertificateBean nameCert : this.certificateBeans) {
-			if (nameCert.getCertificate() != null) {
-				certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
-				certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
-				certLines.add(certLine);
-			}
-		}
-
 		this.certList = new JList<>();
 		this.certList.setCellRenderer(new CertListCellRendered());
+
+		updateCertListInfo(this.certificateBeans);
+
+		this.certList.addListSelectionListener(this);
+		final CertLinkMouseListener mouseListener = new CertLinkMouseListener();
+		this.certList.addMouseMotionListener(mouseListener);
+		this.certList.addMouseListener(mouseListener);
+
+		this.add(this.certListPanel, c);
+	}
+
+	/** Recarga el di&aacute;logo para mostrar un grupo distinto de certificados.
+	 * @param certs Conjunto de datos de los certificados a mostrar. */
+	void refresh(final NameCertificateBean[] certs) {
+
+		this.certificateBeans = certs.clone();
+
+		updateCertListInfo(certs);
+
+		// Mostramos y seleccionamos el primer elemento
+		if (certs.length > 0) {
+			this.certList.setSelectedIndex(0);
+			this.sPane.getVerticalScrollBar().setValue(0);
+		}
+	}
+
+	private static List<CertificateLine> createCertLines(NameCertificateBean[] certBeans) {
+		final List<CertificateLine> certLines = new ArrayList<>();
+		for (final NameCertificateBean nameCert : certBeans) {
+			CertificateLine certLine;
+		    try {
+		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
+		    }
+		    catch(final Exception e) {
+		        continue;
+		    }
+			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
+			certLines.add(certLine);
+		}
+		return certLines;
+	}
+
+	/**
+	 * Actualiza el texto mostrado en el di&aacute;logo seg&uacute;n el numero de
+	 * certificados mostrados y el propio listado de certificados.
+	 * @param certs Certificados.
+	 */
+	private void updateCertListInfo(final NameCertificateBean[] certs) {
+
+		final List<CertificateLine> certLines = createCertLines(certs);
+
+		// Actualizamos el mensaje del dialogo en base al numero de certificados
+		// Mostramos un texto de cabecera si corresponde
+		this.textMessagePanel.removeAll();
+		if (certLines.size() <= 1) {
+			String msg;
+			if (certLines.size() == 1) {
+				msg = this.dialogSubHeadline != null ?
+						this.dialogSubHeadline :
+							CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1"); //$NON-NLS-1$
+			}
+			else {
+				msg = CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.8"); //$NON-NLS-1$
+			}
+
+			final JTextPane textMessage = new JTextPane();
+			textMessage.setOpaque(false);
+			textMessage.setText(msg);
+			textMessage.setFont(TEXT_FONT);
+			textMessage.setBorder(null);
+			textMessage.setPreferredSize(new Dimension(370, 40));
+
+			final GridBagConstraints tmC = new GridBagConstraints();
+			tmC.fill = GridBagConstraints.BOTH;
+			tmC.weightx = 1.0;
+			tmC.weighty = 1.0;
+
+			this.textMessagePanel.add(textMessage, tmC);
+		}
+
+		// Actualizamos el listado de certificados
 		this.certList.setListData(certLines.toArray(new CertificateLine[certLines.size()]));
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
 
@@ -278,84 +324,25 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			this.selectedIndex = -1;
 		}
 
-		this.sPane = new JScrollPane(
-			this.certList,
-			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-		);
-
-		this.certList.addListSelectionListener(this);
-		final CertLinkMouseListener mouseListener = new CertLinkMouseListener();
-		this.certList.addMouseMotionListener(mouseListener);
-		this.certList.addMouseListener(mouseListener);
-
-		this.sPane.setBorder(null);
-		this.sPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
+		final JScrollPane jScrollPane = new JScrollPane(
+				this.certList,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+			);
+		jScrollPane.setBorder(null);
+		jScrollPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
 
 		final GridBagConstraints ic = new GridBagConstraints();
 		ic.fill = GridBagConstraints.BOTH;
 		ic.weightx = 1.0;
 		ic.weighty = 1.0;
-		this.certListPanel.add(this.sPane, ic);
 
-		this.add(this.certListPanel, c);
-	}
-
-	/** Recarga el di&aacute;logo para mostrar un grupo distinto de certificados.
-	 * @param certs Conjunto de datos de los certificados a mostrar. */
-	void refresh(final NameCertificateBean[] certs) {
-
-		this.certificateBeans = certs.clone();
-
-		CertificateLine certLine;
-		final List<CertificateLine> certLines = new ArrayList<>();
-		for (final NameCertificateBean nameCert : this.certificateBeans) {
-		    try {
-		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
-		    }
-		    catch(final Exception e) {
-		        continue;
-		    }
-			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
-			certLines.add(certLine);
-		}
-
-		this.certList.setListData(certLines.toArray(new CertificateLine[certLines.size()]));
-
-		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
-		if (certLines.size() > 0) {
-
-			// Para poder redimensionar el dialogo, construimos un nuevo listado de
-			// certificados, eliminamos el anterior y agregamos el nuevo
-			final JScrollPane tempSPane = new JScrollPane(
-					this.certList,
-					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-					);
-
-			tempSPane.setBorder(null);
-			tempSPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
-
-			// Eliminamos el listado anterior y colocamos el nuevo
+		if (this.sPane != null) {
 			this.certListPanel.remove(this.sPane);
-			this.sPane = tempSPane;
-			final GridBagConstraints ic = new GridBagConstraints();
-			ic.fill = GridBagConstraints.BOTH;
-			ic.weightx = 1.0;
-			ic.weighty = 1.0;
-			this.certListPanel.add(this.sPane, ic);
-
-			if (certs.length > 0) {
-				this.certList.setSelectedIndex(0);
-			}
-
-			this.sPane.getVerticalScrollBar().setValue(0);
 		}
+		this.sPane = jScrollPane;
+		this.certListPanel.add(this.sPane, ic);
 	}
-
-//	private void updateCertListInfo() {
-//
-//	}
 
 	/** Selecciona la lista de certificados. */
     void selectCertificateList() {
