@@ -111,15 +111,14 @@ final class ProtocolInvocationLauncherSign {
 		// Si no hay datos a firmar se los pedimos al usuario
 		if (options.getData() == null) {
 
-			final String dialogTilte = Operation.SIGN.equals(options.getOperation())
-				? ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
+			final String dialogTitle = Operation.SIGN.equals(options.getOperation()) ?
+				ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
 					ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
-			final String fileExts = options.getExtraParams() != null
-				? options.getExtraParams().getProperty("filenameExts", null) : //$NON-NLS-1$
-					null;
-			final String fileDesc = fileExts == null ? ProtocolMessages.getString("ProtocolLauncher.27") : //$NON-NLS-1$
-					String.format(ProtocolMessages.getString("ProtocolLauncher.32"), //$NON-NLS-1$
-							fileExts.replace(",", ",*.")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			final String fileExts = options.getExtraParams().getProperty("filenameExts"); //$NON-NLS-1$
+
+			final String fileDesc = options.getExtraParams().getProperty("filenameDescription", ProtocolMessages.getString("ProtocolLauncher.32")) +  //$NON-NLS-1$//$NON-NLS-2$
+				(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			final File selectedDataFile;
 			try {
@@ -127,9 +126,16 @@ final class ProtocolInvocationLauncherSign {
 					ServiceInvocationManager.focusApplication();
 				}
 
-				selectedDataFile = AOUIFactory.getLoadFiles(dialogTilte, null, null,
-						fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
-						fileDesc, false, false, AutoFirmaUtil.getDefaultDialogsIcon(), null)[0];
+				selectedDataFile = AOUIFactory.getLoadFiles(
+					dialogTitle,
+					options.getExtraParams().getProperty("filenameCurrentDir"), // currentDir //$NON-NLS-1$
+					options.getExtraParams().getProperty("filenameActualName"), // fileName //$NON-NLS-1$
+					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
+					fileDesc,
+					false,
+					false,
+					AutoFirmaUtil.getDefaultDialogsIcon(), null
+				)[0];
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
