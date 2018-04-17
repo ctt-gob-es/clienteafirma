@@ -99,4 +99,8 @@ public final class SignSaverHttpPost implements SignSaver {
 
 	}
 
+	@Override
+	public boolean isInitialized() {
+		return this.param != null;
+	}
 }
