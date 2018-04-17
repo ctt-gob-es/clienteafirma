@@ -199,10 +199,11 @@ final class AOKeyStoreManagerHelperPkcs11 {
 			final OutputStream fos = new FileOutputStream(f);
 		) {
 			fos.write(p11NSSConfigFileContents);
+			fos.close();
 		}
 		final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
 		final Provider ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
-		f.delete();
+		f.deleteOnExit();
 		return ret;
 	}
 

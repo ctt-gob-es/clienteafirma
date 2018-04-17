@@ -49,6 +49,7 @@ public final class AOFileUtils {
 		) {
 			fos.write(zipFileData);
 			fos.flush();
+			fos.close();
 		}
 		tempFile.deleteOnExit();
 		return new ZipFile(tempFile);
@@ -120,23 +121,25 @@ public final class AOFileUtils {
     	try {
     		final SAXParser parser = factory.newSAXParser();
     		final XMLReader reader = parser.getXMLReader();
-    		reader.setErrorHandler(new ErrorHandler() {
-				@Override
-				public void warning(final SAXParseException e) {
-					log(e);
+    		reader.setErrorHandler(
+				new ErrorHandler() {
+					@Override
+					public void warning(final SAXParseException e) {
+						log(e);
+					}
+					@Override
+					public void fatalError(final SAXParseException e) {
+						log(e);
+					}
+					@Override
+					public void error(final SAXParseException e) {
+						log(e);
+					}
+					private void log(final Exception e) {
+						Logger.getLogger("es.gob.afirma").fine("El documento no es un XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
-				@Override
-				public void fatalError(final SAXParseException e) {
-					log(e);
-				}
-				@Override
-				public void error(final SAXParseException e) {
-					log(e);
-				}
-				private void log(final Exception e) {
-					Logger.getLogger("es.gob.afirma").fine("El documento no es un XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
+			);
     		reader.parse(new InputSource(new ByteArrayInputStream(data)));
     	}
     	catch (final Exception e) {
