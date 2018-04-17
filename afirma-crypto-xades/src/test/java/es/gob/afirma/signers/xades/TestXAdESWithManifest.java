@@ -15,11 +15,11 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /** Pruebas de firmas XAdES con MANIFEST. */
 public final class TestXAdESWithManifest {
 
-    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+    private static final String CERT_PATH = "CATCERT CIUTADANIA PF CPIXSA-2.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "1111"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "persona f\u00EDsica de la pe\u00E7a de proves"; //$NON-NLS-1$
 
-    private static final String ALGORITHM = "SHA1withRSA"; //$NON-NLS-1$
+    private static final String ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
     /** Prueba de firma XAdES Externally Detached con Manifest y URI no dereferenciable (URN).
      * @throws Exception En cualquier error. */
