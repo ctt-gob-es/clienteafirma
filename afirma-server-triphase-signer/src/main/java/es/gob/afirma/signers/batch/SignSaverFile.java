@@ -107,4 +107,8 @@ public final class SignSaverFile implements SignSaver {
 		}
 	}
 
+	@Override
+	public boolean isInitialized() {
+		return this.filename != null;
+	}
 }

@@ -117,7 +117,7 @@ public final class BatchPresigner extends HttpServlet {
 
 		final SignBatch batch;
 		try {
-			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml);
+			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml.getBytes());
 			batch = BatchConfigManager.isConcurrentMode() ?
 					new SignBatchConcurrent(batchConfig) :
 						new SignBatchSerial(batchConfig);

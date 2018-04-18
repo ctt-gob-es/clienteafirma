@@ -122,8 +122,8 @@ public final class SignBatchSerial extends SignBatch {
 
 		// En este punto las firmas estan en almacenamiento temporal
 
-		// Si hubo errores y se indico parar en error no hacemos los guardados de datos, borramos los temporales
-		// y enviamos el log
+		// Si hubo errores y se indico parar en caso de error, no hacemos los guardados de datos,
+		// borramos los temporales y enviamos el log
 		if (error && this.stopOnError) {
 			deleteAllTemps();
 			return getResultLog();

@@ -12,20 +12,16 @@ package es.gob.afirma.signers.batch;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import es.gob.afirma.core.signers.TriphaseData;
 
@@ -112,78 +108,32 @@ public abstract class SignBatch {
 			);
 		}
 
-		// ****************************************************
-		// *********** Carga del XML **************************
-		final Document doc;
-		try (
-			final InputStream is = new ByteArrayInputStream(xml);
-		) {
-			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+		// Definimos un manejador que extraera la informacion del XML
+		final SignBatchXmlHandler handler = new SignBatchXmlHandler();
+
+		try (final InputStream is = new ByteArrayInputStream(xml)) {
+
+			final SAXParserFactory spf = SAXParserFactory.newInstance();
+			spf.setNamespaceAware(true);
+			final SAXParser saxParser = spf.newSAXParser();
+			final XMLReader xmlReader = saxParser.getXMLReader();
+
+			xmlReader.setContentHandler(handler);
+			xmlReader.parse(new InputSource(is));
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-				"Error al cargar el fichero XML de definicion de lote: " + e + "\n" + new String(xml) //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			LOGGER.severe("Error al cargar el fichero XML de definicion de lote: " + e + //$NON-NLS-1$
+					"\n" + new String(xml)); //$NON-NLS-1$
 			throw new IOException("Error al cargar el fichero XML de definicion de lote: " + e, e); //$NON-NLS-1$
 		}
-		// *********** Fin carga del XML **********************
-		// ****************************************************
 
-		final Node signBatchNode = doc.getDocumentElement();
-		if (!"signbatch".equalsIgnoreCase(signBatchNode.getNodeName())) { //$NON-NLS-1$
-			throw new IllegalArgumentException("No se encontro el nodo 'signbatch' en el XML proporcionado"); //$NON-NLS-1$
-		}
+		final SignBatchConfig config = handler.getBatchConfig();
 
-		// ****************************************************
-		// ****** Analisis opciones generales del XML *********
-		this.stopOnError = true;
-		final NamedNodeMap nnm = signBatchNode.getAttributes();
-		if (nnm != null) {
-			Node tmpNode = nnm.getNamedItem("stoponerror"); //$NON-NLS-1$
-			if (tmpNode != null) {
-				this.stopOnError = !"false".equalsIgnoreCase(tmpNode.getNodeValue()); //$NON-NLS-1$
-			}
-			tmpNode = nnm.getNamedItem("algorithm"); //$NON-NLS-1$
-			if (tmpNode != null) {
-				this.algorithm = SingleSignConstants.SignAlgorithm.getAlgorithm(tmpNode.getNodeValue());
-			}
-			else {
-				throw new IllegalArgumentException(
-					"El nodo 'signbatch' debe contener al manos el atributo de algoritmo" //$NON-NLS-1$
-				);
-			}
-			tmpNode = nnm.getNamedItem("concurrenttimeout"); //$NON-NLS-1$
-			if (tmpNode != null) {
-				try {
-					this.concurrentTimeout = Long.parseLong(tmpNode.getNodeValue());
-				}
-				catch(final Exception e) {
-					LOGGER.severe(
-						"Se ha especificado un valor invalido para la espera maxima (" + tmpNode.getNodeValue() + "), se usara el valor por defecto (" + Long.MAX_VALUE + "): " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					);
-				}
-			}
-
-			this.id = UUID.randomUUID().toString();
-			tmpNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
-			if (tmpNode != null) {
-				this.id = tmpNode.getNodeValue();
-			}
-		}
-		else {
-			throw new IllegalArgumentException(
-				"El nodo 'signbatch' debe contener al manos el atributo de algoritmo" //$NON-NLS-1$
-			);
-		}
-		// ****** Fin analisis opciones generales del XML *****
-		// ****************************************************
-
-		// ****************************************************
-		// ****** Analisis firmas individuales del XML ********
-		this.signs = parseSignBatchNode(signBatchNode, doc.getXmlEncoding());
-		// ****** Fin analisis firmas individuales del XML ****
-		// ****************************************************
-
+		this.id = config.getId() != null ? config.getId() : UUID.randomUUID().toString();
+		this.algorithm = config.getAlgorithm();
+		this.concurrentTimeout = config.getConcurrentTimeout();
+		this.stopOnError = config.isStopOnError();
+		this.signs = config.getSingleSigns();
 	}
 
 	protected SignBatch(final List<SingleSign> signatures,
@@ -204,45 +154,6 @@ public abstract class SignBatch {
 		this.stopOnError = soe;
 		this.algorithm = algo;
 		this.id = UUID.randomUUID().toString();
-	}
-
-	private static List<SingleSign> parseSignBatchNode(final Node n, final String xmlEncoding) throws DOMException, IOException {
-
-		Charset charset;
-		try {
-			charset = xmlEncoding != null ? Charset.forName(xmlEncoding) : Charset.defaultCharset();
-		}
-		catch (final Exception e) {
-			charset = Charset.defaultCharset();
-		}
-
-		final NodeList childNodes = n.getChildNodes();
-		final List<SingleSign> ret = new ArrayList<>();
-		int idx = nextNodeElementIndex(childNodes, 0);
-		while (idx != -1) {
-			ret.add(new SingleSign(childNodes.item(idx), charset));
-			idx = nextNodeElementIndex(childNodes, idx + 1);
-		}
-		return ret;
-	}
-
-	/** Recupera el &iacute;ndice del siguiente nodo de la lista de tipo <code>Element</code>.
-	 * Empieza a comprobar los nodos a partir del &iacute;ndice marcado. Si no encuentra un
-	 * nodo de tipo <i>elemento</i> devuelve -1.
-	 * @param nodes Listado de nodos.
-	 * @param currentIndex &Iacute;ndice del listado a partir del cual se empieza la comprobaci&oacute;n.
-	 * @return &Iacute;ndice del siguiente node de tipo Element o -1 si no se encontr&oacute;. */
-	private static int nextNodeElementIndex(final NodeList nodes, final int currentIndex) {
-		Node node;
-		int i = currentIndex;
-		while (i < nodes.getLength()) {
-			node = nodes.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				return i;
-			}
-			i++;
-		}
-		return -1;
 	}
 
 	@Override

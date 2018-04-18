@@ -27,4 +27,8 @@ public final class FaultySignSaver implements SignSaver {
 		// Vacio
 	}
 
+	@Override
+	public boolean isInitialized() {
+		return true;
+	}
 }

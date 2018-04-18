@@ -26,21 +26,21 @@ final class BatchServerUtil {
 		// No instanciable
 	}
 
-	static TriphaseData getTriphaseData(final String triphaseDataAsUrlSafeBase64) throws IOException {
+	static TriphaseData getTriphaseData(final byte[] triphaseDataAsUrlSafeBase64) throws IOException {
 		return TriphaseData.parser(
-			Base64.decode(unDoUrlSafe(triphaseDataAsUrlSafeBase64))
+			Base64.decode(triphaseDataAsUrlSafeBase64, 0, triphaseDataAsUrlSafeBase64.length, true)
 		);
 	}
 
-	static byte[] getSignBatchConfig(final String xmlAsUrlSafeBase64) throws IOException {
+	static byte[] getSignBatchConfig(final byte[] xmlAsUrlSafeBase64) throws IOException {
 		if (xmlAsUrlSafeBase64 == null) {
 			throw new IllegalArgumentException(
 				"La definicion de lote no puede ser nula" //$NON-NLS-1$
 			);
 		}
-		final byte[] xml = Base64.isBase64(xmlAsUrlSafeBase64.getBytes()) ?
-			Base64.decode(unDoUrlSafe(xmlAsUrlSafeBase64)) :
-				xmlAsUrlSafeBase64.getBytes();
+		final byte[] xml = Base64.isBase64(xmlAsUrlSafeBase64) ?
+			Base64.decode(xmlAsUrlSafeBase64, 0, xmlAsUrlSafeBase64.length, true) :
+				xmlAsUrlSafeBase64;
 
 		return xml;
 	}
@@ -53,24 +53,16 @@ final class BatchServerUtil {
 			);
 		}
 
-		final String[] certs = unDoUrlSafe(certListUrlSafeBase64).split(";"); //$NON-NLS-1$
+		final String[] certs = certListUrlSafeBase64.split(";"); //$NON-NLS-1$
 		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 		final List<X509Certificate> ret = new ArrayList<>(certs.length);
 		for (final String cert : certs) {
 			ret.add(
-				(X509Certificate) cf.generateCertificate(
-					new ByteArrayInputStream(
-						Base64.decode(
-							unDoUrlSafe(cert)
-						)
-					)
-				)
-			);
+					(X509Certificate) cf.generateCertificate(
+							new ByteArrayInputStream(Base64.decode(cert, true))
+							)
+					);
 		}
 		return ret.toArray(new X509Certificate[0]);
-	}
-
-	private static String unDoUrlSafe(final String b64) {
-		return b64.replace("-", "+").replace("_", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

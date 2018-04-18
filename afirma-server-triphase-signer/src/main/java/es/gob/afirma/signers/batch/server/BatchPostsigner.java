@@ -121,7 +121,7 @@ public final class BatchPostsigner extends HttpServlet {
 
 		final SignBatch batch;
 		try {
-			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml);
+			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml.getBytes());
 			batch = BatchConfigManager.isConcurrentMode() ?
 					new SignBatchConcurrent(batchConfig) :
 						new SignBatchSerial(batchConfig);
@@ -170,7 +170,7 @@ public final class BatchPostsigner extends HttpServlet {
 
 		final TriphaseData td;
 		try {
-			td = BatchServerUtil.getTriphaseData(triphaseDataAsUrlSafeBase64);
+			td = BatchServerUtil.getTriphaseData(triphaseDataAsUrlSafeBase64.getBytes());
 		}
 		catch(final Exception e) {
 			LOGGER.severe("El XML de firmas cliente es invalido: " + e); //$NON-NLS-1$

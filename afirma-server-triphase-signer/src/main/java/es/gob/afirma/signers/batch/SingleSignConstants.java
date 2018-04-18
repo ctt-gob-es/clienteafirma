@@ -15,10 +15,13 @@ import java.util.Properties;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.triphase.server.SignatureService;
+import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.Pkcs1TriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
 /** Constantes para la definici&oacute;n de una firma independiente.
@@ -96,14 +99,23 @@ public final class SingleSignConstants {
 		/** CAdES. */
 		CADES(AOSignConstants.SIGN_FORMAT_CADES),
 
+		/** CAdES ASiC. */
+		CADES_ASIC(AOSignConstants.SIGN_FORMAT_CADES_ASIC_S),
+
 		/** XAdES. */
 		XADES(AOSignConstants.SIGN_FORMAT_XADES),
+
+		/** XAdES ASiC. */
+		XADES_ASIC(AOSignConstants.SIGN_FORMAT_XADES_ASIC_S),
 
 		/** PAdES. */
 		PADES(AOSignConstants.SIGN_FORMAT_PADES),
 
 		/** FacturaE. */
-		FACTURAE(AOSignConstants.SIGN_FORMAT_FACTURAE);
+		FACTURAE(AOSignConstants.SIGN_FORMAT_FACTURAE),
+
+		/** PKCS#1. */
+		PKCS1(AOSignConstants.SIGN_FORMAT_PKCS1);
 
 		private final String name;
 
@@ -197,12 +209,19 @@ public final class SingleSignConstants {
 				return new PAdESTriPhasePreProcessor();
 			case CADES:
 				return new CAdESTriPhasePreProcessor();
+			case CADES_ASIC:
+				return new CAdESASiCSTriPhasePreProcessor();
 			case XADES:
 				final boolean installXmlDSig1 = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
 				return new XAdESTriPhasePreProcessor(installXmlDSig1);
-			case FACTURAE:
+			case XADES_ASIC:
 				final boolean installXmlDSig2 = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
-				return new FacturaETriPhasePreProcessor(installXmlDSig2);
+				return new XAdESASiCSTriPhasePreProcessor(installXmlDSig2);
+			case FACTURAE:
+				final boolean installXmlDSig3 = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
+				return new FacturaETriPhasePreProcessor(installXmlDSig3);
+			case PKCS1:
+				return new Pkcs1TriPhasePreProcessor();
 			default:
 				throw new AOInvalidFormatException("Formato de firma no soportado: " + sSign.getSignFormat()); //$NON-NLS-1$
 		}

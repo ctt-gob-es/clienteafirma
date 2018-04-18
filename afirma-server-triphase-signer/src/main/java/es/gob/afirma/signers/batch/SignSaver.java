@@ -36,4 +36,9 @@ public interface SignSaver {
 	 * @return Propiedades de configuraci&oacute;n. */
 	Properties getConfig();
 
+	/** Indica si el manejador est&aacute; inicializado.
+	 * @return {@code true} si el manejador est&aacute; inicializado,
+	 * {@code false} en caso contrario.
+	 */
+	boolean isInitialized();
 }

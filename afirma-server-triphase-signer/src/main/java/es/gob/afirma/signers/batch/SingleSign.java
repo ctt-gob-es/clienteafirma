@@ -9,9 +9,7 @@
 
 package es.gob.afirma.signers.batch;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -19,11 +17,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -56,19 +49,81 @@ public final class SingleSign {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private final Properties extraParams;
+	private Properties extraParams;
 
-	private final String dataSource;
+	private String dataSource;
 
-	private final SignFormat format;
+	private SignFormat format;
 
 	private final String id;
 
-	private final SignSubOperation subOperation;
+	private SignSubOperation subOperation;
 
-	private final SignSaver signSaver;
+	private SignSaver signSaver;
 
 	private ProcessResult processResult = new ProcessResult(Result.NOT_STARTED, null);
+
+	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
+	 * @param id Identificador de la firma. */
+	SingleSign(final String id) {
+		this.id =  id;
+		this.extraParams = new Properties();
+		// El identificador de la firma debe transmitirse al firmador trifasico a traves
+		// de los extraParams para que este lo utilice y asi podamos luego asociar la
+		// firma con los datos a los que corresponden
+		this.extraParams.put(PROP_ID, getId());
+	}
+
+	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
+	 * @param id Identificador de la firma.
+	 * @param dataSrc Datos a firmar.
+	 * @param fmt Formato de firma.
+	 * @param subOp Tipo de firma a realizar.
+	 * @param xParams Opciones adicionales de la firma.
+	 * @param ss Objeto para guardar la firma una vez completada. */
+	public SingleSign(final String id,
+			          final String dataSrc,
+			          final SignFormat fmt,
+			          final SignSubOperation subOp,
+			          final Properties xParams,
+			          final SignSaver ss) {
+
+		if (dataSrc == null) {
+			throw new IllegalArgumentException(
+				"El origen de los datos a firmar no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+
+		if (fmt == null) {
+			throw new IllegalArgumentException(
+				"El formato de firma no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+
+		if (ss == null) {
+			throw new IllegalArgumentException(
+				"El objeto de guardado de firma no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+
+		this.dataSource = dataSrc;
+		this.format = fmt;
+
+		this.id = id != null ? id : UUID.randomUUID().toString();
+
+		// El identificador de la firma debe transmitirse al firmador trifasico a traves
+		// de los extraParams para que este lo utilice y asi podamos luego asociar la
+		// firma con los datos a los que corresponden
+		this.extraParams = xParams != null ? xParams : new Properties();
+		this.extraParams.put(PROP_ID, getId());
+
+		this.subOperation = subOp;
+		this.signSaver = ss;
+	}
+
+	void save(final byte[] dataToSave) throws IOException {
+		this.signSaver.saveSign(this, dataToSave);
+	}
 
 	/**
 	 * Recupera los par&aacute;metros de configuraci&oacute;n del formato de firma.
@@ -88,6 +143,30 @@ public final class SingleSign {
 
 	SignSubOperation getSubOperation() {
 		return this.subOperation;
+	}
+
+	void setExtraParams(Properties extraParams) {
+		// El identificador de la firma debe transmitirse al firmador trifasico a traves
+		// de los extraParams para que este lo utilice y asi podamos luego asociar la
+		// firma con los datos a los que corresponden
+		this.extraParams = extraParams != null ? extraParams : new Properties();
+		this.extraParams.put(PROP_ID, getId());
+	}
+
+	void setDataSource(String dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	void setFormat(SignFormat format) {
+		this.format = format;
+	}
+
+	void setSubOperation(SignSubOperation subOperation) {
+		this.subOperation = subOperation;
+	}
+
+	void setSignSaver(SignSaver signSaver) {
+		this.signSaver = signSaver;
 	}
 
 	private static void checkDataSource(final String dataSource) {
@@ -272,128 +351,6 @@ public final class SingleSign {
 			}
 		};
 
-	}
-
-	/**
-	 * Construye la operaci&oacute;n simple de firma.
-	 * @param singleSignNode
-	 * @param xmlEncoding Codificaci&oacute;n declarada en el XML. Si no se conoce, ser&aacute; {@code null}.
-	 * @throws DOMException
-	 * @throws IOException
-	 */
-	SingleSign(final Node singleSignNode, final Charset charset) throws DOMException, IOException {
-		if (!(singleSignNode instanceof Element)) {
-			throw new IllegalArgumentException(
-				"El nodo de definicion de la firma debe ser un Elemento DOM" //$NON-NLS-1$
-			);
-		}
-		final Element el = (Element)singleSignNode;
-
-		this.dataSource = el.getElementsByTagName(XML_ELEMENT_DATASOURCE).item(0).getTextContent();
-
-		this.extraParams = new Properties();
-		final NodeList tmpNl = el.getElementsByTagName(XML_ELEMENT_EXTRAPARAMS);
-		if (tmpNl != null && tmpNl.getLength() > 0) {
-			loadProperties(this.extraParams, Base64.decode(tmpNl.item(0).getTextContent()), charset);
-		}
-
-		this.format = SignFormat.getFormat(
-			el.getElementsByTagName(XML_ELEMENT_FORMAT).item(0).getTextContent()
-		);
-
-		this.id = el.getAttribute(XML_ATTRIBUTE_ID);
-		if (this.id == null || "".equals(this.id)) { //$NON-NLS-1$
-			throw new IllegalArgumentException(
-				"Es obligatorio establecer identificadores unicos de firma" //$NON-NLS-1$
-			);
-		}
-		this.extraParams.put(PROP_ID, getId());
-
-		this.subOperation = SignSubOperation.getSubOperation(
-			el.getElementsByTagName(XML_ELEMENT_SUBOPERATION).item(0).getTextContent()
-		);
-
-		final Element signSaverElement = (Element) el.getElementsByTagName(XML_ELEMENT_SIGNSAVER).item(0);
-		final SignSaver ssaver;
-		try {
-			ssaver = (SignSaver) Class.forName(
-				signSaverElement.getElementsByTagName(XML_ELEMENT_SIGNSAVER_CLASSNAME).item(0).getTextContent()
-			).newInstance();
-		}
-		catch (final Exception ex) {
-			throw new IOException(
-				"No se ha podido instanciar el objeto de guardado: " + ex, ex //$NON-NLS-1$
-			);
-		}
-		ssaver.init(
-			AOUtil.base642Properties(
-				signSaverElement.getElementsByTagName(XML_ELEMENT_SIGNSAVER_CONFIG).item(0).getTextContent()
-			)
-		);
-
-		this.signSaver = ssaver;
-	}
-
-	/**
-	 * Carga propiedades de una cadena cuidando de si hay saltos de
-	 * l&iacute;nea protegidos como parte de una propiedad.
-	 * @param properties Objeto en el que cargar las propiedades.
-	 * @param params Propiedades que se deben cargar.
-	 * @param charset Juego de caracteres para hacer la interpretaci&oacute;n de bytes.
-	 * @throws IOException Cuando ocurre un error durante la carga de las propiedades.
-	 */
-	private static void loadProperties(Properties properties, byte[] params, Charset charset) throws IOException {
-		properties.load(new ByteArrayInputStream(
-				new String(params, charset)
-					.replace("\\\\n", "*$bn$*").replace("\\n", "\n").replace("*$bn$*", "\\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-					.getBytes(charset)));
-	}
-
-	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
-	 * @param id Identificador de la firma.
-	 * @param dataSrc Datos a firmar.
-	 * @param fmt Formato de firma.
-	 * @param subOp Tipo de firma a realizar.
-	 * @param xParams Opciones adicionales de la firma.
-	 * @param ss Objeto para guardar la firma una vez completada. */
-	public SingleSign(final String id,
-			          final String dataSrc,
-			          final SignFormat fmt,
-			          final SignSubOperation subOp,
-			          final Properties xParams,
-			          final SignSaver ss) {
-
-		if (dataSrc == null) {
-			throw new IllegalArgumentException(
-				"El origen de los datos a firmar no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		if (fmt == null) {
-			throw new IllegalArgumentException(
-				"El formato de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		if (ss == null) {
-			throw new IllegalArgumentException(
-				"El objeto de guardado de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		this.dataSource = dataSrc;
-		this.extraParams = xParams != null ? xParams : new Properties();
-		this.format = fmt;
-
-		this.id = id != null ? id : UUID.randomUUID().toString();
-		this.extraParams.put(PROP_ID, getId());
-
-		this.subOperation = subOp;
-		this.signSaver = ss;
-	}
-
-	void save(final byte[] dataToSave) throws IOException {
-		this.signSaver.saveSign(this, dataToSave);
 	}
 
 	Callable<CallableResult> getSaveCallable(final TempStore ts, final String batchId) {
