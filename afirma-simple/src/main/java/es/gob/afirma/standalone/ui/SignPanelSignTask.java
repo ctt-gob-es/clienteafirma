@@ -363,7 +363,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         final AOSigner currentSigner = this.signPanel.getSigner();
 
-        // Si es un PDF miramos si nos han pedido firma visible
+        // Comprobamos si se ha marcado la opcion de firma visible
     	final boolean doVisibleSignature;
     	if (this.signPanel.getFilePanel() instanceof SignPanelFilePanel) {
     		doVisibleSignature = ((SignPanelFilePanel)this.signPanel.getFilePanel()).isVisibleSignature();
@@ -372,76 +372,43 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     		doVisibleSignature = false;
     	}
 
-        if (currentSigner instanceof AOPDFSigner) {
-            if (doVisibleSignature) {
-            	final List<SignatureField> emptySignatureFields = PdfUtil.getPdfEmptySignatureFields(this.signPanel.getDataToSign());
-            	final String oldMessage = this.waitDialog.getMessage();
-            	this.waitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
-            	if (!emptySignatureFields.isEmpty()) {
-            		final SignatureField field = PdfEmptySignatureFieldsChooserDialog.selectField(emptySignatureFields);
-            		if (field != null) {
-            			if (field.getName().equals("Create")) { //$NON-NLS-1$
-            				try {
-            					SignPdfDialog.getVisibleSignatureExtraParams(
-            						currentSigner.isSign(this.signPanel.getDataToSign()),
-            						this.signPanel.getDataToSign(),
-            						this.signPanel.getWindow(),
-            						new SignPdfDialogListener() {
-            							@Override
-            							public void propertiesCreated(final Properties extraParams) {
-            								// Solo hacemos la firma si hay propiedades visibles
-            								if (extraParams != null && !extraParams.isEmpty()) {
-            									SignPanelSignTask.this.getWaitDialog().setMessage(oldMessage);
-            									doSignature(currentSigner, extraParams);
-            								}
-            					        	if (getWaitDialog() != null) {
-            					        		getWaitDialog().dispose();
-            					        	}
-            							}
-            						}
-            					);
-            				}
-            				catch (final Exception e) {
-            					LOGGER.severe(
-            		                "No se han podido cargar los parametros de la firma visible: " + e //$NON-NLS-1$
-            		            );
-            					AOUIFactory.showErrorMessage(
-            		                  this.signPanel,
-            		                  SimpleAfirmaMessages.getString("SignPanel.88"), //$NON-NLS-1$
-            		                  SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-            		                  JOptionPane.ERROR_MESSAGE
-            		            );
-            				}
-                    		return null;
-            			}
-						PdfEmptySignatureFieldsChooserDialog.startPdfEmptySignatureFieldsChooserDialog(
-							this.signPanel.getDataToSign(),
-							this.signPanel.getWindow(),
-							field,
-							new SignPdfDialogListener() {
-								@Override
-								public void propertiesCreated(final Properties extraParams) {
-									// Solo hacemos la firma si hay propiedades visibles
-									if (extraParams != null && !extraParams.isEmpty()) {
-										SignPanelSignTask.this.getWaitDialog().setMessage(oldMessage);
-										doSignature(currentSigner, extraParams);
-									}
-						        	if (getWaitDialog() != null) {
-						        		getWaitDialog().dispose();
-						        	}
-								}
-							}
-						);
-						return null;
-            		}
-            		if (getWaitDialog() != null) {
-		        		getWaitDialog().dispose();
-		        	}
-            		return null;
-            	}
-        		try {
+    	// Si hay que firmar en PAdES con firma visible, permitiremos seleccionar
+    	// el campo de firma
+    	if (currentSigner instanceof AOPDFSigner && doVisibleSignature) {
+
+    		final String oldMessage = this.waitDialog.getMessage();
+        	this.waitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
+    		final List<SignatureField> emptySignatureFields = PdfUtil.getPdfEmptySignatureFields(this.signPanel.getDataToSign());
+
+    		// Si hay campos visibles de firma vacios, usaremos uno de entre ellos
+        	if (!emptySignatureFields.isEmpty()) {
+        		selectEmptySignatureField(currentSigner, emptySignatureFields, oldMessage);
+        	}
+        	// Si no los hay, permitiremos crear uno
+        	else {
+        		createNewSignatureField(currentSigner, oldMessage);
+        	}
+    	}
+        // Para cualquier otro formato de firma o PAdES no visible, firmaremos
+    	// directamente
+    	else {
+        	doSignature(currentSigner, null);
+    	}
+    	if (this.waitDialog != null) {
+    		this.waitDialog.dispose();
+    	}
+
+        return null;
+    }
+
+    private void selectEmptySignatureField(AOSigner signer, List<SignatureField> emptySignatureFields, String oldMsg) {
+
+		final SignatureField field = PdfEmptySignatureFieldsChooserDialog.selectField(emptySignatureFields);
+		if (field != null) {
+			if (field.getName().equals("Create")) { //$NON-NLS-1$
+				try {
 					SignPdfDialog.getVisibleSignatureExtraParams(
-						currentSigner.isSign(this.signPanel.getDataToSign()),
+							signer.isSign(this.signPanel.getDataToSign()),
 						this.signPanel.getDataToSign(),
 						this.signPanel.getWindow(),
 						new SignPdfDialogListener() {
@@ -449,8 +416,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 							public void propertiesCreated(final Properties extraParams) {
 								// Solo hacemos la firma si hay propiedades visibles
 								if (extraParams != null && !extraParams.isEmpty()) {
-									SignPanelSignTask.this.getWaitDialog().setMessage(oldMessage);
-									doSignature(currentSigner, extraParams);
+									SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
+									doSignature(signer, extraParams);
 								}
 					        	if (getWaitDialog() != null) {
 					        		getWaitDialog().dispose();
@@ -458,7 +425,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 							}
 						}
 					);
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					LOGGER.severe(
 		                "No se han podido cargar los parametros de la firma visible: " + e //$NON-NLS-1$
 		            );
@@ -469,15 +437,59 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		                  JOptionPane.ERROR_MESSAGE
 		            );
 				}
-        		return null;
-            }
-        }
+        		return;
+			}
+			PdfEmptySignatureFieldsChooserDialog.startPdfEmptySignatureFieldsChooserDialog(
+				this.signPanel.getDataToSign(),
+				this.signPanel.getWindow(),
+				field,
+				new SignPdfDialogListener() {
+					@Override
+					public void propertiesCreated(final Properties extraParams) {
+						// Solo hacemos la firma si hay propiedades visibles
+						if (extraParams != null && !extraParams.isEmpty()) {
+							SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
+							doSignature(signer, extraParams);
+						}
+			        	if (getWaitDialog() != null) {
+			        		getWaitDialog().dispose();
+			        	}
+					}
+				}
+			);
+		}
+    }
 
-        // En cualquier otro caso
-    	doSignature(currentSigner, null);
-    	if (this.waitDialog != null) {
-    		this.waitDialog.dispose();
+    private void createNewSignatureField(final AOSigner signer, final String oldMsg) {
+    	try {
+    		SignPdfDialog.getVisibleSignatureExtraParams(
+    				signer.isSign(this.signPanel.getDataToSign()),
+    				this.signPanel.getDataToSign(),
+    				this.signPanel.getWindow(),
+    				new SignPdfDialogListener() {
+    					@Override
+    					public void propertiesCreated(final Properties extraParams) {
+    						// Solo hacemos la firma si hay propiedades visibles
+    						if (extraParams != null && !extraParams.isEmpty()) {
+    							SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
+    							doSignature(signer, extraParams);
+    						}
+    						if (getWaitDialog() != null) {
+    							getWaitDialog().dispose();
+    						}
+    					}
+    				}
+    				);
+    	} catch (final Exception e) {
+    		LOGGER.severe(
+    				"No se han podido cargar los parametros de la firma visible: " + e //$NON-NLS-1$
+    				);
+    		AOUIFactory.showErrorMessage(
+    				this.signPanel,
+    				SimpleAfirmaMessages.getString("SignPanel.88"), //$NON-NLS-1$
+    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE
+    				);
     	}
-        return null;
     }
 }

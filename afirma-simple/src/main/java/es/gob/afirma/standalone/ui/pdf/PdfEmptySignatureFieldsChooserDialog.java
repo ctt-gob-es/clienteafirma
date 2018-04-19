@@ -143,17 +143,16 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 
 	BufferedImage getFragmentImage(final SignatureField sf) throws IOException {
 
-		final List<BufferedImage> pages = Pdf2ImagesConverter.pdf2Images(this.pdf);
-		final BufferedImage page = pages.get(sf.getPage() - 1);
+		final int currentPage = sf.getPage() - 1;
+		final List<BufferedImage> pages = Pdf2ImagesConverter.pdf2ImagesUsefulSections(this.pdf, currentPage);
+		final BufferedImage page = pages.get(currentPage);
 
 		final int uxr = sf.getSignaturePositionOnPageUpperRightX();
 		final int uyr = sf.getSignaturePositionOnPageUpperRightY();
 		final int lxl = sf.getSignaturePositionOnPageLowerLeftX();
 		final int lyl = sf.getSignaturePositionOnPageLowerLeftY();
 
-		final BufferedImage imSign = page.getSubimage(lxl, uyr, uxr - lxl, uyr - lyl);
-
-		return imSign;
+		return page.getSubimage(lxl, uyr, uxr - lxl, uyr - lyl);
 	}
 
 	void nextPanel(final Properties p, final BufferedImage im) throws IOException {

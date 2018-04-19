@@ -25,8 +25,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -45,6 +48,8 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 
 	private static final long serialVersionUID = 8109653789776305491L;
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private static final int PREFERRED_WIDTH = 466;
 	private static final int PREFERRED_HEIGHT = 410;
 
@@ -53,10 +58,14 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		void positionCancelled();
 	}
 
+	static interface PageLoaderListener {
+		void loaded(final List extraParams, int page);
+		void positionCancelled();
+	}
+
 	private final SignPdfDialog parent;
 
-	public
-	SignPdfDialog getParentDialog() {
+	public SignPdfDialog getParentDialog() {
 		return this.parent;
 	}
 
@@ -78,10 +87,8 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	}
 
 	private JPanel pagePanel;
-	private final List<BufferedImage> pdfPages;
-	List<BufferedImage> getPdfPages() {
-		return this.pdfPages;
-	}
+	private  List<BufferedImage> pdfPages;
+
 	private final boolean isSignPdf;
 	private BufferedImage appendPage;
 	private final List<Dimension> pdfPageSizes;
@@ -96,9 +103,13 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	final JButton nextPageButton = new JButton(">"); //$NON-NLS-1$
 	final JButton lastPageButton = new JButton(">>"); //$NON-NLS-1$
 
+	private final PdfDocument pdfDocument;
+	private int pressButton = 0;
+
 	SignPdfUiPanel(final boolean isSign,
 				   final List<BufferedImage> pages,
 				   final List<Dimension> pageSizes,
+				   final byte[] pdf,
 			       final SignPdfUiPanelListener spul,
 			       final SignPdfDialog parent) {
 
@@ -123,7 +134,18 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		this.isSignPdf = isSign;
 		this.parent = parent;
 
+		this.pdfDocument = new PdfDocument();
+		this.pdfDocument.setBytesPdf(pdf);
+
 		createUI();
+	}
+
+	public void setPdfPages(List<BufferedImage> pages) {
+		this.pdfPages=pages;
+	}
+
+	public List<BufferedImage> getPdfPages() {
+		return this.pdfPages;
 	}
 
 	private void setProperties(final Properties p) {
@@ -485,11 +507,45 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 			}
 			else if (e.getSource() == this.previousPageButton && getCurrentPage() > 1) {
 				this.currentPage--;
-				changePage();
+				if (this.pressButton > 0) {
+					try {
+						preLoadImages(getCurrentPage() + 1, this.currentPage);
+					} catch (final IOException ex) {
+						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas anteriores: " + ex, ex); //$NON-NLS-1$
+						this.currentPage++; // Deshacemos el cambio de pagina
+						AOUIFactory.showErrorMessage(
+								this.parent,
+								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+								);
+					}
+				}
+				 if(this.pdfPages.get(getCurrentPage() - 1) != null) {
+					 changePage();
+					 this.pressButton++;
+				 }
 			}
 			else if (e.getSource() == this.nextPageButton && getCurrentPage() < this.pdfPages.size()) {
 				this.currentPage++;
-				changePage();
+				if (this.pressButton > 0) {
+					try {
+						preLoadImages(getCurrentPage() - 1, this.currentPage);
+					} catch (final IOException ex) {
+						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas siguientes: " + ex, ex); //$NON-NLS-1$
+						this.currentPage--; // Deshacemos el cambio de pagina
+						AOUIFactory.showErrorMessage(
+								this.parent,
+								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+							);
+					}
+				}
+				 if (this.pdfPages.get(getCurrentPage() - 1) != null) {
+					 changePage();
+					 this.pressButton++;
+				 }
 			}
 			else if (e.getSource() == this.lastPageButton && getCurrentPage() < this.pdfPages.size()) {
 				this.currentPage = this.pdfPages.size();
@@ -616,4 +672,27 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		}
 	}
 
+
+	private void preLoadImages(final int actualPage, int pageToLoad) throws IOException {
+
+		int necessaryPage;
+		// Pulsado boton izquierdo (anterior)
+		if (actualPage > pageToLoad) {
+			necessaryPage = pageToLoad - 2;
+		}
+		// Pulsado boton derecho (siguente)
+		else {
+			necessaryPage = pageToLoad + 1;
+		}
+
+		// Si no tenemos la pagina que necesitamos, la cargamos
+		if (this.pdfPages.get(necessaryPage) == null) {
+			try {
+				this.pdfDocument.loadNewPages(this.pdfPages, getCurrentPage() - 1);
+			}
+			catch (final OutOfMemoryError | Exception e) {
+				throw new IOException("No se ha podido cargar la previsualizacion de la pagina", e); //$NON-NLS-1$
+			}
+		}
+	}
 }

@@ -66,19 +66,19 @@ public final class UiTester {
 		final JFrame frame = new JFrame("Prueba"); //$NON-NLS-1$
 		frame.setBounds(100, 20, 900, 900);
 
-		PdfLoader.loadPdfWithProgressDialog(
+		PdfLoader.loadPdf(
 			IS_SIGN,
-			frame,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
+				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
 					System.out.println("Cargado"); //$NON-NLS-1$
 					frame.add(
 						new SignPdfUiPanel(
 							isSign,
 							pages,
 							pageSizes,
+							pdf,
 							new SignPdfUiPanelListener() {
 
 								@Override

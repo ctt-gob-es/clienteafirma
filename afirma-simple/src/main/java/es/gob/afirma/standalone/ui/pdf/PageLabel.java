@@ -145,10 +145,6 @@ final class PageLabel extends JLabel {
 			throw new IllegalArgumentException();
 		}
 		this.listener = pll;
-
-		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-			"Factor de escala de las paginas: " + scaleFactor //$NON-NLS-1$
-		);
 		this.scale = scaleFactor;
 
 		setSize(width, height);

@@ -111,11 +111,12 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	}
 
 	@Override
-	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
+	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] pdf) {
 		this.areaPanel = new SignPdfUiPanel(
 			isSign,
 			pages,
 			pageSizes,
+			pdf,
 			this,
 			SignPdfDialog.this
 		);
@@ -168,6 +169,11 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		setVisible(false);
 		this.listener.propertiesCreated(new Properties());
 		dispose();
+	}
+
+	@Override
+	public final Frame getParent() {
+		return this.parent;
 	}
 
 	/** Define los requerimientos de las clases a las que se informa de que ya se cuenta
