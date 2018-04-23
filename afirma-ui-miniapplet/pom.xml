@@ -118,7 +118,7 @@
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-jmimemagic</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
