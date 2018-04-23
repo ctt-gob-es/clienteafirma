@@ -35,16 +35,22 @@ public final class ValidatePdfSignature implements SignValider{
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
-	/** Valida una firma PDF (PKCS#7/PAdES). 
-	 * Se validan los certificados en local revisando las fechas de validez de los certificados.
+	/** Valida una firma PDF (PKCS#7/PAdES).
+	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
      * @param sign PDF firmado.
      * @return Validez de la firma.
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
+     * @throws IOException Si ocurren problemas relacionados con la lectura del documento
+     * o si no se encuentran firmas PDF en el documento. */
 	@Override
 	public SignValidity validate(final byte[] sign) throws IOException {
 		final PdfReader reader = new PdfReader(sign);
 		final AcroFields af = reader.getAcroFields();
 		final List<String> sigNames = af.getSignatureNames();
+
+		if (sigNames.size() == 0) {
+			throw new IOException("No se encontraron firmas en el PDF"); //$NON-NLS-1$
+		}
+
 		for (final String name : sigNames) {
 			final PdfPKCS7 pk = af.verifySignature(name);
 
