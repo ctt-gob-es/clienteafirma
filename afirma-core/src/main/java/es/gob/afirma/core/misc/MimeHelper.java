@@ -15,14 +15,14 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
- * identificadores de tipo de contenidos. */
+ * identificadores de tipo de contenido. */
 public final class MimeHelper {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Valor que devuelve JMimeMagic por defecto cuando no sabe identificar la extension o el mimetype de unos datos. */
+    /** Valor que devuelve JMimeMagic por defecto cuando no sabe identificar la extensi&oacute;n
+     * o el MimeType de unos datos. */
     public static final String UNKNOWN_JMIMEMAGIC_VALUE = "???"; //$NON-NLS-1$
 
     /** MimeType por defecto. */
@@ -44,7 +44,7 @@ public final class MimeHelper {
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
 
-    /** Tabla que asocia Mimetypes y Oids. */
+    /** Tabla que asocia MimeType y OID. */
     private static Properties mimetypeOidProp = null;
 
     /** Objeto para el almac&eacute;n de la informaci&oacute;n de los datos. */
@@ -57,10 +57,8 @@ public final class MimeHelper {
     private String mimeType = null;
 
     /** Realiza el an&aacute;lisis de los datos.
-     * @param data
-     *        Datos que se desean analizar.
-     * @throws NullPointerException
-     *         Cuando se introducen datos nulos. */
+     * @param data Datos que se desean analizar.
+     * @throws NullPointerException Cuando se introducen datos nulos. */
     public MimeHelper(final byte[] data) {
 
         if (data == null) {
@@ -111,13 +109,12 @@ public final class MimeHelper {
         }
     }
 
-    /** Obtiene el Oid correspondiente a un Mime Type concreto. Si no conoce el
-     * Oid asociado, devuelve el OID por defecto para datos binarios
+    /** Obtiene el OID correspondiente a un MimeType concreto. Si no conoce el
+     * OID asociado, devuelve el OID por defecto para datos binarios
      * (DEFAULT_CONTENT_OID_DATA).
-     * @param mimetype
-     *        del que deseamos obtener el Oid.
-     * @return OID asociado al Mime Type.
-     * @throws IOException Si no se puede cargar la tabla de correspondencias entre MIMEType y OID */
+     * @param mimetype MimeType del que deseamos obtener el OID.
+     * @return OID asociado al MimeType.
+     * @throws IOException Si no se puede cargar la tabla de correspondencias entre MimeType y OID. */
     public static String transformMimeTypeToOid(final String mimetype) throws IOException {
         if (mimetypeOidProp == null) {
             loadMimetypeOidProperties();
@@ -127,13 +124,11 @@ public final class MimeHelper {
         			mimetypeOidProp.getProperty(mimetype, DEFAULT_CONTENT_OID_DATA);
     }
 
-    /** Obtiene el Mime correspondiente a un Oid concreto. Si no conoce el Mime
-     * Type asociado, devuelve el gen&eacute;rico de datos binarios
-     * (DEFAULT_MIMETYPE).
-     * @param oid
-     *        del que deseamos obtener el Mime Type.
+    /** Obtiene el MimeType correspondiente a un OID concreto. Si no conoce el MimeType
+     * asociado, devuelve el gen&eacute;rico de datos binarios (DEFAULT_MIMETYPE).
+     * @param oid OID del que deseamos obtener el MimeType.
      * @return MimeType asociado al OID.
-     * @throws IOException Si no se puede cargar la tabla de correspondencias entre MIMEType y OID */
+     * @throws IOException Si no se puede cargar la tabla de correspondencias entre MimeType y OID. */
     public static String transformOidToMimeType(final String oid) throws IOException {
         if (oidMimetypeProp == null) {
             loadOidMimetypeProperties();
@@ -143,22 +138,26 @@ public final class MimeHelper {
         			oidMimetypeProp.getProperty(oid, DEFAULT_MIMETYPE);
     }
 
-    /** Carga el fichero de propiedades que relaciona OID de formato con su mime type
+    /** Carga el fichero de propiedades que relaciona OID de formato con su MimeType
      * correspondiente.
-     * @throws IOException Cuando hay errores en la carga del fichero de propiedades */
+     * @throws IOException Cuando hay errores en la carga del fichero de propiedades. */
     private static void loadOidMimetypeProperties() throws IOException {
         oidMimetypeProp = new Properties();
         try (
-    		final InputStream isProp = MimeHelper.class.getClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
+    		final InputStream isProp = MimeHelper.class.getClassLoader().getResourceAsStream(
+				"resources/mimetypes_oids.properties" //$NON-NLS-1$
+			);
 		) {
 	        if (isProp == null) {
-	        	throw new IOException("No se ha encontrado el fichero de recursos para la relacion entre OIDs y MimeTypes"); //$NON-NLS-1$
+	        	throw new IOException(
+        			"No se ha encontrado el fichero de recursos para la relacion entre OID y MimeType" //$NON-NLS-1$
+    			);
 	        }
 	        oidMimetypeProp.load(isProp);
         }
     }
 
-    /** Carga la tabla de relacion de MimeTypes y OID.
+    /** Carga la tabla de relaci&oacute;n de MimeType y OID.
      * @throws IOException Cuando hay errores en la carga del fichero de propiedades */
     private static void loadMimetypeOidProperties() throws IOException {
         if (oidMimetypeProp == null) {
@@ -170,10 +169,10 @@ public final class MimeHelper {
         }
     }
 
-    /** Recupera el MimeType de los datos analizados, <code>null</code> si no se
+    /** Recupera el MimeType de los datos analizados.
+     * @return MimeType de los datos o <code>null</code> si no se
      * pudo detectar.
-     * @return MimeType de los datos.
-     * @throws IOException Si no se pueden analizar los datos */
+     * @throws IOException Si no se pueden analizar los datos. */
     public String getMimeType() throws IOException {
 
         // Comprobamos si ya se calculo previamente el tipo de datos
@@ -205,9 +204,9 @@ public final class MimeHelper {
         return this.mimeType;
     }
 
-    /** Recupera la extensi&oacute;n com&uacute;n para un fichero con los datos analizados, {@code null} si no se conoce. La extensi&oacute;n se
-     * devuelve sin el punto separador.
-     * @return Extensi&oacute;n para un fichero de datos. */
+    /** Recupera la extensi&oacute;n com&uacute;n para un fichero con los datos analizados.
+     * @return Extensi&oacute;n para un fichero de datos o {@code null} si no se conoce el
+     *         tipo. La extensi&oacute;n se devuelve sin el punto separador. */
     public String getExtension() {
 
         String extension = null;
@@ -228,16 +227,18 @@ public final class MimeHelper {
 				extension = OfficeAnalizer.getExtension(this.data);
 			}
             catch (final IOException e) {
-				LOGGER.severe("No se ha podido comprobar si el ZIP corresponde a un ODF o a un OOXML, se tomara como ZIP: " + e); //$NON-NLS-1$
+				LOGGER.severe(
+					"No se ha podido comprobar si el ZIP corresponde a un ODF o a un OOXML, se tomara como ZIP: " + e //$NON-NLS-1$
+				);
 			}
         }
 
         return extension;
     }
 
-    /** Recupera la descripcion de los datos analizados, <code>null</code> si no
-     * se pudo detectar.
-     * @return Descripci&oacute;n del tipo de dato. */
+    /** Recupera la descripci&oacute;n de los datos analizados.
+     * @return Descripci&oacute;n del tipo de dato o <code>null</code> si no
+     *         se pudo detectar. */
     public String getDescription() {
     	String desc = null;
 
@@ -264,9 +265,7 @@ public final class MimeHelper {
         return desc == null || desc.length() == 0 ? DEFAULT_CONTENT_DESCRIPTION : desc;
     }
 
-    /**
-     * Almacena la informaci&oacute;n identificada del tipo de datos.
-     */
+    /** Almacena la informaci&oacute;n identificada del tipo de datos. */
     static class MimeInfo {
 
         /** MimeType de los datos. */
