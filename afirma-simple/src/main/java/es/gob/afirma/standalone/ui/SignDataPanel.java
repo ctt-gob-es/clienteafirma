@@ -466,7 +466,8 @@ final class SignDataPanel extends JPanel {
         		new DefaultMutableTreeNode(
     				new ShowFileLinkAction(
 						SimpleAfirmaMessages.getString("SignDataPanel.28"),  //$NON-NLS-1$
-						signInfo.getData()
+						signInfo.getData(),
+						parent
 					)
 				)
     		);
