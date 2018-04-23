@@ -34,6 +34,13 @@ public final class MimeHelper {
     /** OID del tipo de datos gen&eacute;rico. */
     public static final String DEFAULT_CONTENT_OID_DATA ="1.2.840.113549.1.7.1"; //$NON-NLS-1$
 
+    /** Extensi&oacute;n asignada por JMimeMagic a los ficheros ZIP. */
+    public static final String ZIP_EXTENSION = "zip"; //$NON-NLS-1$
+
+    /** Extensi&oacute;n asignada por JMimeMagic a los ficheros ZIP. */
+    public static final String ZIP_DESCRIPTION = "Zip archive data"; //$NON-NLS-1$
+
+
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
 
@@ -216,7 +223,7 @@ public final class MimeHelper {
         // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
         // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
         // estructura concreta)
-        if (extension != null && extension.equals("zip")) { //$NON-NLS-1$
+        if (extension != null && extension.equals(ZIP_EXTENSION)) {
             try {
 				extension = OfficeAnalizer.getExtension(this.data);
 			}
@@ -233,9 +240,27 @@ public final class MimeHelper {
      * @return Descripci&oacute;n del tipo de dato. */
     public String getDescription() {
     	String desc = null;
-        if (this.mimeInfo != null) {
+
+    	// Comprobamossi los datos son XML, si no, los parseamos
+        if (AOFileUtils.isXML(this.data)) {
+        	desc = "Documento XML"; //$NON-NLS-1$
+        }
+        else if (this.mimeInfo != null) {
             desc = this.mimeInfo.getDescription();
         }
+
+        // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
+        // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
+        // estructura concreta)
+        if (desc != null && desc.equals(ZIP_DESCRIPTION)) {
+            try {
+				desc = OfficeAnalizer.getDescription(this.data);
+			}
+            catch (final IOException e) {
+				LOGGER.severe("No se ha podido comprobar si el ZIP corresponde a un ODF o a un OOXML, se tomara como ZIP: " + e); //$NON-NLS-1$
+			}
+        }
+
         return desc == null || desc.length() == 0 ? DEFAULT_CONTENT_DESCRIPTION : desc;
     }
 

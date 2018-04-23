@@ -47,6 +47,9 @@ public final class OfficeAnalizer {
     /** Extensiones de fichero asignadas a cada uno de los mimetypes. */
     private static final Map<String, String> FILE_EXTENSIONS = new HashMap<>();
 
+    /** Descripciones de fichero asignadas a cada uno de los mimetypes. */
+    private static final Map<String, String> FILE_DESCRIPTIONS = new HashMap<>();
+
     static {
         // MimeTypes reconocidos del formato OOXML
         OOXML_MIMETYPES.add("application/vnd.ms-word.document.macroEnabled.12"); //$NON-NLS-1$
@@ -100,6 +103,23 @@ public final class OfficeAnalizer {
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.database", "odb"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.image", "odi"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text-master", "odm"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        // Descripciones de fichero
+        FILE_DESCRIPTIONS.put("application/zip", "Archivo zip"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        FILE_DESCRIPTIONS.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "Documento de texto"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.openxmlformats-officedocument.presentationml.presentation", "Presentaci\u00F3n"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Hoja de c\u00E1lculo"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.text", "Documento de texto"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.presentation", "Presentaci\u00F3n"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.spreadsheet", "Hoja de c\u00E1lculo"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.graphics", "Gr\u00E1fico"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.chart", "Diagrama"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.formula", "F\u00F3rmula"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.database", "Base de datos"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.image", "Imagen"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.text-master", "Plantilla de documento"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /** Devuelve el MimeType correspondiente al documento ofim&aacute;tico
@@ -140,7 +160,6 @@ public final class OfficeAnalizer {
     		return retVal;
     	}
     	return "application/octect-stream"; //$NON-NLS-1$
-
     }
 
 	private static String getMimeTypeOffice97(final byte[] data) {
@@ -179,6 +198,21 @@ public final class OfficeAnalizer {
             return null;
         }
         return FILE_EXTENSIONS.get(mimetype);
+    }
+
+    /** Devuelve la extensi&oacute;n correspondiente al documento ofim&aacute;tico
+     * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
+     * de ellos pero es un Zip se devolver&aacute; la extensi&oacute;n "zip"
+     * y si no es Zip se devolver&aacute; {@code null}.
+     * @param zipData Fichero ODF u OOXML.
+     * @return Extensi&oacute;n.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
+    static String getDescription(final byte[] zipData) throws IOException {
+        final String mimetype = getMimeType(zipData);
+        if (mimetype == null) {
+            return null;
+        }
+        return FILE_DESCRIPTIONS.get(mimetype);
     }
 
     /** Indica si un fichero tiene la estructura de un documento OOXML.
