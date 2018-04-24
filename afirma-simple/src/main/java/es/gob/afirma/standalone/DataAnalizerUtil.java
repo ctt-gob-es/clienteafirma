@@ -197,9 +197,6 @@ public final class DataAnalizerUtil {
      * @param data Datos a analizar.
      * @return Devuelve {@code true} si los datos son OOXML. */
     public static boolean isOOXML(final byte[] data) {
-
-    	System.out.println(" == Es OOXML: " + new AOOOXMLSigner().isValidDataFile(data));
-
         try {
             return new AOOOXMLSigner().isValidDataFile(data);
         }

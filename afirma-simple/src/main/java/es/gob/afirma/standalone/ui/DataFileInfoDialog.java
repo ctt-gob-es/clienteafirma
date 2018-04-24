@@ -55,10 +55,16 @@ public class DataFileInfoDialog {
 				!this.dataInfo.getExtension().trim().isEmpty() &&
 				!DataFileAnalizer.isExecutable(this.dataInfo.getExtension()) ?
 						Options.OPEN : Options.SAVE;
-		final Options[] dialogOptions =
-				Platform.OS.MACOSX.equals(Platform.getOS()) ?
-						new Options[] { Options.CANCEL, okOpt } :
-							new Options[] { okOpt, Options.CANCEL};
+
+		Options[] dialogOptions;
+
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			dialogOptions = new Options[] { okOpt, Options.CANCEL};
+		} else {
+			// En linux se invierte el orden automaticamente, asi que lo
+			// configuramos al contrario para que quede como en Windows
+			dialogOptions = new Options[] { Options.CANCEL, okOpt };
+		}
 		this.optionPane.setOptions(dialogOptions);
 
 		// Mostramos el dialogo

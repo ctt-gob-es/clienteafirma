@@ -65,34 +65,30 @@ public final class MainMenu extends JMenuBar {
      *  <li>Alt+A = Menu archivo</li>
      *  <li>
      *   <ul>
-     *    <li>Alt+B = Abrir archivo</li>
-     *    <li>Alt+I = Firmar archivo</li>
-     *    <li>Alt+H = Huellas digitales</li>
-     *    <li>
-     *     <ul>
-     *      <li>Alt+L = Calcular huella digital</li>
-     *      <li>Alt+R = Comprobar huella digital</li>
-     *     </ul>
-     *    </li>
+     *    <li>Ctrl+B = Abrir archivo</li>
+     *    <li>Ctrl+I = Firmar archivo</li>
+     *    <li>Ctrl+V = Ver firma</li>
      *    <li>Alt+F4 = Salir del programa</li>
+     *   </ul>
+     *  </li>
+     *  <li>Alt+R = Menu herramientas</li>
+     *  <li>
+     *   <ul>
+     *    <li>Ctrl+H = Calcular huella digital</li>
+     *    <li>Ctrl+U = Comprobar huella digital</li>
+     *    <li>Ctrl+D = Calcular huella digital de un directorio</li>
+     *    <li>Ctrl+K = Comprobar huella digital de un directorio</li>
+     *    <li>Ctrl+R = Restaurar instalaci&oacute;n</li>
+     *    <li>Ctrl+P = Preferencias</li>
      *   </ul>
      *  </li>
      *  <li>Alt+Y = Menu Ayuda</li>
      *  <li>
      *   <ul>
-     *    <li>Alt+U = Ayuda</li>
-     *    <li>Alt+R = Acerca de...</li>
+     *    <li>F1 = Ayuda</li>
+     *    <li>Alt+C = Acerca de...</li>
      *   </ul>
      *  </li>
-     *  <li>Alt+S = Seleccionar fichero</li>
-     *  <li>Alt+F = Firmar fichero</li>
-     *  <li>Ctrl+A = Seleccionar fichero</li>
-     *  <li>Ctrl+F = Firmar fichero</li>
-     *  <li>Alt+F4 = Salir del programa</li>
-     *  <li>F1 = Ayuda</li>
-     *  <li>Ctrl+R = Acerca de...</li>
-     *  <li>Ctrl+H = Calcular huella digital</li>
-     *  <li>Ctrl+U = Comprobar huella digital</li>
      * </ul>
      * @param p Componente padre para la modalidad
      * @param s Aplicaci&oacute;n padre, para determinar el n&uacute;mero de
@@ -344,9 +340,9 @@ public final class MainMenu extends JMenuBar {
             acercaMenuItem.getAccessibleContext().setAccessibleDescription(
         		SimpleAfirmaMessages.getString("MainMenu.17") //$NON-NLS-1$
             );
-            acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             acercaMenuItem.addActionListener(ae -> showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent()));
-            acercaMenuItem.setMnemonic(KeyEvent.VK_R);
+            acercaMenuItem.setMnemonic(KeyEvent.VK_C);
             menuAyuda.add(acercaMenuItem);
             this.add(menuAyuda);
         }
@@ -437,7 +433,10 @@ public final class MainMenu extends JMenuBar {
     public static void showAbout(final Component parentComponent) {
         AOUIFactory.showMessageDialog(
     		parentComponent,
-			SimpleAfirmaMessages.getString("MainMenu.14", SimpleAfirma.getVersion(), System.getProperty("java.version")), //$NON-NLS-1$ //$NON-NLS-2$,
+			SimpleAfirmaMessages.getString("MainMenu.14", //$NON-NLS-1$
+					SimpleAfirma.getVersion(),
+					System.getProperty("java.version"), //$NON-NLS-1$,
+					Platform.getJavaArch()),
             SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
             JOptionPane.PLAIN_MESSAGE
         );

@@ -203,7 +203,7 @@ public class DataFileAnalizer {
     	}
 
     	// Cargamos la imagen
-    	final BufferedImage bImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    	final BufferedImage bImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     	final Graphics2D bGr = bImage.createGraphics();
     	bGr.drawImage(image, 0, 0, null);
     	bGr.dispose();
