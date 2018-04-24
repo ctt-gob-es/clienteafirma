@@ -69,14 +69,21 @@ final class ProtocolInvocationLauncherSave {
 		}
 
 		if (options.getStorageServletUrl() != null) {
-			// Enviamos la firma cifrada al servicio remoto de intercambio
-			try {
-				IntermediateServerUtil.sendData(RESULT_OK, options.getStorageServletUrl().toString(), options.getId());
-			}
-			catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
+			// Enviamos los datos cifrados al servicio remoto de intercambio y detenemos la espera
+			// activa si se encontraba vigente
+			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
+				final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
+				if (waitingThread != null) {
+					waitingThread.interrupt();
+				}
+				try {
+					IntermediateServerUtil.sendData(RESULT_OK, options.getStorageServletUrl().toString(), options.getId());
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
+					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
+				}
 			}
 		}
 		else {

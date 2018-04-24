@@ -11,6 +11,7 @@ package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.EventObject;
 import java.util.logging.Level;
@@ -47,6 +48,12 @@ public final class ProtocolInvocationLauncher {
 
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
+
+	/**
+	 * Hilo para solicitar activamente a traves del servidor intermedio que se
+	 * espere a que termine de ejecutarse la aplicaci&oacute;n.
+	 */
+    private static Thread activeWaitingThread = null;
 
 	/** Recupera la entrada con la clave y certificado prefijados para las
 	 * operaciones con certificados.
@@ -148,6 +155,13 @@ public final class ProtocolInvocationLauncher {
 
                     params = ProtocolInvocationUriParser.getParametersForBatch(xmlBatchDefinition);
                 }
+
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
+                }
+
                 try {
                     return  ProtocolInvocationLauncherBatch.processBatch(params, bySocket);
                 }
@@ -175,6 +189,13 @@ public final class ProtocolInvocationLauncher {
         else if (urlString.startsWith("afirma://selectcert?") || urlString.startsWith("afirma://selectcert/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             try {
                 final UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
+
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
+                }
+
                 try {
                     return ProtocolInvocationLauncherSelectCert.processSelectCert(params, bySocket);
                 }
@@ -221,6 +242,13 @@ public final class ProtocolInvocationLauncher {
 
                     params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
                 }
+
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
+                }
+
                 try {
                 	return  ProtocolInvocationLauncherSave.processSave(params, bySocket);
                 }
@@ -280,6 +308,12 @@ public final class ProtocolInvocationLauncher {
                     }
 
                     params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData);
+                }
+
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
                 }
 
                 try {
@@ -343,6 +377,12 @@ public final class ProtocolInvocationLauncher {
                     params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
                 }
 
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
+                }
+
                 LOGGER.info("Se inicia la operacion de firma"); //$NON-NLS-1$
 
                 try {
@@ -383,9 +423,6 @@ public final class ProtocolInvocationLauncher {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga/multicarga"); //$NON-NLS-1$
 
             try {
-
-            	LOGGER.info("URL DE INVOCACION: " + urlString); //$NON-NLS-1$
-
                 UrlParametersToLoad params = ProtocolInvocationUriParser.getParametersToLoad(urlString);
 
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
@@ -407,6 +444,12 @@ public final class ProtocolInvocationLauncher {
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
                     }
                     params = ProtocolInvocationUriParser.getParametersToLoad(xmlData);
+                }
+
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
                 }
 
                 LOGGER.info("Se inicia la operacion de carga"); //$NON-NLS-1$
@@ -441,36 +484,18 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
         }
-        // Se solicita una operacion de carga/multicarga
+        // Se solicita una operacion de recuperacion de logs
         else if (urlString.startsWith("afirma://getLog?") //$NON-NLS-1$
         		) {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de obtencion del log actual de la aplicacion"); //$NON-NLS-1$
 
             try {
+                final UrlParametersToGetCurrentLog params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(urlString);
 
-            	LOGGER.info("URL DE INVOCACION: " + urlString); //$NON-NLS-1$
-
-                UrlParametersToGetCurrentLog params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(urlString);
-
-                // Si se indica un identificador de fichero, es que la configuracion se tiene que
-                // descargar desde el servidor intermedio
-                if (params.getFileId() != null) {
-
-                    final byte[] xmlData;
-                    try {
-                        xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
-                    }
-                    catch(final InvalidEncryptedDataLengthException | IOException e) {
-                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
-                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
-                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
-                    }
-                    catch(final DecryptionException e) {
-                        LOGGER.severe("Error al descifrar" + e); //$NON-NLS-1$
-                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
-                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
-                    }
-                    params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(xmlData);
+                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
+                // que se espere activamente hasta el fin de la tarea
+                if (!bySocket && params.isActiveWaiting()) {
+                	requestWait(params.getStorageServletUrl(), params.getId());
                 }
 
                 LOGGER.info("Se inicia la operacion de obtencion de log actual"); //$NON-NLS-1$
@@ -505,17 +530,43 @@ public final class ProtocolInvocationLauncher {
         throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
     }
 
-    /** Env&iacute;a una cadena de texto al servidor intermedio.
+    /**
+     * Inicia el proceso de solicitud de espera activa a trav&eacute;s del servidor intermedio.
+     * @param storageServletUrl URL del servicio de guardado en el servidor intermedio.
+     * @param id Identificador de la transacci&oacute;n para la que se le solicita la espera.
+     */
+    private static void requestWait(URL storageServletUrl, String id) {
+    	activeWaitingThread = new ActiveWaitingThread(storageServletUrl.toString(), id);
+    	activeWaitingThread.start();
+	}
+
+	/** Env&iacute;a un mensaje de error al servidor intermedio e interrumpe la espera
+	 * declarada en este servidor.
      * @param data Cadena de texto.
      * @param serviceUrl URL del servicio de env&iacute;o de datos.
      * @param id Identificador del mensaje en el servidor. */
 	private static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
-		try {
-			IntermediateServerUtil.sendData(data, serviceUrl, id);
-		}
-		catch (final IOException e) {
-			LOGGER.log(Level.SEVERE, "Error al enviar los datos del error al servidor intermedio: " + e, e); //$NON-NLS-1$
+		synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
+			final Thread waitingThread = getActiveWaitingThread();
+			if (waitingThread != null) {
+				waitingThread.interrupt();
+			}
+			try {
+				IntermediateServerUtil.sendData(data, serviceUrl, id);
+			}
+			catch (final IOException e) {
+				LOGGER.log(Level.SEVERE, "Error al enviar los datos del error al servidor intermedio: " + e, e); //$NON-NLS-1$
+			}
 		}
 	}
 
+	/**
+	 * Obtiene el hilo encargado de solicitar a trav&eacute;s del servidor intermedio que se
+	 * realice una espera activa del resultado de la operaci&oacute;n actual.
+	 * @return Hilo que solicita reiteradamente la espera o {@code null} si no se inici&oacute;
+	 * la espera activa.
+	 */
+	public static Thread getActiveWaitingThread() {
+		return activeWaitingThread;
+	}
 }

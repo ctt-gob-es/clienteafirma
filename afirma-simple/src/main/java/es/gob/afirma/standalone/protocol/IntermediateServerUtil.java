@@ -25,6 +25,8 @@ public class IntermediateServerUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static Object semaphore = null;
+
 	/** Env&iacute;a datos al servidor intermedio.
 	 * @param data Buffer con los datos a enviar.
 	 * @param storageServiceUrl URL del servicio de guardado.
@@ -66,5 +68,19 @@ public class IntermediateServerUtil {
 		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), UrlHttpMethod.POST);
 
 		LOGGER.info("Resultado: " + new String(result)); //$NON-NLS-1$
+	}
+
+	/**
+	 * Obtiene el sem&aacute;foro que gestiona el acceso para el envio de datos
+	 * al servidor intermedio. El uso de este sem&aacute;foro antes de las llamadas
+	 * para el env&iacute;o de datos, garantiza que no se env&iacute;e nada al
+	 * servidor cuando ya deb&iacute;o dejar de enviar.
+	 * @return Instancia del sem&aacute;foro.
+	 */
+	public static Object getUniqueSemaphoreInstance() {
+		if (semaphore == null) {
+			semaphore = new Object();
+		}
+		return semaphore;
 	}
 }

@@ -60,6 +60,10 @@ public abstract class UrlParameters {
 	/** Par&aacute;metro de entrada con la configuraci&oacute;n del almac&eacute;n de claves en base64. */
 	protected static final String KEYSTORE_PARAM = "ksb64"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada con el valor indicativo de si se debe realizar una espera
+	 * activa hasta la devoluci&uacute;on servlet remoto de guardado de datos. */
+	protected static final String ACTIVE_WAITING_PARAM = "aw"; //$NON-NLS-1$
+
 	/** Codificaci&oacute;n por defecto. */
 	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
@@ -69,6 +73,7 @@ public abstract class UrlParameters {
 	private URL retrieveServletUrl = null;
 	private URL storageServer = null;
 	private String id = null;
+	private boolean activeWaiting = false;
 
 	private String defaultKeyStore = null;
 	private String defaultKeyStoreLib = null;
@@ -182,6 +187,23 @@ public abstract class UrlParameters {
 		this.storageServer = url;
 	}
 
+	/** Obtiene el indicador de si se ha solicitado que se realice una espera activa
+	 * a la espera del fin de la operaci&oacute;n solicitada.
+	 * @return {@code true} si se pide que se emita la solicitud de espera activa,
+	 * {@code false} en caso contrario. */
+	public boolean isActiveWaiting() {
+		return this.activeWaiting;
+	}
+
+	/**
+	 * Establece si debe solicitarse a los clientes la espera activa hasta la obtenci&oacute;n
+	 * del resultado de la operaci&oacute;n.
+	 * @param activeWaiting Espera activa.
+	 */
+	protected void setActiveWaiting(final boolean activeWaiting) {
+		this.activeWaiting = activeWaiting;
+	}
+
 	/** Obtiene el identificador de sesi&oacute;n.
 	 * @return Identificador de sesi&oacute;n */
 	public String getId() {
@@ -196,8 +218,11 @@ public abstract class UrlParameters {
 
 		setDesKey(verifyCipherKey(params));
 
+		setActiveWaiting(params.containsKey(ACTIVE_WAITING_PARAM) &&
+				Boolean.parseBoolean(params.get(ACTIVE_WAITING_PARAM)));
+
 		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
-		// identificador de fichero remoto descargar los datos y la ruta del
+		// identificador de fichero remoto a descargar y la ruta del
 		// servicio remoto para el fichero
 		if (!params.containsKey(DATA_PARAM)) {
 

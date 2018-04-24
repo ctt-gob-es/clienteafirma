@@ -2329,6 +2329,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
 			
 				var url = buildUrl(opId, params);
 
@@ -2412,6 +2413,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
 				if (algorithm != null && algorithm != undefined) {		params[i++] = {key:"algorithm", value:algorithm}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(signId, params);
@@ -2475,6 +2477,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (outputFileName != null &&
 						outputFileName != undefined) {					params[i++] = {key:"filename", value:outputFileName}; }
+				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(opId, params);
@@ -2529,6 +2532,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (batchPostSignerUrl != null &&
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
 
 				var url = buildUrl(opId, params);
@@ -2589,8 +2593,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (filename != null && filename != undefined) {		params[i++] = {key:"filename", value:filename}; }
 				if (extension != null && extension != undefined) {		params[i++] = {key:"extension", value:extension}; }
 				if (description != null && description != undefined) {	params[i++] = {key:"description", value:description}; }
+				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[i++] = {key:"dat", value:dataB64}; }
-
+				
+				
 				var url = buildUrl(opId, params);
 
 				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
@@ -2921,7 +2927,10 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			/**
 			 * Ejecuta el metodo de error si el html recuperado es tal o el metodo de exito si no lo es,
-			 * en cuyo caso previamente descifrara el resultado. 
+			 * en cuyo caso previamente descifrara el resultado. Si el valor recuperado no es ni el
+			 * de exito ni el de error, indicara si se debe seguir esperando por un resultado. En caso
+			 * de indicar false, no se esperara mas; en caso de true, se seguira con la espera; y si se
+			 * de vuelve "reset" se debera reiniciar la espera.
 			 * @param html Resultado obtenido.
 			 * @param cipherKey Clave para el descifrado del resultado si no es un error.
 			 * @param successCallback Metodo a ejecutar en caso de exito.
@@ -2936,6 +2945,13 @@ var MiniApplet = ( function ( window, undefined ) {
 					return true;
 				}
 
+				// Si se obtiene el mensaje de espera, es que el cliente se ha levantado y ha iniciado el proceso.
+				// Siempre que obtengamos este resultado, deberemos reiniciar el tiempo de espera, ya que la aplicacion
+				// sigue activa y nos pide mas tiempo
+				if (html.substr(0, 5).toLowerCase() == "#wait") {
+					return "reset";
+				}
+				
 				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
 				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
 					errorMessage = html.substring(html.indexOf(":=") + 2);
@@ -3003,7 +3019,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
-			var NUM_MAX_ITERATIONS = 15;
+			var NUM_MAX_ITERATIONS = 8;
 			var iterations = 0;
 
 			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
@@ -3036,7 +3052,12 @@ var MiniApplet = ( function ( window, undefined ) {
 						if (httpRequest.status == 200) {
 							var needContinue = successResponseFunction(httpRequest.responseText, cipherKey, successCallback, errorCallback);
 							if (needContinue) {
-								setTimeout(retrieveRequest, 4000, httpRequest, url, params.replace("&it=" + (iterations-1), "&it=" + iterations), cipherKey, successCallback, errorCallback);
+								// En caso de que la respuesta sea "reset", se reinicia la espera
+								var oldIterations = iterations-1;
+								if (needContinue == "reset") {
+									iterations = 0;
+								}
+								setTimeout(retrieveRequest, 4000, httpRequest, url, params.replace("&it=" + (oldIterations), "&it=" + iterations), cipherKey, successCallback, errorCallback);
 							}
 						}
 						else {
