@@ -148,13 +148,11 @@ public final class AOUtil {
     }
 
     /** Lee un flujo de datos de entrada y los recupera en forma de array de
-     * bytes. Este m&eacute;todo consume pero no cierra el flujo de datos de
+     * bytes. Este m&eacute;todo consume, pero no cierra el flujo de datos de
      * entrada.
-     * @param input
-     *        Flujo de donde se toman los datos.
+     * @param input Flujo de donde se toman los datos.
      * @return Los datos obtenidos del flujo.
-     * @throws IOException
-     *         Cuando ocurre un problema durante la lectura */
+     * @throws IOException Cuando ocurre un problema durante la lectura. */
     public static byte[] getDataFromInputStream(final InputStream input) throws IOException {
         if (input == null) {
             return new byte[0];
@@ -169,13 +167,12 @@ public final class AOUtil {
     }
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) del titular de un
-     * certificado X.509. Si no se encuentra el CN, se devuelve la unidad organizativa
+     * certificado X&#46;509. Si no se encuentra el CN, se devuelve la unidad organizativa
      * (Organization Unit, OU).
-     * @param c
-     *        Certificado X.509 del cual queremos obtener el nombre
-     *        com&uacute;n
+     * @param c Certificado X&#46;509 del cual queremos obtener el nombre
+     *        com&uacute;n.
      * @return Nombre com&uacute;n (Common Name, CN) del titular de un
-     *         certificado X.509 */
+     *         certificado X&#46;509. */
     public static String getCN(final X509Certificate c) {
         if (c == null) {
             return null;
@@ -184,13 +181,12 @@ public final class AOUtil {
     }
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
-     * X.400. Si no se encuentra el CN, se devuelve la unidad organizativa
+     * X&#46;400. Si no se encuentra el CN, se devuelve la unidad organizativa
      * (Organization Unit, OU).
-     * @param principal
-     *        <i>Principal</i> del cual queremos obtener el nombre
+     * @param principal <i>Principal</i> del cual queremos obtener el nombre
      *        com&uacute;n
      * @return Nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
-     *         X.400 */
+     *         X&#46;400 */
     public static String getCN(final String principal) {
         if (principal == null) {
             return null;
