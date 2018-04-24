@@ -47,8 +47,6 @@ public final class AOOOXMLSigner implements AOSigner {
     private static final String EXTENSION_PPSX = ".ppsx"; //$NON-NLS-1$
     private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
 
-	private static final String MIMETYPE_ZIP = "application/zip"; //$NON-NLS-1$
-
     /** Consutruye un firmador OOXML, comprobando que se cuente con un JRE adecuado. */
     public AOOOXMLSigner() {
     	if (System.getProperty("java.version").startsWith("1.6")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -130,7 +128,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * @throws IOException Cuando no se pueden analizar los datos.
      */
     private static boolean isZipData(final byte[] data) throws IOException {
-    	return MIMETYPE_ZIP.equals(new MimeHelper(data).getMimeType());
+    	return new MimeHelper(data).isZipData();
     }
 
     /** { {@inheritDoc} */

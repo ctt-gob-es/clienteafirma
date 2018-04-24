@@ -34,12 +34,26 @@ public final class MimeHelper {
     /** OID del tipo de datos gen&eacute;rico. */
     public static final String DEFAULT_CONTENT_OID_DATA ="1.2.840.113549.1.7.1"; //$NON-NLS-1$
 
-    /** Extensi&oacute;n asignada por JMimeMagic a los ficheros ZIP. */
-    public static final String ZIP_EXTENSION = "zip"; //$NON-NLS-1$
+    /** Extensi&oacute;n asignada a los ficheros ZIP. */
+    private static final String ZIP_EXTENSION = "zip"; //$NON-NLS-1$
 
-    /** Extensi&oacute;n asignada por JMimeMagic a los ficheros ZIP. */
-    public static final String ZIP_DESCRIPTION = "Zip archive data"; //$NON-NLS-1$
+    /** Descripci&oacute;n asignada por JMimeMagic a los ficheros ZIP. */
+    private static final String ZIP_DESCRIPTION = "Zip archive data"; //$NON-NLS-1$
 
+    /** Mimetype de ficheros ZIP. */
+    private static final String ZIP_MIMETYPE = "application/zip"; //$NON-NLS-1$
+
+    /** Extensi&oacute;n asignada a los ficheros XML. */
+    private static final String XML_EXTENSION = "xml"; //$NON-NLS-1$
+
+    /** Descripci&oacute;n asignada por JMimeMagic a los ficheros XML. */
+    private static final String XML_DESCRIPTION = "Documento XML"; //$NON-NLS-1$
+
+    /** Mimetype de ficheros XML. */
+    private static final String XML_MIMETYPE = "text/xml"; //$NON-NLS-1$
+
+    /** Mimetype asignado por JMimeMagic a algunos ficheros Word. */
+    private static final String DOC_OFFICE_MIMETYPE = "application/msword"; //$NON-NLS-1$
 
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
@@ -184,15 +198,15 @@ public final class MimeHelper {
 
         	// Si no hubo analisis inicial o este indico que los datos son XML, comprobamos
             // si los datos son XML en realidad
-            if (this.mimeInfo == null || "text/xml".equals(this.mimeType)) { //$NON-NLS-1$
+            if (this.mimeInfo == null || XML_MIMETYPE.equals(this.mimeType)) {
             	if (AOFileUtils.isXML(this.data)) {
-            		this.mimeType = "text/xml"; //$NON-NLS-1$
+            		this.mimeType = XML_MIMETYPE;
             	}
             }
 
             // Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
             // realidad alguno de los ficheros ofimaticos soportados
-            if ("application/zip".equals(this.mimeType) || "application/msword".equals(this.mimeType)) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (ZIP_MIMETYPE.equals(this.mimeType) || DOC_OFFICE_MIMETYPE.equals(this.mimeType)) {
                 this.mimeType = OfficeAnalizer.getMimeType(this.data);
             }
 
@@ -213,7 +227,7 @@ public final class MimeHelper {
 
         // Comprobamossi los datos son XML, si no, los parseamos
         if (AOFileUtils.isXML(this.data)) {
-            extension = "xml"; //$NON-NLS-1$
+            extension = XML_EXTENSION;
         }
         else if (this.mimeInfo != null) {
             extension = this.mimeInfo.getExtension();
@@ -244,7 +258,7 @@ public final class MimeHelper {
 
     	// Comprobamossi los datos son XML, si no, los parseamos
         if (AOFileUtils.isXML(this.data)) {
-        	desc = "Documento XML"; //$NON-NLS-1$
+        	desc = XML_DESCRIPTION;
         }
         else if (this.mimeInfo != null) {
             desc = this.mimeInfo.getDescription();
@@ -263,6 +277,29 @@ public final class MimeHelper {
         }
 
         return desc == null || desc.length() == 0 ? DEFAULT_CONTENT_DESCRIPTION : desc;
+    }
+
+    /**
+     * Indica si unos datos son un fichero ZIP, independientemente de que ese ZIP se
+     * corresponda con otro formato basado en el mismo (como los ficheros DOCX, ODT,...).
+     * @return {@code true} si los datos son un ZIP, {@code false} en caso contrario.
+     */
+    public boolean isZipData() {
+
+    	// Comprobamos si JMimeMagic lo detecto como ZIP
+    	if (this.mimeInfo != null) {
+   			return ZIP_MIMETYPE.equals(this.mimeInfo.getMimeType());
+    	}
+
+    	// Si no tenemos el analisis de JMimeMagic, intentamos cargarlo como ZIP
+    	try {
+    		AOFileUtils.createTempZipFile(this.data);
+    	}
+    	catch (final Exception e) {
+    		return false;
+		}
+
+    	return true;
     }
 
     /** Almacena la informaci&oacute;n identificada del tipo de datos. */
