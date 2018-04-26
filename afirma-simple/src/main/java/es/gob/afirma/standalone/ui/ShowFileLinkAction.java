@@ -91,12 +91,11 @@ final class ShowFileLinkAction {
         }
     }
 
-    private static void saveDataFile(DataFileInfo info) {
+    private static void saveDataFile(final DataFileInfo info) {
     	try {
         	AOUIFactory.getSaveDataToFile(
     			info.getData(),
 		        SimpleAfirmaMessages.getString("ShowFileLinkAction.1"), //$NON-NLS-1$
-		        null,
 		        null,
 		        null,
 		        null,

@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,6 +17,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 
 final class ProtocolInvocationLauncherSave {
 
@@ -45,8 +47,12 @@ final class ProtocolInvocationLauncherSave {
 				options.getTitle(),
 				null,
 				options.getFileName(),
-				options.getExtensions() != null ? new String[] { options.getExtensions() } : null,
-				options.getFileTypeDescription(),
+				Collections.singletonList(
+					new GenericFileFilter(
+						options.getExtensions() != null ? new String[] { options.getExtensions() } : null,
+						options.getFileTypeDescription()
+					)
+				),
 				null
 			);
 		}

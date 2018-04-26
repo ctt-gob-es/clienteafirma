@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,6 +26,7 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -178,8 +180,12 @@ public final class HashHelper {
 					SimpleAfirmaMessages.getString("CheckHashFiles.15"), //$NON-NLS-1$ ,,,
 					null,
 					new java.io.File(SimpleAfirmaMessages.getString("CheckHashFiles.16")).getName() + ext, //$NON-NLS-1$
-					new String[] { ext },
-					SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+					Collections.singletonList(
+						new GenericFileFilter(
+							new String[] { ext },
+							SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						)
+					),
 					null
 				);
 			}

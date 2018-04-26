@@ -20,13 +20,12 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -44,6 +43,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
@@ -172,15 +172,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		hashAlgorithmsLabel.setLabelFor(this.hashAlgorithms);
 
 		this.hashAlgorithms.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					PreferencesManager.put(
-						PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM,
-						getSelectedHashAlgorithm()
-					);
-				}
-			}
+			e -> PreferencesManager.put(
+				PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM,
+				getSelectedHashAlgorithm()
+			)
 		);
 		this.hashAlgorithms.setSelectedItem(
 			PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM)
@@ -193,15 +188,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		hashFormatLabel.setLabelFor(this.hashFormats);
 
 		this.hashFormats.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					PreferencesManager.put(
-						PreferencesManager.PREFERENCE_CREATE_HASH_FORMAT,
-						getSelectedHashFormat().toString()
-					);
-				}
-			}
+			e -> PreferencesManager.put(
+				PreferencesManager.PREFERENCE_CREATE_HASH_FORMAT,
+				getSelectedHashFormat().toString()
+			)
 		);
 		this.hashFormats.setSelectedItem(
 			HashFormat.fromString(
@@ -211,15 +201,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		this.hashFormats.addKeyListener(this);
 
 		this.copyToClipBoardCheckBox.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						PreferencesManager.putBoolean(
-								PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD,
-								isCopyToClipBoardChecked()
-						);
-					}
-				}
+				e -> PreferencesManager.putBoolean(
+						PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD,
+						isCopyToClipBoardChecked()
+				)
 		);
 		this.copyToClipBoardCheckBox.setSelected(
 			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD)
@@ -247,28 +232,25 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		fileButton.addKeyListener(this);
 		fileButton.setMnemonic('E');
 		fileButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					try {
-						getFileTextField().setText(
-							AOUIFactory.getLoadFiles(
-								SimpleAfirmaMessages.getString("CreateHashDialog.6"), //$NON-NLS-1$,
-								null,
-								null,
-								null,
-								SimpleAfirmaMessages.getString("CreateHashDialog.7"), //$NON-NLS-1$,,
-								false,
-								false,
-								AutoFirmaUtil.getDefaultDialogsIcon(),
-								CreateHashDialog.this
-							)[0].getAbsolutePath()
-						);
-						generateButton.setEnabled(true);
-					}
-					catch(final AOCancelledOperationException ex) {
-						// Operacion cancelada por el usuario
-					}
+			ae -> {
+				try {
+					getFileTextField().setText(
+						AOUIFactory.getLoadFiles(
+							SimpleAfirmaMessages.getString("CreateHashDialog.6"), //$NON-NLS-1$,
+							null,
+							null,
+							null,
+							SimpleAfirmaMessages.getString("CreateHashDialog.7"), //$NON-NLS-1$,,
+							false,
+							false,
+							AutoFirmaUtil.getDefaultDialogsIcon(),
+							CreateHashDialog.this
+						)[0].getAbsolutePath()
+					);
+					generateButton.setEnabled(true);
+				}
+				catch(final AOCancelledOperationException ex) {
+					// Operacion cancelada por el usuario
 				}
 			}
 		);
@@ -280,20 +262,17 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		generateButton.setEnabled(false);
 		generateButton.setMnemonic('G');
 		generateButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					doHashProcess(
-						parent,
-						getFileTextField().getText(),
-						getSelectedHashAlgorithm(),
-						getSelectedHashFormat(),
-						isCopyToClipBoardChecked(),
-						CreateHashDialog.this
-					);
-					CreateHashDialog.this.setVisible(false);
-					CreateHashDialog.this.dispose();
-				}
+			e -> {
+				doHashProcess(
+					parent,
+					getFileTextField().getText(),
+					getSelectedHashAlgorithm(),
+					getSelectedHashFormat(),
+					isCopyToClipBoardChecked(),
+					CreateHashDialog.this
+				);
+				CreateHashDialog.this.setVisible(false);
+				CreateHashDialog.this.dispose();
 			}
 		);
 		generateButton.getAccessibleContext().setAccessibleDescription(
@@ -306,12 +285,9 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 
 		exitButton.setMnemonic('C');
 		exitButton.addActionListener(
-			new ActionListener () {
-				@Override
-				public void actionPerformed( final ActionEvent e ) {
-					CreateHashDialog.this.setVisible(false);
-					CreateHashDialog.this.dispose();
-				}
+			e -> {
+				CreateHashDialog.this.setVisible(false);
+				CreateHashDialog.this.dispose();
 			}
 		);
 		exitButton.getAccessibleContext().setAccessibleDescription(
@@ -420,8 +396,12 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$
 						null,
 						AutoFirmaUtil.getCanonicalFile(new File(file)).getName() + ext,
-						new String[] { ext },
-						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						Collections.singletonList(
+							new GenericFileFilter(
+								new String[] { ext },
+								SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")"  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+							)
+						),
 						parent
 					);
 					// Si se selecciona Base64 se usa Base64 en portapapeles, en cualquier otro caso, HEX pasado a ASCII.

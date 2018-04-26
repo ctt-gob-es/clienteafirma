@@ -11,6 +11,7 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /** Gestor de componentes de interfaz gr&aacute;fico
  * @version 0.4 */
@@ -167,8 +168,7 @@ public interface AOUIManager {
      * @param currentDir Directorio inicial del di&aacute;logo
      * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
      * @param selectedFile Nombre de fichero por defecto.
-     * @param exts Extensiones de fichero aceptadas.
-     * @param description Descripci&oacute;n del tipo de fichero a guardar.
+     * @param filters Filtros del tipo de fichero a guardar.
      * @param parent Componente padre sobre el que se mostrar&aacute; el
      *        di&aacute;logo de guardado.
      * @return Fichero guardado.
@@ -177,7 +177,6 @@ public interface AOUIManager {
     					final String currentDir,
     					final String dialogTitle,
     		            final String selectedFile,
-    		            final String[] exts,
-    		            final String description,
+    		            final List<GenericFileFilter> filters,
     		            final Object parent) throws IOException;
 }

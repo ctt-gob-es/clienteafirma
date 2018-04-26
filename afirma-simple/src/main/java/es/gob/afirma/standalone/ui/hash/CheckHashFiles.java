@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,6 +73,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
@@ -208,8 +210,12 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CheckHashFiles.15"), //$NON-NLS-1$ ,,,
 						null,
 						new java.io.File(SimpleAfirmaMessages.getString("CheckHashFiles.16")).getName() + ext, //$NON-NLS-1$
-						new String[] { ext },
-						SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						Collections.singletonList(
+							new GenericFileFilter(
+								new String[] { ext },
+								SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+							)
+						),
 						parent
 					);
 					checkButton.setEnabled(false);

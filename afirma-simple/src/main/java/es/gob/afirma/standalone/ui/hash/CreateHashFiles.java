@@ -18,7 +18,9 @@ import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -64,6 +66,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
@@ -76,12 +79,18 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 	private static final long serialVersionUID = -7224732001218823361L;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private static final String[] HASH_ALGOS = new String[] {
 		"SHA-256", //$NON-NLS-1$
 		"SHA-1", //$NON-NLS-1$
 		"SHA-384", //$NON-NLS-1$
 		"SHA-512" //$NON-NLS-1$
 	};
+
+	private static final String FILEEXT_XML = ".hashfiles"; //$NON-NLS-1$
+	private static final String FILEEXT_CSV = ".csv"; //$NON-NLS-1$
+
 	private final JComboBox<String> hashAlgorithms = new JComboBox<>(HASH_ALGOS);
 	private final JTextField selectedFile = new JTextField();
 	private final JButton examineButton = new JButton();
@@ -295,23 +304,57 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		try {
 
 			final Map<String, byte[]> hashs = worker.get();
-			final String xml = generateHashXML(
-				hashs,
-				hashAlgorithm,
-				recursive
-			);
 
-			// El XML se almacenaria en la carpeta que eligiese el usuario.
-			final String ext = SimpleAfirmaMessages.getString("CreateHashFiles.17"); //$NON-NLS-1$
-			AOUIFactory.getSaveDataToFile(
-				xml.getBytes(),
-				SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$ ,,,
+			// El fichero de huellas se almacenaria en la carpeta que eligiese el usuario.
+			final File saveFile = AOUIFactory.getSaveDataToFile(
 				null,
-				AutoFirmaUtil.getCanonicalFile(new File(dir)).getName() + ext,
-				new String[] { ext },
-				SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$
+				null,
+				AutoFirmaUtil.getCanonicalFile(new File(dir)).getName() + FILEEXT_XML,
+				Arrays.asList(
+					new GenericFileFilter[] {
+						new GenericFileFilter(
+							new String[] { FILEEXT_XML },
+							SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + FILEEXT_XML + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						),
+//						new GenericFileFilter(
+//							new String[] { FILEEXT_CSV },
+//							SimpleAfirmaMessages.getString("CreateHashDialog.24") + " (*" + FILEEXT_CSV + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+//						)
+					}
+				),
 				parent
 			);
+
+			final byte[] dataToSave;
+			if (!saveFile.getName().endsWith(FILEEXT_CSV)) {
+				dataToSave = generateHashXML(
+					hashs,
+					hashAlgorithm,
+					recursive
+				).getBytes();
+			}
+			else {
+				dataToSave = generateCsv(hashs).getBytes(
+					Platform.OS.WINDOWS.equals(Platform.getOS()) ? StandardCharsets.ISO_8859_1 : StandardCharsets.UTF_8
+				);
+			}
+            try (
+        		final OutputStream fos = new FileOutputStream(saveFile);
+    		) {
+                fos.write(dataToSave);
+                fos.flush();
+                fos.close();
+            }
+            catch (final Exception ex) {
+                LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
+                AOUIFactory.showErrorMessage(
+            		parent,
+            		SimpleAfirmaMessages.getString("CreateHashFiles.3"), //$NON-NLS-1$
+            		SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
 		}
 		catch (final AOCancelledOperationException e) {
 			// Operacion cancelada
@@ -324,7 +367,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 					SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE
 				);
-				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				LOGGER.severe(
 					"Fichero demasiado grande: " + e.getCause() //$NON-NLS-1$
 				);
 			}
@@ -335,7 +378,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 					SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE
 				);
-				Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
+				LOGGER.log(
 					Level.SEVERE, "Error generando o guardando la huella digital", e//$NON-NLS-1$
 				);
 			}
@@ -365,17 +408,32 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 			return;
 		}
 		if (!file.canRead()) {
-			AOUIFactory.showErrorMessage(null, SimpleAfirmaMessages.getString("MenuValidation.6"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE);
+			AOUIFactory.showErrorMessage(
+				null,
+				SimpleAfirmaMessages.getString("MenuValidation.6"), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 			return;
 		}
 		this.selectedFile.setText(file.getAbsolutePath());
 		this.generateButton.setEnabled(true);
 	}
 
-	/** Genera el XML con las huellas digitales. El
-	 * XML tendr&aacute; el siguiente esquema:
+	private static String generateCsv(final Map<String, byte[]> hashs) {
+		if (hashs == null || hashs.size() < 1) {
+			LOGGER.warning("No hay huellas, se genera un CSV vacio"); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
+		final StringBuilder sb = new StringBuilder();
+		for (final Map.Entry<String, byte[]> entry : hashs.entrySet()) {
+		    sb.append("\"" + entry.getKey() + "\",\"" + AOUtil.hexify(entry.getValue(), false) + "h\"\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		return sb.toString();
+	}
+
+	/** Genera un XML con las huellas digitales.
+	 * El XML tendr&aacute; el siguiente esquema:
 	 * <pre>
 	 * &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
 	 *	&lt;xs:element name="entries"&gt;
@@ -595,32 +653,22 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 	        for (final File child : file.listFiles()) {
 	            size += getSize(child);
 	        }
-	    } else {
-	        size = file.length();
+	        return size;
 	    }
-	    return size;
+		return file.length();
 	}
 
-
-	// ------- Fin.
-
-	// ---------------- Metodos get.
-	/**
-	 * Obtiene el tipo de algoritmo seleccionado por el usuario.
-	 * @return El algoritmo seleccionado por el usuario.
-	 */
+	/** Obtiene el tipo de algoritmo seleccionado por el usuario.
+	 * @return Algoritmo seleccionado por el usuario. */
 	String getSelectedHashAlgorithm() {
 		return this.hashAlgorithms.getSelectedItem().toString();
 	}
 
-	/**
-	 * Obtiene el nombre del directorio seleccionado por el usuario.
-	 * @return El nombre del directorio seleccionado por el usuario
-	 */
+	/** Obtiene el nombre del directorio seleccionado por el usuario.
+	 * @return Nombre del directorio seleccionado por el usuario. */
 	JTextField getFileTextField() {
 		return this.selectedFile;
 	}
-	// ------- Fin metodos get.
 
 	@Override
 	public void keyTyped(final KeyEvent e) { /* Vacio */ }

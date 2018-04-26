@@ -9,6 +9,7 @@
 
 package es.gob.afirma.ui.core.jse;
 
+import java.awt.Dialog;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
@@ -17,9 +18,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.GenericFileFilter;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
@@ -33,15 +38,32 @@ public final class AWTUIManager extends JSEUIManager {
 							   final String dialogTitle,
 							   final String currentDir,
 							   final String selectedFile,
-			                   final String[] exts,
-			                   final String description,
+			                   final List<GenericFileFilter> filters,
 			                   final Object parent) throws IOException {
 
-        final FileDialog fd = new FileDialog(
-             parent instanceof Frame ? (Frame) parent : null, // Padre
-             dialogTitle, // Titulo
-             FileDialog.SAVE // Tipo
-        );
+        final FileDialog fd;
+        if (parent instanceof Frame) {
+        	fd = new FileDialog(
+                (Frame) parent, // Padre
+                dialogTitle, // Titulo
+                FileDialog.SAVE // Tipo
+           );
+        }
+        else if (parent instanceof Dialog) {
+        	fd = new FileDialog(
+                (Dialog) parent, // Padre
+                dialogTitle, // Titulo
+                FileDialog.SAVE // Tipo
+           );
+        }
+        else {
+        	fd = new FileDialog(
+                (Frame) null, // Padre
+                dialogTitle, // Titulo
+                FileDialog.SAVE // Tipo
+           );
+        }
+
 
         // En Windows, el metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
         // se indica el nombre de fichero
@@ -57,24 +79,37 @@ public final class AWTUIManager extends JSEUIManager {
             }
         }
 
+        // Este dialogo no soporta multiples filtros, asi que juntamos
+        // las extensiones de todos para crear un filtro unico
+    	final List<String> extensions = new ArrayList<>();
+        if (filters != null) {
+        	for (final GenericFileFilter gff : filters) {
+        		final String[] fe = gff.getExtensions();
+        		if (fe != null) {
+        			extensions.addAll(Arrays.asList(fe));
+        		}
+        	}
+        }
+        final String[] exts = extensions.toArray(new String[extensions.size()]);
     	if (exts != null) {
-            fd.setFilenameFilter(new FilenameFilter() {
-                @Override
-                public boolean accept(final File dir, final String name) {
-                    for (final String ext : exts) {
-                        if (name.endsWith(ext)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
+            fd.setFilenameFilter(
+        		new FilenameFilter() {
+	                @Override
+	                public boolean accept(final File dir, final String name) {
+	                    for (final String ext : exts) {
+	                        if (name.endsWith(ext)) {
+	                            return true;
+	                        }
+	                    }
+	                    return false;
+	                }
+	            }
+    		);
         }
 
         fd.setVisible(true);
 
         final File file;
-
         if (fd.getFile() != null) {
             file = new File(fd.getDirectory() + fd.getFile());
         }
@@ -82,11 +117,16 @@ public final class AWTUIManager extends JSEUIManager {
         	throw new AOCancelledOperationException();
         }
 
-        try (
-    		final OutputStream fos = new FileOutputStream(file);
-		) {
-	        fos.write(data);
-	        fos.flush();
+        // Si se proporcionan datos, se guardan y se devuelve el fichero donde se ha hecho.
+        // Si no se proporcionan datos, se devuelve el fichero seleccionado, permitiendo que
+        // el guardado se haga externamente.
+        if (data != null) {
+	        try (
+	    		final OutputStream fos = new FileOutputStream(file);
+			) {
+		        fos.write(data);
+		        fos.flush();
+	        }
         }
 
         return file;

@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -25,6 +26,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.ui.core.jse.JSEUIManager;
 
 /** Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados. */
@@ -90,8 +92,12 @@ final class CertificateUtils {
     			CertificateSelectionDialogMessages.getString("CertificateUtils.1"),  //$NON-NLS-1$
     			null,
     			CertificateSelectionDialogMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION, //$NON-NLS-1$
-    			new String[] { CERTIFICATE_DEFAULT_EXTENSION },
-    			CertificateSelectionDialogMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+    			Collections.singletonList(
+					new GenericFileFilter(
+						new String[] { CERTIFICATE_DEFAULT_EXTENSION },
+						CertificateSelectionDialogMessages.getString("CertificateUtils.3") //$NON-NLS-1$
+					)
+				),
     			parent
 			);
 		}

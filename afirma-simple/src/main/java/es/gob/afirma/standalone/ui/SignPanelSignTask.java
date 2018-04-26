@@ -17,6 +17,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -46,7 +48,6 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PdfEmptySignatureFieldsChooserDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
-import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class SignPanelSignTask extends SwingWorker<Void, Void> {
@@ -327,8 +328,12 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     			SimpleAfirmaMessages.getString("SignPanel.81"), //$NON-NLS-1$
     			currentDataFile != null ? currentDataFile.getParent() : null,
     			newFileName,
-    			fExtensions,
-    			fDescription,
+    			Collections.singletonList(
+					new GenericFileFilter(
+						fExtensions,
+						fDescription
+					)
+				),
 				this.signPanel.getWindow()
 			);
         }
@@ -401,7 +406,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         return null;
     }
 
-    private void selectEmptySignatureField(AOSigner signer, List<SignatureField> emptySignatureFields, String oldMsg) {
+    private void selectEmptySignatureField(final AOSigner signer, final List<SignatureField> emptySignatureFields, final String oldMsg) {
 
 		final SignatureField field = PdfEmptySignatureFieldsChooserDialog.selectField(emptySignatureFields);
 		if (field != null) {
@@ -411,17 +416,14 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 							signer.isSign(this.signPanel.getDataToSign()),
 						this.signPanel.getDataToSign(),
 						this.signPanel.getWindow(),
-						new SignPdfDialogListener() {
-							@Override
-							public void propertiesCreated(final Properties extraParams) {
-								// Solo hacemos la firma si hay propiedades visibles
-								if (extraParams != null && !extraParams.isEmpty()) {
-									SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
-									doSignature(signer, extraParams);
-								}
-					        	if (getWaitDialog() != null) {
-					        		getWaitDialog().dispose();
-					        	}
+						extraParams -> {
+							// Solo hacemos la firma si hay propiedades visibles
+							if (extraParams != null && !extraParams.isEmpty()) {
+								SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
+								doSignature(signer, extraParams);
+							}
+							if (getWaitDialog() != null) {
+								getWaitDialog().dispose();
 							}
 						}
 					);
@@ -443,17 +445,14 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 				this.signPanel.getDataToSign(),
 				this.signPanel.getWindow(),
 				field,
-				new SignPdfDialogListener() {
-					@Override
-					public void propertiesCreated(final Properties extraParams) {
-						// Solo hacemos la firma si hay propiedades visibles
-						if (extraParams != null && !extraParams.isEmpty()) {
-							SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
-							doSignature(signer, extraParams);
-						}
-			        	if (getWaitDialog() != null) {
-			        		getWaitDialog().dispose();
-			        	}
+				extraParams -> {
+					// Solo hacemos la firma si hay propiedades visibles
+					if (extraParams != null && !extraParams.isEmpty()) {
+						SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
+						doSignature(signer, extraParams);
+					}
+					if (getWaitDialog() != null) {
+						getWaitDialog().dispose();
 					}
 				}
 			);
@@ -466,19 +465,16 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     				signer.isSign(this.signPanel.getDataToSign()),
     				this.signPanel.getDataToSign(),
     				this.signPanel.getWindow(),
-    				new SignPdfDialogListener() {
-    					@Override
-    					public void propertiesCreated(final Properties extraParams) {
-    						// Solo hacemos la firma si hay propiedades visibles
-    						if (extraParams != null && !extraParams.isEmpty()) {
-    							SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
-    							doSignature(signer, extraParams);
-    						}
-    						if (getWaitDialog() != null) {
-    							getWaitDialog().dispose();
-    						}
-    					}
-    				}
+    				extraParams -> {
+						// Solo hacemos la firma si hay propiedades visibles
+						if (extraParams != null && !extraParams.isEmpty()) {
+							SignPanelSignTask.this.getWaitDialog().setMessage(oldMsg);
+							doSignature(signer, extraParams);
+						}
+						if (getWaitDialog() != null) {
+							getWaitDialog().dispose();
+						}
+					}
     				);
     	} catch (final Exception e) {
     		LOGGER.severe(

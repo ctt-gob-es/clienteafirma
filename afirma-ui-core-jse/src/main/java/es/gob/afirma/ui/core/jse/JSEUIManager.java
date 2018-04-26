@@ -15,6 +15,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,6 +24,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
@@ -33,12 +36,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIManager;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
@@ -462,7 +467,12 @@ public class JSEUIManager implements AOUIManager {
             jfc.setDialogTitle(dialogTitle);
         }
         if (extensions != null && extensions.length > 0) {
-            jfc.setFileFilter(new ExtFilter(extensions, description));
+            jfc.setFileFilter(
+        		new FileNameExtensionFilter(
+    				description,
+    				extensions
+				)
+    		);
         }
         final int ret = jfc.showOpenDialog(parentComponent);
         if (ret == JFileChooser.APPROVE_OPTION) {
@@ -485,12 +495,8 @@ public class JSEUIManager implements AOUIManager {
 							   final String dialogTitle,
 							   final String currentDir,
 			                   final String selectedFile,
-			                   final String[] exts,
-			                   final String description,
+			                   final List<GenericFileFilter> filters,
 			                   final Object parent) throws IOException {
-        if (data == null) {
-            throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
-        }
 
         final Component parentComponent = parent instanceof Component ? (Component) parent : null;
 
@@ -500,7 +506,7 @@ public class JSEUIManager implements AOUIManager {
         while (tryAgain) {
 
             tryAgain = false;
-            final JFileChooser fileChooser = new JFileChooser();
+            final JFileChooser fileChooser = new CustomFileChooserForSave();
 
             // Accesibilidad con textos fijos
             fileChooser.getAccessibleContext().setAccessibleName(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
@@ -511,19 +517,22 @@ public class JSEUIManager implements AOUIManager {
             	fileChooser.setDialogTitle(dialogTitle);
             }
 
+            // Solo aplicamos filtros cuando esten definidos, para evitar que el
+            // desplegable de la ventana de guardado nos aparecezca vacio
+            if (filters != null) {
+            	fileChooser.setAcceptAllFileFilterUsed(false);
+            	for (final GenericFileFilter gff: filters) {
+            		fileChooser.addChoosableFileFilter(
+        				new FileNameExtensionFilter(
+    						gff.getDescription(),
+    						gff.getExtensions()
+						)
+    				);
+            	}
+            }
+
             // Configuramos el directorio y fichero por defecto
             configureDefaultDir(fileChooser, currentDir, selectedFile);
-
-            // Solo aplicamos el filtro cuando este definido para evitar que el
-            // desplegable de la ventana de guardado nos aparecezca vacio
-            final FileExtensionFilter fileExtensionFilter;
-            if (exts != null && exts.length > 0) {
-            	fileExtensionFilter = new FileExtensionFilter(exts, description);
-                fileChooser.setFileFilter(fileExtensionFilter);
-            }
-            else {
-            	fileExtensionFilter = null;
-            }
 
             int selectedOption = JOptionPane.YES_OPTION;
             final int returnCode = fileChooser.showSaveDialog(parentComponent);
@@ -538,15 +547,19 @@ public class JSEUIManager implements AOUIManager {
 
 	                // El dialogo no anade una extension por defecto aunque haya filtro, asi que lo hacemos a mano
 	                // si el usuario no ha puesto extension
-	                if (fileExtensionFilter != null && !fileExtensionFilter.accept(file)) {
-	                	if (exts != null) {
-	                		final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
-	                		file = new File(file.getParent(), file.getName() + extension);
-	                	}
-	                	else {
-	                		file = new File(file.getParent(), file.getName());
-	                	}
-	                }
+            		if (filters != null) {
+            			final FileFilter ff = fileChooser.getFileFilter();
+            			if (ff instanceof FileNameExtensionFilter && !ff.accept(file)) {
+            				final String exts[] = ((FileNameExtensionFilter)ff).getExtensions();
+    	                	if (exts != null) {
+    	                		final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
+    	                		file = new File(file.getParent(), file.getName() + extension);
+    	                	}
+    	                	else {
+    	                		file = new File(file.getParent(), file.getName());
+    	                	}
+            			}
+            		}
 
 	                if (file.exists()) {
 	                    selectedOption = JOptionPane.showConfirmDialog(
@@ -569,25 +582,29 @@ public class JSEUIManager implements AOUIManager {
 	                    break;
 	                }
 
-	                // Hemos seleccionado la opcion de sobreescribir
-                    try (
-                		final OutputStream fos = new FileOutputStream(file);
-            		) {
-                        fos.write(data);
-                        fos.flush();
-                    }
-                    catch (final Exception ex) {
-                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
-                        JOptionPane.showMessageDialog(
-                    		parentComponent,
-                            JSEUIMessages.getString("JSEUIManager.88"), //$NON-NLS-1$
-                            JSEUIMessages.getString("JSEUIManager.89"), //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                        // Volvemos a intentar guardar
-                        tryAgain = true;
-                        continue;
-                    }
+	                // Si se proporcionan datos, se guardan y se devuelve el fichero donde se ha hecho.
+	                // Si no se proporcionan datos, se devuelve el fichero seleccionado, permitiendo que
+	                // el guardado se haga externamente.
+	                if (data != null) {
+		                try (
+	                		final OutputStream fos = new FileOutputStream(file);
+	            		) {
+	                        fos.write(data);
+	                        fos.flush();
+	                    }
+	                    catch (final Exception ex) {
+	                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
+	                        showErrorMessage(
+	                    		parentComponent,
+	                            JSEUIMessages.getString("JSEUIManager.88"), //$NON-NLS-1$
+	                            JSEUIMessages.getString("JSEUIManager.89"), //$NON-NLS-1$
+	                            JOptionPane.ERROR_MESSAGE
+	                        );
+	                        // Volvemos a intentar guardar
+	                        tryAgain = true;
+	                        continue;
+	                    }
+	                }
                     put(PREFERENCE_DIRECTORY, fileChooser.getCurrentDirectory().getPath());
                     return file;
 
@@ -633,63 +650,6 @@ public class JSEUIManager implements AOUIManager {
         }
     }
 
-    /** Filtra los ficheros por extensi&oacute;n para los di&aacute;logos de
-     * carga y guardado.
-     * No usamos <code>FileNameExtensionFilter</code> directamente para
-     * compatibilizar con Java 1.4. */
-    private static final class ExtFilter extends FileFilter implements java.io.FileFilter {
-
-        private final String[] extensions;
-        private final String description;
-
-        /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
-         * @param exts Extensiones de fichero permitidas
-         * @param desc Descripci&oacute;n del tipo de fichero correspondiente a
-         *             las extensiones */
-        public ExtFilter(final String[] exts, final String desc) {
-            if (exts == null || exts.length < 1) {
-                throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
-            }
-            this.extensions = exts.clone();
-            this.description = desc != null ? desc : JSEUIMessages.getString("JSEUIManager.0"); //$NON-NLS-1$
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean accept(final File f) {
-            if (f.isDirectory()) {
-                return true;
-            }
-
-            final String fileExtension = getExtension(f);
-            for (final String aceptedExtension : this.extensions) {
-                if (aceptedExtension.equalsIgnoreCase(fileExtension)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public String getDescription() {
-            return this.description;
-        }
-
-        /** Devuelve la extensi&oacute;n de un fichero.
-         * @param f Fichero del cual queremos conocer la extensi&oacute;n
-         * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
-         *         tiene extensi&oacute;n. */
-        private static String getExtension(final File f) {
-            final String s = f.getName();
-            final int i = s.lastIndexOf('.');
-            if (i > 0 && i < s.length() - 1) {
-                return s.substring(i + 1);
-            }
-            return ""; //$NON-NLS-1$
-        }
-    }
-
 	@Override
     public void showErrorMessage(final Object parent, final Object message, final String title, final int messageType) {
         final String buttonTxt = JSEUIMessages.getString("JSEUIManager.1"); //$NON-NLS-1$
@@ -704,4 +664,62 @@ public class JSEUIManager implements AOUIManager {
             buttonTxt
         );
     }
+
+	/** Di&aacute;logo a medida que permite el control de las extensiones
+	 * de fichero al cambiar de filtro.
+	 * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+	private static final class CustomFileChooserForSave extends JFileChooser {
+
+		private static final long serialVersionUID = -2107199679670180110L;
+
+		private File file = null;
+	    File getFile() {
+	    	return this.file;
+	    }
+
+	    CustomFileChooserForSave() {
+	        addPropertyChangeListener(
+        		JFileChooser.FILE_FILTER_CHANGED_PROPERTY,
+        		new PropertyChangeListener() {
+		            @Override
+					public void propertyChange(final PropertyChangeEvent e) {
+
+		                if (!(e.getOldValue() instanceof FileNameExtensionFilter) || !(e.getNewValue() instanceof FileNameExtensionFilter)) {
+		                    return;
+		                }
+
+		                final FileNameExtensionFilter oldValue = (FileNameExtensionFilter) e.getOldValue();
+		                final FileNameExtensionFilter newValue = (FileNameExtensionFilter) e.getNewValue();
+		                if (
+	                		oldValue.getExtensions() == null || oldValue.getExtensions().length < 1 ||
+	                		newValue.getExtensions() == null || newValue.getExtensions().length < 1
+                		) {
+		                	return;
+		                }
+		                final String extold = oldValue.getExtensions()[0];
+		                final String extnew = newValue.getExtensions()[0];
+
+		                String filename = getFile().getName();
+		                if (filename.endsWith(extold)) {
+		                    filename = filename.replace(extold, extnew);
+		                }
+		                else {
+		                    filename += extnew;
+		                }
+		                setSelectedFile(new File(filename));
+		            }
+        		}
+    		);
+	    }
+
+	    @Override
+	    public void setSelectedFile(final File file) {
+	        super.setSelectedFile(file);
+            if (file != null) {
+                super.setSelectedFile(file);
+                this.file = file;
+            }
+	    }
+
+	}
 }

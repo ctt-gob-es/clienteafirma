@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -36,6 +37,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
@@ -478,8 +480,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 				ProtocolMessages.getString("ProtocolLauncher.31"), // Titulo del dialogo //$NON-NLS-1$
 				options.getExtraParams().getProperty("filenameSaveCurrentDir"), // Directorio de guardado //$NON-NLS-1$
 				getFilename(options, selectedFilename, signer),
-				fileExts != null ? fileExts.split(",") : null, // Extensiones de fichero aceptadas //$NON-NLS-1$
-				fileDesc, // Descripcion del fichero
+				Collections.singletonList(
+					new GenericFileFilter(
+						fileExts != null ? fileExts.split(",") : null, // Extensiones de fichero aceptadas //$NON-NLS-1$
+						fileDesc // Descripcion del fichero
+					)
+				),
 				null // Padre para la modalidad
 			);
 		}

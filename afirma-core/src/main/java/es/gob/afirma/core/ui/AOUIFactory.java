@@ -11,12 +11,13 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
 
 /** Factor&iacute;a de elementos de interfaz gr&aacute;fica.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOUIFactory {
 
     private AOUIFactory() {
@@ -243,29 +244,45 @@ public final class AOUIFactory {
     		                               final boolean multiSelect,
     		                               final Object icon,
     		                               final Object parentComponent) {
-        return uiManager.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parentComponent);
+        return uiManager.getLoadFiles(
+    		dialogTitle,
+    		currentDir,
+    		filename,
+    		extensions,
+    		description,
+    		selectDirectory,
+    		multiSelect,
+    		icon,
+    		parentComponent
+		);
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
-     * los datos y los guarda en la misma. Si ocurre un error durante el guardado, se
-     * vuelve a preguntar al usuario por una localizaci&oacute;n, Si el usuario
-     * cancela el di&aacute;logo, se devolver&aacute; {@code null}.
+     * los datos y, si se proporcionan, los guarda en la misma.
+     * Si ocurre un error durante el guardado, se vuelve a preguntar al usuario por una
+     * localizaci&oacute;n,
+     * Si el usuario cancela el di&aacute;logo, se lanza <code>AOCancelledOperationException</code>.
      * @param data Datos que se desean almacenar.
-     * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
-     * @param currentDir Directorio inicial del di&aacute;logo
+     * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado.
+     * @param currentDir Directorio inicial del di&aacute;logo.
      * @param selectedFile Nombre por defecto del fichero.
-     * @param exts Extensiones de fichero aceptadas.
-     * @param description Descripci&oacute;n del tipo de fichero a guardar
-     * @param parent Componente padre (para la modalidad)
+     * @param filters Filtros del tipo de fichero a guardar.
+     * @param parent Componente padre (para la modalidad).
      * @return Fichero en el que se almacenan los datos.
      * @throws IOException Si no se puede guardar el fichero*/
     public static File getSaveDataToFile(final byte[] data,
     									 final String dialogTitle,
     									 final String currentDir,
     		                             final String selectedFile,
-    		                             final String[] exts,
-    		                             final String description,
+    		                             final List<GenericFileFilter> filters,
     		                             final Object parent) throws IOException {
-        return uiManager.saveDataToFile(data, dialogTitle, currentDir, selectedFile, exts, description, parent);
+        return uiManager.saveDataToFile(
+    		data,
+    		dialogTitle,
+    		currentDir,
+    		selectedFile,
+    		filters,
+    		parent
+		);
     }
 }
