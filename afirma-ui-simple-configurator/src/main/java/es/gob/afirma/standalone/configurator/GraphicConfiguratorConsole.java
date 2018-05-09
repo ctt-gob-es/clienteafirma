@@ -130,7 +130,7 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
     		LOGGER.info("Mensaje de consola: " + text); //$NON-NLS-1$
     	}
     	catch (final Exception e) {
-    		LOGGER.warning("No se pudo mostrar por consola el mensaje:\n" + text);  //$NON-NLS-1$
+		LOGGER.warning("No se pudo mostrar por consola el mensaje '" + text + "': " + e);  //$NON-NLS-1$ //$NON-NLS-2$
     	}
     }
 
