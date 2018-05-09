@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Hashtable;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -27,9 +26,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
- * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
+ * entre JavaScript y aplicaciones nativas.
  * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s. */
 public final class StorageService extends HttpServlet {
 
@@ -58,18 +56,6 @@ public final class StorageService extends HttpServlet {
 
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
-
-	private static StorageConfig CONFIG;
-	static {
-		try {
-			CONFIG = new StorageConfig();
-			CONFIG.load(CONFIG_FILE);
-		}
-		catch (final IOException e) {
-			CONFIG = null;
-			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM), e);
-		}
-	}
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
@@ -101,7 +87,7 @@ public final class StorageService extends HttpServlet {
 			sis.close();
 
 			// Separamos los parametros y sus valores
-			final Hashtable<String, String> params = new Hashtable<String, String>();
+			final Hashtable<String, String> params = new Hashtable<>();
 			final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
 			for (final String param : urlParams) {
 				final int equalsPos = param.indexOf('=');
@@ -135,7 +121,7 @@ public final class StorageService extends HttpServlet {
 		}
 
 		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
-			storeSign(out, id, data, StorageService.CONFIG);
+			storeSign(out, id, data);
 		}
 		else {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
@@ -152,8 +138,7 @@ public final class StorageService extends HttpServlet {
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void storeSign(final PrintWriter out,
 								  final String id,
-								  final String data,
-								  final StorageConfig config) throws IOException {
+								  final String data) throws IOException {
 		if (id == null) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID));
@@ -173,11 +158,11 @@ public final class StorageService extends HttpServlet {
 			dataText = URLDecoder.decode(data, DEFAULT_ENCODING);
 		}
 
-		if (!config.getTempDir().exists()) {
-			config.getTempDir().mkdirs();
+		if (!StorageConfig.getTempDir().exists()) {
+			StorageConfig.getTempDir().mkdirs();
 		}
 
-		final File outFile = new File(config.getTempDir(), id);
+		final File outFile = new File(StorageConfig.getTempDir(), id);
 		try {
 			final OutputStream fos = new FileOutputStream(outFile);
 			final BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -185,7 +170,8 @@ public final class StorageService extends HttpServlet {
 			bos.flush();
 			bos.close();
 			fos.close();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.severe("No se ha podido generar el fichero temporal para el envio de datos a la web: " + e); //$NON-NLS-1$
 			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB));
 			return;
