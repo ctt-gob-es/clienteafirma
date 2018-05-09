@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -24,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Servicio de almacenamiento temporal de firmas.
- * &Uacute;til para servir de intermediario en comunicaci&oacute;n * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+ * &Uacute;til para servir de intermediario en comunicaci&oacute;n * entre JavaScript y aplicaciones nativas.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class RetrieveService extends HttpServlet {
 
 	private static final long serialVersionUID = -3272368448371213403L;
@@ -43,21 +42,6 @@ public final class RetrieveService extends HttpServlet {
 	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$
-
-	/** Fichero de configuraci&oacute;n. */
-	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
-
-	private static RetrieveConfig CONFIG;
-	static {
-		try {
-			CONFIG = new RetrieveConfig();
-			CONFIG.load(CONFIG_FILE);
-		}
-		catch (final IOException e) {
-			CONFIG = null;
-			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM), e);
-		}
-	}
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
@@ -85,7 +69,7 @@ public final class RetrieveService extends HttpServlet {
 		}
 
 		if (OPERATION_RETRIEVE.equalsIgnoreCase(operation)) {
-			retrieveSign(out, request, CONFIG);
+			retrieveSign(out, request);
 		}
 		else {
 			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
@@ -96,18 +80,17 @@ public final class RetrieveService extends HttpServlet {
 
 		// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
 		LOGGER.info("Limpiamos el directorio temporal"); //$NON-NLS-1$
-		removeExpiredFiles(CONFIG);
+		removeExpiredFiles();
 		LOGGER.info("Fin de la limpieza"); //$NON-NLS-1$
 	}
 
-	/** Recupera la firma del servidor.
+	/** Recupera los datos del servidor.
 	 * @param out Respuesta a la petici&oacute;n.
 	 * @param request Petici&oacute;n.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void retrieveSign(final PrintWriter out,
-			                         final HttpServletRequest request,
-			                         final RetrieveConfig config) throws IOException {
+			                         final HttpServletRequest request) throws IOException {
 
 		final String id = request.getParameter(PARAMETER_NAME_ID);
 		if (id == null) {
@@ -118,11 +101,11 @@ public final class RetrieveService extends HttpServlet {
 
 		LOGGER.info("Se solicita el fichero con el identificador: " + id); //$NON-NLS-1$
 
-		final File inFile = new File(config.getTempDir(), id);
+		final File inFile = new File(RetrieveConfig.getTempDir(), id);
 
 		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
 		// para evitar que un atacante conozca su situacion. Lo borramos despues de usarlo
-		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead() || isExpired(inFile, config.getExpirationTime())) {
+		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, RetrieveConfig.getExpirationTime())) {
 
 			if (!inFile.exists()) {
 				LOGGER.warning("El fichero con el identificador '" + id + "' no existe: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -142,7 +125,12 @@ public final class RetrieveService extends HttpServlet {
 			);
 			// Que el fichero sea de tipo fichero, implica que existe
 			if (inFile.isFile()) {
-				inFile.delete();
+				if (RetrieveConfig.DEBUG_NO_DELETE) {
+					LOGGER.info("Modo depuracion, se cancela la eliminacion del fichero " + inFile.getAbsolutePath()); //$NON-NLS-1$
+				}
+				else {
+					inFile.delete();
+				}
 			}
 		}
 		else {
@@ -157,20 +145,30 @@ public final class RetrieveService extends HttpServlet {
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA));
 				return;
 			}
-			inFile.delete();
+			if (RetrieveConfig.DEBUG_NO_DELETE) {
+				LOGGER.info("Modo depuracion, se cancela la eliminacion del fichero " + inFile.getAbsolutePath()); //$NON-NLS-1$
+			}
+			else {
+				inFile.delete();
+			}
 		}
 	}
 
 	/** Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
 	 * de vida configurado.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
-	private static void removeExpiredFiles(final RetrieveConfig config) {
-		if (config != null && config.getTempDir() != null && config.getTempDir().exists()) {
-			for (final File file : config.getTempDir().listFiles()) {
+	private static void removeExpiredFiles() {
+		if (RetrieveConfig.getTempDir() != null && RetrieveConfig.getTempDir().isDirectory()) {
+			for (final File file : RetrieveConfig.getTempDir().listFiles()) {
 				try {
-					if (file.isFile() && isExpired(file, config.getExpirationTime())) {
-						LOGGER.fine("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$
-						file.delete();
+					if (file.isFile() && isExpired(file, RetrieveConfig.getExpirationTime())) {
+						if (RetrieveConfig.DEBUG_NO_DELETE) {
+							LOGGER.info("Modo depuracion, se cancela la eliminacion del fichero " + file.getAbsolutePath()); //$NON-NLS-1$
+						}
+						else {
+							LOGGER.fine("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$
+							file.delete();
+						}
 					}
 				}
 				catch(final Exception e) {
@@ -190,8 +188,7 @@ public final class RetrieveService extends HttpServlet {
 	private static final int BUFFER_SIZE = 4096;
 
 	/** Lee un flujo de datos de entrada y los recupera en forma de array de
-     * octetos. Este m&eacute;todo consume pero no cierra el flujo de datos de
-     * entrada.
+     * octetos. Este m&eacute;todo consume pero no cierra el flujo de datos de entrada.
      * @param input Flujo de donde se toman los datos.
      * @return Los datos obtenidos del flujo.
      * @throws IOException Cuando ocurre un problema durante la lectura. */
