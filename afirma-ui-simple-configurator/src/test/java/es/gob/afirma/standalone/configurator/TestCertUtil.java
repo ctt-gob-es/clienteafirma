@@ -31,7 +31,8 @@ public final class TestCertUtil {
 		final CertPack certPack = CertUtil.getCertPackForHostSsl(
             "tomcat",          // Alias del certificado SSL //$NON-NLS-1$
             "12341234",        // Contrasena del PKCS#12 //$NON-NLS-1$
-            "34.251.104.141",  // IP del host SSL //$NON-NLS-1$
+            "127.0.0.1",       // IP del host SSL //$NON-NLS-1$
+            "demo.tgm",        // Nombre del host SSL //$NON-NLS-1$
             "cn=ca-clavefirma" // Nombre de la CA SSL //$NON-NLS-1$
         );
 		final byte[] p12Bytes = certPack.getPkcs12();
