@@ -23,9 +23,9 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 
-/** Procesador de firmas trif&aacute;sicas CAdES.
+/** Procesador de firmas trif&aacute;sicas PKCS#1.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
-public class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
+public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Prefijo para cada prefirma. */
 	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
@@ -36,13 +36,12 @@ public class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Manejador de log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-
 	@Override
 	public TriphaseData preProcessPreSign(final byte[] data,
-			                        final String algorithm,
-			                        final X509Certificate[] cert,
-			                        final Properties params) throws IOException, AOException {
-
+			                              final String algorithm,
+			                              final X509Certificate[] cert,
+			                              final Properties params) throws IOException,
+	                                                                      AOException {
 		LOGGER.info("Prefirma PKCS#1 - Firma - INICIO"); //$NON-NLS-1$
 
 		if (data == null || data.length < 1) {
@@ -75,7 +74,6 @@ public class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                         final byte[] session) throws NoSuchAlgorithmException,
 			                                                                AOException,
 			                                                                IOException {
-
 		if (session == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
