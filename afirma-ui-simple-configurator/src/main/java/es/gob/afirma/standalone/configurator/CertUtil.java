@@ -125,13 +125,14 @@ final class CertUtil {
 	 * @throws CertificateException Si no se puede generar el certificado.
 	 * @throws IOException El cualquier otro tipo de problema. */
 	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias,
-			                           final String storePassword) throws NoSuchAlgorithmException,
+			                                   final String storePassword) throws NoSuchAlgorithmException,
 	                                                                              CertificateException,
 	                                                                              IOException {
 		return getCertPackForHostSsl(
 			sslCertificateAlias,
 			storePassword,
 			DEFAULT_LOCALHOST,
+			null,
 			ROOT_CERTIFICATE_PRINCIPAL
 		);
 	}
@@ -140,16 +141,18 @@ final class CertUtil {
 	 * para la comunicaci&oacute;n.
 	 * @param sslCertificateAlias Alias con el que identificar el certificado SSL.
 	 * @param storePassword Contrase&ntilde;a del almac&eacute;n de claves a generar.
-	 * @param host Nombre de <i>host</i> SSL.
+	 * @param ipAddress Direcci&oacute;n IP del <i>host</i>.
+	 * @param hostName Nombre de <i>host</i> SSL.
 	 * @param rootName Principal X&#46;500 de la CA a crear (por ejemplo <i>CN=Nombre</i>).
 	 * @return Tupla con un certificado de CA y un certificado SSL.
 	 * @throws NoSuchAlgorithmException Si no se soporta un algoritmo necesario.
 	 * @throws CertificateException Si no se puede generar el certificado.
 	 * @throws IOException El cualquier otro tipo de problema. */
 	static CertPack getCertPackForHostSsl(final String sslCertificateAlias,
-			                      final String storePassword,
-			                      final String host,
-			                      final String rootName) throws NoSuchAlgorithmException,
+			                              final String storePassword,
+			                              final String ipAddress,
+			                              final String hostName,
+			                              final String rootName) throws NoSuchAlgorithmException,
 	                                                                    CertificateException,
 	                                                                    IOException {
 		Security.addProvider(new BouncyCastleProvider());
@@ -157,7 +160,8 @@ final class CertUtil {
 			rootName
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			host,
+			ipAddress,
+			hostName,
 			caCertificatePrivateKeyEntry
 		);
 		return new CertPack(
@@ -264,7 +268,8 @@ final class CertUtil {
 		);
 	}
 
-	private static PrivateKeyEntry generateSslCertificate(final String cn,
+	private static PrivateKeyEntry generateSslCertificate(final String ipAddress,
+			                                              final String hostName,
 			                                              final PrivateKeyEntry issuerKeyEntry) {
 		// Generamos las claves...
 		final X509Certificate cert;
@@ -286,7 +291,7 @@ final class CertUtil {
 				BigInteger.valueOf(new Random().nextInt()),
 				new Date(),
 	    		expirationDate,
-	    		new X500Name("CN="+cn), //$NON-NLS-1$
+	    		new X500Name("CN=" + (hostName != null ? hostName : ipAddress)), //$NON-NLS-1$
 				pair.getPublic()
 			);
 
@@ -311,13 +316,15 @@ final class CertUtil {
 			);
 
 			final List<GeneralName> altNames = new ArrayList<>();
-			altNames.add(new GeneralName(GeneralName.iPAddress, cn));
-			if (altNames.size() > 0) {
-				final GeneralNames subjectAltName = new GeneralNames(
-					altNames.toArray(new GeneralName [altNames.size()])
-				);
-				certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
+			altNames.add(new GeneralName(GeneralName.iPAddress, ipAddress));
+			if (hostName != null) {
+				altNames.add(new GeneralName(GeneralName.dNSName, hostName));
 			}
+			final GeneralNames subjectAltName = new GeneralNames(
+				altNames.toArray(new GeneralName [altNames.size()])
+			);
+			certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
+
 
 			//Firma del certificado SSL con la clave privada del CA
 			final ContentSigner caSigner = new JcaContentSignerBuilder(
