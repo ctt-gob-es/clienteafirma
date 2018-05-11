@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
-enum SignPanelFileType {
+enum FileType {
 
 	PDF(
 		"/resources/icon_pdf_large.png", //$NON-NLS-1$
@@ -64,7 +64,7 @@ enum SignPanelFileType {
 	private final String fileDescription;
 	private final ScalablePane fileTypeScalableIcon;
 
-	private SignPanelFileType(final String iconFile, final String tooltip, final String description) {
+	private FileType(final String iconFile, final String tooltip, final String description) {
 		this.fileDescription = description;
 		this.fileTypeScalableIcon = createScalablePane(
 			iconFile,
@@ -74,7 +74,7 @@ enum SignPanelFileType {
 
 	private static ScalablePane createScalablePane(final String iconFile, final String iconTooltip) {
 		final Image icon;
-		try ( InputStream input = SignPanelFileType.class.getResourceAsStream(iconFile) ) {
+		try ( InputStream input = FileType.class.getResourceAsStream(iconFile) ) {
 			icon = ImageIO.read(input);
 		}
 		catch(final Exception e) {

@@ -286,4 +286,7 @@ final class ScalablePane extends JPanel {
         return ret;
     }
 
+    public Image getMaster() {
+    	return this.master;
+    }
 }

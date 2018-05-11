@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -63,13 +64,15 @@ import es.gob.afirma.standalone.ui.DNIeWaitPanel;
 import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
+import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignPanel;
+import es.gob.afirma.standalone.ui.SignatureResultViewer;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 import es.gob.afirma.standalone.updater.Updater;
 
 /** Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class SimpleAfirma implements PropertyChangeListener, WindowListener {
+public final class SimpleAfirma implements PropertyChangeListener, WindowListener, SignatureResultViewer {
 
 	static {
 		// Instalamos el registro a disco
@@ -320,30 +323,30 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     }
 
     /** Elimina el panel actual y carga el panel de resultados de firma.
-     * @param sign
+     * @param signature
      *        Firma o fichero firmado sobre el que queremos mostrar un
      *        resumen
-     * @param fileName
-     *        Nombre del fichero en el que se ha guardado la firma o el
-     *        fichero firmado
+     * @param signatureFile
+     *        Fichero en el que se ha guardado la firma.
      * @param signingCert
      *        Certificado usado para la firma */
-    public void loadResultsPanel(final byte[] sign, final String fileName, final X509Certificate signingCert) {
+    @Override
+    public void showResultsInfo(byte[] signature, File signatureFile, X509Certificate signingCert) {
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
         final JPanel newPanel = new SignDetailPanel(
     		this,
-    		sign,
-    		fileName,
+    		signature,
+    		signatureFile.getName(),
     		signingCert,
     		new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null),
     		null
 		);
         this.container.add(newPanel, BorderLayout.CENTER);
-        if (this.window != null && fileName != null) {
-            this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
-            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + new File(fileName).getName()); //$NON-NLS-1$ //$NON-NLS-2$
+        if (this.window != null) {
+            this.window.getRootPane().putClientProperty("Window.documentFile", signatureFile); //$NON-NLS-1$
+            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + signatureFile.getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);
@@ -356,8 +359,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         if (this.window != null) {
             this.window.repaint();
         }
+    }
+
+    @Override
+    public void showResultsInfo(List<SignOperationConfig> signConfig, X509Certificate signingCert) {
+    	// TODO Auto-generated method stub
 
     }
+
 
     private static Locale buildLocale(final String locale) {
         final String[] frags = locale.split("_"); //$NON-NLS-1$
@@ -448,7 +457,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     public void loadFileToSign(final File file) {
         if (this.currentPanel instanceof SignPanel) {
             try {
-                ((SignPanel) this.currentPanel).loadFile(file);
+                ((SignPanel) this.currentPanel).loadFiles(new File[] { file } );
             }
             catch (final Exception e) {
             	AOUIFactory.showErrorMessage(

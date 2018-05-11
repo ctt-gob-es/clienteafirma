@@ -57,20 +57,20 @@ final class ShowFileLinkAction {
         final DataFileInfoDialog dialog = new DataFileInfoDialog(info, this.parent);
         final Options op = dialog.show();
         if (op == Options.SAVE) {
-            saveDataFile(info);
+            saveDataFile(info, this.parent);
         }
         else if (op == Options.OPEN) {
-        	openDataFile(info);
+        	openDataFile(info, this.parent);
         }
     }
 
-    private static void openDataFile(final DataFileInfo info) {
+    private static void openDataFile(final DataFileInfo info, final Component parent) {
     	File tmp;
 		try {
 			tmp = File.createTempFile("afirma", "." + info.getExtension()); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final IOException e) {
 			LOGGER.info("No se pudo crear el temporal para abrir el fichero: " + e); //$NON-NLS-1$
-			saveDataFile(info);
+			saveDataFile(info, parent);
 			return;
 		}
         try (
@@ -91,16 +91,16 @@ final class ShowFileLinkAction {
         }
     }
 
-    private static void saveDataFile(DataFileInfo info) {
+    private static void saveDataFile(DataFileInfo info, Component parent) {
     	try {
         	AOUIFactory.getSaveDataToFile(
     			info.getData(),
 		        SimpleAfirmaMessages.getString("ShowFileLinkAction.1"), //$NON-NLS-1$
 		        null,
-		        null,
-		        null,
-		        null,
-		        null
+		        info.getExtension() != null ? "documento." + info.getExtension() : null,
+		        info.getExtension() != null ? new String[] { info.getExtension() } : null,
+		        info.getDescription(),
+		        parent
 			);
 		}
         catch (final IOException e) {
