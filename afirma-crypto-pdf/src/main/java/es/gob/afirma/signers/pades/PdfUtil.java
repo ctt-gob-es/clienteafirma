@@ -169,9 +169,9 @@ public final class PdfUtil {
 	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException {
 		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED &&
 				!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS))) {
-			// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
-			// una excepcion
-			if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS)) || "false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS))) {  //$NON-NLS-1$
+			// Si no permitimos dialogos graficos lanzamos
+			// una excepcion (en otro caso, preguntaremos al usuario tras este if)
+			if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
 				throw new PdfIsCertifiedException();
 			}
 			// En otro caso, perguntamos al usuario
