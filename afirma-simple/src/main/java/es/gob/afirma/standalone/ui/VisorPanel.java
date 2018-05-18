@@ -120,7 +120,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
         final X509Certificate cert = getCertificate(sign);
 
-        final JPanel resultPanel = new SignResultPanel(validity, this);
+        final JPanel resultPanel = new SignResultPanel(validity, true, this);
         final JPanel dataPanel = new SignDataPanel(
     		signFile,
     		sign,

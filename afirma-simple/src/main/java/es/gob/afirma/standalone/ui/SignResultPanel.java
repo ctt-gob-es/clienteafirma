@@ -40,11 +40,11 @@ final class SignResultPanel extends JPanel {
     private final JEditorPane descTextLabel = new JEditorPane();
     private final JLabel resultTextLabel = new JLabel();
 
-    SignResultPanel(final SignValidity validity, final KeyListener extKeyListener) {
-        SwingUtilities.invokeLater(() -> createUI(validity, extKeyListener));
+    SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
+        SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener));
     }
 
-    void createUI(final SignValidity validity, final KeyListener extKeyListener) {
+    void createUI(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
 
         // Para que se detecten apropiadamente los hipervinculos hay que establecer
         // el tipo de contenido antes que el contenido
@@ -56,8 +56,6 @@ final class SignResultPanel extends JPanel {
             iconFilename = "ko_icon.png"; //$NON-NLS-1$
             break;
         case OK:
-            iconFilename = "ok_icon.png"; //$NON-NLS-1$
-            break;
         case GENERATED:
             iconFilename = "ok_icon.png"; //$NON-NLS-1$
             break;
@@ -89,31 +87,47 @@ final class SignResultPanel extends JPanel {
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
             case OK:
-                this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.8")); //$NON-NLS-1$
-                this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.9")); //$NON-NLS-1$
-                resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.10"); //$NON-NLS-1$
+            	if (singleSign) {
+            		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.8")); //$NON-NLS-1$
+            		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.9")); //$NON-NLS-1$
+            		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.10"); //$NON-NLS-1$
+            	}
+            	else {
+            		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.27")); //$NON-NLS-1$
+            		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.28")); //$NON-NLS-1$
+            		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.29"); //$NON-NLS-1$
+            	}
                 break;
             case KO:
-                this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.5")); //$NON-NLS-1$
-                if (validity.getError() != null) {
-                    switch (validity.getError()) {
-                    case CORRUPTED_SIGN: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.14"); break; //$NON-NLS-1$
-                    case CERTIFICATE_EXPIRED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.16"); break; //$NON-NLS-1$
-                    case CERTIFICATE_NOT_VALID_YET: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.17"); break; //$NON-NLS-1$
-                    case CERTIFICATE_PROBLEM: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.18"); break; //$NON-NLS-1$
-                    case NO_MATCH_DATA: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.19"); break; //$NON-NLS-1$
-                    case CRL_PROBLEM: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.20"); break; //$NON-NLS-1$
-                    case ALGORITHM_NOT_SUPPORTED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.22"); break; //$NON-NLS-1$
-                    default:
-                        errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
-                        Logger.getLogger("es.gob.afirma").warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.getError()); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
+                if (singleSign) {
+                	this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.5")); //$NON-NLS-1$
+                    if (validity.getError() != null) {
+                		switch (validity.getError()) {
+                		case CORRUPTED_SIGN: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.14"); break; //$NON-NLS-1$
+                		case CERTIFICATE_EXPIRED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.16"); break; //$NON-NLS-1$
+                		case CERTIFICATE_NOT_VALID_YET: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.17"); break; //$NON-NLS-1$
+                		case CERTIFICATE_PROBLEM: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.18"); break; //$NON-NLS-1$
+                		case NO_MATCH_DATA: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.19"); break; //$NON-NLS-1$
+                		case CRL_PROBLEM: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.20"); break; //$NON-NLS-1$
+                		case ALGORITHM_NOT_SUPPORTED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.22"); break; //$NON-NLS-1$
+
+                		default:
+                			errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
+                			Logger.getLogger("es.gob.afirma").warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.getError()); //$NON-NLS-1$ //$NON-NLS-2$
+                		}
+                	}
+                	else {
+                		errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
+                	}
+                	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                    resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
                 else {
-                    errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
+                	this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.30")); //$NON-NLS-1$
+                    errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.31"); //$NON-NLS-1$
+                	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                    resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.32"); //$NON-NLS-1$
                 }
-                this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-                resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 break;
             default:
                 this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.11")); //$NON-NLS-1$
@@ -202,5 +216,4 @@ final class SignResultPanel extends JPanel {
         this.add(this.descTextLabel, c);
 
     }
-
 }

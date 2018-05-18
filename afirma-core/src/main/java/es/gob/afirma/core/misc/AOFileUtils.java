@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
-import java.util.zip.ZipFile;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -34,25 +33,22 @@ public final class AOFileUtils {
 
 	private static final String SHORTENER_ELLIPSE = "..."; //$NON-NLS-1$
 
-	/** Crea un fichero ZIP en disco apto para manejarse.
-	 * @param zipFileData Los datos del zip.
-	 * @return Fichero Zip.
-	 * @throws java.util.zip.ZipException Cuando los datos no eran realmente un Zip.
-	 * @throws IOException Cuando ocurre un error al leer los datos o crear el temporal
-	 *                     para abrir el Zip. */
-	public static ZipFile createTempZipFile(final byte[] zipFileData) throws IOException {
+	/** Guarda los datos en un temporal.
+	 * @param data Datos a guardar.
+	 * @return Fichero temporal.
+	 * @throws IOException Cuando ocurre un error al leer los datos o crear el temporal. */
+	public static File createTempFile(final byte[] data) throws IOException {
 
 		// Creamos un fichero temporal
-		final File tempFile = File.createTempFile("afirmazip", null); //$NON-NLS-1$
+		final File tempFile = File.createTempFile("afirma", null); //$NON-NLS-1$
 		try (
 			final OutputStream fos = new FileOutputStream(tempFile);
 		) {
-			fos.write(zipFileData);
+			fos.write(data);
 			fos.flush();
 			fos.close();
 		}
-		tempFile.deleteOnExit();
-		return new ZipFile(tempFile);
+		return tempFile;
 	}
 
 	/** Acorta, con puntos suspensivos en la mitad, un nombre de ruta de fichero.

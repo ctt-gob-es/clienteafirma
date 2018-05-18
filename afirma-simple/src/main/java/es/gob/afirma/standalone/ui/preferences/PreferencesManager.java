@@ -160,6 +160,10 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN = "defaultSignatureFormatBin"; //$NON-NLS-1$
 
+	/** Indica si en los procesos de firma masiva se deben sobreescribir o no los ficheros que
+	 * se encuentren en el directorio de salida. */
+	public static final String PREFERENCE_GENERAL_MASSIVE_OVERWRITE = "massiveOverride"; //$NON-NLS-1$
+
 	//**************** FIN PREFERENCIAS GENERALES ******************************************************************************
 	//**************************************************************************************************************************
 

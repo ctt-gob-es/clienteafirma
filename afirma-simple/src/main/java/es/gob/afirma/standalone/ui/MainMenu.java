@@ -137,7 +137,7 @@ public final class MainMenu extends JMenuBar {
 						null,
 						null,
 						false,
-						false,
+						true,
 						AutoFirmaUtil.getDefaultDialogsIcon(),
 						MainMenu.this
 					)[0];

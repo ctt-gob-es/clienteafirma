@@ -54,6 +54,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/** ExtraParam que configura que no aparezcan di&aacute;logos gr&aacute;ficos durante la firma. */
+	private static final String EXTRAPARAM_HEADLESS = "headless"; //$NON-NLS-1$
+
 	private final Component parent;
 	private final List<SignOperationConfig> signConfigs;
 	private final AOKeyStoreManager ksm;
@@ -147,10 +150,16 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	final AOSigner currentSigner = signConfig.getSigner();
 
-            // Anadimos las propiedades del sistema, habilitando asi que se puedan indicar opciones de uso con -D en linea
-            // de comandos
+            // Anadimos las propiedades del sistema, habilitando asi que se puedan indicar
+        	// opciones de uso con -D en linea de comandos y, sobre todo ello y si se firma
+        	// mas de un fichero, se indica que no se muestren dialogos que puedan bloquear
+        	// el proceso
             final Properties p = signConfig.getExtraParams();
             p.putAll(System.getProperties());
+            if (!onlyOneFile) {
+            	p.setProperty(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
+            }
+
 
             final String signatureAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
 
@@ -248,13 +257,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
             // En caso de definirse directorio de salida, se guarda la firma
             if (outDir != null) {
-            	final String signFileName = signConfig.getSigner().getSignedName(
+            	final String defaultFilename = signConfig.getSigner().getSignedName(
             			signConfig.getDataFile().getName(), "_signed"); //$NON-NLS-1$
-            	final File outFile = new File(outDir, signFileName);
+
+            	File outFile;
             	try {
-            		saveDataToDir(signResult, outFile);
+            		outFile = saveDataToDir(signResult, outDir, defaultFilename);
             	}
             	catch (final Exception e) {
+            		LOGGER.log(Level.WARNING, "Error al guardar una de las firmas generadas", e); //$NON-NLS-1$
             		continue;
 				}
             	signConfig.setSignatureFile(outFile);
@@ -296,6 +307,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	this.resultViewer.showResultsInfo(
         			this.signConfigs,
+        			outDir,
         			(X509Certificate) pke.getCertificate()
         			);
         }
@@ -409,13 +421,27 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     /**
      * Guarda datos en un directorio con un nombre concreto.
      * @param data Datos a guardar.
-     * @param outFile Fichero de salida.
+     * @param outDir Directorio de salida.
+     * @param defaultFilename Nombre por defecto del fichero de salida.
+     * @return Fichero en el que se guardan los datos.
      * @throws IOException Cuando se produce un error durante el guardado.
      */
-	private static void saveDataToDir(byte[] data, File outFile) throws IOException {
+	private static File saveDataToDir(byte[] data, File outDir, String defaultFilename) throws IOException {
+		File outFile = new File(outDir, defaultFilename);
+		final boolean overwrite = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE);
+		if (!overwrite) {
+			int i = 1;
+			while (outFile.isFile()) {
+				final int extPos = defaultFilename.lastIndexOf('.');
+				final String filename = defaultFilename.substring(0, extPos) + '(' + i + ')' + defaultFilename.substring(extPos);
+				outFile = new File(outDir, filename);
+				i++;
+			}
+		}
 		try (FileOutputStream fos = new FileOutputStream(outFile)) {
 			fos.write(data, 0, data.length);
 		}
+		return outFile;
 	}
 
 	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,

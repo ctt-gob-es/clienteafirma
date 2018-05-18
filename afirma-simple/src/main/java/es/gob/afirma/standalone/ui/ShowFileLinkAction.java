@@ -97,7 +97,7 @@ final class ShowFileLinkAction {
     			info.getData(),
 		        SimpleAfirmaMessages.getString("ShowFileLinkAction.1"), //$NON-NLS-1$
 		        null,
-		        info.getExtension() != null ? "documento." + info.getExtension() : null,
+		        info.getExtension() != null ? SimpleAfirmaMessages.getString("ShowFileLinkAction.5") + "." + info.getExtension() : null, //$NON-NLS-1$ //$NON-NLS-2$
 		        info.getExtension() != null ? new String[] { info.getExtension() } : null,
 		        info.getDescription(),
 		        parent

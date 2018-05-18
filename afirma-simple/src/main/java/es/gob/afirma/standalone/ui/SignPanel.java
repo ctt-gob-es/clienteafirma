@@ -467,25 +467,25 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        );
 	        getSelectButton().requestFocusInWindow();
 	        getSelectButton().addActionListener(arg0 -> {
-				final File file;
+				final File[] files;
 				try {
-			        file = AOUIFactory.getLoadFiles(
+			        files = AOUIFactory.getLoadFiles(
 			    		SimpleAfirmaMessages.getString("SignPanel.35"), //$NON-NLS-1$
 			    		null,
 			    		null,
 			    		null,
 			    		null,
 			    		false,
-			    		false,
+			    		true,
 			    		AutoFirmaUtil.getDefaultDialogsIcon(),
 			    		UpperPanel.this
-					)[0];
+					);
 				}
 				catch(final AOCancelledOperationException e1) {
 					return;
 				}
 
-		    	this.loadDataListener.loadFiles(new File[] { file });
+		    	this.loadDataListener.loadFiles(files);
 			});
 
 	        final JLabel welcomeLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.14")); //$NON-NLS-1$

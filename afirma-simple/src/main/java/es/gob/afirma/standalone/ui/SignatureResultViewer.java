@@ -12,9 +12,10 @@ public interface SignatureResultViewer {
 	/**
 	 * Muestra la informaci&oacute;n de un conjunto de firmas.
 	 * @param signConfig Configuraci&oacute;n de la firma.
+	 * @param outDir Directorio en el que se almacenan las firmas.
 	 * @param signingCert Certificado de firma utilizado.
 	 */
-	void showResultsInfo(List<SignOperationConfig> signConfig, X509Certificate signingCert);
+	void showResultsInfo(List<SignOperationConfig> signConfig, File outDir, X509Certificate signingCert);
 
 	/**
 	 * Muestra la informaci&oacute;n de una firma.

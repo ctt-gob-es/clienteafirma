@@ -11,13 +11,19 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DropTarget;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -35,6 +41,8 @@ final class SignPanelMultiFilePanel extends JPanel {
 
     /** Serial Id. */
 	private static final long serialVersionUID = 6644719944157037807L;
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	SignPanelMultiFilePanel(List<SignOperationConfig> operations,
                        final DropTarget dropTarget) {
@@ -55,6 +63,34 @@ final class SignPanelMultiFilePanel extends JPanel {
         		new JList<>(operations.toArray(new SignOperationConfig[operations.size()]));
         fileList.setCellRenderer(new FileOperationCellRenderer());
 
+        // Definimos que al hacer doble clic sobre una firma del listado, se visualicen sus datos
+        fileList.addMouseListener(new MouseListener() {
+			@Override public void mouseReleased(MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mousePressed(MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseExited(MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseEntered(MouseEvent e) { /* No hacemos nada */ }
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					if (e.getSource() instanceof JList<?>) {
+						final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
+						final int index = list.locationToIndex(e.getPoint());
+						final SignOperationConfig item = list.getModel().getElementAt(index);
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									Desktop.getDesktop().open(item.getDataFile());
+								} catch (final IOException ex) {
+									LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), e); //$NON-NLS-1$
+								}
+							}
+						});
+					}
+				}
+			}
+		});
+
         final JScrollPane scrollPane = new JScrollPane(fileList);
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -67,9 +103,12 @@ final class SignPanelMultiFilePanel extends JPanel {
     class FileOperationCellRenderer extends JPanel
     								implements ListCellRenderer<SignOperationConfig> {
 
-    	private final Dimension iconDimension;
+    	/** Serial Id. */
+		private static final long serialVersionUID = -6210265681086564451L;
 
-    	private final JPanel icon;
+		private final Dimension iconDimension;
+
+    	private final JLabel icon;
     	private final JLabel fileNameLabel;
     	private final JLabel sizeLabel;
     	private final JLabel formatNameLabel;
@@ -80,7 +119,7 @@ final class SignPanelMultiFilePanel extends JPanel {
 
     		this.iconDimension = new Dimension(32, 32);
 
-    		this.icon = new JPanel();
+    		this.icon = new JLabel();
     		this.icon.setPreferredSize(this.iconDimension);
 
 			this.fileNameLabel = new JLabel();
@@ -109,9 +148,9 @@ final class SignPanelMultiFilePanel extends JPanel {
 			c.insets = new Insets(3, 11, 3, 0);
 
 			c.gridx = 0;
-//			add(this.icon, c);
-//
-//			c.gridx++;
+			add(this.icon, c);
+
+			c.gridx++;
 			c.weightx = 1.0;
 			add(this.fileNameLabel, c);
 
@@ -123,9 +162,6 @@ final class SignPanelMultiFilePanel extends JPanel {
 			add(this.sizeLabel, c);
 		}
 
-		/** Serial Id. */
-		private static final long serialVersionUID = -2216450346454299685L;
-
 		@Override
 		public Component getListCellRendererComponent(JList<? extends SignOperationConfig> list,
 				SignOperationConfig value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -133,9 +169,8 @@ final class SignPanelMultiFilePanel extends JPanel {
 			final ScalablePane typeIcon = (ScalablePane) value.getFileType().getIcon();
 			typeIcon.setPreferredSize(this.iconDimension);
 
-//			this.icon.removeAll();
-//			this.icon.add(typeIcon);
-			this.fileNameLabel.setIcon(new ImageIcon(typeIcon.getMaster()));
+			this.icon.setIcon(new ImageIcon(typeIcon.getScaledInstanceToFit(typeIcon.getMaster(), this.iconDimension)));
+
 			this.fileNameLabel.setText(value.getDataFile().getName());
 			this.formatNameLabel.setText(value.getSignatureFormatName());
 			this.sizeLabel.setText(calculateSize(value.getDataFile().length()));

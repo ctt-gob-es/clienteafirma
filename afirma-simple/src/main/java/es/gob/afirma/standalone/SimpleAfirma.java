@@ -66,6 +66,7 @@ import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
 import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignPanel;
+import es.gob.afirma.standalone.ui.SignResultListPanel;
 import es.gob.afirma.standalone.ui.SignatureResultViewer;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 import es.gob.afirma.standalone.updater.Updater;
@@ -362,9 +363,34 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     }
 
     @Override
-    public void showResultsInfo(List<SignOperationConfig> signConfig, X509Certificate signingCert) {
-    	// TODO Auto-generated method stub
+    public void showResultsInfo(final List<SignOperationConfig> signConfig, final File outDir,
+    		final X509Certificate signingCert) {
+    	this.mainMenu.setEnabledSignCommand(false);
+    	this.mainMenu.setEnabledOpenCommand(false);
 
+        final JPanel newPanel = new SignResultListPanel(
+    		this,
+    		signConfig,
+    		outDir,
+    		signingCert
+		);
+
+        this.container.add(newPanel, BorderLayout.CENTER);
+        if (this.window != null) {
+            this.window.getRootPane().putClientProperty("Window.documentFile", outDir); //$NON-NLS-1$
+            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + outDir.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (this.currentPanel != null) {
+            this.currentPanel.setVisible(false);
+            this.currentPanel.setFocusable(false);
+            this.currentPanel.setEnabled(false);
+        }
+        this.container.repaint();
+        this.container.requestFocusInWindow();
+        this.currentPanel = newPanel;
+        if (this.window != null) {
+            this.window.repaint();
+        }
     }
 
 
