@@ -46,7 +46,7 @@ import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Panel para el di&aacute;logo de configuraci&oacute; de proxy. */
-final class ProxyPanel extends JPanel{
+final class ProxyPanel extends JPanel {
 
 	private static final long serialVersionUID = -5919574790093890970L;
 	private static final int PREFERRED_WIDTH = 420;

@@ -16,7 +16,6 @@ import java.security.cert.Certificate;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -85,8 +84,6 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty(XAdESExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT);
         EXTRA_PARAMS.setProperty(XAdESExtraParams.FACTURAE_SIGN, "true"); //$NON-NLS-1$
     }
-
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Firma Facturas en formato XAdES Factura-E.
      * @param data Factura electr&oacute;nica.
@@ -227,9 +224,6 @@ public final class AOFacturaESigner implements AOSigner {
             for (final Object k : originalExtraParams.keySet()) {
                 if (ALLOWED_PARAMS.contains(k)) {
                     xParams.put(k, originalExtraParams.get(k));
-                }
-                else {
-                	LOGGER.warning("Se ignorara el siguiente parametro por no estar soportado para la firma de FacturaE: " + k); //$NON-NLS-1$
                 }
             }
         }

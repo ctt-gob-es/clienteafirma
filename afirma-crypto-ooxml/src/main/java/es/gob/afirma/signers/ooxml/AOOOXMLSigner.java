@@ -9,7 +9,9 @@
 
 package es.gob.afirma.signers.ooxml;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
@@ -92,7 +94,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * documento OOXML.
      * @param data Datos que deseamos analizar.
      * @return {@code true} si el documento es un OOXML, {@code false} en caso
-     *         contrario.
+     *         de no ser un OOXML o de no poder .
      * @throws IOException Cuando hay problemas en el tratamiento de los datos. */
     private static boolean isOOXMLFile(final byte[] data) throws IOException {
 
@@ -101,24 +103,36 @@ public final class AOOOXMLSigner implements AOSigner {
     		return false;
     	}
 
-    	try (
-	        final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
-		) {
-	        // Se separa en varios "if" para simplificar la condicional
-	        if (zipFile.getEntry("[Content_Types].xml") == null) { //$NON-NLS-1$
-	        	return false;
-	        }
-	        if (zipFile.getEntry("_rels/.rels") == null && zipFile.getEntry("_rels\\.rels") == null) { //$NON-NLS-1$ //$NON-NLS-2$
-	        	return false;
-	        }
-	        if (zipFile.getEntry("docProps/app.xml") == null && zipFile.getEntry("docProps\\app.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
-	        	return false;
-	        }
-	        if (zipFile.getEntry("docProps/core.xml") == null && zipFile.getEntry("docProps\\core.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
-	        	return false;
-	        }
+    	boolean result = true;
+    	final File tempFile = AOFileUtils.createTempFile(data);
+    	try (final ZipFile zipFile = new ZipFile(tempFile)) {
+    		// Se separa en varios "if" para simplificar la condicional
+    		if (zipFile.getEntry("[Content_Types].xml") == null) { //$NON-NLS-1$
+    			result = false;
+    		}
+    		else if (zipFile.getEntry("_rels/.rels") == null && zipFile.getEntry("_rels\\.rels") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+    			result = false;
+    		}
+    		else if (zipFile.getEntry("docProps/app.xml") == null && zipFile.getEntry("docProps\\app.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+    			result = false;
+    		}
+    		else if (zipFile.getEntry("docProps/core.xml") == null && zipFile.getEntry("docProps\\core.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+    			result = false;
+    		}
     	}
-        return true;
+    	catch (final Exception e) {
+    		result = false;
+    	}
+
+    	if (tempFile != null) {
+    		try {
+				Files.delete(tempFile.toPath());
+			} catch (final IOException e) {
+				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
+			}
+    	}
+
+        return result;
     }
 
     /**

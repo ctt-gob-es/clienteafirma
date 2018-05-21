@@ -25,6 +25,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
@@ -187,8 +188,10 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 
 	/** Muestra un di&aacute;logo gr&aacute;fico para la selecci&oacute;n de un campo de firma en un PDF.
 	 * @param emptySignatureFields Listado de campos de firma del PDF.
-	 * @return Campo de firma seleccionado. */
-	public static SignatureField selectField(final List<SignatureField> emptySignatureFields) {
+	 * @return Campo de firma seleccionado o {@code null} si debe crearse uno nuevo.
+	 * @throws AOCancelledOperationException Se cancela por completo la operaci&oacute;n de firma. */
+	public static SignatureField selectField(final List<SignatureField> emptySignatureFields)
+			throws AOCancelledOperationException {
 
 		final JComboBox<Object> combo = new JComboBox<>(emptySignatureFields.toArray());
 
@@ -210,12 +213,15 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 			options[0]
 		);
 
+		// Se ha pulsado en el boton cancelar firma
+		if (selection == 2) {
+			throw new AOCancelledOperationException();
+		}
+		// Se ha seleccionado un campo
 		if (selection == 0) {
 			return (SignatureField) combo.getSelectedItem();
 		}
-		else if (selection == 1) {
-			return new SignatureField(0, 0, 0, 0, 0, "Create"); //$NON-NLS-1$
-		}
+		// Se debe crear un campo nuevo
 		return null;
 	}
 }

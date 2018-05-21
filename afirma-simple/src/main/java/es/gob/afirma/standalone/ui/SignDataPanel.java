@@ -332,6 +332,9 @@ final class SignDataPanel extends JPanel {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
+        else {
+        	detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        }
 
         final JLabel detailPanelText = new JLabel(SimpleAfirmaMessages.getString("SignDataPanel.22")); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);

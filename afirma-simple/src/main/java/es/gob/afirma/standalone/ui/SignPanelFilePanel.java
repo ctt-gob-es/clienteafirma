@@ -21,6 +21,7 @@ import java.awt.dnd.DropTarget;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -56,30 +57,25 @@ final class SignPanelFilePanel extends JPanel {
     	return this.pdfVisible.isSelected();
     }
 
-    SignPanelFilePanel(final SignPanelFileType fileType,
-    				   final AOSigner signer,
-            		   final String signatureName,
-                       final String fileSize,
-                       final File file,
-                       final Date fileLastModified,
-                       final DropTarget dropTarget) {
+    SignPanelFilePanel(final SignOperationConfig signConfig,
+    		final DropTarget dropTarget) {
 
-        super(true);
+    	super(true);
 
-        // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
-        setDropTarget(dropTarget);
+    	// Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
+    	setDropTarget(dropTarget);
 
-        SwingUtilities.invokeLater(() -> createUI(
-    		fileType,
-    		signer,
-    		signatureName,
-    		fileSize,
-    		file,
-    		fileLastModified
-		));
+    	SwingUtilities.invokeLater(() -> createUI(
+    			signConfig.getFileType(),
+    			signConfig.getSigner(),
+    			signConfig.getSignatureFormatName(),
+    			NumberFormat.getNumberInstance().format(signConfig.getDataFile().length() / 1024),
+    			signConfig.getDataFile(),
+    			new Date(signConfig.getDataFile().lastModified())
+    			));
     }
 
-    void createUI(final SignPanelFileType fileType,
+    void createUI(final FileType fileType,
     			  final AOSigner signer,
     			  final String signatureName,
     			  final String fileSize,
@@ -93,12 +89,15 @@ final class SignPanelFilePanel extends JPanel {
         pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
 
 
-        final JLabel signLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.103") + signatureName); //$NON-NLS-1$
-        final JLabel descLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.46") + fileType.getFileDescription()); //$NON-NLS-1$
+        final JLabel signLabel = new JLabel(
+        		SimpleAfirmaMessages.getString("SignPanel.103", signatureName)); //$NON-NLS-1$
+        final JLabel descLabel = new JLabel(
+        		SimpleAfirmaMessages.getString("SignPanel.46", fileType.getFileDescription())); //$NON-NLS-1$
         final JLabel dateLabel = new JLabel(
-    		SimpleAfirmaMessages.getString("SignPanel.47") + //$NON-NLS-1$
-                DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(fileLastModified)
-        );
+        		SimpleAfirmaMessages.getString("SignPanel.47",  //$NON-NLS-1$
+        				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
+        				.format(fileLastModified))
+        		);
 
         final JLabel sizeLabel = new JLabel(
     		SimpleAfirmaMessages.getString("SignPanel.49") + (fileSize.equals("0") ? "<1" : fileSize) + " KB" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

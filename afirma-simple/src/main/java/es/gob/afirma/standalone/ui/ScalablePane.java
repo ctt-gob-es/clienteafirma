@@ -98,7 +98,7 @@ final class ScalablePane extends JPanel {
         return image;
     }
 
-    private Image getScaledInstanceToFit(final Image masterImage, final Dimension size) {
+    Image getScaledInstanceToFit(final Image masterImage, final Dimension size) {
         final Dimension masterSize = new Dimension(masterImage.getWidth(this), masterImage.getHeight(this));
         return getScaledInstance(
                         toBufferedImage(masterImage),
@@ -107,7 +107,7 @@ final class ScalablePane extends JPanel {
                         true);
     }
 
-    private Image getScaledInstanceToFill(final Image masterImage, final Dimension size) {
+    Image getScaledInstanceToFill(final Image masterImage, final Dimension size) {
         final Dimension masterSize = new Dimension(masterImage.getWidth(this), masterImage.getHeight(this));
         return getScaledInstance(
                         toBufferedImage(masterImage),
@@ -286,4 +286,7 @@ final class ScalablePane extends JPanel {
         return ret;
     }
 
+    public Image getMaster() {
+    	return this.master;
+    }
 }
