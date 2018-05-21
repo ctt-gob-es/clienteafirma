@@ -40,7 +40,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -244,7 +243,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
      	final File[] dataFiles = filterFiles(files);
-     	if (dataFiles.length == 0) {
+     	if (dataFiles == null || dataFiles.length == 0) {
      		LOGGER.warning("No se ha cargado ningun fichero valido"); //$NON-NLS-1$
      	}
      	else {
@@ -268,72 +267,38 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	/**
 	 * Filtra los ficheros para obtener un conjunto de ficheros v&aacute;lidos
-	 * para la operaci&oacute;n. En caso de haberse indicado ficheros y directorios,
-	 * se seleccionar&aacute;n s&oacute;lo los ficheros; si s&oloacute; se han
-	 * indicado ficheros, se usar&aacute;n estos; y si s&oacute;lo se ha indicado
-	 * directorios, se obtendr&aacute;n los ficheros contenidos en el nivel
-	 * inmediatamente inferior a este.
+	 * para la operaci&oacute;n.
 	 * @param fileList Listado de ficheros seleccionados.
-	 * @return Listado de ficheros a firmar.
+	 * @return Listado de ficheros a firmar o {@code null} si no se indicaron ficheros.
 	 */
-	 private File[] filterFiles(File[] fileList) {
-     	// Identificamos todos los ficheros seleccionados
-     	boolean hasDirs = false;
-     	boolean hasFiles = false;
-     	final List<File> files = new ArrayList<>();
-     	for (final File file : fileList) {
-     		if (file.exists() && file.canRead()) {
-     			if (file.isFile()) {
-     				hasFiles = true;
-     			}
-     			else {
-     				hasDirs = true;
-     			}
-     			files.add(file);
-     		}
-     		else {
-     			LOGGER.warning(String.format("Error al cargar el fichero '%s', se ignorara: ", file.getAbsolutePath())); //$NON-NLS-1$
-     			continue;
-     		}
-     	}
+	 private static File[] filterFiles(File[] fileList) {
 
-     	// Comprobamos que sea una conbinacion valida de ficheros y filtramos los que no lo sean
+		 if (fileList == null || fileList.length == 0) {
+			 return null;
+		 }
 
-     	// Se han seleccionado ficheros y directorios
-     	if (hasFiles && hasDirs) {
-     		AOUIFactory.showErrorMessage(
-     				SignPanel.this,
-     				SimpleAfirmaMessages.getString("SignPanel.111"), //$NON-NLS-1$
-     				SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-     				JOptionPane.WARNING_MESSAGE
-     				);
-     		for (int i = files.size() - 1; i >= 0; i--) {
-     			if (files.get(i).isDirectory()) {
-     				files.remove(i);
-     			}
-     		}
-     	}
-     	// Se ha seleccionado uno o varios directorios
-     	else if (hasDirs) {
-     		if (files.size() > 1) {
-     			AOUIFactory.showErrorMessage(
-     					SignPanel.this,
-     					SimpleAfirmaMessages.getString("SignPanel.112"), //$NON-NLS-1$
-     					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-     					JOptionPane.WARNING_MESSAGE
-     					);
-     		}
+		 final List<File> resultFiles = new ArrayList<>();
 
-     		// Cargamos los ficheros del primer directorio
-     		final File[] internalFiles = files.get(0).listFiles(new OnlyFileFilter());
-     		files.clear();
-     		for (final File file : internalFiles) {
-     			files.add(file);
-     		}
-     	}
+		 final List<File> tempFiles = new ArrayList<>();
+		 for (final File file : fileList) {
+			 tempFiles.add(file);
+		 }
 
-     	return files.toArray(new File[files.size()]);
-     }
+		 for (int i = 0; i < tempFiles.size(); i++) {
+			 final File file = tempFiles.get(i);
+			 if (file.exists() && file.canRead()) {
+				 if (file.isFile()) {
+					 resultFiles.add(file);
+				 }
+				 else {
+					 for (final File subFile : file.listFiles()) {
+						 tempFiles.add(subFile);
+					 }
+				 }
+			 }
+		 }
+		 return resultFiles.toArray(new File[resultFiles.size()]);
+	 }
 
 	 private static SignOperationConfig prepareSignConfig(File dataFile) throws IOException {
 

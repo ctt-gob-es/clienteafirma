@@ -17,6 +17,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DropTarget;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -32,7 +34,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -75,29 +80,64 @@ final class SignPanelMultiFilePanel extends JPanel {
 					if (e.getSource() instanceof JList<?>) {
 						final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
 						final int index = list.locationToIndex(e.getPoint());
-						final SignOperationConfig item = list.getModel().getElementAt(index);
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									Desktop.getDesktop().open(item.getDataFile());
-								} catch (final IOException ex) {
-									LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), e); //$NON-NLS-1$
-								}
-							}
-						});
+						openDataFileItem(list, index);
 					}
+				}
+			}
+		});
+
+        fileList.addKeyListener(new KeyListener() {
+			@Override public void keyTyped(KeyEvent e) { /* No hacemos nada */ }
+			@Override public void keyPressed(KeyEvent e) { /* No hacemos nada */ }
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER && e.getSource() instanceof JList<?>) {
+					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
+					final int index = fileList.getSelectedIndex();
+					openDataFileItem(list, index);
 				}
 			}
 		});
 
         final JScrollPane scrollPane = new JScrollPane(fileList);
 
+        // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        }
+        else {
+        	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        }
+
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.weighty = 1.0;
         this.add(scrollPane, c);
+    }
+
+	/**
+	 * Abre un fichero de la lista.
+	 * @param list Lista con los ficheros cargados.
+	 * @param index Indice del fichero seleccionado.
+	 */
+    static void openDataFileItem(final JList<SignOperationConfig> list, final int index) {
+		if (index >= 0) {
+			final SignOperationConfig item = list.getModel().getElementAt(index);
+			if (item.getDataFile() != null) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Desktop.getDesktop().open(item.getDataFile());
+						} catch (final IOException ex) {
+							LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
+						}
+					}
+				});
+			}
+		}
     }
 
     class FileOperationCellRenderer extends JPanel
@@ -115,6 +155,11 @@ final class SignPanelMultiFilePanel extends JPanel {
 
     	private final NumberFormat formatter;
 
+    	private final Border focusedBorder;
+    	private final Border unfocusedBorder;
+
+    	private int basePathLength = 0;
+
     	public FileOperationCellRenderer() {
 
     		this.iconDimension = new Dimension(32, 32);
@@ -131,6 +176,9 @@ final class SignPanelMultiFilePanel extends JPanel {
 			this.sizeLabel.setPreferredSize(new Dimension(60, 32));
 
 			this.formatter = NumberFormat.getNumberInstance();
+
+			this.focusedBorder = BorderFactory.createDashedBorder(Color.GRAY);
+			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
 			// Establecemos la configuracion de color
             Color bgColor = Color.WHITE;
@@ -166,16 +214,41 @@ final class SignPanelMultiFilePanel extends JPanel {
 		public Component getListCellRendererComponent(JList<? extends SignOperationConfig> list,
 				SignOperationConfig value, int index, boolean isSelected, boolean cellHasFocus) {
 
+			if (this.basePathLength == 0) {
+				this.basePathLength = calculateBasePathLength(list.getModel());
+			}
+
 			final ScalablePane typeIcon = (ScalablePane) value.getFileType().getIcon();
 			typeIcon.setPreferredSize(this.iconDimension);
 
 			this.icon.setIcon(new ImageIcon(typeIcon.getScaledInstanceToFit(typeIcon.getMaster(), this.iconDimension)));
 
-			this.fileNameLabel.setText(value.getDataFile().getName());
+			this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
 			this.formatNameLabel.setText(value.getSignatureFormatName());
 			this.sizeLabel.setText(calculateSize(value.getDataFile().length()));
 
+			setBorder(cellHasFocus ? this.focusedBorder : this.unfocusedBorder);
+
 			return this;
+		}
+
+		private int calculateBasePathLength(final ListModel<? extends SignOperationConfig> signConfigs) {
+			int parentLength = Integer.MAX_VALUE;
+			for (int i = 0; i < signConfigs.getSize(); i++) {
+				final SignOperationConfig config = signConfigs.getElementAt(i);
+				if (config.getDataFile() != null &&
+						config.getDataFile().getParentFile() != null) {
+					final int length = config.getDataFile().getParentFile().getAbsolutePath().length();
+					if (length < parentLength) {
+						parentLength = length;
+					}
+				}
+			}
+	        if (parentLength > 0) {
+	        	parentLength++;
+	        }
+
+	        return parentLength;
 		}
 
 		/**

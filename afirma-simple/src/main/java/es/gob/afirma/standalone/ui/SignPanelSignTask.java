@@ -143,6 +143,18 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	}
         }
 
+        // Revisamos los directorios de entrada para calcular la ruta base de entrada,
+        // que sera la que se ignore para el calculo de la ruta relativa con respecto
+        // al directorio de salida en el que se guardaran los ficheros
+        String inputBasePath = ""; //$NON-NLS-1$
+        int inputBasePathLength = Integer.MAX_VALUE;
+        for (final SignOperationConfig signConfig : this.signConfigs) {
+        	if (signConfig.getDataFile().getParentFile() != null &&
+        			signConfig.getDataFile().getParentFile().getAbsolutePath().length() < inputBasePathLength) {
+        		inputBasePath = signConfig.getDataFile().getParentFile().getAbsolutePath();
+        		inputBasePathLength = inputBasePath.length();
+        	}
+        }
 
         // Realizamos la firma de cada documento
         byte[] signResult = null;
@@ -260,9 +272,18 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	final String defaultFilename = signConfig.getSigner().getSignedName(
             			signConfig.getDataFile().getName(), "_signed"); //$NON-NLS-1$
 
+            	String relativePath = ""; //$NON-NLS-1$
+            	if (signConfig.getDataFile() != null && !inputBasePath.isEmpty()) {
+            		relativePath = signConfig.getDataFile().getParentFile().getAbsolutePath().substring(
+            				inputBasePath.length()) + File.separator;
+            	}
+
+            	final File defaultOutFile = new File(outDir, relativePath + defaultFilename);
+            	final boolean overwrite = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE);
+
             	File outFile;
             	try {
-            		outFile = saveDataToDir(signResult, outDir, defaultFilename);
+            		outFile = saveDataToFile(signResult, defaultOutFile, overwrite);
             	}
             	catch (final Exception e) {
             		LOGGER.log(Level.WARNING, "Error al guardar una de las firmas generadas", e); //$NON-NLS-1$
@@ -418,32 +439,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     			);
     }
 
-    /**
-     * Guarda datos en un directorio con un nombre concreto.
-     * @param data Datos a guardar.
-     * @param outDir Directorio de salida.
-     * @param defaultFilename Nombre por defecto del fichero de salida.
-     * @return Fichero en el que se guardan los datos.
-     * @throws IOException Cuando se produce un error durante el guardado.
-     */
-	private static File saveDataToDir(byte[] data, File outDir, String defaultFilename) throws IOException {
-		File outFile = new File(outDir, defaultFilename);
-		final boolean overwrite = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE);
-		if (!overwrite) {
-			int i = 1;
-			while (outFile.isFile()) {
-				final int extPos = defaultFilename.lastIndexOf('.');
-				final String filename = defaultFilename.substring(0, extPos) + '(' + i + ')' + defaultFilename.substring(extPos);
-				outFile = new File(outDir, filename);
-				i++;
-			}
-		}
-		try (FileOutputStream fos = new FileOutputStream(outFile)) {
-			fos.write(data, 0, data.length);
-		}
-		return outFile;
-	}
-
 	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,
 	                                                    KeyStoreException,
 	                                                    NoSuchAlgorithmException,
@@ -510,6 +505,39 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	}
 
     /**
+	 * Guarda datos en un directorio con un nombre concreto.
+	 * @param data Datos a guardar.
+	 * @param defaultOutFile Fichero de salida por defecto.
+	 * @return Fichero en el que se guardan los datos.
+	 * @throws IOException Cuando se produce un error durante el guardado.
+	 */
+	private static File saveDataToFile(final byte[] data, final File defaultOutFile, final boolean overwrite) throws IOException {
+		File outFile = defaultOutFile;
+		if (!overwrite) {
+			int i = 1;
+			while (outFile.isFile()) {
+				final String defaultFilename = defaultOutFile.getName();
+				final int extPos = defaultFilename.lastIndexOf('.');
+				final String filename = defaultFilename.substring(0, extPos) + '(' + i + ')' + defaultFilename.substring(extPos);
+				outFile = new File(defaultOutFile.getParentFile(), filename);
+				i++;
+			}
+		}
+
+		if (!defaultOutFile.getParentFile().isDirectory()) {
+			if (!defaultOutFile.getParentFile().mkdirs()) {
+				throw new IOException("No se pudo crear el directorio de salida de la firma"); //$NON-NLS-1$
+			}
+		}
+
+		try (FileOutputStream fos = new FileOutputStream(outFile)) {
+			fos.write(data, 0, data.length);
+		}
+		return outFile;
+	}
+
+
+	/**
      * Muestra un di&aacute;logo con un mensaje de error.
      * @param message Mensaje de error.
      */

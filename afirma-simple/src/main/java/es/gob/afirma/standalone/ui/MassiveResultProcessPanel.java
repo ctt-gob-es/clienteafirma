@@ -19,6 +19,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -46,8 +48,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.event.HyperlinkEvent;
 
 import es.gob.afirma.core.misc.Platform;
@@ -208,6 +212,9 @@ final class MassiveResultProcessPanel extends JPanel {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
+        else {
+        	detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        }
 
         final JLabel detailPanelText = new JLabel("Listado de firmas:"); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);
@@ -255,7 +262,7 @@ final class MassiveResultProcessPanel extends JPanel {
         		new JList<>(signConfigList.toArray(new SignOperationConfig[signConfigList.size()]));
         resultList.setCellRenderer(new SignatureResultCellRenderer());
 
-        // Definimos que al hacer doble clic sobre una firma del listado, se visualicen sus datos
+        // Definimos que al hacer doble clic o pulsar intro sobre una firma del listado, se visualicen sus datos
         resultList.addMouseListener(new MouseListener() {
 			@Override public void mouseReleased(MouseEvent e) { /* No hacemos nada */ }
 			@Override public void mousePressed(MouseEvent e) { /* No hacemos nada */ }
@@ -263,25 +270,48 @@ final class MassiveResultProcessPanel extends JPanel {
 			@Override public void mouseEntered(MouseEvent e) { /* No hacemos nada */ }
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					if (e.getSource() instanceof JList<?>) {
-						final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
-						final int index = list.locationToIndex(e.getPoint());
-						final SignOperationConfig item = list.getModel().getElementAt(index);
-						if (item.getSignatureFile() != null) {
-							SwingUtilities.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									new VisorFirma(false, parent).initialize(false, item.getSignatureFile());
-								}
-							});
-						}
-					}
+				if (e.getClickCount() == 2 && e.getSource() instanceof JList<?>) {
+					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
+					final int index = list.locationToIndex(e.getPoint());
+					openSignatureItem(list, index, parent);
+				}
+			}
+		});
+
+        resultList.addKeyListener(new KeyListener() {
+			@Override public void keyTyped(KeyEvent e) { /* No hacemos nada */ }
+			@Override public void keyPressed(KeyEvent e) { /* No hacemos nada */ }
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
+					final int index = resultList.getSelectedIndex();
+					openSignatureItem(list, index, parent);
 				}
 			}
 		});
 
 		return resultList;
+	}
+
+	/**
+	 * Abre una firma de la lista.
+	 * @param list Lista con las firmas resultantes.
+	 * @param index Indice de la firma seleccionada.
+	 * @param parent Componente padre sobre el que mostrar el dialogo con la informaci&oacute;n.
+	 */
+	static void openSignatureItem(final JList<SignOperationConfig> list, final int index, final Component parent) {
+		if (index >= 0) {
+			final SignOperationConfig item = list.getModel().getElementAt(index);
+			if (item.getSignatureFile() != null) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						new VisorFirma(false, parent).initialize(false, item.getSignatureFile());
+					}
+				});
+			}
+		}
 	}
 
 	static void openCertificate(final X509Certificate cert, final Component parent) {
@@ -325,6 +355,11 @@ final class MassiveResultProcessPanel extends JPanel {
 
 		private final NumberFormat formatter;
 
+    	private final Border focusedBorder;
+    	private final Border unfocusedBorder;
+
+    	private int basePathLength = 0;
+
 		public SignatureResultCellRenderer() {
 
 			this.iconDimension = new Dimension(32, 32);
@@ -341,6 +376,9 @@ final class MassiveResultProcessPanel extends JPanel {
 			this.resultIcon.setPreferredSize(this.iconDimension);
 
 			this.formatter = NumberFormat.getNumberInstance();
+
+			this.focusedBorder = BorderFactory.createDashedBorder(Color.GRAY);
+			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
 			// Establecemos la configuracion de color
 			Color bgColor = Color.WHITE;
@@ -376,6 +414,10 @@ final class MassiveResultProcessPanel extends JPanel {
 		public Component getListCellRendererComponent(JList<? extends SignOperationConfig> list,
 				SignOperationConfig value, int index, boolean isSelected, boolean cellHasFocus) {
 
+			if (this.basePathLength == 0) {
+				this.basePathLength = calculateBasePathLength(list.getModel());
+			}
+
 			final ScalablePane typeIcon = (ScalablePane) value.getFileType().getIcon();
 			typeIcon.setPreferredSize(this.iconDimension);
 
@@ -384,17 +426,38 @@ final class MassiveResultProcessPanel extends JPanel {
 			// Si la operacion ha terminado bien, mostramos la informacion de la firma; si no,
 			// la ruta de los datos que se firmaban y el icono de error
 			if (value.getSignatureFile() != null) {
-				this.fileNameLabel.setText(value.getSignatureFile().getName());
+				this.fileNameLabel.setText(value.getSignatureFile().getAbsolutePath().substring(this.basePathLength));
 				this.sizeLabel.setText(calculateSize(value.getSignatureFile().length()));
 				this.resultIcon.setIcon(new ImageIcon(getResultIcon(true)));
 			}
 			else {
-				this.fileNameLabel.setText(value.getDataFile().getName());
+				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath());
 				this.sizeLabel.setText(calculateSize(0));
 				this.resultIcon.setIcon(new ImageIcon(getResultIcon(false)));
 			}
 
+			setBorder(cellHasFocus ? this.focusedBorder : this.unfocusedBorder);
+
 			return this;
+		}
+
+		private static int calculateBasePathLength(ListModel<? extends SignOperationConfig> signConfigs) {
+	        int parentLength = Integer.MAX_VALUE;
+	        for (int i = 0; i < signConfigs.getSize(); i++) {
+	        	final SignOperationConfig config = signConfigs.getElementAt(i);
+	        	if (config.getSignatureFile() != null &&
+	        			config.getSignatureFile().getParentFile() != null) {
+	        		final int length = config.getSignatureFile().getParentFile().getAbsolutePath().length();
+	        		if (length < parentLength) {
+	        			parentLength = length;
+	        		}
+	        	}
+	        }
+	        if (parentLength > 0) {
+	        	parentLength++;
+	        }
+
+	        return parentLength;
 		}
 
 		/**
