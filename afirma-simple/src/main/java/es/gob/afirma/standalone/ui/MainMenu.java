@@ -37,6 +37,7 @@ import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
 import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
 import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
 import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
+import es.gob.afirma.standalone.ui.plugins.PluginsManagementDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigDialog;
 
@@ -282,6 +283,18 @@ public final class MainMenu extends JMenuBar {
 
 		toolsMenu.add(restoreConfigMenuItem);
 
+		// Preparamos la opcion de menu de la pantalla de plugins en el menu de herramientas
+
+		final JMenuItem pluginsMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.37")); //$NON-NLS-1$
+		pluginsMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		pluginsMenuItem.setMnemonic(KeyEvent.VK_G);
+		pluginsMenuItem.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MainMenu.37")); //$NON-NLS-1$
+		pluginsMenuItem.addActionListener(ae -> showPlugingManagement());
+
+		toolsMenu.add(pluginsMenuItem);
+
+
 		this.add(toolsMenu);
 
         if (!isMac) {
@@ -395,16 +408,20 @@ public final class MainMenu extends JMenuBar {
     }
 
     void showPreferences() {
-        PreferencesDialog.show(MainMenu.this.getParentComponent(), true);
+        PreferencesDialog.show(getParentComponent(), true);
     }
 
     void showRestoreConfig() {
-    	RestoreConfigDialog.show(MainMenu.this.getParentComponent(), true);
+    	RestoreConfigDialog.show(getParentComponent(), true);
+    }
+
+    void showPlugingManagement() {
+    	PluginsManagementDialog.show(getParentComponent(), true);
     }
 
     @SuppressWarnings("unused")
 	void showAbout(final EventObject event) {
-    	showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent());
+    	showAbout(getParentComponent() == null ? MainMenu.this : getParentComponent());
     }
 
     /**

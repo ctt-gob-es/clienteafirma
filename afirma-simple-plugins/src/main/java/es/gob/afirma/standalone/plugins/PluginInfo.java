@@ -4,27 +4,41 @@ package es.gob.afirma.standalone.plugins;
 /**
  * Informaci&oacute;n de un plugin.
  */
-public class PluginInfo {
+public class PluginInfo extends MinimalPluginInfo {
+
+	private static final int DEFAULT_VERSION_CODE = 1;
 
 	private static final String DEFAULT_VERSION = "1.0"; //$NON-NLS-1$
 
 	private final String name;
-	private final String description;
+	private String description;
 	private String version;
 	private String[] authors;
 	private String[] contacts;
 
+	private boolean configurable;
+
 	/**
-	 * Crea la informaci&oacute;n b&aacute;sica de un plugin.
-	 * @param name
-	 * @param description
+	 * Crea la informaci&oacute;n b&aacute;sica de un plugin. El nombre interno del plugin,
+	 * es el nombre con el cual se instalara, pero no se mostrar&aacute; al usuario. El nombre
+	 * com&uacute; s&iacute; se podr&aacute; mostrar. El nombre interno debe
+	 * permanecer invariable
+	 * @param internalName Nombre interno del plugin.
+	 * @param name Nombre legible del plugin.
 	 */
-	public PluginInfo(String name, String description) {
+	public PluginInfo(String internalName, String name) {
+		super(internalName, DEFAULT_VERSION_CODE);
+
+		if (name == null) {
+			throw new NullPointerException("El nombre del plugin no puede ser nulo"); //$NON-NLS-1$
+		}
+
 		this.name = name;
-		this.description = description;
+		this.description = ""; //$NON-NLS-1$
 		this.version = DEFAULT_VERSION;
 		this.authors = null;
 		this.contacts = null;
+		this.configurable = false;
 	}
 
 	/**
@@ -44,6 +58,22 @@ public class PluginInfo {
 	}
 
 	/**
+	 * Estable la descripci&oacute;n del plugin.
+	 * @param description Descripci&oacute;n del plugin.
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Establece la version de c&oacute;digo del plugin.
+	 * @param versionCode Versi&oacute;n.
+	 */
+	public void setVersionCode(int versionCode) {
+		this.versionCode = versionCode;
+	}
+
+	/**
 	 * Recupera la cadena con la identificaci&oacute;n de la versi&oacute;n del plugin.
 	 * @return Cadena con la versi&oacute;n.
 	 */
@@ -56,7 +86,9 @@ public class PluginInfo {
 	 * @param version Versi&oacute;n del plugin.
 	 */
 	public void setVersion(String version) {
-		this.version = version;
+		if (version != null) {
+			this.version = version;
+		}
 	}
 
 	/**
@@ -89,5 +121,30 @@ public class PluginInfo {
 	 */
 	public void setContacts(String[] contacts) {
 		this.contacts = contacts;
+	}
+
+	/**
+	 * Comprueba si el plugin admite configuraci&oacute;n por parte del usuario.
+	 * @return {@code true} si el plugin admite configuraci&oacute;n, {@code false}
+	 * en caso contrario.
+	 */
+	public boolean isConfigurable() {
+		return this.configurable;
+	}
+
+	/**
+	 * Establece si el plugin admite configuraci&oacute;n por parte del usuario. En ese caso,
+	 * se deber&aacute; haber creado una clase que extienda
+	 * {@link es.gob.afirma.standalone.plugins.ConfiguratorPanel}.
+	 * @param configurable {@code true} para indicar que el plugin admite configuraci&oacute;n,
+	 * {@code false} en caso contrario.
+	 */
+	public void setConfigurable(boolean configurable) {
+		this.configurable = configurable;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
 	}
 }

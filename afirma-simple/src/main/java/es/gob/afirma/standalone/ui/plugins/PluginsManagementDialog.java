@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.standalone.ui.restoreconfig;
+package es.gob.afirma.standalone.ui.plugins;
 
 import java.awt.Frame;
 
@@ -17,26 +17,22 @@ import javax.swing.WindowConstants;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
- * Clase que dibuja la ventana de restauraci&oacute;n de configuraci&oacute;n
- * de navegadores
- *
+ * Di&aacute;logo con las opciones de gesti&oacute;n de plugins.
  */
-public final class RestoreConfigDialog extends JDialog {
+public final class PluginsManagementDialog extends JDialog {
 
-	/**
-	 * Attribute that represents the serial version.
-	 */
-	private static final long serialVersionUID = -241482490367263150L;
+	/** Serial Id. */
+	private static final long serialVersionUID = -2374733164838573024L;
 
-	/** Constructor del panel de restauraci&oacute;n de la instalaci&oacute;n.
+	/** Constructor del panel de configuraci&oacute;n de plugins.
 	 * @param parent Componente padre del panel.
-	 * @param modal Indica si el di&aacute;logo debe ser modal.
+	 * @param modal Indica si la ventana debe ser modal.
 	 */
-	public RestoreConfigDialog(final Frame parent, final boolean modal) {
+	public PluginsManagementDialog(final Frame parent, final boolean modal) {
 		super(parent, modal);
-		setTitle(SimpleAfirmaMessages.getString("MainMenu.20")); //$NON-NLS-1$
-		this.add(new RestoreConfigPanel(this));
-		this.setSize(600, 550);
+		setTitle(SimpleAfirmaMessages.getString("MainMenu.37")); //$NON-NLS-1$
+		this.add(new PluginsManagementPanel(this));
+		this.setSize(650, 550);
 		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -46,7 +42,7 @@ public final class RestoreConfigDialog extends JDialog {
 	 * @param parent Componente padre sobre el que mostrar el panel.
 	 * @param modal Modalidad del di&aacute;logo. */
 	public static void show(final Frame parent, final boolean modal) {
-		new RestoreConfigDialog(parent, modal).setVisible(true);
+		new PluginsManagementDialog(parent, modal).setVisible(true);
 	}
 
 }

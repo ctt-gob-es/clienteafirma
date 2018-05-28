@@ -1,5 +1,7 @@
 package es.gob.afirma.standalone.plugins;
 
+import java.security.cert.X509Certificate;
+
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /**
@@ -23,5 +25,27 @@ public abstract class AfirmaPlugin {
 	@SuppressWarnings("static-method")
 	public byte [] preSignProcess(byte[] data, String format) {
 		return data;
+	}
+
+	/**
+	 * Proceso ejecutado sobre las firmas generadas.
+	 * @param signature Firma electr&oacute;nica generada.
+	 * @param format Formato de la firma. Los posibles formatos de firma se
+	 * definen en {@link AOSignConstants}.
+	 * @param cert Certificado utilizado para firmar.
+	 * @return Firma ya posprocesada.
+	 */
+	@SuppressWarnings("static-method")
+	public byte [] postSignProcess(byte[] signature, String format, X509Certificate cert) {
+		return signature;
+	}
+
+	/**
+	 * Proceso ejecutado al finalizar un proceso de firma completo. En &eacute;l se puede
+	 * configurar lo necesario para la restaurar el estado del plugin antes de iniciar una
+	 * nueva operaci&oacute;n.
+	 */
+	public void reset() {
+		// No se hace nada
 	}
 }
