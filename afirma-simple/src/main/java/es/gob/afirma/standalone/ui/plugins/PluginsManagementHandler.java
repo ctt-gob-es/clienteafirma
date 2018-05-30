@@ -17,6 +17,8 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.PluginControlledException;
 import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
 import es.gob.afirma.standalone.plugins.PluginInstalledException;
@@ -31,7 +33,7 @@ public class PluginsManagementHandler implements KeyListener {
 
 	private final PluginsManagementPanel view;
 
-	private List<PluginInfo> pluginsList;
+	private List<AfirmaPlugin> pluginsList;
 
 	/**
 	 * @param view
@@ -85,9 +87,11 @@ public class PluginsManagementHandler implements KeyListener {
 			return;
 		}
 
+		final PluginsManager pluginsManager = PluginsManager.getInstance();
+
 		// Comprobamos que el plugin sea valido
-		final PluginInfo pluginInfo = PluginsManager.checkPlugin(pluginFile);
-		if (pluginInfo == null) {
+		final AfirmaPlugin plugin = PluginsManager.checkPlugin(pluginFile);
+		if (plugin == null) {
 			LOGGER.warning("El plugin no es valido y no se cargara"); //$NON-NLS-1$
 			showError("El plugin no es valido y no se cargara");
 			return;
@@ -95,9 +99,14 @@ public class PluginsManagementHandler implements KeyListener {
 
 		// Copiamos el plugin al subdirectorio correspondiente dentro del
 		// directorio de instalacion
-		File importedPlugin;
+		File importedPluginFile;
 		try {
-			importedPlugin = PluginsManager.installPlugin(pluginFile, pluginInfo);
+			importedPluginFile = pluginsManager.installPlugin(pluginFile, plugin);
+		}
+		catch (final PluginControlledException e) {
+			LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
+			showError(e.getLocalizedMessage());
+			return;
 		}
 		catch (final PluginInstalledException e) {
 			LOGGER.log(Level.WARNING, "Ya existe una version instalada del plugin", e); //$NON-NLS-1$
@@ -111,7 +120,7 @@ public class PluginsManagementHandler implements KeyListener {
 		}
 
 		// Mostramos la informacion del plugin
-		loadPluginInfo(pluginInfo);
+		showPluginInfo(plugin);
 	}
 
 	/**
@@ -123,7 +132,7 @@ public class PluginsManagementHandler implements KeyListener {
 				"Cargar plugin",
 				null,
 				null,
-				new String[] { PluginsManager.PLUGIN_EXTENSION },
+				PluginsManager.PLUGIN_EXTENSIONS,
 				"Plugin de AutoFirma",
 				false,
 				false,
@@ -133,36 +142,32 @@ public class PluginsManagementHandler implements KeyListener {
 		return files[0];
 	}
 
-	private void activePlugin(File file, PluginInfo info) {
-		// TODO Auto-generated method stub
-	}
-
-	private void loadPluginInfo(PluginInfo pluginInfo) {
+	private void showPluginInfo(AfirmaPlugin plugin) {
 
 		// Insertamos el nombre del plugin en la lista
-		final JList<PluginInfo> list = this.view.getPluginsList();
-		final DefaultListModel<PluginInfo> listModel = (DefaultListModel<PluginInfo>) list.getModel();
-		listModel.addElement(pluginInfo);
+		final JList<AfirmaPlugin> list = this.view.getPluginsList();
+		final DefaultListModel<AfirmaPlugin> listModel = (DefaultListModel<AfirmaPlugin>) list.getModel();
+		listModel.addElement(plugin);
 
 		// Seleccionamos el nuevo plugin
 		list.setSelectedIndex(listModel.getSize() - 1);
 
 		// Mostramos la informacion del plugin en el panel lateral
-		showPluginInfo(pluginInfo);
+		showPluginDetails(plugin.getInfo());
 	}
 
 	void removePlugin() {
 
 		// Obtenemos la informacion del plugin seleccionado
-		final JList<PluginInfo> list = this.view.getPluginsList();
-		final PluginInfo pluginInfo = list.getSelectedValue();
-		if (pluginInfo == null) {
+		final JList<AfirmaPlugin> list = this.view.getPluginsList();
+		final AfirmaPlugin plugin = list.getSelectedValue();
+		if (plugin == null) {
 			return;
 		}
 
 		// Desinstalamos el plugin
 		try {
-			PluginsManager.uninstallPlugin(pluginInfo);
+			PluginsManager.getInstance().uninstallPlugin(plugin);
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Ocurrio un error al desinstalar el plugin", e); //$NON-NLS-1$
 			showError("Ocurri\u00F3 un error desinstalar el plugin"); //$NON-NLS-1$
@@ -170,11 +175,11 @@ public class PluginsManagementHandler implements KeyListener {
 		}
 
 		// Eliminamos el plugin del listado
-		final DefaultListModel<PluginInfo> listModel = (DefaultListModel<PluginInfo>) list.getModel();
-		listModel.removeElement(pluginInfo);
+		final DefaultListModel<AfirmaPlugin> listModel = (DefaultListModel<AfirmaPlugin>) list.getModel();
+		listModel.removeElement(plugin);
 
 		// Limpiamos el panel de informacion
-		showPluginInfo(null);
+		showPluginDetails(null);
 	}
 
 	void configPlugin() {
@@ -189,7 +194,7 @@ public class PluginsManagementHandler implements KeyListener {
 	 * Muestra al usuario la informaci&oacute;n de un plugin.
 	 * @param info
 	 */
-	void showPluginInfo(PluginInfo info) {
+	void showPluginDetails(PluginInfo info) {
 
 		final StringBuilder html = new StringBuilder();
 		if (info != null) {
@@ -216,33 +221,32 @@ public class PluginsManagementHandler implements KeyListener {
 		}
 
 		this.view.getPluginInfoPane().setText(html.toString());
-		this.view.getConfigButton().setVisible(info != null ? info.isConfigurable() : false);
+		this.view.getConfigButton().setVisible(info != null ? info.getConfigPanel() != null : false);
+
 	}
 
 	/**
 	 * Carga la informaci&oacute;n actualmente configurada en la vista.
 	 */
-	void loadData() {
-
-		List<PluginInfo> pluginsList;
+	void loadViewData() {
 		try {
-			pluginsList = PluginsManager.getInstance().getPluginsLoadedList();
+			this.pluginsList = PluginsManager.getInstance().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.severe("No se ha podido cargar la lista de plugins"); //$NON-NLS-1$
 			showError("No se ha podido cargar la lista de plugins");
 			return;
 		}
 
-		final JList<PluginInfo> list = this.view.getPluginsList();
-		final DefaultListModel<PluginInfo> listModel = (DefaultListModel<PluginInfo>) list.getModel();
-		for (final PluginInfo pluginInfo : pluginsList) {
-			listModel.addElement(pluginInfo);
+		final JList<AfirmaPlugin> list = this.view.getPluginsList();
+		final DefaultListModel<AfirmaPlugin> listModel = (DefaultListModel<AfirmaPlugin>) list.getModel();
+		for (final AfirmaPlugin plugin : this.pluginsList) {
+			listModel.addElement(plugin);
 		}
 
 		// Seleccionamos el primer elemento
 		if (listModel.size() > 0) {
 			list.setSelectedIndex(0);
-			showPluginInfo(pluginsList.get(0));
+			showPluginDetails(this.pluginsList.get(0).getInfo());
 		}
 	}
 

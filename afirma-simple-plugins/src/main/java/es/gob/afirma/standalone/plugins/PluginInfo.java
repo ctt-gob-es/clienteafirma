@@ -16,7 +16,11 @@ public class PluginInfo extends MinimalPluginInfo {
 	private String[] authors;
 	private String[] contacts;
 
-	private boolean configurable;
+	private String configPanel;
+
+	private GenericMenuOption menu;
+
+	private PluginButton[] buttons;
 
 	/**
 	 * Crea la informaci&oacute;n b&aacute;sica de un plugin. El nombre interno del plugin,
@@ -38,7 +42,7 @@ public class PluginInfo extends MinimalPluginInfo {
 		this.version = DEFAULT_VERSION;
 		this.authors = null;
 		this.contacts = null;
-		this.configurable = false;
+		this.configPanel = null;
 	}
 
 	/**
@@ -128,19 +132,49 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @return {@code true} si el plugin admite configuraci&oacute;n, {@code false}
 	 * en caso contrario.
 	 */
-	public boolean isConfigurable() {
-		return this.configurable;
+	public String getConfigPanel() {
+		return this.configPanel;
 	}
 
 	/**
-	 * Establece si el plugin admite configuraci&oacute;n por parte del usuario. En ese caso,
-	 * se deber&aacute; haber creado una clase que extienda
-	 * {@link es.gob.afirma.standalone.plugins.ConfiguratorPanel}.
-	 * @param configurable {@code true} para indicar que el plugin admite configuraci&oacute;n,
-	 * {@code false} en caso contrario.
+	 * Establece el nombre de la clase con el panel de configuraci&oacute;n del plugin. Esta clase
+	 * deber&aacute; extender {@link es.gob.afirma.standalone.plugins.ConfiguratorPanel}.
+	 * @param configPanel Nombre de la clase del panel de configuraci&oacute;n.
 	 */
-	public void setConfigurable(boolean configurable) {
-		this.configurable = configurable;
+	public void setConfigPanel(String configPanel) {
+		this.configPanel = configPanel;
+	}
+
+	/**
+	 * Recupera el men&uacte; general del plugin.
+	 * @return Men&uacute; general.
+	 */
+	public GenericMenuOption getMenu() {
+		return this.menu;
+	}
+
+	/**
+	 * Establece el men&uacte; general del plugin.
+	 * @param menu Men&uacute; general.
+	 */
+	public void setMenu(GenericMenuOption menu) {
+		this.menu = menu;
+	}
+
+	/**
+	 * Recupera los botones para el uso de las acciones del plugin.
+	 * @return Botones para el acceso a las funciones del plugin.
+	 */
+	public PluginButton[] getButtons() {
+		return this.buttons;
+	}
+
+	/**
+	 * Establece los botones para el uso de las acciones del plugin.
+	 * @param buttons Botones para el acceso a las funciones del plugin.
+	 */
+	public void setButtons(PluginButton[] buttons) {
+		this.buttons = buttons;
 	}
 
 	@Override

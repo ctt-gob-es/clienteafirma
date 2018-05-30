@@ -27,7 +27,7 @@ import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.plugins.PluginInfo;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 
 /**
  * Panel gr&aacute;fico con las opciones de gesti&oacute;n de plugins.
@@ -39,7 +39,7 @@ public final class PluginsManagementPanel extends JPanel {
 
 	private final Window window;
 
-	private JList<PluginInfo> pluginsList;
+	private JList<AfirmaPlugin> pluginsList;
 	private JButton addButton;
 	private JButton removeButton;
 
@@ -63,7 +63,7 @@ public final class PluginsManagementPanel extends JPanel {
 
 			@Override
 			public void run() {
-				PluginsManagementPanel.this.eventsHandler.loadData();
+				PluginsManagementPanel.this.eventsHandler.loadViewData();
 			}
 		}).start();
 	}
@@ -119,7 +119,7 @@ public final class PluginsManagementPanel extends JPanel {
 		final JPanel pluginListPanel = new JPanel(new GridBagLayout());
 		pluginListPanel.setBorder(BorderFactory.createTitledBorder("Plugins instalados"));
 
-		final DefaultListModel<PluginInfo> listModel = new DefaultListModel<>();
+		final DefaultListModel<AfirmaPlugin> listModel = new DefaultListModel<>();
 		this.pluginsList = new JList<>(listModel);
 		final JScrollPane pluginsListScrollPane = new JScrollPane(this.pluginsList);
 
@@ -218,7 +218,7 @@ public final class PluginsManagementPanel extends JPanel {
 	 * Devuelve el listado en el que se visualizan los plugins instalados.
 	 * @return Listado con los plugins.
 	 */
-	JList<PluginInfo> getPluginsList() {
+	JList<AfirmaPlugin> getPluginsList() {
 		return this.pluginsList;
 	}
 

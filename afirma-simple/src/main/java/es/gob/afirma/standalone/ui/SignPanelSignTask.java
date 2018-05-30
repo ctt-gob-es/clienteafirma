@@ -16,6 +16,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,10 @@ import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.PluginControlledException;
+import es.gob.afirma.standalone.plugins.PluginException;
+import es.gob.afirma.standalone.plugins.PluginsManager;
 import es.gob.afirma.standalone.ui.pdf.PdfEmptySignatureFieldsChooserDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
@@ -58,32 +63,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	private final List<? extends CertificateFilter> certFilters;
 
 	private final CommonWaitDialog waitDialog;
-	CommonWaitDialog getWaitDialog() {
-		return this.waitDialog;
-	}
-
-	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,
-	                                                    KeyStoreException,
-	                                                    NoSuchAlgorithmException,
-	                                                    UnrecoverableEntryException {
-
-		final AOKeyStoreManager ksm = this.signPanel.getSimpleAfirma().getAOKeyStoreManager();
-    	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-			ksm,
-			this.signPanel,
-			true,             // Comprobar claves privadas
-			false,            // Mostrar certificados caducados
-			true,             // Comprobar validez temporal del certificado
-			this.certFilters, // Filtros
-			false             // mandatoryCertificate
-		);
-    	dialog.show();
-    	ksm.setParentComponent(this.signPanel);
-    	return ksm.getKeyEntry(
-			dialog.getSelectedAlias()
-		);
-	}
-
 
 	SignPanelSignTask(final SignPanel parentSignPanel,
 			          final List<? extends CertificateFilter> certificateFilters,
@@ -92,6 +71,53 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         this.signPanel = parentSignPanel;
         this.certFilters = certificateFilters;
         this.waitDialog = signWaitDialog;
+    }
+
+	CommonWaitDialog getWaitDialog() {
+		return this.waitDialog;
+	}
+
+	@Override
+    public Void doInBackground() {
+
+        final AOSigner currentSigner = this.signPanel.getSigner();
+
+        // Comprobamos si se ha marcado la opcion de firma visible
+    	final boolean doVisibleSignature;
+    	if (this.signPanel.getFilePanel() instanceof SignPanelFilePanel) {
+    		doVisibleSignature = ((SignPanelFilePanel)this.signPanel.getFilePanel()).isVisibleSignature();
+    	}
+    	else {
+    		doVisibleSignature = false;
+    	}
+
+    	// Si hay que firmar en PAdES con firma visible, permitiremos seleccionar
+    	// el campo de firma
+    	if (currentSigner instanceof AOPDFSigner && doVisibleSignature) {
+
+    		final String oldMessage = this.waitDialog.getMessage();
+        	this.waitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
+    		final List<SignatureField> emptySignatureFields = PdfUtil.getPdfEmptySignatureFields(this.signPanel.getDataToSign());
+
+    		// Si hay campos visibles de firma vacios, usaremos uno de entre ellos
+        	if (!emptySignatureFields.isEmpty()) {
+        		selectEmptySignatureField(currentSigner, emptySignatureFields, oldMessage);
+        	}
+        	// Si no los hay, permitiremos crear uno
+        	else {
+        		createNewSignatureField(currentSigner, oldMessage);
+        	}
+    	}
+        // Para cualquier otro formato de firma o PAdES no visible, firmaremos
+    	// directamente
+    	else {
+        	doSignature(currentSigner, null);
+    	}
+    	if (this.waitDialog != null) {
+    		this.waitDialog.dispose();
+    	}
+
+        return null;
     }
 
     void doSignature(final AOSigner currentSigner, final Properties initialExtraParams) {
@@ -148,11 +174,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         final String signatureAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
 
+        final byte[] dataToSign = pluginsPreProcess(
+        		this.signPanel.getDataToSign(),
+        		this.signPanel.getSignatureFormat());
+
         final byte[] signResult;
         try {
             if (this.signPanel.isCosign()) {
                 signResult = currentSigner.cosign(
-            		this.signPanel.getDataToSign(),
+                	dataToSign,
             		signatureAlgorithm,
                     pke.getPrivateKey(),
                     pke.getCertificateChain(),
@@ -161,13 +191,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             }
             else {
                 signResult = currentSigner.sign(
-            		this.signPanel.getDataToSign(),
+                	dataToSign,
             		signatureAlgorithm,
             		pke.getPrivateKey(),
                     pke.getCertificateChain(),
                     p
                 );
             }
+
+            pluginsPostProcess(signResult, this.signPanel.getSignatureFormat(), pke.getCertificateChain());
         }
         catch(final AOCancelledOperationException e) {
             return;
@@ -363,48 +395,28 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		);
     }
 
-    @Override
-    public Void doInBackground() {
+	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,
+	                                                    KeyStoreException,
+	                                                    NoSuchAlgorithmException,
+	                                                    UnrecoverableEntryException {
 
-        final AOSigner currentSigner = this.signPanel.getSigner();
+		final AOKeyStoreManager ksm = this.signPanel.getSimpleAfirma().getAOKeyStoreManager();
+    	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+			ksm,
+			this.signPanel,
+			true,             // Comprobar claves privadas
+			false,            // Mostrar certificados caducados
+			true,             // Comprobar validez temporal del certificado
+			this.certFilters, // Filtros
+			false             // mandatoryCertificate
+		);
+    	dialog.show();
+    	ksm.setParentComponent(this.signPanel);
+    	return ksm.getKeyEntry(
+			dialog.getSelectedAlias()
+		);
+	}
 
-        // Comprobamos si se ha marcado la opcion de firma visible
-    	final boolean doVisibleSignature;
-    	if (this.signPanel.getFilePanel() instanceof SignPanelFilePanel) {
-    		doVisibleSignature = ((SignPanelFilePanel)this.signPanel.getFilePanel()).isVisibleSignature();
-    	}
-    	else {
-    		doVisibleSignature = false;
-    	}
-
-    	// Si hay que firmar en PAdES con firma visible, permitiremos seleccionar
-    	// el campo de firma
-    	if (currentSigner instanceof AOPDFSigner && doVisibleSignature) {
-
-    		final String oldMessage = this.waitDialog.getMessage();
-        	this.waitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
-    		final List<SignatureField> emptySignatureFields = PdfUtil.getPdfEmptySignatureFields(this.signPanel.getDataToSign());
-
-    		// Si hay campos visibles de firma vacios, usaremos uno de entre ellos
-        	if (!emptySignatureFields.isEmpty()) {
-        		selectEmptySignatureField(currentSigner, emptySignatureFields, oldMessage);
-        	}
-        	// Si no los hay, permitiremos crear uno
-        	else {
-        		createNewSignatureField(currentSigner, oldMessage);
-        	}
-    	}
-        // Para cualquier otro formato de firma o PAdES no visible, firmaremos
-    	// directamente
-    	else {
-        	doSignature(currentSigner, null);
-    	}
-    	if (this.waitDialog != null) {
-    		this.waitDialog.dispose();
-    	}
-
-        return null;
-    }
 
     private void selectEmptySignatureField(final AOSigner signer, final List<SignatureField> emptySignatureFields, final String oldMsg) {
 
@@ -487,5 +499,97 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     				JOptionPane.ERROR_MESSAGE
     				);
     	}
+    }
+
+    private byte[] pluginsPreProcess(final byte[] data, String format) {
+
+    	final PluginsManager pluginsManager = PluginsManager.getInstance();
+    	List<AfirmaPlugin> plugins;
+		try {
+			plugins = pluginsManager.getPluginsLoadedList();
+		} catch (final PluginException e) {
+			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+	                this.signPanel,
+	                SimpleAfirmaMessages.getString("SignPanel.113"), //$NON-NLS-1$
+	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                JOptionPane.WARNING_MESSAGE
+	            );
+			return data;
+		}
+
+		byte[] processedData = data;
+    	for (final AfirmaPlugin plugin : plugins) {
+    		try {
+    			processedData = plugin.preSignProcess(processedData, format);
+    		}
+    		catch (final PluginControlledException e) {
+    			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
+    			AOUIFactory.showErrorMessage(
+    	                this.signPanel,
+    	                e.getMessage(),
+    	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    	                JOptionPane.WARNING_MESSAGE
+    	            );
+			}
+    		catch (Exception | Error e) {
+    			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al preprocesar los datos con el plugin " + plugin + //$NON-NLS-1$
+    					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(
+    	                this.signPanel,
+    	                SimpleAfirmaMessages.getString("SignPanel.111", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+    	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    	                JOptionPane.ERROR_MESSAGE
+    	            );
+			}
+    	}
+
+    	return processedData;
+    }
+
+    private byte[] pluginsPostProcess(final byte[] signature, String format, Certificate[] certChain) {
+
+    	final PluginsManager pluginsManager = PluginsManager.getInstance();
+    	List<AfirmaPlugin> plugins;
+		try {
+			plugins = pluginsManager.getPluginsLoadedList();
+		} catch (final PluginException e) {
+			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+	                this.signPanel,
+	                SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
+	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                JOptionPane.WARNING_MESSAGE
+	            );
+			return signature;
+		}
+
+    	byte[] processedSignature = signature;
+    	for (final AfirmaPlugin plugin : plugins) {
+    		try {
+    			processedSignature = plugin.postSignProcess(processedSignature, format, certChain);
+    		}
+    		catch (final PluginControlledException e) {
+    			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
+    			AOUIFactory.showErrorMessage(
+    					this.signPanel,
+    					e.getMessage(),
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					JOptionPane.WARNING_MESSAGE
+    					);
+    		}
+    		catch (Exception | Error e) {
+    			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al postprocesar la firma con el plugin " + plugin + //$NON-NLS-1$
+    					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(
+    					this.signPanel,
+    					SimpleAfirmaMessages.getString("SignPanel.112", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					JOptionPane.ERROR_MESSAGE
+    					);
+    		}
+    	}
+
+    	return processedSignature;
     }
 }

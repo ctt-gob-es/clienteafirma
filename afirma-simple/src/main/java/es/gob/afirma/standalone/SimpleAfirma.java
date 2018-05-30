@@ -57,6 +57,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.standalone.plugins.PluginsManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncher;
 import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
@@ -597,6 +598,22 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
     					}
     				}
+
+    				LOGGER.info("Cargando plugins"); //$NON-NLS-1$
+    				try {
+    					PluginsManager.getInstance().getPluginsLoadedList();
+    				}
+    				catch (final Exception e) {
+    					LOGGER.severe("No se han podido cargar los plugins en la aplicacion"); //$NON-NLS-1$
+        				AOUIFactory.showErrorMessage(
+        						null,
+        						"No se han podido cargar los plugins en la aplicacion.", //$NON-NLS-1$
+        						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+        						JOptionPane.WARNING_MESSAGE
+        					);
+    				}
+
+    				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
    					saf.initialize(null);
     			}
     			else {
@@ -752,6 +769,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		) {
         	return in.readLine();
         }
+    }
+
+    /**
+     * Devuelve el panel que actualmente muestra la aplicaci&oacute;n.
+     * @return Panel que muestra la aplicaci&oacute;n.
+     */
+    public JPanel getCurrentPanel() {
+    	return this.currentPanel;
     }
 
     private static String version = null;

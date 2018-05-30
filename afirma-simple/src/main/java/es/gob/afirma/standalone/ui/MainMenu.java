@@ -416,7 +416,12 @@ public final class MainMenu extends JMenuBar {
     }
 
     void showPlugingManagement() {
+    	// Mostramos el dialogo de gestion de plugins y luego refrescamos los elimentos
+    	// de los plugins en el panel actual
     	PluginsManagementDialog.show(getParentComponent(), true);
+    	if (getSimpleAfirma().getCurrentPanel() instanceof PluginButtonsContainer) {
+    		((PluginButtonsContainer) getSimpleAfirma().getCurrentPanel()).refreshPluginButtonsContainer();
+    	}
     }
 
     @SuppressWarnings("unused")

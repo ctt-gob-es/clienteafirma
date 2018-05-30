@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -31,7 +32,7 @@ public class PluginsManager {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Extensi&oacute;n de fichero asociada a los plugins de la aplicaci&oacute;n. */
-	public static final String PLUGIN_EXTENSION = "afirmaplugin"; //$NON-NLS-1$
+	public static final String[] PLUGIN_EXTENSIONS = new String[] { "jar", "zip" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private List<AfirmaPlugin> pluginsLoadedList = null;
 
@@ -53,8 +54,9 @@ public class PluginsManager {
 	}
 
 	/**
-	 * Obtiene el listado con la informacion de los plugins actualmente cargados.
-	 * @return Informaci&oacute;n de los plugins.
+	 * Obtiene el listado con la informacion de los plugins instalados y cargados.
+	 * Si los plugins no estan cargados en memoria, lo hace.
+	 * @return Listado de plugins.
 	 * @throws PluginException Cuando no se han podido cargar los plugins.
 	 */
 	public List<AfirmaPlugin> getPluginsLoadedList() throws PluginException {
@@ -69,7 +71,7 @@ public class PluginsManager {
 		return tempList;
 	}
 
-	private List<AfirmaPlugin> loadPlugins() throws PluginException {
+	private static List<AfirmaPlugin> loadPlugins() throws PluginException {
 
 		final List<AfirmaPlugin> list = new ArrayList<>();
 
@@ -94,7 +96,7 @@ public class PluginsManager {
 			}
 
 			try {
-				savePluginsList(relationFile, list.toArray(new AfirmaPlugin[list.size()]));
+				savePluginsList(relationFile, list);
 			} catch (final IOException e) {
 				throw new PluginException("No se pudo guardar la lista de plugins cargados", e); //$NON-NLS-1$
 			}
@@ -139,16 +141,16 @@ public class PluginsManager {
 		return list.toArray(new MinimalPluginInfo[list.size()]);
 	}
 
-	private AfirmaPlugin loadPlugin(final MinimalPluginInfo info) throws PluginException {
+	private static AfirmaPlugin loadPlugin(final MinimalPluginInfo info) throws PluginException {
 
 		final File pluginDir = new File(getPluginsDir(), info.getInternalName());
 		if (!pluginDir.isDirectory()) {
-			throw new PluginException("No se ha encontrado el plugin " + pluginDir.getName());
+			throw new PluginException("No se ha encontrado el plugin " + pluginDir.getName()); //$NON-NLS-1$
 		}
 
 		final File pluginFile = new File(pluginDir, getPluginFilename(info));
 		if (!pluginFile.isFile() || !pluginFile.canRead()) {
-			throw new PluginException("No se ha encontrado el fichero de plugin " + pluginFile.getName());
+			throw new PluginException("No se ha encontrado el fichero de plugin " + pluginFile.getName()); //$NON-NLS-1$
 		}
 
 		return checkPlugin(pluginFile);
@@ -176,14 +178,6 @@ public class PluginsManager {
 	}
 
 	/**
-	 * Recupera el listado de plugins cargado.
-	 * @return Listado con la informaci&oacute;n de los plugins.
-	 */
-	public static List<PluginInfo> getPluginsInfo() {
-		return new ArrayList<>();
-	}
-
-	/**
 	 * Comprueba que un fichero se corresponda con un plugin compatible.
 	 * @param file Fichero de plugin a evaluar.
 	 * @return Plugins cargados desde los archivos indicados o {@code null} si no
@@ -203,8 +197,8 @@ public class PluginsManager {
 			LOGGER.log(Level.SEVERE, "Error en la carga de un conjunto de ficheros de plugin", e); //$NON-NLS-1$
 			return null;
 		} catch (final PluginException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "El plugin importado no es valido", e); //$NON-NLS-1$
+			return null;
 		}
 
 		return plugin;
@@ -213,14 +207,16 @@ public class PluginsManager {
 	/**
 	 * Importa un plugin al directorio de plugins de la aplicaci&oacute;n.
 	 * @param pluginFile Archivo con el plugin.
-	 * @param info Informaci&oacute;n del plugin.
+	 * @param plugin Plugin a instalar.
 	 * @return Copia del fichero con el plugin ya en el directorio de instalaci&oacute;.
 	 * @throws PluginInstalledException Cuando el plugin ya se encontraba instalado.
 	 * @throws PluginException Cuando ocurre un error en la instalaci&oacute;n del plugin.
 	 * @throws IOException Cuando ocurre un error en la carga del fichero o creaci&oacute;n
 	 * del directorio de plugins.
+	 * @throws PluginControlledException Cuando se produce un error en la instalaci&oacute;n
+	 * emitido por el propio plugin.
 	 */
-	public File installPlugin(File pluginFile, MinimalPluginInfo info) throws PluginInstalledException, PluginException, IOException {
+	public File installPlugin(File pluginFile, AfirmaPlugin plugin) throws PluginInstalledException, PluginException, IOException, PluginControlledException {
 
 		final File pluginsDir = getPluginsDir();
 		if (!pluginsDir.isDirectory()) {
@@ -229,18 +225,42 @@ public class PluginsManager {
 			}
 		}
 
-		final File pluginDir = new File(pluginsDir, info.getInternalName());
+		final File pluginDir = new File(pluginsDir, plugin.getInfo().getInternalName());
 		if (pluginDir.exists()) {
 			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$
 		}
 		pluginDir.mkdir();
 
-		final File outPluginFile = new File(pluginDir, getPluginFilename(info));
+		final File outPluginFile = new File(pluginDir, getPluginFilename(plugin.getInfo()));
 		try (OutputStream fos = new FileOutputStream(outPluginFile)) {
 			Files.copy(pluginFile.toPath(), fos);
 		}
 
-		addPluginToRelationsFile(info);
+		try {
+			plugin.install();
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Ocurrio un error al instalar el plugin. Lo desinstalamos", e); //$NON-NLS-1$
+			try {
+				uninstallPlugin(plugin);
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se han podido eliminar los ficheros importados del plugin"); //$NON-NLS-1$
+			}
+			if (e instanceof PluginControlledException) {
+				throw (PluginControlledException) e;
+			}
+			throw new PluginException("Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
+		}
+
+		// Agregamos el plugin a la lista de plugins instalados
+		addPluginToRelationsFile(plugin.getInfo());
+
+		// Agregamos el plugin a la lista de plugins cargados
+		if (this.pluginsLoadedList == null) {
+			this.pluginsLoadedList = new ArrayList<>();
+		}
+		this.pluginsLoadedList.add(plugin);
 
 		return outPluginFile;
 	}
@@ -271,35 +291,40 @@ public class PluginsManager {
 
 	/**
 	 * Elimina de memoria y borra del directorio de plugins un plugins concreto.
-	 * @param info Informaci&oacute;n del plugin a eliminar.
+	 * @param plugin Informaci&oacute;n del plugin a eliminar.
 	 * @throws IOException Cuando no se puede eliminar el plugin.
 	 */
-	public void uninstallPlugin(PluginInfo info) throws IOException {
+	public void uninstallPlugin(AfirmaPlugin plugin) throws IOException {
+
+		// Ejecutamos el proceso de desinstalacion
+		try {
+			plugin.uninstall();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "El proceso de desinstalacion interno del plugin devolvio un error", e); //$NON-NLS-1$
+		}
 
 		// Descargamos el plugin de memoria
-		unloadPlugin(info);
+		((URLClassLoader) plugin.getClass().getClassLoader()).close();
+		this.pluginsLoadedList.remove(plugin);
 
 		// Identificamos el directorio del plugin y lo eliminamos
 		final File pluginsDir = getPluginsDir();
 		if (!pluginsDir.isDirectory()) {
-			LOGGER.info("No existe el directorio de plugins, asi que no deberia haber ninguno instalado"); //$NON-NLS-1$
+			LOGGER.warning("No existe el directorio de plugins, asi que no deberia haber ninguno instalado"); //$NON-NLS-1$
 			return;
 		}
 
-		final File pluginDir = new File(pluginsDir, info.getInternalName());
+		final File pluginDir = new File(pluginsDir, plugin.getInfo().getInternalName());
 		if (!pluginDir.exists()) {
-			LOGGER.info("El plugin seleccionado, no se encuentra instalado"); //$NON-NLS-1$
+			LOGGER.warning("El plugin seleccionado, no se encuentra instalado"); //$NON-NLS-1$
 			return;
 		}
 
 		deleteDirectory(pluginDir);
 
-		savePluginsList(, this.pluginsLoadedList);
-	}
+		final File relationFile = new File(pluginsDir, PLUGIN_RELATION_FILENAME);
 
-	private static void unloadPlugin(PluginInfo pluginInfo) {
-		// TODO Auto-generated method stub
-
+		savePluginsList(relationFile, this.pluginsLoadedList);
 	}
 
 	/**

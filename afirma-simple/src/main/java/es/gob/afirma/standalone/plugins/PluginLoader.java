@@ -2,6 +2,7 @@ package es.gob.afirma.standalone.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import java.util.ServiceLoader;
  * aplicaci&oacute;n (comportamiento por defecto del ClassLoader).
  */
 public class PluginLoader {
+
+	private static final String CONFIG_FILE = "/plugin.json"; //$NON-NLS-1$
 
 	/**
 	 * Carga la colecci&oacute;n de JARs de un plugin y devuelve un objeto
@@ -36,7 +39,7 @@ public class PluginLoader {
 		for (final File jar : jars) {
 			urls.add(jar.toURI().toURL());
 		}
-		final URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), PluginLoader.class.getClassLoader());
+		final ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), PluginLoader.class.getClassLoader());
 
 		// Cargamos las clases de plugin
 		final List<AfirmaPlugin> plugins = new ArrayList<>();
@@ -46,13 +49,40 @@ public class PluginLoader {
 		}
 
 		if (plugins.size() == 0) {
-			throw new PluginException("No se encontro ningun plugin en los archivos");
+			throw new PluginException("No se encontro ningun plugin en los archivos"); //$NON-NLS-1$
 		}
 
 		if (plugins.size() > 1) {
-			throw new PluginException("No se permite la carga simulatea de varios plugins");
+			throw new PluginException("No se permite la carga simulatea de varios plugins"); //$NON-NLS-1$
 		}
 
-		return plugins.get(0);
+		final AfirmaPlugin plugin = plugins.get(0);
+		loadPluginConfiguration(plugin);
+
+		return plugin;
+	}
+
+	/**
+	 * Carga la configuracion del plugin.
+	 * @param plugin Plugin del que cargar la configuraci&oacute;n.
+	 * @throws IOException Cuando se produce alg&uacute;n error en la lectura del plugin.
+	 * @throws PluginException Cuando se encuentra un error en el fichero de
+	 * configuraci&oacute;n del plugin.
+	 */
+	private static void loadPluginConfiguration(AfirmaPlugin plugin) throws IOException, PluginException {
+		final String classPackage = plugin.getClass().getPackage().getName();
+		final String infoResource = '/' + classPackage.replace('.', '/') + CONFIG_FILE;
+
+		try (InputStream is = plugin.getClass().getResourceAsStream(infoResource)) {
+				if (is == null) {
+					throw new IOException(String.format("No se encontro el fichero %1s en el plugin", infoResource)); //$NON-NLS-1$
+				}
+				plugin.setInfo(PluginInfoLoader.parseInfo(is));
+		} catch (final IOException e) {
+			throw new IOException("Error en la lectura del fichero " + CONFIG_FILE, e); //$NON-NLS-1$
+
+		} catch (final Exception e) {
+			throw new PluginException("Se ha encontrado un error en el fichero " + CONFIG_FILE, e); //$NON-NLS-1$
+		}
 	}
 }

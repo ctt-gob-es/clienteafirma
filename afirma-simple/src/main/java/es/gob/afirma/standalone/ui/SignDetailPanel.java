@@ -10,6 +10,8 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,30 +21,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import es.gob.afirma.cert.signvalidation.SignValidity;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 
 /** Panel con detalles de una firma electr&oacute;nica. */
-public final class SignDetailPanel extends JPanel {
+public final class SignDetailPanel extends JPanel implements PluginButtonsContainer {
 
     /** Serial ID. */
     private static final long serialVersionUID = 7567869419737753210L;
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Referencia a la aplicaci&oacute;n de firma. */
     private final SimpleAfirma saf;
 
     /** Bot&oacute;n para volver a la pantalla anterior. */
     private final JButton returnButton = new JButton();
+
+    JPanel mainPluginsButtonsPanel = null;
+    JPanel pluginButtonsPanel = null;
 
     /** Construye el panel para mostrar el detalle de una firma electr&oacute;nica.
      * @param saf Referencia a la misma aplicaci&oacute;n
@@ -81,10 +92,10 @@ public final class SignDetailPanel extends JPanel {
         if (sig == null && sigPath != null) {
             final File signFile = new File(sigPath);
             if (!signFile.exists()) {
-                Logger.getLogger("es.gob.afirma").severe("La ruta de firma proporcionada no corresponde a ningun fichero");  //$NON-NLS-1$ //$NON-NLS-2$
+            	LOGGER.severe("La ruta de firma proporcionada no corresponde a ningun fichero");  //$NON-NLS-1$
             }
             else if (!signFile.canRead()) {
-                Logger.getLogger("es.gob.afirma").severe("No se tienen permisos de lectura del fichero indicado");  //$NON-NLS-1$//$NON-NLS-2$
+                LOGGER.severe("No se tienen permisos de lectura del fichero indicado");  //$NON-NLS-1$
             }
             else {
                 try (
@@ -94,7 +105,7 @@ public final class SignDetailPanel extends JPanel {
                     sig = AOUtil.getDataFromInputStream(bis);
                 }
                 catch (final IOException e) {
-                    Logger.getLogger("es.gob.afirma").severe("No se ha podido leer el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    LOGGER.severe("No se ha podido leer el fichero de firma: " + e); //$NON-NLS-1$
                 }
             }
         }
@@ -117,21 +128,31 @@ public final class SignDetailPanel extends JPanel {
             returnPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
+        // Agregamos un panel adicional en el que se mostraran los botones de los plugins
+        this.mainPluginsButtonsPanel = buildMainPluginsButtonsPanel();
+
+        // Agregamos al panel principal los componentes creados
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
+        c.gridy = 0;
         c.insets = new Insets(11, 11, 11, 11);
         add(infoPanel, c);
         c.weighty = 1.0;
-        c.gridy = 1;
+        c.gridy++;
         c.insets = new Insets(0, 11, 11, 11);
         add(componentPanel, c);
         c.weighty = 0.0;
-        c.gridy = 2;
+        c.gridy++;
         c.insets = new Insets(0, 11, 11, 11);
         add(returnPanel, c);
+        c.gridy++;
+        add(this.mainPluginsButtonsPanel, c);
+
+        refreshPluginButtonsContainer();
+
         this.returnButton.requestFocusInWindow();
     }
 
@@ -139,4 +160,50 @@ public final class SignDetailPanel extends JPanel {
     void goToBack() {
         this.saf.loadMainApp();
     }
+
+    /**
+	 * Construye el panel en el que se mostraran los botones propios de los plugins instalados.
+	 * @return Panel para los botones de los plugins.
+	 */
+	private JPanel buildMainPluginsButtonsPanel() {
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
+
+		this.pluginButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+    	c.weightx = 1.0;
+    	c.gridy = 0;
+    	mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), c);
+    	c.gridy++;
+    	mainPanel.add(this.pluginButtonsPanel, c);
+
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    	}
+
+    	return mainPanel;
+	}
+
+	@Override
+	public void refreshPluginButtonsContainer() {
+		final List<JButton> pluginsButtons = PluginsUiComponentsBuilder.getPluginsButtons(
+    			PluginIntegrationWindow.POSTPROCESS);
+    	EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+		        if (pluginsButtons == null || pluginsButtons.isEmpty()) {
+		        	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		        }
+		        else {
+		        	SignDetailPanel.this.pluginButtonsPanel.removeAll();
+		        	for (final JButton button : pluginsButtons) {
+		        		SignDetailPanel.this.pluginButtonsPanel.add(button);
+		        	}
+		        	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		        }
+			}
+		});
+	}
 }

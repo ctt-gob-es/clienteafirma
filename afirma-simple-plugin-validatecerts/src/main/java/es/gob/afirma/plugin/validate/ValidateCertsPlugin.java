@@ -1,7 +1,11 @@
 package es.gob.afirma.plugin.validate;
 
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.logging.Logger;
+
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
-import es.gob.afirma.standalone.plugins.PluginInfo;
+import es.gob.afirma.standalone.plugins.PluginControlledException;
 
 /**
  * Plugin para permitir la validaci&oacute;n de certificados.
@@ -12,15 +16,22 @@ public class ValidateCertsPlugin extends AfirmaPlugin {
 	private static final int VERSION_CODE = 1;
 
 	@Override
-	public PluginInfo getInfo() {
+	public byte[] preSignProcess(byte[] data, String format) throws PluginControlledException {
+		final String log = " ============= PREPROCESAMOS LOS DATOS =================\n" +
+				"Formato: " + format;
+		Logger.getLogger("es.gob.afirma").info(log);
 
-		final PluginInfo info = new PluginInfo(INTERNAL_NAME, Messages.getString("ValidateCertsInfo.0")); //$NON-NLS-1$
-		info.setDescription(Messages.getString("ValidateCertsInfo.1")); //$NON-NLS-1$
-		info.setVersionCode(VERSION_CODE);
-		info.setVersion(Messages.getString("ValidateCertsInfo.2")); //$NON-NLS-1$
-		info.setAuthors(new String[] {Messages.getString("ValidateCertsInfo.3")}); //$NON-NLS-1$
+		return super.preSignProcess(data, format);
+	}
 
-		return info;
+	@Override
+	public byte[] postSignProcess(byte[] signature, String format, Certificate[] cert) throws PluginControlledException {
+		final String log = " ============= POSTPROCESAMOS LA FIRMA =================\n" +
+		"Formato: " + format + "\n" +
+		"Certificado: " + ((X509Certificate) cert[0]).getSubjectDN();
+		Logger.getLogger("es.gob.afirma").info(log);
+
+		return super.postSignProcess(signature, format, cert);
 	}
 
 }

@@ -20,9 +20,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -50,10 +52,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -68,11 +73,12 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class SignPanel extends JPanel {
+public final class SignPanel extends JPanel implements PluginButtonsContainer {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -94,6 +100,12 @@ public final class SignPanel extends JPanel {
     	return this.signer;
     }
 
+    private String signatureFormat;
+
+    String getSignatureFormat() {
+		return this.signatureFormat;
+	}
+
     private byte[] dataToSign = null;
 
     byte[] getDataToSign() {
@@ -111,6 +123,9 @@ public final class SignPanel extends JPanel {
     }
 
     private JPanel lowerPanel;
+
+    JPanel mainPluginsButtonsPanel = null;
+    JPanel pluginButtonsPanel = null;
 
     private DropTarget dropTarget;
 
@@ -155,6 +170,17 @@ public final class SignPanel extends JPanel {
     	return this.currentFile != null ?
 			AutoFirmaUtil.getCanonicalFile(this.currentFile) :
 				null;
+    }
+
+    /** Construye el panel de firma, en el que se selecciona y se firma un fichero.
+     * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
+     * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
+     *        realizar las firmas y cambiar de panel al finalizar una firma. */
+    public SignPanel(final JFrame win, final SimpleAfirma sa) {
+        super(true);
+        this.window = win;
+        this.saf = sa;
+        createUI();
     }
 
     /** Carga el fichero a firmar.
@@ -226,6 +252,7 @@ public final class SignPanel extends JPanel {
         	this.signer = AOSignerFactory.getSigner(
         		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
     		);
+        	this.signatureFormat = AOSignConstants.SIGN_FORMAT_PADES;
         }
         // Comprobamos si es una factura electronica
         else if (DataAnalizerUtil.isFacturae(data)) {
@@ -242,6 +269,7 @@ public final class SignPanel extends JPanel {
         	this.signer = AOSignerFactory.getSigner(
             		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE)
         		);
+        	this.signatureFormat = AOSignConstants.SIGN_FORMAT_FACTURAE;
         }
         // Comprobamos si es un OOXML
         else if (DataAnalizerUtil.isOOXML(data)) {
@@ -249,6 +277,7 @@ public final class SignPanel extends JPanel {
         	this.signer = AOSignerFactory.getSigner(
 	    		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML)
     		);
+        	this.signatureFormat = AOSignConstants.SIGN_FORMAT_OOXML;
         }
         // Comprobamos si es un ODF
         else if (DataAnalizerUtil.isODF(data)) {
@@ -256,14 +285,18 @@ public final class SignPanel extends JPanel {
         	this.signer = AOSignerFactory.getSigner(
 	    		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF)
     		);
+        	this.signatureFormat = AOSignConstants.SIGN_FORMAT_ODF;
         }
-        // Comprobamos si es un fichero de firma CAdES o XAdES (los PDF, facturas, OOXML y ODF pasaran por las condiciones anteriores)
+        // Comprobamos si es un fichero de firma CAdES o XAdES (los PDF, facturas,
+        // OOXML y ODF pasaran por las condiciones anteriores)
         else if ((this.signer = AOSignerFactory.getSigner(data)) != null) {
         	if (this.signer instanceof AOXAdESSigner) {
         		signPanelFileType = SignPanelFileType.SIGN_XADES;
+        		this.signatureFormat = AOSignConstants.SIGN_FORMAT_XADES;
         	}
         	else {
         		signPanelFileType = SignPanelFileType.SIGN_CADES;
+        		this.signatureFormat = AOSignConstants.SIGN_FORMAT_CADES;
         	}
             this.cosign = true;
         }
@@ -273,6 +306,7 @@ public final class SignPanel extends JPanel {
         	this.signer = AOSignerFactory.getSigner(
         		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML)
     		);
+        	this.signatureFormat = AOSignConstants.SIGN_FORMAT_XADES;
         }
         // Cualquier otro tipo de fichero
         else {
@@ -280,6 +314,7 @@ public final class SignPanel extends JPanel {
             this.signer = AOSignerFactory.getSigner(
 	    		PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN)
     		);
+            this.signatureFormat = AOSignConstants.SIGN_FORMAT_CADES;
         }
 
         final String signatureName = getSignatureName(this.signer);
@@ -348,10 +383,28 @@ public final class SignPanel extends JPanel {
             setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
-        setLayout(new GridLayout(2, 1));
-        this.add(new UpperPanel());
+        setLayout(new GridBagLayout());
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
+        this.add(new UpperPanel(), c);
+
         this.lowerPanel = new LowerPanel();
-        this.add(this.lowerPanel);
+        c.weighty = 1.0;
+        c.gridy++;
+        this.add(this.lowerPanel, c);
+
+        // Agregamos un panel adicional en el que se mostraran los botones de los plugins.
+        // Este panel permanecera oculto si no hay botones
+        this.mainPluginsButtonsPanel = buildMainPluginsButtonsPanel();
+        c.weighty = 0.0;
+        c.gridy++;
+        this.add(this.mainPluginsButtonsPanel, c);
+
+        refreshPluginButtonsContainer();
+
         this.dropTarget = new DropTarget(this.filePanel, DnDConstants.ACTION_COPY, new DropTargetListener() {
 
             @Override
@@ -453,16 +506,32 @@ public final class SignPanel extends JPanel {
         }
     }
 
-    /** Construye el panel de firma, en el que se selecciona y se firma un fichero.
-     * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
-     * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
-     *        realizar las firmas y cambiar de panel al finalizar una firma. */
-    public SignPanel(final JFrame win, final SimpleAfirma sa) {
-        super(true);
-        this.window = win;
-        this.saf = sa;
-        createUI();
-    }
+	/**
+	 * Construye el panel en el que se mostraran los botones propios de los plugins instalados.
+	 * @return Panel para los botones de los plugins.
+	 */
+	private JPanel buildMainPluginsButtonsPanel() {
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
+
+		this.pluginButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+    	c.weightx = 1.0;
+    	c.gridy = 0;
+    	mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), c);
+    	c.gridy++;
+    	mainPanel.add(this.pluginButtonsPanel, c);
+
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    	}
+
+    	return mainPanel;
+	}
+
+
 
     private final class UpperPanel extends JPanel {
 
@@ -578,6 +647,7 @@ public final class SignPanel extends JPanel {
         }
 
         void createUI() {
+
             setLayout(new BorderLayout(5, 5));
             setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
@@ -673,4 +743,25 @@ public final class SignPanel extends JPanel {
     	return null;
     }
 
+    @Override
+    public void refreshPluginButtonsContainer() {
+
+    	final List<JButton> pluginsButtons = PluginsUiComponentsBuilder.getPluginsButtons(
+    			PluginIntegrationWindow.PREPROCESS);
+    	EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+		        if (pluginsButtons == null || pluginsButtons.isEmpty()) {
+		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		        }
+		        else {
+		        	SignPanel.this.pluginButtonsPanel.removeAll();
+		        	for (final JButton button : pluginsButtons) {
+		        		SignPanel.this.pluginButtonsPanel.add(button);
+		        	}
+		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		        }
+			}
+		});
+    }
 }
