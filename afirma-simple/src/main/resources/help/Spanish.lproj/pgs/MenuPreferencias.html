@@ -38,25 +38,40 @@
    <li><b>Opciones de firma:</b>
     <ul>
      <li><b>Algoritmo de firma:</b> Algoritmo de firma por defecto que utiliza la aplicaci&oacute;n para generar las firmas electr&oacute;nicas.</li>
-     <li><b>Formatos de firma por defecto:</b> Configura que formato de firma debe aplicarse cuando se proporciona determinado tipo de documento. Los tipos de documento son:
+     <li><b>Formatos de firma:</b> Configura qu&eacute; formato de firma debe aplicarse cuando se proporciona determinado tipo de documento. Al pulsar el bot&oacute;n
+     "Configurar formatos" se muestra un di&uacute;logo con Los tipos de documento para los que se puede configurar un formato de firma espec&iacute;fico:
       <ul>
        <li>Documentos PDF</li>
        <li>Documentos OOXML de Microsoft Office</li>
        <li>Facturas electrónicas</li>
-       <li>Ficheros XML genéricos</li>
+       <li>Ficheros XML gen&eacute;ricos</li>
        <li>Ficheros ODF de LibreOffice u OpenOffice</li>
-       <li>Ficheros binarios gen&eacute;ricos</li>
+       <li>Resto de ficheros</li>
       </ul>
       <p>Cualquiera de estos tipos de fichero pueden firmarse con los formatos CAdES y XAdES (acordes a la
       configuraci&oacute;n establecida en las pesta&ntilde;as correspondientes) y algunos de ellos pueden ser
       firmados en formatos espec&iacute;ficos.<br>
-      El tipo de documento "Ficheros binarios gen&eacute;ricos" hace referencia a cualquier documento que no
+      El tipo de documento "Resto de ficheros" hace referencia a cualquier documento que no
       est&eacute; en cualquiera de las categor&iacute;as anteriores.
 	  </p>
 	  <p><b><u>ADVERTENCIA:</u></b> No se recomienda que se modifique que las facturas electr&oacute;nicas se
       firmen en un formato distinto al de factura electr&oacute;nica.
       </p>
      </li>
+     <li><b>Firma masiva:</b>
+      <ul>
+       <li><b>Sobreescribir ficheros en el directorio de salida:</b> Opci&oacute;n para configurar si se desea
+       que, al generar la estructura de directorios de firmas resultante de un proceso de firma masiva, y en caso
+       de encontrar un fichero con el mismo nombre con el que se va a guardar una firma, se sobreescriba el
+       fichero preexistente por el nuevo fichero de firma o se guarde la firma utilizando un nuevo nombre.</li>
+     </ul>
+    </li>
+    </ul>
+   </li>
+   <li><b>Configuraci&oacute;n de red:</b>
+    <ul>
+     <li><b>Configurar proxy:</b> Opci&oacute;o para configurar el proxy para todas las conexiones de red de
+     AutoFirma.</li>
     </ul>
    </li>
   </ul>

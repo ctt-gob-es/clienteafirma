@@ -9,11 +9,14 @@
 
 package es.gob.afirma.core.misc;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.zip.ZipFile;
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
  * identificadores de tipo de contenido. */
@@ -282,7 +285,8 @@ public final class MimeHelper {
     /**
      * Indica si unos datos son un fichero ZIP, independientemente de que ese ZIP se
      * corresponda con otro formato basado en el mismo (como los ficheros DOCX, ODT,...).
-     * @return {@code true} si los datos son un ZIP, {@code false} en caso contrario.
+     * @return {@code true} si los datos son un ZIP, {@code false} en caso de que no
+     * sean un ZIP o que no se puedan analizar.
      */
     public boolean isZipData() {
 
@@ -292,14 +296,25 @@ public final class MimeHelper {
     	}
 
     	// Si no tenemos el analisis de JMimeMagic, intentamos cargarlo como ZIP
+    	boolean isZip = true;
+    	File dataFile = null;
     	try {
-    		AOFileUtils.createTempZipFile(this.data);
+    		dataFile = AOFileUtils.createTempFile(this.data);
+    		new ZipFile(dataFile).close();
     	}
     	catch (final Exception e) {
-    		return false;
+    		isZip = false;
 		}
 
-    	return true;
+    	if (dataFile != null) {
+			try {
+				Files.delete(dataFile.toPath());
+			} catch (final IOException e) {
+				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
+			}
+		}
+
+    	return isZip;
     }
 
     /** Almacena la informaci&oacute;n identificada del tipo de datos. */

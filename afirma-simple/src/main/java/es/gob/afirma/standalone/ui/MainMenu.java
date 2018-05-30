@@ -138,7 +138,7 @@ public final class MainMenu extends JMenuBar {
 						null,
 						null,
 						false,
-						false,
+						true,
 						AutoFirmaUtil.getDefaultDialogsIcon(),
 						MainMenu.this
 					)[0];
@@ -401,10 +401,6 @@ public final class MainMenu extends JMenuBar {
         if (this.firmarMenuItem != null) {
             this.firmarMenuItem.setEnabled(en);
         }
-    }
-
-    void showPreferences(final EventObject event) {
-    	showPreferences();
     }
 
     void showPreferences() {

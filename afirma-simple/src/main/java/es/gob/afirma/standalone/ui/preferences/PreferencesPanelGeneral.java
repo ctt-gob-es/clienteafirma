@@ -9,18 +9,14 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_XML;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -46,7 +42,6 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.ProxyUtil;
@@ -68,20 +63,6 @@ final class PreferencesPanelGeneral extends JPanel {
 
 	private final JComboBox<String> signarureAlgorithms = new JComboBox<>();
 
-	private static final String XADES = AOSignConstants.SIGN_FORMAT_XADES;
-	private static final String CADES = AOSignConstants.SIGN_FORMAT_CADES;
-	private static final String PADES = AOSignConstants.SIGN_FORMAT_PADES;
-	private static final String OOXML = AOSignConstants.SIGN_FORMAT_OOXML;
-	private static final String FACTURAE = AOSignConstants.SIGN_FORMAT_FACTURAE;
-	private static final String ODF = AOSignConstants.SIGN_FORMAT_ODF;
-
-	private final JComboBox<String> pdfFilesCombo = new JComboBox<>(new String[] { PADES, CADES, XADES });
-	private final JComboBox<String> ooxmlFilesCombo = new JComboBox<>(new String[] { OOXML, CADES, XADES });
-	private final JComboBox<String> facturaeFilesCombo = new JComboBox<>(new String[] { FACTURAE, XADES, CADES });
-	private final JComboBox<String> xmlFilesCombo = new JComboBox<>(new String[] { XADES, CADES });
-	private final JComboBox<String> binFilesCombo = new JComboBox<>(new String[] { CADES, XADES });
-	private final JComboBox<String> odfFilesCombo = new JComboBox<>(new String[] { ODF, CADES, XADES });
-
 	private final JCheckBox avoidAskForClose = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.36")); //$NON-NLS-1$
 
 	private final JCheckBox hideDniStartScreen = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.81")); //$NON-NLS-1$
@@ -89,6 +70,8 @@ final class PreferencesPanelGeneral extends JPanel {
 	private final JCheckBox checkForUpdates = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.87")); //$NON-NLS-1$
 
 	private final JCheckBox sendAnalytics = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.89")); //$NON-NLS-1$
+
+	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 
 	private final DisposableInterface disposableInterface;
 	DisposableInterface getDisposableInterface() {
@@ -120,14 +103,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			PreferencesManager.putBoolean(PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		}
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
-
-		// Formatos por defecto
-		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, this.binFilesCombo.getSelectedItem().toString());
-		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE, this.facturaeFilesCombo.getSelectedItem().toString());
-		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML, this.ooxmlFilesCombo.getSelectedItem().toString());
-		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, this.pdfFilesCombo.getSelectedItem().toString());
-		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, this.xmlFilesCombo.getSelectedItem().toString());
-		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, this.odfFilesCombo.getSelectedItem().toString());
+		PreferencesManager.putBoolean(PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
 	}
 
 	void loadPreferences() {
@@ -159,13 +135,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS));
 		}
 
-		// Formatos por defecto
-		this.pdfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF));
-		this.ooxmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML));
-		this.facturaeFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE));
-		this.odfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF));
-		this.xmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML));
-		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN));
+		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
 	}
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
@@ -400,10 +370,50 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		signGeneralPanel.add(signatureAgorithmPanel, c);
 
-		final JPanel signatureDefaultsFormats = createSignatureFormatPanel(
-			modificationListener,
-			keyListener
+		final JPanel signatureDefaultsFormats = new JPanel(fLayout);
+		signatureDefaultsFormats.setBorder(
+			BorderFactory.createTitledBorder(
+				BorderFactory.createEmptyBorder(),
+				SimpleAfirmaMessages.getString("PreferencesPanel.39") //$NON-NLS-1$
+			)
 		);
+
+		final JLabel configureFormatsLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.161")); //$NON-NLS-1$
+		final JButton configureFormatsButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.162")); //$NON-NLS-1$
+		configureFormatsButton.setMnemonic('o');
+		configureFormatsButton.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.163") //$NON-NLS-1$
+		);
+		configureFormatsButton.addActionListener(
+				ae -> openFormatsDlg(getParent(), isBlocked())
+			);
+		signatureDefaultsFormats.add(configureFormatsLabel);
+		signatureDefaultsFormats.add(configureFormatsButton);
+
+		c.gridy++;
+		signGeneralPanel.add(signatureDefaultsFormats, c);
+
+		final JPanel massiveSignaturePanel = new JPanel(fLayout);
+		massiveSignaturePanel.setBorder(
+			BorderFactory.createTitledBorder(
+				BorderFactory.createEmptyBorder(),
+				SimpleAfirmaMessages.getString("PreferencesPanel.159") //$NON-NLS-1$
+			)
+		);
+
+		this.massiveOverwrite.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.160") //$NON-NLS-1$
+				);
+		this.massiveOverwrite.setMnemonic('S');
+		this.massiveOverwrite.addItemListener(modificationListener);
+		this.massiveOverwrite.addKeyListener(keyListener);
+
+		massiveSignaturePanel.add(this.massiveOverwrite);
+
+		c.gridy++;
+		signGeneralPanel.add(massiveSignaturePanel, c);
+
+
 
 		final JPanel netConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		netConfigPanel.setBorder(
@@ -416,7 +426,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanel.126") //$NON-NLS-1$
 		);
 
-		proxyConfigButton.setMnemonic('P');
+		proxyConfigButton.setMnemonic('y');
 		proxyConfigButton.addActionListener(
 			ae -> changeProxyDlg(getParent())
 		);
@@ -430,8 +440,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		netConfigPanel.add(proxyLabel);
 		netConfigPanel.add(proxyConfigButton);
 
-		c.gridy++;
-		signGeneralPanel.add(signatureDefaultsFormats, c);
+
 		gbc.gridy++;
 		add(signGeneralPanel, gbc);
 		gbc.gridy++;
@@ -441,119 +450,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		add(new JPanel(), gbc);
 
 		loadPreferences();
-	}
-
-	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
-	 * @param modificationListener Listener para la detecci&oacute;n de cambio de configuraci&oacute;n.
-	 * @param keyListener Listener para la detecci&oacute;n del uso de teclas para el cierre de la pantalla.
-	 * @return Panel con los componentes de configuraci&oacute;n. */
-	private JPanel createSignatureFormatPanel(final ItemListener modificationListener,
-		 	                                  final KeyListener keyListener) {
-
-		final JPanel signatureDefaultsFormats = new JPanel(new GridBagLayout());
-		signatureDefaultsFormats.setBorder(
-			BorderFactory.createTitledBorder(
-				BorderFactory.createEmptyBorder(),
-				SimpleAfirmaMessages.getString("PreferencesPanel.39") //$NON-NLS-1$
-			)
-		);
-
-		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.insets = new Insets(5, 7, 0, 7);
-
-		// PDF
-		final JLabel pdfFilesLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.74")); //$NON-NLS-1$
-		pdfFilesLabel.setLabelFor(this.pdfFilesCombo);
-		this.pdfFilesCombo.addItemListener(modificationListener);
-		this.pdfFilesCombo.addKeyListener(keyListener);
-		this.pdfFilesCombo.setEnabled(!isBlocked());
-		c.gridx = 0;
-		c.weightx = 0;
-		signatureDefaultsFormats.add(pdfFilesLabel, c);
-		c.gridx = 1;
-		c.weightx = 1.0;
-		signatureDefaultsFormats.add(this.pdfFilesCombo, c);
-		c.gridy++;
-
-		// OOXML
-		final JLabel ooxmlFilesLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.75")); //$NON-NLS-1$
-		ooxmlFilesLabel.setLabelFor(this.ooxmlFilesCombo);
-		this.ooxmlFilesCombo.addItemListener(modificationListener);
-		this.ooxmlFilesCombo.addKeyListener(keyListener);
-		this.ooxmlFilesCombo.setEnabled(!isBlocked());
-
-		c.gridx = 0;
-		c.weightx = 0;
-		signatureDefaultsFormats.add(ooxmlFilesLabel, c);
-		c.gridx = 1;
-		c.weightx = 1.0;
-		signatureDefaultsFormats.add(this.ooxmlFilesCombo, c);
-		c.gridy++;
-
-		// FACTURAE
-		final JLabel facturaeFilesLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.76")); //$NON-NLS-1$
-		facturaeFilesLabel.setLabelFor(this.facturaeFilesCombo);
-		this.facturaeFilesCombo.addItemListener(modificationListener);
-		this.facturaeFilesCombo.addKeyListener(keyListener);
-		this.facturaeFilesCombo.setEnabled(!isBlocked());
-
-		c.gridx = 0;
-		c.weightx = 0;
-		signatureDefaultsFormats.add(facturaeFilesLabel, c);
-		c.gridx = 1;
-		c.weightx = 1.0;
-		signatureDefaultsFormats.add(this.facturaeFilesCombo, c);
-		c.gridy++;
-
-		// XML
-		final JLabel xmlFilesLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.77")); //$NON-NLS-1$
-		xmlFilesLabel.setLabelFor(this.xmlFilesCombo);
-		this.xmlFilesCombo.addItemListener(modificationListener);
-		this.xmlFilesCombo.addKeyListener(keyListener);
-		this.xmlFilesCombo.setEnabled(!isBlocked());
-
-		c.gridx = 0;
-		c.weightx = 0;
-		signatureDefaultsFormats.add(xmlFilesLabel, c);
-		c.gridx = 1;
-		c.weightx = 1.0;
-		signatureDefaultsFormats.add(this.xmlFilesCombo, c);
-		c.gridy++;
-
-		// ODF
-		final JLabel odfFilesLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.83")); //$NON-NLS-1$
-		odfFilesLabel.setLabelFor(this.odfFilesCombo);
-		this.odfFilesCombo.addItemListener(modificationListener);
-		this.odfFilesCombo.addKeyListener(keyListener);
-		this.odfFilesCombo.setEnabled(!isBlocked());
-
-		c.gridx = 0;
-		c.weightx = 0;
-		signatureDefaultsFormats.add(odfFilesLabel, c);
-		c.gridx = 1;
-		c.weightx = 1.0;
-		signatureDefaultsFormats.add(this.odfFilesCombo, c);
-		c.gridy++;
-
-		// BIN
-		final JLabel binFilesLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.78")); //$NON-NLS-1$
-		binFilesLabel.setLabelFor(this.binFilesCombo);
-		this.binFilesCombo.addItemListener(modificationListener);
-		this.binFilesCombo.addKeyListener(keyListener);
-		this.binFilesCombo.setEnabled(!isBlocked());
-
-		c.gridx = 0;
-		c.weightx = 0;
-		signatureDefaultsFormats.add(binFilesLabel, c);
-		c.gridx = 1;
-		signatureDefaultsFormats.add(this.binFilesCombo, c);
-		c.gridy++;
-		c.weightx = 1.0;
-
-		return signatureDefaultsFormats;
 	}
 
 	/** Di&aacute;logo para cambiar la configuraci&oacute;n del <i>proxy</i>.
@@ -650,6 +546,29 @@ final class PreferencesPanelGeneral extends JPanel {
 			ProxyUtil.setProxySettings();
     	}
     }
+
+    /**
+     * Abre el dialogo de configuracion de los formatos de firma configurados para cada
+     * tipo de fichero.
+     * @param parent Componente sobre el que mostrar el di&aacute;logo.
+     * @param blocked Indica si la configuraci&oacute;n del di&aacute;logo debe aparecer bloqueada.
+     */
+    private static void openFormatsDlg(final Component parent, final boolean blocked) {
+
+    	final DefaultFormatPanel formatPanel = new DefaultFormatPanel();
+    	formatPanel.loadPreferences();
+    	formatPanel.setBlocked(blocked);
+
+    	if(AOUIFactory.showConfirmDialog(
+    			parent,
+    			formatPanel,
+    			SimpleAfirmaMessages.getString("PreferencesPanel.164"), //$NON-NLS-1$
+    			JOptionPane.OK_CANCEL_OPTION,
+    			JOptionPane.DEFAULT_OPTION
+    			) == JOptionPane.OK_OPTION) {
+    		formatPanel.savePreferences();
+    	}
+	}
 
     /**
 	 * Indica si el panel permite o no la edici&oacute;n de sus valores.

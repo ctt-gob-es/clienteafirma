@@ -9,7 +9,9 @@
 
 package es.gob.afirma.signers.ooxml;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -62,16 +64,16 @@ final class OOXMLUtil {
     private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
 
         final List<Relationship> relations = new ArrayList<>();
-    	try (
-    			final ZipFile zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
-		) {
+
+        final File tempFile = AOFileUtils.createTempFile(ooxmlFile);
+    	try (final ZipFile zipFile = new ZipFile(tempFile)) {
 
 	        // Comprobamos si existe la relacion de firmas del documento
 	        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
-	        // Si no existe el fichero, el documento no contiene firmas
+	        // Si no existe el fichero de relaciones, el documento no contiene firmas
 	        if (relsEntry == null) {
-	            return new Relationship[0];
+	            throw new IOException("No se ha encontrado el listado de relaciones"); //$NON-NLS-1$
 	        }
 
 	        // Analizamos el fichero de relaciones
@@ -83,6 +85,17 @@ final class OOXMLUtil {
 	                relations.add(rel);
 	            }
 	        }
+    	}
+        catch (final Exception e) {
+            LOGGER.severe("No se pudieron leer las firmas del documento OOXML: " + e); //$NON-NLS-1$
+        }
+
+    	if (tempFile != null) {
+    		try {
+				Files.delete(tempFile.toPath());
+			} catch (final IOException e) {
+				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
+			}
     	}
 
         return relations.toArray(new Relationship[0]);
@@ -96,49 +109,56 @@ final class OOXMLUtil {
      * @throws SAXException Cuando alguno de los XML internos del fichero no est&aacute; bien formado. */
     static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
     	final List<byte[]> relations = new ArrayList<>();
-        try (
-    		final ZipFile zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
-        ) {
 
-	        // Comprobamos si existe la relacion de firmas del documento
-	        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+    	boolean error = false;
+    	final File tempFile = AOFileUtils.createTempFile(ooxmlFile);
+    	try (final ZipFile zipFile = new ZipFile(tempFile)) {
 
-	        // Si no existe el fichero, el documento no contiene firmas
-	        if (relsEntry == null) {
-	            return new byte[0][];
-	        }
+    		// Comprobamos si existe la relacion de firmas del documento
+    		final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+    		if (relsEntry == null) {
+    			throw new IOException("No se han contrado relaciones en el documento"); //$NON-NLS-1$
+    		}
 
-	        // Analizamos el fichero de relaciones
-	        final RelationshipsParser parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
+    		// Analizamos el fichero de relaciones
+    		final RelationshipsParser parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
 
-	        // Contamos las relaciones de firma
-	        for (final Relationship rel : parser.getRelationships()) {
-	            if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
+    		// Contamos las relaciones de firma
+    		for (final Relationship rel : parser.getRelationships()) {
+    			if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
 
-	                // Comprobamos que exista el firma referenciada
-	                final String target = rel.getTarget();
-	                ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target); //$NON-NLS-1$
-	                if (signEntry == null) {
-	                    signEntry = zipFile.getEntry("_xmlsignatures\\" + target); //$NON-NLS-1$
-	                }
-	                if (signEntry == null) {
-	                    LOGGER.severe("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
-	                    zipFile.close();
-	                    return new byte[0][];
-	                }
+    				// Comprobamos que exista el firma referenciada
+    				final String target = rel.getTarget();
+    				ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target); //$NON-NLS-1$
+    				if (signEntry == null) {
+    					signEntry = zipFile.getEntry("_xmlsignatures\\" + target); //$NON-NLS-1$
+    				}
+    				if (signEntry == null) {
+    					LOGGER.severe("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
+    					throw new IOException("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
+    				}
 
-	                // Guardamos la firma
-	                try {
-	                    relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
-	                }
-	                catch (final Exception e) {
-	                    LOGGER.severe("No se pudo leer una de las firmas del documento OOXML: " + e); //$NON-NLS-1$
-	                    zipFile.close();
-	                    return new byte[0][];
-	                }
-	            }
-	        }
+    				// Guardamos la firma
+    				relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
+    			}
+    		}
+    	}
+        catch (final Exception e) {
+            LOGGER.severe("No se pudieron leer las firmas del documento OOXML: " + e); //$NON-NLS-1$
+            error = true;
         }
+
+    	if (tempFile != null) {
+    		try {
+				Files.delete(tempFile.toPath());
+			} catch (final IOException e) {
+				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
+			}
+    	}
+
+    	if (error) {
+    		return new byte[0][];
+    	}
 
         return relations.toArray(new byte[0][]);
     }

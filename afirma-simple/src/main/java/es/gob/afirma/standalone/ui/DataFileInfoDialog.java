@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -51,19 +52,29 @@ public class DataFileInfoDialog {
         // Preparamos el dialogo
 		this.optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 		this.optionPane.setMessage(createInfoPanel(this.dataInfo));
-		final Options okOpt = this.dataInfo.getExtension() != null &&
+		final boolean needOpenOption = this.dataInfo.getExtension() != null &&
 				!this.dataInfo.getExtension().trim().isEmpty() &&
-				!DataFileAnalizer.isExecutable(this.dataInfo.getExtension()) ?
-						Options.OPEN : Options.SAVE;
+				!DataFileAnalizer.isExecutable(this.dataInfo.getExtension());
 
 		Options[] dialogOptions;
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			dialogOptions = new Options[] { okOpt, Options.CANCEL};
+			if (needOpenOption) {
+				dialogOptions = new Options[] { Options.OPEN, Options.SAVE, Options.CANCEL};
+			}
+			else {
+				dialogOptions = new Options[] { Options.SAVE, Options.CANCEL};
+			}
 		} else {
-			// En linux se invierte el orden automaticamente, asi que lo
-			// configuramos al contrario para que quede como en Windows
-			dialogOptions = new Options[] { Options.CANCEL, okOpt };
+			// En macOS, el boton Cancelar va a la izquierda y en linux se invierte el
+			// orden automaticamente, asi que lo configuramos al contrario para que quede
+			// como en Windows
+			if (needOpenOption) {
+				dialogOptions = new Options[] { Options.CANCEL, Options.OPEN, Options.SAVE };
+			}
+			else {
+				dialogOptions = new Options[] { Options.CANCEL, Options.SAVE };
+			}
 		}
 		this.optionPane.setOptions(dialogOptions);
 
@@ -87,8 +98,11 @@ public class DataFileInfoDialog {
 		final GridBagConstraints c = new GridBagConstraints();
 
 		final JPanel iconPanel = new JPanel();
-		final JLabel iconLabel = new JLabel(new ImageIcon(info.getIcon()));
-		iconPanel.add(iconLabel);
+		final BufferedImage icon = info.getIcon();
+		if (icon != null) {
+			final JLabel iconLabel = new JLabel(new ImageIcon(icon));
+			iconPanel.add(iconLabel);
+		}
 
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weighty = 1.0;

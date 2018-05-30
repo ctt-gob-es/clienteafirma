@@ -551,9 +551,11 @@ public class JSEUIManager implements AOUIManager {
             			final FileFilter ff = fileChooser.getFileFilter();
             			if (ff instanceof FileNameExtensionFilter && !ff.accept(file)) {
             				final String exts[] = ((FileNameExtensionFilter)ff).getExtensions();
-    	                	if (exts != null) {
-    	                		final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
-    	                		file = new File(file.getParent(), file.getName() + extension);
+    	                	if (exts != null && exts.length > 0) {
+    	                		if (!file.getName().toLowerCase().endsWith(exts[0].toLowerCase())) {
+    	                			final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
+    	                			file = new File(file.getParent(), file.getName() + extension);
+    	                		}
     	                	}
     	                	else {
     	                		file = new File(file.getParent(), file.getName());

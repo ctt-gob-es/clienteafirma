@@ -36,7 +36,6 @@ public class ActiveWaitingThread extends Thread {
 	public void run() {
 
 		while (!this.cancelled) {
-			LOGGER.info(" ==== Ciclo de hilo");
 			try {
 				Thread.sleep(SLEEP_PERIOD);
 			} catch (final InterruptedException e) {
@@ -44,15 +43,11 @@ public class ActiveWaitingThread extends Thread {
 			}
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				if (!this.cancelled) {
-					LOGGER.info(" ==== El hilo NO esta interrumpido\n");
 					try {
 						IntermediateServerUtil.sendData(WAIT_CONSTANT, this.storageServiceUrl, this.transactionId);
 					} catch (final IOException e) {
 						LOGGER.warning("No se ha podido enviar la peticion de espera: " + e); //$NON-NLS-1$
 					}
-				}
-				else {
-					LOGGER.info(" ==== El hilo SI esta interrumpido\n");
 				}
 			}
 		}

@@ -13,8 +13,10 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 
 /**
  * Acci&oacute;n para almacenar un fichero en disco.
@@ -62,8 +64,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<File> {
 			this.title,
 			null,
 			this.filename,
-			this.exts,
-			this.desc,
+			Collections.singletonList(new GenericFileFilter(this.exts, this.desc)),
 			this.parent
 		);
 	}

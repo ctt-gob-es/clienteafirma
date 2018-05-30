@@ -54,9 +54,6 @@ public final class StorageService extends HttpServlet {
 	private static final String OPERATION_STORE = "put"; //$NON-NLS-1$
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
-	/** Fichero de configuraci&oacute;n. */
-	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
-
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
@@ -87,7 +84,7 @@ public final class StorageService extends HttpServlet {
 			sis.close();
 
 			// Separamos los parametros y sus valores
-			final Hashtable<String, String> params = new Hashtable<>();
+			final Hashtable<String, String> params = new Hashtable<String, String>();
 			final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
 			for (final String param : urlParams) {
 				final int equalsPos = param.indexOf('=');

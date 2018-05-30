@@ -437,7 +437,6 @@ final class ProtocolInvocationLauncherSign {
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
 				if (waitingThread != null) {
-					LOGGER.info(" ==== Interrumpimos el hilo");
 					waitingThread.interrupt();
 				}
 				try {

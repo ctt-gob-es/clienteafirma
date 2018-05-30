@@ -16,12 +16,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.DataFileInfoDialog.Options;
 
@@ -57,20 +59,20 @@ final class ShowFileLinkAction {
         final DataFileInfoDialog dialog = new DataFileInfoDialog(info, this.parent);
         final Options op = dialog.show();
         if (op == Options.SAVE) {
-            saveDataFile(info);
+            saveDataFile(info, this.parent);
         }
         else if (op == Options.OPEN) {
-        	openDataFile(info);
+        	openDataFile(info, this.parent);
         }
     }
 
-    private static void openDataFile(final DataFileInfo info) {
+    private static void openDataFile(final DataFileInfo info, final Component parent) {
     	File tmp;
 		try {
 			tmp = File.createTempFile("afirma", "." + info.getExtension()); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final IOException e) {
 			LOGGER.info("No se pudo crear el temporal para abrir el fichero: " + e); //$NON-NLS-1$
-			saveDataFile(info);
+			saveDataFile(info, parent);
 			return;
 		}
         try (
@@ -91,16 +93,21 @@ final class ShowFileLinkAction {
         }
     }
 
-    private static void saveDataFile(final DataFileInfo info) {
+    private static void saveDataFile(DataFileInfo info, Component parent) {
     	try {
-        	AOUIFactory.getSaveDataToFile(
-    			info.getData(),
-		        SimpleAfirmaMessages.getString("ShowFileLinkAction.1"), //$NON-NLS-1$
-		        null,
-		        null,
-		        null,
-		        null
-			);
+    		AOUIFactory.getSaveDataToFile(
+				info.getData(),
+				SimpleAfirmaMessages.getString("ShowFileLinkAction.1"), //$NON-NLS-1$
+				null,
+				info.getExtension() != null ? SimpleAfirmaMessages.getString("ShowFileLinkAction.5") + "." + info.getExtension() : null, //$NON-NLS-1$ //$NON-NLS-2$
+				Collections.singletonList(
+						new GenericFileFilter(
+								info.getExtension() != null ? new String[] { info.getExtension() } : null,
+								info.getDescription()
+						)
+				),
+				parent
+				);
 		}
         catch (final IOException e) {
 			Logger.getLogger("es.gob.afirma").severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
