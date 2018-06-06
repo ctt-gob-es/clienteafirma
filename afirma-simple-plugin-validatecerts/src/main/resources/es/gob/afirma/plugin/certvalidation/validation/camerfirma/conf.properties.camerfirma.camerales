@@ -1,0 +1,2 @@
+# Certificado raiz del emisor
+issuerCertFile=/es/gob/afirma/plugin/certvalidation/validation/camerfirma/AC_CAMERFIRMA_CAMERALES.cer

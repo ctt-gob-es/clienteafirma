@@ -31,9 +31,9 @@ public class PluginsUiComponentsBuilder {
 	 * @param currentWindow Ventana para la que se solicita el listado de botones.
 	 * @return Listado de botones o {@code null} si no se definen botones.
 	 */
-	public static List<JButton> getPluginsButtons(PluginIntegrationWindow currentWindow) {
+	public static List<PluginGraphicButton> getPluginsButtons(PluginIntegrationWindow currentWindow) {
 
-		List<JButton> jButtons = null;
+		final List<PluginGraphicButton> jButtons = new ArrayList<>();
         List<AfirmaPlugin> plugins = null;
 		try {
 			plugins = PluginsManager.getInstance().getPluginsLoadedList();
@@ -48,11 +48,8 @@ public class PluginsUiComponentsBuilder {
 						try {
 							final PluginIntegrationWindow targetWindow = PluginIntegrationWindow.getWindow(button.getWindow());
 							if (targetWindow == currentWindow) {
-								final JButton jButton = PluginsUiComponentsBuilder.buildButton(button, plugin.getClass().getClassLoader());
-								if (jButtons == null) {
-									jButtons = new ArrayList<>();
-								}
-								jButtons.add(jButton);
+								final JButton jButton = buildButton(button, plugin.getClass().getClassLoader());
+								jButtons.add(new PluginGraphicButton(button, jButton));
 							}
 						}
 						catch (final Exception e) {
@@ -82,7 +79,7 @@ public class PluginsUiComponentsBuilder {
 				final byte[] image = AOUtil.getDataFromInputStream(is);
 					jButton.setIcon(new ImageIcon(image));
 			} catch (final IOException e) {
-				//
+				LOGGER.warning("No se pudo cargar el icono de un boton de plugin: " + e); //$NON-NLS-1$
 			}
 		}
 		jButton.setToolTipText(button.getToolTip());
@@ -90,6 +87,4 @@ public class PluginsUiComponentsBuilder {
 
 		return jButton;
 	}
-
-
 }

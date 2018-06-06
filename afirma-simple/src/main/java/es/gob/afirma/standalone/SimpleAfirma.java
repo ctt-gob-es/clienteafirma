@@ -333,22 +333,23 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * @param signingCert
      *        Certificado usado para la firma */
     @Override
-    public void showResultsInfo(byte[] signature, File signatureFile, X509Certificate signingCert) {
+    public void showResultsInfo(final byte[] signature, final SignOperationConfig signConfig,
+    		final X509Certificate signingCert) {
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
         final JPanel newPanel = new SignDetailPanel(
     		this,
     		signature,
-    		signatureFile.getName(),
+    		signConfig,
     		signingCert,
     		new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null),
     		null
 		);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null) {
-            this.window.getRootPane().putClientProperty("Window.documentFile", signatureFile); //$NON-NLS-1$
-            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + signatureFile.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+            this.window.getRootPane().putClientProperty("Window.documentFile", signConfig.getSignatureFile()); //$NON-NLS-1$
+            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + signConfig.getSignatureFile().getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);

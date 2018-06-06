@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.plugins;
 
 import java.security.cert.Certificate;
+import java.util.Properties;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 
@@ -25,6 +26,37 @@ public abstract class AfirmaPlugin {
 	 */
 	public final void setInfo(PluginInfo info) {
 		this.info = info;
+	}
+
+	/**
+	 * Permite recuperar la configuraci&oacute;n establecida en el plugin.
+	 * @return Configuraci&oacute;n del plugin.
+	 */
+	public final Properties getConfig() {
+		return PluginPreferences.getInstance(this).recoverConfig();
+	}
+
+	/**
+	 * Construye una instancia del panel de configuraci&oacute;n.
+	 * @return Panel de configuraci&oacute;n construido.
+	 * @throws ReflectiveOperationException Cuando ocurre un error al construir el panel.
+	 */
+	public final ConfigurationPanel buildConfigurationPanel() throws ReflectiveOperationException {
+
+		final String configPanelClass = getInfo().getConfigPanel();
+		if (configPanelClass == null) {
+			return null;
+		}
+
+		ConfigurationPanel panel;
+		try {
+			final Class<?> panelClass = Class.forName(
+					configPanelClass, true, this.getClass().getClassLoader());
+			panel = (ConfigurationPanel) panelClass.newInstance();
+		} catch (final Exception e) {
+			throw new ReflectiveOperationException("No se pudo crear el panel de configuracion", e); //$NON-NLS-1$
+		}
+		return panel;
 	}
 
 	/**
@@ -80,11 +112,13 @@ public abstract class AfirmaPlugin {
 	}
 
 	/**
-	 * Proceso ejecutado al finalizar un proceso de firma completo. En &eacute;l se puede
-	 * configurar lo necesario para restaurar el estado del plugin antes de iniciar una
-	 * nueva operaci&oacute;n.
+	 * Proceso ejecutado al finalizar un proceso de firma completo. En este proceso pueden
+	 * haberse realizado m&uacute;ltiples firmas como parte de un proceso de firma masiva.
+	 * En este m&eacute;todo se puede configurar lo necesario para restaurar el estado del
+	 * plugin o liberar recursos antes de una nueva operaci&oacute;n.
+	 * @throws PluginControlledException Cuando falla el proceso de reinicio.
 	 */
-	public void reset() {
+	public void reset() throws PluginControlledException {
 		// No se hace nada
 	}
 
@@ -93,8 +127,12 @@ public abstract class AfirmaPlugin {
 		if (obj != null && obj instanceof AfirmaPlugin) {
 			final PluginInfo myInfo = getInfo();
 			final PluginInfo objInfo = ((AfirmaPlugin) obj).getInfo();
-			return myInfo.getInternalName().equals(objInfo.getInternalName()) &&
-					myInfo.getVersionCode() == objInfo.getVersionCode();
+			return myInfo.getInternalName().equals(objInfo.getInternalName());
+		}
+		else if (obj != null && obj instanceof PluginInfo) {
+			final PluginInfo myInfo = getInfo();
+			final PluginInfo objInfo = (PluginInfo) obj;
+			return myInfo.getInternalName().equals(objInfo.getInternalName());
 		}
 		return super.equals(obj);
 	}

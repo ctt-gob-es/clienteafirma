@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.misc.Platform;
@@ -60,7 +61,6 @@ public final class PluginsManagementPanel extends JPanel {
 		this.eventsHandler.registerComponents();
 
         new Thread(new Runnable() {
-
 			@Override
 			public void run() {
 				PluginsManagementPanel.this.eventsHandler.loadViewData();
@@ -117,10 +117,11 @@ public final class PluginsManagementPanel extends JPanel {
 	 * @return Panel con el listado de plugins. */
 	private JPanel createPluginsListPanel() {
 		final JPanel pluginListPanel = new JPanel(new GridBagLayout());
-		pluginListPanel.setBorder(BorderFactory.createTitledBorder("Plugins instalados"));
+		pluginListPanel.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PluginsManagementPanel.0"))); //$NON-NLS-1$
 
 		final DefaultListModel<AfirmaPlugin> listModel = new DefaultListModel<>();
 		this.pluginsList = new JList<>(listModel);
+		this.pluginsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		final JScrollPane pluginsListScrollPane = new JScrollPane(this.pluginsList);
 
 		if (Platform.getOS() == Platform.OS.MACOSX) {
@@ -131,8 +132,8 @@ public final class PluginsManagementPanel extends JPanel {
 			pluginsListScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		}
 
-		this.addButton = new JButton("Agregar");
-		this.removeButton = new JButton("Eliminar");
+		this.addButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.1")); //$NON-NLS-1$
+		this.removeButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.2")); //$NON-NLS-1$
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -161,7 +162,7 @@ public final class PluginsManagementPanel extends JPanel {
 	 * @return Panel donde se ubican los botones de la ventana de restauraci&oacute;n. */
 	private JPanel createPluginInfoPanel() {
 		final JPanel infoPanel = new JPanel(new GridBagLayout());
-		infoPanel.setBorder(BorderFactory.createTitledBorder("Informaci\u00F3n del plugin"));
+		infoPanel.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PluginsManagementPanel.3"))); //$NON-NLS-1$
 
 		// Panel con la informacion del plugin
 		this.pluginInfoPane = new JLabel();
@@ -169,7 +170,7 @@ public final class PluginsManagementPanel extends JPanel {
 
 		// Panel con el boton para la configuracion del plugin. El boton perman
 		final JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-		this.configButton = new JButton("Configurar");
+		this.configButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.4")); //$NON-NLS-1$
 		this.configButton.setVisible(false);
 		configPanel.add(this.configButton);
 

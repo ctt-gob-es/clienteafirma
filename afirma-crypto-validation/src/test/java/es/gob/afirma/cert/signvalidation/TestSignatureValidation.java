@@ -5,6 +5,8 @@ import java.io.InputStream;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signvalidation.SignValiderFactory;
+import es.gob.afirma.signvalidation.ValidateBinarySignature;
 
 /** Pruebas de validaci&oacute;n de firmas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

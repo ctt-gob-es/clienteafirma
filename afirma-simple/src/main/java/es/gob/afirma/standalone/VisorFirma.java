@@ -90,7 +90,7 @@ public class VisorFirma extends JApplet implements WindowListener {
 
             if (this.parentComponent == null) {
 	           	final MainScreen mainScreen = new MainScreen();
-	           	mainScreen.showMainScreen(this, this.currentPanel, 780, 550);
+	           	mainScreen.showMainScreen(this, this.currentPanel, 780, 650);
 	            this.container = mainScreen;
             }
             else {
@@ -108,10 +108,10 @@ public class VisorFirma extends JApplet implements WindowListener {
             		dialog = new JDialog();
             	}
             	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-            	dialog.setSize(780, 500);
+            	dialog.setSize(780, 600);
             	dialog.setResizable(false);
             	final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-        		dialog.setLocation(cp.x - 780/2, cp.y - 500/2);
+        		dialog.setLocation(cp.x - 780/2, cp.y - 600/2);
         		dialog.add(this.currentPanel);
             	this.container = dialog;
             }
@@ -132,6 +132,15 @@ public class VisorFirma extends JApplet implements WindowListener {
             }
         }
     }
+
+    /**
+     * Devuelve el component padre sobre el que se muestra todos los elementos
+     * gr&aacute;ficos.
+     * @return Componente padre.
+     */
+    public Container getParentComponent() {
+		return this.container;
+	}
 
     private static Locale buildLocale(final String locale) {
         final String[] frags = locale.split("_"); //$NON-NLS-1$

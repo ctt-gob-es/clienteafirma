@@ -5,10 +5,12 @@ package es.gob.afirma.standalone.plugins;
  */
 public enum PluginIntegrationWindow {
 	/** Ventana de carga de datos. */
-	PREPROCESS,
-	/** Ventana de visualizacion del resultado de la firma. */
-	POSTPROCESS,
-	/** Ventana con la informaci&oacute;n de firma firma. */
+	INPUT_DATA,
+	/** Ventana de visualizaci&oacute;n del resultado de una firma. */
+	SINGLE_RESULT,
+	/** Ventana de visualizaci&oacute;n del resultado de m&uacute;ltiples firmas. */
+	MULTI_RESULT,
+	/** Ventana con la informaci&oacute;n de firma. */
 	VISOR;
 
 	/**
@@ -20,12 +22,15 @@ public enum PluginIntegrationWindow {
 	public static PluginIntegrationWindow getWindow(String window) {
 
 		switch (window) {
-		case "preprocess": //$NON-NLS-1$
-		case "PREPROCESS": //$NON-NLS-1$
-			return PREPROCESS;
-		case "postprocess": //$NON-NLS-1$
-		case "POSTPROCESS": //$NON-NLS-1$
-			return POSTPROCESS;
+		case "input": //$NON-NLS-1$
+		case "INPUT_DATA": //$NON-NLS-1$
+			return INPUT_DATA;
+		case "single_result": //$NON-NLS-1$
+		case "SINGLE_RESULT": //$NON-NLS-1$
+			return SINGLE_RESULT;
+		case "multi_result": //$NON-NLS-1$
+		case "MULTI_RESULT": //$NON-NLS-1$
+			return MULTI_RESULT;
 		case "visor": //$NON-NLS-1$
 		case "VISOR": //$NON-NLS-1$
 			return VISOR;

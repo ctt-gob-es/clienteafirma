@@ -10,25 +10,37 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
 
+/**
+ * Clase para la carga de la informaci&oacute;n de los plugins.
+ */
 public class PluginInfoLoader {
 
+	/**
+	 * Obtiene la informaci&oacute;n de un plugin.
+	 * @param is Flujo de entrada de datos.
+	 * @return Informaci&oacute;n del plugin.
+	 * @throws PluginException Cuando no se puede leer la informaci&oacute;n del plugin
+	 * o la informaci&oacute;n encontrada est&aacute; mal formada.
+	 */
 	static PluginInfo parseInfo(final InputStream is) throws PluginException {
 
-		final JsonReader reader = Json.createReader(is);
-		final JsonObject mainObject = reader.readObject();
+		PluginInfo info;
+		try (final JsonReader reader = Json.createReader(is)) {
+			final JsonObject mainObject = reader.readObject();
 
-		// Parseamos la informacion del plugin
+			// Parseamos la informacion del plugin
 
-		final PluginInfo info = parseInfoObject(mainObject);
+			info = parseInfoObject(mainObject);
 
-		final GenericMenuOption menu = parseMenuObject(mainObject);
-		if (menu != null) {
-			info.setMenu(menu);
-		}
+			final GenericMenuOption menu = parseMenuObject(mainObject);
+			if (menu != null) {
+				info.setMenu(menu);
+			}
 
-		final PluginButton[] buttons = parseButtonsObject(mainObject);
-		if (buttons != null) {
-			info.setButtons(buttons);
+			final PluginButton[] buttons = parseButtonsObject(mainObject);
+			if (buttons != null) {
+				info.setButtons(buttons);
+			}
 		}
 
 		return info;
@@ -110,14 +122,17 @@ public class PluginInfoLoader {
 			if (!buttonObject.containsKey("action")) { //$NON-NLS-1$
 				throw new PluginException("No se ha definido una accion para un boton"); //$NON-NLS-1$
 			}
+			if (!buttonObject.containsKey("window")) { //$NON-NLS-1$
+				throw new PluginException("No se ha definido la ventana para un boton"); //$NON-NLS-1$
+			}
 
 			final PluginButton button = new PluginButton();
 			button.setTitle(buttonObject.getString("title", null)); //$NON-NLS-1$
 			button.setIcon(buttonObject.getString("icon", null)); //$NON-NLS-1$
 			button.setToolTip(buttonObject.getString("tooltip", null)); //$NON-NLS-1$
 			button.setAccesibleDescription(buttonObject.getString("accesible_description", null)); //$NON-NLS-1$
-			button.setAfirmaWindow(buttonObject.getString("window", PluginIntegrationWindow.PREPROCESS.toString())); //$NON-NLS-1$
-			button.setAction(buttonObject.getString("action", null)); //$NON-NLS-1$
+			button.setAfirmaWindow(buttonObject.getString("window")); //$NON-NLS-1$
+			button.setActionClassName(buttonObject.getString("action")); //$NON-NLS-1$
 
 			buttons.add(button);
 		}

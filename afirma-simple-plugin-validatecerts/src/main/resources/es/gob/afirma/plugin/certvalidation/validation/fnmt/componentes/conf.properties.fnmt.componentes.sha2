@@ -1,0 +1,8 @@
+# Certificado raiz del emisor
+issuerCertFile=/es/gob/afirma/plugin/certvalidation/validation/fnmt/componentes/AC_Componentes_Informaticos_SHA256.cer
+
+# Si hay que firmar o no la peticion OCSP
+signOcspRequest=false
+
+# URL del responder OCSP
+responderUrl=http://ocspcomp.cert.fnmt.es/ocsp/OcspResponder

@@ -66,6 +66,8 @@ final class SignDataPanel extends JPanel {
 
     private static final long serialVersionUID = 4956746943438652928L;
 
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.png"; //$NON-NLS-1$
     private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.png"; //$NON-NLS-1$
@@ -78,7 +80,7 @@ final class SignDataPanel extends JPanel {
     private final JEditorPane certDescription = new JEditorPane();
     private final JButton validateCertButton = null;
 
-    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    private CompleteSignInfo currentSignInfo = null;
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(() -> createUI(signFile, sign, fileTypeIcon, cert, extKeyListener));
@@ -223,75 +225,6 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addFocusListener(editorFocusManager);
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
-
-//	            CertificateVerificable cfv = null;
-//	            try {
-//	            	cfv = CertificateVerifierFactory.getCertificateVerifier(cert);
-//	            }
-//	            catch(final Exception e) {
-//	            	LOGGER.warning("No se ha podido cargar el verificador de certificados: " + e); //$NON-NLS-1$
-//	            }
-//
-//	            if (cfv != null) {
-//	            	final CertificateVerificable cf = cfv;
-//	            	this.validateCertButton = new JButton();
-//	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
-//	                this.validateCertButton.setText(SimpleAfirmaMessages.getString("SignDataPanel.15")); //$NON-NLS-1$
-//	                this.validateCertButton.setMnemonic('c');
-//	                this.validateCertButton.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.16")); //$NON-NLS-1$
-//	                this.validateCertButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.17")); //$NON-NLS-1$
-//	                this.validateCertButton.getAccessibleContext()
-//	                .setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.18")); //$NON-NLS-1$
-//	                this.validateCertButton.addActionListener(new ActionListener() {
-//						@Override
-//						public void actionPerformed(final ActionEvent ae) {
-//						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-//
-//							final ValidationResult vr = cf.validateCertificate(cert);
-//							String validationMessage;
-//							int validationMessageType = JOptionPane.ERROR_MESSAGE;
-//							switch(vr) {
-//								case VALID:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.19"); //$NON-NLS-1$
-//									validationMessageType = JOptionPane.INFORMATION_MESSAGE;
-//									break;
-//								case EXPIRED:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.32"); //$NON-NLS-1$
-//									break;
-//								case REVOKED:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.33"); //$NON-NLS-1$
-//									break;
-//								case NOT_YET_VALID:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.34"); //$NON-NLS-1$
-//									break;
-//								case CA_NOT_SUPPORTED:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.35"); //$NON-NLS-1$
-//									break;
-//								case CORRUPT:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.36"); //$NON-NLS-1$
-//									break;
-//								case SERVER_ERROR:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.37"); //$NON-NLS-1$
-//									break;
-//								case UNKNOWN:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.38"); //$NON-NLS-1$
-//									break;
-//								default:
-//									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.11");  //$NON-NLS-1$
-//							}
-//							AOUIFactory.showMessageDialog(
-//								SignDataPanel.this,
-//								validationMessage,
-//								SimpleAfirmaMessages.getString("SignDataPanel.39"),  //$NON-NLS-1$
-//								validationMessageType
-//							);
-//
-//						    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-//
-//						}
-//					});
-//	            }
-
             }
             certDescPanel = new JPanel();
             certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -323,6 +256,9 @@ final class SignDataPanel extends JPanel {
         	LOGGER.severe("Error obteniendo los datos de la firma: " + e); //$NON-NLS-1$
             signInfo = null;
         }
+
+        this.currentSignInfo = signInfo;
+
         final JScrollPane detailPanel = new JScrollPane(
     		signInfo == null ? null : SignDataPanel.getSignDataTree(signInfo, extKeyListener, SignDataPanel.this)
 		);
@@ -535,5 +471,9 @@ final class SignDataPanel extends JPanel {
 
         return tree;
     }
+
+    public CompleteSignInfo getCurrentSignInfo() {
+		return this.currentSignInfo;
+	}
 
 }

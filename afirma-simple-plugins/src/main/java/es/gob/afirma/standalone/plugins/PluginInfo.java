@@ -138,7 +138,7 @@ public class PluginInfo extends MinimalPluginInfo {
 
 	/**
 	 * Establece el nombre de la clase con el panel de configuraci&oacute;n del plugin. Esta clase
-	 * deber&aacute; extender {@link es.gob.afirma.standalone.plugins.ConfiguratorPanel}.
+	 * deber&aacute; extender {@link es.gob.afirma.standalone.plugins.ConfigurationPanel}.
 	 * @param configPanel Nombre de la clase del panel de configuraci&oacute;n.
 	 */
 	public void setConfigPanel(String configPanel) {
@@ -180,5 +180,18 @@ public class PluginInfo extends MinimalPluginInfo {
 	@Override
 	public String toString() {
 		return this.name;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PluginInfo) {
+			return this.internalName.equals(((PluginInfo) obj).getInternalName());
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

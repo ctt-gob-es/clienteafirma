@@ -27,6 +27,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -35,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -64,6 +67,8 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.plugins.DataProcessAction;
+import es.gob.afirma.standalone.plugins.InputData;
 import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.pdf.VisiblePdfSignatureManager;
@@ -457,18 +462,52 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	@Override
     public void refreshPluginButtonsContainer() {
 
-    	final List<JButton> pluginsButtons = PluginsUiComponentsBuilder.getPluginsButtons(
-    			PluginIntegrationWindow.PREPROCESS);
+    	final List<PluginGraphicButton> pluginsButtons = PluginsUiComponentsBuilder.getPluginsButtons(
+    			PluginIntegrationWindow.INPUT_DATA);
+
+    	for (final PluginGraphicButton button : pluginsButtons) {
+    		button.getGraphicButton().addActionListener(
+    				new ActionListener() {
+    					@Override
+    					public void actionPerformed(ActionEvent e) {
+    						try {
+    							final List<InputData> inputDatas = new ArrayList<>();
+    							final List<SignOperationConfig> configs = getSignOperationConfigs();
+    							if (configs != null) {
+    								for (final SignOperationConfig config : configs) {
+    									final InputData data = new InputData();
+    									data.setDataFile(config.getDataFile());
+    									data.setSignatureFormat(config.getSignatureFormatName());
+    									inputDatas.add(data);
+    								}
+    							}
+    							new Thread(new Runnable() {
+    								@Override
+    								public void run() {
+    									((DataProcessAction) button.getButton().getAction()).processData(
+    											inputDatas.toArray(new InputData[inputDatas.size()]),
+    											SwingUtilities.getWindowAncestor(SignPanel.this));
+    								}
+    							}).start();
+    						}
+    						catch (final Exception ex) {
+    							LOGGER.log(Level.SEVERE, "La accion del boton devolvio un error", ex); //$NON-NLS-1$
+    						}
+    					}
+    				});
+    	}
+
     	EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-		        if (pluginsButtons == null || pluginsButtons.isEmpty()) {
+		        if (pluginsButtons.isEmpty()) {
 		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
 		        }
 		        else {
+		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
 		        	SignPanel.this.pluginButtonsPanel.removeAll();
-		        	for (final JButton button : pluginsButtons) {
-		        		SignPanel.this.pluginButtonsPanel.add(button);
+		        	for (final PluginGraphicButton button : pluginsButtons) {
+		        		SignPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
 		        	}
 		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(true);
 		        }

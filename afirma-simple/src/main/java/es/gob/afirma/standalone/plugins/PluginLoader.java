@@ -39,25 +39,65 @@ public class PluginLoader {
 		for (final File jar : jars) {
 			urls.add(jar.toURI().toURL());
 		}
-		final ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), PluginLoader.class.getClassLoader());
+		final URLClassLoader classLoader = new URLClassLoader(
+				urls.toArray(new URL[urls.size()]),
+				PluginLoader.class.getClassLoader());
 
 		// Cargamos las clases de plugin
 		final List<AfirmaPlugin> plugins = new ArrayList<>();
-		final ServiceLoader<AfirmaPlugin> loader = ServiceLoader.load(AfirmaPlugin.class, classLoader);
-		for (final AfirmaPlugin plugin : loader) {
-		    plugins.add(plugin);
+		final ServiceLoader<AfirmaPlugin> loader;
+		try {
+			loader = ServiceLoader.load(AfirmaPlugin.class, classLoader);
+			for (final AfirmaPlugin plugin : loader) {
+				plugins.add(plugin);
+			}
+		}
+		catch (final Error e) {
+			classLoader.close();
+			throw new PluginException("Se han contrado plugins mal definidos en el fichero importado"); //$NON-NLS-1$
 		}
 
 		if (plugins.size() == 0) {
+			classLoader.close();
 			throw new PluginException("No se encontro ningun plugin en los archivos"); //$NON-NLS-1$
 		}
 
 		if (plugins.size() > 1) {
+			classLoader.close();
 			throw new PluginException("No se permite la carga simulatea de varios plugins"); //$NON-NLS-1$
 		}
 
 		final AfirmaPlugin plugin = plugins.get(0);
-		loadPluginConfiguration(plugin);
+		final PluginInfo info = loadPluginConfiguration(plugin);
+
+		for (final PluginButton button : info.getButtons()) {
+
+			if (button.getActionClassName() == null) {
+				classLoader.close();
+				throw new PluginException(String.format("El plugin %1s no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
+			}
+			if (button.getWindow() == null) {
+				classLoader.close();
+				throw new PluginException(String.format("El plugin %1s no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
+			}
+			final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
+			if (window == null) {
+				classLoader.close();
+				throw new PluginException(String.format("El plugin %1s definio un boton en una ventana desconocida", info.getName())); //$NON-NLS-1$
+			}
+			try {
+				final PluginAction action = getPluginAction(button.getActionClassName(), window, classLoader);
+				action.setPlugin(plugin);
+				button.setAction(action);
+			}
+			catch (final Exception e) {
+				classLoader.close();
+				throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea", info.getName()), e); //$NON-NLS-1$
+			}
+		}
+
+		// Configuramos la informacion obtenida del plugin, en el propio plugin
+		plugin.setInfo(info);
 
 		return plugin;
 	}
@@ -65,24 +105,63 @@ public class PluginLoader {
 	/**
 	 * Carga la configuracion del plugin.
 	 * @param plugin Plugin del que cargar la configuraci&oacute;n.
+	 * @return Informaci&oacute;n extra&iacute;da del plugin.
 	 * @throws IOException Cuando se produce alg&uacute;n error en la lectura del plugin.
 	 * @throws PluginException Cuando se encuentra un error en el fichero de
 	 * configuraci&oacute;n del plugin.
 	 */
-	private static void loadPluginConfiguration(AfirmaPlugin plugin) throws IOException, PluginException {
+	private static PluginInfo loadPluginConfiguration(AfirmaPlugin plugin) throws IOException, PluginException {
 		final String classPackage = plugin.getClass().getPackage().getName();
 		final String infoResource = '/' + classPackage.replace('.', '/') + CONFIG_FILE;
 
+		PluginInfo info;
 		try (InputStream is = plugin.getClass().getResourceAsStream(infoResource)) {
 				if (is == null) {
 					throw new IOException(String.format("No se encontro el fichero %1s en el plugin", infoResource)); //$NON-NLS-1$
 				}
-				plugin.setInfo(PluginInfoLoader.parseInfo(is));
+				info = PluginInfoLoader.parseInfo(is);
 		} catch (final IOException e) {
 			throw new IOException("Error en la lectura del fichero " + CONFIG_FILE, e); //$NON-NLS-1$
 
 		} catch (final Exception e) {
 			throw new PluginException("Se ha encontrado un error en el fichero " + CONFIG_FILE, e); //$NON-NLS-1$
 		}
+
+		return info;
+	}
+
+	private static PluginAction getPluginAction(String actionClassName,
+			PluginIntegrationWindow window, ClassLoader classLoader) throws PluginException {
+		Class<?> actionClass;
+		try {
+			actionClass = Class.forName(actionClassName, true, classLoader);
+		} catch (final Throwable e) {
+			throw new PluginException(String.format("La clase de accion %1s no existe", //$NON-NLS-1$
+					actionClassName), e);
+		}
+		Object actionObject;
+		try {
+			actionObject = actionClass.newInstance();
+		} catch (final Throwable e) {
+			throw new PluginException(String.format("No se puede instanciar la clase %s. El constructor por defecto deber existir y ser publico", //$NON-NLS-1$
+					actionClassName), e);
+		}
+
+		if (window == PluginIntegrationWindow.INPUT_DATA) {
+			if (!(actionObject instanceof DataProcessAction)) {
+				throw new PluginException(String.format(
+						"Se ha establecido un boton en la pantalla de entrada de datos que no define una accion de tipo %1s", //$NON-NLS-1$
+						DataProcessAction.class.getName()));
+			}
+		}
+		else {
+			if (!(actionObject instanceof SignatureProcessAction)) {
+				throw new PluginException(String.format(
+						"Se ha establecido un boton en una pantalla de salida que no define una accion de tipo %1s", //$NON-NLS-1$
+						SignatureProcessAction.class.getName()));
+			}
+		}
+
+		return (PluginAction) actionObject;
 	}
 }

@@ -28,7 +28,7 @@ public final class PluginsManagementDialog extends JDialog {
 	 * @param parent Componente padre del panel.
 	 * @param modal Indica si la ventana debe ser modal.
 	 */
-	public PluginsManagementDialog(final Frame parent, final boolean modal) {
+	private PluginsManagementDialog(final Frame parent, final boolean modal) {
 		super(parent, modal);
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.37")); //$NON-NLS-1$
 		this.add(new PluginsManagementPanel(this));

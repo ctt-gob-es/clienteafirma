@@ -11,7 +11,8 @@ public class PluginButton {
 	private String toolTip = null;
 	private String accesibleDescription = null;
 	private String afirmaWindow = null;
-	private String action = null;
+	private String actionClassName = null;
+	private PluginAction action = null;
 
 	/**
 	 * Recupera el texto del bot&oacute;n.
@@ -86,17 +87,31 @@ public class PluginButton {
 		this.afirmaWindow = window;
 	}
 	/**
+	 * Recupera el nombre de la clase de la acci&oacute;n asignada al bot&oacute;n.
+	 * @return Nombre de la clase de acci&oacute;n.
+	 */
+	public String getActionClassName() {
+		return this.actionClassName;
+	}
+	/**
+	 * Establece el nombre de clase de la acci&oacute;n asignada al bot&oacute;n.
+	 * @param actionClassName Nombre de la clase de acci&oacute;n.
+	 */
+	public void setActionClassName(String actionClassName) {
+		this.actionClassName = actionClassName;
+	}
+	/**
 	 * Recupera la acci&oacute;n asignada al bot&oacute;n.
 	 * @return Acci&oacute;n asignada al bot&oacute;n.
 	 */
-	public String getAction() {
+	public PluginAction getAction() {
 		return this.action;
 	}
 	/**
 	 * Establece la acci&oacute;n asignada al bot&oacute;n.
 	 * @param action Acci&oacute;n asignada al bot&oacute;n.
 	 */
-	public void setAction(String action) {
+	public void setAction(PluginAction action) {
 		this.action = action;
 	}
 }

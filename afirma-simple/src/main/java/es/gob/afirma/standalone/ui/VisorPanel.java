@@ -9,21 +9,31 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import es.gob.afirma.cert.signvalidation.SignValider;
 import es.gob.afirma.cert.signvalidation.SignValiderFactory;
@@ -46,20 +56,32 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.crypto.CompleteSignInfo;
+import es.gob.afirma.standalone.plugins.OutputData;
+import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
+import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
 /** Visor de firmas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
  * @author Carlos Gamuci. */
-public final class VisorPanel extends JPanel implements KeyListener {
+public final class VisorPanel extends JPanel implements KeyListener, PluginButtonsContainer {
 
     /** Version ID. */
     private static final long serialVersionUID = 8309157734617505338L;
 
     private final VisorFirma visorFirma;
 
-    VisorFirma getVisorFirma() {
-        return this.visorFirma;
-    }
+    /** Panel principal en el que se muestran los botones de los plugins. */
+    JPanel mainPluginsButtonsPanel = null;
+
+    /** Panel concreto en el que se muestran los botones de los plugins. */
+    JPanel pluginButtonsPanel = null;
+
+    SignDataPanel signDataPanel = null;
+
+    /** Fichero cargado actualmente. Puede ser nulo si se cargaron datos en memoria. */
+    File signatureFile = null;
+
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
@@ -72,6 +94,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
     public VisorPanel(final File signFile, final byte[] sign, final VisorFirma vf, final boolean allowReload) {
         super(true);
         this.visorFirma = vf;
+        this.signatureFile = signFile;
         createUI(signFile, sign, allowReload);
     }
 
@@ -121,7 +144,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
         final X509Certificate cert = getCertificate(sign);
 
         final JPanel resultPanel = new SignResultPanel(validity, true, this);
-        final JPanel dataPanel = new SignDataPanel(
+        this.signDataPanel = new SignDataPanel(
     		signFile,
     		sign,
     		null,
@@ -163,24 +186,35 @@ public final class VisorPanel extends JPanel implements KeyListener {
             bottonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
+        // Agregamos un panel adicional en el que se mostraran los botones de los plugins
+        this.mainPluginsButtonsPanel = buildMainPluginsButtonsPanel();
+
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
+        c.gridy = 0;
         c.insets = new Insets(11, 11, 11, 11);
         add(resultPanel, c);
         c.weighty = 1.0;
-        c.gridy = 1;
+        c.gridy++;
         c.insets = new Insets(0, 11, 11, 11);
-        add(dataPanel, c);
+        add(this.signDataPanel, c);
         c.weighty = 0.0;
-        c.gridy = 2;
-        c.insets = new Insets(0, 11, 11, 11);
+        c.gridy++;
         add(bottonPanel, c);
+        c.gridy++;
+        add(this.mainPluginsButtonsPanel, c);
+
+        refreshPluginButtonsContainer();
 
         repaint();
 
+    }
+
+    VisorFirma getVisorFirma() {
+        return this.visorFirma;
     }
 
     private static X509Certificate getCertificate(final byte[] sign) {
@@ -274,4 +308,113 @@ public final class VisorPanel extends JPanel implements KeyListener {
 		// Vacio
 	}
 
+	/**
+	 * Construye el panel en el que se mostraran los botones propios de los plugins instalados.
+	 * @return Panel para los botones de los plugins.
+	 */
+	private JPanel buildMainPluginsButtonsPanel() {
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
+
+		this.pluginButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+    	c.weightx = 1.0;
+    	c.gridy = 0;
+    	mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), c);
+    	c.gridy++;
+    	mainPanel.add(this.pluginButtonsPanel, c);
+
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    	}
+
+    	return mainPanel;
+	}
+
+	@Override
+    public void refreshPluginButtonsContainer() {
+
+    	final List<PluginGraphicButton> pluginsButtons = PluginsUiComponentsBuilder.getPluginsButtons(
+    			PluginIntegrationWindow.VISOR);
+
+    	for (final PluginGraphicButton button : pluginsButtons) {
+			button.getGraphicButton().addActionListener(new PluginButtonActionListener(
+					this.signDataPanel,
+					this.signatureFile,
+					(SignatureProcessAction) button.getButton().getAction()));
+    	}
+
+    	EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+		        if (pluginsButtons == null || pluginsButtons.isEmpty()) {
+		        	VisorPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		        }
+		        else {
+		        	VisorPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		        	VisorPanel.this.pluginButtonsPanel.removeAll();
+		        	for (final PluginGraphicButton button : pluginsButtons) {
+		        		VisorPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
+		        	}
+		        	VisorPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		        }
+			}
+		});
+    }
+
+	/** Acci&oacute;n gen&eacute;rica que se asigna a cada bot&oacute;n de plugin
+	 * que aparezca en la pantalla. */
+	class PluginButtonActionListener implements ActionListener {
+
+		final SignDataPanel panel;
+		final File signFile;
+		final SignatureProcessAction action;
+
+		public PluginButtonActionListener(SignDataPanel panel, final File signFile, SignatureProcessAction action) {
+			this.panel = panel;
+			this.signFile = signFile;
+			this.action = action;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			final CompleteSignInfo signInfo = this.panel.getCurrentSignInfo();
+
+			final OutputData data = new OutputData();
+			data.setDataFile(this.signFile);
+			data.setSignatureFormat(signInfo.getSignInfo().getFormat());
+
+			final Map<BigInteger, X509Certificate> certs = new HashMap<>();
+			final AOTreeModel tree = signInfo.getSignsTree();
+			for (int i = 0; i < AOTreeModel.getChildCount(tree.getRoot()); i++) {
+				readCertsFromBranch((AOTreeNode) AOTreeModel.getChild(tree.getRoot(), i), certs);
+			}
+			data.setCerts(certs.values().toArray(new X509Certificate[certs.size()]));
+
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					PluginButtonActionListener.this.action.processSignatures(
+							new OutputData[] { data }, null,
+							SwingUtilities.getWindowAncestor(VisorPanel.this));
+				}
+			}).start();
+		}
+
+
+		private void readCertsFromBranch(AOTreeNode node, Map<BigInteger, X509Certificate> certs) {
+			final AOSimpleSignInfo signInfo = (AOSimpleSignInfo) node.getUserObject();
+			if (signInfo.getCerts() != null && signInfo.getCerts().length > 0
+					&& signInfo.getCerts()[0] != null) {
+				certs.put(signInfo.getCerts()[0].getSerialNumber(), signInfo.getCerts()[0]);
+			}
+
+			for (int i = 0; i < AOTreeModel.getChildCount(node); i++) {
+				readCertsFromBranch((AOTreeNode) AOTreeModel.getChild(node, i), certs);
+			}
+		}
+	}
 }

@@ -307,6 +307,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         }
 
+        // Terminado el proceso, notificamos al plugin que puede reiniciarse si es preciso
+        pluginsReset();
+
         // Si solo habia una firma, decidimos ahora donde se guarda
         if (onlyOneFile) {
         	File signatureFile;
@@ -329,9 +332,11 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	this.signExecutor.finishTask();
 
+        	signConfig.setSignatureFile(signatureFile);
+
             this.resultViewer.showResultsInfo(
             		signResult,
-            		signatureFile,
+            		signConfig,
             		(X509Certificate) pke.getCertificate()
         		);
         }
@@ -657,5 +662,47 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     	}
 
     	return processedSignature;
+    }
+
+    private void pluginsReset() {
+
+    	final PluginsManager pluginsManager = PluginsManager.getInstance();
+    	List<AfirmaPlugin> plugins;
+		try {
+			plugins = pluginsManager.getPluginsLoadedList();
+		} catch (final PluginException e) {
+			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+	                this.parent,
+	                SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
+	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                JOptionPane.WARNING_MESSAGE
+	            );
+			return;
+		}
+
+    	for (final AfirmaPlugin plugin : plugins) {
+    		try {
+    			plugin.reset();
+    		}
+    		catch (final PluginControlledException e) {
+    			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
+    			AOUIFactory.showErrorMessage(
+    					this.parent,
+    					e.getMessage(),
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					JOptionPane.WARNING_MESSAGE
+    					);
+    		}
+    		catch (Exception | Error e) {
+    			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al reiniciar la firma con el plugin " + plugin, e); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(
+    					this.parent,
+    					SimpleAfirmaMessages.getString("SignPanel.115", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					JOptionPane.ERROR_MESSAGE
+    					);
+    		}
+    	}
     }
 }

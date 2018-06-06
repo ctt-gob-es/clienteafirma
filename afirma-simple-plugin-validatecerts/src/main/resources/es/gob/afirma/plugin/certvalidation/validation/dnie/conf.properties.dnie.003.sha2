@@ -1,0 +1,8 @@
+# Certificado raiz del emisor
+issuerCertFile=/es/gob/afirma/plugin/certvalidation/validation/dnie/ACDNIE003-SHA2.crt
+
+# Si hay que firmar o no la peticion OCSP
+signOcspRequest=false
+
+# URL del responder OCSP
+responderUrl=http://ocsp.dnielectronico.es/
