@@ -20,7 +20,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.6.2"
+!define VERSION "1.6.3"
 
 ;--------------------------------
 ;Paginas del instalador
@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma32/AutoFirma_32_v1_6_2_installer.exe
+OutFile AutoFirma32/AutoFirma_32_v1_6_3_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
