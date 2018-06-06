@@ -18,7 +18,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.6.3"
+!define VERSION "1.6.4"
 
 ;--------------------------------
 ;Paginas del instalador

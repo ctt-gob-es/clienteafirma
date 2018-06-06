@@ -14,7 +14,7 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.6.3";
+		var VERSION = "1.6.4";
 
 		var JAR_NAME = 'miniapplet-full_1_6_3.jar';
 
