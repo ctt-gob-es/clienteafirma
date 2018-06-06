@@ -142,13 +142,14 @@
 				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
-
+				
 				
 				<!-- Servicios -->
 				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>
+				
 			</modules>
 			
 			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo -->
@@ -197,6 +198,8 @@
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
+				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->
 				<module>afirma-ui-miniapplet</module>
