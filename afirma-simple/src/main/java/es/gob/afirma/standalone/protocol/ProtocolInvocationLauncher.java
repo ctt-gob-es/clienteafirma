@@ -30,10 +30,12 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
+import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.OSXHandler;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n
  * por protocolo y bajo un entorno compatible <code>Swing</code>.
@@ -111,6 +113,12 @@ public final class ProtocolInvocationLauncher {
             ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_02);
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_02);
         }
+
+        // Configuramos el uso de JMulticard segun lo establecido en el dialogo
+        // de preferencias
+        final boolean defaultBehavior = PreferencesManager.getBoolean(
+        		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
+        JMulticardUtilities.configureJMulticard(defaultBehavior);
 
         // Se invoca la aplicacion para iniciar la comunicacion por socket
         if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$

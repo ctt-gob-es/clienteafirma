@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE;
@@ -44,6 +45,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -70,6 +72,8 @@ final class PreferencesPanelGeneral extends JPanel {
 	private final JCheckBox checkForUpdates = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.87")); //$NON-NLS-1$
 
 	private final JCheckBox sendAnalytics = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.89")); //$NON-NLS-1$
+
+	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 
@@ -103,6 +107,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			PreferencesManager.putBoolean(PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		}
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
+		PreferencesManager.putBoolean(PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
 	}
 
@@ -133,6 +138,14 @@ final class PreferencesPanelGeneral extends JPanel {
 		}
 		else {
 			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS));
+		}
+
+		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {
+			this.enableJMulticard.setSelected(false);
+			this.enableJMulticard.setEnabled(false);
+		}
+		else {
+			this.enableJMulticard.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_ENABLED_JMULTICARD));
 		}
 
 		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
@@ -326,7 +339,18 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.sendAnalytics.addItemListener(modificationListener);
 		this.sendAnalytics.addKeyListener(keyListener);
 		signConfigPanel.add(this.sendAnalytics, signConstraint);
+		signConstraint.gridy++;
 
+		// En Windows, se dara la posibilidad de configurar el comportamiento de
+		// JMulticard. Para el resto de sistemas, es obligatorio su uso
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			this.enableJMulticard.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("PreferencesPanel.166")); //$NON-NLS-1$
+			this.enableJMulticard.setMnemonic('j');
+			this.enableJMulticard.addItemListener(modificationListener);
+			this.enableJMulticard.addKeyListener(keyListener);
+			signConfigPanel.add(this.enableJMulticard, signConstraint);
+		}
 		add(signConfigPanel, gbc);
 
 		final JPanel signGeneralPanel = new JPanel(new GridBagLayout());

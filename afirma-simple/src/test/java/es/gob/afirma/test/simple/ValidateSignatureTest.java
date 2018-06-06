@@ -7,11 +7,11 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.cert.signvalidation.SignValider;
-import es.gob.afirma.cert.signvalidation.SignValiderFactory;
-import es.gob.afirma.cert.signvalidation.SignValidity;
-import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signvalidation.SignValider;
+import es.gob.afirma.signvalidation.SignValiderFactory;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Realiza pruebas de validaci&oacute;n del core de firma. */

@@ -42,6 +42,8 @@ public final class SimpleKeyStoreManager {
      * @throws AOKeyStoreManagerException Si ocurre cualquier problema durante la obtenci&oacute;n del <code>KeyStore</code>. */
     static AOKeyStoreManager getKeyStore(final boolean dnie, final Component parent) throws AOKeyStoreManagerException {
 
+    	// -- Se ha habilitado el uso de DNIe --
+
         if (dnie) {
             try {
             	return getKeyStoreManager(AOKeyStore.DNIEJAVA, parent);
@@ -111,6 +113,18 @@ public final class SimpleKeyStoreManager {
             	}
             }
         }
+
+        // El por defecto
+
+        // -- Comportamiento por defecto --
+
+        // Configuramos el uso de JMulticard segun lo establecido en el dialogo
+        // de preferencias
+        final boolean defaultBehavior = PreferencesManager.getBoolean(
+        		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
+        JMulticardUtilities.configureJMulticard(defaultBehavior);
+
+        // Cargamos el almacen por defecto
 
         // El por defecto
         final AOKeyStore aoks = getDefaultKeyStoreType();
