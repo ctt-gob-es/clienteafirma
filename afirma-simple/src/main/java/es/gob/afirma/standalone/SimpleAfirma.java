@@ -326,12 +326,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     /** Elimina el panel actual y carga el panel de resultados de firma.
      * @param signature
-     *        Firma o fichero firmado sobre el que queremos mostrar un
-     *        resumen
-     * @param signatureFile
-     *        Fichero en el que se ha guardado la firma.
+     *        Firma sobre el que queremos mostrar un resumen.
+     * @param signConfig
+     * 		  Configuraci&oacute;n de firma aplicada.
      * @param signingCert
-     *        Certificado usado para la firma */
+     *        Certificado usado para la firma. */
     @Override
     public void showResultsInfo(final byte[] signature, final SignOperationConfig signConfig,
     		final X509Certificate signingCert) {
