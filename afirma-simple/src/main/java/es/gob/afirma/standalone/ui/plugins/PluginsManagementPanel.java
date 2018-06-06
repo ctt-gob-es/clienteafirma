@@ -19,6 +19,7 @@ import java.awt.Window;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -164,9 +165,12 @@ public final class PluginsManagementPanel extends JPanel {
 		final JPanel infoPanel = new JPanel(new GridBagLayout());
 		infoPanel.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PluginsManagementPanel.3"))); //$NON-NLS-1$
 
-		// Panel con la informacion del plugin
-		this.pluginInfoPane = new JLabel();
-		this.pluginInfoPane.setFocusable(false);
+		// Creamos un panel con el texto que solo tenga scroll vertical y no en horizontal
+		final JComponent textPanel = createScrollableTextPanel();
+
+		final JScrollPane scrollPane = new JScrollPane(textPanel);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
 		// Panel con el boton para la configuracion del plugin. El boton perman
 		final JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
@@ -178,17 +182,45 @@ public final class PluginsManagementPanel extends JPanel {
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
-		c.gridy = 0;
-		infoPanel.add(this.pluginInfoPane, c);
 		c.weighty = 1.0;
-		c.gridy++;
-		infoPanel.add(new JPanel(), c); // Panel vacio para rellenar la vertical
+		c.gridy = 0;
+		infoPanel.add(scrollPane, c);
 		c.weightx = 0;
 		c.weighty = 0;
 		c.gridy++;
 		infoPanel.add(configPanel, c);
 
 		return infoPanel;
+	}
+
+	/**
+	 * Crea un panel con el texto de informaci&oacute;n del plugin preparado para
+	 * agregar a un panel con scroll.
+	 * @return Componente para la visualizaci&oacute;n del texto.
+	 */
+	@SuppressWarnings("serial")
+	private JComponent createScrollableTextPanel() {
+		this.pluginInfoPane = new JLabel() {
+			@Override public Dimension getPreferredSize() {
+		        return new Dimension(getParent().getSize().width, super.getPreferredSize().height);
+		    }
+		};
+		this.pluginInfoPane.setFocusable(false);
+
+		final JPanel textPanel = new JPanel() {
+			@Override public Dimension getPreferredSize() {
+		        return new Dimension(getParent().getSize().width, super.getPreferredSize().height);
+		    }
+		};
+		final GridBagConstraints c2 = new GridBagConstraints();
+		c2.fill = GridBagConstraints.VERTICAL;
+		c2.gridy = 0;
+		textPanel.add(this.pluginInfoPane, c2);
+		c2.weighty = 1.0;
+		c2.gridy++;
+		textPanel.add(new JPanel(), c2); // Panel vacio para rellenar la vertical
+
+		return textPanel;
 	}
 
 	/** Construye el objeto gr&aacute;fico que representa el panel
