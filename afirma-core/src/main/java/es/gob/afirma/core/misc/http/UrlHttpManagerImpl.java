@@ -338,7 +338,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	                                             CertificateException,
 	                                             IOException {
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
-		System.out.println(sc.getProvider().getName());
 		KeyManager[] km;
 		try {
 			km = getKeyManager();
