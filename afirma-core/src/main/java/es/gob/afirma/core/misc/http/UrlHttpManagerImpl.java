@@ -44,6 +44,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -78,6 +79,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final String KEYMANAGER_INSTANCE = "SunX509";//$NON-NLS-1$
 	private static final String SSL_CONTEXT = "SSL";//$NON-NLS-1$
 
+	private static KeyStore sslKeyStore = null;
+	private static PasswordCallback sslKeyStorePasswordCallback = null;
+
 	static {
 		final CookieManager cookieManager = new CookieManager();
 		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
@@ -86,6 +90,25 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	protected UrlHttpManagerImpl() {
 		// Vacio y "protected"
+	}
+
+	/** Establece el almac&eacute;n de claves a usar en SSL.
+	 * Esto permite usar un almac&eacute;n de claves que necesite una inicializaci&oacute;n a medida
+	 * y que por lo tanto no baste con indicarlo en las variables de entorno.
+	 * El almac&eacute;n debe proporcionarse inicializado y cargado.
+	 * Si se especifica aqu&iacute; un almac&eacute;n de claves se ignoran las variables de entorno
+	 * que pudiesen estar establecidas.
+	 * @param ks Almac&eacute;n de claves a usar en SSL. */
+	public static void setSslKeyStore(final KeyStore ks) {
+		sslKeyStore = ks;
+	}
+
+	/** Establece el <code>PasswordCallback</code> a usar cuando se establece directamente un
+	 * almac&eacute;n de claves a usar en SSL.
+	 * @param pwc <code>PasswordCallback</code> a usar cuando se establece directamente un
+	 * almac&eacute;n de claves a usar en SSL. */
+	public static void setSslKeyStorePasswordCallback(final PasswordCallback pwc) {
+		sslKeyStorePasswordCallback = pwc;
 	}
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
@@ -212,7 +235,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		conn.setRequestMethod(method.toString());
 
-
 		// Trabajamos las cabeceras, las por defecto y las que nos indiquen
 
 		final Properties headers = new Properties();
@@ -316,6 +338,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	                                             CertificateException,
 	                                             IOException {
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
+		System.out.println(sc.getProvider().getName());
 		KeyManager[] km;
 		try {
 			km = getKeyManager();
@@ -357,38 +380,47 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
 	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
 	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida. */
-
 	private static KeyManager[] getKeyManager() throws KeyStoreException,
 	                                                   NoSuchAlgorithmException,
 	                                                   CertificateException,
 	                                                   IOException,
 	                                                   UnrecoverableKeyException {
-		final String keyStore = System.getProperty(KEYSTORE);
-		final String keyStorePassword = System.getProperty(KEYSTORE_PASS);
-		final String keyStoreType = System.getProperty(KEYSTORE_TYPE);
-		if (keyStore == null || keyStore.isEmpty()) {
-			return null;
+		final KeyStore kstore;
+		final char[] kstorePassword;
+		if (sslKeyStore != null) {
+			LOGGER.info("Se usara el almacen de claves SSL proporcionado de forma directa: " + sslKeyStore.getType()); //$NON-NLS-1$
+			kstore = sslKeyStore;
+			kstorePassword = sslKeyStorePasswordCallback != null ? sslKeyStorePasswordCallback.getPassword() : new char[0];
 		}
-		final File f = new File(keyStore);
-		if (!f.isFile() || !f.canRead()) {
-			LOGGER.warning("El KeyStore SSL no existe o no es legible: " + f.getAbsolutePath()); //$NON-NLS-1$
-			return null;
-		}
-		final KeyStore keystore = KeyStore.getInstance(
-			keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE
-		);
-		try (
-			final InputStream fis = new FileInputStream(f);
-		) {
-			keystore.load(
-				fis,
-				keyStorePassword != null ? keyStorePassword.toCharArray() : null
+		else {
+			final String keyStore = System.getProperty(KEYSTORE);
+			final String keyStorePassword = System.getProperty(KEYSTORE_PASS);
+			final String keyStoreType = System.getProperty(KEYSTORE_TYPE);
+			if (keyStore == null || keyStore.isEmpty()) {
+				return null;
+			}
+			final File f = new File(keyStore);
+			if (!f.isFile() || !f.canRead()) {
+				LOGGER.warning("El KeyStore SSL no existe o no es legible: " + f.getAbsolutePath()); //$NON-NLS-1$
+				return null;
+			}
+			kstore = KeyStore.getInstance(
+				keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE
 			);
+			try (
+				final InputStream fis = new FileInputStream(f);
+			) {
+				kstore.load(
+					fis,
+					keyStorePassword != null ? keyStorePassword.toCharArray() : null
+				);
+			}
+			kstorePassword = keyStorePassword != null ? keyStorePassword.toCharArray() : new char[0];
 		}
 		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KEYMANAGER_INSTANCE);
 		keyFac.init(
-			keystore,
-			keyStorePassword != null ? keyStorePassword.toCharArray() : new char[0]
+			kstore,
+			kstorePassword
 		);
 		return keyFac.getKeyManagers();
 	}
