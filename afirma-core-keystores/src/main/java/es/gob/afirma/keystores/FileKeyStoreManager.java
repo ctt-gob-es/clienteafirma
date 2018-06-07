@@ -137,7 +137,7 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
     }
 
 
-	protected void setKeyStoreFile(String pkcs12File) {
+	protected void setKeyStoreFile(final String pkcs12File) {
 		this.keystoreFile = pkcs12File;
 	}
 
@@ -145,10 +145,13 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 	public void refresh() throws IOException {
 		// Para recargar el almacen, volvemos a cargar el fichero indicado.
 		// El metodo de inicializacion ya se encarga de cerrar el fichero.
-		try {
-			setKeyStore(init(new FileInputStream(this.keystoreFile), this.cachePasswordCallback));
-		} catch (final AOKeyStoreManagerException e) {
-			throw new IOException("Error al recargar el almacen PKCS#12", e); //$NON-NLS-1$
+		try (
+			final InputStream fis = new FileInputStream(this.keystoreFile);
+		) {
+			setKeyStore(init(fis, this.cachePasswordCallback));
+		}
+		catch (final AOKeyStoreManagerException e) {
+			throw new IOException("Error al recargar el almacen PKCS#12: " + e, e); //$NON-NLS-1$
 		}
 	}
 }

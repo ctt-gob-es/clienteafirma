@@ -85,7 +85,7 @@ public final class TestOOXML {
 	@Test
     public void TestFormatDetection() {
     	for (final byte[] data : DATAS) {
-    		Assert.assertTrue("No se esta detectando correctamente el formato OOXML",
+    		Assert.assertTrue("No se esta detectando correctamente el formato OOXML", //$NON-NLS-1$
     				new AOOOXMLSigner().isValidDataFile(data));
     	}
     }

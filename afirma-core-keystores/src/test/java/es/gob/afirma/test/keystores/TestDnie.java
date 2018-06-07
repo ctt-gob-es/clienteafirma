@@ -30,7 +30,7 @@ public class TestDnie {
 
 	private static final String SIGN_ALIAS = "CertFirmaDigital";  //$NON-NLS-1$
 	private static final String DNIE_P11_64 = "c:\\windows\\system32\\DNIe_P11_x64.dll"; //$NON-NLS-1$
-	private static final String DNIE_P11_32 = "c:\\windows\\system32\\DNIe_P11.dll"; //$NON-NLS-1$
+	//private static final String DNIE_P11_32 = "c:\\windows\\system32\\DNIe_P11.dll"; //$NON-NLS-1$
 
     /** Prueba de carga y uso del almac&eacute;n DNIe 100% Java.
      * @throws Exception En cualquier error. */
