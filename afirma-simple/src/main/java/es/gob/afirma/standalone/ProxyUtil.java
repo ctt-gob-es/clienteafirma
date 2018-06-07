@@ -47,6 +47,10 @@ public final class ProxyUtil {
 	private static void setDefaultProxy() {
 		final ProxySearch ps = ProxySearch.getDefaultProxySearch();
 		final ProxySelector psel = ps.getProxySelector();
+		if (psel == null) {
+			LOGGER.info("No se usara proxy para las conexiones de red"); //$NON-NLS-1$
+			return;
+		}
 		ProxySelector.setDefault(psel);
 
 		// Este bloque es solo para el log
