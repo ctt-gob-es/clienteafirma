@@ -102,6 +102,8 @@
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
+				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 			</modules>
 			
       		<build>
@@ -142,7 +144,6 @@
 				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
-				
 				
 				<!-- Servicios -->
 				<module>afirma-server-simple-webstart</module>
