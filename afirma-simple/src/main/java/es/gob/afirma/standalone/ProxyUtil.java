@@ -22,6 +22,8 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.github.markusbernhardt.proxy.ProxySearch;
+
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
@@ -42,50 +44,38 @@ public final class ProxyUtil {
 		// No instanciable
 	}
 
-	private static boolean setDefaultHttpProxy() {
-		return setDefaultProxy("http://www.google.com", "http.proxyHost", "http.proxyPort"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
+	private static void setDefaultProxy() {
+		final ProxySearch ps = ProxySearch.getDefaultProxySearch();
+		final ProxySelector psel = ps.getProxySelector();
+		if (psel == null) {
+			LOGGER.info("No se usara proxy para las conexiones de red"); //$NON-NLS-1$
+			return;
+		}
+		ProxySelector.setDefault(psel);
 
-	private static boolean setDefaultHttpsProxy() {
-		return setDefaultProxy("https://www.google.com", "https.proxyHost", "https.proxyPort"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
-	private static boolean setDefaultProxy(final String urlToCkech, final String hostProperty, final String portProperty) {
-		System.setProperty("java.net.useSystemProxies", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-		final List<Proxy> l;
-		final URI uri;
+		// Este bloque es solo para el log
 		try {
-			uri = new URI(urlToCkech);
-		    l = ProxySelector.getDefault().select(uri);
+			List<Proxy> proxies = psel.select(new URI("http://www.theregister.co.uk")); //$NON-NLS-1$
+			if (proxies.isEmpty()) {
+				LOGGER.info("No se usara proxy para las conexiones HTTP"); //$NON-NLS-1$
+			}
+			else {
+		        final InetSocketAddress addr = (InetSocketAddress) proxies.get(0).address();
+				LOGGER.info("Se usara proxy para las conexiones HTTP: " + addr.getHostName() + ":" + addr.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			proxies = psel.select(new URI("https://www.google.com")); //$NON-NLS-1$
+			if (proxies.isEmpty()) {
+				LOGGER.info("No se usara proxy para las conexiones HTTPS"); //$NON-NLS-1$
+			}
+			else {
+		        final InetSocketAddress addr = (InetSocketAddress) proxies.get(0).address();
+				LOGGER.info("Se usara proxy para las conexiones HTTPS: " + addr.getHostName() + ":" + addr.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 		catch (final URISyntaxException e) {
-			LOGGER.warning(
-				"No se ha podido comprobar el proxy por defecto: " + e //$NON-NLS-1$
-			);
-		    return false;
+			// No debe pasar
+			throw new IllegalStateException("La URI de pruebas del proxy es invalida: " + e, e); //$NON-NLS-1$
 		}
-		if (l != null) {
-		    for (final Proxy proxy : l) {
-		    	LOGGER.info(
-	    			"Las conexiones para protocolo '" + uri.getScheme() + "' son por defecto de tipo: " + proxy.type() //$NON-NLS-1$ //$NON-NLS-2$
-    			);
-		        final InetSocketAddress addr = (InetSocketAddress) proxy.address();
-
-		        if (addr == null) {
-		            continue;
-		        }
-
-				System.setProperty(hostProperty, addr.getHostName());
-				System.setProperty(portProperty, Integer.toString(addr.getPort()));
-
-		        LOGGER.info(
-					"Se usara el Proxy configurado en sistema para las conexiones de red HTTP: " + addr.getHostName() + ":" + addr.getPort() //$NON-NLS-1$ //$NON-NLS-2$
-				);
-
-				return true;
-		    }
-		}
-		return false;
 	}
 
 	/** Establece la configuraci&oacute;n para el servidor <i>Proxy</i> seg&uacute;n los valores
@@ -160,12 +150,13 @@ public final class ProxyUtil {
     	// la JVM tal y como estaban, nunca se sobreescriben, a menos que estos mismos valores
     	// hubiesen sido establecidos con el mismo AutoFirma.
     	else {
-    		// Si es establecio el Proxy con AutoFirma y se desmarca, se borra con AutoFirma
+    		// Si se establecio el Proxy con AutoFirma y se desmarca, se borra con AutoFirma
     		if (clearOnUncheck) {
     			clearJavaProxy();
     		}
-    		// Si se desmarca con AutoFirma pero habia un Proxy establecido externamente, se respeta
+    		// Si no esta marcado en AutoFirma pero hay un Proxy establecido externamente, se respeta
     		else {
+
 	    		final String javaProxyHost = System.getProperty("http.proxyHost"); //$NON-NLS-1$
 	    		final String javaProxyPort = System.getProperty("http.proxyPort"); //$NON-NLS-1$
 	    		// Si hay un proxy establecido a nivel de JVM...
@@ -176,14 +167,12 @@ public final class ProxyUtil {
 	    			LOGGER.info(
 						"Se usara el Proxy por defecto de Java para las conexiones de red: " + javaProxyHost + ":" + javaProxyPort //$NON-NLS-1$ //$NON-NLS-2$
 					);
+	    			return;
 	    		}
-	    		// Miramos a ver si hay establecido un proxy a nivel de SO (solo para Windows 7 y
-	    		// superiores y Linux con GNOME. Si lo hay, las funciones lo aplican
-	    		else if (!setDefaultHttpProxy() && !setDefaultHttpsProxy()) {
-	    			// Si las funciones no han encontrado y establecido un proxy a nivel de SO, ya no nos
-	    			// quedan mas opciones, no se usa proxy
-	    			LOGGER.info("No se usara Proxy para las conexiones de red"); //$NON-NLS-1$
-	    		}
+
+	    		// No no esta marcado ni hay uno externo, vemos si hay establecido un proxy a nivel de SO
+	    		// (usando ProxyVole), en cuyo caso, se usa.
+	    		setDefaultProxy();
     		}
     	}
     }
@@ -210,7 +199,7 @@ public final class ProxyUtil {
     /** Cifra una contrase&ntilde;a.
      * @param password Contrase&ntilde;a cifrada o <code>null</code> si la contrase&ntilde;a proporcionada es
      *                 nula o vac&iacute;a.
-     * @return Contrase&tilde;a cifrada en base 64.
+     * @return Contrase&tilde;a cifrada en Base64.
      * @throws GeneralSecurityException Cuando se produce un error durante el cifrado. */
     public static String cipherPassword(final char[] password) throws GeneralSecurityException {
     	if (password == null || password.length < 1) {
