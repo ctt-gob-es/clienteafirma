@@ -12,6 +12,11 @@ package es.gob.afirma.signers.pades;
 /** Par&aacute;metros adicionales para las firmas PAdES. */
 public final class PdfExtraParams {
 
+	/** Grados en los que hay que rotar el campo de firma. Debe ser un entero entre 0 y 360.
+	 * Este campo solo aplica a las firmas PDF visibles. Si se rota una firma se pierde la imagen de
+	 * r&uacute;brica que se pudiese haber establecido. */
+	static final String SIGNATURE_ROTATION = "signatureRotation"; //$NON-NLS-1$
+
     /** Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      * pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
      * si se establece a <code>false</code> se incluye siempre que el certificado

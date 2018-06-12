@@ -56,6 +56,9 @@ public final class PdfSessionManager {
     private static final int PDF_MAX_VERSION = 7;
     private static final int PDF_MIN_VERSION = 2;
 
+    /** Rotaci&oacute;n de las firmas en grados (cuando se indica que deben rotarse). */
+    private static final int DEFAULT_SIGNATURE_ROTATION = 90;
+
     private PdfSessionManager() {
     	// No permitimos la instanciacion
     }
@@ -81,6 +84,9 @@ public final class PdfSessionManager {
 		// *********************************************************************************************************************
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
 		// *********************************************************************************************************************
+
+    	// Rotacion del campo de firma (90 grados)
+    	final boolean signatureRotation = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
 
     	// Imagen de la rubrica
 		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
@@ -359,12 +365,7 @@ public final class PdfSessionManager {
 			page = pdfReader.getNumberOfPages();
 		}
 
-		if (signaturePositionOnPage != null && signatureField == null) {
-			sap.setVisibleSignature(signaturePositionOnPage, page, null);
-		}
-		else if (signatureField != null) {
-			sap.setVisibleSignature(signatureField);
-		}
+		sap.setCrypto(null, certChain, null, null);
 
 		// Localizacion en donde se produce la firma
 		if (signatureProductionCity != null) {
@@ -378,9 +379,17 @@ public final class PdfSessionManager {
 
 		// Rubrica de la firma
 		if (rubric != null) {
-			sap.setImage(rubric);
-			sap.setLayer2Text(""); //$NON-NLS-1$
-			sap.setLayer4Text(""); //$NON-NLS-1$
+			if (signatureRotation) {
+				LOGGER.warning(
+					"Se ha indicado rotar la firma y ademas insertar una imagen, pero las firmas rotadas" //$NON-NLS-1$
+						+ " no aceptan imagenenes. No se usara la imagen proporcionada" //$NON-NLS-1$
+				);
+			}
+			else {
+				sap.setImage(rubric);
+				sap.setLayer2Text(""); //$NON-NLS-1$
+				sap.setLayer4Text(""); //$NON-NLS-1$
+			}
 		}
 
 		// **************************
@@ -405,11 +414,35 @@ public final class PdfSessionManager {
 			sap.setLayer4Text(layer4Text);
 		}
 
+		if (signaturePositionOnPage != null && signatureField == null) {
+			if (!signatureRotation) {
+				sap.setVisibleSignature(signaturePositionOnPage, page, null);
+			}
+			else {
+				try {
+					PdfVisibleAreasUtils.setVisibleSignatureRotated(
+						stp,
+						sap,
+						signaturePositionOnPage,
+						page,
+						null,
+						DEFAULT_SIGNATURE_ROTATION
+					);
+				}
+				catch (final DocumentException e) {
+					throw new IOException(
+						"Error en la insercion de la firma rotada: " + e, e //$NON-NLS-1$
+					);
+				}
+			}
+		}
+		else if (signatureField != null) {
+			sap.setVisibleSignature(signatureField);
+		}
+
 		// ***************************
 		// ** Fin texto en las capas *
 		// ***************************
-
-		sap.setCrypto(null, certChain, null, null);
 
 		final PdfSignature dic = new PdfSignature(
 			PdfName.ADOBE_PPKLITE,

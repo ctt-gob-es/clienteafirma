@@ -77,7 +77,6 @@ public class TestSignField {
 				tempFile.getAbsolutePath()
 		);
 
-
 		// Ahora con imagen en ultima pagina
 		extraParams.put("imagePage", "-1"); //$NON-NLS-1$ //$NON-NLS-2$
 		signedPdf = signer.sign(
@@ -119,9 +118,7 @@ public class TestSignField {
 			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
 				tempFile.getAbsolutePath()
 		);
-
 	}
-
 
 	//TODO: Averiguar porque en MAVEN no encuentra la fuente Helvetica
 
@@ -221,8 +218,9 @@ public class TestSignField {
 		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
-				tempFile.getAbsolutePath());
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+			tempFile.getAbsolutePath()
+		);
 	}
 
 	/** Prueba de firma PDF visible con r&uacute;brica.
@@ -272,8 +270,9 @@ public class TestSignField {
 		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
-				tempFile.getAbsolutePath());
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+			tempFile.getAbsolutePath()
+		);
 	}
 
 	/** Prueba de firma PDF visible con un texto.
@@ -379,8 +378,68 @@ public class TestSignField {
 		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
-				tempFile.getAbsolutePath());
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+			tempFile.getAbsolutePath()
+		);
+	}
+
+	/** Prueba de firma PDF visible con r&uacute;brica y texto con todo el recuadro rotado.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testCampoDeFirmaRotadoConPosicionesRubricaYTexto() throws Exception {
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Prueba de firma de PDF con posiciones de firma, rubrica y texto"); //$NON-NLS-1$
+
+		final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties extraParams = new Properties();
+		extraParams.put("signaturePositionOnPageLowerLeftX", "50"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageLowerLeftY", "50"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightX", "300"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightY", "400"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		extraParams.put("signatureRotation", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(RUBRIC_IMAGE));
+
+		final String rubricImageB64 = Base64.encode(rubricImage);
+
+		extraParams.put("signatureRubricImage", rubricImageB64); //$NON-NLS-1$
+		extraParams.put("layer2Text", "Este es el texto de prueba 'Hola Mundo'"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontFamily", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontSize", "14"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+
+		final AOPDFSigner signer = new AOPDFSigner();
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+
+		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+			tempFile.getAbsolutePath()
+		);
 	}
 
 	/** Entrada para pruebas manuales.

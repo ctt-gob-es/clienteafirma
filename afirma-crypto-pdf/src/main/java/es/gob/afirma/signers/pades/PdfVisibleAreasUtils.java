@@ -9,6 +9,7 @@
 
 package es.gob.afirma.signers.pades;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -16,6 +17,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import com.aowagie.text.DocumentException;
+import com.aowagie.text.Image;
+import com.aowagie.text.Rectangle;
+import com.aowagie.text.pdf.ByteBuffer;
+import com.aowagie.text.pdf.PdfSignatureAppearance;
+import com.aowagie.text.pdf.PdfStamper;
+import com.aowagie.text.pdf.PdfTemplate;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -98,6 +107,9 @@ final class PdfVisibleAreasUtils {
 			);
 		}
 		catch (final Exception e) {
+			LOGGER.warning(
+				"Error estableciendo el color del tipo de letra para la firma visible PDF, se usara el por defecto: " + e //$NON-NLS-1$
+			);
 			return new com.aowagie.text.Font(
 				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3,
 				// ZAPFDINGBATS = 4)
@@ -181,5 +193,67 @@ final class PdfVisibleAreasUtils {
 		}
 	}
 
+	/** A&ntilde;ade al PDF un campo de firma rotado.
+	 * Para ello, se obtiene la representaci&oacute;n gr&aacute;fica de la capa 2 de la apariencia de
+	 * la firma, se convierte a imagen, se rota y se inserta como imagen. Esto hace que se pierda la
+	 * imagen original de la capa 2.
+	 * @param stamper Estampador PDF.
+	 * @param appearance Apariencia de la firma PDF.
+	 * @param pageRect Rect&aacute;ngulo de firma.
+	 * @param page P&aacute;gina donde insertar la firma.
+	 * @param fieldName Nombre del campo de firma a usar (si se especifica <code>null</code> se
+	 *                  crea uno nuevo.
+	 * @param degrees Grados de ro5taci&oacute;n del campo de firma.
+	 * @throws DocumentException Si hay problemas tratando el PDF.
+	 * @throws IOException En cualquier otro error. */
+    static void setVisibleSignatureRotated(final PdfStamper stamper,
+    		                               final PdfSignatureAppearance appearance,
+    		                               final Rectangle pageRect,
+    		                               final int page,
+    		                               final String fieldName,
+    		                               final int degrees) throws DocumentException,
+                                                                     IOException {
+        final float height = pageRect.getHeight();
+        final float width = pageRect.getWidth();
+        final float llx = pageRect.getLeft();
+        final float lly = pageRect.getBottom();
+
+        // La firma visible se configura inicialmente de forma horizontal.
+        appearance.setVisibleSignature(
+    		new Rectangle(0, 0, width, height),
+    		page,
+    		null
+		);
+
+        // Iniciamos la creacion de la apariencia, de forma que la podamos modificar posteriormente.
+        appearance.getAppearance();
+
+        // Usamos las dimensiones indicadas.
+        appearance.setVisibleSignature(
+    		new Rectangle(llx, lly, llx + width, lly + height),
+    		page,
+    		fieldName
+		);
+
+        appearance.getTopLayer().setWidth(width);
+        appearance.getTopLayer().setHeight(height);
+        final PdfTemplate n2Layer = appearance.getLayer(2);
+        n2Layer.setWidth(width);
+        n2Layer.setHeight(height);
+        // Rotamos entonces la capa 2: http://developers.itextpdf.com/question/how-rotate-paragraph.
+        final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), width, height);
+        try (
+    		final ByteBuffer internalBuffer = t.getInternalBuffer();
+		) {
+	        internalBuffer.write(n2Layer.toString().getBytes());
+	        n2Layer.reset();
+	        final Image textImg = Image.getInstance(t);
+	        textImg.setInterpolation(true);
+	        textImg.scaleAbsolute(height, width);
+	        textImg.setRotationDegrees(degrees);
+	        textImg.setAbsolutePosition(0, 0);
+	        n2Layer.addImage(textImg);
+        }
+    }
 
 }
