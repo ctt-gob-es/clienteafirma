@@ -522,12 +522,14 @@ public class JSEUIManager implements AOUIManager {
             if (filters != null) {
             	fileChooser.setAcceptAllFileFilterUsed(false);
             	for (final GenericFileFilter gff: filters) {
-            		fileChooser.addChoosableFileFilter(
-        				new FileNameExtensionFilter(
-    						gff.getDescription(),
-    						gff.getExtensions()
-						)
-    				);
+            		if (gff.getExtensions() != null && gff.getExtensions().length != 0) {
+            			fileChooser.addChoosableFileFilter(
+            					new FileNameExtensionFilter(
+            							gff.getDescription(),
+            							gff.getExtensions()
+            							)
+            					);
+            		}
             	}
             }
 
