@@ -468,7 +468,8 @@ public final class PreferencesManager {
 	 * @return {@code true} Si es una preferencia bloqueable, {@code false} en caso contrario
 	 */
 	public static boolean isProtectedPreference(final String key) {
-		return key.equals(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM) || key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
+		return key.equals(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
+				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE)
 				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF)

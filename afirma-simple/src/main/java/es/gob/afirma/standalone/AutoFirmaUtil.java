@@ -190,6 +190,27 @@ public final class AutoFirmaUtil {
 	}
 
 	/**
+	 * Recupera el directorio alternativo de la aplicaci&oacute;n, en el que
+	 * se pueden almacenar los logs y recursos externos.
+	 * @return Directorio alternativo de la aplicaci&oacute;n o {@code null} si
+	 * no ha podido determinarse.
+	 */
+	public static File getAlternativeDirectory() {
+
+		File appDir = null;
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			appDir = getWindowsAlternativeAppDir();
+		}
+		else if (Platform.getOS() == Platform.OS.LINUX) {
+			appDir = getLinuxAlternativeAppDir();
+		}
+		else if (Platform.getOS() == Platform.OS.MACOSX) {
+			appDir = getMacOsXAlternativeAppDir();
+		}
+		return appDir;
+	}
+
+	/**
 	 * Comprueba si estamos en un despliegue JNLP de la aplicaci&oacute;n.
 	 * @return {@code true} si estamos en un despliegue JNLP, {@code false}
 	 * en caso contrario.

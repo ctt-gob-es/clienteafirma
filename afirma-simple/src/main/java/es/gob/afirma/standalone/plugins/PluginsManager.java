@@ -403,7 +403,10 @@ public class PluginsManager {
 	}
 
 	private static File getPluginsDir() {
-		final File appDir = AutoFirmaUtil.getApplicationDirectory();
+		File appDir = AutoFirmaUtil.getAlternativeDirectory();
+		if (appDir == null) {
+			appDir = AutoFirmaUtil.getApplicationDirectory();
+		}
 		return new File(appDir, PLUGINS_DIRNAME);
 	}
 }
