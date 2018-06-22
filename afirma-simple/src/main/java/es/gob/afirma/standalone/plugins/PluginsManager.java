@@ -247,7 +247,7 @@ public class PluginsManager {
 		// Obtenemos el directorio de plugins
 		final File pluginsDir = getPluginsDir();
 		if (!pluginsDir.isDirectory()) {
-			if (!pluginsDir.mkdir()) {
+			if (!pluginsDir.mkdirs()) {
 				throw new IOException("No se ha podido crear el directorio interno de plugins"); //$NON-NLS-1$
 			}
 		}
@@ -309,7 +309,7 @@ public class PluginsManager {
 
 		final File pluginsDir = getPluginsDir();
 		if (!pluginsDir.isDirectory()) {
-			if (!pluginsDir.mkdir()) {
+			if (!pluginsDir.mkdirs()) {
 				throw new IOException("No se ha podido crear el directorio interno de plugins"); //$NON-NLS-1$
 			}
 		}
