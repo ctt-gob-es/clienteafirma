@@ -570,6 +570,8 @@ Section "uninstall"
 	StrCmp $R3 0 0 +2
 		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
 
+	; ==== Desinstalador EXE - FIN ====
+		
 	; ==== Desinstalador MSI - INICIO ====
    
 	;Se fuerza el cierre de Firefox y Chrome si estan abiertos
