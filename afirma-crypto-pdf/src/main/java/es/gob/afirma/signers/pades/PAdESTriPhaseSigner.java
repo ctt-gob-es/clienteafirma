@@ -305,7 +305,10 @@ public final class PAdESTriPhaseSigner {
         //***************** SELLO DE TIEMPO ****************
 
         // El sello a nivel de firma nunca se aplica si han pedido solo sello a nivel de documento
-        if (!TsaParams.TS_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE))) {
+        if (
+    		!TsaParams.TS_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE)) &&
+    		extraParams.getProperty(PdfExtraParams.TSA_URL) != null
+		) {
 	        TsaParams tsaParams;
 	        try {
 	        	tsaParams = new TsaParams(extraParams);

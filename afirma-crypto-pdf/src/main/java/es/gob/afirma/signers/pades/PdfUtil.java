@@ -167,24 +167,38 @@ public final class PdfUtil {
 	}
 
 	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException {
-		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED &&
-				!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS))) {
-			// Si no permitimos dialogos graficos lanzamos
-			// una excepcion (en otro caso, preguntaremos al usuario tras este if)
-			if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
+		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED) {
+
+			// "allowSigningCertifiedPdfs" puede ser "true", "false" o no estar establecido (vacio, nulo o cualquier otro valor).
+			// Para tratar el caso en el que sea "false" no puedo usar Boolean.parseBoolean(), ya que no distingue entre "false"
+			// y "no establecido"
+			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
+			if ("true".equalsIgnoreCase(allow)) { //$NON-NLS-1$
+				// Se permite, no se hace nada
+				return;
+			}
+			else if ("false".equalsIgnoreCase(allow)) { //$NON-NLS-1$
+				// No se permite, se lanza excepcion
 				throw new PdfIsCertifiedException();
 			}
-			// En otro caso, perguntamos al usuario
-			if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
-				null,
-				CommonPdfMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
-				CommonPdfMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
-				AOUIFactory.YES_NO_OPTION,
-				AOUIFactory.WARNING_MESSAGE)
-			) {
-				throw new AOCancelledOperationException("El usuario no ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
+			// No establecido
+			else {
+				// Si no podemos preguntar al usuario, lanzamos excepcion
+				if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
+					throw new PdfIsCertifiedException();
+				}
+				// En otro caso, perguntamos al usuario
+				if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
+					null,
+					CommonPdfMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
+					CommonPdfMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
+					AOUIFactory.YES_NO_OPTION,
+					AOUIFactory.WARNING_MESSAGE)
+				) {
+					throw new AOCancelledOperationException("El usuario no ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
+				}
+				extraParams.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, "true"); //$NON-NLS-1$
 			}
-			extraParams.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, "true"); //$NON-NLS-1$
 		}
 	}
 
