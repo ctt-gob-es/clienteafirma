@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
-import com.aowagie.text.Image;
 import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.PdfDate;
@@ -89,7 +88,7 @@ public final class PdfSessionManager {
     	final boolean signatureRotation = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
 
     	// Imagen de la rubrica
-		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
+		final com.aowagie.text.Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
 
 		// Motivo de la firma
 		final String reason = extraParams.getProperty(PdfExtraParams.SIGN_REASON);
@@ -140,6 +139,9 @@ public final class PdfSessionManager {
 					UNDEFINED;
 		}
 		catch(final Exception e) {
+			LOGGER.warning(
+				"Se ha indicado un nivel de certificacion no valido ('" + extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			certificationLevel = UNDEFINED;
 		}
 
@@ -184,6 +186,9 @@ public final class PdfSessionManager {
 					-1;
 		}
 		catch(final Exception e) {
+			LOGGER.warning(
+				"Se ha indicado un tipo de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			layer2FontFamily = UNDEFINED;
 		}
 
@@ -195,6 +200,9 @@ public final class PdfSessionManager {
 					-1;
 		}
 		catch(final Exception e) {
+			LOGGER.warning(
+				"Se ha indicado un tamano de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			layer2FontSize = UNDEFINED;
 		}
 
@@ -206,6 +214,9 @@ public final class PdfSessionManager {
 					-1;
 		}
 		catch(final Exception e) {
+			LOGGER.warning(
+				"Se ha indicado un estilo de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			layer2FontStyle = UNDEFINED;
 		}
 
@@ -309,7 +320,9 @@ public final class PdfSessionManager {
             // proporcionaron ninguna
             final String userPwd = new String(
                 AOUIFactory.getPassword(
-                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD) == null ? CommonPdfMessages.getString("AOPDFSigner.0") : CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
+                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD) == null ?
+                		CommonPdfMessages.getString("AOPDFSigner.0") : //$NON-NLS-1$
+                			CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
                     null
                 )
             );
@@ -446,7 +459,9 @@ public final class PdfSessionManager {
 
 		final PdfSignature dic = new PdfSignature(
 			PdfName.ADOBE_PPKLITE,
-			signatureSubFilter != null && !signatureSubFilter.isEmpty() ? new PdfName(signatureSubFilter) : PdfName.ADBE_PKCS7_DETACHED
+			signatureSubFilter != null && !signatureSubFilter.isEmpty() ?
+				new PdfName(signatureSubFilter) :
+					PdfName.ADBE_PKCS7_DETACHED
 		);
 
 		// Fecha de firma
