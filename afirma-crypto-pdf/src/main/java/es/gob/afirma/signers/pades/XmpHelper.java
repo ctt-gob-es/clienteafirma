@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Map;
@@ -55,7 +56,7 @@ final class XmpHelper {
 
     private static final String PROCESSING_INSTRUCTION_SUFFIX = "?>"; //$NON-NLS-1$
 
-    private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+    private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
 	private static final String NEW_HISTORY_LIST_ITEM = "<rdf:li rdf:parseType=\"Resource\">\n" + //$NON-NLS-1$
 			"  <stEvt:action>signed</stEvt:action>\n" + //$NON-NLS-1$
@@ -129,15 +130,6 @@ final class XmpHelper {
 		final PdfReader reader = new PdfReader(inPdf);
 		final byte[] xmpBytes = reader.getMetadata();
 
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final PdfStamper stamper;
-		try {
-			stamper = new PdfStamper(reader, baos, globalDate);
-		}
-		catch(final DocumentException ex) {
-			throw new IOException(ex);
-		}
-
 		if (!PdfUtil.isPdfAx(xmpBytes) || new AOPDFSigner().isSign(inPdf)) {
 			reader.close();
 			return inPdf;
@@ -210,7 +202,7 @@ final class XmpHelper {
 		n.appendChild(node);
 
 		final Map<String, String> props = new ConcurrentHashMap<>(1);
-		props.put("encoding", DEFAULT_ENCODING); //$NON-NLS-1$
+		props.put("encoding", DEFAULT_ENCODING.name()); //$NON-NLS-1$
 
 		String xmlString = new String(
 			writeXml(doc.getDocumentElement()),
@@ -247,6 +239,15 @@ final class XmpHelper {
 			);
 		}
 
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final PdfStamper stamper;
+		try {
+			stamper = new PdfStamper(reader, baos, globalDate);
+		}
+		catch(final DocumentException ex) {
+			throw new IOException(ex);
+		}
+
 		try {
 			stamper.setXmpMetadata(xmlString.getBytes(DEFAULT_ENCODING));
 			stamper.close(globalDate);
@@ -279,7 +280,7 @@ final class XmpHelper {
             lsSerializer.getDomConfig().setParameter("canonical-form", Boolean.TRUE); //$NON-NLS-1$
         }
         final LSOutput lsOutput = domImpl.createLSOutput();
-        lsOutput.setEncoding(DEFAULT_ENCODING);
+        lsOutput.setEncoding(DEFAULT_ENCODING.name());
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         lsOutput.setByteStream(baos);
         lsSerializer.write(node, lsOutput);

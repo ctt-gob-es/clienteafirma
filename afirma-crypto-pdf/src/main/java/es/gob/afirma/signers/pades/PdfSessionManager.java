@@ -67,7 +67,7 @@ public final class PdfSessionManager {
      * @param pdfBytes Documento PDF que se desea firmar
      * @param certChain Cadena de certificados del firmante
      * @param signTime Hora de la firma
-     * @param extraParams Par&aacute;metros adicionales de la firma
+     * @param xParams Par&aacute;metros adicionales de la firma
      * @return Datos PDF relevantes en cuanto a las firmas electr&oacute;nicas
      * @throws IOException En caso de errores de entrada / salida.
      * @throws InvalidPdfException Si el formato del documento no es v&aacute;lido.
@@ -76,13 +76,15 @@ public final class PdfSessionManager {
     public static PdfTriPhaseSession getSessionData(final byte[] pdfBytes,
                                                     final Certificate[] certChain,
                                                     final Calendar signTime,
-                                                    final Properties extraParams) throws IOException,
+                                                    final Properties xParams) throws IOException,
                                                                                          InvalidPdfException,
                                                                                          AOException {
 
 		// *********************************************************************************************************************
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
 		// *********************************************************************************************************************
+
+    	final Properties extraParams = xParams != null ? xParams : new Properties();
 
     	// Rotacion del campo de firma (90 grados)
     	final boolean signatureRotation = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
@@ -167,14 +169,14 @@ public final class PdfSessionManager {
 		// Texto en capa 4
 		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
-			(X509Certificate) certChain[0],
+			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
 			signTime
 		);
 
 		// Texto en capa 2
 		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty(PdfExtraParams.LAYER2_TEXT),
-			(X509Certificate) certChain[0],
+			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
 			signTime
 		);
 
@@ -469,7 +471,9 @@ public final class PdfSessionManager {
 			dic.setDate(new PdfDate(sap.getSignDate()));
 		}
 
-		dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) certChain[0]).getField("CN")); //$NON-NLS-1$
+		if (certChain != null && certChain.length > 0) {
+			dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) certChain[0]).getField("CN")); //$NON-NLS-1$
+		}
 
 		if (sap.getReason() != null) {
 			dic.setReason(sap.getReason());
