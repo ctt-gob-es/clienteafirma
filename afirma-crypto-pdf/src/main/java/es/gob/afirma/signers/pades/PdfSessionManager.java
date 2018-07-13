@@ -86,6 +86,9 @@ public final class PdfSessionManager {
 
     	final Properties extraParams = xParams != null ? xParams : new Properties();
 
+    	// Omision de informacion del firmante diccionario o estructura de apariencia PDF. */
+    	final boolean doNotUseCertChainOnPostSign = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_USE_CERTCHAIN_ON_POSTSIGN));
+
     	// Rotacion del campo de firma (90 grados)
     	final boolean signatureRotation = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
 
@@ -341,7 +344,7 @@ public final class PdfSessionManager {
 		// visible
 
 		// Posicion de la firma
-		final Rectangle signaturePositionOnPage = getSignaturePositionOnPage(extraParams);
+		final Rectangle signaturePositionOnPage = PdfVisibleAreasUtils.getSignaturePositionOnPage(extraParams);
 		if (page == NEW_PAGE && signaturePositionOnPage != null && signatureField == null) {
 			stp.insertPage(pdfReader.getNumberOfPages() + 1, pdfReader.getPageSizeWithRotation(1));
 			// La pagina pasa a ser la nueva, que es la ultima,
@@ -380,7 +383,12 @@ public final class PdfSessionManager {
 			page = pdfReader.getNumberOfPages();
 		}
 
-		sap.setCrypto(null, certChain, null, null);
+		sap.setCrypto(
+			null,
+			doNotUseCertChainOnPostSign ? null : certChain,
+			null,
+			null
+		);
 
 		// Localizacion en donde se produce la firma
 		if (signatureProductionCity != null) {
@@ -471,7 +479,7 @@ public final class PdfSessionManager {
 			dic.setDate(new PdfDate(sap.getSignDate()));
 		}
 
-		if (certChain != null && certChain.length > 0) {
+		if (certChain != null && certChain.length > 0 && !doNotUseCertChainOnPostSign) {
 			dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) certChain[0]).getField("CN")); //$NON-NLS-1$
 		}
 
@@ -508,7 +516,8 @@ public final class PdfSessionManager {
 
 		try {
 			sap.preClose(exc, signTime);
-		} catch (final DocumentException e) {
+		}
+		catch (final DocumentException e) {
 			LOGGER.severe("Error al estampar la firma: " + e); //$NON-NLS-1$
 			throw new AOException("Error al estampar la firma", e); //$NON-NLS-1$
 		}
@@ -516,17 +525,6 @@ public final class PdfSessionManager {
 		final PdfObject pdfObject = ((com.aowagie.text.pdf.PdfStamperImp) stp.getWriter()).getFileID();
 
 		return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
-    }
-
-    /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
-     * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
-     * el eje horizontal de izquierda a derecha y en el vertical de abajo a
-     * arriba.
-     * @param extraParams Conjunto de propiedades con las coordenadas del rect&aacute;ngulo
-     * @return  Rect&aacute;ngulo que define la posici&oacute;n de la p&aacute;gina en donde
-     *          debe agregarse la firma*/
-    private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
-    	return PdfUtil.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
 
 }
