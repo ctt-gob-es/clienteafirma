@@ -16,7 +16,7 @@ public final class PdfExtraParams {
 	 * inclusi&oacute;n en el diccionario PDF y en la estructura de apariencia (PdfSignatureAppearance).
 	 * Esto permite trabajar en modo trif&aacute;sico sin que la infraestructura PDF conozca la identidad del
 	 * firmante, que quedar&iacute;a encapsulada en la parte CAdES. */
-	static final String DO_NOT_USE_CERTCHAIN_ON_POSTSIGN = "doNotUseCertChainOnPostSign"; //$NON-NLS-1$
+	public static final String DO_NOT_USE_CERTCHAIN_ON_POSTSIGN = "doNotUseCertChainOnPostSign"; //$NON-NLS-1$
 
 	/** Indica si debe rotarse el campo de firma. Si se indica <code>true</code> el texto de la firma se
 	 * rota 90 grados en sentido positivo. Si se indica <code>false</code> o no se indica, no se rota nada.
