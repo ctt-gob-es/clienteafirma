@@ -411,7 +411,7 @@ public class TestSignField {
 		final String rubricImageB64 = Base64.encode(rubricImage);
 
 		extraParams.put("signatureRubricImage", rubricImageB64); //$NON-NLS-1$
-		extraParams.put("layer2Text", "Este es el texto de prueba 'Hola Mundo'"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2Text", "Firmado por $$SUBJECTCN$$ el día $$SIGNDATE=dd/MM/yyyy$$ con un certificado emitido por $$ISSUERCN$$"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontFamily", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontSize", "14"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$

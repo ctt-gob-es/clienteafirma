@@ -109,7 +109,7 @@ public final class PdfSessionManager {
 
 		// Pagina donde situar la firma visible
 		int page = LAST_PAGE;
-		final String pageStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE, "-1"); //$NON-NLS-1$
+		final String pageStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(LAST_PAGE));
 		if ("append".equalsIgnoreCase(pageStr)) { //$NON-NLS-1$
 			page = NEW_PAGE;
 		}
@@ -188,7 +188,7 @@ public final class PdfSessionManager {
 		try {
 			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim()) :
-					-1;
+					UNDEFINED;
 		}
 		catch(final Exception e) {
 			LOGGER.warning(
@@ -202,7 +202,7 @@ public final class PdfSessionManager {
 		try {
 			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim()) :
-					-1;
+					UNDEFINED;
 		}
 		catch(final Exception e) {
 			LOGGER.warning(
@@ -216,7 +216,7 @@ public final class PdfSessionManager {
 		try {
 			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim()) :
-					-1;
+					UNDEFINED;
 		}
 		catch(final Exception e) {
 			LOGGER.warning(

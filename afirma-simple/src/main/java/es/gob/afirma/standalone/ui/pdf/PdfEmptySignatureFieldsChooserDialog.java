@@ -13,6 +13,7 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,7 +23,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -190,10 +193,17 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	 * @param emptySignatureFields Listado de campos de firma del PDF.
 	 * @return Campo de firma seleccionado o {@code null} si debe crearse uno nuevo.
 	 * @throws AOCancelledOperationException Se cancela por completo la operaci&oacute;n de firma. */
-	public static SignatureField selectField(final List<SignatureField> emptySignatureFields)
-			throws AOCancelledOperationException {
+	public static SignatureField selectField(final List<SignatureField> emptySignatureFields) throws AOCancelledOperationException {
 
 		final JComboBox<Object> combo = new JComboBox<>(emptySignatureFields.toArray());
+		final JLabel label = new JLabel(
+			emptySignatureFields.size() > 1 ?
+				SignPdfUiMessages.getString("SignPdfFieldChooser.7") : //$NON-NLS-1$
+					SignPdfUiMessages.getString("SignPdfFieldChooser.8") //$NON-NLS-1$
+		);
+		final JPanel panel = new JPanel(new GridLayout(2, 1));
+		panel.add(label);
+		panel.add(combo);
 
 		final String[] options = {
 			SignPdfUiMessages.getString("SignPdfFieldChooser.4"), //$NON-NLS-1$
@@ -204,7 +214,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		final String title = SimpleAfirmaMessages.getString("SignPanelSignTask.1"); //$NON-NLS-1$
 		final int selection = JOptionPane.showOptionDialog(
 			null,
-			combo,
+			panel,//combo,
 			title,
 			JOptionPane.DEFAULT_OPTION,
 			JOptionPane.QUESTION_MESSAGE,
