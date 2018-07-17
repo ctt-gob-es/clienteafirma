@@ -214,7 +214,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		final String title = SimpleAfirmaMessages.getString("SignPanelSignTask.1"); //$NON-NLS-1$
 		final int selection = JOptionPane.showOptionDialog(
 			null,
-			panel,//combo,
+			panel,
 			title,
 			JOptionPane.DEFAULT_OPTION,
 			JOptionPane.QUESTION_MESSAGE,
