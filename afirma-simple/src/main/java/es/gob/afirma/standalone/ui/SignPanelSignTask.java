@@ -24,7 +24,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -133,8 +132,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	return;
     	}
 
-
-
         // Si se va a firmar un unico documento, se pedira al final donde desea guardarse.
         // Tambien se mostraran los mensajes de error al usuario.
         // Si se va a firmar mas de un documento, se debera pedir de antemano la carpeta
@@ -173,12 +170,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	// opciones de uso con -D en linea de comandos y, sobre todo ello y si se firma
         	// mas de un fichero, se indica que no se muestren dialogos que puedan bloquear
         	// el proceso
-            final Properties p = signConfig.getExtraParams();
-            p.putAll(System.getProperties());
+        	signConfig.addExtraParams(System.getProperties());
             if (!onlyOneFile) {
-            	p.setProperty(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
+            	signConfig.addExtraParam(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
             }
-
 
             final String signatureAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
 
@@ -192,6 +187,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             		this.signExecutor.finishTask();
             		return;
             	}
+            	LOGGER.severe("Error cargando el fichero a firmar: " + e); //$NON-NLS-1$
             	continue;
 			}
 
@@ -202,21 +198,21 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             try {
                 if (signConfig.getCryptoOperation() == CryptoOperation.COSIGN) {
                 	signResult = currentSigner.cosign(
-                			dataToSign,
-                			signatureAlgorithm,
-                			pke.getPrivateKey(),
-                			pke.getCertificateChain(),
-                			p
-                			);
+            			dataToSign,
+            			signatureAlgorithm,
+            			pke.getPrivateKey(),
+            			pke.getCertificateChain(),
+            			signConfig.getExtraParams()
+        			);
                 }
                 else {
                 	signResult = currentSigner.sign(
-                			dataToSign,
-                			signatureAlgorithm,
-                			pke.getPrivateKey(),
-                			pke.getCertificateChain(),
-                			p
-                			);
+            			dataToSign,
+            			signatureAlgorithm,
+            			pke.getPrivateKey(),
+            			pke.getCertificateChain(),
+            			signConfig.getExtraParams()
+        			);
                 }
             }
             catch(final AOCancelledOperationException e) {
@@ -312,12 +308,14 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         // Si solo habia una firma, decidimos ahora donde se guarda
         if (onlyOneFile) {
-        	File signatureFile;
+        	final File signatureFile;
         	final SignOperationConfig signConfig = this.signConfigs.get(0);
         	try {
         		signatureFile = saveSignature(
-        				signResult, signConfig.getSigner(),
-        				signConfig.getDataFile(), this.parent);
+    				signResult, signConfig.getSigner(),
+    				signConfig.getDataFile(),
+    				this.parent
+				);
         	}
         	catch(final AOCancelledOperationException e) {
         		this.signExecutor.finishTask();
@@ -335,77 +333,76 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	signConfig.setSignatureFile(signatureFile);
 
             this.resultViewer.showResultsInfo(
-            		signResult,
-            		signConfig,
-            		(X509Certificate) pke.getCertificate()
-        		);
+        		signResult,
+        		signConfig,
+        		(X509Certificate) pke.getCertificate()
+    		);
         }
         else {
-
         	this.signExecutor.finishTask();
-
         	this.resultViewer.showResultsInfo(
-        			this.signConfigs,
-        			outDir,
-        			(X509Certificate) pke.getCertificate()
-        			);
+    			this.signConfigs,
+    			outDir,
+    			(X509Certificate) pke.getCertificate()
+			);
         }
 
     }
 
-    /**
-     * Guarda una firma en disco permitiendo al usuario seleccionar el fichero
+    /** Guarda una firma en disco permitiendo al usuario seleccionar el fichero
      * de salida mediante un di&aacute;logo.
      * @param signature Datos a guardar.
      * @param signer Manejador de firma utilizado.
      * @param dataFile Fichero de datos firmado.
      * @param parent Componente padre.
      * @return Fichero guardado.
-     * @throws IOException Cuando ocurre un error durante el guardado.
-     */
-    private static File saveSignature(byte[] signature, AOSigner signer, File dataFile, Component parent) throws IOException {
+     * @throws IOException Cuando ocurre un error durante el guardado. */
+    private static File saveSignature(final byte[] signature,
+    		                          final AOSigner signer,
+    		                          final File dataFile,
+    		                          final Component parent) throws IOException {
 
     	final String newFileName = signer.getSignedName(
-    			dataFile.getName(),
-    			"_signed" //$NON-NLS-1$
-    			);
+			dataFile.getName(),
+			"_signed" //$NON-NLS-1$
+		);
 
     	String[] filterExtensions;
     	String filterDescription;
     	if (signer instanceof AOPDFSigner) {
     		filterExtensions = new String[] {
-    				"pdf" //$NON-NLS-1$
+				"pdf" //$NON-NLS-1$
     		};
     		filterDescription = SimpleAfirmaMessages.getString("SignPanel.72"); //$NON-NLS-1$
     	}
     	else if (signer instanceof AOXAdESSigner || signer instanceof AOFacturaESigner) {
     		filterExtensions = new String[] {
-    				"xsig", "xml" //$NON-NLS-1$ //$NON-NLS-2$
+				"xsig", "xml" //$NON-NLS-1$ //$NON-NLS-2$
     		};
     		filterDescription = SimpleAfirmaMessages.getString("SignPanel.76"); //$NON-NLS-1$
     	}
     	else if (signer instanceof AOOOXMLSigner) {
     		if (newFileName.toLowerCase().endsWith("docx")) { //$NON-NLS-1$
     			filterExtensions = new String[] {
-    					"docx" //$NON-NLS-1$
+					"docx" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.91"); //$NON-NLS-1$
     		}
     		else if (newFileName.toLowerCase().endsWith("pptx")) { //$NON-NLS-1$
     			filterExtensions = new String[] {
-    					"pptx" //$NON-NLS-1$
+					"pptx" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.92"); //$NON-NLS-1$
     		}
     		else if (newFileName.toLowerCase().endsWith("xlsx")) { //$NON-NLS-1$
     			filterExtensions = new String[] {
-    					"xlsx" //$NON-NLS-1$
+					"xlsx" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.93"); //$NON-NLS-1$
     		}
     		else {
     			filterExtensions = new String[] {
-    					"ooxml" //$NON-NLS-1$
+					"ooxml" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.94"); //$NON-NLS-1$
     		}
@@ -413,32 +410,32 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     	else if (signer instanceof AOODFSigner) {
     		if (newFileName.toLowerCase().endsWith("odt")) { //$NON-NLS-1$
     			filterExtensions = new String[] {
-    					"odt" //$NON-NLS-1$
+					"odt" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.96"); //$NON-NLS-1$
     		}
     		else if (newFileName.toLowerCase().endsWith("odp")) { //$NON-NLS-1$
     			filterExtensions = new String[] {
-    					"odp" //$NON-NLS-1$
+					"odp" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.97"); //$NON-NLS-1$
     		}
     		else if (newFileName.toLowerCase().endsWith("ods")) { //$NON-NLS-1$
     			filterExtensions = new String[] {
-    					"ods" //$NON-NLS-1$
+					"ods" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.98"); //$NON-NLS-1$
     		}
     		else {
     			filterExtensions = new String[] {
-    					"odf" //$NON-NLS-1$
+					"odf" //$NON-NLS-1$
     			};
     			filterDescription = SimpleAfirmaMessages.getString("SignPanel.99"); //$NON-NLS-1$
     		}
     	}
     	else {
     		filterExtensions = new String[] {
-    				"csig", "p7s" //$NON-NLS-1$ //$NON-NLS-2$
+				"csig", "p7s" //$NON-NLS-1$ //$NON-NLS-2$
     		};
     		filterDescription = SimpleAfirmaMessages.getString("SignPanel.80"); //$NON-NLS-1$
     	}
@@ -486,7 +483,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	 * @return Contenido del fichero.
 	 * @throws IOException Cuando ocurre un error durante la carga.
 	 */
-	private static byte[] loadData(File file) throws IOException {
+	private static byte[] loadData(final File file) throws IOException {
 		int n = 0;
 		final byte[] buffer = new byte[4096];
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -507,32 +504,31 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     	//Usamos como directorio por defecto el mismo de los datos
     	final String currentDir = this.signConfigs.get(0).getDataFile().getParent();
 
-    	File[] dirs;
+    	final File[] dirs;
     	try {
     		dirs = AOUIFactory.getLoadFiles(
-    				SimpleAfirmaMessages.getString("SignPanelSignTask.3"), //$NON-NLS-1$
-    				currentDir,
-    				null,
-    				null,
-    				null,
-    				true,
-    				false,
-    				AutoFirmaUtil.getDefaultDialogsIcon(),
-    				this.parent);
+				SimpleAfirmaMessages.getString("SignPanelSignTask.3"), //$NON-NLS-1$
+				currentDir,
+				null,
+				null,
+				null,
+				true,
+				false,
+				AutoFirmaUtil.getDefaultDialogsIcon(),
+				this.parent
+			);
     	}
     	catch (final AOCancelledOperationException e) {
-    		dirs = null;
+    		return null;
     	}
     	return dirs != null ? dirs[0] : null;
 	}
 
-    /**
-	 * Guarda datos en un directorio con un nombre concreto.
+    /** Guarda datos en un directorio con un nombre concreto.
 	 * @param data Datos a guardar.
 	 * @param defaultOutFile Fichero de salida por defecto.
 	 * @return Fichero en el que se guardan los datos.
-	 * @throws IOException Cuando se produce un error durante el guardado.
-	 */
+	 * @throws IOException Cuando se produce un error durante el guardado. */
 	private static File saveDataToFile(final byte[] data, final File defaultOutFile, final boolean overwrite) throws IOException {
 		File outFile = defaultOutFile;
 		if (!overwrite) {
@@ -559,33 +555,32 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	}
 
 
-	/**
-     * Muestra un di&aacute;logo con un mensaje de error.
-     * @param message Mensaje de error.
-     */
+	/** Muestra un di&aacute;logo con un mensaje de error.
+     * @param message Mensaje de error. */
     static void showErrorMessage(final Component parent, final String message) {
 		AOUIFactory.showErrorMessage(
-				parent,
-				message,
-				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-				);
+			parent,
+			message,
+			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			JOptionPane.ERROR_MESSAGE
+		);
     }
 
-    private byte[] pluginsPreProcess(final byte[] data, String format) {
+    private byte[] pluginsPreProcess(final byte[] data, final String format) {
 
     	final PluginsManager pluginsManager = PluginsManager.getInstance();
-    	List<AfirmaPlugin> plugins;
+    	final List<AfirmaPlugin> plugins;
 		try {
 			plugins = pluginsManager.getPluginsLoadedList();
-		} catch (final PluginException e) {
+		}
+		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-	                this.parent,
-	                SimpleAfirmaMessages.getString("SignPanel.113"), //$NON-NLS-1$
-	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                JOptionPane.WARNING_MESSAGE
-	            );
+                this.parent,
+                SimpleAfirmaMessages.getString("SignPanel.113"), //$NON-NLS-1$
+                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
 			return data;
 		}
 
@@ -597,41 +592,42 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     		catch (final PluginControlledException e) {
     			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
     			AOUIFactory.showErrorMessage(
-    	                this.parent,
-    	                e.getMessage(),
-    	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    	                JOptionPane.WARNING_MESSAGE
-    	            );
+	                this.parent,
+	                e.getMessage(),
+	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                JOptionPane.WARNING_MESSAGE
+	            );
 			}
     		catch (Exception | Error e) {
     			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al preprocesar los datos con el plugin " + plugin + //$NON-NLS-1$
-    					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
+					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
     			AOUIFactory.showErrorMessage(
-    	                this.parent,
-    	                SimpleAfirmaMessages.getString("SignPanel.111", plugin.toString(), e.getMessage()), //$NON-NLS-1$
-    	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    	                JOptionPane.ERROR_MESSAGE
-    	            );
+	                this.parent,
+	                SimpleAfirmaMessages.getString("SignPanel.111", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                JOptionPane.ERROR_MESSAGE
+	            );
 			}
     	}
 
     	return processedData;
     }
 
-    private byte[] pluginsPostProcess(final byte[] signature, String format, Certificate[] certChain) {
+    private byte[] pluginsPostProcess(final byte[] signature, final String format, final Certificate[] certChain) {
 
     	final PluginsManager pluginsManager = PluginsManager.getInstance();
-    	List<AfirmaPlugin> plugins;
+    	final List<AfirmaPlugin> plugins;
 		try {
 			plugins = pluginsManager.getPluginsLoadedList();
-		} catch (final PluginException e) {
+		}
+		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-	                this.parent,
-	                SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
-	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                JOptionPane.WARNING_MESSAGE
-	            );
+                this.parent,
+                SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
+                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
 			return signature;
 		}
 
@@ -643,21 +639,21 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     		catch (final PluginControlledException e) {
     			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
     			AOUIFactory.showErrorMessage(
-    					this.parent,
-    					e.getMessage(),
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    					JOptionPane.WARNING_MESSAGE
-    					);
+					this.parent,
+					e.getMessage(),
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE
+				);
     		}
     		catch (Exception | Error e) {
     			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al postprocesar la firma con el plugin " + plugin + //$NON-NLS-1$
     					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
     			AOUIFactory.showErrorMessage(
-    					this.parent,
-    					SimpleAfirmaMessages.getString("SignPanel.112", plugin.toString(), e.getMessage()), //$NON-NLS-1$
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    					JOptionPane.ERROR_MESSAGE
-    					);
+					this.parent,
+					SimpleAfirmaMessages.getString("SignPanel.112", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
     		}
     	}
 
@@ -667,17 +663,18 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     private void pluginsReset() {
 
     	final PluginsManager pluginsManager = PluginsManager.getInstance();
-    	List<AfirmaPlugin> plugins;
+    	final List<AfirmaPlugin> plugins;
 		try {
 			plugins = pluginsManager.getPluginsLoadedList();
-		} catch (final PluginException e) {
+		}
+		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-	                this.parent,
-	                SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
-	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                JOptionPane.WARNING_MESSAGE
-	            );
+                this.parent,
+                SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
+                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
 			return;
 		}
 
@@ -688,20 +685,20 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     		catch (final PluginControlledException e) {
     			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
     			AOUIFactory.showErrorMessage(
-    					this.parent,
-    					e.getMessage(),
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    					JOptionPane.WARNING_MESSAGE
-    					);
+					this.parent,
+					e.getMessage(),
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE
+				);
     		}
     		catch (Exception | Error e) {
     			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al reiniciar la firma con el plugin " + plugin, e); //$NON-NLS-1$
     			AOUIFactory.showErrorMessage(
-    					this.parent,
-    					SimpleAfirmaMessages.getString("SignPanel.115", plugin.toString(), e.getMessage()), //$NON-NLS-1$
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    					JOptionPane.ERROR_MESSAGE
-    					);
+					this.parent,
+					SimpleAfirmaMessages.getString("SignPanel.115", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
     		}
     	}
     }

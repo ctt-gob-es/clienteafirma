@@ -2,13 +2,12 @@ package es.gob.afirma.standalone.ui;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.signers.AOSigner;
 
-/**
- * Configuraci&oacute;n de una operaci&oacute;n de firma.
- */
-public class SignOperationConfig {
+/** Configuraci&oacute;n de una operaci&oacute;n de firma. */
+public final class SignOperationConfig {
 
 	private FileType fileType;
 	private File dataFile;
@@ -18,9 +17,7 @@ public class SignOperationConfig {
 	private Properties extraParams;
 	private String signatureFormatName;
 
-	/**
-	 * Construye la configuraci&oacute;n de firma.
-	 */
+	/** Construye la configuraci&oacute;n de firma. */
 	public SignOperationConfig() {
 		this.fileType = FileType.BINARY;
 		this.signer = null;
@@ -30,109 +27,120 @@ public class SignOperationConfig {
 		this.cryptoOperation = CryptoOperation.SIGN;
 	}
 
-	/**
-	 * Recupera el tipo de fichero que se va a firmar.
-	 * @return Tipo de fichero.
-	 */
+	/** Recupera el tipo de fichero que se va a firmar.
+	 * @return Tipo de fichero. */
 	public FileType getFileType() {
 		return this.fileType;
 	}
-	/**
-	 * Establece el tipo de fichero que se va a firmar.
-	 * @param fileType Tipo de fichero.
-	 */
-	public void setFileType(FileType fileType) {
+
+	/** Establece el tipo de fichero que se va a firmar.
+	 * @param fileType Tipo de fichero. */
+	public void setFileType(final FileType fileType) {
 		this.fileType = fileType;
 	}
-	/**
-	 * Recupera el manejador de firma que se va a utilizar.
-	 * @return Manejador de firma.
-	 */
+
+	/** Recupera el manejador de firma que se va a utilizar.
+	 * @return Manejador de firma. */
 	public AOSigner getSigner() {
 		return this.signer;
 	}
-	/**
-	 * Establece el manejador de firma que se va a utilizar.
-	 * @param signer Manejador de firma.
-	 */
-	public void setSigner(AOSigner signer) {
+
+	/** Establece el manejador de firma que se va a utilizar.
+	 * @param signer Manejador de firma. */
+	public void setSigner(final AOSigner signer) {
 		this.signer = signer;
 	}
-	/**
-	 * Recupera la configuraci&oacute;n de firma que se va a utilizar.
-	 * @return Configuraci&oacute; de firma.
-	 */
+
+	/** Recupera la configuraci&oacute;n de firma que se va a utilizar.
+	 * @return Configuraci&oacute; de firma. */
 	public Properties getExtraParams() {
 		return this.extraParams;
 	}
-	/**
-	 * Establece la configuraci&oacute;n de firma que se va a utilizar.
-	 * @param extraParams Configuraci&oacute; de firma.
-	 */
-	public void setExtraParams(Properties extraParams) {
-		this.extraParams = extraParams;
+
+	/** Establece la configuraci&oacute;n de firma que se va a utilizar.
+	 * Si se indica <code>null</code> se establece un objeto de propiedades vac&iacute;o.
+	 * @param xParams Configuraci&oacute; de firma. */
+	public void setExtraParams(final Properties xParams) {
+		this.extraParams = xParams != null ? xParams : new Properties();
 	}
-	/**
-	 * Recupera el texto descriptivo del formato de firma que se va a utilizar.
-	 * @return Descripci&oacute;n del formato.
-	 */
+
+	/** A&ntilde;ade una colecci&oacute;n de par&aacute;metros adicionales a la configuraci&oacute;n.
+	 * @param xParams Colecci&oacute;n de par&aacute;metros adicionales. */
+	public void addExtraParams(final Properties xParams) {
+		if (xParams == null) {
+			return;
+		}
+		if (this.extraParams == null) {
+			this.extraParams = new Properties();
+		}
+		this.extraParams.putAll(xParams);
+	}
+
+	/** A&ntilde;ade una colecci&oacute;n de par&aacute;metros adicionales a la configuraci&oacute;n.
+	 * @param key Clave del par&aacute;metro adicional.
+	 * @param value Valor del par&aacute;metro adicional. */
+	public void addExtraParam(final String key, final String value) {
+		if (key == null || value == null) {
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No se pueden establecer parametros adicionales nulos" //$NON-NLS-1$
+			);
+		}
+		if (this.extraParams == null) {
+			this.extraParams = new Properties();
+		}
+		this.extraParams.put(key, value);
+	}
+
+	/** Recupera el texto descriptivo del formato de firma que se va a utilizar.
+	 * @return Descripci&oacute;n del formato. */
 	public String getSignatureFormatName() {
 		return this.signatureFormatName;
 	}
-	/**
-	 * Establece el texto descriptivo del formato de firma que se va a utilizar.
-	 * @param signatureFormatName Descripci&oacute;n del formato.
-	 */
-	public void setSignatureFormatName(String signatureFormatName) {
+
+	/** Establece el texto descriptivo del formato de firma que se va a utilizar.
+	 * @param signatureFormatName Descripci&oacute;n del formato. */
+	public void setSignatureFormatName(final String signatureFormatName) {
 		this.signatureFormatName = signatureFormatName;
 	}
-	/**
-	 * Recupera el fichero con los datos que se van a firmar.
-	 * @return Fichero de datos.
-	 */
+
+	/** Recupera el fichero con los datos que se van a firmar.
+	 * @return Fichero de datos. */
 	public File getDataFile() {
 		return this.dataFile;
 	}
-	/**
-	 * Establece el fichero con los datos que se van a firmar.
-	 * @param file Fichero de datos.
-	 */
-	public void setDataFile(File file) {
+
+	/** Establece el fichero con los datos que se van a firmar.
+	 * @param file Fichero de datos. */
+	public void setDataFile(final File file) {
 		this.dataFile = file;
 	}
-	/**
-	 * Recupera el fichero de firma que se va a generar.
-	 * @return Fichero de firma.
-	 */
+
+	/** Recupera el fichero de firma que se va a generar.
+	 * @return Fichero de firma. */
 	public File getSignatureFile() {
 		return this.signatureFile;
 	}
-	/**
-	 * Establece el fichero de firma que se va a generar.
-	 * @param file Fichero de firma.
-	 */
-	public void setSignatureFile(File file) {
+
+	/** Establece el fichero de firma que se va a generar.
+	 * @param file Fichero de firma. */
+	public void setSignatureFile(final File file) {
 		this.signatureFile = file;
 	}
-	/**
-	 * Recupera la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
-	 * @return Operaci&oacute;n criptogr&aacute;fica de firma.
-	 */
+
+	/** Recupera la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
+	 * @return Operaci&oacute;n criptogr&aacute;fica de firma. */
 	public CryptoOperation getCryptoOperation() {
 		return this.cryptoOperation;
 	}
-	/**
-	 * Establece la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
-	 * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica de firma.
-	 */
-	public void setCryptoOperation(CryptoOperation cryptoOperation) {
+
+	/** Establece la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
+	 * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica de firma. */
+	public void setCryptoOperation(final CryptoOperation cryptoOperation) {
 		this.cryptoOperation = cryptoOperation;
 	}
 
-	/**
-	 * Operaci&oacute;n criptogr&aacute;fica que debe aplicarse durante
-	 * un proces de firma.
-	 */
+	/** Operaci&oacute;n criptogr&aacute;fica que debe aplicarse durante
+	 * un proceso de firma. */
 	enum CryptoOperation {
 		/** Firma electr&oacute;nica simple. */
 		SIGN,

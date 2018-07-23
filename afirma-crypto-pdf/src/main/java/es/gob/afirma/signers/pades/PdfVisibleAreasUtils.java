@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
@@ -254,6 +255,17 @@ final class PdfVisibleAreasUtils {
 	        textImg.setAbsolutePosition(0, 0);
 	        n2Layer.addImage(textImg);
         }
+    }
+
+    /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
+     * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
+     * el eje horizontal de izquierda a derecha y en el vertical de abajo a
+     * arriba.
+     * @param extraParams Conjunto de propiedades con las coordenadas del rect&aacute;ngulo
+     * @return  Rect&aacute;ngulo que define la posici&oacute;n de la p&aacute;gina en donde
+     *          debe agregarse la firma*/
+    static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
+    	return PdfUtil.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
 
 }

@@ -33,7 +33,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
 
-	/** Par&aacute;metro de entrada que nos dice si tenemos que usar un provatekeyentry fijado o fijar uno nuevo. */
+	/** Par&aacute;metro de entrada que nos dice si tenemos que usar una clave prefijada o establecer una nueva. */
 	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
@@ -41,10 +41,8 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	private String minimumVersion;
 
-	/**
-	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
-	 * el primer certificado seleccionado para todas las operaciones.
-	 */
+	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
+	 * el primer certificado seleccionado para todas las operaciones. */
 	private boolean sticky;
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
@@ -57,23 +55,18 @@ public final class UrlParametersForBatch extends UrlParameters {
 		this.batchPreSignerUrl = url;
 	}
 
-	/**
-	 * Obtiene la opci&oacute;n de configuraci&oacute;n sticky
-	 *
+	/** Obtiene la opci&oacute;n de configuraci&oacute;n sticky
 	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
-	 *         debe pedir siempre que el usuario elija uno ({@code false})
-	 */
+	 *         debe pedir siempre que el usuario elija uno ({@code false}). */
 	public boolean getSticky() {
 		return this.sticky;
 	}
 
-	/**
-	 * Establece la opci&oacute;n de configuraci&oacute;n sticky
+	/** Establece la opci&oacute;n de configuraci&oacute;n sticky
 	 * @param sticky Opci&oacute;n de configuraci&oacute;n que determina si se debe
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
-	 *         debe pedir siempre que el usuario elija uno ({@code false})
-	 */
+	 *         debe pedir siempre que el usuario elija uno ({@code false}). */
 	public void setSticky(final boolean sticky) {
 		this.sticky = sticky;
 	}

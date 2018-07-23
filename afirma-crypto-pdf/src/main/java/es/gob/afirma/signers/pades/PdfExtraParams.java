@@ -12,6 +12,12 @@ package es.gob.afirma.signers.pades;
 /** Par&aacute;metros adicionales para las firmas PAdES. */
 public final class PdfExtraParams {
 
+	/** Si se establece a <code>true</code> se evita usar la cadena de certificados del firmante en la
+	 * inclusi&oacute;n en el diccionario PDF y en la estructura de apariencia (PdfSignatureAppearance).
+	 * Esto permite trabajar en modo trif&aacute;sico sin que la infraestructura PDF conozca la identidad del
+	 * firmante, que quedar&iacute;a encapsulada en la parte CAdES. */
+	public static final String DO_NOT_USE_CERTCHAIN_ON_POSTSIGN = "doNotUseCertChainOnPostSign"; //$NON-NLS-1$
+
 	/** Indica si debe rotarse el campo de firma. Si se indica <code>true</code> el texto de la firma se
 	 * rota 90 grados en sentido positivo. Si se indica <code>false</code> o no se indica, no se rota nada.
 	 * Se respetan las posiciones del campo de firma (no se rota el propio campo, solo su texto).

@@ -11,11 +11,13 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
@@ -140,9 +142,6 @@ public final class PAdESTriPhaseSigner {
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -1;
-
-    /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
-    public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
 
     private static final int CSIZE = 27000;
 
@@ -306,12 +305,18 @@ public final class PAdESTriPhaseSigner {
         //***************** SELLO DE TIEMPO ****************
 
         // El sello a nivel de firma nunca se aplica si han pedido solo sello a nivel de documento
-        if (!TsaParams.TS_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE))) {
+        if (
+    		!TsaParams.TS_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE)) &&
+    		extraParams.getProperty(PdfExtraParams.TSA_URL) != null
+		) {
 	        TsaParams tsaParams;
 	        try {
 	        	tsaParams = new TsaParams(extraParams);
 	        }
 	        catch(final Exception e) {
+	        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+        			"Se ha pedido aplicar sello de tiempo, pero falta informacion necesaria: " + e //$NON-NLS-1$
+    			);
 	        	tsaParams = null;
 	        }
 	        if (tsaParams != null) {
@@ -377,7 +382,7 @@ public final class PAdESTriPhaseSigner {
 		    	baos.close();
 		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
 		    }
-		    ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, signature.getFileID()).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+		    ret = new String(baos.toByteArray(), StandardCharsets.ISO_8859_1).replace(badFileID, signature.getFileID()).getBytes(StandardCharsets.ISO_8859_1);
         }
 	    return ret;
     }

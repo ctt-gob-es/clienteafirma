@@ -22,6 +22,11 @@ public final class PdfTriPhaseSession {
     private final ByteArrayOutputStream baos;
     private final String fileID;
 
+    @Override
+	public String toString() {
+    	return "Sesion trifasica del PDF con identificador: " + this.fileID; //$NON-NLS-1$
+    }
+
     PdfTriPhaseSession(final PdfSignatureAppearance s, final ByteArrayOutputStream b, final String fid) {
         this.sap = s;
         this.baos = b;
