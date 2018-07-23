@@ -833,8 +833,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	private static void printSystemInfo() {
 
     	// Logs de informacion basica
-		final StringBuilder info = new StringBuilder(370)
-       	.append("Resolucion DPI de pantalla: ").append(AutoFirmaUtil.getDPI()) //$NON-NLS-1$
+		final StringBuilder info = new StringBuilder(390)
+		.append("AutoFirma ").append(getVersion()) //$NON-NLS-1$
+		.append("\nResolucion DPI de pantalla: ").append(AutoFirmaUtil.getDPI()) //$NON-NLS-1$
 		.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion de Java: ").append(System.getProperty("java.version")) //$NON-NLS-1$ //$NON-NLS-2$
