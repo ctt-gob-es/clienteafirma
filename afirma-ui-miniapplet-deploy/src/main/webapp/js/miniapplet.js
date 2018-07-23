@@ -16,7 +16,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var VERSION = "1.6.4";
 
-		var JAR_NAME = 'miniapplet-full_1_6_3.jar';
+		var JAR_NAME = 'miniapplet-full_1_6_4.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -1241,6 +1241,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			/* Caracteres validos para los ID de sesion */
 			var VALID_CHARS_TO_ID = "1234567890abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+			/* URL de la operacion que se solicita actualmente. */
+			var currentOperationUrl = null;
+			
 			/* Genera un identificador de sesion. */
 			function generateNewIdSession () {
 				var ID_LENGTH = 20;
@@ -1579,12 +1582,20 @@ var MiniApplet = ( function ( window, undefined ) {
 			* peticion sea aceptada.
 			*/
 			function executeEchoByService (currentPort, url, timeoutResetCounter, semaphore) {
+
+				
+				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada porque
+				// al invocar muchas peticiones consecutivas, en caso de introducir un retardo con setTimeout,
+				// queremos que las peticiones se realicen siempre para la ultima operacion establecida y no
+				// la que hubiese antes de empezar la espera (lo que ocurriria si le pasasemos la URL como
+				// parametro).
+				currentOperationUrl = url;
+				
 				var httpRequest = getHttpRequest();
 				httpRequest.open("POST", URL_REQUEST + currentPort + "/afirma", true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText, true) == "OK" && !connection) {
-						//console.log("puerto asignado puerto:" + currentPort);
 						port = currentPort;
 						urlHttpRequest = URL_REQUEST + port + "/afirma";
 						connection = true;
@@ -1592,18 +1603,17 @@ var MiniApplet = ( function ( window, undefined ) {
 							semaphore.locked = true;
 						}
 						// Comprobamos si es una operacion de seleccion de certificado
-						isSelectCertOperation = url.indexOf("afirma://selectcert") > -1;
+						isSelectCertOperation = currentOperationUrl.indexOf("afirma://selectcert") > -1;
 						// Comprobamos si es una operacion de guardado.
-						isSaveOperation = url.indexOf("afirma://save") > -1;
+						isSaveOperation = currentOperationUrl.indexOf("afirma://save") > -1;
 						// Comprobamos si es una operacion de firma por lotes
-						isBatchOperation = url.indexOf("afirma://batch") > -1;
+						isBatchOperation = currentOperationUrl.indexOf("afirma://batch") > -1;
 						// Comprobamos si es una operacion criptografica mas guardado del resultado
-						isOpAndSaveOperation = url.indexOf("afirma://signandsave") > -1;
-						executeOperationByService(url);
+						isOpAndSaveOperation = currentOperationUrl.indexOf("afirma://signandsave") > -1;
+						executeOperationByService();
 					}
 					else if ((!semaphore || !semaphore.locked) && !connection && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
 						timeoutResetCounter--;
-						//console.log("Quedan " + timeoutResetCounter + " peticiones a " + currentPort)
 						
 						// Si ya se conecto antes con la aplicacion pero ahora llevamos la mitad de los intentos
 						// sin conectar, consideramos que se ha tumbado y hay que relanzarla
@@ -1613,7 +1623,7 @@ var MiniApplet = ( function ( window, undefined ) {
 								semaphore.locked = true;
 							}
 							timeoutResetCounter = MiniApplet.AUTOFIRMA_CONNECTION_RETRIES;
-							execAppIntent(url);							
+							execAppIntent(currentOperationUrl);							
 						}
 						// Si hemos agotado todos los reintentos consideramos que la aplicacion no esta instalada
 						else if (timeoutResetCounter == 0) {
@@ -1627,7 +1637,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 						// Aun quedan reintentos
 						else {
-							setTimeout(executeEchoByService, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, currentPort, url, timeoutResetCounter, semaphore);
+							setTimeout(executeEchoByServiceDelayed, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, currentPort, timeoutResetCounter, semaphore);
 						}
 					}
 				}
@@ -1640,13 +1650,25 @@ var MiniApplet = ( function ( window, undefined ) {
 					//console.log("probamos puerto " +currentPort)
 				}
 			}
+
+			/** Funcion que ejecuta la llamada a la funcion eco previa a una llamada de operacion
+			 * de tal forma que esta preparada para ser lanzada desde un setTimeout. Esta funcion
+			 * toma la URL de la operacion de la variable global "currentOperationUrl" ya que, en
+			 * una ejecucion rapida de firmas en serie, si se pasase por parametro, en el momento
+			 * de la ejecucion podria ejecutar la operacion con una URL de una operacion anterior. */
+			function executeEchoByServiceDelayed (currentPort, timeoutResetCounter, semaphore) {
+				executeEchoByService (currentPort, currentOperationUrl, timeoutResetCounter, semaphore);
+			}
+			
 			
 			/**
 			* Comprueba si hay que dividir los datos que se se mandan a la aplicacion nativa.
 			* Si hay que dividirlos se llama a la funcion executeOperationRecursive.
 			* Si cabe en un solo envio se manda directamente.
 			*/
-			function executeOperationByService (url) {
+			function executeOperationByService () {
+				
+				var url = currentOperationUrl;
 				
 				// Si el envio se debe fragmentar, llamamos a una funcion que se encarga
 				// de mandar la peticion recursivamente
@@ -1684,7 +1706,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 						// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
 						else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
-							setTimeout(executeOperationByService, WAITING_TIME, url);
+							setTimeout(executeOperationByService, WAITING_TIME);
 						}
 					}
 				}
@@ -2028,7 +2050,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 			
 			function errorServiceResponseFunction(exception, message){
-				errorCallback(exception, message);
+				if (errorCallback) {
+					errorCallback(exception, message);
+				}
 			}
 			
 			function successBatchResponseFunction (data) {
