@@ -197,6 +197,12 @@ var MiniApplet = ( function ( window, undefined ) {
 		function isOldInternetExplorer() {
 			return !!(navigator.userAgent.match(/MSIE/));
 		}
+		
+		/** Indica si el navegador es Internet Explorer 7 o inferior. */
+		function isInternetExplorer7orLower() {
+			var myNav = navigator.userAgent.toLowerCase();
+			return 7 >= (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+		}
 
 		function isFirefoxUAM() {
 		    return navigator.userAgent.indexOf("UAM") > 0;
@@ -1118,9 +1124,12 @@ var MiniApplet = ( function ( window, undefined ) {
 			widthAttr.value = 1;
 			iframeElem.setAttributeNode(widthAttr);
 			
-			var styleAttr = document.createAttribute("style");
-			styleAttr.value = "display: none;";
-			iframeElem.setAttributeNode(styleAttr);
+			// Ocultamos el frame en los sistemas en los que podemos mediante CSS
+			if (!isInternetExplorer7orLower()) {
+				var styleAttr = document.createAttribute("style");
+				styleAttr.value = "display: none;";
+				iframeElem.setAttributeNode(styleAttr);
+			}
 
 			document.body.appendChild(iframeElem);				
 		}
