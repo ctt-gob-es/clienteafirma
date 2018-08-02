@@ -13,7 +13,6 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -201,9 +200,18 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 				SignPdfUiMessages.getString("SignPdfFieldChooser.7") : //$NON-NLS-1$
 					SignPdfUiMessages.getString("SignPdfFieldChooser.8") //$NON-NLS-1$
 		);
-		final JPanel panel = new JPanel(new GridLayout(2, 1));
-		panel.add(label);
-		panel.add(combo);
+
+		final JPanel panel = new JPanel(new GridBagLayout());
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
+		c.gridy = 0;
+		panel.add(label, c);
+		c.gridy++;
+		panel.add(combo, c);
+		c.fill = GridBagConstraints.BOTH;
+		c.weighty = 1.0;
+		panel.add(new JLabel(), c);
 
 		final String[] options = {
 			SignPdfUiMessages.getString("SignPdfFieldChooser.4"), //$NON-NLS-1$
