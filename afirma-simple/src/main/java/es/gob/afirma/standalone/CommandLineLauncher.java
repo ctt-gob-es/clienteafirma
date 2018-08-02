@@ -529,8 +529,8 @@ final class CommandLineLauncher {
 						beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
 					}
 					extraParamsProperties.setProperty(
-						params.substring(beginIndex, params.indexOf('=', beginIndex)),
-						params.substring(params.indexOf('=', beginIndex) + 1)
+						params.substring(beginIndex, params.indexOf('=', beginIndex)).trim(),
+						params.substring(params.indexOf('=', beginIndex) + 1).trim()
 					);
 				}
 				catch (final Exception e) {
