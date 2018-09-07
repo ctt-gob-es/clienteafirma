@@ -2377,7 +2377,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para la recuperacion de datos");
 						return;
 					}
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, signId, params, successCallback, errorCallback)
+					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
 				}
 				else {
 					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
@@ -3052,7 +3052,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
-			var NUM_MAX_ITERATIONS = 8;
+			var NUM_MAX_ITERATIONS = 15;
 			var iterations = 0;
 
 			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
