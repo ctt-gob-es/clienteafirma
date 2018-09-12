@@ -157,7 +157,89 @@
 			
 		</profile>
 		
-		<!-- ===== Construccion para despliegue en el repositorio de artefactos ===== -->
+		<!-- ===== Construccion para despliegue en el repositorio de artefactos del MINHAP ===== -->
+		<profile>
+			<id>minhap</id>
+			
+			<modules>
+				<module>afirma-core</module>
+				<module>afirma-core-keystores</module>
+				<module>afirma-crypto-batch-client</module>
+				<module>afirma-crypto-cadestri-client</module>
+				<module>afirma-crypto-cipher</module>
+				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cades</module>
+				<module>afirma-crypto-cades-multi</module>
+				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cms-enveloper</module>
+				<module>afirma-crypto-core-pkcs7-tsp</module>
+				<module>afirma-crypto-core-xml</module>
+				<module>afirma-crypto-odf</module>
+				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-enhancer</module>
+				<module>afirma-crypto-validation</module>
+				<module>afirma-crypto-xades</module>
+				<module>afirma-crypto-xadestri-client</module>
+				<module>afirma-crypto-xmlsignature</module>
+				<module>afirma-crypto-ooxml</module>
+				<module>afirma-crypto-jarverifier</module>
+				<module>afirma-keystores-capiaddressbook</module>
+				<module>afirma-keystores-filters</module>
+				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-single</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				<module>afirma-crypto-pdf</module>
+				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-validatecerts</module>
+				
+				<!-- Servicios -->
+				<module>afirma-server-simple-webstart</module>
+				<module>afirma-server-triphase-signer</module>
+				<module>afirma-signature-retriever</module>
+				<module>afirma-signature-storage</module>
+			</modules>
+			
+			<distributionManagement>
+				<repository>
+					<id>MINHAP-central</id>
+					<name>artefactos.scae.redsara.es-releases</name>
+					<url>https://artefactos.scae.redsara.es/artifactory/AFIRMA-release/</url>
+				</repository>
+				<snapshotRepository>
+					<id>MINHAP-snapshots</id>
+					<name>artefactos.scae.redsara.es-snapshots</name>
+					<url>https://artefactos.scae.redsara.es/artifactory/AFIRMA-snapshot/</url>
+				</snapshotRepository>
+			</distributionManagement>
+			
+      		<build>
+       			<plugins>
+	
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.6.1</version>
+						<configuration>
+							<source>1.7</source>
+							<target>1.7</target>
+							<fork>true</fork>
+							<compilerArgs>
+								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
+							</compilerArgs>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+	    </profile>
+		
+		
+		<!-- ===== Construccion para despliegue en el repositorio de artefactos de Maven ===== -->
 		<profile>
 			<id>env-deploy</id>
 			<activation>
@@ -253,8 +335,8 @@
 							<target>1.7</target>
 							<fork>true</fork>
 							<compilerArgs>
-		-						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
-		-					</compilerArgs>
+								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
+							</compilerArgs>
 							<debug>false</debug>
 						</configuration>
 					</plugin>
