@@ -15,11 +15,18 @@ public final class ParameterLocalAccessRequestedException extends ParameterExcep
 
 	private static final long serialVersionUID = -6979789543878872249L;
 
-	ParameterLocalAccessRequestedException(final String msg) {
+	/** Crea una excepci&oacute;n que indica que se ha solicitado en los par&aacute;metros
+	 * un acceso local prohibido.
+	 * @param msg Mensaje de la excepci&oacute;n. */
+	public ParameterLocalAccessRequestedException(final String msg) {
 		super(msg);
 	}
 
-	ParameterLocalAccessRequestedException(final String msg, final Throwable cause) {
+	/** Crea una excepci&oacute;n que indica que se ha solicitado en los par&aacute;metros
+	 * un acceso local prohibido.
+	 * @param msg Mensaje de la excepci&oacute;n.
+	 * @param cause Causa inicial de la excepci&oacute;n. */
+	public ParameterLocalAccessRequestedException(final String msg, final Throwable cause) {
 		super(msg, cause);
 	}
 }

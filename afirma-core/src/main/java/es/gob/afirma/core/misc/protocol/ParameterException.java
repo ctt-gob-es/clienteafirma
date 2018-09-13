@@ -14,11 +14,18 @@ public class ParameterException extends Exception {
 
 	private static final long serialVersionUID = 976364958815642808L;
 
-	ParameterException(final String msg) {
+	/** Construye una excepci&oacute;n de error en los par&aacute;metros de la URL
+	 * recibida por la aplicaci&oacute;n.
+	 * @param msg Mensaje de la excepci&oacute;n. */
+	public ParameterException(final String msg) {
 		super(msg);
 	}
 
-	ParameterException(final String msg, final Throwable t) {
+	/** Construye una excepci&oacute;n de error en los par&aacute;metros de la URL
+	 * recibida por la aplicaci&oacute;n.
+	 * @param msg Mensaje de la excepci&oacute;n.
+	 * @param t Causa inicial de la excepci&oacute;n. */
+	public ParameterException(final String msg, final Throwable t) {
 		super(msg, t);
 	}
 }

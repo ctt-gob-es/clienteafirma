@@ -237,6 +237,15 @@ public final class PreferencesManager {
 	 *  <li>XAdES Enveloped</li>
 	 * </ul> */
 	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
+	
+	/** Realizar cofirma en multifirmas XAdES. */
+	public static final String PREFERENCE_XADES_MULTISIGN_COSIGN = "xadesMultisignCosign";  //$NON-NLS-1$
+
+	/** Realizar contrafirma en hojas en multifirmas XAdES. */
+	public static final String PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS = "xadesMultisignCountersignLeafs";  //$NON-NLS-1$
+
+	/** Realizar contrafirma en arbol en multifirmas XAdES. */
+	public static final String PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_TREE = "xadesMultisignCountersignTree";  //$NON-NLS-1$
 
 	//************************* FIN PREFERENCIAS DE FIRMAS XAdES ***************************************************************
 	//**************************************************************************************************************************
@@ -313,6 +322,15 @@ public final class PreferencesManager {
 	/** Si est&aacute; establecido a <code>true</code> la firma CAdES se realizar&aacute; en modo impl&iacute;cito (<i>attached</i>),
 	 *  si est&aacute; establecido a <code>false</code> se realizar&aacute; en modo (<i>detached</i>). */
 	public static final String PREFERENCE_CADES_IMPLICIT = "cadesImplicitMode"; //$NON-NLS-1$
+
+	/** Realizar cofirma en multifirmas CAdES. */
+	public static final String PREFERENCE_CADES_MULTISIGN_COSIGN = "cadesMultisignCosign";  //$NON-NLS-1$
+
+	/** Realizar contrafirma en hojas en multifirmas CAdES. */
+	public static final String PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS = "cadesMultisignCountersignLeafs";  //$NON-NLS-1$
+
+	/** Realizar contrafirma en arbol en multifirmas CAdES. */
+	public static final String PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE = "cadesMultisignCountersignTree";  //$NON-NLS-1$
 
 	//************************* FIN PREFERENCIAS DE FIRMAS CAdES ***************************************************************
 	//**************************************************************************************************************************
