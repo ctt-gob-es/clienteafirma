@@ -30,6 +30,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -42,6 +44,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class SignPanelFilePanel extends JPanel {
@@ -55,6 +58,34 @@ final class SignPanelFilePanel extends JPanel {
 
     boolean isVisibleSignature() {
     	return this.pdfVisible.isSelected();
+    }
+    
+    private final JRadioButton optionCoSign = new JRadioButton(
+		SimpleAfirmaMessages.getString("SignPanel.116"), //$NON-NLS-1$
+		true
+	);
+
+    private final JRadioButton optionCounterSignLeafs = new JRadioButton(
+		SimpleAfirmaMessages.getString("SignPanel.117"), //$NON-NLS-1$
+		false
+	);
+
+    private final JRadioButton optionCounterSignTree = new JRadioButton(
+		SimpleAfirmaMessages.getString("SignPanel.118"), //$NON-NLS-1$
+		false
+	);
+
+    CryptoOperation getSignOperation()
+    {
+    	if(this.optionCoSign.isSelected()) {
+    		return CryptoOperation.COSIGN;
+    	}
+    	else if(this.optionCounterSignLeafs.isSelected()) {
+    		return CryptoOperation.COUNTERSIGN_LEAFS;
+    	}
+    	else {
+    		return CryptoOperation.COUNTERSIGN_TREE;
+    	}
     }
 
     SignPanelFilePanel(final SignOperationConfig signConfig,
@@ -131,6 +162,43 @@ final class SignPanelFilePanel extends JPanel {
             this.pdfVisible.setBackground(bgColor);
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             detailPanel.add(this.pdfVisible);
+        }
+
+        // Habilita selección entre cofirma y contrafirma
+        if (fileType == FileType.SIGN_CADES || fileType == FileType.SIGN_XADES) {
+        	ButtonGroup grupo = new ButtonGroup();
+        	
+            this.optionCoSign.setMnemonic('C');
+            this.optionCoSign.setBackground(bgColor);
+        	grupo.add(optionCoSign);
+
+        	this.optionCounterSignLeafs.setMnemonic('L');
+            this.optionCounterSignLeafs.setBackground(bgColor);
+        	grupo.add(this.optionCounterSignLeafs);
+
+        	this.optionCounterSignTree.setMnemonic('T');
+            this.optionCounterSignTree.setBackground(bgColor);
+        	grupo.add(this.optionCounterSignTree);
+        	
+        	if(fileType == FileType.SIGN_CADES)
+        	{
+        		this.optionCoSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN));
+        		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS));
+        		this.optionCounterSignTree.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE));
+        	}
+        	else
+        	{
+        		this.optionCoSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN));
+        		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS));
+        		this.optionCounterSignTree.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_TREE));
+        	}
+
+        	detailPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+            detailPanel.add(this.optionCoSign);
+        	detailPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+            detailPanel.add(this.optionCounterSignLeafs);
+        	detailPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+            detailPanel.add(this.optionCounterSignTree);
         }
 
     	final GridBagConstraints c = new GridBagConstraints();

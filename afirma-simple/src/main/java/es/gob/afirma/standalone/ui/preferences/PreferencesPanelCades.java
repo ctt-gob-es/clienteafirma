@@ -14,6 +14,9 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE;
 
 import java.awt.Container;
 import java.awt.Cursor;
@@ -28,11 +31,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -72,6 +77,10 @@ final class PreferencesPanelCades extends JPanel {
 	private JLabel policyLabel;
 
 	private final JCheckBox cadesImplicit = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.1")); //$NON-NLS-1$
+	
+	private final JRadioButton optionCoSign = new JRadioButton(SimpleAfirmaMessages.getString("PreferencesPanel.168")); //$NON-NLS-1$
+	private final JRadioButton optionCounterSignLeafs = new JRadioButton(SimpleAfirmaMessages.getString("PreferencesPanel.169")); //$NON-NLS-1$
+	private final JRadioButton optionCounterSignTree = new JRadioButton(SimpleAfirmaMessages.getString("PreferencesPanel.170")); //$NON-NLS-1$
 
 	PreferencesPanelCades(final KeyListener keyListener,
 						  final ModificationListener modificationListener,
@@ -134,8 +143,51 @@ final class PreferencesPanelCades extends JPanel {
         ///////////// Fin Panel Policy ////////////////
 
 		c.gridy++;
-
         add(policyConfigPanel, c);
+        
+        ///////////// Panel Multisign ////////////////
+
+        final JPanel multisignConfigPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints mcpc = new GridBagConstraints();
+        mcpc.fill = GridBagConstraints.BOTH;
+        mcpc.weightx = 1.0;
+        mcpc.gridy = 0;
+
+        multisignConfigPanel.setBorder(
+			BorderFactory.createTitledBorder(
+				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.167")) //$NON-NLS-1$
+			)
+		);
+        
+        ButtonGroup grupo = new ButtonGroup();
+        grupo.add(optionCoSign);
+        grupo.add(optionCounterSignLeafs);
+        grupo.add(optionCounterSignTree);
+        
+        optionCoSign.setEnabled(!isBlocked());
+    	optionCoSign.addItemListener(modificationListener);
+    	optionCoSign.addKeyListener(keyListener);
+
+        optionCounterSignLeafs.setEnabled(!isBlocked());
+        optionCounterSignLeafs.addItemListener(modificationListener);
+        optionCounterSignLeafs.addKeyListener(keyListener);
+
+        optionCounterSignTree.setEnabled(!isBlocked());
+        optionCounterSignTree.addItemListener(modificationListener);
+        optionCounterSignTree.addKeyListener(keyListener);
+
+        multisignConfigPanel.add(optionCoSign,mcpc);
+        
+        mcpc.gridy++;
+        multisignConfigPanel.add(optionCounterSignLeafs,mcpc);
+
+        mcpc.gridy++;
+        multisignConfigPanel.add(optionCounterSignTree,mcpc);
+
+        ///////////// Fin Panel Multisign ////////////////
+
+		c.gridy++;
+        add(multisignConfigPanel, c);
 
 	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 	    final JPanel signatureMode = new JPanel(fLayout);
@@ -229,6 +281,11 @@ final class PreferencesPanelCades extends JPanel {
 			PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH_ALGORITHM);
 			PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 		}
+		
+		PreferencesManager.putBoolean(PREFERENCE_CADES_MULTISIGN_COSIGN, this.optionCoSign.isSelected());
+		PreferencesManager.putBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS, this.optionCounterSignLeafs.isSelected());
+		PreferencesManager.putBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE, this.optionCounterSignTree.isSelected());
+		
 		this.cadesPolicyDlg.saveCurrentPolicy();
 	}
 
@@ -249,6 +306,10 @@ final class PreferencesPanelCades extends JPanel {
     		getCadesPreferedPolicy(),
     		isBlocked()
         );
+
+		this.optionCoSign.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_MULTISIGN_COSIGN));
+		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS));
+		this.optionCounterSignTree.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE));
 
         revalidate();
         repaint();
@@ -274,6 +335,10 @@ final class PreferencesPanelCades extends JPanel {
     		);
 
 		this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicyName());
+
+		this.optionCoSign.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COSIGN));
+		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS));
+		this.optionCounterSignTree.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE));
 
         revalidate();
         repaint();
