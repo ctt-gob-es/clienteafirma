@@ -42,6 +42,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class SignPanelFilePanel extends JPanel {
@@ -56,7 +57,7 @@ final class SignPanelFilePanel extends JPanel {
     boolean isVisibleSignature() {
     	return this.pdfVisible.isSelected();
     }
-
+    
     SignPanelFilePanel(final SignOperationConfig signConfig,
     		final DropTarget dropTarget) {
 
@@ -131,6 +132,25 @@ final class SignPanelFilePanel extends JPanel {
             this.pdfVisible.setBackground(bgColor);
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             detailPanel.add(this.pdfVisible);
+        }
+
+        // Habilita botón de opciones avanzadas de multifirma
+        if (fileType == FileType.SIGN_CADES || fileType == FileType.SIGN_XADES) {
+        	final JButton avanzado = new JButton(SimpleAfirmaMessages.getString("SignPanel.119"));
+        	
+        	detailPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+        	avanzado.setMnemonic('a');
+        	avanzado.addActionListener(
+    			ae -> {
+    				if(fileType == FileType.SIGN_CADES) {
+    					PreferencesDialog.show(null, true, 2);
+    				}
+    				else {
+    					PreferencesDialog.show(null, true, 3);
+    				}
+    			}
+        	);
+            detailPanel.add(avanzado);
         }
 
     	final GridBagConstraints c = new GridBagConstraints();

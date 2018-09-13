@@ -33,6 +33,7 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
@@ -200,6 +201,28 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
                 	signResult = currentSigner.cosign(
             			dataToSign,
             			signatureAlgorithm,
+            			pke.getPrivateKey(),
+            			pke.getCertificateChain(),
+            			signConfig.getExtraParams()
+        			);
+                }
+                else if(signConfig.getCryptoOperation() == CryptoOperation.COUNTERSIGN_LEAFS) {
+                	signResult = currentSigner.countersign(
+            			dataToSign,
+            			signatureAlgorithm,
+            			CounterSignTarget.LEAFS,
+            			null,
+            			pke.getPrivateKey(),
+            			pke.getCertificateChain(),
+            			signConfig.getExtraParams()
+        			);
+                }
+                else if(signConfig.getCryptoOperation() == CryptoOperation.COUNTERSIGN_TREE) {
+                	signResult = currentSigner.countersign(
+            			dataToSign,
+            			signatureAlgorithm,
+            			CounterSignTarget.TREE,
+            			null,
             			pke.getPrivateKey(),
             			pke.getCertificateChain(),
             			signConfig.getExtraParams()
