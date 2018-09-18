@@ -323,20 +323,18 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		);
 	}
 
-	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
-	 * cualquier certificado.
+	/** Establece los <code>TrustManager</code> de las conexiones SSL.
+	 * @param tms <code>TrustManager</code> a establecer.
+	 * @param hv Verificador de nombres de <i>host</i> a usar en las conexiones SSL.
 	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
-	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
-	 * @throws KeyStoreException Si no se puede cargar el KeyStore SSL.
-	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
-	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
-	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida. */
-	public static void disableSslChecks() throws KeyManagementException,
-	                                             NoSuchAlgorithmException,
-	                                             KeyStoreException,
-	                                             UnrecoverableKeyException,
-	                                             CertificateException,
-	                                             IOException {
+	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
+	public static void setTrustManager(final TrustManager[] tms, final HostnameVerifier hv) throws KeyManagementException, NoSuchAlgorithmException {
+		if (tms == null || tms.length < 1) {
+			throw new IllegalArgumentException("Es necesario proporcionar al menos un TrustManager"); //$NON-NLS-1$
+		}
+		if (hv == null) {
+			throw new IllegalArgumentException("Es necesario proporcionar un HostnameVerifier"); //$NON-NLS-1$
+		}
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
 		KeyManager[] km;
 		try {
@@ -355,11 +353,20 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 		sc.init(
 			km,
-			DUMMY_TRUST_MANAGER,
+			tms,
 			new java.security.SecureRandom()
 		);
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		HttpsURLConnection.setDefaultHostnameVerifier(
+		HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	}
+
+	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
+	 * cualquier certificado.
+	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
+	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
+	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+		setTrustManager(
+			DUMMY_TRUST_MANAGER,
 			new HostnameVerifier() {
 				@Override
 				public boolean verify(final String hostname, final SSLSession session) {
@@ -367,7 +374,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				}
 			}
 		);
-		LOGGER.info(
+		LOGGER.warning(
 			"Deshabilitadas comprobaciones SSL" //$NON-NLS-1$
 		);
 	}
