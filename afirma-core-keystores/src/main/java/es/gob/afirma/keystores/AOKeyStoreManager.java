@@ -84,7 +84,12 @@ public class AOKeyStoreManager implements KeyStoreManager {
     protected void setKeyStore(final KeyStore k) {
     	this.ks = k;
     }
-    protected KeyStore getKeyStore() {
+
+    /** Obtiene el <code>KeyStore</code> principal asociado a este gestor de almacenes.
+     * En caso de un gestor de m&uacute;ltiples almacenes, no hay garant&iacute;a de que
+     * este m&eacute;todo devuelva
+     * @return <code>KeyStore</code> principal asociado a este gestor de almacenes. */
+    public KeyStore getKeyStore() {
     	return this.ks;
     }
 

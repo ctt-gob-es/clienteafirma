@@ -73,6 +73,9 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 				keyStore.load(null, new char[0]);
 			}
 			catch (final Exception e) {
+				LOGGER.info(
+					"No se ha podido abrir el almacen sin contrasena, se intentara proporcionando una : " + e //$NON-NLS-1$
+				);
 				try {
 					keyStore.load(null, pssCallBack != null
 						? pssCallBack.getPassword()

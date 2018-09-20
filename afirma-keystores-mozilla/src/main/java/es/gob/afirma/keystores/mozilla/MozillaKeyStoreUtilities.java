@@ -59,6 +59,10 @@ public final class MozillaKeyStoreUtilities {
 
 	private static final String USE_ENV_VARS = "es.gob.afirma.keystores.mozilla.UseEnvironmentVariables"; //$NON-NLS-1$
 
+	/** Variable (Java) que, cuando se establece a <code>true</code> hace que NSS se abra habilitando la escritura.
+	 * Si no se esteblece o se hace con un valor distinto a <code>true</code>, NSS se abre como solo lectura. */
+	public static final String ENABLE_NSS_WRITE = "es.gob.afirma.keystores.mozilla.EnableNssWrite"; //$NON-NLS-1$
+
 	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
 	private static final String[] DNI_P11_NAMES = new String[] {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
@@ -163,7 +167,7 @@ public final class MozillaKeyStoreUtilities {
 			.append("' ") //$NON-NLS-1$
 			.append("certPrefix='' ") //$NON-NLS-1$
 			.append("keyPrefix='' ") //$NON-NLS-1$
-			.append("flags='readOnly'") //$NON-NLS-1$
+			.append(Boolean.getBoolean(ENABLE_NSS_WRITE) ? "" : "flags='readOnly'") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("\""); //$NON-NLS-1$
 
 		return buffer.toString();
