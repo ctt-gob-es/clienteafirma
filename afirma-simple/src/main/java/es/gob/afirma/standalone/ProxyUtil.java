@@ -56,7 +56,7 @@ public final class ProxyUtil {
 		// Este bloque es solo para el log
 		try {
 			List<Proxy> proxies = psel.select(new URI("http://www.theregister.co.uk")); //$NON-NLS-1$
-			if (proxies.isEmpty()) {
+			if (proxies.isEmpty() || proxies.get(0).address() == null) {
 				LOGGER.info("No se usara proxy para las conexiones HTTP"); //$NON-NLS-1$
 			}
 			else {
@@ -64,7 +64,7 @@ public final class ProxyUtil {
 				LOGGER.info("Se usara proxy para las conexiones HTTP: " + addr.getHostName() + ":" + addr.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			proxies = psel.select(new URI("https://www.google.com")); //$NON-NLS-1$
-			if (proxies.isEmpty()) {
+			if (proxies.isEmpty() || proxies.get(0).address() == null) {
 				LOGGER.info("No se usara proxy para las conexiones HTTPS"); //$NON-NLS-1$
 			}
 			else {
