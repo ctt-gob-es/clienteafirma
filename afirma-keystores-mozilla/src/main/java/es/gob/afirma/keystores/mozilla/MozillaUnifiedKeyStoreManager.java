@@ -31,7 +31,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
     private static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
     private static final String ONLY_PKCS11_ENV = "AFIRMA_NSS_LOAD_SSCD_ONLY"; //$NON-NLS-1$
 
-    protected static final String INCLUDE_NATIVE_DNIE_P11 = "es.gob.afirma.keystores.mozilla.IncludeNativeDniePkcs11"; //$NON-NLS-1$
+    /** Propiedad de sistema que indica que hay que a&ntilde;adir el PKCS#11 nativo de DNIe aunque no
+     * est&eacute; declarado como m&oacute;dulo externo en Mozilla. */
+    public static final String INCLUDE_NATIVE_DNIE_P11 = "es.gob.afirma.keystores.mozilla.IncludeNativeDniePkcs11"; //$NON-NLS-1$
+
+    protected static final String INCLUDE_NATIVE_DNIE_P11_ENV = "AFIRMA_NSS_INCLUDE_NATIVE_DNIE_PKCS11"; //$NON-NLS-1$
 
 	private PasswordCallback passwordCallback = null;
 	private Object[] configParams = null;
@@ -72,6 +76,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 					"No se ha podido cargar NSS, se continuara con los almacenes externos: " + e //$NON-NLS-1$
 				);
 			}
+			setKeyStore(ksm.getKeyStore());
 			addKeyStoreManager(ksm);
 		}
 

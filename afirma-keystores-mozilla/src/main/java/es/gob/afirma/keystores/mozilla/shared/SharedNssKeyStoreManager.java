@@ -30,7 +30,7 @@ public final class SharedNssKeyStoreManager extends MozillaUnifiedKeyStoreManage
 	@Override
 	protected final Map<String, String> getExternalStores() {
 		return SharedNssUtil.getSharedNssPKCS11Modules(
-			!(Boolean.getBoolean(INCLUDE_NATIVE_DNIE_P11) || Boolean.parseBoolean(System.getenv(INCLUDE_NATIVE_DNIE_P11))), // Excluir modulos nativos DNIe
+			!(Boolean.getBoolean(INCLUDE_NATIVE_DNIE_P11) || Boolean.parseBoolean(System.getenv(INCLUDE_NATIVE_DNIE_P11_ENV))), // Excluir modulos nativos DNIe
 			true  // Incluir los PKCS#11 que esten instalados en el sistema pero no en Mozilla
 		);
 	}
