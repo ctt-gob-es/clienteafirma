@@ -12,6 +12,7 @@ package es.gob.afirma.keystores.mozilla;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
+import java.security.Security;
 import java.util.logging.Level;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -55,7 +56,7 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 		// se cargue en un futuro, asi que guardamos una copia local del proveedor para hacer
 		// estas comprobaciones
 		// getNssProvider() hace toda la inicializacion de NSS como PKCS#11 especial en Java
-		final Provider p = getNssProvider(this.useSharedNss);
+		final Provider p = getNssProvider(this.useSharedNss, forceReset);
 
 		KeyStore keyStore = null;
 		if (p != null) {
@@ -101,14 +102,21 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 
 	}
 
-	/** Carga e instala el proveedor de seguridad para el acceso al almac&eacute;n de NSS. Si
-	 * ya estaba cargado, lo recupera directamente.
+	/** Carga e instala el proveedor de seguridad para el acceso al almac&eacute;n de NSS.
 	 * @param useSharedNss Si se indica <code>true</code> se usa el directorio de NSS compartido (de sistema), si por
 	 *                     el contrario se indica <code>false</code> se usa el NSS espec&iacute;fico de Mozilla.
+	 * @param forceReset Si se indica <code>true</code> no se reutiliza el proveedor y siempre se crea uno
+	 *                   nuevo. Si se indica <code>false</code> y ya hab&iacute; un proveedor cargado, lo recupera
+	 *                   directamente, reutiliz&aacute;ndolo.
 	 * @return Proveedor para el acceso a NSS. */
-	private static Provider getNssProvider(final boolean useSharedNss) {
+	private static Provider getNssProvider(final boolean useSharedNss, final boolean forceReset) {
 		if (nssProvider != null) {
-			return nssProvider;
+			if (forceReset) {
+				Security.removeProvider(nssProvider.getName());
+			}
+			else {
+				return nssProvider;
+			}
 		}
 		try {
 			nssProvider = MozillaKeyStoreUtilities.loadNSS(useSharedNss);
