@@ -51,10 +51,11 @@ public final class MozillaKeyStoreUtilities {
 	/** Nombre del PKCS#11 NSS en Windows. */
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
 
-	/** Nombre del fichero que declara los m&oacute;dulos de NSS en sustituci&oacute;n a secmod.db */
+	/** Nombre del fichero que declara los m&oacute;dulos de NSS en sustituci&oacute;n a 'secmod.db'. */
 	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
 
-	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
+	private static final String AFIRMA_NSS_HOME_ENV = "AFIRMA_NSS_HOME_ENV"; //$NON-NLS-1$
+
 	private static final String AFIRMA_NSS_PROFILES_INI = "AFIRMA_NSS_PROFILES_INI"; //$NON-NLS-1$
 
 	private static final String USE_ENV_VARS = "es.gob.afirma.keystores.mozilla.UseEnvironmentVariables"; //$NON-NLS-1$
@@ -219,23 +220,23 @@ public final class MozillaKeyStoreUtilities {
 		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
 		if (Boolean.getBoolean(USE_ENV_VARS)) {
 			try {
-				nssLibDir = System.getenv(AFIRMA_NSS_HOME);
+				nssLibDir = System.getenv(AFIRMA_NSS_HOME_ENV);
 			}
 			catch(final Exception e) {
 				LOGGER.warning(
-					"No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+					"No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME_ENV + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
 			if (nssLibDir != null) {
 				final File nssDir = new File(nssLibDir);
 				if (nssDir.isDirectory() && nssDir.canRead()) {
 					LOGGER.info(
-						"Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+						"Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME_ENV + "'" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 				else {
 					LOGGER.warning(
-						"La variable de entorno '" + AFIRMA_NSS_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
+						"La variable de entorno '" + AFIRMA_NSS_HOME_ENV + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					nssLibDir = null;
 				}
@@ -603,6 +604,10 @@ public final class MozillaKeyStoreUtilities {
 				ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 			}
 			catch (final Exception ex) {
+
+				LOGGER.info(
+					"No se ha podido cargar NSS en modo SQLite, se intentara en modo Berkeley: " + ex //$NON-NLS-1$
+				);
 
 				// Realizamos un ultimo intento configurando NSS para que utilice la base de
 				// datos Berkeley en lugar de SQLite
