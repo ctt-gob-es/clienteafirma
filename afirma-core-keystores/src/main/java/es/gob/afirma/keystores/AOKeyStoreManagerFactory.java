@@ -35,7 +35,11 @@ public final class AOKeyStoreManagerFactory {
         // No permitimos la instanciacion
     }
 
-    private static final String FORCE_STORE_RESET = "es.gob.afirma.keystores.ForceReset"; //$NON-NLS-1$
+    /** Variable de entorno de ejecuci&acute;n que si se establece a <code>true</code> indica que
+     * nunca debe reutilizarse un almac&eacute;n de claves ya creado. Si no se establece o se
+     * establece a <code>false</code>, se reutilizan las instancias existentes siempre que sea
+     * posible, por eficiencia. */
+    public static final String FORCE_STORE_RESET = "es.gob.afirma.keystores.ForceReset"; //$NON-NLS-1$
 
     /** Obtiene el <code>KeyStoreManager</code> del tipo indicado.
      * @param store Almac&eacute;n de claves
