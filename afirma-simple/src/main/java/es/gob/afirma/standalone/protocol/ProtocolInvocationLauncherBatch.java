@@ -54,15 +54,15 @@ final class ProtocolInvocationLauncherBatch {
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_21);
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_21);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 		}
 
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore asociado al valor: " + options.getDefaultKeyStore()); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_KEYSTORE);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_KEYSTORE);
 		}
 
 		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
@@ -92,11 +92,11 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch (final Exception e3) {
 				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
 				if (!bySocket){
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
 			}
 
 			try {
@@ -131,19 +131,19 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch(final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
 				if (!bySocket){
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
 				if (!bySocket){
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
 			}
 		}
 
@@ -170,11 +170,11 @@ final class ProtocolInvocationLauncherBatch {
 				LOGGER.severe("Error en el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
 						e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
 			}
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_26);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE);
 			if (!bySocket){
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_26 + ": " + e.getResponseDescription()); //$NON-NLS-1$
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE + ": " + e.getResponseDescription()); //$NON-NLS-1$
 			}
-			return ProtocolInvocationLauncherErrorManager.SAF_26 + ": " + e.getResponseDescription(); //$NON-NLS-1$
+			return ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE + ": " + e.getResponseDescription(); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			LOGGER.log(
@@ -182,11 +182,11 @@ final class ProtocolInvocationLauncherBatch {
 				"Error en el proceso del lote de firmas: " + e, //$NON-NLS-1$
 				e
 			);
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_20);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
 			if (!bySocket){
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_20);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_20);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
 		}
 
 		// Tenemos el XML de resultado del lote, lo subimos al servidor intermedio
@@ -199,11 +199,11 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_12);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
 				if (!bySocket){
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_12);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_12);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
 			}
 		}
 		else {
@@ -225,11 +225,11 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
+					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_SIGNATURE);
 					if (!bySocket){
-						throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_11);
+						throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_SIGNATURE);
 					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_SIGNATURE);
 				}
 			}
 		}
