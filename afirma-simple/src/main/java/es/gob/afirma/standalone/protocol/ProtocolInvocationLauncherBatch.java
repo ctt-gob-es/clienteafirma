@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.HttpError;
@@ -131,11 +132,11 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch(final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE);
 				if (!bySocket){
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
@@ -176,6 +177,23 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			return ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE + ": " + e.getResponseDescription(); //$NON-NLS-1$
 		}
+		catch (final AOException e) {
+			LOGGER.log(
+					Level.SEVERE,
+					"Error en el proceso del lote de firmas: " + e, //$NON-NLS-1$
+					e
+				);
+			ProtocolInvocationLauncherErrorManager.showErrorDetail(
+					ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN,
+					e.getMessage()
+					);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
+			
+		}
 		catch(final Exception e) {
 			LOGGER.log(
 				Level.SEVERE,
@@ -199,11 +217,11 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA);
 				if (!bySocket){
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA);
 			}
 		}
 		else {

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
@@ -187,6 +188,14 @@ public final class ProtocolInvocationLauncher {
                     }
                 }
             }
+            catch(final ParameterException e) {
+                LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+            }
             catch(final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
@@ -214,6 +223,14 @@ public final class ProtocolInvocationLauncher {
                     LOGGER.severe("Error durante la operacion de seleccion de certificados: " + e); //$NON-NLS-1$
                    	return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
+            }
+            catch (final ParameterException e) {
+                LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
             catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
@@ -281,6 +298,14 @@ public final class ProtocolInvocationLauncher {
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
             }
+            catch (final ParameterException e) {
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado: " + e, e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+            }
             catch (final Exception e) {
             	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
@@ -346,6 +371,14 @@ public final class ProtocolInvocationLauncher {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+            }
+            catch (final ParameterException e) {
+                LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
             catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
@@ -417,6 +450,14 @@ public final class ProtocolInvocationLauncher {
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
             }
+            catch (final ParameterException e) {
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma: " + e, e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+            }
             catch (final Exception e) {
             	LOGGER.log(Level.SEVERE, "Error en los parametros de firma: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
@@ -486,6 +527,14 @@ public final class ProtocolInvocationLauncher {
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
             }
+            catch (final ParameterException e) {
+                LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+            }
             catch (final Exception e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
@@ -520,6 +569,14 @@ public final class ProtocolInvocationLauncher {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+            }
+            catch (final ParameterException e) {
+                LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showErrorDetail(
+                		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
+                		e.getMessage()
+                		);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
             catch (final Exception e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$

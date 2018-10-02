@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
@@ -43,6 +46,13 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.signers.pades.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.InvalidPdfException;
+import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
+import es.gob.afirma.signers.pades.PdfIsCertifiedException;
+import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
+import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
+import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
@@ -214,12 +224,12 @@ final class ProtocolInvocationLauncherSign {
 				LOGGER.severe(
 					"Los datos no se corresponden con una firma electronica o no se pudieron analizar" //$NON-NLS-1$
 				);
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNATURE);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNER);
 				if (!bySocket) {
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNATURE);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNER);
 				}
 				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNATURE);
+						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNER);
 			}
 		}
 
@@ -310,12 +320,12 @@ final class ProtocolInvocationLauncherSign {
 				return getResultCancel();
 			} catch (final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE);
 				if (!bySocket) {
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE);
 				}
 				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CERTIFICATE_MISSING);
+						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE);
 			} catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE);
@@ -329,60 +339,145 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		final byte[] sign;
-		switch (options.getOperation()) {
-		case SIGN:
-			try {
+		try {
+			switch (options.getOperation()) {
+			case SIGN:
 				sign = signer.sign(options.getData(), options.getSignatureAlgorithm(), pke.getPrivateKey(),
 						pke.getCertificateChain(), options.getExtraParams());
-			} catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error al realizar la operacion firma: " + e, e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
-				if (!bySocket) {
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
-				}
-				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
-			}
-			break;
-		case COSIGN:
-			try {
+				break;
+			case COSIGN:
 				sign = signer.cosign(options.getData(), options.getSignatureAlgorithm(), pke.getPrivateKey(),
 						pke.getCertificateChain(), options.getExtraParams());
-			} catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error al realizar la operacion cofirma: " + e, e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
-				if (!bySocket) {
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
-				}
-				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
-			}
-			break;
-		case COUNTERSIGN:
-			try {
+				break;
+			case COUNTERSIGN:
 				sign = signer.countersign(options.getData(), options.getSignatureAlgorithm(),
 						"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? //$NON-NLS-1$ //$NON-NLS-2$
 								CounterSignTarget.TREE : CounterSignTarget.LEAFS,
 						null, // Targets
 						pke.getPrivateKey(), pke.getCertificateChain(), options.getExtraParams());
-			} catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error al realizar la contrafirma" + e, e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+			default:
+				LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
 				if (!bySocket) {
-					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
 				}
 				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
 			}
-			break;
-		default:
-			LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
+		}
+		catch (final SocketOperationException e) {
+			throw e;
+		}
+		catch (final IllegalArgumentException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
 			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			}
 			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+		}
+		catch (final InvalidPdfException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_PDF);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_PDF);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_PDF);
+		}
+		catch (final InvalidXMLException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_XML);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_XML);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_XML);
+		}
+		catch (final AOFormatFileException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA);
+		}
+		catch (final EFacturaAlreadySignedException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED);
+		}
+		catch (final AOInvalidFormatException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA);
+		}
+		catch (final BadPdfPasswordException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
+		}
+		catch (final PdfHasUnregisteredSignaturesException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN);
+		}
+		catch (final PdfIsCertifiedException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED);
+		}
+		catch (final PdfIsPasswordProtectedException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
+		}
+		catch (final AOException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showErrorDetail(
+					ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED,
+					e.getMessage()
+					);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED);
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un
