@@ -57,7 +57,7 @@ final class SignPanelFilePanel extends JPanel {
     boolean isVisibleSignature() {
     	return this.pdfVisible.isSelected();
     }
-    
+
     SignPanelFilePanel(final SignOperationConfig signConfig,
     		final DropTarget dropTarget) {
 
@@ -134,10 +134,10 @@ final class SignPanelFilePanel extends JPanel {
             detailPanel.add(this.pdfVisible);
         }
 
-        // Habilita botón de opciones avanzadas de multifirma
+        // Habilita boton de opciones avanzadas de multifirma
         if (fileType == FileType.SIGN_CADES || fileType == FileType.SIGN_XADES) {
-        	final JButton avanzado = new JButton(SimpleAfirmaMessages.getString("SignPanel.119"));
-        	
+        	final JButton avanzado = new JButton(SimpleAfirmaMessages.getString("SignPanel.119")); //$NON-NLS-1$
+
         	detailPanel.add(Box.createRigidArea(new Dimension(0, 6)));
         	avanzado.setMnemonic('a');
         	avanzado.addActionListener(

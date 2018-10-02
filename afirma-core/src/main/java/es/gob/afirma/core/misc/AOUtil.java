@@ -478,11 +478,28 @@ public final class AOUtil {
 			if (Integer.parseInt(ver.substring(0, 1)) > 8) {
 				return true;
 			}
+			// En el nuevo esquema de versionado de Java se sigue el patron [1-9][0-9]*((\.0)*\.[1-9][0-9]*)*,
+			// en el que tenemos $MAJOR.$MINOR.$SECURITY (http://openjdk.java.net/jeps/223)
+			final String newVer = ver.substring(0, ver.indexOf(".")); //$NON-NLS-1$
+			if (isOnlyNumber(newVer)) {
+				return Integer.parseInt(newVer) > 8;
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido determinar la version de Java (" + ver + "):" + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return false;
+	}
+
+	/** Comprueba si el texto es un n&uacute;mero.
+	 * @param value Texto a comprobar.
+	 * @return <code>true</code> si el texto es un n&uacute;mero, <code>false</code>
+	 *         en caso contrario. */
+	public static boolean isOnlyNumber(final String value) {
+		if (value == null || value.isEmpty()) {
+			return false;
+		}
+	    return value.matches("^[0-9]+$"); //$NON-NLS-1$
 	}
 
 }

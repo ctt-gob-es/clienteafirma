@@ -209,7 +209,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	else {
     		// Comprobamos si hay casos de multifirma, y aplicamos
     		// la configuración seleccionada en las preferencias
-    		for(final SignOperationConfig signConfig : signOperationConfigs) {
+    		for(final SignOperationConfig signConfig : this.signOperationConfigs) {
     			if(signConfig.getFileType() == FileType.SIGN_CADES) {
     				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)) {
     					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
