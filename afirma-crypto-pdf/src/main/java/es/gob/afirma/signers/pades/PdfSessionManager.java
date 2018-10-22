@@ -173,14 +173,20 @@ public final class PdfSessionManager {
 		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
 			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
-			signTime
+			signTime,
+			reason,
+			signatureProductionCity,
+			signerContact
 		);
 
 		// Texto en capa 2
 		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty(PdfExtraParams.LAYER2_TEXT),
 			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
-			signTime
+			signTime,
+			reason,
+			signatureProductionCity,
+			signerContact
 		);
 
 		// Tipo de letra en capa 2

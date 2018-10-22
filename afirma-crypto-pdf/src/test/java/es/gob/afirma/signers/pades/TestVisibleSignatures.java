@@ -11,7 +11,7 @@ public final class TestVisibleSignatures {
 	@Test
 	public void testLayerText() {
 		System.out.println(
-			PdfVisibleAreasUtils.getLayerText("Texto $$SIGNDATE=hh:mm:ss$$", null, null) //$NON-NLS-1$
+			PdfVisibleAreasUtils.getLayerText("Texto $$SIGNDATE=hh:mm:ss$$", null, null, null, null, null) //$NON-NLS-1$
 		);
 	}
 
