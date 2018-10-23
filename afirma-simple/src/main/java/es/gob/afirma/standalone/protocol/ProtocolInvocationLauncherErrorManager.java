@@ -54,6 +54,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String SAF_24 = "SAF_24"; //$NON-NLS-1$
 	static final String SAF_25 = "SAF_25"; //$NON-NLS-1$
 	static final String SAF_26 = "SAF_26"; //$NON-NLS-1$
+	static final String SAF_27 = "SAF_27"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
@@ -84,6 +85,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(SAF_24, ProtocolMessages.getString("ProtocolLauncher.34")); //$NON-NLS-1$
 		ERRORS.put(SAF_25, ProtocolMessages.getString("ProtocolLauncher.35")); //$NON-NLS-1$
 		ERRORS.put(SAF_26, ProtocolMessages.getString("ProtocolLauncher.36")); //$NON-NLS-1$
+		ERRORS.put(SAF_27, ProtocolMessages.getString("ProtocolLauncher.37")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {
