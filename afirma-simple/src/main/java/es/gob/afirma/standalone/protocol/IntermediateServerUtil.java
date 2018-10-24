@@ -54,7 +54,7 @@ public class IntermediateServerUtil {
 		.append("?op=").append(METHOD_OP_PUT) //$NON-NLS-1$
 		.append("&v=").append(SYNTAX_VERSION) //$NON-NLS-1$
 		.append("&id=").append(id) //$NON-NLS-1$
-		.append("&dat=").append(data.toString()); //$NON-NLS-1$
+		.append("&dat=").append(data); //$NON-NLS-1$
 
 		send(url);
 	}
