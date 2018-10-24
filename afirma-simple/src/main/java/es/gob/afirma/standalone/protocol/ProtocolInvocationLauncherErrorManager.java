@@ -27,7 +27,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		"es.gob.afirma.protocolinvocation.HeadLess" //$NON-NLS-1$
 	);
 
-  static final String ERROR_CANNOT_READ_DATA = "SAF_00"; //$NON-NLS-1$
+	static final String ERROR_CANNOT_READ_DATA = "SAF_00"; //$NON-NLS-1$
 	static final String ERROR_NULL_URI = "SAF_01"; //$NON-NLS-1$
 	static final String ERROR_UNSUPPORTED_PROTOCOL = "SAF_02"; //$NON-NLS-1$
 	static final String ERROR_PARAMS = "SAF_03"; //$NON-NLS-1$
@@ -54,7 +54,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_RECOVERING_LOG = "SAF_24"; //$NON-NLS-1$
 	static final String ERROR_CANNOT_LOAD_DATA = "SAF_25"; //$NON-NLS-1$
 	static final String ERROR_CONTACT_BATCH_SERVICE = "SAF_26"; //$NON-NLS-1$
-  static final String SAF_27 = "SAF_27"; //$NON-NLS-1$
+	static final String ERROR_SENDING_RESULT = "SAF_27"; //$NON-NLS-1$
 	static final String ERROR_INVALID_PDF = "SAF_28"; //$NON-NLS-1$
 	static final String ERROR_INVALID_XML = "SAF_29"; //$NON-NLS-1$
 	static final String ERROR_INVALID_DATA = "SAF_30"; //$NON-NLS-1$
@@ -93,7 +93,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_RECOVERING_LOG, ProtocolMessages.getString("ProtocolLauncher.34")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_LOAD_DATA, ProtocolMessages.getString("ProtocolLauncher.35")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CONTACT_BATCH_SERVICE, ProtocolMessages.getString("ProtocolLauncher.36")); //$NON-NLS-1$
-		ERRORS.put(SAF_27, ProtocolMessages.getString("ProtocolLauncher.37")); //$NON-NLS-1$
+		ERRORS.put(ERROR_SENDING_RESULT, ProtocolMessages.getString("ProtocolLauncher.37")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_PDF, ProtocolMessages.getString("ProtocolLauncher.38")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_XML, ProtocolMessages.getString("ProtocolLauncher.39")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_DATA, ProtocolMessages.getString("ProtocolLauncher.40")); //$NON-NLS-1$
