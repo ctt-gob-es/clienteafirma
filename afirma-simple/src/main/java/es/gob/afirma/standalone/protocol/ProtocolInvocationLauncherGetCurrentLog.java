@@ -30,8 +30,8 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_21);
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_21);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 		}
 
 		// Preparamos el buffer para enviar el resultado
@@ -40,12 +40,12 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 			dataToSend = getCurrentLog();
 		} catch (final IOException e) {
 			LOGGER.severe("Error al obtener el registro de log acumulado hasta la ejecucion actual: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_24);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG);
 			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_24);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG);
 			}
 			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_24);
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG);
 		}
 
 		return dataToSend;

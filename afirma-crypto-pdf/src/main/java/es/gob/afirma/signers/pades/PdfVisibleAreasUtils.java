@@ -44,8 +44,15 @@ final class PdfVisibleAreasUtils {
 	private static final String LAYERTEXT_TAG_DATE_PREFIX = LAYERTEXT_TAG_DELIMITER + "SIGNDATE"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_DATE_DELIMITER = "="; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_SUBJECTDN = "$$SUBJECTDN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_ISSUERCN = "$$ISSUERCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CERTSERIAL = "$$CERTSERIAL$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_GIVENNAME = "$$GIVENNAME$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_SURNAME = "$$SURNAME$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_ORGANIZATION = "$$ORGANIZATION$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_REASON = "$$REASON$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_LOCATION = "$$LOCATION$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_CONTACT = "$$CONTACT$$"; //$NON-NLS-1$
 
 	private static final Map<String, ColorValues> COLORS = new HashMap<>(7);
 	static {
@@ -126,7 +133,12 @@ final class PdfVisibleAreasUtils {
 		}
 	}
 
-	static String getLayerText(final String txt, final X509Certificate cert, final Calendar signDate) {
+	static String getLayerText(final String txt,
+							   final X509Certificate cert,
+							   final Calendar signDate,
+							   final String reason,
+							   final String signatureProductionCity,
+							   final String signerContact) {
 		if (txt == null) {
 			return null;
 		}
@@ -134,7 +146,14 @@ final class PdfVisibleAreasUtils {
 			txt :
 				txt.replace(LAYERTEXT_TAG_SUBJECTCN, AOUtil.getCN(cert))
 				   .replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
-				   .replace(LAYERTEXT_TAG_CERTSERIAL, cert.getSerialNumber().toString());
+				   .replace(LAYERTEXT_TAG_CERTSERIAL, cert.getSerialNumber().toString())
+				   .replace(LAYERTEXT_TAG_SUBJECTDN, cert.getSubjectDN().toString())
+				   .replace(LAYERTEXT_TAG_GIVENNAME, AOUtil.getRDNvalueFromLdapName("GIVENNAME", cert.getSubjectDN().toString()))
+				   .replace(LAYERTEXT_TAG_SURNAME, AOUtil.getRDNvalueFromLdapName("SURNAME", cert.getSubjectDN().toString()))
+				   .replace(LAYERTEXT_TAG_ORGANIZATION, AOUtil.getRDNvalueFromLdapName("o", cert.getSubjectDN().toString()))
+				   .replace(LAYERTEXT_TAG_REASON, reason)
+				   .replace(LAYERTEXT_TAG_LOCATION, signatureProductionCity)
+				   .replace(LAYERTEXT_TAG_CONTACT, signerContact);
 		if (txt.contains(LAYERTEXT_TAG_DATE_PREFIX)) {
 			final int strIdx = txt.indexOf(LAYERTEXT_TAG_DATE_PREFIX);
 			final String sdTag = txt.substring(
