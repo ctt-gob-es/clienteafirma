@@ -38,6 +38,8 @@ final class CommandLineParameters {
 	public static final String FORMAT_PADES    = "pades"; //$NON-NLS-1$
 	public static final String FORMAT_CADES    = "cades"; //$NON-NLS-1$
 	public static final String FORMAT_FACTURAE = "facturae"; //$NON-NLS-1$
+	public static final String FORMAT_OOXML = "ooxml"; //$NON-NLS-1$
+	public static final String FORMAT_ODF = "odf"; //$NON-NLS-1$
 	public static final String DEFAULT_FORMAT  = FORMAT_AUTO;
 
 	public static final String MASSIVE_OP_SIGN			= "sign"; //$NON-NLS-1$
@@ -190,7 +192,10 @@ final class CommandLineParameters {
 				if (!this.format.equals(FORMAT_XADES) &&
 						!this.format.equals(FORMAT_CADES) &&
 						!this.format.equals(FORMAT_PADES) &&
-						!this.format.equals(FORMAT_FACTURAE)) {
+						!this.format.equals(FORMAT_FACTURAE) &&
+						!this.format.equals(FORMAT_OOXML) &&
+						!this.format.equals(FORMAT_ODF) && 
+						!this.format.equals(FORMAT_AUTO)) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", params[i + 1])); //$NON-NLS-1$
 				}
 				i++;
@@ -328,6 +333,8 @@ final class CommandLineParameters {
 			.append("  \t ").append(FORMAT_PADES).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.44")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  \t ").append(FORMAT_XADES).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.45")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  \t ").append(FORMAT_FACTURAE).append("\t (").append(CommandLineMessages.getString("CommandLineLauncher.46")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  \t ").append(FORMAT_OOXML).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.72")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  \t ").append(FORMAT_ODF).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.73")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_CONFIG).append(" extraParams\t (").append(CommandLineMessages.getString("CommandLineLauncher.27")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_STORE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.31")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  \t auto\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.36")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
