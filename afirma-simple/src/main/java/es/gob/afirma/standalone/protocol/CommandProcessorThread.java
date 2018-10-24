@@ -101,13 +101,13 @@ class CommandProcessorThread extends Thread {
 		}
 		catch(final IllegalArgumentException e) {
 			LOGGER.severe("Se proporciono un ID de sesion erroneo. Se rechaza la conexion: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.SAF_03, this.localSocket, "ID de sesion erroneo"); //$NON-NLS-1$
+			sendError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, this.localSocket, "ID de sesion erroneo"); //$NON-NLS-1$
 			closeSocket(this.localSocket);
 			return;
 		}
 		catch(final Exception e) {
 			LOGGER.severe("Error en la lectura de datos del socket: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.SAF_03, this.localSocket, "No se pudieron leer los datos del socket"); //$NON-NLS-1$
+			sendError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, this.localSocket, "No se pudieron leer los datos del socket"); //$NON-NLS-1$
 			closeSocket(this.localSocket);
 			return;
 		}
@@ -126,11 +126,11 @@ class CommandProcessorThread extends Thread {
 		}
 		catch (final IllegalArgumentException e) {
 			LOGGER.severe("Los parametros recibidos a traves del socket no son validos: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.SAF_03, this.localSocket, "Parametros incorrectos"); //$NON-NLS-1$
+			sendError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, this.localSocket, "Parametros incorrectos"); //$NON-NLS-1$
 		}
 		catch(final IOException e) {
 			LOGGER.severe("Error en el envio a traves del socket: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.SAF_27, this.localSocket, "Envio del resultado a la aplicacion"); //$NON-NLS-1$
+			sendError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, this.localSocket, "Envio del resultado a la aplicacion"); //$NON-NLS-1$
 		}
 		catch (final OutOfMemoryError e){
 			LOGGER.severe("Se ha producido un error por falta memoria de la maquina virtual: " + e); //$NON-NLS-1$
@@ -138,7 +138,7 @@ class CommandProcessorThread extends Thread {
 		}
 		catch(final Exception e) {
 			LOGGER.severe("Error al procesar el comando enviado: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.SAF_09, this.localSocket, "Error al procesar el comando"); //$NON-NLS-1$
+			sendError(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED, this.localSocket, "Error al procesar el comando"); //$NON-NLS-1$
 		}
 
 		closeSocket(this.localSocket);

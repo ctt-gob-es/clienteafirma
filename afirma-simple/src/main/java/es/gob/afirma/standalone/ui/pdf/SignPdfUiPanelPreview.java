@@ -138,6 +138,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	void setViewFont(final Font f) {
 		this.font = f;
 	}
+
 	private int style;
 	int getStyle() {
 		return this.style;
@@ -166,7 +167,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return this.strikethroughButton;
 	}
 	
-	private final JCheckBox saveConfig = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiPreview.5"), true);
+	private final JCheckBox saveConfig = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiPreview.33"), true);
 	JCheckBox getSaveConfig() {
 		return this.saveConfig;
 	}
@@ -199,8 +200,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	int getSelectedSize() {
 		return ((Integer)this.sizeSpinner.getValue()).intValue();
 	}
-
-	void setSelectedSize(int size) {
+	void setSelectedSize(final int size) {
 		this.sizeSpinner.setValue(size);
 	}
 
@@ -730,7 +730,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		
 		final JButton defaultButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.31")); //$NON-NLS-1$
-		defaultButton.setMnemonic('C');
+		defaultButton.setMnemonic('R');
 		defaultButton.getAccessibleContext().setAccessibleDescription(
 			SignPdfUiMessages.getString("SignPdfUiPreview.7") //$NON-NLS-1$
 		);
@@ -815,7 +815,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private void loadProperties() {
 		getTextArea().setText(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT));
 
-		String pdfFontIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
+		final String pdfFontIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
 		int comboFontIndex = 0;
 		FontResource[] fonts = FontResource.getAllFontresources();
 		for (int i = 0; i < fonts.length; ++i) {
@@ -829,7 +829,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		setSelectedSize(
 				Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)));
 
-		int style = Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
+		final int style = Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
 		if (style == 8) {
 			getStrikethroughButton().doClick();
 		} else if (style == 4) {
@@ -843,7 +843,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			getBoldButton().doClick();
 		}
 
-		String pdfColorIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
+		final String pdfColorIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
 		int comboColorIndex = 0;
 		ColorResource[] colors = ColorResource.getAllColorResources();
 		for (int i = 0; i < colors.length; ++i) {
@@ -866,9 +866,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	/** Restaura las propiedades por defecto de la firma. */
 	private void loadDefaultProperties() {
-		getTextArea().setText(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT));
+		getTextArea().setText(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT)
+		);
 
-		String pdfFontIndex = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
+		final String pdfFontIndex = 
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
 		int comboFontIndex = 0;
 		FontResource[] fonts = FontResource.getAllFontresources();
 		for (int i = 0; i < fonts.length; ++i) {
@@ -879,10 +882,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		getLetterType().setSelectedIndex(comboFontIndex);
 
-		setSelectedSize(
-				Integer.parseInt(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)));
+		setSelectedSize(Integer.parseInt(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)
+		));
 
-		int style = Integer.parseInt(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
+		final int style = Integer.parseInt(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
 		if (style == 8) {
 			getStrikethroughButton().doClick();
 		} else if (style == 4) {
@@ -896,7 +901,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			getBoldButton().doClick();
 		}
 
-		String pdfColorIndex = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
+		final String pdfColorIndex = 
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
 		int comboColorIndex = 0;
 		ColorResource[] colors = ColorResource.getAllColorResources();
 		for (int i = 0; i < colors.length; ++i) {
@@ -919,16 +925,28 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	/** Almacena las propiedades de la firma.
 	 * @param params Colección de propiedades de la firma. */
-	private void saveProperties(Properties params) {
+	private void saveProperties(final Properties params) {
 
-		PreferencesManager.put(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text"));
-		PreferencesManager.put(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily"));
-		PreferencesManager.put(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize"));
-		PreferencesManager.put(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle"));
-		PreferencesManager.put(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor"));
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
+		);
 
 		if (getSignImage() != null) {
-			PreferencesManager.put(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, params.getProperty("signatureRubricImage"));
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, params.getProperty("signatureRubricImage")
+			);
 		}
 		else {
 			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
@@ -1018,7 +1036,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			final Graphics2D g = newImage.createGraphics();
 			g.drawImage(this.image, 0, 0, null);
 			g.drawImage(
-					bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
+				bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null
+			);
 			g.dispose();
 			this.signImage = newImage;
 		}
@@ -1339,7 +1358,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
         	super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-            final JLabel renderer = (JLabel) this.defaultRenderer.getListCellRendererComponent(list, value, this.row, isSelected, cellHasFocus);
+            final JLabel renderer =
+            	(JLabel) this.defaultRenderer.getListCellRendererComponent(list, value, this.row, isSelected, cellHasFocus);
             final Object fntObj = value;
             final Font fon = ((FontResource) fntObj).getFont();
             final Font itemFont = new Font(fon.getFontName(), Font.PLAIN, 14);
