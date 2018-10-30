@@ -34,7 +34,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private static final long serialVersionUID = -7987676963743094243L;
 
 	private static final int PREFERRED_WIDTH = 500;
-	private static final int PREFERRED_HEIGHT = 615;
+	private static final int PREFERRED_HEIGHT = 680;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -45,6 +45,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	SignPdfDialogListener getListener() {
 		return this.listener;
 	}
+
+	private boolean isPdfSign;
+	private byte[] pdfData;
 
 	/** Construye un di&aacute;logo para la obtenci&oacute;n de los datos de firma PDF Visible.
 	 * @param parentFrame Marco padre para la modalidad.
@@ -122,12 +125,16 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		);
 		add(this.areaPanel);
 		pack();
+
+		this.isPdfSign = isSign;
+		this.pdfData = pdf;
+
 		setVisible(true);
 	}
 
 	void nextPanel(final Properties p, final BufferedImage im) {
 		remove(this.areaPanel);
-		final JPanel preview = new SignPdfUiPanelPreview(this, p, im);
+		final JPanel preview = new SignPdfUiPanelPreview(this, p, im, this.isPdfSign, this.pdfData, this);
 		add(preview);
 		pack();
 	}

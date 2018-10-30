@@ -166,7 +166,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 			constraints.weightx = 1.0;
 			constraints.weighty = 1.0;
 			constraints.insets = new Insets(0, 0, 0, 0);
-			getContentPane().add(new SignPdfUiPanelPreview(this, p, im), constraints);
+			getContentPane().add(new SignPdfUiPanelPreview(this, p, im, false, null, this), constraints);
 			setVisible(true);
 		}
 		else {

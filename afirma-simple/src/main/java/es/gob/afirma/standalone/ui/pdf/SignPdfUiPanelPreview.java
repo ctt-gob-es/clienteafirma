@@ -58,6 +58,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -86,10 +87,11 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
+import es.gob.afirma.standalone.ui.pdf.SignPdfUiSeal.SignPdfUiSealListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
-final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
+final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdfUiSealListener {
 
 	private static final long serialVersionUID = 1848879900511003335L;
 	private static final int PREFERRED_WIDTH = 475;
@@ -112,6 +114,24 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	void setSignImage(final BufferedImage bi) {
 		this.signImage = bi;
 	}
+
+	private Properties sealLocation;
+	private BufferedImage sealImage;
+	private String sealImagePath;
+	BufferedImage getSealImage() {
+		return this.sealImage;
+	}
+	void setSealImage(final BufferedImage bi) {
+		this.sealImage = bi;
+	}
+	
+	private final JDialog parent;
+	public JDialog getParentDialog() {
+		return this.parent;
+	}
+	
+	private final boolean isPdfSign;
+	private final byte[] pdfData;
 
 	private final SignPdfUiPanelListener listener;
 	SignPdfUiPanelListener getListener() {
@@ -171,6 +191,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	JCheckBox getSaveConfig() {
 		return this.saveConfig;
 	}
+	
+	private final JButton addSealButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.30")); //$NON-NLS-1$
+	private final JButton removeSealButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.34")); //$NON-NLS-1$
 
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.5")); //$NON-NLS-1$
 	JButton getOkButton() {
@@ -211,7 +234,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
 						   final Properties p,
-						   final BufferedImage im) {
+						   final BufferedImage im,
+						   boolean isSign,
+						   byte[] pdf,
+						   JDialog parent) {
 
 		if (spul == null) {
 			throw new IllegalArgumentException(
@@ -223,6 +249,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.style = 0;
 		this.image = im;
 		this.signImage = null;
+		this.isPdfSign = isSign;
+		this.pdfData = pdf;
+		this.parent = parent;
 
 		createUI();
 
@@ -265,7 +294,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createTextAreaHelpPanel(), gbc);
 		gbc.gridy++;
-		gbc.insets = new Insets(10, 5, 0, 5);
+		gbc.insets = new Insets(0, 5, 0, 5);
+		add(createSealPanel(), gbc);
+		gbc.gridy++;
+		gbc.insets = new Insets(0, 5, 0, 5);
 		add(saveConfig, gbc);
 		gbc.gridy++;
 		gbc.insets = new Insets(10, 5, 0, 5);
@@ -722,6 +754,71 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	}
 
 
+	/** Crea el panel con el botón de insertar sello.
+	 * @return Panel de insertar sello. */
+	private JPanel createSealPanel() {
+
+		final JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+		this.addSealButton.setMnemonic('S');
+		this.addSealButton.getAccessibleContext().setAccessibleDescription(
+			SignPdfUiMessages.getString("SignPdfUiPreview.30") //$NON-NLS-1$
+		);
+		this.addSealButton.addActionListener(
+			e -> {
+				final File[] files;
+				try {
+					files = AOUIFactory.getLoadFiles(
+							SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
+							null,
+							null,
+							IMAGE_EXT,
+							SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,,
+							false,
+							false,
+							null,
+							this
+					);
+				}
+				catch(AOCancelledOperationException ex)
+				{
+					return;
+				}
+				
+				sealImagePath = files[0].getAbsolutePath();
+
+				final SignPdfUiSeal dialog = new SignPdfUiSeal(this.getParentDialog(), this);
+
+				PdfLoader.loadPdf(
+					isPdfSign,
+					pdfData,
+					dialog
+				);
+			}
+		);
+		
+		this.addSealButton.addKeyListener(this);
+		this.addSealButton.setEnabled(!isPdfSign);
+		panel.add(this.addSealButton);
+
+		this.removeSealButton.setMnemonic('E');
+		this.removeSealButton.getAccessibleContext().setAccessibleDescription(
+			SignPdfUiMessages.getString("SignPdfUiPreview.34") //$NON-NLS-1$
+		);
+		this.removeSealButton.addActionListener(
+			e -> {
+				this.sealImage = null;
+				this.removeSealButton.setEnabled(false);
+			}
+		);
+		this.removeSealButton.addKeyListener(this);
+		this.removeSealButton.setEnabled(false);
+		panel.add(this.removeSealButton);
+
+		return panel;
+	}
+
 	/** Crea el panel con los botones de aceptar y cancelar.
 	 * @return Panel de botones. */
 	private JPanel createButtonsPanel() {
@@ -755,26 +852,29 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					getProp().put("layer2FontColor", getColorCombobox().getSelectedItem().getPdfColorKey()); //$NON-NLS-1$*/
 				}
 				if (getSignImage() != null ) {
-					getProp().put("signatureRubricImage", getInsertImageBase64()); //$NON-NLS-1$
+					getProp().put("signatureRubricImage", getInsertImageBase64(getSignImage())); //$NON-NLS-1$
+				}
+				if (getSealImage() != null ) {
+					getProp().put("image", getInsertImageBase64(getSealImage())); //$NON-NLS-1$
 					getProp().put(
 						"imagePositionOnPageLowerLeftX", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
+						sealLocation.getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePositionOnPageLowerLeftY", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
+						sealLocation.getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePositionOnPageUpperRightX", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
+						sealLocation.getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePositionOnPageUpperRightY", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
+						sealLocation.getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePage", //$NON-NLS-1$
-						getProp().getProperty("signaturePage") //$NON-NLS-1$
+						sealLocation.getProperty("imagePage") //$NON-NLS-1$
 					);
 				}
 				if(saveConfig.isSelected()) {
@@ -1007,9 +1107,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return valid;
 	}
 
-	String getInsertImageBase64() {
+	String getInsertImageBase64(BufferedImage bi) {
 		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
-			ImageIO.write(this.signImage, "jpg", osImage); //$NON-NLS-1$
+			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
 			return Base64.encode(osImage.toByteArray());
 		}
         catch (final Exception e1) {
@@ -1423,4 +1523,29 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    }
 	}
 
+	@Override
+	public void positionSelected(Properties extraParams) {
+		try {
+			sealImage = ImageIO.read(new File(sealImagePath));
+			
+			if(sealImage != null) {
+				this.sealLocation = extraParams;
+				this.removeSealButton.setEnabled(true);
+			}
+		}
+		catch (IOException ioe) {
+			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+					"No ha sido posible cargar la imagen: " + ioe //$NON-NLS-1$
+			);
+			AOUIFactory.showMessageDialog(
+				SignPdfUiPanelPreview.this,
+				SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+	}
+	
+	@Override
+	public void positionCancelled() {/* vacio */}
 }
