@@ -10,6 +10,7 @@
 package es.gob.afirma.signfolder.server.proxy;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -19,7 +20,9 @@ import java.util.logging.Logger;
 final class RetrieveConfig {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-	
+
+	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "AFIRMA_CONFIG_DIR"; //$NON-NLS-1$
+
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
 
@@ -28,7 +31,7 @@ final class RetrieveConfig {
 
 	/** Directorio temporal por defecto. */
 	private static String defaultTmpDir;
-	
+
 	/** Directorio temporal a usar. */
 	private static final File TMP_DIR;
 
@@ -37,7 +40,7 @@ final class RetrieveConfig {
 
 	/** Milisegundos que, por defecto, tardan los mensajes en caducar. */
 	private static final long DEFAULT_EXPIRATION_TIME = 60000; // 1 minuto
-	
+
 	private static final long EXPIRATION_TIME;
 
 	/** Modo de depuraci&oacute;n activo o no, en el que no se borran los ficheros en servidor. */
@@ -46,23 +49,48 @@ final class RetrieveConfig {
 	private static final String DEBUG_KEY = "debug"; //$NON-NLS-1$
 
 	static {
+
+		InputStream is = null;
 		final Properties config = new Properties();
 		try {
-			final InputStream is = RetrieveConfig.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+			final String configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
+
+			if (configDir != null) {
+				final File configFile = new File(configDir, CONFIG_FILE).getCanonicalFile();
+				if (!configFile.isFile() || !configFile.canRead()) {
+					LOGGER.warning(
+							"No se encontro el fichero " + CONFIG_FILE + " en el directorio configurado en la variable " + //$NON-NLS-1$ //$NON-NLS-2$
+									ENVIRONMENT_VAR_CONFIG_DIR + ": " + configFile.getAbsolutePath() + //$NON-NLS-1$
+									"\nSe buscara en el CLASSPATH."); //$NON-NLS-1$
+				}
+				else {
+					LOGGER.info("Se carga un fichero de configuracion externo: " + configFile.getAbsolutePath()); //$NON-NLS-1$
+					is = new FileInputStream(configFile);
+				}
+			}
+
+			if (is == null) {
+				LOGGER.info("Se carga el fichero de configuracion del classpath"); //$NON-NLS-1$
+				is = RetrieveConfig.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+			}
+
 			config.load(is);
 			is.close();
 		}
 		catch (final IOException e) {
+			if (is != null) {
+				try { is.close(); } catch (final Exception ex) { /* No hacemos nada */}
+			}
 			LOGGER.severe(
 				"No se ha podido cargar el fichero con las propiedades (" + CONFIG_FILE + "), se usaran los valores por defecto: " + e.toString() //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
-		
+
 		DEBUG_NO_DELETE = Boolean.parseBoolean(config.getProperty(DEBUG_KEY));
 		if (DEBUG_NO_DELETE) {
 			LOGGER.warning("Modo de depuracion activado, no se borraran los ficheros en servidor"); //$NON-NLS-1$
 		}
-		
+
 		try {
 			defaultTmpDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		}
@@ -80,7 +108,7 @@ final class RetrieveConfig {
 				);
 			}
 		}
-		
+
 		File tmpDir = new File(config.getProperty(TMP_DIR_KEY, defaultTmpDir).trim());
 		if (!tmpDir.isDirectory() || !tmpDir.canRead()) {
 			LOGGER.warning(
@@ -92,7 +120,7 @@ final class RetrieveConfig {
 			}
 		}
 		TMP_DIR = tmpDir;
-		
+
 		long expTime;
 		try {
 			expTime = config.containsKey(EXPIRATION_TIME_KEY) ?
@@ -106,7 +134,7 @@ final class RetrieveConfig {
 			expTime = DEFAULT_EXPIRATION_TIME;
 		}
 		EXPIRATION_TIME = expTime;
-		
+
 	}
 
 	/** Recupera el directorio configurado para la creaci&oacute;n de ficheros temporales o el por defecto.
