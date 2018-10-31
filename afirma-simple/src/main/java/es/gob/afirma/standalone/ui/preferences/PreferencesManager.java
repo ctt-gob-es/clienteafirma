@@ -407,6 +407,30 @@ public final class PreferencesManager {
 	//**************** FIN PREFERENCIAS DE HUELLAS DIGITALES *******************************************************************
 	//**************************************************************************************************************************
 
+	//**************************************************************************************************************************
+	//**************** PREFERENCIAS DE FIRMA VISIBLE EN PDF ********************************************************************
+
+	/** Texto contenido en la firma visible en pdf.*/
+	public static final String PREFERENCE_PDF_SIGN_LAYER2TEXT = "pdfLayer2Text"; //$NON-NLS-1$
+
+	/** Fuente utilizada en el texto de la firma visible en pdf.*/
+	public static final String PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY = "pdfLayer2FontFamily"; //$NON-NLS-1$
+
+	/** Tamaño de la fuente utilizada en el texto de la firma visible en pdf.*/
+	public static final String PREFERENCE_PDF_SIGN_LAYER2FONTSIZE = "pdfLayer2FontSize"; //$NON-NLS-1$
+
+	/** Estilo de la fuente utilizada en el texto de la firma visible en pdf.*/
+	public static final String PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE = "pdfLayer2FontStyle"; //$NON-NLS-1$
+
+	/** Color de la fuente utilizada en el texto de la firma visible en pdf.*/
+	public static final String PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR = "pdfLayer2FontColor"; //$NON-NLS-1$
+
+	/** Imagen de fondo de la firma visible en pdf.*/
+	public static final String PREFERENCE_PDF_SIGN_IMAGE = "pdfSignatureImage"; //$NON-NLS-1$
+
+	//**************** FIN PREFERENCIAS DE FIRMA VISIBLE EN PDF ****************************************************************
+	//**************************************************************************************************************************
+
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.

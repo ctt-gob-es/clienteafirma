@@ -79,7 +79,7 @@ public class TestProtocolInvocation {
 				new Runnable() {
 					@Override
 					public void run() {
-						SimpleAfirma.main(new String[] { LINE_SERVICE });
+						SimpleAfirma.main(new String[] { LINE_NODATA });
 					}
 				}
 			).start();

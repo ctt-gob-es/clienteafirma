@@ -209,6 +209,8 @@ public final class PdfExtraParams {
      <dl>
       <dt><i><b>$$SUBJECTCN$$</b></i></dt>
        <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
+      <dt><i><b>$$SUBJECTDN$$</b></i></dt>
+       <dd>Nombre diferenciado (DN, <i>Distinguished Name</i>) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
       <dt><i><b>$$ISSUERCN$$</b></i></dt>
        <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del emisor del certificado de firma.</dd>
       <dt><i><b>$$CERTSERIAL$$</b></i></dt>
@@ -218,6 +220,18 @@ public final class PdfExtraParams {
         Fecha de la firma, donde <code>PATR&Oacute;N</code> debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema
         definido por Oracle para la clase <a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>.
        </dd>
+      <dt><i><b>$$GIVENNAME$$</b></i></dt>
+       <dd>Nombre Propio (GIVENNAME) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
+      <dt><i><b>$$SURNAME$$</b></i></dt>
+       <dd>Apellido (SURNAME) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
+      <dt><i><b>$$SUBJECTCN$$</b></i></dt>
+       <dd>Organizaci&oacute;n (O, <i>Organzation</i>) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
+      <dt><i><b>$$REASON$$</b></i></dt>
+       <dd>Razón de la firma, definida en las preferencias de Firmas PAdES</dd>
+      <dt><i><b>$$LOCATION$$</b></i></dt>
+       <dd>Ciudad de creación de la firma, definida en las preferencias de Firmas PAdES</dd>
+      <dt><i><b>$$CONTACT$$</b></i></dt>
+       <dd>Información de contacto, definida en las preferencias de Firmas PAdES</dd>
      </dl>
      As&iacute;, por ejemplo, el texto "<code>Firmado por $$SUBJECTCN$$ el d&iacute;a $$SIGNDATE=dd/MM/yyyy$$.</code>" resultar&aacute; finalmente
      en el PDF como "<code>Firmado por Tom&aacute;s Garc&iacute;a-Mer&aacute;s el d&iacute;a 04/01/2016.</code>" suponiendo que el CN del titular del certificado

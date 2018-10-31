@@ -39,6 +39,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -85,6 +87,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
@@ -135,6 +138,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	void setViewFont(final Font f) {
 		this.font = f;
 	}
+
 	private int style;
 	int getStyle() {
 		return this.style;
@@ -161,6 +165,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private final JToggleButton strikethroughButton = new JToggleButton("<html><s>T</s></html>"); //$NON-NLS-1$
 	JToggleButton getStrikethroughButton() {
 		return this.strikethroughButton;
+	}
+	
+	private final JCheckBox saveConfig = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiPreview.33"), true);
+	JCheckBox getSaveConfig() {
+		return this.saveConfig;
 	}
 
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.5")); //$NON-NLS-1$
@@ -191,6 +200,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	int getSelectedSize() {
 		return ((Integer)this.sizeSpinner.getValue()).intValue();
 	}
+	void setSelectedSize(final int size) {
+		this.sizeSpinner.setValue(size);
+	}
 
 	private final JTextArea textArea = new JTextArea();
 	JTextArea getTextArea() {
@@ -213,6 +225,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.signImage = null;
 
 		createUI();
+
+		loadProperties();
 	}
 
 	void createUI() {
@@ -250,6 +264,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.weighty = 0.0;
 		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createTextAreaHelpPanel(), gbc);
+		gbc.gridy++;
+		gbc.insets = new Insets(10, 5, 0, 5);
+		add(saveConfig, gbc);
 		gbc.gridy++;
 		gbc.insets = new Insets(10, 5, 0, 5);
 		add(createButtonsPanel(), gbc);
@@ -711,6 +728,18 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		
+		final JButton defaultButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.31")); //$NON-NLS-1$
+		defaultButton.setMnemonic('R');
+		defaultButton.getAccessibleContext().setAccessibleDescription(
+			SignPdfUiMessages.getString("SignPdfUiPreview.7") //$NON-NLS-1$
+		);
+		defaultButton.addActionListener(
+			e -> {
+				loadDefaultProperties();
+			}
+		);
+		defaultButton.addKeyListener(this);
 
 		this.okButton.setMnemonic('A');
 		this.okButton.getAccessibleContext().setAccessibleDescription(
@@ -748,6 +777,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 						getProp().getProperty("signaturePage") //$NON-NLS-1$
 					);
 				}
+				if(saveConfig.isSelected()) {
+					saveProperties(getProp());
+				}
 				getListener().positionSelected(getProp());
 			}
 		);
@@ -766,15 +798,164 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			panel.add(defaultButton);
 			panel.add(cancelButton);
 			panel.add(this.okButton);
 		}
 		else {
+			panel.add(defaultButton);
 			panel.add(this.okButton);
 			panel.add(cancelButton);
 		}
 
 		return panel;
+	}
+
+	/** Recupera las propiedades de la firma. */
+	private void loadProperties() {
+		getTextArea().setText(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT));
+
+		final String pdfFontIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
+		int comboFontIndex = 0;
+		FontResource[] fonts = FontResource.getAllFontresources();
+		for (int i = 0; i < fonts.length; ++i) {
+			if (fonts[i].getPdfFontIndex().equals(pdfFontIndex)) {
+				comboFontIndex = i;
+			}
+		}
+
+		getLetterType().setSelectedIndex(comboFontIndex);
+
+		setSelectedSize(
+				Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)));
+
+		final int style = Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
+		if (style == 8) {
+			getStrikethroughButton().doClick();
+		} else if (style == 4) {
+			getUnderlineButton().doClick();
+		} else if (style == 3) {
+			getItalicButton().doClick();
+			getBoldButton().doClick();
+		} else if (style == 2) {
+			getItalicButton().doClick();
+		} else if (style == 1) {
+			getBoldButton().doClick();
+		}
+
+		final String pdfColorIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
+		int comboColorIndex = 0;
+		ColorResource[] colors = ColorResource.getAllColorResources();
+		for (int i = 0; i < colors.length; ++i) {
+			if (colors[i].getPdfColorKey().equals(pdfColorIndex)) {
+				comboColorIndex = i;
+			}
+		}
+		getColorCombobox().setSelectedItem(colors[comboColorIndex]);
+		getColorCombobox().getColorList().setSelectedIndex(comboColorIndex);
+
+		final Font fon = fonts[comboFontIndex].getFont();
+		final Map<TextAttribute, Object> atr = (Map<TextAttribute, Object>) getViewFont().getAttributes();
+		atr.put(TextAttribute.FAMILY, fon.getFontName());
+		setViewFont(getViewFont().deriveFont(atr));
+		
+		this.setInsertImageBase64(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
+
+		showPreview();
+	}
+
+	/** Restaura las propiedades por defecto de la firma. */
+	private void loadDefaultProperties() {
+		getTextArea().setText(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT)
+		);
+
+		final String pdfFontIndex = 
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
+		int comboFontIndex = 0;
+		FontResource[] fonts = FontResource.getAllFontresources();
+		for (int i = 0; i < fonts.length; ++i) {
+			if (fonts[i].getPdfFontIndex().equals(pdfFontIndex)) {
+				comboFontIndex = i;
+			}
+		}
+
+		getLetterType().setSelectedIndex(comboFontIndex);
+
+		setSelectedSize(Integer.parseInt(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)
+		));
+
+		final int style = Integer.parseInt(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
+		if (style == 8) {
+			getStrikethroughButton().doClick();
+		} else if (style == 4) {
+			getUnderlineButton().doClick();
+		} else if (style == 3) {
+			getItalicButton().doClick();
+			getBoldButton().doClick();
+		} else if (style == 2) {
+			getItalicButton().doClick();
+		} else if (style == 1) {
+			getBoldButton().doClick();
+		}
+
+		final String pdfColorIndex = 
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
+		int comboColorIndex = 0;
+		ColorResource[] colors = ColorResource.getAllColorResources();
+		for (int i = 0; i < colors.length; ++i) {
+			if (colors[i].getPdfColorKey().equals(pdfColorIndex)) {
+				comboColorIndex = i;
+			}
+		}
+		getColorCombobox().setSelectedItem(colors[comboColorIndex]);
+		getColorCombobox().getColorList().setSelectedIndex(comboColorIndex);
+
+		final Font fon = fonts[comboFontIndex].getFont();
+		final Map<TextAttribute, Object> atr = (Map<TextAttribute, Object>) getViewFont().getAttributes();
+		atr.put(TextAttribute.FAMILY, fon.getFontName());
+		setViewFont(getViewFont().deriveFont(atr));
+		
+		this.setInsertImageBase64(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
+
+		showPreview();
+	}
+
+	/** Almacena las propiedades de la firma.
+	 * @param params Colección de propiedades de la firma. */
+	private void saveProperties(final Properties params) {
+
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
+		);
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
+		);
+
+		if (getSignImage() != null) {
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, params.getProperty("signatureRubricImage")
+			);
+		}
+		else {
+			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
+		}
+		try {
+			PreferencesManager.flush();
+		} catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("Error al guardar las preferencias de firma visible PDF: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 	 /** Carga la imagen para a&ntilde;adir a la firma.
@@ -837,6 +1018,34 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			);
 		}
 		return null;
+	}
+
+	void setInsertImageBase64(final String base64Image) {
+		try (final ByteArrayInputStream isImage = new ByteArrayInputStream(Base64.decode(base64Image))) {
+			final BufferedImage bi = ImageIO.read(isImage);
+			
+			if(bi == null) {
+				this.signImage = null;
+				return;
+			}
+			
+			final BufferedImage newImage = new BufferedImage(
+			    this.image.getWidth(), this.image.getHeight(), this.image.getType()
+			);
+
+			final Graphics2D g = newImage.createGraphics();
+			g.drawImage(this.image, 0, 0, null);
+			g.drawImage(
+				bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null
+			);
+			g.dispose();
+			this.signImage = newImage;
+		}
+		catch (final Exception e1) {
+			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+					"No ha sido posible recuperar la imagen guardada: " + e1 //$NON-NLS-1$
+			);
+		}
 	}
 
 	private void createImage() {
@@ -913,7 +1122,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    	y = 0;
 	    }
 	    else {
-	    	y = 40;
+	    	y = 0;
 	    }
 	    int textLength;
 	    for (final String line : getTextArea().getText().split("\n")) { //$NON-NLS-1$
@@ -1149,7 +1358,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
         	super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-            final JLabel renderer = (JLabel) this.defaultRenderer.getListCellRendererComponent(list, value, this.row, isSelected, cellHasFocus);
+            final JLabel renderer =
+            	(JLabel) this.defaultRenderer.getListCellRendererComponent(list, value, this.row, isSelected, cellHasFocus);
             final Object fntObj = value;
             final Font fon = ((FontResource) fntObj).getFont();
             final Font itemFont = new Font(fon.getFontName(), Font.PLAIN, 14);
