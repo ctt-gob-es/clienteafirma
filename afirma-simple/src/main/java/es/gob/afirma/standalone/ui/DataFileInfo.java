@@ -12,6 +12,7 @@ public class DataFileInfo {
 	private int size = 0;
 	private byte[] data = null;
 	private BufferedImage icon = null;
+	private boolean executable = false;
 
 	/**
 	 * Recupera la extensi&oacute;n que com&uacute;nmente muestra este tipo de fichero.
@@ -89,7 +90,25 @@ public class DataFileInfo {
 	 * Establece la imagen del icono con el que se visualiza el fichero.
 	 * @param icon Icono del fichero.
 	 */
-	public void setIcon(BufferedImage icon) {
+	public void setIcon(final BufferedImage icon) {
 		this.icon = icon;
+	}
+
+	/**
+	 * Indica si se identifican los datos como ejecutables.
+	 * @return {@code true} si los datos son ejecutables, {@code false}
+	 * si no lo son o si se desconoce el tipo.
+	 */
+	public boolean isExecutable() {
+		return this.executable;
+	}
+
+	/**
+	 * Establece si los datos son ejecutables o no.
+	 * @param executable {@code true} si los datos son ejecutables, {@code false}
+	 * si no lo son.
+	 */
+	public void setExecutable(final boolean executable) {
+		this.executable = executable;
 	}
 }

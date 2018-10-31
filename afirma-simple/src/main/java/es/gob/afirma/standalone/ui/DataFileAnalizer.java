@@ -66,43 +66,31 @@ public class DataFileAnalizer {
     	EXECUTABLE_EXTENSIONS.add("WSH"); //$NON-NLS-1$
     }
 
-	private final byte[] data;
-
 	/**
-	 * Construye el analizador para la obtenci&oacute;n de datos de un fichero.
-	 * @param data
+	 * Analiza los datos proporcionados para obtener informaci&oacute;n de ellos.
+	 * @param data Datos a analizar.
+	 * @return Informaci&oacute;n sobre los datos analizados.
 	 */
-	public DataFileAnalizer(byte[] data) {
-		this.data = data;
-	}
+	static DataFileInfo analize(final byte[] data) {
 
-	DataFileInfo analize() {
-
-		final MimeHelper mimeHelper = new MimeHelper(this.data);
+		final MimeHelper mimeHelper = new MimeHelper(data);
 
 		final DataFileInfo info = new DataFileInfo();
 		info.setExtension(mimeHelper.getExtension());
 		info.setDescription(mimeHelper.getDescription());
-		info.setSize(this.data.length);
+		info.setSize(data.length);
 		try {
 			info.setIcon(FileIconProvider.getIcon(info.getExtension()));
 		} catch (final IOException e) {
 			LOGGER.warning("No se ha podido cargar el icono de la extension " + info.getExtension() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		info.setData(this.data);
+		info.setData(data);
+
+		if (info.getExtension() != null &&
+				EXECUTABLE_EXTENSIONS.contains(info.getExtension().toUpperCase())) {
+			info.setExecutable(true);
+		}
 
 		return info;
 	}
-
-    /**
-     * Identifica si la extensi&oacute;n de fichero indicada se corresponde con la de un ejecutable
-     * nativo.
-     * @param ext Extensi&oacute;n de fichero.
-     * @return {@code true} si la extensi&oacute;n es la de un ejecutable, {@code false} en caso
-     * contrario.
-     */
-    static boolean isExecutable(String ext) {
-    	return ext != null && EXECUTABLE_EXTENSIONS.contains(ext.toUpperCase());
-    }
-
 }

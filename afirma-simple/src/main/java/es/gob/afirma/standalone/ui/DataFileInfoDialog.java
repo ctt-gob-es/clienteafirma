@@ -54,7 +54,7 @@ public class DataFileInfoDialog {
 		this.optionPane.setMessage(createInfoPanel(this.dataInfo));
 		final boolean needOpenOption = this.dataInfo.getExtension() != null &&
 				!this.dataInfo.getExtension().trim().isEmpty() &&
-				!DataFileAnalizer.isExecutable(this.dataInfo.getExtension());
+				!this.dataInfo.isExecutable();
 
 		Options[] dialogOptions;
 
