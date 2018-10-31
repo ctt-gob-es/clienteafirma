@@ -133,6 +133,16 @@ final class PdfVisibleAreasUtils {
 		}
 	}
 
+	/**
+	 * Obtiene el texto que debe mostrarse en la firmna PDF visible.
+	 * @param txt Texto base con los patrones de los datos a integrar.
+	 * @param cert Certificado de firma.
+	 * @param signDate Fecha de firma.
+	 * @param reason Raz&oacute;n de firma del PDF.
+	 * @param signatureProductionCity Ciudad en la que se firma el PDF.
+	 * @param signerContact Informaci&oacute;n de contacto del firmante.
+	 * @return Texto que mostrar en el campo de firma PDF.
+	 */
 	static String getLayerText(final String txt,
 							   final X509Certificate cert,
 							   final Calendar signDate,
@@ -142,18 +152,38 @@ final class PdfVisibleAreasUtils {
 		if (txt == null) {
 			return null;
 		}
-		String ret = cert == null ?
-			txt :
-				txt.replace(LAYERTEXT_TAG_SUBJECTCN, AOUtil.getCN(cert))
-				   .replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
-				   .replace(LAYERTEXT_TAG_CERTSERIAL, cert.getSerialNumber().toString())
-				   .replace(LAYERTEXT_TAG_SUBJECTDN, cert.getSubjectDN().toString())
-				   .replace(LAYERTEXT_TAG_GIVENNAME, AOUtil.getRDNvalueFromLdapName("GIVENNAME", cert.getSubjectDN().toString()))
-				   .replace(LAYERTEXT_TAG_SURNAME, AOUtil.getRDNvalueFromLdapName("SURNAME", cert.getSubjectDN().toString()))
-				   .replace(LAYERTEXT_TAG_ORGANIZATION, AOUtil.getRDNvalueFromLdapName("o", cert.getSubjectDN().toString()))
-				   .replace(LAYERTEXT_TAG_REASON, reason)
-				   .replace(LAYERTEXT_TAG_LOCATION, signatureProductionCity)
-				   .replace(LAYERTEXT_TAG_CONTACT, signerContact);
+
+		String ret = txt;
+
+		// Se mapean los datos relativos al certificado de firma
+		if (cert != null) {
+			ret = ret.replace(LAYERTEXT_TAG_SUBJECTCN, AOUtil.getCN(cert))
+					.replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
+					.replace(LAYERTEXT_TAG_CERTSERIAL, cert.getSerialNumber().toString());
+
+			// Se mapea el principal del subject del certificado
+			final String subjectPrincipal = cert.getSubjectX500Principal().toString();
+			ret = ret.replace(LAYERTEXT_TAG_SUBJECTDN, cert.getSubjectX500Principal().toString());
+
+			// Se mapea el nombre declarado en el subject del certificado
+			final String givenName = AOUtil.getRDNvalueFromLdapName("GIVENNAME", subjectPrincipal);  //$NON-NLS-1$
+			ret = ret.replace(LAYERTEXT_TAG_GIVENNAME, givenName != null ? givenName : ""); //$NON-NLS-1$
+
+			// Se mapea el apellido declarado en el subject del certificado
+			final String surname = AOUtil.getRDNvalueFromLdapName("SURNAME", subjectPrincipal); //$NON-NLS-1$
+			ret = ret.replace(LAYERTEXT_TAG_SURNAME, surname != null ? surname : ""); //$NON-NLS-1$
+
+			// Se mapea la organizacion declarada en el subject del certificado
+			final String organization = AOUtil.getRDNvalueFromLdapName("o", subjectPrincipal); //$NON-NLS-1$
+			ret = ret.replace(LAYERTEXT_TAG_ORGANIZATION, organization != null ? organization : ""); //$NON-NLS-1$
+		}
+
+		// Se mapean los datos del PDF
+		ret = ret.replace(LAYERTEXT_TAG_REASON, reason != null ? reason : ""); //$NON-NLS-1$
+		ret = ret.replace(LAYERTEXT_TAG_LOCATION, signatureProductionCity != null ? signatureProductionCity : ""); //$NON-NLS-1$
+		ret = ret.replace(LAYERTEXT_TAG_CONTACT, signerContact != null ? signerContact : ""); //$NON-NLS-1$
+
+		// Se mapea la fecha con el formato proporcionado
 		if (txt.contains(LAYERTEXT_TAG_DATE_PREFIX)) {
 			final int strIdx = txt.indexOf(LAYERTEXT_TAG_DATE_PREFIX);
 			final String sdTag = txt.substring(
