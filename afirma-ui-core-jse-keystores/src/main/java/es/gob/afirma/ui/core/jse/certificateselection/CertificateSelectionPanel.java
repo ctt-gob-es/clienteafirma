@@ -395,7 +395,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final long notAfter = cert.getNotAfter().getTime();
 			final long actualDate = new Date().getTime();
 			if (actualDate >= notAfter || actualDate <= cert.getNotBefore().getTime()) {
-				return CertificateIconManager.getErrorIcon(cert);
+				return CertificateIconManager.getExpiredIcon(cert);
 			}
 			if (notAfter - actualDate < EXPIRITY_WARNING_LEVEL) {
 				return CertificateIconManager.getWarningIcon(cert);
