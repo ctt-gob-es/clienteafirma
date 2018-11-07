@@ -34,7 +34,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private static final long serialVersionUID = -7987676963743094243L;
 
 	private static final int PREFERRED_WIDTH = 500;
-	private static final int PREFERRED_HEIGHT = 680;
+	private static final int PREFERRED_HEIGHT = 700;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 

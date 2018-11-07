@@ -87,11 +87,11 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
-import es.gob.afirma.standalone.ui.pdf.SignPdfUiSeal.SignPdfUiSealListener;
+import es.gob.afirma.standalone.ui.pdf.SignPdfUiStamp.SignPdfUiStampListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
-final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdfUiSealListener {
+final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdfUiStampListener {
 
 	private static final long serialVersionUID = 1848879900511003335L;
 	private static final int PREFERRED_WIDTH = 475;
@@ -115,14 +115,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		this.signImage = bi;
 	}
 
-	private Properties sealLocation;
-	private BufferedImage sealImage;
-	private String sealImagePath;
-	BufferedImage getSealImage() {
-		return this.sealImage;
+	private Properties stampLocation;
+	private BufferedImage stampImage;
+	private String stampImagePath;
+	BufferedImage getStampImage() {
+		return this.stampImage;
 	}
-	void setSealImage(final BufferedImage bi) {
-		this.sealImage = bi;
+	void setStampImage(final BufferedImage bi) {
+		this.stampImage = bi;
 	}
 	
 	private final JDialog parent;
@@ -192,8 +192,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		return this.saveConfig;
 	}
 	
-	private final JButton addSealButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.30")); //$NON-NLS-1$
-	private final JButton removeSealButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.34")); //$NON-NLS-1$
+	private final JButton addStampButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.30")); //$NON-NLS-1$
+	private final JButton removeStampButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.34")); //$NON-NLS-1$
 
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.5")); //$NON-NLS-1$
 	JButton getOkButton() {
@@ -294,13 +294,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createTextAreaHelpPanel(), gbc);
 		gbc.gridy++;
-		gbc.insets = new Insets(0, 5, 0, 5);
-		add(createSealPanel(), gbc);
+		gbc.insets = new Insets(10, 5, 0, 5);
+		add(createStampPanel(), gbc);
 		gbc.gridy++;
-		gbc.insets = new Insets(0, 5, 0, 5);
+		gbc.insets = new Insets(0, 15, 0, 5);
 		add(saveConfig, gbc);
 		gbc.gridy++;
-		gbc.insets = new Insets(10, 5, 0, 5);
+		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createButtonsPanel(), gbc);
 		showPreview();
 		this.letterType.requestFocusInWindow();
@@ -756,16 +756,19 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 
 	/** Crea el panel con el botón de insertar sello.
 	 * @return Panel de insertar sello. */
-	private JPanel createSealPanel() {
+	private JPanel createStampPanel() {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		panel.setBorder(BorderFactory.createTitledBorder(
+				SignPdfUiMessages.getString("SignPdfUiPreview.35")) //$NON-NLS-1$
+			);
 
-		this.addSealButton.setMnemonic('S');
-		this.addSealButton.getAccessibleContext().setAccessibleDescription(
+		this.addStampButton.setMnemonic('I');
+		this.addStampButton.getAccessibleContext().setAccessibleDescription(
 			SignPdfUiMessages.getString("SignPdfUiPreview.30") //$NON-NLS-1$
 		);
-		this.addSealButton.addActionListener(
+		this.addStampButton.addActionListener(
 			e -> {
 				final File[] files;
 				try {
@@ -786,9 +789,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 					return;
 				}
 				
-				sealImagePath = files[0].getAbsolutePath();
+				stampImagePath = files[0].getAbsolutePath();
 
-				final SignPdfUiSeal dialog = new SignPdfUiSeal(this.getParentDialog(), this);
+				final SignPdfUiStamp dialog = new SignPdfUiStamp(this.getParentDialog(), this);
 
 				PdfLoader.loadPdf(
 					isPdfSign,
@@ -798,23 +801,23 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 			}
 		);
 		
-		this.addSealButton.addKeyListener(this);
-		this.addSealButton.setEnabled(!isPdfSign);
-		panel.add(this.addSealButton);
+		this.addStampButton.addKeyListener(this);
+		this.addStampButton.setEnabled(!isPdfSign);
+		panel.add(this.addStampButton);
 
-		this.removeSealButton.setMnemonic('E');
-		this.removeSealButton.getAccessibleContext().setAccessibleDescription(
+		this.removeStampButton.setMnemonic('E');
+		this.removeStampButton.getAccessibleContext().setAccessibleDescription(
 			SignPdfUiMessages.getString("SignPdfUiPreview.34") //$NON-NLS-1$
 		);
-		this.removeSealButton.addActionListener(
+		this.removeStampButton.addActionListener(
 			e -> {
-				this.sealImage = null;
-				this.removeSealButton.setEnabled(false);
+				this.stampImage = null;
+				this.removeStampButton.setEnabled(false);
 			}
 		);
-		this.removeSealButton.addKeyListener(this);
-		this.removeSealButton.setEnabled(false);
-		panel.add(this.removeSealButton);
+		this.removeStampButton.addKeyListener(this);
+		this.removeStampButton.setEnabled(false);
+		panel.add(this.removeStampButton);
 
 		return panel;
 	}
@@ -854,27 +857,27 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 				if (getSignImage() != null ) {
 					getProp().put("signatureRubricImage", getInsertImageBase64(getSignImage())); //$NON-NLS-1$
 				}
-				if (getSealImage() != null ) {
-					getProp().put("image", getInsertImageBase64(getSealImage())); //$NON-NLS-1$
+				if (getStampImage() != null ) {
+					getProp().put("image", getInsertImageBase64(getStampImage())); //$NON-NLS-1$
 					getProp().put(
 						"imagePositionOnPageLowerLeftX", //$NON-NLS-1$
-						sealLocation.getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
+						stampLocation.getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePositionOnPageLowerLeftY", //$NON-NLS-1$
-						sealLocation.getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
+						stampLocation.getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePositionOnPageUpperRightX", //$NON-NLS-1$
-						sealLocation.getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
+						stampLocation.getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePositionOnPageUpperRightY", //$NON-NLS-1$
-						sealLocation.getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
+						stampLocation.getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
 					);
 					getProp().put(
 						"imagePage", //$NON-NLS-1$
-						sealLocation.getProperty("imagePage") //$NON-NLS-1$
+						stampLocation.getProperty("imagePage") //$NON-NLS-1$
 					);
 				}
 				if(saveConfig.isSelected()) {
@@ -1027,23 +1030,28 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	 * @param params Colección de propiedades de la firma. */
 	private void saveProperties(final Properties params) {
 
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
-		);
-
-		if (getSignImage() != null) {
+		if (params.getProperty("layer2Text") != null) {
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
+			);
+		}
+		else {
+			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT);			
+		}
+		
+		if (params.getProperty("signatureRubricImage") != null) {
 			PreferencesManager.put(
 				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, params.getProperty("signatureRubricImage")
 			);
@@ -1526,11 +1534,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	@Override
 	public void positionSelected(Properties extraParams) {
 		try {
-			sealImage = ImageIO.read(new File(sealImagePath));
+			stampImage = ImageIO.read(new File(stampImagePath));
 			
-			if(sealImage != null) {
-				this.sealLocation = extraParams;
-				this.removeSealButton.setEnabled(true);
+			if(stampImage != null) {
+				this.stampLocation = extraParams;
+				this.removeStampButton.setEnabled(true);
 			}
 		}
 		catch (IOException ioe) {

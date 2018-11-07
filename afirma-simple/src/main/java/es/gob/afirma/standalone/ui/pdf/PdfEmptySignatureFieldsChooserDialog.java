@@ -51,6 +51,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	private final byte[] pdf;
+	private final boolean isSign;
 
 	private final SignatureField field;
 	SignatureField getField() {
@@ -63,12 +64,14 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	 * @param field Campos de firma seleccionado.
 	 * @param signPdfDialogListener Clase a la que hay que notificar la selecci&oacute;n de propiedades de firma visible PDF. */
 	public static void startPdfEmptySignatureFieldsChooserDialog(final byte[] pdf,
+																 final boolean isSign, 
 																 final Frame parent,
 																 final SignatureField field,
 																 final SignPdfDialogListener signPdfDialogListener) {
 
 		final PdfEmptySignatureFieldsChooserDialog tsd = new PdfEmptySignatureFieldsChooserDialog(
 			pdf,
+			isSign,
 			parent,
 			field,
 			signPdfDialogListener
@@ -79,12 +82,14 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	private PdfEmptySignatureFieldsChooserDialog(final byte[] pdf,
+												 final boolean isSign,
 												 final Frame parentFrame,
 												 final SignatureField fld,
 												 final SignPdfDialogListener spul) {
 		super(parentFrame);
 		this.listener = spul;
 		this.pdf = pdf;
+		this.isSign = isSign;
 		this.field = fld;
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
@@ -166,7 +171,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 			constraints.weightx = 1.0;
 			constraints.weighty = 1.0;
 			constraints.insets = new Insets(0, 0, 0, 0);
-			getContentPane().add(new SignPdfUiPanelPreview(this, p, im, false, null, this), constraints);
+			getContentPane().add(new SignPdfUiPanelPreview(this, p, im, this.isSign, this.pdf, this), constraints);
 			setVisible(true);
 		}
 		else {

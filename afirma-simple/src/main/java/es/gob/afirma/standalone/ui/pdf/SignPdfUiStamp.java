@@ -48,7 +48,7 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 
-public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyListener, PageLabelListener, ActionListener {
+public class SignPdfUiStamp extends JDialog implements PdfLoaderListener, KeyListener, PageLabelListener, ActionListener {
 
 	private static final long serialVersionUID = -4465164058611491582L;
 
@@ -59,7 +59,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 	private static final int PREFERRED_PAGE_WIDTH = 466;
 	private static final int PREFERRED_PAGE_HEIGHT = 410;
 
-	static interface SignPdfUiSealListener {
+	static interface SignPdfUiStampListener {
 		void positionSelected(final Properties extraParams);
 		void positionCancelled();
 	}
@@ -67,6 +67,9 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 	private Properties extraParamsForLocation = null;
 	Properties getExtraParamsForLocation() {
 		return this.extraParamsForLocation;
+	}
+	private void setProperties(final Properties p) {
+		this.extraParamsForLocation = p;
 	}
 
 	private int currentPage = 1;
@@ -76,8 +79,8 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 
 	private int currentScale = 100;
 
-	private final SignPdfUiSealListener listener;
-	SignPdfUiSealListener getListener() {
+	private final SignPdfUiStampListener listener;
+	SignPdfUiStampListener getListener() {
 		return this.listener;
 	}
 
@@ -86,7 +89,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 
 	private List<Dimension> pdfPageSizes;
 	private JLabel pageLabel;
-	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiSeal.8")); //$NON-NLS-1$
+	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiStamp.8")); //$NON-NLS-1$
 	private final JTextField posX = new JTextField(4);
 	private final JTextField posY = new JTextField(4);
 	private final JLabel indexLabel = new JLabel();
@@ -95,18 +98,19 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 	private final JButton previousPageButton = new JButton("<"); //$NON-NLS-1$
 	private final JButton nextPageButton = new JButton(">"); //$NON-NLS-1$
 	private final JButton lastPageButton = new JButton(">>"); //$NON-NLS-1$
-	private final JToggleButton allPagesButton = new JToggleButton(SignPdfUiMessages.getString("SignPdfUiSeal.7")); //$NON-NLS-1$
+	private final JToggleButton allPagesButton = new JToggleButton(SignPdfUiMessages.getString("SignPdfUiStamp.7")); //$NON-NLS-1$
 
 	private PdfDocument pdfDocument;
 	private int pressButton = 0;
 
-	public SignPdfUiSeal(JDialog parent, SignPdfUiSealListener spsl) {
+	public SignPdfUiStamp(JDialog parent, SignPdfUiStampListener spsl) {
 		super(parent);
 		
 		this.setPreferredSize(new Dimension(PREFERRED_DIALOG_WIDTH, PREFERRED_DIALOG_HEIGHT));
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		this.setLocation(cp.x - PREFERRED_DIALOG_WIDTH/2, cp.y - PREFERRED_DIALOG_HEIGHT/2);
 		this.setResizable(false);
+		this.setModalityType(ModalityType.APPLICATION_MODAL);
 
 		if (spsl == null) {
 			throw new IllegalArgumentException(
@@ -147,26 +151,22 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 		if (cause instanceof OutOfMemoryError) {
 			AOUIFactory.showErrorMessage(
 				this,
-				SignPdfUiMessages.getString("SignPdfUiSeal.14"), //$NON-NLS-1$
-				SignPdfUiMessages.getString("SignPdfUiSeal.12"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiStamp.14"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE
 			);
 		}
 		else {
 			AOUIFactory.showErrorMessage(
 				this,
-				SignPdfUiMessages.getString("SignPdfUiSeal.13"), //$NON-NLS-1$
-				SignPdfUiMessages.getString("SignPdfUiSeal.12"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiStamp.13"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE
 			);
 		}
 		setVisible(false);
 		this.listener.positionCancelled();
 		dispose();
-	}
-
-	private void setProperties(final Properties p) {
-		this.extraParamsForLocation = p;
 	}
 
 	private JLabel createPageLabel(final BufferedImage page,
@@ -218,17 +218,17 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 		ret.setFocusable(false);
 
 		ret.getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiSeal.5") //$NON-NLS-1$
+			SignPdfUiMessages.getString("SignPdfUiStamp.5") //$NON-NLS-1$
 		);
 
 		return ret;
 	}
 
 	void createUI() {
-		setTitle(SignPdfUiMessages.getString("SignPdfUiSeal.0")); //$NON-NLS-1$
+		setTitle(SignPdfUiMessages.getString("SignPdfUiStamp.0")); //$NON-NLS-1$
 		setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
 		getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiSeal.1") //$NON-NLS-1$
+			SignPdfUiMessages.getString("SignPdfUiStamp.1") //$NON-NLS-1$
 		);
 		setModalityType(ModalityType.TOOLKIT_MODAL);
 
@@ -252,7 +252,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
-		final TitledBorder tb = BorderFactory.createTitledBorder(SignPdfUiMessages.getString("SignPdfUiSeal.2")); //$NON-NLS-1$
+		final TitledBorder tb = BorderFactory.createTitledBorder(SignPdfUiMessages.getString("SignPdfUiStamp.2")); //$NON-NLS-1$
 		tb.setTitleFont(mainPanel.getFont().deriveFont(Font.PLAIN));
 		mainPanel.setBorder(tb);
 
@@ -323,7 +323,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 
 		this.indexLabel.setText(
 			SignPdfUiMessages.getString(
-				"SignPdfUiSeal.6", //$NON-NLS-1$
+				"SignPdfUiStamp.6", //$NON-NLS-1$
 				Integer.toString(getCurrentPage()),
 				Integer.toString(this.pdfPages.size()),
 				Integer.toString(this.currentScale)
@@ -364,7 +364,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 			}
 		});
 		allPagesButton.getAccessibleContext().setAccessibleDescription(
-				SignPdfUiMessages.getString("SignPdfUiSeal.16") //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiStamp.16") //$NON-NLS-1$
 			);
 
 
@@ -384,14 +384,14 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-		panel.add(new JLabel(SignPdfUiMessages.getString("SignPdfUiSeal.3"))); //$NON-NLS-1$
+		panel.add(new JLabel(SignPdfUiMessages.getString("SignPdfUiStamp.3"))); //$NON-NLS-1$
 
 		this.posX.setEnabled(false);
 		this.posX.setFocusable(false);
 		this.posX.addKeyListener(this);
 		panel.add(this.posX);
 
-		panel.add(new JLabel(SignPdfUiMessages.getString("SignPdfUiSeal.4"))); //$NON-NLS-1$
+		panel.add(new JLabel(SignPdfUiMessages.getString("SignPdfUiStamp.4"))); //$NON-NLS-1$
 
 		this.posY.setEnabled(false);
 		this.posY.setFocusable(false);
@@ -411,7 +411,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 		this.okButton.setEnabled(false);
 		this.okButton.setMnemonic('A');
 		this.okButton.getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiSeal.9") //$NON-NLS-1$
+			SignPdfUiMessages.getString("SignPdfUiStamp.9") //$NON-NLS-1$
 		);
 		this.okButton.addActionListener(
 			new ActionListener() {
@@ -425,7 +425,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 						p.put("imagePage", Integer.toString(getCurrentPage())); //$NON-NLS-1$
 					}
 					p.putAll(getExtraParamsForLocation());
-					SignPdfUiSeal.this.listener.positionSelected(p);
+					SignPdfUiStamp.this.listener.positionSelected(p);
 					dispose();
 				}
 			}
@@ -433,10 +433,10 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 		this.okButton.addKeyListener(this);
 		panel.add(this.okButton);
 
-		final JButton cancelButton = new JButton(SignPdfUiMessages.getString("SignPdfUiSeal.10")); //$NON-NLS-1$
+		final JButton cancelButton = new JButton(SignPdfUiMessages.getString("SignPdfUiStamp.10")); //$NON-NLS-1$
 		cancelButton.setMnemonic('C');
 		cancelButton.getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiSeal.11") //$NON-NLS-1$
+			SignPdfUiMessages.getString("SignPdfUiStamp.11") //$NON-NLS-1$
 		);
 		cancelButton.addActionListener(
 			new ActionListener() {
@@ -523,8 +523,8 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 						this.currentPage++; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
 								this,
-								SignPdfUiMessages.getString("SignPdfUiSeal.15"), //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfUiSeal.12"), //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
 								JOptionPane.ERROR_MESSAGE
 								);
 					}
@@ -544,8 +544,8 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 						this.currentPage--; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
 								this,
-								SignPdfUiMessages.getString("SignPdfUiSeal.15"), //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfUiSeal.12"), //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
 								JOptionPane.ERROR_MESSAGE
 							);
 					}
@@ -578,7 +578,7 @@ public class SignPdfUiSeal extends JDialog implements PdfLoaderListener, KeyList
 
 		this.indexLabel.setText(
 			SignPdfUiMessages.getString(
-				"SignPdfUiSeal.6", //$NON-NLS-1$
+				"SignPdfUiStamp.6", //$NON-NLS-1$
 				Integer.toString(getCurrentPage()),
 				Integer.toString(this.pdfPages.size()),
 				Integer.toString(this.currentScale)
