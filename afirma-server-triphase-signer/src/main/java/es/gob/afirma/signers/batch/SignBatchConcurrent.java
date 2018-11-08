@@ -77,7 +77,7 @@ public final class SignBatchConcurrent extends SignBatch {
 		for (final Future<String> f : results) {
 			String tmp;
 			try {
-				tmp = f.get();
+				tmp = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch (final Exception e) {
 				if (this.stopOnError) {
@@ -139,7 +139,7 @@ public final class SignBatchConcurrent extends SignBatch {
 
 			final CallableResult tmp;
 			try {
-				tmp = f.get();
+				tmp = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch (final Exception e) {
 				// Este caso no debe darse nunca, porque el call() del Callable no lanza excepciones
@@ -224,7 +224,7 @@ public final class SignBatchConcurrent extends SignBatch {
 		for (final Future<CallableResult> f : saveResults) {
 			final CallableResult result;
 			try {
-				result = f.get();
+				result = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch(final Exception e) {
 				// Este caso no debe darse nunca, porque el call() del Callable no lanza excepciones

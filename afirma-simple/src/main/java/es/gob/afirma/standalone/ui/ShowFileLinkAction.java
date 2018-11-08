@@ -52,7 +52,7 @@ final class ShowFileLinkAction {
         }
 
         // Extraemos informacion del fichero
-        final DataFileInfo info = new DataFileAnalizer(this.data).analize();
+        final DataFileInfo info = DataFileAnalizer.analize(this.data);
 
         // Mostramos un dialogo con la informacion del fichero. Si se conoce el tipo de
         // fichero, se permitira abrirlo. Si no, se permitira almacenarlo.
