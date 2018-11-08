@@ -134,7 +134,16 @@ public final class PluginsManagementPanel extends JPanel {
 		}
 
 		this.addButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.1")); //$NON-NLS-1$
+		this.addButton.setMnemonic('A');
+		this.addButton.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PluginsManagementPanel.7") //$NON-NLS-1$
+			);
+
 		this.removeButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.2")); //$NON-NLS-1$
+		this.removeButton.setMnemonic('E');
+		this.removeButton.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PluginsManagementPanel.8") //$NON-NLS-1$
+			);
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -231,10 +240,10 @@ public final class PluginsManagementPanel extends JPanel {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
-		this.closeButton = new JButton(SimpleAfirmaMessages.getString("RestoreConfigPanel.5")); //$NON-NLS-1$
+		this.closeButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.5")); //$NON-NLS-1$
 		this.closeButton.setMnemonic('C');
 		this.closeButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("RestoreConfigPanel.6") //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("PluginsManagementPanel.6") //$NON-NLS-1$
 		);
 		panel.add(this.closeButton);
 
