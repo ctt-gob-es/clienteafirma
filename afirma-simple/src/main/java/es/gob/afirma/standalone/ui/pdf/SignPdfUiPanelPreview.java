@@ -186,8 +186,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	JToggleButton getStrikethroughButton() {
 		return this.strikethroughButton;
 	}
-	
-	private final JCheckBox saveConfig = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiPreview.33"), true);
+
+	private final JCheckBox saveConfig = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiPreview.33"), true); //$NON-NLS-1$
 	JCheckBox getSaveConfig() {
 		return this.saveConfig;
 	}
@@ -224,7 +224,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		return ((Integer)this.sizeSpinner.getValue()).intValue();
 	}
 	void setSelectedSize(final int size) {
-		this.sizeSpinner.setValue(size);
+		this.sizeSpinner.setValue(Integer.valueOf(size));
 	}
 
 	private final JTextArea textArea = new JTextArea();
@@ -298,7 +298,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		add(createStampPanel(), gbc);
 		gbc.gridy++;
 		gbc.insets = new Insets(0, 15, 0, 5);
-		add(saveConfig, gbc);
+		add(this.saveConfig, gbc);
 		gbc.gridy++;
 		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createButtonsPanel(), gbc);
@@ -746,7 +746,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
         helpLabel.addHyperlinkListener(editorFocusManager);
         helpLabel.addKeyListener(editorFocusManager);
         helpLabel.setEditable(false);
-        helpLabel.setHighlighter(null);
         helpLabel.setFocusable(false);
         helpLabel.setBackground(new Color(0,0,0,0));
 
@@ -828,7 +827,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		
+
 		final JButton defaultButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.31")); //$NON-NLS-1$
 		defaultButton.setMnemonic('R');
 		defaultButton.getAccessibleContext().setAccessibleDescription(
@@ -880,7 +879,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 						stampLocation.getProperty("imagePage") //$NON-NLS-1$
 					);
 				}
-				if(saveConfig.isSelected()) {
+				if(this.saveConfig.isSelected()) {
 					saveProperties(getProp());
 				}
 				getListener().positionSelected(getProp());
@@ -920,7 +919,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 
 		final String pdfFontIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
 		int comboFontIndex = 0;
-		FontResource[] fonts = FontResource.getAllFontresources();
+		final FontResource[] fonts = FontResource.getAllFontresources();
 		for (int i = 0; i < fonts.length; ++i) {
 			if (fonts[i].getPdfFontIndex().equals(pdfFontIndex)) {
 				comboFontIndex = i;
@@ -932,23 +931,23 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		setSelectedSize(
 				Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)));
 
-		final int style = Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
-		if (style == 8) {
+		final int fontStyle = Integer.parseInt(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
+		if (fontStyle == 8) {
 			getStrikethroughButton().doClick();
-		} else if (style == 4) {
+		} else if (fontStyle == 4) {
 			getUnderlineButton().doClick();
-		} else if (style == 3) {
+		} else if (fontStyle == 3) {
 			getItalicButton().doClick();
 			getBoldButton().doClick();
-		} else if (style == 2) {
+		} else if (fontStyle == 2) {
 			getItalicButton().doClick();
-		} else if (style == 1) {
+		} else if (fontStyle == 1) {
 			getBoldButton().doClick();
 		}
 
 		final String pdfColorIndex = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
 		int comboColorIndex = 0;
-		ColorResource[] colors = ColorResource.getAllColorResources();
+		final ColorResource[] colors = ColorResource.getAllColorResources();
 		for (int i = 0; i < colors.length; ++i) {
 			if (colors[i].getPdfColorKey().equals(pdfColorIndex)) {
 				comboColorIndex = i;
@@ -961,8 +960,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		final Map<TextAttribute, Object> atr = (Map<TextAttribute, Object>) getViewFont().getAttributes();
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
-		
-		this.setInsertImageBase64(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
+
+		setInsertImageBase64(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
 
 		showPreview();
 	}
@@ -973,10 +972,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT)
 		);
 
-		final String pdfFontIndex = 
+		final String pdfFontIndex =
 			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
 		int comboFontIndex = 0;
-		FontResource[] fonts = FontResource.getAllFontresources();
+		final FontResource[] fonts = FontResource.getAllFontresources();
 		for (int i = 0; i < fonts.length; ++i) {
 			if (fonts[i].getPdfFontIndex().equals(pdfFontIndex)) {
 				comboFontIndex = i;
@@ -1004,10 +1003,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 			getBoldButton().doClick();
 		}
 
-		final String pdfColorIndex = 
+		final String pdfColorIndex =
 			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
 		int comboColorIndex = 0;
-		ColorResource[] colors = ColorResource.getAllColorResources();
+		final ColorResource[] colors = ColorResource.getAllColorResources();
 		for (int i = 0; i < colors.length; ++i) {
 			if (colors[i].getPdfColorKey().equals(pdfColorIndex)) {
 				comboColorIndex = i;
@@ -1020,8 +1019,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		final Map<TextAttribute, Object> atr = (Map<TextAttribute, Object>) getViewFont().getAttributes();
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
-		
-		this.setInsertImageBase64(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
+
+		setInsertImageBase64(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
 
 		showPreview();
 	}
@@ -1131,12 +1130,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	void setInsertImageBase64(final String base64Image) {
 		try (final ByteArrayInputStream isImage = new ByteArrayInputStream(Base64.decode(base64Image))) {
 			final BufferedImage bi = ImageIO.read(isImage);
-			
+
 			if(bi == null) {
 				this.signImage = null;
 				return;
 			}
-			
+
 			final BufferedImage newImage = new BufferedImage(
 			    this.image.getWidth(), this.image.getHeight(), this.image.getType()
 			);

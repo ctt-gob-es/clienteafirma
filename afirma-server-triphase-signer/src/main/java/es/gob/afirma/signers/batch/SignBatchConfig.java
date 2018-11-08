@@ -10,6 +10,10 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
  */
 class SignBatchConfig {
 
+	/** Tiempo de espera que, por defecto, se aplicar&aacute;a a las distintas
+	 * operaciones de firma concurrente de datos. */
+	private static final long DEFAULT_TIMEOUT = 30;
+
 	private String id;
 
 	private boolean stopOnError;
@@ -26,7 +30,7 @@ class SignBatchConfig {
 	public SignBatchConfig() {
 		this.id = null;
 		this.stopOnError = true;
-		this.concurrentTimeout = 0;
+		this.concurrentTimeout = DEFAULT_TIMEOUT;
 		this.signs = new ArrayList<>();
 	}
 

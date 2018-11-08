@@ -178,7 +178,7 @@ final class CertificateIconManager {
 		return ICON_OTHER_WARNING;
 	}
 
-	static ImageIcon getErrorIcon(final X509Certificate certificate) {
+	static ImageIcon getExpiredIcon(final X509Certificate certificate) {
 		if (isAccvCert(certificate)) {
 			return ICON_ACCV_ERROR;
 		}
@@ -193,5 +193,4 @@ final class CertificateIconManager {
 		}
 		return ICON_OTHER_ERROR;
 	}
-
 }
