@@ -87,11 +87,10 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
-import es.gob.afirma.standalone.ui.pdf.SignPdfUiStamp.SignPdfUiStampListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
-final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdfUiStampListener {
+final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	private static final long serialVersionUID = 1848879900511003335L;
 	private static final int PREFERRED_WIDTH = 475;
@@ -114,24 +113,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	void setSignImage(final BufferedImage bi) {
 		this.signImage = bi;
 	}
-
-	private Properties stampLocation;
-	private BufferedImage stampImage;
-	private String stampImagePath;
-	BufferedImage getStampImage() {
-		return this.stampImage;
-	}
-	void setStampImage(final BufferedImage bi) {
-		this.stampImage = bi;
-	}
-	
-	private final JDialog parent;
-	public JDialog getParentDialog() {
-		return this.parent;
-	}
-	
-	private final boolean isPdfSign;
-	private final byte[] pdfData;
 
 	private final SignPdfUiPanelListener listener;
 	SignPdfUiPanelListener getListener() {
@@ -192,9 +173,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		return this.saveConfig;
 	}
 	
-	private final JButton addStampButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.30")); //$NON-NLS-1$
-	private final JButton removeStampButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.34")); //$NON-NLS-1$
-
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.5")); //$NON-NLS-1$
 	JButton getOkButton() {
 		return this.okButton;
@@ -235,8 +213,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
 						   final Properties p,
 						   final BufferedImage im,
-						   boolean isSign,
-						   byte[] pdf,
 						   JDialog parent) {
 
 		if (spul == null) {
@@ -249,9 +225,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		this.style = 0;
 		this.image = im;
 		this.signImage = null;
-		this.isPdfSign = isSign;
-		this.pdfData = pdf;
-		this.parent = parent;
 
 		createUI();
 
@@ -293,9 +266,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 		gbc.weighty = 0.0;
 		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createTextAreaHelpPanel(), gbc);
-		gbc.gridy++;
-		gbc.insets = new Insets(10, 5, 0, 5);
-		add(createStampPanel(), gbc);
 		gbc.gridy++;
 		gbc.insets = new Insets(0, 15, 0, 5);
 		add(this.saveConfig, gbc);
@@ -752,75 +722,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
         return helpLabel;
 	}
 
-
-	/** Crea el panel con el botón de insertar sello.
-	 * @return Panel de insertar sello. */
-	private JPanel createStampPanel() {
-
-		final JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		panel.setBorder(BorderFactory.createTitledBorder(
-				SignPdfUiMessages.getString("SignPdfUiPreview.35")) //$NON-NLS-1$
-			);
-
-		this.addStampButton.setMnemonic('I');
-		this.addStampButton.getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiPreview.30") //$NON-NLS-1$
-		);
-		this.addStampButton.addActionListener(
-			e -> {
-				final File[] files;
-				try {
-					files = AOUIFactory.getLoadFiles(
-							SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
-							null,
-							null,
-							IMAGE_EXT,
-							SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,,
-							false,
-							false,
-							null,
-							this
-					);
-				}
-				catch(AOCancelledOperationException ex)
-				{
-					return;
-				}
-				
-				stampImagePath = files[0].getAbsolutePath();
-
-				final SignPdfUiStamp dialog = new SignPdfUiStamp(this.getParentDialog(), this);
-
-				PdfLoader.loadPdf(
-					isPdfSign,
-					pdfData,
-					dialog
-				);
-			}
-		);
-		
-		this.addStampButton.addKeyListener(this);
-		this.addStampButton.setEnabled(!isPdfSign);
-		panel.add(this.addStampButton);
-
-		this.removeStampButton.setMnemonic('E');
-		this.removeStampButton.getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiPreview.34") //$NON-NLS-1$
-		);
-		this.removeStampButton.addActionListener(
-			e -> {
-				this.stampImage = null;
-				this.removeStampButton.setEnabled(false);
-			}
-		);
-		this.removeStampButton.addKeyListener(this);
-		this.removeStampButton.setEnabled(false);
-		panel.add(this.removeStampButton);
-
-		return panel;
-	}
-
 	/** Crea el panel con los botones de aceptar y cancelar.
 	 * @return Panel de botones. */
 	private JPanel createButtonsPanel() {
@@ -856,33 +757,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 				if (getSignImage() != null ) {
 					getProp().put("signatureRubricImage", getInsertImageBase64(getSignImage())); //$NON-NLS-1$
 				}
-				if (getStampImage() != null ) {
-					getProp().put("image", getInsertImageBase64(getStampImage())); //$NON-NLS-1$
-					getProp().put(
-						"imagePositionOnPageLowerLeftX", //$NON-NLS-1$
-						stampLocation.getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePositionOnPageLowerLeftY", //$NON-NLS-1$
-						stampLocation.getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePositionOnPageUpperRightX", //$NON-NLS-1$
-						stampLocation.getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePositionOnPageUpperRightY", //$NON-NLS-1$
-						stampLocation.getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePage", //$NON-NLS-1$
-						stampLocation.getProperty("imagePage") //$NON-NLS-1$
-					);
-				}
 				if(this.saveConfig.isSelected()) {
 					saveProperties(getProp());
 				}
-				getListener().positionSelected(getProp());
+				getListener().nextPanel(getProp(),null);
 			}
 		);
 		this.okButton.addKeyListener(this);
@@ -1529,30 +1407,4 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener, SignPdf
 	        add(this.addImageItem);
 	    }
 	}
-
-	@Override
-	public void positionSelected(Properties extraParams) {
-		try {
-			stampImage = ImageIO.read(new File(stampImagePath));
-			
-			if(stampImage != null) {
-				this.stampLocation = extraParams;
-				this.removeStampButton.setEnabled(true);
-			}
-		}
-		catch (IOException ioe) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-					"No ha sido posible cargar la imagen: " + ioe //$NON-NLS-1$
-			);
-			AOUIFactory.showMessageDialog(
-				SignPdfUiPanelPreview.this,
-				SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$
-				SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-			);
-		}
-	}
-	
-	@Override
-	public void positionCancelled() {/* vacio */}
 }

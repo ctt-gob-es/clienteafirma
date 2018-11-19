@@ -34,28 +34,38 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private static final long serialVersionUID = -7987676963743094243L;
 
 	private static final int PREFERRED_WIDTH = 500;
-	private static final int PREFERRED_HEIGHT = 700;
+	private static final int PREFERRED_HEIGHT = 615;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private final Frame parent;
 	private final SignPdfDialogListener listener;
 
-	private SignPdfUiPanel areaPanel;
+	private JPanel activePanel;
 	SignPdfDialogListener getListener() {
 		return this.listener;
 	}
 
 	private boolean isPdfSign;
 	private byte[] pdfData;
+	
+	private final boolean signatureVisible;
+	private final boolean stampVisible;
 
 	/** Construye un di&aacute;logo para la obtenci&oacute;n de los datos de firma PDF Visible.
 	 * @param parentFrame Marco padre para la modalidad.
-	 * @param spdl Clase a la que notificar la obtencion de propiedades de la firma visible. */
-	private SignPdfDialog(final Frame parentFrame, final SignPdfDialogListener spdl) {
+	 * @param spdl Clase a la que notificar la obtencion de propiedades de la firma visible. 
+	 * @param signatureVisible Indica si se va a insertar una firma
+	 * @param stampVisible Indica si se va a insertar una marca*/
+	private SignPdfDialog(final Frame parentFrame,
+						  final SignPdfDialogListener spdl,
+						  final boolean signatureVisible,
+						  final boolean stampVisible) {
 		super(parentFrame);
 		this.parent = parentFrame;
 		this.listener = spdl;
+		this.signatureVisible = signatureVisible;
+		this.stampVisible = stampVisible;
 		createUI();
 	}
 
@@ -84,10 +94,14 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 *               <code>false</code> en caso contrario.
 	 * @param pdf PDF al que aplicar la firma visible.
 	 * @param parentFrame Marco padre para la modalidad.
+	 * @param signatureVisible Indica si se va a insertar una firma
+	 * @param stampVisible Indica si se va a insertar una marca
 	 * @param spdl Clase a la que notificar la obtencion de propiedades de la firma visible. */
 	public static void getVisibleSignatureExtraParams(final boolean isSign,
 													  final byte[] pdf,
 			                                          final Frame parentFrame,
+			                                          final boolean signatureVisible,
+			                                          final boolean stampVisible,
 			                                          final SignPdfDialogListener spdl) {
 		if (pdf == null || pdf.length < 3) {
 			throw new IllegalArgumentException(
@@ -100,7 +114,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 			);
 		}
 
-		final JDialog dialog = new SignPdfDialog(parentFrame, spdl);
+		final JDialog dialog = new SignPdfDialog(parentFrame, spdl, signatureVisible, stampVisible);
 		dialog.setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		dialog.setLocation(cp.x - PREFERRED_WIDTH/2, cp.y - PREFERRED_HEIGHT/2);
@@ -113,30 +127,44 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		);
 	}
 
+	private List<BufferedImage> pages;
+	private List<Dimension> pageSizes;
+
 	@Override
 	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] pdf) {
-		this.areaPanel = new SignPdfUiPanel(
-			isSign,
-			pages,
-			pageSizes,
-			pdf,
-			this,
-			SignPdfDialog.this
-		);
-		add(this.areaPanel);
-		pack();
-
 		this.isPdfSign = isSign;
+		this.pages = pages;
+		this.pageSizes = pageSizes;
 		this.pdfData = pdf;
 
-		setVisible(true);
-	}
 
-	void nextPanel(final Properties p, final BufferedImage im) {
-		remove(this.areaPanel);
-		final JPanel preview = new SignPdfUiPanelPreview(this, p, im, this.isPdfSign, this.pdfData, this);
-		add(preview);
+		if(signatureVisible)
+		{
+			this.activePanel = new SignPdfUiPanel(
+				this.isPdfSign,
+				this.pages,
+				this.pageSizes,
+				this.pdfData,
+				this
+			);
+			add(this.activePanel);
+		}
+		else if(stampVisible)
+		{
+			this.setTitle(SignPdfUiMessages.getString("SignPdfUiStamp.0"));
+			this.activePanel = new SignPdfUiPanelStamp(
+				this.isPdfSign,
+				this.pages,
+				this.pageSizes,
+				this.pdfData,
+				this,
+				new Properties()
+			);
+			add(this.activePanel);
+		}
 		pack();
+
+		setVisible(true);
 	}
 
 	@Override
@@ -161,6 +189,35 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		setVisible(false);
 		this.listener.propertiesCreated(new Properties());
 		dispose();
+	}
+
+	@Override
+	public void nextPanel(final Properties p, final BufferedImage im) {
+		if(this.activePanel instanceof SignPdfUiPanel)
+		{
+			remove(this.activePanel);
+			this.activePanel = new SignPdfUiPanelPreview(this, p, im, this);
+			add(this.activePanel);
+			pack();
+		}
+		else if(this.activePanel instanceof SignPdfUiPanelPreview && stampVisible)
+		{
+			remove(this.activePanel);
+			this.activePanel = new SignPdfUiPanelStamp(
+					this.isPdfSign,
+					this.pages,
+					this.pageSizes,
+					this.pdfData,
+					this,
+					p
+				);
+			add(this.activePanel);
+			pack();
+		}
+		else
+		{
+			positionSelected(p);
+		}
 	}
 
 	@Override

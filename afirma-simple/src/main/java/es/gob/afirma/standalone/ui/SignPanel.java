@@ -188,7 +188,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	if (this.signOperationConfigs.size() == 1 &&
     			this.signOperationConfigs.get(0).getSigner() instanceof AOPDFSigner &&
     			this.lowerPanel.getFilePanel() instanceof SignPanelFilePanel &&
-    			((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature()) {
+    				(((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature() || 
+    				((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp())){
 
     		this.signWaitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
 
@@ -196,6 +197,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     			VisiblePdfSignatureManager.getVisibleSignatureParams(
     					this.signOperationConfigs.get(0),
     					this,
+    					((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature(),
+    					((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp(), 
     					getWindow());
     		}
     		catch (final AOCancelledOperationException e) {

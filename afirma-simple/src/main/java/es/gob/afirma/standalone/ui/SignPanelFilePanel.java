@@ -58,6 +58,15 @@ final class SignPanelFilePanel extends JPanel {
     	return this.pdfVisible.isSelected();
     }
 
+    private final JCheckBox pdfStamp = new JCheckBox(
+		SimpleAfirmaMessages.getString("SignPanel.120"), //$NON-NLS-1$
+		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_STAMP)
+	);
+
+    boolean isVisibleStamp() {
+    	return this.pdfStamp.isSelected();
+    }
+
     SignPanelFilePanel(final SignOperationConfig signConfig,
     		final DropTarget dropTarget) {
 
@@ -132,6 +141,11 @@ final class SignPanelFilePanel extends JPanel {
             this.pdfVisible.setBackground(bgColor);
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             detailPanel.add(this.pdfVisible);
+
+            this.pdfStamp.setMnemonic('S');
+            this.pdfStamp.setBackground(bgColor);
+            detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+            detailPanel.add(this.pdfStamp);
         }
 
         // Habilita boton de opciones avanzadas de multifirma
