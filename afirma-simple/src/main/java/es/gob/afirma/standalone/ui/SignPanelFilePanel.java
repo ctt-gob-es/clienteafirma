@@ -42,6 +42,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
@@ -81,7 +82,8 @@ final class SignPanelFilePanel extends JPanel {
     			signConfig.getSignatureFormatName(),
     			NumberFormat.getNumberInstance().format(signConfig.getDataFile().length() / 1024),
     			signConfig.getDataFile(),
-    			new Date(signConfig.getDataFile().lastModified())
+    			new Date(signConfig.getDataFile().lastModified()),
+    			signConfig.getCryptoOperation()
     			));
     }
 
@@ -90,7 +92,8 @@ final class SignPanelFilePanel extends JPanel {
     			  final String signatureName,
     			  final String fileSize,
                   final File file,
-                  final Date fileLastModified) {
+                  final Date fileLastModified,
+                  final CryptoOperation operation) {
 
         setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new GridBagLayout());
@@ -146,6 +149,13 @@ final class SignPanelFilePanel extends JPanel {
             this.pdfStamp.setBackground(bgColor);
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             detailPanel.add(this.pdfStamp);
+
+            if(operation == CryptoOperation.COSIGN) {
+            	this.pdfStamp.setSelected(false);
+            	this.pdfStamp.setEnabled(false);
+                detailPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                detailPanel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121")));
+            }
         }
 
         // Habilita boton de opciones avanzadas de multifirma
