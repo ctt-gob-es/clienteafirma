@@ -34,7 +34,7 @@ public final class TestOfficeMIMEDetection {
 	public void testWordOoxmlDetection() throws Exception {
 		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("Nuevo_Documento_de_Microsoft_Word.docx")); //$NON-NLS-1$
 		final String mime = new MimeHelper(file).getMimeType();
-		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Word: " + mime, "application/msword", mime); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Word: " + mime, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** Prueba la detecci&oacute;n de documentos PowerPoint.

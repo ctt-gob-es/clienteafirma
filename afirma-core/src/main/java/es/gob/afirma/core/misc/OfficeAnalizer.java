@@ -106,6 +106,11 @@ public final class OfficeAnalizer {
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.image", "odi"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text-master", "odm"); //$NON-NLS-1$ //$NON-NLS-2$
 
+        FILE_EXTENSIONS.put("application/msword", "doc"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.ms-powerpoint", "ppt"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.ms-excel", "xls"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.ms-project", "mpp"); //$NON-NLS-1$ //$NON-NLS-2$
+
         // Descripciones de fichero
         FILE_DESCRIPTIONS.put("application/zip", "Archivo zip"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -122,12 +127,17 @@ public final class OfficeAnalizer {
         FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.database", "Base de datos"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.image", "Imagen"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_DESCRIPTIONS.put("application/vnd.oasis.opendocument.text-master", "Plantilla de documento"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        FILE_DESCRIPTIONS.put("application/msword", "Documento de texto"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.ms-powerpoint", "Presentaci\u00F3n"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.ms-excel", "Hoja de c\u00E1lculo"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_DESCRIPTIONS.put("application/vnd.ms-project", "Planificaci&oacute;n de proyecto"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /** Devuelve el MimeType correspondiente al documento ofim&aacute;tico
      * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
      * de ellos pero es un Zip se devolver&aacute; el MimeType del Zip
-     * (application/zip) y si no es Zip se devolver&aacute; {@code null}.
+     * (application/zip) y, si tampocop es Zip, se devolver&aacute; "application/octect-stream".
      * @param data Fichero ODF, OOXML o Microsoft Office 97/2003.
      * @return MimeType.
      * @throws IOException Si no se puede leer el fichero, */
@@ -149,8 +159,8 @@ public final class OfficeAnalizer {
     			mimetype = ZIP_MIMETYPE;
     		}
     	}
-    	catch (final ZipException e1) {
-    		LOGGER.warning("El fichero indicado no es un ZIP: " + e1); //$NON-NLS-1$
+    	catch (final ZipException e) {
+    		// El fichero indicado no es un ZIP y, por tanto, tampoco un OOXML
     	}
 
     	try {
@@ -208,6 +218,17 @@ public final class OfficeAnalizer {
         return FILE_EXTENSIONS.get(mimetype);
     }
 
+    /** Devuelve la extensi&oacute;n correspondiente al tipo de dato indicado.
+     * @param mimetype Tipo de datos ofim&aacute;tico.
+     * @return Extensi&oacute;n de fichero asociada con el tipo de datos indicado o
+     * {@code null} si no se reconoce. */
+    static String getExtension(final String mimetype) {
+        if (mimetype == null) {
+            return null;
+        }
+        return FILE_EXTENSIONS.get(mimetype);
+    }
+
     /** Devuelve la extensi&oacute;n correspondiente al documento ofim&aacute;tico
      * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
      * de ellos pero es un Zip se devolver&aacute; la extensi&oacute;n "zip"
@@ -217,6 +238,17 @@ public final class OfficeAnalizer {
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
     static String getDescription(final byte[] zipData) throws IOException {
         final String mimetype = getMimeType(zipData);
+        if (mimetype == null) {
+            return null;
+        }
+        return FILE_DESCRIPTIONS.get(mimetype);
+    }
+
+    /** Devuelve la extensi&oacute;n correspondiente al tipo de dato indicado.
+     * @param mimetype Tipo de datos ofim&aacute;tico.
+     * @return Extensi&oacute;n de fichero asociada con el tipo de datos indicado o
+     * {@code null} si no se reconoce. */
+    static String getDescription(final String mimetype) {
         if (mimetype == null) {
             return null;
         }

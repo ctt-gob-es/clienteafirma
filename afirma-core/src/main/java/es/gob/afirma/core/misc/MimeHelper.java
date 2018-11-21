@@ -37,12 +37,6 @@ public final class MimeHelper {
     /** OID del tipo de datos gen&eacute;rico. */
     public static final String DEFAULT_CONTENT_OID_DATA ="1.2.840.113549.1.7.1"; //$NON-NLS-1$
 
-    /** Extensi&oacute;n asignada a los ficheros ZIP. */
-    private static final String ZIP_EXTENSION = "zip"; //$NON-NLS-1$
-
-    /** Descripci&oacute;n asignada por JMimeMagic a los ficheros ZIP. */
-    private static final String ZIP_DESCRIPTION = "Zip archive data"; //$NON-NLS-1$
-
     /** Mimetype de ficheros ZIP. */
     private static final String ZIP_MIMETYPE = "application/zip"; //$NON-NLS-1$
 
@@ -69,9 +63,6 @@ public final class MimeHelper {
 
     /** Datos analizados. */
     private final byte[] data;
-
-    /** MimeType de los datos analizados. */
-    private String mimeType = null;
 
     /** Realiza el an&aacute;lisis de los datos.
      * @param data Datos que se desean analizar.
@@ -192,97 +183,145 @@ public final class MimeHelper {
      * @throws IOException Si no se pueden analizar los datos. */
     public String getMimeType() throws IOException {
 
-        // Comprobamos si ya se calculo previamente el tipo de datos
-        if (this.mimeType == null) {
+        // Comprobamos si ya se verifico previamente el tipo de datos
+    	if (this.mimeInfo.isMimeTypeVerified()) {
+    		return this.mimeInfo.getMimeType();
+    	}
 
-            if (this.mimeInfo != null) {
-                this.mimeType = this.mimeInfo.getMimeType();
-            }
+    	String mType = this.mimeInfo.getMimeType();
 
-        	// Si no hubo analisis inicial o este indico que los datos son XML, comprobamos
-            // si los datos son XML en realidad
-            if (this.mimeInfo == null || XML_MIMETYPE.equals(this.mimeType)) {
-            	if (AOFileUtils.isXML(this.data)) {
-            		this.mimeType = XML_MIMETYPE;
-            	}
-            }
+    	// Si no hubo analisis inicial o este indico que los datos son XML, comprobamos
+    	// si los datos son XML en realidad
+    	if (mType == null || XML_MIMETYPE.equals(mType)) {
+    		if (AOFileUtils.isXML(this.data)) {
+    			this.mimeInfo.setMimeType(XML_MIMETYPE);
+    			this.mimeInfo.setMimeTypeVerified(true);
+    		}
+    		else {
+    			mType = null;
+    		}
+    	}
 
-            // Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
-            // realidad alguno de los ficheros ofimaticos soportados
-            if (ZIP_MIMETYPE.equals(this.mimeType) || DOC_OFFICE_MIMETYPE.equals(this.mimeType)) {
-                this.mimeType = OfficeAnalizer.getMimeType(this.data);
-            }
+    	// Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
+    	// realidad alguno de los ficheros ofimaticos soportados
+    	if (ZIP_MIMETYPE.equals(mType) || DOC_OFFICE_MIMETYPE.equals(mType)) {
+    		this.mimeInfo.setMimeType(OfficeAnalizer.getMimeType(this.data));
+    		this.mimeInfo.setMimeTypeVerified(true);
+    	}
 
-            if (this.mimeType == null) {
-                this.mimeType = MimeHelper.DEFAULT_MIMETYPE;
-            }
-        }
+    	if (mType == null) {
+    		this.mimeInfo.setMimeType(DEFAULT_MIMETYPE);
+    		this.mimeInfo.setMimeTypeVerified(true);
+    	}
 
-        return this.mimeType;
+        return this.mimeInfo.getMimeType();
     }
 
     /** Recupera la extensi&oacute;n com&uacute;n para un fichero con los datos analizados.
      * @return Extensi&oacute;n para un fichero de datos o {@code null} si no se conoce el
-     *         tipo. La extensi&oacute;n se devuelve sin el punto separador. */
-    public String getExtension() {
+     *         tipo. La extensi&oacute;n se devuelve sin el punto separador.
+     * @throws IOException Cuando no se pueden analizar los datos. */
+    public String getExtension() throws IOException {
 
-        String extension = null;
+        // Si ya se verifico previamente la extension, la devolvemos directamente
+    	if (this.mimeInfo.isExtensionVerified()) {
+    		return this.mimeInfo.getExtension();
+    	}
 
-        // Comprobamossi los datos son XML, si no, los parseamos
-        if (AOFileUtils.isXML(this.data)) {
-            extension = XML_EXTENSION;
-        }
-        else if (this.mimeInfo != null) {
-            extension = this.mimeInfo.getExtension();
-        }
+    	// Obtenemos la extension asociada al tipo de datos indicado o, si no se identifica,
+    	// confiamos en el valor inicial
+   		final String mType = getMimeType();
+    	final String ext = verifyExtension(mType);
+    	if (ext != null) {
+    		this.mimeInfo.setExtension(ext);
+    	}
+		this.mimeInfo.setExtensionVerified(true);
 
-        // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
-        // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
-        // estructura concreta)
-        if (extension != null && extension.equals(ZIP_EXTENSION)) {
-            try {
-				extension = OfficeAnalizer.getExtension(this.data);
-			}
-            catch (final IOException e) {
-				LOGGER.severe(
-					"No se ha podido comprobar si el ZIP corresponde a un ODF o a un OOXML, se tomara como ZIP: " + e //$NON-NLS-1$
-				);
-			}
-        }
-
-        return extension;
-    }
-
-    /** Recupera la descripci&oacute;n de los datos analizados.
-     * @return Descripci&oacute;n del tipo de dato o <code>null</code> si no
-     *         se pudo detectar. */
-    public String getDescription() {
-    	String desc = null;
-
-    	// Comprobamossi los datos son XML, si no, los parseamos
-        if (AOFileUtils.isXML(this.data)) {
-        	desc = XML_DESCRIPTION;
-        }
-        else if (this.mimeInfo != null) {
-            desc = this.mimeInfo.getDescription();
-        }
-
-        // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
-        // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
-        // estructura concreta)
-        if (desc != null && desc.equals(ZIP_DESCRIPTION)) {
-            try {
-				desc = OfficeAnalizer.getDescription(this.data);
-			}
-            catch (final IOException e) {
-				LOGGER.severe("No se ha podido comprobar si el ZIP corresponde a un ODF o a un OOXML, se tomara como ZIP: " + e); //$NON-NLS-1$
-			}
-        }
-
-        return desc == null || desc.length() == 0 ? DEFAULT_CONTENT_DESCRIPTION : desc;
+		return this.mimeInfo.getExtension();
     }
 
     /**
+     * Obtiene la extensi&oacute;n que debe corresponder al tipo de dato en base a
+     * una serie de comprobaciones no englobadas en el an&aacute;lisis incial.
+     * @param mimeType Tipo de dato.
+     * @return Extensi&oacute;n que le corresponde a un fichero con esos datos o
+     * {@code null} si no se conoce.
+     */
+    private static String verifyExtension(String mimeType) {
+
+    	if (DEFAULT_MIMETYPE.equals(mimeType)) {
+    		return null;
+    	}
+    	if (XML_MIMETYPE.equals(mimeType)) {
+    		return XML_EXTENSION;
+    	}
+
+    	if (mimeType != null) {
+    		final String ext = OfficeAnalizer.getExtension(mimeType);
+    		if (ext != null) {
+    			return ext;
+    		}
+    	}
+
+		return null;
+	}
+
+	/** Recupera la descripci&oacute;n de los datos analizados.
+     * @return Descripci&oacute;n del tipo de dato.
+	 * @throws IOException Cuando no se pueden analizar los datos. */
+    public String getDescription() throws IOException {
+
+    	// Si ya se verifico previamente la descripcion, la devolvemos directamente
+    	if (this.mimeInfo.isDescriptionVerified()) {
+    		return this.mimeInfo.getDescription();
+    	}
+
+    	// Si se verifico el tipo de los datos, identificamos la descripcion que le
+    	// correponderia si es alguno de los datos registrados, o usamos el tipo
+    	// preasignado si no lo tenemos identificado como tipo a verificar
+    	final String mType = getMimeType();
+    	String desc = verifyDescription(mType);
+    	if (desc == null) {
+    		if (this.mimeInfo.getDescription() != null) {
+    			desc = this.mimeInfo.getDescription();
+    		} else {
+    			desc = DEFAULT_CONTENT_DESCRIPTION;
+    		}
+    	}
+
+		this.mimeInfo.setDescription(desc);
+		this.mimeInfo.setDescriptionVerified(true);
+
+		return this.mimeInfo.getDescription();
+    }
+
+    /**
+     * Obtiene la descripci&oacute;n que debe corresponder al tipo de dato en base a
+     * una serie de comprobaciones no englobadas en el an&aacute;lisis incial.
+     * @param mimeType Tipo de dato.
+     * @return Descripci&oacute;n que le corresponde a un fichero con esos datos o
+     * {@code null} si no se conoce.
+     */
+    private static String verifyDescription(String mimeType) {
+
+    	if (DEFAULT_MIMETYPE.equals(mimeType)) {
+    		return DEFAULT_CONTENT_DESCRIPTION;
+    	}
+    	if (XML_MIMETYPE.equals(mimeType)) {
+    		return XML_DESCRIPTION;
+    	}
+
+    	if (mimeType != null) {
+    		final String desc = OfficeAnalizer.getDescription(mimeType);
+    		if (desc != null) {
+    			return desc;
+    		}
+    	}
+
+		return null;
+	}
+
+	/**
      * Indica si unos datos son un fichero ZIP, independientemente de que ese ZIP se
      * corresponda con otro formato basado en el mismo (como los ficheros DOCX, ODT,...).
      * @return {@code true} si los datos son un ZIP, {@code false} en caso de que no
@@ -323,16 +362,39 @@ public final class MimeHelper {
         /** MimeType de los datos. */
         private String mType = null;
 
-        void setMimeType(final String mimeType) {
-            this.mType = mimeType;
-        }
+        /** Indica si se han realizado comprobaciones adicionales para verificar si el
+         * tipo de dato es el que se ha establecido. */
+        private boolean mTypeVerified = false;
+
+        /** Extensi&oacute;n com&uacute;n para el tipo de fichero. */
+        private String extension = null;
+
+        /** Indica si se han realizado comprobaciones adicionales para verificar si la
+         * extension es la que se ha establecido. */
+        private boolean extensionVerified = false;
+
+        /** Descripci&oacute;n del tipo de datos. */
+        private String description = null;
+
+        /** Indica si se han realizado comprobaciones adicionales para verificar si la
+         * descripci&oacute;n es la que se ha establecido. */
+        private boolean descriptionVerified = false;
 
         String getMimeType() {
             return this.mType;
         }
 
-        /** Extensi&oacute;n com&uacute;n para el tipo de fichero. */
-        private String extension = null;
+        void setMimeType(final String mimeType) {
+            this.mType = mimeType;
+        }
+
+        boolean isMimeTypeVerified() {
+			return this.mTypeVerified;
+		}
+
+        void setMimeTypeVerified(boolean mTypeVerified) {
+			this.mTypeVerified = mTypeVerified;
+		}
 
         String getExtension() {
             return this.extension;
@@ -342,6 +404,14 @@ public final class MimeHelper {
             this.extension = ext;
         }
 
+        boolean isExtensionVerified() {
+			return this.extensionVerified;
+		}
+
+        void setExtensionVerified(boolean extensionVerified) {
+			this.extensionVerified = extensionVerified;
+		}
+
         String getDescription() {
             return this.description;
         }
@@ -350,7 +420,12 @@ public final class MimeHelper {
             this.description = desc;
         }
 
-        /** Descripci&oacute;n del tipo de datos. */
-        private String description = null;
+        boolean isDescriptionVerified() {
+			return this.descriptionVerified;
+		}
+
+        void setDescriptionVerified(boolean descriptionVerified) {
+			this.descriptionVerified = descriptionVerified;
+		}
     }
 }
