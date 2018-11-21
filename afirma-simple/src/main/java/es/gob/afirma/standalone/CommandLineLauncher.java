@@ -47,6 +47,8 @@ import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.odf.AOODFSigner;
+import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
@@ -491,7 +493,8 @@ final class CommandLineLauncher {
 		String format = null;
 		Properties extraParamsProperties = null;
 		if (command != CommandLineCommand.MASSIVE) {
-			// Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES
+			/* Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES,
+			   Office para asignar OOXML, OpenOffice para asignar ODF */
 			if (CommandLineParameters.FORMAT_AUTO.equals(fmt)) {
 				final String ext = new MimeHelper(data).getExtension();
 				if ("pdf".equals(ext)) { //$NON-NLS-1$
@@ -499,6 +502,14 @@ final class CommandLineLauncher {
 				}
 				else if ("xml".equals(ext)) { //$NON-NLS-1$
 					format = CommandLineParameters.FORMAT_XADES;
+				}
+				else if("docx".equals(ext) || "xlsx".equals(ext) || "pptx".equals(ext))
+				{
+					format = CommandLineParameters.FORMAT_OOXML;					
+				}
+				else if("odt".equals(ext) || "ods".equals(ext) || "odp".equals(ext))
+				{
+					format = CommandLineParameters.FORMAT_ODF;					
 				}
 				else {
 					format = CommandLineParameters.FORMAT_CADES;
@@ -553,6 +564,12 @@ final class CommandLineLauncher {
 		}
 		else if (CommandLineParameters.FORMAT_FACTURAE.equals(format)) {
 			signer = new AOFacturaESigner();
+		}
+		else if (CommandLineParameters.FORMAT_OOXML.equals(format)) {
+			signer = new AOOOXMLSigner();
+		}
+		else if (CommandLineParameters.FORMAT_ODF.equals(format)) {
+			signer = new AOODFSigner();
 		}
 		else {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", format)); //$NON-NLS-1$
