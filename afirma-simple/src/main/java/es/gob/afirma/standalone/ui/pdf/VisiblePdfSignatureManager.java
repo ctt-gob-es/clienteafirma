@@ -27,11 +27,15 @@ public final class VisiblePdfSignatureManager {
 	/** Obtiene la configuracion necesaria para realizar una firma PDF visible.
 	 * @param signConfig Configuraci&oacute;n de firma.
 	 * @param signExecutor Objeto para la ejecuci&oacute;n de las firmas.
+	 * @param signatureVisible Indica si se va a insertar una firma
+	 * @param stampVisible Indica si se va a insertar una marca
 	 * @param parent Componente padre.
 	 * @throws IOException Cuando se produce un error al procesar el PDF.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n. */
 	public static void getVisibleSignatureParams(final SignOperationConfig signConfig,
 												 final SignatureExecutor signExecutor,
+												 final boolean signatureVisible,
+												 final boolean stampVisible, 
 												 final Frame parent) throws IOException,
 	                                                                        AOCancelledOperationException {
 		final byte[] data = loadData(signConfig.getDataFile());
@@ -39,11 +43,11 @@ public final class VisiblePdfSignatureManager {
 
 		// Si hay campos visibles de firma vacios, usaremos uno de entre ellos
 		if (!emptySignatureFields.isEmpty()) {
-			selectEmptySignatureField(data, signConfig, emptySignatureFields, signExecutor, parent);
+			selectEmptySignatureField(data, signConfig, emptySignatureFields, signExecutor, signatureVisible, stampVisible, parent);
 		}
 		// Si no los hay, permitiremos crear uno
 		else {
-			createNewSignatureField(data, signConfig, signExecutor, parent);
+			createNewSignatureField(data, signConfig, signExecutor, signatureVisible, stampVisible, parent);
 		}
 	}
 
@@ -53,6 +57,8 @@ public final class VisiblePdfSignatureManager {
 	 * @param signConfig Configuraci&oacute;n de firma a aplicar.
 	 * @param emptySignatureFields Listado de campos vaci&oacute;s del PDF.
 	 * @param executor Componente encargado de ejecutar la firma.
+	 * @param signatureVisible Indica si se va a insertar una firma
+	 * @param stampVisible Indica si se va a insertar una marca
 	 * @param parent Componente padre.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws IOException Cuando se produce un error durante la firma. */
@@ -60,6 +66,8 @@ public final class VisiblePdfSignatureManager {
 			                                      final SignOperationConfig signConfig,
 			                                      final List<SignatureField> emptySignatureFields,
 			                                      final SignatureExecutor executor,
+												  final boolean signatureVisible,
+												  final boolean stampVisible, 
 			                                      final Frame parent) throws AOCancelledOperationException,
 	                                                                         IOException {
 		// Selecionamos uno de los campos de firma vacios del PDF
@@ -69,7 +77,7 @@ public final class VisiblePdfSignatureManager {
 
 		// Si no se selecciono un campo de firma, se permitira crearlo
 		if (field == null) {
-			createNewSignatureField(data, signConfig, executor, parent);
+			createNewSignatureField(data, signConfig, executor, signatureVisible, stampVisible, parent);
 		}
 		else {
 			signConfig.addExtraParam(PdfExtraParams.SIGNATURE_FIELD, field.getName());
@@ -80,12 +88,16 @@ public final class VisiblePdfSignatureManager {
     private static void createNewSignatureField(final byte[] data,
     		                                    final SignOperationConfig signConfig,
     		                                    final SignatureExecutor executor,
+    		                                    final boolean signatureVisible,
+    		                                    final boolean stampVisible, 
     		                                    final Frame parent) throws IOException {
     	try {
     		SignPdfDialog.getVisibleSignatureExtraParams(
 				signConfig.getSigner().isSign(data),
 				data,
 				parent,
+				signatureVisible,
+				stampVisible,
 				new SignPdfListener(signConfig, executor)
 			);
     	}

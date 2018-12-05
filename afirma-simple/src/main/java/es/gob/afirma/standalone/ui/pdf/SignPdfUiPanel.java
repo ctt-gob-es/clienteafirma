@@ -56,17 +56,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	static interface SignPdfUiPanelListener {
 		void positionSelected(final Properties extraParams);
 		void positionCancelled();
-	}
-
-	static interface PageLoaderListener {
-		void loaded(final List extraParams, int page);
-		void positionCancelled();
-	}
-
-	private final SignPdfDialog parent;
-
-	public SignPdfDialog getParentDialog() {
-		return this.parent;
+		void nextPanel(final Properties p, final BufferedImage im);
 	}
 
 	private Properties extraParamsForLocation = null;
@@ -110,8 +100,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 				   final List<BufferedImage> pages,
 				   final List<Dimension> pageSizes,
 				   final byte[] pdf,
-			       final SignPdfUiPanelListener spul,
-			       final SignPdfDialog parent) {
+			       final SignPdfUiPanelListener spul) {
 
 		if (pages == null || pages.isEmpty()) {
 			throw new IllegalArgumentException(
@@ -132,7 +121,6 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		this.pdfPageSizes = pageSizes;
 		this.listener = spul;
 		this.isSignPdf = isSign;
-		this.parent = parent;
 
 		this.pdfDocument = new PdfDocument();
 		this.pdfDocument.setBytesPdf(pdf);
@@ -367,7 +355,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 						p.put("signaturePage", Integer.toString(getCurrentPage())); //$NON-NLS-1$
 					}
 					p.putAll(getExtraParamsForLocation());
-					getParentDialog().nextPanel(p, getFragmentImage(p));
+					getListener().nextPanel(p, getFragmentImage(p));
 				}
 			}
 		);
@@ -514,7 +502,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas anteriores: " + ex, ex); //$NON-NLS-1$
 						this.currentPage++; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								this.parent,
+								SignPdfUiPanel.this,
 								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
 								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
 								JOptionPane.ERROR_MESSAGE
@@ -535,7 +523,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas siguientes: " + ex, ex); //$NON-NLS-1$
 						this.currentPage--; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								this.parent,
+								SignPdfUiPanel.this,
 								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
 								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
 								JOptionPane.ERROR_MESSAGE
@@ -684,6 +672,10 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		else {
 			necessaryPage = pageToLoad + 1;
 		}
+		
+		// Verificamos que sea una pagina valida
+		if(necessaryPage < 0 || necessaryPage >= this.pdfPages.size())
+			return;
 
 		// Si no tenemos la pagina que necesitamos, la cargamos
 		if (this.pdfPages.get(necessaryPage) == null) {
