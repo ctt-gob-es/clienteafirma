@@ -123,7 +123,7 @@ public enum AOKeyStore {
     WINCA(
 		"Windows / Internet Explorer (CA intermedias)", //$NON-NLS-1$
 		12,
-		"Windows-CA", //$NON-NLS-1$
+		"Windows-ROOT", //$NON-NLS-1$
 		new CachePasswordCallback("wincadummy".toCharArray()), //$NON-NLS-1$
 		NullPasswordCallback.getInstance()
 	),

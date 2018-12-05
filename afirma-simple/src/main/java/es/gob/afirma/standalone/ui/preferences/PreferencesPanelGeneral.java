@@ -590,10 +590,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			PreferencesManager.clearAll();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: e"); //$NON-NLS-1$
+			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: " + e); //$NON-NLS-1$
 		}
 		loadPreferences();
 		getDisposableInterface().disposeInterface();
 	}
 
 }
+
