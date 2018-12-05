@@ -86,7 +86,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /** Anchura m&iacute;nima que deber&aacute; tener el panel. */
 	private static final int MINIMUM_PANEL_WIDTH = 600;
 	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
-	private static final int MINIMUM_PANEL_HEIGHT = 420;
+	private static final int MINIMUM_PANEL_HEIGHT = 475;
 
     private static String[][] signersTypeRelation = new String[][] {
     	{"es.gob.afirma.signers.pades.AOPDFSigner", SimpleAfirmaMessages.getString("SignPanel.104")}, //$NON-NLS-1$ //$NON-NLS-2$
@@ -198,7 +198,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	if (this.signOperationConfigs.size() == 1 &&
     			this.signOperationConfigs.get(0).getSigner() instanceof AOPDFSigner &&
     			this.lowerPanel.getFilePanel() instanceof SignPanelFilePanel &&
-    			((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature()) {
+    				(((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature() ||
+    				((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp())){
 
     		this.signWaitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
 
@@ -206,6 +207,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     			VisiblePdfSignatureManager.getVisibleSignatureParams(
     					this.signOperationConfigs.get(0),
     					this,
+    					((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature(),
+    					((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp(),
     					getWindow());
     		}
     		catch (final AOCancelledOperationException e) {
@@ -391,6 +394,11 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 config.setSigner(AOSignerFactory.getSigner(
 					 PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF))
 					 );
+			 // Se comprueba si ya está firmada para deshabilitar la opcion de marca visible
+			 if (config.getSigner() instanceof AOPDFSigner &&
+					 config.getSigner().isSign(data)) {
+				 config.setCryptoOperation(CryptoOperation.COSIGN);
+			 }
 		 }
 		 // Comprobamos si es una factura electronica
 		 else if (DataAnalizerUtil.isFacturae(data)) {

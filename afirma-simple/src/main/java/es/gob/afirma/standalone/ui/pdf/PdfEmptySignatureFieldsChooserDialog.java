@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,12 +34,13 @@ import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
 /** Di&aacute;logo de selecci&oacute;n de campo de firma PDF visible.
  * @author Mariano Mart&iacute;nez. */
-public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implements SignPdfUiPanelListener{
+public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implements SignPdfUiPanelListener, PdfLoaderListener{
 
 	private static final long serialVersionUID = 4904673758490090781L;
 
@@ -51,6 +53,12 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	private final byte[] pdf;
+	private final boolean isSign;
+
+	private JPanel activePanel;
+
+	private final Properties extraParams;
+	private final boolean stampVisible;
 
 	private final SignatureField field;
 	SignatureField getField() {
@@ -59,19 +67,28 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 
 	/** Inicia el proceso de creaci&oacute;n de di&aacute;logo de selecci&oacute;n del campo de firma PDF visible.
 	 * @param pdf PDF de entrada.
+	 * @param isSign Indica si el pdf de entrada esta firmado
 	 * @param parent Componente padre para la modalidad.
 	 * @param field Campos de firma seleccionado.
-	 * @param signPdfDialogListener Clase a la que hay que notificar la selecci&oacute;n de propiedades de firma visible PDF. */
+	 * @param signPdfDialogListener Clase a la que hay que notificar la selecci&oacute;n de propiedades de firma visible PDF.
+	 * @param signatureVisible Indica si se va a insertar una firma visible
+	 * @param stampVisible Indica si se va a insertar una marca visible */
 	public static void startPdfEmptySignatureFieldsChooserDialog(final byte[] pdf,
+																 final boolean isSign, 
 																 final Frame parent,
 																 final SignatureField field,
-																 final SignPdfDialogListener signPdfDialogListener) {
+																 final SignPdfDialogListener signPdfDialogListener,
+																 final boolean signatureVisible,
+																 final boolean stampVisible) {
 
 		final PdfEmptySignatureFieldsChooserDialog tsd = new PdfEmptySignatureFieldsChooserDialog(
 			pdf,
+			isSign,
 			parent,
 			field,
-			signPdfDialogListener
+			signPdfDialogListener,
+			signatureVisible,
+			stampVisible
 		);
 		tsd.setSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
 		tsd.setResizable(false);
@@ -79,15 +96,28 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	private PdfEmptySignatureFieldsChooserDialog(final byte[] pdf,
+												 final boolean isSign,
 												 final Frame parentFrame,
 												 final SignatureField fld,
-												 final SignPdfDialogListener spul) {
+												 final SignPdfDialogListener spul,
+												 final boolean signatureVisible,
+												 final boolean stampVisible) {
 		super(parentFrame);
 		this.listener = spul;
 		this.pdf = pdf;
+		this.isSign = isSign;
 		this.field = fld;
+		this.stampVisible = stampVisible;
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
+
+		extraParams = new Properties();
+		extraParams.put(PdfExtraParams.SIGNATURE_FIELD, getField().getName());
+		extraParams.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getField().getPage()));
+		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX, Integer.toString(getField().getSignaturePositionOnPageLowerLeftX()));
+		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY, Integer.toString(getField().getSignaturePositionOnPageLowerLeftY()));
+		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX, Integer.toString(getField().getSignaturePositionOnPageUpperRightX()));
+		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY, Integer.toString(getField().getSignaturePositionOnPageUpperRightY()));
 
 		SwingUtilities.invokeLater(
 			() -> createUI()
@@ -119,14 +149,13 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		);
 
 		try {
-			final Properties p = new Properties();
-			p.put(PdfExtraParams.SIGNATURE_FIELD, getField().getName());
-			p.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getField().getPage()));
-			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX, Integer.toString(getField().getSignaturePositionOnPageLowerLeftX()));
-			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY, Integer.toString(getField().getSignaturePositionOnPageLowerLeftY()));
-			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX, Integer.toString(getField().getSignaturePositionOnPageUpperRightX()));
-			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY, Integer.toString(getField().getSignaturePositionOnPageUpperRightY()));
-			nextPanel(p, getFragmentImage(getField()));
+			BufferedImage im = getFragmentImage(getField());
+			if(im!=null) {
+				nextPanel(extraParams, im);
+			}
+			else {
+				throw new IOException("Error creando la imagen para previsualizar"); //$NON-NLS-1$
+			}
 		}
 		catch (final Exception e1) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
@@ -158,19 +187,29 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		return page.getSubimage(lxl, uyr, uxr - lxl, uyr - lyl);
 	}
 
-	void nextPanel(final Properties p, final BufferedImage im) throws IOException {
-		if (im != null) {
+	@Override
+	public void nextPanel(final Properties p, final BufferedImage im) {
+		if(activePanel == null) {
 			getContentPane().removeAll();
 			final GridBagConstraints constraints = new GridBagConstraints();
 			constraints.fill = GridBagConstraints.BOTH;
 			constraints.weightx = 1.0;
 			constraints.weighty = 1.0;
 			constraints.insets = new Insets(0, 0, 0, 0);
-			getContentPane().add(new SignPdfUiPanelPreview(this, p, im), constraints);
+			activePanel = new SignPdfUiPanelPreview(this, p, im, this);
+			getContentPane().add(activePanel, constraints);
 			setVisible(true);
 		}
+		else if(activePanel instanceof SignPdfUiPanelPreview && stampVisible)
+		{
+			PdfLoader.loadPdf(
+				this.isSign,
+				this.pdf,
+				this
+			);
+		}
 		else {
-			throw new IOException("Error creando la imagen para previsualizar"); //$NON-NLS-1$
+			positionSelected(p);
 		}
 	}
 
@@ -241,5 +280,44 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		}
 		// Se debe crear un campo nuevo
 		return null;
+	}
+
+	@Override
+	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] pdf) {
+		getContentPane().remove(activePanel);
+		this.activePanel = new SignPdfUiPanelStamp(
+			isSign,
+			pages,
+			pageSizes,
+			pdf,
+			this,
+			new Properties()
+		);
+		getContentPane().add(this.activePanel);
+	}
+
+	@Override
+	public void pdfLoadedFailed(final Throwable cause) {
+		Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				"Error creando la previsualizacion del PDF: " + cause); //$NON-NLS-1$
+		if (cause instanceof OutOfMemoryError) {
+			AOUIFactory.showErrorMessage(
+				this,
+				SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+		else {
+			AOUIFactory.showErrorMessage(
+				this,
+				SignPdfUiMessages.getString("SignPdfDialog.0"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+		setVisible(false);
+		this.listener.propertiesCreated(new Properties());
+		dispose();
 	}
 }

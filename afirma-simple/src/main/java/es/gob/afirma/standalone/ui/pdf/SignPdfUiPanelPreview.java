@@ -58,6 +58,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -171,7 +172,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	JCheckBox getSaveConfig() {
 		return this.saveConfig;
 	}
-
+	
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.5")); //$NON-NLS-1$
 	JButton getOkButton() {
 		return this.okButton;
@@ -211,7 +212,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
 						   final Properties p,
-						   final BufferedImage im) {
+						   final BufferedImage im,
+						   JDialog parent) {
 
 		if (spul == null) {
 			throw new IllegalArgumentException(
@@ -265,10 +267,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createTextAreaHelpPanel(), gbc);
 		gbc.gridy++;
-		gbc.insets = new Insets(10, 5, 0, 5);
+		gbc.insets = new Insets(0, 15, 0, 5);
 		add(this.saveConfig, gbc);
 		gbc.gridy++;
-		gbc.insets = new Insets(10, 5, 0, 5);
+		gbc.insets = new Insets(0, 5, 0, 5);
 		add(createButtonsPanel(), gbc);
 		showPreview();
 		this.letterType.requestFocusInWindow();
@@ -720,7 +722,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
         return helpLabel;
 	}
 
-
 	/** Crea el panel con los botones de aceptar y cancelar.
 	 * @return Panel de botones. */
 	private JPanel createButtonsPanel() {
@@ -754,32 +755,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					getProp().put("layer2FontColor", getColorCombobox().getSelectedItem().getPdfColorKey()); //$NON-NLS-1$*/
 				}
 				if (getSignImage() != null ) {
-					getProp().put("signatureRubricImage", getInsertImageBase64()); //$NON-NLS-1$
-					getProp().put(
-						"imagePositionOnPageLowerLeftX", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePositionOnPageLowerLeftY", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePositionOnPageUpperRightX", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePositionOnPageUpperRightY", //$NON-NLS-1$
-						getProp().getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
-					);
-					getProp().put(
-						"imagePage", //$NON-NLS-1$
-						getProp().getProperty("signaturePage") //$NON-NLS-1$
-					);
+					getProp().put("signatureRubricImage", getInsertImageBase64(getSignImage())); //$NON-NLS-1$
 				}
 				if(this.saveConfig.isSelected()) {
 					saveProperties(getProp());
 				}
-				getListener().positionSelected(getProp());
+				getListener().nextPanel(getProp(),null);
 			}
 		);
 		this.okButton.addKeyListener(this);
@@ -926,23 +907,28 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	 * @param params Colección de propiedades de la firma. */
 	private void saveProperties(final Properties params) {
 
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
-		);
-		PreferencesManager.put(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
-		);
-
-		if (getSignImage() != null) {
+		if (params.getProperty("layer2Text") != null) {
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
+			);
+		}
+		else {
+			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT);			
+		}
+		
+		if (params.getProperty("signatureRubricImage") != null) {
 			PreferencesManager.put(
 				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, params.getProperty("signatureRubricImage")
 			);
@@ -1006,9 +992,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return valid;
 	}
 
-	String getInsertImageBase64() {
+	String getInsertImageBase64(BufferedImage bi) {
 		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
-			ImageIO.write(this.signImage, "jpg", osImage); //$NON-NLS-1$
+			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
 			return Base64.encode(osImage.toByteArray());
 		}
         catch (final Exception e1) {
@@ -1421,5 +1407,4 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	        add(this.addImageItem);
 	    }
 	}
-
 }

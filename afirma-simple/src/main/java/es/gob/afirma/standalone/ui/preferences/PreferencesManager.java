@@ -294,6 +294,11 @@ public final class PreferencesManager {
 	 * documento. */
 	public static final String PREFERENCE_PADES_VISIBLE = "padesVisibleSignature"; //$NON-NLS-1$
 
+	/** Si est&aacute; establecido a <code>true</code> se pide al usuario que determine mediante di&aacute;logos
+	 * gr&aacute;ficos los par&aacute;metros de una marca visible en PDF y se inserta como tal en el
+	 * documento. */
+	public static final String PREFERENCE_PADES_STAMP = "padesVisibleStamp"; //$NON-NLS-1$
+
 	//************************* FIN PREFERENCIAS DE FIRMAS PAdES ***************************************************************
 	//**************************************************************************************************************************
 
