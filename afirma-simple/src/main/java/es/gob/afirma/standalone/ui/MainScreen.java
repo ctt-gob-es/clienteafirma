@@ -10,11 +10,14 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.WindowListener;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -25,6 +28,8 @@ import es.gob.afirma.standalone.LookAndFeelManager;
 public final class MainScreen extends JFrame {
 
     private static final long serialVersionUID = -3288572031446592104L;
+
+    private JScrollPane scrollPane = null;
 
     /** Muestra la pantalla principal de la aplicaci&oacute;n.
      * @param wlist WindowListener para el control del cierre de la ventana
@@ -43,15 +48,25 @@ public final class MainScreen extends JFrame {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        this.setSize(width, height);
+
+        if (LookAndFeelManager.needMaximizeWindow()) {
+        	setExtendedState(getExtendedState() | Frame.MAXIMIZED_BOTH);
+        }
+
         setLayout(new BorderLayout());
-        setLocationRelativeTo(null);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         if (wlist != null) {
             addWindowListener(wlist);
         }
 
-        this.add(firstPanel, BorderLayout.CENTER);
+        // Creamos un panel con barras de desplazamiento y establecemos su tamano inicial
+        this.scrollPane = new JScrollPane();
+        this.scrollPane.setPreferredSize(new Dimension(width, height));
+        this.scrollPane.getHorizontalScrollBar().setUnitIncrement(30);
+        this.scrollPane.getVerticalScrollBar().setUnitIncrement(30);
+        this.scrollPane.setViewportView(firstPanel);
+
+        add(this.scrollPane, BorderLayout.CENTER);
 
         try {
             setIconImage(
@@ -64,6 +79,21 @@ public final class MainScreen extends JFrame {
     		);
         }
 
+        // Ajustamos el tamano de la pantalla al de su contenido y
+        // la localizamos centrada en base al nuevo tamano que adquiera
+        pack();
+        setLocationRelativeTo(null);
+
         setVisible(true);
+    }
+
+    /**
+     * Reemplaza el panel que se muestra actualmente por el indicado.
+     * @param panel Panel a mostrar.
+     */
+    public void replaceShowingPanel(JPanel panel ) {
+    	if (this.scrollPane != null) {
+    		this.scrollPane.setViewportView(panel);
+    	}
     }
 }

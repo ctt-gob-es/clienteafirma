@@ -9,18 +9,9 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS;
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -40,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
@@ -51,7 +43,7 @@ import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.updater.Updater;
 
-final class PreferencesPanelGeneral extends JPanel {
+final class PreferencesPanelGeneral extends JScrollPane {
 
 	private static final long serialVersionUID = 5442844766530064610L;
 
@@ -63,7 +55,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		return this.preferencesPanel;
 	}
 
-	private final JComboBox<String> signarureAlgorithms = new JComboBox<>();
+	private final JComboBox<String> signatureAlgorithms = new JComboBox<>();
 
 	private final JCheckBox avoidAskForClose = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.36")); //$NON-NLS-1$
 
@@ -98,78 +90,10 @@ final class PreferencesPanelGeneral extends JPanel {
 		createUI(keyListener, modificationListener);
 	}
 
-	void savePreferences() {
-		// Opciones varias
-		PreferencesManager.put(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
-		if (SimpleAfirma.isUpdatesEnabled()) {
-			PreferencesManager.putBoolean(PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
-		}
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
-	}
-
-	void loadPreferences() {
-
-		this.signarureAlgorithms.setSelectedItem(
-			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
-		);
-		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
-		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
-
-		if (
-			Boolean.getBoolean(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK) ||
-			Boolean.parseBoolean(System.getenv(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK)) ||
-			!SimpleAfirma.isUpdatesEnabled()
-		) {
-			this.checkForUpdates.setSelected(false);
-			this.checkForUpdates.setEnabled(false);
-		}
-		else {
-			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_UPDATECHECK));
-		}
-
-		if (Boolean.getBoolean(SimpleAfirma.DO_NOT_SEND_ANALYTICS) ||
-				Boolean.parseBoolean(System.getenv(SimpleAfirma.DO_NOT_SEND_ANALYTICS_ENV))) {
-			this.sendAnalytics.setSelected(false);
-			this.sendAnalytics.setEnabled(false);
-		}
-		else {
-			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS));
-		}
-
-		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {
-			this.enableJMulticard.setSelected(false);
-			this.enableJMulticard.setEnabled(false);
-		}
-		else {
-			this.enableJMulticard.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_ENABLED_JMULTICARD));
-		}
-
-		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
-	}
-
-	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
-	 * desde un fichero externo de preferencias. */
-	void loadDefaultPreferences() {
-
-		try {
-			PreferencesManager.clearAll();
-		}
-		catch (final Exception e) {
-			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: e"); //$NON-NLS-1$
-		}
-		loadPreferences();
-		getDisposableInterface().disposeInterface();
-	}
-
-	void createUI(final KeyListener keyListener,
+	private void createUI(final KeyListener keyListener,
 				  final ItemListener modificationListener) {
 
-
-		setLayout(new GridBagLayout());
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
 		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -177,12 +101,10 @@ final class PreferencesPanelGeneral extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 
-		final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
-
 		final JPanel signConfigPanel = new JPanel(new GridBagLayout());
 		signConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.108")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.108") //$NON-NLS-1$
 			)
 		);
 
@@ -286,12 +208,15 @@ final class PreferencesPanelGeneral extends JPanel {
 		restoreConfigFromFileButton.setEnabled(!this.blocked);
 
 		final JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		panel.setLayout(new GridBagLayout());
 
-		importConfigFromFileButton.setPreferredSize(new Dimension(280, 28));
-		panel.add(importConfigFromFileButton);
-		restoreConfigFromFileButton.setPreferredSize(new Dimension(280, 28));
-		panel.add(restoreConfigFromFileButton);
+		final GridBagConstraints panelConstraint = new GridBagConstraints();
+		panelConstraint.fill = GridBagConstraints.HORIZONTAL;
+		panelConstraint.weightx = 1.0;
+		panelConstraint.gridx = 0;
+		panel.add(importConfigFromFileButton, panelConstraint);
+		panelConstraint.gridx++;
+		panel.add(restoreConfigFromFileButton, panelConstraint);
 
 		signConfigPanel.add(panel, signConstraint);
 
@@ -351,35 +276,29 @@ final class PreferencesPanelGeneral extends JPanel {
 			this.enableJMulticard.addKeyListener(keyListener);
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
 		}
-		add(signConfigPanel, gbc);
+		mainPanel.add(signConfigPanel, gbc);
 
-		final JPanel signGeneralPanel = new JPanel(new GridBagLayout());
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
+		final JPanel signGeneralPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		signGeneralPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-					SimpleAfirmaMessages.getString("PreferencesPanel.17") //$NON-NLS-1$
-				)
+				SimpleAfirmaMessages.getString("PreferencesPanel.17") //$NON-NLS-1$
 			)
 		);
 
 		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
 		c.gridy = 0;
-		c.insets = new Insets(0, 7, 0, 7);
+		c.insets = new Insets(0, 7, 4, 7);
+		c.anchor = GridBagConstraints.LINE_START;
 
-		final JPanel signatureAgorithmPanel = new JPanel(fLayout);
-		signatureAgorithmPanel.setBorder(
-			BorderFactory.createTitledBorder(
-				BorderFactory.createEmptyBorder(), SimpleAfirmaMessages.getString("PreferencesPanel.18") //$NON-NLS-1$
-			)
-		);
-		this.signarureAlgorithms.getAccessibleContext().setAccessibleDescription(
+		final JLabel signatureAlgorithmsLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.18")); //$NON-NLS-1$
+
+		this.signatureAlgorithms.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.46") //$NON-NLS-1$
 		);
-		this.signarureAlgorithms.addItemListener(modificationListener);
-		this.signarureAlgorithms.addKeyListener(keyListener);
-		this.signarureAlgorithms.setModel(
+		this.signatureAlgorithms.addItemListener(modificationListener);
+		this.signatureAlgorithms.addKeyListener(keyListener);
+		this.signatureAlgorithms.setModel(
 			new DefaultComboBoxModel<>(
 				new String[] {
 					"SHA1withRSA", //$NON-NLS-1$
@@ -389,18 +308,15 @@ final class PreferencesPanelGeneral extends JPanel {
 				}
 			)
 		);
-		this.signarureAlgorithms.setEnabled(!isBlocked());
-		signatureAgorithmPanel.add(this.signarureAlgorithms);
+		signatureAlgorithmsLabel.setLabelFor(this.signatureAlgorithms);
+		this.signatureAlgorithms.setEnabled(!isBlocked());
 
-		signGeneralPanel.add(signatureAgorithmPanel, c);
+		signGeneralPanel.add(innerPanel);
 
-		final JPanel signatureDefaultsFormats = new JPanel(fLayout);
-		signatureDefaultsFormats.setBorder(
-			BorderFactory.createTitledBorder(
-				BorderFactory.createEmptyBorder(),
-				SimpleAfirmaMessages.getString("PreferencesPanel.39") //$NON-NLS-1$
-			)
-		);
+		c.gridx = 0;
+		innerPanel.add(signatureAlgorithmsLabel, c);
+		c.gridx = 1;
+		innerPanel.add(this.signatureAlgorithms, c);
 
 		final JLabel configureFormatsLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.161")); //$NON-NLS-1$
 		final JButton configureFormatsButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.162")); //$NON-NLS-1$
@@ -411,16 +327,17 @@ final class PreferencesPanelGeneral extends JPanel {
 		configureFormatsButton.addActionListener(
 				ae -> openFormatsDlg(getParent(), isBlocked())
 			);
-		signatureDefaultsFormats.add(configureFormatsLabel);
-		signatureDefaultsFormats.add(configureFormatsButton);
+		configureFormatsLabel.setLabelFor(configureFormatsButton);
 
 		c.gridy++;
-		signGeneralPanel.add(signatureDefaultsFormats, c);
+		c.gridx = 0;
+		innerPanel.add(configureFormatsLabel, c);
+		c.gridx = 1;
+		innerPanel.add(configureFormatsButton, c);
 
-		final JPanel massiveSignaturePanel = new JPanel(fLayout);
+		final JPanel massiveSignaturePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		massiveSignaturePanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createEmptyBorder(),
 				SimpleAfirmaMessages.getString("PreferencesPanel.159") //$NON-NLS-1$
 			)
 		);
@@ -434,15 +351,10 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		massiveSignaturePanel.add(this.massiveOverwrite);
 
-		c.gridy++;
-		signGeneralPanel.add(massiveSignaturePanel, c);
-
-
-
 		final JPanel netConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		netConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.125")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.125") //$NON-NLS-1$
 			)
 		);
 
@@ -466,14 +378,18 @@ final class PreferencesPanelGeneral extends JPanel {
 
 
 		gbc.gridy++;
-		add(signGeneralPanel, gbc);
+		mainPanel.add(signGeneralPanel, gbc);
 		gbc.gridy++;
-		add(netConfigPanel, gbc);
+		mainPanel.add(massiveSignaturePanel, gbc);
+		gbc.gridy++;
+		mainPanel.add(netConfigPanel, gbc);
 		gbc.weighty = 1.0;
 		gbc.gridy++;
-		add(new JPanel(), gbc);
+		mainPanel.add(new JPanel(), gbc);
 
 		loadPreferences();
+
+		setViewportView(mainPanel);
 	}
 
 	/** Di&aacute;logo para cambiar la configuraci&oacute;n del <i>proxy</i>.
@@ -611,4 +527,73 @@ final class PreferencesPanelGeneral extends JPanel {
 	public void setBlocked(final boolean blocked) {
 		this.blocked = blocked;
 	}
+
+
+	void savePreferences() {
+		// Opciones varias
+		PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signatureAlgorithms.getSelectedItem().toString());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
+		if (SimpleAfirma.isUpdatesEnabled()) {
+			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
+		}
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
+	}
+
+	void loadPreferences() {
+
+		this.signatureAlgorithms.setSelectedItem(
+			PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
+		);
+		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
+		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
+
+		if (
+			Boolean.getBoolean(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK) ||
+			Boolean.parseBoolean(System.getenv(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK)) ||
+			!SimpleAfirma.isUpdatesEnabled()
+		) {
+			this.checkForUpdates.setSelected(false);
+			this.checkForUpdates.setEnabled(false);
+		}
+		else {
+			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK));
+		}
+
+		if (Boolean.getBoolean(SimpleAfirma.DO_NOT_SEND_ANALYTICS) ||
+				Boolean.parseBoolean(System.getenv(SimpleAfirma.DO_NOT_SEND_ANALYTICS_ENV))) {
+			this.sendAnalytics.setSelected(false);
+			this.sendAnalytics.setEnabled(false);
+		}
+		else {
+			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS));
+		}
+
+		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {
+			this.enableJMulticard.setSelected(false);
+			this.enableJMulticard.setEnabled(false);
+		}
+		else {
+			this.enableJMulticard.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD));
+		}
+
+		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
+	}
+
+	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
+	 * desde un fichero externo de preferencias. */
+	void loadDefaultPreferences() {
+
+		try {
+			PreferencesManager.clearAll();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: e"); //$NON-NLS-1$
+		}
+		loadPreferences();
+		getDisposableInterface().disposeInterface();
+	}
+
 }

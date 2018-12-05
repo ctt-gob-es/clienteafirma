@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -39,6 +40,8 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
+    private static final long serialVersionUID = -8543615798397861866L;
+
 	/** Evento de Ayuda solicitada. */
 	public static final String PROP_HELP_REQUESTED = "F1"; //$NON-NLS-1$
 
@@ -48,13 +51,26 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 	/** Evento de DNIe rechazado. */
 	public static final String PROP_DNIE_REJECTED = "NoDNI"; //$NON-NLS-1$
 
-    private static final long serialVersionUID = -8543615798397861866L;
+    /** Anchura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int DEFAULT_WINDOW_WIDTH = 600;
+	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int DEFAULT_WINDOW_HEIGHT = 420;
+
+    /** Construye un panel de espera a insercci&oacute;n de DNIe.
+     * @param pcl <code>PropertyChangeListener</code> para la detecci&oacute;n de las teclas ESC para el
+     *        cierre del aplicativo y F1 para mostrar la ayuda y para el control de los botones */
+    public DNIeWaitPanel(final PropertyChangeListener pcl) {
+        super(true);
+        createUI(pcl);
+    }
 
     private void createUI(final PropertyChangeListener pcl) {
 
     	this.addPropertyChangeListener(pcl);
 
         setLayout(new GridBagLayout());
+
+        setPreferredSize(new Dimension(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         final JPanel dniePanel = new JPanel();
@@ -181,14 +197,6 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
     	);
         hideDniWaitScreen.setBackground(Color.WHITE);
         this.add(hideDniWaitScreen, c);
-    }
-
-    /** Construye un panel de espera a insercci&oacute;n de DNIe.
-     * @param pcl <code>PropertyChangeListener</code> para la detecci&oacute;n de las teclas ESC para el
-     *        cierre del aplicativo y F1 para mostrar la ayuda y para el control de los botones */
-    public DNIeWaitPanel(final PropertyChangeListener pcl) {
-        super(true);
-        createUI(pcl);
     }
 
     /** {@inheritDoc} */

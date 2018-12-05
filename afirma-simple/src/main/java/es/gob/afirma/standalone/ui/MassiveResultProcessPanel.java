@@ -202,22 +202,39 @@ final class MassiveResultProcessPanel extends JPanel {
             this.certDescText.setLabelFor(this.certDescription);
         }
 
-        // Listado con los resultados de firma
-        final JScrollPane detailPanel = new JScrollPane(
+        // Barra de titulo del listado de resultados
+		final SignatureResultTitleRenderer resultTitlePanel = new SignatureResultTitleRenderer();
+		resultTitlePanel.setFileNameColumnTitle("Fichero");
+		resultTitlePanel.setSizeColumnTitle("Tama\u00F1o");
+		resultTitlePanel.setResultColumnTitle("Estado");
+		resultTitlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, Color.GRAY));
+
+        final JScrollPane resultListPanel = new JScrollPane(
     		getSignResultList(signConfigList, this)
 		);
+        resultListPanel.setBorder(BorderFactory.createEmptyBorder());
 
         // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-            detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        	resultListPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        	resultListPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
         else {
-        	detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        	resultListPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         }
 
-        final JLabel detailPanelText = new JLabel("Listado de firmas:"); //$NON-NLS-1$
-        detailPanelText.setLabelFor(detailPanel);
+        // Creamos un panel que contenga el titulo del listado y el propio listado
+        final JPanel resultPanel = new JPanel(new GridBagLayout());
+        resultPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        final GridBagConstraints resultConstraints = new GridBagConstraints();
+        resultConstraints.fill = GridBagConstraints.BOTH;
+        resultConstraints.weightx = 1.0;
+        resultConstraints.gridy = 0;
+        resultPanel.add(resultTitlePanel, resultConstraints);
+        resultConstraints.weighty = 1.0;
+        resultConstraints.gridy++;
+        resultPanel.add(resultListPanel, resultConstraints);
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
@@ -234,25 +251,24 @@ final class MassiveResultProcessPanel extends JPanel {
         c.gridy = 0;
         c.insets = new Insets(11, 0, 0, 0);
         this.add(this.dirPathText, c);
-        c.gridy = 1;
+        c.gridy++;
         c.insets = new Insets(0, 0, 0, 0);
         this.add(dirPathPanel, c);
-        c.gridy = 2;
+        c.gridy++;
         c.insets = new Insets(11, 0, 0, 0);
         if (certDescPanel != null) {
             this.add(this.certDescText, c);
-            c.gridy = 3;
+            c.gridy++;
             c.insets = new Insets(0, 0, 0, 0);
             this.add(certDescPanel, c);
-            c.gridy = 4;
+            c.gridy++;
             c.insets = new Insets(11, 0, 0, 0);
         }
-        this.add(detailPanelText, c);
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 1.0;
-        c.gridy = 5;
-        c.insets = new Insets(0, 0, 0, 0);
-        this.add(detailPanel, c);
+        c.gridy++;
+        c.insets = new Insets(11, 0, 0, 0);
+        this.add(resultPanel, c);
     }
 
 	private static Component getSignResultList(List<SignOperationConfig> signConfigList,
@@ -338,6 +354,74 @@ final class MassiveResultProcessPanel extends JPanel {
         }
     }
 
+	/**
+	 * Renderer de los t&iacute;tulos del listado de firmas realizadas.
+	 */
+	private static class SignatureResultTitleRenderer extends JPanel {
+
+		/** Serial Id. */
+
+		private final JLabel fileNameLabel;
+		private final JLabel sizeLabel;
+		private final JLabel resultLabel;
+
+		public SignatureResultTitleRenderer() {
+
+			this.fileNameLabel = new JLabel();
+
+			this.sizeLabel = new JLabel();
+			this.sizeLabel.setPreferredSize(new Dimension(60, 14));
+
+			this.resultLabel = new JLabel();
+			this.resultLabel.setPreferredSize(new Dimension(52, 14));
+
+			// Establecemos la configuracion de color
+			Color bgColor = Color.WHITE;
+			// Configuramos los colores
+			if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+				bgColor = LookAndFeelManager.WINDOW_COLOR;
+			}
+
+			setBackground(bgColor);
+
+			setLayout(new GridBagLayout());
+
+			final GridBagConstraints c = new GridBagConstraints();
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.insets = new Insets(3, 11, 3, 0);
+
+			c.gridx = 0;
+			c.weightx = 1.0;
+			add(this.fileNameLabel, c);
+
+			c.weightx = 0;
+			c.gridx++;
+			add(this.sizeLabel, c);
+
+			c.gridx++;
+			c.insets = new Insets(0,  5,  0,  5);
+			add(this.resultLabel, c);
+		}
+
+
+    	void setFileNameColumnTitle(String title) {
+    		this.fileNameLabel.setText(title);
+    	}
+
+
+    	void setSizeColumnTitle(String title) {
+    		this.sizeLabel.setText(title);
+    	}
+
+    	void setResultColumnTitle(String title) {
+    		this.resultLabel.setText(title);
+    	}
+
+	}
+
+	/**
+	 * Renderer de los elementos del listado de firmas realizadas.
+	 */
 	private static class SignatureResultCellRenderer extends JPanel implements ListCellRenderer<SignOperationConfig> {
 
 		/** Serial Id. */
@@ -406,7 +490,7 @@ final class MassiveResultProcessPanel extends JPanel {
 			c.gridx++;
 			add(this.sizeLabel, c);
 			c.gridx++;
-			c.insets = new Insets(0,  5,  0,  5);
+			c.insets = new Insets(0,  15,  0,  15);
 			add(this.resultIcon, c);
 		}
 

@@ -220,7 +220,6 @@ public class JSEUIManager implements AOUIManager {
     	}
     	catch (final InvocationTargetException e) {
     		LOGGER.severe("Se genero un error en el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
-    		System.out.println(e.getCause());
     		if (e.getCause() instanceof RuntimeException) {
     			throw (RuntimeException) e.getCause();
     		}

@@ -9,11 +9,13 @@
 
 package es.gob.afirma.standalone.ui.plugins;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
@@ -31,8 +33,10 @@ public final class PluginsManagementDialog extends JDialog {
 	private PluginsManagementDialog(final Frame parent, final boolean modal) {
 		super(parent, modal);
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.37")); //$NON-NLS-1$
-		this.add(new PluginsManagementPanel(this));
-		this.setSize(650, 550);
+		add(new PluginsManagementPanel(this));
+		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
+		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
+		setSize(preferedFrameSize);
 		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

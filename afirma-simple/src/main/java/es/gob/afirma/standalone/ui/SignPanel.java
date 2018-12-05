@@ -25,6 +25,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
@@ -82,6 +83,11 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** Anchura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int MINIMUM_PANEL_WIDTH = 600;
+	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int MINIMUM_PANEL_HEIGHT = 420;
+
     private static String[][] signersTypeRelation = new String[][] {
     	{"es.gob.afirma.signers.pades.AOPDFSigner", SimpleAfirmaMessages.getString("SignPanel.104")}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"es.gob.afirma.signers.xades.AOFacturaESigner", SimpleAfirmaMessages.getString("SignPanel.105")}, //$NON-NLS-1$ //$NON-NLS-2$
@@ -125,6 +131,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         }
 
 		setLayout(new GridBagLayout());
+
+        // Establecemos el que deberia ser el tamano minimo del panel antes de que se
+        // muestren las barras de desplazamiento
+        setPreferredSize(new Dimension(MINIMUM_PANEL_WIDTH, MINIMUM_PANEL_HEIGHT));
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -674,7 +684,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.add(this.filePanel, BorderLayout.CENTER);
 
 	        final JPanel buttonPanel = new JPanel(true);
-	        this.signButton.setPreferredSize(new Dimension(160, 27));
+	        this.signButton.setMargin(new Insets(0, 30, 0, 30));
            	this.signButton.setText(SimpleAfirmaMessages.getString("SignPanel.45")); //$NON-NLS-1$
 
 	        this.signButton.setMnemonic('F');

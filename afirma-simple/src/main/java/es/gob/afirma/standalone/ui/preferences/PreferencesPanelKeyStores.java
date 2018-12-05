@@ -31,6 +31,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
@@ -43,7 +44,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
 
-final class PreferencesPanelKeyStores extends JPanel {
+final class PreferencesPanelKeyStores extends JScrollPane {
 
 	private static final long serialVersionUID = 3255071607793273334L;
 
@@ -94,7 +95,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 	void createUI(final KeyListener keyListener,
 				  final ModificationListener modificationListener) {
 
-        setLayout(new GridBagLayout());
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -230,14 +231,16 @@ final class PreferencesPanelKeyStores extends JPanel {
 		ksc.weightx = 1.0;
 		keysStorePanel.add(new JPanel(), ksc);
 
-	    add(keysFilerPanel, c);
+	    mainPanel.add(keysFilerPanel, c);
 	    c.gridy++;
 
-	    add(keysStorePanel, c);
+	    mainPanel.add(keysStorePanel, c);
 
 	    c.weighty = 1.0;
 	    c.gridy++;
-		add(new JPanel(), c);
+		mainPanel.add(new JPanel(), c);
+
+		setViewportView(mainPanel);
 	}
 
 	void savePreferences() {

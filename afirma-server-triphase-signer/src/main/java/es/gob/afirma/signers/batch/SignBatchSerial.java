@@ -138,7 +138,7 @@ public final class SignBatchSerial extends SignBatch {
 				ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
 			}
 			catch (final IOException e) {
-				LOGGER.warning("Error en el guardado de la firma: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "Error en el guardado de la firma", e); //$NON-NLS-1$
 				error = true;
 				ss.setProcessResult(
 					new ProcessResult(

@@ -30,7 +30,7 @@ public class CertificateSelectionDialogTest {
 				new CachePasswordCallback(CERT_PASS.toCharArray()),
 				null);
 
-		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, false);
+		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, false);
 		String alias;
 		try {
 			alias = dialog.show();

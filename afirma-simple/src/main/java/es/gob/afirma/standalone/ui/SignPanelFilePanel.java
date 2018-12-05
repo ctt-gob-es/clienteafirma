@@ -118,6 +118,36 @@ final class SignPanelFilePanel extends JPanel {
         // Definimos aqui el boton para poder crear una politica de foco si fuese necesario
         final JButton openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
 
+        openFileButton.setMnemonic('v');
+        openFileButton.addActionListener(
+    		ae -> {
+			    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
+			        new VisorFirma(false, null).initialize(false, file);
+			    }
+			    else {
+			        try {
+			            Desktop.getDesktop().open(file);
+			        }
+			        catch (final IOException e) {
+			        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			    			"Error abriendo el fichero: " + e //$NON-NLS-1$
+						);
+			        	AOUIFactory.showErrorMessage(
+			                SignPanelFilePanel.this,
+			                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
+			                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			                JOptionPane.ERROR_MESSAGE
+			            );
+			            return;
+			        }
+			    }
+			}
+		);
+        pathLabel.setLabelFor(openFileButton);
+        descLabel.setLabelFor(openFileButton);
+        dateLabel.setLabelFor(openFileButton);
+        sizeLabel.setLabelFor(openFileButton);
+
         // Establecemos la configuracion de color
         Color bgColor = Color.WHITE;
         // Configuramos los colores
@@ -163,54 +193,27 @@ final class SignPanelFilePanel extends JPanel {
         final Component icon = fileType.getIcon();
         if (icon != null) {
         	icon.setMinimumSize(new Dimension(110,  110));
-        	this.add(icon, c);
+        	add(icon, c);
         }
-
-        c.weightx = 1.0;
-        c.gridx = 1;
-        c.ipadx = 0;
-        c.ipady = 0;
-        c.insets = new Insets(14, 0, 11, 5);
-        c.anchor = GridBagConstraints.NORTH;
-        this.add(detailPanel, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.gridx = 2;
+        c.ipadx = 0;
+        c.ipady = 0;
         c.insets = new Insets(11, 6, 11, 11);
         c.anchor = GridBagConstraints.NORTHEAST;
+        add(openFileButton, c);
 
-        openFileButton.setMnemonic('v');
-        openFileButton.addActionListener(
-    		ae -> {
-			    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
-			        new VisorFirma(false, null).initialize(false, file);
-			    }
-			    else {
-			        try {
-			            Desktop.getDesktop().open(file);
-			        }
-			        catch (final IOException e) {
-			        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-			    			"Error abriendo el fichero: " + e //$NON-NLS-1$
-						);
-			        	AOUIFactory.showErrorMessage(
-			                SignPanelFilePanel.this,
-			                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
-			                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			                JOptionPane.ERROR_MESSAGE
-			            );
-			            return;
-			        }
-			    }
-			}
-		);
-        this.add(openFileButton, c);
-        pathLabel.setLabelFor(openFileButton);
-        descLabel.setLabelFor(openFileButton);
-        dateLabel.setLabelFor(openFileButton);
-        sizeLabel.setLabelFor(openFileButton);
-
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.gridx = 1;
+        c.ipadx = 0;
+        c.ipady = 0;
+        c.insets = new Insets(14, 0, 11, 5);
+        c.anchor = GridBagConstraints.NORTH;
+        add(detailPanel, c);
     }
 }
