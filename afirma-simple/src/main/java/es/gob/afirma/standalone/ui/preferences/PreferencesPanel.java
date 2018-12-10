@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -24,6 +25,7 @@ import javax.swing.JTabbedPane;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 final class PreferencesPanel extends JPanel implements KeyListener, DisposableInterface {
@@ -59,6 +61,10 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, blocked);
 		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, blocked);
 
+		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
+		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(610, screenHeight * 0.8));
+
+		this.tabbedPane.setPreferredSize(preferedFrameSize);
 		this.tabbedPane.addKeyListener(this);
 
 		int count = this.tabbedPane.getTabCount();

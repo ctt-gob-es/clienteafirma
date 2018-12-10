@@ -9,8 +9,11 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
@@ -151,7 +154,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	private void createUI(final String signFormat, final boolean showFields, final boolean blocked) {
 
 		if (AOSignConstants.SIGN_FORMAT_FACTURAE.equals(this.signatureFormat)) {
-			setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
+			setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.153") //$NON-NLS-1$
 			));
 		} else {
 			setBorder(BorderFactory.createEmptyBorder());
@@ -174,14 +177,20 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 		final JLabel policyComboLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.23")); //$NON-NLS-1$
 		policyComboLabel.setLabelFor(this.policiesCombo);
-		c.gridy++;
-		add(policyComboLabel, c);
-		c.gridy++;
-		add(this.policiesCombo, c);
 
-		policyComboLabel.setLabelFor(this.policiesCombo);
+		// El panel de FacturaE se muestra con otro estilo
+		if (AOSignConstants.SIGN_FORMAT_FACTURAE.equals(this.signatureFormat)) {
+			final JPanel panel = createFacturaEPolicyPanel(policyComboLabel, this.policiesCombo);
+			c.gridy++;
+			add(panel, c);
+		}
+		else {
+			c.gridy++;
+			add(policyComboLabel, c);
+			c.gridy++;
+			add(this.policiesCombo, c);
+		}
 
-		add(this.policiesCombo, c);
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
 		);
@@ -299,6 +308,21 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 		// Cargamos la configuracion de politica que corresponde
 		loadPolicy(((PolicyItem) this.policiesCombo.getSelectedItem()).getPolicy());
+	}
+
+	private static JPanel createFacturaEPolicyPanel(Component label, Component combo) {
+		final JPanel outerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
+		final GridBagConstraints feConstraints = new GridBagConstraints();
+		feConstraints.anchor = GridBagConstraints.LINE_START;
+		feConstraints.insets = new Insets(0, 7, 4, 7);
+		feConstraints.gridx = 0;
+		innerPanel.add(label, feConstraints);
+		feConstraints.gridx = 1;
+		innerPanel.add(combo, feConstraints);
+		outerPanel.add(innerPanel);
+
+		return outerPanel;
 	}
 
 	/** Obtiene el &iacute;ndice de la pol&iacute;tica personalizada en el listado de pol&iacute;ticas.

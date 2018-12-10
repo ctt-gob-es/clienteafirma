@@ -94,6 +94,8 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
     			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
     			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+    	this.taskOutput.addKeyListener(this);
+
     	c.fill = GridBagConstraints.BOTH;
     	c.insets = new Insets(0, 15,  0,  15);
     	c.weighty = 1.0;
@@ -158,6 +160,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			panel.add(restoreButton);
 			panel.add(closeButton);
 		}
+
 		return panel;
 	}
 

@@ -9,17 +9,18 @@
 
 package es.gob.afirma.standalone.ui.restoreconfig;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
  * Clase que dibuja la ventana de restauraci&oacute;n de configuraci&oacute;n
- * de navegadores
- *
+ * de la instalaci&oacute;n.
  */
 public final class RestoreConfigDialog extends JDialog {
 
@@ -35,8 +36,11 @@ public final class RestoreConfigDialog extends JDialog {
 	public RestoreConfigDialog(final Frame parent, final boolean modal) {
 		super(parent, modal);
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.20")); //$NON-NLS-1$
-		this.add(new RestoreConfigPanel(this));
-		this.setSize(600, 550);
+		add(new RestoreConfigPanel(this));
+
+		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
+		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
+		setSize(preferedFrameSize);
 		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

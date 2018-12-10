@@ -9,12 +9,15 @@
 
 package es.gob.afirma.standalone.ui.plugins;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -178,8 +181,19 @@ public final class PluginsManagementPanel extends JPanel {
 		final JComponent textPanel = createScrollableTextPanel();
 
 		final JScrollPane scrollPane = new JScrollPane(textPanel);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		scrollPane.setFocusable(true);
+		scrollPane.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+			}
+			@Override
+			public void focusGained(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
+			}
+		});
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
 		// Panel con el boton para la configuracion del plugin. El boton perman
 		final JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));

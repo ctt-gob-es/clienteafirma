@@ -86,7 +86,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 	}
 
+	/** Anchura por defecto con la que se muestra inicialmente la pantalla principal. */
 	private static final int DEFAULT_WINDOW_WIDTH = 780;
+	/** Altura por defecto con la que se muestra inicialmente la pantalla principal. */
 	private static final int DEFAULT_WINDOW_HEIGHT = 550;
 
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
@@ -286,7 +288,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	configureMenuBar();
 
         final JPanel newPanel = new SignPanel(this.window, this);
-        this.container.add(newPanel, BorderLayout.CENTER);
+
+        if (this.container instanceof MainScreen) {
+        	((MainScreen) this.container).replaceShowingPanel(newPanel);
+        }
+        else {
+        	this.container.add(newPanel, BorderLayout.CENTER);
+        }
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);
             this.currentPanel.setFocusable(false);
@@ -345,7 +353,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null),
     		null
 		);
-        this.container.add(newPanel, BorderLayout.CENTER);
+
+        if (this.container instanceof MainScreen) {
+        	((MainScreen) this.container).replaceShowingPanel(newPanel);
+        }
+        else {
+        	this.container.add(newPanel, BorderLayout.CENTER);
+        }
         if (this.window != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", signConfig.getSignatureFile()); //$NON-NLS-1$
             this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + signConfig.getSignatureFile().getName()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -376,7 +390,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		signingCert
 		);
 
-        this.container.add(newPanel, BorderLayout.CENTER);
+        if (this.container instanceof MainScreen) {
+        	((MainScreen) this.container).replaceShowingPanel(newPanel);
+        }
+        else {
+        	this.container.add(newPanel, BorderLayout.CENTER);
+        }
         if (this.window != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", outDir); //$NON-NLS-1$
             this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + outDir.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$

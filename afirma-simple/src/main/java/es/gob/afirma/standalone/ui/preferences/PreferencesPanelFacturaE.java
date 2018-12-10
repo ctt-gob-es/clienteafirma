@@ -22,6 +22,7 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
@@ -35,6 +36,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.ietf.jgss.GSSException;
@@ -49,7 +51,7 @@ import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 /** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de facturaE.
  * @author Mariano Mart&iacute;nez. */
-final class PreferencesPanelFacturaE extends JPanel {
+final class PreferencesPanelFacturaE extends JScrollPane {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -109,7 +111,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 	void createUI(final KeyListener keyListener,
 				  final ModificationListener modificationListener) {
 
-        setLayout(new GridBagLayout());
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -123,7 +125,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 
         gbc.gridy++;
 
-        add(this.panelPolicies, gbc);
+        mainPanel.add(this.panelPolicies, gbc);
 
         this.facturaePolicyPanel.setModificationListener(modificationListener);
         this.facturaePolicyPanel.setKeyListener(keyListener);
@@ -194,24 +196,12 @@ final class PreferencesPanelFacturaE extends JPanel {
         c.gridy++;
         metadata.add(this.facturaeSignatureProductionCountry, c);
 
-        final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
-	    final JPanel signOptions = new JPanel(fLayout);
+	    final JPanel signOptions = new JPanel(new FlowLayout(FlowLayout.LEADING));
         signOptions.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.69")) //$NON-NLS-1$
-			)
+			SimpleAfirmaMessages.getString("PreferencesPanel.69")) //$NON-NLS-1$
 		);
 
-	    final JPanel format = new JPanel();
-        format.setBorder(
-    		BorderFactory.createEmptyBorder()
-		);
-
-        format.setLayout(new GridBagLayout());
-
-        final GridBagConstraints cf = new GridBagConstraints();
-        cf.fill = GridBagConstraints.HORIZONTAL;
-        cf.weightx = 1.0;
+        final JPanel signOptionsInnerPanel = new JPanel(new GridBagLayout());
 
         this.facturaeRol.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.53") //$NON-NLS-1$
@@ -223,22 +213,27 @@ final class PreferencesPanelFacturaE extends JPanel {
 		);
         facturaeRolLabel.setLabelFor(this.facturaeRol);
 
-        format.add(facturaeRolLabel, cf);
-        cf.gridy++;
-        cf.gridy++;
-        format.add(this.facturaeRol, cf);
 
-        signOptions.add(format);
+        final GridBagConstraints cf = new GridBagConstraints();
+        cf.anchor = GridBagConstraints.LINE_START;
+        cf.insets = new Insets(0, 7, 4, 7);
+        cf.gridx = 0;
+        cf.gridy = 0;
+        signOptionsInnerPanel.add(facturaeRolLabel, cf);
+        cf.gridx++;
+        signOptionsInnerPanel.add(this.facturaeRol, cf);
+
+        signOptions.add(signOptionsInnerPanel);
 
         gbc.gridy++;
-        add(metadata, gbc);
+        mainPanel.add(metadata, gbc);
 
         gbc.gridy++;
-        add(signOptions, gbc);
+        mainPanel.add(signOptions, gbc);
 
         gbc.gridy++;
         gbc.weighty = 1.0;
-        add(new JPanel(), gbc);
+        mainPanel.add(new JPanel(), gbc);
 
 		// Panel para el boton de restaurar la configuracion
 		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
@@ -269,7 +264,9 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 		gbc.gridy++;
 
-		add(panelGeneral, gbc);
+		mainPanel.add(panelGeneral, gbc);
+
+		setViewportView(mainPanel);
 	}
 
 	/** Guarda las preferencias de FacturaE. */

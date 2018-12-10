@@ -39,6 +39,11 @@ public class VisorFirma extends JApplet implements WindowListener {
     /** Serial ID */
     private static final long serialVersionUID = 7060676034863587322L;
 
+	/** Anchura por defecto con la que se muestra inicialmente la pantalla principal. */
+	private static final int DEFAULT_WINDOW_WIDTH = 780;
+	/** Altura por defecto con la que se muestra inicialmente la pantalla principal. */
+	private static final int DEFAULT_WINDOW_HEIGHT = 650;
+
     private Window window;
     private Container container = null;
     private JPanel currentPanel;
@@ -57,6 +62,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     public VisorFirma(final boolean standalone, final Object parent) {
         this.standalone = standalone;
         LookAndFeelManager.applyLookAndFeel();
+
         this.parentComponent = parent;
     }
 
@@ -89,11 +95,16 @@ public class VisorFirma extends JApplet implements WindowListener {
     		);
 
             if (this.parentComponent == null) {
+
+
+            	System.out.println(" ======== VisorFirma showMainScreen");
+
 	           	final MainScreen mainScreen = new MainScreen();
-	           	mainScreen.showMainScreen(this, this.currentPanel, 780, 650);
+	           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 	            this.container = mainScreen;
             }
             else {
+
             	JDialog dialog;
             	if (this.parentComponent instanceof Frame) {
             		dialog = new JDialog((Frame) this.parentComponent);
@@ -108,10 +119,10 @@ public class VisorFirma extends JApplet implements WindowListener {
             		dialog = new JDialog();
             	}
             	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-            	dialog.setSize(780, 600);
+            	dialog.setSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
             	dialog.setResizable(false);
             	final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-        		dialog.setLocation(cp.x - 780/2, cp.y - 600/2);
+        		dialog.setLocation(cp.x - DEFAULT_WINDOW_WIDTH/2, cp.y - DEFAULT_WINDOW_WIDTH/2);
         		dialog.add(this.currentPanel);
             	this.container = dialog;
             }
@@ -124,6 +135,9 @@ public class VisorFirma extends JApplet implements WindowListener {
             if (this.window instanceof JFrame) {
             	((JFrame)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
             	((JFrame)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            	if (LookAndFeelManager.needMaximizeWindow()) {
+            		((JFrame)this.window).setExtendedState(((JFrame)this.window).getExtendedState() | Frame.MAXIMIZED_BOTH);
+            	}
             }
             else if (this.window instanceof JDialog) {
             	((JDialog)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
@@ -212,5 +226,8 @@ public class VisorFirma extends JApplet implements WindowListener {
             return;
         }
         initialize(VisorFirma.this.equals(VisorFirma.this.container), sgFile);
+
+        System.out.println(" ====== REPAINT");
+        repaint();
     }
 }

@@ -59,7 +59,7 @@ public class PluginConfigurationDialog extends JDialog {
 		c.gridy++;
 		c.insets = new Insets(11, 0, 0, 0);
 		add(createButtonsPanel(), c);
-		setResizable(false);
+		setResizable(true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		pack();
 

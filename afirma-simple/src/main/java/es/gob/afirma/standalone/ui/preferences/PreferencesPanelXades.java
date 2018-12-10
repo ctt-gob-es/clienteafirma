@@ -23,12 +23,16 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGN_FORMAT;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,10 +44,12 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import es.gob.afirma.core.AOException;
@@ -53,7 +59,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
-final class PreferencesPanelXades extends JPanel {
+final class PreferencesPanelXades extends JScrollPane {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -93,7 +99,7 @@ final class PreferencesPanelXades extends JPanel {
 	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
 	 * el di&aacute;logo
 	 */
-	private JLabel policyLabel;
+	private JLabel currentPolicyValue;
 
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
@@ -112,7 +118,7 @@ final class PreferencesPanelXades extends JPanel {
 				  final ModificationListener modificationListener
 				  ) {
 
-        setLayout(new GridBagLayout());
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -126,45 +132,53 @@ final class PreferencesPanelXades extends JPanel {
     	this.xadesPolicyDlg.setModificationListener(modificationListener);
     	this.xadesPolicyDlg.setKeyListener(keyListener);
 
-        ///////////// Panel Policy ////////////////
+        ///////////// Inicio Panel Policy ////////////////
 
-        final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        final JPanel policyConfigPanel = createPolicyPanel();
 		policyConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.153")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.153") //$NON-NLS-1$
 			)
 		);
 
-		final JButton policyConfigButton = new JButton(
-			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
-		);
-
-		this.policyLabel = new JLabel(this.xadesPolicyDlg.getSelectedPolicyName());
-		this.policyLabel.setLabelFor(policyConfigButton);
-
-		policyConfigButton.setMnemonic('P');
-		policyConfigButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					changeXadesPolicyDlg(getParent());
-				}
-			}
-		);
-		policyConfigButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
-		);
-
-		policyConfigButton.setEnabled(!isBlocked());
-		policyConfigPanel.add(this.policyLabel);
-		policyConfigPanel.add(policyConfigButton);
-
         ///////////// Fin Panel Policy ////////////////
 
-		gbc.gridy++;
-        add(policyConfigPanel, gbc);
+        ///////////// Inicio Panel Opciones de firma ////////////////
 
-        ///////////// Panel Multisign ////////////////
+	    final JPanel signOptions = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        signOptions.setBorder(
+        	BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanel.69") //$NON-NLS-1$
+			)
+		);
+
+        final JPanel signOptionsInnerPanel = new JPanel(new GridBagLayout());
+
+        this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
+        this.xadesSignFormat.addItemListener(modificationListener);
+        this.xadesSignFormat.addKeyListener(keyListener);
+        this.xadesSignFormat.setEnabled(!isBlocked());
+
+        final JLabel xadesFormatLabel = new JLabel(
+				SimpleAfirmaMessages.getString("PreferencesPanel.15") //$NON-NLS-1$
+		);
+        xadesFormatLabel.addKeyListener(keyListener);
+        xadesFormatLabel.setLabelFor(this.xadesSignFormat);
+
+        final GridBagConstraints cf = new GridBagConstraints();
+        cf.anchor = GridBagConstraints.LINE_START;
+        cf.insets = new Insets(0, 7, 4, 7);
+        cf.gridx = 0;
+        cf.gridx = 0;
+
+        signOptionsInnerPanel.add(xadesFormatLabel, cf);
+        cf.gridx = 1;
+        signOptionsInnerPanel.add(this.xadesSignFormat, cf);
+        signOptions.add(signOptionsInnerPanel);
+
+        ///////////// Fin Panel Opciones de firma ////////////////
+
+        ///////////// Inicio Panel Multisign ////////////////
 
         final JPanel multisignConfigPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints mcpc = new GridBagConstraints();
@@ -174,7 +188,7 @@ final class PreferencesPanelXades extends JPanel {
 
         multisignConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.167")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.167") //$NON-NLS-1$
 			)
 		);
 
@@ -205,11 +219,14 @@ final class PreferencesPanelXades extends JPanel {
 
         ///////////// Fin Panel Multisign ////////////////
 
-		gbc.gridy++;
-        add(multisignConfigPanel, gbc);
+        ///////////// Inicio Panel Metadatos ////////////////
 
         final JPanel metadata = new JPanel();
-        metadata.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.8"))); //$NON-NLS-1$
+        metadata.setBorder(
+        		BorderFactory.createTitledBorder(
+        				SimpleAfirmaMessages.getString("PreferencesPanel.8") //$NON-NLS-1$
+        		)
+        );
         metadata.setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -272,50 +289,24 @@ final class PreferencesPanelXades extends JPanel {
         c.gridy++;
         metadata.add(this.xadesSignerClaimedRole, c);
 
-        final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
-	    final JPanel signOptions = new JPanel(fLayout);
-        signOptions.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.69")) //$NON-NLS-1$
-			)
-		);
+        ///////////// Fin Panel Metadatos ////////////////
 
-        final JPanel panelFirm = new JPanel();
-		panelFirm.setBorder(
-    		BorderFactory.createEmptyBorder()
-		);
-		panelFirm.setLayout(new GridBagLayout());
 
-        final GridBagConstraints cf = new GridBagConstraints();
-        cf.fill = GridBagConstraints.HORIZONTAL;
-        cf.weightx = 1.0;
-
-        this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
-        this.xadesSignFormat.addItemListener(modificationListener);
-        this.xadesSignFormat.addKeyListener(keyListener);
-        this.xadesSignFormat.setEnabled(!isBlocked());
-
-        final JLabel xadesFormatLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanel.15") //$NON-NLS-1$
-		);
-        xadesFormatLabel.addKeyListener(keyListener);
-        xadesFormatLabel.setLabelFor(this.xadesSignFormat);
-
-        panelFirm.add(xadesFormatLabel, cf);
-        cf.gridy++;
-        cf.gridy++;
-        panelFirm.add(this.xadesSignFormat, cf);
-        signOptions.add(panelFirm);
+		gbc.gridy++;
+        mainPanel.add(policyConfigPanel, gbc);
 
         gbc.gridy++;
-        add(metadata, gbc);
+        mainPanel.add(signOptions, gbc);
+
+		gbc.gridy++;
+        mainPanel.add(multisignConfigPanel, gbc);
 
         gbc.gridy++;
-        add(signOptions, gbc);
+        mainPanel.add(metadata, gbc);
 
         gbc.gridy++;
         gbc.weighty = 1.0;
-        add(new JPanel(), gbc);
+        mainPanel.add(new JPanel(), gbc);
 
 		// Panel para el boton de restaurar la configuracion
 		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
@@ -346,8 +337,65 @@ final class PreferencesPanelXades extends JPanel {
 
 		gbc.gridy++;
 
-		add(panelGeneral, gbc);
+		mainPanel.add(panelGeneral, gbc);
 
+		setViewportView(mainPanel);
+	}
+
+	private JPanel createPolicyPanel() {
+
+		final JLabel currentPolicyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.171")); //$NON-NLS-1$
+		this.currentPolicyValue = new JLabel(this.xadesPolicyDlg.getSelectedPolicyName());
+		this.currentPolicyValue.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		this.currentPolicyValue.setFocusable(true);
+		this.currentPolicyValue.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+			}
+			@Override
+			public void focusGained(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
+			}
+		});
+		currentPolicyLabel.setLabelFor(this.currentPolicyValue);
+
+		final JButton policyConfigButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
+			);
+
+
+		policyConfigButton.setMnemonic('P');
+		policyConfigButton.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					changeXadesPolicyDlg(getParent());
+				}
+			}
+		);
+		policyConfigButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
+		);
+
+		policyConfigButton.setEnabled(!isBlocked());
+
+		final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = new Insets(0,  7,  4,  7);
+		c.gridx = 0;
+		innerPanel.add(currentPolicyLabel, c);
+		c.gridx = 1;
+		innerPanel.add(this.currentPolicyValue, c);
+		c.gridx = 2;
+		innerPanel.add(policyConfigButton, c);
+
+		policyConfigPanel.add(innerPanel);
+
+		return policyConfigPanel;
 	}
 
 	void savePreferences() {
@@ -509,7 +557,7 @@ final class PreferencesPanelXades extends JPanel {
         this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
         this.xadesSignFormat.setEnabled(!isBlocked());
 
-		this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicyName());
+		this.currentPolicyValue.setText(this.xadesPolicyDlg.getSelectedPolicyName());
 
 		this.optionCoSign.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_XADES_MULTISIGN_COSIGN));
 		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS));
@@ -646,7 +694,7 @@ final class PreferencesPanelXades extends JPanel {
 			try {
 				checkPreferences();
 
-				this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicyName());
+				this.currentPolicyValue.setText(this.xadesPolicyDlg.getSelectedPolicyName());
 				final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 
 				if (xadesPolicy != null) {

@@ -15,6 +15,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -25,7 +26,8 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 
-final class ProtocolInvocationUriParserUtil {
+/** Utilidades para en an&aacute;lisis de URL de invocaci&oacute;n por protocolo. */
+public final class ProtocolInvocationUriParserUtil {
 
 	static final String DEFAULT_URL_ENCODING = StandardCharsets.UTF_8.name();
 
@@ -86,7 +88,7 @@ final class ProtocolInvocationUriParserUtil {
 	 * @param xml XML con el listado de par&aacute;metros.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor
 	 * @throws ParameterException Cuando el XML de entrada no es v&acute;lido. */
-	static Map<String, String> parseXml(final byte[] xml) throws ParameterException {
+	public static Map<String, String> parseXml(final byte[] xml) throws ParameterException {
 		final Map<String, String> params = new HashMap<>();
 		final NodeList elems;
 
@@ -123,6 +125,7 @@ final class ProtocolInvocationUriParserUtil {
 				params.put(keyNode.getNodeValue(), URLDecoder.decode(valueNode.getNodeValue(), DEFAULT_URL_ENCODING));
 			}
 			catch (final UnsupportedEncodingException e) {
+				Logger.getLogger("es.gob.afirma").warning("Codificacion no soportada para la URL (" + DEFAULT_URL_ENCODING + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				params.put(keyNode.getNodeValue(), valueNode.getNodeValue());
 			}
 		}

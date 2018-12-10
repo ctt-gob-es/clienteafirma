@@ -355,11 +355,11 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	signConfig.setSignatureFile(signatureFile);
 
-            this.resultViewer.showResultsInfo(
-        		signResult,
-        		signConfig,
-        		(X509Certificate) pke.getCertificate()
-    		);
+        	this.resultViewer.showResultsInfo(
+        			signResult,
+        			signConfig,
+        			(X509Certificate) pke.getCertificate()
+	    		);
         }
         else {
         	this.signExecutor.finishTask();
@@ -497,6 +497,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		);
     	dialog.show();
     	this.ksm.setParentComponent(this.parent);
+
     	return this.ksm.getKeyEntry(dialog.getSelectedAlias());
 	}
 

@@ -42,7 +42,7 @@ public final class AutoFirmaUtil {
 	);
 
 	/** Obtiene el icono por defecto para los di&aacute;logos gr&aacute;fcos.
-	 * @return Icono por defecto para los di&aacute;logos gr&aacute;fcos. */
+	 * @return Icono por defecto para los di&aacute;logos gr&aacute;ficos. */
 	public static Image getDefaultDialogsIcon() {
 		return ICON;
 	}

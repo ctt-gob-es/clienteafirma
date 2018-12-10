@@ -18,13 +18,17 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +38,12 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -48,7 +54,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
-final class PreferencesPanelCades extends JPanel {
+final class PreferencesPanelCades extends JScrollPane {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -74,9 +80,9 @@ final class PreferencesPanelCades extends JPanel {
 	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
 	 * el di&aacute;logo
 	 */
-	private JLabel policyLabel;
+	private JLabel currentPolicyValue;
 
-	private final JCheckBox cadesImplicit = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.1")); //$NON-NLS-1$
+	private final JCheckBox signatureMode = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.1")); //$NON-NLS-1$
 
 	private final JRadioButton optionCoSign = new JRadioButton(SimpleAfirmaMessages.getString("PreferencesPanel.168")); //$NON-NLS-1$
 	private final JRadioButton optionCounterSignLeafs = new JRadioButton(SimpleAfirmaMessages.getString("PreferencesPanel.169")); //$NON-NLS-1$
@@ -93,7 +99,7 @@ final class PreferencesPanelCades extends JPanel {
 	void createUI(final KeyListener keyListener,
 				  final ModificationListener modificationListener) {
 
-        setLayout(new GridBagLayout());
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -109,41 +115,40 @@ final class PreferencesPanelCades extends JPanel {
 
         ///////////// Panel Policy ////////////////
 
-        final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        final JPanel policyConfigPanel = createPolicyPanel();
 		policyConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.153")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.153") //$NON-NLS-1$
 			)
 		);
-
-		final JButton policyConfigButton = new JButton(
-			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
-		);
-
-		this.policyLabel = new JLabel(this.cadesPolicyDlg.getSelectedPolicyName());
-		this.policyLabel.setLabelFor(policyConfigButton);
-
-		policyConfigButton.setMnemonic('P');
-		policyConfigButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					changeCadesPolicyDlg(getParent());
-				}
-			}
-		);
-		policyConfigButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
-		);
-
-		policyConfigButton.setEnabled(!isBlocked());
-		policyConfigPanel.add(this.policyLabel);
-		policyConfigPanel.add(policyConfigButton);
 
         ///////////// Fin Panel Policy ////////////////
 
 		c.gridy++;
-        add(policyConfigPanel, c);
+		mainPanel.add(policyConfigPanel, c);
+
+		///////////// Inicio Panel Opciones de firma ////////////////
+
+	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
+	    final JPanel signatureOptionsPanel = new JPanel(fLayout);
+	    signatureOptionsPanel.setBorder(
+	    	BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanel.69") //$NON-NLS-1$
+			)
+		);
+	    this.signatureMode.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.45") //$NON-NLS-1$
+		);
+	    this.signatureMode.setMnemonic('i');
+	    this.signatureMode.addItemListener(modificationListener);
+	    this.signatureMode.addKeyListener(keyListener);
+	    this.signatureMode.setEnabled(!isBlocked());
+	    signatureOptionsPanel.add(this.signatureMode);
+
+	    ///////////// Fin Panel Opciones de firma ////////////////
+
+	    c.gridy++;
+	    mainPanel.add(signatureOptionsPanel, c);
 
         ///////////// Panel Multisign ////////////////
 
@@ -155,7 +160,7 @@ final class PreferencesPanelCades extends JPanel {
 
         multisignConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.167")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.167") //$NON-NLS-1$
 			)
 		);
 
@@ -187,30 +192,11 @@ final class PreferencesPanelCades extends JPanel {
         ///////////// Fin Panel Multisign ////////////////
 
 		c.gridy++;
-        add(multisignConfigPanel, c);
-
-	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
-	    final JPanel signatureMode = new JPanel(fLayout);
-	    signatureMode.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.69")) //$NON-NLS-1$
-			)
-		);
-	    this.cadesImplicit.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("PreferencesPanel.45") //$NON-NLS-1$
-		);
-	    this.cadesImplicit.setMnemonic('i');
-	    this.cadesImplicit.addItemListener(modificationListener);
-	    this.cadesImplicit.addKeyListener(keyListener);
-	    this.cadesImplicit.setEnabled(!isBlocked());
-	    signatureMode.add(this.cadesImplicit);
-
-	    c.gridy++;
-	    add(signatureMode, c);
+		mainPanel.add(multisignConfigPanel, c);
 
 	    c.gridy++;
 	    c.weighty = 1.0;
-	    add(new JPanel(), c);
+	    mainPanel.add(new JPanel(), c);
 
 		// Panel para el boton de restaurar la configuracion
 		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
@@ -241,8 +227,64 @@ final class PreferencesPanelCades extends JPanel {
 
 		c.gridy++;
 
-		add(panelGeneral, c);
+		mainPanel.add(panelGeneral, c);
 
+		setViewportView(mainPanel);
+	}
+
+	private JPanel createPolicyPanel() {
+
+		final JLabel currentPolicyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.171")); //$NON-NLS-1$
+		this.currentPolicyValue = new JLabel(this.cadesPolicyDlg.getSelectedPolicyName());
+		this.currentPolicyValue.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		this.currentPolicyValue.setFocusable(true);
+		this.currentPolicyValue.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+			}
+			@Override
+			public void focusGained(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
+			}
+		});
+		currentPolicyLabel.setLabelFor(this.currentPolicyValue);
+
+		final JButton policyConfigButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
+			);
+
+		policyConfigButton.setMnemonic('P');
+		policyConfigButton.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					changeCadesPolicyDlg(getParent());
+				}
+			}
+		);
+		policyConfigButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
+		);
+
+		policyConfigButton.setEnabled(!isBlocked());
+
+		final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = new Insets(0,  7,  4,  7);
+		c.gridx = 0;
+		innerPanel.add(currentPolicyLabel, c);
+		c.gridx = 1;
+		innerPanel.add(this.currentPolicyValue, c);
+		c.gridx = 2;
+		innerPanel.add(policyConfigButton, c);
+
+		policyConfigPanel.add(innerPanel);
+
+		return policyConfigPanel;
 	}
 
 	void checkPreferences() throws AOException {
@@ -262,7 +304,7 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void savePreferences() {
-		PreferencesManager.putBoolean(PREFERENCE_CADES_IMPLICIT, this.cadesImplicit.isSelected());
+		PreferencesManager.putBoolean(PREFERENCE_CADES_IMPLICIT, this.signatureMode.isSelected());
 		final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
 		if (cadesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
@@ -290,7 +332,7 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.cadesImplicit.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
+		this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
 
         final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -317,7 +359,7 @@ final class PreferencesPanelCades extends JPanel {
 
 	void loadDefaultPreferences() {
 
-		this.cadesImplicit.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_IMPLICIT));
+		this.signatureMode.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_IMPLICIT));
 
 		final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -334,7 +376,7 @@ final class PreferencesPanelCades extends JPanel {
         		isBlocked()
     		);
 
-		this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicyName());
+		this.currentPolicyValue.setText(this.cadesPolicyDlg.getSelectedPolicyName());
 
 		this.optionCoSign.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COSIGN));
 		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS));
@@ -442,7 +484,7 @@ final class PreferencesPanelCades extends JPanel {
 			try {
 				checkPreferences();
 
-				this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicyName());
+				this.currentPolicyValue.setText(this.cadesPolicyDlg.getSelectedPolicyName());
 
 				final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
 				if (cadesPolicy != null) {

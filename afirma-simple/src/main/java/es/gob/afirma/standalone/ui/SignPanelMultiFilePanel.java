@@ -22,6 +22,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.logging.Level;
@@ -64,6 +66,12 @@ final class SignPanelMultiFilePanel extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new GridBagLayout());
 
+        final FileOperationTitleRenderer titlePanel = new FileOperationTitleRenderer();
+        titlePanel.setFileNameColumnTitle("Fichero");
+        titlePanel.setSignatureFormatColumnTitle("Formato");
+        titlePanel.setSizeColumnTitle("Tama\u00F1o");
+        titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, Color.black));
+
         final JList<SignOperationConfig> fileList =
         		new JList<>(operations.toArray(new SignOperationConfig[operations.size()]));
         fileList.setCellRenderer(new FileOperationCellRenderer());
@@ -100,6 +108,7 @@ final class SignPanelMultiFilePanel extends JPanel {
 		});
 
         final JScrollPane scrollPane = new JScrollPane(fileList);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -113,7 +122,10 @@ final class SignPanelMultiFilePanel extends JPanel {
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
+        c.gridy = 0;
+        this.add(titlePanel, c);
         c.weighty = 1.0;
+        c.gridy++;
         this.add(scrollPane, c);
     }
 
@@ -140,6 +152,68 @@ final class SignPanelMultiFilePanel extends JPanel {
 		}
     }
 
+    /**
+     * Panel de t&iacute;tulo de las columnas del listado de ficheros.
+     */
+    class FileOperationTitleRenderer extends JPanel {
+
+    	/** Serial Id. */
+		private static final long serialVersionUID = -8317461712461916374L;
+
+    	private final JLabel fileNameLabel;
+    	private final JLabel sizeLabel;
+    	private final JLabel formatNameLabel;
+
+    	public FileOperationTitleRenderer() {
+
+    		this.fileNameLabel = new JLabel();
+
+    		this.formatNameLabel = new JLabel();
+    		this.formatNameLabel.setPreferredSize(new Dimension(120, 14));
+
+    		this.sizeLabel = new JLabel();
+    		this.sizeLabel.setPreferredSize(new Dimension(60, 14));
+
+    		// Establecemos la configuracion de color
+    		Color bgColor = Color.WHITE;
+    		// Configuramos los colores
+    		if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+    			bgColor = LookAndFeelManager.WINDOW_COLOR;
+    		}
+
+    		setBackground(bgColor);
+
+    		setLayout(new GridBagLayout());
+
+    		final GridBagConstraints c = new GridBagConstraints();
+    		c.fill = GridBagConstraints.HORIZONTAL;
+    		c.insets = new Insets(3, 11, 3, 0);
+
+    		c.gridx = 0;
+    		c.weightx = 1.0;
+    		add(this.fileNameLabel, c);
+
+    		c.weightx = 0;
+
+    		c.gridx++;
+    		add(this.formatNameLabel, c);
+    		c.gridx++;
+    		add(this.sizeLabel, c);
+    	}
+
+    	void setFileNameColumnTitle(String title) {
+    		this.fileNameLabel.setText(title);
+    	}
+
+    	void setSignatureFormatColumnTitle(String title) {
+    		this.formatNameLabel.setText(title);
+    	}
+
+    	void setSizeColumnTitle(String title) {
+    		this.sizeLabel.setText(title);
+    	}
+    }
+
     class FileOperationCellRenderer extends JPanel
     								implements ListCellRenderer<SignOperationConfig> {
 
@@ -153,7 +227,8 @@ final class SignPanelMultiFilePanel extends JPanel {
     	private final JLabel sizeLabel;
     	private final JLabel formatNameLabel;
 
-    	private final NumberFormat formatter;
+    	private final NumberFormat kbFormatter;
+    	private final DecimalFormat mbFormatter;
 
     	private final Border focusedBorder;
     	private final Border unfocusedBorder;
@@ -175,7 +250,10 @@ final class SignPanelMultiFilePanel extends JPanel {
 			this.sizeLabel = new JLabel();
 			this.sizeLabel.setPreferredSize(new Dimension(60, 32));
 
-			this.formatter = NumberFormat.getNumberInstance();
+			this.kbFormatter = NumberFormat.getNumberInstance();
+
+			this.mbFormatter = new DecimalFormat("#.#"); //$NON-NLS-1$
+			this.mbFormatter.setRoundingMode(RoundingMode.CEILING);
 
 			this.focusedBorder = BorderFactory.createDashedBorder(Color.GRAY);
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
@@ -263,7 +341,11 @@ final class SignPanelMultiFilePanel extends JPanel {
 			if (size < 1024) {
 				return "1 KB"; //$NON-NLS-1$
 			}
-			return this.formatter.format(size / 1024) + " KB"; //$NON-NLS-1$
+			if (size < 1024 * 1000) { // Con 1000Kb o menos, lo  expresamos en kilobytes
+				return this.kbFormatter.format(size / 1024) + " KB"; //$NON-NLS-1$
+			}
+
+			return this.mbFormatter.format(size / (1024 * 1024)) + " MB"; //$NON-NLS-1$
 		}
     }
 }

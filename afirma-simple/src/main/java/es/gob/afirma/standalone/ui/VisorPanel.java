@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -69,6 +70,11 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     /** Version ID. */
     private static final long serialVersionUID = 8309157734617505338L;
 
+	/** Anchura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int DEFAULT_WINDOW_WIDTH = 600;
+	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int DEFAULT_WINDOW_HEIGHT = 540;
+
     private final VisorFirma visorFirma;
 
     /** Panel principal en el que se muestran los botones de los plugins. */
@@ -104,6 +110,8 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
         }
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        setPreferredSize(new Dimension(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 
         openSign(signFile, sign, addReloadButton);
     }

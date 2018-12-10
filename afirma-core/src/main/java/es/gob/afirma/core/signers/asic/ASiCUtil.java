@@ -12,6 +12,7 @@ package es.gob.afirma.core.signers.asic;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -35,6 +36,8 @@ public final class ASiCUtil {
 
 	private static final String ENTRY_NAME_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private ASiCUtil() {
 		// No instanciable
 	}
@@ -43,7 +46,13 @@ public final class ASiCUtil {
 	 * @param data Contenido del objeto de datos.
 	 * @return Nombre por defecto del objeto de datos dentro de un contenedor ASiC-S. */
 	public static String getASiCSDefaultDataFilename(final byte[] data) {
-		final String extension = new MimeHelper(data).getExtension();
+		String extension;
+		try {
+			extension = new MimeHelper(data).getExtension();
+		} catch (final IOException e) {
+			LOGGER.warning("No se pudieron cargar los datos para su analisis: " + e); //$NON-NLS-1$
+			extension = null;
+		}
 		return "dataobject." + (extension != null && !extension.isEmpty() ? extension : DEFAULT_DATAOBJECT_EXTENSION); //$NON-NLS-1$
 	}
 

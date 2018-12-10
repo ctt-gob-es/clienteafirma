@@ -20,11 +20,17 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_STAMP;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +42,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.ietf.jgss.GSSException;
@@ -52,7 +60,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
-final class PreferencesPanelPades extends JPanel {
+final class PreferencesPanelPades extends JScrollPane {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -64,7 +72,7 @@ final class PreferencesPanelPades extends JPanel {
 	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
 	 * el di&aacute;logo.
 	 */
-	private JLabel policyLabel;
+	private JLabel currentPolicyValue;
 
 	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
 		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
@@ -90,7 +98,7 @@ final class PreferencesPanelPades extends JPanel {
 	private final JTextField padesSignerContact = new JTextField();
 
 	private final JCheckBox visiblePdfSignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.79")); //$NON-NLS-1$
-	private final JCheckBox visiblePdfStamp = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.171")); //$NON-NLS-1$
+	private final JCheckBox visiblePdfStamp = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.172")); //$NON-NLS-1$
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
@@ -108,7 +116,7 @@ final class PreferencesPanelPades extends JPanel {
 	void createUI(final KeyListener keyListener,
 				  final ModificationListener modificationListener) {
 
-		setLayout(new GridBagLayout());
+		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -130,7 +138,14 @@ final class PreferencesPanelPades extends JPanel {
 		this.padesBasicFormat.addKeyListener(keyListener);
 		this.padesBasicFormat.setEnabled(!isBlocked());
 
-        loadPreferences();
+		this.visiblePdfSignature.setMnemonic('i');
+		this.visiblePdfSignature.addItemListener(modificationListener);
+		this.visiblePdfSignature.addKeyListener(keyListener);
+		this.visiblePdfStamp.addItemListener(modificationListener);
+    	this.visiblePdfStamp.addKeyListener(keyListener);
+    	
+		// Una vez creados todos los componentes, cargamos la configuracion
+		loadPreferences();
 
         loadPadesPolicy();
 
@@ -148,41 +163,35 @@ final class PreferencesPanelPades extends JPanel {
 
         ///////////// Panel Policy ////////////////
 
-        final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        final JPanel policyConfigPanel = createPolicyPanel();
 		policyConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.153")) //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.153") //$NON-NLS-1$
 			)
 		);
-
-		final JButton policyConfigButton = new JButton(
-			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
-		);
-
-		policyConfigButton.setMnemonic('P');
-		policyConfigButton.addActionListener(
-			ae -> changePadesPolicyDlg(getParent())
-		);
-		policyConfigButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
-		);
-
-		this.policyLabel = new JLabel(this.padesPolicyDlg.getSelectedPolicyName());
-		this.policyLabel.setLabelFor(policyConfigButton);
-
-		policyConfigButton.setEnabled(!isBlocked());
-		policyConfigPanel.add(this.policyLabel);
-		policyConfigPanel.add(policyConfigButton);
-
         ///////////// Fin Panel Policy ////////////////
 
         gbc.gridy++;
+        mainPanel.add(policyConfigPanel, gbc);
 
-        add(policyConfigPanel, gbc);
+        ///////////// Inicio Panel Opciones de firma ////////////////
+	    final JPanel signatureOptionsPanel = createSignatureOptionsPanel();
+	    signatureOptionsPanel.setBorder(
+	    	BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanel.69") //$NON-NLS-1$
+			)
+		);
+	    ///////////// Fin Panel Opciones de firma ////////////////
 
+	    gbc.gridy++;
+		mainPanel.add(signatureOptionsPanel, gbc);
+
+		///////////// Inicio Panel Metadatos ////////////////
 	    final JPanel metadataPanel = new JPanel();
-        metadataPanel.setBorder(BorderFactory.createTitledBorder(
-    		SimpleAfirmaMessages.getString("PreferencesPanel.19")) //$NON-NLS-1$
+	    metadataPanel.setBorder(
+    		BorderFactory.createTitledBorder(
+    			SimpleAfirmaMessages.getString("PreferencesPanel.19") //$NON-NLS-1$
+			)
 		);
         metadataPanel.setLayout(new GridBagLayout());
 
@@ -233,55 +242,13 @@ final class PreferencesPanelPades extends JPanel {
 	    metadataPanel.add(new JPanel(), c);
 
 	    gbc.gridy++;
+	    mainPanel.add(metadataPanel, gbc);
 
-	    add(metadataPanel, gbc);
+	    ///////////// Fin Panel Metadatos ////////////////
 
-		final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
-		final JPanel padesPreferencesPanel = new JPanel(fLayout);
-		padesPreferencesPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.69")) //$NON-NLS-1$
-			)
-		);
-
-		final JPanel panelFirm = new JPanel();
-		panelFirm.setBorder(
-    		BorderFactory.createEmptyBorder()
-
-		);
-		panelFirm.setLayout(new GridBagLayout());
-
-        final GridBagConstraints cf = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 1.0;
-
-		final JLabel fileFormatLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanel.115") //$NON-NLS-1$
-		);
-		fileFormatLabel.addKeyListener(keyListener);
-
-		cf.anchor = GridBagConstraints.LINE_START;
-		panelFirm.add(fileFormatLabel, cf);
-		cf.gridy = 1;
-		panelFirm.add(this.padesBasicFormat, cf);
-		cf.gridy = 0;
-
-		padesPreferencesPanel.setLayout(new GridBagLayout());
-		final GridBagConstraints fc = new GridBagConstraints();
-		fc.weightx = 1.0;
-		fc.anchor = GridBagConstraints.LINE_START;
-
-		padesPreferencesPanel.add(panelFirm, fc);
-		padesPreferencesPanel.add(createVisiblePdfPanel(keyListener, modificationListener), fc);
-
-		gbc.gridy++;
-		add(padesPreferencesPanel, gbc);
-
-	    gbc.gridy++;
-	    gbc.gridy++;
 	    gbc.gridy++;
 	    gbc.weighty = 1.0;
-	    add(new JPanel(), gbc); // Panel de relleno
+	    mainPanel.add(new JPanel(), gbc); // Panel de relleno
 
 	    // Panel para el boton de restaurar la configuracion
 	 	final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
@@ -295,7 +262,6 @@ final class PreferencesPanelPades extends JPanel {
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
 				loadDefaultPreferences();
-
 			}
 		});
 	 	restoreConfigButton.getAccessibleContext().setAccessibleDescription(
@@ -306,40 +272,96 @@ final class PreferencesPanelPades extends JPanel {
 		panelGeneral.add(restoreConfigButton, gbc);
 
 	   	gbc.gridy++;
+		mainPanel.add(panelGeneral, gbc);
 
-		add(panelGeneral, gbc);
+		setViewportView(mainPanel);
 	}
 
-	private JPanel createVisiblePdfPanel(final KeyListener keyListener, final ModificationListener modificationListener) {
-		final JPanel panel = new JPanel();
-        panel.setBorder(
-    		BorderFactory.createEmptyBorder()
+	private JPanel createPolicyPanel() {
 
+		final JLabel currentPolicyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.171")); //$NON-NLS-1$
+		this.currentPolicyValue = new JLabel(this.padesPolicyDlg.getSelectedPolicyName());
+		this.currentPolicyValue.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		this.currentPolicyValue.setFocusable(true);
+		this.currentPolicyValue.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+			}
+			@Override
+			public void focusGained(FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
+			}
+		});
+		currentPolicyLabel.setLabelFor(this.currentPolicyValue);
+
+		final JButton policyConfigButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
+			);
+
+		policyConfigButton.setMnemonic('P');
+		policyConfigButton.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					changePadesPolicyDlg(getParent());
+				}
+			}
 		);
-        panel.setLayout(new GridBagLayout());
-
-        final GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 1.0;
-
-    	final JLabel visiblePdfSignatureLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanel.80") //$NON-NLS-1$
+		policyConfigButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
 		);
-    	visiblePdfSignatureLabel.setLabelFor(this.visiblePdfSignature);
-        this.visiblePdfSignature.setMnemonic('i');
-        panel.add(visiblePdfSignatureLabel, c);
-        c.gridy = 1;
-        panel.add(this.visiblePdfSignature, c);
-        c.gridy = 2;
-        panel.add(this.visiblePdfStamp, c);
 
+		policyConfigButton.setEnabled(!isBlocked());
 
-    	this.visiblePdfSignature.addItemListener(modificationListener);
-    	this.visiblePdfSignature.addKeyListener(keyListener);
-    	this.visiblePdfStamp.addItemListener(modificationListener);
-    	this.visiblePdfStamp.addKeyListener(keyListener);
+		final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
 
-        return panel;
+		final GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = new Insets(0,  7,  4,  7);
+		c.gridx = 0;
+		innerPanel.add(currentPolicyLabel, c);
+		c.gridx = 1;
+		innerPanel.add(this.currentPolicyValue, c);
+		c.gridx = 2;
+		innerPanel.add(policyConfigButton, c);
+
+		policyConfigPanel.add(innerPanel);
+
+		return policyConfigPanel;
+	}
+
+	private JPanel createSignatureOptionsPanel() {
+
+		// Creamos un panel interior con los componentes locales
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
+
+		final JLabel fileFormatLabel = new JLabel(
+				SimpleAfirmaMessages.getString("PreferencesPanel.115") //$NON-NLS-1$
+		);
+		fileFormatLabel.setLabelFor(this.padesBasicFormat);
+
+		// Colocamos los elementos
+		final GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.LINE_START;
+		c.insets = new Insets(0, 7, 4, 7);
+		c.gridx = 0;
+		c.gridy = 0;
+		innerPanel.add(fileFormatLabel, c);
+		c.gridx = 1;
+		innerPanel.add(this.padesBasicFormat, c);
+		c.gridx = 0;
+		c.gridy++;
+		c.gridwidth = 2;
+		innerPanel.add(this.visiblePdfSignature, c);
+		c.gridy++;
+		innerPanel.add(this.visiblePdfStamp, c);
+
+		final JPanel signatureOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		signatureOptionsPanel.add(innerPanel);
+
+		return signatureOptionsPanel;
 	}
 
 	void checkPreferences() throws AOException {
@@ -490,7 +512,7 @@ final class PreferencesPanelPades extends JPanel {
     		isBlocked()
 		);
 
-		this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicyName());
+		this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
 
         revalidate();
         repaint();
@@ -607,7 +629,7 @@ final class PreferencesPanelPades extends JPanel {
 			try {
 				checkPreferences();
 
-				this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicyName());
+				this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
 				final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 
 				if (padesPolicy != null) {

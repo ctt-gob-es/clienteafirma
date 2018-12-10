@@ -1062,11 +1062,14 @@ var MiniApplet = ( function ( window, undefined ) {
 		function openUrl (url) {
 			
 			// Usamos el modo de invocacion mas apropiado segun el entorno
+			
+			// Redireccion del navegador
 			if (isChrome() || isIOS()) {
 				// Usamos document.location porque tiene mejor soporte por los navegadores que
 				// window.location que es el mecanismo estandar
 				document.location = url;
 			}
+			// Apertura de un IFrame
 			else {
 
 				// Si ya existe el iframe, lo eliminamos para despues volverlo a crear 

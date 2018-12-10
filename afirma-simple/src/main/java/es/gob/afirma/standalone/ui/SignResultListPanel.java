@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -46,6 +47,11 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
 	private static final long serialVersionUID = 1896328450345342947L;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	/** Anchura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int DEFAULT_WINDOW_WIDTH = 600;
+	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
+	private static final int DEFAULT_WINDOW_HEIGHT = 540;
 
 	/** Referencia a la aplicaci&oacute;n de firma. */
     private final SimpleAfirma saf;
@@ -84,6 +90,8 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
      * @param signValidity Validez de la firma. */
     private void createUI(final List<SignOperationConfig> signConfigList, final File outDir,
                           final X509Certificate signingCert) {
+
+    	setPreferredSize(new Dimension(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 
     	// Recorremos el listado para comprobar el estado de las firmas. Si todas estan bien,
     	// se mostrara el resultado de todo correcto; si hay alguna que haya fallado, no

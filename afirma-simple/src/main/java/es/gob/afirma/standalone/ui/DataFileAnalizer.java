@@ -76,8 +76,16 @@ public class DataFileAnalizer {
 		final MimeHelper mimeHelper = new MimeHelper(data);
 
 		final DataFileInfo info = new DataFileInfo();
-		info.setExtension(mimeHelper.getExtension());
-		info.setDescription(mimeHelper.getDescription());
+		try {
+			info.setExtension(mimeHelper.getExtension());
+		} catch (final IOException e) {
+			LOGGER.warning("No se pudo analizar el tipo de datos para identificar la extension: " + e); //$NON-NLS-1$
+		}
+		try {
+			info.setDescription(mimeHelper.getDescription());
+		} catch (final IOException e) {
+			LOGGER.warning("No se pudo analizar el tipo de datos para identificar la descripcion: " + e); //$NON-NLS-1$
+		}
 		info.setSize(data.length);
 		try {
 			info.setIcon(FileIconProvider.getIcon(info.getExtension()));

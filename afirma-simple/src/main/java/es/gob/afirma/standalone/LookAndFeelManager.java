@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.logging.Logger;
 
@@ -43,12 +44,14 @@ public final class LookAndFeelManager {
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     private static final boolean LARGE_FONT;
 
+    private static Dimension screenSize = null;
+
     static {
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
         }
-        // En Linux usmos siempre una configuracion como si se usase combinacion de colores
+        // En Linux usamos siempre la misma configuracion que al detectar la combinacion de colores
         // de alto contraste
         else if (Platform.OS.LINUX.equals(Platform.getOS())) {
             HIGH_CONTRAST = true;
@@ -61,7 +64,7 @@ public final class LookAndFeelManager {
         if (defaultFontHeight instanceof Integer) {
            LARGE_FONT = ((Integer) defaultFontHeight).intValue() > LARGE_FONT_LIMIT;
         }
-        // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande
+        // En Linux usamos siempre la misma configuracion que al detectar un tamano de fuente grande
         else if (Platform.OS.LINUX.equals(Platform.getOS())) {
             LARGE_FONT = true;
         }
@@ -140,4 +143,23 @@ public final class LookAndFeelManager {
              );
          }
     }
+
+    /**
+     * Obtiene el tama&ntilde;o de pantalla.
+     * @return Tama&ntilde;o de pantalla.
+     */
+    public static Dimension getScreenSize() {
+    	if (screenSize == null) {
+    		screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	}
+    	return screenSize;
+    }
+
+	/**
+	 * Indica si es necesario maximizar las ventanas para asegurar una buena visualizaci&oacute;n.
+	 * @return {@code true} si se debe maximizar la pantalla, {@code false} en caso contrario.
+	 */
+	public static boolean needMaximizeWindow() {
+		return getScreenSize().height <= 600;
+	}
 }
