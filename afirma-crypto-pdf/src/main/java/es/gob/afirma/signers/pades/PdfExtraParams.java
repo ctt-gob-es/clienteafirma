@@ -49,13 +49,13 @@ public final class PdfExtraParams {
      * por lo que no se recomienda permitirlo.
      * Si no se establece o se establece a <code>false</code>, al intentar firmar un PDF que contenga firmas no registradas
      * se lanza una excepci&oacute;n de tipo<code> PdfHasUnregisteredSignaturesException</code>. */
-    static final String ALLOW_COSIGNING_UNREGISTERED_SIGNATURES = "allowCosigningUnregisteredSignatures";//$NON-NLS-1$
+    public static final String ALLOW_COSIGNING_UNREGISTERED_SIGNATURES = "allowCosigningUnregisteredSignatures";//$NON-NLS-1$
 
     /** Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma.
      * Si no se indica este par&aacute;metro por defecto se usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
      * Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar
      * que al a&ntilde;adir firmas adicionales al PDF se invaliden las ya existentes. */
-    static final String SIGNATURE_SUBFILTER = "signatureSubFilter";//$NON-NLS-1$
+    public static final String SIGNATURE_SUBFILTER = "signatureSubFilter";//$NON-NLS-1$
 
     /** Si se establece a <code>false</code> no se comprime el PDF resultante. Si no se establece o se establece a
      * cualquier otro valor distinto de <code>false</code>, el PDF de salida (firmado) se comprime para que ocupe
@@ -77,28 +77,28 @@ public final class PdfExtraParams {
      * La imagen debe proporcionarse en formato JPEG codificado en Base64.
      * Si el documento ya contiene firmas es posible que se invaliden, por lo que conviene usarlo
      * &uacute;nicamente en documentos sin firmas previas. */
-    static final String IMAGE = "image";//$NON-NLS-1$
+    public static final String IMAGE = "image";//$NON-NLS-1$
 
     /** P&aacute;gina donde desea insertarse la imagen indicada mediante el par&aacute;metro <code>image</code>.
      * La numeraci&oacute;n de las p&aacute;ginas comienza en uno.<br>
      * Si se indica <i>-1</i> como n&uacute;mero de p&aacute;gina se inserta la imagen en la &uacute;ltima p&aacute;gina del documento.
      * Si se indica <i>0</i> como n&uacute;mero de p&aacute;gina se inserta la imagen en todas las p&aacute;ginas del documento.
      * Este par&aacute;metro es obligatorio, si no se indica una p&aacute;gina v&aacute;lida no se insertar&aacute; la imagen. */
-    static final String IMAGE_PAGE = "imagePage";//$NON-NLS-1$
+    public static final String IMAGE_PAGE = "imagePage";//$NON-NLS-1$
 
     /** Coordenada horizontal inferior izquierda de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro
      * <code>image</code>) dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftY</code>,
      * <code>imagePositionOnPageUpperRightX</code> e <code>imagePositionOnPageUpperRightY</code>.<br>
      * Es necesario indicar tambi&eacute;n una p&aacute;gina de inserci&oacute;n en el par&aacute;metro <code>imagePage</code>. */
-    static final String IMAGE_POSITION_ON_PAGE_LOWER_LEFTX = "imagePositionOnPageLowerLeftX";//$NON-NLS-1$
+    public static final String IMAGE_POSITION_ON_PAGE_LOWER_LEFTX = "imagePositionOnPageLowerLeftX";//$NON-NLS-1$
 
     /** Coordenada vertical inferior izquierda de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro
      * <code>image</code>) dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftX</code>,
      * <code>imagePositionOnPageUpperRightX</code> e <code>imagePositionOnPageUpperRightY</code>.<br>
      * Es necesario indicar tambi&eacute;n una p&aacute;gina de inserci&oacute;n en el par&aacute;metro <code>imagePage</code>. */
-    static final String IMAGE_POSITION_ON_PAGE_LOWER_LEFTY = "imagePositionOnPageLowerLeftY";//$NON-NLS-1$
+    public static final String IMAGE_POSITION_ON_PAGE_LOWER_LEFTY = "imagePositionOnPageLowerLeftY";//$NON-NLS-1$
 
 
     /** Coordenada horizontal superior derecha de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro
@@ -106,14 +106,14 @@ public final class PdfExtraParams {
      * Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftX</code>,
      * <code>imagePositionOnPageLowerLeftY</code> e <code>imagePositionOnPageUpperRightY</code>.<br>
      * Es necesario indicar tambi&eacute;n una p&aacute;gina de inserci&oacute;n en el par&aacute;metro <code>imagePage</code>. */
-    static final String IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX = "imagePositionOnPageUpperRightX";//$NON-NLS-1$
+    public static final String IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX = "imagePositionOnPageUpperRightX";//$NON-NLS-1$
 
     /** Coordenada vertical superior derecha de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro
      * <code>image</code>) dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftX</code>,
      * <code>imagePositionOnPageLowerLeftY</code> e <code>imagePositionOnPageUpperRightX</code>.<br>
      * Es necesario indicar tambi&eacute;n una p&aacute;gina de inserci&oacute;n en el par&aacute;metro <code>imagePage</code>. */
-    static final String IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY = "imagePositionOnPageUpperRightY";//$NON-NLS-1$
+    public static final String IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY = "imagePositionOnPageUpperRightY";//$NON-NLS-1$
 
     /** Contenido a a&ntilde;adir como adjunto al PDF, en formato Base64 (el adjunto ser&aacute; el binario decodificado).
      * Este par&aacute;metro requiere que se haya establecido tambi&eacute;n el par&aacute;metro <code>attachFileName</code>. */
@@ -194,7 +194,7 @@ public final class PdfExtraParams {
     public static final String SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY = "signaturePositionOnPageUpperRightY";//$NON-NLS-1$
 
     /** Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF. */
-    static final String SIGNATURE_RUBRIC_IMAGE = "signatureRubricImage";//$NON-NLS-1$
+    public static final String SIGNATURE_RUBRIC_IMAGE = "signatureRubricImage";//$NON-NLS-1$
 
     /** <p>
      Texto a escribir dentro de la "capa 2" de la firma visible.<br>
@@ -236,7 +236,7 @@ public final class PdfExtraParams {
      As&iacute;, por ejemplo, el texto "<code>Firmado por $$SUBJECTCN$$ el d&iacute;a $$SIGNDATE=dd/MM/yyyy$$.</code>" resultar&aacute; finalmente
      en el PDF como "<code>Firmado por Tom&aacute;s Garc&iacute;a-Mer&aacute;s el d&iacute;a 04/01/2016.</code>" suponiendo que el CN del titular del certificado
      de firma es <code>Tom&aacute;s Garc&iacute;a-Mer&aacute;s</code> y que la firma se realiza el 04/01/2016. */
-    static final String LAYER2_TEXT = "layer2Text";//$NON-NLS-1$
+    public static final String LAYER2_TEXT = "layer2Text";//$NON-NLS-1$
 
     /** Tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido tambi&eacute;n
      * el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
@@ -247,11 +247,11 @@ public final class PdfExtraParams {
      *  <li><i>3</i> = Symbol</li>
      *  <li><i>4</i> = ZapfDingBats</li>
      * </ul> */
-    static final String LAYER2_FONTFAMILY = "layer2FontFamily";//$NON-NLS-1$
+    public static final String LAYER2_FONTFAMILY = "layer2FontFamily";//$NON-NLS-1$
 
     /** Tama&ntilde;o de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
     tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos (y el valor por defecto es 12). */
-    static final String LAYER2_FONTSIZE = "layer2FontSize";//$NON-NLS-1$
+    public static final String LAYER2_FONTSIZE = "layer2FontSize";//$NON-NLS-1$
 
     /** Estilo del tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
      * tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
@@ -264,7 +264,7 @@ public final class PdfExtraParams {
      *  <li><i>8</i> = Tachado</li>
      * </ul>
      * Es posible combinar estilos aplicando la operaci&oacute;n l&oacute;gica <cite>o</cite> sobre los valores num&eacute;ricos a combinar. */
-    static final String LAYER2_FONTSTYLE  = "layer2FontStyle";//$NON-NLS-1$
+    public static final String LAYER2_FONTSTYLE  = "layer2FontStyle";//$NON-NLS-1$
 
     /** Color del texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
      * tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son textuales (se ignora entre may&uacute;sculas
@@ -278,17 +278,17 @@ public final class PdfExtraParams {
      *  <li><i>red</i> = Rojo</li>
      *  <li><i>pink</i> = Rosa</li>
      * </ul> */
-    static final String LAYER2_FONTCOLOR = "layer2FontColor";//$NON-NLS-1$
+    public static final String LAYER2_FONTCOLOR = "layer2FontColor";//$NON-NLS-1$
 
     /** Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma). */
-    static final String SIGN_REASON = "signReason";//$NON-NLS-1$
+    public static final String SIGN_REASON = "signReason";//$NON-NLS-1$
 
     /** Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma). */
-    static final String SIGNATURE_PRODUCTION_CITY  = "signatureProductionCity";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_CITY  = "signatureProductionCity";//$NON-NLS-1$
 
     /** Contacto del firmante, usualmente una direcci&oacute;n de correo electr&oacute;nico (este dato se a&ntilde;ade al
      * diccionario PDF, y no a la propia firma). */
-    static final String SIGNER_CONTACT = "signerContact";//$NON-NLS-1$
+    public static final String SIGNER_CONTACT = "signerContact";//$NON-NLS-1$
 
     /** Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID)
      * que identifique un&iacute;vocamente la pol&iacute;tica en formato ASN.1 procesable.

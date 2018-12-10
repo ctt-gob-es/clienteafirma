@@ -304,14 +304,11 @@ public final class MimeHelper {
      */
     private static String verifyDescription(String mimeType) {
 
-    	if (DEFAULT_MIMETYPE.equals(mimeType)) {
-    		return DEFAULT_CONTENT_DESCRIPTION;
-    	}
     	if (XML_MIMETYPE.equals(mimeType)) {
     		return XML_DESCRIPTION;
     	}
 
-    	if (mimeType != null) {
+    	if (mimeType != null && !mimeType.equals(DEFAULT_MIMETYPE)) {
     		final String desc = OfficeAnalizer.getDescription(mimeType);
     		if (desc != null) {
     			return desc;

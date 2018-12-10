@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
@@ -160,22 +161,22 @@ final class ExtraParamsHelper {
         // Metadatos PAdES
         final String signReason = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_SIGN_REASON);
         if (signReason != null && !signReason.trim().isEmpty()) {
-        	p.put("signReason", signReason); //$NON-NLS-1$
+        	p.put(PdfExtraParams.SIGN_REASON, signReason);
         }
         final String productionCity = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
         if (productionCity != null && !productionCity.trim().isEmpty()) {
-        	p.put("signatureProductionCity", productionCity); //$NON-NLS-1$
+        	p.put(PdfExtraParams.SIGNATURE_PRODUCTION_CITY, productionCity);
         }
 
         final String contact = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT);
         if (contact != null && !contact.trim().isEmpty()) {
-        	p.put("signerContact", contact); //$NON-NLS-1$
+        	p.put(PdfExtraParams.SIGNER_CONTACT, contact);
         }
 
         // PAdES BES/Basic
         final String subfilter = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_FORMAT);
         if (subfilter != null && !subfilter.trim().isEmpty()) {
-        	p.put("signatureSubFilter", subfilter); //$NON-NLS-1$
+        	p.put(PdfExtraParams.SIGNATURE_SUBFILTER, subfilter);
         }
 		return p;
 	}

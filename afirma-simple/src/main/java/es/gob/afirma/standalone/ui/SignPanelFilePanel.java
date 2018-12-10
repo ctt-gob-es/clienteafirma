@@ -184,7 +184,7 @@ final class SignPanelFilePanel extends JPanel {
             	this.pdfStamp.setSelected(false);
             	this.pdfStamp.setEnabled(false);
                 detailPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-                detailPanel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121")));
+                detailPanel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121"))); //$NON-NLS-1$
             }
         }
 

@@ -11,8 +11,10 @@ package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -127,6 +129,14 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 
+		final Toolkit toolkit = Toolkit.getDefaultToolkit();
+		if (toolkit != null) {
+			final int screenHeight = (int) toolkit.getScreenSize().getHeight();
+			if (this.certDialog.getSize().getHeight() > screenHeight) {
+				this.certDialog.setSize(
+						new Dimension((int) this.certDialog.getSize().getWidth(), screenHeight));
+			}
+		}
 		this.certDialog.setVisible(true);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);

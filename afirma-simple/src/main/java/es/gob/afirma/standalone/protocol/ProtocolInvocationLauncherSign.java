@@ -355,6 +355,7 @@ final class ProtocolInvocationLauncherSign {
 								CounterSignTarget.TREE : CounterSignTarget.LEAFS,
 						null, // Targets
 						pke.getPrivateKey(), pke.getCertificateChain(), options.getExtraParams());
+				break;
 			default:
 				LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);

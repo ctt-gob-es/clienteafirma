@@ -43,6 +43,7 @@ import javax.swing.border.Border;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 final class SignPanelMultiFilePanel extends JPanel {
 
@@ -67,9 +68,9 @@ final class SignPanelMultiFilePanel extends JPanel {
         setLayout(new GridBagLayout());
 
         final FileOperationTitleRenderer titlePanel = new FileOperationTitleRenderer();
-        titlePanel.setFileNameColumnTitle("Fichero");
-        titlePanel.setSignatureFormatColumnTitle("Formato");
-        titlePanel.setSizeColumnTitle("Tama\u00F1o");
+        titlePanel.setFileNameColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.43")); //$NON-NLS-1$
+        titlePanel.setSignatureFormatColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.44")); //$NON-NLS-1$
+        titlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.45")); //$NON-NLS-1$
         titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, Color.black));
 
         final JList<SignOperationConfig> fileList =

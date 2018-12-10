@@ -19,9 +19,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -39,19 +42,32 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 
-final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener, KeyListener, ActionListener {
+final class SignPdfUiPanel extends JPanel implements
+											PageLabel.PageLabelListener,
+											KeyListener,
+											FocusListener,
+											ActionListener,
+											DocumentListener {
 
 	private static final long serialVersionUID = 8109653789776305491L;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final int PREFERRED_WIDTH = 466;
-	private static final int PREFERRED_HEIGHT = 410;
+	private static final int PREFERRED_WIDTH = 470;
+	private static final int PREFERRED_HEIGHT = 600;
+	private static final int PAGEPANEL_PREFERRED_WIDTH = 466;
+	private static final int PAGEPANEL_PREFERRED_HEIGHT = 410;
 
 	static interface SignPdfUiPanelListener {
 		void positionSelected(final Properties extraParams);
@@ -82,10 +98,12 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	private final boolean isSignPdf;
 	private BufferedImage appendPage;
 	private final List<Dimension> pdfPageSizes;
-	private JLabel pageLabel;
+	private PageLabel pageLabel;
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPanel.0")); //$NON-NLS-1$
 	private final JTextField posX = new JTextField(4);
 	private final JTextField posY = new JTextField(4);
+	private final JTextField width = new JTextField(4);
+	private final JTextField height = new JTextField(4);
 	private final JLabel indexLabel = new JLabel();
 
 	final JButton firstPageButton = new JButton("<<"); //$NON-NLS-1$
@@ -140,7 +158,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		this.extraParamsForLocation = p;
 	}
 
-	private JLabel createPageLabel(final BufferedImage page,
+	private PageLabel createPageLabel(final BufferedImage page,
 			                       final PageLabelListener pll,
 			                       final KeyListener kl,
 			                       final Component parentFrame,
@@ -177,7 +195,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		pageWidth = Math.round(page.getWidth() * aspectRatio);
 		pageHeight = Math.round(page.getHeight() * aspectRatio);
 
-		final JLabel ret = new PageLabel(
+		final PageLabel ret = new PageLabel(
 			page.getScaledInstance(pageWidth, pageHeight, Image.SCALE_SMOOTH),
 			pageWidth,
 			pageHeight,
@@ -203,6 +221,9 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 			SignPdfUiMessages.getString("SignPdfUiPanel.1") //$NON-NLS-1$
 		);
 
+		// Establecemos un tamano preferido cualquiera para que se redimensione
+		// correctamente el panel de scroll en el que se mostrara este panel
+		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 		setLayout(new GridBagLayout());
 
 		final GridBagConstraints gbc = new GridBagConstraints();
@@ -224,6 +245,10 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		c.gridy = 0;
+
+		mainPanel.add(createMessageLabel(), c);
+
+		c.gridy++;
 
 		mainPanel.add(createCoordenatesPanel(), c);
 
@@ -253,7 +278,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 
 		this.pagePanel = new JPanel();
 		this.pagePanel.setLayout(new GridBagLayout());
-		this.pagePanel.setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+		this.pagePanel.setPreferredSize(new Dimension(PAGEPANEL_PREFERRED_WIDTH, PAGEPANEL_PREFERRED_HEIGHT));
 
 		// Creamos la etiqueta y establecemos la primera pagina
 		this.pageLabel = createPageLabel(
@@ -306,6 +331,18 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		return panel;
 	}
 
+	/**
+	 * Crea la etiqueta que explica la selecci&oacute;n del &aacute;rea de firma.
+	 * @return Etiqueta.
+	 */
+	private static JLabel createMessageLabel() {
+		final JLabel messageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.14")); //$NON-NLS-1$
+		messageLabel.getAccessibleContext().setAccessibleDescription(
+				SignPdfUiMessages.getString("SignPdfUiPanel.15")); //$NON-NLS-1$
+
+		return messageLabel;
+	}
+
 	/** Crea el panel con los elementos que muestran las coordenadas del cursor dentro
 	 * del panel de firma.
 	 * @return Panel con los componentes para la visualizacion de coordenadas. */
@@ -314,19 +351,56 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-		panel.add(new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.8"))); //$NON-NLS-1$
+		final DocumentFilter docFilter = new NaturalNumbersDocFilter();
 
-		this.posX.setEnabled(false);
-		this.posX.setFocusable(false);
+		final JLabel posXLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.8")); //$NON-NLS-1$
+		posXLabel.setLabelFor(this.posX);
+		panel.add(posXLabel);
+
+		this.posX.getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfUiPanel.16")); //$NON-NLS-1$
 		this.posX.addKeyListener(this);
+		this.posX.addFocusListener(this);
+		PlainDocument doc = (PlainDocument) this.posX.getDocument();
+		doc.setDocumentFilter(docFilter);
+		doc.addDocumentListener(this);
 		panel.add(this.posX);
 
-		panel.add(new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.9"))); //$NON-NLS-1$
+		final JLabel posYLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.9")); //$NON-NLS-1$
+		posYLabel.setLabelFor(this.posY);
+		panel.add(posYLabel);
 
-		this.posY.setEnabled(false);
-		this.posY.setFocusable(false);
+		this.posY.getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfUiPanel.17")); //$NON-NLS-1$
 		this.posY.addKeyListener(this);
+		this.posY.addFocusListener(this);
+		doc = (PlainDocument) this.posY.getDocument();
+		doc.setDocumentFilter(docFilter);
+		doc.addDocumentListener(this);
 		panel.add(this.posY);
+
+		final JLabel widthLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.12")); //$NON-NLS-1$
+		widthLabel.setLabelFor(this.width);
+		panel.add(widthLabel);
+
+
+		this.width.getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfUiPanel.18")); //$NON-NLS-1$
+		this.width.addKeyListener(this);
+		this.width.addFocusListener(this);
+		doc = (PlainDocument) this.width.getDocument();
+		doc.setDocumentFilter(docFilter);
+		doc.addDocumentListener(this);
+		panel.add(this.width);
+
+		final JLabel heightLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.13")); //$NON-NLS-1$
+		heightLabel.setLabelFor(this.height);
+		panel.add(heightLabel);
+
+		this.height.getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfUiPanel.19")); //$NON-NLS-1$
+		this.height.addKeyListener(this);
+		this.height.addFocusListener(this);
+		doc = (PlainDocument) this.height.getDocument();
+		doc.setDocumentFilter(docFilter);
+		doc.addDocumentListener(this);
+		panel.add(this.height);
 
 		return panel;
 	}
@@ -349,10 +423,10 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 				public void actionPerformed(final ActionEvent e) {
 					final Properties p = new Properties();
 					if (getCurrentPage() > getPdfPages().size()) {
-						p.put("signaturePage", "append"); //$NON-NLS-1$ //$NON-NLS-2$
+						p.put(PdfExtraParams.SIGNATURE_PAGE, "append"); //$NON-NLS-1$
 					}
 					else {
-						p.put("signaturePage", Integer.toString(getCurrentPage())); //$NON-NLS-1$
+						p.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getCurrentPage()));
 					}
 					p.putAll(getExtraParamsForLocation());
 					getListener().nextPanel(p, getFragmentImage(p));
@@ -437,19 +511,6 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	}
 
 	@Override
-	public void selectionAvailable(final Properties p) {
-		if (p != null) {
-			this.okButton.setEnabled(true);
-			this.okButton.requestFocusInWindow();
-		}
-		else {
-			this.okButton.setEnabled(false);
-		}
-
-		setProperties(p);
-	}
-
-	@Override
 	public void setX(final String x) {
 		this.posX.setText(x);
 	}
@@ -459,30 +520,56 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		this.posY.setText(y);
 	}
 
+	@Override
+	public void setWidth(final String width) {
+		this.width.setText(width);
+	}
+
+	@Override
+	public void setHeight(final String height) {
+		this.height.setText(height);
+	}
+
 	@Override public void keyTyped(final KeyEvent e) { /* vacio */ }
 	@Override public void keyReleased(final KeyEvent e) { /* vacio */ }
 
 	@Override
 	public void keyPressed(final KeyEvent ke) {
 		if (ke != null) {
-			if (ke.getKeyCode() == KeyEvent.VK_LEFT && getCurrentPage() > 1) {
-				this.currentPage--;
-				changePage();
+			if (!(ke.getComponent() instanceof JTextComponent)) {
+				if (ke.getKeyCode() == KeyEvent.VK_LEFT && getCurrentPage() > 1) {
+					this.currentPage--;
+					changePage();
+				}
+				else if (ke.getKeyCode() == KeyEvent.VK_RIGHT && getCurrentPage() < this.pdfPages.size()) {
+					this.currentPage++;
+					changePage();
+				}
+				else if (ke.getKeyCode() == KeyEvent.VK_RIGHT
+						&& getCurrentPage() == this.pdfPages.size()
+						&& !this.isSignPdf) {
+					this.currentPage++;
+					appendPage();
+				}
 			}
-			else if (ke.getKeyCode() == KeyEvent.VK_RIGHT && getCurrentPage() < this.pdfPages.size()) {
-				this.currentPage++;
-				changePage();
-			}
-			else if (ke.getKeyCode() == KeyEvent.VK_RIGHT
-					&& getCurrentPage() == this.pdfPages.size()
-					&& !this.isSignPdf) {
-				this.currentPage++;
-				appendPage();
-			}
-			else if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
 				this.currentPage++;
 				getListener().positionCancelled();
 			}
+		}
+	}
+
+	@Override
+	public void focusGained(FocusEvent evt) {
+		if (evt.getSource() instanceof JTextComponent) {
+			((JTextComponent) evt.getSource()).selectAll();
+		}
+	}
+
+	@Override
+	public void focusLost(FocusEvent evt) {
+		if (evt.getSource() instanceof JTextComponent) {
+			((JTextComponent) evt.getSource()).select(0,  0);
 		}
 	}
 
@@ -570,6 +657,8 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 			this.pagePanel.remove(this.pageLabel);
 			this.posX.setText(""); //$NON-NLS-1$
 			this.posY.setText(""); //$NON-NLS-1$
+			this.width.setText(""); //$NON-NLS-1$
+			this.height.setText(""); //$NON-NLS-1$
 			this.pageLabel = createPageLabel(
 				bi,
 				this,
@@ -603,6 +692,8 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		this.pagePanel.remove(this.pageLabel);
 		this.posX.setText(""); //$NON-NLS-1$
 		this.posY.setText(""); //$NON-NLS-1$
+		this.width.setText(""); //$NON-NLS-1$
+		this.height.setText(""); //$NON-NLS-1$
 		this.pageLabel = createPageLabel(
 			this.pdfPages.get(getCurrentPage() - 1),
 			this,
@@ -672,10 +763,11 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		else {
 			necessaryPage = pageToLoad + 1;
 		}
-		
+
 		// Verificamos que sea una pagina valida
-		if(necessaryPage < 0 || necessaryPage >= this.pdfPages.size())
+		if(necessaryPage < 0 || necessaryPage >= this.pdfPages.size()) {
 			return;
+		}
 
 		// Si no tenemos la pagina que necesitamos, la cargamos
 		if (this.pdfPages.get(necessaryPage) == null) {
@@ -686,5 +778,106 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 				throw new IOException("No se ha podido cargar la previsualizacion de la pagina", e); //$NON-NLS-1$
 			}
 		}
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent evt) {
+		updateArea();
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent evt) {
+		updateArea();
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent evt) {
+		updateArea();
+	}
+
+	private void updateArea() {
+
+		final float scale = this.pageLabel.getScale();
+
+		Rectangle r = null;
+		final int x = this.posX.getText().isEmpty() ? 0 : Integer.parseInt(this.posX.getText());
+		final int rX = (int) (x * scale);
+		final int y = this.posY.getText().isEmpty() ? 0 : Integer.parseInt(this.posY.getText());
+		final int rY = (int) (y * scale);
+		final int w = this.width.getText().isEmpty() ? 0 : Integer.parseInt(this.width.getText());
+		final int rWidth = (int) (w * scale);
+		final int h = this.height.getText().isEmpty() ? 0 : Integer.parseInt(this.height.getText());
+		final int rHeight = (int) (h * scale);
+
+		if (rWidth > 0 && rHeight > 0) {
+			r = new Rectangle(rX, rY, rWidth, rHeight);
+			setProperties(toPdfPosition(r));
+		}
+		else {
+			setProperties(null);
+		}
+
+		this.okButton.setEnabled(r != null);
+
+		this.pageLabel.setSelectionBounds(r);
+		this.pageLabel.repaint();
+	}
+
+	private Properties toPdfPosition(final Rectangle original) {
+
+		final Dimension currentPageDim = this.pdfPageSizes.get(getCurrentPage() - 1);
+
+		// Si se ha indicado una posicion externa a la pagina, no se imprime la imagen
+		if (original.x > currentPageDim.width || original.y > currentPageDim.height) {
+			return null;
+		}
+
+		// Si se ha indicado un tamano superior a la imagen, se redimensiona al maximo de la imagen
+		if (original.x + original.width > currentPageDim.width) {
+			original.width = currentPageDim.width - original.x;
+		}
+		if (original.y + original.height > currentPageDim.height) {
+			original.height = currentPageDim.height - original.y;
+		}
+
+		final int areaHeight = original.height + original.y > this.pageLabel.getHeight() ?
+				this.pageLabel.getHeight() - original.y : original.height;
+		final int areaWidth = original.width + original.x > this.pageLabel.getWidth() ?
+				this.pageLabel.getWidth() - original.x : original.width;
+
+		final Properties extraParams = new Properties();
+		extraParams.put(
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX,
+			Integer.toString(
+				Math.round(
+					original.x * this.pageLabel.getScale()
+				)
+			)
+		);
+		extraParams.put(
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY,
+			Integer.toString(
+				Math.round(
+					(this.pageLabel.getHeight() - original.y - areaHeight) * this.pageLabel.getScale()
+				)
+			)
+		);
+		extraParams.put(
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX,
+			Integer.toString(
+				Math.round(
+					(original.x + areaWidth) * this.pageLabel.getScale()
+				)
+			)
+		);
+		extraParams.put(
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY,
+			Integer.toString(
+				Math.round(
+					(this.pageLabel.getHeight() - original.y) * this.pageLabel.getScale()
+				)
+			)
+		);
+		return extraParams;
 	}
 }

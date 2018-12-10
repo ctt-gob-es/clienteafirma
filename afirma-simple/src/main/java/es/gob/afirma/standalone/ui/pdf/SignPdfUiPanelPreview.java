@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui.pdf;
 
+import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,6 +25,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -33,6 +35,9 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -45,13 +50,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -70,6 +79,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
@@ -85,6 +95,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
@@ -93,8 +104,13 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	private static final long serialVersionUID = 1848879900511003335L;
-	private static final int PREFERRED_WIDTH = 475;
-	private static final int PREFERRED_HEIGHT = 140;
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final int PREFERRED_WIDTH = 470;
+	private static final int PREFERRED_HEIGHT = 600;
+	private static final int VIEWLABEL_PREFERRED_WIDTH = 475;
+	private static final int VIEWLABEL_PREFERRED_HEIGHT = 140;
 	private static final int MAX_TEXT_SIZE = 50;
 	private static final int MIN_TEXT_SIZE = 1;
 	private static final int STEP_TEXT_SIZE = 1;
@@ -109,9 +125,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private BufferedImage signImage;
 	BufferedImage getSignImage() {
 		return this.signImage;
-	}
-	void setSignImage(final BufferedImage bi) {
-		this.signImage = bi;
 	}
 
 	private final SignPdfUiPanelListener listener;
@@ -130,6 +143,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	JLabel getViewLabel() {
 		return this.viewLabel;
 	}
+
+	JTextField signatureImagePath;
 
 	private Font font;
 	Font getViewFont() {
@@ -172,7 +187,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	JCheckBox getSaveConfig() {
 		return this.saveConfig;
 	}
-	
+
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.5")); //$NON-NLS-1$
 	JButton getOkButton() {
 		return this.okButton;
@@ -183,9 +198,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return this.colorCombobox;
 	}
 
-	private JComboBox<FontResource> letterType;
+	private JComboBox<FontResource> fontFamilyCombo;
 	JComboBox<FontResource> getLetterType() {
-		return this.letterType;
+		return this.fontFamilyCombo;
 	}
 
 	SpinnerNumberModel sizeSpinnerModel = new SpinnerNumberModel(
@@ -194,20 +209,20 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		MAX_TEXT_SIZE,
 		STEP_TEXT_SIZE
 	);
-	JSpinner sizeSpinner = new JSpinner(this.sizeSpinnerModel);
+	JSpinner fontSizeSpinner = new JSpinner(this.sizeSpinnerModel);
 	JSpinner getSizeSpinner() {
-		return this.sizeSpinner;
+		return this.fontSizeSpinner;
 	}
 	int getSelectedSize() {
-		return ((Integer)this.sizeSpinner.getValue()).intValue();
+		return ((Integer)this.fontSizeSpinner.getValue()).intValue();
 	}
 	void setSelectedSize(final int size) {
-		this.sizeSpinner.setValue(Integer.valueOf(size));
+		this.fontSizeSpinner.setValue(Integer.valueOf(size));
 	}
 
-	private final JTextArea textArea = new JTextArea();
+	private final JTextArea signatureText = new JTextArea(4, 60);
 	JTextArea getTextArea() {
-		return this.textArea;
+		return this.signatureText;
 	}
 
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
@@ -239,50 +254,40 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPreview.3") //$NON-NLS-1$
 		);
 
+		// Establecemos un tamano preferido cualquiera para que se redimensione
+		// correctamente el panel de scroll en el que se mostrara este panel
+		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 		setLayout(new GridBagLayout());
 
 		final GridBagConstraints gbc = new GridBagConstraints();
-
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(10, 5, 0, 5);
 		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
 		gbc.gridy = 0;
 		add(createPreviewPanel(), gbc);
 		gbc.gridy++;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 0.0;
-		gbc.insets = new Insets(0, 5, 0, 5);
-		add(createPreviewHelpPanel(), gbc);
-		gbc.gridy++;
-		gbc.insets = new Insets(10, 5, 0, 5);
-		add(createFontPanel(), gbc);
-		gbc.gridy++;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weighty = 1.0;
-		add(createTextAreaPanel(), gbc);
+		add(createConfigurationPanel(), gbc);
 		gbc.gridy++;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weighty = 0.0;
-		gbc.insets = new Insets(0, 5, 0, 5);
-		add(createTextAreaHelpPanel(), gbc);
-		gbc.gridy++;
-		gbc.insets = new Insets(0, 15, 0, 5);
 		add(this.saveConfig, gbc);
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
 		gbc.gridy++;
-		gbc.insets = new Insets(0, 5, 0, 5);
+		add(new JPanel(), gbc);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weighty = 0.0;
+		gbc.gridy++;
 		add(createButtonsPanel(), gbc);
 		showPreview();
-		this.letterType.requestFocusInWindow();
+		this.fontFamilyCombo.requestFocusInWindow();
 	}
 
 	private JPanel createPreviewPanel() {
 
 		final JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		panel.setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(BorderFactory.createTitledBorder(
 			SignPdfUiMessages.getString("SignPdfUiPreview.0")) //$NON-NLS-1$
 		);
@@ -309,7 +314,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                         transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
                     }
                     catch (final Exception e) {
-                    	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+                    	LOGGER.warning(
                             "Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
                         );
                         dtde.dropComplete(false);
@@ -350,7 +355,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                             	file = new File(new URI(filename));
                             }
                             catch (final Exception e) {
-                            	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+                            	LOGGER.warning(
                             		"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
                                 );
                                 dtde.dropComplete(false);
@@ -361,7 +366,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                             loadFile(file != null ? file : new File(filename));
                         }
                         catch (final Exception e) {
-                        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+                        	LOGGER.warning(
                                 "Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
                             );
                             dtde.dropComplete(false);
@@ -384,17 +389,20 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		panel.setDropTarget(this.dropTarget);
 
-		if (getProp().getProperty("signaturePage") != null && //$NON-NLS-1$
-				getProp().getProperty("signaturePage").equals("append")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (getProp().getProperty(PdfExtraParams.SIGNATURE_PAGE) != null &&
+				getProp().getProperty(PdfExtraParams.SIGNATURE_PAGE).equals("append")) { //$NON-NLS-1$
 			createImage();
 		}
-		if (this.image.getHeight() > PREFERRED_HEIGHT || this.image.getWidth() > PREFERRED_WIDTH) {
-			resizeImage(panel);
+
+		this.viewLabel = new JLabel();
+		this.viewLabel.setPreferredSize(new Dimension(VIEWLABEL_PREFERRED_WIDTH, VIEWLABEL_PREFERRED_HEIGHT));
+
+		if (this.image.getHeight() > VIEWLABEL_PREFERRED_HEIGHT || this.image.getWidth() > VIEWLABEL_PREFERRED_WIDTH) {
+			resizeImage(this.viewLabel);
 		}
-		this.viewLabel = new JLabel(new ImageIcon(this.image));
-		this.viewLabel.getAccessibleContext().setAccessibleDescription(
-			SignPdfUiMessages.getString("SignPdfUiPreview.9") //$NON-NLS-1$
-		);
+
+		this.viewLabel.setIcon(new ImageIcon(this.image));
+
 		this.viewLabel.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.26")); //$NON-NLS-1$
 		this.viewLabel.addMouseListener(
 			new MouseAdapter() {
@@ -411,99 +419,106 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	            		}
 	            	}
 	            	else {
-	                	try {
-							final String imPath = AOUIFactory.getLoadFiles(
-								SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
-								null,
-								null,
-								IMAGE_EXT,
-								SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,,
-								false,
-								false,
-								null,
-								SignPdfUiPanelPreview.this
-							)[0].getAbsolutePath();
-							paintImage(imPath);
-							showPreview();
-						}
-						catch(final AOCancelledOperationException ex) {
-							// Operacion cancelada por el usuario
-						}
-	                	catch (final Exception e) {
-							Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-								"No ha sido posible cargar la imagen: " + e //$NON-NLS-1$
-							);
-							AOUIFactory.showMessageDialog(
-								SignPdfUiPanelPreview.this,
-								SignPdfUiMessages.getString("SignPdfUiPreview.24"),  //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
-							);
-						}
+	            		selectSignatureImage();
 	                }
 		        }
 			}
 		);
 		this.viewLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-		panel.add(this.viewLabel, c);
+		panel.add(this.viewLabel);
+		panel.add(createPreviewHintLabel());
 
 		return panel;
 
 	}
 
-	private static Component createPreviewHelpPanel() {
-		final JEditorPane helpLabel = new JEditorPane();
-		helpLabel.setContentType("text/html"); //$NON-NLS-1$
-		helpLabel.setText(SignPdfUiMessages.getString("SignPdfUiPreview.29")); //$NON-NLS-1$
-        helpLabel.setEditable(false);
-        helpLabel.setHighlighter(null);
-        helpLabel.setFocusable(false);
-        helpLabel.setBackground(new Color(0,0,0,0));
+	private JPanel createConfigurationPanel() {
 
-        return helpLabel;
-	}
-
-	private JPanel createFontPanel() {
-
-		final JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		final GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.LINE_START;
-		c.weightx = 1.0;
-		c.gridy = 0;
-		c.insets = new Insets(5, 5, 0, 5);
-
+		final JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createTitledBorder(
 			SignPdfUiMessages.getString("SignPdfUiPreview.1")) //$NON-NLS-1$
 		);
 
-		this.letterType = new JComboBox<>(FontResource.getAllFontresources());
+		final JPanel signatureImagePanel = createBrowseImagePanel();
+
+		final JLabel signatureTextLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPreview.36")); //$NON-NLS-1$
+		signatureTextLabel.setLabelFor(this.signatureText);
+		this.signatureText.setEditable(true);
+		final Set<AWTKeyStroke> forwardKeys = new HashSet<>(this.signatureText.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+		forwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0));
+		this.signatureText.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+		final Set<AWTKeyStroke> backwardKeys = new HashSet<>(this.signatureText.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+		backwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK));
+		this.signatureText.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
+		this.signatureText.setBackground(Color.WHITE);
+		this.signatureText.setText(SignPdfUiMessages.getString("SignPdfUiPreview.25")); //$NON-NLS-1$
+		this.signatureText.setLineWrap(true);
+		this.signatureText.setWrapStyleWord(true);
+		this.signatureText.addKeyListener(this);
+
+		final JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setMinimumSize(new Dimension(400, 80));
+		scrollPane.setViewportView(this.signatureText);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+		this.signatureText.getDocument().addDocumentListener(
+			new DocumentListener() {
+		        @Override
+		        public void removeUpdate(final DocumentEvent e) {
+		        	showPreview();
+		        }
+		        @Override
+		        public void insertUpdate(final DocumentEvent e) {
+		        	showPreview();
+		        }
+		        @Override
+		        public void changedUpdate(final DocumentEvent e) {
+		        	showPreview();
+		        }
+		    }
+		);
+
+		final JPanel fontPanel = new JPanel(new GridBagLayout());
+
+		this.fontFamilyCombo = new JComboBox<>(FontResource.getAllFontresources());
 		setViewFont(
 			new Font(
-				((FontResource)this.letterType.getSelectedItem()).getFont().getFontName(),
+				((FontResource)this.fontFamilyCombo.getSelectedItem()).getFont().getFontName(),
 				getStyle(),
 				getSelectedSize()
 			)
 		);
 
-		this.letterType.setSelectedItem(FontResource.COURIER);
-		this.letterType.setRenderer(new ComboRenderer());
-		this.letterType.addKeyListener(this);
-		this.letterType.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.20")); //$NON-NLS-1$
+		this.fontFamilyCombo.setSelectedItem(FontResource.COURIER);
+		this.fontFamilyCombo.setRenderer(new ComboRenderer());
+		this.fontFamilyCombo.addKeyListener(this);
+		this.fontFamilyCombo.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.20")); //$NON-NLS-1$
 
-		final JComponent comp = this.sizeSpinner.getEditor();
+		final JComponent comp = this.fontSizeSpinner.getEditor();
 	    final JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
 	    final DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
 	    formatter.setAllowsInvalid(false);
-		this.sizeSpinner.addChangeListener(
+		this.fontSizeSpinner.addChangeListener(
 			e -> {
 				setViewFont(getViewFont().deriveFont(getStyle(), getSelectedSize()));
 				showPreview();
 			}
 		);
-		this.sizeSpinner.getEditor().getComponent(0).addKeyListener(this);
-		this.sizeSpinner.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.18")); //$NON-NLS-1$
+		this.fontSizeSpinner.getEditor().getComponent(0).addKeyListener(this);
+		this.fontSizeSpinner.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.18")); //$NON-NLS-1$
+
+		final GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.weightx = 1.0;
+		cons.gridx = 0;
+		cons.insets = new Insets(0, 0, 0, 0);
+		fontPanel.add(this.fontFamilyCombo, cons);
+		cons.weightx = 0.0;
+		cons.gridx++;
+		fontPanel.add(this.fontSizeSpinner, cons);
+
+		final JPanel fontStylePanel = new JPanel(new GridBagLayout());
 
 		this.boldButton.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.14")); //$NON-NLS-1$
 		this.boldButton.getAccessibleContext().setAccessibleDescription(
@@ -619,76 +634,85 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.colorCombobox.getColorList().addKeyListener(this);
 		this.colorCombobox.getColorList().setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.19")); //$NON-NLS-1$
 
+		cons.gridx = 0;
+		cons.gridy = 0;
+		cons.weightx = 1.0;
+		fontStylePanel.add(this.boldButton, cons);
+		cons.gridx++;
+		fontStylePanel.add(this.italicButton, cons);
+		cons.gridx++;
+		fontStylePanel.add(this.underlineButton, cons);
+		cons.gridx++;
+		fontStylePanel.add(this.strikethroughButton, cons);
+		cons.gridx++;
+		fontStylePanel.add(this.colorCombobox, cons);
 
-
-		c.gridwidth = 4;
+		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
-		panel.add(this.letterType, c);
-		c.gridwidth = 1;
-		c.fill = GridBagConstraints.NONE;
-		panel.add(this.sizeSpinner, c);
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
+		c.insets = new Insets(4,  0,  0,  0);
+		c.gridy = 0;
+		panel.add(signatureImagePanel, c);
 		c.gridy++;
-		panel.add(this.boldButton, c);
-		panel.add(this.italicButton, c);
-		panel.add(this.underlineButton, c);
-		panel.add(this.strikethroughButton, c);
-		panel.add(this.colorCombobox, c);
+		panel.add(signatureTextLabel, c);
+		c.insets = new Insets(0,  0,  0,  0);
+		c.gridy++;
+		panel.add(scrollPane, c);
+		c.insets = new Insets(4,  0,  0,  0);
+		c.gridy++;
+		panel.add(fontPanel, c);
+		c.gridy++;
+		panel.add(fontStylePanel, c);
 
 		return panel;
 	}
 
-	private JPanel createTextAreaPanel() {
+	private JPanel createBrowseImagePanel() {
+		final JPanel signatureImagePanel = new JPanel(new GridBagLayout());
+		final JLabel signatureImageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPreview.37")); //$NON-NLS-1$
+		this.signatureImagePath = new JTextField();
+		this.signatureImagePath.setEditable(false);
+		final JButton browseImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.38")); //$NON-NLS-1$
+		browseImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.39")); //$NON-NLS-1$
+		browseImageButton.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent evt) {
+						selectSignatureImage();
+					}
+				});
+		final JButton clearImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.40")); //$NON-NLS-1$
+		clearImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.41")); //$NON-NLS-1$
+		clearImageButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				clearSignImage();
+				showPreview();
+			}
+		});
 
-		final JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		panel.setMinimumSize(new Dimension(400, 100));
+		final GridBagConstraints imageCons = new GridBagConstraints();
+		imageCons.fill = GridBagConstraints.HORIZONTAL;
+		imageCons.weightx = 1.0;
+		imageCons.gridx = 0;
+		imageCons.gridy = 0;
+		imageCons.gridwidth = 3;
+		signatureImagePanel.add(signatureImageLabel, imageCons);
+		imageCons.gridy = 1;
+		imageCons.gridwidth = 1;
+		signatureImagePanel.add(this.signatureImagePath, imageCons);
+		imageCons.weightx = 0.0;
+		imageCons.gridx = 1;
+		signatureImagePanel.add(browseImageButton, imageCons);
+		imageCons.gridx = 2;
+		signatureImagePanel.add(clearImageButton, imageCons);
 
-		panel.setBorder(BorderFactory.createTitledBorder(
-			SignPdfUiMessages.getString("SignPdfUiPreview.2")) //$NON-NLS-1$
-		);
-
-		this.textArea.setEditable(true);
-		this.textArea.setBackground(Color.WHITE);
-		this.textArea.setText(SignPdfUiMessages.getString("SignPdfUiPreview.25")); //$NON-NLS-1$
-		this.textArea.setLineWrap(true);
-		this.textArea.setWrapStyleWord(true);
-		this.textArea.addKeyListener(this);
-		final JScrollPane scrollPane = new JScrollPane(
-			this.textArea,
-			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-		);
-		scrollPane.setMinimumSize(new Dimension(300, 80));
-		scrollPane.addKeyListener(this);
-
-		this.textArea.getDocument().addDocumentListener(
-			new DocumentListener() {
-		        @Override
-		        public void removeUpdate(final DocumentEvent e) {
-		        	showPreview();
-		        }
-
-		        @Override
-		        public void insertUpdate(final DocumentEvent e) {
-		        	showPreview();
-		        }
-
-		        @Override
-		        public void changedUpdate(final DocumentEvent e) {
-		        	showPreview();
-		        }
-		    }
-		);
-
-		panel.add(scrollPane);
-
-		return panel;
+		return signatureImagePanel;
 	}
 
 	/** Crea el panel con los botones de aceptar y cancelar.
 	 * @return Panel de botones. */
-	private Component createTextAreaHelpPanel() {
+	private Component createPreviewHintLabel() {
 
 		final JEditorPane helpLabel = new JEditorPane();
 		helpLabel.setContentType("text/html"); //$NON-NLS-1$
@@ -714,9 +738,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		);
 
         helpLabel.addHyperlinkListener(editorFocusManager);
+        helpLabel.addFocusListener(editorFocusManager);
         helpLabel.addKeyListener(editorFocusManager);
         helpLabel.setEditable(false);
-        helpLabel.setFocusable(false);
         helpLabel.setBackground(new Color(0,0,0,0));
 
         return helpLabel;
@@ -748,14 +772,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.okButton.addActionListener(
 			e -> {
 				if (!getTextArea().getText().trim().isEmpty()) {
-					getProp().put("layer2Text", getTextArea().getText().toString()); //$NON-NLS-1$
-					getProp().put("layer2FontFamily", ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex()); //$NON-NLS-1$
-					getProp().put("layer2FontSize", Integer.toString(getSelectedSize())); //$NON-NLS-1$
-					getProp().put("layer2FontStyle", Integer.toString(getStyleIndex())); //$NON-NLS-1$
-					getProp().put("layer2FontColor", getColorCombobox().getSelectedItem().getPdfColorKey()); //$NON-NLS-1$*/
+					getProp().put(PdfExtraParams.LAYER2_TEXT, getTextArea().getText().toString());
+					getProp().put(PdfExtraParams.LAYER2_FONTFAMILY, ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex());
+					getProp().put(PdfExtraParams.LAYER2_FONTSIZE, Integer.toString(getSelectedSize()));
+					getProp().put(PdfExtraParams.LAYER2_FONTSTYLE, Integer.toString(getStyleIndex()));
+					getProp().put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey()); //*/
 				}
 				if (getSignImage() != null ) {
-					getProp().put("signatureRubricImage", getInsertImageBase64(getSignImage())); //$NON-NLS-1$
+					getProp().put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(getSignImage()));
 				}
 				if(this.saveConfig.isSelected()) {
 					saveProperties(getProp());
@@ -789,6 +813,57 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		}
 
 		return panel;
+	}
+
+	/**
+     * Permite al usuario seleccionar una imagen de firma. Toma como ruta por defecto
+     * la de la imagen actualmente establecida.
+     */
+	void selectSignatureImage() {
+		String defaultPath = null;
+		String defaultFilename = null;
+		try {
+			defaultPath = SignPdfUiPanelPreview.this.signatureImagePath.getText();
+			if (defaultPath != null && !defaultPath.isEmpty()) {
+				final File imgFile = new File(defaultPath);
+				if (imgFile.isFile()) {
+					defaultPath = imgFile.getParent();
+					defaultFilename = imgFile.getName();
+				}
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se tiene acceso a la ruta definida para la imagen de firma", e); //$NON-NLS-1$
+		}
+    	try {
+			final String imPath = AOUIFactory.getLoadFiles(
+				SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
+				defaultPath,
+				defaultFilename,
+				IMAGE_EXT,
+				SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,,
+				false,
+				false,
+				null,
+				SignPdfUiPanelPreview.this
+			)[0].getAbsolutePath();
+			loadSignImage(imPath);
+			showPreview();
+		}
+		catch(final AOCancelledOperationException ex) {
+			// Operacion cancelada por el usuario
+		}
+    	catch (final Exception e) {
+			LOGGER.severe(
+				"No ha sido posible cargar la imagen: " + e //$NON-NLS-1$
+			);
+			AOUIFactory.showMessageDialog(
+				SignPdfUiPanelPreview.this,
+				SignPdfUiMessages.getString("SignPdfUiPreview.24"),  //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
 	}
 
 	/** Recupera las propiedades de la firma. */
@@ -839,7 +914,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
 
-		setInsertImageBase64(PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
+		final String imagePath = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
+		if (imagePath != null && !imagePath.isEmpty()) {
+			try {
+				loadSignImage(imagePath);
+			} catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
+			}
+		}
 
 		showPreview();
 	}
@@ -866,18 +948,18 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)
 		));
 
-		final int style = Integer.parseInt(
+		final int fontSyle = Integer.parseInt(
 			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
-		if (style == 8) {
+		if (fontSyle == 8) {
 			getStrikethroughButton().doClick();
-		} else if (style == 4) {
+		} else if (fontSyle == 4) {
 			getUnderlineButton().doClick();
-		} else if (style == 3) {
+		} else if (fontSyle == 3) {
 			getItalicButton().doClick();
 			getBoldButton().doClick();
-		} else if (style == 2) {
+		} else if (fontSyle == 2) {
 			getItalicButton().doClick();
-		} else if (style == 1) {
+		} else if (fontSyle == 1) {
 			getBoldButton().doClick();
 		}
 
@@ -898,39 +980,45 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
 
-		setInsertImageBase64(PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE));
-
+		final String imagePath = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
+		if (imagePath != null && !imagePath.isEmpty()) {
+			try {
+				loadSignImage(imagePath);
+			} catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
+			}
+		}
 		showPreview();
 	}
 
 	/** Almacena las propiedades de la firma.
-	 * @param params Colección de propiedades de la firma. */
+	 * @param params Colecci&oacute;n de propiedades de la firma. */
 	private void saveProperties(final Properties params) {
 
-		if (params.getProperty("layer2Text") != null) {
+		if (params.getProperty(PdfExtraParams.LAYER2_TEXT) != null) {
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty("layer2Text")
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty(PdfExtraParams.LAYER2_TEXT)
 			);
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty("layer2FontFamily")
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty(PdfExtraParams.LAYER2_FONTFAMILY)
 			);
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty("layer2FontSize")
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty(PdfExtraParams.LAYER2_FONTSIZE)
 			);
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty("layer2FontStyle")
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty(PdfExtraParams.LAYER2_FONTSTYLE)
 			);
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty("layer2FontColor")
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty(PdfExtraParams.LAYER2_FONTCOLOR)
 			);
 		}
 		else {
-			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT);			
+			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT);
 		}
-		
-		if (params.getProperty("signatureRubricImage") != null) {
+
+		if (params.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE) != null) {
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, params.getProperty("signatureRubricImage")
+				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, this.signatureImagePath.getText()
 			);
 		}
 		else {
@@ -939,7 +1027,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		try {
 			PreferencesManager.flush();
 		} catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al guardar las preferencias de firma visible PDF: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error al guardar las preferencias de firma visible PDF: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -977,7 +1065,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
             return;
         }
 
-        paintImage(file.getAbsolutePath());
+        loadSignImage(file.getAbsolutePath());
         showPreview();
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
@@ -992,13 +1080,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return valid;
 	}
 
-	String getInsertImageBase64(BufferedImage bi) {
+	static String getInsertImageBase64(BufferedImage bi) {
 		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
 			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
 			return Base64.encode(osImage.toByteArray());
 		}
         catch (final Exception e1) {
-        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+        	LOGGER.severe(
 				"No ha sido posible pasar la imagen a JPG: " + e1 //$NON-NLS-1$
 			);
 		}
@@ -1027,7 +1115,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			this.signImage = newImage;
 		}
 		catch (final Exception e1) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+			LOGGER.severe(
 					"No ha sido posible recuperar la imagen guardada: " + e1 //$NON-NLS-1$
 			);
 		}
@@ -1046,8 +1134,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.image = bi;
 	}
 
-	void paintImage(final String path) throws IOException {
+	void loadSignImage(final String path) throws IOException {
 
+		// Cargamos la imagen
 		final BufferedImage bi = ImageIO.read(new File(path));
 
 		final BufferedImage newImage = new BufferedImage(
@@ -1059,6 +1148,16 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		g.drawImage(bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
 		g.dispose();
 		this.signImage = newImage;
+
+		// Mostramos la ruta en el campo de carga
+		this.signatureImagePath.setText(path);
+	}
+
+	void clearSignImage() {
+		this.signImage = null;
+
+		// Eliminamos la ruta del campo de carga
+		this.signatureImagePath.setText(null);
 	}
 
 	public static String breakLines(final String input, final int maxLineLength, final FontMetrics fm ) {
@@ -1127,7 +1226,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    getViewLabel().setIcon(new ImageIcon(bi));
 	}
 
-	private void resizeImage(final JPanel panel) {
+	private void resizeImage(final JComponent panel) {
 		int newWidth = this.image.getWidth();
 		int newHeight = this.image.getHeight();
 
@@ -1373,7 +1472,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	        this.removeImageItem = new JMenuItem(SignPdfUiMessages.getString("SignPdfUiPreview.27")); //$NON-NLS-1$
 	        this.removeImageItem.addActionListener(
     			e -> {
-					setSignImage(null);
+					clearSignImage();
 					showPreview();
 				}
     		);

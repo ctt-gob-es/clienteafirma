@@ -620,7 +620,6 @@ class CommandProcessorThread extends Thread {
 	 * @throws IllegalArgumentException Cuando el identificador no sea correcto. */
 	private void checkIdSession (final String requestSessionId) throws IllegalArgumentException {
 		// se esperaba un idSession y no se ha recibido
-		LOGGER.info("-- idSession actual: " + this.idSession + "; idSession solicitado: " + requestSessionId);
 		if (this.idSession != null && !this.idSession.equals(requestSessionId)) {
 			throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
 		}

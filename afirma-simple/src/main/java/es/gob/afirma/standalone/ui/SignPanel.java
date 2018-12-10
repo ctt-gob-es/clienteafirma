@@ -215,7 +215,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     			this.signWaitDialog.dispose();
 			}
     		catch (final Exception e) {
-    			LOGGER.warning("No se pudo crear la firma visible PDF, se creara una firma invisible"); //$NON-NLS-1$
+    			LOGGER.log(Level.WARNING, "No se pudo crear la firma visible PDF, se creara una firma invisible", e); //$NON-NLS-1$
     			initSignTask(this.signOperationConfigs);
 			}
     	}
