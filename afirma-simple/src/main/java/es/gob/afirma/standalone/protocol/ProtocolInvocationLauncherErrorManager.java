@@ -129,7 +129,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	static void showErrorDetail(final String code, final String message, final String detail) {
-		showError(code, message + "\n" + detail);
+		showError(code, message + "\n" + detail); //$NON-NLS-1$
 	}
 
 	static String getErrorMessage(final String code) {

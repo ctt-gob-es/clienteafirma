@@ -23,21 +23,18 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.lang.reflect.Method;
 import java.util.EventListener;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-
-import es.gob.afirma.signers.pades.PdfExtraParams;
 
 final class PageLabel extends JLabel {
 
 	static interface PageLabelListener extends EventListener {
-		void selectionAvailable(Properties p);
 		void setX(String x);
 		void setY(String y);
+		void setWidth(String width);
+		void setHeight(String height);
 	}
 
 	private static final long serialVersionUID = 4917110251831788580L;
@@ -75,51 +72,9 @@ final class PageLabel extends JLabel {
 
 	private final float scale;
 
-	private Properties toPdfPosition(final Rectangle original) {
-
-		final int height = original.height + original.y > getHeight() ? getHeight() - original.y : original.height;
-		final int width = original.width + original.x > getWidth() ? getWidth() - original.x : original.width;
-
-		final Properties extraParams = new Properties();
-		extraParams.put(
-			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX,
-			Integer.toString(
-				Math.round(
-					original.x * this.scale
-				)
-			)
-		);
-		extraParams.put(
-			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY,
-			Integer.toString(
-				Math.round(
-					(getHeight() - original.y - height) * this.scale
-				)
-			)
-		);
-		extraParams.put(
-			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX,
-			Integer.toString(
-				Math.round(
-					(original.x + width) * this.scale
-				)
-			)
-		);
-		extraParams.put(
-			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY,
-			Integer.toString(
-				Math.round(
-					(getHeight() - original.y) * this.scale
-				)
-			)
-		);
-		return extraParams;
-	}
-
     private Rectangle selectionBounds = null;
     void setSelectionBounds(final Rectangle r) {
     	this.selectionBounds = r;
-    	this.listener.selectionAvailable(r != null ? toPdfPosition(r) : null);
     }
     Rectangle getSelectionBounds() {
     	return this.selectionBounds = null;
@@ -154,13 +109,12 @@ final class PageLabel extends JLabel {
 
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-                    System.exit(0);
-                }
+            	// No hacemos nada
             }
 
             @Override
             public void mousePressed(final MouseEvent e) {
+            	clearAreaValues();
             	setClickPoint(e.getPoint());
                 setSelectionBounds(null);
                 repaint();
@@ -168,6 +122,19 @@ final class PageLabel extends JLabel {
 
             @Override
             public void mouseReleased(final MouseEvent e) {
+            	final Point initialPoint = getClickPoint();
+            	final Point finalPoint = e.getPoint();
+            	if (initialPoint.getX() == finalPoint.getX() ||
+            			initialPoint.getY() == finalPoint.getY()) {
+            		clearAreaValues();
+            	}
+            	else {
+            		setAreaValues(
+            				(int) Math.min(initialPoint.getX(), finalPoint.getX()),
+            				(int) Math.min(initialPoint.getY(), finalPoint.getY()),
+            				(int) Math.abs(initialPoint.getX() - finalPoint.getX()),
+            				(int) Math.abs(initialPoint.getY() - finalPoint.getY()));
+            	}
             	setClickPoint(null);
             }
 
@@ -182,18 +149,17 @@ final class PageLabel extends JLabel {
 	                setSelectionBounds(new Rectangle(x, y, rWidth, rHeight));
 	                repaint();
             	}
-            	setPositionValues(e.getX(), e.getY());
+
             }
 
             @Override
 			public void mouseMoved(final MouseEvent e) {
-            	setPositionValues(e.getX(), e.getY());
+            	// No hacemos nada
             }
 
             @Override
 			public void mouseExited(final MouseEvent e) {
-            	getPageLabelListener().setX(""); //$NON-NLS-1$
-            	getPageLabelListener().setY(""); //$NON-NLS-1$
+            	// No hacemos nada
             }
 		};
 
@@ -201,21 +167,46 @@ final class PageLabel extends JLabel {
 		addMouseMotionListener(ma);
 	}
 
-	void setPositionValues(final int x, final int y) {
+	void clearAreaValues() {
+		getPageLabelListener().setX(""); //$NON-NLS-1$
+		getPageLabelListener().setY(""); //$NON-NLS-1$
+		getPageLabelListener().setWidth(""); //$NON-NLS-1$
+		getPageLabelListener().setHeight(""); //$NON-NLS-1$
+	}
+
+	void setAreaValues(final int x, final int y, final int width, final int height) {
     	getPageLabelListener().setX(
 			Integer.toString(
 				Math.round(
-					(x < getWidth() ? x : getWidth()) / this.scale
+					Math.min(x, getWidth()) / this.scale
 				)
 			)
 		);
     	getPageLabelListener().setY(
 			Integer.toString(
 				Math.round(
-					(y < getHeight() ? y : getHeight()) / this.scale
+						Math.min(y, getHeight()) / this.scale
 				)
 			)
 		);
+    	getPageLabelListener().setWidth(
+			Integer.toString(
+				Math.round(
+						width / this.scale
+				)
+			)
+		);
+    	getPageLabelListener().setHeight(
+			Integer.toString(
+				Math.round(
+						height / this.scale
+				)
+			)
+		);
+	}
+
+	public float getScale() {
+		return this.scale;
 	}
 
 	@Override

@@ -94,11 +94,18 @@ public class DataFileAnalizer {
 		}
 		info.setData(data);
 
-		if (info.getExtension() != null &&
-				EXECUTABLE_EXTENSIONS.contains(info.getExtension().toUpperCase())) {
-			info.setExecutable(true);
-		}
+		info.setExecutable(isExecutableExtension(info.getExtension()));
 
 		return info;
+	}
+
+	/**
+	 * Indica si una extensi&oacute;n de fichero se corresponde con la de un fichero ejecutable.
+	 * @param extension Extensi&oacute;n de fichero.
+	 * @return {@code true} si la extensi&oacute;n es la de un fichero ejecutable,
+	 * {@code false} en caso contrario.
+	 */
+	static boolean isExecutableExtension(final String extension) {
+		return extension != null && EXECUTABLE_EXTENSIONS.contains(extension.toUpperCase());
 	}
 }

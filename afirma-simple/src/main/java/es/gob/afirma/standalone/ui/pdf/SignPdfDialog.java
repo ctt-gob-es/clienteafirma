@@ -21,9 +21,12 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
@@ -41,6 +44,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private final Frame parent;
 	private final SignPdfDialogListener listener;
 
+	private JScrollPane scrollPanel;
 	private JPanel activePanel;
 	SignPdfDialogListener getListener() {
 		return this.listener;
@@ -48,13 +52,13 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 	private boolean isPdfSign;
 	private byte[] pdfData;
-	
+
 	private final boolean signatureVisible;
 	private final boolean stampVisible;
 
 	/** Construye un di&aacute;logo para la obtenci&oacute;n de los datos de firma PDF Visible.
 	 * @param parentFrame Marco padre para la modalidad.
-	 * @param spdl Clase a la que notificar la obtencion de propiedades de la firma visible. 
+	 * @param spdl Clase a la que notificar la obtencion de propiedades de la firma visible.
 	 * @param signatureVisible Indica si se va a insertar una firma
 	 * @param stampVisible Indica si se va a insertar una marca*/
 	private SignPdfDialog(final Frame parentFrame,
@@ -79,6 +83,11 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		);
 		setModalityType(ModalityType.TOOLKIT_MODAL);
 		setLocationRelativeTo(this.parent);
+
+		this.scrollPanel = new JScrollPane();
+		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		add(this.scrollPanel);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
@@ -115,9 +124,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		}
 
 		final JDialog dialog = new SignPdfDialog(parentFrame, spdl, signatureVisible, stampVisible);
-		dialog.setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+		dialog.setPreferredSize(getPreferredDimensionToSignatureDialog());
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-		dialog.setLocation(cp.x - PREFERRED_WIDTH/2, cp.y - PREFERRED_HEIGHT/2);
+		dialog.setLocation(cp.x - (int) dialog.getPreferredSize().getWidth()/2, cp.y - (int) dialog.getPreferredSize().getHeight()/2);
 		dialog.setResizable(false);
 
 		PdfLoader.loadPdf(
@@ -131,15 +140,16 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private List<Dimension> pageSizes;
 
 	@Override
-	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] pdf) {
+	public void pdfLoaded(final boolean isSign, final List<BufferedImage> listPages, final List<Dimension> listPageSizes, byte[] pdf) {
 		this.isPdfSign = isSign;
-		this.pages = pages;
-		this.pageSizes = pageSizes;
+		this.pages = listPages;
+		this.pageSizes = listPageSizes;
 		this.pdfData = pdf;
 
 
-		if(signatureVisible)
+		if(this.signatureVisible)
 		{
+			setPreferredSize(getPreferredDimensionToSignatureDialog());
 			this.activePanel = new SignPdfUiPanel(
 				this.isPdfSign,
 				this.pages,
@@ -147,24 +157,40 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 				this.pdfData,
 				this
 			);
-			add(this.activePanel);
+			this.scrollPanel.setViewportView(this.activePanel);
 		}
-		else if(stampVisible)
+		else if(this.stampVisible)
 		{
-			this.setTitle(SignPdfUiMessages.getString("SignPdfUiStamp.0"));
+			setPreferredSize(getPreferredDimensionToStampDialog());
+			setTitle(SignPdfUiMessages.getString("SignPdfUiStamp.0")); //$NON-NLS-1$
 			this.activePanel = new SignPdfUiPanelStamp(
-				this.isPdfSign,
 				this.pages,
 				this.pageSizes,
 				this.pdfData,
 				this,
 				new Properties()
 			);
-			add(this.activePanel);
+			this.scrollPanel.setViewportView(this.activePanel);
 		}
 		pack();
 
 		setVisible(true);
+	}
+
+	private static Dimension getPreferredDimensionToSignatureDialog() {
+		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
+		final Dimension dim = new Dimension(
+				PREFERRED_WIDTH,
+				(int) Math.min(PREFERRED_HEIGHT, screenHeight * 0.9));
+		return dim;
+	}
+
+	private static Dimension getPreferredDimensionToStampDialog() {
+		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
+		final Dimension dim = new Dimension(
+				PREFERRED_WIDTH,
+				(int) Math.min(PREFERRED_HEIGHT + 60, screenHeight * 0.9));
+		return dim;
 	}
 
 	@Override
@@ -195,24 +221,25 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	public void nextPanel(final Properties p, final BufferedImage im) {
 		if(this.activePanel instanceof SignPdfUiPanel)
 		{
-			remove(this.activePanel);
+			setPreferredSize(getPreferredDimensionToSignatureDialog());
 			this.activePanel = new SignPdfUiPanelPreview(this, p, im, this);
-			add(this.activePanel);
+			this.scrollPanel.setViewportView(this.activePanel);
 			pack();
+			((SignPdfUiPanelPreview) this.activePanel).requestFocusInWindow();
 		}
-		else if(this.activePanel instanceof SignPdfUiPanelPreview && stampVisible)
+		else if(this.activePanel instanceof SignPdfUiPanelPreview && this.stampVisible)
 		{
-			remove(this.activePanel);
+			setPreferredSize(getPreferredDimensionToStampDialog());
 			this.activePanel = new SignPdfUiPanelStamp(
-					this.isPdfSign,
 					this.pages,
 					this.pageSizes,
 					this.pdfData,
 					this,
 					p
 				);
-			add(this.activePanel);
+			this.scrollPanel.setViewportView(this.activePanel);
 			pack();
+			((SignPdfUiPanelStamp) this.activePanel).requestFocusInWindow();
 		}
 		else
 		{

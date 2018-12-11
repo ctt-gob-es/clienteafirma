@@ -226,10 +226,11 @@ final class PreferencesPanelFacturaE extends JScrollPane {
         signOptions.add(signOptionsInnerPanel);
 
         gbc.gridy++;
-        mainPanel.add(metadata, gbc);
+        mainPanel.add(signOptions, gbc);
 
         gbc.gridy++;
-        mainPanel.add(signOptions, gbc);
+        mainPanel.add(metadata, gbc);
+
 
         gbc.gridy++;
         gbc.weighty = 1.0;

@@ -95,16 +95,11 @@ public class VisorFirma extends JApplet implements WindowListener {
     		);
 
             if (this.parentComponent == null) {
-
-
-            	System.out.println(" ======== VisorFirma showMainScreen");
-
 	           	final MainScreen mainScreen = new MainScreen();
 	           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 	            this.container = mainScreen;
             }
             else {
-
             	JDialog dialog;
             	if (this.parentComponent instanceof Frame) {
             		dialog = new JDialog((Frame) this.parentComponent);
@@ -227,7 +222,6 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
         initialize(VisorFirma.this.equals(VisorFirma.this.container), sgFile);
 
-        System.out.println(" ====== REPAINT");
         repaint();
     }
 }

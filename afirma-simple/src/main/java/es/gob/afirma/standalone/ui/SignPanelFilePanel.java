@@ -127,38 +127,43 @@ final class SignPanelFilePanel extends JPanel {
         detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
         detailPanel.add(sizeLabel);
 
-        // Definimos aqui el boton para poder crear una politica de foco si fuese necesario
-        final JButton openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
+        // Definimos aqui el boton
+        JButton openFileButton = null;
 
-        openFileButton.setMnemonic('v');
-        openFileButton.addActionListener(
-    		ae -> {
-			    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
-			        new VisorFirma(false, null).initialize(false, file);
-			    }
-			    else {
-			        try {
-			            Desktop.getDesktop().open(file);
-			        }
-			        catch (final IOException e) {
-			        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-			    			"Error abriendo el fichero: " + e //$NON-NLS-1$
-						);
-			        	AOUIFactory.showErrorMessage(
-			                SignPanelFilePanel.this,
-			                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
-			                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			                JOptionPane.ERROR_MESSAGE
-			            );
-			            return;
-			        }
-			    }
-			}
-		);
-        pathLabel.setLabelFor(openFileButton);
-        descLabel.setLabelFor(openFileButton);
-        dateLabel.setLabelFor(openFileButton);
-        sizeLabel.setLabelFor(openFileButton);
+        final String ext = getExtension(file);
+        if (ext == null || !isExecutable(ext) && !isLink(ext)) {
+
+        	openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
+        	openFileButton.setMnemonic('v');
+        	openFileButton.addActionListener(
+        			ae -> {
+        				if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
+        					new VisorFirma(false, null).initialize(false, file);
+        				}
+        				else {
+        					try {
+        						Desktop.getDesktop().open(file);
+        					}
+        					catch (final IOException e) {
+        						Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+        								"Error abriendo el fichero: " + e //$NON-NLS-1$
+        								);
+        						AOUIFactory.showErrorMessage(
+        								SignPanelFilePanel.this,
+        								SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
+        								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+        								JOptionPane.ERROR_MESSAGE
+        								);
+        						return;
+        					}
+        				}
+        			}
+        			);
+        	pathLabel.setLabelFor(openFileButton);
+        	descLabel.setLabelFor(openFileButton);
+        	dateLabel.setLabelFor(openFileButton);
+        	sizeLabel.setLabelFor(openFileButton);
+        }
 
         // Establecemos la configuracion de color
         Color bgColor = Color.WHITE;
@@ -184,7 +189,7 @@ final class SignPanelFilePanel extends JPanel {
             	this.pdfStamp.setSelected(false);
             	this.pdfStamp.setEnabled(false);
                 detailPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-                detailPanel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121")));
+                detailPanel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121"))); //$NON-NLS-1$
             }
         }
 
@@ -220,15 +225,17 @@ final class SignPanelFilePanel extends JPanel {
         	add(icon, c);
         }
 
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.0;
-        c.weighty = 0.0;
-        c.gridx = 2;
-        c.ipadx = 0;
-        c.ipady = 0;
-        c.insets = new Insets(11, 6, 11, 11);
-        c.anchor = GridBagConstraints.NORTHEAST;
-        add(openFileButton, c);
+        if (openFileButton != null) {
+        	c.fill = GridBagConstraints.HORIZONTAL;
+        	c.weightx = 0.0;
+        	c.weighty = 0.0;
+        	c.gridx = 2;
+        	c.ipadx = 0;
+        	c.ipady = 0;
+        	c.insets = new Insets(11, 6, 11, 11);
+        	c.anchor = GridBagConstraints.NORTHEAST;
+        	add(openFileButton, c);
+        }
 
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
@@ -240,4 +247,37 @@ final class SignPanelFilePanel extends JPanel {
         c.anchor = GridBagConstraints.NORTH;
         add(detailPanel, c);
     }
+
+
+
+    /**
+     * Indica si el fichero es un ejecutable en base a la extensi&oacute;n de su nombre.
+     * @param file Fichero.
+     * @return {@code true} si el nombre del fichero tiene extensi&oacute;nde ejecutable,
+     * {@code false} en caso contrario.
+     */
+	private static boolean isExecutable(String ext) {
+		return DataFileAnalizer.isExecutableExtension(ext);
+	}
+
+	private static boolean isLink(String ext) {
+		return "LNK".equals(ext.toUpperCase()); //$NON-NLS-1$
+	}
+
+    /**
+     * Indica si el fichero es un ejecutable en base a la extensi&oacute;n de su nombre.
+     * @param file Fichero.
+     * @return {@code true} si el nombre del fichero tiene extensi&oacute;nde ejecutable,
+     * {@code false} en caso contrario.
+     */
+	private static String getExtension(File file) {
+
+		String ext = null;
+		final String filename = file.getName();
+		final int dotPos = filename.lastIndexOf('.');
+		if (dotPos > 0 && dotPos < filename.length() - 1) {
+			ext = filename.substring(dotPos + 1);
+		}
+		return ext;
+	}
 }

@@ -204,9 +204,9 @@ final class MassiveResultProcessPanel extends JPanel {
 
         // Barra de titulo del listado de resultados
 		final SignatureResultTitleRenderer resultTitlePanel = new SignatureResultTitleRenderer();
-		resultTitlePanel.setFileNameColumnTitle("Fichero");
-		resultTitlePanel.setSizeColumnTitle("Tama\u00F1o");
-		resultTitlePanel.setResultColumnTitle("Estado");
+		resultTitlePanel.setFileNameColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.9")); //$NON-NLS-1$
+		resultTitlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.10")); //$NON-NLS-1$
+		resultTitlePanel.setResultColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.11")); //$NON-NLS-1$
 		resultTitlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, Color.GRAY));
 
         final JScrollPane resultListPanel = new JScrollPane(
@@ -360,6 +360,7 @@ final class MassiveResultProcessPanel extends JPanel {
 	private static class SignatureResultTitleRenderer extends JPanel {
 
 		/** Serial Id. */
+		private static final long serialVersionUID = 6994842579055905859L;
 
 		private final JLabel fileNameLabel;
 		private final JLabel sizeLabel;

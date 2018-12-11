@@ -74,7 +74,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	 * @param signatureVisible Indica si se va a insertar una firma visible
 	 * @param stampVisible Indica si se va a insertar una marca visible */
 	public static void startPdfEmptySignatureFieldsChooserDialog(final byte[] pdf,
-																 final boolean isSign, 
+																 final boolean isSign,
 																 final Frame parent,
 																 final SignatureField field,
 																 final SignPdfDialogListener signPdfDialogListener,
@@ -111,13 +111,13 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
 
-		extraParams = new Properties();
-		extraParams.put(PdfExtraParams.SIGNATURE_FIELD, getField().getName());
-		extraParams.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getField().getPage()));
-		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX, Integer.toString(getField().getSignaturePositionOnPageLowerLeftX()));
-		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY, Integer.toString(getField().getSignaturePositionOnPageLowerLeftY()));
-		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX, Integer.toString(getField().getSignaturePositionOnPageUpperRightX()));
-		extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY, Integer.toString(getField().getSignaturePositionOnPageUpperRightY()));
+		this.extraParams = new Properties();
+		this.extraParams.put(PdfExtraParams.SIGNATURE_FIELD, getField().getName());
+		this.extraParams.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getField().getPage()));
+		this.extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX, Integer.toString(getField().getSignaturePositionOnPageLowerLeftX()));
+		this.extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY, Integer.toString(getField().getSignaturePositionOnPageLowerLeftY()));
+		this.extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX, Integer.toString(getField().getSignaturePositionOnPageUpperRightX()));
+		this.extraParams.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY, Integer.toString(getField().getSignaturePositionOnPageUpperRightY()));
 
 		SwingUtilities.invokeLater(
 			() -> createUI()
@@ -149,9 +149,9 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		);
 
 		try {
-			BufferedImage im = getFragmentImage(getField());
+			final BufferedImage im = getFragmentImage(getField());
 			if(im!=null) {
-				nextPanel(extraParams, im);
+				nextPanel(this.extraParams, im);
 			}
 			else {
 				throw new IOException("Error creando la imagen para previsualizar"); //$NON-NLS-1$
@@ -189,18 +189,20 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 
 	@Override
 	public void nextPanel(final Properties p, final BufferedImage im) {
-		if(activePanel == null) {
+		if(this.activePanel == null) {
 			getContentPane().removeAll();
 			final GridBagConstraints constraints = new GridBagConstraints();
 			constraints.fill = GridBagConstraints.BOTH;
 			constraints.weightx = 1.0;
 			constraints.weighty = 1.0;
 			constraints.insets = new Insets(0, 0, 0, 0);
-			activePanel = new SignPdfUiPanelPreview(this, p, im, this);
-			getContentPane().add(activePanel, constraints);
+			this.activePanel = new SignPdfUiPanelPreview(this, p, im, this);
+			getContentPane().add(this.activePanel, constraints);
 			setVisible(true);
+
+			((SignPdfUiPanelPreview) this.activePanel).requestFocusInWindow();
 		}
-		else if(activePanel instanceof SignPdfUiPanelPreview && stampVisible)
+		else if(this.activePanel instanceof SignPdfUiPanelPreview && this.stampVisible)
 		{
 			PdfLoader.loadPdf(
 				this.isSign,
@@ -214,9 +216,9 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	@Override
-	public void positionSelected(final Properties extraParams) {
+	public void positionSelected(final Properties params) {
 		setVisible(false);
-		this.listener.propertiesCreated(extraParams);
+		this.listener.propertiesCreated(params);
 		dispose();
 	}
 
@@ -283,13 +285,12 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	@Override
-	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] pdf) {
-		getContentPane().remove(activePanel);
+	public void pdfLoaded(final boolean signed, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] document) {
+		getContentPane().remove(this.activePanel);
 		this.activePanel = new SignPdfUiPanelStamp(
-			isSign,
 			pages,
 			pageSizes,
-			pdf,
+			document,
 			this,
 			new Properties()
 		);
