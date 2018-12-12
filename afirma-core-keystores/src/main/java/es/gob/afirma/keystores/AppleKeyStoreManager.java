@@ -128,8 +128,11 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 				if (getKeyStore().isKeyEntry(alias)) {
 					tmpAliasesWithPrivateKey.add(alias);
 				}
-			} catch (final KeyStoreException e) {
-            	//No se puede comprobar la clave privada, se ignora
+			}
+			catch (final KeyStoreException e) {
+            	LOGGER.info(
+        			"Se ignora el certificado '" + alias + "' por no poderse operar con su clave privada: " + e //$NON-NLS-1$ //$NON-NLS-2$
+    			);
 			}
 		}
 

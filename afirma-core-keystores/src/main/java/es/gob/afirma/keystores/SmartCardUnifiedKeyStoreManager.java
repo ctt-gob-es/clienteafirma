@@ -110,6 +110,11 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 						continue;
 					}
 					catch (final Exception ex) {
+
+						LOGGER.warning(
+							"Fallo el acceso al almacen externo  '" + sc.getDescription() + "', se reintentara: " + ex //$NON-NLS-1$ //$NON-NLS-2$
+						);
+
 						// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, reintentamos
 						if (Platform.OS.LINUX.equals(Platform.getOS())) {
 							try {
@@ -120,6 +125,9 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 								continue;
 							}
 							catch(final Exception e) {
+								LOGGER.warning(
+									"Fallo el acceso al almacen externo  '" + sc.getDescription() + "', se continuara con el siguiente: " + e //$NON-NLS-1$ //$NON-NLS-2$
+								);
 								continue;
 							}
 						}

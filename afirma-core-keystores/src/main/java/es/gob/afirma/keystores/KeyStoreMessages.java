@@ -11,6 +11,7 @@ package es.gob.afirma.keystores;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del UI. */
 final class KeyStoreMessages {
@@ -23,30 +24,33 @@ final class KeyStoreMessages {
     }
 
     /** Recupera el texto identificado con la clave proporcionada.
-     * @param key
-     *        Clave del texto.
-     * @return Recuerso textual. */
+     * @param key Clave del texto.
+     * @return Recurso textual. */
     static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+    			"No se ha encontrado el recurso textual '" + key + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
             return '!' + key + '!';
         }
     }
 
     /** Recupera el texto identificado con la clave proporcionada y sustituye la
      * subcadenas "%0" por el texto proporcionado.
-     * @param key
-     *        Clave del texto.
-     * @param text
-     *        Texto que se desea insertar.
-     * @return Recuerso textual con la subcadena sustituida. */
+     * @param key Clave del texto.
+     * @param text Texto que se desea insertar.
+     * @return Recurso textual con la subcadena sustituida. */
     static String getString(final String key, final String text) {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+    			"No se ha encontrado el recurso textual '" + key + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
             return '!' + key + '!';
         }
     }

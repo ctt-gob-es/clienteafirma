@@ -110,9 +110,12 @@ public final class KeyStoreUtilities {
 	        // Ignoramos la descripcion que se nos proporciona, ya que el
 	        // proveedor PKCS#11 de Sun falla si llegan espacios o caracteres raros
             .append("name=") //$NON-NLS-1$
+
             .append(name != null ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
-            // El showInfo debe ser false para mantener la compatibilidad con el PKCS#11 de los dispositivos Clauer
-            .append("\r\nshowInfo=false\r\n"); //$NON-NLS-1$
+
+            // El showInfo debe ser 'true' por el error 8039912 de Java
+            //       https://bugs.openjdk.java.net/browse/JDK-8039912
+            .append("\r\nshowInfo=true\r\n"); //$NON-NLS-1$
 
         if (slot != null) {
             buffer.append("slot=").append(slot).append("\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
