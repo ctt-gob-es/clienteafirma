@@ -173,10 +173,10 @@ final class CertUtil {
 	}
 
 	/** Genera un certificado de CA apto para la emisi&oacute;n de un certificado SSL.
-	 * @param subjectPrincipal Principal del subject del certificado.
+	 * @param subjectPrincipal Principal del titular del certificado.
 	 * @return Entrada con el certificado y su conjunto de claves.
 	 * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo de generaci&oacute;n de claves.
-	 * @throws CertificateException Cuando ocurre un error en la codificacion del certificado.
+	 * @throws CertificateException Cuando ocurre un error en la codificaci&oacute;n del certificado.
 	 * @throws IOException Cuando ocurre un error al generar el certificado. */
 	private static PrivateKeyEntry generateCaCertificate(final String subjectPrincipal) throws NoSuchAlgorithmException,
                                                                                                CertificateException,
@@ -199,7 +199,7 @@ final class CertUtil {
 		);
 
 		//Se incluyen los atributos del certificado CA
-		DigestCalculator digCalc = null;
+		final DigestCalculator digCalc;
 		try {
 			digCalc = new BcDigestCalculatorProvider().get(
 				new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1)
@@ -245,7 +245,7 @@ final class CertUtil {
         );
 
 	    //Firma del CA con su propia clave privada (autofirmado)
-	    X509Certificate cert = null;
+	    final X509Certificate cert;
 		try {
 			cert = new JcaX509CertificateConverter().setProvider(PROVIDER).getCertificate(
 				generator.build(
