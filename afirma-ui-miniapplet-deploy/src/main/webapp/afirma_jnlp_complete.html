@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pruebas AutoFirma</title>
+		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript">
+			function getOSName() {
+				var osName="unknown";
+				if (navigator.appVersion.indexOf("Win")!=-1) osName="windows";
+				if (navigator.appVersion.indexOf("Mac")!=-1) osName="mac";
+				if (navigator.appVersion.indexOf("Linux")!=-1) osName="linux";
+				return osName;
+			}
+		</script>
+    </head>
+
+    <body>
+
+		<div>Página de descarga de AutoFirma</div>
+
+		<script type="text/javascript">
+			
+			var url = "http://localhost:8080/afirma-server-simpleafirma-webstart/autofirmajnlp?cp=true&os=" + getOSName();
+		    deployJava.createWebStartLaunchButton(url, '1.8.0');
+		</script>
+    </body>
+
+</html>
