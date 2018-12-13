@@ -101,7 +101,20 @@ public final class AOKeyStoreManagerFactory {
 
         // Token PKCS#11, en cualquier sistema operativo
         if (AOKeyStore.PKCS11.equals(store)) {
-        	return new AggregatedKeyStoreManager(getPkcs11KeyStoreManager(lib, description, pssCallback, forceReset, parentComponent));
+        	final AOKeyStoreManager ksm = getPkcs11KeyStoreManager(
+				lib,
+				description,
+				pssCallback,
+				forceReset,
+				parentComponent
+			);
+        	final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(
+    			ksm
+			);
+        	aksm.setKeyStore(
+    			ksm.getKeyStore()
+			);
+        	return aksm;
         }
 
         // Almacen de certificados de Windows

@@ -248,8 +248,17 @@ public enum AOKeyStore {
 	 * @param parent Componente padre para la modalidad.
 	 * @return <i>PasswordCallback</i> necesario para abrir el almac&eacute;n. */
 	public PasswordCallback getStorePasswordCallback(final Object parent) {
+		return getStorePasswordCallback(parent, null);
+	}
+
+	/** Obtiene el <i>PasswordCallback</i> necesario para abrir el almac&eacute;n.
+	 * @param parent Componente padre para la modalidad.
+	 * @param prompt Texto del di&aacute;logo para solicitar la contrase&ntilde;a.
+	 * @return <i>PasswordCallback</i> necesario para abrir el almac&eacute;n. */
+	public PasswordCallback getStorePasswordCallback(final Object parent, final String prompt) {
 		if (this.storePasswordCallback instanceof UIPasswordCallback) {
 			((UIPasswordCallback)this.storePasswordCallback).setParent(parent);
+			((UIPasswordCallback)this.storePasswordCallback).setPrompt(prompt);
 		}
 		return this.storePasswordCallback;
 	}
