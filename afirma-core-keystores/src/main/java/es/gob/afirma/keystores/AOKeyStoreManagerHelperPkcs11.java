@@ -98,6 +98,9 @@ final class AOKeyStoreManagerHelperPkcs11 {
                 p11Provider = getP11Provider(config);
             }
             catch (final Exception e) {
+            	LOGGER.warning(
+        			"Ha fallado el primer intento de inicializacion del PKCS#11 para la la biblioteca '" + p11lib + "', se reintentara: " + e //$NON-NLS-1$ //$NON-NLS-2$
+    			);
                 // El PKCS#11 del DNIe a veces falla a la primera pero va
                 // correctamente a la segunda asi que reintentamos una vez mas
                 try {
@@ -105,7 +108,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
                 }
                 catch (final Exception ex) {
                     throw new AOKeyStoreManagerException(
-                		"No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib + ": " + ex, ex  //$NON-NLS-1$//$NON-NLS-2$
+                		"No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca '" + p11lib + "': " + ex, ex  //$NON-NLS-1$//$NON-NLS-2$
             		);
                 }
             }
