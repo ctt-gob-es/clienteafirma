@@ -15,8 +15,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,17 +22,21 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
@@ -158,6 +160,152 @@ public class JSEUIManager implements AOUIManager {
         }
         if (((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
             return pwd.getPassword();
+        }
+        throw new AOCancelledOperationException(
+    		"La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
+        );
+
+    }
+
+    /** Muestra un di&aacute;logo para pedir dos veces una contrase&ntilde;a al usuario (ambas deben coincidir).
+     * Es el procedimiento normal cuando se pide el establecimiento de una nueva contrase&ntilde;a, para evitar errores.
+     * @param text Texto con el que se solicitar&aacute; la entrada de texto al
+     *             usuario (<i>prompt</i>).
+     * @param text2 Texto con el que se solicitar&aacute; al usuario que repita la contrase&ntilde;a.
+     * @param imageIcon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
+     * 			   {@code null} para no mostrar icono.
+     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a.
+     * @param beep <code>true</code> si se desea un sonido de advertencia al
+     *             introducir un caracter no v&aacute;lido, <code>false</code> en
+     *             caso contrario.
+     * @param c Componente padre (para la modalidad).
+     * @return Array de caracteres del texto introducido como contrase&ntilde;a.
+     * @throws AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo. */
+    @Override
+	public final char[] getDoublePassword(final String text,
+										  final String text2,
+			                              final Object imageIcon,
+			                              final String charSet,
+			                              final boolean beep,
+			                              final Object c) {
+
+        final JPasswordField pwd1 = new JPasswordField(10);
+        if (charSet != null) {
+            pwd1.setDocument(new JTextFieldFilter(charSet, beep));
+        }
+        final JLabel lbText1 = new JLabel(text != null ? text : JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
+        lbText1.setMinimumSize(
+    		new Dimension(
+				lbText1.getFontMetrics(lbText1.getFont()).stringWidth(text != null ? text : JSEUIMessages.getString("JSEUIManager.24")), //$NON-NLS-1$
+				lbText1.getSize().height
+			)
+		);
+        lbText1.setLabelFor(pwd1);
+
+        final JPasswordField pwd2 = new JPasswordField(10);
+        if (charSet != null) {
+            pwd2.setDocument(new JTextFieldFilter(charSet, beep));
+        }
+        final JLabel lbText2 = new JLabel(text2 != null ? text2 : JSEUIMessages.getString("JSEUIManager.2")); //$NON-NLS-1$
+        lbText2.setMinimumSize(
+    		new Dimension(
+				lbText2.getFontMetrics(lbText2.getFont()).stringWidth(text2 != null ? text2 : JSEUIMessages.getString("JSEUIManager.2")), //$NON-NLS-1$
+				lbText2.getSize().height
+			)
+		);
+        lbText2.setLabelFor(pwd2);
+
+        final JPanel panel = new JPanel();
+
+        final GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        constraints.anchor = GridBagConstraints.CENTER;
+        panel.setLayout(new GridBagLayout());
+
+        constraints.gridy = 0;
+        panel.add(lbText1, constraints);
+
+        constraints.gridy = 1;
+        panel.add(pwd1, constraints);
+
+        constraints.gridy = 2;
+        panel.add(lbText2, constraints);
+
+        constraints.gridy = 3;
+        panel.add(pwd2, constraints);
+
+        final Icon icon = imageIcon instanceof javax.swing.Icon ? (javax.swing.Icon) imageIcon : null;
+
+        final JButton okBtn = new JButton(JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$
+        okBtn.getAccessibleContext().setAccessibleDescription(
+    		JSEUIMessages.getString("JSEUIManager.4") //$NON-NLS-1$
+		);
+        okBtn.setEnabled(false);
+
+        final JButton cancelBtn = new JButton(JSEUIMessages.getString("JSEUIManager.5")); //$NON-NLS-1$
+        cancelBtn.getAccessibleContext().setAccessibleDescription(
+        		JSEUIMessages.getString("JSEUIManager.6") //$NON-NLS-1$
+		);
+
+        final DocumentListener dl = new DocumentListener() {
+
+        	private void something() {
+        		if (pwd1.getPassword() != null && pwd1.getPassword().length > 1 && Arrays.equals(pwd1.getPassword(), pwd2.getPassword())) {
+    				okBtn.setEnabled(true);
+    			}
+    			else {
+    				okBtn.setEnabled(false);
+    			}
+        	}
+
+			@Override public void removeUpdate(final DocumentEvent e) { something(); }
+			@Override public void insertUpdate(final DocumentEvent e) { something(); }
+			@Override public void changedUpdate(final DocumentEvent e) { something(); }
+		};
+
+		pwd1.getDocument().addDocumentListener(dl);
+		pwd2.getDocument().addDocumentListener(dl);
+
+        final JOptionPane pane = new JOptionPane(
+    		panel,                             // Cuerpo del dialogo
+    		JOptionPane.QUESTION_MESSAGE,      // Tipo de dialogo
+    		JOptionPane.OK_CANCEL_OPTION,      // Opciones del dialogo
+    		icon,                              // Icono
+    		new Object[] { okBtn, cancelBtn }, // Opciones
+    		okBtn                              // Opcion por defecto
+		) {
+            private static final long serialVersionUID = -3012522768561175760L;
+
+            /** {@inheritDoc} */
+            @Override
+            public void selectInitialValue() {
+                pwd1.requestFocusInWindow();
+            }
+        };
+
+        okBtn.addActionListener(
+    		e -> {
+    			pane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
+			}
+		);
+        cancelBtn.addActionListener(
+    		e -> {
+    			pane.setValue(Integer.valueOf(JOptionPane.CANCEL_OPTION));
+			}
+		);
+
+        final Component parent = c instanceof Component ? (Component) c : null;
+
+        final JDialog dialog = pane.createDialog(parent, JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
+        dialog.setVisible(true);
+
+        final Object selectedValue = pane.getValue();
+        if (selectedValue == null) {
+            return new char[0];
+        }
+        if (((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
+            return pwd1.getPassword();
         }
         throw new AOCancelledOperationException(
     		"La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
@@ -683,35 +831,32 @@ public class JSEUIManager implements AOUIManager {
 	    CustomFileChooserForSave() {
 	        addPropertyChangeListener(
         		JFileChooser.FILE_FILTER_CHANGED_PROPERTY,
-        		new PropertyChangeListener() {
-		            @Override
-					public void propertyChange(final PropertyChangeEvent e) {
+        		e -> {
 
-		                if (!(e.getOldValue() instanceof FileNameExtensionFilter) || !(e.getNewValue() instanceof FileNameExtensionFilter)) {
-		                    return;
-		                }
+				    if (!(e.getOldValue() instanceof FileNameExtensionFilter) || !(e.getNewValue() instanceof FileNameExtensionFilter)) {
+				        return;
+				    }
 
-		                final FileNameExtensionFilter oldValue = (FileNameExtensionFilter) e.getOldValue();
-		                final FileNameExtensionFilter newValue = (FileNameExtensionFilter) e.getNewValue();
-		                if (
-	                		oldValue.getExtensions() == null || oldValue.getExtensions().length < 1 ||
-	                		newValue.getExtensions() == null || newValue.getExtensions().length < 1
-                		) {
-		                	return;
-		                }
-		                final String extold = oldValue.getExtensions()[0];
-		                final String extnew = newValue.getExtensions()[0];
+				    final FileNameExtensionFilter oldValue = (FileNameExtensionFilter) e.getOldValue();
+				    final FileNameExtensionFilter newValue = (FileNameExtensionFilter) e.getNewValue();
+				    if (
+						oldValue.getExtensions() == null || oldValue.getExtensions().length < 1 ||
+						newValue.getExtensions() == null || newValue.getExtensions().length < 1
+					) {
+				    	return;
+				    }
+				    final String extold = oldValue.getExtensions()[0];
+				    final String extnew = newValue.getExtensions()[0];
 
-		                String filename = getFile().getName();
-		                if (filename.endsWith(extold)) {
-		                    filename = filename.replace(extold, extnew);
-		                }
-		                else {
-		                    filename += extnew;
-		                }
-		                setSelectedFile(new File(filename));
-		            }
-        		}
+				    String filename = getFile().getName();
+				    if (filename.endsWith(extold)) {
+				        filename = filename.replace(extold, extnew);
+				    }
+				    else {
+				        filename += extnew;
+				    }
+				    setSelectedFile(new File(filename));
+				}
     		);
 	    }
 
