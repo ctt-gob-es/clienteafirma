@@ -109,7 +109,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	static void showError(final String code, final String message) {
-		final String desc = ProtocolMessages.getString("ProtocolLauncher.28") + "\n(" + message + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final String desc = ProtocolMessages.getString("ProtocolLauncher.28") + "\n(" + code + ": " + message + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (!HEADLESS) {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				ServiceInvocationManager.focusApplication();
@@ -133,6 +133,6 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	static String getErrorMessage(final String code) {
-		return ERRORS.get(code); //$NON-NLS-1$
+		return code + ": " + ERRORS.get(code); //$NON-NLS-1$
 	}
 }
