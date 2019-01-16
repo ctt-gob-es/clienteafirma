@@ -401,7 +401,7 @@ public final class AOKeyStoreManagerFactory {
         if (lib != null && !lib.isEmpty()) {
             p11Lib = lib;
         }
-        if (p11Lib != null && !new File(p11Lib).exists()) {
+        if (p11Lib != null && !new File(p11Lib).isFile()) {
         	throw new IOException("La biblioteca '" + p11Lib + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 

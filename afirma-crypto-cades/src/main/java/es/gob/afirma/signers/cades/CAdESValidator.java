@@ -98,7 +98,7 @@ public final class CAdESValidator {
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             final Enumeration<?> e = getCAdESObjects(data);
 
-            // Elementos que contienen los elementos OID Data
+            // Elementos que contienen los elementos OID SignedData
             final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
             	LOGGER.fine(

@@ -92,11 +92,9 @@ public final class AOUIFactory {
         }
     }
 
-    /**
-     * Establece el manejador de interfaces que gestionar&aacute; los di&aacute;logos
+    /** Establece el manejador de interfaces que gestionar&aacute; los di&aacute;logos
      * gr&aacute;ficos que utilizar&aacute; @firma para mostrar o solicitar informaci&oacute;n.
-     * @param manager Manejador de interfaces.
-     */
+     * @param manager Manejador de interfaces. */
     public static void setUIManager(final AOUIManager manager) {
     	if (manager != null) {
     		uiManager = manager;
@@ -104,15 +102,12 @@ public final class AOUIFactory {
     }
 
     /** Pregunta al usuario por una contrase&ntilde;a.
-     * @param text
-     *        Texto que se muestra en el di&aacute;logo para pedir la
-     *        contrase&ntilde;a
-     * @param c
-     *        Componente padre (para la modalidad)
+     * @param text Texto que se muestra en el di&aacute;logo para pedir la
+     *             contrase&ntilde;a
+     * @param c Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws es.gob.afirma.core.AOCancelledOperationException
-     *         Cuando el usuario cancela el proceso de solicitud de
-     *         contrase&ntilde;a */
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el proceso
+     *                                                          de solicitud de contrase&ntilde;a */
     public static char[] getPassword(final String text, final Object c) {
         return uiManager.getPassword(text, c);
     }
@@ -122,25 +117,43 @@ public final class AOUIFactory {
      * car&aacute;cter no permitido, se emitir&aacute;a una advertencia no bloqueante
      * (sonido, vibraci&oacute;n...) si el par&aacute;metro {@code beep} est&aacute;
      * activado.
-     * @param text
-     *        Texto que se muestra en el di&aacute;logo para pedir la
-     *        contrase&ntilde;a
+     * @param text Texto que se muestra en el di&aacute;logo para pedir la
+     *             contrase&ntilde;a
      * @param icon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo
      * 		  o {@code null} para no mostrar icono.
-     * @param charset
-     *        Cadena con los caracteres permitidos para la contrase&ntilde;a.
-     * @param beep
-     *        Indica si se debe dar una se&ntilde;al al usuario al intentar insertar
-     *        un caracter no v&aacute;lido para la contrase&ntilde;a.
-     * @param c
-     *        Componente padre (para la modalidad)
+     * @param charset Cadena con los caracteres permitidos para la contrase&ntilde;a.
+     * @param beep Indica si se debe dar una se&ntilde;al al usuario al intentar insertar
+     *             un caracter no v&aacute;lido para la contrase&ntilde;a.
+     * @param c Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws es.gob.afirma.core.AOCancelledOperationException
-     *         Cuando el usuario cancela el proceso de solicitud de
-     *         contrase&ntilde;a */
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el
+     *                                                          proceso de solicitud de contrase&ntilde;a */
     public static char[] getPassword(final String text, final Object icon, final String charset, final boolean beep, final Object c) {
         return uiManager.getPassword(text, icon, charset, beep, c);
     }
+
+    /** Pregunta al usuario dos veces una misma contrase&ntilde;a (deben coincidir).
+     * Es el procedimiento normal cuando se pide el establecimiento de una nueva contrase&ntilde;a, para evitar errores.
+     * @param text Texto con el que se solicitar&aacute; la entrada de texto al
+     *             usuario (<i>prompt</i>).
+     * @param text2 Texto con el que se solicitar&aacute; al usuario que repita la contrase&ntilde;a.
+     * @param imageIcon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
+     * 			   {@code null} para no mostrar icono.
+     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a.
+     * @param beep <code>true</code> si se desea un sonido de advertencia al
+     *             introducir un caracter no v&aacute;lido, <code>false</code> en
+     *             caso contrario.
+     * @param c Componente padre (para la modalidad).
+     * @return Array de caracteres del texto introducido como contrase&ntilde;a.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo. */
+	public static char[] getDoublePassword(final String text,
+			                               final String text2,
+			                               final Object imageIcon,
+			                               final String charSet,
+			                               final boolean beep,
+			                               final Object c) {
+		return uiManager.getDoublePassword(text, text2, imageIcon, charSet, beep, c);
+	}
 
     /** JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
