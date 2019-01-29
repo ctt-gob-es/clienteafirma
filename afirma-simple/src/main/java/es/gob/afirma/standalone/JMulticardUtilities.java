@@ -19,12 +19,15 @@ public class JMulticardUtilities {
 	}
 
 	/**
-	 * Configura si JMulticard debe utilizarse normalmente o si debe desactivarse su uso.
+	 * Configura si JMulticard debe utilizarse normalmente o si debe desactivarse su uso y c&oacute;mo
+	 * tratar las contrase&ntilde;as de las tarjetas.
 	 * @param defaultBehavior {@code true} para configurar el comportamiento por defecto de JMulticard
 	 * (se utilizara para las tarjetas inteligentes soportadas) o {@code false} para desactivar
 	 * el uso de JMulticard.
+	 * @param cachePasswords {@code true} para indicar que se almacenen las contrase&ntilde;as de las
+	 * tarjetas, {@code false} para que no se almacenen.
 	 */
-	public static void configureJMulticard(boolean defaultBehavior) {
+	public static void configureJMulticard(final boolean defaultBehavior, final boolean cachePasswords) {
 		if (defaultBehavior) {
         	System.clearProperty(KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER);
         	System.clearProperty(KeyStoreUtilities.DISABLE_CERES_NATIVE_DRIVER);
@@ -33,5 +36,15 @@ public class JMulticardUtilities {
         	System.setProperty(KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER, Boolean.TRUE.toString());
         	System.setProperty(KeyStoreUtilities.DISABLE_CERES_NATIVE_DRIVER, Boolean.TRUE.toString());
         }
+
+		if (!cachePasswords) {
+        	System.clearProperty(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_DNIE_NATIVE_DRIVER);
+        	System.clearProperty(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER);
+        }
+        else {
+        	System.setProperty(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_DNIE_NATIVE_DRIVER, Boolean.TRUE.toString());
+        	System.setProperty(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER, Boolean.TRUE.toString());
+        }
+
 	}
 }

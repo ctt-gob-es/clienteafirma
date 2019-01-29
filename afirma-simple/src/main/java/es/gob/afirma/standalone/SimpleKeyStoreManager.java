@@ -120,9 +120,12 @@ public final class SimpleKeyStoreManager {
 
         // Configuramos el uso de JMulticard segun lo establecido en el dialogo
         // de preferencias
-        final boolean defaultBehavior = PreferencesManager.getBoolean(
+        final boolean enableJMulticard = PreferencesManager.getBoolean(
         		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
-        JMulticardUtilities.configureJMulticard(defaultBehavior);
+        final boolean cachePassword = PreferencesManager.getBoolean(
+        		PreferencesManager.PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD);
+
+        JMulticardUtilities.configureJMulticard(enableJMulticard, cachePassword);
 
         // Cargamos el almacen por defecto
 

@@ -61,6 +61,29 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>es.gob.afirma.jmulticard</groupId>
+				<artifactId>jmulticard</artifactId>
+				<version>1.5</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>es.gob.afirma.jmulticard</groupId>
+				<artifactId>jmulticard-jse</artifactId>
+				<version>1.5</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>es.gob.afirma.jmulticard</groupId>
+				<artifactId>jmulticard-ui</artifactId>
+				<version>1.5</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+		
 	
 	<profiles>
 		<!-- ===== Construccion por defecto ===== -->

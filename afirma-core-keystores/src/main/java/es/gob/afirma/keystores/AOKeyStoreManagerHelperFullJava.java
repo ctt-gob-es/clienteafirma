@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
 import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
 import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCallbackHandler;
 
@@ -88,9 +89,19 @@ final class AOKeyStoreManagerHelperFullJava {
 	 * @throws IOException Si hay problemas en la lectura de datos. */
     static KeyStore initDnieJava(final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                          IOException {
+
+    	CallbackHandler callbackHandler;
+    	if (Boolean.getBoolean(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_DNIE_NATIVE_DRIVER) ||
+    		Boolean.parseBoolean(System.getenv(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_DNIE_NATIVE_DRIVER_ENV))) {
+    		callbackHandler = new DnieCacheCallbackHandler();
+    	}
+    	else {
+    		callbackHandler = new DnieCallbackHandler();
+    	}
+
     	return init(
 			AOKeyStore.DNIEJAVA,
-			buildLoadStoreParameter(new DnieCallbackHandler()),
+			buildLoadStoreParameter(callbackHandler),
 			new es.gob.jmulticard.jse.provider.DnieProvider(),
 			parentComponent
 		);
