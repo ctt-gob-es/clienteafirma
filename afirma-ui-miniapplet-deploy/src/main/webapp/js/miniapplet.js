@@ -347,18 +347,17 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 						downloadSuccessFunction(b64);
 					}
-//					else {
-//						console.log("Se termino la descarga de los datos. No se invoca a ninguna funcion.");
-//					}
 				}
 			}
-			httpRequest.onerror = function(e) {
-				if (downloadErrorFunction) {
-					downloadErrorFunction(e);
+			try {
+				httpRequest.onerror = function(e) {
+					if (downloadErrorFunction) {
+						downloadErrorFunction(e);
+					}
 				}
-//				else {
-//					console.log("Error en la descarga de los datos. No se invoca a ninguna funcion.");
-//				}
+			}
+			catch (e) {
+				// Vacio
 			}
 			httpRequest.send();
 		}
@@ -1722,15 +1721,20 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}
 				}
-				httpRequest.onerror = function(e) {
-					// status error 0 es que no se ha podido comunicar con la aplicacion
-					if (e.target.status == 0) {
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+				try {
+					httpRequest.onerror = function(e) {
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0) {
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// error desconocido 
+						else {
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
 					}
-					// error desconocido 
-					else {
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
-					}
+				}
+				catch (e) {
+					// Vacio
 				}
 				// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
 				httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession + "@EOF");
@@ -1779,15 +1783,20 @@ var MiniApplet = ( function ( window, undefined ) {
 						setTimeout(executeOperationRecursive, WAITING_TIME, url, i, iFinal);
 					}
 				}
-				httpRequest.onerror = function(e) { 
-					// Status error 0 es que no se ha podido comunicar con la aplicacion
-					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+				try {
+					httpRequest.onerror = function(e) { 
+						// Status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// Error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
 					}
-					// Error desconocido 
-					else{
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
-					}
+				}
+				catch (e) {
+					// Vacio
 				}
 				// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
 				httpRequest.send("fragment=@" + i + "@" + iFinal + "@"  + Base64.encode(urlToSend, true) + "idsession=" + idSession +"@EOF");
@@ -1832,15 +1841,20 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}
 				}
-				httpRequest.onerror = function(e) { 
-					// status error 0 es que no se ha podido comunicar con la aplicacion
-					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+				try {
+					httpRequest.onerror = function(e) { 
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
 					}
-					// error desconocido 
-					else{
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
-					}
+				}
+				catch (e) {
+					// Vacio
 				}
 				httpRequest.send("firm=idsession=" + idSession +"@EOF");
 			}
@@ -1888,15 +1902,20 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}
 				}
-				httpRequest.onerror = function(e) { 
-					// status error 0 es que no se ha podido comunicar con la aplicacion
-					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+				try {
+					httpRequest.onerror = function(e) { 
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
 					}
-					// error desconocido 
-					else{
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
-					}
+				}
+				catch (e) {
+					// Vacio
 				}
 				if (part <= totalParts){
 					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
@@ -2838,9 +2857,13 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}
 				}
-				
-				httpRequest.onerror = function(e) {
-					errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+				try {
+					httpRequest.onerror = function(e) {
+						errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+					}
+				}
+				catch (e) {
+					// Vacio
 				}
 
 				var requestData =
@@ -3101,9 +3124,13 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}					
 				}
-				
-				httpRequest.onerror = function() {
-					errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion", errorCallback);
+				try {
+					httpRequest.onerror = function() {
+						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion", errorCallback);
+					}
+				}
+				catch (e) {
+					// Vacio
 				}
 
 				httpRequest.open("POST", url, true);
