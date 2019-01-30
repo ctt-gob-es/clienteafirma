@@ -39,6 +39,22 @@ public interface AOUIManager {
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     char[] getPassword(String text, Object icon, String charSet, boolean beep, Object c);
 
+    /** Muestra un di&aacute;logo para pedir dos veces una contrase&ntilde;a al usuario (ambas deben coincidir).
+     * Es el procedimiento normal cuando se pide el establecimiento de una nueva contrase&ntilde;a, para evitar errores.
+     * @param text Texto con el que se solicitar&aacute; la entrada de texto al
+     *             usuario (<i>prompt</i>).
+     * @param text2 Texto con el que se solicitar&aacute; al usuario que repita la contrase&ntilde;a.
+     * @param imageIcon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
+     * 			   {@code null} para no mostrar icono.
+     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a.
+     * @param beep <code>true</code> si se desea un sonido de advertencia al
+     *             introducir un caracter no v&aacute;lido, <code>false</code> en
+     *             caso contrario.
+     * @param c Componente padre (para la modalidad).
+     * @return Array de caracteres del texto introducido como contrase&ntilde;a.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo. */
+	char[] getDoublePassword(String text, String text2, Object imageIcon, String charSet, boolean beep, Object c);
+
     /** JOptionPane.showInputDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param message Mensaje

@@ -560,12 +560,16 @@ public final class KeyStoreUtilities {
 
     /** Manejador para la gesti&oacute;n de la contrase&ntilde;a (y otros di&aacute;logos)
      * de un almac&eacute;n de claves. */
-    private static class PasswordCallbackHandler implements CallbackHandler {
+    public static class PasswordCallbackHandler implements CallbackHandler {
 
     	private final Object parentComponent;
     	private final PasswordCallback pssCallBack;
     	private boolean cancelled = false;
 
+    	/** Construye un manejador para la gesti&oacute;n de la contrase&ntilde;a (y otros di&aacute;logos)
+         * de un almac&eacute;n de claves.
+    	 * @param parentComponent Componente padre para la modalidad.
+    	 * @param pssCallBack <code>PasswordCallback</code> para solicitar la contrase&ntilde;a. */
     	public PasswordCallbackHandler(final Object parentComponent, final PasswordCallback pssCallBack) {
     		this.parentComponent = parentComponent;
     		this.pssCallBack = pssCallBack;
