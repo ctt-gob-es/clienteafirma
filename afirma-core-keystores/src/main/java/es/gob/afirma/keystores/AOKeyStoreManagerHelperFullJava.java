@@ -23,6 +23,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
 import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
+import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCacheCallbackHandler;
 import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
@@ -41,9 +42,19 @@ final class AOKeyStoreManagerHelperFullJava {
 	 * @throws IOException Si hay problemas en la lectura de datos. */
 	static KeyStore initCeresJava(final Object parentComponent) throws AOKeyStoreManagerException,
                                                                        IOException {
+
+    	CallbackHandler callbackHandler;
+    	if (Boolean.getBoolean(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER) ||
+    		Boolean.parseBoolean(System.getenv(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER_ENV))) {
+    		callbackHandler = new SmartcardCacheCallbackHandler();
+    	}
+    	else {
+    		callbackHandler = new SmartcardCallbackHandler();
+    	}
+
 		return init(
 			AOKeyStore.CERES,
-			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			buildLoadStoreParameter(callbackHandler),
 			new es.gob.jmulticard.jse.provider.ceres.CeresProvider(),
 			parentComponent
 		);
@@ -57,9 +68,19 @@ final class AOKeyStoreManagerHelperFullJava {
 	 * @throws IOException Si hay problemas en la lectura de datos. */
 	static KeyStore initCeres430Java(final Object parentComponent) throws AOKeyStoreManagerException,
                                                                        IOException {
+
+    	CallbackHandler callbackHandler;
+    	if (Boolean.getBoolean(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER) ||
+    		Boolean.parseBoolean(System.getenv(KeyStoreUtilities.ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER_ENV))) {
+    		callbackHandler = new SmartcardCacheCallbackHandler();
+    	}
+    	else {
+    		callbackHandler = new SmartcardCallbackHandler();
+    	}
+
 		return init(
 			AOKeyStore.CERES_430,
-			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			buildLoadStoreParameter(callbackHandler),
 			new es.gob.jmulticard.jse.provider.Ceres430Provider(),
 			parentComponent
 		);
