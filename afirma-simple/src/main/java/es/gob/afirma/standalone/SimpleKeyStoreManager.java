@@ -46,12 +46,7 @@ public final class SimpleKeyStoreManager {
 
         if (dnie) {
 
-            // Configuramos el uso de JMulticard segun lo establecido en el dialogo
-            // de preferencias (salvo que el propio JMulticard siempre estara habilitado
-            final boolean cachePassword = PreferencesManager.getBoolean(
-            		PreferencesManager.PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD);
-
-            JMulticardUtilities.configureJMulticard(true, cachePassword);
+            JMulticardUtilities.configureJMulticard(true);
 
             try {
             	return getKeyStoreManager(AOKeyStore.DNIEJAVA, parent);
@@ -126,14 +121,11 @@ public final class SimpleKeyStoreManager {
 
         // -- Comportamiento por defecto --
 
-        // Configuramos el uso de JMulticard segun lo establecido en el dialogo
-        // de preferencias
+        // Configuramos el uso de JMulticard segun lo establecido en el dialogo de preferencias
         final boolean enableJMulticard = PreferencesManager.getBoolean(
         		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
-        final boolean cachePassword = PreferencesManager.getBoolean(
-        		PreferencesManager.PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD);
 
-        JMulticardUtilities.configureJMulticard(enableJMulticard, cachePassword);
+        JMulticardUtilities.configureJMulticard(enableJMulticard);
 
         // Cargamos el almacen por defecto
 

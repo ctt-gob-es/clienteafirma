@@ -29,15 +29,12 @@ public final class PreferencesManager {
 
 		properties = new Properties();
 		try {
-
-			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties" //$NON-NLS-1$
-			));
+			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
 		} catch (final Exception e) {
 			LOGGER.severe(
 					"No han podido cargarse los valores por defecto del fichero de configuracion de preferencias, se usaran los valores por defecto: " //$NON-NLS-1$
 							+ e);
 		}
-
 	}
 
 	private PreferencesManager() {
@@ -103,15 +100,6 @@ public final class PreferencesManager {
 	 * por defecto de JMulticard, que usaria las tarjetas DNIe y CERES. Un valor de <code>false</code>
 	 * har&aacute; que no se desactive el uso de JMulticard para estas tarjetas. */
 	public static final String PREFERENCE_GENERAL_ENABLED_JMULTICARD = "enabledJmulticard"; //$NON-NLS-1$
-
-	/** Cachear contrase&ntilde;as utilizadas con JMulticard.
-	 * Un valor de <code>true</code> en esta preferencia hace que se configure JMulticard para que cachee las contrase&ntide;as
-	 * la aplicacion deje el comportamiento
-	 * por defecto de JMulticard, que usaria las tarjetas DNIe y CERES. Un valor de <code>false</code>
-	 * har&aacute; que no se desactive el uso de JMulticard para estas tarjetas. */
-	public static final String PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD = "jmulticardCachePassword"; //$NON-NLS-1$
-
-
 
 	/** Algoritmo de firma.
 	 * Esta preferencia debe tener uno de estos valores:

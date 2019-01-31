@@ -115,13 +115,10 @@ public final class ProtocolInvocationLauncher {
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROTOCOL);
         }
 
-        // Configuramos el uso de JMulticard segun lo establecido en el dialogo
-        // de preferencias
+        // Configuramos el uso de JMulticard segun lo establecido en el dialogo de preferencias
         final boolean jMulticardEnabled = PreferencesManager.getBoolean(
         		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
-        final boolean cachePassword = PreferencesManager.getBoolean(
-        		PreferencesManager.PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD);
-        JMulticardUtilities.configureJMulticard(jMulticardEnabled, cachePassword);
+        JMulticardUtilities.configureJMulticard(jMulticardEnabled);
 
         // Se invoca la aplicacion para iniciar la comunicacion por socket
         if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$

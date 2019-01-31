@@ -67,8 +67,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
-	private final JCheckBox jMulticardCachePassword = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.173")); //$NON-NLS-1$
-
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 
 	private final DisposableInterface disposableInterface;
@@ -277,15 +275,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.enableJMulticard.addItemListener(modificationListener);
 			this.enableJMulticard.addKeyListener(keyListener);
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
-			signConstraint.gridy++;
 		}
 
-		this.jMulticardCachePassword.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.174")); //$NON-NLS-1$
-		this.jMulticardCachePassword.setMnemonic('m');
-		this.jMulticardCachePassword.addItemListener(modificationListener);
-		this.jMulticardCachePassword.addKeyListener(keyListener);
-		signConfigPanel.add(this.jMulticardCachePassword, signConstraint);
 
 		mainPanel.add(signConfigPanel, gbc);
 
@@ -550,7 +541,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		}
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD, this.jMulticardCachePassword.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
 	}
 
@@ -591,7 +581,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.enableJMulticard.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD));
 		}
 
-		this.jMulticardCachePassword.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_JMULTICARD_CACHE_PASSWORD));
 		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
 	}
 

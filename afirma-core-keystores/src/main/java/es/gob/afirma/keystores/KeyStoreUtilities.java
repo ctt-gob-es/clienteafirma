@@ -65,23 +65,6 @@ public final class KeyStoreUtilities {
 	 * si se desea <b>no</b> usar el controlador Java de tarjetas G&amp;D SmartCafe interno del programa. */
 	public static final String ENABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.enableGYDSCNativeDriver"; //$NON-NLS-1$
 
-	/** Nombre de la variable de entorno (a nivel de sistema operativo) que debe establecerse a <code>true</code>
-	 * si se desea cachear el PIN del DNIe para uso con el controlador de DNIe Java interno del programa. */
-	public static final String ENABLE_CACHE_PASSWORD_FOR_DNIE_NATIVE_DRIVER_ENV = "AFIRMA_CACHE_DNIE_PASSWORD"; //$NON-NLS-1$
-
-	/** Nombre de la propiedad Java (a nivel de JVM) que debe establecerse a <code>true</code>
-	 * si se desea cachear el PIN del DNIe para uso con el controlador de DNIe Java interno del programa. */
-	public static final String ENABLE_CACHE_PASSWORD_FOR_DNIE_NATIVE_DRIVER = "es.gob.afirma.keystores.enableDnieCachePassword"; //$NON-NLS-1$
-
-	/** Nombre de la variable de entorno (a nivel de sistema operativo) que debe establecerse a <code>true</code>
-	 * si se desea cachear el PIN de las tarjetas CERES para uso con el controlador de CERES Java interno del programa. */
-	public static final String ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER_ENV = "AFIRMA_CACHE_CERES_PASSWORD"; //$NON-NLS-1$
-
-	/** Nombre de la propiedad Java (a nivel de JVM) que debe establecerse a <code>true</code>
-	 * si se desea cachear el PIN de las tarjetas CERES para uso con el controlador de CERES Java interno del programa. */
-	public static final String ENABLE_CACHE_PASSWORD_FOR_CERES_NATIVE_DRIVER = "es.gob.afirma.keystores.enableCeresCachePassword"; //$NON-NLS-1$
-
-
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
     }
