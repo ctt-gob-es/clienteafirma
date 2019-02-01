@@ -115,11 +115,10 @@ public final class ProtocolInvocationLauncher {
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROTOCOL);
         }
 
-        // Configuramos el uso de JMulticard segun lo establecido en el dialogo
-        // de preferencias
-        final boolean defaultBehavior = PreferencesManager.getBoolean(
+        // Configuramos el uso de JMulticard segun lo establecido en el dialogo de preferencias
+        final boolean jMulticardEnabled = PreferencesManager.getBoolean(
         		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
-        JMulticardUtilities.configureJMulticard(defaultBehavior);
+        JMulticardUtilities.configureJMulticard(jMulticardEnabled);
 
         // Se invoca la aplicacion para iniciar la comunicacion por socket
         if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -600,7 +599,7 @@ public final class ProtocolInvocationLauncher {
      * @param storageServletUrl URL del servicio de guardado en el servidor intermedio.
      * @param id Identificador de la transacci&oacute;n para la que se le solicita la espera.
      */
-    private static void requestWait(URL storageServletUrl, String id) {
+    private static void requestWait(final URL storageServletUrl, final String id) {
     	activeWaitingThread = new ActiveWaitingThread(storageServletUrl.toString(), id);
     	activeWaitingThread.start();
 	}

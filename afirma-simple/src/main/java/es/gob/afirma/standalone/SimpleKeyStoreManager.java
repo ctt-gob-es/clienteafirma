@@ -45,6 +45,9 @@ public final class SimpleKeyStoreManager {
     	// -- Se ha habilitado el uso de DNIe --
 
         if (dnie) {
+
+            JMulticardUtilities.configureJMulticard(true);
+
             try {
             	return getKeyStoreManager(AOKeyStore.DNIEJAVA, parent);
             }
@@ -118,11 +121,11 @@ public final class SimpleKeyStoreManager {
 
         // -- Comportamiento por defecto --
 
-        // Configuramos el uso de JMulticard segun lo establecido en el dialogo
-        // de preferencias
-        final boolean defaultBehavior = PreferencesManager.getBoolean(
+        // Configuramos el uso de JMulticard segun lo establecido en el dialogo de preferencias
+        final boolean enableJMulticard = PreferencesManager.getBoolean(
         		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
-        JMulticardUtilities.configureJMulticard(defaultBehavior);
+
+        JMulticardUtilities.configureJMulticard(enableJMulticard);
 
         // Cargamos el almacen por defecto
 

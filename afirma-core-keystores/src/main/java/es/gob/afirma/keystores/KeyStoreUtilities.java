@@ -319,7 +319,7 @@ public final class KeyStoreUtilities {
 	 * @throws AOCancelledOperationException Cuando se cancela la carga del almac&eacute;n. */
 	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm,
 			                                           final Object parentComponent) {
-		// Anadimos el controlador Java del DNIe SIEMPRE excepto a menos que se indique lo contrario
+		// Anadimos el controlador Java del DNIe SIEMPRE excepto que se indique lo contrario
 		// mediante una variable de entorno de sistema operativo o una propiedad Java
 		if (
 			!Boolean.getBoolean(DISABLE_DNIE_NATIVE_DRIVER) &&

@@ -1,9 +1,7 @@
 package es.gob.jmulticard;
 
 import java.security.KeyStore;
-import java.security.KeyStore.LoadStoreParameter;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStore.ProtectionParameter;
 import java.security.Provider;
 import java.security.Security;
 import java.security.Signature;
@@ -14,7 +12,7 @@ import org.junit.Test;
 
 import es.gob.jmulticard.jse.provider.DnieProvider;
 import es.gob.jmulticard.ui.passwordcallback.gui.CommonPasswordCallback;
-import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
+import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
 
 /** Pruebas de tarjetas inteligentes con <i>CallbackHandler</i>. */
 public class TestCallBackHandler {
@@ -29,14 +27,9 @@ public class TestCallBackHandler {
 		Security.addProvider(p);
 		final KeyStore ks = KeyStore.getInstance("DNI", p); //$NON-NLS-1$
 		ks.load(
-			new LoadStoreParameter() {
-				@Override
-				public ProtectionParameter getProtectionParameter() {
-					return new KeyStore.CallbackHandlerProtection(
-							new DnieCallbackHandler()
-					);
-				}
-			}
+			() -> new KeyStore.CallbackHandlerProtection(
+					new DnieCacheCallbackHandler()
+			)
 		);
 
 		final Enumeration<String> aliases = ks.aliases();
@@ -59,14 +52,9 @@ public class TestCallBackHandler {
 		Security.addProvider(p);
 		final KeyStore ks = KeyStore.getInstance("DNI", p); //$NON-NLS-1$
 		ks.load(
-			new LoadStoreParameter() {
-				@Override
-				public ProtectionParameter getProtectionParameter() {
-					return new KeyStore.PasswordProtection(
-						new CommonPasswordCallback("Introduzca el PIN de su DNIe", "PIN", true).getPassword() //$NON-NLS-1$ //$NON-NLS-2$
-					);
-				}
-			}
+			() -> new KeyStore.PasswordProtection(
+				new CommonPasswordCallback("Introduzca el PIN de su DNIe", "PIN", true).getPassword() //$NON-NLS-1$ //$NON-NLS-2$
+			)
 		);
 		final Enumeration<String> aliases = ks.aliases();
 		while (aliases.hasMoreElements()) {
@@ -88,7 +76,7 @@ public class TestCallBackHandler {
 				"DNI", //$NON-NLS-1$
 				new DnieProvider(),
 				new KeyStore.CallbackHandlerProtection(
-						new DnieCallbackHandler()
+						new DnieCacheCallbackHandler()
 				)
 			);
 

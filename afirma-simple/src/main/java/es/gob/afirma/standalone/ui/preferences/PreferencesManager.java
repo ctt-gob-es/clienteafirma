@@ -29,15 +29,12 @@ public final class PreferencesManager {
 
 		properties = new Properties();
 		try {
-
-			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties" //$NON-NLS-1$
-			));
+			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
 		} catch (final Exception e) {
 			LOGGER.severe(
 					"No han podido cargarse los valores por defecto del fichero de configuracion de preferencias, se usaran los valores por defecto: " //$NON-NLS-1$
 							+ e);
 		}
-
 	}
 
 	private PreferencesManager() {
@@ -237,7 +234,7 @@ public final class PreferencesManager {
 	 *  <li>XAdES Enveloped</li>
 	 * </ul> */
 	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
-	
+
 	/** Realizar cofirma en multifirmas XAdES. */
 	public static final String PREFERENCE_XADES_MULTISIGN_COSIGN = "xadesMultisignCosign";  //$NON-NLS-1$
 

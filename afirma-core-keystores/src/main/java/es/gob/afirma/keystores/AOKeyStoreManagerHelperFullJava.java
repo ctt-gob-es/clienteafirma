@@ -21,7 +21,8 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
+import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
+import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCacheCallbackHandler;
 import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
@@ -42,7 +43,7 @@ final class AOKeyStoreManagerHelperFullJava {
                                                                        IOException {
 		return init(
 			AOKeyStore.CERES,
-			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.ceres.CeresProvider(),
 			parentComponent
 		);
@@ -58,7 +59,7 @@ final class AOKeyStoreManagerHelperFullJava {
                                                                        IOException {
 		return init(
 			AOKeyStore.CERES_430,
-			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.Ceres430Provider(),
 			parentComponent
 		);
@@ -90,7 +91,7 @@ final class AOKeyStoreManagerHelperFullJava {
     		                                                          IOException {
     	return init(
 			AOKeyStore.DNIEJAVA,
-			buildLoadStoreParameter(new DnieCallbackHandler()),
+			buildLoadStoreParameter(new DnieCacheCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.DnieProvider(),
 			parentComponent
 		);

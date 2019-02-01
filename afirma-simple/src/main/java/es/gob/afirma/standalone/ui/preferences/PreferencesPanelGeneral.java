@@ -276,6 +276,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.enableJMulticard.addKeyListener(keyListener);
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
 		}
+
+
 		mainPanel.add(signConfigPanel, gbc);
 
 		final JPanel innerPanel = new JPanel(new GridBagLayout());

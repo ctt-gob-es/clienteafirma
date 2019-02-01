@@ -33,7 +33,7 @@
      permitir al usuario seleccionar el certificado de firma de entre los disponibles en el almacén del sistema.</li>
      <li><b>Buscar actualizaciones al inicio:</b> Permite configurar si se deben b&uacute;scar si hay actualizaciones disponibles al iniciar la aplicacion.</li>
      <li><b>Enviar estad&iacute;sticas de uso de forma an&oacute;nima para ayudar a mejorar la aplicaci&oacute;n:</b> Permite configurar si se desea permitir el env&iacute;o de estad&iacute;sticas de uso.</li>
-     <li><b>Habilitar JMulticard para el uso de las tarjetas de la FNMT y DNIe</b> Configura si debe utilizarse el controlador integrado en AutoFirma para el uso de las tarjetas de FNMT y DNIe. En caso de desactivarse, se utilizar&aacute;n los controladores encontrados en el sistema. El uso de esta funci&oacute;n permite usar las tarjetas compatibles cuando el usuario no tiene instalado su controlador o existe alguna incompatibilidad con &eacute;l. Esta funci&oacute;n puede ocasionar que se solicite al usuario m&uacute;ltiples veces la inserci&oacute;n del PIN de la tarjeta en procesos de firma masiva. Esta configuraci&oacute;n no tendr&aacute; efecto hasta la pr&oacute;xima vez que se abra la aplicaci&oacute;n.</li>
+     <li><b>Habilitar JMulticard para el uso de las tarjetas de la FNMT y DNIe:</b> Configura si debe utilizarse el controlador integrado en AutoFirma para el uso de las tarjetas de FNMT y DNIe. En caso de desactivarse, se utilizar&aacute;n los controladores encontrados en el sistema. El uso de esta funci&oacute;n permite usar las tarjetas compatibles cuando el usuario no tiene instalado su controlador o existe alguna incompatibilidad con &eacute;l. Esta funci&oacute;n puede ocasionar que se solicite al usuario m&uacute;ltiples veces la inserci&oacute;n del PIN de la tarjeta en procesos de firma masiva. Esta configuraci&oacute;n no tendr&aacute; efecto hasta la pr&oacute;xima vez que se abra la aplicaci&oacute;n.</li>
     </ul>
    </li>
    <li><b>Opciones de firma:</b>
@@ -81,7 +81,8 @@
   	<img src="../gfx/menufirmaspades_mini.png" alt="Pantalla para la configuraci&oacute;n de las firmas de documentos PDF">
   </p>
   <ul>
-   <li><b>Política de firma:</b> Permite declarar la política de firma que se sigue en las firmas PAdES;
+   <li><b>Configuraci&oacute;n de la pol&iacute;tica de firma:</b> Permite declarar la pol&iacute;tica de firma que se sigue en las firmas PAdES.
+   <p>Los valores accesibles a trav&eacute;s del panel de configuraci&oacute;n son:</p>
     <ul>
      <li>Ninguna pol&iacute;tica: La firmas de PDF generadas no declarar&aacute;n pol&iacute;tica de firma.</li>
      <li>Pol&iacute;tica de firma de la AGE 1.9: Se declara la pol&iacute;tica de firma de la AGE v1.9.</li>
@@ -94,29 +95,27 @@
       </ul>
     </ul>
     </li>
+    <li><b>Opciones de firma:</b> Opciones generales de firma PAdESFormato b&aacute;sico de firma.
+     <ul>
+      <li>Formato b&aacute;sico de firma: Permite configurar el formato b&aacute;sico de las firmas PAdES:
+       <ul>
+        <li>PAdES B&aacute;sico: Es el formato de firma PAdES generado por Adobe Acrobat y el utilizado por defecto por el Cliente @firma.</li>
+        <li>PAdES-BES: Es el formato que m&aacute;s se ajusta al est&aacute;ndar PAdES, pero Adobe Reader/Acrobat no valida correctamente las multifirmas generadas a partir de &eacute;l.</li>
+       </ul>
+      </li>
+      <li>Realizar por defecto firmas visibles PDF: Al habilitar esta opci&oacute;n y firmar un documento en formato PAdES, se le
+      presentar&aacute; al usuario una ventana para la selecci&oacute;n del &aacute;rea del PDF en el que se agregar&aacute;
+      la firma visible. Consulte el apartado <a href="VentanaPdfVisible.html">Firmas visibles PDF</a> para mayor detalle.</li>
+      <li>Aplicar marca visible a documentos PDF: Al habilitar esta opci&oacute;n y firmar un documento en formato PAdES, se le
+      presentar&aacute; al usuario una ventana para la selecci&oacute;n del &aacute;rea y p&aacute;ginas del PDF en las que se
+      agregar&aacute; una marca visible. Consulte el apartado <a href="VentanaPdfVisible.html">Marcas visibles PDF</a> para mayor detalle.</li>
+     </ul>
+    </li>
     <li><b>Metadatos de las firmas PAdES:</b>
      <ul>
       <li>Raz&oacute;n por la que se firma el documento: Descripci&oacute;n breve del motivo de la firma.</li>
       <li>Ciudad en la que se realiza la firma: Ciudad en la que se localiza el firmante en el momento de la firma.</li>
       <li>Contacto del firmante: Direcci&oacute;n de correo electr&oacute;nico.</li>
-     </ul>
-    </li>
-    <li><b>Formato b&aacute;sico de firma:</b> Permite configurar el formato b&aacute;sico de las firmas PAdES:
-     <ul>
-      <li>PAdES B&aacute;sico: Es el formato de firma PAdES generado por Adobe Acrobat y el utilizado por defecto por el Cliente @firma.</li>
-      <li>PAdES-BES: Es el formato que m&aacute;s se ajusta al est&aacute;ndar PAdES, pero Adobe Reader/Acrobat no valida correctamente las multifirmas generadas a partir de &eacute;l.</li>
-     </ul>
-    </li>
-    <li><b>Elementos visibles:</b>
-     <ul>
-      <li>Crear firmas visibles en el PDF: Al habilitar esta opci&oacute;n y firmar un documento en formato PAdES, se le
-      presentar&aacute; al usuario una ventana para la selecci&oacute;n del &aacute;rea del PDF en el que se agregar&aacute;
-      la firma visible. Consulte el apartado <a href="VentanaPdfVisible.html">Firmas visibles PDF</a> para mayor detalle.</li>
-     </ul>
-     <ul>
-      <li>Aplicar marcas visibles al PDF: Al habilitar esta opci&oacute;n y firmar un documento en formato PAdES, se le
-      presentar&aacute; al usuario una ventana para la selecci&oacute;n del &aacute;rea y p&aacute;ginas del PDF en las que se
-      agregar&aacute; una marca visible. Consulte el apartado <a href="VentanaPdfVisible.html">Marcas visibles PDF</a> para mayor detalle.</li>
      </ul>
     </li>
    </ul> 
@@ -125,7 +124,8 @@
   	<img src="../gfx/menufirmascades_mini.png" alt="Pantalla para la configuraci&oacute;n de las firmas de documentos binarios">
   </p>
   <ul>
-   <li><b>Pol&iacute;tica de firma:</b> Permite declarar la pol&iacute;tica de firma que se sigue en las firmas CAdES:
+   <li><b>Configuraci&oacute;n de la pol&iacute;tica de firma:</b> Permite declarar la pol&iacute;tica de firma que se sigue en las firmas CAdES:
+    <p>Los valores accesibles a trav&eacute;s del panel de configuraci&oacute;n son:</p>
     <ul>
      <li>Ninguna pol&iacute;tica: La firmas generadas no declarar&aacute;n pol&iacute;tica de firma.</li>
      <li>Pol&iacute;tica de firma de la AGE 1.9: Se declara la pol&iacute;tica de firma de la AGE v1.9</li>
@@ -143,13 +143,21 @@
       <li>Incluir una copia de los datos firmados en la propia firma: Configura si la firma electr&oacute;nica debe almacenar internamente los datos firmados.</li>
      </ul>
     </li>
+    <li><b>Operaci&oacute;n en multifirmas:</b> Permite configurar la operaci&oacute;n que deber&aacute; realizarse cuando el fichero de entrada sea un firma CAdES.
+     <ul>
+      <li>Cofirma: Cofirma la firma de entrada.</li>
+      <li>Contrafirma (&uacute;nicamente de los nodos hoja): Contrafirma los nodos hoja de la firma de entrada.</li>
+      <li>Contrafirma (de todo el &aacute;rbol): Contrafirma todos los nodos de firma de la firma de entrada.</li>
+     </ul>
+    </li>
    </ul>
    <h3>Men&uacute; "Firmas XAdES (XML)"</h3>
   <p align="center">
   	<img src="../gfx/menufirmasxades_mini.png" alt="Pantalla para la configuraci&oacute;n de las firmas de documentos XML">
   </p>
   <ul>
-   <li><b>Pol&iacute;tica de firma:</b> Permite declarar la pol&iacute;tica de firma que se sigue en las firmas XAdES:
+   <li><b>Configuraci&oacute;n de la pol&iacute;tica de firma:</b> Permite declarar la pol&iacute;tica de firma que se sigue en las firmas XAdES:
+    <p>Los valores accesibles a trav&eacute;s del panel de configuraci&oacute;n son:</p>
     <ul>
      <li>Ninguna pol&iacute;tica: La firmas de XML generadas no declarar&aacute;n pol&iacute;tica de firma.</li>
      <li>Pol&iacute;tica de firma de la AGE 1.9: Se declara la pol&iacute;tica de firma de la AGE v1.9</li>
@@ -162,45 +170,47 @@
       </ul>
     </ul>
    </li>
-  </ul>
-  <ul>
-    <li><b>Metadatos de las firmas XAdES:</b>
-     <ul>
-      <li>Ciudad en la que se realiza la firma: Ciudad en la que se localiza el firmante en el momento de la firma.</li>
-      <li>Provincia en la que se realiza la firma: Provincia en la que se localiza el firmante en el momento de la firma.</li>
-      <li>C&oacute;digo postal en la que se realiza la firma: C&oacute;digo postal en la que se localiza el firmante en el momento de la firma.</li>
-      <li>Pa&iacute;s en el que se realiza la firma: Pa&iacute;s la que se localiza el firmante en el momento de la firma.</li>
-      <li>Cargo del firmante: Cargo de quien realiza la firma.</li>
-     </ul>
-    </li>
-    <li><b>Formato de las firmas XAdES:</b>
-     <ul>
-      <li>XAdES Enveloping: Se configura el modo enveloping (la firma envuelve a los datos firmados).</li>
-      <li>XAdES Detached: Se configura el modo detached (firma y datos en una super-estructura XML).</li>
-      <li>XAdES Enveloped: Se configura el modo enveloped (la firma se inserta dentro de los datos XML).</li>
-     </ul>
-     <p><b><u>ADVERTENCIA:</u></b> La pol&iacute;tica de firma de la AGE, sólo permite la realización de firmas
+   <li><b>Opciones de firma:</b>
+    <ul>
+	 <li><b>Formato de las firmas:</b>
+      <ul>
+       <li>XAdES Enveloping: Se configura el modo enveloping (la firma envuelve a los datos firmados).</li>
+       <li>XAdES Detached: Se configura el modo detached (firma y datos en una super-estructura XML).</li>
+       <li>XAdES Enveloped: Se configura el modo enveloped (la firma se inserta dentro de los datos XML).</li>
+      </ul>
+     </li>
+    </ul>
+    <p><b><u>ADVERTENCIA:</u></b> La pol&iacute;tica de firma de la AGE, sólo permite la realización de firmas
      en formatos Enveloped e Internally Detached (aquí referida como Detached). Así pues, sólo se podrán configurar
      estos formatos de firma cuando se declare la política de firma de la AGE.</p>
-    </li>
-   </ul>
+   </li>
+   <li><b>Metadatos de las firmas XAdES:</b>
+    <ul>
+     <li>Ciudad en la que se realiza la firma: Ciudad en la que se localiza el firmante en el momento de la firma.</li>
+     <li>Provincia en la que se realiza la firma: Provincia en la que se localiza el firmante en el momento de la firma.</li>
+     <li>C&oacute;digo postal en la que se realiza la firma: C&oacute;digo postal en la que se localiza el firmante en el momento de la firma.</li>
+     <li>Pa&iacute;s en el que se realiza la firma: Pa&iacute;s la que se localiza el firmante en el momento de la firma.</li>
+     <li>Cargo del firmante: Cargo de quien realiza la firma.</li>
+    </ul>
+   </li>
+  </ul>
    <h3>Men&uacute; "Factura Electr&oacute;nica"</h3>
    <p align="center">
   	<img src="../gfx/menufirmasfacturae_mini.png" alt="Pantalla para la configuraci&oacute;n de las firmas de facturas electr&oacute;nicas">
    </p>
    <ul>
-    <li><b>Pol&iacute;tica de firma:</b> Permite declarar la versi&oacute;n de la pol&iacute;tica de firma de Factura electr&oacute;nica que debe utilizarse.</li>
+    <li><b>Configuraci&oacute;n de la pol&iacute;tica de firma:</b> Permite declarar la versi&oacute;n de la pol&iacute;tica de firma de Factura electr&oacute;nica que debe utilizarse.</li>
+    <li><b>Opciones de firma:</b>
+     <ul>
+      <li>Papel del firmante de la factura electr&oacute;nica: Permite configurar el rol que desempeña el firmante en el ciclo de vida de la factura.</li>
+     </ul>
+    </li>
     <li><b>Metadatos de las facturas electr&oacute;nicas:</b>
      <ul>
       <li>Ciudad en la que se realiza la firma: Ciudad en la que se localiza el firmante en el momento de la firma.</li>
       <li>Provincia en la que se realiza la firma: Provincia en la que se localiza el firmante en el momento de la firma.</li>
       <li>C&oacute;digo postal en la que se realiza la firma: C&oacute;digo postal en la que se localiza el firmante en el momento de la firma.</li>
       <li>Pa&iacute;s en el que se realiza la firma: Pa&iacute;s la que se localiza el firmante en el momento de la firma.</li>
-     </ul>
-    </li>
-    <li><b>Opciones de firma:</b>
-     <ul>
-      <li>Papel del firmante de la factura electr&oacute;nica: Permite configurar el rol que desempeña el firmante en el ciclo de vida de la factura.</li>
      </ul>
     </li>
    </ul>

@@ -26,19 +26,16 @@
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard</artifactId>
-			<version>1.4</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
-			<version>1.4</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-ui</artifactId>
-			<version>1.4</version>
 		</dependency>
 		
 	</dependencies>
