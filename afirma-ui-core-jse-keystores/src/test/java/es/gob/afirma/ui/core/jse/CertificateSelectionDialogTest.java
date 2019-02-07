@@ -1,5 +1,8 @@
 package es.gob.afirma.ui.core.jse;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -21,7 +24,10 @@ public class CertificateSelectionDialogTest {
 	/** Para pruebas sin JUnit
 	 * @param args No se usa.
 	 * @throws Exception En cualquier error. */
-	public static void main(final String[] args) throws Exception {
+    @SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void showCertDialogTest() throws Exception {
 
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				AOKeyStore.PKCS12,
@@ -36,7 +42,7 @@ public class CertificateSelectionDialogTest {
 			alias = dialog.show();
 		}
 		catch (final Exception e) {
-			System.err.println("Error: " + e);
+			System.err.println("Error: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 			return;
 		}

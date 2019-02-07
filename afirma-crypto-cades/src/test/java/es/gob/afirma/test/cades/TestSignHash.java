@@ -36,8 +36,8 @@ public class TestSignHash {
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-		this.pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		ks.load(ClassLoader.getSystemResourceAsStream(TestSignHash.CERT_PATH), TestSignHash.CERT_PASS.toCharArray());
+		this.pke = (PrivateKeyEntry) ks.getEntry(TestSignHash.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignHash.CERT_PASS.toCharArray()));
 	}
 
 	/** Prueba de firma de huella SHA-1.
@@ -47,7 +47,7 @@ public class TestSignHash {
 
 		final String HASH_ALGORITHM = "SHA1"; //$NON-NLS-1$
 
-		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(DATA_FILE));
+		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(TestSignHash.DATA_FILE));
 		final byte[] hash = MessageDigest.getInstance(HASH_ALGORITHM).digest(data);
 
 		final Properties config = new Properties();
@@ -77,7 +77,7 @@ public class TestSignHash {
 
 		final String HASH_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 
-		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(DATA_FILE));
+		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(TestSignHash.DATA_FILE));
 		final byte[] hash = MessageDigest.getInstance(HASH_ALGORITHM).digest(data);
 
 		final Properties config = new Properties();

@@ -70,6 +70,8 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     /** Version ID. */
     private static final long serialVersionUID = 8309157734617505338L;
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Anchura m&iacute;nima que deber&aacute; tener el panel. */
 	private static final int DEFAULT_WINDOW_WIDTH = 600;
 	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
@@ -119,7 +121,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     private void openSign(final File signFile, final byte[] signature, final boolean addReloadButton) {
 
         if (signFile == null && signature == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$
             return;
         }
 
@@ -130,7 +132,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
                 sign = AOUtil.getDataFromInputStream(fis);
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            	LOGGER.warning(
             		"No se ha podido cargar el fichero de firma: " + e //$NON-NLS-1$
         		);
             }
@@ -142,7 +144,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
                 validity = validateSign(sign);
             }
             catch (final Exception e) {
-            	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            	LOGGER.warning(
         			"No se ha podido comprobar la validez de la firma: " + e //$NON-NLS-1$
     			);
                 validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
@@ -260,7 +262,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 			}
 		}
 		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"No se ha podido obtener el certificado de la firma: " + e //$NON-NLS-1$
 			);
 			return null;
@@ -354,21 +356,18 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 					(SignatureProcessAction) button.getButton().getAction()));
     	}
 
-    	EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-		        if (pluginsButtons == null || pluginsButtons.isEmpty()) {
-		        	VisorPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        }
-		        else {
-		        	VisorPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        	VisorPanel.this.pluginButtonsPanel.removeAll();
-		        	for (final PluginGraphicButton button : pluginsButtons) {
-		        		VisorPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
-		        	}
-		        	VisorPanel.this.mainPluginsButtonsPanel.setVisible(true);
-		        }
-			}
+    	EventQueue.invokeLater(() -> {
+		    if (pluginsButtons == null || pluginsButtons.isEmpty()) {
+		    	VisorPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    }
+		    else {
+		    	VisorPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    	VisorPanel.this.pluginButtonsPanel.removeAll();
+		    	for (final PluginGraphicButton button : pluginsButtons) {
+		    		VisorPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
+		    	}
+		    	VisorPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		    }
 		});
     }
 
@@ -380,14 +379,14 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 		final File signFile;
 		final SignatureProcessAction action;
 
-		public PluginButtonActionListener(SignDataPanel panel, final File signFile, SignatureProcessAction action) {
+		public PluginButtonActionListener(final SignDataPanel panel, final File signFile, final SignatureProcessAction action) {
 			this.panel = panel;
 			this.signFile = signFile;
 			this.action = action;
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 
 			final CompleteSignInfo signInfo = this.panel.getCurrentSignInfo();
 
@@ -402,18 +401,13 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 			}
 			data.setCerts(certs.values().toArray(new X509Certificate[certs.size()]));
 
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					PluginButtonActionListener.this.action.processSignatures(
-							new OutputData[] { data }, null,
-							SwingUtilities.getWindowAncestor(VisorPanel.this));
-				}
-			}).start();
+			new Thread(() -> PluginButtonActionListener.this.action.processSignatures(
+					new OutputData[] { data }, null,
+					SwingUtilities.getWindowAncestor(VisorPanel.this))).start();
 		}
 
 
-		private void readCertsFromBranch(AOTreeNode node, Map<BigInteger, X509Certificate> certs) {
+		private void readCertsFromBranch(final AOTreeNode node, final Map<BigInteger, X509Certificate> certs) {
 			final AOSimpleSignInfo signInfo = (AOSimpleSignInfo) node.getUserObject();
 			if (signInfo.getCerts() != null && signInfo.getCerts().length > 0
 					&& signInfo.getCerts()[0] != null) {

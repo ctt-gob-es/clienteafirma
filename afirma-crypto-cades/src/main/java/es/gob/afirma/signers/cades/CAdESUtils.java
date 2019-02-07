@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +29,7 @@ import org.spongycastle.asn1.ASN1UTCTime;
 import org.spongycastle.asn1.DEROctetString;
 import org.spongycastle.asn1.DERSequence;
 import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.DERTaggedObject;
 import org.spongycastle.asn1.DERUTCTime;
 import org.spongycastle.asn1.DERUTF8String;
 import org.spongycastle.asn1.cms.Attribute;
@@ -46,6 +48,7 @@ import org.spongycastle.asn1.x509.GeneralName;
 import org.spongycastle.asn1.x509.GeneralNames;
 import org.spongycastle.asn1.x509.IssuerSerial;
 import org.spongycastle.asn1.x509.PolicyInformation;
+import org.spongycastle.asn1.x509.X509AttributeIdentifiers;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -425,6 +428,7 @@ public final class CAdESUtils {
                                                          final String contentType,
                                                          final String contentDescription,
                                                          final List<CommitmentTypeIndicationBean> ctis,
+                                                         final String[] claimedRoles,
                                                          final CAdESSignerMetadata csm,
                                                          final boolean isCountersign,
                                                          final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
@@ -520,6 +524,70 @@ public final class CAdESUtils {
 			);
         }
 
+
+        // Roles declarados (Segun ETSI TS 101 733 V2.1.1 (2012-03))
+        //
+        // SignerAttribute ::= SEQUENCE OF CHOICE {
+        //    claimedAttributes   [0] ClaimedAttributes,
+        //    certifiedAttributes [1] CertifiedAttributes }
+        //
+        // ClaimedAttributes ::= SEQUENCE OF Attribute
+        // CertifiedAttributes ::= AttributeCertificate -- as defined in RFC 3281: see clause 4.1. (No lo implementamos)
+        if (claimedRoles != null && claimedRoles.length > 0) {
+
+        	// Creamos un listado de roles con el ID de rol utilizado en los certificados
+        	final List<Attribute> claimedRolesAttrs = new ArrayList<>();
+        	for (final String role : claimedRoles) {
+        		if (role != null && !role.isEmpty()) {
+        			claimedRolesAttrs.add(new Attribute(
+							X509AttributeIdentifiers.id_at_role,
+							new DERSet(new DERUTF8String(role))
+							));
+        		}
+        	}
+
+
+        	// ############### PRUEBA 1 #################
+
+        	// Agregamos el listado de roles al SignerAttribute, que sera un atributo firmado
+        	if (!claimedRolesAttrs.isEmpty()) {
+        		final ASN1EncodableVector roles = new ASN1EncodableVector();
+        		for (final Attribute attr : claimedRolesAttrs) {
+        			roles.add(attr);
+        		}
+        		contextSpecific.add(
+        				new Attribute(
+        						PKCSObjectIdentifiers.id_aa_ets_signerAttr,
+        						new DERSet(
+        								new DERSequence(
+        										new DERTaggedObject(0, new DERSequence(roles))
+        										)
+        								)
+        						)
+        				);
+        	}
+
+
+        	// ############### PRUEBA 2 #################
+
+//        	// Agregamos el listado de roles al SignerAttribute, que sera un atributo firmado
+//        	if (!claimedRolesAttrs.isEmpty()) {
+//        		final ASN1EncodableVector roles = new ASN1EncodableVector();
+//        		for (final Attribute attr : claimedRolesAttrs) {
+//        			roles.add(attr);
+//        		}
+//        		contextSpecific.add(
+//        				new Attribute(
+//        						PKCSObjectIdentifiers.id_aa_ets_signerAttr,
+//        						new DERSet(
+//        										new DERTaggedObject(0, new DERSequence(roles))
+//        										)
+//        						)
+//        				);
+//        	}
+        }
+
+        // Agregamos la hora de firma
         if (includeSigningTimeAttribute /* && !padesMode */) {
         	contextSpecific.add(
     			new Attribute(
@@ -530,7 +598,6 @@ public final class CAdESUtils {
 				)
 			);
         }
-
 
         return contextSpecific;
     }

@@ -145,7 +145,7 @@ public final class SingleSign {
 		return this.subOperation;
 	}
 
-	void setExtraParams(Properties extraParams) {
+	void setExtraParams(final Properties extraParams) {
 		// El identificador de la firma debe transmitirse al firmador trifasico a traves
 		// de los extraParams para que este lo utilice y asi podamos luego asociar la
 		// firma con los datos a los que corresponden
@@ -153,19 +153,19 @@ public final class SingleSign {
 		this.extraParams.put(PROP_ID, getId());
 	}
 
-	void setDataSource(String dataSource) {
+	void setDataSource(final String dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	void setFormat(SignFormat format) {
+	void setFormat(final SignFormat format) {
 		this.format = format;
 	}
 
-	void setSubOperation(SignSubOperation subOperation) {
+	void setSubOperation(final SignSubOperation subOperation) {
 		this.subOperation = subOperation;
 	}
 
-	void setSignSaver(SignSaver signSaver) {
+	void setSignSaver(final SignSaver signSaver) {
 		this.signSaver = signSaver;
 	}
 
@@ -224,7 +224,7 @@ public final class SingleSign {
 			sb.append(AOUtil.properties2Base64(getExtraParams()));
 		}
 		catch (final IOException e) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+			LOGGER.severe(
 				"Error convirtiendo los parametros adicionales de la firma '" + getId() + "' a Base64: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
@@ -245,7 +245,7 @@ public final class SingleSign {
 			sb.append(AOUtil.properties2Base64(this.signSaver.getConfig()));
 		}
 		catch (final IOException e) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+			LOGGER.severe(
 				"Error convirtiendo la configuracion del objeto de guardado de la firma '" + getId() + "' a Base64: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
@@ -428,7 +428,7 @@ public final class SingleSign {
 		return data;
 	}
 
-	private static String getTempFileName(String source, String signId) throws NoSuchAlgorithmException {
+	private static String getTempFileName(final String source, final String signId) throws NoSuchAlgorithmException {
 		return Base64.encode(MessageDigest.getInstance("SHA-1").digest((source + signId).getBytes()), true); //$NON-NLS-1$
 	}
 

@@ -18,6 +18,7 @@ import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
@@ -191,6 +192,12 @@ public final class PAdESTriPhaseSigner {
 	    	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName));	 //$NON-NLS-1$
 	    }
 
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(PdfExtraParams.SIGNER_CLAIMED_ROLES);
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+        }
+
         final byte[] original = AOUtil.getDataFromInputStream(ptps.getSAP().getRangeStream());
 
         // Calculamos el MessageDigest
@@ -218,6 +225,7 @@ public final class PAdESTriPhaseSigner {
                 PDF_OID,
                 PDF_DESC,
                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                claimedRoles,
                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
                 Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false")) //$NON-NLS-1$
             ),

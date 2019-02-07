@@ -84,6 +84,9 @@ import es.gob.afirma.standalone.ui.CommonWaitDialog;
 public final class CheckHashFiles extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = 5969239673119761747L;
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private final JTextField xml = new JTextField();
 	private final JTextField directory = new JTextField();
 	private static Map<String, List<String>> reportXML;
@@ -229,7 +232,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+					LOGGER.severe(
 						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
 					);
 				}
@@ -237,7 +240,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 					// Operacion cancelada por el usuario
 				}
 				catch (final Exception ex2) {
-					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+					LOGGER.severe(
 						"No ha sido posible comprobar las huellas digitales: " + ex2 //$NON-NLS-1$
 					);
 					AOUIFactory.showErrorMessage(

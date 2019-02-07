@@ -49,8 +49,8 @@ final class ClientHandler extends BasicHandler {
 	/** Sin seguridad. */
 	static final String NONEOPTION = "none"; //$NON-NLS-1$
 
-	static final String DIGESTPASSWORD = "DIGEST"; //$NON-NLS-1$
-	static final String TEXTPASSWORD = "TEXT"; //$NON-NLS-1$
+	static final String TOKEN_TYPE_DIGEST = "DIGEST"; //$NON-NLS-1$
+	static final String TOKEN_TYPE_TEXT = "TEXT"; //$NON-NLS-1$
 
 	private static final long serialVersionUID = 2L;
 
@@ -163,10 +163,10 @@ final class ClientHandler extends BasicHandler {
 		// Insercion del tag wsse:Security y userNameToken
 		final WSSecHeader wsSecHeader = new WSSecHeader(null, false);
 		final WSSecUsernameToken wsSecUsernameToken = new WSSecUsernameToken();
-		if (TEXTPASSWORD.equalsIgnoreCase(this.usernameTokenPasswordType)) {
+		if (TOKEN_TYPE_TEXT.equalsIgnoreCase(this.usernameTokenPasswordType)) {
 			wsSecUsernameToken.setPasswordType(WSConstants.PASSWORD_TEXT);
 		}
-		else if (DIGESTPASSWORD.equalsIgnoreCase(this.usernameTokenPasswordType)) {
+		else if (TOKEN_TYPE_DIGEST.equalsIgnoreCase(this.usernameTokenPasswordType)) {
 			wsSecUsernameToken.setPasswordType(WSConstants.PASSWORD_DIGEST);
 		}
 		else {

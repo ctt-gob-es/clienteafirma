@@ -61,12 +61,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 	/** URI que define el espacio de nombres de firma XMLdSig (Compatible XAdES). */
     public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 
-    static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
+    protected static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
 
     /** Etiqueta de los nodos firma de los XML firmados. */
     public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
 
-    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
+    protected static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
 
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$

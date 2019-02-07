@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.core.ui.GenericFileFilter;
 
@@ -14,7 +17,10 @@ public final class SaveTest {
 	/** Main para pruebas.
 	 * @param args No se usa.
 	 * @throws IOException En cualquier error. */
-	public static void main(final String[] args) throws IOException {
+    @SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void showSaveFileDialogTest() throws IOException {
 		final AOUIManager m = new JSEUIManager();
 		m.saveDataToFile(
 			"HOLA".getBytes(), //$NON-NLS-1$

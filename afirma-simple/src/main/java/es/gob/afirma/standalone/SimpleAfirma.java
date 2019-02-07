@@ -43,10 +43,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import com.dmurph.tracking.AnalyticsConfigData;
-import com.dmurph.tracking.JGoogleAnalyticsTracker;
-import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
-
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
@@ -552,9 +548,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				!Boolean.parseBoolean(System.getenv(DO_NOT_SEND_ANALYTICS_ENV))
 		) {
 	    	new Thread(() ->  {
+	    			// No importamos directamente los paquetes para no crear una dependencia absoluta de ellos.
+	    			// En AutoFirma WS, podrian no importarse.
 			    	try {
-						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+						final com.dmurph.tracking.AnalyticsConfigData config = new com.dmurph.tracking.AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+						final com.dmurph.tracking.JGoogleAnalyticsTracker tracker = new com.dmurph.tracking.JGoogleAnalyticsTracker(
+								config, com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion.V_4_7_2);
 						tracker.trackPageView(
 							"AutoFirma", //$NON-NLS-1$
 							"AutoFirma", //$NON-NLS-1$
@@ -688,7 +687,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
     }
 
-    private static void settingDockMacIconWithJava8(Image icon) throws ClassNotFoundException,
+    private static void settingDockMacIconWithJava8(final Image icon) throws ClassNotFoundException,
     		NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
     		InvocationTargetException {
 		final Class<?> applicationClass = Class.forName("com.apple.eawt.Application"); //$NON-NLS-1$
@@ -698,7 +697,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		setDockIconImageMethod.invoke(applicationObject, icon);
     }
 
-    private static void settingDockMacIconWithJava9(Image icon) throws ClassNotFoundException,
+    private static void settingDockMacIconWithJava9(final Image icon) throws ClassNotFoundException,
 		    NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
 		    InvocationTargetException {
 

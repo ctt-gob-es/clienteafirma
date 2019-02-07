@@ -509,7 +509,7 @@ public final class AOPDFSigner implements AOSigner {
             new ByteArrayInputStream(data).read(buffer);
         }
         catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"El contenido parece corrupto o truncado: " + e //$NON-NLS-1$
 			);
 			return false;

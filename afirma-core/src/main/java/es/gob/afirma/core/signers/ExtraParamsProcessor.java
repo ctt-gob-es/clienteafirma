@@ -55,7 +55,7 @@ public final class ExtraParamsProcessor {
 			params.load(new ByteArrayInputStream(entries.getBytes()));
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"Se han encontrado entradas no validas en la configuracion de la operacion: " + e//$NON-NLS-1$
 			);
 		}
@@ -212,7 +212,7 @@ public final class ExtraParamsProcessor {
 				configureMethod.invoke(null, data, params);
 			}
 			catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning("Error al configurar una firma PAdES igual a las existentes: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("Error al configurar una firma PAdES igual a las existentes: " + e); //$NON-NLS-1$
 			}
 		}
 	}

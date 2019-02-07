@@ -108,17 +108,17 @@ public final class PdfSessionManager {
 		final String signerContact = extraParams.getProperty(PdfExtraParams.SIGNER_CONTACT);
 
 		// Pagina donde situar la firma visible
-		int page = LAST_PAGE;
-		final String pageStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(LAST_PAGE));
+		int page = PdfSessionManager.LAST_PAGE;
+		final String pageStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(PdfSessionManager.LAST_PAGE));
 		if ("append".equalsIgnoreCase(pageStr)) { //$NON-NLS-1$
-			page = NEW_PAGE;
+			page = PdfSessionManager.NEW_PAGE;
 		}
 		else {
 			try {
 				page = Integer.parseInt(pageStr.trim());
 			}
 			catch (final Exception e) {
-				LOGGER.warning(
+				PdfSessionManager.LOGGER.warning(
 					"Se ha indicado un numero de pagina invalido ('" + pageStr + "'), se usara la ultima pagina: " + e //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
@@ -141,13 +141,13 @@ public final class PdfSessionManager {
 		try {
 			certificationLevel = extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL).trim()) :
-					UNDEFINED;
+					PdfSessionManager.UNDEFINED;
 		}
 		catch(final Exception e) {
-			LOGGER.warning(
+			PdfSessionManager.LOGGER.warning(
 				"Se ha indicado un nivel de certificacion no valido ('" + extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
-			certificationLevel = UNDEFINED;
+			certificationLevel = PdfSessionManager.UNDEFINED;
 		}
 
 		// Establecimiento de version PDF
@@ -155,15 +155,15 @@ public final class PdfSessionManager {
 		try {
 			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION).trim()) :
-					PDF_MAX_VERSION;
+					PdfSessionManager.PDF_MAX_VERSION;
 		}
 		catch(final Exception e) {
-			LOGGER.warning("Error en el establecimiento de la version PDF, se usara " + PDF_MAX_VERSION + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			pdfVersion = PDF_MAX_VERSION;
+			PdfSessionManager.LOGGER.warning("Error en el establecimiento de la version PDF, se usara " + PdfSessionManager.PDF_MAX_VERSION + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			pdfVersion = PdfSessionManager.PDF_MAX_VERSION;
 		}
-		if (pdfVersion != UNDEFINED && (pdfVersion < PDF_MIN_VERSION || pdfVersion > PDF_MAX_VERSION)) {
-			LOGGER.warning("Se ha establecido un valor invalido para version, se ignorara: " + pdfVersion); //$NON-NLS-1$
-			pdfVersion = UNDEFINED;
+		if (pdfVersion != PdfSessionManager.UNDEFINED && (pdfVersion < PdfSessionManager.PDF_MIN_VERSION || pdfVersion > PdfSessionManager.PDF_MAX_VERSION)) {
+			PdfSessionManager.LOGGER.warning("Se ha establecido un valor invalido para version, se ignorara: " + pdfVersion); //$NON-NLS-1$
+			pdfVersion = PdfSessionManager.UNDEFINED;
 		}
 
 		// *****************************
@@ -194,13 +194,13 @@ public final class PdfSessionManager {
 		try {
 			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim()) :
-					UNDEFINED;
+					PdfSessionManager.UNDEFINED;
 		}
 		catch(final Exception e) {
-			LOGGER.warning(
+			PdfSessionManager.LOGGER.warning(
 				"Se ha indicado un tipo de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
-			layer2FontFamily = UNDEFINED;
+			layer2FontFamily = PdfSessionManager.UNDEFINED;
 		}
 
 		// Tamano del tipo de letra en capa 2
@@ -208,13 +208,13 @@ public final class PdfSessionManager {
 		try {
 			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim()) :
-					UNDEFINED;
+					PdfSessionManager.UNDEFINED;
 		}
 		catch(final Exception e) {
-			LOGGER.warning(
+			PdfSessionManager.LOGGER.warning(
 				"Se ha indicado un tamano de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
-			layer2FontSize = UNDEFINED;
+			layer2FontSize = PdfSessionManager.UNDEFINED;
 		}
 
 		// Estilo del tipo de letra en capa 2
@@ -222,13 +222,13 @@ public final class PdfSessionManager {
 		try {
 			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null ?
 				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim()) :
-					UNDEFINED;
+					PdfSessionManager.UNDEFINED;
 		}
 		catch(final Exception e) {
-			LOGGER.warning(
+			PdfSessionManager.LOGGER.warning(
 				"Se ha indicado un estilo de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
-			layer2FontStyle = UNDEFINED;
+			layer2FontStyle = PdfSessionManager.UNDEFINED;
 		}
 
 		// Color del tipo de letra en capa 2
@@ -246,7 +246,7 @@ public final class PdfSessionManager {
 			inPDF = XmpHelper.addSignHistoryToXmp(pdfBytes, signTime);
 		}
 		catch (final Exception e1) {
-			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
+			PdfSessionManager.LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
 			inPDF = pdfBytes;
 		}
 
@@ -261,7 +261,7 @@ public final class PdfSessionManager {
 		final byte[] xmpBytes = pdfReader.getMetadata();
 		final boolean pdfA1 = PdfUtil.isPdfA1(xmpBytes);
 		if (pdfA1) {
-			LOGGER.info("Detectado PDF-A1, no se comprimira el PDF"); //$NON-NLS-1$
+			PdfSessionManager.LOGGER.info("Detectado PDF-A1, no se comprimira el PDF"); //$NON-NLS-1$
 		}
 
 		// *** Fin comprobaciones y parametros necesarios para PDF-A1 ***
@@ -310,14 +310,14 @@ public final class PdfSessionManager {
 			stp = PdfStamper.createSignature(
 				pdfReader, // PDF de entrada
 				baos,      // Salida
-				pdfVersion == UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
+				pdfVersion == PdfSessionManager.UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
 				null,      // No crear temporal
 				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
 				signTime   // Momento de la firma
 			);
 		}
 		catch (final DocumentException e) {
-			LOGGER.severe("Error al crear la firma para estampar: " + e); //$NON-NLS-1$
+			PdfSessionManager.LOGGER.severe("Error al crear la firma para estampar: " + e); //$NON-NLS-1$
 			throw new AOException("Error al crear la firma para estampar", e); //$NON-NLS-1$
 		}
 		catch(final BadPasswordException e) {
@@ -331,7 +331,7 @@ public final class PdfSessionManager {
             // proporcionaron ninguna
             final String userPwd = new String(
                 AOUIFactory.getPassword(
-                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD) == null ?
+                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING) == null ?
                 		CommonPdfMessages.getString("AOPDFSigner.0") : //$NON-NLS-1$
                 			CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
                     null
@@ -351,20 +351,22 @@ public final class PdfSessionManager {
 
 		// Posicion de la firma
 		final Rectangle signaturePositionOnPage = PdfVisibleAreasUtils.getSignaturePositionOnPage(extraParams);
-		if (page == NEW_PAGE && signaturePositionOnPage != null && signatureField == null) {
+		if (page == PdfSessionManager.NEW_PAGE && signaturePositionOnPage != null && signatureField == null) {
 			stp.insertPage(pdfReader.getNumberOfPages() + 1, pdfReader.getPageSizeWithRotation(1));
 			// La pagina pasa a ser la nueva, que es la ultima,
-			page = LAST_PAGE;
+			page = PdfSessionManager.LAST_PAGE;
 		}
 
 		// Aplicamos todos los atributos de firma
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
 		// La compresion solo para versiones superiores a la 4
 		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
-		if (pdfVersion > PDF_MIN_VERSION && !pdfA1 && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
+		if (pdfVersion > PdfSessionManager.PDF_MIN_VERSION && !pdfA1 && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
 			stp.setFullCompression();
 		}
-		sap.setAcro6Layers(true);
+		//sap.setAcro6Layers(true);
+		sap.setAcro6Layers(false);
+		sap.setLayer4Text(PdfSignatureAppearance.questionMark);
 
 		PdfUtil.enableLtv(stp);
 
@@ -385,7 +387,7 @@ public final class PdfSessionManager {
 		sap.setSignDate(signTime);
 
 		// Pagina en donde se imprime la firma
-		if (page == LAST_PAGE) {
+		if (page == PdfSessionManager.LAST_PAGE) {
 			page = pdfReader.getNumberOfPages();
 		}
 
@@ -409,7 +411,7 @@ public final class PdfSessionManager {
 		// Rubrica de la firma
 		if (rubric != null) {
 			if (signatureRotation) {
-				LOGGER.warning(
+				PdfSessionManager.LOGGER.warning(
 					"Se ha indicado rotar la firma y ademas insertar una imagen, pero las firmas rotadas" //$NON-NLS-1$
 						+ " no aceptan imagenenes. No se usara la imagen proporcionada" //$NON-NLS-1$
 				);
@@ -455,7 +457,7 @@ public final class PdfSessionManager {
 						signaturePositionOnPage,
 						page,
 						null,
-						DEFAULT_SIGNATURE_ROTATION
+						PdfSessionManager.DEFAULT_SIGNATURE_ROTATION
 					);
 				}
 				catch (final DocumentException e) {
@@ -507,24 +509,24 @@ public final class PdfSessionManager {
 
 		// Certificacion del PDF (NOT_CERTIFIED = 0, CERTIFIED_NO_CHANGES_ALLOWED = 1,
 		// CERTIFIED_FORM_FILLING = 2, CERTIFIED_FORM_FILLING_AND_ANNOTATIONS = 3)
-		if (certificationLevel != UNDEFINED) {
+		if (certificationLevel != PdfSessionManager.UNDEFINED) {
 			sap.setCertificationLevel(certificationLevel);
 		}
 
 		// Version del PDF
-		if (pdfVersion != UNDEFINED) {
+		if (pdfVersion != PdfSessionManager.UNDEFINED) {
 			stp.getWriter().setPdfVersion(Integer.toString(pdfVersion).toCharArray()[0]);
 		}
 
 		// Reservamos el espacio necesario en el PDF para insertar la firma
 		final HashMap<PdfName, Integer> exc = new HashMap<>();
-		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
+		exc.put(PdfName.CONTENTS, Integer.valueOf(PdfSessionManager.CSIZE * 2 + 2));
 
 		try {
 			sap.preClose(exc, signTime);
 		}
 		catch (final DocumentException e) {
-			LOGGER.severe("Error al estampar la firma: " + e); //$NON-NLS-1$
+			PdfSessionManager.LOGGER.severe("Error al estampar la firma: " + e); //$NON-NLS-1$
 			throw new AOException("Error al estampar la firma", e); //$NON-NLS-1$
 		}
 

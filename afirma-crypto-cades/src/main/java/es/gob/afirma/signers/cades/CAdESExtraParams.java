@@ -100,6 +100,13 @@ public final class CAdESExtraParams {
     static final String POLICY_QUALIFIER = "policyQualifier";//$NON-NLS-1$
 
     /**
+     * Lista de cargos atribuidos al firmante separados por el car&uacute;cter
+     * '|'. Los cargos de la lista no pueden contener el car&uacute;cter '|' (ya
+     * que este se usa como separador).
+     */
+    public static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
+
+    /**
      *  Ciudad en la que se realiza la firma.
      *  <br> Propiedad compartida con XAdES y PAdES.
      */
@@ -181,7 +188,7 @@ public final class CAdESExtraParams {
     /**
      *  Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.
      */
-    static final String TSA_PWD = "tsaPwd";//$NON-NLS-1$
+    static final String TSA_PWD_KEY = "tsaPwd";//$NON-NLS-1$
 
     /**
      *  Nombre del fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute; la TSA al establecer la coneci&oacute;s HTTPS.*/
@@ -190,7 +197,7 @@ public final class CAdESExtraParams {
     /**
      *  Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS.
      */
-    static final String TSA_SSL_PKCS12_FILE_PASSWORD = "tsaSslPkcs12FilePassword";//$NON-NLS-1$
+    static final String TSA_SSL_PKCS12_FILE_PASSWORD_KEY = "tsaSslPkcs12FilePassword";//$NON-NLS-1$
 
     /**
      *  Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>

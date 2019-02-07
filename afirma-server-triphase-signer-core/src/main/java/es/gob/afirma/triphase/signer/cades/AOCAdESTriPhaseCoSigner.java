@@ -76,6 +76,7 @@ public final class AOCAdESTriPhaseCoSigner {
 	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+	 * @param claimedRoles Roles declarados por el usuario.
 	 * @param csm Metadatos sobre el firmante
 	 * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
@@ -96,6 +97,7 @@ public final class AOCAdESTriPhaseCoSigner {
 			                       final Date signDate,
 			                       final boolean includeSigningTimeAttribute,
 			                       final List<CommitmentTypeIndicationBean> ctis,
+			                       final String[] claimedRoles,
 			                       final CAdESSignerMetadata csm,
                                    final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
 			                                                                                    NoSuchAlgorithmException,
@@ -112,6 +114,7 @@ public final class AOCAdESTriPhaseCoSigner {
 			signDate,
 			includeSigningTimeAttribute,
 			ctis,
+			claimedRoles,
 			csm,
 			doNotIncludePolicyOnSigningCertificate
 		).getEncoded(ASN1Encoding.DER);
@@ -128,6 +131,7 @@ public final class AOCAdESTriPhaseCoSigner {
 			                                   final Date signDate,
 			                                   final boolean includeSigningTimeAttribute,
 			                                   final List<CommitmentTypeIndicationBean> ctis,
+			                                   final String[] claimedRoles,
 			                                   final CAdESSignerMetadata csm,
 	                                           final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
 			                                                                                                 NoSuchAlgorithmException,
@@ -146,6 +150,7 @@ public final class AOCAdESTriPhaseCoSigner {
 			contentType,
 			contentDescription,
 			ctis,
+			claimedRoles,
 			csm,
             false,  // No es contrafirma
             doNotIncludePolicyOnSigningCertificate

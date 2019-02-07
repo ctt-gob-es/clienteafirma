@@ -37,6 +37,8 @@ final class SignResultPanel extends JPanel {
 
     private static final long serialVersionUID = -7982793036430571363L;
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     private final JEditorPane descTextLabel = new JEditorPane();
     private final JLabel resultTextLabel = new JLabel();
 
@@ -74,7 +76,7 @@ final class SignResultPanel extends JPanel {
             resultOperationIcon.setMinimumSize(new Dimension(120, 120));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$
             resultOperationIcon = null;
         }
 
@@ -113,7 +115,7 @@ final class SignResultPanel extends JPanel {
 
                 		default:
                 			errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
-                			Logger.getLogger("es.gob.afirma").warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.getError()); //$NON-NLS-1$ //$NON-NLS-2$
+                			LOGGER.warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.getError()); //$NON-NLS-1$
                 		}
                 	}
                 	else {
@@ -161,7 +163,7 @@ final class SignResultPanel extends JPanel {
 			        }
 			    }
 			    catch (final Exception e) {
-			    	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			    	LOGGER.warning(
 						"Error abriendo el fichero: " + e //$NON-NLS-1$
 					);
 			    	AOUIFactory.showErrorMessage(

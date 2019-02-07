@@ -93,7 +93,7 @@ public final class CommonWaitDialog extends JDialog {
             );
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            LOGGER.warning(
         		"No se ha podido cargar el icono del dialogo de espera de firma: " + e  //$NON-NLS-1$
     		);
         }
