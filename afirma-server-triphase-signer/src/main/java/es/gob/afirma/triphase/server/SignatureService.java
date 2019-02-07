@@ -87,7 +87,7 @@ public final class SignatureService extends HttpServlet {
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK NEWID="; //$NON-NLS-1$
 
-	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+	private static final String CONFIG_FILE = "tpsconfig.properties"; //$NON-NLS-1$
 
 	/** Variable de entorno que determina el directorio en el que buscar el fichero de configuraci&oacute;n. */
 	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
