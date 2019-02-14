@@ -30,9 +30,9 @@ import es.gob.afirma.core.misc.AOUtil;
 /** Comprueba la ejecuci&oacute;n de firmas electr&oacute;nicas ODF. */
 public final class TestAOODFSignerTest {
 
-    private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
 
     private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
