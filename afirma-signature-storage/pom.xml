@@ -46,15 +46,17 @@
 					<source>1.6</source>
 					<target>1.6</target>
 					<fork>true</fork>
+<!-- 
 					<compilerArgs>
 						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
 					</compilerArgs>
+ -->
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.2.2</version>
 				<configuration>  
 					<archive>  
 						<addMavenDescriptor>false</addMavenDescriptor> 

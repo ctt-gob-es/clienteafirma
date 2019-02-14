@@ -46,31 +46,6 @@
 
 	<profiles>
 	
-		<profile>
-			<id>env-dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-      		</activation>
-		
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
-						<configuration>
-							<source>1.8</source> 
-							<target>1.8</target> 
-							<fork>true</fork>
-							<compilerArgs>
-								<arg>-XDignore.symbol.file</arg>
-							</compilerArgs>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	
 	    <profile>
 			<id>env-install</id>
 			<activation>
@@ -86,7 +61,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
 						<configuration>
 							<source>1.8</source> 
 							<target>1.8</target> 
@@ -100,7 +74,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.0.0</version>
+						<version>3.2.1</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -132,7 +106,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>3.0.2</version>
+						<version>3.1.1</version>
 						<configuration>
 							<archive>
 								<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>

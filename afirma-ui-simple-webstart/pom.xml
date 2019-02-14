@@ -77,7 +77,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.1</version>
 						<configuration>
 							<source>1.8</source>
 							<target>1.8</target>
@@ -89,6 +88,7 @@
 			</build>
 		</profile>
 	
+		<!-- Perfil para la construccion de una version del MiniApplet distribuible (firmada con certificado de pruebas) -->
 		<profile>
 			<id>env-install</id>
 			<activation>
@@ -144,7 +144,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -156,7 +155,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -230,9 +229,54 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<finalName>${afirma.jar.name}__${afirma.legible.version}.jar</finalName>    
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>${afirma.keytool.keystore}</keystore>
+					<alias>${afirma.keytool.alias}</alias>
+					<storepass>${afirma.keytool.password}</storepass>
+					<verify>true</verify>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	</profile>
+
+	
+	<!--  Si usamos Java 8, ademas del perfil anterior se ejecutara este para ofuscar el codigo -->
+    <profile>
+      <id>env-install-java-8</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>install</value>
+        </property>
+        <jdk>1.8</jdk>
+      </activation>
+
+	  <build>
+	  	<plugins>
+		  <plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
-				<version>2.0.13</version>
+				<version>2.0.14</version>
 				<executions>
 					<execution>
 						<goals>
@@ -259,30 +303,10 @@
 					</dependency>
 				</dependencies>
 			</plugin>
- 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>${afirma.keytool.keystore}</keystore>
-					<alias>${afirma.keytool.alias}</alias>
-					<storepass>${afirma.keytool.password}</storepass>
-					<signedjar>${project.build.directory}/${afirma.jar.name}__${afirma.legible.version}.jar</signedjar>
-					<verify>true</verify>
-				</configuration>
-			</plugin>
-
-		</plugins>
-	</build>
+		  </plugins>
+		</build>
 	</profile>
+	
 
 
 	<!-- Construccion para el despliegue como aplicacion WebStart completa, con la misma funcionalidad

@@ -260,7 +260,6 @@
        				<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.7.0</version>
 						<configuration>
 							<source>1.8</source>
 							<target>1.8</target>
@@ -272,7 +271,7 @@
 					<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.1</version>
 					<configuration>
 						<archive>
 							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
@@ -299,7 +298,6 @@
      			<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.7.0</version>
 					<configuration>
 						<source>1.8</source>
 						<target>1.8</target>
@@ -311,7 +309,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.1</version>
 					<executions>
 						<execution>
 							<phase>package</phase>
@@ -359,7 +357,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.1</version>
 					<configuration>
 						<archive>
 							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
