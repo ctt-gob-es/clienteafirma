@@ -1101,15 +1101,15 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // genera la firma
             final XMLSignature signature = fac.newXMLSignature(
-        		fac.newSignedInfo(
-					fac.newCanonicalizationMethod(canonicalizationTransform != null ? canonicalizationAlgorithm : CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
-    				fac.newSignatureMethod(algoUri, null),
-                    XmlDSigUtil.cleanReferencesList(referenceList)),
-                    kif.newKeyInfo(content, keyInfoId),
-                    objectList,
-                    "Signature-" + id, //$NON-NLS-1$
-                    "SignatureValue-" + id //$NON-NLS-1$
-                );
+            		fac.newSignedInfo(
+            				fac.newCanonicalizationMethod(canonicalizationTransform != null ? canonicalizationAlgorithm : CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
+            				fac.newSignatureMethod(algoUri, null),
+            				XmlDSigUtil.cleanReferencesList(referenceList)),
+            		kif.newKeyInfo(content, keyInfoId),
+            		objectList,
+            		"Signature-" + id, //$NON-NLS-1$
+            		"SignatureValue-" + id //$NON-NLS-1$
+            		);
 
             final DOMSignContext signContext = new DOMSignContext(
         		key, docSignature.getDocumentElement()
