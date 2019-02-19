@@ -309,6 +309,13 @@ public final class AOSignConstants {
 			return "RIPEMD160"; //$NON-NLS-1$
 		}
 
+		if (pseudoName.contains("with")) { //$NON-NLS-1$
+			return pseudoName.substring(
+				0,
+				pseudoName.indexOf("with") //$NON-NLS-1$
+			);
+		}
+
 		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 			"Algoritmo de huella desconocido, no se normalizara su nombre: " + pseudoName //$NON-NLS-1$
 		);
