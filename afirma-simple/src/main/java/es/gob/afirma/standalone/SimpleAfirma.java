@@ -10,9 +10,11 @@
 package es.gob.afirma.standalone;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.Image;
@@ -39,7 +41,11 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -67,6 +73,7 @@ import es.gob.afirma.standalone.ui.SignResultListPanel;
 import es.gob.afirma.standalone.ui.SignatureResultViewer;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 import es.gob.afirma.standalone.updater.Updater;
+
 
 /** Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -110,6 +117,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Variable de entorno que hay que establecer (a nivel de sistema operativo) a <code>true</code> para
      * evitar el env&iacute;o de estad&iacute;sticas a Google Analytics. */
     public static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
+
+    /** Versiones de Java soportadas. */
+	private static final String[] SUPPORTED_JAVA_VERSIONS = new String[] {
+			"1.8", //$NON-NLS-1$
+			"9.0", //$NON-NLS-1$
+			"10.0", //$NON-NLS-1$
+			"11.0" //$NON-NLS-1$
+	};
 
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
     public static final boolean DEBUG = false;
@@ -248,9 +263,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
-    	if (this.ksManager != null) {
-    		return;
-    	}
     	if (DNIeWaitPanel.PROP_DNIE_REJECTED.equals(evt.getPropertyName())) {
     		loadDefaultKeyStore();
             loadMainApp();
@@ -668,6 +680,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
    					saf.initialize(null);
+
+
+   					checkJavaVersion(saf.getMainFrame());
     			}
     			else {
     				AOUIFactory.showErrorMessage(
@@ -687,7 +702,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
     }
 
-    private static void settingDockMacIconWithJava8(final Image icon) throws ClassNotFoundException,
+	private static void settingDockMacIconWithJava8(final Image icon) throws ClassNotFoundException,
     		NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
     		InvocationTargetException {
 		final Class<?> applicationClass = Class.forName("com.apple.eawt.Application"); //$NON-NLS-1$
@@ -886,5 +901,63 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * de actualizaciones, {@code false} en caso contrario. */
 	public static boolean isUpdatesEnabled() {
 		return updatesEnabled;
+	}
+
+	/**
+	 * Comprueba que la versi&oacute;n de Java ejecutada sea compatible.
+	 * @return {@code true} si la aplicaci&oacute; se est&aacute; ejecutando con una versi&oacute;n
+	 * de Java compatible, {@code false} en caso contrario.
+	 */
+	private static boolean isJavaSupported() {
+
+		final String currentJavaVersion = System.getProperty("java.version"); //$NON-NLS-1$
+    	for (final String javaVersion : SUPPORTED_JAVA_VERSIONS) {
+    		if (currentJavaVersion.startsWith(javaVersion)) {
+    			return true;
+    		}
+    	}
+    	return false;
+	}
+
+	/**
+	 * Comprueba que la versi&oacute;n de Java ejecutada sea compatible. Si no lo es y se encuentra
+	 * configurado el que se compruebe, se mostrar&aacute; una advertencia al usuario. Si no lo es y
+	 * se encuentra configurado que se advierta, se mostrar&aacute;a un mensaje al usuario.<br/>
+	 * En caso de ser compatible la versi&oacute;n, si se configur&oacute; anteriormente que no se
+	 * volviera a mostrar la advertencia, se modificar&aacute; esto para que si se muestre cuando vuelva
+	 * a ser no compatible.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 */
+    private static void checkJavaVersion(final Component parent) {
+
+    	final boolean isSupportedVersion = isJavaSupported();
+
+    	final boolean needCheck = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CHECK_JAVA_VERSION);
+
+    	if (!isSupportedVersion && needCheck) {
+
+    		final String currentJavaVersion = System.getProperty("java.version"); //$NON-NLS-1$
+
+    		final JCheckBox cbDontShow = new JCheckBox(SimpleAfirmaMessages.getString("SimpleAfirma.51")); //$NON-NLS-1$
+
+    		final JPanel panel = new JPanel();
+    		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    		panel.add(new JLabel(SimpleAfirmaMessages.getString("SimpleAfirma.49", currentJavaVersion))); //$NON-NLS-1$
+    		panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    		panel.add(cbDontShow);
+
+    		JOptionPane.showMessageDialog(
+    				parent,
+    				panel,
+    				SimpleAfirmaMessages.getString("SimpleAfirma.50"), //$NON-NLS-1$
+    				JOptionPane.WARNING_MESSAGE);
+
+    		if (cbDontShow.isSelected()) {
+    			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CHECK_JAVA_VERSION, false);
+    		}
+    	}
+    	else if (isSupportedVersion && !needCheck) {
+    		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CHECK_JAVA_VERSION, true);
+    	}
 	}
 }

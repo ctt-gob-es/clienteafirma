@@ -69,7 +69,7 @@ final class Pdf2ImagesConverter {
 	}
 
 	/**
-	 * Actualiza el array de imagenes con la nueva selecci&oacute;n de miniaturas necesarias
+	 * Actualiza el array de im&aacute;genes con la nueva selecci&oacute;n de miniaturas necesarias
 	 * en base a la posici&oacute;n se&ntilde;alada, elimina las que ya no son necesarias.
 	 * @param inPdf Documento PDF.
 	 * @param currentPage P&aacute;gina entorno a la cual son necesarias las miniaturas.
@@ -100,7 +100,7 @@ final class Pdf2ImagesConverter {
 	 * @return {@code true} si la p&aacute;gina est&aacute; entre las primeras del documento,
 	 * {@code false} en caso contrario.
 	 */
-	private static boolean isOfTheFirstPages(int page) {
+	private static boolean isOfTheFirstPages(final int page) {
 		return page < 4;
 	}
 
@@ -111,7 +111,7 @@ final class Pdf2ImagesConverter {
 	 * @return {@code true} si la p&aacute;gina est&aacute; entre las &uacute;ltimas del documento,
 	 * {@code false} en caso contrario.
 	 */
-	private static boolean isOfTheLastPages(int page, int totalPages) {
+	private static boolean isOfTheLastPages(final int page, final int totalPages) {
 		return page >= totalPages - 4 && page < totalPages;
 	}
 
@@ -121,7 +121,7 @@ final class Pdf2ImagesConverter {
 	 * @param currentPage N&uacute;mero de la p&aacute;gina actual.
 	 * @return {@code true} si la p&aacute;gina es cercana a la actual, {@code false} en caso contrario.
 	 */
-	private static boolean isNearTheCurrentPage(int page, int currentPage) {
+	private static boolean isNearTheCurrentPage(final int page, final int currentPage) {
 		return Math.abs(page - currentPage) <= 4;
 	}
 }
