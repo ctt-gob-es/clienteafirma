@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-client</artifactId>
-	<version>1.6.4-SNAPSHOT</version>
+	<version>1.6.5</version>
 	<packaging>pom</packaging>
 	
 	<name>afirma-client</name>
@@ -50,11 +50,11 @@
 	</distributionManagement>
 	
 	<properties>
+		<clienteafirma.version>1.6.5</clienteafirma.version>
+		<afirma.legible.version>1_6_5</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		
 		<jdk.version>1.7</jdk.version>
-		
-		<clienteafirma.version>1.6.4-SNAPSHOT</clienteafirma.version>
 		
 		<junit.version>4.8.2</junit.version>
 	</properties>
@@ -87,6 +87,55 @@
 				<artifactId>jmulticard-ui</artifactId>
 				<version>1.5</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-itext</artifactId>
+				<version>1.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-jmimemagic</artifactId>
+				<version>0.0.5</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-oro</artifactId>
+				<version>0.0.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-juniversalchardet</artifactId>
+				<version>0.0.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.madgag.spongycastle</groupId>
+				<artifactId>core</artifactId>
+				<version>1.56.0.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.madgag.spongycastle</groupId>
+				<artifactId>prov</artifactId>
+				<version>1.56.0.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.madgag.spongycastle</groupId>
+				<artifactId>bcpkix-jdk15on</artifactId>
+				<version>1.56.0.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>es.uji.crypto.xades</groupId>
+				<artifactId>jxades</artifactId>
+				<version>0.2.0</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 	

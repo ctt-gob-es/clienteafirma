@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 	
 	<dependencies>
@@ -20,13 +20,12 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-xml</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
   			<groupId>es.uji.crypto.xades</groupId>
   			<artifactId>jxades</artifactId>
-  			<version>0.2.0</version>
 		</dependency>
 
 		<!-- Compatibilidad con Java 9 y superiores -->
@@ -40,7 +39,7 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7-tsp</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<!--  Canonicalizador para el sello de tiempo -->

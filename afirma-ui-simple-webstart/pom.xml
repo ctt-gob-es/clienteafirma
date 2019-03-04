@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 
 	<properties>
@@ -102,7 +102,7 @@
 		 <dependency>
 		 	 <groupId>es.gob.afirma</groupId>
 		 	 <artifactId>afirma-ui-simpleafirma</artifactId>
-		 	 <version>${project.version}</version>
+		 	 <version>${clienteafirma.version}</version>
 		 	 <exclusions>
 		 	 	<exclusion>
 		 	 		<groupId>es.gob.afirma</groupId>
@@ -134,7 +134,7 @@
 		 <dependency>
 		 	 <groupId>es.gob.afirma</groupId>
 		 	 <artifactId>afirma-ui-simpleafirma-configurator</artifactId>
-		 	 <version>${project.version}</version>
+		 	 <version>${clienteafirma.version}</version>
 		 </dependency>
 
 		</dependencies>

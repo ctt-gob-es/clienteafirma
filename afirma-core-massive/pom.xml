@@ -12,62 +12,62 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cms</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cades-multi</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xades</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xmlsignature</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-odf</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-pdf</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-ooxml</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 			<scope>test</scope>
 		</dependency>
 
