@@ -404,6 +404,10 @@ public final class PdfExtraParams {
     /** Contrase&ntilde;a del pdf en caso de se encuentre protegido contra modificaciones y/o aperturas. */
     static final String USER_PASSWORD_STRING = "userPassword";//$NON-NLS-1$
 
+    /** Si se indica a {@code true}, se mostrar&aacute; una marca junto a la firma visible que el lector de
+     * PDF podr&aacute; utilizar para indicar si la firma es v&aacute;lida o no. */
+    static final String INCLUDE_QUESTION_MARK = "includeQuestionMark";//$NON-NLS-1$
+
     /** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
     private PdfExtraParams(){
         // No instanciable
