@@ -193,7 +193,13 @@
 		function doSignAndSave(cryptoOp) {
 			
 			try {				
-				var data = document.getElementById("data").value;
+				var data;
+				if (cryptoOp == 'sign') {
+					data = document.getElementById("data").value;
+				}
+				else {
+					data = document.getElementById("signature").value;
+				}
 
 				MiniApplet.signAndSaveToFile(
 					cryptoOp,

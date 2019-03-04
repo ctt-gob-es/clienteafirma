@@ -503,13 +503,13 @@ final class CommandLineLauncher {
 				else if ("xml".equals(ext)) { //$NON-NLS-1$
 					format = CommandLineParameters.FORMAT_XADES;
 				}
-				else if("docx".equals(ext) || "xlsx".equals(ext) || "pptx".equals(ext))
+				else if("docx".equals(ext) || "xlsx".equals(ext) || "pptx".equals(ext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				{
-					format = CommandLineParameters.FORMAT_OOXML;					
+					format = CommandLineParameters.FORMAT_OOXML;
 				}
-				else if("odt".equals(ext) || "ods".equals(ext) || "odp".equals(ext))
+				else if("odt".equals(ext) || "ods".equals(ext) || "odp".equals(ext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				{
-					format = CommandLineParameters.FORMAT_ODF;					
+					format = CommandLineParameters.FORMAT_ODF;
 				}
 				else {
 					format = CommandLineParameters.FORMAT_CADES;

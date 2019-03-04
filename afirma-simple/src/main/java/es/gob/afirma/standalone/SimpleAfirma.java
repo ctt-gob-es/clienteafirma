@@ -243,7 +243,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
-            new SimpleKeyStoreManagerWorker(this, null, false).execute();
+            new SimpleKeyStoreManagerWorker(this, null, false, false).execute();
         }
         catch (final Exception e) {
             LOGGER.severe(
@@ -264,7 +264,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
     	if (DNIeWaitPanel.PROP_DNIE_REJECTED.equals(evt.getPropertyName())) {
-    		loadDefaultKeyStore();
+    		if (this.ksManager == null) {
+    			loadDefaultKeyStore();
+    		}
             loadMainApp();
     	}
     	if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
@@ -273,8 +275,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
-                new SimpleKeyStoreManagerWorker(this, null, true).execute();
-            }
+                new SimpleKeyStoreManagerWorker(this, null, true, this.ksManager != null).execute();
+			}
             catch (final Exception e) {
                 LOGGER.severe(
                   "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
@@ -633,6 +635,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	    				// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la inicializacion
 	    				// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve siempre
 	    				// un CKR_DEVICE_ERROR (directamente desde NSS).
+
+    			        // Configuramos el uso de JMulticard segun lo establecido en el dialogo de preferencias
+    			        final boolean enableJMulticard = PreferencesManager.getBoolean(
+    			        		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
+
+    			        JMulticardUtilities.configureJMulticard(enableJMulticard);
+
 	    		    	try {
 	    					final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 							    AOKeyStore.MOZ_UNI, // Store

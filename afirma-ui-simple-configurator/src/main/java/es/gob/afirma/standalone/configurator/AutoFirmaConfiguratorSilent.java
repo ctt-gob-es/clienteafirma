@@ -142,7 +142,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 
 		// Creamos el almacen para la configuracion del SSL
-		this.configurator.uninstall();
+		this.configurator.uninstall(this.mainScreen);
 	}
 
     /** Cierra la aplicaci&oacute;n.

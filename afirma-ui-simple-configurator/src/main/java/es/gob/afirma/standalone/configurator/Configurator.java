@@ -23,6 +23,7 @@ interface Configurator {
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados. */
 	void configure(Console window) throws IOException, ConfigurationException, GeneralSecurityException;
 
-	/** Desinstala los componentes necesarios del sistema. */
-	void uninstall();
+	/** Desinstala los componentes necesarios del sistema.
+	 * @param window Ventana padre con consola. */
+	void uninstall(Console window);
 }

@@ -61,14 +61,17 @@ final class ConfiguratorFirefoxLinux {
 			throws IOException {
 
 		// Comprobamos que certutil este disponible y, si no, copiamos una version propia
+		LOGGER.info("Comprobamos que se encuentre certutil en el sistema"); //$NON-NLS-1$
 		String certUtilPath;
 		try {
 			checkCertUtil(CERTUTIL_EXE);
 			certUtilPath = CERTUTIL_EXE;
 		}
 		catch (final Exception e) {
-			ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
 			certUtilPath = new File(appDir, CERTUTIL_RELATIVE_PATH).getAbsolutePath();
+			LOGGER.info("No se ha encontrado certutil en el sistema. Se extrae la version interna " //$NON-NLS-1$
+					+ "del configurador al directorio de instalacion: " + certUtilPath); //$NON-NLS-1$
+			ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
 		}
 
 		// Creamos los scripts para cada uno de los usuarios
@@ -102,7 +105,7 @@ final class ConfiguratorFirefoxLinux {
 					"-d", //$NON-NLS-1$
 					profileReference,
 					"-n", //$NON-NLS-1$
-					escapePath(appDir.getAbsolutePath())
+					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"" //$NON-NLS-1$ //$NON-NLS-2$
 			};
 			createScript(uninstallCACommans, uninstallScriptFile);
 		}
@@ -249,7 +252,7 @@ final class ConfiguratorFirefoxLinux {
 					"-d", //$NON-NLS-1$
 					profileReference,
 					"-n", //$NON-NLS-1$
-					escapePath(certDir.getAbsolutePath())
+					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"" //$NON-NLS-1$ //$NON-NLS-2$
 			};
 			createScript(uninstallCACommans, uninstallScriptFile);
 		}

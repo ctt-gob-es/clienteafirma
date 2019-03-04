@@ -306,7 +306,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	}
 
 	@Override
-	public void uninstall() {
+	public void uninstall(final Console console) {
 
 		LOGGER.info("Desinstalacion del certificado raiz de los almacenes de MacOSX"); //$NON-NLS-1$
 

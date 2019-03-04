@@ -33,7 +33,7 @@ public final class LookAndFeelManager {
 	}
 
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-    public static final Color WINDOW_COLOR = UIManager.getColor("window") !=null ? new Color(UIManager.getColor("window").getRGB()) : Color.WHITE; //$NON-NLS-1$ //$NON-NLS-2$
+    public static final Color WINDOW_COLOR;
 
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean HIGH_CONTRAST;
@@ -47,6 +47,20 @@ public final class LookAndFeelManager {
     private static Dimension screenSize = null;
 
     static {
+
+    	// Obtenemos el color de la ventanas. Se protege porque puede producir errores en
+    	// algunas distribuciones de Linux
+    	Color windowColor;
+    	try {
+	    	 windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
+	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
+	    			Color.WHITE;
+    	}
+    	catch (final Throwable e) {
+    		windowColor = Color.WHITE;
+		}
+    	WINDOW_COLOR = windowColor;
+
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();

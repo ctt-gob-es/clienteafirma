@@ -63,10 +63,20 @@ final class ConfiguratorUtil {
 			ZipEntry entry;
 			while ((entry = zipIs.getNextEntry()) != null) {
 				final File outFile = new File(outDir, entry.getName());
+
+				// Si es un directorio y no existe en local, lo creamos
 				if (entry.isDirectory()) {
-					outFile.mkdirs();
+					if (!outFile.exists()) {
+						outFile.mkdirs();
+					}
 				}
 				else {
+
+					// Si no existe en local el directorio padre del fichero, lo creamos
+					if (!outFile.getParentFile().exists()) {
+						outFile.getParentFile().mkdirs();
+					}
+
 					try (final OutputStream outFis = jnlpDeploy ?
 							AutoFirmaConfiguratiorJNLPUtils.selectFileToWrite(outFile) :
 								new FileOutputStream(outFile);) {
