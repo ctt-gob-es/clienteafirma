@@ -31,6 +31,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/opt/firefox", //$NON-NLS-1$
 		"/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
 		"/lib", //$NON-NLS-1$
+		"/usr/lib64", //$NON-NLS-1$
 		"/usr/lib", //$NON-NLS-1$
 		"/usr/lib/nss", //$NON-NLS-1$
 		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
