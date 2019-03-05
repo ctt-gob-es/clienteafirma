@@ -96,9 +96,11 @@ final class MozillaKeyStoreUtilitiesUnix {
 		if (directoryLib.isDirectory()) {
 			final String filenames[] = directoryLib.list();
 			final List<String> firefoxDirectories = new ArrayList<>();
-			for (final String filename : filenames) {
-				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
-					firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (filenames != null) {
+				for (final String filename : filenames) {
+					if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+						firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
 			if (firefoxDirectories.isEmpty()) {
