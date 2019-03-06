@@ -118,7 +118,7 @@ public final class AOPkcs1Signer implements AOSigner {
 
 	@Override
 	public boolean isSign(final byte[] is) {
-		throw new UnsupportedOperationException("No se pueden detectar firmas PKCS#1"); //$NON-NLS-1$
+		return false;
 	}
 
 	@Override
