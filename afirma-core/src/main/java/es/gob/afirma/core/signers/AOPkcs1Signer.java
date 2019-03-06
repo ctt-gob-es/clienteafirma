@@ -13,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.util.Locale;
 import java.util.Properties;
@@ -43,7 +42,12 @@ public final class AOPkcs1Signer implements AOSigner {
 	 * @return Firma PKCS#1 en binario puro no tratado.
 	 * @throws AOException en caso de cualquier problema durante la firma. */
 	@Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException {
+	public byte[] sign(final byte[] data,
+			           final String algorithm,
+			           final PrivateKey key,
+			           final Certificate[] certChain,
+			           final Properties extraParams) throws AOException {
+
 		final Signature sig;
 
 		try {
@@ -80,41 +84,41 @@ public final class AOPkcs1Signer implements AOSigner {
 		try {
 			sig.update(data);
 		}
-		catch (final SignatureException e) {
+		catch (final Exception e) {
 			throw new AOException("Error al configurar los datos a firmar: " + e, e); //$NON-NLS-1$
 		}
 
 		try {
 			return sig.sign();
 		}
-		catch (final SignatureException e) {
+		catch (final Exception e) {
 			throw new AOException("Error durante el proceso de firma PKCS#1: " + e, e); //$NON-NLS-1$
 		}
 	}
 
 	@Override
 	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se pueden hacer cofirmas en PKCS#1"); //$NON-NLS-1$
 	}
 
 	@Override
 	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se pueden hacer cofirmas en PKCS#1"); //$NON-NLS-1$
 	}
 
 	@Override
 	public byte[] countersign(final byte[] sign, final String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se pueden hacer contrafirmas en PKCS#1"); //$NON-NLS-1$
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se puede obtener la estructura de firmantes en PKCS#1"); //$NON-NLS-1$
 	}
 
 	@Override
 	public boolean isSign(final byte[] is) {
-		return false;
+		throw new UnsupportedOperationException("No se pueden detectar firmas PKCS#1"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -129,7 +133,7 @@ public final class AOPkcs1Signer implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
         if (originalName == null) {
-            return "signature.p1"; //$NON-NLS-1$
+            return "signature" + PKCS1_FILE_SUFFIX; //$NON-NLS-1$
         }
         if (originalName.toLowerCase(Locale.US).endsWith(PKCS1_FILE_SUFFIX)) {
             return originalName.substring(0, originalName.length() - PKCS1_FILE_SUFFIX.length()) + inTextInt + PKCS1_FILE_SUFFIX;
@@ -139,11 +143,12 @@ public final class AOPkcs1Signer implements AOSigner {
 
 	@Override
 	public byte[] getData(final byte[] signData) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se pueden obtener los datos firmados en PKCS#1"); //$NON-NLS-1$
 	}
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se puede obtener informacion de las firmas PKCS#1"); //$NON-NLS-1$
 	}
+
 }

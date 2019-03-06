@@ -12,7 +12,6 @@ package es.gob.afirma.core.signers;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-
 /** Constantes relativas a las firmas digitales. */
 public final class AOSignConstants {
 
@@ -215,6 +214,15 @@ public final class AOSignConstants {
 	/** Algoritmo de firma SHA1withECDSA. */
 	public static final String SIGN_ALGORITHM_SHA1WITHECDSA = "SHA1withECDSA"; //$NON-NLS-1$
 
+	/** Algoritmo de firma SHA256withECDSA. */
+	public static final String SIGN_ALGORITHM_SHA256WITHECDSA = "SHA256withECDSA"; //$NON-NLS-1$
+
+	/** Algoritmo de firma SHA384withECDSA. */
+	public static final String SIGN_ALGORITHM_SHA384WITHECDSA = "SHA384withECDSA"; //$NON-NLS-1$
+
+	/** Algoritmo de firma SHA512withECDSA. */
+	public static final String SIGN_ALGORITHM_SHA512WITHECDSA = "SHA512withECDSA"; //$NON-NLS-1$
+
 	/** Algoritmo de firma ECDSA que no incluye la generaci&oacute;n de la huella
 	 * digital (NONEwithEDSSA). */
 	public static final String SIGN_ALGORITHM_NONEWITHECDSA = "NONEwithECDSA"; //$NON-NLS-1$
@@ -227,6 +235,9 @@ public final class AOSignConstants {
 		SIGN_ALGORITHM_SHA384WITHRSA,
 		SIGN_ALGORITHM_SHA512WITHRSA,
 		SIGN_ALGORITHM_SHA1WITHECDSA,
+		SIGN_ALGORITHM_SHA256WITHECDSA,
+		SIGN_ALGORITHM_SHA384WITHECDSA,
+		SIGN_ALGORITHM_SHA512WITHECDSA,
 		SIGN_ALGORITHM_NONEWITHECDSA
 	};
 
@@ -298,6 +309,13 @@ public final class AOSignConstants {
 			return "RIPEMD160"; //$NON-NLS-1$
 		}
 
+		if (pseudoName.contains("with")) { //$NON-NLS-1$
+			return pseudoName.substring(
+				0,
+				pseudoName.indexOf("with") //$NON-NLS-1$
+			);
+		}
+
 		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 			"Algoritmo de huella desconocido, no se normalizara su nombre: " + pseudoName //$NON-NLS-1$
 		);
@@ -310,8 +328,11 @@ public final class AOSignConstants {
 	 * @param algorithm Algoritmo de firma.
 	 * @return {@code true} cuando el algoritmo es un SHA-2, {@code false} en caso contrario. */
 	public static boolean isSHA2SignatureAlgorithm(final String algorithm) {
-		return SIGN_ALGORITHM_SHA256WITHRSA.equals(algorithm) ||
-			   SIGN_ALGORITHM_SHA384WITHRSA.equals(algorithm) ||
-			   SIGN_ALGORITHM_SHA512WITHRSA.equals(algorithm);
+		return SIGN_ALGORITHM_SHA256WITHRSA.equals(algorithm)   ||
+			   SIGN_ALGORITHM_SHA384WITHRSA.equals(algorithm)   ||
+			   SIGN_ALGORITHM_SHA512WITHRSA.equals(algorithm)   ||
+			   SIGN_ALGORITHM_SHA256WITHECDSA.equals(algorithm) ||
+			   SIGN_ALGORITHM_SHA384WITHECDSA.equals(algorithm) ||
+			   SIGN_ALGORITHM_SHA512WITHECDSA.equals(algorithm);
 	}
 }
