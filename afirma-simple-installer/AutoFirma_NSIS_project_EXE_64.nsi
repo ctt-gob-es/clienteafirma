@@ -309,7 +309,7 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$PROGRAMFILES64\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma\AutoFirma"
 	Call AddToPath
 
 SectionEnd
@@ -649,7 +649,7 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	Push "$PROGRAMFILES64\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma\AutoFirma"
 	Call un.RemoveFromPath
 
 SectionEnd

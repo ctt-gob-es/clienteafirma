@@ -230,7 +230,7 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma\AutoFirma"
 	Call AddToPath
 
 SectionEnd

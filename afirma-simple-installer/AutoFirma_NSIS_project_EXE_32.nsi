@@ -298,8 +298,8 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
-	Call AddToPath
+	Push "$INSTDIR\AutoFirma\AutoFirma"
+	Call AddToPath                                  
 
 SectionEnd
 
@@ -609,7 +609,7 @@ Section "uninstall"
 	${StrContains} $0 $PATH $INSTDIR
 	StrCmp $0 "" PostValidacion
 	DirectorioValido:
-		RMDir /r $INSTDIR 
+		RMDir /r $INSTDIR  
 	PostValidacion:
 	;Borrar accesos directorios del menu inicio
 	Delete "$DESKTOP\AutoFirma.lnk"
@@ -639,7 +639,7 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma\AutoFirma"
 	Call un.RemoveFromPath
 
 SectionEnd
