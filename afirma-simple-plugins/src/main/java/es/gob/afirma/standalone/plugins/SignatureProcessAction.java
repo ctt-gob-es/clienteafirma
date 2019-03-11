@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
  * seg&uacute;n la pantalla desde la que se invoque. As&iacute;, cuando
  * Este proceso no puede implicar ning&uacute;n tipo de cambio sobre las firmas procesadas.
  */
-public abstract class SignatureProcessAction extends PluginAction {
+public class SignatureProcessAction extends PluginAction {
 
 	/**
 	 * Procesa las firmas resultantes de una operaci&oacute;n de firma o de la que se
@@ -29,5 +29,7 @@ public abstract class SignatureProcessAction extends PluginAction {
 	 * @param parent Ventana padre sobre la que poder mostrar di&aacute;ogos
 	 * gr&aacute;ficos.
 	 */
-	public abstract void processSignatures(OutputData[] signatures, X509Certificate signingCert, Window parent);
+	public void processSignatures(final OutputData[] signatures, final X509Certificate signingCert, final Window parent) {
+		super.start(parent);
+	}
 }

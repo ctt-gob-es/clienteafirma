@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /**
  * Clase de gesti&oacute;n de plugins.
@@ -71,7 +73,7 @@ public class PluginsManager {
 	 * @return Listado de plugins.
 	 * @throws PluginException Cuando no se han podido cargar los plugins.
 	 */
-	public List<AfirmaPlugin> getPluginsLoadedList(boolean force) throws PluginException {
+	public List<AfirmaPlugin> getPluginsLoadedList(final boolean force) throws PluginException {
 		if (this.pluginsLoadedList == null || force) {
 			this.pluginsLoadedList = loadPlugins();
 		}
@@ -121,7 +123,7 @@ public class PluginsManager {
 		return new File(getPluginsDir(), PLUGIN_RELATION_FILENAME);
 	}
 
-	private static MinimalPluginInfo[] loadPluginsList(File relationFile) throws IOException {
+	private static MinimalPluginInfo[] loadPluginsList(final File relationFile) throws IOException {
 
 		if (!relationFile.isFile() || !relationFile.canRead()) {
 			return new MinimalPluginInfo[0];
@@ -160,11 +162,7 @@ public class PluginsManager {
 			throw new PluginException("No se ha encontrado el plugin " + pluginDir.getName()); //$NON-NLS-1$
 		}
 
-		final File[] pluginFiles = pluginDir.listFiles(new FileFilter() {
-			@Override public boolean accept(File pathname) {
-				return pathname.isFile() && pathname.canRead();
-			}
-		});
+		final File[] pluginFiles = pluginDir.listFiles((FileFilter) pathname -> pathname.isFile() && pathname.canRead());
 		if (pluginFiles == null || pluginFiles.length == 0) {
 			throw new PluginException("No se han encontrado los ficheros del plugin " + info.getInternalName()); //$NON-NLS-1$
 		}
@@ -178,7 +176,7 @@ public class PluginsManager {
 	 * @param infos Listado de plugins cargados.
 	 * @throws IOException Cuando ocurre un error al guardar el listado de plugins.
 	 */
-	private static void savePluginsList(File relationsFile, List<AfirmaPlugin> plugins)
+	private static void savePluginsList(final File relationsFile, final List<AfirmaPlugin> plugins)
 			throws IOException {
 
 		try (final FileOutputStream fos = new FileOutputStream(relationsFile);) {
@@ -199,7 +197,7 @@ public class PluginsManager {
 	 * @return Plugins cargados desde los archivos indicados o {@code null} si no
 	 * se trata de ficheros de un plugin.
 	 */
-	public static AfirmaPlugin loadPluginFromFiles(File[] files) {
+	public static AfirmaPlugin loadPluginFromFiles(final File[] files) {
 
 		AfirmaPlugin plugin;
 		try {
@@ -219,7 +217,7 @@ public class PluginsManager {
 	 * Descarga un plugin de memoria siempre y cuando se haya cargado desde fichero.
 	 * @param plugin Plugin a descargar.
 	 */
-	public static void closePlugin(AfirmaPlugin plugin) {
+	public static void closePlugin(final AfirmaPlugin plugin) {
 		final ClassLoader classloader = plugin.getClass().getClassLoader();
 		if (classloader instanceof URLClassLoader) {
 			try {
@@ -242,28 +240,13 @@ public class PluginsManager {
 	 * @throws PluginControlledException Cuando se produce un error en la instalaci&oacute;n
 	 * emitido por el propio plugin.
 	 */
-	public AfirmaPlugin installPlugin(File pluginFile, String pluginName) throws PluginInstalledException, PluginException, IOException, PluginControlledException {
+	public AfirmaPlugin installPlugin(final File pluginFile, final String pluginName) throws PluginInstalledException, PluginException, IOException, PluginControlledException {
 
 		// Obtenemos el directorio de plugins
 		final File pluginsDir = getPluginsDir();
-		if (!pluginsDir.isDirectory()) {
-			if (!pluginsDir.mkdirs()) {
-				throw new IOException("No se ha podido crear el directorio interno de plugins"); //$NON-NLS-1$
-			}
-		}
 
-		// Creamos un directorio para el nuevo plugin
-		final File pluginDir = new File(pluginsDir, pluginName);
-		if (pluginDir.exists()) {
-			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$
-		}
-		pluginDir.mkdir();
-
-		// Copiamos los JAR del plugin a su directorio
-		final File outPluginFile = new File(pluginDir, pluginFile.getName());
-		try (OutputStream fos = new FileOutputStream(outPluginFile)) {
-			Files.copy(pluginFile.toPath(), fos);
-		}
+		// Copiamos el plugin al directorio de plugins
+		final File outPluginFile = copyPluginToDirectory(pluginFile, pluginName, pluginsDir);
 
 		// Cargamos el nuevo plugin
 		AfirmaPlugin plugin;
@@ -271,7 +254,7 @@ public class PluginsManager {
 			plugin = loadPluginFromFiles(new File[] { outPluginFile });
 		}
 		catch (final Exception e) {
-			deleteDirectory(pluginDir);
+			deleteDirectory(outPluginFile.getParentFile());
 			throw new PluginException("No se pudo cargar el plugin recien importado", e); //$NON-NLS-1$
 		}
 
@@ -305,14 +288,131 @@ public class PluginsManager {
 		return plugin;
 	}
 
-	private static void addPluginToRelationsFile(MinimalPluginInfo info) throws IOException {
+	/**
+	 * Copia un fichero de plugin al directorio de plugins. Si no existiese el directorio de plugins, se crear&iacute;a.
+	 * @param pluginFile Fichero de plugin.
+	 * @param pluginName Nombre del plugin.
+	 * @param pluginsDir Directorio de plugins.
+	 * @return Fichero del plugin ya instalado en el directorio.
+	 * @throws IOException Cuando ocurre un error de permisos o durante la copia.
+	 * @throws PluginInstalledException Cuando el plugin ya existe.
+	 */
+	private static File copyPluginToDirectory(final File pluginFile, final String pluginName, final File pluginsDir) throws IOException, PluginInstalledException {
 
-		final File pluginsDir = getPluginsDir();
+		if (Platform.getOS() == Platform.OS.MACOSX) {
+			return copyPluginToDirectoryMacOS(pluginFile, pluginName, pluginsDir);
+		}
+		return copyPluginToDirectoryStandard(pluginFile, pluginName, pluginsDir);
+	}
+
+
+	/**
+	 * Copia un fichero de plugin al directorio de plugins en macOS. Si no existiese el directorio
+	 * de plugins, se crear&iacute;a.
+	 * @param pluginFile Fichero de plugin.
+	 * @param pluginName Nombre del plugin.
+	 * @param pluginsDir Directorio de plugins.
+	 * @return Fichero del plugin ya instalado en el directorio.
+	 * @throws IOException Cuando ocurre un error de permisos o durante la copia.
+	 * @throws PluginInstalledException Cuando el plugin ya existe.
+	 */
+	private static File copyPluginToDirectoryMacOS(final File pluginFile, final String pluginName, final File pluginsDir) throws PluginInstalledException, IOException {
+
+		// Comprobamos si el plugin ya existia
+		final File pluginDir = new File(pluginsDir, pluginName);
+		if (pluginDir.exists()) {
+			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$
+		}
+
+		// Preparamos un script en el que se introduciran las ordenes de copiado
+		File scriptFile;
+		try {
+			scriptFile = MacUtils.newScriptFile();
+		} catch (final IOException e) {
+			LOGGER.warning("No se pudo crear el script para la importacion del plugin"); //$NON-NLS-1$
+			throw e;
+		}
+		final StringBuilder scriptText = new StringBuilder();
+
+		// Creacion del directorio de plugins si es preciso
+		if (!pluginsDir.isDirectory()) {
+			scriptText.append("mkdir '").append(pluginsDir.getAbsolutePath()).append("'\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			scriptText.append("chmod 777 '").append(pluginsDir).append("'\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		// Creamos un directorio para el nuevo plugin
+		scriptText.append("mkdir '").append(pluginDir.getAbsolutePath()).append("'\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Copiamos los JAR del plugin a su directorio
+		final File outPluginFile = new File(pluginDir, pluginFile.getName());
+		scriptText.append("cp '").append(pluginFile.getAbsolutePath()).append("' '") //$NON-NLS-1$ //$NON-NLS-2$
+					.append(outPluginFile.getAbsolutePath()).append("'\n"); //$NON-NLS-1$
+
+		scriptText.append("chmod 777 '").append(pluginDir).append("'\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Creamos el fichero con el script, le damos permisos y lo ejecutamos
+		try {
+			MacUtils.writeScriptFile(scriptText, scriptFile, false);
+			MacUtils.addAllPermissionsToFile(scriptFile);
+			MacUtils.executeScriptFile(scriptFile, true, true);
+		} catch (final Exception e) {
+			LOGGER.warning("Error al ejecutar el AppleScript para la importacion del plugin"); //$NON-NLS-1$
+			try {
+				Files.delete(scriptFile.toPath());
+			} catch (final IOException ex) {
+				// No hacemos nada
+			}
+			throw new IOException(e);
+		}
+
+		return outPluginFile;
+
+	}
+
+	/**
+	 * Copia un fichero de plugin al directorio de plugins de manera corriente, presuponiendo que se dispone
+	 * de permisos en el directorio de plugins y su directorio padre. Si no existiese el directorio de plugins,
+	 * se crear&oacute;a.
+	 * @param pluginFile Fichero de plugin.
+	 * @param pluginName Nombre del plugin.
+	 * @param pluginsDir Directorio de plugins.
+	 * @return Fichero del plugin ya instalado en el directorio.
+	 * @throws IOException Cuando ocurre un error de permisos o durante la copia.
+	 * @throws PluginInstalledException Cuando el plugin ya existe.
+	 */
+	private static File copyPluginToDirectoryStandard(final File pluginFile, final String pluginName, final File pluginsDir) throws IOException, PluginInstalledException {
+
+		// Creamos el directorio de plugins si es preciso
 		if (!pluginsDir.isDirectory()) {
 			if (!pluginsDir.mkdirs()) {
-				throw new IOException("No se ha podido crear el directorio interno de plugins"); //$NON-NLS-1$
+				throw new IOException("No se ha podido crear el directorio interno de plugins: " + pluginsDir.getAbsolutePath()); //$NON-NLS-1$
 			}
 		}
+
+		// Creamos un directorio para el nuevo plugin
+		final File pluginDir = new File(pluginsDir, pluginName);
+		if (pluginDir.exists()) {
+			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$
+		}
+		pluginDir.mkdir();
+
+		// Copiamos los JAR del plugin a su directorio
+		final File outPluginFile = new File(pluginDir, pluginFile.getName());
+		try (OutputStream fos = new FileOutputStream(outPluginFile)) {
+			Files.copy(pluginFile.toPath(), fos);
+		}
+		return outPluginFile;
+	}
+
+	/**
+	 * Agrega la referencia a un plugin instalado en la relaci&oacute;n de plugins de AutoFirma para
+	 * que lo cargue a partir de ahora.
+	 * @param info Informaci&oacute;n del plugin necesaria para el registro.
+	 * @throws IOException Cuando no se pueda agregar la referencia.
+	 */
+	private static void addPluginToRelationsFile(final MinimalPluginInfo info) throws IOException {
+
+		final File pluginsDir = getPluginsDir();
 
 		final byte[] pluginRegistry = (info.getInternalName() + RELATIONS_SEPARATOR +
 				info.getVersionCode() + "\n").getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
@@ -334,7 +434,7 @@ public class PluginsManager {
 	 * @param plugin Informaci&oacute;n del plugin a eliminar.
 	 * @throws IOException Cuando no se puede eliminar el plugin.
 	 */
-	public void uninstallPlugin(AfirmaPlugin plugin) throws IOException {
+	public void uninstallPlugin(final AfirmaPlugin plugin) throws IOException {
 
 		// Ejecutamos el proceso de desinstalacion del propio plugin
 		try {
@@ -373,7 +473,7 @@ public class PluginsManager {
 	 * @param pluginName Nombre interno del plugin que se desea eliminar.
 	 * @throws IOException Si ocurre un error durante la eliminaci&oacute;n.
 	 */
-	public static void forceRemove(String pluginName) throws IOException {
+	public static void forceRemove(final String pluginName) throws IOException {
 		final File pluginsDir = getPluginsDir();
 		final File pluginDir = new File(pluginsDir, pluginName);
 		if (!pluginDir.exists()) {
@@ -389,7 +489,7 @@ public class PluginsManager {
 	 * @throws IOException Cuando se produce un error al eliminar el directorio
 	 * o cualquiera de los ficheros que contiene.
 	 */
-	private static void deleteDirectory(File dir) throws IOException {
+	private static void deleteDirectory(final File dir) throws IOException {
 
 		for (final File file : dir.listFiles()) {
 			if (file.isFile()) {

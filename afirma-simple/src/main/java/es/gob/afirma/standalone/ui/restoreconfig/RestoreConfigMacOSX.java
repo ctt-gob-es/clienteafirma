@@ -57,6 +57,7 @@ import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
@@ -319,7 +320,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 		try {
 			final File getUsersScriptFile = createGetUsersScript();
-			final Object o = executeScriptFile(getUsersScriptFile.getAbsolutePath(), false, true);
+			final Object o = MacUtils.executeScriptFile(getUsersScriptFile, false, true);
 			userDirs = new ArrayList<>();
 			try (
 					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
@@ -353,12 +354,12 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		final StringBuilder script = new StringBuilder(GET_USERS_COMMAND);
 		final File scriptFile = File.createTempFile(GET_USER_SCRIPTS_NAME, SCRIPT_EXT);
 		try {
-			ConfiguratorMacUtils.writeScriptFile(script, scriptFile.getAbsolutePath(), true);
+			MacUtils.writeScriptFile(script, scriptFile, true);
 		}
 		catch (final IOException e) {
 			LOGGER.log(Level.WARNING, "Ha ocurrido un error al generar el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
 		}
-		ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
+		MacUtils.addAllPermissionsToFile(scriptFile);
 		return scriptFile;
 	}
 
@@ -738,7 +739,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param data Datos a escribir.
 	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void writeScriptFile(final String path, final StringBuilder data, final boolean append ) throws IOException{
+	static void writeScriptFile(final String path, final StringBuilder data, final boolean append) throws IOException{
 		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + data.toString()); //$NON-NLS-1$
 		final File macScript = new File(path);
 		data.append("\n"); //$NON-NLS-1$
@@ -820,31 +821,4 @@ final class RestoreConfigMacOSX implements RestoreConfig {
         }
         return destinationPath + resourceName;
     }
-
-    /** Ejecuta un fichero de scripts.
-	 * @param path Ruta donde se encuentra el <i>script</i>.
-	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
-	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-	 * @return El objeto que da como resultado el <i>script</i>.
-	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
-     * @throws InterruptedException Cuando el proceso se ve interrumpido. */
-	public static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
-
-		final AppleScript script = new AppleScript(new File(path), delete);
-
-		LOGGER.info("Path del script: " + path); //$NON-NLS-1$
-		try {
-			Object o;
-			if (administratorMode) {
-				o = script.runAsAdministrator();
-			}
-			else {
-				o = script.run();
-			}
-			return o;
-		}
-		catch (final IOException e) {
-			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
-		}
-	}
 }

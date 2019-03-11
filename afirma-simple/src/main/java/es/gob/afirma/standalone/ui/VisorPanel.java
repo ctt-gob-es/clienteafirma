@@ -59,6 +59,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 import es.gob.afirma.standalone.plugins.OutputData;
+import es.gob.afirma.standalone.plugins.PluginAction;
 import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
@@ -353,7 +354,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 			button.getGraphicButton().addActionListener(new PluginButtonActionListener(
 					this.signDataPanel,
 					this.signatureFile,
-					(SignatureProcessAction) button.getButton().getAction()));
+					button.getButton().getAction()));
     	}
 
     	EventQueue.invokeLater(() -> {
@@ -377,9 +378,9 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 
 		final SignDataPanel panel;
 		final File signFile;
-		final SignatureProcessAction action;
+		final PluginAction action;
 
-		public PluginButtonActionListener(final SignDataPanel panel, final File signFile, final SignatureProcessAction action) {
+		public PluginButtonActionListener(final SignDataPanel panel, final File signFile, final PluginAction action) {
 			this.panel = panel;
 			this.signFile = signFile;
 			this.action = action;
@@ -401,9 +402,18 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 			}
 			data.setCerts(certs.values().toArray(new X509Certificate[certs.size()]));
 
-			new Thread(() -> PluginButtonActionListener.this.action.processSignatures(
-					new OutputData[] { data }, null,
-					SwingUtilities.getWindowAncestor(VisorPanel.this))).start();
+			new Thread(() -> {
+				if (PluginButtonActionListener.this.action instanceof SignatureProcessAction) {
+				((SignatureProcessAction) PluginButtonActionListener.this.action).processSignatures(
+					new OutputData[] { data },
+					null,
+					SwingUtilities.getWindowAncestor(VisorPanel.this));
+				}
+				else {
+					PluginButtonActionListener.this.action.start(
+							SwingUtilities.getWindowAncestor(VisorPanel.this));
+				}
+			}).start();
 		}
 
 

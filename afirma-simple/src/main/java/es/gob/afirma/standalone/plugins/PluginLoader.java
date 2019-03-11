@@ -32,7 +32,7 @@ public class PluginLoader {
 	 * @throws PluginException Cuando no se encuentran plugins o se encuentra mas de uno
 	 * en el archivo.
 	 */
-	static AfirmaPlugin loadPlugin(File[] jars) throws IOException, PluginException {
+	static AfirmaPlugin loadPlugin(final File[] jars) throws IOException, PluginException {
 
 		// Cargamos los JAR
 		final List<URL> urls = new ArrayList<>();
@@ -110,7 +110,7 @@ public class PluginLoader {
 	 * @throws PluginException Cuando se encuentra un error en el fichero de
 	 * configuraci&oacute;n del plugin.
 	 */
-	private static PluginInfo loadPluginConfiguration(AfirmaPlugin plugin) throws IOException, PluginException {
+	private static PluginInfo loadPluginConfiguration(final AfirmaPlugin plugin) throws IOException, PluginException {
 		final String classPackage = plugin.getClass().getPackage().getName();
 		final String infoResource = '/' + classPackage.replace('.', '/') + CONFIG_FILE;
 
@@ -130,8 +130,8 @@ public class PluginLoader {
 		return info;
 	}
 
-	private static PluginAction getPluginAction(String actionClassName,
-			PluginIntegrationWindow window, ClassLoader classLoader) throws PluginException {
+	private static PluginAction getPluginAction(final String actionClassName,
+			final PluginIntegrationWindow window, final ClassLoader classLoader) throws PluginException {
 		Class<?> actionClass;
 		try {
 			actionClass = Class.forName(actionClassName, true, classLoader);
@@ -147,19 +147,10 @@ public class PluginLoader {
 					actionClassName), e);
 		}
 
-		if (window == PluginIntegrationWindow.INPUT_DATA) {
-			if (!(actionObject instanceof DataProcessAction)) {
-				throw new PluginException(String.format(
-						"Se ha establecido un boton en la pantalla de entrada de datos que no define una accion de tipo %1s", //$NON-NLS-1$
-						DataProcessAction.class.getName()));
-			}
-		}
-		else {
-			if (!(actionObject instanceof SignatureProcessAction)) {
-				throw new PluginException(String.format(
-						"Se ha establecido un boton en una pantalla de salida que no define una accion de tipo %1s", //$NON-NLS-1$
-						SignatureProcessAction.class.getName()));
-			}
+		if (!(actionObject instanceof PluginAction)) {
+			throw new PluginException(String.format(
+					"Se ha establecido un boton que no define una accion de tipo %1s", //$NON-NLS-1$
+					PluginAction.class.getName()));
 		}
 
 		return (PluginAction) actionObject;

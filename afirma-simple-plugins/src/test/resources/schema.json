@@ -1,0 +1,56 @@
+
+{
+
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "info": {
+      "type": "object",
+      "properties": {
+        "name":		 			{ "type": "string" },
+        "title":				{ "type": "string" },
+        "version_code":			{ "type": "integer", "default": 1 },
+        "version":				{ "type": "string", "default": "1.0" },
+        "authors":				{
+        							"type": "array",
+          							"items": { "type": "string" },
+          							"default": []
+          						},
+        "contacts":				{
+        							"type": "array",
+          							"items": { "type": "string" },
+          							"default": []
+          						},
+        "description":			{ "type": "string" },
+        "configuration_panel":	{ "type": "string" }
+      },
+      "required": ["name", "title", "description"]
+    },
+
+    "button": {
+      "type": "object",
+      "properties": {
+        "title":				{ "type": "string" },
+        "icon":					{ "type": "string" },
+        "tooltip":				{ "type": "string" },
+        "accesible_description":{ "type": "string" },
+        "window":				{ "type": { "enum": [ "input", "single_result", "multi_result", "visor" ] } },
+        "action":				{ "type": "string" }
+      },
+      "required": ["window", "action"]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "info": { "$ref": "#/definitions/info" },
+    "buttons": { 
+    	"type": "array",
+        "items": { "$ref": "#/definitions/button" },
+        "default": []
+    }
+  },
+  
+  "required": ["info"]
+}

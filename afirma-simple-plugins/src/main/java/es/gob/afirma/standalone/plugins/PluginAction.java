@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.plugins;
 
+import java.awt.Window;
 import java.util.Properties;
 
 /**
@@ -7,11 +8,11 @@ import java.util.Properties;
  * Para definir una accion personalizada, se deber&iacute;a implementar alguna de las subinterfaces
  * que extienden a esta.
  */
-public class PluginAction {
+public abstract class PluginAction {
 
 	private AfirmaPlugin plugin = null;
 
-	final void setPlugin(AfirmaPlugin plugin) {
+	final void setPlugin(final AfirmaPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -25,6 +26,11 @@ public class PluginAction {
 			return PluginPreferences.getInstance(this.plugin).recoverConfig();
 		}
 		return new Properties();
+	}
+
+	@SuppressWarnings("unused")
+	public void start(final Window parent) {
+		// Por defecto, no se hace nada
 	}
 
 }
