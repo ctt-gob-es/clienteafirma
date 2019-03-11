@@ -92,17 +92,12 @@ final class ConfiguratorLinux implements Configurator {
             		new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME)
         		);
 
-                LOGGER.info(" ===================== Certificado instalado en el almacen del sistema.");
-                LOGGER.info(" ===================== Configuramos el certificado en Firefox.");
-
                 ConfiguratorFirefoxLinux.createScriptsToMozillaKeyStore(
             		appDir,
             		usersDirs,
                 	new File(appDir, ConfiguratorLinux.INSTALL_SCRIPT_NAME),
                 	new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME)
             	);
-
-                LOGGER.info(" ===================== Certificado instalado en el almacen de Firefox.");
               }
             catch(final MozillaProfileNotFoundException e) {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.12")); //$NON-NLS-1$
@@ -112,12 +107,7 @@ final class ConfiguratorLinux implements Configurator {
             LOGGER.info(Messages.getString("ConfiguratorLinux.14")); //$NON-NLS-1$
         }
 
-        LOGGER.info(" ===================== Eliminamos los warnings de Chrome");
-
         createScriptsRemoveChromeWarnings(appDir, usersDirs);
-
-
-        LOGGER.info(" ===================== Eliminados");
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.8")); //$NON-NLS-1$
     }
