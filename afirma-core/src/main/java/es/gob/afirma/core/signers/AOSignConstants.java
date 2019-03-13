@@ -40,6 +40,12 @@ public final class AOSignConstants {
 	/** Identificador de la firma PKCS1 (RAW). */
 	public static final String SIGN_FORMAT_PKCS1 = "NONE"; //$NON-NLS-1$
 
+	/** Identificador (alternativo 1) de la firma PKCS1 (RAW). */
+	public static final String SIGN_FORMAT_PKCS1_ALT1 = "PKCS1"; //$NON-NLS-1$
+
+	/** Identificador (alternativo 2) de la firma PKCS1 (RAW). */
+	public static final String SIGN_FORMAT_PKCS1_ALT2 = "PKCS#1"; //$NON-NLS-1$
+
 	/** Identificador de la firma PKCS#1 (RAW) para su uso en modo trif&aacute;sico
 	 * (la parte servidora no har&aacute; nada. */
 	public static final String SIGN_FORMAT_PKCS1_TRI = "NONEtri"; //$NON-NLS-1$
