@@ -184,7 +184,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             }
             catch (final Exception e) {
             	if (onlyOneFile) {
-            		showErrorMessage(this.parent, "No se ha podido cargar el fichero seleccionado."); //$NON-NLS-1$
+            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.123")); //$NON-NLS-1$
             		this.signExecutor.finishTask();
             		return;
             	}

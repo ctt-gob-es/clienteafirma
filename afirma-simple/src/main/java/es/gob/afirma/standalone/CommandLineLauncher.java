@@ -25,9 +25,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
+import java.util.List;
 import java.util.Properties;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +38,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
@@ -87,7 +87,6 @@ final class CommandLineLauncher {
 		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
 
 		final Console console = System.console();
-
 		try (
 			final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out);
 		) {
@@ -176,15 +175,35 @@ final class CommandLineLauncher {
 				return;
 			}
 			catch (final IOException e) {
-				closeApp(STATUS_ERROR, pw, e.getMessage());
+				String msg = e.getMessage();
+				if (params.isXml()) {
+					msg = buildXmlResponse(false, msg, null);
+				}
+				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
 			catch (final AOKeystoreAlternativeException e) {
-				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.49", e.getMessage())); //$NON-NLS-1$
+				String msg = CommandLineMessages.getString("CommandLineLauncher.49", e.getMessage()); //$NON-NLS-1$
+				if (params.isXml()) {
+					msg = buildXmlResponse(false, msg, null);
+				}
+				closeApp(STATUS_ERROR, pw, msg);
+				return;
+			}
+			catch (final AOException e) {
+				String msg = e.getMessage();
+				if (params.isXml()) {
+					msg = buildXmlResponse(false, msg, null);
+				}
+				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
 			catch (final Exception e) {
-				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.50", e.getMessage())); //$NON-NLS-1$
+				String msg = CommandLineMessages.getString("CommandLineLauncher.50", e.getMessage()); //$NON-NLS-1$
+				if (params.isXml()) {
+					msg = buildXmlResponse(false, msg, null);
+				}
+				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
 
@@ -194,12 +213,7 @@ final class CommandLineLauncher {
 	/** Desactiva el log por consola.
 	 * @param handlerName Nombre del manejador. */
 	private static void deactivateConsoleLog(final String handlerName) {
-		final Handler[] handlers = Logger.getLogger(handlerName).getHandlers();
-		for(final Handler handler : handlers) {
-			if(handler instanceof ConsoleHandler) {
-				handler.setLevel(Level.OFF);
-			}
-		}
+		Logger.getLogger(handlerName).setLevel(Level.SEVERE);
 	}
 
 	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales mostrando los di&aacute;logos
@@ -255,7 +269,7 @@ final class CommandLineLauncher {
 		final SimpleAfirma simpleAfirma = new SimpleAfirma();
 		simpleAfirma.initialize(inputFile);
 		simpleAfirma.loadFileToSign(inputFile);
-	}
+		}
 
 	private static String batchByCommandLine(final CommandLineParameters params) throws CommandLineException {
 
@@ -351,14 +365,16 @@ final class CommandLineLauncher {
 	 * @param command Comando ejecutado en l&iacute;nea de comandos.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @return Mensaje con el resultado de la operaci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
-	private static String signByCommandLine(final CommandLineCommand command, final CommandLineParameters params) throws CommandLineException {
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
+	 * @throws IOException
+	 * @throws AOException */
+	private static String signByCommandLine(final CommandLineCommand command, final CommandLineParameters params) throws CommandLineException, IOException, AOException {
 
 		if (params.getInputFile() == null) {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 		}
 
-		if (params.getAlias() == null && params.getFilter() == null) {
+		if (params.getAlias() == null && params.getFilter() == null && !params.isCertGui()) {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
 		}
 
@@ -370,9 +386,27 @@ final class CommandLineLauncher {
 		try {
 			final AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
 
-			String selectedAlias = params.getAlias();
-			if (params.getFilter() != null) {
-				selectedAlias = filterCertificates(ksm, params.getFilter());
+			String selectedAlias;
+			if (params.isCertGui()) {
+				final Properties extraParams = buildProperties(params.getExtraParams());
+				final CertFilterManager filterManager = new CertFilterManager(extraParams);
+				final List<CertificateFilter> filters = filterManager.getFilters();
+
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null,
+						true, // Solo mostrar certificados con clave privada
+						true, // Mostrar certificados caducados
+						false, // Advertir si certicado caducado
+						filters,
+						false);
+				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
+				dialog.show();
+				selectedAlias = dialog.getSelectedAlias();
+			}
+			else {
+				selectedAlias = params.getAlias();
+				if (params.getFilter() != null) {
+					selectedAlias = filterCertificates(ksm, params.getFilter());
+				}
 			}
 
 			res = sign(
@@ -387,10 +421,7 @@ final class CommandLineLauncher {
 			);
 		}
 		catch (IOException | AOException | AOKeystoreAlternativeException e) {
-			if (params.isXml()) {
-				return buildXmlResponse(false, e.getMessage(), null);
-			}
-			return e.getMessage();
+			throw new AOException(e.getMessage(), e);
 		}
 
 		// Si se ha proporcionado un fichero de salida, se guarda el resultado de la firma en el.
@@ -403,15 +434,16 @@ final class CommandLineLauncher {
 				fos.write(res);
 			}
 			catch(final Exception e) {
-				return CommandLineMessages.getString(
+				throw new IOException(CommandLineMessages.getString(
 					"CommandLineLauncher.21", //$NON-NLS-1$
-					params.getOutputFile().getAbsolutePath()
-				);
+					params.getOutputFile().getAbsolutePath())
+				, e);
 			}
 		}
 
 		final String okMsg = CommandLineMessages.getString("CommandLineLauncher.22"); //$NON-NLS-1$
 		if (params.isXml()) {
+			// Si se guardo, no es necesario mostrarla en la salida
 			if (params.getOutputFile() != null) {
 				return buildXmlResponse(true, okMsg, null);
 			}
@@ -519,36 +551,7 @@ final class CommandLineLauncher {
 				format = fmt;
 			}
 
-			extraParamsProperties = new Properties();
-			if (extraParams != null) {
-				try {
-					final String params = extraParams.trim();
-
-					// La division no funciona correctamente con split porque el caracter salto de linea se protege
-					// al insertarse por consola, asi que lo hacemos manualmente.
-					int beginIndex = 0;
-					int endIndex;
-					while ((endIndex = params.indexOf("\\n", beginIndex)) != -1) { //$NON-NLS-1$
-						final String keyValue = params.substring(beginIndex, endIndex).trim();
-						// Solo procesamos las lineas con contenido que no sean comentario
-						if (keyValue.length() > 0 && keyValue.charAt(0) != '#') {
-							extraParamsProperties.setProperty(
-								keyValue.substring(0, keyValue.indexOf('=')),
-								keyValue.substring(keyValue.indexOf('=') + 1)
-							);
-						}
-						beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
-					}
-					extraParamsProperties.setProperty(
-						params.substring(beginIndex, params.indexOf('=', beginIndex)).trim(),
-						params.substring(params.indexOf('=', beginIndex) + 1).trim()
-					);
-				}
-				catch (final Exception e) {
-					throw new CommandLineException(
-							CommandLineMessages.getString("CommandLineLauncher.51", extraParams), e); //$NON-NLS-1$
-				}
-			}
+			extraParamsProperties = buildProperties(extraParams);
 		}
 
 		// Instanciamos un firmador del tipo adecuado
@@ -618,7 +621,7 @@ final class CommandLineLauncher {
 			}
 		}
 		catch(final Exception e) {
-			throw new CommandLineException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new AOException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 
 		return resBytes;
@@ -751,7 +754,7 @@ final class CommandLineLauncher {
 	 * }
 	 * @param ok Resultado de la operaci&oacute;n.
 	 * @param msg Mensaje de respuesta.
-	 * @param resBytes Firma generada o {@code null} si se produjo un error.
+	 * @param resBytes Firma generada o {@code null} si no es necesario imprimirla.
 	 * @return XML resultado de la operaci&oacute;n. */
 	private static String buildXmlResponse(final boolean ok, final String msg, final byte[] resBytes) {
 
@@ -789,5 +792,33 @@ final class CommandLineLauncher {
 
 	public static void main(final String[] args) {
 		processCommandLine( args );
+	}
+
+	private static Properties buildProperties(final String propertiesParams) throws IOException {
+		final Properties properties = new Properties();
+		if (propertiesParams != null) {
+			final String params = propertiesParams.trim();
+
+			// La division no funciona correctamente con split porque el caracter salto de linea se protege
+			// al insertarse por consola, asi que lo hacemos manualmente.
+			int beginIndex = 0;
+			int endIndex;
+			while ((endIndex = params.indexOf("\\n", beginIndex)) != -1) { //$NON-NLS-1$
+				final String keyValue = params.substring(beginIndex, endIndex).trim();
+				// Solo procesamos las lineas con contenido que no sean comentario
+				if (keyValue.length() > 0 && keyValue.charAt(0) != '#') {
+					properties.setProperty(
+							keyValue.substring(0, keyValue.indexOf('=')),
+							keyValue.substring(keyValue.indexOf('=') + 1)
+							);
+				}
+				beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
+			}
+			properties.setProperty(
+					params.substring(beginIndex, params.indexOf('=', beginIndex)).trim(),
+					params.substring(params.indexOf('=', beginIndex) + 1).trim()
+					);
+		}
+		return properties;
 	}
 }

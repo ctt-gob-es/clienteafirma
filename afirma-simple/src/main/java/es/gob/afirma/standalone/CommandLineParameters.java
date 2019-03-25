@@ -29,6 +29,7 @@ final class CommandLineParameters {
 	private static final String PARAM_CONFIG  = "-config"; //$NON-NLS-1$
 	private static final String PARAM_OP	  = "-operation"; //$NON-NLS-1$
 	private static final String PARAM_GUI     = "-gui"; //$NON-NLS-1$
+	private static final String PARAM_CERT_GUI= "-certgui"; //$NON-NLS-1$
 	private static final String PARAM_PREURL  = "-preurl"; //$NON-NLS-1$
 	private static final String PARAM_POSTURL = "-posturl"; //$NON-NLS-1$
 
@@ -60,22 +61,14 @@ final class CommandLineParameters {
 	private String massiveOp = null;
 	private boolean xml = false;
 	private boolean gui = false;
+	private boolean certgui = false;
 	private final boolean help = false;
 	private URL postUrl = null;
 	private URL preUrl = null;
 
 	public CommandLineParameters(final String[] params) throws CommandLineException {
 
-		// Si solo hay un parametro y este es la ruta de un fichero, sera el de entrada
-		if (params.length == 1) {
-			if (new File(params[0]).isFile()) {
-				this.inputFile = new File(params[0]);
-				return;
-			}
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.25", params[0])); //$NON-NLS-1$
-		}
-
-		// En caso de ser mas de 1, los parseamos entendiendo que el primero es la aplicacion
+		// Ignoramos el primer parametro (la operacion) y parseamos el resto
 		for (int i = 1; i < params.length; i++) {
 
 			if (PARAM_XML.equals(params[i])) {
@@ -109,6 +102,9 @@ final class CommandLineParameters {
 			}
 			else if (PARAM_GUI.equals(params[i])) {
 				this.gui = true;
+			}
+			else if (PARAM_CERT_GUI.equals(params[i])) {
+				this.certgui = true;
 			}
 			else if (PARAM_STORE.equals(params[i])) {
 				if (this.store != null) {
@@ -245,10 +241,18 @@ final class CommandLineParameters {
 		return this.filter;
 	}
 
+	/**
+	 * Recupera el fichero de entrada configurado.
+	 * @return Fichero de entrada o {@code null} si no se ha establecido.
+	 */
 	public File getInputFile() {
 		return this.inputFile;
 	}
 
+	/**
+	 * Recupera el fichero de salida configurado.
+	 * @return Fichero en el que almacenar la firma o {@code null} si no se ha establecido.
+	 */
 	public File getOutputFile() {
 		return this.outputFile;
 	}
@@ -288,6 +292,10 @@ final class CommandLineParameters {
 
 	public boolean isGui() {
 		return this.gui;
+	}
+
+	public boolean isCertGui() {
+		return this.certgui;
 	}
 
 	public boolean isHelp() {
@@ -330,7 +338,8 @@ final class CommandLineParameters {
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
 			.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
 			.append("options\n\n") //$NON-NLS-1$
-			.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  ").append(PARAM_CERT_GUI).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.76")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_OUTPUT).append(" outputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.14")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_ALGO).append(" algo\t (").append(CommandLineMessages.getString("CommandLineLauncher.20")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
