@@ -405,6 +405,7 @@ public final class CAdESUtils {
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Lista de compromisos adquiridos con esta firma.
+     * @param claimedRoles Roles del firmante.
      * @param csm Metadatos sobre el firmante.
      * @param isCountersign <code>true</code> si desea generarse el <code>SignerInfo</code> de una
      *                      contrafirma, <code>false</code> en caso contrario.

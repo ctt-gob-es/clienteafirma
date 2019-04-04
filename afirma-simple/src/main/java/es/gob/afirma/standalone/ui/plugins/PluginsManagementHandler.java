@@ -43,7 +43,9 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	private List<AfirmaPlugin> pluginsList;
 
 	/**
-	 * @param view
+	 * Construye el objeto para la gesti&oacute;n de los eventos del di&aacute;logo de
+	 * gesti&oacute;n de plugins.
+	 * @param view Panel sobre en el que encuentran los componentes que gestinar.
 	 */
 	public PluginsManagementHandler(final PluginsManagementPanel view) {
 		this.view = view;
@@ -111,7 +113,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		addPlugin(pluginFile, info);
 	}
 
-	private void addPlugin(File pluginFile, PluginInfo info) {
+	private void addPlugin(final File pluginFile, final PluginInfo info) {
 
 		final PluginsManager pluginsManager = PluginsManager.getInstance();
 
@@ -176,7 +178,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		return files[0];
 	}
 
-	private void showPluginInfo(PluginsManager manager, AfirmaPlugin plugin) {
+	private void showPluginInfo(final PluginsManager manager, final AfirmaPlugin plugin) {
 
 		// Actualizamos la lista con los plugins cargados
 		final JList<AfirmaPlugin> list = this.view.getPluginsList();
@@ -209,7 +211,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 * @throws PluginException Cuando no se puede reemplazar la versi&oacute;n
 	 * preexistente del plugin.
 	 */
-	private void removeLoadedPlugin(PluginsManager pluginsManager, PluginInfo info) throws PluginException {
+	private void removeLoadedPlugin(final PluginsManager pluginsManager, final PluginInfo info) throws PluginException {
 
 		// Para desinstalar el plugin anterior, antes vemos si esta en la lista de plugins
 		AfirmaPlugin previousPlugin = null;
@@ -278,7 +280,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 * @param plugin Plugin a desinstalar.
 	 * @throws IOException Cuando ocurre un error durante la desinstalaci&oacute;n.
 	 */
-	private void removePlugin(AfirmaPlugin plugin) throws IOException {
+	private void removePlugin(final AfirmaPlugin plugin) throws IOException {
 		// Desinstalamos el plugin
 		PluginsManager.getInstance().uninstallPlugin(plugin);
 
@@ -311,7 +313,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		dialog.init(preferences.recoverConfig());
 		dialog.addWindowListener(new WindowAdapter() {
 		    @Override
-		    public void windowClosed(WindowEvent e) {
+		    public void windowClosed(final WindowEvent e) {
 				if (dialog.isAccepted()) {
 					preferences.saveConfig(dialog.recoverConfig());
 				}
@@ -320,7 +322,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		dialog.setVisible(true);
 	}
 
-	private void showError(String message) {
+	private void showError(final String message) {
 		JOptionPane.showMessageDialog(this.view, message,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE);
@@ -330,7 +332,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 * Muestra al usuario la informaci&oacute;n de un plugin.
 	 * @param info
 	 */
-	void showPluginDetails(PluginInfo info) {
+	void showPluginDetails(final PluginInfo info) {
 
 		final StringBuilder html = new StringBuilder();
 		if (info != null) {
@@ -398,7 +400,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
+	public void valueChanged(final ListSelectionEvent e) {
 
 		// Cuando se selecciona un plugin del listado, se muestra su informacion en el
 		// panel lateral

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * Clase encargada de cargar y mantener los objetos correspondientes a un plugin.<br/>
+ * Clase encargada de cargar y mantener los objetos correspondientes a un plugin.<br>
  * Esta clase permite cargar una colecci&oacute;n de archivos JARs entre los que
  * se buscar&acute;n uno o m&acute;s plugins. Los plugins podr&aacute;n hacer uso
  * de las clases de las bibliotecas que los acompa&ntilde;en, pero si estas tienen

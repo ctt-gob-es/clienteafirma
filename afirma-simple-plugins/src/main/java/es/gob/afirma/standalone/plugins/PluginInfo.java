@@ -30,7 +30,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @param internalName Nombre interno del plugin.
 	 * @param name Nombre legible del plugin.
 	 */
-	public PluginInfo(String internalName, String name) {
+	public PluginInfo(final String internalName, final String name) {
 		super(internalName, DEFAULT_VERSION_CODE);
 
 		if (name == null) {
@@ -65,7 +65,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * Estable la descripci&oacute;n del plugin.
 	 * @param description Descripci&oacute;n del plugin.
 	 */
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -73,7 +73,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * Establece la version de c&oacute;digo del plugin.
 	 * @param versionCode Versi&oacute;n.
 	 */
-	public void setVersionCode(int versionCode) {
+	public void setVersionCode(final int versionCode) {
 		this.versionCode = versionCode;
 	}
 
@@ -89,7 +89,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * Estable el n&uacute;mero de versi&oacute;n del plugin.
 	 * @param version Versi&oacute;n del plugin.
 	 */
-	public void setVersion(String version) {
+	public void setVersion(final String version) {
 		if (version != null) {
 			this.version = version;
 		}
@@ -107,7 +107,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * Establece el listado de autores del plugin.
 	 * @param authors Listado de autores.
 	 */
-	public void setAuthors(String[] authors) {
+	public void setAuthors(final String[] authors) {
 		this.authors = authors;
 	}
 
@@ -123,7 +123,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * Establece el listado de informaci&oacute;n de contacto del soporte del plugin.
 	 * @param contacts Listado contactos.
 	 */
-	public void setContacts(String[] contacts) {
+	public void setContacts(final String[] contacts) {
 		this.contacts = contacts;
 	}
 
@@ -141,12 +141,12 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * deber&aacute; extender {@link es.gob.afirma.standalone.plugins.ConfigurationPanel}.
 	 * @param configPanel Nombre de la clase del panel de configuraci&oacute;n.
 	 */
-	public void setConfigPanel(String configPanel) {
+	public void setConfigPanel(final String configPanel) {
 		this.configPanel = configPanel;
 	}
 
 	/**
-	 * Recupera el men&uacte; general del plugin.
+	 * Recupera el men&uacute; general del plugin.
 	 * @return Men&uacute; general.
 	 */
 	public GenericMenuOption getMenu() {
@@ -154,10 +154,10 @@ public class PluginInfo extends MinimalPluginInfo {
 	}
 
 	/**
-	 * Establece el men&uacte; general del plugin.
+	 * Establece el men&uacute; general del plugin.
 	 * @param menu Men&uacute; general.
 	 */
-	public void setMenu(GenericMenuOption menu) {
+	public void setMenu(final GenericMenuOption menu) {
 		this.menu = menu;
 	}
 
@@ -173,7 +173,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * Establece los botones para el uso de las acciones del plugin.
 	 * @param buttons Botones para el acceso a las funciones del plugin.
 	 */
-	public void setButtons(PluginButton[] buttons) {
+	public void setButtons(final PluginButton[] buttons) {
 		this.buttons = buttons;
 	}
 
@@ -183,7 +183,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj instanceof PluginInfo) {
 			return this.internalName.equals(((PluginInfo) obj).getInternalName());
 		}

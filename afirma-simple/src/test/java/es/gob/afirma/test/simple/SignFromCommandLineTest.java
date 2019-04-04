@@ -16,7 +16,7 @@ public final class SignFromCommandLineTest {
 	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
 
 	/** Prueba de generacion de firma visible PDF.
-	 * @throws Exception */
+	 * @throws Exception Cuando ocurre cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore

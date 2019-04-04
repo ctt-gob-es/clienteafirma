@@ -212,8 +212,9 @@
      No confundir con la codificaci&oacute;n del XML, son valores independientes.
     </p>
     <p>
-     Por restricc&oacute;n de esquema de XMLDsig debe ser una URI:
-     <pre>
+     Por restricci&oacute;n de esquema de XMLDsig debe ser una URI:
+    </p>
+    <pre>
          &lt;element name="Object" type="ds:ObjectType"/&gt;
          &lt;complexType name="ObjectType" mixed="true"&gt;
            &lt;sequence minOccurs="0" maxOccurs="unbounded"&gt;
@@ -223,8 +224,7 @@
            &lt;attribute name="MimeType" type="string" use="optional"/&gt;
            &lt;attribute name="Encoding" type="anyURI" use="optional"/&gt;
          &lt;/complexType&gt;
-     </pre>
-    </p>    
+    </pre>
     <p>
      Si se proporcionan datos a firmar previamente codificados en Base64 pero se desea sean considerados como
      su forma descodificada, debe establecerse este valor a <code>http://www.w3.org/2000/09/xmldsig#base64</code>
