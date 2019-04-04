@@ -265,7 +265,7 @@
 							<excludes>
 								<exclude>**/nss/**</exclude>
 							</excludes>
-							<finalName>${afirma.jar.name}_${afirma.legible.version}.jar</finalName>    
+							<finalName>${afirma.jar.name}_${afirma.legible.version}</finalName>    
 						</configuration>
 					</plugin>
 
@@ -293,51 +293,150 @@
 		</profile>
 
 	
-		<!--  Si usamos Java 8, ademas del perfil anterior se ejecutara este para ofuscar el codigo -->
+		<!--  Si usamos Java 8 se puede ofuscar el codigo -->
 	    <profile>
 	      <id>env-install-java-8</id>
 	      <activation>
 	        <property>
 	          <name>env</name>
-	          <value>install</value>
+	          <value>install_java8</value>
 	        </property>
 	        <jdk>1.8</jdk>
 	      </activation>
 
 		  <build>
 		  	<plugins>
-			  <plugin>
-				<groupId>com.github.wvengen</groupId>
-				<artifactId>proguard-maven-plugin</artifactId>
-				<version>2.0.14</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>proguard</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<proguardVersion>6.0.3</proguardVersion>
-					<injar>${project.build.finalName}.jar</injar>
-					<outputDirectory>${project.build.directory}</outputDirectory>
-					<proguardInclude>${basedir}/proguard.conf</proguardInclude>
+		  	
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${jdk.version}</source>
+						<target>${jdk.version}</target>
+						<fork>true</fork>
+						<compilerArgument>-XDignore.symbol.file</compilerArgument>
+					</configuration>
+				</plugin>
 	
-					<libs>
-						<lib>${java.home}/lib/rt.jar</lib>
-						<lib>${java.home}/lib/jsse.jar</lib>
-						<lib>${java.home}/lib/jce.jar</lib>
-					</libs>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.2.1</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+							<configuration>
+								<transformers>
+									<transformer
+										implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+										<mainClass>es.gob.afirma.miniapplet.MiniAfirmaApplet</mainClass>
+									</transformer>
+								</transformers>
+							</configuration>
+						</execution>
+					</executions>
+					<configuration>
+						<archive>
+							<addMavenDescriptor>false</addMavenDescriptor>
+						</archive>
+						<filters>
+							<filter>
+								<artifact>*:*</artifact>
+								<excludes>
+									<exclude>META-INF/*.SF</exclude>
+									<exclude>META-INF/*.DSA</exclude>
+									<exclude>META-INF/*.RSA</exclude>
+									<exclude>*.crt</exclude>
+								</excludes>
+							</filter>
+							<filter>
+								<artifact>es.gob.afirma:afirma-keystores-mozilla</artifact>
+								<excludes>
+									<exclude>nss/**</exclude>
+								</excludes>
+							</filter>
+							<filter>
+								<artifact>net.java.xades:jxades</artifact>
+								<excludes>
+									<exclude>TrustRootCACertificates/**</exclude>
+									<exclude>*.*</exclude>
+								</excludes>
+							</filter>
+						</filters>
+					</configuration>
+				</plugin>
 	
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>net.sf.proguard</groupId>
-						<artifactId>proguard-base</artifactId>
-						<version>6.0.3</version>
-					</dependency>
-				</dependencies>
-			   </plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.1</version>
+					<configuration>
+						<archive>
+							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+						</archive>
+						<excludes>
+							<exclude>**/nss/**</exclude>
+						</excludes>
+						<finalName>${afirma.jar.name}_${afirma.legible.version}</finalName>    
+					</configuration>
+				</plugin>
+		  	
+				<plugin>
+					<groupId>com.github.wvengen</groupId>
+					<artifactId>proguard-maven-plugin</artifactId>
+					<version>2.0.14</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>proguard</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<proguardVersion>6.0.3</proguardVersion>
+						<injar>${afirma.jar.name}_${afirma.legible.version}.jar</injar>
+						<outputDirectory>${project.build.directory}</outputDirectory>
+						<proguardInclude>${basedir}/proguard.conf</proguardInclude>
+					
+						<libs>
+							<lib>${java.home}/lib/rt.jar</lib>
+							<lib>${java.home}/lib/jsse.jar</lib>
+							<lib>${java.home}/lib/jce.jar</lib>
+						</libs>
+					
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>net.sf.proguard</groupId>
+							<artifactId>proguard-base</artifactId>
+							<version>6.0.3</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			   
+<!-- 
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jarsigner-plugin</artifactId>
+					<version>3.0.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<keystore>${afirma.keytool.keystore}</keystore>
+						<alias>${afirma.keytool.alias}</alias>
+						<storepass>${afirma.keytool.password}</storepass>
+						<verify>true</verify>
+					</configuration>
+				</plugin>
+ -->
 			  </plugins>
 			</build>
 		</profile>
