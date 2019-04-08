@@ -391,6 +391,9 @@ public class TestPAdES {
             System.out.println("PDF Fallido: " + file.getAbsolutePath()); //$NON-NLS-1$
         }
         catch(final Exception e) {
+	    	Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Fallo esperado: " + e //$NON-NLS-1$
+			);
             failed = true;
         }
         Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
@@ -412,6 +415,9 @@ public class TestPAdES {
     		);
         }
         catch(final Exception e) {
+        	Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Fallo esperado: " + e //$NON-NLS-1$
+			);
             failed = true;
         }
         Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
