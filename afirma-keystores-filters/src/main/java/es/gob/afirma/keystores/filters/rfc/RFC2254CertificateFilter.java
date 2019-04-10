@@ -45,11 +45,11 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
      *                por positivo si al menos uno de los certificados de esta cadena pasa el fltro establecido
      *                para el titular. */
     public RFC2254CertificateFilter(final String subjectFilter, final String issuerFilter, final boolean recurse) {
-        if (subjectFilter == null && issuerFilter == null) {
+        if ((subjectFilter == null || subjectFilter.isEmpty()) && (issuerFilter == null || issuerFilter.isEmpty())) {
             throw new IllegalArgumentException("Al menos uno de los criterios de filtrado debe no ser nulo"); //$NON-NLS-1$
         }
-        this.rfc2254IssuerFilter = issuerFilter;
-        this.rfc2254SubjectFilter = subjectFilter;
+        this.rfc2254IssuerFilter = issuerFilter != null && !issuerFilter.isEmpty() ? issuerFilter : null;
+        this.rfc2254SubjectFilter = subjectFilter != null && !subjectFilter.isEmpty() ? subjectFilter : null;
         this.recurseIssuers = recurse;
     }
 
