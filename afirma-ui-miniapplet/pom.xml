@@ -417,7 +417,6 @@
 					</dependencies>
 				</plugin>
 			   
-<!-- 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jarsigner-plugin</artifactId>
@@ -436,7 +435,7 @@
 						<verify>true</verify>
 					</configuration>
 				</plugin>
- -->
+
 			  </plugins>
 			</build>
 		</profile>
