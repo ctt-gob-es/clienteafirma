@@ -462,7 +462,7 @@ public final class Utils {
         }
 
         // Ahora escribimos el XML usando XALAN
-        writeXMLwithXALAN(writer, node, xmlEncoding);
+       	writeXMLwithXALAN(writer, node, xmlEncoding);
 
         // Si no se trata de un XML completo y bien formado, devolvemos ya el resultado
         if (!AOFileUtils.isXML(baos.toByteArray())) {
@@ -632,6 +632,16 @@ public final class Utils {
      * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache. */
     public static void installXmlDSigProvider(final boolean forceApacheProvider) {
 
+    	// Correccion al problema insertado en Apache Santuario 2.1.0 (Java 11)
+    	// Establecemos la propiedad de Apache Santuario necesaria para que no se agreguen saltos
+    	// de linea en los Base64 generados, ya que de hacerlo se utiliza "\r\n" y el "\r" aparece como
+    	// "&#13;" al final de cada linea en las firmas XML. Las firmas generadas serian validas pero
+    	// darian problemas al promocionarlas a formatos longevos.
+    	// Referencias:
+    	// - https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8177334
+    	// - https://issues.apache.org/jira/browse/SANTUARIO-482
+    	System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
     	final Provider provider = Security.getProvider(XMLDSIG);
 
     	if (provider == null || forceApacheProvider) {
@@ -659,9 +669,9 @@ public final class Utils {
     		}
     	}
 
-    	final Provider p = Security.getProvider(XMLDSIG);
-    	if (p != null) {
-    		LOGGER.info("Se usara el proveedor de XMLDSig '" + p.getName() + "': " + p.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+    	final XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+    	if (factory != null) {
+    		LOGGER.info("Se usara el proveedor '" + factory.getProvider().getName() + "': " + factory.getProvider().getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
     	}
     	else {
     		LOGGER.warning("No hay proveedor instalado para XMLDSig"); //$NON-NLS-1$

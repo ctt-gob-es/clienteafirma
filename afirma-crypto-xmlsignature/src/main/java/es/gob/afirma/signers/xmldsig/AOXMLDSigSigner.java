@@ -121,7 +121,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     private Document doc;
 
     static {
-    	Utils.installXmlDSigProvider(false);
+    	Utils.installXmlDSigProvider(true);
     }
 
     /** Firma datos en formato XMLDSig 1.0 (XML Digital Signature).

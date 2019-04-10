@@ -288,7 +288,7 @@ public final class AOXAdESSigner implements AOSigner {
     static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
     static {
-        Utils.installXmlDSigProvider(false);
+    	Utils.installXmlDSigProvider(true);
     }
 
     /** Firma datos en formato XAdES.

@@ -57,7 +57,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     	// Proveedor XMLDSig
     	try {
-    		Utils.installXmlDSigProvider(false);
+    		Utils.installXmlDSigProvider(true);
     	}
         catch (final Throwable e) {
         	LOGGER.log(Level.WARNING, "Error en la instalacion del proveedor XMLdSig: " + e, e); //$NON-NLS-1$

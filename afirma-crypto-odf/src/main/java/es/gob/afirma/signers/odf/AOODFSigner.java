@@ -118,7 +118,7 @@ public final class AOODFSigner implements AOSigner {
     }
 
     static {
-        Utils.installXmlDSigProvider(false);
+        Utils.installXmlDSigProvider(true);
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
