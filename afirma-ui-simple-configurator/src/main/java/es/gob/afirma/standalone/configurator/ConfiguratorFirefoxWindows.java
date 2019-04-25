@@ -9,24 +9,34 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
+ * @author Carlos Gamuci. */
 final class ConfiguratorFirefoxWindows {
 
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
@@ -118,7 +128,7 @@ final class ConfiguratorFirefoxWindows {
 
 		window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 		for (final File profileDir : mozillaProfileDirs) {
-			importCACertOnMozillaKeyStore(appDir, profileDir);
+			importCACertOnMozillaKeyStore(appDir, profileDir, window);
 		}
 
 		window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
@@ -128,7 +138,7 @@ final class ConfiguratorFirefoxWindows {
 	/** Desinstala un certificado de los almacenes de autoridades de confianza
 	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n. */
-	static void uninstallRootCAMozillaKeyStore(final File appDir) {
+	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console) {
 
 		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
 		if (mozillaProfileDirs == null || mozillaProfileDirs.length == 0) {
@@ -152,7 +162,7 @@ final class ConfiguratorFirefoxWindows {
 
 		for (final File profileDir : mozillaProfileDirs) {
 			try {
-				uninstallCACertFromMozillaKeyStore(appDir, profileDir);
+				uninstallCACertFromMozillaKeyStore(appDir, profileDir, console);
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
@@ -182,14 +192,16 @@ final class ConfiguratorFirefoxWindows {
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param profilesDir Directorio del perfil de Mozilla. */
 	private static void importCACertOnMozillaKeyStore (final File appDir,
-			                                           final File profilesDir) {
+			                                           final File profilesDir,
+			                                           final Console console) {
 		boolean installed = false;
 		boolean cancelled = false;
 		do {
 			try {
 				executeCertUtilToImport(
 					appDir,
-					profilesDir
+					profilesDir,
+					console
 				);
 				installed = true;
 			}
@@ -223,7 +235,8 @@ final class ConfiguratorFirefoxWindows {
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
 	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore. */
 	private static void executeCertUtilToImport(final File appDir,
-			                                    final File profileDir)
+			                                    final File profileDir,
+			                                    final Console console)
 			                                    		throws IOException, GeneralSecurityException {
 
 		final File certutilExe =
@@ -246,11 +259,17 @@ final class ConfiguratorFirefoxWindows {
 		};
 
 		try {
-			execCertUtilCommandLine(certutilCommands);
+			execCertUtilCommandLine(appDir, certutilCommands, console);
+		}
+		catch (final AOCancelledOperationException e) {
+			throw new KeyStoreException(
+				"Se cancelo la insercion del Error en la instalacion del certificado de CA en el perfil " + profileDir //$NON-NLS-1$
+					+ " de Firefox. Es probable que la aplicacion no funcione en este perfil.", e //$NON-NLS-1$
+			);
 		}
 		catch (final Exception e) {
 			throw new KeyStoreException(
-				"Error en la instalacion del certificado de CA en el perfiles " + profileDir //$NON-NLS-1$
+				"Error en la instalacion del certificado de CA en el perfil " + profileDir //$NON-NLS-1$
 					+ " de Firefox. Es posible que la aplicacion funcione en su propio perfil. Si desea que la aplicacion se " //$NON-NLS-1$
 					+ " ejecute correctamente en todos los perfiles, desinstalela y vuelvala a instalar.", e //$NON-NLS-1$
 			);
@@ -263,7 +282,7 @@ final class ConfiguratorFirefoxWindows {
 	 * @param profileDir Directorio de perfil de Mozilla.
 	 * @throws IOException Cuando no se encuentra o puede leer alguno de los ficheros necesarios.
 	 * @throws GeneralSecurityException Cuando no se puede ejecutar. */
-	private static void uninstallCACertFromMozillaKeyStore(final File appDir, final File profileDir) throws IOException, GeneralSecurityException {
+	private static void uninstallCACertFromMozillaKeyStore(final File appDir, final File profileDir, final Console console) throws IOException, GeneralSecurityException {
 
 		final File certutilFile = new File(appDir, CERTUTIL_DIR + File.separator + CERTUTIL_EXE);
 
@@ -282,7 +301,7 @@ final class ConfiguratorFirefoxWindows {
 		};
 
 		try {
-			execCertUtilCommandLine(certutilCommands);
+			execCertUtilCommandLine(appDir, certutilCommands, console);
 		}
 		catch (final Exception e) {
 			throw new KeyStoreException("Error en el borrado del certificado de CA en el perfil de usuario " + profileDir.getAbsolutePath(), e); //$NON-NLS-1$
@@ -292,14 +311,24 @@ final class ConfiguratorFirefoxWindows {
 	/** Ejecuta Mozilla CertUtil como comando del sistema.
 	 * @param command Comando a ejecutar, con el nombre de comando y sus par&aacute;metros separados en un array.
 	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
-	private static void execCertUtilCommandLine(final String[] command)
+	private static void execCertUtilCommandLine(final File appDir, final String[] command, final Console console)
 			throws IOException {
 
 		LOGGER.info("Se ejecutara el siguiente comando:\n" + printCommand(command)); //$NON-NLS-1$
 
 		final Process process = new ProcessBuilder(command).start();
+
+		try (final OutputStream resOs = process.getOutputStream();) {
+			// Abrimos el canal de entrada para poder identificar si certutil nos pide contrasena
+			// maestra e insertarsela en ese caso. Lo abrimos en este punto porque de no hacerlo
+			// o hacerlo en el mismo try que el canal de salida, se queda bloqueada la ejecucion de
+			// certutil
+		}
+
 		// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
-		// cualquier salida como un error
+		// cualquier salida como un problema en la instalacion.
+		// En caso de necesitar contrasena maestra para instalar los certificados de usuario, se
+		// lanzara un error con el texto 'Enter Password or Pin for "NSS Certificate DB":'
 		String line;
 		try (
 				final InputStream resIs = process.getInputStream();
@@ -309,11 +338,29 @@ final class ConfiguratorFirefoxWindows {
 						1024 // Maximo 1024 caracteres por linea
 						);
 				) {
-			while ((line = resReader.readLine()) != null) {
-				throw new IOException("Error durante la ejecucion de certutil: " + line); //$NON-NLS-1$
+			if ((line = resReader.readLine()) != null) {
+
+				// Si se devuelve una cadena distinta a en la que piden la contrasena maestra,
+				// devolvemos un error
+				if (!line.startsWith("Enter Password")) { //$NON-NLS-1$
+					throw new IOException("Error durante la ejecucion de certutil (out): " + line); //$NON-NLS-1$
+				}
+
+
+				// CertUtil nos pide la contrasena maestra, pero a estas alturas no podemos
+				// pasarsela (la aplicacion no acepta la entrada).
+				// Destruimos el proceso y creamos uno nuevo en el que solicitamos de primeras
+				// la contrasena
+				process.destroyForcibly();
+
+				// Solicitamos la contrasena al usuario
+				execCertUtilCommandLineWithPassword(appDir, command, console);
+				return;
 			}
 		}
 
+		// Comprobamos que tampoco se haya devuelto ningun mensaje por el canal de error,
+		// en cuyo caso la operacion habra finalizado correctamente
 		try (
 				final InputStream errIs = process.getErrorStream();
 				final BufferedReader errReader = new BoundedBufferedReader(
@@ -322,9 +369,129 @@ final class ConfiguratorFirefoxWindows {
 						1024 // Maximo 1024 caracteres por linea
 						);
 				) {
-			while ((line = errReader.readLine()) != null) {
-				throw new IOException("Error durante la ejecucion de certutil: " + line); //$NON-NLS-1$
+			if ((line = errReader.readLine()) != null) {
+				throw new IOException("Error durante la ejecucion de certutil (err): " + line); //$NON-NLS-1$
 			}
+		}
+	}
+
+	/** Solicita al usuario la contrase&ntilde;a maestra del almac&eacute;n y
+	 * ejecuta Mozilla CertUtil para importar un certificado.
+	 * @param command Comando a ejecutar, con el nombre de comando y sus par&aacute;metros separados en un array.
+	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
+	private static void execCertUtilCommandLineWithPassword(final File appDir, final String[] command, final Console console)
+			throws IOException {
+
+		// Solicitamos la contrasena al usuario hasta que inserte una o cancele el dialogo
+		char[] password = null;
+		do {
+			password = showPasswordDialog(console.getParentComponent());
+		}
+		while (password == null || password.length == 0);
+
+		// La escribimos a fichero
+		final File tempFile = writePasswordToTempFile(password, appDir);
+
+		// Ejecutamos la orden indicando la nueva contrasena
+		final List<String> commands = new ArrayList<>(Arrays.asList(command));
+		commands.add(1, "-f"); //$NON-NLS-1$
+		commands.add(2, tempFile.getAbsolutePath());
+
+		final Process process = new ProcessBuilder(commands).start();
+
+		try (final OutputStream resOs = process.getOutputStream();) {
+			// Abrimos el canal de entrada para poder identificar si certutil nos pide contrasena
+			// maestra e insertarsela en ese caso. Lo abrimos en este punto porque de no hacerlo
+			// o hacerlo en el mismo try que el canal de salida, se queda bloqueada la ejecucion de
+			// certutil
+		}
+
+		// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
+		// cualquier salida como un problema en la instalacion.
+		String line;
+		try (
+				final InputStream resIs = process.getInputStream();
+				final BufferedReader resReader = new BoundedBufferedReader(
+						new InputStreamReader(resIs),
+						256, // Maximo 256 lineas de salida
+						1024 // Maximo 1024 caracteres por linea
+						);
+				) {
+			if ((line = resReader.readLine()) != null) {
+				deleteFileSilently(tempFile);
+				throw new IOException("Error durante la ejecucion de certutil (out): " + line); //$NON-NLS-1$
+			}
+		}
+
+		// Comprobamos que tampoco se haya devuelto ningun mensaje por el canal de error,
+		// en cuyo caso la operacion habra finalizado correctamente
+		try (
+				final InputStream errIs = process.getErrorStream();
+				final BufferedReader errReader = new BoundedBufferedReader(
+						new InputStreamReader(errIs),
+						256, // Maximo 256 lineas de salida
+						1024 // Maximo 1024 caracteres por linea
+						);
+				) {
+			if ((line = errReader.readLine()) != null) {
+				deleteFileSilently(tempFile);
+				throw new IOException("Error durante la ejecucion de certutil (err): " + line); //$NON-NLS-1$
+			}
+		}
+
+		// Eliminamos la contrasena
+		deleteFileSilently(tempFile);
+	}
+
+	private static char[] showPasswordDialog(final Component parent) throws AOCancelledOperationException {
+		return AOUIFactory.getPassword(
+				Messages.getString("ConfiguratorWindows.18"), //$NON-NLS-1$
+				null,
+				null,
+				false,
+				parent);
+	}
+
+	/**
+	 * Escribe una contrase&ntilde;a en un nuevo fichero y lo devuelve.
+	 * @param password Contrasen&ntilde;a a escribir.
+	 * @param appDir Directorio en el que se crear&aacute; el fichero.
+	 * @return Fichero creado con la contrase&ntilde;a.
+	 * @throws IOException Cuando ocurrio un error al crear la contrase&ntilde;a.
+	 */
+	private static File writePasswordToTempFile(final char[] password, final File appDir) throws IOException {
+
+		File outFile;
+
+		for (int i = 0; (outFile = new File(appDir, "p" + i)).isFile(); i++) { //$NON-NLS-1$
+			// Identificamos un nombre de fichero que no exista
+		}
+
+		// Creamos el fichero con la contrasena
+		try (OutputStream fos = new FileOutputStream(outFile)) {
+			fos.write(new String(password).getBytes(StandardCharsets.UTF_8));
+		}
+		catch (final Exception e) {
+			if (outFile.exists()) {
+				deleteFileSilently(outFile);
+			}
+			throw new IOException("No se pudo preparar la contrasena maestra para pasarsela a CertUtil", e); //$NON-NLS-1$
+		}
+
+		return outFile;
+	}
+
+	/**
+	 * Elimina un fichero sin mostrar ni registrar ning&uacute; tipo de error en caso de no poder hacerlo.
+	 * @param file Fichero a eliminar.
+	 */
+	private static void deleteFileSilently(final File file) {
+		try {
+			Files.delete(file.toPath());
+		}
+		catch (final Exception e) {
+			// No dejamos trazas de que no se ha podido eliminar este fichero para no dejar
+			// pistas del problema
 		}
 	}
 

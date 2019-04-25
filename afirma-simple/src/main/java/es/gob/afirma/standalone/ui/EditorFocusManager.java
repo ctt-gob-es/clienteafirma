@@ -79,18 +79,34 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
         this.linkUnfocusedStyle = sc.addStyle("linkUnfocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setUnderline(this.linkUnfocusedStyle, true);
         StyleConstants.setForeground(this.linkUnfocusedStyle, Color.BLUE);
+
+        // Obtenemos colores del sistema, protegiendolo porque algunos sistemas linux no lo permiten
+        Color backgroundColor;
+        Color selecctionBackgroundColor;
+        Color foregroundColor;
+        try {
+        	backgroundColor = UIManager.getColor("TREE.background"); //$NON-NLS-1$
+        	selecctionBackgroundColor = UIManager.getColor("TREE.selectionBackground"); //$NON-NLS-1$
+        	foregroundColor = UIManager.getColor("TREE.selectionForeground"); //$NON-NLS-1$
+        }
+        catch (final Throwable e) {
+        	backgroundColor = Color.WHITE;
+        	selecctionBackgroundColor = Color.WHITE;
+        	foregroundColor = Color.WHITE;
+		}
+
         StyleConstants.setBackground(
     		this.linkUnfocusedStyle,
-    		UIManager.getColor("TREE.background")!=null ? UIManager.getColor("TREE.background") : Color.WHITE  //$NON-NLS-1$ //$NON-NLS-2$
+    		backgroundColor != null ? backgroundColor : Color.WHITE
 		);
         this.linkFocusedStyle = sc.addStyle("linkFocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setBackground(
     		this.linkFocusedStyle,
-    		UIManager.getColor("TREE.selectionBackground")!=null ? UIManager.getColor("TREE.selectionBackground") : Color.BLUE //$NON-NLS-1$ //$NON-NLS-2$
+    		selecctionBackgroundColor != null ? selecctionBackgroundColor : Color.BLUE
 		);
         StyleConstants.setForeground(
     		this.linkFocusedStyle,
-    		UIManager.getColor("TREE.selectionForeground")!=null ? UIManager.getColor("TREE.selectionForeground") : Color.WHITE //$NON-NLS-1$ //$NON-NLS-2$
+    		foregroundColor != null ? foregroundColor : Color.WHITE
 		);
 
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();
@@ -232,8 +248,9 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
     private boolean editorFirstShow = true;
     @Override public void componentResized(final ComponentEvent e) {
         if (this.editorFirstShow) {
-            final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getFamily(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$ //$NON-NLS-2$
-            final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        	final Font font = UIManager.getFont("Label.font"); //$NON-NLS-1$
+            final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), font.getFamily(), font.getSize());
+            final String bodyRule = "body { font-family: " + font.getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
             this.editorFirstShow = false;
         }

@@ -181,6 +181,7 @@ final class CAdESCounterSigner {
      *                             atributo <i>Signing Certificate</i> <code>false</code> para
      *                             usar la versi&oacute;n 1
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param claimedRoles Roles declarados por el usuario.
      * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
@@ -203,6 +204,7 @@ final class CAdESCounterSigner {
                        final AdESPolicy policy,
                        final boolean signingCertificateV2,
                        final List<CommitmentTypeIndicationBean> ctis,
+                       final String[] claimedRoles,
                        final boolean includeSigningTimeAttribute,
                        final CAdESSignerMetadata csm,
                        final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
@@ -247,6 +249,7 @@ final class CAdESCounterSigner {
             policy,
             signingCertificateV2,
             ctis,
+            claimedRoles,
             includeSigningTimeAttribute,
             csm,
             targetType,
@@ -278,6 +281,7 @@ final class CAdESCounterSigner {
      * @param certChain Cadena de certificados del firmante.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param claimedRoles Roles declarados por el usuario.
      * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
@@ -298,6 +302,7 @@ final class CAdESCounterSigner {
                                                        final AdESPolicy policy,
                                                        final boolean signingCertificateV2,
                                                        final List<CommitmentTypeIndicationBean> ctis,
+                                                       final String[] claimedRoles,
                                                        final boolean includeSigningTimeAttribute,
                                                        final CAdESSignerMetadata csm,
                                                        final CounterSignTarget targetType,
@@ -322,6 +327,7 @@ final class CAdESCounterSigner {
                     policy,
                     signingCertificateV2,
                     ctis,
+                    claimedRoles,
                     includeSigningTimeAttribute,
                     csm,
                     targetType,
@@ -345,6 +351,7 @@ final class CAdESCounterSigner {
      * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
      *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param claimedRoles Roles declarados por el usuario.
      * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
@@ -367,6 +374,7 @@ final class CAdESCounterSigner {
                                              final AdESPolicy policy,
                                              final boolean signingCertificateV2,
                                              final List<CommitmentTypeIndicationBean> ctis,
+                                             final String[] claimedRoles,
                                              final boolean includeSigningTimeAttribute,
                                              final CAdESSignerMetadata csm,
                                              final CounterSignTarget targetType,
@@ -408,6 +416,7 @@ final class CAdESCounterSigner {
                 				policy,
                 				signingCertificateV2,
                 				ctis,
+                				claimedRoles,
                 				includeSigningTimeAttribute,
                 				csm,
                 				targetType,
@@ -437,6 +446,7 @@ final class CAdESCounterSigner {
 					policy,
 					signingCertificateV2,
 					ctis,
+					claimedRoles,
 					includeSigningTimeAttribute,
 					csm,
 					doNotIncludePolicyOnSigningCertificate
@@ -472,6 +482,7 @@ final class CAdESCounterSigner {
      * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
      *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param claimedRoles Roles declarados por el usuario.
      * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
@@ -490,6 +501,7 @@ final class CAdESCounterSigner {
                                       final AdESPolicy policy,
                                       final boolean signingCertificateV2,
                                       final List<CommitmentTypeIndicationBean> ctis,
+                                      final String[] claimedRoles,
                                       final boolean includeSigningTimeAttribute,
                                       final CAdESSignerMetadata csm,
                                       final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
@@ -512,6 +524,7 @@ final class CAdESCounterSigner {
              PKCSObjectIdentifiers.data.toString(), // El ContentType de las contrafirmas siempre sera id-data
 			 null,	// No agregamos content-description
              ctis,
+             claimedRoles,
              csm,
              true,  // Es contrafirma
              doNotIncludePolicyOnSigningCertificate

@@ -83,7 +83,7 @@ final class ShowFileLinkAction {
             tmp.deleteOnExit();
         }
         catch(final Exception e) {
-        	Logger.getLogger("es.gob.afirma").warning("Error intentado abrir el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.warning("Error intentado abrir el fichero: " + e); //$NON-NLS-1$
         	AOUIFactory.showErrorMessage(
                 null,
                 SimpleAfirmaMessages.getString("ShowFileLinkAction.2", info.getExtension()),  //$NON-NLS-1$
@@ -93,7 +93,7 @@ final class ShowFileLinkAction {
         }
     }
 
-    private static void saveDataFile(DataFileInfo info, Component parent) {
+    private static void saveDataFile(final DataFileInfo info, final Component parent) {
     	try {
     		AOUIFactory.getSaveDataToFile(
 				info.getData(),
@@ -110,7 +110,7 @@ final class ShowFileLinkAction {
 				);
 		}
         catch (final IOException e) {
-			Logger.getLogger("es.gob.afirma").severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
 				null,
 				SimpleAfirmaMessages.getString("ShowFileLinkAction.3"), //$NON-NLS-1$
@@ -119,7 +119,7 @@ final class ShowFileLinkAction {
 			);
 		}
         catch (final AOCancelledOperationException e) {
-			Logger.getLogger("es.gob.afirma").info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 		}
     }
 

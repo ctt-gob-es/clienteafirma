@@ -62,9 +62,9 @@ public final class JarSignatureCertExtractor {
 
 	private static final String USER_HOME = "$USER_HOME"; //$NON-NLS-1$
 
-	private static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
+	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final String[] CACERTS_DEFAULT_PASSWORDS = {
-		DEFAULT_PASSWORD,
+		EMPTY_STRING,
 		"changeit", //$NON-NLS-1$
 		"changeme", //$NON-NLS-1$
 	};
@@ -300,7 +300,7 @@ public final class JarSignatureCertExtractor {
 		// Si existe el fichero, lo cargamos, si no existe pero se puede crear, lo creamos
 		final KeyStore usersTruststore;
 		if (!usersCaCertFile.exists()) {
-			keystorePassword = DEFAULT_PASSWORD;
+			keystorePassword = EMPTY_STRING;
 			usersTruststore = KeyStore.getInstance(KeyStore.getDefaultType());
 			usersTruststore.load(null, keystorePassword.toCharArray());
 			LOGGER.info("Creamos el truststore ya que no existia previamente"); //$NON-NLS-1$

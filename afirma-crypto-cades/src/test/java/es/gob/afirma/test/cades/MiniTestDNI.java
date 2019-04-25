@@ -79,6 +79,7 @@ public final class MiniTestDNI {
         		null,
         		null,
         		null,
+        		null,
         		false // SI incluir politica en SigningCertificate
 		);
 

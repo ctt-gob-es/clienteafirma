@@ -81,6 +81,7 @@ public final class GenCAdESEPESSignedData {
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param claimedRoles Roles declarados por el usuario.
      * @param csm Metadatos sobre el firmante.
      * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
@@ -101,6 +102,7 @@ public final class GenCAdESEPESSignedData {
                                             final String contentType,
                                             final String contentDescription,
                                             final List<CommitmentTypeIndicationBean> ctis,
+                                            final String[] claimedRoles,
                                             final CAdESSignerMetadata csm,
                                             final boolean doNotIncludePolicyOnSigningCertificate) throws AOException {
         if (parameters == null) {
@@ -126,6 +128,7 @@ public final class GenCAdESEPESSignedData {
             contentType,
             contentDescription,
             ctis,
+            claimedRoles,
             csm,
             doNotIncludePolicyOnSigningCertificate
         );

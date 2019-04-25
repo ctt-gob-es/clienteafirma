@@ -12,24 +12,24 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core-keystores</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-core-jse</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 	</dependencies>
 </project>

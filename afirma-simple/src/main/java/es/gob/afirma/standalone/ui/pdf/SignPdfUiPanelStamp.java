@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -339,19 +338,15 @@ final class SignPdfUiPanelStamp extends JPanel implements
 		selectPagePanel.add(this.nextPageButton);
 		selectPagePanel.add(this.lastPageButton);
 
-		this.allPagesCheckbox.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent evt) {
-				if (evt.getStateChange() == ItemEvent.SELECTED) {
-					SignPdfUiPanelStamp.this.firstPageButton.setEnabled(false);
-					SignPdfUiPanelStamp.this.previousPageButton.setEnabled(false);
-					SignPdfUiPanelStamp.this.nextPageButton.setEnabled(false);
-					SignPdfUiPanelStamp.this.lastPageButton.setEnabled(false);
-				}
-				else {
-					enableButtons();
-				}
+		this.allPagesCheckbox.addItemListener(evt -> {
+			if (evt.getStateChange() == ItemEvent.SELECTED) {
+				SignPdfUiPanelStamp.this.firstPageButton.setEnabled(false);
+				SignPdfUiPanelStamp.this.previousPageButton.setEnabled(false);
+				SignPdfUiPanelStamp.this.nextPageButton.setEnabled(false);
+				SignPdfUiPanelStamp.this.lastPageButton.setEnabled(false);
+			}
+			else {
+				enableButtons();
 			}
 		});
 		this.allPagesCheckbox.getAccessibleContext().setAccessibleDescription(
@@ -440,13 +435,13 @@ final class SignPdfUiPanelStamp extends JPanel implements
 		return panel;
 	}
 
-	static String getInsertImageBase64(BufferedImage bi) throws IOException{
+	static String getInsertImageBase64(final BufferedImage bi) throws IOException{
 		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
 			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
 			return Base64.encode(osImage.toByteArray());
 		}
         catch (final IOException e1) {
-        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+        	LOGGER.severe(
 				"No ha sido posible pasar la imagen a JPG: " + e1 //$NON-NLS-1$
 			);
         	throw e1;
@@ -469,7 +464,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 		fileButton.addActionListener(
 				new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent e) {
+					public void actionPerformed(final ActionEvent e) {
 						final File[] files;
 						try {
 							files = AOUIFactory.getLoadFiles(
@@ -494,7 +489,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 							SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, getInsertImageBase64(stampImage));
 						}
 						catch (final IOException ioe) {
-							Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+							LOGGER.severe(
 									"No ha sido posible cargar la imagen: " + ioe //$NON-NLS-1$
 							);
 							AOUIFactory.showMessageDialog(
@@ -545,34 +540,31 @@ final class SignPdfUiPanelStamp extends JPanel implements
 			SignPdfUiMessages.getString("SignPdfUiStamp.9") //$NON-NLS-1$
 		);
 		this.okButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (SignPdfUiPanelStamp.this.allPagesCheckbox.isSelected()) {
-						SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE_PAGE, "0"); //$NON-NLS-1$
-					}
-					else {
-						SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE_PAGE, Integer.toString(getCurrentPage()));
-					}
-
-					SignPdfUiPanelStamp.this.extraParams.put(
-						PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX,
-						getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX)
-					);
-					SignPdfUiPanelStamp.this.extraParams.put(
-						PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY,
-						getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY)
-					);
-					SignPdfUiPanelStamp.this.extraParams.put(
-							PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX,
-						getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX)
-					);
-					SignPdfUiPanelStamp.this.extraParams.put(
-							PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY,
-						getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY)
-					);
-					getListener().nextPanel(SignPdfUiPanelStamp.this.extraParams, null);
+			e -> {
+				if (SignPdfUiPanelStamp.this.allPagesCheckbox.isSelected()) {
+					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE_PAGE, "0"); //$NON-NLS-1$
 				}
+				else {
+					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE_PAGE, Integer.toString(getCurrentPage()));
+				}
+
+				SignPdfUiPanelStamp.this.extraParams.put(
+					PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX,
+					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX)
+				);
+				SignPdfUiPanelStamp.this.extraParams.put(
+					PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY,
+					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY)
+				);
+				SignPdfUiPanelStamp.this.extraParams.put(
+						PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX,
+					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX)
+				);
+				SignPdfUiPanelStamp.this.extraParams.put(
+						PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY,
+					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY)
+				);
+				getListener().nextPanel(SignPdfUiPanelStamp.this.extraParams, null);
 			}
 		);
 		this.okButton.addKeyListener(this);
@@ -584,12 +576,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 			SignPdfUiMessages.getString("SignPdfUiStamp.11") //$NON-NLS-1$
 		);
 		cancelButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					getListener().positionCancelled();
-				}
-			}
+			e -> getListener().positionCancelled()
 		);
 		cancelButton.addKeyListener(this);
 
@@ -617,11 +604,11 @@ final class SignPdfUiPanelStamp extends JPanel implements
 	}
 
 	@Override
-	public void setWidth(String width) {
+	public void setWidth(final String width) {
 		this.width.setText(width);
 	}
 	@Override
-	public void setHeight(String height) {
+	public void setHeight(final String height) {
 		this.height.setText(height);
 	}
 
@@ -647,14 +634,14 @@ final class SignPdfUiPanelStamp extends JPanel implements
 	}
 
 	@Override
-	public void focusGained(FocusEvent evt) {
+	public void focusGained(final FocusEvent evt) {
 		if (evt.getSource() instanceof JTextComponent) {
 			((JTextComponent) evt.getSource()).selectAll();
 		}
 	}
 
 	@Override
-	public void focusLost(FocusEvent evt) {
+	public void focusLost(final FocusEvent evt) {
 		if (evt.getSource() instanceof JTextComponent) {
 			((JTextComponent) evt.getSource()).select(0,  0);
 		}
@@ -770,7 +757,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 		}
 	}
 
-	private void preLoadImages(final int actualPage, int pageToLoad) throws IOException {
+	private void preLoadImages(final int actualPage, final int pageToLoad) throws IOException {
 
 		int necessaryPage;
 		// Pulsado boton izquierdo (anterior)
@@ -799,17 +786,17 @@ final class SignPdfUiPanelStamp extends JPanel implements
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent evt) {
+	public void changedUpdate(final DocumentEvent evt) {
 		updateArea();
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent evt) {
+	public void insertUpdate(final DocumentEvent evt) {
 		updateArea();
 	}
 
 	@Override
-	public void removeUpdate(DocumentEvent evt) {
+	public void removeUpdate(final DocumentEvent evt) {
 		updateArea();
 	}
 

@@ -69,7 +69,7 @@ final class SignPdfUiPanel extends JPanel implements
 	private static final int PAGEPANEL_PREFERRED_WIDTH = 466;
 	private static final int PAGEPANEL_PREFERRED_HEIGHT = 410;
 
-	static interface SignPdfUiPanelListener {
+	interface SignPdfUiPanelListener {
 		void positionSelected(final Properties extraParams);
 		void positionCancelled();
 		void nextPanel(final Properties p, final BufferedImage im);
@@ -146,7 +146,7 @@ final class SignPdfUiPanel extends JPanel implements
 		createUI();
 	}
 
-	public void setPdfPages(List<BufferedImage> pages) {
+	public void setPdfPages(final List<BufferedImage> pages) {
 		this.pdfPages=pages;
 	}
 
@@ -418,19 +418,16 @@ final class SignPdfUiPanel extends JPanel implements
 			SignPdfUiMessages.getString("SignPdfUiPanel.2") //$NON-NLS-1$
 		);
 		this.okButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final Properties p = new Properties();
-					if (getCurrentPage() > getPdfPages().size()) {
-						p.put(PdfExtraParams.SIGNATURE_PAGE, "append"); //$NON-NLS-1$
-					}
-					else {
-						p.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getCurrentPage()));
-					}
-					p.putAll(getExtraParamsForLocation());
-					getListener().nextPanel(p, getFragmentImage(p));
+			e -> {
+				final Properties p = new Properties();
+				if (getCurrentPage() > getPdfPages().size()) {
+					p.put(PdfExtraParams.SIGNATURE_PAGE, "append"); //$NON-NLS-1$
 				}
+				else {
+					p.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getCurrentPage()));
+				}
+				p.putAll(getExtraParamsForLocation());
+				getListener().nextPanel(p, getFragmentImage(p));
 			}
 		);
 		this.okButton.addKeyListener(this);
@@ -442,12 +439,7 @@ final class SignPdfUiPanel extends JPanel implements
 			SignPdfUiMessages.getString("SignPdfUiPanel.4") //$NON-NLS-1$
 		);
 		cancelButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					getListener().positionCancelled();
-				}
-			}
+			e -> getListener().positionCancelled()
 		);
 		cancelButton.addKeyListener(this);
 
@@ -560,14 +552,14 @@ final class SignPdfUiPanel extends JPanel implements
 	}
 
 	@Override
-	public void focusGained(FocusEvent evt) {
+	public void focusGained(final FocusEvent evt) {
 		if (evt.getSource() instanceof JTextComponent) {
 			((JTextComponent) evt.getSource()).selectAll();
 		}
 	}
 
 	@Override
-	public void focusLost(FocusEvent evt) {
+	public void focusLost(final FocusEvent evt) {
 		if (evt.getSource() instanceof JTextComponent) {
 			((JTextComponent) evt.getSource()).select(0,  0);
 		}
@@ -752,7 +744,7 @@ final class SignPdfUiPanel extends JPanel implements
 	}
 
 
-	private void preLoadImages(final int actualPage, int pageToLoad) throws IOException {
+	private void preLoadImages(final int actualPage, final int pageToLoad) throws IOException {
 
 		int necessaryPage;
 		// Pulsado boton izquierdo (anterior)
@@ -781,17 +773,17 @@ final class SignPdfUiPanel extends JPanel implements
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent evt) {
+	public void changedUpdate(final DocumentEvent evt) {
 		updateArea();
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent evt) {
+	public void insertUpdate(final DocumentEvent evt) {
 		updateArea();
 	}
 
 	@Override
-	public void removeUpdate(DocumentEvent evt) {
+	public void removeUpdate(final DocumentEvent evt) {
 		updateArea();
 	}
 
@@ -878,6 +870,7 @@ final class SignPdfUiPanel extends JPanel implements
 				)
 			)
 		);
+
 		return extraParams;
 	}
 }

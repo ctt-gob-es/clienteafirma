@@ -16,8 +16,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -48,6 +46,8 @@ import es.gob.afirma.standalone.ui.CommonWaitDialog;
 public final class CheckHashDialog extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = 2431770911918905439L;
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
@@ -93,54 +93,51 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		checkButton.setMnemonic('C');
 		checkButton.setEnabled(false);
 		checkButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					CheckHashDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					try {
-						if (checkHash(getTextFieldHashText(), getTextFieldDataText())) {
-							AOUIFactory.showMessageDialog(
-								CheckHashDialog.this,
-								SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
-								JOptionPane.INFORMATION_MESSAGE
-							);
-						}
-						else {
-							AOUIFactory.showMessageDialog(
-								CheckHashDialog.this,
-								SimpleAfirmaMessages.getString("CheckHashDialog.4"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("CheckHashDialog.5"), //$NON-NLS-1$
-								JOptionPane.WARNING_MESSAGE
-							);
-						}
-					}
-					catch(final OutOfMemoryError ooe) {
-						AOUIFactory.showErrorMessage(
-							parent,
-							SimpleAfirmaMessages.getString("CreateHashDialog.18"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
-						);
-						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-							"Fichero demasiado grande: " + ooe //$NON-NLS-1$
-						);
-						return;
-					}
-					catch(final Exception ex) {
-						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-							"No ha sido posible comprobar las huellas digitales: " + ex //$NON-NLS-1$
-						);
-						AOUIFactory.showErrorMessage(
+			e -> {
+				CheckHashDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				try {
+					if (checkHash(getTextFieldHashText(), getTextFieldDataText())) {
+						AOUIFactory.showMessageDialog(
 							CheckHashDialog.this,
-							SimpleAfirmaMessages.getString("CheckHashDialog.6"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
+							JOptionPane.INFORMATION_MESSAGE
 						);
 					}
-					finally {
-						CheckHashDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					else {
+						AOUIFactory.showMessageDialog(
+							CheckHashDialog.this,
+							SimpleAfirmaMessages.getString("CheckHashDialog.4"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("CheckHashDialog.5"), //$NON-NLS-1$
+							JOptionPane.WARNING_MESSAGE
+						);
 					}
+				}
+				catch(final OutOfMemoryError ooe) {
+					AOUIFactory.showErrorMessage(
+						parent,
+						SimpleAfirmaMessages.getString("CreateHashDialog.18"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
+					);
+					return;
+				}
+				catch(final Exception ex) {
+					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+						"No ha sido posible comprobar las huellas digitales: " + ex //$NON-NLS-1$
+					);
+					AOUIFactory.showErrorMessage(
+						CheckHashDialog.this,
+						SimpleAfirmaMessages.getString("CheckHashDialog.6"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CheckHashDialog.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+				}
+				finally {
+					CheckHashDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
 			}
 		);
@@ -158,31 +155,28 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		textFieldHashButton.addKeyListener(this);
 		textFieldHashButton.setMnemonic('x');
 		textFieldHashButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					try {
-						setTextFieldHashText(
-							AOUIFactory.getLoadFiles(
-								SimpleAfirmaMessages.getString("CheckHashDialog.10"), //$NON-NLS-1$
-								null,
-								null,
-								new String[] { "hash", "hashb64", "hexhash" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
-								false,
-								false,
-								AutoFirmaUtil.getDefaultDialogsIcon(),
-								CheckHashDialog.this
-							)[0].getAbsolutePath()
-						);
-						final String dataFile = getTextFieldDataText();
-						if (!(dataFile == null) && !dataFile.isEmpty()) {
-							checkButton.setEnabled(true);
-						}
+			ae -> {
+				try {
+					setTextFieldHashText(
+						AOUIFactory.getLoadFiles(
+							SimpleAfirmaMessages.getString("CheckHashDialog.10"), //$NON-NLS-1$
+							null,
+							null,
+							new String[] { "hash", "hashb64", "hexhash" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
+							false,
+							false,
+							AutoFirmaUtil.getDefaultDialogsIcon(),
+							CheckHashDialog.this
+						)[0].getAbsolutePath()
+					);
+					final String dataFile = getTextFieldDataText();
+					if (!(dataFile == null) && !dataFile.isEmpty()) {
+						checkButton.setEnabled(true);
 					}
-					catch(final AOCancelledOperationException ex) {
-						// Operacion cancelada por el usuario
-					}
+				}
+				catch(final AOCancelledOperationException ex) {
+					// Operacion cancelada por el usuario
 				}
 			}
 		);
@@ -200,31 +194,28 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		textFieldDataButton.addKeyListener(this);
 		textFieldDataButton.setMnemonic('E');
 		textFieldDataButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					try {
-						setTextFieldDataText(
-							AOUIFactory.getLoadFiles(
-								SimpleAfirmaMessages.getString("CheckHashDialog.13"), //$NON-NLS-1$
-								null,
-								null,
-								null,
-								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
-								false,
-								false,
-								AutoFirmaUtil.getDefaultDialogsIcon(),
-								CheckHashDialog.this
-							)[0].getAbsolutePath()
-						);
-						final String hashFile = getTextFieldHashText();
-						if (!(hashFile == null) && !hashFile.isEmpty()) {
-							checkButton.setEnabled(true);
-						}
+			ae -> {
+				try {
+					setTextFieldDataText(
+						AOUIFactory.getLoadFiles(
+							SimpleAfirmaMessages.getString("CheckHashDialog.13"), //$NON-NLS-1$
+							null,
+							null,
+							null,
+							SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
+							false,
+							false,
+							AutoFirmaUtil.getDefaultDialogsIcon(),
+							CheckHashDialog.this
+						)[0].getAbsolutePath()
+					);
+					final String hashFile = getTextFieldHashText();
+					if (!(hashFile == null) && !hashFile.isEmpty()) {
+						checkButton.setEnabled(true);
 					}
-					catch(final AOCancelledOperationException ex) {
-						// Operacion cancelada por el usuario
-					}
+				}
+				catch(final AOCancelledOperationException ex) {
+					// Operacion cancelada por el usuario
 				}
 			}
 		);
@@ -235,12 +226,9 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 		exitButton.setMnemonic('C');
 		exitButton.addActionListener(
-			new ActionListener () {
-				@Override
-				public void actionPerformed( final ActionEvent e ) {
-					CheckHashDialog.this.setVisible(false);
-					CheckHashDialog.this.dispose();
-				}
+			e -> {
+				CheckHashDialog.this.setVisible(false);
+				CheckHashDialog.this.dispose();
 			}
 		);
 		exitButton.getAccessibleContext().setAccessibleDescription(
@@ -345,7 +333,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 			return worker.get().booleanValue();
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+			LOGGER.severe(
 				"Error en el proceso en segundo plano de comparacion de huellas: " + e //$NON-NLS-1$
 			);
 			return false;

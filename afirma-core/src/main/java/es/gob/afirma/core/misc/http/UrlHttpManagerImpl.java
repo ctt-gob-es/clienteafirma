@@ -219,7 +219,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				disableSslChecks();
 			}
 			catch(final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				LOGGER.warning(
 					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
 				);
 			}

@@ -47,6 +47,7 @@ import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 import es.gob.afirma.standalone.plugins.OutputData;
+import es.gob.afirma.standalone.plugins.PluginAction;
 import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
@@ -225,25 +226,22 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
     			PluginIntegrationWindow.SINGLE_RESULT);
 
 		for (final PluginGraphicButton button : pluginsButtons) {
-			final SignatureProcessAction action = (SignatureProcessAction) button.getButton().getAction();
+			final PluginAction action = button.getButton().getAction();
     		button.getGraphicButton().addActionListener(new PluginButtonActionListener(this, this.signingCert, action));
     	}
 
-    	EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-		        if (pluginsButtons.isEmpty()) {
-		        	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        }
-		        else {
-		        	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        	SignDetailPanel.this.pluginButtonsPanel.removeAll();
-		        	for (final PluginGraphicButton button : pluginsButtons) {
-		        		SignDetailPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
-		        	}
-		        	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(true);
-		        }
-			}
+    	EventQueue.invokeLater(() -> {
+		    if (pluginsButtons.isEmpty()) {
+		    	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    }
+		    else {
+		    	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    	SignDetailPanel.this.pluginButtonsPanel.removeAll();
+		    	for (final PluginGraphicButton button : pluginsButtons) {
+		    		SignDetailPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
+		    	}
+		    	SignDetailPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		    }
 		});
 	}
 
@@ -251,16 +249,16 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
 
 		final SignDetailPanel signDetailPanel;
 		final X509Certificate cert;
-		final SignatureProcessAction action;
+		final PluginAction action;
 
-		public PluginButtonActionListener(SignDetailPanel signDetailPanel, final X509Certificate signingCert, SignatureProcessAction action) {
+		public PluginButtonActionListener(final SignDetailPanel signDetailPanel, final X509Certificate signingCert, final PluginAction action) {
 			this.signDetailPanel = signDetailPanel;
 			this.cert = signingCert;
 			this.action = action;
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 
 			final OutputData data = new OutputData();
 			data.setDataFile(this.signDetailPanel.signConfig.getSignatureFile());
@@ -274,17 +272,20 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
 			}
 			data.setCerts(certs.values().toArray(new X509Certificate[certs.size()]));
 
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					PluginButtonActionListener.this.action.processSignatures(
+			new Thread(() -> {
+				if (PluginButtonActionListener.this.action instanceof SignatureProcessAction) {
+					((SignatureProcessAction) PluginButtonActionListener.this.action).processSignatures(
 							new OutputData[] { data }, PluginButtonActionListener.this.cert,
+							SwingUtilities.getWindowAncestor(SignDetailPanel.this));
+				}
+				else {
+					PluginButtonActionListener.this.action.start(
 							SwingUtilities.getWindowAncestor(SignDetailPanel.this));
 				}
 			}).start();
 		}
 
-		private void readCertsFromBranch(AOTreeNode node, Map<BigInteger, X509Certificate> certs) {
+		private void readCertsFromBranch(final AOTreeNode node, final Map<BigInteger, X509Certificate> certs) {
 			final AOSimpleSignInfo signInfo = (AOSimpleSignInfo) node.getUserObject();
 			if (signInfo.getCerts() != null && signInfo.getCerts().length > 0
 					&& signInfo.getCerts()[0] != null) {

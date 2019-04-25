@@ -31,6 +31,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/opt/firefox", //$NON-NLS-1$
 		"/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
 		"/lib", //$NON-NLS-1$
+		"/usr/lib64", //$NON-NLS-1$
 		"/usr/lib", //$NON-NLS-1$
 		"/usr/lib/nss", //$NON-NLS-1$
 		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
@@ -96,9 +97,11 @@ final class MozillaKeyStoreUtilitiesUnix {
 		if (directoryLib.isDirectory()) {
 			final String filenames[] = directoryLib.list();
 			final List<String> firefoxDirectories = new ArrayList<>();
-			for (final String filename : filenames) {
-				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
-					firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (filenames != null) {
+				for (final String filename : filenames) {
+					if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+						firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
 			if (firefoxDirectories.isEmpty()) {

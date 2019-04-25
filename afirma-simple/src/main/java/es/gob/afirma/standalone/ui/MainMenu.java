@@ -403,6 +403,17 @@ public final class MainMenu extends JMenuBar {
         }
     }
 
+
+    /**
+     * M&eacute;todo para hacer aparecer el di&aacute;logo de preferencias en macOS mediante la opci&oacute;n
+     * de men&uacute; del sistema operativo.
+     * @param event Evento que desencadena la acci&oacute;n.
+     */
+	@SuppressWarnings("unused")
+	void showPreferences(final EventObject event) {
+	    PreferencesDialog.show(getParentComponent(), true);
+	}
+
     void showPreferences() {
         PreferencesDialog.show(getParentComponent(), true);
     }
@@ -420,17 +431,12 @@ public final class MainMenu extends JMenuBar {
     	}
     }
 
-    @SuppressWarnings("unused")
-	void showAbout(final EventObject event) {
-    	showAbout(getParentComponent() == null ? MainMenu.this : getParentComponent());
-    }
-
     /**
      * Permite la selecci&oacute;n de un fichero de firma y muestra su contenido en
      * el visor.
      * @param parentComponent Componente padre sobre el que mostrar el
      */
-    static void viewSignature(Object parentComponent) {
+    static void viewSignature(final Object parentComponent) {
     	final File[] file = AOUIFactory.getLoadFiles(
     			SimpleAfirmaMessages.getString("MainMenu.35"), //$NON-NLS-1$
     			null,
@@ -446,7 +452,18 @@ public final class MainMenu extends JMenuBar {
     	}
     }
 
-    /** Muestra en OS X el men&uacute; "Acerca de...".
+
+    /**
+     * M&eacute;todo para hacer aparecer el di&aacute;logo "Acerca de" en macOS mediante la opci&oacute;n
+     * de men&uacute; del sistema operativo.
+     * @param event Evento que desencadena la acci&oacute;n.
+     */
+    @SuppressWarnings("unused")
+	void showAbout(final EventObject event) {
+    	showAbout(getParentComponent() == null ? MainMenu.this : getParentComponent());
+    }
+
+    /** Muestra ek di&aacute;logo "Acerca de...".
      * @param parentComponent Componente padre para la modalidad. */
     public static void showAbout(final Component parentComponent) {
         AOUIFactory.showMessageDialog(
@@ -460,6 +477,12 @@ public final class MainMenu extends JMenuBar {
         );
     }
 
+    /**
+     * M&eacute;todo para salir de la aplicaci&oacute;n en macOS mediante la opci&oacute;n
+     * de men&uacute; del sistema operativo.
+     * @param event Evento que desencadena la acci&oacute;n.
+     * @param response Respuesta que se debe devolver.
+     */
     @SuppressWarnings("unused")
 	boolean exitApplication(final EventObject event, final Object response) {
     	return this.saf.askForClosing();
@@ -468,5 +491,4 @@ public final class MainMenu extends JMenuBar {
     boolean exitApplication() {
         return this.saf.askForClosing();
     }
-
 }

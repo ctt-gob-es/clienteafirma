@@ -34,10 +34,6 @@ import es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner;
  * remoto asignado al resultado. */
 public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 
-    static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
-
-    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
-
 	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de firma. */
 	private static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
 

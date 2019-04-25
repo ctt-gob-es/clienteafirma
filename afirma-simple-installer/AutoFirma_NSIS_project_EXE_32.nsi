@@ -20,7 +20,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.6.4"
+!define VERSION "1.6.5"
 
 ;--------------------------------
 ;Paginas del instalador
@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma32/AutoFirma_32_v1_6_4_installer.exe
+OutFile AutoFirma32/AutoFirma_32_v1_6_5_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -200,7 +200,8 @@ Section "Programa" sPrograma
 	Sleep 2000
 
 	;creamos un acceso directo en el escitorio
-	CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	MessageBox MB_YESNO "¿Desea instalar un acceso directo a AutoFirma en su escritorio?" /SD IDYES IDNO +2
+		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
 
 	;Menu items
 	CreateDirectory "$SMPROGRAMS\AutoFirma"
@@ -297,8 +298,8 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
-	Call AddToPath
+	Push "$INSTDIR\AutoFirma\AutoFirma"
+	Call AddToPath                                  
 
 SectionEnd
 
@@ -608,7 +609,7 @@ Section "uninstall"
 	${StrContains} $0 $PATH $INSTDIR
 	StrCmp $0 "" PostValidacion
 	DirectorioValido:
-		RMDir /r $INSTDIR 
+		RMDir /r $INSTDIR  
 	PostValidacion:
 	;Borrar accesos directorios del menu inicio
 	Delete "$DESKTOP\AutoFirma.lnk"
@@ -638,7 +639,7 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma\AutoFirma"
 	Call un.RemoveFromPath
 
 SectionEnd

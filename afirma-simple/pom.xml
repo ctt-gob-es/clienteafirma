@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 
 	<properties>
@@ -32,157 +32,154 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-simpleafirma-plugins</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-core-jse</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-core-jse-keystores</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core-keystores</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-filters</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-mozilla</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cms</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cades</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cades-multi</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-pdf</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-xml</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xades</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-odf</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-ooxml</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cadestri-client</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xadestri-client</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-padestri-client</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xmlsignature</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-validation</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core-massive</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-batch-client</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>core</artifactId>
-			<version>1.56.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>prov</artifactId>
-			<version>1.56.0.0</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.56.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -260,7 +257,6 @@
        				<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.7.0</version>
 						<configuration>
 							<source>1.8</source>
 							<target>1.8</target>
@@ -272,7 +268,7 @@
 					<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.1</version>
 					<configuration>
 						<archive>
 							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
@@ -299,7 +295,6 @@
      			<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.7.0</version>
 					<configuration>
 						<source>1.8</source>
 						<target>1.8</target>
@@ -311,7 +306,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.1</version>
 					<executions>
 						<execution>
 							<phase>package</phase>
@@ -359,7 +354,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.1</version>
 					<configuration>
 						<archive>
 							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>

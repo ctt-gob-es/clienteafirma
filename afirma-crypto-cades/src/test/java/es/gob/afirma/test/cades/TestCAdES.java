@@ -32,15 +32,16 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESValidator;
 
 /** Pruebas del m&oacute;dulo CAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdES {
 
-    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
 
 	private static final String[] DATA_FILES = {
 		"txt", //$NON-NLS-1$
@@ -200,7 +201,7 @@ public final class TestCAdES {
 
 					AOTreeModel tree = signer.getSignersStructure(result, false);
 					Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-					Assert.assertEquals("FISICO ACTIVO PRUEBA", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+					Assert.assertEquals("PRUEBA4EMPN P4EMPAPE1 P4EMPAPE2 - 00000000T", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
 
 					tree = signer.getSignersStructure(result, true);
 					Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
@@ -218,4 +219,37 @@ public final class TestCAdES {
 		}
 	}
 
+
+	/** Prueba de firma indicando los cargos del firmante.
+	 * @throws Exception en cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testSignatureWithClaimedRoles() throws Exception {
+
+		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+		final PrivateKeyEntry pke;
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final AOSigner signer = new AOCAdESSigner();
+
+		final Properties extraParams = new Properties();
+		extraParams.setProperty(CAdESExtraParams.MODE, "implicit"); //$NON-NLS-1$
+		extraParams.setProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES, "Apoderado de empresa|Director de proyecto"); //$NON-NLS-1$
+
+		final byte[] result = signer.sign(
+				DATA.get(0), AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
+				);
+
+		final File saveFile = File.createTempFile("CAdES-ClaimedRoles-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+		try (
+				final OutputStream os = new FileOutputStream(saveFile);
+				) {
+			os.write(result);
+			os.flush();
+		}
+		System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+	}
 }

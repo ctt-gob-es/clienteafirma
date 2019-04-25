@@ -311,9 +311,16 @@ public final class PdfExtraParams {
      * (propiedad compartida con XAdES y CAdES). */
     static final String POLICY_QUALIFIER  = "policyQualifier";//$NON-NLS-1$
 
+    /**
+     * Lista de cargos atribuidos al firmante separados por el car&uacute;cter
+     * '|'. Los cargos de la lista no pueden contener el car&uacute;cter '|' (ya
+     * que este se usa como separador).
+     */
+    static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
+
     /** Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.
      * No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256. */
-    static final String OWNER_PASSWORD = "ownerPassword";//$NON-NLS-1$
+    static final String OWNER_PASSWORD_STRING = "ownerPassword";//$NON-NLS-1$
 
     /** Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
      * act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
@@ -353,7 +360,7 @@ public final class PdfExtraParams {
     static final String TSA_USR = "tsaUsr";//$NON-NLS-1$
 
     /** Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>. */
-    static final String TSA_PWD = "tsaPwd";//$NON-NLS-1$
+    static final String TSA_PWD_KEY = "tsaPwd";//$NON-NLS-1$
 
     /** OID de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al servidor de sello de tiempo (opcional). Solo se permite indicar una extensi&oacute;n. */
     static final String TSA_EXTENSION_OID = "tsaExtensionOid";//$NON-NLS-1$
@@ -370,7 +377,7 @@ public final class PdfExtraParams {
     static final String TSA_SSL_KEYSTORE = "tsaSslKeyStore";//$NON-NLS-1$
 
     /** Contrase&ntilde;a del almac&eacute;n de claves que contiene el certificado SSL cliente para las conexiones HTTPS. */
-    static final String TSA_SSL_KEYSTORE_PASSWORD = "tsaSslKeyStorePassword";//$NON-NLS-1$
+    static final String TSA_SSL_KEYSTORE_PASSWORD_PARAM = "tsaSslKeyStorePassword";//$NON-NLS-1$
 
     /** Tipo del almac&eacute;n de claves que contiene el certificado SSL cliente para las conexiones HTTPS.<br>
      * El formato <code>JKS</code> puede no funcionar adecuadamente en Android. */
@@ -380,7 +387,7 @@ public final class PdfExtraParams {
     static final String TSA_SSL_TRUST_STORE = "tsaSslTrustStore";//$NON-NLS-1$
 
     /** Contrase&ntilde;a del almac&eacute;n de confianza que contiene los certificados emisores del certificado SSL de la TSA. */
-    static final String TSA_SSL_TRUST_STORE_PASSWORD = "tsaSslTrustStorePassword";//$NON-NLS-1$
+    static final String TSA_SSL_TRUST_STORE_PASSWORD_PARAM = "tsaSslTrustStorePassword";//$NON-NLS-1$
 
     /** Tipo del almac&eacute;n de confianza que contiene los certificados emisores del certificado SSL de la TSA.<br>
      * El formato <code>JKS</code> puede no funcionar adecuadamente en Android. */
@@ -395,7 +402,11 @@ public final class PdfExtraParams {
     static final String LAYER4_TEXT = "layer4Text";//$NON-NLS-1$
 
     /** Contrase&ntilde;a del pdf en caso de se encuentre protegido contra modificaciones y/o aperturas. */
-    static final String USER_PASSWORD = "userPassword";//$NON-NLS-1$
+    static final String USER_PASSWORD_STRING = "userPassword";//$NON-NLS-1$
+
+    /** Si se indica a {@code true}, se mostrar&aacute; una marca junto a la firma visible que el lector de
+     * PDF podr&aacute; utilizar para indicar si la firma es v&aacute;lida o no. */
+    static final String INCLUDE_QUESTION_MARK = "includeQuestionMark";//$NON-NLS-1$
 
     /** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
     private PdfExtraParams(){

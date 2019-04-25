@@ -38,8 +38,8 @@ public class TestSignField {
 		);
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("imagePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -53,12 +53,12 @@ public class TestSignField {
 
 		extraParams.put("imagePage", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_MP));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE_MP));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -81,7 +81,7 @@ public class TestSignField {
 		extraParams.put("imagePage", "-1"); //$NON-NLS-1$ //$NON-NLS-2$
 		signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -102,7 +102,7 @@ public class TestSignField {
 		extraParams.put("imagePage", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 		signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -135,8 +135,8 @@ public class TestSignField {
 		final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePage", "append"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -151,12 +151,12 @@ public class TestSignField {
 		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -189,8 +189,8 @@ public class TestSignField {
 		final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -198,12 +198,12 @@ public class TestSignField {
 		extraParams.put("signaturePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("signaturePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -235,8 +235,8 @@ public class TestSignField {
 		final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -244,18 +244,18 @@ public class TestSignField {
 		extraParams.put("signaturePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("signaturePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(RUBRIC_IMAGE));
+		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.RUBRIC_IMAGE));
 
 		final String rubricImageB64 = Base64.encode(rubricImage);
 
 		extraParams.put("signatureRubricImage", rubricImageB64); //$NON-NLS-1$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -287,8 +287,8 @@ public class TestSignField {
 		final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -302,12 +302,12 @@ public class TestSignField {
 		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -338,8 +338,8 @@ public class TestSignField {
 		final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -347,7 +347,7 @@ public class TestSignField {
 		extraParams.put("signaturePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("signaturePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(RUBRIC_IMAGE));
+		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.RUBRIC_IMAGE));
 
 		final String rubricImageB64 = Base64.encode(rubricImage);
 
@@ -358,12 +358,12 @@ public class TestSignField {
 		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams
@@ -395,8 +395,8 @@ public class TestSignField {
 		final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(TestSignField.CERT_PATH), TestSignField.CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(TestSignField.CERT_ALIAS, new KeyStore.PasswordProtection(TestSignField.CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePositionOnPageLowerLeftX", "50"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -406,7 +406,7 @@ public class TestSignField {
 
 		extraParams.put("signatureRotation", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(RUBRIC_IMAGE));
+		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.RUBRIC_IMAGE));
 
 		final String rubricImageB64 = Base64.encode(rubricImage);
 
@@ -417,12 +417,12 @@ public class TestSignField {
 		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final byte[] signedPdf = signer.sign(
 			testPdf,
-			DEFAULT_SIGNATURE_ALGORITHM,
+			TestSignField.DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			extraParams

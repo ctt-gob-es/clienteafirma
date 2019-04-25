@@ -37,6 +37,7 @@ import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.OutputData;
+import es.gob.afirma.standalone.plugins.PluginAction;
 import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
@@ -75,8 +76,8 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
      * @param outDir Directorio en el que se han almacenado las firmas.
      * @param signingCert Certificado utilizado para la firma.
      */
-    public SignResultListPanel(SimpleAfirma simpleAfirma, List<SignOperationConfig> signConfig,
-    		final File outDir, X509Certificate signingCert) {
+    public SignResultListPanel(final SimpleAfirma simpleAfirma, final List<SignOperationConfig> signConfig,
+    		final File outDir, final X509Certificate signingCert) {
     	this.saf = simpleAfirma;
     	this.currentSignConfigs = signConfig;
     	this.currentSigningCert = signingCert;
@@ -191,21 +192,18 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
 					(SignatureProcessAction) button.getButton().getAction()));
     	}
 
-    	EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-		        if (pluginsButtons.isEmpty()) {
-		        	SignResultListPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        }
-		        else {
-		        	SignResultListPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        	SignResultListPanel.this.pluginButtonsPanel.removeAll();
-		        	for (final PluginGraphicButton button : pluginsButtons) {
-		        		SignResultListPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
-		        	}
-		        	SignResultListPanel.this.mainPluginsButtonsPanel.setVisible(true);
-		        }
-			}
+    	EventQueue.invokeLater(() -> {
+		    if (pluginsButtons.isEmpty()) {
+		    	SignResultListPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    }
+		    else {
+		    	SignResultListPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    	SignResultListPanel.this.pluginButtonsPanel.removeAll();
+		    	for (final PluginGraphicButton button : pluginsButtons) {
+		    		SignResultListPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
+		    	}
+		    	SignResultListPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		    }
 		});
 	}
 
@@ -215,16 +213,16 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
 
 		final SignResultListPanel signResultPanel;
 		final X509Certificate cert;
-		final SignatureProcessAction action;
+		final PluginAction action;
 
-		public PluginButtonActionListener(SignResultListPanel signResultPanel, final X509Certificate signingCert, SignatureProcessAction action) {
+		public PluginButtonActionListener(final SignResultListPanel signResultPanel, final X509Certificate signingCert, final PluginAction action) {
 			this.signResultPanel = signResultPanel;
 			this.cert = signingCert;
 			this.action = action;
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 
 			final List<SignOperationConfig> configs = this.signResultPanel.currentSignConfigs;
 			final List<OutputData> datas = new ArrayList<>();
@@ -235,11 +233,14 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
 				datas.add(data);
 			}
 
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					PluginButtonActionListener.this.action.processSignatures(
-							datas.toArray(new OutputData[datas.size()]), PluginButtonActionListener.this.cert,
+			new Thread(() -> {
+				if (PluginButtonActionListener.this.action instanceof SignatureProcessAction) {
+				((SignatureProcessAction) PluginButtonActionListener.this.action).processSignatures(
+						datas.toArray(new OutputData[datas.size()]), PluginButtonActionListener.this.cert,
+						SwingUtilities.getWindowAncestor(SignResultListPanel.this));
+				}
+				else {
+					PluginButtonActionListener.this.action.start(
 							SwingUtilities.getWindowAncestor(SignResultListPanel.this));
 				}
 			}).start();

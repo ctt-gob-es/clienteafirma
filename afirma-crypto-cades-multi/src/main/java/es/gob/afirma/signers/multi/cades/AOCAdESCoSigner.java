@@ -15,6 +15,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -86,6 +87,12 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			)
 		);
 
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+        }
+
         //*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
     	//****************************************************************************************************
 
@@ -130,6 +137,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 				contentTypeOid != null ? contentTypeOid : altContentTypeOid,
                 contentDescription != null ? contentDescription : altContentDescription,
 				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+				claimedRoles,
 				Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
 				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
 				doNotIncludePolicyOnSigningCertificate
@@ -185,6 +193,12 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			)
 		);
 
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+        }
+
         //*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
     	//****************************************************************************************************
 
@@ -222,6 +236,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			    contentTypeOid != null ? contentTypeOid : altContentTypeOid,
 			    contentDescription != null ? contentDescription : altContentDescription,
 			    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+			    claimedRoles,
 			    Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
 			    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
 			    doNotIncludePolicyOnSigningCertificate

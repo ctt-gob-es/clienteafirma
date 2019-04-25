@@ -12,64 +12,43 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 
 	<dependencies>
-	    
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-mozilla</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-core-jse</artifactId>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 		    <groupId>com.madgag.spongycastle</groupId>
 		    <artifactId>core</artifactId>
-		    <version>1.56.0.0</version>
 		</dependency>
 		
 		<dependency>
 		    <groupId>com.madgag.spongycastle</groupId>
 		    <artifactId>bcpkix-jdk15on</artifactId>
-		    <version>1.56.0.0</version>
 		</dependency>
 
 	</dependencies>
 
 
 	<profiles>
-	
-		<profile>
-			<id>env-dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-      		</activation>
-		
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
-						<configuration>
-							<source>1.8</source> 
-							<target>1.8</target> 
-							<fork>true</fork>
-							<compilerArgs>
-								<arg>-XDignore.symbol.file</arg>
-							</compilerArgs>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	
 	    <profile>
 			<id>env-install</id>
@@ -86,7 +65,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
 						<configuration>
 							<source>1.8</source> 
 							<target>1.8</target> 
@@ -100,7 +78,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.0.0</version>
+						<version>3.2.1</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -132,7 +110,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>3.0.2</version>
+						<version>3.1.1</version>
 						<configuration>
 							<archive>
 								<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>

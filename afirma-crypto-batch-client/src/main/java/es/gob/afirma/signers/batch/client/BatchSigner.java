@@ -269,7 +269,7 @@ public final class BatchSigner {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+			LOGGER.severe(
 				"Error al cargar el fichero XML de lote: " + e + "\n" + new String(xml) //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			throw new IOException("Error al cargar el fichero XML de lote: " + e, e); //$NON-NLS-1$

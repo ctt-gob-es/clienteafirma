@@ -190,6 +190,10 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
 	public void refresh() {
 
+		// Ya que al refrescarga el dialogo pueden aparecer otros nuevos (como alguno de solicitud de PIN),
+		// dejamos de obligar a que este este siempre encima
+		this.certDialog.setAlwaysOnTop(false);
+
 		try {
 			this.ksdm.refresh();
 		}

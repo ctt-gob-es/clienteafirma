@@ -64,6 +64,53 @@ public final class ServiceInvocationManager {
 	private static final String KEY_MANAGER_TYPE = "SunX509"; //$NON-NLS-1$
 	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
 
+	private static final String[] ENABLED_CIPHER_SUITES = new String[] {
+			"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_DHE_DSS_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_DHE_DSS_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+
+
+			"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
+			"TLS_RSA_WITH_AES_256_CBC_SHA256", //$NON-NLS-1$
+			"TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
+			"TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_256_CBC_SHA256", //$NON-NLS-1$
+			"TLS_DHE_DSS_WITH_AES_256_CBC_SHA256", //$NON-NLS-1$
+			"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDH_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_DHE_DSS_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_DHE_DSS_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
+			"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
+			"TLS_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
+			"TLS_ECDH_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
+			"TLS_DHE_DSS_WITH_AES_128_CBC_SHA" //$NON-NLS-1$
+	};
+
 	/** Coge el foco del sistema en macOS. En el resto de sistemas no hace nada. */
 	public static void focusApplication() {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -120,7 +167,16 @@ public final class ServiceInvocationManager {
 			final SSLServerSocket ssocket = tryPorts(channelInfo.getPorts(), ssocketFactory);
 			ssocket.setReuseAddress(true);
 
-			// empieza la cuenta atras del temporizador.
+			// TODO: Restringimos las suites a utilizar a las por defecto de Java 11 (compatible con Java 8 y posteriores)
+			// omitiendo las suites de TLSv1.3 ya que la implementacion de estas no es compatible con la implementacion
+			// de Chrome v74 y anteriores (probablemente porque la version implementada en Java se basa en uno de los
+			// ultimos bocetos del estandar y no en la version final).
+			// Se hace de esta manera porque Java no responde a los mecanismos tradicionales para desactivar el protocolo
+			// (como la propiedad "jdk.tls.disabledAlgorithms").
+			// Una vez se implemente una version compatible del estandar se deberia eliminar esta limitacion.
+			ssocket.setEnabledCipherSuites(ENABLED_CIPHER_SUITES);
+
+			// Empieza la cuenta atras del temporizador.
 
 			/** Temporizador para cerrar la aplicaci&oacute;n cuando pase un tiempo de inactividad. */
 			final Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
@@ -340,7 +396,7 @@ public final class ServiceInvocationManager {
 	/** Mata el proceso de AutoFirma cuando estamos en macOS. En el resto de sistemas
 	 * no hace nada.
 	 * @param idSession Identificador de sesi&oacute;n utilizado para identificar al cliente. */
-	static void closeMacService(String idSession) {
+	static void closeMacService(final String idSession) {
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
 		final AppleScript script = new AppleScript(
 				"kill -9 $(ps -ef | grep " + idSession + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
@@ -358,7 +414,7 @@ public final class ServiceInvocationManager {
 		private final String idSession;
 		private final int[] ports;
 
-		public ChannelInfo(String idSession, int[] ports) {
+		public ChannelInfo(final String idSession, final int[] ports) {
 			this.idSession = idSession;
 			this.ports = ports;
 		}

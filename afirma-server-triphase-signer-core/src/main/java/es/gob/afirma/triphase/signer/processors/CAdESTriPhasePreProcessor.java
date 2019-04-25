@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
@@ -28,6 +29,7 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
@@ -73,17 +75,23 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
 			signingCertificateV2 = true;
 		}
-		else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-			signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+		else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
+			signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
 		}
 		else {
 			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
 		}
 
 		boolean omitContent = true;
-		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
-			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
+		if (extraParams.containsKey(CAdESExtraParams.MODE)) {
+			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty(CAdESExtraParams.MODE)); //$NON-NLS-1$
 		}
+
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+        }
 
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
 		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
@@ -99,7 +107,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final byte[] messageDigest;
 		final String digestAlgorithm;
-		final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+		final String precalculatedHashAlgorithm = extraParams.getProperty(CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
 		if (precalculatedHashAlgorithm != null) {
 			digestAlgorithm = precalculatedHashAlgorithm;
 			messageDigest = data;
@@ -123,13 +131,14 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					signingCertificateV2,
 					messageDigest,
 					new Date(),
-					Boolean.parseBoolean(extraParams.getProperty("includeSigningTimeAttribute", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+					Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
 					false,           // PAdES Mode
 					contentTypeOid,
 					contentDescription,
 					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+					claimedRoles,
 					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-	                Boolean.parseBoolean(extraParams.getProperty("doNotIncludePolicyOnSigningCertificate", "false")) //$NON-NLS-1$ //$NON-NLS-2$
+					Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()))
 				);
 
 		LOGGER.info("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
@@ -241,12 +250,18 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
 			signingCertificateV2 = true;
 		}
-		else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-			signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+		else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
+			signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
 		}
 		else {
 			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
 		}
+
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+        }
 
 		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
@@ -284,10 +299,11 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				contentTypeOid,
 				contentDescription,
 				new Date(),
-				Boolean.parseBoolean(extraParams.getProperty("includeSigningTimeAttribute", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+				Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
 				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+				claimedRoles,
 				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                Boolean.parseBoolean(extraParams.getProperty("doNotIncludePolicyOnSigningCertificate", "false")) //$NON-NLS-1$ //$NON-NLS-2$
+                Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()))
 			);
 		}
 		catch (final CertificateEncodingException e) {

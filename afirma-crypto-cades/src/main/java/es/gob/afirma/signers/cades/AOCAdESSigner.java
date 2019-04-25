@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -84,7 +85,8 @@ public final class AOCAdESSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    @Override
+    @SuppressWarnings("nls")
+	@Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKey key,
@@ -146,6 +148,18 @@ public final class AOCAdESSigner implements AOSigner {
 			)
 		);
 
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
+
+
+        System.out.println("Parametro signatureClaimedRoles: " + claimedRolesParam);
+
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+
+        	System.out.println("Numero de parametros: " + claimedRoles.length);
+        }
+
     	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
     	//****************************************************************************************************
 
@@ -179,7 +193,7 @@ public final class AOCAdESSigner implements AOSigner {
 					altContentDescription = mimeHelper.getDescription();
 				}
 				catch (final Exception e) {
-					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+					LOGGER.warning(
 						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e //$NON-NLS-1$
 					);
 				}
@@ -202,6 +216,7 @@ public final class AOCAdESSigner implements AOSigner {
                    contentTypeOid != null ? contentTypeOid : altContentTypeOid,
                    contentDescription != null ? contentDescription : altContentDescription,
                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                   claimedRoles,
                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
                    doNotIncludePolicyOnSigningCertificate
             );
@@ -230,7 +245,7 @@ public final class AOCAdESSigner implements AOSigner {
 				);
 			}
         	catch (final Exception e) {
-        		LOGGER.severe("no se ha podido aplicar el sello de tiempo: " + e); //$NON-NLS-1$
+        		LOGGER.severe("No se ha podido aplicar el sello de tiempo: " + e); //$NON-NLS-1$
 			}
         }
         //************** FIN SELLO DE TIEMPO ****************

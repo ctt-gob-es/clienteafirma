@@ -18,7 +18,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.6.4"
+!define VERSION "1.6.5"
 
 ;--------------------------------
 ;Paginas del instalador
@@ -133,7 +133,8 @@ Section "Programa" sPrograma
 	;Creamos tambien el aceso directo al instalador
 
 	;creamos un acceso directo en el escitorio
-	CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	MessageBox MB_YESNO "?Desea instalar un acceso directo a AutoFirma en su escritorio?" /SD IDYES IDNO +2
+		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
 
 	;Menu items
 	CreateDirectory "$SMPROGRAMS\AutoFirma"
@@ -229,7 +230,7 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma\AutoFirma"
 	Call AddToPath
 
 SectionEnd

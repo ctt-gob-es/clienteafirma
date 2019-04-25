@@ -29,8 +29,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
@@ -315,16 +313,13 @@ final class PreferencesPanelXades extends JScrollPane {
 		);
 
 		restoreConfigButton.setMnemonic('R');
-		restoreConfigButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.156"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+		restoreConfigButton.addActionListener(ae -> {
+			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.156"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-					loadDefaultPreferences();
+				loadDefaultPreferences();
 
-				}
 			}
 		});
 		restoreConfigButton.getAccessibleContext()
@@ -350,11 +345,11 @@ final class PreferencesPanelXades extends JScrollPane {
 		this.currentPolicyValue.setFocusable(true);
 		this.currentPolicyValue.addFocusListener(new FocusListener() {
 			@Override
-			public void focusLost(FocusEvent evt) {
+			public void focusLost(final FocusEvent evt) {
 				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 			}
 			@Override
-			public void focusGained(FocusEvent evt) {
+			public void focusGained(final FocusEvent evt) {
 				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
 			}
 		});
@@ -367,12 +362,7 @@ final class PreferencesPanelXades extends JScrollPane {
 
 		policyConfigButton.setMnemonic('P');
 		policyConfigButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					changeXadesPolicyDlg(getParent());
-				}
-			}
+			ae -> changeXadesPolicyDlg(getParent())
 		);
 		policyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
@@ -585,7 +575,7 @@ final class PreferencesPanelXades extends JScrollPane {
 				);
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
 			return null;
 		}
 	}
@@ -657,7 +647,7 @@ final class PreferencesPanelXades extends JScrollPane {
 	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
 	 * {@code false} en caso contrario.
 	 */
-	public void setBlocked(boolean blocked) {
+	public void setBlocked(final boolean blocked) {
 		this.blocked = blocked;
 	}
 

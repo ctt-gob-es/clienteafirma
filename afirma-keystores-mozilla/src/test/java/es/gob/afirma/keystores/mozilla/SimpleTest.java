@@ -37,7 +37,7 @@ public final class SimpleTest {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
     @Test
-    @Ignore // Necesita NSS
+    //@Ignore // Necesita NSS
     public void testKeyStoreManagerCreation() throws Exception {
 
     	System.setProperty(
@@ -74,13 +74,22 @@ public final class SimpleTest {
 
     	System.out.println("============="); //$NON-NLS-1$
 
+
+    	Provider provider = ksm.getKeyStore().getProvider();
+    	System.out.println("Proveedor almacen: " + provider.getName() + ": " + provider.getInfo());
+
     	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
     	sig.initSign(
 			ksm.getKeyEntry(
-				aliases[0]
+				aliases[1]
 			).getPrivateKey()
 		);
     	sig.update("Hola".getBytes()); //$NON-NLS-1$
+
+
+    	provider = sig.getProvider();
+    	System.out.println("Proveedor firma: " + provider.getName() + ": " + provider.getInfo());
+
     	System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false)); //$NON-NLS-1$
     }
 

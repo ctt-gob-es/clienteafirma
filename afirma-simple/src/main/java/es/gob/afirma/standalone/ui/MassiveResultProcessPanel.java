@@ -52,7 +52,6 @@ import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import javax.swing.event.HyperlinkEvent;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -171,12 +170,7 @@ final class MassiveResultProcessPanel extends JPanel {
 	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
 
-	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
-                    @Override
-                    public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-                        openCertificate(cert, MassiveResultProcessPanel.this);
-                    }
-                });
+	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, (he, linkIndex) -> openCertificate(cert, MassiveResultProcessPanel.this));
                 this.certDescription.addFocusListener(editorFocusManager);
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
@@ -271,8 +265,8 @@ final class MassiveResultProcessPanel extends JPanel {
         this.add(resultPanel, c);
     }
 
-	private static Component getSignResultList(List<SignOperationConfig> signConfigList,
-			Component parent) {
+	private static Component getSignResultList(final List<SignOperationConfig> signConfigList,
+			final Component parent) {
 
         final JList<SignOperationConfig> resultList =
         		new JList<>(signConfigList.toArray(new SignOperationConfig[signConfigList.size()]));
@@ -280,12 +274,12 @@ final class MassiveResultProcessPanel extends JPanel {
 
         // Definimos que al hacer doble clic o pulsar intro sobre una firma del listado, se visualicen sus datos
         resultList.addMouseListener(new MouseListener() {
-			@Override public void mouseReleased(MouseEvent e) { /* No hacemos nada */ }
-			@Override public void mousePressed(MouseEvent e) { /* No hacemos nada */ }
-			@Override public void mouseExited(MouseEvent e) { /* No hacemos nada */ }
-			@Override public void mouseEntered(MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseReleased(final MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mousePressed(final MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseExited(final MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseEntered(final MouseEvent e) { /* No hacemos nada */ }
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() == 2 && e.getSource() instanceof JList<?>) {
 					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
 					final int index = list.locationToIndex(e.getPoint());
@@ -295,10 +289,10 @@ final class MassiveResultProcessPanel extends JPanel {
 		});
 
         resultList.addKeyListener(new KeyListener() {
-			@Override public void keyTyped(KeyEvent e) { /* No hacemos nada */ }
-			@Override public void keyPressed(KeyEvent e) { /* No hacemos nada */ }
+			@Override public void keyTyped(final KeyEvent e) { /* No hacemos nada */ }
+			@Override public void keyPressed(final KeyEvent e) { /* No hacemos nada */ }
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
 					final int index = resultList.getSelectedIndex();
@@ -320,12 +314,7 @@ final class MassiveResultProcessPanel extends JPanel {
 		if (index >= 0) {
 			final SignOperationConfig item = list.getModel().getElementAt(index);
 			if (item.getSignatureFile() != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						new VisorFirma(false, parent).initialize(false, item.getSignatureFile());
-					}
-				});
+				SwingUtilities.invokeLater(() -> new VisorFirma(false, parent).initialize(false, item.getSignatureFile()));
 			}
 		}
 	}
@@ -405,16 +394,16 @@ final class MassiveResultProcessPanel extends JPanel {
 		}
 
 
-    	void setFileNameColumnTitle(String title) {
+    	void setFileNameColumnTitle(final String title) {
     		this.fileNameLabel.setText(title);
     	}
 
 
-    	void setSizeColumnTitle(String title) {
+    	void setSizeColumnTitle(final String title) {
     		this.sizeLabel.setText(title);
     	}
 
-    	void setResultColumnTitle(String title) {
+    	void setResultColumnTitle(final String title) {
     		this.resultLabel.setText(title);
     	}
 
@@ -496,8 +485,8 @@ final class MassiveResultProcessPanel extends JPanel {
 		}
 
 		@Override
-		public Component getListCellRendererComponent(JList<? extends SignOperationConfig> list,
-				SignOperationConfig value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(final JList<? extends SignOperationConfig> list,
+				final SignOperationConfig value, final int index, final boolean isSelected, final boolean cellHasFocus) {
 
 			if (this.basePathLength == 0) {
 				this.basePathLength = calculateBasePathLength(list.getModel());
@@ -526,7 +515,7 @@ final class MassiveResultProcessPanel extends JPanel {
 			return this;
 		}
 
-		private static int calculateBasePathLength(ListModel<? extends SignOperationConfig> signConfigs) {
+		private static int calculateBasePathLength(final ListModel<? extends SignOperationConfig> signConfigs) {
 	        int parentLength = Integer.MAX_VALUE;
 	        for (int i = 0; i < signConfigs.getSize(); i++) {
 	        	final SignOperationConfig config = signConfigs.getElementAt(i);
@@ -551,7 +540,7 @@ final class MassiveResultProcessPanel extends JPanel {
 		 * para solicitar el de error.
 		 * @return Componente con el icono deseado.
 		 */
-		private Image getResultIcon(boolean ok) {
+		private Image getResultIcon(final boolean ok) {
 
 			Image icon;
 			if (ok) {
@@ -569,7 +558,7 @@ final class MassiveResultProcessPanel extends JPanel {
 			return icon;
 		}
 
-		private static Image buildIcon(boolean ok) {
+		private static Image buildIcon(final boolean ok) {
 			Image resultIcon;
 			final String imageName = ok ? "ok_icon.png" : "ko_icon.png"; //$NON-NLS-1$ //$NON-NLS-2$
 	        try (
@@ -582,7 +571,7 @@ final class MassiveResultProcessPanel extends JPanel {
 	            resultIcon = resultOperationIcon.getScaledInstanceToFit(image, new Dimension(32,  32));
 	        }
 	        catch (final Exception e) {
-	            Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+	            LOGGER.warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$
 	            resultIcon = null;
 	        }
 	        return resultIcon;
@@ -593,7 +582,7 @@ final class MassiveResultProcessPanel extends JPanel {
 		 * @param size Bytes del fichero.
 		 * @return Tama&ntilde;o del fichero.
 		 */
-		private String calculateSize(long size) {
+		private String calculateSize(final long size) {
 			if (size == 0) {
 				return "0 KB"; //$NON-NLS-1$
 			}

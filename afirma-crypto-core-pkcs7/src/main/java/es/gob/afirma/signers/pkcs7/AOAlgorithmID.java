@@ -14,8 +14,7 @@ import java.util.Hashtable;
 import java.util.Locale;
 
 /** Identificadores (OID) comunes de algoritmos usados en CMS/CAdES
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOAlgorithmID {
 
     private static final String OID_SHA1   = "1.3.14.3.2.26"; //$NON-NLS-1$
@@ -55,16 +54,15 @@ public final class AOAlgorithmID {
     }
 
     /** Obtiene el OID del algoritmo indicado.
-     * @param name Nombre del algoritmo
-     * @return OID del algoritmo
-     */
+     * @param name Nombre del algoritmo.
+     * @return OID del algoritmo. */
     public static String getOID(final String name) {
         if (name == null) {
             return null;
         }
         final String res = OIDS.get(name.toUpperCase(Locale.US));
         if (res == null) {
-            throw new IllegalArgumentException("Se deconoce el algoritmo '" + name + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new IllegalArgumentException("Se desconoce el algoritmo '" + name + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return res;
     }

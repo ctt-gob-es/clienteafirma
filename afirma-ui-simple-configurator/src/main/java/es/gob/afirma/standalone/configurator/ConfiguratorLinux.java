@@ -91,6 +91,7 @@ final class ConfiguratorLinux implements Configurator {
             		new File(appDir, ConfiguratorLinux.INSTALL_SCRIPT_NAME),
             		new File(appDir, ConfiguratorLinux.UNINSTALL_SCRIPT_NAME)
         		);
+
                 ConfiguratorFirefoxLinux.createScriptsToMozillaKeyStore(
             		appDir,
             		usersDirs,
@@ -594,7 +595,7 @@ final class ConfiguratorLinux implements Configurator {
 	}
 
     @Override
-    public void uninstall() {
+    public void uninstall(final Console console) {
         // No es necesario hacer nada porque el  proceso de desinstalacion de linux
         // eliminara el directorio de aplicacion con todo su contenido.
     }

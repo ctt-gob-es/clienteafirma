@@ -17,8 +17,8 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGN_REASON;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_STAMP;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -27,8 +27,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
@@ -143,7 +141,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.visiblePdfSignature.addKeyListener(keyListener);
 		this.visiblePdfStamp.addItemListener(modificationListener);
     	this.visiblePdfStamp.addKeyListener(keyListener);
-    	
+
 		// Una vez creados todos los componentes, cargamos la configuracion
 		loadPreferences();
 
@@ -285,11 +283,11 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.currentPolicyValue.setFocusable(true);
 		this.currentPolicyValue.addFocusListener(new FocusListener() {
 			@Override
-			public void focusLost(FocusEvent evt) {
+			public void focusLost(final FocusEvent evt) {
 				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 			}
 			@Override
-			public void focusGained(FocusEvent evt) {
+			public void focusGained(final FocusEvent evt) {
 				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
 			}
 		});
@@ -301,12 +299,7 @@ final class PreferencesPanelPades extends JScrollPane {
 
 		policyConfigButton.setMnemonic('P');
 		policyConfigButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					changePadesPolicyDlg(getParent());
-				}
-			}
+			ae -> changePadesPolicyDlg(getParent())
 		);
 		policyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
@@ -535,7 +528,7 @@ final class PreferencesPanelPades extends JScrollPane {
 			);
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al recuperar la politica PAdES guardada en preferencias: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error al recuperar la politica PAdES guardada en preferencias: " + e); //$NON-NLS-1$
 			return null;
 		}
 	}

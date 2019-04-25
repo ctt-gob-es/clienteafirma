@@ -133,6 +133,7 @@ final class ConfiguratorWindows implements Configurator {
 	 * defecto de instalaci&oacute;n de AutoFirma en el sistema, y despu&eacute;s
 	 * el directorio indicado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
+	 * @param jnlpDeployment Indica si la funci&oacute;n se ejecuta desde un aplicativo desplegado mediante JNLP.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
 	private static boolean checkSSLKeyStoreGenerated(final File appDir,
 			                                         final boolean jnlpDeployment) {
@@ -176,14 +177,15 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	@Override
-	public void uninstall() {
+	public void uninstall(final Console console) {
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Windows"); //$NON-NLS-1$
 		uninstallRootCAWindowsKeyStore(CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(
-				getApplicationDirectory(this.jnlpInstance));
+				getApplicationDirectory(this.jnlpInstance),
+				console);
 
 		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
 		configureChrome(null, false);

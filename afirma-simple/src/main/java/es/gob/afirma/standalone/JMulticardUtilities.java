@@ -21,7 +21,7 @@ public class JMulticardUtilities {
 	/**
 	 * Configura si JMulticard debe utilizarse normalmente o si debe desactivarse su uso.
 	 * @param defaultBehavior {@code true} para configurar el comportamiento por defecto de JMulticard
-	 * (se utilizara para las tarjetas inteligentes soportadas) o {@code false} para desactivar
+	 * (se utilizar&aacute; para las tarjetas inteligentes soportadas) o {@code false} para desactivar
 	 * el uso de JMulticard.
 	 */
 	public static void configureJMulticard(final boolean defaultBehavior) {

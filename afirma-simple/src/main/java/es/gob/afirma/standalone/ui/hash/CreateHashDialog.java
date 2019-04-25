@@ -55,6 +55,8 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = 3581001930027153381L;
 
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private static final String[] HASH_ALGOS = new String[] {
@@ -101,7 +103,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 			if (BINARY.toString().equals(name)) {
 				return BINARY;
 			}
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 				"Formato de huella desconocido, se usara el por defecto: " + name //$NON-NLS-1$
 			);
 			return getDefaultFormat();
@@ -418,7 +420,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+					LOGGER.severe(
 						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
 					);
 					return null;
@@ -434,7 +436,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+					LOGGER.severe(
 						"Error generando o guardando la huella digital: " + ioe //$NON-NLS-1$
 					);
 					return null;

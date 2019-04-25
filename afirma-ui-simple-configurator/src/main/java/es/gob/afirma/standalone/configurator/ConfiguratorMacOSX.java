@@ -220,6 +220,10 @@ final class ConfiguratorMacOSX implements Configurator {
 			ConfiguratorFirefoxMac.createScriptToInstallOnMozillaKeyStore(appDir, userHomes, new File(mac_script_path));
 			LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
 			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
+
+			ConfiguratorMacUtils.addExexPermissionsToFile(new File(mac_script_path));
+			executeScriptFile(mac_script_path, true, true);
+
 		}
 		catch (final MozillaProfileNotFoundException e) {
 			LOGGER.severe("Perfil de Mozilla no encontrado: " + e); //$NON-NLS-1$
@@ -227,6 +231,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 		catch (final AOException e1) {
 			LOGGER.severe("La configuracion de NSS para Mac OS X ha fallado: " + e1); //$NON-NLS-1$
+		}
+		catch (final Exception e1) {
+			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el almacen de Firefox: " + e1, e1); //$NON-NLS-1$
 		}
 		finally {
 			if (sslCerFile != null) {
@@ -306,7 +313,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	}
 
 	@Override
-	public void uninstall() {
+	public void uninstall(final Console console) {
 
 		LOGGER.info("Desinstalacion del certificado raiz de los almacenes de MacOSX"); //$NON-NLS-1$
 

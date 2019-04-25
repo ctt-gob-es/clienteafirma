@@ -28,8 +28,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -255,7 +253,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      * @param signConfigs Operaciones de firma a ejecutar.
      */
     @Override
-    public void initSignTask(List<SignOperationConfig> signConfigs) {
+    public void initSignTask(final List<SignOperationConfig> signConfigs) {
 
     	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
@@ -305,7 +303,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
 	@Override
-	public void loadFiles(File[] files) {
+	public void loadFiles(final File[] files) {
 
      	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
@@ -338,7 +336,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	 * @param fileList Listado de ficheros seleccionados.
 	 * @return Listado de ficheros a firmar o {@code null} si no se indicaron ficheros.
 	 */
-	 private static File[] filterFiles(File[] fileList) {
+	 private static File[] filterFiles(final File[] fileList) {
 
 		 if (fileList == null || fileList.length == 0) {
 			 return null;
@@ -367,7 +365,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 return resultFiles.toArray(new File[resultFiles.size()]);
 	 }
 
-	 private static SignOperationConfig prepareSignConfig(File dataFile) throws IOException {
+	 private static SignOperationConfig prepareSignConfig(final File dataFile) throws IOException {
 
 		 final byte[] data;
 		 try (final InputStream fis = new FileInputStream(dataFile)) {
@@ -387,7 +385,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 return config;
 	 }
 
-	 private static void configureDataSigner(SignOperationConfig config, byte[] data) throws IOException {
+	 private static void configureDataSigner(final SignOperationConfig config, final byte[] data) throws IOException {
 		 // Comprobamos si es un fichero PDF
 		 if (DataAnalizerUtil.isPDF(data)) {
 			 config.setFileType(FileType.PDF);
@@ -511,51 +509,49 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
     	for (final PluginGraphicButton button : pluginsButtons) {
     		button.getGraphicButton().addActionListener(
-    				new ActionListener() {
-    					@Override
-    					public void actionPerformed(ActionEvent e) {
-    						try {
-    							final List<InputData> inputDatas = new ArrayList<>();
-    							final List<SignOperationConfig> configs = getSignOperationConfigs();
-    							if (configs != null) {
-    								for (final SignOperationConfig config : configs) {
-    									final InputData data = new InputData();
-    									data.setDataFile(config.getDataFile());
-    									data.setSignatureFormat(config.getSignatureFormatName());
-    									inputDatas.add(data);
-    								}
-    							}
-    							new Thread(new Runnable() {
-    								@Override
-    								public void run() {
-    									((DataProcessAction) button.getButton().getAction()).processData(
-    											inputDatas.toArray(new InputData[inputDatas.size()]),
-    											SwingUtilities.getWindowAncestor(SignPanel.this));
-    								}
-    							}).start();
-    						}
-    						catch (final Exception ex) {
-    							LOGGER.log(Level.SEVERE, "La accion del boton devolvio un error", ex); //$NON-NLS-1$
-    						}
-    					}
-    				});
+    				e -> {
+						try {
+							final List<InputData> inputDatas = new ArrayList<>();
+							final List<SignOperationConfig> configs = getSignOperationConfigs();
+							if (configs != null) {
+								for (final SignOperationConfig config : configs) {
+									final InputData data = new InputData();
+									data.setDataFile(config.getDataFile());
+									data.setSignatureFormat(config.getSignatureFormatName());
+									inputDatas.add(data);
+								}
+							}
+
+							new Thread(() -> {
+								if (button.getButton().getAction() instanceof DataProcessAction) {
+								((DataProcessAction) button.getButton().getAction()).processData(
+									inputDatas.toArray(new InputData[inputDatas.size()]),
+									SwingUtilities.getWindowAncestor(SignPanel.this));
+								}
+								else {
+									button.getButton().getAction().start(
+											SwingUtilities.getWindowAncestor(SignPanel.this));
+								}
+							}).start();
+						}
+						catch (final Exception ex) {
+							LOGGER.log(Level.SEVERE, "La accion del boton devolvio un error", ex); //$NON-NLS-1$
+						}
+					});
     	}
 
-    	EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-		        if (pluginsButtons.isEmpty()) {
-		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        }
-		        else {
-		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
-		        	SignPanel.this.pluginButtonsPanel.removeAll();
-		        	for (final PluginGraphicButton button : pluginsButtons) {
-		        		SignPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
-		        	}
-		        	SignPanel.this.mainPluginsButtonsPanel.setVisible(true);
-		        }
-			}
+    	EventQueue.invokeLater(() -> {
+		    if (pluginsButtons.isEmpty()) {
+		    	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    }
+		    else {
+		    	SignPanel.this.mainPluginsButtonsPanel.setVisible(false);
+		    	SignPanel.this.pluginButtonsPanel.removeAll();
+		    	for (final PluginGraphicButton button : pluginsButtons) {
+		    		SignPanel.this.pluginButtonsPanel.add(button.getGraphicButton());
+		    	}
+		    	SignPanel.this.mainPluginsButtonsPanel.setVisible(true);
+		    }
 		});
     }
 
@@ -713,7 +709,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.add(buttonPanel, BorderLayout.PAGE_END);
 	    }
 
-	    public void loadDataInfo(List<SignOperationConfig> configs) {
+	    public void loadDataInfo(final List<SignOperationConfig> configs) {
 
 	         remove(this.filePanel);
 
@@ -733,7 +729,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	         revalidate();
 	    }
 
-	    public void updateSignButtonState(boolean enable) {
+	    public void updateSignButtonState(final boolean enable) {
 
 	        if (enable) {
 	            this.signButton.setIcon(null);
@@ -761,7 +757,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
       */
      class OnlyFileFilter implements FileFilter {
  		@Override
- 		public boolean accept(File pathname) {
+ 		public boolean accept(final File pathname) {
  			return pathname.isFile() && pathname.canRead();
  		}
 

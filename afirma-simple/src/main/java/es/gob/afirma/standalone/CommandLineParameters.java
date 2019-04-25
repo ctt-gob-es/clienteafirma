@@ -32,7 +32,6 @@ final class CommandLineParameters {
 	private static final String PARAM_PREURL  = "-preurl"; //$NON-NLS-1$
 	private static final String PARAM_POSTURL = "-posturl"; //$NON-NLS-1$
 
-
 	public static final String FORMAT_AUTO     = "auto"; //$NON-NLS-1$
 	public static final String FORMAT_XADES    = "xades"; //$NON-NLS-1$
 	public static final String FORMAT_PADES    = "pades"; //$NON-NLS-1$
@@ -88,10 +87,10 @@ final class CommandLineParameters {
 				}
 				catch (final MalformedURLException e) {
 					throw new CommandLineException(
-						CommandLineMessages.getString(
-							"CommandLineLauncher.59", params[i+1], e.toString() //$NON-NLS-1$
-						)
-					);
+							CommandLineMessages.getString(
+									"CommandLineLauncher.59", params[i+1], e.toString() //$NON-NLS-1$
+									)
+							);
 				}
 				i++;
 			}
@@ -101,10 +100,10 @@ final class CommandLineParameters {
 				}
 				catch (final MalformedURLException e) {
 					throw new CommandLineException(
-						CommandLineMessages.getString(
-							"CommandLineLauncher.59", params[i+1], e.toString() //$NON-NLS-1$
-						)
-					);
+							CommandLineMessages.getString(
+									"CommandLineLauncher.59", params[i+1], e.toString() //$NON-NLS-1$
+									)
+							);
 				}
 				i++;
 			}
@@ -173,7 +172,11 @@ final class CommandLineParameters {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
 				}
 
-				this.inputFile = new File(params[i+1]);
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.74")); //$NON-NLS-1$
+				}
+
+				this.inputFile = new File(params[i + 1]);
 
 				if (!this.inputFile.exists()) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.0", params[i + 1])); //$NON-NLS-1$
@@ -194,7 +197,7 @@ final class CommandLineParameters {
 						!this.format.equals(FORMAT_PADES) &&
 						!this.format.equals(FORMAT_FACTURAE) &&
 						!this.format.equals(FORMAT_OOXML) &&
-						!this.format.equals(FORMAT_ODF) && 
+						!this.format.equals(FORMAT_ODF) &&
 						!this.format.equals(FORMAT_AUTO)) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", params[i + 1])); //$NON-NLS-1$
 				}
@@ -205,7 +208,11 @@ final class CommandLineParameters {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
 				}
 
-				this.outputFile = new File(params[i+1]);
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.75")); //$NON-NLS-1$
+				}
+
+				this.outputFile = new File(params[i + 1]);
 				final String parent = this.outputFile.getParent();
 				if (parent != null && !new File(parent).canWrite()) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.3", params[i + 1])); //$NON-NLS-1$

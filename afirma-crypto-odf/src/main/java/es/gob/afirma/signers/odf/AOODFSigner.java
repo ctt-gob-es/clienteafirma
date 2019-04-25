@@ -332,8 +332,8 @@ public final class AOODFSigner implements AOSigner {
 	            	isCofirm = true;
 	            }
 
-	            final Document docSignatures;
-	            final Element rootSignatures;
+	            Document docSignatures;
+	            Element rootSignatures;
 	            // si es cofirma
 	            if (isCofirm) {
 	                // recupera el documento de firmas y su raiz
@@ -370,10 +370,16 @@ public final class AOODFSigner implements AOSigner {
 	            // referencia a SignatureProperty
 	            referenceList.add(fac.newReference("#" + signaturePropertyId, dm)); //$NON-NLS-1$
 
-	            // contenido de SignatureProperty
-	            final Element content = docSignatures.createElement("dc:date"); //$NON-NLS-1$
-	            content.setAttribute("xmlns:dc", "http://purl.org/dc/elements/1.1/"); //$NON-NLS-1$ //$NON-NLS-2$
-	            content.setTextContent(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SS").format(new Date())); //$NON-NLS-1$
+	            // Tenemos que crear el elemento de datos cargandolo como un XML completo
+	            // para evitar un error con Java 11
+	            final String contentString = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SS") //$NON-NLS-1$
+	            		.format(new Date());
+	            final Document dateDocument = dbf.newDocumentBuilder().parse(
+	            		new ByteArrayInputStream(
+	            				("<dc:date xmlns:dc=\"http://purl.org/dc/elements/1.1/\">" + contentString + "</dc:date>") //$NON-NLS-1$ //$NON-NLS-2$
+	            					.getBytes()));
+	            final Element content = dateDocument.getDocumentElement();
+
 	            final List<XMLStructure> contentList = new ArrayList<>();
 	            contentList.add(new DOMStructure(content));
 
@@ -397,26 +403,29 @@ public final class AOODFSigner implements AOSigner {
 	            x509Content.add(cert);
 
 	            // genera la firma
-	            fac.newXMLSignature(
-	              // SignedInfo
-	              fac.newSignedInfo(
-	                // CanonicalizationMethod
-	                 fac.newCanonicalizationMethod(
-	                   CanonicalizationMethod.INCLUSIVE,
-	                   (C14NMethodParameterSpec) null),
-	                   fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
-	                   referenceList
-	                 ),
-	                 // KeyInfo
-	                 kif.newKeyInfo(
-	                   Collections.singletonList(kif.newX509Data(x509Content)),
-	                   null
-	                 ),
-	                 objectList,
-	                 signatureId,
-	                 null
-	              ).sign(
-	                 new DOMSignContext(key, rootSignatures)
+	            final javax.xml.crypto.dsig.XMLSignature xmlSignature = fac.newXMLSignature(
+	            		// SignedInfo
+	            		fac.newSignedInfo(
+	            				// CanonicalizationMethod
+	            				fac.newCanonicalizationMethod(
+	            						CanonicalizationMethod.INCLUSIVE,
+	            						(C14NMethodParameterSpec) null),
+	            				fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
+	            				referenceList
+	            				),
+	            		// KeyInfo
+	            		kif.newKeyInfo(
+	            				Collections.singletonList(kif.newX509Data(x509Content)),
+	            				null
+	            				),
+	            		objectList,
+	            		signatureId,
+	            		null
+	            		);
+
+	            final DOMSignContext context = new DOMSignContext(key, rootSignatures);
+	            xmlSignature.sign(
+	                 context
 	            );
 
 	            try (

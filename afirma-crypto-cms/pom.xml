@@ -12,38 +12,35 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
+		<version>1.6.5</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
-			<version>${project.version}</version>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>core</artifactId>
-			<version>1.56.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>prov</artifactId>
-			<version>1.56.0.0</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.56.0.0</version>
 		</dependency>
 		
 	</dependencies>

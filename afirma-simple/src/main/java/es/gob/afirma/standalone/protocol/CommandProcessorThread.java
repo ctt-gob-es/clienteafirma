@@ -442,6 +442,7 @@ class CommandProcessorThread extends Thread {
 	private void sendData(final byte[] response, final Socket socket, final String petition) throws IOException {
 		socket.getOutputStream().write(response);
 		socket.getOutputStream().flush();
+
 		LOGGER.info("Mandando respuesta a la aplicacion: " + petition);  //$NON-NLS-1$
 		// Si el Timer estaba parado es que estabamos procesando una operacion, tras lo cual,
 		// se reinicia el temporizador. En cambio, si estaba en ejecucion, es que nunca lo hemos
@@ -460,7 +461,7 @@ class CommandProcessorThread extends Thread {
 	 * @param socket Socket a trav&eacute;s del que enviar el mensaje.
 	 * @param petition Descripcion del mensaje que se trato de enviar.
 	 */
-	private void sendError(String safError, final Socket socket, final String petition) {
+	private void sendError(final String safError, final Socket socket, final String petition) {
 		try {
 			sendData(createHttpResponse(true, ProtocolInvocationLauncherErrorManager.getErrorMessage(safError)), this.localSocket, "ID de sesion erroneo"); //$NON-NLS-1$
 		} catch (final IOException ex) {
@@ -629,7 +630,7 @@ class CommandProcessorThread extends Thread {
 	 * Trata de cerrar un socket y muestra un log de advertencia en caso no no poder hacerlo.
 	 * @param socket Socket a cerrar.
 	 */
-	private static void closeSocket(Socket socket) {
+	private static void closeSocket(final Socket socket) {
 		try {
 			socket.close();
 		}

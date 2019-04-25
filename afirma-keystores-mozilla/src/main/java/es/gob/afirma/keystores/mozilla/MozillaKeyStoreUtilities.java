@@ -718,7 +718,7 @@ public final class MozillaKeyStoreUtilities {
 			nssDirectory
 		);
 
-		// Mostramos la configuracion de NSS, susyituyendo la ruta del usuario del
+		// Mostramos la configuracion de NSS, sustituyendo la ruta del usuario del
 		// registro para evitar mostrar datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 

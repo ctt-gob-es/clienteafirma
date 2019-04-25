@@ -64,7 +64,6 @@ public final class TestXMLdSig {
         p3.setProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED); //$NON-NLS-1$
         p3.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
-
         final Properties p4 = new Properties();
         p4.setProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING); //$NON-NLS-1$
         p4.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$

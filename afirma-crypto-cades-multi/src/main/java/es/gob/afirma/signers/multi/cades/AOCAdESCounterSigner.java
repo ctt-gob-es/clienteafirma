@@ -17,6 +17,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
@@ -103,6 +104,16 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 			)
 		);
 
+        String[] claimedRoles = null;
+        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
+        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
+        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+        }
+
+    	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
+    	//****************************************************************************************************
+
+
         // Creamos el contrafirmador
         final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner();
 
@@ -128,6 +139,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 					AdESPolicy.buildAdESPolicy(extraParams),
 					signingCertificateV2,
 					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+					claimedRoles,
 					Boolean.parseBoolean(
 							extraParams.getProperty(
 									CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,

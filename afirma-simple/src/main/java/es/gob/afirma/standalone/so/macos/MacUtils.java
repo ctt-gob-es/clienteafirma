@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.standalone.ui.restoreconfig;
+package es.gob.afirma.standalone.so.macos;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,23 +19,30 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+
 /**
  * Funciones de utilidad para la configuraci&oacute;n de Mac.
  */
-public class ConfiguratorMacUtils {
+public class MacUtils {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final String SCRIPT_NAME = "afirma";//$NON-NLS-1$
+	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
+
+	public static File newScriptFile() throws IOException {
+		return File.createTempFile(SCRIPT_NAME, SCRIPT_EXT);
+	}
 
 	/** Escribe un <i>script</i> en un fichero dado.
-	 * @param path Ruta donde se escribir&aacute; el <i>script</i>.
 	 * @param script Datos a escribir.
+	 * @param scriptFile Fichero donde se escribir&aacute; el <i>script</i>.
 	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void writeScriptFile(final StringBuilder script, final String path, final boolean append) throws IOException{
+	public static void writeScriptFile(final StringBuilder script, final File scriptFile, final boolean append) throws IOException{
 		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + script.toString()); //$NON-NLS-1$
-		final File macScript = new File(path);
-		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
+		try (final FileOutputStream fout = new FileOutputStream(scriptFile, append);) {
 			fout.write(script.toString().getBytes());
 			fout.write("\n".getBytes()); //$NON-NLS-1$
 		}
@@ -48,7 +55,7 @@ public class ConfiguratorMacUtils {
 	public static void addExexPermissionsToAllFilesOnDirectory(final File dir) {
 
 		for (final File fileEntry : dir.listFiles()) {
-			addExexPermissionsToFile(fileEntry);
+			addAllPermissionsToFile(fileEntry);
 		}
 	}
 
@@ -56,7 +63,7 @@ public class ConfiguratorMacUtils {
 	 * Concede permisos POSIX completos a un fichero para todos los usuarios.
 	 * @param f Fichero al que se le conceden permisos.
 	 */
-	static void addExexPermissionsToFile(final File f) {
+	public static void addAllPermissionsToFile(final File f) {
 		final Set<PosixFilePermission> perms = new HashSet<>();
 		perms.add(PosixFilePermission.OWNER_EXECUTE);
 		perms.add(PosixFilePermission.GROUP_EXECUTE);
@@ -77,6 +84,34 @@ public class ConfiguratorMacUtils {
 			LOGGER.warning(
 				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
 			);
+		}
+	}
+
+
+    /** Ejecuta un fichero de scripts.
+	 * @param scriptFile Fichero de <i>script</i>.
+	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
+	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
+	 * @return El objeto que da como resultado el <i>script</i>.
+	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
+     * @throws InterruptedException Cuando el proceso se ve interrumpido (posiblemente por el usuario). */
+	public static Object executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
+
+		final AppleScript script = new AppleScript(scriptFile, delete);
+
+		LOGGER.info("Path del script: " + scriptFile); //$NON-NLS-1$
+		try {
+			Object o;
+			if (administratorMode) {
+				o = script.runAsAdministrator();
+			}
+			else {
+				o = script.run();
+			}
+			return o;
+		}
+		catch (final IOException e) {
+			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
 		}
 	}
 }

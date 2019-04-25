@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-client</artifactId>
-	<version>1.6.4-SNAPSHOT</version>
+	<version>1.6.5</version>
 	<packaging>pom</packaging>
 	
 	<name>afirma-client</name>
@@ -50,7 +50,13 @@
 	</distributionManagement>
 	
 	<properties>
+		<clienteafirma.version>1.6.5</clienteafirma.version>
+		<afirma.legible.version>1_6_5</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		
+		<jdk.version>1.7</jdk.version>
+		
+		<junit.version>4.8.2</junit.version>
 	</properties>
 
 	<dependencies>
@@ -81,9 +87,69 @@
 				<artifactId>jmulticard-ui</artifactId>
 				<version>1.5</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-itext</artifactId>
+				<version>1.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-jmimemagic</artifactId>
+				<version>0.0.5</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-oro</artifactId>
+				<version>0.0.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>es.gob.afirma.lib</groupId>
+				<artifactId>afirma-lib-juniversalchardet</artifactId>
+				<version>0.0.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.madgag.spongycastle</groupId>
+				<artifactId>core</artifactId>
+				<version>1.56.0.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.madgag.spongycastle</groupId>
+				<artifactId>prov</artifactId>
+				<version>1.56.0.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.madgag.spongycastle</groupId>
+				<artifactId>bcpkix-jdk15on</artifactId>
+				<version>1.56.0.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>es.uji.crypto.xades</groupId>
+				<artifactId>jxades</artifactId>
+				<version>0.2.0</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
-		
+	
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 	
 	<profiles>
 		<!-- ===== Construccion por defecto ===== -->
@@ -135,14 +201,15 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
 						<configuration>
-							<source>1.7</source>
-							<target>1.7</target>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
 							<fork>true</fork>
+<!--
 							<compilerArgs>
 								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
 							</compilerArgs>
+-->
 							<debug>false</debug>
 						</configuration>
 					</plugin>
@@ -245,10 +312,9 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
 						<configuration>
-							<source>1.7</source>
-							<target>1.7</target>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
 							<fork>true</fork>
 							<compilerArgs>
 								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
@@ -352,10 +418,9 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.6.1</version>
 						<configuration>
-							<source>1.7</source>
-							<target>1.7</target>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
 							<fork>true</fork>
 							<compilerArgs>
 								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>

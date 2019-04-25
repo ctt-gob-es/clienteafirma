@@ -139,8 +139,9 @@ public final class OfficeAnalizer {
      * de ellos pero es un Zip se devolver&aacute; el MimeType del Zip
      * (application/zip) y, si tampocop es Zip, se devolver&aacute; "application/octect-stream".
      * @param data Fichero ODF, OOXML o Microsoft Office 97/2003.
-     * @return MimeType.
+     * @return MimeType de los datos o el mimetype por defecto para datos binarios.
      * @throws IOException Si no se puede leer el fichero, */
+
     static String getMimeType(final byte[] data) throws IOException {
 
     	String mimetype = null;
@@ -212,9 +213,6 @@ public final class OfficeAnalizer {
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
     static String getExtension(final byte[] zipData) throws IOException {
         final String mimetype = getMimeType(zipData);
-        if (mimetype == null) {
-            return null;
-        }
         return FILE_EXTENSIONS.get(mimetype);
     }
 
@@ -238,9 +236,6 @@ public final class OfficeAnalizer {
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
     static String getDescription(final byte[] zipData) throws IOException {
         final String mimetype = getMimeType(zipData);
-        if (mimetype == null) {
-            return null;
-        }
         return FILE_DESCRIPTIONS.get(mimetype);
     }
 

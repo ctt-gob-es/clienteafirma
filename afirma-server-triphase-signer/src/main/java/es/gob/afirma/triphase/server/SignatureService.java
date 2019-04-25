@@ -87,7 +87,9 @@ public final class SignatureService extends HttpServlet {
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK NEWID="; //$NON-NLS-1$
 
-	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+	private static final String CONFIG_FILE = "tpsconfig.properties"; //$NON-NLS-1$
+
+	private static final String OLD_CONFIG_FILE = "config.properties"; //$NON-NLS-1$
 
 	/** Variable de entorno que determina el directorio en el que buscar el fichero de configuraci&oacute;n. */
 	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
@@ -101,48 +103,32 @@ public final class SignatureService extends HttpServlet {
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
 	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
 
+	private static String configDir;
+
 	private static final Properties config;
 
 	static {
+
 		try {
-			InputStream configIs = null;
-			String configDir;
-			try {
-				configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
-			}
-			catch (final Exception e) {
-				LOGGER.warning(
-						"No se pudo acceder a la variable de entorno '" + ENVIRONMENT_VAR_CONFIG_DIR + //$NON-NLS-1$
-						"' que configura el directorio del fichero de configuracion: " + e);//$NON-NLS-1$
-				configDir = null;
-			}
-			if (configDir != null) {
-				final File configFile = new File(configDir, CONFIG_FILE).getCanonicalFile();
-				if (!configFile.isFile() || !configFile.canRead()) {
-					LOGGER.warning(
-							"No se encontro el fichero " + CONFIG_FILE + " en el directorio configurado en la variable " + //$NON-NLS-1$ //$NON-NLS-2$
-									ENVIRONMENT_VAR_CONFIG_DIR + ": " + configFile.getAbsolutePath() + //$NON-NLS-1$
-									"\nSe buscara en el CLASSPATH."); //$NON-NLS-1$
-				}
-				else {
-					configIs = new FileInputStream(configFile);
-				}
-			}
-
-			if (configIs == null) {
-				configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
-			}
-
-			if (configIs == null) {
-				throw new IOException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
-			}
-			config = new Properties();
-			config.load(configIs);
-			configIs.close();
+			configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
 		}
-		catch(final Exception e) {
-			throw new RuntimeException("Error en la carga del fichero de propiedades: " + e, e); //$NON-NLS-1$
+		catch (final Exception e) {
+			LOGGER.warning(
+					"No se ha podido obtener el directorio del fichero de configuracion: " + e);//$NON-NLS-1$
+			configDir = null;
 		}
+
+		// Cargamos la configuracion del servicio
+		Properties configProperties = loadConfigFile(CONFIG_FILE);
+		if (configProperties == null) {
+			configProperties = loadConfigFile(OLD_CONFIG_FILE);
+		}
+
+		if (configProperties == null) {
+			throw new RuntimeException("No se ha encontrado el fichero de configuracion del servicio"); //$NON-NLS-1$
+		}
+
+		config = configProperties;
 
 		if (!config.containsKey(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS)) {
 			throw new IllegalArgumentException(
@@ -174,6 +160,53 @@ public final class SignatureService extends HttpServlet {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Intenta cargar un fichero propiedades del directorio indicado mediante variable de entorno
+	 * o del classpath si no se encuentra.
+	 * @param configFilename Nombre del fichero de propedades.
+	 * @return Propiedades cargadas o {@code null} si no se pudo cargar el fichero.
+	 */
+	private static Properties loadConfigFile(final String configFilename) {
+
+
+		LOGGER.info("Se cargara el fichero de configuracion " + configFilename); //$NON-NLS-1$
+
+		Properties configProperties = null;
+
+		if (configDir != null) {
+			try {
+				final File configFile = new File(configDir, configFilename).getCanonicalFile();
+				try (final InputStream configIs = new FileInputStream(configFile);) {
+					configProperties = new Properties();
+					configProperties.load(configIs);
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+						"No se pudo cargar el fichero de configuracion " + configFilename + //$NON-NLS-1$
+						" desde el directorio " + configDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				configProperties = null;
+			}
+		}
+
+		if (configProperties == null) {
+			LOGGER.info(
+					"Se cargara el fichero de configuracion " + configFilename + " desde el CLASSPATH"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			try (final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(configFilename);) {
+					configProperties = new Properties();
+					configProperties.load(configIs);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+						"No se pudo cargar el fichero de configuracion " + configFilename + " desde el CLASSPATH: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				configProperties = null;
+			}
+		}
+
+		return configProperties;
 	}
 
 	@Override

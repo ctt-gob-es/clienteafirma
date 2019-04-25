@@ -131,10 +131,10 @@ public final class PdfUtil {
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
 		// Contrasena del propietario del PDF
-		final String ownerPassword = extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD);
+		final String ownerPassword = extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD_STRING);
 
 		// Contrasena del usuario del PDF
-		final String userPassword =  extraParams.getProperty(PdfExtraParams.USER_PASSWORD);
+		final String userPassword =  extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING);
 
 		PdfReader pdfReader;
 		try {
@@ -231,7 +231,8 @@ public final class PdfUtil {
 	}
 
 	static boolean getAppendMode(final Properties extraParams, final PdfReader pdfReader) {
-		if (extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD) != null || extraParams.getProperty(PdfExtraParams.USER_PASSWORD) != null) {
+		if (extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD_STRING) != null ||
+				extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING) != null) {
 			return true;
 		}
 		return Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALWAYS_CREATE_REVISION)) || pdfReader.getAcroFields().getSignatureNames().size() > 0;

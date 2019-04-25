@@ -331,7 +331,7 @@ public final class PdfSessionManager {
             // proporcionaron ninguna
             final String userPwd = new String(
                 AOUIFactory.getPassword(
-                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD) == null ?
+                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING) == null ?
                 		CommonPdfMessages.getString("AOPDFSigner.0") : //$NON-NLS-1$
                 			CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
                     null
@@ -364,7 +364,18 @@ public final class PdfSessionManager {
 		if (pdfVersion > PDF_MIN_VERSION && !pdfA1 && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
 			stp.setFullCompression();
 		}
-		sap.setAcro6Layers(true);
+
+		// Si se ha configurado, permitimos que el lector de PDF muestre una marca junto a la firma
+		final boolean includeQuestionMark = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_QUESTION_MARK));
+		if (includeQuestionMark) {
+			sap.setAcro6Layers(false);
+			sap.setLayer4Text(PdfSignatureAppearance.questionMark);
+		}
+		else {
+			sap.setAcro6Layers(true);
+		}
+
+
 
 		PdfUtil.enableLtv(stp);
 

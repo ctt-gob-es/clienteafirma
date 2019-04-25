@@ -43,6 +43,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
      * @param params Parametros adicionales para la configuraci&oacute;n del
      *        almac&eacute;n.
      * @param forceReset Indica si se debe forzar el reinicio del almac&eacute;n.
+     * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
      * @return Almac&eacute;n configurado.
      * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
@@ -50,7 +51,8 @@ final class AOKeyStoreManagerHelperPkcs11 {
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela algun di&aacute;logo de PIN. */
     static KeyStore initPKCS11(final PasswordCallback pssCallBack,
     		                   final Object[] params,
-    		                   final boolean forceReset) throws AOKeyStoreManagerException,
+    		                   final boolean forceReset,
+    		                   final Object parent) throws AOKeyStoreManagerException,
     		                                                 IOException {
         // En el "params" debemos traer los parametros:
         // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
@@ -127,7 +129,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
 				AOKeyStore.PKCS11,
 				pssCallBack,
 				p11Provider,
-				null
+				parent
 			);
 		}
         catch (final AOCancelledOperationException e) {
@@ -205,9 +207,10 @@ final class AOKeyStoreManagerHelperPkcs11 {
 			fos.close();
 		}
 		final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
-		final Provider ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
+		final Provider configuredProvider = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 		f.deleteOnExit();
-		return ret;
+		Security.addProvider(configuredProvider);
+		return configuredProvider;
 	}
 
 	private static Provider getP11ProviderJava8(final byte[] p11NSSConfigFileContents) throws InstantiationException,
