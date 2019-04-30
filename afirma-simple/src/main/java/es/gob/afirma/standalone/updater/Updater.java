@@ -11,9 +11,12 @@ package es.gob.afirma.standalone.updater;
 
 import java.awt.Desktop;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JOptionPane;
 
@@ -21,6 +24,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -30,8 +34,12 @@ public final class Updater {
 	private static String currentVersion = null;
 	private static String updateSite = null;
 
-	private static final String PREFERENCE_UPDATE_URL_VERSION = "url"; //$NON-NLS-1$
+	private static final String PREFERENCE_UPDATE_URL_VERSION_WINDOWS = "urlWindows"; //$NON-NLS-1$
+	private static final String PREFERENCE_UPDATE_URL_VERSION_LINUX = "urlLinux"; //$NON-NLS-1$
+	private static final String PREFERENCE_UPDATE_URL_VERSION_MACOSX = "urlMacosx"; //$NON-NLS-1$
 	private static final String PREFERENCE_UPDATE_URL_SITE = "updateSite"; //$NON-NLS-1$
+
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd"); //$NON-NLS-1$
 
 	/** Variable de entorno que hay que establecer (a nivel de sistema operativo o como propiedad de Java a
 	 * nivel de JVM) a <code>true</code> para evitar la comprobaci&oacute;n de disponibilidad de
@@ -96,7 +104,19 @@ public final class Updater {
 
 		// Configuramos la URL del fichero de version a partir del fichero interno o,
 		// si esta configurada, preferentemente de la variable de registro
-		final String url = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_VERSION);
+		String url = null; 
+		if(Platform.getOS() == Platform.OS.WINDOWS)
+		{
+			url = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_VERSION_WINDOWS);
+		}
+		else if(Platform.getOS() == Platform.OS.LINUX)
+		{
+			url = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_VERSION_LINUX);
+		}
+		else if(Platform.getOS() == Platform.OS.MACOSX)
+		{
+			url = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_VERSION_MACOSX);
+		}
 
 		// Configuramos la URL del sitio de actualizacion a partir del fichero interno o,
 		// si esta configurada, preferentemente de la variable de registro
@@ -185,6 +205,16 @@ public final class Updater {
 			}
 		}
 
+		// Comprobamos si ya se ha realizado la comprobacion de actualizaciones hoy
+		if (!omitCheck)
+		{
+			Calendar today = Calendar.getInstance();
+			Calendar lastCheck = getLastCheck();
+			omitCheck = (lastCheck.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR) &&
+					lastCheck.get(Calendar.YEAR) == today.get(Calendar.YEAR)) ||
+					lastCheck.get(Calendar.YEAR) > today.get(Calendar.YEAR);
+		}
+
 		if (!omitCheck) {
 			new Thread(() ->  {
 
@@ -198,6 +228,9 @@ public final class Updater {
 					);
 					return;
 				}
+
+				updateLastCheck();
+
 				if (newVersionAvailable) {
 					if (
 						JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
@@ -231,5 +264,26 @@ public final class Updater {
 				}
 			}).start();
 		}
+	}
+
+	private static void updateLastCheck() {
+		Calendar lastCheck = Calendar.getInstance();
+		PreferencesManager.put("lastCheckDate", DATE_FORMAT.format(lastCheck.getTime())); //$NON-NLS-1$
+		try {
+			PreferencesManager.flush();
+		} catch (BackingStoreException e) {
+			LOGGER.warning("No se ha podido almacenar la fecha de la ultima comprobacion de version"); //$NON-NLS-1$
+		}
+	}
+
+	private static Calendar getLastCheck() {
+		Calendar lastCheck = Calendar.getInstance();
+		try {
+			lastCheck.setTime(DATE_FORMAT.parse(PreferencesManager.get("lastCheckDate"))); //$NON-NLS-1$
+		} catch (Exception e) {
+			LOGGER.warning("No se ha podido recuperar la fecha de la ultima comprobacion de version"); //$NON-NLS-1$
+			lastCheck.set(Calendar.YEAR, 2000);
+		}
+		return lastCheck;
 	}
 }
