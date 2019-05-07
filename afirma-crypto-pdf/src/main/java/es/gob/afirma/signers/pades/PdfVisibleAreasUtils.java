@@ -270,7 +270,7 @@ final class PdfVisibleAreasUtils {
 
         // La firma visible se configura inicialmente de forma horizontal.
         appearance.setVisibleSignature(
-    		new Rectangle(0, 0, width, height),
+    		new Rectangle(0, 0, height, width),
     		page,
     		null
 		);
@@ -278,20 +278,13 @@ final class PdfVisibleAreasUtils {
         // Iniciamos la creacion de la apariencia, de forma que la podamos modificar posteriormente.
         appearance.getAppearance();
 
-        // Usamos las dimensiones indicadas.
-        appearance.setVisibleSignature(
-    		new Rectangle(llx, lly, llx + width, lly + height),
-    		page,
-    		fieldName
-		);
-
-        appearance.getTopLayer().setWidth(width);
-        appearance.getTopLayer().setHeight(height);
+        appearance.getTopLayer().setWidth(height);
+        appearance.getTopLayer().setHeight(width);
         final PdfTemplate n2Layer = appearance.getLayer(2);
-        n2Layer.setWidth(width);
-        n2Layer.setHeight(height);
+        n2Layer.setWidth(height);
+        n2Layer.setHeight(width);
         // Rotamos entonces la capa 2: http://developers.itextpdf.com/question/how-rotate-paragraph.
-        final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), width, height);
+        final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), height, width);
         try (
     		final ByteBuffer internalBuffer = t.getInternalBuffer();
 		) {
@@ -299,11 +292,21 @@ final class PdfVisibleAreasUtils {
 	        n2Layer.reset();
 	        final Image textImg = Image.getInstance(t);
 	        textImg.setInterpolation(true);
-	        textImg.scaleAbsolute(height, width);
 	        textImg.setRotationDegrees(degrees);
 	        textImg.setAbsolutePosition(0, 0);
 	        n2Layer.addImage(textImg);
+	        n2Layer.setWidth(width);
+	        n2Layer.setHeight(height);
+	        appearance.getTopLayer().setWidth(width);
+	        appearance.getTopLayer().setHeight(height);
         }
+
+        // Usamos las dimensiones indicadas.
+        appearance.setVisibleSignature(
+    		new Rectangle(llx, lly, llx + width, lly + height),
+    		page,
+    		fieldName
+		);
     }
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse

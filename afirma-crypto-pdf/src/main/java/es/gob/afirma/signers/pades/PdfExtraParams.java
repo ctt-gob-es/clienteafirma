@@ -23,7 +23,7 @@ public final class PdfExtraParams {
 	 * Se respetan las posiciones del campo de firma (no se rota el propio campo, solo su texto).
 	 * Este campo solo aplica a las firmas PDF visibles. Si se rota una firma se pierde la imagen de
 	 * r&uacute;brica que se pudiese haber establecido. */
-	static final String SIGNATURE_ROTATION = "signatureRotation"; //$NON-NLS-1$
+	public static final String SIGNATURE_ROTATION = "signatureRotation"; //$NON-NLS-1$
 
     /** Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      * pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
