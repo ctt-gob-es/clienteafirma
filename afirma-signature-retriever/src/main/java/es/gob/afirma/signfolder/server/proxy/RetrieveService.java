@@ -15,15 +15,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.logging.Logger;
+
 /** Servicio de almacenamiento temporal de firmas.
- * &Uacute;til para servir de intermediario en comunicaci&oacute;n * entre JavaScript y aplicaciones nativas.
+ * &Uacute;til para servir de intermediario en comunicaci&oacute;n entre JavaScript y aplicaciones nativas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class RetrieveService extends HttpServlet {
 
@@ -45,8 +46,6 @@ public final class RetrieveService extends HttpServlet {
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-
-		LOGGER.info("== INICIO DE LA RECUPERACION =="); //$NON-NLS-1$
 
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
@@ -76,18 +75,14 @@ public final class RetrieveService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
 		}
 		out.flush();
-		LOGGER.info("== FIN DE LA RECUPERACION =="); //$NON-NLS-1$
 
 		// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
-		LOGGER.info("Limpiamos el directorio temporal"); //$NON-NLS-1$
 		removeExpiredFiles();
-		LOGGER.info("Fin de la limpieza"); //$NON-NLS-1$
 	}
 
 	/** Recupera los datos del servidor.
 	 * @param out Respuesta a la petici&oacute;n.
 	 * @param request Petici&oacute;n.
-	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void retrieveSign(final PrintWriter out,
 			                         final HttpServletRequest request) throws IOException {
@@ -125,10 +120,7 @@ public final class RetrieveService extends HttpServlet {
 			);
 			// Que el fichero sea de tipo fichero, implica que existe
 			if (inFile.isFile()) {
-				if (RetrieveConfig.DEBUG_NO_DELETE) {
-					LOGGER.info("Modo depuracion, se cancela la eliminacion del fichero " + inFile.getAbsolutePath()); //$NON-NLS-1$
-				}
-				else {
+				if (!RetrieveConfig.DEBUG) {
 					inFile.delete();
 				}
 			}
@@ -145,10 +137,7 @@ public final class RetrieveService extends HttpServlet {
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA));
 				return;
 			}
-			if (RetrieveConfig.DEBUG_NO_DELETE) {
-				LOGGER.info("Modo depuracion, se cancela la eliminacion del fichero " + inFile.getAbsolutePath()); //$NON-NLS-1$
-			}
-			else {
+			if (!RetrieveConfig.DEBUG) {
 				inFile.delete();
 			}
 		}
@@ -159,16 +148,14 @@ public final class RetrieveService extends HttpServlet {
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
 	private static void removeExpiredFiles() {
 		if (RetrieveConfig.getTempDir() != null && RetrieveConfig.getTempDir().isDirectory()) {
+			if (RetrieveConfig.DEBUG) {
+				// No se limpia el directorio temporal por estar en modo depuracion
+				return;
+			}
 			for (final File file : RetrieveConfig.getTempDir().listFiles()) {
 				try {
 					if (file.isFile() && isExpired(file, RetrieveConfig.getExpirationTime())) {
-						if (RetrieveConfig.DEBUG_NO_DELETE) {
-							LOGGER.info("Modo depuracion, se cancela la eliminacion del fichero " + file.getAbsolutePath()); //$NON-NLS-1$
-						}
-						else {
-							LOGGER.fine("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$
-							file.delete();
-						}
+						file.delete();
 					}
 				}
 				catch(final Exception e) {
@@ -182,6 +169,9 @@ public final class RetrieveService extends HttpServlet {
 	}
 
 	private static boolean isExpired(final File file, final long expirationTimeLimit) {
+		if (RetrieveConfig.DEBUG) {
+			return false;
+		}
 		return System.currentTimeMillis() - file.lastModified() > expirationTimeLimit;
 	}
 
