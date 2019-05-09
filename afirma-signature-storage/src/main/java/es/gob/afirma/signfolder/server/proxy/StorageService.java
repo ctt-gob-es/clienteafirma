@@ -18,13 +18,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Hashtable;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.logging.Logger;
 
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y aplicaciones nativas.
@@ -56,8 +57,6 @@ public final class StorageService extends HttpServlet {
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-
-		LOGGER.info(" == INICIO GUARDADO == "); //$NON-NLS-1$
 
 		final String operation;
 		final String syntaxVersion;
@@ -124,14 +123,15 @@ public final class StorageService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
 		}
 		out.flush();
-		LOGGER.info("== FIN DEL GUARDADO =="); //$NON-NLS-1$
+
+		// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
+		removeExpiredFiles();
 	}
 
 	/** Almacena una firma en servidor.
 	 * @param out Respuesta a la petici&oacute;n.
 	 * @param id Identificador de los datos a almacenar.
 	 * @param data Datos a almacenar.
-	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void storeSign(final PrintWriter out,
 								  final String id,
@@ -153,9 +153,15 @@ public final class StorageService extends HttpServlet {
 		}
 		else {
 			dataText = URLDecoder.decode(data, DEFAULT_ENCODING);
+			if (dataText.getBytes().length > StorageConfig.getMaxDataSize() && !StorageConfig.DEBUG) {
+				LOGGER.warning(
+					"El tamano de los datos (" + dataText.getBytes().length + ") es mayor de lo permitido: " + StorageConfig.getMaxDataSize() //$NON-NLS-1$ //$NON-NLS-2$
+				);
+				dataText = ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA);
+			}
 		}
 
-		if (!StorageConfig.getTempDir().exists()) {
+		if (!StorageConfig.getTempDir().isDirectory()) {
 			StorageConfig.getTempDir().mkdirs();
 		}
 
@@ -177,5 +183,37 @@ public final class StorageService extends HttpServlet {
 		LOGGER.info("Se guardo correctamente el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$
 
 		out.print(SUCCESS);
+	}
+
+	/** Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
+	 * de vida configurado.
+	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
+	private static void removeExpiredFiles() {
+		if (StorageConfig.getTempDir() != null && StorageConfig.getTempDir().isDirectory()) {
+			if (StorageConfig.DEBUG) {
+				// No se limpia el directorio temporal por estar en modo depuracion
+				return;
+			}
+			for (final File file : StorageConfig.getTempDir().listFiles()) {
+				try {
+					if (file.isFile() && isExpired(file, StorageConfig.getExpirationTime())) {
+						file.delete();
+					}
+				}
+				catch(final Exception e) {
+					// Suponemos que el fichero ha sido eliminado por otro hilo
+					LOGGER.warning(
+						"No se ha podido eliminar el fichero '" + file.getAbsolutePath() + "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$ //$NON-NLS-2$
+					);
+				}
+			}
+		}
+	}
+
+	private static boolean isExpired(final File file, final long expirationTimeLimit) {
+		if (StorageConfig.DEBUG) {
+			return false;
+		}
+		return System.currentTimeMillis() - file.lastModified() > expirationTimeLimit;
 	}
 }
