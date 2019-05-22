@@ -9,12 +9,8 @@
 
 package es.gob.afirma.signers.batch;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.triphase.server.SignatureService;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
@@ -27,29 +23,6 @@ import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 /** Constantes para la definici&oacute;n de una firma independiente.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SingleSignConstants {
-
-	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
-
-	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
-
-	private static final Properties config;
-
-	static {
-		try (
-			final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
-		) {
-			if (configIs == null) {
-				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
-			}
-			config = new Properties();
-			config.load(configIs);
-			// Cerramos explicitamente
-			configIs.close();
-		}
-		catch(final Exception e) {
-			throw new RuntimeException("Error en la carga del fichero de propiedades: " + e, e); //$NON-NLS-1$
-		}
-	}
 
 	/** Tipo de operaci&oacute;n de firma. */
 	public enum SignSubOperation {
@@ -212,14 +185,11 @@ public final class SingleSignConstants {
 			case CADES_ASIC:
 				return new CAdESASiCSTriPhasePreProcessor();
 			case XADES:
-				final boolean installXmlDSig1 = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
-				return new XAdESTriPhasePreProcessor(installXmlDSig1);
+				return new XAdESTriPhasePreProcessor(TriConfigManager.needInstallXmlDSig());
 			case XADES_ASIC:
-				final boolean installXmlDSig2 = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
-				return new XAdESASiCSTriPhasePreProcessor(installXmlDSig2);
+				return new XAdESASiCSTriPhasePreProcessor(TriConfigManager.needInstallXmlDSig());
 			case FACTURAE:
-				final boolean installXmlDSig3 = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
-				return new FacturaETriPhasePreProcessor(installXmlDSig3);
+				return new FacturaETriPhasePreProcessor(TriConfigManager.needInstallXmlDSig());
 			case PKCS1:
 				return new Pkcs1TriPhasePreProcessor();
 			default:

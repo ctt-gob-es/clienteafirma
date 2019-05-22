@@ -29,7 +29,7 @@ public final class SignSaverFile implements SignSaver {
 	/** El guardado real est&aacute; deshabilitado por defecto, habilitar para usar esta clase
 	 * para depuraci&oacute;n. No debe usarse para entornos reales, ya que no hay comprobaciones de
 	 * qu&eacute; ficheros pueden sobrescribirse. */
-	private static final boolean DISABLED = true;
+	private static final boolean DISABLED = false;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -78,7 +78,7 @@ public final class SignSaverFile implements SignSaver {
 		}
 		else {
 			LOGGER.info(
-				"El guardado esta deshabilitado. La ruta de guadado solicitada es: " +  this.filename //$NON-NLS-1$
+				"El guardado esta deshabilitado. La ruta de guardado solicitada es: " +  this.filename //$NON-NLS-1$
 			);
 		}
 	}

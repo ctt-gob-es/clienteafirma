@@ -96,9 +96,15 @@
 			
 			var stopOnError = document.getElementById("stopOnError").checked;
 			var algorithm = document.getElementById("algorithm").value;
+			var concurrentTimeOut = document.getElementById("concurrentTimeOut").value;
 			
 			var configuration = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n"
-				+ "<signbatch stoponerror=\"" + stopOnError + "\" algorithm=\"" + algorithm + "\">";
+				+ "<signbatch stoponerror=\"" + stopOnError + "\" algorithm=\"" + algorithm + "\" ";
+			
+			if (concurrentTimeOut) {
+				configuration += "concurrenttimeout=\"" + concurrentTimeOut + "\"";
+			}
+			configuration += ">";
 			
 			for (var i=0; i < singleSigns.length; i++) {
 				configuration += MiniApplet.getTextFromBase64(singleSigns[i]);
@@ -178,6 +184,10 @@
 			<div>
 			 <input type="checkbox" id="stopOnError" />Parar en caso de error
 			</div>
+			<div>
+			 <label for="concurrentTimeOut">Tiempo m&aacute;ximo por fase en los procesos concurrentes:</label>&nbsp;<input type="text" id="concurrentTimeOut" /> Segundos
+			</div>
+			
 			<div>
 			 <label for="filter">Filtros</label>
 			 <input id="filter" type="text"><input type="button" value="Agregar" onclick="addExtraParam('filter', 'filters');">&nbsp;

@@ -99,7 +99,15 @@ public final class BatchSigner {
 	 *           &lt;/xs:complexType&gt;
 	 *         &lt;/xs:element&gt;
 	 *       &lt;/xs:sequence&gt;
+	 *       &lt;xs:attribute type="xs:integer" name="concurrenttimeout" use="optional"/&gt;
 	 *       &lt;xs:attribute type="xs:string" name="stoponerror" use="optional"/&gt;
+	 *         &lt;xs:simpleType&gt;
+	 *           &lt;xs:restriction base="xs:string"&gt;
+	 *             &lt;xs:enumeration value="true"/&gt;
+	 *             &lt;xs:enumeration value="false"/&gt;
+	 *           &lt;/xs:restriction&gt;
+	 *         &lt;/xs:simpleType&gt;
+	 *       &lt;/xs:attribute&gt;
 	 *       &lt;xs:attribute type="xs:string" name="algorithm" use="required"&gt;
 	 *         &lt;xs:simpleType&gt;
 	 *           &lt;xs:restriction base="xs:string"&gt;

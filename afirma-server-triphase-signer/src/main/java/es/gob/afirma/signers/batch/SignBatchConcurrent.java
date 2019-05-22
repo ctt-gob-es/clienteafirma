@@ -66,6 +66,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			results = executorService.invokeAll(callables, this.concurrentTimeout, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
+			stopExecution(executorService);
 			throw new BatchException(
 				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
@@ -81,11 +82,12 @@ public final class SignBatchConcurrent extends SignBatch {
 			}
 			catch (final Exception e) {
 				if (this.stopOnError) {
+					stopExecution(executorService);
 					throw new BatchException(
 						"Error en una de las firmas del lote, se parara el proceso: " + e, e //$NON-NLS-1$
 					);
 				}
-				LOGGER.log(Level.SEVERE,
+				LOGGER.log(Level.WARNING,
 					"Error en una de las firmas del lote, se continua con el siguiente elemento: " + e, //$NON-NLS-1$
 					e
 				);
@@ -126,6 +128,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			results = executorService.invokeAll(callables, this.concurrentTimeout, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
+			stopExecution(executorService);
 			throw new BatchException(
 				"Error en el postproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
@@ -142,11 +145,14 @@ public final class SignBatchConcurrent extends SignBatch {
 				tmp = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch (final Exception e) {
-				// Este caso no debe darse nunca, porque el call() del Callable no lanza excepciones
-				throw new IllegalStateException(
-					"Error en la recogida del resultados del postproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
-					e
-				);
+				LOGGER.log(Level.WARNING, "Error en la postfirma en paralelo del lote de firma", e); //$NON-NLS-1$
+				error = true;
+				if (this.stopOnError) {
+					LOGGER.severe("Se interrumpe la postfirma de todos los elementos del lote al detectar un error"); //$NON-NLS-1$
+					stopExecution(executorService);
+					break;
+				}
+				continue;
 			}
 
 			if (!ignoreRemaining) {
@@ -179,7 +185,7 @@ public final class SignBatchConcurrent extends SignBatch {
 					);
 				}
 			}
-			// Cuando se indica que se pare en error se marcan las firmas que no se han
+			// Cuando se indica que se pare en caso de error, se marcan las firmas que no se han
 			// llegado a procesar
 			else {
 				getSingleSignById(tmp.getSignatureId()).setProcessResult(
@@ -191,8 +197,8 @@ public final class SignBatchConcurrent extends SignBatch {
 
 		// En este punto las firmas estan en almacenamiento temporal
 
-		// Si hubo errores y se indico parar en error no hacemos los guardados de datos, borramos los temporales
-		// y enviamos el log
+		// Si hubo errores y se indico parar en caso de error, no hacemos los guardados de datos,
+		// borramos los temporales y enviamos el log
 		if (error && this.stopOnError) {
 			deleteAllTemps();
 			return getResultLog();
@@ -215,6 +221,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			saveResults = executorService.invokeAll(saveCallables, this.concurrentTimeout, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
+			stopExecution(executorService);
 			throw new BatchException(
 				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
@@ -227,11 +234,14 @@ public final class SignBatchConcurrent extends SignBatch {
 				result = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch(final Exception e) {
-				// Este caso no debe darse nunca, porque el call() del Callable no lanza excepciones
-				throw new IllegalStateException(
-					"Error en la recogida del resultados del guardado en paralelo del lote de firma: " + e, //$NON-NLS-1$
-					e
-				);
+				LOGGER.log(Level.WARNING, "Error en la recogida del resultado del guardado en paralelo del lote de firma", e); //$NON-NLS-1$
+				error = true;
+				if (this.stopOnError) {
+					LOGGER.severe("Se interrumpe el guardado del lote al detectar un error"); //$NON-NLS-1$
+					stopExecution(executorService);
+					break;
+				}
+				continue;
 			}
 
 			if (result.isOk()) {
@@ -248,6 +258,7 @@ public final class SignBatchConcurrent extends SignBatch {
 					)
 				);
 				if (this.stopOnError) {
+					stopExecution(executorService);
 					break;
 				}
 			}
@@ -276,5 +287,21 @@ public final class SignBatchConcurrent extends SignBatch {
 			}
 		}
 		return null;
+	}
+
+
+	/**
+	 * Detiene la ejecuci&oacute;n de las operaciones concurrentes.
+	 * @param executorService
+	 */
+	private static void stopExecution(final ExecutorService executorService) {
+		executorService.shutdown();
+		try {
+		    if (!executorService.awaitTermination(200, TimeUnit.MILLISECONDS)) {
+		        executorService.shutdownNow();
+		    }
+		} catch (final InterruptedException ex) {
+		    executorService.shutdownNow();
+		}
 	}
 }
