@@ -34,7 +34,7 @@ import nu.xom.converters.DOMConverter;
 
 /** Estampador de sellos de tiempo en firmas XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-final class XAdESTspUtil {
+public final class XAdESTspUtil {
 
 	private static final String DEFAULT_CANONICAL_ALGO = nu.xom.canonical.Canonicalizer.CANONICAL_XML;
 
@@ -61,22 +61,27 @@ final class XAdESTspUtil {
 		// No instanciable
 	}
 
-	static byte[] timestampXAdES(final byte[] xml,
-                                 final Properties extraParams) throws AOException {
+	/** Estampa un sello de tiempo a una firma XAdES.
+	 * @param xml XAdES de entrada.
+	 * @param extraParams Configuraci&oacute;n de la TSA.
+	 * @return Firmas XAdES con el sello de tiempo estampado.
+	 * @throws AOException Si ocurre cualquier problema durante el proceso. */
+	public static byte[] timestampXAdES(final byte[] xml,
+                                        final Properties extraParams) throws AOException {
 		if (extraParams == null) {
-			return xml;
+			throw new AOException(
+				"No se han proporcionado los datos de configuracion de la TSA" //$NON-NLS-1$
+			);
 		}
 
-		TsaParams tsaParams;
+		final TsaParams tsaParams;
 		try {
 			tsaParams = new TsaParams(extraParams);
 		}
 		catch (final Exception e) {
-			tsaParams = null;
-		}
-
-		if (tsaParams == null) {
-			return xml;
+			throw new AOException(
+				"Los datos de configuracion de la TSA son incorrectos: " + e, e //$NON-NLS-1$
+			);
 		}
 
 		final Document doc;
@@ -162,11 +167,11 @@ final class XAdESTspUtil {
 		);
 	}
 
-	static String getBase64XAdESTimestampToken(final Calendar time,
-			                                   final Document doc,
-			                                   final TsaParams tsaParams) throws NoSuchAlgorithmException,
-	                                                                             IOException,
-	                                                                             AOException {
+	private static String getBase64XAdESTimestampToken(final Calendar time,
+			                                           final Document doc,
+			                                           final TsaParams tsaParams) throws NoSuchAlgorithmException,
+	                                                                                     IOException,
+	                                                                                     AOException {
 		return Base64.encode(
 			new CMSTimestamper(tsaParams).getTimeStampToken(
 				getSignatureNodeDigest(
