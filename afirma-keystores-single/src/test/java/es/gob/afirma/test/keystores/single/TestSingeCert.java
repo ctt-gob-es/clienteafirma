@@ -1,8 +1,5 @@
 package es.gob.afirma.test.keystores.single;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
@@ -42,12 +39,6 @@ public class TestSingeCert {
                 System.out.println(alias);
                 final X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
                 System.out.println(cert.getPublicKey().getAlgorithm());
-                if ("www.google.com".equals(alias)) {
-                	final OutputStream fos = new FileOutputStream(File.createTempFile("GOO_", ".cer"));
-                	fos.write(cert.getEncoded());
-                	fos.flush();
-                	fos.close();
-                }
             }
         }
     }
