@@ -23,20 +23,15 @@ public interface AOCoSigner {
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
      * (a los que se agregar&aacute; el resultado de la nueva firma).<br>
-     * @param data
-     *        Datos que deseamos a cofirmar.
-     * @param sign
-     *        Flujo de lectura de la firma de los datos que se quiere
-     *        cofirmar.
-     * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA,...)
+     * @param data Datos que deseamos a cofirmar.
+     * @param sign Flujo de lectura de la firma de los datos que se quiere
+     *             cofirmar.
+     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA,...)
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
-     * @param extraParams
-     *        Par&aacute;metros adicionales para la cofirma
+     * @param extraParams Par&aacute;metros adicionales para la cofirma
      * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma o los datos */
     byte[] cosign(byte[] data,
     		      byte[] sign,
