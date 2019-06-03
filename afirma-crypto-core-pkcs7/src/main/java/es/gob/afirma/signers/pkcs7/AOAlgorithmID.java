@@ -17,14 +17,37 @@ import java.util.Locale;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOAlgorithmID {
 
-    private static final String OID_SHA1   = "1.3.14.3.2.26"; //$NON-NLS-1$
-    private static final String OID_SHA512 = "2.16.840.1.101.3.4.2.3"; //$NON-NLS-1$
-
     /** OID del algoritmo de huella SHA-256. */
     public static final String OID_SHA256 = "2.16.840.1.101.3.4.2.1"; //$NON-NLS-1$
 
+    private static final String OID_SHA1   = "1.3.14.3.2.26"; //$NON-NLS-1$
+    private static final String OID_SHA224 = "2.16.840.1.101.3.4.2.4"; //$NON-NLS-1$
+    private static final String OID_SHA512 = "2.16.840.1.101.3.4.2.3"; //$NON-NLS-1$
     private static final String OID_SHA384 = "2.16.840.1.101.3.4.2.2"; //$NON-NLS-1$
-    private static final String OID_RSA    = "1.2.840.113549.1.1.1"; //$NON-NLS-1$
+
+    private static final String OID_RSA        = "1.2.840.113549.1.1.1"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA1   = "1.2.840.113549.1.1.5"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA224 = "1.2.840.113549.1.1.14"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA256 = "1.2.840.113549.1.1.11"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA384 = "1.2.840.113549.1.1.12"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA512 = "1.2.840.113549.1.1.13"; //$NON-NLS-1$
+
+    private static final String OID_ECDSA_SHA1   = "1.2.840.10045.4.1"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA224 = "1.2.840.10045.4.3.1"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA256 = "1.2.840.10045.4.3.2"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA384 = "1.2.840.10045.4.3.3"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA512 = "1.2.840.10045.4.3.4"; //$NON-NLS-1$
+
+    private static final String OID_RSA_SHA3_224 = "2.16.840.1.101.3.4.3.13"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA3_256 = "2.16.840.1.101.3.4.3.14"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA3_384 = "2.16.840.1.101.3.4.3.15"; //$NON-NLS-1$
+    private static final String OID_RSA_SHA3_512 = "2.16.840.1.101.3.4.3.16"; //$NON-NLS-1$
+
+    private static final String OID_ECDSA_SHA3_224 = "2.16.840.1.101.3.4.3.9"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA3_256 = "2.16.840.1.101.3.4.3.10"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA3_384 = "2.16.840.1.101.3.4.3.11"; //$NON-NLS-1$
+    private static final String OID_ECDSA_SHA3_512 = "2.16.840.1.101.3.4.3.12"; //$NON-NLS-1$
+
 
     private AOAlgorithmID() {
         // No permitimos la instanciacion
@@ -49,8 +72,55 @@ public final class AOAlgorithmID {
         OIDS.put("SHA384", OID_SHA384); //$NON-NLS-1$
         OIDS.put(OID_SHA384, OID_SHA384);
 
+        OIDS.put("SHA-224", OID_SHA224); //$NON-NLS-1$
+        OIDS.put("SHA224", OID_SHA224); //$NON-NLS-1$
+        OIDS.put(OID_SHA224, OID_SHA224);
+
         OIDS.put("RSA", OID_RSA); //$NON-NLS-1$
         OIDS.put(OID_RSA, OID_RSA);
+
+        OIDS.put("SHA1withRSA", OID_RSA_SHA1); //$NON-NLS-1$
+        OIDS.put("SHA-1withRSA", OID_RSA_SHA1); //$NON-NLS-1$
+
+        OIDS.put("SHA224withRSA", OID_RSA_SHA224); //$NON-NLS-1$
+        OIDS.put("SHA-224withRSA", OID_RSA_SHA224); //$NON-NLS-1$
+
+        OIDS.put("SHA256withRSA", OID_RSA_SHA256); //$NON-NLS-1$
+        OIDS.put("SHA-256withRSA", OID_RSA_SHA256); //$NON-NLS-1$
+
+        OIDS.put("SHA384withRSA", OID_RSA_SHA384); //$NON-NLS-1$
+        OIDS.put("SHA-238withRSA", OID_RSA_SHA384); //$NON-NLS-1$
+
+        OIDS.put("SHA512withRSA", OID_RSA_SHA512); //$NON-NLS-1$
+        OIDS.put("SHA-512withRSA", OID_RSA_SHA512); //$NON-NLS-1$
+
+        OIDS.put("SHA1withECDSA", OID_ECDSA_SHA1); //$NON-NLS-1$
+        OIDS.put("SHA-1withECDSA", OID_ECDSA_SHA1); //$NON-NLS-1$
+
+        OIDS.put("SHA224withECDSA", OID_ECDSA_SHA224); //$NON-NLS-1$
+        OIDS.put("SHA-224withECDSA", OID_ECDSA_SHA224); //$NON-NLS-1$
+
+        OIDS.put("SHA256withECDSA", OID_ECDSA_SHA256); //$NON-NLS-1$
+        OIDS.put("SHA-256withECDSA", OID_ECDSA_SHA256); //$NON-NLS-1$
+
+        OIDS.put("SHA384withECDSA", OID_ECDSA_SHA384); //$NON-NLS-1$
+        OIDS.put("SHA-238withECDSA", OID_ECDSA_SHA384); //$NON-NLS-1$
+
+        OIDS.put("SHA512withECDSA", OID_ECDSA_SHA512); //$NON-NLS-1$
+        OIDS.put("SHA-512withECDSA", OID_ECDSA_SHA512); //$NON-NLS-1$
+
+        // https://docs.oracle.com/javase/9/docs/specs/security/standard-names.html#signature-algorithms
+
+        OIDS.put("SHA3-224withRSA", OID_RSA_SHA3_224); //$NON-NLS-1$
+        OIDS.put("SHA3-256withRSA", OID_RSA_SHA3_256); //$NON-NLS-1$
+        OIDS.put("SHA3-384withRSA", OID_RSA_SHA3_384); //$NON-NLS-1$
+        OIDS.put("SHA3-512withRSA", OID_RSA_SHA3_512); //$NON-NLS-1$
+
+        OIDS.put("SHA3-224withECDSA", OID_ECDSA_SHA3_224); //$NON-NLS-1$
+        OIDS.put("SHA3-256withECDSA", OID_ECDSA_SHA3_256); //$NON-NLS-1$
+        OIDS.put("SHA3-384withECDSA", OID_ECDSA_SHA3_384); //$NON-NLS-1$
+        OIDS.put("SHA3-512withECDSA", OID_ECDSA_SHA3_512); //$NON-NLS-1$
+
     }
 
     /** Obtiene el OID del algoritmo indicado.
