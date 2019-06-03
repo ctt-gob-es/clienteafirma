@@ -188,44 +188,20 @@ public final class XAdESTriPhaseSignerServerSide {
 					}
 				}
 			}
-
-//			final Element rootElement = xml.getDocumentElement();
-//			if (rootElement.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
-//				final NamedNodeMap nnm = rootElement.getAttributes();
-//				if (nnm != null) {
-//					final Node node = nnm.getNamedItem(XML_NODE_ID);
-//					if (node != null) {
-//						final String id = node.getNodeValue();
-//						if (id != null) {
-//							previousSignaturesIds.add(id);
-//						}
-//					}
-//				}
-//			}
-//			else {
-//				final NodeList mainChildNodes = xml.getDocumentElement().getChildNodes();
-//				for (int i = 0; i < mainChildNodes.getLength(); i++) {
-//					final Node currentNode = mainChildNodes.item(i);
-//					if (currentNode.getNodeType() == Node.ELEMENT_NODE && currentNode.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
-//						final NamedNodeMap nnm = currentNode.getAttributes();
-//						if (nnm != null) {
-//							final Node node = nnm.getNamedItem(XML_NODE_ID);
-//							if (node != null) {
-//								final String id = node.getNodeValue();
-//								if (id != null) {
-//									previousSignaturesIds.add(id);
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
 		}
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final PrivateKey prk = generateKeyPair(
-			((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
-		).getPrivate();
+		final PrivateKey prk;
+		if (((X509Certificate)certChain[0]).getPublicKey() instanceof RSAPublicKey) {
+			prk = generateKeyPair(
+				((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
+			).getPrivate();
+		}
+		else {
+			throw new InvalidKeyException(
+				"No se soportan las claves de tipo " + ((X509Certificate)certChain[0]).getPublicKey().getClass().getName() //$NON-NLS-1$
+			);
+		}
 
 		final byte[] result;
 		switch (op) {
@@ -411,9 +387,9 @@ public final class XAdESTriPhaseSignerServerSide {
 	}
 
 	/** Genera un par de claves RSA.
-	 * @param keySize Tama&ntilde;o de las claves a generar
-	 * @return Par de claves RSA
-	 * @throws NoSuchAlgorithmException Si no se soporta la generaci&oacute;n de claves RSA */
+	 * @param keySize Tama&ntilde;o de las claves a generar.
+	 * @return Par de claves RSA.
+	 * @throws NoSuchAlgorithmException Si no se soporta la generaci&oacute;n de claves RSA. */
 	private static KeyPair generateKeyPair(final int keySize) throws NoSuchAlgorithmException {
 		final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
 		keyGen.initialize(keySize);
