@@ -20,8 +20,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
+import com.aowagie.text.Font;
 import com.aowagie.text.Image;
 import com.aowagie.text.Rectangle;
+import com.aowagie.text.pdf.BaseFont;
 import com.aowagie.text.pdf.ByteBuffer;
 import com.aowagie.text.pdf.PdfSignatureAppearance;
 import com.aowagie.text.pdf.PdfStamper;
@@ -253,7 +255,7 @@ final class PdfVisibleAreasUtils {
 	 * @param page P&aacute;gina donde insertar la firma.
 	 * @param fieldName Nombre del campo de firma a usar (si se especifica <code>null</code> se
 	 *                  crea uno nuevo.
-	 * @param degrees Grados de ro5taci&oacute;n del campo de firma.
+	 * @param degrees Grados de rotaci&oacute;n del campo de firma.
 	 * @throws DocumentException Si hay problemas tratando el PDF.
 	 * @throws IOException En cualquier otro error. */
     static void setVisibleSignatureRotated(final PdfStamper stamper,
@@ -263,14 +265,18 @@ final class PdfVisibleAreasUtils {
     		                               final String fieldName,
     		                               final int degrees) throws DocumentException,
                                                                      IOException {
-        final float height = pageRect.getHeight();
         final float width = pageRect.getWidth();
+        final float height = pageRect.getHeight();
         final float llx = pageRect.getLeft();
         final float lly = pageRect.getBottom();
 
+        // Parametros de rectangulo utilizado para crear el texto
+        final float widthTxt = (degrees == 0 || degrees == 180) ? width : height;
+        final float heightTxt = (degrees == 0 || degrees == 180) ? height : width;
+
         // La firma visible se configura inicialmente de forma horizontal.
         appearance.setVisibleSignature(
-    		new Rectangle(0, 0, height, width),
+    		new Rectangle(0, 0, widthTxt, heightTxt),
     		page,
     		null
 		);
@@ -278,17 +284,22 @@ final class PdfVisibleAreasUtils {
         // Iniciamos la creacion de la apariencia, de forma que la podamos modificar posteriormente.
         appearance.getAppearance();
 
-        appearance.getTopLayer().setWidth(height);
-        appearance.getTopLayer().setHeight(width);
+        appearance.getTopLayer().setWidth(widthTxt);
+        appearance.getTopLayer().setHeight(heightTxt);
         final PdfTemplate n2Layer = appearance.getLayer(2);
-        n2Layer.setWidth(height);
-        n2Layer.setHeight(width);
+        n2Layer.setWidth(widthTxt);
+        n2Layer.setHeight(heightTxt);
         // Rotamos entonces la capa 2: http://developers.itextpdf.com/question/how-rotate-paragraph.
-        final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), height, width);
+        final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), widthTxt, heightTxt);
         try (
     		final ByteBuffer internalBuffer = t.getInternalBuffer();
 		) {
-	        internalBuffer.write(n2Layer.toString().getBytes());
+	        internalBuffer.write(n2Layer.getInternalBuffer().toByteArray());
+	        Font f = appearance.getLayer2Font();
+            // Traduccion de la fuente a una fuente PDF
+            BaseFont bf = f.getCalculatedBaseFont(false);
+	        t.setFontAndSize(bf, f.getSize());
+
 	        n2Layer.reset();
 	        final Image textImg = Image.getInstance(t);
 	        textImg.setInterpolation(true);
