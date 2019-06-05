@@ -687,14 +687,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		rotatePanel.add(this.rotateSignature, cons);
 
 		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.NONE;
 		c.weightx = 1.0;
 		c.insets = new Insets(4,  0,  0,  0);
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.WEST;
-		panel.add(rotatePanel, c);
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridy++;
 		panel.add(signatureImagePanel, c);
 		c.gridy++;
 		panel.add(signatureTextLabel, c);
@@ -706,6 +703,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		panel.add(fontPanel, c);
 		c.gridy++;
 		panel.add(fontStylePanel, c);
+		c.gridy++;
+		c.fill = GridBagConstraints.NONE;
+		panel.add(rotatePanel, c);
 
 		return panel;
 	}
