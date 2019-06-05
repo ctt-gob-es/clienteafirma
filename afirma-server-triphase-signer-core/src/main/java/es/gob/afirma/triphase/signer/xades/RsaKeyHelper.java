@@ -1,6 +1,7 @@
 package es.gob.afirma.triphase.signer.xades;
 
 import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
@@ -10,7 +11,7 @@ final class RsaKeyHelper {
 
 	private static final String RSA = "RSA"; //$NON-NLS-1$
 
-	private static final byte[] PRK = new byte[] {
+	private static final byte[] PRK_2014 = new byte[] {
 		(byte) 0x30, (byte) 0x82, (byte) 0x02, (byte) 0x76, (byte) 0x02, (byte) 0x01, (byte) 0x00, (byte) 0x30, (byte) 0x0D, (byte) 0x06, (byte) 0x09, (byte) 0x2A, (byte) 0x86, (byte) 0x48, (byte) 0x86, (byte) 0xF7,
 		(byte) 0x0D, (byte) 0x01, (byte) 0x01, (byte) 0x01, (byte) 0x05, (byte) 0x00, (byte) 0x04, (byte) 0x82, (byte) 0x02, (byte) 0x60, (byte) 0x30, (byte) 0x82, (byte) 0x02, (byte) 0x5C, (byte) 0x02, (byte) 0x01,
 		(byte) 0x00, (byte) 0x02, (byte) 0x81, (byte) 0x81, (byte) 0x00, (byte) 0x9F, (byte) 0xC0, (byte) 0xA8, (byte) 0x2B, (byte) 0x78, (byte) 0x3C, (byte) 0xEF, (byte) 0x26, (byte) 0x78, (byte) 0xDD, (byte) 0xC1,
@@ -57,12 +58,26 @@ final class RsaKeyHelper {
 		// No instanciable
 	}
 
-	static PrivateKey getFixedPrivateKey() throws InvalidKeySpecException, NoSuchAlgorithmException {
-		return KeyFactory.getInstance(
-			RSA
-		).generatePrivate(
-			new PKCS8EncodedKeySpec(PRK)
-		);
+	static PrivateKey getPrivateKey(final int keySize) throws NoSuchAlgorithmException {
+		switch (keySize) {
+			case 1024:
+			try {
+				return KeyFactory.getInstance(
+					RSA
+				).generatePrivate(
+					new PKCS8EncodedKeySpec(PRK_2014)
+				);
+			}
+			catch (final InvalidKeySpecException e) {
+				// No deberia darse nunca
+				throw new NoSuchAlgorithmException(e);
+			}
+			default:
+				final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
+				keyGen.initialize(keySize);
+				return keyGen.generateKeyPair().getPrivate();
+		}
+
 	}
 
 }

@@ -163,13 +163,13 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 		catch (final InvalidKeyException e) {
-			throw new AOException("Error en la prefirma XAdES por problemas con las claves RSA: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por problemas con las claves: " + e, e); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOException("Error en la prefirma XAdES por no soportarse un algoritmo: " + e, e); //$NON-NLS-1$
 		}
 		catch (final SignatureException e) {
-			throw new AOException("Error en la prefirma XAdES en la firma RSA: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en la firma: " + e, e); //$NON-NLS-1$
 		}
 		catch (final SAXException e) {
 			throw new AOException("Error en la prefirma XAdES en el proceso SAX del XML: " + e, e); //$NON-NLS-1$
