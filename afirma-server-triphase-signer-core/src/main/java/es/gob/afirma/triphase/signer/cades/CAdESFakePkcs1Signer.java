@@ -94,10 +94,18 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		// puede salir del Certificado
 
 		// Obtenemos el tamano de clave y de PKCS#1
-		final int keySize = ((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength();
-		final Integer p1Size = P1_SIZES.get(Integer.valueOf(keySize));
+		final Integer p1Size;
+		if (certChain[0].getPublicKey() instanceof RSAPublicKey) {
+			final int keySize = ((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength();
+			p1Size = P1_SIZES.get(Integer.valueOf(keySize));
+		}
+		else {
+			throw new AOException(
+				"Tipo de clave no soportada: " + certChain[0].getPublicKey().getAlgorithm() //$NON-NLS-1$
+			);
+		}
 		if (p1Size == null) {
-			throw new AOException("Tamano de clave no soportado: " + keySize); //$NON-NLS-1$
+			throw new AOException("Tamano de clave no soportado: " + p1Size); //$NON-NLS-1$
 		}
 
 		// Calculamos un valor que sera siempre el mismo para los mismos datos y de las dimensiones que

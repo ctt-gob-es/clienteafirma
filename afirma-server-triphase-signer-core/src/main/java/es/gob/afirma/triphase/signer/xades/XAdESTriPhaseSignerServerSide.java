@@ -13,16 +13,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -191,57 +188,56 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final PrivateKey prk;
-		if (((X509Certificate)certChain[0]).getPublicKey() instanceof RSAPublicKey) {
-			prk = generateKeyPair(
-				((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
-			).getPrivate();
+		PrivateKey prk;
+		try {
+			prk = RsaKeyHelper.getFixedPrivateKey();
 		}
-		else {
-			throw new InvalidKeyException(
-				"No se soportan las claves de tipo " + ((X509Certificate)certChain[0]).getPublicKey().getClass().getName() //$NON-NLS-1$
+		catch (final InvalidKeySpecException e) {
+			// No deberia producirse nunca
+			throw new IllegalStateException(
+				"Error creando la clave privada a partir de su representacion binaria: " + e, e //$NON-NLS-1$
 			);
 		}
 
 		final byte[] result;
 		switch (op) {
-		case SIGN:
-			result = XAdESSigner.sign(
-				data,
-				algorithm,
-				prk,
-				certChain,
-				extraParams
-			);
-			break;
-		case COSIGN:
-			result = XAdESCoSigner.cosign(
-				data,
-				algorithm,
-				prk,
-				certChain,
-				extraParams
-			);
-			break;
-		case COUNTERSIGN:
-			final CounterSignTarget targets =
-				extraParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
-					CounterSignTarget.LEAFS : CounterSignTarget.TREE;
+			case SIGN:
+				result = XAdESSigner.sign(
+					data,
+					algorithm,
+					prk,
+					certChain,
+					extraParams
+				);
+				break;
+			case COSIGN:
+				result = XAdESCoSigner.cosign(
+					data,
+					algorithm,
+					prk,
+					certChain,
+					extraParams
+				);
+				break;
+			case COUNTERSIGN:
+				final CounterSignTarget targets =
+					extraParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
+						CounterSignTarget.LEAFS : CounterSignTarget.TREE;
 
-			result = XAdESCounterSigner.countersign(
-				data,
-				algorithm,
-				targets,
-				null,
-				prk,
-				certChain,
-				extraParams
-			);
-			break;
-		default:
-			throw new IllegalStateException(
-				"No se puede dar una operacion no contemplada en el enumerado de operaciones: " + op //$NON-NLS-1$
-			);
+				result = XAdESCounterSigner.countersign(
+					data,
+					algorithm,
+					targets,
+					null,
+					prk,
+					certChain,
+					extraParams
+				);
+				break;
+			default:
+				throw new IllegalStateException(
+					"No se puede dar una operacion no contemplada en el enumerado de operaciones: " + op //$NON-NLS-1$
+				);
 		}
 
 		// Cargamos el XML firmado en un String
@@ -384,16 +380,6 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		@Override
 		public Key getKey() { return this.pk; }
-	}
-
-	/** Genera un par de claves RSA.
-	 * @param keySize Tama&ntilde;o de las claves a generar.
-	 * @return Par de claves RSA.
-	 * @throws NoSuchAlgorithmException Si no se soporta la generaci&oacute;n de claves RSA. */
-	private static KeyPair generateKeyPair(final int keySize) throws NoSuchAlgorithmException {
-		final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
-		keyGen.initialize(keySize);
-		return keyGen.generateKeyPair();
 	}
 
 }
