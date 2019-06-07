@@ -406,9 +406,9 @@ public final class MozillaKeyStoreUtilities {
 		// Compobamos despues el caso especifico de NSS partido entre /usr/lib y
 		// /lib, que se da en versiones de Fedora muy antiguas y solo en 32 bits
 		if (Platform.OS.LINUX.equals(Platform.getOS())
-                && "32".equals(Platform.getJavaArch())
-                && new File("/usr/lib/" + SOFTOKN3_SO).exists()
-                && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
+                && "32".equals(Platform.getJavaArch()) //$NON-NLS-1$
+                && new File("/usr/lib/" + SOFTOKN3_SO).exists() //$NON-NLS-1$
+                && new File(LIB_NSPR4_SO).exists()) {
 			dependList = new String[] {
 					"/lib/libmozglue.so", //$NON-NLS-1$
 					"/usr/lib/libmozglue.so", //$NON-NLS-1$
@@ -754,7 +754,7 @@ public final class MozillaKeyStoreUtilities {
 		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return ""; //$NON-NLS-1$
 		} else {
-		    return Platform.getSystemLibDir() + "\\";
+		    return Platform.getSystemLibDir() + "\\"; //$NON-NLS-1$
         }
 	}
 
