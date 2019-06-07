@@ -254,7 +254,28 @@ public final class Platform {
 
             return systemRoot + "System32"; //$NON-NLS-1$
         }
-        return "/usr/lib"; //$NON-NLS-1$
+
+        // ALL UNIX VARIANTS FOLLOWING FHS
+        // There are, generally, two kind of Unix flavours:
+        // a) Those whose libdir has explicit bit set: /usr/lib64 or /usr/lib32
+        // b) Those whose libdir does not include it: /usr/lib
+        //
+        // In the case of X bits and /usr/libX exists, it is clear that we
+        // are safe.
+        // In the case of X bits and /usr/libX does not exist, it is probably
+        // due to either the case:
+        //     Platform is 64, and folders /usr/lib and /usr/lib32 exist
+        // or
+        //     Platform is 32, and folders /usr/lib and /usr/lib64 exist
+        //
+        // In any case, the *safe* route is to first try the a) case before b).
+
+        final String canonicalLibDir = "/usr/lib" + Platform.getJavaArch(); // $NON-NLS-1$
+        if (new File(canonicalLibDir).exists()) {
+            return canonicalLibDir;
+        } else {
+            return "/usr/lib"; //$NON-NLS-1$
+        }
     }
 
 }
