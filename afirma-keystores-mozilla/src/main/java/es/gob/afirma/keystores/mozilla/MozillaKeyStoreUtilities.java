@@ -750,20 +750,9 @@ public final class MozillaKeyStoreUtilities {
 		// En sistema operativo extrano devulevo cadena vacia
 		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return ""; //$NON-NLS-1$
-		}
-		final String winDir = System.getenv("SystemRoot"); //$NON-NLS-1$
-		if (winDir == null) {
-			return ""; //$NON-NLS-1$
-		}
-		// Si java es 64 bits, no hay duda de que Windows es 64 bits y buscamos bibliotecas
-		// de 64 bits
-		if ("64".equals(Platform.getJavaArch())) { //$NON-NLS-1$
-			return winDir + "\\System32\\";  //$NON-NLS-1$
-		}
-		if (new File(winDir + "\\SysWOW64\\").exists()) { //$NON-NLS-1$
-			return winDir + "\\SysWOW64\\"; //$NON-NLS-1$
-		}
-		return winDir + "\\System32\\"; //$NON-NLS-1$
+		} else {
+		    return Platform.getSystemLibDir() + "\\";
+        }
 	}
 
 	private static boolean isModuleIncluded(final Map<String, String> externalStores, final String moduleName) {
