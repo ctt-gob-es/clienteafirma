@@ -21,8 +21,7 @@ public class CertificateSelectionDialogTest {
     private static final String CERT_PATH = "multi_almacen.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
 
-	/** Para pruebas sin JUnit
-	 * @param args No se usa.
+	/** Prueba de di&aacute;logo de selecci&oacute;n de certificados.
 	 * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
@@ -50,24 +49,4 @@ public class CertificateSelectionDialogTest {
 		System.out.println("Certificado:\n" + ksm.getCertificate(alias)); //$NON-NLS-1$
 	}
 
-//	/** Para pruebas sin JUnit
-//	 * @param args
-//	 * @throws Exception */
-//	public static void main(final String[] args) throws Exception {
-//
-//		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-//				AOKeyStore.WINDOWS,
-//				null,
-//				null,
-//				AOKeyStore.WINDOWS.getStorePasswordCallback(null),
-//				null);
-//
-//		List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
-//		filters.add(new RFC2254CertificateFilter("(CN=NOMBRE*)", "(OU=FNMT*)"));
-//
-//		AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, false, false, false, filters, true);
-//
-//
-//		System.out.println(AOUtil.getCN((X509Certificate) dialog.show().getCertificate()));
-//	}
 }
