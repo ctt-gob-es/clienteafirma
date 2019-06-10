@@ -523,14 +523,14 @@ final class SearchFilter implements AttrFilter {
     }
 
 
-    /** Finds the first occurrence of <tt>ch</tt> in <tt>val</tt> starting
-      * from position <tt>start</tt>. It doesn't count if <tt>ch</tt>
+    /** Finds the first occurrence of <code>ch</code> in <code>val</code> starting
+      * from position <code>start</code>. It doesn't count if <code>ch</code>
       * has been escaped by a backslash (\).
       * @param ch Character to find.
       * @param val String to search on.
       * @param st Start position.
-      * @return First occurrence of <tt>ch</tt> in <tt>val</tt> starting
-      *         from <tt>start</tt>. */
+      * @return First occurrence of <code>ch</code> in <code>val</code> starting
+      *         from <code>start</code>. */
     static int findUnescaped(final char ch, final String val, final int st) {
         final int len = val.length();
         int start = st;
@@ -547,8 +547,8 @@ final class SearchFilter implements AttrFilter {
         return -1;
     }
 
-    /** Formats the expression <tt>expr</tt> using arguments from the array
-     * <tt>args</tt>.
+    /** Formats the expression <code>expr</code> using arguments from the array
+     * <code>args</code>.
      * <code>{i}</code> specifies the <code>i</code>'th element from
      * the array <code>args</code> is to be substituted for the
      * string "<code>{i}</code>".
