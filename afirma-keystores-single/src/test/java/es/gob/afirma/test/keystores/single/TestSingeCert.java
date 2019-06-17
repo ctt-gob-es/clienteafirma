@@ -3,6 +3,7 @@ package es.gob.afirma.test.keystores.single;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 import org.junit.Test;
@@ -15,7 +16,9 @@ public class TestSingeCert {
 
     private static String[] TEST_FILES = new String[] {
        "b64cert1.txt", //$NON-NLS-1$
-       "Equifax_Secure_Certificate_Authority.pem" //$NON-NLS-1$
+       "Equifax_Secure_Certificate_Authority.pem", //$NON-NLS-1$
+       "juaneliptico.cer", //$NON-NLS-1$
+       "www_google_com.crt" //$NON-NLS-1$
     };
 
     /** Pruebas de apertura de certificados sueltos.
@@ -32,7 +35,10 @@ public class TestSingeCert {
             ks.load(ClassLoader.getSystemResourceAsStream(filename), null);
             final Enumeration<String> aliases = ks.aliases();
             while (aliases.hasMoreElements()) {
-                System.out.println(aliases.nextElement());
+            	final String alias = aliases.nextElement();
+                System.out.println(alias);
+                final X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+                System.out.println(cert.getPublicKey().getAlgorithm());
             }
         }
     }

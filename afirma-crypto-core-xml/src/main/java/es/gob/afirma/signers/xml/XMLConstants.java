@@ -34,11 +34,19 @@ public final class XMLConstants {
     private static final String URL_SHA384      = "http://www.w3.org/2001/04/xmldsig-more#sha384"; //$NON-NLS-1$
     private static final String URL_SHA512      = "http://www.w3.org/2001/04/xmlenc#sha512"; //$NON-NLS-1$
 
+    // Identificadores para ECDSA
+    private static final String URL_SHA1_ECDSA    = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"; //$NON-NLS-1$
+    private static final String URL_SHA224_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"; //$NON-NLS-1$
+    private static final String URL_SHA256_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"; //$NON-NLS-1$
+    private static final String URL_SHA384_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"; //$NON-NLS-1$
+    private static final String URL_SHA512_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"; //$NON-NLS-1$
+
     /** URIs de los algoritmos de firma */
     public static final Map<String, String> SIGN_ALGOS_URI;
     static {
     	SIGN_ALGOS_URI = new HashMap<>();
 
+    	// RSA
     	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA);
     	// Introducimos variantes para hacerlo mas robusto
     	SIGN_ALGOS_URI.put("RSA", URL_SHA1_RSA); //$NON-NLS-1$
@@ -65,6 +73,40 @@ public final class XMLConstants {
     	SIGN_ALGOS_URI.put("SHA-512withRSA", URL_SHA512_RSA); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put("SHA512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put("SHA-512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
+
+    	//ECDSA
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHECDSA, URL_SHA1_ECDSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("ECDSA", URL_SHA1_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-1withECDSA", URL_SHA1_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA1withECDSAEncryption", URL_SHA1_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-1withECDSAEncryption", URL_SHA1_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHAwithECDSAEncryption", URL_SHA1_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHAwithECDSA", URL_SHA1_ECDSA); //$NON-NLS-1$
+
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA224WITHECDSA, URL_SHA224_ECDSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-224withECDSA", URL_SHA224_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA224withECDSAEncryption", URL_SHA224_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-224withECDSAEncryption", URL_SHA224_ECDSA); //$NON-NLS-1$
+
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHECDSA, URL_SHA256_ECDSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-256withECDSA", URL_SHA256_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA256withECDSAEncryption", URL_SHA256_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-256withECDSAEncryption", URL_SHA256_ECDSA); //$NON-NLS-1$
+
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHECDSA, URL_SHA384_ECDSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-384withECDSA", URL_SHA384_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA384withECDSAEncryption", URL_SHA384_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-384withECDSAEncryption", URL_SHA384_ECDSA); //$NON-NLS-1$
+
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHECDSA, URL_SHA512_ECDSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-512withECDSA", URL_SHA512_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA512withECDSAEncryption", URL_SHA512_ECDSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-512withECDSAEncryption", URL_SHA512_ECDSA); //$NON-NLS-1$
     }
 
     /** Codificaci&oacute;n Base64 para firmas XMLDSig y XAdES. */

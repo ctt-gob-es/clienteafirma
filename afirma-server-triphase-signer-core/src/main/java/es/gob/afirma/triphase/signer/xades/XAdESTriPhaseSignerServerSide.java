@@ -13,8 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -188,84 +186,60 @@ public final class XAdESTriPhaseSignerServerSide {
 					}
 				}
 			}
-
-//			final Element rootElement = xml.getDocumentElement();
-//			if (rootElement.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
-//				final NamedNodeMap nnm = rootElement.getAttributes();
-//				if (nnm != null) {
-//					final Node node = nnm.getNamedItem(XML_NODE_ID);
-//					if (node != null) {
-//						final String id = node.getNodeValue();
-//						if (id != null) {
-//							previousSignaturesIds.add(id);
-//						}
-//					}
-//				}
-//			}
-//			else {
-//				final NodeList mainChildNodes = xml.getDocumentElement().getChildNodes();
-//				for (int i = 0; i < mainChildNodes.getLength(); i++) {
-//					final Node currentNode = mainChildNodes.item(i);
-//					if (currentNode.getNodeType() == Node.ELEMENT_NODE && currentNode.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
-//						final NamedNodeMap nnm = currentNode.getAttributes();
-//						if (nnm != null) {
-//							final Node node = nnm.getNamedItem(XML_NODE_ID);
-//							if (node != null) {
-//								final String id = node.getNodeValue();
-//								if (id != null) {
-//									previousSignaturesIds.add(id);
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
 		}
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final PrivateKey prk = generateKeyPair(
-			((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
-		).getPrivate();
+		final PrivateKey prk;
+		if (((X509Certificate)certChain[0]).getPublicKey() instanceof RSAPublicKey) {
+			prk = RsaKeyHelper.getPrivateKey(
+				((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
+			);
+		}
+		else {
+			throw new InvalidKeyException(
+				"No se soportan las claves de tipo " + ((X509Certificate)certChain[0]).getPublicKey().getClass().getName() //$NON-NLS-1$
+			);
+		}
 
 		final byte[] result;
 		switch (op) {
-		case SIGN:
-			result = XAdESSigner.sign(
-				data,
-				algorithm,
-				prk,
-				certChain,
-				extraParams
-			);
-			break;
-		case COSIGN:
-			result = XAdESCoSigner.cosign(
-				data,
-				algorithm,
-				prk,
-				certChain,
-				extraParams
-			);
-			break;
-		case COUNTERSIGN:
-			final CounterSignTarget targets =
-				extraParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
-					CounterSignTarget.LEAFS : CounterSignTarget.TREE;
+			case SIGN:
+				result = XAdESSigner.sign(
+					data,
+					algorithm,
+					prk,
+					certChain,
+					extraParams
+				);
+				break;
+			case COSIGN:
+				result = XAdESCoSigner.cosign(
+					data,
+					algorithm,
+					prk,
+					certChain,
+					extraParams
+				);
+				break;
+			case COUNTERSIGN:
+				final CounterSignTarget targets =
+					extraParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
+						CounterSignTarget.LEAFS : CounterSignTarget.TREE;
 
-			result = XAdESCounterSigner.countersign(
-				data,
-				algorithm,
-				targets,
-				null,
-				prk,
-				certChain,
-				extraParams
-			);
-			break;
-		default:
-			throw new IllegalStateException(
-				"No se puede dar una operacion no contemplada en el enumerado de operaciones: " + op //$NON-NLS-1$
-			);
+				result = XAdESCounterSigner.countersign(
+					data,
+					algorithm,
+					targets,
+					null,
+					prk,
+					certChain,
+					extraParams
+				);
+				break;
+			default:
+				throw new IllegalStateException(
+					"No se puede dar una operacion no contemplada en el enumerado de operaciones: " + op //$NON-NLS-1$
+				);
 		}
 
 		// Cargamos el XML firmado en un String
@@ -408,16 +382,6 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		@Override
 		public Key getKey() { return this.pk; }
-	}
-
-	/** Genera un par de claves RSA.
-	 * @param keySize Tama&ntilde;o de las claves a generar
-	 * @return Par de claves RSA
-	 * @throws NoSuchAlgorithmException Si no se soporta la generaci&oacute;n de claves RSA */
-	private static KeyPair generateKeyPair(final int keySize) throws NoSuchAlgorithmException {
-		final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
-		keyGen.initialize(keySize);
-		return keyGen.generateKeyPair();
 	}
 
 }

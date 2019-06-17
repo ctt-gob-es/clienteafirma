@@ -20,10 +20,14 @@ public final class TestRFC2254CertificateFilter {
 	@Test
 	@SuppressWarnings("static-method")
 	public void TestRFC2254CertificateSimpleFilter() throws Exception {
+
 		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
 			ClassLoader.getSystemResourceAsStream("Tomas_DNI_FIRMA.cer") //$NON-NLS-1$
 		);
-		RFC2254CertificateFilter filter = new RFC2254CertificateFilter(
+
+		RFC2254CertificateFilter filter;
+
+		filter = new RFC2254CertificateFilter(
 			"SERIALNUMBER=11830960J", //$NON-NLS-1$
 			"O=*POLIC*" //$NON-NLS-1$
 		);
@@ -34,6 +38,12 @@ public final class TestRFC2254CertificateFilter {
 			"cn=*QNIE*" //$NON-NLS-1$
 		);
 		Assert.assertFalse(filter.matches(cert));
+
+		filter = new RFC2254CertificateFilter(
+			null,
+			"cn=*DNIE*" //$NON-NLS-1$
+		);
+		Assert.assertTrue(filter.matches(cert));
 	}
 
 	/** Prueba recursiva por emisor de filtro RFC 2254.

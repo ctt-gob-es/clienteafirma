@@ -388,7 +388,6 @@ public final class CAdESUtils {
      *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
      *	  contentType ContentType
      * }
-     *
      * </pre>
      *
      * @param cert Certificado del firmante.
@@ -436,32 +435,44 @@ public final class CAdESUtils {
                                                                                                                       IOException,
                                                                                                                       CertificateEncodingException {
     	if (padesMode) {
-    		LOGGER.info("Se ha seleccionado la generacion de CAdES para inclusion en PAdES"); //$NON-NLS-1$
+    		LOGGER.info(
+				"Se ha seleccionado la generacion de CAdES para inclusion en PAdES" //$NON-NLS-1$
+			);
     	}
     	if (includeSigningTimeAttribute) {
-    		LOGGER.info("Se incluira el atributo SigningTime (OID:1.2.840.113549.1.9.5) en la firma CAdES"); //$NON-NLS-1$
+    		LOGGER.info(
+				"Se incluira el atributo SigningTime (OID:1.2.840.113549.1.9.5) en la firma CAdES" //$NON-NLS-1$
+			);
     	}
 
         // // ATRIBUTOS
 
         // authenticatedAttributes (http://tools.ietf.org/html/rfc3852#section-11)
         final ASN1EncodableVector contextSpecific = initContextSpecific(
-                digestAlgorithmName,
-                data,
-                dataDigest,
-                signDate,
-                isCountersign,
-                padesMode
+            digestAlgorithmName,
+            data,
+            dataDigest,
+            signDate,
+            isCountersign,
+            padesMode
         );
 
         if (signingCertificateV2) {
             contextSpecific.add(
-        		getSigningCertificateV2((X509Certificate) cert, digestAlgorithmName, doNotIncludePolicyOnSigningCertificate)
+        		getSigningCertificateV2(
+    				(X509Certificate) cert,
+    				digestAlgorithmName,
+    				doNotIncludePolicyOnSigningCertificate
+				)
     		);
         }
         else {
             contextSpecific.add(
-        		getSigningCertificateV1((X509Certificate) cert, digestAlgorithmName, doNotIncludePolicyOnSigningCertificate)
+        		getSigningCertificateV1(
+    				(X509Certificate) cert,
+    				digestAlgorithmName,
+    				doNotIncludePolicyOnSigningCertificate
+				)
     		);
         }
 
@@ -530,7 +541,8 @@ public final class CAdESUtils {
         //
         // SignerAttribute ::= SEQUENCE OF CHOICE {
         //    claimedAttributes   [0] ClaimedAttributes,
-        //    certifiedAttributes [1] CertifiedAttributes }
+        //    certifiedAttributes [1] CertifiedAttributes
+        // }
         //
         // ClaimedAttributes ::= SEQUENCE OF Attribute
         // CertifiedAttributes ::= AttributeCertificate -- as defined in RFC 3281: see clause 4.1. (No lo implementamos)
@@ -547,9 +559,6 @@ public final class CAdESUtils {
         		}
         	}
 
-
-        	// ############### PRUEBA 1 #################
-
         	// Agregamos el listado de roles al SignerAttribute, que sera un atributo firmado
         	if (!claimedRolesAttrs.isEmpty()) {
         		final ASN1EncodableVector roles = new ASN1EncodableVector();
@@ -557,35 +566,17 @@ public final class CAdESUtils {
         			roles.add(attr);
         		}
         		contextSpecific.add(
-        				new Attribute(
-        						PKCSObjectIdentifiers.id_aa_ets_signerAttr,
-        						new DERSet(
-        								new DERSequence(
-        										new DERTaggedObject(0, new DERSequence(roles))
-        										)
-        								)
-        						)
-        				);
+    				new Attribute(
+						PKCSObjectIdentifiers.id_aa_ets_signerAttr,
+						new DERSet(
+							new DERSequence(
+								new DERTaggedObject(0, new DERSequence(roles))
+							)
+						)
+					)
+				);
         	}
 
-
-        	// ############### PRUEBA 2 #################
-
-//        	// Agregamos el listado de roles al SignerAttribute, que sera un atributo firmado
-//        	if (!claimedRolesAttrs.isEmpty()) {
-//        		final ASN1EncodableVector roles = new ASN1EncodableVector();
-//        		for (final Attribute attr : claimedRolesAttrs) {
-//        			roles.add(attr);
-//        		}
-//        		contextSpecific.add(
-//        				new Attribute(
-//        						PKCSObjectIdentifiers.id_aa_ets_signerAttr,
-//        						new DERSet(
-//        										new DERTaggedObject(0, new DERSequence(roles))
-//        										)
-//        						)
-//        				);
-//        	}
         }
 
         // Agregamos la hora de firma

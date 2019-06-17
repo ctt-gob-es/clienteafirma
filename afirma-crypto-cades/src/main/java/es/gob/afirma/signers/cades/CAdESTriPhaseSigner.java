@@ -273,6 +273,7 @@ public final class CAdESTriPhaseSigner {
         // EncryptionAlgorithm
         final AlgorithmIdentifier keyAlgorithmIdentifier;
         try {
+        	//TODO: Soporte de DSA y ECDSA
             keyAlgorithmIdentifier = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
         }
         catch (final Exception e) {

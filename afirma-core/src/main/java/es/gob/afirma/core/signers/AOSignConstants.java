@@ -220,6 +220,9 @@ public final class AOSignConstants {
 	/** Algoritmo de firma SHA1withECDSA. */
 	public static final String SIGN_ALGORITHM_SHA1WITHECDSA = "SHA1withECDSA"; //$NON-NLS-1$
 
+	/** Algoritmo de firma SHA224withECDSA. */
+	public static final String SIGN_ALGORITHM_SHA224WITHECDSA = "SHA224withECDSA"; //$NON-NLS-1$
+
 	/** Algoritmo de firma SHA256withECDSA. */
 	public static final String SIGN_ALGORITHM_SHA256WITHECDSA = "SHA256withECDSA"; //$NON-NLS-1$
 

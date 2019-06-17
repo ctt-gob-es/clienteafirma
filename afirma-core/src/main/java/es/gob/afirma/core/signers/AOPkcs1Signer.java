@@ -27,14 +27,7 @@ public final class AOPkcs1Signer implements AOSigner {
 	private static final String PKCS1_FILE_SUFFIX = ".p1"; //$NON-NLS-1$
 
 	/** Realiza una firma electr&oacute;nica PKCS#1 v1.5.
-	 * @param algorithm Algoritmo de firma a utilizar
-	 * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>signatureAlgorithm</code>:</p>
-	 * <ul>
-	 *  <li><i>SHA1withRSA</i></li>
-	 *  <li><i>SHA256withRSA</i></li>
-	 *  <li><i>SHA384withRSA</i></li>
-	 *  <li><i>SHA512withRSA</i></li>
-	 * </ul>
+	 * @param algorithm Algoritmo de firma a utilizar.
 	 * @param key Clave privada a usar para la firma.
 	 * @param certChain Se ignora, esta clase no necesita la cadena de certificados.
 	 * @param data Datos a firmar.
