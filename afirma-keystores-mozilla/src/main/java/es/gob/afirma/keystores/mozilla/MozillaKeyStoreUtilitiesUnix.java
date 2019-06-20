@@ -31,7 +31,6 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/opt/firefox", //$NON-NLS-1$
 		"/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
 		"/lib", //$NON-NLS-1$
-		"/usr/lib64", //$NON-NLS-1$
 		"/usr/lib", //$NON-NLS-1$
 		"/usr/lib/nss", //$NON-NLS-1$
 		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
@@ -40,6 +39,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura */ //$NON-NLS-1$
 		"/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
 		"/usr/lib64", /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
+		"/lib64" // No es comun para NSS, pero si para sus dependencias //$NON-NLS-1$
 	};
 
 	private static final String[] SQLITE_LIBS = {
@@ -58,13 +58,17 @@ final class MozillaKeyStoreUtilitiesUnix {
 		String nssLibDir = null;
 
 		for (final String path : NSS_PATHS) {
-			if (new File(path, SOFTOKN3_SO).exists()){
+			if (new File(path, SOFTOKN3_SO).isFile()) {
 				nssLibDir = path;
+				break;
 			}
 		}
+
 		if (nssLibDir == null) {
 			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX"); //$NON-NLS-1$
 		}
+
+		LOGGER.info("Se usara el NSS encontrado en '" + nssLibDir + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (final String path : NSS_PATHS) {
 			final File dir = new File(path);
@@ -75,10 +79,10 @@ final class MozillaKeyStoreUtilitiesUnix {
 						System.load(library.getAbsolutePath());
 						return nssLibDir;
 					}
-					catch (final Exception e) {
+					catch (final Exception | Error e) {
 						LOGGER.warning(
-								"Descartamos el NSS situado en '" + path + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
-							);
+							"Descartamos el NSS situado en '" + path + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
+						);
 					}
 				}
 			}
