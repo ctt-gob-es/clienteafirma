@@ -271,15 +271,14 @@ class CommandProcessorThread extends Thread {
 		// paramos el timer mientras la aplicacion realiza operaciones
 		boolean isSave = false;
 	    this.timer.stop();
-		LOGGER.info("Comando URI recibido por HTTP: " + SIGN); //$NON-NLS-1$
+		LOGGER.info("Comando URI recibido por HTTP (Fragmento)"); //$NON-NLS-1$
 		// en caso de que sea la primera vez que lo ejecutamos, realizamos la operacion.
 		// si la respuesta no llega al JS y vuelve a realizar la misma peticion, ya tenemos
 		// formada la respuesta y solo hay que devolver el numero de peticiones.
 		if (toSend.isEmpty()) {
 			final StringBuilder totalhttpRequest = new StringBuilder();
-			for(final String object: request){
+			for (final String object: request){
 				totalhttpRequest.append(object);
-				LOGGER.info("PETICION PROCESADA: " + totalhttpRequest); //$NON-NLS-1$
 			}
 
 			// Si la operacion es de guardado (Respuesta fija)
@@ -363,7 +362,7 @@ class CommandProcessorThread extends Thread {
 
 		// paramos el timer mientras la aplicacion realiza operaciones
 		this.timer.stop();
-		LOGGER.info("Comando URI recibido por HTTP: " + fragment); //$NON-NLS-1$
+		LOGGER.info("Comando URI recibido por HTTP (fragmento)"); //$NON-NLS-1$
 		final String[] petition = fragment.split(SEPARADOR);
 		final int part = Integer.parseInt(petition [1]);
 		final int partTotal = Integer.parseInt(petition [2]);

@@ -165,11 +165,17 @@ public final class ProtocolInvocationUriParser {
 		for (final String param : parameters) {
 			if (param.indexOf('=') > 0) {
 				try {
+					// // Parseamos el campo para extraer la clave-valor del parametro.
+					// Si el parametro tiene mas de 1000 caracteres, presuponemos que es un
+					// campo de datos en base 64 URL SAFE y no lo decodicaremos como URL por
+					// el coste de esta operacion
 					params.put(
 						param.substring(0, param.indexOf('=')),
 						param.indexOf('=') == param.length() - 1 ?
 							"" : //$NON-NLS-1$
-								URLDecoder.decode(param.substring(param.indexOf('=') + 1), ProtocolInvocationUriParserUtil.DEFAULT_URL_ENCODING)
+								param.length() > 1000 ?
+										param.substring(param.indexOf('=') + 1) :
+										URLDecoder.decode(param.substring(param.indexOf('=') + 1), ProtocolInvocationUriParserUtil.DEFAULT_URL_ENCODING)
 					);
 				}
 				catch (final UnsupportedEncodingException e) {
@@ -181,15 +187,15 @@ public final class ProtocolInvocationUriParser {
 			}
 		}
 
-		// Agregamos como codigo de operacion el nombre de host de la URL
 
-		Logger.getLogger("es.gob.afirma").info("URI recibida: " + uri); //$NON-NLS-1$ //$NON-NLS-2$
+		Logger.getLogger("es.gob.afirma").info("URI recibida: " + (uri.length() <= 300 ? uri : uri.substring(0, 300) + "...")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		String path = uri.substring(uri.indexOf("://") + "://".length(), uri.indexOf('?') != -1 ? uri.indexOf('?') : uri.length()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (path.endsWith("/")) { //$NON-NLS-1$
 			path = path.substring(0, path.length() - 1);
 		}
-		params.put(ProtocolConstants.OPERATION_PARAM, path.substring(path.lastIndexOf('/') + 1));
+		// El codigo de operacion se habra recibido como la parte de host de la URL
+		params.put(ProtocolConstants.OPERATION_PARAM, path.indexOf("/") == -1 ? path : path.substring(0, path.indexOf("/"))); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return params;
 	}
