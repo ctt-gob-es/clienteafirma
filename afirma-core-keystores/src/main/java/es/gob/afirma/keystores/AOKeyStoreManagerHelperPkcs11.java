@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -109,6 +110,9 @@ final class AOKeyStoreManagerHelperPkcs11 {
                     p11Provider = getP11Provider(config);
                 }
                 catch (final Exception ex) {
+                	LOGGER.log(Level.WARNING,
+                			"Ha fallado el segundo intento de inicializacion del PKCS#11 para la la biblioteca " + p11lib, e //$NON-NLS-1$
+            			);
                     throw new AOKeyStoreManagerException(
                 		"No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca '" + p11lib + "': " + ex, ex  //$NON-NLS-1$//$NON-NLS-2$
             		);

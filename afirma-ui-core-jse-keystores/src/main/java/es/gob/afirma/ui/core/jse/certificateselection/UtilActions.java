@@ -15,6 +15,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.net.URI;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -123,15 +124,29 @@ final class UtilActions {
 		if (ksFile != null && ksFile.length > 0) {
 			AOKeyStoreManager ksm;
 			try {
-				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-						AOKeyStore.PKCS12,
-						ksFile[0].getAbsolutePath(),
-						null,
-						AOKeyStore.PKCS12.getStorePasswordCallback(parent),
-						parent);
+
+				if (hasLibraryExtension(ksFile[0])) {
+					ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+							AOKeyStore.PKCS11,
+							ksFile[0].getAbsolutePath(),
+							null,
+							AOKeyStore.PKCS11.getStorePasswordCallback(parent),
+							parent);
+				}
+				else {
+					ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+							AOKeyStore.PKCS12,
+							ksFile[0].getAbsolutePath(),
+							null,
+							AOKeyStore.PKCS12.getStorePasswordCallback(parent),
+							parent);
+				}
 			}
 			catch (final Exception e) {
-				LOGGER.warning("No se ha podido cargar el almacen de certificados seleccionado: " + e); //$NON-NLS-1$
+				LOGGER.log(
+						Level.WARNING,
+						"No se ha podido cargar la biblioteca o almacen de certificados seleccionado", //$NON-NLS-1$
+						e);
 				AOUIFactory.showErrorMessage(
 					parent,
 					CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.4"), //$NON-NLS-1$
@@ -143,6 +158,17 @@ final class UtilActions {
 
 			selectionDialog.changeKeyStore(ksm);
 		}
+	}
+
+	/**
+	 * Comprueba si un fichero tiene la extensi&oacute;n propia de una biblioteca.
+	 * @param libraryFile Fichero del que se quiere comprobar el nombre.
+	 * @return {@code true} si tiene extensi&oacute;n de biblioteca, {@code false}
+	 * en caso contrario.
+	 */
+	private static boolean hasLibraryExtension(final File libraryFile) {
+		final String name = libraryFile.getName().toLowerCase();
+		return name.endsWith(".dll") || name.endsWith(".so") || name.endsWith(".dlib"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }
