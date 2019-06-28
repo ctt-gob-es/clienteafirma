@@ -1472,7 +1472,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function execAppIntent (url) {
 				
 				// Primera ejecucion, no hay puerto definido
-				if (port == "") {
+				if (!port) {
 					// Calculamos los puertos
 					var ports = getRandomPorts();
 					// Invocamos a la aplicacion nativa
@@ -1593,6 +1593,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			* peticion sea aceptada.
 			*/
 			function executeEchoByService (currentPort, url, timeoutResetCounter, semaphore) {
+				
+				// Si llegados a este punto ya tenemos una conexion o si se ha establecido una eb puerto distinto al que estamos probando
+				if (connection || (port && port != currentPort)) {
+					return;
+				}
 
 				
 				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada porque
@@ -1601,12 +1606,18 @@ var MiniApplet = ( function ( window, undefined ) {
 				// la que hubiese antes de empezar la espera (lo que ocurriria si le pasasemos la URL como
 				// parametro).
 				currentOperationUrl = url;
-				
+
 				var httpRequest = getHttpRequest();
 				httpRequest.open("POST", URL_REQUEST + currentPort + "/afirma", true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				httpRequest.onreadystatechange = function() {
-					if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText, true) == "OK" && !connection) {
+
+					if (httpRequest.readyState == 1 && httpRequest.status == 0) { // Ignoramos este conjunto de estados propio de Internet Explorer
+						return;
+					}
+
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 &&
+							httpRequest.responseText == "T0s=" && !connection) {   // "T0s=" es "OK" en base 64
 						port = currentPort;
 						urlHttpRequest = URL_REQUEST + port + "/afirma";
 						connection = true;
@@ -1653,13 +1664,11 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 				}
 				
-				if (!connection) {
-					// Mandamos un echo con - por lo que las variables de control se resetearan
-					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa
-					// que ha llegado al final y no se quede en espera
-					httpRequest.send("echo=-idsession=" + idSession + "@EOF");
-					//console.log("probamos puerto " +currentPort)
-				}
+				
+				// Mandamos un echo con - por lo que las variables de control se resetearan
+				// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa
+				// que ha llegado al final y no se quede en espera
+				httpRequest.send("echo=-idsession=" + idSession + "@EOF");
 			}
 
 			/** Funcion que ejecuta la llamada a la funcion eco previa a una llamada de operacion
@@ -1668,6 +1677,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * una ejecucion rapida de firmas en serie, si se pasase por parametro, en el momento
 			 * de la ejecucion podria ejecutar la operacion con una URL de una operacion anterior. */
 			function executeEchoByServiceDelayed (currentPort, timeoutResetCounter, semaphore) {
+				if (connection || (port && port != currentPort)) {
+					return;
+				}
 				executeEchoByService (currentPort, currentOperationUrl, timeoutResetCounter, semaphore);
 			}
 			
@@ -1696,10 +1708,11 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.status == 404) {
 						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+						return;
 					}
 					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
 					if (isSaveOperation) {
-						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
+						if (httpRequest.readyState == 4 && httpRequest.responseText != "") {
 							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 						}
 						return;
@@ -1707,13 +1720,14 @@ var MiniApplet = ( function ( window, undefined ) {
 					// El resto de operaciones deben componer el resultado
 					else {
 						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
-							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+							var responseDecoded = Base64.decode(httpRequest.responseText, true);
+							if (responseDecoded == "MEMORY_ERROR") {
 								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
 								return;
 							}
 							// Juntamos los fragmentos
 							totalResponseRequest = "";
-							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+							addFragmentRequest (1, responseDecoded);
 						}
 						// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
 						else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
@@ -1815,23 +1829,25 @@ var MiniApplet = ( function ( window, undefined ) {
 
 					if (httpRequest.status == 404) {
 						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						return;
 					}
 
 					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
 					// porque no requiere respuesta
 					if (isSaveOperation) {
-						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
+						if (httpRequest.readyState == 4 && httpRequest.responseText != "") {
 							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 						}
 						return;
 					}
 					else {
 						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
-							if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+							var responseDecoded = Base64.decode(httpRequest.responseText, true);
+							if (responseDecoded == "MEMORY_ERROR"){
 								successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 							}
 							totalResponseRequest = "";
-							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+							addFragmentRequest (1, responseDecoded);
 						}
 						// No recibimos la respuesta, volvemos a llamar.
 						else {
@@ -1868,12 +1884,13 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
-						if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+						var responseDecoded = Base64.decode(httpRequest.responseText, true);
+						if (responseDecoded == "MEMORY_ERROR") {
 							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
 							return;
 						}
 						//console.log("recibida la parte " + part);
-						totalResponseRequest += Base64.decode(httpRequest.responseText, true);
+						totalResponseRequest += responseDecoded;
 						// Si estan todas las partes llamamos al successcallback
 						if (part == totalParts) {
 							// Es una operacion de firma por lotes y tiene un callback propio
@@ -2880,7 +2897,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Invoca un Intent con la operacion seleccionada, la configuraci\u00F3n establecida y las campos del
-			 * formulario pasado como parametro. Si se define un callback para tratar el caso de exito o error de
+			 * formulario pasados como parametros. Si se define un callback para tratar el caso de exito o error de
 			 * la operacion, se intentara descargar el resultado devuelto por la app del servidor intermedio de
 			 * comunicacion. 
 			 *
@@ -2908,12 +2925,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				// Preguntamos repetidamente por el resultado
-				if (successCallback != null || errorCallback != null) {
-					if (idSession != null && idSession != undefined && 
-							((successCallback != undefined && successCallback != null) ||
-									(errorCallback != undefined && errorCallback != null))) {
-						getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, successCallback, errorCallback);
-					}
+				if (!!idSession && (!!successCallback || !!errorCallback)) {
+					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, successCallback, errorCallback);
 				}
 			}
 
@@ -3282,9 +3295,6 @@ var MiniApplet = ( function ( window, undefined ) {
 })(window, undefined);
 
 
-
-
-
 /**
  *  Base64 encode / decode
  *  http://www.webtoolkit.info/
@@ -3494,30 +3504,29 @@ var Base64 = {
 		}
 };
 
-//Paul Tero, July 2001
-//http://www.tero.co.uk/des/
-
-//Optimised for performance with large blocks by Michael Hayworth, November 2001
-//http://www.netdealing.com
-
-//THIS SOFTWARE IS PROVIDED "AS IS" AND
-//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-//ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-//FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-//DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-//OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-//HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-//OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-//SUCH DAMAGE.
-
-//des
-//this takes the key, the message, and whether to encrypt or decrypt
+/* Paul Tero, July 2001
+ * http://www.tero.co.uk/des/
+ * 
+ * Optimised for performance with large blocks by Michael Hayworth, November 2001
+ * http://www.netdealing.com
+ * 
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE. */
 var Cipher = {
 	tableStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
 	tableStr_URL_SAFE : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
 	
+	/* des
+	 * this takes the key, the message, and whether to encrypt or decrypt */
 	des : function  (key, message, encrypt, mode, iv, padding) {
 		//declaring this locally speeds things up a bit
 		var spfunction1 = new Array (0x1010400,0,0x10000,0x1010404,0x1010004,0x10404,0x4,0x10000,0x400,0x1010400,0x1010404,0x400,0x1000404,0x1010004,0x1000000,0x4,0x404,0x1000400,0x1000400,0x10400,0x10400,0x1010000,0x1010000,0x1000404,0x10004,0x1000004,0x1000004,0x10004,0,0x404,0x10404,0x1000000,0x10000,0x1010404,0x4,0x1010000,0x1010400,0x1000000,0x1000000,0x400,0x1010004,0x10000,0x10400,0x1000004,0x400,0x4,0x1000404,0x10404,0x1010404,0x10004,0x1010000,0x1000404,0x1000004,0x404,0x10404,0x1010400,0x404,0x1000400,0x1000400,0,0x10004,0x10400,0,0x1010004);
