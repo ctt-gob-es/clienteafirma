@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -252,11 +253,16 @@ final class Desensobrado extends JPanel {
 
             // Analizamos los datos para intentar determinar una extension por defecto
             final MimeHelper mh = new MimeHelper(recoveredData);
-            final String ext = mh.getExtension();
             ExtFilter fileFilter = null;
-            if (ext != null && (!name.toLowerCase().endsWith("." + ext) || ext.equals("html") && name.toLowerCase().endsWith(".htm") || ext.equals("jpg") && name.toLowerCase().endsWith(".jpeg"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            	name = name + "." + ext; //$NON-NLS-1$
-            	fileFilter = new ExtFilter(new String[] { ext }, mh.getDescription());
+            try {
+            	final String ext = mh.getExtension();
+            	if (ext != null && (!name.toLowerCase().endsWith("." + ext) || ext.equals("html") && name.toLowerCase().endsWith(".htm") || ext.equals("jpg") && name.toLowerCase().endsWith(".jpeg"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            		name = name + "." + ext; //$NON-NLS-1$
+            		fileFilter = new ExtFilter(new String[] { ext }, mh.getDescription());
+            	}
+            }
+            catch (final Exception e) {
+            	LOGGER.log(Level.WARNING, "No se pudo definir el filtro del dialogo de guardado", e); //$NON-NLS-1$
             }
 
             // Salvamos los datos

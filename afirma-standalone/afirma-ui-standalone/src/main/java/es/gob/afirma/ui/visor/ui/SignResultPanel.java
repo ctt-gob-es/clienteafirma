@@ -16,8 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
-import es.gob.afirma.cert.signvalidation.SignValidity;
-import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -46,7 +46,7 @@ final class SignResultPanel extends JPanel {
         // el tipo de contenido antes que el contenido
         this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
 
-        this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
+        this.resultTextLabel.setFont(getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
         this.descTextLabel.addAncestorListener(new RequestFocusListener(false));
@@ -61,7 +61,7 @@ final class SignResultPanel extends JPanel {
         setResultDescription(validity);
 
         // Colocamos los paneles
-        this.setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;

@@ -498,7 +498,7 @@ final class CipherManager {
                 throw new AOException("No se ha establecido una clave de cifrado"); //$NON-NLS-1$
             }
         }
-        else if (this.keyMode.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+        else if (this.keyMode.equals(AOCipherConstants.KEY_MODE_STRING)) {
             if (this.cipherPassword == null || this.cipherPassword.length == 0) {
                 this.cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), null, ACCEPTED_CHARS, true, this.parent); //$NON-NLS-1$
             }
@@ -577,7 +577,7 @@ final class CipherManager {
         // Si el modo de clave es por password, generamos la clave a partir de
         // el.
         // En caso contrario, requeriremos que nos den la clave
-        if (this.keyMode.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+        if (this.keyMode.equals(AOCipherConstants.KEY_MODE_STRING)) {
             if (this.cipherPassword == null || this.cipherPassword.length == 0) {
                 this.cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), this.parent); //$NON-NLS-1$
             }

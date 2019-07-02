@@ -82,7 +82,7 @@ final class Cifrado extends JPanel {
     // Constantes de los mecanismos de cifrado
     private final List<String> mecanismos = new ArrayList<>(
 		Arrays.asList(
-			AOCipherConstants.KEY_MODE_PASSWORD,
+			AOCipherConstants.KEY_MODE_STRING,
 			AOCipherConstants.KEY_MODE_USERINPUT
 		)
 	);
@@ -98,7 +98,7 @@ final class Cifrado extends JPanel {
     void cifrarActionPerformed(final JComboBox<String> comboMecanismo, final JComboBox<String> comboAlgoritmo, final JTextField campoFichero) {
         String algoritmo;
         final String mecanismo = this.mecanismos.get(comboMecanismo.getSelectedIndex());
-        if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+        if (mecanismo.equals(AOCipherConstants.KEY_MODE_STRING)) {
             algoritmo = this.algoritmoVc[comboAlgoritmo.getSelectedIndex()];
         }
         else {
@@ -114,7 +114,7 @@ final class Cifrado extends JPanel {
         }
         else {
             // Se selecciona el primer elemento del combo
-            if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+            if (mecanismo.equals(AOCipherConstants.KEY_MODE_STRING)) {
                 // Se muestra el asistente de cifrado con contrasena
                 new AsistenteCifradoContrasenia(algoritmo, campoFichero.getText());
             }
@@ -130,7 +130,7 @@ final class Cifrado extends JPanel {
      * @param comboAlgoritmo Combo que contiene el listado de algoritmos */
     void comboMecanismoItemStateChanged(final JComboBox<String> comboMecanismo, final JComboBox<String> comboAlgoritmo) {
         final String mecanismo = this.mecanismos.get(comboMecanismo.getSelectedIndex());
-        if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+        if (mecanismo.equals(AOCipherConstants.KEY_MODE_STRING)) {
             comboAlgoritmo.setModel(new DefaultComboBoxModel<>(this.algoritmoLc.toArray(new String[0])));
         }
         else {

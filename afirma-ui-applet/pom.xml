@@ -156,7 +156,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob.jmulticard</groupId>
+			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
 		</dependency>
 		

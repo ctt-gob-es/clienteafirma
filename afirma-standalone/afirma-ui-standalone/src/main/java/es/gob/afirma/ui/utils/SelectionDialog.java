@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
@@ -22,6 +23,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.ui.principal.Main;
 
 /** Clase para seleccionar un tipo de ventana de di&aacute;logo. */
@@ -102,7 +104,7 @@ public final class SelectionDialog {
 	 * @return Archivo seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
 	private static File showOpenDialog(final Component parent, final String title, final String defaultDir, final int selectionMode, final ExtFilter filter) {
 
-        String currentDir = (defaultDir != null) ? defaultDir : Main.getPreferences().get("dialog.load.dir", null); //$NON-NLS-1$
+        String currentDir = defaultDir != null ? defaultDir : Main.getPreferences().get("dialog.load.dir", null); //$NON-NLS-1$
         if (currentDir == null) {
             currentDir = "."; //$NON-NLS-1$
         }
@@ -194,8 +196,9 @@ public final class SelectionDialog {
     			dialogTitle,
     			null,
     			defaultName,
-    			fileFilter != null ? fileFilter.getExtensions() : null,
-    			fileFilter != null ? fileFilter.getDescription() : null,
+    			Arrays.asList(new GenericFileFilter(
+    					fileFilter != null ? fileFilter.getExtensions() : null,
+    					fileFilter != null ? fileFilter.getDescription() : null)),
     			parentComponent
 			);
         }

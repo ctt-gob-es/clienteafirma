@@ -5,10 +5,10 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import es.gob.afirma.cert.signvalidation.SignValidity;
-import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.ValidateBinarySignature;
 
 /** Prueba de validaci&oacute;n de firma binaria. */
 public class TestValidatebinarySignature {

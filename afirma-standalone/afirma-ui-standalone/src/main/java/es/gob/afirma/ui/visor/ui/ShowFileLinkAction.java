@@ -6,6 +6,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -112,7 +114,13 @@ final class ShowFileLinkAction {
     }
 
     private static String getCommonDataExtension(final byte[] dat) {
-    	final String ext = new MimeHelper(dat).getExtension();
+    	String ext = null;
+    	try {
+    		ext = new MimeHelper(dat).getExtension();
+    	}
+    	catch (final Exception e) {
+    		Logger.getLogger("es.gob.afirma").log(Level.WARNING, "Error al identificar el tipo de dato", e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
         return ext == null || ext.length() == 0 ? null : ext;
     }
 

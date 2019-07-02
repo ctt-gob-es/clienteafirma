@@ -14,12 +14,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 
 /** Invocar preferentemente de la siguiente manera:<br>
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
@@ -117,8 +119,9 @@ final class AsynchronousSaveData implements Runnable {
                     			AsynchronousSaveData.this.getDialogTitle(),
                     			null,
                     			"*" + (exts == null || exts.length == 0 ? "" : "." + exts[0]), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    			exts,
-                    			AsynchronousSaveData.this.getDescription(),
+                    			Arrays.asList(new GenericFileFilter(
+                    					exts,
+                    					AsynchronousSaveData.this.getDescription())),
                     			AsynchronousSaveData.this.getParent()
             			);
                     	if (outputFile == null) {
