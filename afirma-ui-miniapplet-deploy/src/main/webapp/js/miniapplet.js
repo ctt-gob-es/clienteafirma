@@ -3027,7 +3027,11 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
 				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
 					errorMessage = html.substring(html.indexOf(":=") + 2);
-					errorType = "java.lang.Exception";
+					if (html.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
 					errorCallback(errorType, errorMessage);
 					return false;
 				}
