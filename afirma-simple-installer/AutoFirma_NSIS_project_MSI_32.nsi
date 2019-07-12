@@ -117,7 +117,12 @@ Section "Programa" sPrograma
 	
 	SetOutPath $INSTDIR\$PATH
 
-	;Copiamos la JRE en el directorio de instalacion
+	;Si en el directorio de instalacion hay una JRE de una version anterior, se elimina
+	;para evitar errores al actualizarla 
+	IfFileExists $INSTDIR\$PATH\jre\*.* 0 +2
+		RMDir /r $INSTDIR\$PATH\jre
+
+	;Incluimos la JRE
 	File /r java32\jre
 	
 	;Incluimos todos los ficheros que componen nuestra aplicacion
@@ -129,8 +134,6 @@ Section "Programa" sPrograma
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
-   
-	;Creamos tambien el aceso directo al instalador
 
 	;creamos un acceso directo en el escitorio
 	MessageBox MB_YESNO "?Desea instalar un acceso directo a AutoFirma en su escritorio?" /SD IDYES IDNO +2
@@ -196,6 +199,7 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
 	
+
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
 	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
@@ -363,6 +367,7 @@ Function DeleteCertificateOnInstall
   Pop $1
   Pop $0
 FunctionEnd 
+
 
 ;--------------------------------------------------------------------
 ; Path functions

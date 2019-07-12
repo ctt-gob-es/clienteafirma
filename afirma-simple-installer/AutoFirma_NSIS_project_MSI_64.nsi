@@ -125,7 +125,12 @@ Section "Programa" sPrograma
 	
 	SetOutPath $INSTDIR\$PATH
 
-	;Copiamos la JRE en el directorio de instalacion
+	;Si en el directorio de instalacion hay una JRE de una version anterior, se elimina
+	;para evitar errores al actualizarla 
+	IfFileExists $INSTDIR\$PATH\jre\*.* 0 +2
+		RMDir /r $INSTDIR\$PATH\jre
+
+	;Incluimos la JRE
 	File /r java64\jre
 	
 	;Incluimos todos los ficheros que componen nuestra aplicacion
@@ -137,20 +142,7 @@ Section "Programa" sPrograma
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
-   
-	;Se cierra Firefox y Chrome si están abiertos
-	${nsProcess::FindProcess} "firefox.exe" $R2
-	StrCmp $R2 0 0 +1
-	${nsProcess::KillProcess} "firefox.exe" $R0
-	
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "chrome.exe" $R0
 
-	${nsProcess::Unload}
-
-	Sleep 2000
-	
 	;creamos un acceso directo en el escitorio
 	MessageBox MB_YESNO "?Desea instalar un acceso directo a AutoFirma en su escritorio?" /SD IDYES IDNO +2
 		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
@@ -222,6 +214,18 @@ Section "Programa" sPrograma
 	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 	
+	;Se cierra Firefox y Chrome si están abiertos
+	${nsProcess::FindProcess} "firefox.exe" $R2
+	StrCmp $R2 0 0 +1
+	${nsProcess::KillProcess} "firefox.exe" $R0
+	
+	${nsProcess::FindProcess} "chrome.exe" $R3
+	StrCmp $R3 0 0 +1
+	${nsProcess::KillProcess} "chrome.exe" $R0
+
+	${nsProcess::Unload}
+
+	Sleep 2000
 	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
