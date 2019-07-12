@@ -18,14 +18,13 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.util.logging.Logger;
 
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y aplicaciones nativas.
@@ -57,6 +56,8 @@ public final class StorageService extends HttpServlet {
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+
+		LOGGER.info(" == INICIO GUARDADO"); //$NON-NLS-1$
 
 		final String operation;
 		final String syntaxVersion;
@@ -123,6 +124,8 @@ public final class StorageService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
 		}
 		out.flush();
+
+		LOGGER.info(" == FIN GUARDADO"); //$NON-NLS-1$
 
 		// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
 		removeExpiredFiles();
