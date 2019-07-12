@@ -207,13 +207,21 @@
 			MiniApplet.saveDataToFile(consoleB64, "Guardar consola", "salida.txt", "txt", "Texto de consola");
 		}
 		
+		function alertOkCallback(param) {
+			alert("OK: " + param);
+		}
+		
+		function alertErrorCallback(param1, param2) {
+			alert("Error: " + param1 + ": " + param2);
+		}
+		
 	</script>
   </head>
 	<body>
 		<br/>
 		<br/>
 		<label for="certificateSerieParam">N&uacute;mero de serie del certificado firmante</label>
-		 <input id="certificateSerieParam" type="text" value="64 27 c1 43 12 3e 4c aa">&nbsp;(N&uacute;mero de serie de certificado en Hex. sin espacios)
+		 <input id="certificateSerieParam" type="text" value="">&nbsp;(N&uacute;mero de serie de certificado en Hex.)
 		<br/>
 		<br/>
 		<input type="button" value="Firmas Masivas" onclick="doSign2();">&nbsp;
