@@ -1571,9 +1571,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
 				else {
-					
-					console.log("Enviamos el mensaje al socket 2");
-					
+					console.log("Enviamos el mensaje al socket abierto");
 					processRequest (MiniApplet.AUTOFIRMA_CONNECTION_RETRIES)
 				}
 			}
@@ -1645,10 +1643,8 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 				}
 				else {
-					
-					console.log("Enviamos el mensaje al socket 1");
-					
 					// Enviamos la peticion
+					console.log("Enviamos el mensaje al socket");
 					processRequest (MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
 				}
 			}
@@ -1666,8 +1662,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				
 				// Establecemos que se reintente la conexion en caso de error
 				ws.onerror = function(evt) {
-					console.log("onerror: " + evt);
-					
+					console.log("Error en la comunicacion por websocket: " + evt);
 					sendEcho(ws, idSession, retries - 1);
 				}
 
@@ -1681,7 +1676,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				console.log("Respuesta de la peticion de eco");
 				
 				ws.onmessage = function (evt) {
-					console.log("Respuesta obtenida de la peticion real");
+					console.log("Respuesta obtenida de la operacion enviada");
 					processResponse(evt.data);
 				}
 				
@@ -1755,7 +1750,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					processSignResponse(data);
 				}
 				else {
-					console.log("Operacion desconocida. Se procesa su resultado.");
+					console.log("Operacion desconocida. Se devuelve directamente su resultado.");
 					if (!!successCallback) {
 						successCallback(data);
 					}
