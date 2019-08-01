@@ -12,6 +12,7 @@ package es.gob.afirma.standalone.protocol;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.EventObject;
 import java.util.logging.Level;
@@ -121,8 +122,31 @@ public final class ProtocolInvocationLauncher {
         JMulticardUtilities.configureJMulticard(jMulticardEnabled);
 
         // Se invoca la aplicacion para iniciar la comunicacion por socket
-        if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-            LOGGER.info("Se inicia la invocacion por servicio: " + urlString); //$NON-NLS-1$
+        if (urlString.startsWith("afirma://websocket?") || urlString.startsWith("afirma://websocket/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+        	 LOGGER.info("Se inicia el modo de comunicacion por websockets: " + urlString); //$NON-NLS-1$
+        	 try {
+        		 AfirmaWebSocketServer.startService(urlString);
+        	 }
+             catch(final UnsupportedProtocolException e) {
+             	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
+             	final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
+             	ProtocolInvocationLauncherErrorManager.showError(errorCode);
+             	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+             }
+        	 catch(final GeneralSecurityException | IOException e) {
+              	LOGGER.log(Level.SEVERE, "Ocurrio un error durante la carga del almacen de claves", e); //$NON-NLS-1$
+              	final String errorCode = e instanceof IOException ?
+              			ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_SSL_KEYSTORE :
+              			ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_SSL_KEYSTORE;
+              	ProtocolInvocationLauncherErrorManager.showError(errorCode);
+              	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+              }
+
+             return RESULT_OK;
+        }
+        // Se invoca la aplicacion para iniciar la comunicacion por socket
+        else if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.info("Se inicia el modo de comunicacion por sockets: " + urlString); //$NON-NLS-1$
             try {
             	ServiceInvocationManager.startService(urlString);
             }
@@ -139,6 +163,7 @@ public final class ProtocolInvocationLauncher {
         }
         // Se solicita una operacion de firma batch
         else if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.info("Se invoca a la aplicacion para el procesado de un lote de firma"); //$NON-NLS-1$
             try {
 
                 UrlParametersForBatch params = ProtocolInvocationUriParser.getParametersForBatch(urlString);
@@ -203,6 +228,7 @@ public final class ProtocolInvocationLauncher {
         }
         // Se solicita una operacion de seleccion de certificado
         else if (urlString.startsWith("afirma://selectcert?") || urlString.startsWith("afirma://selectcert/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.info("Se invoca a la aplicacion para la seleccion de un certificado"); //$NON-NLS-1$
             try {
                 final UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
 
@@ -464,11 +490,9 @@ public final class ProtocolInvocationLauncher {
             }
         }
 
-        // Se solicita una operacion de carga/multicarga
-        else if (
-    		urlString.startsWith("afirma://load?") //$NON-NLS-1$
-		) {
-            LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga/multicarga"); //$NON-NLS-1$
+        // Se solicita una operacion de carga de ficheros
+        else if (urlString.startsWith("afirma://load?")) { //$NON-NLS-1$
+            LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga de uno o varios ficheros"); //$NON-NLS-1$
 
             try {
                 UrlParametersToLoad params = ProtocolInvocationUriParser.getParametersToLoad(urlString);
@@ -541,8 +565,7 @@ public final class ProtocolInvocationLauncher {
             }
         }
         // Se solicita una operacion de recuperacion de logs
-        else if (urlString.startsWith("afirma://getLog?") //$NON-NLS-1$
-        		) {
+        else if (urlString.startsWith("afirma://getLog?")) { //$NON-NLS-1$
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de obtencion del log actual de la aplicacion"); //$NON-NLS-1$
 
             try {

@@ -107,6 +107,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Inicio (en min&uacute;sculas) de una ruta que invoca a la aplicaci&oacute;n por protocolo. */
     private static final String PROTOCOL_URL_START_LOWER_CASE = "afirma://"; //$NON-NLS-1$
 
+    /** Esquema y host de las URL de petici&oacute;n para la comunicaci&oacute;n por websockets. */
+    private final static String WEBSOCKET_REQUEST_PREFIX = PROTOCOL_URL_START_LOWER_CASE + "websocket"; //$NON-NLS-1$
+
     /** Indica si esta permitida la b&uacute;squeda de actualizaciones de la aplicaci&oacute;n. */
     private static boolean updatesEnabled = true;
 
@@ -614,7 +617,22 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
     			ProtocolInvocationLauncher.launch(args[0]);
-    			System.exit(0);
+
+    			// Segun sea el modo de comunicacion:
+    			// - Servidor intermedio:	Se llegara a este punto al completar una peticion de firma,
+    			//							que sera al volver de la llamada anterior al metodo "launch()".
+    			//							En este caso, ya se puede cerrar la aplicacion.
+    			// - Socket tradicional:	Nunca se llegara a este punto ya que el proceso se quedara
+    			//							permanentemente bloqueado en el bucle que abre hilos para
+    			//							atender las diversas peticiones.
+    			// - WebSocket:				Se llegara a este punto inmediatamente despues de llamar a la
+    			//							aplicacion ya que entonces se abre el socket y se atiende a las
+    			//							peticiones desde otros hilos. En estos casos no se debe cerrar
+    			//							la aplicacion, que debera permanecer abierta hasta que se cierre
+    			//							el socket.
+    			if (!args[0].startsWith(WEBSOCKET_REQUEST_PREFIX)) {
+    				System.exit(0);
+    			}
     		}
     		// Invocacion normal modo grafico
     		else {

@@ -10,14 +10,12 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -26,7 +24,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -34,7 +31,6 @@ import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.apple.AppleScript;
-import es.gob.afirma.standalone.AutoFirmaUtil;
 
 /** Gestor de la invocaci&oacute;n por <i>socket</i>. */
 public final class ServiceInvocationManager {
@@ -55,14 +51,6 @@ public final class ServiceInvocationManager {
 	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { CURRENT_PROTOCOL_VERSION };
 
 	private static final String IDSESSION = "idsession"; //$NON-NLS-1$
-
-	// parametros para carga del certificado SSL
-	private static final String KSPASS = "654321"; //$NON-NLS-1$
-	private static final String CTPASS = "654321"; //$NON-NLS-1$
-	private static final String KEYSTORE_NAME = "autofirma.pfx"; //$NON-NLS-1$
-	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
-	private static final String KEY_MANAGER_TYPE = "SunX509"; //$NON-NLS-1$
-	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
 
 	private static final String[] ENABLED_CIPHER_SUITES = new String[] {
 			"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
@@ -138,28 +126,9 @@ public final class ServiceInvocationManager {
 		checkSupportProtocol(getVersion(url));
 
 		try {
-			// ruta de la que debe buscar el fichero
-			final File sslKeyStoreFile = getKeyStoreFile();
-			if (sslKeyStoreFile == null) {
-				throw new KeyStoreException(
-					"No se encuentra el almacen para el cifrado de la comunicacion SSL" //$NON-NLS-1$
-				);
-			}
 
-			LOGGER.info("Se utilizara el siguiente almacen para establecer el socket SSL: " + sslKeyStoreFile.getAbsolutePath()); //$NON-NLS-1$
+			final SSLContext sc = SecureSocketUtils.getSecureSSLContext();
 
-			// pass del fichero
-			final char ksPass[] = KSPASS.toCharArray();
-			final char ctPass[] = CTPASS.toCharArray();
-			// generamos el key store desde el fichero del certificado, de tipo PKCS12
-			final KeyStore ks = KeyStore.getInstance(PKCS12);
-			ks.load(new FileInputStream(sslKeyStoreFile), ksPass);
-			// key manager factory de tipo SunX509
-			final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KEY_MANAGER_TYPE);
-			kmf.init(ks, ctPass);
-
-			final SSLContext sc = SSLContext.getInstance(SSLCONTEXT);
-			sc.init(kmf.getKeyManagers(), null, null);
 			LOGGER.info("Iniciando servicio local de firma: " + url); //$NON-NLS-1$
 			final SSLServerSocketFactory ssocketFactory = sc.getServerSocketFactory();
 
@@ -218,40 +187,9 @@ public final class ServiceInvocationManager {
         catch(final KeyManagementException e){
             LOGGER.severe("Error con el KeyManager: " + e); //$NON-NLS-1$
         }
-
-	}
-
-	/** Obtiene el fichero del almac&eacute;n con la clave SSL de alguno de los directorios
-	 * del sistema en los que puede estar.
-	 * @return Almac&eacute;n de claves o {@code null} si no se encontr&oacute;. */
-	private static File getKeyStoreFile() {
-
-		File appDir = AutoFirmaUtil.getApplicationDirectory();
-
-		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
-			return new File(appDir, KEYSTORE_NAME);
+		catch (final GeneralSecurityException e) {
+			LOGGER.severe("Error durante la carga del almacen de claves SSL: " + e); //$NON-NLS-1$
 		}
-
-		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			appDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
-			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
-				return new File(appDir, KEYSTORE_NAME);
-			}
-		}
-		else if (Platform.getOS() == Platform.OS.LINUX) {
-			appDir = AutoFirmaUtil.getLinuxAlternativeAppDir();
-			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
-				return new File(appDir, KEYSTORE_NAME);
-			}
-		}
-		else if (Platform.getOS() == Platform.OS.MACOSX) {
-			appDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
-			if (new File(appDir, KEYSTORE_NAME).exists()) {
-				return new File(appDir, KEYSTORE_NAME);
-			}
-		}
-
-		return null;
 	}
 
 	/** Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
