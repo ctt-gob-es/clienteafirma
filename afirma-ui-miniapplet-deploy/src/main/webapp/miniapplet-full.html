@@ -267,9 +267,11 @@
 		function browseFirma(title) {
 			try {
 
-				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc",
-						"Fichero para prueba de función load",
-						"C://Users//jose.rodriguez.gomez//Documents",
+				MiniApplet.getFileNameContentBase64(
+						title,
+						"csig,xsig,sig,pdf,xml",
+						"Fichero de firma electrónica",
+						null,
 						showLoadFirmaResultCallback, showErrorCallback);
 
 			} catch (e) {

@@ -14,9 +14,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.6.5";
+		var VERSION = "1.7.0";
 
-		var JAR_NAME = 'miniapplet-full_1_6_5.jar';
+		var JAR_NAME = 'miniapplet-full_1_7_0.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -75,7 +75,6 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		/* Identifica que se utilizara una aplicacion nativa de firma. */
 		var TYPE_JAVASCRIPT_WEB_SERVICE = "JAVASCRIPT_WEB_SERVICE";
-		var TYPE_JAVASCRIPT_SOCKET = "JAVASCRIPT_SOCKET";
 		var TYPE_JAVASCRIPT_WEBSOCKET = "JAVASCRIPT_WEBSOCKET";
 
 		/* --------------------------------- */
@@ -1009,7 +1008,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 			if (clientType == null ||
 					clientType == TYPE_JAVASCRIPT_WEB_SERVICE ||
-					clientType == TYPE_JAVASCRIPT_SOCKET ||
 					clientType == TYPE_JAVASCRIPT_WEBSOCKET) {
 				
 				var tempCliente = document.getElementById("miniApplet");
