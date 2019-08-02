@@ -433,6 +433,9 @@ public final class PreferencesManager {
 	/** Color de la fuente utilizada en el texto de la firma visible en pdf.*/
 	public static final String PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR = "pdfLayer2FontColor"; //$NON-NLS-1$
 
+	/** Indica el &aacute;ngulo que se debe rotar la firma.*/
+	public static final String PREFERENCE_PDF_SIGN_SIGNATUREROTATION = "pdfSignatureRotation"; //$NON-NLS-1$
+
 	/** Imagen de fondo de la firma visible en pdf.*/
 	public static final String PREFERENCE_PDF_SIGN_IMAGE = "pdfSignatureImage"; //$NON-NLS-1$
 

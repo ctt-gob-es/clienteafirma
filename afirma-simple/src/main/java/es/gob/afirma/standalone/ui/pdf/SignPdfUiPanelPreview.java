@@ -35,14 +35,13 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -108,7 +107,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int PREFERRED_WIDTH = 470;
-	private static final int PREFERRED_HEIGHT = 600;
+	private static final int PREFERRED_HEIGHT = 620;
 	private static final int VIEWLABEL_PREFERRED_WIDTH = 475;
 	private static final int VIEWLABEL_PREFERRED_HEIGHT = 140;
 	private static final int MAX_TEXT_SIZE = 50;
@@ -145,6 +144,16 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	}
 
 	JTextField signatureImagePath;
+
+	private final JButton browseImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.38")); //$NON-NLS-1$
+	JButton getBrowseImageButton() {
+		return this.browseImageButton;
+	}
+
+	final JButton clearImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.40")); //$NON-NLS-1$
+	JButton getClearImageButton() {
+		return this.clearImageButton;
+	}
 
 	private Font font;
 	Font getViewFont() {
@@ -193,14 +202,20 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return this.okButton;
 	}
 
-	private CustomComboBox colorCombobox;
-	CustomComboBox getColorCombobox() {
-		return this.colorCombobox;
-	}
-
 	private JComboBox<FontResource> fontFamilyCombo;
 	JComboBox<FontResource> getLetterType() {
 		return this.fontFamilyCombo;
+	}
+
+
+	private JComboBox<RotationAngles> rotateSignature;
+	JComboBox<RotationAngles> getRotateSignature() {
+		return this.rotateSignature;
+	}
+
+	private CustomComboBox colorCombobox;
+	CustomComboBox getColorCombobox() {
+		return this.colorCombobox;
 	}
 
 	SpinnerNumberModel sizeSpinnerModel = new SpinnerNumberModel(
@@ -228,7 +243,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
 						   final Properties p,
 						   final BufferedImage im,
-						   JDialog parent) {
+						   final JDialog parent) {
 
 		if (spul == null) {
 			throw new IllegalArgumentException(
@@ -238,6 +253,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.listener = spul;
 		this.prop = p;
 		this.style = 0;
+
 		this.image = im;
 		this.signImage = null;
 
@@ -307,7 +323,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
             public void drop(final DropTargetDropEvent dtde) {
 
                 final Transferable tr = dtde.getTransferable();
-                if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                if (getRotateSignature().getSelectedItem() == RotationAngles.DEGREES_0 &&
+                		tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY);
                     final Object transData;
                     try {
@@ -381,7 +398,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
             @Override
             public void dragEnter(final DropTargetDragEvent dtde) {
-                if (!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                if (getRotateSignature().getSelectedItem() != RotationAngles.DEGREES_0 ||
+                		!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     dtde.rejectDrag();
                 }
             }
@@ -458,7 +476,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.signatureText.addKeyListener(this);
 
 		final JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setMinimumSize(new Dimension(400, 80));
+		scrollPane.setMinimumSize(new Dimension(400, 90));
 		scrollPane.setViewportView(this.signatureText);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -494,6 +512,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.fontFamilyCombo.setRenderer(new ComboRenderer());
 		this.fontFamilyCombo.addKeyListener(this);
 		this.fontFamilyCombo.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.20")); //$NON-NLS-1$
+		this.fontFamilyCombo.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.20")); //$NON-NLS-1$
 
 		final JComponent comp = this.fontSizeSpinner.getEditor();
 	    final JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
@@ -506,7 +525,22 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			}
 		);
 		this.fontSizeSpinner.getEditor().getComponent(0).addKeyListener(this);
+		this.fontSizeSpinner.getAccessibleContext().setAccessibleName("SignPdfUiPreview.18"); //$NON-NLS-1$
 		this.fontSizeSpinner.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.18")); //$NON-NLS-1$
+
+		this.rotateSignature = new JComboBox<>(RotationAngles.values());
+		this.rotateSignature.addKeyListener(this);
+		this.rotateSignature.addItemListener(
+			e -> {
+				getBrowseImageButton().setEnabled(getRotateSignature().getSelectedItem() == RotationAngles.DEGREES_0);
+				getClearImageButton().setEnabled(getRotateSignature().getSelectedItem() == RotationAngles.DEGREES_0);
+				clearSignImage();
+				showPreview();
+			}
+		);
+		this.rotateSignature.getAccessibleContext().setAccessibleName("SignPdfUiPreview.42"); //$NON-NLS-1$
+		this.rotateSignature.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.42")); //$NON-NLS-1$
+
 
 		final GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -517,6 +551,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		cons.weightx = 0.0;
 		cons.gridx++;
 		fontPanel.add(this.fontSizeSpinner, cons);
+		cons.gridx++;
+		fontPanel.add(this.rotateSignature, cons);
 
 		final JPanel fontStylePanel = new JPanel(new GridBagLayout());
 
@@ -648,10 +684,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		fontStylePanel.add(this.colorCombobox, cons);
 
 		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
 		c.insets = new Insets(4,  0,  0,  0);
 		c.gridy = 0;
+		c.anchor = GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		panel.add(signatureImagePanel, c);
 		c.gridy++;
 		panel.add(signatureTextLabel, c);
@@ -672,23 +709,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		final JLabel signatureImageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPreview.37")); //$NON-NLS-1$
 		this.signatureImagePath = new JTextField();
 		this.signatureImagePath.setEditable(false);
-		final JButton browseImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.38")); //$NON-NLS-1$
-		browseImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.39")); //$NON-NLS-1$
-		browseImageButton.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent evt) {
-						selectSignatureImage();
-					}
-				});
-		final JButton clearImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.40")); //$NON-NLS-1$
-		clearImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.41")); //$NON-NLS-1$
-		clearImageButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				clearSignImage();
-				showPreview();
-			}
+		this.browseImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.39")); //$NON-NLS-1$
+		this.browseImageButton.addActionListener(
+				evt -> selectSignatureImage());
+		this.clearImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.41")); //$NON-NLS-1$
+		this.clearImageButton.addActionListener(evt -> {
+			clearSignImage();
+			showPreview();
 		});
 
 		final GridBagConstraints imageCons = new GridBagConstraints();
@@ -703,9 +730,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		signatureImagePanel.add(this.signatureImagePath, imageCons);
 		imageCons.weightx = 0.0;
 		imageCons.gridx = 1;
-		signatureImagePanel.add(browseImageButton, imageCons);
+		signatureImagePanel.add(this.browseImageButton, imageCons);
 		imageCons.gridx = 2;
-		signatureImagePanel.add(clearImageButton, imageCons);
+		signatureImagePanel.add(this.clearImageButton, imageCons);
 
 		return signatureImagePanel;
 	}
@@ -776,7 +803,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					getProp().put(PdfExtraParams.LAYER2_FONTFAMILY, ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex());
 					getProp().put(PdfExtraParams.LAYER2_FONTSIZE, Integer.toString(getSelectedSize()));
 					getProp().put(PdfExtraParams.LAYER2_FONTSTYLE, Integer.toString(getStyleIndex()));
-					getProp().put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey()); //*/
+					getProp().put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey());
+					getProp().put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees()));
 				}
 				if (getSignImage() != null ) {
 					getProp().put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(getSignImage()));
@@ -914,6 +942,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
 
+		final String rotateSign = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION);
+		getRotateSignature().setSelectedItem(RotationAngles.parse(Integer.parseInt(rotateSign)));
+
 		final String imagePath = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
 		if (imagePath != null && !imagePath.isEmpty()) {
 			try {
@@ -980,6 +1011,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
 
+		final String rotateSign = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION);
+		getRotateSignature().setSelectedItem(RotationAngles.parse(Integer.parseInt(rotateSign)));
+
 		final String imagePath = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
 		if (imagePath != null && !imagePath.isEmpty()) {
 			try {
@@ -1010,6 +1044,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			);
 			PreferencesManager.put(
 				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty(PdfExtraParams.LAYER2_FONTCOLOR)
+			);
+			PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION, params.getProperty(PdfExtraParams.SIGNATURE_ROTATION)
 			);
 		}
 		else {
@@ -1080,7 +1117,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return valid;
 	}
 
-	static String getInsertImageBase64(BufferedImage bi) {
+	static String getInsertImageBase64(final BufferedImage bi) {
 		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
 			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
 			return Base64.encode(osImage.toByteArray());
@@ -1160,7 +1197,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.signatureImagePath.setText(null);
 	}
 
-	public static String breakLines(final String input, final int maxLineLength, final FontMetrics fm ) {
+	public static String breakLines(final String input, final double maxLineLength, final FontMetrics fm ) {
 	    final String[] tokens = input.split(SPLIT_REGEXP);
 	    final StringBuilder output = new StringBuilder(input.length());
 	    int lineLen = 0;
@@ -1200,30 +1237,76 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    g.setColor(this.colorCombobox.getSelectedItem().getColor());
 	    final int scaledSize = Math.max(1,Math.round(getViewFont().getSize() / this.scale) - 3);
 	    g.setFont(getViewFont().deriveFont(getStyle(), scaledSize));
-	    final int x = 5;
-	    int y;
-	    if (getProp().getProperty("signatureField") != null) { //$NON-NLS-1$
-	    	y = 0;
-	    }
-	    else {
-	    	y = 0;
-	    }
-	    int textLength;
-	    for (final String line : getTextArea().getText().split("\n")) { //$NON-NLS-1$
-	    	textLength = g.getFontMetrics().stringWidth(line);
-	    	if (textLength > this.image.getWidth()) {
-	    		final String lineWrapped = breakLines(line, this.image.getWidth(), g.getFontMetrics());
-	    		for (final String s : lineWrapped.split("\n")) { //$NON-NLS-1$
-	    			g.drawString(s, x, y += g.getFontMetrics().getHeight());
-	    		}
-	    	}
-	    	else {
-	    		g.drawString(line, x, y += g.getFontMetrics().getHeight());
-	    	}
-		}
+
+	    final RotationAngles rotationGrades = (RotationAngles) this.rotateSignature.getSelectedItem();
+
+	    drawRotateText(g, this.image.getWidth(), this.image.getHeight(), getTextArea().getText(), rotationGrades);
+
 	    g.dispose();
 
+
 	    getViewLabel().setIcon(new ImageIcon(bi));
+	}
+
+	private static void drawRotateText(final Graphics2D g, final int imageWidth, final int imageHeight, final String text, final RotationAngles rotation) {
+
+		final AffineTransform originalTransform = g.getTransform();
+
+		final FontMetrics fontMetrics = g.getFontMetrics();
+		final int fontHeight = fontMetrics.getHeight();
+		//final int fontHeight = g.getFont().getSize();
+		final int MARGIN = 4;
+
+		int lineWidth;
+		int posX;
+		int posY;
+
+		// Realizamos la rotacion correspondiente y calculamos las referencias
+		// para el posicionamiento del texto
+		switch (rotation) {
+		case DEGREES_90:
+			lineWidth = imageHeight;
+			posX = -imageHeight + MARGIN;
+			posY = 0;
+			g.rotate(-Math.PI/2);
+			break;
+		case DEGREES_180:
+			lineWidth = imageWidth;
+			posX = -imageWidth + MARGIN;
+			posY = -imageHeight;
+			g.rotate(Math.PI);
+			break;
+		case DEGREES_270:
+			lineWidth = imageHeight;
+			posX = MARGIN;
+			posY = -imageWidth;
+			g.rotate(Math.PI/2);
+			break;
+		default:  //case 0:
+			lineWidth = imageWidth;
+			posX = MARGIN;
+			posY = 0;
+			break;
+		}
+
+		// Imprimimos el texto en lineas en base a las referencias determinadas
+		// por la rotacion
+
+		int textLength;
+		for (final String line : text.split("\n")) { //$NON-NLS-1$
+			textLength = fontMetrics.stringWidth(line);
+			if (textLength > lineWidth) {
+				final String lineWrapped = breakLines(line, lineWidth, fontMetrics);
+				for (final String s : lineWrapped.split("\n")) { //$NON-NLS-1$
+					g.drawString(s, posX, posY += fontHeight);
+				}
+			}
+			else {
+				g.drawString(line, posX, posY += fontHeight);
+			}
+		}
+
+		g.setTransform(originalTransform);
 	}
 
 	private void resizeImage(final JComponent panel) {
@@ -1505,5 +1588,54 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
     		);
 	        add(this.addImageItem);
 	    }
+	}
+
+	/**
+	 * Niveles de rotaci&oacute;n permitidos para el texto.
+	 */
+	private enum RotationAngles {
+		DEGREES_0 (0, "RotationModel.0"), //$NON-NLS-1$
+		DEGREES_90(90, "RotationModel.1"), //$NON-NLS-1$
+		DEGREES_180(180, "RotationModel.2"), //$NON-NLS-1$
+		DEGREES_270(270, "RotationModel.3"); //$NON-NLS-1$
+
+		private int degrees;
+		private String text;
+
+		private RotationAngles(final int degrees, final String text) {
+			this.degrees = degrees;
+			this.text = text;
+		}
+
+		public int getDegrees() {
+			return this.degrees;
+		}
+
+		/**
+		 * Recupera el texto que identifica al &aacute;ngulo de rotaci&oacute;n.
+		 * @return Texto descriptivo del &aacute;gulo de rotaci&oacute;n.
+		 */
+		public String getText() {
+			return SignPdfUiMessages.getString(this.text);
+		}
+
+		@Override
+		public String toString() {
+			return getText();
+		}
+
+		/**
+		 * Identifica qu&eacute; elemento del enumerado se corresponde con los grados indicados. obtener un elemento del numerado
+		 * @param degrees Grados de rotaci&oacute;n deseados.
+		 * @return &Aacute;ngulo de rotaci&oacute;n o nulo si no es un &aacute;ngulo permitido.
+		 */
+		public static RotationAngles parse(final int degrees) {
+			for (final RotationAngles angle : values()) {
+				if (angle.getDegrees() == degrees) {
+					return angle;
+				}
+			}
+			return null;
+		}
 	}
 }
