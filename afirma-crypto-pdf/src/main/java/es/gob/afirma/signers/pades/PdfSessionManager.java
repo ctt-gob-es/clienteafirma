@@ -90,7 +90,7 @@ public final class PdfSessionManager {
     	final boolean doNotUseCertChainOnPostSign = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_USE_CERTCHAIN_ON_POSTSIGN));
 
     	// Rotacion del campo de firma (90 grados)
-    	final boolean signatureRotation = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
+    	final int signatureRotation = Integer.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
 
     	// Imagen de la rubrica
 		final com.aowagie.text.Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
@@ -419,7 +419,7 @@ public final class PdfSessionManager {
 
 		// Rubrica de la firma
 		if (rubric != null) {
-			if (signatureRotation) {
+			if (signatureRotation != 0) {
 				LOGGER.warning(
 					"Se ha indicado rotar la firma y ademas insertar una imagen, pero las firmas rotadas" //$NON-NLS-1$
 						+ " no aceptan imagenenes. No se usara la imagen proporcionada" //$NON-NLS-1$
@@ -455,7 +455,7 @@ public final class PdfSessionManager {
 		}
 
 		if (signaturePositionOnPage != null && signatureField == null) {
-			if (!signatureRotation) {
+			if (signatureRotation == 0) {
 				sap.setVisibleSignature(signaturePositionOnPage, page, null);
 			}
 			else {
@@ -466,7 +466,7 @@ public final class PdfSessionManager {
 						signaturePositionOnPage,
 						page,
 						null,
-						DEFAULT_SIGNATURE_ROTATION
+						signatureRotation
 					);
 				}
 				catch (final DocumentException e) {
