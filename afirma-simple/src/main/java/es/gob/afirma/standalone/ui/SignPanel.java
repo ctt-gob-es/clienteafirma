@@ -392,7 +392,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 config.setSigner(AOSignerFactory.getSigner(
 					 PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF))
 					 );
-			 // Se comprueba si ya está firmada para deshabilitar la opcion de marca visible
+			 // Se comprueba si ya esta firmada para deshabilitar la opcion de marca visible
 			 if (config.getSigner() instanceof AOPDFSigner &&
 					 config.getSigner().isSign(data)) {
 				 config.setCryptoOperation(CryptoOperation.COSIGN);

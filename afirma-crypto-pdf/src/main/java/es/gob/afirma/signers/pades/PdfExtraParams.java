@@ -320,7 +320,7 @@ public final class PdfExtraParams {
 
     /** Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.
      * No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256. */
-    static final String OWNER_PASSWORD_STRING = "ownerPassword";//$NON-NLS-1$
+    public static final String OWNER_PASSWORD_STRING = "ownerPassword";//$NON-NLS-1$
 
     /** Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
      * act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
@@ -334,7 +334,7 @@ public final class PdfExtraParams {
      * <b>Si el par&aacute;metro <code>headless</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
      * de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
      * No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256. */
-    static final String ALLOW_SIGNING_CERTIFIED_PDFS = "allowSigningCertifiedPdfs";//$NON-NLS-1$
+    public static final String ALLOW_SIGNING_CERTIFIED_PDFS = "allowSigningCertifiedPdfs";//$NON-NLS-1$
 
     /** Tipo de sello de tiempo a aplicar:
      * <ul>

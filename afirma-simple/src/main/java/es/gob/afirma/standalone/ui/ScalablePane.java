@@ -82,10 +82,16 @@ final class ScalablePane extends JPanel {
 
     protected void generateScaledInstance() {
         this.scaled = null;
-        if (isToFit()) {
-            this.scaled = getScaledInstanceToFit(this.master, getSize());
-        } else {
-            this.scaled = getScaledInstanceToFill(this.master, getSize());
+        final Dimension size = getSize();
+        if (size == null || (int) size.getWidth() == 0 || (int) size.getHeight() == 0) {
+        	this.scaled = this.master;
+        }
+        else {
+        	if (isToFit()) {
+        		this.scaled = getScaledInstanceToFit(this.master, getSize());
+        	} else {
+        		this.scaled = getScaledInstanceToFill(this.master, getSize());
+        	}
         }
     }
 

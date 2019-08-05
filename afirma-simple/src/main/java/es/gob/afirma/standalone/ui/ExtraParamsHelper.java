@@ -24,7 +24,7 @@ final class ExtraParamsHelper {
 		// No permitimos la instanciacion
 	}
 
-	final static Properties loadExtraParamsForSigner(final AOSigner signer) {
+	static Properties loadExtraParamsForSigner(final AOSigner signer) {
 
 		final Properties p;
 		if (signer instanceof AOFacturaESigner) {
@@ -214,5 +214,22 @@ final class ExtraParamsHelper {
 					"explicit" //$NON-NLS-1$
 		);
         return p;
+	}
+
+	/**
+	 * Agrega a la configuraci&oacute;n de firma la opci&oacute;n para permitir firmar documentos certificados.
+	 * @param extraParams Configuraci&oaucte;n a la que agregar la opci&oacute;n.
+	 */
+	public static void addParamToCertifiedPdf(final Properties extraParams) {
+		extraParams.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, Boolean.TRUE.toString());
+	}
+
+	/**
+	 * Agrega a la configuraci&oacute;n de firma la opci&oacute;n para permitir firmar documentos con
+	 * firmas previas no registradas.
+	 * @param extraParams Configuraci&oaucte;n a la que agregar la opci&oacute;n.
+	 */
+	public static void addParamToUnregisteredPdf(final Properties extraParams) {
+		extraParams.setProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES, Boolean.TRUE.toString());
 	}
 }

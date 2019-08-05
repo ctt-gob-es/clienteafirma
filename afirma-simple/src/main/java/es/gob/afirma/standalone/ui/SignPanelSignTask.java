@@ -24,6 +24,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -196,47 +198,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		data,
         		signConfig.getSignatureFormatName());
 
+        	// Ejecutamos la operacion de firma apropiada
             try {
-                if (signConfig.getCryptoOperation() == CryptoOperation.COSIGN) {
-                	signResult = currentSigner.cosign(
-            			dataToSign,
-            			signatureAlgorithm,
-            			pke.getPrivateKey(),
-            			pke.getCertificateChain(),
-            			signConfig.getExtraParams()
-        			);
-                }
-                else if(signConfig.getCryptoOperation() == CryptoOperation.COUNTERSIGN_LEAFS) {
-                	signResult = currentSigner.countersign(
-            			dataToSign,
-            			signatureAlgorithm,
-            			CounterSignTarget.LEAFS,
-            			null,
-            			pke.getPrivateKey(),
-            			pke.getCertificateChain(),
-            			signConfig.getExtraParams()
-        			);
-                }
-                else if(signConfig.getCryptoOperation() == CryptoOperation.COUNTERSIGN_TREE) {
-                	signResult = currentSigner.countersign(
-            			dataToSign,
-            			signatureAlgorithm,
-            			CounterSignTarget.TREE,
-            			null,
-            			pke.getPrivateKey(),
-            			pke.getCertificateChain(),
-            			signConfig.getExtraParams()
-        			);
-                }
-                else {
-                	signResult = currentSigner.sign(
-            			dataToSign,
-            			signatureAlgorithm,
-            			pke.getPrivateKey(),
-            			pke.getCertificateChain(),
-            			signConfig.getExtraParams()
-        			);
-                }
+                signResult = signData(dataToSign, currentSigner, signConfig.getCryptoOperation(),
+                		signatureAlgorithm, pke, signConfig.getExtraParams(), onlyOneFile, this.parent);
             }
             catch(final AOCancelledOperationException e) {
             	this.signExecutor.finishTask();
@@ -251,15 +216,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	}
             	continue;
             }
-            catch(final PdfIsCertifiedException e) {
-            	LOGGER.warning("PDF no firmado por estar certificado: " + e); //$NON-NLS-1$
-            	if (onlyOneFile) {
-            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.27")); //$NON-NLS-1$
-            		this.signExecutor.finishTask();
-            		return;
-            	}
-            	continue;
-            }
             catch(final BadPdfPasswordException e) {
             	LOGGER.warning("PDF protegido con contrasena mal proporcionada: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
@@ -269,13 +225,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	}
             	continue;
             }
-            catch(final PdfHasUnregisteredSignaturesException e) {
-            	LOGGER.warning("PDF con firmas no registradas: " + e); //$NON-NLS-1$
-            	if (onlyOneFile) {
-            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.28")); //$NON-NLS-1$
-            		this.signExecutor.finishTask();
-            		return;
-            	}
+            catch(final SingleSignatureException e) {
+            	LOGGER.warning("Error en una firma del lote, se continua con la siguiente: " + e); //$NON-NLS-1$
             	continue;
             }
             catch(final Exception e) {
@@ -370,6 +321,105 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			);
         }
 
+    }
+
+    /**
+     * Ejecuta una operaci&oacute;n de firma.
+     * @param data Datos a firmar.
+     * @param signer Manejador de firma con el que realizar la operaci&oacute;n.
+     * @param cop Typo de operaci&oacute;n.
+     * @param algorithm Algoritmo de firma.
+     * @param pke Referencia al certificado y clave de firma.
+     * @param extraParams Configuraci&oacute;n de firma.
+     * @return Firma electr&oacute;nica generada.
+     * @throws AOException Cuando se produce un error relacionado a la generaci&oacute;n del formato de firma.
+     * @throws IOException Cuando se produce un error relacionado a la lectura de los datos a firmar.
+     * @throws SingleSignatureException Cuando se produce un error en una firma dentro de un proceso masivo.
+     */
+    private static byte[] signData(final byte[] data, final AOSigner signer, final CryptoOperation cop, final String algorithm,
+    		final PrivateKeyEntry pke, final Properties extraParams, final boolean onlyOneFile, final Component parent)
+    				throws AOException, IOException, SingleSignatureException {
+
+    	byte[] signResult;
+
+    	try {
+    		switch (cop) {
+    		case COSIGN:
+    			signResult = signer.cosign(
+    					data,
+    					algorithm,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+    					);
+    			break;
+
+    		case COUNTERSIGN_LEAFS:
+    			signResult = signer.countersign(
+    					data,
+    					algorithm,
+    					CounterSignTarget.LEAFS,
+    					null,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+    					);
+    			break;
+
+    		case COUNTERSIGN_TREE:
+    			signResult = signer.countersign(
+    					data,
+    					algorithm,
+    					CounterSignTarget.TREE,
+    					null,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+    					);
+    			break;
+
+    		default:	// Firma
+    			signResult = signer.sign(
+    					data,
+    					algorithm,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+    					);
+    		}
+    	}
+    	catch(final PdfIsCertifiedException e) {
+        	LOGGER.warning("PDF no firmado por estar certificado: " + e); //$NON-NLS-1$
+        	if (!onlyOneFile) {
+        		throw new SingleSignatureException(e);
+        	}
+        	final boolean resign = showConfirmRequest(parent, SimpleAfirmaMessages.getString("SignPanel.27")); //$NON-NLS-1$
+        	if (!resign) {
+        		LOGGER.warning("El usuario decidio no firmar el documento para evitar corromper las firmas del PDF certificado"); //$NON-NLS-1$
+        		throw new AOCancelledOperationException("El usuario decidio no firmar el documento para evitar corromper firmas del PDF certificado"); //$NON-NLS-1$
+        	}
+
+        	final Properties newExtraParams = (Properties) extraParams.clone();
+        	ExtraParamsHelper.addParamToCertifiedPdf(newExtraParams);
+        	signResult = signData(data, signer, cop, algorithm, pke, newExtraParams, onlyOneFile, parent);
+        }
+        catch(final PdfHasUnregisteredSignaturesException e) {
+        	LOGGER.warning("PDF con firmas no registradas: " + e); //$NON-NLS-1$
+        	if (!onlyOneFile) {
+        		throw new SingleSignatureException(e);
+        	}
+        	final boolean resign = showConfirmRequest(parent, SimpleAfirmaMessages.getString("SignPanel.28")); //$NON-NLS-1$
+        	if (!resign) {
+        		LOGGER.warning("El usuario decidio no firmar el documento para evitar corromper firmas sin registrar"); //$NON-NLS-1$
+        		throw new AOCancelledOperationException("El usuario decidio no firmar el documento para evitar corromper firmas sin registrar"); //$NON-NLS-1$
+        	}
+
+        	final Properties newExtraParams = (Properties) extraParams.clone();
+        	ExtraParamsHelper.addParamToUnregisteredPdf(newExtraParams);
+        	signResult = signData(data, signer, cop, algorithm, pke, newExtraParams, onlyOneFile, parent);
+        }
+
+    	return signResult;
     }
 
     /** Guarda una firma en disco permitiendo al usuario seleccionar el fichero
@@ -588,6 +638,20 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 			JOptionPane.ERROR_MESSAGE
 		);
+    }
+
+    /** Muestra un di&aacute;logo para indicar al usuario que se ha encontrado una dificultad durante
+     * la operaci&oacute;n y consultarle si desea continuar o no con ella.
+     * @param message Mensaje de advertencia. */
+    static boolean showConfirmRequest(final Component parent, final String message) {
+		final int response = AOUIFactory.showConfirmDialog(
+			parent,
+			message,
+			SimpleAfirmaMessages.getString("SimpleAfirma.8"), //$NON-NLS-1$
+			JOptionPane.YES_NO_OPTION,
+			JOptionPane.WARNING_MESSAGE
+		);
+		return response == JOptionPane.YES_OPTION;
     }
 
     private byte[] pluginsPreProcess(final byte[] data, final String format) {
