@@ -448,7 +448,7 @@ public final class AOPDFSigner implements AOSigner {
 
     			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(
 					certChain,
-					pcks7.getSignDate().getTime()
+					pcks7.getSignDate() != null ? pcks7.getSignDate().getTime() : null
 				);
 
     			// Extraemos el PKCS#1 de la firma
