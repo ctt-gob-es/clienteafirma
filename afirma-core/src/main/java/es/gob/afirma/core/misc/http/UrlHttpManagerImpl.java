@@ -233,6 +233,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			conn = (HttpURLConnection) uri.openConnection();
 		}
 
+		conn.setUseCaches(false);
+		conn.setDefaultUseCaches(false);
+
 		conn.setRequestMethod(method.toString());
 
 		// Trabajamos las cabeceras, las por defecto y las que nos indiquen
