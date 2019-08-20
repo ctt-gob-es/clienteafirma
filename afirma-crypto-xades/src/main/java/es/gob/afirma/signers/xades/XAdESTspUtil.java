@@ -69,9 +69,7 @@ public final class XAdESTspUtil {
 	public static byte[] timestampXAdES(final byte[] xml,
                                         final Properties extraParams) throws AOException {
 		if (extraParams == null) {
-			throw new AOException(
-				"No se han proporcionado los datos de configuracion de la TSA" //$NON-NLS-1$
-			);
+			return xml;
 		}
 
 		final TsaParams tsaParams;
@@ -79,9 +77,7 @@ public final class XAdESTspUtil {
 			tsaParams = new TsaParams(extraParams);
 		}
 		catch (final Exception e) {
-			throw new AOException(
-				"Los datos de configuracion de la TSA son incorrectos: " + e, e //$NON-NLS-1$
-			);
+			return xml;
 		}
 
 		final Document doc;
@@ -203,7 +199,7 @@ public final class XAdESTspUtil {
 		);
 	}
 
-	private final static byte[] getSignatureNodeDigest(final Document doc,
+	private static byte[] getSignatureNodeDigest(final Document doc,
 			                                           final String algorithm) throws NoSuchAlgorithmException,
 	                                                                                  IOException {
 		final NodeList nl = doc.getElementsByTagNameNS(
