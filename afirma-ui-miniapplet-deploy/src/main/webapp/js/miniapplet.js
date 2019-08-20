@@ -916,7 +916,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			return clienteFirma.getErrorType();
 		}
 		
-
 		var setServlets = function (storageServlet,  retrieverServlet) {
 			
 			storageServletAddress = storageServlet;
@@ -2012,8 +2011,12 @@ var MiniApplet = ( function ( window, undefined ) {
 			/** Version del protocolo utilizada. */
 			var PROTOCOL_VERSION = 1;
 			
-			/* Indica si ya se ha detectado que la aplicacion no esta instalada  */
+			/** Indica si ya se ha detectado que la aplicacion no esta instalada  */
 			var wrongInstallation = true;
+			
+			/** Certificado en base 64 que se deve usar por defecto cuando la opcion stickySignatory
+			 * este activada. */
+			var stickyCertificate;
 			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
@@ -2053,6 +2056,11 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				var opId = "selectcert";
 				
+				// Si hay un certificado prefijado, lo agregamos a los parametros extra
+				if (stickySignatory && !!stickyCertificate) {
+					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
+				}
+				
 				var i = 0;
 				var params = new Array();
 				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
@@ -2065,7 +2073,7 @@ var MiniApplet = ( function ( window, undefined ) {
 																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
-				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (extraParams != null && extraParams != undefined) {	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
 			
 				var url = buildUrl(opId, params);
@@ -2133,6 +2141,11 @@ var MiniApplet = ( function ( window, undefined ) {
 					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 				}
 
+				// Si hay un certificado prefijado, lo agregamos a los parametros extra
+				if (stickySignatory && !!stickyCertificate) {
+					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
+				}
+				
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
@@ -2192,6 +2205,11 @@ var MiniApplet = ( function ( window, undefined ) {
 					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 				}
 
+				// Si hay un certificado prefijado, lo agregamos a los parametros extra
+				if (stickySignatory && !!stickyCertificate) {
+					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
+				}
+				
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
@@ -2248,6 +2266,11 @@ var MiniApplet = ( function ( window, undefined ) {
 					batchB64 = batchB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 				}
 
+				// Si hay un certificado prefijado, lo agregamos a los parametros extra
+				if (stickySignatory && !!stickyCertificate) {
+					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
+				}
+				
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
 				
@@ -2753,12 +2776,26 @@ var MiniApplet = ( function ( window, undefined ) {
 				var certificate;
 				var signature;
 				var sepPos = html.indexOf('|');
+
+				// En caso de recibir un unico parametro, este sera la firma en el caso de las operaciones de firma y el
+				// certificado cuando se pidio seleccionar uno 
 				if (sepPos == -1) {
 					if (cipherKey != undefined && cipherKey != null) {
 						signature = decipher(html, cipherKey);
 					}
 					else {
 						signature = fromBase64UrlSaveToBase64(html);
+					}
+					
+					// Guardamos el dato, por si es necesario para la seleccion
+					// de certificado automatica
+					if (!!stickySignatory) {
+						if (!!signature) {
+							stickyCertificate = signature;
+						}
+					}
+					else {
+						stickyCertificate = null;
 					}
 				}
 				else {
@@ -2770,13 +2807,22 @@ var MiniApplet = ( function ( window, undefined ) {
 						certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
 						signature = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
 					}
+					
+					if (!!stickySignatory) {
+						if (!!certificate) {
+							stickyCertificate = certificate;
+						}
+					}
+					else {
+						stickyCertificate = null;
+					}
 				}
 
 				successCallback(signature, certificate);
 
 				return false;
 			}
-
+			
 			function errorResponseFunction (type, message, errorCallback) {
 
 				errorType = (type != null && type.length > 0) ?
@@ -2787,7 +2833,61 @@ var MiniApplet = ( function ( window, undefined ) {
 					errorCallback(errorType, errorMessage);
 				}
 			}
+			
+			/** Agrega a los extraParams un filtro de seleccion de certificado concreto. */
+			function addSignatoryCertificateToExtraParams(certificate, params) {
 
+				// Obtenemos un listado con los parametros
+				var paramsList = split(params, "\n");
+				
+				// Creamos un nuevo listado omitiendo los filtros
+				var newParamsList = [];
+				for (var i = 0; i < paramsList.length; i++) {
+					if (!!paramsList[i] && !checkParamIsFilter(paramsList[i])) {
+						newParamsList.push(paramsList[i]);
+					}
+				}
+				
+				// Agregamos al listado el nuevo filtro
+				newParamsList.push("filters=encodedcert:" + certificate);
+				newParamsList.push("headless=true");
+				
+				// Componemos la cadera con los parametros
+				var newParams = "";
+				if (newParamsList.length > 0) {
+					newParams = newParamsList[0];
+					for (var i = 1; i < newParamsList.length; i++) {
+						newParams += "\n" + newParamsList[i];
+					}
+				}
+				
+				return newParams;
+			}
+			
+			/** Comprueba si un parametro es un filtro. */
+			function checkParamIsFilter(param) {
+				return	param.indexOf("filters=") == 0 ||
+						param.indexOf("filter=") == 0 ||
+						param.indexOf("filters.") == 0 ||
+						param.indexOf("headless=") == 0;
+			}
+			
+			/** Compone un array con las subcadenas de un texto separadas por una cadena separadora. */
+			function split(text, sep) {
+				var textArray = [];
+				if (!!text) {
+					var idx1 = 0;
+					var idx2;
+					while ((idx2 = text.indexOf(sep, idx1)) != -1) {
+						textArray.push(text.substring(idx1, idx2));
+						idx1 = idx2 + 1;
+					}
+					textArray.push(text.substring(idx1));
+				}
+				
+				return textArray;
+			}
+			
 			var NUM_MAX_ITERATIONS = 15;
 			var iterations = 0;
 
