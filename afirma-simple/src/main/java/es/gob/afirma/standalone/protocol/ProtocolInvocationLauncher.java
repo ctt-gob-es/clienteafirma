@@ -230,7 +230,29 @@ public final class ProtocolInvocationLauncher {
         else if (urlString.startsWith("afirma://selectcert?") || urlString.startsWith("afirma://selectcert/?")) { //$NON-NLS-1$ //$NON-NLS-2$
         	LOGGER.info("Se invoca a la aplicacion para la seleccion de un certificado"); //$NON-NLS-1$
             try {
-                final UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
+                UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
+
+                // Si se indica un identificador de fichero, es que la configuracion de la operacion
+                // se tiene que descargar desde el servidor intermedio
+                if (params.getFileId() != null) {
+                    final byte[] xmlData;
+                    try {
+                        xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+                    }
+                    catch(final InvalidEncryptedDataLengthException e) {
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+                    }
+                    catch(final DecryptionException e) {
+                        LOGGER.severe("Error al descifrar: " + e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+                    }
+
+                    params = ProtocolInvocationUriParser.getParametersToSelectCert(xmlData);
+                }
+
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
                 // que se espere activamente hasta el fin de la tarea
@@ -271,8 +293,8 @@ public final class ProtocolInvocationLauncher {
                 UrlParametersToSave params = ProtocolInvocationUriParser.getParametersToSave(urlString);
                 LOGGER.info("Cantidad de datos a guardar: " + (params.getData() == null ? 0 : params.getData().length)); //$NON-NLS-1$
 
-                // Si se indica un identificador de fichero, es que la configuracion se tiene que
-                // descargar desde el servidor intermedio
+                // Si se indica un identificador de fichero, es que la configuracion de la operacion
+                // se tiene que descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
 
                     final byte[] xmlData;
@@ -346,8 +368,8 @@ public final class ProtocolInvocationLauncher {
                 UrlParametersToSignAndSave params = ProtocolInvocationUriParser.getParametersToSignAndSave(urlString);
                 LOGGER.info("Cantidad de datos a firmar y guardar: " + (params.getData() == null ? 0 : params.getData().length)); //$NON-NLS-1$
 
-                // Si se indica un identificador de fichero, es que la configuracion se tiene que
-                // descargar desde el servidor intermedio
+                // Si se indica un identificador de fichero, es que la configuracion de la operacion
+                // se tiene que descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
 
                     final byte[] xmlData;
@@ -422,8 +444,8 @@ public final class ProtocolInvocationLauncher {
             try {
                 UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
 
-                // Si se indica un identificador de fichero, es que la configuracion se tiene que
-                // descargar desde el servidor intermedio
+                // Si se indica un identificador de fichero, es que la configuracion de la operacion
+                // se tiene que descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
 
                     final byte[] xmlData;
@@ -497,8 +519,8 @@ public final class ProtocolInvocationLauncher {
             try {
                 UrlParametersToLoad params = ProtocolInvocationUriParser.getParametersToLoad(urlString);
 
-                // Si se indica un identificador de fichero, es que la configuracion se tiene que
-                // descargar desde el servidor intermedio
+                // Si se indica un identificador de fichero, es que la configuracion de la operacion
+                // se tiene que descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
 
                     final byte[] xmlData;
