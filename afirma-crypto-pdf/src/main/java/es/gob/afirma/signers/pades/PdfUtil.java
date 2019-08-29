@@ -157,24 +157,21 @@ public final class PdfUtil {
 			}
 			// La contrasena que nos han proporcionada no es buena o no nos
 			// proporcionaron ninguna
-			final String ownerPwd = new String(
+			final String pwd = new String(
 				AOUIFactory.getPassword(
-					ownerPassword == null ? CommonPdfMessages.getString("AOPDFSigner.0") : CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
+					ownerPassword == null && userPassword == null ?
+						CommonPdfMessages.getString("AOPDFSigner.0") : //$NON-NLS-1$
+							CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
 					null
 				)
 			);
-			if (ownerPwd.isEmpty()) {
-                throw new AOCancelledOperationException(
-                    "Entrada de contrasena de PDF cancelada por el usuario", e //$NON-NLS-1$
-                );
-			}
 			try {
-				pdfReader = new PdfReader(inPDF, ownerPwd.getBytes());
+				pdfReader = new PdfReader(inPDF, pwd.getBytes());
 			}
 			catch (final BadPasswordException e2) {
 				throw new BadPdfPasswordException(e2);
 			}
-			extraParams.put("ownerPassword", ownerPwd); //$NON-NLS-1$
+			extraParams.put("ownerPassword", pwd); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			throw new InvalidPdfException(e);

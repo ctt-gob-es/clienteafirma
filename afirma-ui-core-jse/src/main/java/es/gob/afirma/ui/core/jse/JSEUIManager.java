@@ -15,10 +15,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -160,7 +156,9 @@ public class JSEUIManager implements AOUIManager {
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {
-            return new char[0];
+        	throw new AOCancelledOperationException(
+        		"La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
+            );
         }
         if (((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
             return pwd.getPassword();
@@ -168,7 +166,6 @@ public class JSEUIManager implements AOUIManager {
         throw new AOCancelledOperationException(
     		"La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
         );
-
     }
 
     /** Muestra un di&aacute;logo para pedir dos veces una contrase&ntilde;a al usuario (ambas deben coincidir).
@@ -288,19 +285,9 @@ public class JSEUIManager implements AOUIManager {
             }
         };
 
-        okBtn.addActionListener(new ActionListener() {
-        	@Override
-        	public void actionPerformed(final ActionEvent e) {
-        		pane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
-        	}
-        });
+        okBtn.addActionListener(e -> pane.setValue(Integer.valueOf(JOptionPane.OK_OPTION)));
 
-        cancelBtn.addActionListener(new ActionListener() {
-        	@Override
-        	public void actionPerformed(final ActionEvent e) {
-        		pane.setValue(Integer.valueOf(JOptionPane.CANCEL_OPTION));
-        	}
-        });
+        cancelBtn.addActionListener(e -> pane.setValue(Integer.valueOf(JOptionPane.CANCEL_OPTION)));
 
         final Component parent = c instanceof Component ? (Component) c : null;
 
@@ -838,34 +825,31 @@ public class JSEUIManager implements AOUIManager {
 	    CustomFileChooserForSave() {
 	    	addPropertyChangeListener(
 	    			JFileChooser.FILE_FILTER_CHANGED_PROPERTY,
-	    			new PropertyChangeListener() {
-	    				@Override
-	    				public void propertyChange(final PropertyChangeEvent e) {
-	    					if (!(e.getOldValue() instanceof FileNameExtensionFilter) || !(e.getNewValue() instanceof FileNameExtensionFilter)) {
-	    						return;
-	    					}
+	    			e -> {
+						if (!(e.getOldValue() instanceof FileNameExtensionFilter) || !(e.getNewValue() instanceof FileNameExtensionFilter)) {
+							return;
+						}
 
-	    					final FileNameExtensionFilter oldValue = (FileNameExtensionFilter) e.getOldValue();
-	    					final FileNameExtensionFilter newValue = (FileNameExtensionFilter) e.getNewValue();
-	    					if (
-	    							oldValue.getExtensions() == null || oldValue.getExtensions().length < 1 ||
-	    							newValue.getExtensions() == null || newValue.getExtensions().length < 1
-	    							) {
-	    						return;
-	    					}
-	    					final String extold = oldValue.getExtensions()[0];
-	    					final String extnew = newValue.getExtensions()[0];
+						final FileNameExtensionFilter oldValue = (FileNameExtensionFilter) e.getOldValue();
+						final FileNameExtensionFilter newValue = (FileNameExtensionFilter) e.getNewValue();
+						if (
+								oldValue.getExtensions() == null || oldValue.getExtensions().length < 1 ||
+								newValue.getExtensions() == null || newValue.getExtensions().length < 1
+								) {
+							return;
+						}
+						final String extold = oldValue.getExtensions()[0];
+						final String extnew = newValue.getExtensions()[0];
 
-	    					String filename = getFile().getName();
-	    					if (filename.endsWith(extold)) {
-	    						filename = filename.replace(extold, extnew);
-	    					}
-	    					else {
-	    						filename += extnew;
-	    					}
-	    					setSelectedFile(new File(filename));
-	    				}
-	    			});
+						String filename = getFile().getName();
+						if (filename.endsWith(extold)) {
+							filename = filename.replace(extold, extnew);
+						}
+						else {
+							filename += extnew;
+						}
+						setSelectedFile(new File(filename));
+					});
 	    }
 
 	    @Override
