@@ -30,7 +30,6 @@ import com.aowagie.text.pdf.PdfSignature;
 import com.aowagie.text.pdf.PdfSignatureAppearance;
 import com.aowagie.text.pdf.PdfStamper;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -337,11 +336,6 @@ public final class PdfSessionManager {
                     null
                 )
             );
-            if ("".equals(userPwd)) { //$NON-NLS-1$
-                throw new AOCancelledOperationException(
-                    "Entrada de contrasena de PDF cancelada por el usuario", e //$NON-NLS-1$
-                );
-            }
             extraParams.put("userPassword", userPwd); //$NON-NLS-1$
             return getSessionData(inPDF, certChain, signTime, extraParams);
 		}
@@ -374,8 +368,6 @@ public final class PdfSessionManager {
 		else {
 			sap.setAcro6Layers(true);
 		}
-
-
 
 		PdfUtil.enableLtv(stp);
 
