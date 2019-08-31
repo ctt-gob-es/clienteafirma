@@ -196,7 +196,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 			constraints.weightx = 1.0;
 			constraints.weighty = 1.0;
 			constraints.insets = new Insets(0, 0, 0, 0);
-			this.activePanel = new SignPdfUiPanelPreview(this, p, im, this);
+			this.activePanel = new SignPdfUiPanelPreview(this, p, im);
 			getContentPane().add(this.activePanel, constraints);
 			setVisible(true);
 
@@ -285,7 +285,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	@Override
-	public void pdfLoaded(final boolean signed, final List<BufferedImage> pages, final List<Dimension> pageSizes, byte[] document) {
+	public void pdfLoaded(final boolean signed, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] document) {
 		getContentPane().remove(this.activePanel);
 		this.activePanel = new SignPdfUiPanelStamp(
 			pages,

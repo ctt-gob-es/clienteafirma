@@ -43,13 +43,16 @@ final class SignPdfUiMessages {
      * @param key Clave del texto.
      * @param params Par&aacute;metros que se desean insertar.
      * @return Recurso textual con las subcadenas sustituidas. */
-    public static String getString(final String key, final String... params) {
+    static String getString(final String key, final String... params) {
 
         String text;
         try {
             text = RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Texto '" + key + "' del UI de firma de PDF no encontrado: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
             return '!' + key + '!';
         }
 

@@ -59,24 +59,23 @@ import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
-final class SignPdfUiPanelStamp extends JPanel implements
-												KeyListener,
-												FocusListener,
-												PageLabelListener,
-												ActionListener,
-												DocumentListener {
+final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
+														  FocusListener,
+														  PageLabelListener,
+														  ActionListener,
+														  DocumentListener {
 
 	private static final long serialVersionUID = -4465164058611491582L;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int PREFERRED_WIDTH = 470;
 	private static final int PREFERRED_HEIGHT = 630;
 	private static final int PAGEPANEL_PREFERRED_WIDTH = 466;
 	private static final int PAGEPANEL_PREFERRED_HEIGHT = 410;
-	static final String IMAGE_EXT[] = {"jpg", "jpeg", "png", "gif"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final String IMAGE_EXT[] = { "jpg", "jpeg", "png", "gif" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-	JTextField fileText = null;
+	final JTextField fileText = new JTextField();
 
 	final Properties extraParams;
 
@@ -375,7 +374,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 
 	/** Crea el panel con los elementos que muestran las coordenadas del cursor dentro
 	 * del panel de firma.
-	 * @return Panel con los componentes para la visualizacion de coordenadas. */
+	 * @return Panel con los componentes para la visualizaci&oacute;n de coordenadas. */
 	private JPanel createCoordenatesPanel() {
 
 		final JPanel panel = new JPanel();
@@ -448,70 +447,69 @@ final class SignPdfUiPanelStamp extends JPanel implements
 		}
 	}
 
-	/** Crea el panel con un boton de seleccion de archivo de imagen.
-	 * @return Panel de seleccion de imagen. */
+	/** Crea el panel con un bot&oacute;n de selecci&oacute;n de archivo de imagen.
+	 * @return Panel de selecci&oacute;n de imagen. */
 	private JPanel createFilePanel() {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 
-		this.fileText = new JTextField();
 		this.fileText.setEditable(false);
 
 		final JButton fileButton = new JButton(SignPdfUiMessages.getString("SignPdfUiStamp.18")); //$NON-NLS-1$
 		fileButton.getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfUiStamp.19")); //$NON-NLS-1$
 
 		fileButton.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						final File[] files;
-						try {
-							files = AOUIFactory.getLoadFiles(
-									SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
-									null,
-									null,
-									IMAGE_EXT,
-									SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,
-									false,
-									false,
-									null,
-									SignPdfUiPanelStamp.this
-							);
-						}
-						catch(final AOCancelledOperationException ex)
-						{
-							return;
-						}
-
-						try {
-							final BufferedImage stampImage = ImageIO.read(files[0]);
-							SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, getInsertImageBase64(stampImage));
-						}
-						catch (final IOException ioe) {
-							LOGGER.severe(
-									"No ha sido posible cargar la imagen: " + ioe //$NON-NLS-1$
-							);
-							AOUIFactory.showMessageDialog(
-								this,
-								SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
-							);
-							return;
-						}
-
-						SignPdfUiPanelStamp.this.fileText.setText(files[0].getAbsolutePath());
-
-						if (SignPdfUiPanelStamp.this.locationSelected) {
-							SignPdfUiPanelStamp.this.okButton.setEnabled(true);
-							SignPdfUiPanelStamp.this.okButton.requestFocusInWindow();
-						}
-						else {
-							SignPdfUiPanelStamp.this.okButton.setEnabled(false);
-						}
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final File[] files;
+					try {
+						files = AOUIFactory.getLoadFiles(
+							SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
+							null,
+							null,
+							IMAGE_EXT,
+							SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,
+							false,
+							false,
+							null,
+							SignPdfUiPanelStamp.this
+						);
 					}
-				});
+					catch(final AOCancelledOperationException ex) {
+						return;
+					}
+
+					try {
+						final BufferedImage stampImage = ImageIO.read(files[0]);
+						SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, getInsertImageBase64(stampImage));
+					}
+					catch (final IOException ioe) {
+						LOGGER.severe(
+							"No ha sido posible cargar la imagen: " + ioe //$NON-NLS-1$
+						);
+						AOUIFactory.showMessageDialog(
+							this,
+							SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$
+							SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
+						return;
+					}
+
+					SignPdfUiPanelStamp.this.fileText.setText(files[0].getAbsolutePath());
+
+					if (SignPdfUiPanelStamp.this.locationSelected) {
+						SignPdfUiPanelStamp.this.okButton.setEnabled(true);
+						SignPdfUiPanelStamp.this.okButton.requestFocusInWindow();
+					}
+					else {
+						SignPdfUiPanelStamp.this.okButton.setEnabled(false);
+					}
+				}
+			}
+		);
 
 		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 5, 0, 5);
@@ -557,11 +555,11 @@ final class SignPdfUiPanelStamp extends JPanel implements
 					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY)
 				);
 				SignPdfUiPanelStamp.this.extraParams.put(
-						PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX,
+					PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX,
 					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX)
 				);
 				SignPdfUiPanelStamp.this.extraParams.put(
-						PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY,
+					PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY,
 					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY)
 				);
 				getListener().nextPanel(SignPdfUiPanelStamp.this.extraParams, null);
@@ -607,6 +605,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 	public void setWidth(final String width) {
 		this.width.setText(width);
 	}
+
 	@Override
 	public void setHeight(final String height) {
 		this.height.setText(height);
@@ -659,14 +658,15 @@ final class SignPdfUiPanelStamp extends JPanel implements
 				if (this.pressButton > 0) {
 					try {
 						preLoadImages(getCurrentPage() + 1, this.currentPage);
-					} catch (final IOException ex) {
+					}
+					catch (final IOException ex) {
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas anteriores: " + ex, ex); //$NON-NLS-1$
 						this.currentPage++; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								SignPdfUiPanelStamp.this,
-								SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+							SignPdfUiPanelStamp.this,
+							SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
+							SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
 						);
 					}
 				}
@@ -680,15 +680,16 @@ final class SignPdfUiPanelStamp extends JPanel implements
 				if (this.pressButton > 0) {
 					try {
 						preLoadImages(getCurrentPage() - 1, this.currentPage);
-					} catch (final IOException ex) {
+					}
+					catch (final IOException ex) {
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas siguientes: " + ex, ex); //$NON-NLS-1$
 						this.currentPage--; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								SignPdfUiPanelStamp.this,
-								SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
-							);
+							SignPdfUiPanelStamp.this,
+							SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
+							SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
 					}
 				}
 				if (this.pdfPages.get(getCurrentPage() - 1) != null) {
@@ -851,8 +852,8 @@ final class SignPdfUiPanelStamp extends JPanel implements
 		final int areaWidth = original.width + original.x > this.pageLabel.getWidth() ?
 				this.pageLabel.getWidth() - original.x : original.width;
 
-		final Properties extraParams = new Properties();
-		extraParams.put(
+		final Properties xParams = new Properties();
+		xParams.put(
 			PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX,
 			Integer.toString(
 				Math.round(
@@ -860,7 +861,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 				)
 			)
 		);
-		extraParams.put(
+		xParams.put(
 			PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY,
 			Integer.toString(
 				Math.round(
@@ -868,7 +869,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 				)
 			)
 		);
-		extraParams.put(
+		xParams.put(
 			PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX,
 			Integer.toString(
 				Math.round(
@@ -876,7 +877,7 @@ final class SignPdfUiPanelStamp extends JPanel implements
 				)
 			)
 		);
-		extraParams.put(
+		xParams.put(
 			PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY,
 			Integer.toString(
 				Math.round(
@@ -884,6 +885,6 @@ final class SignPdfUiPanelStamp extends JPanel implements
 				)
 			)
 		);
-		return extraParams;
+		return xParams;
 	}
 }

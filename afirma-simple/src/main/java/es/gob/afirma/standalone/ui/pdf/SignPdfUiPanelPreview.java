@@ -66,7 +66,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -242,8 +241,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
 						   final Properties p,
-						   final BufferedImage im,
-						   final JDialog parent) {
+						   final BufferedImage im) {
 
 		if (spul == null) {
 			throw new IllegalArgumentException(
@@ -754,6 +752,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			        }
 			    }
 			    catch (final Exception e) {
+			    	LOGGER.severe(
+		    			"No ha podido abrirse el navegador de sistema: " + e //$NON-NLS-1$
+	    			);
 			    	AOUIFactory.showErrorMessage(
 						SignPdfUiPanelPreview.this,
 			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
@@ -979,23 +980,33 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)
 		));
 
-		final int fontSyle = Integer.parseInt(
-			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE));
-		if (fontSyle == 8) {
-			getStrikethroughButton().doClick();
-		} else if (fontSyle == 4) {
-			getUnderlineButton().doClick();
-		} else if (fontSyle == 3) {
-			getItalicButton().doClick();
-			getBoldButton().doClick();
-		} else if (fontSyle == 2) {
-			getItalicButton().doClick();
-		} else if (fontSyle == 1) {
-			getBoldButton().doClick();
+		final int fontStyle = Integer.parseInt(
+			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE)
+		);
+		switch(fontStyle) {
+			case 8:
+				getStrikethroughButton().doClick();
+				break;
+			case 4:
+				getUnderlineButton().doClick();
+				break;
+			case 3:
+				getItalicButton().doClick();
+				getBoldButton().doClick();
+				break;
+			case 2:
+				getItalicButton().doClick();
+				break;
+			case 1:
+				getBoldButton().doClick();
+				break;
+			default:
+				LOGGER.warning("Estilo de texto desconocido: " + fontStyle); //$NON-NLS-1$
 		}
 
-		final String pdfColorIndex =
-			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR);
+		final String pdfColorIndex = PreferencesManager.getDefaultPreference(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR
+		);
 		int comboColorIndex = 0;
 		final ColorResource[] colors = ColorResource.getAllColorResources();
 		for (int i = 0; i < colors.length; ++i) {
@@ -1011,10 +1022,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
 
-		final String rotateSign = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION);
+		final String rotateSign = PreferencesManager.getDefaultPreference(
+			PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION
+		);
 		getRotateSignature().setSelectedItem(RotationAngles.parse(Integer.parseInt(rotateSign)));
 
-		final String imagePath = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
+		final String imagePath = PreferencesManager.getDefaultPreference(
+			PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE
+		);
 		if (imagePath != null && !imagePath.isEmpty()) {
 			try {
 				loadSignImage(imagePath);

@@ -4,11 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Clase para almacenar los datos para la previsualizaci&oacute;n de
- * un PDF y aquellos necesarios para regenerarlos.
- */
-public class PdfDocument {
+/** Almacena los datos para la previsualizaci&oacute;n de
+ * un PDF y aquellos necesarios para regenerarlos. */
+final class PdfDocument {
 
 	private byte[] bytesPdf;
 
@@ -17,9 +15,8 @@ public class PdfDocument {
 	 * @param previews Listado de ministaturas.
 	 * @param currentPage P&aacute;fina actual.
 	 * @throws IOException Cuando ocurre un error al generar las miniaturas de
-	 * las p&aacute;ginas.
-	 */
-	public void loadNewPages(final List<BufferedImage> previews, final int currentPage) throws IOException {
+	 *                     las p&aacute;ginas. */
+	void loadNewPages(final List<BufferedImage> previews, final int currentPage) throws IOException {
 		if (this.bytesPdf != null) {
 			try {
 				Pdf2ImagesConverter.updateUsefulSections(this.bytesPdf, currentPage, previews);
@@ -29,19 +26,15 @@ public class PdfDocument {
 		}
 	}
 
-	/**
-	 * Obtiene el PDF.
-	 * @return Contenido del PDF.
-	 */
-	public  byte[] getBytesPdf() {
+	/** Obtiene el PDF.
+	 * @return Contenido del PDF. */
+	byte[] getBytesPdf() {
 		return this.bytesPdf;
 	}
 
-	/**
-	 * Establece el PDF.
-	 * @param inPdf Contenido del PDF.
-	 */
-	public void setBytesPdf( byte[] inPdf) {
+	/** Establece el PDF.
+	 * @param inPdf Contenido del PDF. */
+	void setBytesPdf( final byte[] inPdf) {
 		this.bytesPdf = inPdf;
 	}
 }
