@@ -152,7 +152,7 @@ public final class SignatureService extends HttpServlet {
 		}
 		catch (final Exception e) {
 			try {
-				DOC_MANAGER = (DocumentManager) docManagerClass.newInstance();
+				DOC_MANAGER = (DocumentManager) docManagerClass.getConstructor().newInstance();
 			}
 			catch (final Exception e2) {
 				throw new RuntimeException(
