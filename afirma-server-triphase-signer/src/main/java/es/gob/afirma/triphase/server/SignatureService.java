@@ -114,7 +114,8 @@ public final class SignatureService extends HttpServlet {
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-					"No se ha podido obtener el directorio del fichero de configuracion: " + e);//$NON-NLS-1$
+				"No se ha podido obtener el directorio del fichero de configuracion: " + e //$NON-NLS-1$
+			);
 			configDir = null;
 		}
 
@@ -136,7 +137,7 @@ public final class SignatureService extends HttpServlet {
 			);
 		}
 
-		Class<?> docManagerClass;
+		final Class<?> docManagerClass;
 		try {
 			docManagerClass = Class.forName(config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS));
 		}
@@ -160,16 +161,14 @@ public final class SignatureService extends HttpServlet {
 				);
 			}
 		}
+		LOGGER.info("Se usara el siguiente 'DocumentManager' para firma trifasica: " + DOC_MANAGER.getClass().getName()); //$NON-NLS-1$
 	}
 
-	/**
-	 * Intenta cargar un fichero propiedades del directorio indicado mediante variable de entorno
-	 * o del classpath si no se encuentra.
+	/** Intenta cargar un fichero propiedades del directorio indicado mediante variable de entorno
+	 * o del <i>classpath</i> si no se encuentra.
 	 * @param configFilename Nombre del fichero de propedades.
-	 * @return Propiedades cargadas o {@code null} si no se pudo cargar el fichero.
-	 */
+	 * @return Propiedades cargadas o {@code null} si no se pudo cargar el fichero. */
 	private static Properties loadConfigFile(final String configFilename) {
-
 
 		LOGGER.info("Se cargara el fichero de configuracion " + configFilename); //$NON-NLS-1$
 
@@ -193,15 +192,17 @@ public final class SignatureService extends HttpServlet {
 
 		if (configProperties == null) {
 			LOGGER.info(
-					"Se cargara el fichero de configuracion " + configFilename + " desde el CLASSPATH"); //$NON-NLS-1$ //$NON-NLS-2$
+				"Se cargara el fichero de configuracion " + configFilename + " desde el CLASSPATH" //$NON-NLS-1$ //$NON-NLS-2$
+			);
 
 			try (final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(configFilename);) {
-					configProperties = new Properties();
-					configProperties.load(configIs);
+				configProperties = new Properties();
+				configProperties.load(configIs);
 			}
 			catch (final Exception e) {
 				LOGGER.warning(
-						"No se pudo cargar el fichero de configuracion " + configFilename + " desde el CLASSPATH: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					"No se pudo cargar el fichero de configuracion " + configFilename + " desde el CLASSPATH: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				configProperties = null;
 			}
 		}
@@ -299,10 +300,10 @@ public final class SignatureService extends HttpServlet {
 
 			try {
 				extraParams = ExtraParamsProcessor.expandProperties(
-						extraParams,
-						null,
-						format
-						);
+					extraParams,
+					null,
+					format
+				);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Se han indicado una politica de firma y un formato incompatibles: "  + e); //$NON-NLS-1$
