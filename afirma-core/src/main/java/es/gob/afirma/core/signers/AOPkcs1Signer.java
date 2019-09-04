@@ -14,8 +14,12 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -25,6 +29,8 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 public final class AOPkcs1Signer implements AOSigner {
 
 	private static final String PKCS1_FILE_SUFFIX = ".p1"; //$NON-NLS-1$
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Realiza una firma electr&oacute;nica PKCS#1 v1.5.
 	 * @param algorithm Algoritmo de firma a utilizar.
@@ -40,6 +46,28 @@ public final class AOPkcs1Signer implements AOSigner {
 			           final PrivateKey key,
 			           final Certificate[] certChain,
 			           final Properties extraParams) throws AOException {
+
+		if (algorithm == null) {
+			throw new IllegalArgumentException(
+				"Es necesario indicar el algoritmo de firma, no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+
+		if (key instanceof RSAPrivateKey && !(algorithm.toLowerCase().endsWith("withrsa") || algorithm.toLowerCase().endsWith("withrsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning(
+				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo RSA" //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		else if (key instanceof ECPrivateKey && !(algorithm.toLowerCase().endsWith("withecdsa") || algorithm.toLowerCase().endsWith("withecdsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning(
+				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo ECDSA" //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		else if (key instanceof DSAPrivateKey && !(algorithm.toLowerCase().endsWith("withdsa") || algorithm.toLowerCase().endsWith("withdsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning(
+				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo DSA" //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
 
 		final Signature sig;
 
@@ -71,7 +99,7 @@ public final class AOPkcs1Signer implements AOSigner {
 			sig.initSign(key);
 		}
 		catch (final Exception e) {
-			throw new AOException("Error al inicializar la firma con la clave privada: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error al inicializar la firma con la clave privada para el algoritmo '" + algorithm + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		try {
