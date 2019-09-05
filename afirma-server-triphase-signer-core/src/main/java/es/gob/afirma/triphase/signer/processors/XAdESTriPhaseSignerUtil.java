@@ -92,11 +92,7 @@ final class XAdESTriPhaseSignerUtil {
 
 		String base = new String(xmlBase, docBase.getXmlEncoding());
 
-
 		final String source = new String(xmlSource, docSource.getXmlEncoding());
-
-
-
 
 		for (int i=0; i<elDeliBase.size(); i++) {
 			base = base.replace(

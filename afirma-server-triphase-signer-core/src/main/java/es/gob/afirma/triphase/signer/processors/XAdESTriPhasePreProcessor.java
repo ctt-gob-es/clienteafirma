@@ -79,10 +79,10 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public TriphaseData preProcessPreSign(final byte[] data,
-			                        final String algorithm,
-			                        final X509Certificate[] cert,
-			                        final Properties extraParams) throws IOException, AOException {
-
+			                              final String algorithm,
+			                              final X509Certificate[] cert,
+			                              final Properties extraParams) throws IOException,
+	                                                                           AOException {
 		LOGGER.info("Prefirma XAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		// Con FacturaE solo podemos firmar facturas
@@ -137,11 +137,11 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	private static TriphaseData preProcessPre(final byte[] data,
-			                            final String algorithm,
-			                            final X509Certificate[] cert,
-			                            final Properties extraParams,
-			                            final Op op) throws IOException,
-			                                                AOException {
+			                                  final String algorithm,
+			                                  final X509Certificate[] cert,
+			                                  final Properties extraParams,
+			                                  final Op op) throws IOException,
+			                                                      AOException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -217,9 +217,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				);
 				if (preSignature.getEncoding() != null) {
 					signConfig.put(
-							PROPERTY_NAME_XML_ENCODING,
-							preSignature.getEncoding()
-							);
+						PROPERTY_NAME_XML_ENCODING,
+						preSignature.getEncoding()
+					);
 				}
 			}
 
@@ -252,9 +252,8 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
-			                                                      AOException,
-			                                                      IOException {
-
+			                                                                 AOException,
+			                                                                 IOException {
 		// Con FacturaE solo podemos firmar facturas
 		if (this.facturae && !new AOFacturaESigner().isValidDataFile(data)) {
 			throw new AOInvalidFormatException(
@@ -286,8 +285,8 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                           final X509Certificate[] cert,
 			                           final Properties extraParams,
 			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
-			                                                        AOException,
-			                                                        IOException {
+			                                                                   AOException,
+			                                                                   IOException {
 
 		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, triphaseData);
 	}
@@ -339,10 +338,14 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		String xmlBase;
 		if (triphaseData.getSign(0).getProperty(PROPERTY_NAME_XML_ENCODING) != null) {
 			xmlBase = new String(
-					Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)),
-					triphaseData.getSign(0).getProperty(PROPERTY_NAME_XML_ENCODING));
-		} else {
-			xmlBase = new String(Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)));
+				Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)),
+				triphaseData.getSign(0).getProperty(PROPERTY_NAME_XML_ENCODING)
+			);
+		}
+		else {
+			xmlBase = new String(
+				Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE))
+			);
 		}
 
 		// Sustituimos los valores dummy de la firma por los reales
@@ -382,10 +385,10 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		byte[] counterSignature;
 		try {
 			counterSignature = XAdESTriPhaseSignerUtil.insertCommonParts(
-					xmlBase.getBytes(preSignature.getEncoding()),
-					preSignature.getXmlSign(),
-					extraParams
-				);
+				xmlBase.getBytes(preSignature.getEncoding()),
+				preSignature.getXmlSign(),
+				extraParams
+			);
 		}
 		catch (final Exception e) {
 			throw new AOException(

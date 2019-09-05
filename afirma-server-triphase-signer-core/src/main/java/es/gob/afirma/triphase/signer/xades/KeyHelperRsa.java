@@ -37,13 +37,12 @@ final class KeyHelperRsa implements KeyHelper {
 
 	private static PrivateKey getPrivateKey(final int keySize) throws NoSuchAlgorithmException {
 		PrivateKey ret = KEYS.get(Integer.valueOf(keySize));
-		if (ret != null) {
-			return ret;
+		if (ret == null) {
+			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(RSA);
+			keyGen.initialize(keySize);
+			ret = keyGen.generateKeyPair().getPrivate();
+			KEYS.put(Integer.valueOf(keySize), ret);
 		}
-		final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(RSA);
-		keyGen.initialize(keySize);
-		ret = keyGen.generateKeyPair().getPrivate();
-		KEYS.put(Integer.valueOf(keySize), ret);
 		return ret;
 	}
 

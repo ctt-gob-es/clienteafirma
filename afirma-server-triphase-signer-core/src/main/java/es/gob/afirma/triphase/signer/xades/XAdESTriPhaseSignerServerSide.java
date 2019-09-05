@@ -20,7 +20,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -189,17 +188,8 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final PrivateKey prk;
-		if (((X509Certificate)certChain[0]).getPublicKey() instanceof RSAPublicKey) {
-			prk = new KeyHelperRsa().getPrivateKey(
-				((X509Certificate)certChain[0]).getPublicKey()
-			);
-		}
-		else {
-			throw new InvalidKeyException(
-				"No se soportan las claves de tipo " + ((X509Certificate)certChain[0]).getPublicKey().getClass().getName() //$NON-NLS-1$
-			);
-		}
+		final PublicKey publicKey = ((X509Certificate)certChain[0]).getPublicKey();
+		final PrivateKey prk = KeyHelperFactory.getKeyHelper(publicKey).getPrivateKey(publicKey);
 
 		final byte[] result;
 		switch (op) {
