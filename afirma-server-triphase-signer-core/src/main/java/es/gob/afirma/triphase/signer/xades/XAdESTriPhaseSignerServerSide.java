@@ -191,8 +191,8 @@ public final class XAdESTriPhaseSignerServerSide {
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
 		final PrivateKey prk;
 		if (((X509Certificate)certChain[0]).getPublicKey() instanceof RSAPublicKey) {
-			prk = RsaKeyHelper.getPrivateKey(
-				((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
+			prk = new KeyHelperRsa().getPrivateKey(
+				((X509Certificate)certChain[0]).getPublicKey()
 			);
 		}
 		else {
