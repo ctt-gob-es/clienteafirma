@@ -303,9 +303,8 @@ final class XAdESTriPhaseSignerUtil {
 	}
 
 	private static Document getDocumentFromBytes(final byte[] data) throws SAXException,
-	                                                               IOException,
-	                                                               ParserConfigurationException {
-		final String xml = new String(data);
+	                                                                       IOException,
+	                                                                       ParserConfigurationException {
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         return dbf.newDocumentBuilder().parse(
