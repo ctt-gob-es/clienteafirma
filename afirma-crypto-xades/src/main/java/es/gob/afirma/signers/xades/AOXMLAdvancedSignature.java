@@ -33,6 +33,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
+import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
@@ -202,7 +203,13 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
             getSignatureValueId(signatureIdPrefix)
         );
 
-        this.signContext = new DOMSignContext(privateKey, this.baseElement);
+        this.signContext = new DOMSignContext(
+        	// Si llega una clave ECDSA de BC la convertimos a una EC de JSE para evitar problemas
+    		privateKey instanceof BCECPrivateKey ?
+				KeyUtil.ecBc2Jce((BCECPrivateKey)privateKey) :
+					privateKey,
+    		this.baseElement
+		);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
