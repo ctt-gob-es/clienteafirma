@@ -306,7 +306,6 @@ final class XAdESTriPhaseSignerUtil {
 	                                                               IOException,
 	                                                               ParserConfigurationException {
 		final String xml = new String(data);
-		System.out.println(xml);
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         return dbf.newDocumentBuilder().parse(
