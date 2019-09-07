@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -46,6 +47,8 @@ final class XAdESTriPhaseSignerUtil {
 	private static final String REPLACEMENT_TEMPLATE = "%%%%REPLACE-%1$d%%%%"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String ID_STR = "Id=\""; //$NON-NLS-1$
 
 	/** Inserta en la estructura base XML las partes comunes de la firma XML generada
 	 * para los mismos datos y certificados.
@@ -96,12 +99,12 @@ final class XAdESTriPhaseSignerUtil {
 
 		for (int i=0; i<elDeliBase.size(); i++) {
 			base = base.replace(
-					String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)),
-					source.substring(
-							source.indexOf(elDeliSource.get(i).get(0)) + elDeliSource.get(i).get(0).length(),
-							source.indexOf(elDeliSource.get(i).get(1), source.indexOf(elDeliSource.get(i).get(0)) + elDeliSource.get(i).get(0).length())
-							)
-					);
+				String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)),
+				source.substring(
+					source.indexOf(elDeliSource.get(i).get(0)) + elDeliSource.get(i).get(0).length(),
+					source.indexOf(elDeliSource.get(i).get(1), source.indexOf(elDeliSource.get(i).get(0)) + elDeliSource.get(i).get(0).length())
+				)
+			);
 		}
 		return base.getBytes(docBase.getXmlEncoding());
 	}
@@ -151,9 +154,12 @@ final class XAdESTriPhaseSignerUtil {
 			ret = new String(xml);
 		}
 
-		final List<List<String>> delits = XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
-			XAdESTriPhaseSignerUtil.getInmutableReferences(doc),
-			doc
+		final List<List<String>> delits = CleanContentDelimiters(
+			XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
+				XAdESTriPhaseSignerUtil.getInmutableReferences(doc),
+				doc
+			),
+			ret
 		);
 
 		for (int i = 0; i < delits.size(); i++) {
@@ -181,11 +187,79 @@ final class XAdESTriPhaseSignerUtil {
 		return ret.getBytes();
 	}
 
+	/** Limpia la lista de delimitadores de nodos.
+	 * Los calculados en base al API XML pueden no corresponder con los reales en el texto
+	 * XML por la inclusi&oacute;n de espacios de nombres, por lo que es necesario revisarla
+	 * y corregir las discordancias.
+	 * @param or Lista original de delimitadores de nodos
+	 * @param orXml XML en su forma de texto.
+	 * @return Lista de delimitadores de nodos con los delimitadores correctos. */
+	private static List<List<String>> CleanContentDelimiters(final List<List<String>> or, final String orXml) {
+		final List<List<String>> ret = new ArrayList<>(or.size());
+		for (final List<String> del : or) {
+			// Las discordancias siempre estan en la apertura del nodo
+			final String orDel = del.get(0);
+			if (orXml.contains(orDel)) {
+				ret.add(del);
+			}
+			else {
+
+				// Obtenemos el texto de inicio del nodo
+				final String nodeStart = orDel.substring(
+					0,
+					orDel.indexOf(' ')
+				);
+
+				// Obtenemos todo los indices de ocurrencias del texto de inicio del nodo, por
+				// si hay varias ocurrencias
+				final List<Integer> indexes = new ArrayList<>();
+				for (int index = orXml.indexOf(nodeStart); index >= 0; index = orXml.indexOf(nodeStart, index + 1)) {
+				    indexes.add(Integer.valueOf(index));
+				}
+
+				String retDel = null;
+				for (final Integer beginIndex : indexes) {
+					retDel = orXml.substring(
+						beginIndex.intValue(),
+						orXml.indexOf('>', beginIndex.intValue()) + 1
+					);
+
+					// En este punto 'retDel' es un candidato, comprobamos que el Id sea el mismo
+					if (retDel.contains(ID_STR) && retDel.contains(ID_STR)) {
+						final String id = orXml.substring(
+							orXml.indexOf(ID_STR, beginIndex.intValue()),
+							orXml.indexOf('"',  orXml.indexOf(ID_STR, beginIndex.intValue()) + ID_STR.length())
+						);
+						if (retDel.contains(id)) {
+							break;
+						}
+					}
+					else {
+						break;
+					}
+				}
+
+				if (retDel != null) {
+					ret.add(Arrays.asList(new String[] { retDel, del.get(1) }));
+				}
+				else {
+					LOGGER.warning(
+						"No se ha completado la limpieza de nodos a reemplazar, es posible que falle el proceso" //$NON-NLS-1$
+					);
+					ret.add(del);
+				}
+
+			}
+		}
+		return ret;
+	}
+
 	/** Obtiene los nodos delimitadores de todos nodos referenciados por las firmas XML del documento.
 	 * @param uris Listado de referencias.
 	 * @param doc Documento de firma XML al que pertenecen las referencias.
 	 * @return Listado de nodos. */
-	private static List<List<String>> getCommonContentDelimiters(final List<String> uris, final Document doc) {
+	private static List<List<String>> getCommonContentDelimiters(final List<String> uris,
+			                                                     final Document doc) {
 		final String encoding = doc.getInputEncoding();
 		final List<List<String>> ret = new ArrayList<>();
 		for (final String uriValue : uris) {
@@ -231,6 +305,8 @@ final class XAdESTriPhaseSignerUtil {
 	private static Document getDocumentFromBytes(final byte[] data) throws SAXException,
 	                                                               IOException,
 	                                                               ParserConfigurationException {
+		final String xml = new String(data);
+		System.out.println(xml);
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         return dbf.newDocumentBuilder().parse(
