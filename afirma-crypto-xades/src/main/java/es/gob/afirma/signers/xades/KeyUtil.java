@@ -1,0 +1,50 @@
+package es.gob.afirma.signers.xades;
+
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+
+import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+
+/** Utilidades de claves criptogr&aacute;ficas.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class KeyUtil {
+
+	private KeyUtil() {
+		// No instanciable
+	}
+
+	/** Convierte una clave privada de curva el&iacute;ptica en formato BouncyCastle a
+	 * formato JSE.
+	 * La implementaci&oacute;n de curva el&iacute;ptica de BouncyCastle es anterior a la
+	 * de JSE e incompatible con esta &uacute;ltima, por lo que, dependiendo del orden de
+	 * los proveedores, es posible que el proveedor de firma XML del JRE rechaze las claves
+	 * de BouncyCastle, haciendo conveniente esta conversi&oacute;n.
+	 * @param bcKey Clave en formato BouncyCastle.
+	 * @return Clave en formato JSE. */
+	public static ECPrivateKey ecBc2Jce(final BCECPrivateKey bcKey) {
+		final PrivateKey ret;
+		try {
+			final KeyFactory keyFactory = KeyFactory.getInstance("EC"); //$NON-NLS-1$
+			final PKCS8EncodedKeySpec kspec = new PKCS8EncodedKeySpec(bcKey.getEncoded());
+			ret = keyFactory.generatePrivate(kspec);
+		}
+		catch(final NoSuchAlgorithmException | InvalidKeySpecException e) {
+			System.out.println(
+				"No se ha podido convertir la clave de BC a JRE, es posible que falle el proceso: " + e //$NON-NLS-1$
+			);
+			return bcKey;
+		}
+		if (ret instanceof ECPrivateKey) {
+			return (ECPrivateKey) ret;
+		}
+		System.out.println(
+			"No se ha podido convertir la clave de BC a JRE, es posible que falle el proceso" //$NON-NLS-1$
+		);
+		return bcKey;
+	}
+
+}
