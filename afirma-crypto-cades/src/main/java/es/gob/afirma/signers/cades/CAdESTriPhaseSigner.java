@@ -43,6 +43,7 @@ import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -223,24 +224,26 @@ public final class CAdESTriPhaseSigner {
     }
 
     /** Realiza una firma CAdES completa.
-     * @param digestAlgorithmName Algoritmo de huella digital
-     * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
-     * @param signerCertificateChain Cadena de certificados del firmante
-     * @param signature Firma PKCS#1 v1.5 de los atributos firmados
-     * @param signedAttributes Atributos firmados (prefirma)
-     * @return Firma CAdES completa
-     * @throws AOException Cuando se produce cualquier error durante el proceso.
-     */
-    public static byte[] postSign(final String digestAlgorithmName,
-                           final byte[] content,
-                           final Certificate[] signerCertificateChain,
-                           final byte[] signature,
-                           final byte[] signedAttributes
-               ) throws AOException {
+     * @param signatureAlgorithm Algoritmo de firma electr&oacute;nica.
+     * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma).
+     * @param signerCertificateChain Cadena de certificados del firmante.
+     * @param signature Firma PKCS#1 v1.5 de los atributos firmados.
+     * @param signedAttributes Atributos firmados (prefirma).
+     * @return Firma CAdES completa.
+     * @throws AOException Cuando se produce cualquier error durante el proceso. */
+    public static byte[] postSign(final String signatureAlgorithm,
+                                  final byte[] content,
+                                  final Certificate[] signerCertificateChain,
+                                  final byte[] signature,
+                                  final byte[] signedAttributes) throws AOException {
 
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
-            throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"La cadena de certificados debe contener al menos una entrada" //$NON-NLS-1$
+    		);
         }
+
+        final String digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
 
         final TBSCertificate tbsCertificateStructure;
         try {
@@ -267,17 +270,21 @@ public final class CAdESTriPhaseSigner {
             digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo el OID en ASN.1 del algoritmo de huella digital", e); //$NON-NLS-1$
+            throw new AOException("Error obteniendo el OID en ASN.1 del algoritmo de huella digital: " + e, e); //$NON-NLS-1$
         }
 
         // EncryptionAlgorithm
         final AlgorithmIdentifier keyAlgorithmIdentifier;
         try {
-        	//TODO: Soporte de DSA y ECDSA
-            keyAlgorithmIdentifier = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        	//TODO: En RSA seria conveniente usar el OID del algoritmo de huella, y no solo el de RSA
+            keyAlgorithmIdentifier = SigUtils.makeAlgId(
+        		signatureAlgorithm.contains("withRSA") ? //$NON-NLS-1$
+    				AOAlgorithmID.getOID("RSA") : //$NON-NLS-1$
+    					AOAlgorithmID.getOID(signatureAlgorithm)
+    		);
         }
         catch (final Exception e) {
-            throw new AOException("Error al codificar el algoritmo de cifrado", e); //$NON-NLS-1$
+            throw new AOException("Error al codificar el algoritmo de cifrado: " + e, e); //$NON-NLS-1$
         }
 
         // Firma PKCS#1 codificada

@@ -13,6 +13,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -102,6 +104,21 @@ public final class AOPDFSigner implements AOSigner {
 		}
 	}
 
+	// iText tiene ciertos problemas reconociendo ECDSA y a veces usa su OID, por lo que declaramos alias de los
+	// algoritmos de firma en los proveedores mas comunes
+	static {
+		final String[] providers = new String[] { "SunEC", "BC", "SC" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (final String providerName : providers) {
+		    final Provider p = Security.getProvider(providerName);
+		    if (p != null) {
+		    	p.put("Alg.Alias.Signature.SHA224with1.2.840.10045.4.3.2", "SHA224withECDSA"); //$NON-NLS-1$ //$NON-NLS-2$
+		    	p.put("Alg.Alias.Signature.SHA256with1.2.840.10045.4.3.2", "SHA256withECDSA"); //$NON-NLS-1$ //$NON-NLS-2$
+		    	p.put("Alg.Alias.Signature.SHA384with1.2.840.10045.4.3.2", "SHA384withECDSA"); //$NON-NLS-1$ //$NON-NLS-2$
+		    	p.put("Alg.Alias.Signature.SHA512with1.2.840.10045.4.3.2", "SHA512withECDSA"); //$NON-NLS-1$ //$NON-NLS-2$
+		    }
+		}
+	}
+
 	/** Obtiene el mejorador de firmas por defecto.
 	 * @return Mejorador de firmas por defecto. */
 	public static SignEnhancer getSignEnhancer() {
@@ -133,14 +150,7 @@ public final class AOPDFSigner implements AOSigner {
      *  igualmente cifrado y protegido con contrase&ntilde;a..
      * </p>
      * @param inPDF Documento PDF a firmar.
-     * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
-     * </ul>
+     * @param signatureAlgorithm Algoritmo a usar para la firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
@@ -149,7 +159,7 @@ public final class AOPDFSigner implements AOSigner {
      * @throws IOException Cuando hay errores en el tratamiento de datos. */
     @Override
 	public byte[] sign(final byte[] inPDF,
-			           final String algorithm,
+			           final String signatureAlgorithm,
 			           final PrivateKey key,
 			           final java.security.cert.Certificate[] certChain,
 			           final Properties xParams) throws AOException,
@@ -164,7 +174,7 @@ public final class AOPDFSigner implements AOSigner {
     	final GregorianCalendar signTime = PdfUtil.getSignTime(extraParams.getProperty(PdfExtraParams.SIGN_TIME));
 
         // Sello de tiempo
-        byte[] data;
+        final byte[] data;
 		try {
 			data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);
 		}
@@ -178,7 +188,7 @@ public final class AOPDFSigner implements AOSigner {
         final PdfSignResult pre;
         try {
 			pre = PAdESTriPhaseSigner.preSign(
-				algorithm,
+				signatureAlgorithm,
 				data,
 				certificateChain,
 				signTime,
@@ -194,7 +204,7 @@ public final class AOPDFSigner implements AOSigner {
         try {
 	        interSign = new AOPkcs1Signer().sign(
 	    		pre.getSign(),
-	    		algorithm,
+	    		signatureAlgorithm,
 	    		key,
 	    		certificateChain,
 	    		extraParams
@@ -210,7 +220,7 @@ public final class AOPDFSigner implements AOSigner {
         // Postfirma
         try {
 			return PAdESTriPhaseSigner.postSign(
-				algorithm,
+				signatureAlgorithm,
 				data,
 				certificateChain,
 				interSign,
@@ -425,9 +435,9 @@ public final class AOPDFSigner implements AOSigner {
     			continue;
     		}
 
-    		final PdfPKCS7 pcks7;
+    		final PdfPKCS7 pkcs7;
     		try {
-    			pcks7 = af.verifySignature(signatureName);
+    			pkcs7 = af.verifySignature(signatureName);
     		}
     		catch(final Exception e) {
     			LOGGER.log(
@@ -441,18 +451,18 @@ public final class AOPDFSigner implements AOSigner {
     		}
     		if (asSimpleSignInfo) {
 
-       			final X509Certificate[] certChain = new X509Certificate[pcks7.getSignCertificateChain().length];
+       			final X509Certificate[] certChain = new X509Certificate[pkcs7.getSignCertificateChain().length];
     			for (int j = 0; j < certChain.length; j++) {
-    				certChain[j] = (X509Certificate) pcks7.getSignCertificateChain()[j];
+    				certChain[j] = (X509Certificate) pkcs7.getSignCertificateChain()[j];
     			}
 
     			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(
 					certChain,
-					pcks7.getSignDate() != null ? pcks7.getSignDate().getTime() : null
+					pkcs7.getSignDate() != null ? pkcs7.getSignDate().getTime() : null
 				);
 
     			// Extraemos el PKCS#1 de la firma
-    			final byte[] pkcs1 = pcks7.getPkcs1();
+    			final byte[] pkcs1 = pkcs7.getPkcs1();
     			if (pkcs1 != null) {
     				ssi.setPkcs1(pkcs1);
     			}
@@ -460,7 +470,7 @@ public final class AOPDFSigner implements AOSigner {
     			root.add(new AOTreeNode(ssi));
     		}
     		else {
-    			root.add(new AOTreeNode(AOUtil.getCN(pcks7.getSigningCertificate())));
+    			root.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate())));
     		}
     	}
 

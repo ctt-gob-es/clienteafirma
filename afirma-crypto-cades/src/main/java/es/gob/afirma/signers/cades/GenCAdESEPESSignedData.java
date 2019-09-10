@@ -54,20 +54,17 @@ public final class GenCAdESEPESSignedData {
         // No permitimos la instanciacion
     }
 
-    /** Genera una firma digital usando una estructura PKCS#7
-     * SignedData. Puede incluir el contenido del fichero codificado
+    /** Genera una firma digital usando una estructura PKCS#7.
+     * SignedData. Puede incluir el contenido del fichero codificado.
      * o s&oacute;lo una referencia a este.
-     * @param parameters
-     *        Par&aacute;metros necesarios para obtener los datos de
-     *        SignedData.
-     * @param omitContent
-     *        <code>false</code> si en la firma se desea incluir el contenido del
-     *        fichero o <code>true</code> si s&oacute;lo se desea usar una referencia.
+     * @param parameters Par&aacute;metros necesarios para obtener los datos de
+     *                   SignedData.
+     * @param omitContent <code>false</code> si en la firma se desea incluir el contenido del
+     *                    fichero o <code>true</code> si s&oacute;lo se desea usar una referencia.
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>SigningCertificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
+     * @param signingCertificateV2 <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *                             atributo <i>SigningCertificate</i> <code>false</code> para
+     *                             usar la versi&oacute;n 1
      * @param key Clave privada para firma.
      * @param certChain Cadena de certificados del firmante
      * @param dataDigest Huella digital de los datos a firmar cuando esta se proporciona precalculada. Si los datos a firmar (que se proporcionan
@@ -136,7 +133,7 @@ public final class GenCAdESEPESSignedData {
         final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, key, certChain, null);
 
         return CAdESTriPhaseSigner.postSign(
-            AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
+            signatureAlgorithm,
             omitContent ? null : content,
             certChain,
             signature,

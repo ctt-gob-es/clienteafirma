@@ -292,7 +292,8 @@ public final class CAdESUtils {
 		);
     }
 
-    private static Attribute getSigPolicyId(final String digestAlgorithmName, final AdESPolicy policy) throws IOException {
+    private static Attribute getSigPolicyId(final String digestAlgorithmName,
+    		                                final AdESPolicy policy) throws IOException {
 
         final ASN1ObjectIdentifier doiSigPolicyId = new ASN1ObjectIdentifier(
     		policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
@@ -312,7 +313,7 @@ public final class CAdESUtils {
         }
         // Si no tenemos, ponemos el algoritmo de firma.
         else {
-            hashid= SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
+            hashid = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
         }
 
         // Huella del documento
@@ -352,7 +353,7 @@ public final class CAdESUtils {
 
     }
 
-    /** Genera la parte que contiene la informaci&oacute;n del Usuario.
+    /** Genera la parte que contiene la informaci&oacute;n del usuario.
      * Se generan los atributos que se necesitan para generar la firma.
      *
      * <pre>
@@ -552,10 +553,12 @@ public final class CAdESUtils {
         	final List<Attribute> claimedRolesAttrs = new ArrayList<>();
         	for (final String role : claimedRoles) {
         		if (role != null && !role.isEmpty()) {
-        			claimedRolesAttrs.add(new Attribute(
+        			claimedRolesAttrs.add(
+    					new Attribute(
 							X509AttributeIdentifiers.id_at_role,
 							new DERSet(new DERUTF8String(role))
-							));
+						)
+					);
         		}
         	}
 

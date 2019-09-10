@@ -89,31 +89,31 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] data,
-			                         final String algorithm,
+			                         final String signatureAlgorithm,
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
 			                         final TriphaseData sessionData) throws NoSuchAlgorithmException,
 			                                                                IOException,
 			                                                                AOException {
 		final TriPhasePreProcessor prep = getPreProcessor(sessionData.getFormat());
-		return prep.preProcessPostSign(data, algorithm, cert, extraParams, sessionData);
+		return prep.preProcessPostSign(data, signatureAlgorithm, cert, extraParams, sessionData);
 	}
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
-			                           final String algorithm,
+			                           final String signatureAlgorithm,
 			                           final X509Certificate[] cert,
 			                           final Properties extraParams,
 			                           final TriphaseData sessionData) throws NoSuchAlgorithmException,
 			                                                                  AOException,
 			                                                                  IOException {
 		final TriPhasePreProcessor prep = getPreProcessor(sessionData.getFormat());
-		return prep.preProcessPostCoSign(data, algorithm, cert, extraParams, sessionData);
+		return prep.preProcessPostCoSign(data, signatureAlgorithm, cert, extraParams, sessionData);
 	}
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] data,
-			                         final String algorithm,
+			                         final String signatureAlgorithm,
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
 			                         final byte[] session) throws NoSuchAlgorithmException,
@@ -122,12 +122,12 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (session == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
-		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parser(session));
+		return preProcessPostSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parser(session));
 	}
 
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign,
-			                                final String algorithm,
+			                                final String signatureAlgorithm,
 			                                final X509Certificate[] cert,
 			                                final Properties extraParams,
 			                                final byte[] session,
@@ -137,12 +137,12 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (session == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
-		return preProcessPostCounterSign(sign, algorithm, cert, extraParams, TriphaseData.parser(session), targets);
+		return preProcessPostCounterSign(sign, signatureAlgorithm, cert, extraParams, TriphaseData.parser(session), targets);
 	}
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
-			                           final String algorithm,
+			                           final String signatureAlgorithm,
 			                           final X509Certificate[] cert,
 			                           final Properties extraParams,
 			                           final byte[] session) throws NoSuchAlgorithmException,
@@ -151,7 +151,7 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (session == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
-		return preProcessPostCoSign(data, algorithm, cert, extraParams, TriphaseData.parser(session));
+		return preProcessPostCoSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parser(session));
 	}
 
 	private TriPhasePreProcessor getPreProcessor(final String format) {
