@@ -1438,8 +1438,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			function createSelectCertificateRequest(extraParams) {
 				var data = new Object();
 				data.op = createKeyValuePair ("op", "selectcert");
-				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams) : null);
-				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
+				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
 				
 				return data;
@@ -1451,10 +1451,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.op = createKeyValuePair("op", signId);
 				data.algorithm = createKeyValuePair ("algorithm", algorithm);
 				data.format = createKeyValuePair ("format", format); 
-				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams) : null);
-				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
+				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
-				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64);
+				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
 				
 				return data;
 			}
@@ -1475,15 +1475,15 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.cryptoOp = createKeyValuePair("cop", signId);
 				data.algorithm = createKeyValuePair ("algorithm", algorithm);
 				data.format = createKeyValuePair ("format", format);
-				data.properties = createKeyValuePair ("properties", !!extraParams ? Base64.encode(extraParams) : null);
+				data.properties = createKeyValuePair ("properties", !!extraParams ? Base64.encode(extraParams, true) : null, true);
 				data.filename = createKeyValuePair ("filename", outputFileName);
-				data.ksb64 = createKeyValuePair ("ksb64", !!defaultKeyStore ? Base64.encode(defaultKeyStore) : null);
+				data.ksb64 = createKeyValuePair ("ksb64", !!defaultKeyStore ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
-				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64);
+				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
 				
 				return data;
 			}
-						
+
 			/**
 			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
@@ -1492,10 +1492,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.op = createKeyValuePair("op","batch");
 				data.batchpresignerurl = createKeyValuePair("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = createKeyValuePair("batchpostsignerurl", batchPostSignerUrl);
-				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams) : null);
-				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
+				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
-				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64);
+				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
 				
 				return data;
 			}
@@ -1525,7 +1525,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.filename = createKeyValuePair ("filename", filename);
 				data.extension = createKeyValuePair ("exts", extension);
 				data.description = createKeyValuePair ("desc", description);
-				data.dat = createKeyValuePair ("dat",  dataB64 == "" ? null : dataB64);
+				data.dat = createKeyValuePair ("dat",  dataB64 == "" ? null : dataB64, true);
 				
 				return data;
 			}
@@ -1544,7 +1544,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				var intentURL = 'afirma://' + encodeURIComponent(arr.op.value) + '?';	
 				for (var i = 0; i < params.length; i++) {
 					if (params[i].value != null && params[i].value != "null") {
-						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
+						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' +
+							(params[i].avoidEncoding ?
+									params[i].value :
+									encodeURIComponent(params[i].value));
 					}
 				}
 				return intentURL;
@@ -1785,6 +1788,12 @@ var MiniApplet = ( function ( window, undefined ) {
 					return;
 				}
 
+				// Si no se proporciona funcion de exito, no se procesa la respuesta
+				if (!successCallback) {
+					console.log("No se ha proporcionado funcion callback para procesar el resultado del lote de firma");
+					return;
+				}
+				
 				// Nombre del fichero cargado o array de nombres si era mas de uno
 				var filenames;
 				// Contenido del fichero cargado o array de contenidos si era mas de uno
@@ -1814,12 +1823,8 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 
 				}
-				if (!!successCallback) {
-					successCallback(filenames, datasB64);
-				}
-				else {
-					console.log("No se ha proporcionado funcion callback para procesar el resultado del lote de firma");
-				}
+
+				successCallback(filenames, datasB64);
 			}
 			
 			/**
@@ -1869,6 +1874,12 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function processLogResponse(data) {
 
+				// Si no se proporciona funcion de exito, no se procesa la respuesta
+				if (!successCallback) {
+					console.log("No se ha proporcionado funcion callback para procesar el log");
+					return;
+				}
+				
 				var log = " === JAVASCRIPT INFORMATION === " +
 				"\nnavigator.appCodeName: " + navigator.appCodeName +
 				"\nnavigator.appName: " +  navigator.appName +
@@ -1880,18 +1891,20 @@ var MiniApplet = ( function ( window, undefined ) {
 				"\nscreen.height: " + (window.screen ? screen.height : 0) +
 				"\n\n   === CLIENTE LOG === \n" + data;
 				
-				if (!!successCallback) {
-					successCallback(log);
-				}
-				else {
-					console.log("No se ha proporcionado funcion callback para procesar el log");
-				}
+				successCallback(log);
 			}
 
 			/**
 			 * Procesa la respuesta de una operacion de firma.
 			 */
 			function processSignResponse(data) {
+				
+				// Si no se proporciona funcion de exito, no se procesa la respuesta
+				if (!successCallback) {
+					console.log("No se ha proporcionado funcion callback para procesar el resultado de la firma");
+					return;
+				}
+				
 				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 				var signature;
 				var certificate = null;
@@ -1904,19 +1917,16 @@ var MiniApplet = ( function ( window, undefined ) {
 					certificate = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
 					signature = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
-				if (!!successCallback) {
-					successCallback(signature, certificate);
-				}
-				else {
-					console.log("No se ha proporcionado funcion callback para procesar el resultado de la firma");
-				}
+
+				successCallback(signature, certificate);
 			}
 			
 			/** Crea un objeto con los parametros indicados. */
-			function createKeyValuePair(key, value) {
+			function createKeyValuePair(key, value, avoidUrlEncoding) {
 				var data  = new Object();
 				data.key = key;
 				data.value = value;
+				data.avoidEncoding = !!avoidUrlEncoding;
 				return data;
 			}
 
