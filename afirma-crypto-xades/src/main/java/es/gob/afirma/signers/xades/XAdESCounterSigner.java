@@ -449,8 +449,6 @@ public final class XAdESCounterSigner {
 		        XAdESExtraParams.XADES_NAMESPACE, AOXAdESSigner.XADESNS);
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
 		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE);
-		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
-		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
 
 		// Buscamos un nodo UnsignedProperties
 		final NodeList up = signature.getElementsByTagNameNS(
@@ -574,33 +572,6 @@ public final class XAdESCounterSigner {
 			digestMethodAlgorithm,
 			canonicalizationAlgorithm
 		);
-
-		// *************************************************************************************
-		// ********************************* GESTION MANIFEST **********************************
-
-		if (useManifest) {
-			try {
-				XAdESUtil.createManifest(
-					referenceList,
-					fac,
-					xmlSignature,
-					digestMethod,
-					fac.newTransform(
-						canonicalizationAlgorithm,
-						(TransformParameterSpec) null
-					),
-					referenceId
-				);
-			}
-			catch (final Exception e) {
-				throw new AOException(
-					"Error creando el algoritmo de canonicalizacion para el MANIFEST: " + e, e //$NON-NLS-1$
-				);
-			}
-		}
-
-		// ********************************* FIN GESTION MANIFEST ******************************
-		// *************************************************************************************
 
 		try {
 			final boolean onlySignningCert = Boolean.parseBoolean(

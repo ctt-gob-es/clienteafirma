@@ -38,6 +38,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
+import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -143,9 +144,19 @@ final class ProtocolInvocationLauncherSign {
 			);
 		}
 
-		// Si no hay datos a firmar se los pedimos al usuario
+		// Comprobamos si es necesario pedir datos de entrada al usuario
+		boolean needRequestData = false;
 		if (options.getData() == null) {
+			if (signer != null && signer instanceof OptionalDataInterface) {
+				needRequestData = ((OptionalDataInterface) signer).needData(options.getExtraParams());
+			}
+			else {
+				needRequestData = true;
+			}
+		}
 
+		// Si se tienen que pedir los datos al usuario, se hace
+		if (needRequestData) {
 			final String dialogTitle = Operation.SIGN.equals(options.getOperation()) ?
 				ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
 					ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$

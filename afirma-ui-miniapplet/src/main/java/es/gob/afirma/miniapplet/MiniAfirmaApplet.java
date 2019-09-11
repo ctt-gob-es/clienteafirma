@@ -21,7 +21,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.MessageDigest;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.cert.CertificateEncodingException;
@@ -45,11 +44,11 @@ import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
+import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.SmartCardException;
 import es.gob.afirma.keystores.filters.CertFilterManager;
@@ -144,8 +143,33 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
+		// Intentamos obtener de primera el manejador de firma aunque puede
+		// que este se deba calcular mas adelante en base a los datos a firmar
+		String signatureFormat = MiniAfirmaApplet.cleanParam(format);
+		AOSigner signer;
+		try {
+			signer = MiniAfirmaApplet.selectSigner(signatureFormat, null, null);
+		}
+		catch (final Exception e) {
+			// No ha sido posible determinar el manejador de firma sin los datos
+			signer = null;
+		}
+
+		// Comprobamos si es necesario pedir los datos al usuario segun si se han obtenido ya
+		// y si el manejador de firma lo requiere
+		boolean needRequestData = false;
+		if (this.dataStore.length() == 0) {
+			if (signer != null && signer instanceof OptionalDataInterface) {
+				needRequestData = ((OptionalDataInterface) signer).needData(params);
+			}
+			else {
+				needRequestData = true;
+			}
+		}
+
+		// Cargamos los datos proporcionados o se los pedimos al usuario segun sea necesario
 		byte[] dataBinary;
-		if (this.dataStore.length() > 0) {
+		if (!needRequestData) {
 			try {
 				dataBinary = Base64.decode(this.dataStore.toString());
 			}
@@ -206,37 +230,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		LOGGER.info("Recibidos los siguientes parametros adicionales:\n" + baos.toString()); //$NON-NLS-1$
 
 		try {
-			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, dataBinary, null);
+			// Si no se pudo identificar antes el firmador que debe usarse, intentamos identificarlo
+			// en base al tipo de datos que se ha pedido firmar
+			if (signer == null) {
+				signer = MiniAfirmaApplet.selectSigner(signatureFormat, dataBinary, null);
+			}
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = AOSignerFactory.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
 			}
 
-			// XXX: Codigo para la identificacion de firmas XAdES enveloped explicita
-			// (Eliminar cuando se abandone el soporte de XAdES explicitas)
-			if (isXadesEnvelopedExplicit(signatureFormat, params)) {
-				final IllegalArgumentException e = new IllegalArgumentException(
-						"El formato Enveloped es incompatible con el modo de firma explicito"); //$NON-NLS-1$
-				setError(e);
-				throw e;
-			}
-
-			// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
-			if (isXadesExplicitConfigurated(signatureFormat, params)) {
-				LOGGER.warning(
-					"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
-				);
-				try {
-					dataBinary = MessageDigest.getInstance("SHA1").digest(dataBinary); //$NON-NLS-1$
-					params.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				catch (final Exception e) {
-					LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
-						+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
-				}
-			}
-
+			// Se obtiene la clave de firma
 			final PrivateKeyEntry pke = selectPrivateKey(params);
 			final byte[] signature = AccessController.doPrivileged(
 					new SignAction(
@@ -381,8 +385,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		try {
-			String signatureFormat = format;
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signature);
+			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, null, signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = AOSignerFactory.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
@@ -1347,36 +1351,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public String getCurrentLog() {
 		return AccessController.doPrivileged(new GetCurrentLogAction());
-	}
-
-	/**
-	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
-	 * de tipo enveloped y la propiedad {@code mode} con el valor {@code explicit}. Este tipo de firma
-	 * no existe.
-	 * @param format Formato declarado para la firma.
-	 * @param config Par&aacute;metros adicionales declarados para la firma.
-	 * @return {@code true} si se configura una firma XAdES Enveloped explicit, {@code false} en caso contrario.
-	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES explicitas.
-	 */
-	@Deprecated
-	private static boolean isXadesEnvelopedExplicit(final String format, final Properties config) {
-		return isXadesExplicitConfigurated(format, config) &&
-				AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(config.getProperty("format")) //$NON-NLS-1$
-			;
-	}
-
-	/** Identifica cuando se ha configurado una firma con el formato XAdES
-	 * y la propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma correcta,
-	 * pero por compatibilidad con los tipos de firmas del Applet pesado se ha incluido aqu&iacute;.
-	 * @param format Formato declarado para la firma.
-	 * @param config Par&aacute;metros adicionales declarados para la firma.
-	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>, {@code false} en caso contrario.
-	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES expl&iacute;citas. */
-	@Deprecated
-	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
-		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
-				AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")) //$NON-NLS-1$
-			;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
@@ -254,7 +256,7 @@ import es.uji.crypto.xades.jxades.util.XMLUtils;
  *  </dd>
  * </dl>
  * @version 0.3.1 */
-public final class AOXAdESSigner implements AOSigner {
+public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
@@ -423,6 +425,8 @@ public final class AOXAdESSigner implements AOSigner {
     			);
     }
 
+    // TODO: Hacer mas fiables los metodos de deteccion de los tipos de formato (isDetached, isEnveloping, etc)
+
     /** Comprueba si la firma es <i>detached</i>. Previamente debe haberse comprobado que el XML se
      * corresponde con una firma XAdES.
      * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
@@ -446,10 +450,93 @@ public final class AOXAdESSigner implements AOSigner {
         		return false;
         	}
 
-        	final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
-        	for (int i = 0; i < transformList.getLength(); i++) {
-        		if (((Element) transformList.item(i)).getAttribute("URI").equals('#' + dataNodeId)) { //$NON-NLS-1$
+        	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+        	for (int i = 0; i < referenceList.getLength(); i++) {
+        		if (((Element) referenceList.item(i)).getAttribute("URI").equals('#' + dataNodeId)) { //$NON-NLS-1$
         			return true;
+        		}
+        	}
+        }
+        catch (final Exception e) {
+        	return false;
+        }
+
+        return false;
+    }
+
+    /** Comprueba si la firma es <i>externally detached</i>. Previamente debe haberse
+     * comprobado que el XML se corresponde con una firma XAdES.
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
+     *                quiere comprobar
+     * @return {@code true} si la firma es <i>externally detached</i>, {@code false}
+     * en caso contrario. */
+    public static boolean isExternallyDetached(final Element element) {
+        if (element == null) {
+            return false;
+        }
+
+        try {
+        	String dataNodeId = null;
+        	final NodeList mainChildNodes = element.getChildNodes();
+        	for (int i = 0; i < mainChildNodes.getLength(); i++) {
+        		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
+        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
+        			break;
+        		}
+        	}
+        	if (dataNodeId == null || dataNodeId.length() == 0) {
+        		return false;
+        	}
+
+        	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+        	for (int i = 0; i < referenceList.getLength(); i++) {
+        		try {
+        			new URI(((Element) referenceList.item(i)).getAttribute("URI"));
+        		}
+        		catch (final Exception e) {
+        			continue;
+				}
+        		// Es una referencia externa con URI valida, ya que las internas empiezan por '#'
+        		return true;
+        	}
+        }
+        catch (final Exception e) {
+        	return false;
+        }
+
+        return false;
+    }
+
+    /** Comprueba si una firma de manifest. Previamente debe haberse comprobado que el XML se
+     * corresponde con una firma XAdES.
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
+     *                quiere comprobar
+     * @return {@code true} si es una firma con <i>manifest</i>, {@code false} en caso contrario. */
+    public static boolean isManifestSignature(final Element element) {
+        if (element == null) {
+            return false;
+        }
+
+        try {
+        	String dataNodeId = null;
+        	final NodeList mainChildNodes = element.getChildNodes();
+        	for (int i = 0; i < mainChildNodes.getLength(); i++) {
+        		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
+        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
+        			break;
+        		}
+        	}
+        	if (dataNodeId == null || dataNodeId.length() == 0) {
+        		return false;
+        	}
+
+        	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+        	for (int i = 0; i < referenceList.getLength(); i++) {
+
+        		final String referenceType = ((Element) referenceList.item(i)).getAttribute("Type"); //$NON-NLS-1$
+        		if (referenceType != null && referenceType.equals(MANIFESTURI)) {
+	        		// Si la firma tiene una referencia de tipo manifest, es manifest
+	        		return true;
         		}
         	}
         }
@@ -502,15 +589,15 @@ public final class AOXAdESSigner implements AOSigner {
         Element elementRes = null;
         try {
 
-            // comprueba que sea una documento de firma valido
+            // Comprueba que sea una documento de firma valido
             if (!isSign(sign)) {
                 throw new AOInvalidFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
             }
 
-            // obtiene la raiz del documento de firmas
+            // Obtiene la raiz del documento de firmas
             rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
-            // si es detached
+            // Si es detached
             if (AOXAdESSigner.isDetached(rootSig)) {
 
                 final Element firstChild = (Element) rootSig.getFirstChild();
@@ -524,6 +611,16 @@ public final class AOXAdESSigner implements AOSigner {
                 }
                 // Si no era un nodo de texto, se considera que es XML
                 elementRes = (Element) firstChild.getFirstChild();
+            }
+
+            // Si es externally detached
+            else if (AOXAdESSigner.isExternallyDetached(rootSig)) {
+            	elementRes = null;
+            }
+
+            // Si es una firma de Manifest
+            else if (AOXAdESSigner.isManifestSignature(rootSig)) {
+            	elementRes = null;
             }
 
             // Si es enveloped
@@ -546,7 +643,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // Si el documento es binario se deshace la codificacion en
                 // Base64 si y solo si esta declarada esta transformacion
                 else {
-                	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
+                	// Se deshace el Base64 si existe la transformacion Base64
                 	return isBase64TransformationDeclared(rootSig, object.getAttribute(ID_IDENTIFIER)) ?
         				Base64.decode(object.getTextContent()) :
         					object.getTextContent().getBytes();
@@ -973,6 +1070,9 @@ public final class AOXAdESSigner implements AOSigner {
             if (isDetached(rootSig)) {
                 signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
             }
+            else if (isExternallyDetached(rootSig)) {
+            	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+            }
             else if (isEnveloped(rootSig)) {
                 signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
             }
@@ -988,4 +1088,12 @@ public final class AOXAdESSigner implements AOSigner {
         return signInfo;
     }
 
+    @Override
+    public boolean needData(final Properties config) {
+
+    	// Sera obligatorio que se indiquen los datos de entrada siempre que el formato no sea
+    	// Externally Detached y no se trate de una firma manifest
+    	return !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(XAdESExtraParams.FORMAT)) &&
+    			!Boolean.parseBoolean(config.getProperty(XAdESExtraParams.USE_MANIFEST));
+    }
 }

@@ -362,7 +362,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final String precalculatedHashAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.PRECALCULATED_HASH_ALGORITHM);
 
-        Utils.checkIllegalParams(format, mode, uri, precalculatedHashAlgorithm, false);
+        Utils.checkIllegalParams(format, mode, false, uri, precalculatedHashAlgorithm, false);
 
         // Un externally detached con URL permite los datos nulos o vacios
         if ((data == null || data.length == 0) && !(format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && uri != null)) {

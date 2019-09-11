@@ -81,7 +81,6 @@ public final class AOFacturaESigner implements AOSigner {
     private static final Properties EXTRA_PARAMS = new Properties();
     static {
         EXTRA_PARAMS.setProperty(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
-        EXTRA_PARAMS.setProperty(XAdESExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT);
         EXTRA_PARAMS.setProperty(XAdESExtraParams.FACTURAE_SIGN, "true"); //$NON-NLS-1$
     }
 

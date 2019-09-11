@@ -343,7 +343,7 @@ public final class Utils {
     /** Comprueba si hay alguna incorrecci&oacute;n en los par&aacute;metros
      * principales de firma.
      * @param format Formato de firma.
-     * @param mode Modo de firma.
+     * @param mode Modo de firma (s&oacute;lo usado en XMLdSig).
      * @param uri URI del objeto a firmar.
      * @param externallyDetachedHashAlgorithm Algoritmo de huella digital en el caso de estar esta
      *                                        pre-calculada
@@ -351,32 +351,26 @@ public final class Utils {
      *              es XMLDSig. */
     public static void checkIllegalParams(final String format,
                                           final String mode,
+                                          final boolean useManifest,
                                           final URI uri,
                                           final String externallyDetachedHashAlgorithm,
                                           final boolean xades) {
-        if (!mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_IMPLICIT) &&
-        	!mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {
-            throw new UnsupportedOperationException("El modo de firma '" + mode + "' no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+    	if (xades) { // XAdES
 
-        if (xades) { // XAdES
-            if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
-            	&& mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {
-                throw new UnsupportedOperationException("El formato Enveloped es incompatible con el modo de firma explicito"); //$NON-NLS-1$
-            }
+    		if (mode != null) {
+    			LOGGER.warning("El parametro 'mode' se ignora en las firmas XAdES"); //$NON-NLS-1$
+    		}
+
             if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
-            	if ( uri == null && externallyDetachedHashAlgorithm == null) {
+            	if (uri == null && !useManifest) {
             		throw new UnsupportedOperationException(
-            				"La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
-            				);
+            			"Las firmas XML Externally Detached necesitan la URI para referenciar a los datos firmados" //$NON-NLS-1$
+            		);
             	}
             }
             else {
             	if (uri != null) {
             		LOGGER.warning("Se ignorara el parametro 'uri' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
-            	}
-            	if (externallyDetachedHashAlgorithm != null) {
-            		LOGGER.warning("Se ignorara el parametro 'precalculatedHashAlgorithm' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
             	}
             }
             if (!format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
@@ -387,6 +381,11 @@ public final class Utils {
             }
         }
         else { // XMLDSig
+
+        	if (!mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_IMPLICIT) &&
+        			!mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {
+        		throw new UnsupportedOperationException("El modo de firma '" + mode + "' no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+        	}
 
             if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
             	&& mode.equalsIgnoreCase(AOSignConstants.SIGN_MODE_EXPLICIT)) {

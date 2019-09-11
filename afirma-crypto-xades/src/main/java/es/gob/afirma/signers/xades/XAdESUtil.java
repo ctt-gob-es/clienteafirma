@@ -171,7 +171,7 @@ public final class XAdESUtil {
 		ArrayList<String> documentationReferences;
 		ArrayList<String> commitmentTypeQualifiers;
 
-		for(int i=0;i<=nCtis;i++) {
+		for(int i = 0; i <= nCtis; i++) {
 
 			// Identifier
 			tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER);
@@ -289,10 +289,10 @@ public final class XAdESUtil {
 			                              final Transform canonicalizationTransform,
 			                              final String referenceId) {
 
-		// Con Manifest vamos a incluir las referencias de "referencesList" en el Manifest y luego
-		// limpiar este mismo "referencesList" incluyendo posteriormente unica referencia al propio
-		// Manifest. Como es este "referencesList" lo que se firma, queda ya listo con el Manifest
-		// que contiene las referencias que de no usar Manifest estarian en "referencesList".
+		// Incluimos las referencias de "referencesList" en el Manifest y luego modificamos el listado
+		// para que solo haya una referencia, que sera la del propio manifest. Asi, lo que se firma es
+		// el manifest. De no haber usado manifest, lo que se hubiese firmado son las referencias
+		// proporcionadas.
 
 		// Creamos un nodo padre donde insertar el Manifest
 		final List<XMLStructure> objectContent = new LinkedList<>();

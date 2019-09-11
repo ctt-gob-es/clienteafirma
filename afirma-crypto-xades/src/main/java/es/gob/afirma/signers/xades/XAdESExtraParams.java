@@ -20,10 +20,20 @@ public final class XAdESExtraParams {
 	 * una referencia a &eacute;l. */
 	static final String KEEP_KEYINFO_UNSIGNED = "keepKeyInfoUnsigned"; //$NON-NLS-1$
 
-    /** URL en la que se encuentra el documento a firmar, necesario en el caso
+    /** URI en la que se encuentra el documento a firmar, necesario en el caso
      * del formato <i>XAdES Externally Detached</i>
      * (no aplica a contrafirmas). */
     public static final String URI = "uri"; //$NON-NLS-1$
+
+    /** Prefijo con el que se pueden marcar los nombres de las propiedades con las URI de los datos
+     * externos que se desean firmar. Es necesario para las firmas de m&uacute;ltiples documemntos
+     * mediante manifest. */
+    public static final String URI_PREFIX = "uri"; //$NON-NLS-1$
+
+    /** Prefijo con el que se pueden marcar los nombres de las propiedades con las huellas digitales
+     * de los datos que se desean firmar. Es necesario para las firmas de m&uacute;ltiples
+     * documemntos mediante manifest. */
+    public static final String MD_PREFIX = "md"; //$NON-NLS-1$
 
     /** Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
      * XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
@@ -180,7 +190,12 @@ public final class XAdESExtraParams {
 
     /** MIME-Type de los datos a firmar.
      * Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede ser inexacto. */
-    static final String XMLDSIG_OBJECT_MIME_TYPE = "mimeType";//$NON-NLS-1$
+    static final String CONTENT_MIME_TYPE = "mimeType";//$NON-NLS-1$
+
+    /**
+     * OID que identifica el tipo de datos a firmar. <br> No aplica a contrafirmas.
+     */
+    static final String CONTENT_TYPE_OID = "contentTypeOid";//$NON-NLS-1$
 
     /** Codificaci&oacute;n de los datos a firmar.<br>No aplica a contrafirmas.
      * Por restricc&oacute;n de esquema de XMLDsig debe ser una URI:
@@ -195,16 +210,25 @@ public final class XAdESExtraParams {
      *      &lt;attribute name="Encoding" type="anyURI" use="optional"/&gt;
      *    &lt;/complexType&gt;
      * </pre> */
-    static final String XMLDSIG_OBJECT_ENCODING = "encoding";//$NON-NLS-1$
+    static final String CONTENT_ENCODING = "encoding";//$NON-NLS-1$
+
+    /** Prefijo del par&aacute;metro con el MIME-Type de los datos de una referencia concreta de
+     * las que se firman. */
+    static final String CONTENT_MIME_TYPE_PREFIX = "mimeType";//$NON-NLS-1$
+
+    /**
+     * Prefijo del par&aacute;metro con el OID que identifica el tipo de datos a firmar para una
+     * referencia concreta de las firmadas. No aplica a contrafirmas.
+     */
+    static final String CONTENT_TYPE_OID_PREFIX = "contentTypeOid";//$NON-NLS-1$
+
+    /** Prefijo del par&aacute;metro con la codificaci&oacute;n de los datos a firmar para una
+     * referencia concreta de las firmadas. No aplica a contrafirmas. */
+    static final String CONTENT_ENCODING_PREFIX = "encoding";//$NON-NLS-1$
 
     /** Codificaci&oacute;n del XML de salida.
      * Si no se indica este valor se intenta auto-detectar a partir del XML de entrada (si los datos a firmar son un XML). */
     static final String OUTPUT_XML_ENCODING = "outputXmlEncoding"; //$NON-NLS-1$
-
-    /**
-     * OID que identifica el tipo de datos a firmar. <br> No aplica a contrafirmas.
-     */
-    static final String CONTENT_TYPE_OID = "contentTypeOid";//$NON-NLS-1$
 
     /**
      * Identificador de la pol&iacute;tica de firma (normalmente una URL hacia
@@ -351,11 +375,9 @@ public final class XAdESExtraParams {
 	}
 
     /**
-     * Modo de firma a usar. El valor explicit indica que no se incluyen los
-     * datos firmados, sino una referencia a estos, mientras que el valor
-     * implicit indica que s&iacute; se incluir&aacute;n dentro de la propia
-     * firma los datos firmados.
+     * Modo de firma. Se utiliza solo para se&ntilde;alar que ya ha dejado de usarse.
      */
+	@Deprecated
     static final String MODE = "mode";//$NON-NLS-1$
 
     /**

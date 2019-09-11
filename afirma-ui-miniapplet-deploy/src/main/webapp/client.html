@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+	var arrayBuffer;
+
+	function webSocketTest() {
+		var ws = new WebSocket("wss://127.0.0.1:12345");
+
+		ws.onopen = function() {
+			console.log("onopen");
+			ws.send(arrayBuffer);
+			document.getElementById('file-content').textContent = "Completed";
+		};
+
+		ws.onmessage = function(evt) {
+			console.log("onmessage: " + evt.data);
+		};
+
+		ws.onclose = function() {
+			console.log("onclose");
+		};
+	}
+
+	function readSingleFile(e) {
+		var file = e.target.files[0];
+		if (!file) {
+			return;
+		}
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			arrayBuffer = reader.result;
+			webSocketTest();
+		};
+		reader.readAsArrayBuffer(file);
+	}
+
+	window.onload = function() {
+		document.getElementById('file-input').addEventListener('change',
+				readSingleFile, false);
+	}
+</script>
+
+</head>
+
+<body>
+	<div id="sse">
+		<input type="file" id="file-input" />
+		<h3 id="file-content"></h3>
+	</div>
+</body>
+</html>

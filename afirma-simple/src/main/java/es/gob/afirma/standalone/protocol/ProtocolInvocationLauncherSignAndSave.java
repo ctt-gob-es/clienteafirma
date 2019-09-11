@@ -39,6 +39,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
+import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
@@ -138,9 +139,27 @@ final class ProtocolInvocationLauncherSignAndSave {
 			);
 		}
 
-		// Si no hay datos a firmar se los pedimos al usuario
-		String selectedFilename = null;
+		// Comprobamos si es necesario pedir datos de entrada al usuario
+		boolean needRequestData = false;
 		if (options.getData() == null) {
+
+			System.out.println(" ... 1");
+			if (signer != null && signer instanceof OptionalDataInterface) {
+				System.out.println(" ... 2");
+				needRequestData = ((OptionalDataInterface) signer).needData(options.getExtraParams());
+
+				System.out.println(" ... 2: " + needRequestData);
+			}
+			else {
+				System.out.println(" ... 3");
+				needRequestData = true;
+			}
+		}
+
+		String selectedFilename = null;
+
+		// Si se tienen que pedir los datos al usuario, se hace
+		if (needRequestData) {
 
 			final String dialogTitle = Operation.SIGN.equals(options.getOperation()) ?
 				ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
@@ -513,7 +532,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED);
 			}
 			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED);	
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED);
 		}
 		catch (final PdfIsPasswordProtectedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$

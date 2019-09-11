@@ -10,7 +10,6 @@
 package es.gob.afirma.signers.xades;
 
 import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
@@ -33,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
@@ -42,7 +42,6 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
@@ -52,7 +51,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -67,6 +65,8 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
 public final class XAdESCoSigner {
 
     private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
+
+	private static final Logger	LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private XAdESCoSigner() {
 		// No permitimos la instanciacion
@@ -134,18 +134,15 @@ public final class XAdESCoSigner {
 		final boolean addKeyInfoX509IssuerSerial = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.ADD_KEY_INFO_X509_ISSUER_SERIAL, Boolean.FALSE.toString()));
 
-		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
-		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
-
 		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
 
 		final String outputXmlEncoding = extraParams.getProperty(
 		        XAdESExtraParams.OUTPUT_XML_ENCODING);
 
-		String mimeType = extraParams.getProperty(XAdESExtraParams.XMLDSIG_OBJECT_MIME_TYPE);
+		String mimeType = extraParams.getProperty(XAdESExtraParams.CONTENT_MIME_TYPE);
 
-		String encoding = extraParams.getProperty(XAdESExtraParams.XMLDSIG_OBJECT_ENCODING);
+		String encoding = extraParams.getProperty(XAdESExtraParams.CONTENT_ENCODING);
 
 		// Dejamos que indiquen "base64" en vez de la URI, hacemos el cambio manualmente
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
@@ -269,13 +266,6 @@ public final class XAdESCoSigner {
 
 				// Firmas enveloped
 				if ("".equals(dataXmlUri)) { //$NON-NLS-1$
-
-					// Comprobamos que no se use MANIFEST con Enveloped
-					if (useManifest) {
-						throw new AOUnsupportedSignFormatException(
-							"El formato Enveloped es incompatible con el uso de estructuras Manifest" //$NON-NLS-1$
-						);
-					}
 
 					if (mimeType == null) {
 						mimeType = "text/xml"; //$NON-NLS-1$
@@ -459,33 +449,6 @@ public final class XAdESCoSigner {
 		if (isEnveloping) {
 			xmlSignature.addXMLObject(envelopingObject);
 		}
-
-		// *************************************************************************************
-		// ********************************* GESTION MANIFEST **********************************
-
-		if (useManifest) {
-			try {
-				XAdESUtil.createManifest(
-					referenceList,
-					fac,
-					xmlSignature,
-					digestMethod,
-					fac.newTransform(
-						canonicalizationAlgorithm,
-						(TransformParameterSpec) null
-					),
-					referenceId
-				);
-			}
-			catch (final Exception e) {
-				throw new AOException(
-					"Error creando el algoritmo de canonicalizacion para el MANIFEST: " + e, e //$NON-NLS-1$
-				);
-			}
-		}
-
-		// ********************************* FIN GESTION MANIFEST ******************************
-		// *************************************************************************************
 
 		try {
 			final boolean onlySignningCert = Boolean.parseBoolean(
