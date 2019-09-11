@@ -19,20 +19,17 @@ public enum PluginIntegrationWindow {
 	 * @return Identificador de la que se desea integrar el plugin o {@code null}
 	 * si no se identifica el tipo.
 	 */
-	public static PluginIntegrationWindow getWindow(String window) {
+	public static PluginIntegrationWindow getWindow(final String window) {
 
-		switch (window) {
+		switch (window.toLowerCase()) {
 		case "input": //$NON-NLS-1$
-		case "INPUT_DATA": //$NON-NLS-1$
+		case "input_data": //$NON-NLS-1$
 			return INPUT_DATA;
 		case "single_result": //$NON-NLS-1$
-		case "SINGLE_RESULT": //$NON-NLS-1$
 			return SINGLE_RESULT;
 		case "multi_result": //$NON-NLS-1$
-		case "MULTI_RESULT": //$NON-NLS-1$
 			return MULTI_RESULT;
 		case "visor": //$NON-NLS-1$
-		case "VISOR": //$NON-NLS-1$
 			return VISOR;
 		default:
 			return null;
