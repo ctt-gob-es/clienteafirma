@@ -97,7 +97,7 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 		// incluso, que hubo un problema al abrirlo, con lo cual puede que ya hubiese otra instancia de
 		// la aplicacion escuchando en el
 		LOGGER.info("Se ha cerrado la comunicacion con el socket. Cerramos la aplicacion"); //$NON-NLS-1$
-		System.exit(0);
+		Runtime.getRuntime().halt(0);
 	}
 
 	@Override
@@ -108,7 +108,6 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
 		LOGGER.info("Recibimos una peticion en el socket"); //$NON-NLS-1$
-
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {
 			broadcast(ECHO_RESPONSE, Collections.singletonList(ws));
