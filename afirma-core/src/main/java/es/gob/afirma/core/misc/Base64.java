@@ -641,7 +641,7 @@ public final class Base64 {
         		return false;
         	}
 
-        	// Solo puede aparecer el signo igual en como 2 ultimos caracteres de la cadena
+        	// Solo puede aparecer el signo igual en los 2 ultimos caracteres de la cadena
         	if (b == '=' && i < data.length - 2) {
         		return false;
         	}

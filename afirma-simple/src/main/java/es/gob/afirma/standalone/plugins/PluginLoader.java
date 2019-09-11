@@ -74,16 +74,17 @@ public class PluginLoader {
 
 			if (button.getActionClassName() == null) {
 				classLoader.close();
-				throw new PluginException(String.format("El plugin %1s no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
+				throw new PluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
 			}
 			if (button.getWindow() == null) {
 				classLoader.close();
-				throw new PluginException(String.format("El plugin %1s no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
+				throw new PluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
 			}
 			final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
 			if (window == null) {
 				classLoader.close();
-				throw new PluginException(String.format("El plugin %1s definio un boton en una ventana desconocida", info.getName())); //$NON-NLS-1$
+				throw new PluginException(String.format("El plugin '%1s' definio un boton en una ventana desconocida: %2s", //$NON-NLS-1$
+						info.getName(), button.getWindow()));
 			}
 			try {
 				final PluginAction action = getPluginAction(button.getActionClassName(), window, classLoader);
@@ -92,7 +93,8 @@ public class PluginLoader {
 			}
 			catch (final Exception e) {
 				classLoader.close();
-				throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea", info.getName()), e); //$NON-NLS-1$
+				throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
+						info.getName(), button.getActionClassName()), e);
 			}
 		}
 

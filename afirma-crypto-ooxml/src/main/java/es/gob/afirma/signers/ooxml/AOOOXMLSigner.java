@@ -197,7 +197,7 @@ public final class AOOOXMLSigner implements AOSigner {
             return null;
         }
 
-        // Las firmas contenidas en el documento OOXML son de tipo XMLdSig asi
+        // Las firmas contenidas en el documento OOXML son de tipo XAdES asi
         // que utilizaremos el signer de este tipo para gestionar el arbol de firmas
         final AOSigner xmldsigSigner = new AOXAdESSigner();
 
