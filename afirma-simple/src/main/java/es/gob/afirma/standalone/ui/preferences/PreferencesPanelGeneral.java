@@ -41,7 +41,6 @@ import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.updater.Updater;
 
 final class PreferencesPanelGeneral extends JScrollPane {
 
@@ -245,8 +244,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		signConstraint.gridy++;
 
-		// Solo se buscaran actualizaciones automaticamente en Windows
-		if (SimpleAfirma.isUpdatesEnabled() && Platform.OS.WINDOWS.equals(Platform.getOS())) {
+		// Solo mostramos el check de buscar actualizaciones si esta habilitado
+		// su uso
+		if (SimpleAfirma.isUpdatesEnabled()) {
 			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
 			);
@@ -552,11 +552,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 
-		if (
-			Boolean.getBoolean(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK) ||
-			Boolean.parseBoolean(System.getenv(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK)) ||
-			!SimpleAfirma.isUpdatesEnabled()
-		) {
+		if (!SimpleAfirma.isUpdatesEnabled()) {
 			this.checkForUpdates.setSelected(false);
 			this.checkForUpdates.setEnabled(false);
 		}

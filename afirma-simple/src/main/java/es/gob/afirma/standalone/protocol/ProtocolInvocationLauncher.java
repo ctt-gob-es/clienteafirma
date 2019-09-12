@@ -73,17 +73,17 @@ public final class ProtocolInvocationLauncher {
 		ProtocolInvocationLauncher.stickyKeyEntry = stickyKeyEntry;
 	}
 
+    @SuppressWarnings({ "unused", "static-method" })
+	void showAbout(final EventObject event) {
+    	MainMenu.showAbout(null);
+    }
+
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
      * Este m&eacute;todo usa siempre comunicaci&oacute;n mediante servidor intermedio, nunca localmente.
      * @param urlString URL de invocaci&oacute;n por protocolo.
      * @return Resultado de la operaci&oacute;n. */
     public static String launch(final String urlString)  {
         return launch(urlString, false);
-    }
-
-    @SuppressWarnings({ "unused", "static-method" })
-	void showAbout(final EventObject event) {
-    	MainMenu.showAbout(null);
     }
 
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.

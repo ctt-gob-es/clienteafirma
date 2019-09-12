@@ -442,6 +442,16 @@ public final class PreferencesManager {
 	//**************** FIN PREFERENCIAS DE FIRMA VISIBLE EN PDF ****************************************************************
 	//**************************************************************************************************************************
 
+	//******** Otras propiedades que se almacenan a pesar de no ser configurables por la aplicacion. **********
+	//*********************************************************************************************************
+
+	/** Clave para el guardado y recuperacaci&oacute;n de la fecha de la &uacute;ltima comprobaci&oacute;n de versi&oacute;n. */
+	public static final String HIDDEN_CONFIG_LASTCHECKDATE = "lastCheckDate"; //$NON-NLS-1$
+
+
+	/** Formato de fecha con el que se guarda el valor de la propiedad {@code HIDDEN_CONFIG_LASTCHECKDATE}. */
+	public static final String LASTCHECKDATE_DATEFORMAT = "yyyyMMdd"; //$NON-NLS-1$
+
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.

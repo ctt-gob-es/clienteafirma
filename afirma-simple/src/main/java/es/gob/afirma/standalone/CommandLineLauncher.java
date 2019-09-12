@@ -267,7 +267,7 @@ final class CommandLineLauncher {
 		}
 
 		final SimpleAfirma simpleAfirma = new SimpleAfirma();
-		simpleAfirma.initialize(inputFile);
+		simpleAfirma.initGUI(inputFile);
 		simpleAfirma.loadFileToSign(inputFile);
 		}
 

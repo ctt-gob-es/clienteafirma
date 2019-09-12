@@ -39,12 +39,8 @@ public final class Updater {
 	private static final String PREFERENCE_UPDATE_URL_VERSION_MACOSX = "urlMacosx"; //$NON-NLS-1$
 	private static final String PREFERENCE_UPDATE_URL_SITE = "updateSite"; //$NON-NLS-1$
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd"); //$NON-NLS-1$
-
-	/** Variable de entorno que hay que establecer (a nivel de sistema operativo o como propiedad de Java a
-	 * nivel de JVM) a <code>true</code> para evitar la comprobaci&oacute;n de disponibilidad de
-	 * actualizaciones de la aplicaci&oacute;n. */
-	public static final String AUTOFIRMA_AVOID_UPDATE_CHECK = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT =
+			new SimpleDateFormat(PreferencesManager.LASTCHECKDATE_DATEFORMAT);
 
 	private static Properties updaterProperties = null;
 
@@ -104,7 +100,7 @@ public final class Updater {
 
 		// Configuramos la URL del fichero de version a partir del fichero interno o,
 		// si esta configurada, preferentemente de la variable de registro
-		String url = null; 
+		String url = null;
 		if(Platform.getOS() == Platform.OS.WINDOWS)
 		{
 			url = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_VERSION_WINDOWS);
@@ -184,34 +180,16 @@ public final class Updater {
 	 * @param parent Componente padre para la modalidad. */
 	public static void checkForUpdates(final Object parent) {
 
-		// Primero miramos si directamente la comprobacion de actualizaciones esta deshabilitada a nivel interno de
-		// aplicacion
-		boolean omitCheck = Boolean.parseBoolean(updaterProperties.getProperty("avoidUpdateCheck")); //$NON-NLS-1$
-		if (omitCheck) {
-			LOGGER.info("La configuracion interna de la aplicacion solicita que no se busquen actualizaciones"); //$NON-NLS-1$
-		}
-
-		// Despues, miramos en la configuracion de la aplicacion que el usuario ha establecido mediante el UI.
-		// Si se ha deshabilitado la comprobacion de actualizaciones en la aplicacion, no se buscan actualizaciones,
-		// pero si la aplicacion si permite la busqueda de actualizaciones, miramos antes de hacerlo si se ha
-		// pedido que no se haga mediante variables de entorno
-		if (!omitCheck) {
-			omitCheck = Boolean.getBoolean(AUTOFIRMA_AVOID_UPDATE_CHECK) ||
-	                    Boolean.parseBoolean(System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK));
-			if (omitCheck) {
-				LOGGER.info(
-					"Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
-				);
-			}
-		}
+		// Miramos en la configuracion de la aplicacion que el usuario ha establecido mediante el UI.
+		boolean omitCheck = !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK);
 
 		// Comprobamos si ya se ha realizado la comprobacion de actualizaciones hoy
 		if (!omitCheck)
 		{
-			Calendar today = Calendar.getInstance();
-			Calendar lastCheck = getLastCheck();
-			omitCheck = (lastCheck.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR) &&
-					lastCheck.get(Calendar.YEAR) == today.get(Calendar.YEAR)) ||
+			final Calendar today = Calendar.getInstance();
+			final Calendar lastCheck = getLastCheck();
+			omitCheck = lastCheck.get(Calendar.DAY_OF_YEAR) >= today.get(Calendar.DAY_OF_YEAR) &&
+					lastCheck.get(Calendar.YEAR) == today.get(Calendar.YEAR) ||
 					lastCheck.get(Calendar.YEAR) > today.get(Calendar.YEAR);
 		}
 
@@ -266,21 +244,29 @@ public final class Updater {
 		}
 	}
 
+	/**
+	 * Establece la fecha actual como la fecha en la que se ha realizado la &uacute;ltima
+	 * comprobaci&oacute;n de versi&oacute;n.
+	 */
 	private static void updateLastCheck() {
-		Calendar lastCheck = Calendar.getInstance();
-		PreferencesManager.put("lastCheckDate", DATE_FORMAT.format(lastCheck.getTime())); //$NON-NLS-1$
+		final Calendar lastCheck = Calendar.getInstance();
+		PreferencesManager.put(PreferencesManager.HIDDEN_CONFIG_LASTCHECKDATE, DATE_FORMAT.format(lastCheck.getTime()));
 		try {
 			PreferencesManager.flush();
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			LOGGER.warning("No se ha podido almacenar la fecha de la ultima comprobacion de version"); //$NON-NLS-1$
 		}
 	}
 
+	/**
+	 * Recupera la fecha de la &uacute;ltima comprobaci&oacute;n de versi&oacute;n.
+	 * @return Fecha de la &uacute;ltima comprobaci&oacute;n.
+	 */
 	private static Calendar getLastCheck() {
-		Calendar lastCheck = Calendar.getInstance();
+		final Calendar lastCheck = Calendar.getInstance();
 		try {
-			lastCheck.setTime(DATE_FORMAT.parse(PreferencesManager.get("lastCheckDate"))); //$NON-NLS-1$
-		} catch (Exception e) {
+			lastCheck.setTime(DATE_FORMAT.parse(PreferencesManager.get(PreferencesManager.HIDDEN_CONFIG_LASTCHECKDATE)));
+		} catch (final Exception e) {
 			LOGGER.warning("No se ha podido recuperar la fecha de la ultima comprobacion de version"); //$NON-NLS-1$
 			lastCheck.set(Calendar.YEAR, 2000);
 		}

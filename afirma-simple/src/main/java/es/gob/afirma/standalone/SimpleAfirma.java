@@ -121,6 +121,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * evitar el env&iacute;o de estad&iacute;sticas a Google Analytics. */
     public static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
 
+    /** Variable de entorno que hay que establecer (a nivel de sistema operativo o como propiedad de Java a
+	 * nivel de JVM) a <code>true</code> para evitar la comprobaci&oacute;n de disponibilidad de
+	 * actualizaciones de la aplicaci&oacute;n. */
+	public static final String AVOID_UPDATE_CHECK = "es.gob.afirma.doNotCheckUpdates"; //$NON-NLS-1$
+
+	/** Variable de entorno que hay que establecer (a nivel de sistema operativo o como propiedad de Java a
+	 * nivel de JVM) a <code>true</code> para evitar la comprobaci&oacute;n de disponibilidad de
+	 * actualizaciones de la aplicaci&oacute;n. */
+	public static final String AVOID_UPDATE_CHECK_ENV = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
+
     /** Versiones de Java soportadas. */
 	private static final String[] SUPPORTED_JAVA_VERSIONS = new String[] {
 			"1.8", //$NON-NLS-1$
@@ -181,7 +191,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-	void initialize(final File preSelectedFile) {
+	void initGUI(final File preSelectedFile) {
 
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCES_LOCALE);
@@ -559,6 +569,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
        	ProxyUtil.setProxySettings();
 
+       	// Comprobamos si es necesario buscar actualizaciones
+        updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK) &&
+        		!Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
+        if (!updatesEnabled) {
+        	LOGGER.info(
+        			"Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
+        			);
+        }
+
 		// Google Analytics
 		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS) &&
 			!Boolean.getBoolean(DO_NOT_SEND_ANALYTICS) &&
@@ -600,9 +619,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	}
         }
 
-    	// Comprobamos actualizaciones si estan habilitadas y estamos en Windows
-        if (updatesEnabled && Platform.OS.WINDOWS.equals(Platform.getOS()) &&
-        		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
+    	// Comprobamos actualizaciones si estan habilitadas
+        if (updatesEnabled && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
 			Updater.checkForUpdates(null);
 		}
 		else {
@@ -706,7 +724,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     				}
 
     				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
-   					saf.initialize(null);
+   					saf.initGUI(null);
 
 
    					checkJavaVersion(saf.getMainFrame());
@@ -916,15 +934,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
 	}
 
-	/** Establece si las actualizaciones est&aacute;n permitidas.
-	 * @param enabled {@code true} si se permite la b&uacute;squeda y configuraci&oacute;n
-	 * de actualizaciones, {@code false} en caso contrario. */
-	public static void setUpdatesEnabled(final boolean enabled) {
-		updatesEnabled = enabled;
-	}
-
-	/** Indica si las actualizaciones est&aacute;n permitidas.
-	 * @return {@code true} si se permite la b&uacute;squeda y configuraci&oacute;n
+	/** Indica si las actualizaciones est&aacute;n permitidas o si se desactivaron mediante
+	 * alg&uacute;n mecanismo a nivel de administraci&oacute;n.
+	 * @return {@code true} si se permite la b&uacute;squeda
 	 * de actualizaciones, {@code false} en caso contrario. */
 	public static boolean isUpdatesEnabled() {
 		return updatesEnabled;
