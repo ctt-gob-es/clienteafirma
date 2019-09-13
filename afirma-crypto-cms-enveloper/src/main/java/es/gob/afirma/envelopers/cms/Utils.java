@@ -152,8 +152,11 @@ final class Utils {
      * @param keySize Tama&ntilde;o (en bits) de la clave.
      * @return Clave asignada.
      * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
-    private static SecretKey assignKey(final AOCipherConfig config, final Integer keySize) throws NoSuchAlgorithmException {
-        final KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
+    private static SecretKey assignKey(final AOCipherConfig config,
+    		                           final Integer keySize) throws NoSuchAlgorithmException {
+        final KeyGenerator kg = KeyGenerator.getInstance(
+    		config.getAlgorithm().getName()
+		);
         if (keySize != null) {
         	kg.init(keySize.intValue(), new SecureRandom());
         }
@@ -367,7 +370,8 @@ final class Utils {
      * @return Cifrador.
      * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario. */
-    private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException,
+                                                                    NoSuchPaddingException {
         return Cipher.getInstance(algName);
     }
 
@@ -384,22 +388,27 @@ final class Utils {
         }
         else {
             if (!algorithmConfig.getBlockMode().equals(AOCipherBlockMode.ECB)) {
-                params = new IvParameterSpec(algorithmConfig.getAlgorithm().equals(AOCipherAlgorithm.AES) ? IV_16 : IV_8);
+                params = new IvParameterSpec(
+            		algorithmConfig.getAlgorithm().equals(AOCipherAlgorithm.AES) ?
+        				IV_16 :
+        					IV_8
+				);
             }
         }
 
         return params;
     }
 
-    /** M&eacute;todo cifra la clave usada para cifrar el archivo usando para
-     * ello la clave p&uacute;blica del certificado del usuario.
+    /** Cifra la clave usada para cifrar el archivo usando para ello la clave p&uacute;blica del
+     * certificado del usuario.
      * @param pKey Clave p&uacute;blica del certificado.
      * @param cipherKey Clave de cifrado.
      * @return La clave cifrada en "WRAP_MODE".
      * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
      * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
-     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado. */
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de
+     *                                   bloque de cifrado. */
     private static byte[] cipherKey(final PublicKey pKey,
     		                        final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                       NoSuchPaddingException,

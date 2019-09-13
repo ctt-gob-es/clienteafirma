@@ -151,19 +151,19 @@ public final class CMSEnvelopedData {
      * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
      * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     byte[] genEnvelopedData(final byte[] data,
-                                   final String digestAlg,
-                                   final AOCipherConfig config,
-                                   final X509Certificate[] certDest,
-                                   final String dataType,
-                                   final Map<String, byte[]> uatrib,
-                                   final Integer keySize) throws IOException,
-                                                                 CertificateEncodingException,
-                                                                 NoSuchAlgorithmException,
-                                                                 InvalidKeyException,
-                                                                 NoSuchPaddingException,
-                                                                 InvalidAlgorithmParameterException,
-                                                                 IllegalBlockSizeException,
-                                                                 BadPaddingException {
+                            final String digestAlg,
+                            final AOCipherConfig config,
+                            final X509Certificate[] certDest,
+                            final String dataType,
+                            final Map<String, byte[]> uatrib,
+                            final Integer keySize) throws IOException,
+                                                          CertificateEncodingException,
+                                                          NoSuchAlgorithmException,
+                                                          InvalidKeyException,
+                                                          NoSuchPaddingException,
+                                                          InvalidAlgorithmParameterException,
+                                                          IllegalBlockSizeException,
+                                                          BadPaddingException {
 
         this.cipherKey = Utils.initEnvelopedData(config, keySize);
 
@@ -185,25 +185,29 @@ public final class CMSEnvelopedData {
 		);
 
         // construimos el Enveloped Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,
-                                                                                      new DERSet(infos.getRecipientInfos()),
-                                                                                      infos.getEncInfo(),
-                                                                                      unprotectedAttrs)).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.envelopedData,
+    		new EnvelopedData(
+				origInfo,
+                new DERSet(infos.getRecipientInfos()
+    		),
+            infos.getEncInfo(),
+            unprotectedAttrs)
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
-    /** M&eacute;todo que inserta remitentes en el "OriginatorInfo" de un sobre
+    /** Inserta remitentes en el <i>OriginatorInfo</i> de un sobre
      * de tipo envelopedData.
-     * @param data
-     *        Datos CMS que admiten multiples remitentes/firmantes.
-     * @param signerCertificateChain
-     *        Cadena de certificados a agregar.
+     * @param data Datos CMS que admiten multiples remitentes/firmantes.
+     * @param signerCertificateChain Cadena de certificados a agregar.
      * @return La nueva firma enveloped con los remitentes que ten&iacute;a (si
      *         los tuviera) con la cadena de certificados nueva.
-     * @throws IOException Si hay errores de lectura de datos
-     * @throws CertificateEncodingException Cuando el certificado proporcionado es inv&aacute;lido */
-    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
-
+     * @throws IOException Si hay errores de lectura de datos.
+     * @throws CertificateEncodingException Cuando el certificado proporcionado es inv&aacute;lido. */
+    public static byte[] addOriginatorInfo(final byte[] data,
+    		                               final X509Certificate[] signerCertificateChain) throws IOException,
+                                                                                                  CertificateEncodingException {
     	final ASN1Sequence dsq;
     	try (
 			final ASN1InputStream is = new ASN1InputStream(data);
