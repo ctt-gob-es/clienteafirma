@@ -1908,6 +1908,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 				var signature;
 				var certificate = null;
+				var extraInfo = null;
 				var sepPos = data.indexOf("|");
 				
 				if (sepPos == -1) {
@@ -1915,10 +1916,17 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 				else {
 					certificate = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
-					signature = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+					var sepPos2 = data.indexOf("|", sepPos + 1);
+					if (sepPos2 == -1) {
+						signature = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+					}
+					else {
+						signature = data.substring(sepPos + 1, sepPos2).replace(/\-/g, "+").replace(/\_/g, "/");
+						extraInfo = Base64.decode(data.substring(sepPos2), true);
+					}
 				}
 
-				successCallback(signature, certificate);
+				successCallback(signature, certificate, extraInfo);
 			}
 			
 			/** Crea un objeto con los parametros indicados. */
@@ -2783,8 +2791,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Si no se obtuvo un error, habremos recibido la firma y posiblemente el certificado (que antecederia a la
 				// firma y se separaria de ella con '|'). Si se definio una clave de cifrado, consideramos que la firma
 				// y el certificado (en caso de estar) llegan cifrados. El cifrado de ambos elementos es independiente
-				var certificate;
 				var signature;
+				var certificate = null;
+				var extraInfo = null;
 				var sepPos = html.indexOf('|');
 
 				// En caso de recibir un unico parametro, este sera la firma en el caso de las operaciones de firma y el
@@ -2809,13 +2818,28 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 				}
 				else {
-					if (cipherKey != undefined && cipherKey != null) {
-						certificate = decipher(html.substring(0, sepPos), cipherKey, true);
-						signature = decipher(html.substring(sepPos + 1), cipherKey);
+					var sepPos2 = html.indexOf('|', sepPos + 1);
+					if (sepPos2 == -1) {
+						if (cipherKey != undefined && cipherKey != null) {
+							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
+							signature = decipher(html.substring(sepPos + 1), cipherKey);
+						}
+						else {
+							certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
+							signature = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
+						}
 					}
 					else {
-						certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
-						signature = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
+						if (cipherKey != undefined && cipherKey != null) {
+							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
+							signature = decipher(html.substring(sepPos + 1, sepPos2), cipherKey);
+							extraInfo = Base64.decode(decipher(html.substring(sepPos2 + 1), cipherKey));
+						}
+						else {
+							certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
+							signature = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
+							extraInfo = Base64.decode(fromBase64UrlSaveToBase64(html.substring(sepPos2 + 1)));
+						}
 					}
 					
 					if (!!stickySignatory) {
@@ -2828,7 +2852,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 				}
 
-				successCallback(signature, certificate);
+				successCallback(signature, certificate, extraInfo);
 
 				return false;
 			}
