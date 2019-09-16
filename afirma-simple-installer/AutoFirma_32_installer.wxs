@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-   <?define VersionNumber="1.6.5" ?>
+   <?define VersionNumber="1.7.0" ?>
    <?define Platform="x86" ?>
    <?define ProjectDir ="" ?>
    <?define ProjectName ="AutoFirma" ?>
@@ -14,11 +14,13 @@
        
 	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
 	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
-	   
+
+		<Property Id="CREATE_ICON" Value="true" Admin="yes" />
+
 		<!-- Ejecucion del instalador -->
 		<CustomAction Id='QtExecInstall'
 					  FileKey='$(var.ProjectName)Generator.exe'
-					  ExeCommand='/S'
+					  ExeCommand='/S CREATE_ICON=[CREATE_ICON]'
                       Execute="deferred"
                       Return="check"
 					  Impersonate="no" />

@@ -18,7 +18,13 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.6.5"
+!define VERSION "1.7.0"
+
+;--------------------------------
+;Macros para el tratamiento de los parametros de entrada del instalador
+
+  !insertmacro GetParameters
+  !insertmacro GetOptions
 
 ;--------------------------------
 ;Paginas del instalador
@@ -40,7 +46,6 @@ SetCompressor lzma
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
   
- 
 ;--------------------------------
 ;Idiomas
  
@@ -82,6 +87,7 @@ XPStyle on
 Var PATH
 Var PATH_ACCESO_DIRECTO
 
+Var CREATE_ICON
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
 InstallDir "$PROGRAMFILES\AutoFirma"
@@ -103,6 +109,11 @@ SetDatablockOptimize on
 ;Habilitamos la compresion de nuestro instalador
 SetCompress auto
 
+Function .onInit
+  ${GetParameters} $R0
+    ClearErrors
+  ${GetOptions} $R0 "CREATE_ICON=" $CREATE_ICON						  
+FunctionEnd		   
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la aplicacion y configuracion de la misma            ;
@@ -135,8 +146,8 @@ Section "Programa" sPrograma
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
 
-	;creamos un acceso directo en el escitorio
-	MessageBox MB_YESNO "?Desea instalar un acceso directo a AutoFirma en su escritorio?" /SD IDYES IDNO +2
+	;Creamos un acceso directo en el escitorio salvo que se haya configurado lo contrario
+	StrCmp $CREATE_ICON "false" +2
 		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
 
 	;Menu items
