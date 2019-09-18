@@ -46,6 +46,7 @@ SetCompressor lzma
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
+
 ;--------------------------------
 ;Idiomas
  
@@ -79,14 +80,10 @@ XPStyle on
 
 /*
 	Declaracion de variables a usar
-	
 */
-# tambien comprobamos los distintos
-; tipos de comentarios que nos permite este lenguaje de script
-
+;Ruta relativa interna de instalacion
 Var PATH
-Var PATH_ACCESO_DIRECTO
-
+;Parametro que indica si se debe crear el acceso directo en el escritorio
 Var CREATE_ICON
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
@@ -133,14 +130,35 @@ Section "Programa" sPrograma
 		Quit
 
 	StrCpy $PATH "AutoFirma"
-	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
-	
-	SetOutPath $INSTDIR\$PATH
 
-	;Si en el directorio de instalacion hay una JRE de una version anterior, se elimina
-	;para evitar errores al actualizarla 
-	IfFileExists $INSTDIR\$PATH\jre\*.* 0 +2
-		RMDir /r $INSTDIR\$PATH\jre
+	;Comprueba que exista ya una version EXE instalada y la desinstala si existe
+	ClearErrors
+	;Leemos el directorio de instalacion de la version actual de la aplicacion, si estuviese instalada
+	ReadRegStr $R0 HKLM SOFTWARE\$PATH "InstallDir"
+	;Leemos el comando de desinstalacion de la aplicacion
+	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+	;Si encontramos el comando de desinstalacion, lo ejecutamos en modo silencioso indicando el directorio de instalacion
+	StrCmp $R1 "" +4
+		ExecWait '"$R1" /S _?=$R0'
+		;Si el anterior directorio de instalacion y el nuevo fuesen distintos, nos aseguramos de borrar el viejo
+		StrCmp $R0 $INSTDIR +2
+			RMDir /r /REBOOTOK '$0'
+			
+	;Si en el directorio de instalacion nuevo ya existiese el directorio interno, lo eliminamos
+	IfFileExists $INSTDIR\$PATH\*.* 0 +2
+		RMDir /r $INSTDIR\$PATH
+		
+	;Iniciamos el proceso de instalacion
+	
+	;El desinstalador del MSI lo dejamos en el directorio principal
+	;Este fichero ya esta incluido en el propio MSI pero cuando se instala el MSI sobre una
+	;instalacion con EXE, al ejecutar el proceso de desinstalacion del EXE se elimina este
+	;recurso. Por eso lo volvemos a crear una vez terminada la desinstalacion
+	SetOutPath $INSTDIR
+	File  no_ejecutar_x64.exe
+	
+	;Los ficheros de la aplicacion los dejamos en un subdirectorio
+	SetOutPath $INSTDIR\$PATH
 
 	;Incluimos la JRE
 	File /r java64\jre
@@ -149,6 +167,7 @@ Section "Programa" sPrograma
 	File  AutoFirma64\AutoFirma.exe
 	File  AutoFirma64\AutoFirmaConfigurador.exe
 	File  AutoFirma64\AutoFirmaCommandLine.exe
+	
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -157,11 +176,11 @@ Section "Programa" sPrograma
 
 	;Creamos un acceso directo en el escitorio salvo que se haya configurado lo contrario
 	StrCmp $CREATE_ICON "false" +2
-		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 
 	;Menu items
 	CreateDirectory "$SMPROGRAMS\AutoFirma"
-	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 
 	WriteRegStr HKLM SOFTWARE\$PATH "InstallDir" $INSTDIR
 	WriteRegStr HKLM SOFTWARE\$PATH "Version" "${VERSION}"
@@ -171,60 +190,60 @@ Section "Programa" sPrograma
 	;Registro
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\AutoFirma.exe sign -gui -i "%1"'
 	
 	;Generar huella archivos
  	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "" "Generar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\$PATH\AutoFirma.exe createdigest -i "%1"'
 
 	;Generar huella directorios
 	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "" "Generar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\$PATH\AutoFirma.exe createdigest -i "%1"'
 
 	;Comprobar huella .hash
  	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 
 	;Comprobar huella .hashb64
  	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 	
 	;Comprobar huella .hashfiles
  	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 	
 	;Verify
 	; .csig
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
 
 	
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
-	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
-	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
-	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
+	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
+	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
+	Delete "$INSTDIR\$PATH\autofirma.pfx"
 	
 	;Se cierra Firefox y Chrome si están abiertos
 	${nsProcess::FindProcess} "firefox.exe" $R2
@@ -240,12 +259,12 @@ Section "Programa" sPrograma
 	Sleep 2000
 	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
-	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" /passive'
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
 	
 	; Importamos el certificado en el sistema
-	Push "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
+	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
@@ -254,7 +273,7 @@ Section "Programa" sPrograma
 	;${EndIf}
 	
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$INSTDIR\AutoFirma"
+	Push "$INSTDIR\$PATH"
 	Call AddToPath
 
 SectionEnd

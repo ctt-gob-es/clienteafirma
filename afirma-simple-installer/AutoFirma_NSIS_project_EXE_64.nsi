@@ -77,11 +77,8 @@ XPStyle on
 /*
 	Declaracion de variables a usar
 */
-# tambien comprobamos los distintos
-; tipos de comentarios que nos permite este lenguaje de script
-
+;Ruta relativa interna de instalacion
 Var PATH
-Var PATH_ACCESO_DIRECTO
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
@@ -138,37 +135,36 @@ Section "Programa" sPrograma
 		Quit
 
 	StrCpy $PATH "AutoFirma"
-	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 
 	; Comprueba que no este ya instalada
-	  ClearErrors
-	  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	  ${If} ${Errors}
-		; Comprobamos si esta la version 1.4.2 en ese directorio y la desinstalamos en tal caso; despues instalamos
-		IfFileExists '$INSTDIR\unistall.exe' 0 +4
-		  MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		  StrCpy $R0 "$INSTDIR\unistall.exe"
-		  Goto UninstallOlderVersion
-		; Comprobamos si esta la version 1.4.2 en su directorio por defecto y la desinstalamos en tal caso; despues instalamos
-		IfFileExists '$PROGRAMFILES\AutoFirma\unistall.exe' 0 +5
-		  MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		  StrCpy $R0 "$PROGRAMFILES\AutoFirma\unistall.exe"
-		  ExecWait '"$R0" /S _?=$PROGRAMFILES\AutoFirma'
-		  RMDir /r /REBOOTOK '$PROGRAMFILES\AutoFirma'
-		Goto Install
-	  ${EndIf}
-	  ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
-	  ${VersionCheckNew} $R1 ${VERSION} "$R2"
-	  ${If} $R2 = 0
-        MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
-	  ${else}
-		${If} $R2 = 2
+	ClearErrors
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+	${If} ${Errors}
+	  ; Comprobamos si esta la version 1.4.2 en ese directorio y la desinstalamos en tal caso; despues instalamos
+	  IfFileExists '$INSTDIR\unistall.exe' 0 +4
+	    MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		StrCpy $R0 "$INSTDIR\unistall.exe"
+	    Goto UninstallOlderVersion
+	  ; Comprobamos si esta la version 1.4.2 en su directorio por defecto y la desinstalamos en tal caso; despues instalamos
+	  IfFileExists '$PROGRAMFILES\AutoFirma\unistall.exe' 0 +5
 		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		Goto UninstallOlderVersion
-		${else}
-		MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
-		${EndIf}
-      ${EndIf}
+		StrCpy $R0 "$PROGRAMFILES\AutoFirma\unistall.exe"
+		ExecWait '"$R0" /S _?=$PROGRAMFILES\AutoFirma'
+		RMDir /r /REBOOTOK '$PROGRAMFILES\AutoFirma'
+	  Goto Install
+	${EndIf}
+	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+	${VersionCheckNew} $R1 ${VERSION} "$R2"
+	${If} $R2 = 0
+	  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
+	${else}
+	  ${If} $R2 = 2
+	    MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+	    Goto UninstallOlderVersion
+	  ${else}
+	    MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
+	  ${EndIf}
+	${EndIf}
 	Exit:
 	  Quit
 
@@ -219,21 +215,19 @@ Section "Programa" sPrograma
 
 	
 	;Anade una entrada en la lista de "Program and Features"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayName" "AutoFirma"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString" "$INSTDIR\uninstall.exe"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayIcon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "NoModify" "1"
-	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "NoRepair" "1"
-	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "EstimatedSize" "100000"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "Publisher" "Gobierno de España"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion" "${VERSION}"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "AutoFirma"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "UninstallString" "$INSTDIR\uninstall.exe"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayIcon" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoModify" "1"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoRepair" "1"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "EstimatedSize" "100000"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "Publisher" "Gobierno de España"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayVersion" "${VERSION}"
 
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 
-	WriteRegStr HKLM SOFTWARE\$PATH "InstallDir" $INSTDIR
-	WriteRegStr HKLM SOFTWARE\$PATH "Version" "${VERSION}"
-
-	;Exec "explorer $SMPROGRAMS\$PATH_ACCESO_DIRECTO\"
+	WriteRegStr HKLM "SOFTWARE\$PATH" "InstallDir" $INSTDIR
+	WriteRegStr HKLM "SOFTWARE\$PATH" "Version" "${VERSION}"
 
 	;Registro
 	;CascadeAfirma.reg
@@ -286,14 +280,12 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
 
-	
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
 	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 
-	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
 	; Eliminamos los certificados de versiones previas del sistema
@@ -565,22 +557,20 @@ FunctionEnd
 
 Section "uninstall"
 	StrCpy $PATH "AutoFirma"
-	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 	SetShellVarContext all
 
-   ; ==== Desinstalador EXE - INICIO ====
+	; ==== Desinstalador EXE - INICIO ====
    
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
-	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalación de AutoFirma.' IDOK loopChrome
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
 	
 	; ==== Desinstalador EXE - FIN ====
 	
@@ -601,11 +591,11 @@ Section "uninstall"
 ;	Goto loopChrome
 	
 	; ==== Desinstalador MSI - FIN ====
-	
+
 	${nsProcess::Unload}
 	
 	Sleep 2000
-	
+
 	;Eliminamos los certificados del sistema
 	Call un.DeleteCertificate
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
@@ -623,7 +613,7 @@ Section "uninstall"
 	PostValidacion:
 	;Borrar accesos directorios del menu inicio
 	Delete "$DESKTOP\AutoFirma.lnk"
-	RMDir /r $SMPROGRAMS\$PATH_ACCESO_DIRECTO
+	RMDir /r $SMPROGRAMS\$PATH
 	
 	DeleteRegKey HKLM "SOFTWARE\$PATH"
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 

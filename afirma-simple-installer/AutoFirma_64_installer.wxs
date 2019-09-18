@@ -51,7 +51,7 @@
                 <File Id="$(var.ProjectName)Generator.exe" Source="AutoFirma64\$(var.ProjectName)Generator.exe" KeyPath="yes" Checksum="yes"/>
             </Component>
 			<!-- no_ejecutar es el desinstalador. Se le asigna ese nombre para que los usuarios no lo ejecuten manualmente.
-			Lo hacemos permanente para asegurarnos de que no se elimina antes de que la CustomAction lo ejecute -->
+			Lo hacemos permanente para asegurarnos de que no se elimina antes de que la CustomAction de desinstalacion lo ejecute -->
 			<Component Id="no_ejecutar_$(var.Platform).exe" Guid="*" Win64="no" Permanent="yes">
 				<File Id="no_ejecutar_$(var.Platform).exe" Source="no_ejecutar_$(var.Platform).exe" KeyPath="yes" Checksum="yes"/>
             </Component>
