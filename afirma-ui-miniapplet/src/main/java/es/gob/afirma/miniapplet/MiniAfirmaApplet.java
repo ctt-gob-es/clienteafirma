@@ -168,10 +168,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		// Cargamos los datos proporcionados o se los pedimos al usuario segun sea necesario
-		byte[] dataBinary;
+		FileData fileData;
 		if (!needRequestData) {
 			try {
-				dataBinary = Base64.decode(this.dataStore.toString());
+				fileData = new FileData(Base64.decode(this.dataStore.toString()));
 			}
 			catch (final Exception e) {
 				setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
@@ -194,7 +194,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 								fileExts.replace(",", ",*.")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			try {
-				dataBinary = AccessController.doPrivileged(new GetFileContentAction(
+				fileData = AccessController.doPrivileged(new GetFileContentAction(
 						MiniAppletMessages.getString("MiniAfirmaApplet.0"), //$NON-NLS-1$
 						fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
 						fileDesc,
@@ -233,11 +233,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			// Si no se pudo identificar antes el firmador que debe usarse, intentamos identificarlo
 			// en base al tipo de datos que se ha pedido firmar
 			if (signer == null) {
-				signer = MiniAfirmaApplet.selectSigner(signatureFormat, dataBinary, null);
+				signer = MiniAfirmaApplet.selectSigner(signatureFormat, fileData.getData(), null);
 			}
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = AOSignerFactory.getSignFormat(signer);
-				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
+				ExtraParamsProcessor.configAutoFormat(signer, fileData.getData(), params);
 			}
 
 			// Se obtiene la clave de firma
@@ -245,22 +245,27 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final byte[] signature = AccessController.doPrivileged(
 					new SignAction(
 						signer,
-						dataBinary,
+						fileData.getData(),
 						MiniAfirmaApplet.cleanParam(algorithm),
 						pke,
-						ExtraParamsProcessor.expandProperties(params, dataBinary, signatureFormat)
+						ExtraParamsProcessor.expandProperties(params, fileData.getData(), signatureFormat)
 					)
 				);
 
 			// El base 64 es un 30% mayor que los datos originales, asi que calculamos el tamano al alza en base al tamano de la firma
 			// (normalmente mayor que el del certificado)
-			final StringBuilder result = new StringBuilder((int) Math.floor(signature.length * 1.4));
-			return chunkReturn(
-				result.
-					append(Base64.encode(pke.getCertificate().getEncoded())).
-					append('|').
-					append(Base64.encode(signature)).toString()
-			);
+			final StringBuilder result = new StringBuilder((int) Math.floor(signature.length * 1.5));
+			result
+				.append(Base64.encode(pke.getCertificate().getEncoded()))
+				.append('|')
+				.append(Base64.encode(signature)).toString();
+			if (fileData.getFilename() != null) {
+				result
+					.append('|')
+					.append(Base64.encode(buildExtraDataResult(fileData.getFilename())
+							.getBytes(StandardCharsets.UTF_8)));
+			}
+			return chunkReturn(result.toString());
 		}
 		catch (final IncompatiblePolicyException e) {
 			setError(e);
@@ -311,10 +316,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
-		byte[] signature;
+		FileData signatureFileData;
 		if (this.dataStore.length() > 0) {
 			try {
-				signature = Base64.decode(this.dataStore.toString());
+				signatureFileData = new FileData(Base64.decode(this.dataStore.toString()));
 			}
 			catch (final Exception e) {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
@@ -338,7 +343,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 								fileExts.replace(",", ",*.")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			try {
-				signature = AccessController.doPrivileged(new GetFileContentAction(
+				signatureFileData = AccessController.doPrivileged(new GetFileContentAction(
 						MiniAppletMessages.getString("MiniAfirmaApplet.2"), //$NON-NLS-1$
 						fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$,
 						fileDesc,
@@ -386,17 +391,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, null, signature);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, null, signatureFileData.getData());
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = AOSignerFactory.getSignFormat(signer);
-				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
+				ExtraParamsProcessor.configAutoFormat(signer, signatureFileData.getData(), params);
 			}
 
 			final PrivateKeyEntry pke = selectPrivateKey(params);
 			final byte[] cosignature = AccessController.doPrivileged(
 				new CoSignAction(
 					signer,
-					signature,
+					signatureFileData.getData(),
 					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm),
 					pke,
@@ -406,13 +411,19 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 			// El base 64 es un 30% mayor que los datos originales, asi que calculamos el tamano al alza en base al tamano de la firma
 			// (normalmente mayor que el del certificado)
-			final StringBuilder result = new StringBuilder((int) Math.floor(cosignature.length * 1.4));
-			return chunkReturn(result.
-				append(Base64.encode(pke.getCertificate().getEncoded())).
-				append('|').
-				append(Base64.encode(cosignature)).toString()
-			);
+			final StringBuilder result = new StringBuilder((int) Math.floor(cosignature.length * 1.5));
+			result
+				.append(Base64.encode(pke.getCertificate().getEncoded()))
+				.append('|')
+				.append(Base64.encode(cosignature));
+			if (signatureFileData.getFilename() != null) {
+				result
+					.append('|')
+					.append(Base64.encode(buildExtraDataResult(signatureFileData.getFilename())
+							.getBytes(StandardCharsets.UTF_8)));
+			}
 
+			return chunkReturn(result.toString());
 		}
 		catch (final IncompatiblePolicyException e) {
 			setError(e);
@@ -461,10 +472,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
-		byte[] signature;
+		FileData signatureFileData;
 		if (this.dataStore.length() > 0) {
 			try {
-				signature = Base64.decode(this.dataStore.toString());
+				signatureFileData = new FileData(Base64.decode(this.dataStore.toString()));
 			}
 			catch (final Exception e) {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
@@ -488,7 +499,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 								fileExts.replace(",", ",*.")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			try {
-				signature = AccessController.doPrivileged(new GetFileContentAction(
+				signatureFileData = AccessController.doPrivileged(new GetFileContentAction(
 						MiniAppletMessages.getString("MiniAfirmaApplet.2"), //$NON-NLS-1$
 						fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$,
 						fileDesc,
@@ -515,17 +526,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			String signatureFormat = format;
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signature);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signatureFileData.getData());
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = AOSignerFactory.getSignFormat(signer);
-				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
+				ExtraParamsProcessor.configAutoFormat(signer, signatureFileData.getData(), params);
 			}
 
 			final PrivateKeyEntry pke = selectPrivateKey(params);
 			final byte[] countersignature = AccessController.doPrivileged(
 				new CounterSignAction(
 						signer,
-						signature,
+						signatureFileData.getData(),
 						MiniAfirmaApplet.cleanParam(algorithm),
 						pke,
 						ExtraParamsProcessor.expandProperties(params, null, signatureFormat)
@@ -534,7 +545,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 			// El base 64 es un 30% mayor que los datos originales, asi que calculamos el tamano al alza en base al tamano de la firma
 			// (normalmente mayor que el del certificado)
-			final StringBuilder result = new StringBuilder((int) Math.floor(countersignature.length * 1.4));
+			final StringBuilder result = new StringBuilder((int) Math.floor(countersignature.length * 1.5));
 			return chunkReturn(result.
 					append(Base64.encode(pke.getCertificate().getEncoded())).
 					append('|').
@@ -658,7 +669,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		// Establecemos los datos que se deben guardar
-		this.dataStore.append(result.substring(result.indexOf('|') + 1));
+		final int pos1 = result.indexOf('|') + 1;
+		final int pos2 = result.indexOf('|', pos1 + 1);
+		this.dataStore.append(pos2 == -1 ? result.substring(pos1 + 1) : result.substring(pos1 + 1, pos2));
 
 		// Solicitamos el guardado
 		try {
@@ -1461,5 +1474,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw new AOException("Ocurrio un error grave durante la seleccion de un certificado de firma", e); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Construye una cadena de texto con un objeto JSON de datos extra que enviar en la respuesta.
+	 * @param filename Nombre de fichero.
+	 * @return Cadena con el JSON de datos extra.
+	 */
+	private static String buildExtraDataResult(final String filename) {
+		if (filename == null) {
+			return null;
+		}
+		return "{\"filename\":\"" + filename + "\"}"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

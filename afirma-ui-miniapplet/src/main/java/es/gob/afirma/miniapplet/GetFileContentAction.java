@@ -10,6 +10,7 @@
 package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
  * por el usuario.
  * @author Carlos Gamuci Mill&aacute;n
  */
-final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
+final class GetFileContentAction implements PrivilegedExceptionAction<FileData>{
 
     private final String title;
     private final String[] exts;
@@ -49,9 +50,9 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero. */
 	@Override
-	public byte[] run() throws IOException {
-		try (
-			final InputStream is = new FileInputStream(AOUIFactory.getLoadFiles(
+	public FileData run() throws IOException {
+
+		final File inputFile = AOUIFactory.getLoadFiles(
 				this.title,
 				null,
 				null,
@@ -61,9 +62,13 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 				false,
 				null,
 				this.parent
-			)[0]);
-		) {
-			return AOUtil.getDataFromInputStream(is);
+			)[0];
+
+		FileData fileData;
+		try (final InputStream is = new FileInputStream(inputFile);) {
+			fileData = new FileData(AOUtil.getDataFromInputStream(is));
 		}
+		fileData.setFilename(inputFile.getName());
+		return fileData;
 	}
 }
