@@ -137,8 +137,19 @@ Section "Programa" sPrograma
 	ReadRegStr $R0 HKLM SOFTWARE\$PATH "InstallDir"
 	;Leemos el comando de desinstalacion de la aplicacion
 	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	;Si encontramos el comando de desinstalacion, lo ejecutamos en modo silencioso indicando el directorio de instalacion
-	StrCmp $R1 "" +4
+	
+	;Si encontramos el comando de desinstalacion, lo ejecutamos en modo silencioso para eliminar la anterior version
+	;anterior de la aplicacion. Antes de hacerlo, cerramos Firefox y Chrome para evitar que el proceso de desinstalacion
+	;se quede bloqueado pidiendo al usuario que los cierre
+	StrCmp $R1 "" +10
+		;Se cierra Firefox y Chrome si estan abiertos
+		${nsProcess::FindProcess} "firefox.exe" $R2
+		StrCmp $R2 0 0 +1
+		${nsProcess::KillProcess} "firefox.exe" $R3
+		${nsProcess::FindProcess} "chrome.exe" $R2
+		StrCmp $R2 0 0 +1
+		${nsProcess::KillProcess} "chrome.exe" $R3
+		;Indicamos el directorio de instalacion anterior para asegurar que se borrar ese
 		ExecWait '"$R1" /S _?=$R0'
 		;Si el anterior directorio de instalacion y el nuevo fuesen distintos, nos aseguramos de borrar el viejo
 		StrCmp $R0 $INSTDIR +2
