@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html> <!-- Ejemplo basico de lanzador de la aplicacion -->
   <head>
 	<title>Ejemplo de despliegue del MiniApplet @firma</title>
@@ -24,9 +24,18 @@
 			showLog("Guardado OK");
 		}
 		
-		function showSignResultCallback(signatureB64, certificateB64) {
+		function showSignResultCallback(signatureB64, certificateB64, extraData) {
 			showLog("Firma OK");
+			if (extraData) {
+				var extras = JSON.parse(extraData);
+				showLog("Fichero cargado: " + extras.filename);
+			}
 			document.getElementById('result').value = signatureB64;
+		}
+		
+		function showBatchResultCallback(resultB64, certificateB64) {
+			showLog("Firma de lote OK");
+			document.getElementById('result').value = resultB64;
 		}
 
 		function showCertCallback(certificateB64) {
@@ -102,7 +111,7 @@
 					Constants.URL_BASE_SERVICES + '/afirma-server-triphase-signer/BatchPresigner', //$NON-NLS-1$
 					Constants.URL_BASE_SERVICES + '/afirma-server-triphase-signer/BatchPostsigner', //$NON-NLS-1$
 					document.getElementById("params").value,
-					showSignResultCallback,
+					showBatchResultCallback,
 					showErrorCallback);
 
 			} catch(e) {
@@ -326,12 +335,13 @@
 	</script>
   </head>
 	<body>
-		<script type="text/javascript">
+		<script>
 			//MiniApplet.setForceWSMode(true);
 			//MiniApplet.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
 			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
 			//MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
-			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",
+					Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -421,10 +431,10 @@
 		 </textarea>
 		</div>
 		<input type="button" value="Guardar" onclick="saveSignature();">
+		
+		<script>
+			var paramsElement = document.getElementById("params");
+			paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
+		</script>
 	</body>
-	
-	<script type="text/javascript">
-		var paramsElement = document.getElementById("params");
-		paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
-	</script>
 </html>	

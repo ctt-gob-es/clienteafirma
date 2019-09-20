@@ -258,7 +258,7 @@ var MiniApplet = ( function ( window, undefined ) {
          * completar el proceso de firma.
          */
         function needNativeAppInstalled() {
-        	return forceAFirma || isLinux() || isFirefox() || isAndroid() || isIOS();
+        	return forceAFirma || isLinux() || isAndroid() || isIOS();
         }
         
         /**
@@ -719,10 +719,21 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			if (clientType == TYPE_APPLET) {
 				try {
-					if (successCallback == undefined || successCallback == null) {
-						return clienteFirma.signBatch(batchB64, batchPreSignerUrl, batchPostSignerUrl, params);
+					var batchResult;
+					var certificate = null;
+					var result = clienteFirma.signBatch(batchB64, batchPreSignerUrl, batchPostSignerUrl, params);
+					var sepPos = result.indexOf('|');
+					if (sepPos == -1) {
+						batchResult = result;
 					}
-					successCallback(clienteFirma.signBatch(batchB64, batchPreSignerUrl, batchPostSignerUrl, params));
+					else {
+						batchResult = result.substring(0, sepPos);
+						certificate = result.substring(sepPos + 1);
+					}
+					if (successCallback == undefined || successCallback == null) {
+						return batchResult;
+					}
+					successCallback(batchResult, certificate);
 				}
 				catch (e) {
 					if (errorCallback == undefined || errorCallback == null) {
@@ -1156,10 +1167,10 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		/**
 		 * Establece el objeto que simula ser el Applet de firma en sistemas en los que no se
-		 * soportan los applets. Se usara comunicacion mediante socket cuando:
+		 * soportan los applets. Se usara comunicacion mediante websocket cuando:
 		 *  - El sistema operativo no sea Android.
 		 *  - El sistema operativo no sea iOS.
-		 *  - El navegador web no sea Intenet Explorer 10 o inferior (o 11 con modo de compatibilidad)
+		 *  - El navegador web soporte websocket.
 		 *  - No se fuerce el uso del servidor intermedio.
 		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
 		 */
@@ -1245,7 +1256,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			var PROTOCOL_VERSION = 1;
 			
-			var PORT = "13117";
+			var PORT = "63117";
 			
 			var URL_REQUEST = "wss://127.0.0.1:" + PORT;
 			
@@ -1365,7 +1376,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						extraParams, normalizeBase64Data(batchB64));
 				execAppIntent(buildUrl(requestData));
 			};
-						
+
 			/**
 			 * Inicia el proceso de carga de un fichero.
 			 * Implementada tambien en el applet Java de firma
@@ -1495,6 +1506,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
 				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
+				data.needcert = createKeyValuePair ("needcert", true);
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
 				
 				return data;
@@ -1545,7 +1557,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				for (var i = 0; i < params.length; i++) {
 					if (params[i].value != null && params[i].value != "null") {
 						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' +
-							(params[i].avoidEncoding ?
+							(params[i].avoidEncoding === true ?
 									params[i].value :
 									encodeURIComponent(params[i].value));
 					}
@@ -1566,7 +1578,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Si la aplicacion no esta abierta (primera ejecucion o se ejecuta despues del cierre de la aplicacion)
 				// es necesario abrirla y esperar a que este lista
 				if (!isAppOpened()) {
-					// Invocamos a la aplicacion nativa
+					// Invocamos a la aplicacion cliente
 					openNativeApp();
 					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
 					setTimeout(waitAppAndProcessRequest, 3000, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
@@ -1588,7 +1600,14 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				idSession = AfirmaUtils.generateNewIdSession();
 
-				openUrl("afirma://websocket?v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
+				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://websocket?v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession, true));
+				}
+				// En caso contrario, cargamos la version nativa
+				else {
+					bJNLP = false;
+					openUrl("afirma://websocket?v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
+				}
 			}
 			
 
@@ -1641,7 +1660,17 @@ var MiniApplet = ( function ( window, undefined ) {
 						setTimeout(waitAppAndProcessRequest, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, retries - 1);
 					}
 					else {
-						processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
+						// Si se ejecutaba la aplicacion nativa, devolvemos un error
+						if (!bJNLP) {
+							processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
+						}
+						// Si se ejecutaba el cliente WebStart, se reintenta con la aplicacion nativa y se vuelven
+						// a iniciar los intentos de conexion
+						else {
+							setForceAFirma(true);
+							openNativeApp();
+							setTimeout(waitAppAndProcessRequest, 3000, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
+						}
 					}
 				}
 				else {
@@ -1862,7 +1891,17 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function processBatchResponse(data) {
 				if (!!successCallback) {
-					successCallback(data);
+					var result;
+					var certificate = null;
+					var sepPos = data.indexOf("|");
+					if (sepPos == -1) {
+						result = data;
+					}
+					else {
+						result = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
+						certificate = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+					}
+					successCallback(result, certificate);
 				}
 				else {
 					console.log("No se ha proporcionado funcion callback para procesar el resultado del lote de firma");
@@ -2029,8 +2068,23 @@ var MiniApplet = ( function ( window, undefined ) {
 			/** Version del protocolo utilizada. */
 			var PROTOCOL_VERSION = 1;
 			
+			/** Tiempo de espera entre intentos de obtener el resultado de la operacion. */
+			var WAITING_CYCLE_MILLIS = isAndroid() || isIOS() ? 4000 : 3000;
+			
+			/** Numero de intentos maximo para obtener el resultado de la operacion sin respuesta
+			 * de la aplicacion. */
+			var NUM_MAX_ITERATIONS = isAndroid() || isIOS() ? 15 : 10;
+			
 			/** Indica si ya se ha detectado que la aplicacion no esta instalada  */
 			var wrongInstallation = true;
+			
+			var OPERATION_BATCH = "batch";
+						
+			var OPERATION_SELECT_CERTIFICATE = "certificate";
+
+			var OPERATION_SIGN = "sign";
+			
+			var currentOperation = OPERATION_SIGN;
 			
 			/** Certificado en base 64 que se deve usar por defecto cuando la opcion stickySignatory
 			 * este activada. */
@@ -2069,6 +2123,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function selectCertificate (extraParams, successCallback, errorCallback) {
 			
+				currentOperation = OPERATION_SELECT_CERTIFICATE;
+				
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
@@ -2150,6 +2206,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function signOperation (signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
 
+				currentOperation = OPERATION_SIGN;
+				
 				if (dataB64 == undefined || dataB64 == "") {
 					dataB64 = null;
 				}
@@ -2214,6 +2272,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function signAndSaveToFile (signId, dataB64, algorithm, format, extraParams, outputFileName, successCallback, errorCallback) {
 
+				currentOperation = OPERATION_SIGN;
+				
 				if (dataB64 == undefined || dataB64 == "") {
 					dataB64 = null;
 				}
@@ -2275,6 +2335,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function signBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallback, errorCallback) {
 				
+				currentOperation = OPERATION_BATCH;
+				
 				if (batchB64 == undefined || batchB64 == "") {
 					batchB64 = null;
 				}
@@ -2293,7 +2355,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var cipherKey = generateCipherKey();
 				
 				var opId = "batch";
-
+				
 				var i = 0;
 				var params = new Array();
 				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
@@ -2311,6 +2373,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"needcert", value:"true"}; } // Espera activa
 				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
 
 				var url = buildUrl(opId, params);
@@ -2660,7 +2723,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				// Preguntamos repetidamente por el resultado
 				if (!!idSession && (!!successCallback || !!errorCallback)) {
-					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, successCallback, errorCallback);
+					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, intentURL, successCallback, errorCallback);
 				}
 			}
 
@@ -2788,9 +2851,72 @@ var MiniApplet = ( function ( window, undefined ) {
 					return false;
 				}
 				
-				// Si no se obtuvo un error, habremos recibido la firma y posiblemente el certificado (que antecederia a la
-				// firma y se separaria de ella con '|'). Si se definio una clave de cifrado, consideramos que la firma
-				// y el certificado (en caso de estar) llegan cifrados. El cifrado de ambos elementos es independiente
+				// Si no se obtuvo un error ni hemos recibido ninguno de los resultados anteriores,
+				// procesamos el resultado según el tipo de operacion:
+				//  - Si es una firma; se recibira la firma, el certificado + la firma, o el certificado + firma + datos extra.
+				// ´- Si es una seleccion de certificado; solo se recibira el certificado.
+				//  - Si es una firma de lote; se recibira el resultado del lote, o el resultado del lote + certificado. 
+				// Los distintos valores del resultado se separan con una tuberia ('|'). Si se
+				// definio una clave de cifrado, consideramos que cada uno de los datos se han
+				// cifrado de forma independiente
+				
+				// Procesamos el resultado de la firma de lote
+				if (currentOperation == OPERATION_BATCH) {
+					var result;
+					var certificate = null;
+					var sepPos = html.indexOf('|');
+
+					// En caso de recibir un unico parametro, este sera la firma en el caso de las operaciones de firma y el
+					// certificado cuando se pidio seleccionar uno 
+					if (sepPos == -1) {
+						if (cipherKey != undefined && cipherKey != null) {
+							result = decipher(html, cipherKey);
+						}
+						else {
+							result = fromBase64UrlSaveToBase64(html);
+						}
+					}
+					else {
+						if (cipherKey != undefined && cipherKey != null) {
+							result = decipher(html.substring(0, sepPos), cipherKey, true);
+							certificate = decipher(html.substring(sepPos + 1), cipherKey);
+						}
+						else {
+							result = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
+							certificate = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
+						}
+						// Guardamos el certificado si corresponde
+						if (!!stickySignatory) {
+							if (!!certificate) {
+								stickyCertificate = certificate;
+							}
+						}
+						else {
+							stickyCertificate = null;
+						}
+					}
+
+					successCallback(result, certificate);
+					return false;
+				}
+				// Procesamos el resultado de la seleccion de certificado
+				else if (currentOperation == OPERATION_SELECT_CERTIFICATE) {
+					var certificate;
+					if (cipherKey != undefined && cipherKey != null) {
+						certificate = decipher(html, cipherKey);
+					}
+					else {
+						certificate = fromBase64UrlSaveToBase64(html);
+					}
+
+					// Guardamos el certificado
+					stickyCertificate = !!stickySignatory ? certificate : null;
+ 					
+					successCallback(certificate);
+					return false;
+				}
+				
+				// Procesamos suponiendo que la operacion se corresponde con una firma  
 				var signature;
 				var certificate = null;
 				var extraInfo = null;
@@ -2832,7 +2958,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					else {
 						if (cipherKey != undefined && cipherKey != null) {
 							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
-							signature = decipher(html.substring(sepPos + 1, sepPos2), cipherKey);
+							signature = decipher(html.substring(sepPos + 1, sepPos2), cipherKey, true);
 							extraInfo = Base64.decode(decipher(html.substring(sepPos2 + 1), cipherKey));
 						}
 						else {
@@ -2853,7 +2979,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				successCallback(signature, certificate, extraInfo);
-
 				return false;
 			}
 			
@@ -2922,10 +3047,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				return textArray;
 			}
 			
-			var NUM_MAX_ITERATIONS = 15;
 			var iterations = 0;
 
-			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
+			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, intentURL, successCallback, errorCallback) {
 
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
@@ -2933,10 +3057,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				iterations = 0;
-				setTimeout(retrieveRequest, 4000, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, successCallback, errorCallback);
+				setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, intentURL, idDocument, successCallback, errorCallback);
 			}
 
-			function retrieveRequest(httpRequest, url, params, cipherKey, successCallback, errorCallback) {
+			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, successCallback, errorCallback) {
 
 				if (wrongInstallation) {
 					errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);
@@ -2945,7 +3069,15 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
-					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
+					// Si estabamos lanzando la aplicacion nativa, interpretamos que no estaba instalada
+					// y devolvemos un error
+					if (!bJNLP) {
+						errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
+						return;
+					}
+					// Si era un despliegue JNLP, configuramos el uso de la aplicacion nativa y reintentamos
+					setForceAFirma(true);
+					execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback);
 					return;
 				}
 				iterations++;
@@ -2960,7 +3092,7 @@ var MiniApplet = ( function ( window, undefined ) {
 								if (needContinue == "reset") {
 									iterations = 0;
 								}
-								setTimeout(retrieveRequest, 4000, httpRequest, url, params.replace("&it=" + (oldIterations), "&it=" + iterations), cipherKey, successCallback, errorCallback);
+								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + (oldIterations), "&it=" + iterations), cipherKey, intentURL, idDocument, successCallback, errorCallback);
 							}
 						}
 						else {
