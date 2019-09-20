@@ -9,6 +9,9 @@
 
 package es.gob.afirma.core.misc;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -83,6 +86,17 @@ public final class TestAOUtil {
             System.out.println(principal[0] + ": " + principal[1]); //$NON-NLS-1$
             Assert.assertEquals("El metodo getCN() no devuelve el resultado correcto para " + principal[0], AOUtil.getCN(principal[0]), principal[1]); //$NON-NLS-1$
         }
+    }
+
+    @Test
+    public void testBase64ToProperties() throws IOException {
+
+    	final String base64 = "Iw0KI1RodSBTZXAgMTkgMTY6MDc6MDAgQ0VTVCAyMDE5DQpzZXJ2ZXJVcmw9aHR0cHNcOi8vc2Vydmlkb3JjZW50cmFsXDo4NDQzL2ZpcmUtc2lnbmF0dXJlL3B1YmxpYy9hZmlybWEvdHJpcGhhc2VTaWduU2VydmljZQ0KaWduYXR1cmVSb3RhdGlvbj10cnVlDQpsYXllcjJUZXh0PUZpcm1hZG8gZWxlY3Ryw7NuaWNhbWVudGUgcG9yIEZJREVMIE1BUlRJTkVaIEZFUk5BTkRFWiBlbCBkw61hICQkU0lHTkRBVEVcPWRkL01NL3l5eXkgYSBsYXMgSEhcOm1tXDpzcyQkLg0KbGF5ZXIyRm9udFNpemU9Ng0Kc2lnbmF0dXJlRmllbGQ9RW1wdHlTaWduYXR1cmVGaWVsZA0KbGF5ZXIyRm9udEZhbWlseT0xDQphcHBseVN5c3RlbURhdGU9ZmFsc2UNCg==";
+    	final Properties prop = AOUtil.base642Properties(base64);
+    	for (final String k : prop.keySet().toArray(new String[0])) {
+    		System.out.println(k + ": " + prop.getProperty(k) + "\n");
+    	}
+    	System.out.println(prop.toString());
     }
 }
 
