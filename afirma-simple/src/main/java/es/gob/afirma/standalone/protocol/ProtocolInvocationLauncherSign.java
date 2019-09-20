@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
@@ -60,7 +61,7 @@ import es.gob.afirma.standalone.crypto.CypherDataManager;
 
 final class ProtocolInvocationLauncherSign {
 
-	private static final char CERT_SIGNATURE_SEPARATOR = '|';
+	private static final char RESULT_SEPARATOR = '|';
 
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
@@ -155,6 +156,10 @@ final class ProtocolInvocationLauncherSign {
 			}
 		}
 
+		// Nombre dl fichero firmado. Tomara valor solo si es ekl usuario quien selecciona
+		// el fichero a firmar
+		String inputFilename = null;
+
 		// Si se tienen que pedir los datos al usuario, se hace
 		if (needRequestData) {
 			final String dialogTitle = Operation.SIGN.equals(options.getOperation()) ?
@@ -189,6 +194,9 @@ final class ProtocolInvocationLauncherSign {
 				}
 				return getResultCancel();
 			}
+
+			// Asignamos el nombre del fichero firmado para devolverlo a la aplicacion
+			inputFilename = selectedDataFile.getName();
 
 			try {
 				final byte[] data;
@@ -608,8 +616,13 @@ final class ProtocolInvocationLauncherSign {
 			try {
 				// El CipherData devuelve los datos directamente en Base64
 				dataToSend.append(CypherDataManager.cipherData(certEncoded, options.getDesKey()));
-				dataToSend.append(CERT_SIGNATURE_SEPARATOR);
+				dataToSend.append(RESULT_SEPARATOR);
 				dataToSend.append(CypherDataManager.cipherData(sign, options.getDesKey()));
+				if (inputFilename != null) {
+					dataToSend.append(RESULT_SEPARATOR);
+					dataToSend.append(CypherDataManager.cipherData(buildExtraDataResult(inputFilename)
+							.getBytes(StandardCharsets.UTF_8), options.getDesKey()));
+				}
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
@@ -631,11 +644,16 @@ final class ProtocolInvocationLauncherSign {
 				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
 			dataToSend.append(Base64.encode(certEncoded, true));
-			dataToSend.append(CERT_SIGNATURE_SEPARATOR);
-			// Se hace una doble codigicacion Base64, una de los datos y otras
-			// del cifrado, que si bien este ultimo
-			// no se realiza, si se mantiene la codificacion
+			dataToSend.append(RESULT_SEPARATOR);
+			// Se hace una doble codificacion Base64, una de los datos y otras
+			// del cifrado. La codificacion se realiza incluso si el cifrado
+			// no se hiciera
 			dataToSend.append(Base64.encode(sign, true));
+			if (inputFilename != null) {
+				dataToSend.append(RESULT_SEPARATOR);
+				dataToSend.append(Base64.encode(buildExtraDataResult(inputFilename)
+						.getBytes(StandardCharsets.UTF_8), true));
+			}
 		}
 
 		if (!bySocket) {
@@ -687,5 +705,17 @@ final class ProtocolInvocationLauncherSign {
 	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
 		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
 			AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")); //$NON-NLS-1$
+	}
+
+	/**
+	 * Construye una cadena de texto con un objeto JSON de datos extra que enviar en la respuesta.
+	 * @param filename Nombre de fichero.
+	 * @return Cadena con el JSON de datos extra.
+	 */
+	private static String buildExtraDataResult(final String filename) {
+		if (filename == null) {
+			return null;
+		}
+		return "{\"filename\":\"" + filename + "\"}"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

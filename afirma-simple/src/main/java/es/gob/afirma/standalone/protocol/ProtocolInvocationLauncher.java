@@ -210,6 +210,7 @@ public final class ProtocolInvocationLauncher {
                     		params.getId()
                 		);
                     }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
             catch(final ParameterException e) {
@@ -333,6 +334,7 @@ public final class ProtocolInvocationLauncher {
                     else {
                         sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
@@ -407,6 +409,7 @@ public final class ProtocolInvocationLauncher {
                     else {
                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
@@ -465,6 +468,9 @@ public final class ProtocolInvocationLauncher {
                     params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
                 }
 
+
+                LOGGER.info(" ============== ExtraParams recibidos de la web: " + params.getExtraParams());
+
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
                 // que se espere activamente hasta el fin de la tarea
                 if (!bySocket && params.isActiveWaiting()) {
@@ -485,6 +491,7 @@ public final class ProtocolInvocationLauncher {
                     else {
                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
@@ -560,6 +567,7 @@ public final class ProtocolInvocationLauncher {
                     else {
                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
@@ -628,15 +636,13 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
         }
-        else {
-        	LOGGER.severe(
-    			"La operacion indicada en la URL no esta soportada: " +  //$NON-NLS-1$
-    					urlString.substring(0, Math.min(30, urlString.length())) + "..." //$NON-NLS-1$
-			);
-            ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
-            return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
-        }
-        throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
+
+        LOGGER.severe(
+    		"La operacion indicada en la URL no esta soportada: " +  //$NON-NLS-1$
+    				urlString.substring(0, Math.min(30, urlString.length())) + "..." //$NON-NLS-1$
+		);
+        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
+        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
     }
 
     /**
@@ -645,8 +651,13 @@ public final class ProtocolInvocationLauncher {
      * @param id Identificador de la transacci&oacute;n para la que se le solicita la espera.
      */
     private static void requestWait(final URL storageServletUrl, final String id) {
-    	activeWaitingThread = new ActiveWaitingThread(storageServletUrl.toString(), id);
-    	activeWaitingThread.start();
+    	try {
+	    	activeWaitingThread = new ActiveWaitingThread(storageServletUrl.toString(), id);
+	    	activeWaitingThread.start();
+    	}
+    	catch (final Exception e) {
+			LOGGER.warning("Se ha interrumpido la espera activa para la conexion con servidor intermedio: " + e); //$NON-NLS-1$
+		}
 	}
 
 	/** Env&iacute;a un mensaje de error al servidor intermedio e interrumpe la espera
