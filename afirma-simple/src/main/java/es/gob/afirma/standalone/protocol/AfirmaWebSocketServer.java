@@ -47,7 +47,7 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 	private static final String ECHO_RESPONSE = "OK"; //$NON-NLS-1$
 
 
-	private static final int PORT = 13117;
+	private static final int PORT = 63117;
 
 	static AfirmaWebSocketServer instance = null;
 
