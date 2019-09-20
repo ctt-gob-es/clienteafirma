@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.CertificateEncodingException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,9 +35,11 @@ import es.gob.afirma.standalone.crypto.CypherDataManager;
 
 final class ProtocolInvocationLauncherBatch {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final char RESULT_SEPARATOR = '|';
 
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private ProtocolInvocationLauncherBatch() {
 		// No instanciable
@@ -157,10 +160,6 @@ final class ProtocolInvocationLauncherBatch {
 				pke.getCertificateChain(),
 				pke.getPrivateKey()
 			);
-			// Devuelve los datos sin codificar en el caso de peticion por socket, por lo que hay que codificarlo
-			if (bySocket){
-				batchResult = Base64.encode(batchResult.getBytes());
-			}
 		}
 		catch(final HttpError e) {
 			if (e.getResponseCode() / 100 == 4) {
@@ -192,7 +191,7 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
-			
+
 		}
 		catch(final Exception e) {
 			LOGGER.log(
@@ -207,13 +206,35 @@ final class ProtocolInvocationLauncherBatch {
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN);
 		}
 
-		// Tenemos el XML de resultado del lote, lo subimos al servidor intermedio
+		final StringBuilder result = new StringBuilder();
 
+		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos la resultado con un separador
+		byte[] signingCertEncoded = null;
+		if (options.isCertNeeded()) {
+			try {
+				signingCertEncoded = pke.getCertificate().getEncoded();
+			} catch (final CertificateEncodingException e) {
+				LOGGER.log(
+						Level.SEVERE,
+						"No se ha podido codificar el certificado de firma para su devolucion: " + e, //$NON-NLS-1$
+						e
+					);
+					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE);
+					if (!bySocket){
+						throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE);
+					}
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE);
+			}
+		}
 
 		// Si hay clave de cifrado, ciframos
 		if (options.getDesKey() != null) {
 			try {
-				batchResult = CypherDataManager.cipherData(batchResult.getBytes(), options.getDesKey());
+				result.append(CypherDataManager.cipherData(batchResult.getBytes(), options.getDesKey()));
+				if (signingCertEncoded != null) {
+					result.append(RESULT_SEPARATOR)
+						.append(CypherDataManager.cipherData(signingCertEncoded, options.getDesKey()));
+				}
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
@@ -228,8 +249,13 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.warning(
 				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
+			result.append(Base64.encode(batchResult.getBytes()));
+			if (signingCertEncoded != null) {
+				result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
+			}
 		}
 
+		// Si hay servidor intermedio, se envia
 		if (options.getStorageServletUrl() != null) {
 			// Enviamos la firma cifrada al servicio remoto de intercambio y detenemos la espera
 			// activa si se encontraba vigente
@@ -239,7 +265,7 @@ final class ProtocolInvocationLauncherBatch {
 					waitingThread.interrupt();
 				}
 				try {
-					IntermediateServerUtil.sendData(batchResult, options.getStorageServletUrl().toString(), options.getId());
+					IntermediateServerUtil.sendData(result.toString(), options.getStorageServletUrl().toString(), options.getId());
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
@@ -257,7 +283,7 @@ final class ProtocolInvocationLauncherBatch {
 			);
 		}
 
-		return batchResult;
+		return result.toString();
 	}
 
 	public static String getResultCancel() {

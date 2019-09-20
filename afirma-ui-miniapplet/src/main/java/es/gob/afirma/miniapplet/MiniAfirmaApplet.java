@@ -80,6 +80,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	private static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
 	private static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
+	/** Separador utilizador para separar los distintos fragmentos de un resultado. */
+	private static final String RESULT_SEPARATOR = "|"; //$NON-NLS-1$
+
 	/** N&uacute;mero m&aacute;ximo de caracteres que se devuelven en cualquiera de los
 	 * m&eacute;todos del Applet. */
 	private static final int BUFFER_SIZE = 1024 * 1024;	// 1 Mb
@@ -257,11 +260,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final StringBuilder result = new StringBuilder((int) Math.floor(signature.length * 1.5));
 			result
 				.append(Base64.encode(pke.getCertificate().getEncoded()))
-				.append('|')
+				.append(RESULT_SEPARATOR)
 				.append(Base64.encode(signature)).toString();
 			if (fileData.getFilename() != null) {
 				result
-					.append('|')
+					.append(RESULT_SEPARATOR)
 					.append(Base64.encode(buildExtraDataResult(fileData.getFilename())
 							.getBytes(StandardCharsets.UTF_8)));
 			}
@@ -414,11 +417,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final StringBuilder result = new StringBuilder((int) Math.floor(cosignature.length * 1.5));
 			result
 				.append(Base64.encode(pke.getCertificate().getEncoded()))
-				.append('|')
+				.append(RESULT_SEPARATOR)
 				.append(Base64.encode(cosignature));
 			if (signatureFileData.getFilename() != null) {
 				result
-					.append('|')
+					.append(RESULT_SEPARATOR)
 					.append(Base64.encode(buildExtraDataResult(signatureFileData.getFilename())
 							.getBytes(StandardCharsets.UTF_8)));
 			}
@@ -548,7 +551,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final StringBuilder result = new StringBuilder((int) Math.floor(countersignature.length * 1.5));
 			return chunkReturn(result.
 					append(Base64.encode(pke.getCertificate().getEncoded())).
-					append('|').
+					append(RESULT_SEPARATOR).
 					append(Base64.encode(countersignature)).toString());
 		}
 		catch (final IncompatiblePolicyException e) {
@@ -669,8 +672,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		// Establecemos los datos que se deben guardar
-		final int pos1 = result.indexOf('|') + 1;
-		final int pos2 = result.indexOf('|', pos1 + 1);
+		final int pos1 = result.indexOf(RESULT_SEPARATOR) + 1;
+		final int pos2 = result.indexOf(RESULT_SEPARATOR, pos1 + 1);
 		this.dataStore.append(pos2 == -1 ? result.substring(pos1 + 1) : result.substring(pos1 + 1, pos2));
 
 		// Solicitamos el guardado
@@ -696,7 +699,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** Permite seleccionar al usuario un fichero y devuelve la tupla con el
-	 * nombre de fichero y su contenido separados por ('|').
+	 * nombre de fichero y su contenido separados por RESULT_SEPARATOR.
 	 * @param title T&iacute;tulo de la ventana de selecci&oacute;n.
 	 * @param extensions Extensiones de fichero permitidas separadas por coma (',').
 	 * @param description Descripci&oacute;n del tipo de fichero.
@@ -705,6 +708,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * 				lo devuelve en texto plano.
 	 * @return Tuplas "NombreFichero|Contenido".
 	 * @throws PrivilegedActionException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
+	 * @see #RESULT_SEPARATOR
 	 */
 	private String getFileNameContent(final String title,
 			                          final String extensions,
@@ -757,7 +761,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** Permite seleccionar al usuario un conjunto de ficheros y devuelve las tuplas con cada
-	 * nombre de fichero y contenido separados por ('|').
+	 * nombre de fichero y contenido separados por RESULT_SEPARATOR.
 	 * @param title T&iacute;tulo de la ventana de selecci&oacute;n.
 	 * @param extensions Extensiones de fichero permitidas separadas por coma (',').
 	 * @param description Descripci&oacute;n del tipo de fichero.
@@ -766,6 +770,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * 				lo devuelve en texto plano.
 	 * @return Listado de tuplas "NombreFichero|Contenido".
 	 * @throws PrivilegedActionException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
+	 * @see #RESULT_SEPARATOR
 	 */
 	private String[] getMultiFileNameContent(final String title,
 			                                 final String extensions,
@@ -1399,26 +1404,26 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de firma de lote", e); //$NON-NLS-1$
 		}
 
+		final StringBuilder result = new StringBuilder();
+		byte[] certEncoded;
 		try {
-
-			return Base64.encode(
-				AccessController.doPrivileged(
-						new PrivilegedExceptionAction<byte[]>() {
-
-							@Override
-							public byte[] run() throws Exception {
-
-								return BatchSigner.sign(
-										batchB64,
-										batchPreSignerUrl,
-										batchPostSignerUrl,
-										pke.getCertificateChain(),
-										pke.getPrivateKey()
-									).getBytes(StandardCharsets.UTF_8.name());
+			certEncoded = pke.getCertificate().getEncoded();
+			result.append(Base64.encode(
+					AccessController.doPrivileged(
+							new PrivilegedExceptionAction<byte[]>() {
+								@Override
+								public byte[] run() throws Exception {
+									return BatchSigner.sign(
+											batchB64,
+											batchPreSignerUrl,
+											batchPostSignerUrl,
+											pke.getCertificateChain(),
+											pke.getPrivateKey()
+											).getBytes(StandardCharsets.UTF_8.name());
+								}
 							}
-
-						}
-				));
+					)
+			));
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof CertificateEncodingException) {
@@ -1432,6 +1437,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw aoe;
 		}
+
+		// Agregamos el certificado usado para firmar
+		result.append(RESULT_SEPARATOR).append(Base64.encode(certEncoded));
+
+		return result.toString();
 	}
 
 	@Override

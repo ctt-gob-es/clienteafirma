@@ -25,16 +25,19 @@ public final class UrlParametersForBatch extends UrlParameters {
 	private static final int MAX_ID_LENGTH = 20;
 
 	/** Par&aacute;metro de entrada con el identificador de sesi&oacute;n de la operaci&oacute;n. */
-	private static final String PARAM_ID = "id"; //$NON-NLS-1$
+	private static final String ID_PARAM = "id"; //$NON-NLS-1$
 
 	private static final String PARAM_BATCH_POSTSIGNER = "batchpostsignerurl"; //$NON-NLS-1$
 	private static final String PARAM_BATCH_PRESIGNER = "batchpresignerurl"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
-	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
+	private static final String PARAM_VER = "ver"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada que nos dice si tenemos que usar una clave prefijada o establecer una nueva. */
-	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
+	private static final String PARAM_STICKY = "sticky"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el dice si tenemos que usar una clave prefijada o establecer una nueva. */
+	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
@@ -44,6 +47,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. */
 	private boolean sticky;
+
+	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe devolver
+	 * el certificado utilizado para firmar o no. */
+	private boolean certNeeded;
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
 	 * @return URL del servicio de preprocesado de lotes de firma. */
@@ -71,6 +78,23 @@ public final class UrlParametersForBatch extends UrlParameters {
 		this.sticky = sticky;
 	}
 
+
+	/** Obtiene la opci&oacute;n de configuraci&oacute;n needcert
+	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         devolver el certificado utilizado para firmar el lote ({@code true}) o
+	 *         no ({@code false}). */
+	public boolean isCertNeeded() {
+		return this.certNeeded;
+	}
+
+	/** Establece la opci&oacute;n de configuraci&oacute;n needcert
+	 * @param needcert Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         devolver el certificado utilizado para firmar el lote ({@code true}) o
+	 *         no ({@code false}). */
+	public void setCertNeeded(final boolean certNeeded) {
+		this.certNeeded = certNeeded;
+	}
+
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
 	 * @return URL del servicio de preprocesado de lotes de firma. */
 	public String getBatchPostSignerUrl() {
@@ -84,9 +108,9 @@ public final class UrlParametersForBatch extends UrlParameters {
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
 		// idSession para el service Web. Con socket no se usa
-		if (params.containsKey(PARAM_ID) || params.containsKey(FILE_ID_PARAM)) {
+		if (params.containsKey(ID_PARAM) || params.containsKey(FILE_ID_PARAM)) {
 			// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-			final String signatureSessionId = params.containsKey(PARAM_ID) ? params.get(PARAM_ID) : params.get(FILE_ID_PARAM);
+			final String signatureSessionId = params.containsKey(ID_PARAM) ? params.get(ID_PARAM) : params.get(FILE_ID_PARAM);
 			if (signatureSessionId.length() > MAX_ID_LENGTH) {
 				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -102,8 +126,8 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 
 		// Version minima requerida del protocolo que se debe soportar
-		if (params.containsKey(VER_PARAM)) {
-			setMinimumVersion(params.get(VER_PARAM));
+		if (params.containsKey(PARAM_VER)) {
+			setMinimumVersion(params.get(PARAM_VER));
 		}
 		else {
 			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
@@ -179,11 +203,19 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 
 		// Valor de parametro sticky
-		if (params.containsKey(STICKY_PARAM)) {
-			setSticky(Boolean.parseBoolean(params.get(STICKY_PARAM)));
+		if (params.containsKey(PARAM_STICKY)) {
+			setSticky(Boolean.parseBoolean(params.get(PARAM_STICKY)));
 		}
 		else {
 			setSticky(false);
+		}
+
+		// Valor del parametro needCert
+		if (params.containsKey(PARAM_NEED_CERT)) {
+			setCertNeeded(Boolean.parseBoolean(params.get(PARAM_NEED_CERT)));
+		}
+		else {
+			setCertNeeded(false);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
