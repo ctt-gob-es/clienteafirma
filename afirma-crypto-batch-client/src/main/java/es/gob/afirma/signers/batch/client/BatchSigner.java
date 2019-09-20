@@ -12,6 +12,8 @@ package es.gob.afirma.signers.batch.client;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -44,6 +46,8 @@ public final class BatchSigner {
 	private static final String AMP = "&"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
 	private BatchSigner() {
 		// No instanciable
@@ -244,7 +248,7 @@ public final class BatchSigner {
 					batchPostSignerUrl + "?" + //$NON-NLS-1$
 							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
 							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-							BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(), true),
+							BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(DEFAULT_CHARSET), true),
 							UrlHttpMethod.POST
 					);
 		}
@@ -253,7 +257,7 @@ public final class BatchSigner {
 			throw e;
 		}
 
-		return new String(ret);
+		return new String(ret, DEFAULT_CHARSET);
 	}
 
 	private static String getCertChainAsBase64(final Certificate[] certChain) throws CertificateEncodingException {
@@ -278,7 +282,7 @@ public final class BatchSigner {
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
-				"Error al cargar el fichero XML de lote: " + e + "\n" + new String(xml) //$NON-NLS-1$ //$NON-NLS-2$
+				"Error al cargar el fichero XML de lote: " + e + "\n" + new String(xml, DEFAULT_CHARSET) //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			throw new IOException("Error al cargar el fichero XML de lote: " + e, e); //$NON-NLS-1$
 		}

@@ -11,6 +11,8 @@ package es.gob.afirma.signers.batch.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -39,6 +41,8 @@ public final class BatchPostsigner extends HttpServlet {
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
 	private static final String BATCH_TRI_PARAM = "tridata"; //$NON-NLS-1$
 
+	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+
 	/** Realiza la tercera y &uacute;ltima fase de un proceso de firma por lote.
 	 * Debe recibir la definici&oacute;n XML (<a href="../doc-files/batch-scheme.html">descripci&oacute;n
 	 * del formato</a>) del lote (exactamente la misma enviada para la primera fase)
@@ -64,7 +68,7 @@ public final class BatchPostsigner extends HttpServlet {
 
 		final SignBatch batch;
 		try {
-			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml.getBytes());
+			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml.getBytes(DEFAULT_CHARSET));
 			batch = BatchConfigManager.isConcurrentMode() ?
 					new SignBatchConcurrent(batchConfig) :
 						new SignBatchSerial(batchConfig);
@@ -113,7 +117,7 @@ public final class BatchPostsigner extends HttpServlet {
 
 		final TriphaseData td;
 		try {
-			td = BatchServerUtil.getTriphaseData(triphaseDataAsUrlSafeBase64.getBytes());
+			td = BatchServerUtil.getTriphaseData(triphaseDataAsUrlSafeBase64.getBytes(DEFAULT_CHARSET));
 		}
 		catch(final Exception e) {
 			LOGGER.severe("El XML de firmas cliente es invalido: " + e); //$NON-NLS-1$

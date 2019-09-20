@@ -499,9 +499,9 @@ class CommandProcessorThread extends Thread {
 		sb.append("Access-Control-Allow-Origin: *\n"); //$NON-NLS-1$
 		sb.append('\n');
 		if (response != null) {
-			sb.append(Base64.encode(response.getBytes(), true));
+			sb.append(Base64.encode(response.getBytes(StandardCharsets.UTF_8), true));
 		}
-		return sb.toString().getBytes();
+		return sb.toString().getBytes(StandardCharsets.UTF_8);
 	}
 
 

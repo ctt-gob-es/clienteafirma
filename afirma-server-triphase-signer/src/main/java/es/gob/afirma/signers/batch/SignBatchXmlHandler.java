@@ -1,6 +1,5 @@
 package es.gob.afirma.signers.batch;
 
-import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.util.Properties;
@@ -9,7 +8,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
@@ -79,7 +78,7 @@ class SignBatchXmlHandler extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
 
 		switch (localName) {
 		case NODE_NAME_SIGNBATCH:
@@ -175,12 +174,12 @@ class SignBatchXmlHandler extends DefaultHandler {
 	}
 
 	@Override
-	public void characters(char ch[], int start, int length) throws SAXException {
+	public void characters(final char ch[], final int start, final int length) throws SAXException {
 		this.acumulateContent.write(ch, start, length);
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 
 		// Realizamos la accion concreta para el elemento actual. Sin embargo, esta variable
 		// solo tendra el valor adecuado cuando el nodo no contuviese otro dentro. En caso
@@ -218,10 +217,10 @@ class SignBatchXmlHandler extends DefaultHandler {
 			this.currentSign.setSubOperation(SignSubOperation.getSubOperation(new String(this.acumulateContent.toCharArray()).trim()));
 			break;
 		case ELEMENT_EXTRAPARAMS:
-			final Properties extraParams = new Properties();
+			Properties extraParams = new Properties();
 			if (this.acumulateContent.size() > 0) {
 				try {
-					extraParams.load(new ByteArrayInputStream(Base64.decode(new String(this.acumulateContent.toCharArray()).trim())));
+					extraParams = AOUtil.base642Properties(new String(this.acumulateContent.toCharArray()).trim());
 				} catch (final IOException e) {
 					throw new SAXException("ExtraParams mal codificados en la firma " + this.currentSign.getId(), e); //$NON-NLS-1$
 				}
@@ -240,10 +239,10 @@ class SignBatchXmlHandler extends DefaultHandler {
 			if (this.currentSignSaver == null) {
 				throw new SAXException("No se definio la clase de guardado para la firma " + this.currentSign.getId()); //$NON-NLS-1$
 			}
-			final Properties config = new Properties();
+			Properties config = new Properties();
 			if (this.acumulateContent.size() > 0) {
 				try {
-					config.load(new ByteArrayInputStream(Base64.decode(new String(this.acumulateContent.toCharArray()).trim())));
+					config = AOUtil.base642Properties(new String(this.acumulateContent.toCharArray()).trim());
 				} catch (final IOException e) {
 					throw new SAXException("La configuracion de la clase de guardado esta mal codificada en la firma " + this.currentSign.getId(), e); //$NON-NLS-1$
 				}

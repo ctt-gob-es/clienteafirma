@@ -455,15 +455,27 @@ public final class AOUtil {
     	if (base64 == null || base64.isEmpty()) {
     		return p;
     	}
-    	p.load(
-		new InputStreamReader(
-    			new ByteArrayInputStream(Base64.decode(base64)
-		),
-		DEFAULT_ENCODING)
-    	);
+    	p.load(new InputStreamReader(
+    					new ByteArrayInputStream(Base64.decode(base64.replace('-', '+').replace('_', '/'))), DEFAULT_ENCODING)
+    			);
 
     	return p;
     }
+
+    /** Convierte un objeto de propiedades en una cadena Base64 URL SAFE.
+	 * @param p Objeto de propiedades a convertir.
+	 * @return Base64 URL SAFE que descodificado es un fichero de propiedades en texto plano.
+	 * @throws IOException Si hay problemas en la conversi&oacute;n a Base64. */
+	public static String propertiesAsString(final Properties p) throws IOException {
+		if (p == null) {
+			return ""; //$NON-NLS-1$
+		}
+		final StringBuilder buffer = new StringBuilder();
+    	for (final String k : p.keySet().toArray(new String[0])) {
+    		buffer.append(k).append("=").append(p.getProperty(k)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+		return buffer.toString();
+	}
 
     /** Indica si el JRE actual es Java 9 o superior.
      * @return <code>true</code> si el JRE actual es Java 9 o superior,

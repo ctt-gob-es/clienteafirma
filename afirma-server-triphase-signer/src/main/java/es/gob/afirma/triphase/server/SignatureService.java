@@ -280,11 +280,7 @@ public final class SignatureService extends HttpServlet {
 			Properties extraParams = new Properties();
 			try {
 				if (parameters.containsKey(PARAM_NAME_EXTRA_PARAM)) {
-					extraParams.load(
-						new ByteArrayInputStream(
-							Base64.decode(parameters.get(PARAM_NAME_EXTRA_PARAM).trim(), true)
-						)
-					);
+					extraParams = AOUtil.base642Properties(parameters.get(PARAM_NAME_EXTRA_PARAM));
 				}
 			}
 			catch (final Exception e) {

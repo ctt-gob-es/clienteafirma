@@ -11,6 +11,8 @@ package es.gob.afirma.signers.batch.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +39,8 @@ public final class BatchPresigner extends HttpServlet {
 	private static final String BATCH_XML_PARAM = "xml"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
 
+	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+
 	/** Realiza la primera fase de un proceso de firma por lote.
 	 * Debe recibir la definici&oacute;n del lote en un XML (<a href="../doc-files/batch-scheme.html">descripci&oacute;n
 	 * del formato</a>) convertido completamente
@@ -60,7 +64,7 @@ public final class BatchPresigner extends HttpServlet {
 
 		final SignBatch batch;
 		try {
-			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml.getBytes());
+			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml.getBytes(DEFAULT_CHARSET));
 			batch = BatchConfigManager.isConcurrentMode() ?
 					new SignBatchConcurrent(batchConfig) :
 						new SignBatchSerial(batchConfig);
@@ -116,5 +120,4 @@ public final class BatchPresigner extends HttpServlet {
 		writer.write(pre);
 		writer.flush();
 	}
-
 }

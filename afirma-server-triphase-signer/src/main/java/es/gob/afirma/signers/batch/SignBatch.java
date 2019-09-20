@@ -12,6 +12,8 @@ package es.gob.afirma.signers.batch;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +56,8 @@ import es.gob.afirma.core.signers.TriphaseData;
  * </pre>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public abstract class SignBatch {
+
+	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -123,7 +127,7 @@ public abstract class SignBatch {
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al cargar el fichero XML de definicion de lote: " + e + //$NON-NLS-1$
-					"\n" + new String(xml)); //$NON-NLS-1$
+					"\n" + new String(xml, DEFAULT_CHARSET)); //$NON-NLS-1$
 			throw new IOException("Error al cargar el fichero XML de definicion de lote: " + e, e); //$NON-NLS-1$
 		}
 
