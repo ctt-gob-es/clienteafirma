@@ -570,13 +570,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
        	ProxyUtil.setProxySettings();
 
        	// Comprobamos si es necesario buscar actualizaciones
-        updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK) &&
-        		!Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
-        if (!updatesEnabled) {
-        	LOGGER.info(
-        			"Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
-        			);
-        }
+       	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
+       		updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK) &&
+       				!Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
+       		if (!updatesEnabled) {
+       			LOGGER.info(
+       					"Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
+       					);
+       		}
+       	}
 
 		// Google Analytics
 		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS) &&
@@ -932,6 +934,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return {@code true} si la llamada se debe procesar como si se hubiese recibido por l&iacute;nea de comandos. */
 	private static boolean isUsingCommnadLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
+	}
+
+	/** Establece si las actualizaciones est&aacute;n permitidas o si se desactivaron mediante
+	 * alg&uacute;n mecanismo a nivel de administraci&oacute;n.
+	 * @param enable {@code true} si se debe permitir la b&uacute;squeda
+	 * de actualizaciones, {@code false} en caso contrario. */
+	public static void setUpdatesEnabled(final boolean enable) {
+		updatesEnabled = enable;
 	}
 
 	/** Indica si las actualizaciones est&aacute;n permitidas o si se desactivaron mediante
