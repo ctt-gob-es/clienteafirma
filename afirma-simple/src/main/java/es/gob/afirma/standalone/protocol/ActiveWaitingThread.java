@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class ActiveWaitingThread extends Thread {
 
 	private static final String WAIT_CONSTANT = "#WAIT"; //$NON-NLS-1$
-	private static final long SLEEP_PERIOD = 15000;
+	private static final long SLEEP_PERIOD = 10000;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -27,7 +27,7 @@ public class ActiveWaitingThread extends Thread {
 	 * @param storageServiceUrl URL del servicio de guardado del servidor intermedio.
 	 * @param transactionId Identificador de transacci&oacute;n.
 	 */
-	public ActiveWaitingThread(String storageServiceUrl, String transactionId) {
+	public ActiveWaitingThread(final String storageServiceUrl, final String transactionId) {
 		this.storageServiceUrl = storageServiceUrl;
 		this.transactionId = transactionId;
 	}
@@ -39,7 +39,8 @@ public class ActiveWaitingThread extends Thread {
 			try {
 				Thread.sleep(SLEEP_PERIOD);
 			} catch (final InterruptedException e) {
-				LOGGER.warning("No se ha podido esperar para el envio de la peticion de espera: " + e); //$NON-NLS-1$
+				LOGGER.warning("No se ha podido esperar para el envio de la senal de espera activa para el JavaScript. " //$NON-NLS-1$
+						+ "No se envia la peticion: " + e); //$NON-NLS-1$
 			}
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				if (!this.cancelled) {

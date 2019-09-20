@@ -21,6 +21,8 @@
 		<afirma.keytool.password>afirma</afirma.keytool.password>
 		<afirma.jar.name>AutoFirmaWS</afirma.jar.name>
 		<afirma.legible.version>V${project.version}</afirma.legible.version>
+		<afirma.finalName>${afirma.jar.name}__${afirma.legible.version}</afirma.finalName>
+		<java.target.version>1.8</java.target.version>
 	</properties>
 
 	<profiles>
@@ -78,8 +80,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>1.8</source>
-							<target>1.8</target>
+							<source>${java.target.version}</source>
+							<target>${java.target.version}</target>
 							<fork>true</fork>
 							<compilerArgument>-XDignore.symbol.file</compilerArgument>
 						</configuration>
@@ -104,6 +106,10 @@
 		 	 <artifactId>afirma-ui-simpleafirma</artifactId>
 		 	 <version>${clienteafirma.version}</version>
 		 	 <exclusions>
+		 	 	<exclusion> <!-- Se omite para permitir la ofuscacion a pesar de ser necesario en Java 11 -->
+					<groupId>org.apache.santuario</groupId>
+				    <artifactId>xmlsec</artifactId>
+		 	 	</exclusion>
 		 	 	<exclusion>
 		 	 		<groupId>es.gob.afirma</groupId>
 					<artifactId>afirma-core-massive</artifactId>
@@ -145,8 +151,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${java.target.version}</source>
+					<target>${java.target.version}</target>
 					<fork>true</fork>
 					<compilerArgument>-XDignore.symbol.file</compilerArgument>
 				</configuration>
@@ -233,7 +239,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.1.1</version>
 				<configuration>
-					<finalName>${afirma.jar.name}__${afirma.legible.version}.jar</finalName>    
+					<finalName>${afirma.finalName}</finalName>
 				</configuration>
 			</plugin>
 
@@ -261,6 +267,7 @@
 
 	
 	<!--  Si usamos Java 8, ademas del perfil anterior se ejecutara este para ofuscar el codigo -->
+<!-- 
     <profile>
       <id>env-install-java-8</id>
       <activation>
@@ -286,7 +293,7 @@
 				</executions>
 				<configuration>
 					<proguardVersion>5.2</proguardVersion>
-					<injar>${project.build.finalName}.jar</injar>
+					<injar>${afirma.finalName}.jar</injar>
 					<outputDirectory>${project.build.directory}</outputDirectory>
 					<proguardInclude>${basedir}/proguard.conf</proguardInclude>
 					<libs>
@@ -306,7 +313,7 @@
 		  </plugins>
 		</build>
 	</profile>
-	
+	 -->
 
 
 	<!-- Construccion para el despliegue como aplicacion WebStart completa, con la misma funcionalidad
@@ -344,8 +351,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${java.target.version}</source>
+					<target>${java.target.version}</target>
 					<fork>true</fork>
 					<compilerArgument>-XDignore.symbol.file</compilerArgument>
 				</configuration>
