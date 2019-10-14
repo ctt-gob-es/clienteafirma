@@ -121,6 +121,13 @@
 				
 				ocultarDialogoEspera();
 			}
+			else if (MiniApplet.echo() == "Cliente JavaScript") {
+				document.getElementById("testLoad").innerHTML = "";
+				document.getElementById("signButton").removeAttribute("disabled");
+				showResultIcon("resultLoad", false);
+				
+				ocultarDialogoEspera();
+			}
 			else {
 				setTimeout(checkAppletLoad, 2000);	
 			}
@@ -131,13 +138,10 @@
 		}
 		
 		function checkAppletSign() {
-			if (isAppletLoaded()) {
-				
-				mostrarDialogoEspera();
-				
-				MiniApplet.sign("Test", "SHA1withRSA", "CAdES", null,
-						showSignSuccessResult, showSignErrorResult);
-			}
+			mostrarDialogoEspera();
+			
+			MiniApplet.sign("Test", "SHA256withRSA", "CAdES", null,
+					showSignSuccessResult, showSignErrorResult);
 		}
 	
 		function showSignSuccessResult() {
@@ -184,7 +188,7 @@
 	-->  
 </script>
 		
-<body onload="mostrarPantalla()">
+<body>
 	<!-- CONTENEDOR ** -->
 	<div id="contenedor" style="background-color: rgb(230,230,230)">
 		<div id="cabecera">
@@ -208,7 +212,7 @@
 
 <div id="dialogoEspera" style="display: none;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: fixed; left: 0; top: 0; ">
 	<div style="background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;">
-		<span style="text-align: center; font-weight: bold; font-size: 20pt;">Cargando datos...</span>
+		<span style="text-align: center; font-weight: bold; font-size: 20pt;">Cargando...</span>
 	</div>
 </div>
 <div style="display: none;" id="cargandoApplet" class="error cursiva">
@@ -254,7 +258,7 @@
 			</tr>
 			<tr>
 				<td>Prueba de carga del applet</td>
-				<td id="testLoad"><img src="cargando.gif" /></td>
+				<td id="testLoad"><img src="img/cargando.gif" /></td>
 				<td></td>
 				<td id="resultLoad"></td>
 			</tr>
@@ -288,7 +292,7 @@ la Administración Electrónica por su seguridad.
 </div>
 
 <div style="float: left; width: 200px; margin-left: 30px; margin-top: 20px;">
-<a href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store"style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.png) no-repeat;width:135px;height:40px;@media only screen{background-image:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.svg);}"></a>
+<a href="https://itunes.apple.com/us/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store" style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/assets/shared/badges/es-es/appstore-lrg.svg) no-repeat;width:135px;height:40px;background-size:contain;"></a>
 </div>
 				 <div class="clear"></div>
 			</div><!-- FIN DE CUERPO -->

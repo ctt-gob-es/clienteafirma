@@ -23,7 +23,6 @@
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
-	<!--
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
 		var firmarFichero;
 		var firmarDatosGenerados;
@@ -67,7 +66,7 @@
 			var format = document.getElementById("fFormat").value;
 			
 			try {
-				MiniApplet.sign(dataB64, "SHA1withRSA", format, params, successCallback, errorCallback);
+				MiniApplet.sign(dataB64, "SHA256withRSA", format, params, successCallback, errorCallback);
 			}
 			catch (excep) {
 				errorCallback(MiniApplet.getErrorType(), MiniApplet.getErrorMessage());
@@ -177,7 +176,7 @@
 		function ocultarDialogoEspera() {
 			document.getElementById("dialogoEspera").style.display = "none";
 		}
-	-->
+		
 		MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
 		MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 	</script>
@@ -242,6 +241,8 @@
 				<option value="PAdEStri">PAdEStri</option>
 				<option value="XAdES">XAdES</option>
 				<option value="XAdEStri">XAdEStri</option>
+				<option value="NONE">NONE</option>
+				<option value="NONEtri">NONEtri</option>
 				<option value="AUTO">AUTO</option>
 			</select>
 	</div><br/>
@@ -290,7 +291,7 @@ la Administración Electrónica por su seguridad.
 </div>
 
 <div style="float: left; width: 200px; margin-left: 30px; margin-top: 20px;">
-<a href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store"style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.png) no-repeat;width:135px;height:40px;@media only screen{background-image:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.svg);}"></a>
+<a href="https://itunes.apple.com/us/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store" style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/assets/shared/badges/es-es/appstore-lrg.svg) no-repeat;width:135px;height:40px;background-size:contain;"></a>
 </div>
 				 <div class="clear"></div>
 			</div><!-- FIN DE CUERPO -->
