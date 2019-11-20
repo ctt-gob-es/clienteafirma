@@ -42,7 +42,7 @@ final class NSPreferences {
     		);
         }
 
-        if (!iniFile.exists() || !iniFile.isFile()) {
+        if (!iniFile.isFile()) {
             throw new IOException(
         		"No se ha encontrado el fichero con los perfiles de Firefox en: " + iniFile //$NON-NLS-1$
     		);
@@ -71,7 +71,7 @@ final class NSPreferences {
         }
 
         // Si no hay ninguno por defecto, se toma el primero
-        if (profiles.length > 0) {
+        if (currentProfilePath == null && profiles.length > 0) {
             currentProfilePath = profiles[0].getAbsolutePath();
         }
 
@@ -149,16 +149,16 @@ final class NSPreferences {
         return profiles.toArray(new FirefoxProfile[profiles.size()]);
     }
 
-    /** Comprueba si un perfil de Firefox est&eacute; bloqueado. Un perfil esta
+    /** Comprueba si un perfil de Firefox est&eacute; bloqueado. Un perfil est&aacute;
      * bloqueado cuando en su directorio se encuentra el fichero "parent.lock".
      * @param profile Informaci&oacute;n del perfil de Firefox.
-     * @return Devuelve {@code true} si el perfil esta bloqueado, {@code false} en caso contrario. */
+     * @return Devuelve {@code true} si el perfil est&aacute; bloqueado, {@code false} en caso contrario. */
     private static boolean isProfileLocked(final FirefoxProfile profile) {
         return new File(profile.getAbsolutePath(), "parent.lock").exists() || // En Windows //$NON-NLS-1$
                new File(profile.getAbsolutePath(), "lock").exists(); // En UNIX //$NON-NLS-1$
     }
 
-    /** Almacena la configuraci&oacute;n para la identificacion de un
+    /** Almacena la configuraci&oacute;n para la identificaci&oacute;n de un
      * perfil de Mozilla Firefox. */
     static final class FirefoxProfile {
         private String name = null;

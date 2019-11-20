@@ -168,7 +168,12 @@ final class CMSSignedAndEnvelopedData {
         unSignedAttr = EvelopUtils.generateUnsignedInfo(uatrib);
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = EvelopUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        //TODO: En RSA seria conveniente usar el OID del algoritmo de huella, y no solo el de RSA
+        final AlgorithmIdentifier encAlgId = EvelopUtils.makeAlgId(
+    		signatureAlgorithm.contains("withRSA") ? //$NON-NLS-1$
+				AOAlgorithmID.getOID("RSA") : //$NON-NLS-1$
+					AOAlgorithmID.getOID(signatureAlgorithm)
+		);
 
         final ASN1OctetString sign2 = Utils.firma(signatureAlgorithm, keyEntry, this.signedAttr2);
 

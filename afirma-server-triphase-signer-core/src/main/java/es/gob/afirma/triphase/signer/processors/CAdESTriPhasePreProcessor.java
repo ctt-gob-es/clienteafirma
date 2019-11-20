@@ -183,7 +183,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] data,
-			                         final String algorithm,
+			                         final String signatureAlgorithm,
 			                         final X509Certificate[] cert,
 			                         final Properties params,
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
@@ -220,7 +220,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
 
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
-			AOSignConstants.getDigestAlgorithmName(algorithm),
+			signatureAlgorithm,
 			omitContent ? null : data,
 			cert,
 			Base64.decode(config.getProperty(PROPERTY_NAME_PKCS1_SIGN)),

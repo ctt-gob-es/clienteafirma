@@ -236,14 +236,7 @@ public final class PAdESTriPhaseSigner {
     }
 
     /** Post-firma en PAdES un documento PDF a partir de una pre-firma y la firma PKCS#1, generando un PDF final completo.
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma (debe ser el mismo que el usado en la pre-firma).
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
-     * <ul>
-     *  <li><i>SHA1</i></li>
-     *  <li><i>SHA-256</i></li>
-     *  <li><i>SHA-384</i></li>
-     *  <li><i>SHA-512</i></li>
-     * </ul>
+     * @param signatureAlgorithm Nombre del algoritmo de firma electr&oacute;nica (debe ser el mismo que el usado en la pre-firma).
      * @param inPdf PDF a firmar (debe ser el mismo que el usado en la pre-firma).
      * @param signerCertificateChain Cadena de certificados del firmante (debe ser la misma que la usado en la pre-firma).
      * @param pkcs1Signature Resultado de la firma PKCS#1 v1.5 de los datos de la pre-firma.
@@ -256,7 +249,7 @@ public final class PAdESTriPhaseSigner {
      * @throws IOException Cuando ocurre algun error en la conversi&oacute;n o generaci&oacute;n
      *                     de estructuras.
      * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo. */
-    public static byte[] postSign(final String digestAlgorithmName,
+    public static byte[] postSign(final String signatureAlgorithm,
                                   final byte[] inPdf,
                                   final Certificate[] signerCertificateChain,
                                   final byte[] pkcs1Signature,
@@ -267,7 +260,7 @@ public final class PAdESTriPhaseSigner {
                                                                           NoSuchAlgorithmException {
     	// Obtenemos la firma
     	final PdfSignResult completePdfSSignature = generatePdfSignature(
-    		digestAlgorithmName,
+    		signatureAlgorithm,
     		signerCertificateChain,
     		preSign.getExtraParams(),
     		pkcs1Signature,
@@ -287,7 +280,7 @@ public final class PAdESTriPhaseSigner {
 		);
     }
 
-    private static PdfSignResult generatePdfSignature(final String digestAlgorithmName,
+    private static PdfSignResult generatePdfSignature(final String signatureAlgorithm,
                                                       final Certificate[] signerCertificateChain,
                                                       final Properties xParams,
                                                       final byte[] pkcs1Signature,
@@ -300,7 +293,7 @@ public final class PAdESTriPhaseSigner {
                                                                                               IOException,
                                                                                               NoSuchAlgorithmException {
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(
-    		AOSignConstants.getDigestAlgorithmName(digestAlgorithmName),
+    		signatureAlgorithm,
     		null,
     		signerCertificateChain,
     		pkcs1Signature,

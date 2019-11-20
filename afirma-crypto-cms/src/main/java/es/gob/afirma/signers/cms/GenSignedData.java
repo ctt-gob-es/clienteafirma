@@ -110,18 +110,17 @@ final class GenSignedData {
      * @throws AOException Cuando ocurre un error durante el proceso de descifrado
      *                     (formato o clave incorrecto,...) */
     byte[] generateSignedData(final P7ContentSignerParameters parameters,
-                                     final boolean omitContent,
-                                     final boolean applyTimestamp,
-                                     final String dataType,
-                                     final PrivateKey key,
-                                     final java.security.cert.Certificate[] certChain,
-                                     final Map<String, byte[]> atrib,
-                                     final Map<String, byte[]> uatrib,
-                                     final byte[] messageDigest) throws NoSuchAlgorithmException,
-                                                                        CertificateException,
-                                                                        IOException,
-                                                                        AOException {
-
+                              final boolean omitContent,
+                              final boolean applyTimestamp,
+                              final String dataType,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
+                              final Map<String, byte[]> atrib,
+                              final Map<String, byte[]> uatrib,
+                              final byte[] messageDigest) throws NoSuchAlgorithmException,
+                                                                 CertificateException,
+                                                                 IOException,
+                                                                 AOException {
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }
@@ -196,22 +195,40 @@ final class GenSignedData {
         // digEncryptionAlgorithm
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        	//TODO: En RSA seria conveniente usar el OID del algoritmo de huella, y no solo el de RSA
+            encAlgId = SigUtils.makeAlgId(
+        		signatureAlgorithm.contains("withRSA") ? //$NON-NLS-1$
+    				AOAlgorithmID.getOID("RSA") : //$NON-NLS-1$
+    					AOAlgorithmID.getOID(signatureAlgorithm)
+    		);
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e, e); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2 = firma(signatureAlgorithm, key);
-        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
-        ));
+        signerInfos.add(
+    		new SignerInfo(
+				identifier,
+				digAlgId,
+				signedAttr,
+				encAlgId,
+				sign2,
+				unSignedAttr
+			)
+		);
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(new DERSet(digestAlgs),
-                                                                                encInfo,
-                                                                                certificates,
-                                                                                certrevlist,
-                                                                                new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedData,
+    		new SignedData(
+				new DERSet(digestAlgs),
+                encInfo,
+                certificates,
+                certrevlist,
+                new DERSet(signerInfos)
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -293,14 +310,12 @@ final class GenSignedData {
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
 
         return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
-
     }
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos no firmados.
-     * @param uatrib
-     *        Lista de atributos no firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
+     * @param uatrib Lista de atributos no firmados que se insertar&aacute;n dentro
+     *               del archivo de firma.
      * @return Los atributos no firmados de la firma. */
     private static ASN1Set generateUnsignedInfo(final Map<String, byte[]> uatrib) {
 

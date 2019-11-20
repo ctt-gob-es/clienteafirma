@@ -120,7 +120,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] docBytes,
-			                         final String algorithm,
+			                         final String signatureAlgorithm,
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
@@ -161,7 +161,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Se invocan las funciones internas de postfirma PAdES"); //$NON-NLS-1$
 		final byte[] postsign = PAdESTriPhaseSigner.postSign(
-			AOSignConstants.getDigestAlgorithmName(algorithm),
+			signatureAlgorithm,
 			docBytes,
 			cert,
 			Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
@@ -198,38 +198,38 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public TriphaseData preProcessPreCoSign(final byte[] data,
-			                          final String algorithm,
+			                          final String signatureAlgorithm,
 			                          final X509Certificate[] cert,
 			                          final Properties extraParams) throws IOException,
 			                                                               AOException {
-		return preProcessPreSign(data, algorithm, cert, extraParams);
+		return preProcessPreSign(data, signatureAlgorithm, cert, extraParams);
 	}
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
-			                           final String algorithm,
+			                           final String signatureAlgorithm,
 			                           final X509Certificate[] cert,
 			                           final Properties extraParams,
 			                           final byte[] session) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parser(session));
+		return preProcessPostSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parser(session));
 	}
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
-			                           final String algorithm,
+			                           final String signatureAlgorithm,
 			                           final X509Certificate[] cert,
 			                           final Properties extraParams,
 			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		return preProcessPostSign(data, algorithm, cert, extraParams, triphaseData);
+		return preProcessPostSign(data, signatureAlgorithm, cert, extraParams, triphaseData);
 	}
 
 	@Override
 	public TriphaseData preProcessPreCounterSign(final byte[] sign,
-			                               final String algorithm,
+			                               final String signatureAlgorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
 			                               final CounterSignTarget targets) throws IOException, AOException {
@@ -238,7 +238,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign,
-			                                final String algorithm,
+			                                final String signatureAlgorithm,
 			                                final X509Certificate[] cert,
 			                                final Properties extraParams,
 			                                final TriphaseData triphaseData,
@@ -248,7 +248,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign,
-			                                final String algorithm,
+			                                final String signatureAlgorithm,
 			                                final X509Certificate[] cert,
 			                                final Properties extraParams,
 			                                final byte[] session,

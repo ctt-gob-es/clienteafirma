@@ -404,7 +404,7 @@ public class TestSignField {
 		extraParams.put("signaturePositionOnPageUpperRightX", "300"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("signaturePositionOnPageUpperRightY", "400"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		extraParams.put("signatureRotation", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signatureRotation", "90"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TestSignField.RUBRIC_IMAGE));
 

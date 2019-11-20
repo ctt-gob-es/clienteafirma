@@ -33,19 +33,19 @@ import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import es.gob.afirma.signers.pkcs7.DigestedData;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
-/** Clase que verifica los distintos tipos de firma para CMS a partir de un
+/** Verifica los distintos tipos de firma para CMS a partir de un
  * fichero pasado por par&aacute;metro.
  * La verificaci&oacute; es para los tipo:
  * <ul>
- * <li>Data</li>
- * <li>Signed Data</li>
- * <li>Digested Data</li>
- * <li>Encrypted Data</li>
- * <li>Enveloped Data</li>
- * <li>Signed and Enveloped Data</li>
- * <li>Compressed Data</li>
- * <li>Authenticated Data</li>
- * <li>Authenticated and Enveloped Data</li>
+ *  <li>Data</li>
+ *  <li>Signed Data</li>
+ *  <li>Digested Data</li>
+ *  <li>Encrypted Data</li>
+ *  <li>Enveloped Data</li>
+ *  <li>Signed and Enveloped Data</li>
+ *  <li>Compressed Data</li>
+ *  <li>Authenticated Data</li>
+ *  <li>Authenticated and Enveloped Data</li>
  * </ul> */
 final class ValidateCMS {
 
@@ -53,9 +53,8 @@ final class ValidateCMS {
 		// No permitimos la instanciacion
 	}
 
-    /** M&eacute;todo que verifica que es una firma de tipo "data"
-     * @param data
-     *        Datos CMS.
+    /** Verifica si una firma es de tipo <i>Data</i>.
+     * @param data Datos CMS.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
 	static
@@ -91,7 +90,7 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Signed data"
+    /** Verifica si una firma es de tipo <i>Signed Data</i>.
      * @param data Datos CMS.
      * @return si es de este tipo. */
     static boolean isCMSSignedData(final byte[] data) {
@@ -126,12 +125,11 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que los SignerInfos tenga el par&aacute;metro
-     * que identifica que es de tipo cades.
-     * @param si
-     *        SignerInfo para la verificaci&oacute;n del p&aacute;rametro
+    /** Verifica que <i>SignerInfo</i> tenga el par&aacute;metro
+     * que identifica que es de tipo CAdES.
+     * @param si <i>SignerInfo</i> para la verificaci&oacute;n del p&aacute;rametro
      *        adecuado.
-     * @return si contiene el par&aacute;metro. */
+     * @return Si contiene o no el par&aacute;metro. */
     private static boolean verifySignerInfo(final SignerInfo si) {
         boolean isSignerValid = true;
         final ASN1Set attrib = si.getAuthenticatedAttributes();
@@ -148,10 +146,9 @@ final class ValidateCMS {
         return isSignerValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Digested data"
-     * @param data
-     *        Datos CMS.
-     * @return si es de este tipo. */
+    /** Verifica si una firma es de tipo <i>Digested Data</i>.
+     * @param data Datos CMS.
+     * @return Si es de este tipo. */
     @SuppressWarnings("unused")
 	static
     boolean isCMSDigestedData(final byte[] data) {
@@ -186,9 +183,9 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Encrypted data"
+    /** Verifica si una firma es de tipo <i>Encrypted Data</i>.
      * @param data Datos CMS.
-     * @return si es de este tipo. */
+     * @return Si es de este tipo. */
     static boolean isCMSEncryptedData(final byte[] data) {
         boolean isValid = true;
         try (
@@ -222,11 +219,10 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Enveloped data"
+    /** Verifica si una firma es de tipo </i>Enveloped Data</i>.
      * @param data Datos CMS.
-     * @return si es de este tipo. */
-	static
-    boolean isCMSEnvelopedData(final byte[] data) {
+     * @return Si es de este tipo. */
+	static boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try (
     		final ASN1InputStream is = new ASN1InputStream(data);
@@ -257,11 +253,9 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo
-     * "Signed and Enveloped data"
-     * @param data
-     *        Datos CMS.
-     * @return si es de este tipo. */
+    /** Verifica si una firma es de tipo <i>Signed and Enveloped Data</i>.
+     * @param data Datos CMS.
+     * @return Si es de este tipo. */
     static boolean isCMSSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try (
@@ -295,10 +289,9 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "AuthenticatedData"
-     * @param data
-     *        Datos CMS.
-     * @return si es de este tipo. */
+    /** Verifica si una firma es de tipo <i>Authenticated Data</i>.
+     * @param data Datos CMS.
+     * @return Si es de este tipo. */
     static boolean isCMSAuthenticatedData(final byte[] data) {
         boolean isValid = true;
 
@@ -328,11 +321,9 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo
-     * "AuthenticatedEnvelopedData"
-     * @param data
-     *        Datos CMS.
-     * @return si es de este tipo. */
+    /** Verifica si una firma es de tipo <i>Authenticated and Enveloped Data</i>.
+     * @param data Datos CMS.
+     * @return Si es de este tipo. */
     static boolean isCMSAuthenticatedEnvelopedData(final byte[] data) {
         boolean isValid = true;
 
@@ -363,10 +354,9 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "CompressedData"
-     * @param data
-     *        Datos CMS.
-     * @return si es de este tipo. */
+    /** Verifica si una firma es de tipo <i>Compressed Data</i>.
+     * @param data Datos CMS.
+     * @return Si es de este tipo. */
     static boolean isCMSCompressedData(final byte[] data) {
         boolean isValid = true;
         try (

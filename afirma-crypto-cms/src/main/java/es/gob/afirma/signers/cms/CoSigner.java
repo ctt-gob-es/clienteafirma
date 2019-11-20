@@ -183,7 +183,12 @@ final class CoSigner {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        //TODO: En RSA seria conveniente usar el OID del algoritmo de huella, y no solo el de RSA
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(
+    		signatureAlgorithm.contains("withRSA") ? //$NON-NLS-1$
+				AOAlgorithmID.getOID("RSA") : //$NON-NLS-1$
+					AOAlgorithmID.getOID(signatureAlgorithm)
+		);
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -326,7 +331,12 @@ final class CoSigner {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        //TODO: En RSA seria conveniente usar el OID del algoritmo de huella, y no solo el de RSA
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(
+    		signatureAlgorithm.contains("withRSA") ? //$NON-NLS-1$
+				AOAlgorithmID.getOID("RSA") : //$NON-NLS-1$
+					AOAlgorithmID.getOID(signatureAlgorithm)
+		);
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
