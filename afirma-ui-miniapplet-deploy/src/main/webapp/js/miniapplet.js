@@ -2057,7 +2057,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			var MAX_LONG_ANDROID_URL = 2000;
 			
 			/* Longitud maxima de una URL en iOS para la invocacion de una aplicacion nativa. */
-			var MAX_LONG_IOS_URL = 80000;
+			var MAX_LONG_IOS_URL = 2000;
 			
 			/* Longitud maxima de una URL en Windows 8 para la invocacion de una aplicacion nativa. */
 			var MAX_LONG_WINDOWS8_URL = 2000;
