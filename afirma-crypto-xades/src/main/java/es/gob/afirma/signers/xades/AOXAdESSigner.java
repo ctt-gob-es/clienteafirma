@@ -12,12 +12,14 @@ package es.gob.afirma.signers.xades;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
@@ -491,9 +493,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
         	for (int i = 0; i < referenceList.getLength(); i++) {
         		try {
-        			new URI(((Element) referenceList.item(i)).getAttribute("URI"));
+        			new URI(((Element) referenceList.item(i)).getAttribute("URI")); //$NON-NLS-1$
         		}
+        		catch (final URISyntaxException e) {
+        			LOGGER.warning("Una de las referencias introducidas no tiene un formato valido: " + ((Element) referenceList.item(i)).getAttribute("URI")); //$NON-NLS-1$ //$NON-NLS-2$
+        			continue;
+				}
         		catch (final Exception e) {
+        			LOGGER.log(Level.WARNING, "Una de las referencias introducidas no es valida", e); //$NON-NLS-1$
         			continue;
 				}
         		// Es una referencia externa con URI valida, ya que las internas empiezan por '#'
