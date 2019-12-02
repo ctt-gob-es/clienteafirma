@@ -126,7 +126,9 @@ public final class TestXAdES {
     	{"XAdES-Detached-SHA1withRSA-XML.xml", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"XAdES-Enveloped-SHA1withRSA-XML.xml", "true"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"XAdES-Enveloping-SHA1withRSA-B64.xml", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
-    	{"XAdES-Enveloping-SHA1withRSA-XML.xml", "false"} //$NON-NLS-1$ //$NON-NLS-2$
+    	{"XAdES-Enveloping-SHA1withRSA-XML.xml", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"firmaMinetad.xsig", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"xades_con_manifest.xsig", "false"} //$NON-NLS-1$ //$NON-NLS-2$
     };
 
     /** Prueba de firma de nodo indicado expl&iacute;citamente.
@@ -320,7 +322,8 @@ public final class TestXAdES {
 //          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
 //        }
 
-        for (final String algo : ALGOS) {
+        //for (final String algo : ALGOS) {
+        final String algo = ALGOS[1];
           for(final String[] signfile : TEST_FILES_MULTISIGN) {
 
         	final String filename = signfile[0];
@@ -362,7 +365,7 @@ public final class TestXAdES {
           }
         }
 
-    }
+    //}
 
     /** Pruebas de cofirmacon Manifest.
      * @throws Exception Cuando ocurre un error */

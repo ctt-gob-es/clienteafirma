@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.XMLStructure;
@@ -43,6 +44,9 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -140,6 +144,8 @@ public final class XAdESCoSigner {
 		final String outputXmlEncoding = extraParams.getProperty(
 		        XAdESExtraParams.OUTPUT_XML_ENCODING);
 
+		String oid = extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID);
+
 		String mimeType = extraParams.getProperty(XAdESExtraParams.CONTENT_MIME_TYPE);
 
 		String encoding = extraParams.getProperty(XAdESExtraParams.CONTENT_ENCODING);
@@ -161,10 +167,6 @@ public final class XAdESCoSigner {
 				);
 			}
 		}
-
-		String oid = extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID);
-
-		ObjectIdentifierImpl objectIdentifier = null;
 
 		// nueva instancia de DocumentBuilderFactory que permita espacio de
 		// nombres (necesario para XML)
@@ -207,202 +209,252 @@ public final class XAdESCoSigner {
 			);
 		}
 
-		// Objeto en donde se almacenaran los datos firmados en caso de tratarse de
-		// una firma enveloping
-		XMLObject envelopingObject = null;
-		boolean isEnveloping = false;
-
 		// Localizamos la primera firma (primer nodo "Signature") en profundidad en el arbol de firma.
 		// Se considera que todos los objetos "Signature" del documento firman (referencian) los mismos
-		// objetos, por lo que podemos extraerlos de cualquiera de las firmas actuales.
-		// Buscamos dentro de ese Signature todas las referencias que apunten a datos para firmarlas
+		// objetos, por lo que podemos extraerlos de cualquiera de ellas.
+		// Buscamos dentro del SignedInfo de ese Signature todas las referencias que apunten a datos
+		// para firmarlas.
+		final Element signatureElement = (Element) docSig.
+				getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0);
+		final Element signedInfo = (Element) signatureElement.
+				getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignedInfo").item(0); //$NON-NLS-1$
+		final NodeList referencesNl = signedInfo.
+				getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+
+		// Se deben firmar todas las referencias a datos de la firma que cofirmamos. Para ello
+		// comprobaremos sus refencias y, segun sea, se firmara o no:
+		// - Un elemento interno de tipo KeyInfo: No se firma
+		// - Un elemento interno de tipo SignedProperties: No se firma.
+		// - Cualquier otra cosa (URI vacia, manifest, hoja de estilo, elemento externo...): Se firma.
+		final List<Node> objectReferencesList = new ArrayList<>();
+		for (int i = 0; i < referencesNl.getLength(); i++) {
+			final Node currentReference = referencesNl.item(i);
+
+			final NamedNodeMap referenceAttributes = currentReference.getAttributes();
+
+			// Si tiene declarado el tipo de la referencia es de SignedProperties, se ignora,
+			// si tiene otro valor (objeto de datos, manifest u hoja de estilo), se agrega,
+			// si no esta establecido, se comprueba
+			final Node referenceType = referenceAttributes != null ?
+					referenceAttributes.getNamedItem("Type") : null; //$NON-NLS-1$
+
+			if (referenceType != null) {
+				if (referenceType.getNodeValue() != null &&
+						!referenceType.getNodeValue().endsWith("#SignedProperties")) { //$NON-NLS-1$
+					objectReferencesList.add(currentReference);
+				}
+			}
+			// Si no se establecio el tipo de referencia, lo comprobamos a partir de la URI
+			else {
+				final Node referenceUri = referenceAttributes != null ?
+						referenceAttributes.getNamedItem("URI") : null; //$NON-NLS-1$
+
+				// Omitimos las referencias cuya
+				String uri;
+				if (referenceUri == null || (uri = referenceUri.getNodeValue()) == null) {
+					throw new AOException("Se ha encontrado una referencia sin URI"); //$NON-NLS-1$
+				}
+
+				// Si es una referencia interna, comprobamos que no sea el KeyInfo o el SignedProperties
+				if (uri.startsWith("#")) { //$NON-NLS-1$
+					final String elementId = uri.substring(1);
+					final Node referencedNode = findNodeById(elementId, docSig);
+					if (referencedNode == null) {
+						throw new AOException("No se ha encontrado el nodo correspondiente a una referencia interna"); //$NON-NLS-1$
+					}
+					final String nodeName = referencedNode.getNodeName();
+					if (!equalsNodeName(nodeName, "KeyInfo") && !equalsNodeName(nodeName, "SignedProperties")) { //$NON-NLS-1$ //$NON-NLS-2$
+						objectReferencesList.add(currentReference);
+					}
+				}
+				// Cualquier referencia no interna hay que firmarla
+				else {
+					objectReferencesList.add(currentReference);
+				}
+			}
+		}
+
+		// Creamos el listado de referencias que deberan aparecer en la firma
 		final List<Reference> referenceList = new ArrayList<>();
-		Node currentElement;
-		final NodeList nl = ((Element) docSig.getElementsByTagNameNS(
-			XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)
-		).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
 
-		// Se considera que la primera referencia de la firma son los datos que debemos firmar, ademas
-		// de varias referencias especiales
+		// Objeto en donde se almacenaran los datos firmados en caso de tratarse de
+		// una firma enveloping
+		ObjectIdentifierImpl objectIdentifier = null;
+		XMLObject envelopingObject = null;
+		boolean isEnveloping = false;
 		String referenceId = null;
-		for (int i = 0; i < nl.getLength(); i++) {
-			currentElement = nl.item(i);
+		for (final Node currentReference : objectReferencesList) {
 
-			// Firmamos la primera referencia (que seran los datos firmados) y las hojas de estilo que
-			// tenga asignadas. Las hojas de estilo tendran un identificador que comience por STYLE_REFERENCE_PREFIX.
-			// TODO: Identificar las hojas de estilo de un modo generico.
-			final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
-			if (i == 0 || currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null && currentNodeAttributes.getNamedItem(ID_IDENTIFIER)
-					.getNodeValue()
-					.startsWith(STYLE_REFERENCE_PREFIX)) {
+			// Buscamos las transformaciones declaradas en la Referencia,
+			// para anadirlas tambien en la nueva
+			final List<Transform> currentTransformList;
+			try {
+				currentTransformList = Utils.getObjectReferenceTransforms(currentReference, XML_SIGNATURE_PREFIX);
+			}
+			catch (final NoSuchAlgorithmException e) {
+				throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e); //$NON-NLS-1$
+			}
+			catch (final InvalidAlgorithmParameterException e) {
+				throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e); //$NON-NLS-1$
+			}
 
-				// Buscamos las transformaciones declaradas en la Referencia,
-				// para anadirlas tambien en la nueva
-				final List<Transform> currentTransformList;
-				try {
-					currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
+			// Creamos un identificador de referencia para el objeto a firmar y la almacenamos
+			// para mantener un listado con todas. En el caso de las hojas de estilo lo creamos con un
+			// identificador descriptivo
+			final NamedNodeMap referenceAttributes = currentReference.getAttributes();
+			if (referenceAttributes.getNamedItem(ID_IDENTIFIER) != null &&
+					referenceAttributes.getNamedItem(ID_IDENTIFIER).getNodeValue().startsWith(STYLE_REFERENCE_PREFIX)) {
+				referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
+			}
+			else {
+				referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+			}
+
+
+			// Buscamos y analizamos el nodo de datos para obtener su tipo
+			final String referenceUri = ((Element) currentReference).getAttribute("URI"); //$NON-NLS-1$
+			String referenceType = ((Element) currentReference).getAttribute("Type"); //$NON-NLS-1$
+			if (referenceType != null && referenceType.isEmpty()) {
+				referenceType = null;
+			}
+
+			// Firmas enveloped
+			if ("".equals(referenceUri)) { //$NON-NLS-1$
+
+				if (mimeType == null) {
+					mimeType = "text/xml"; //$NON-NLS-1$
 				}
-				catch (final NoSuchAlgorithmException e) {
-					throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e); //$NON-NLS-1$
-				}
-				catch (final InvalidAlgorithmParameterException e) {
-					throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e); //$NON-NLS-1$
-				}
 
-				// Creamos un identificador de referencia para el objeto a firmar y la almacenamos
-				// para mantener un listado con todas. En el caso de las hojas de estilo lo creamos con un
-				// identificador descriptivo
-				if (currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null &&
-					currentNodeAttributes.getNamedItem(ID_IDENTIFIER).getNodeValue().startsWith(STYLE_REFERENCE_PREFIX)) {
-						referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
-				}
-				else {
-					referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-				}
-
-
-				// Buscamos y analizamos el nodo de datos para obtener su tipo
-				final String dataXmlUri = ((Element) currentElement).getAttribute("URI"); //$NON-NLS-1$
-
-				// Firmas enveloped
-				if ("".equals(dataXmlUri)) { //$NON-NLS-1$
-
-					if (mimeType == null) {
-						mimeType = "text/xml"; //$NON-NLS-1$
-					}
-
-					// Creamos la referencia a los datos con las transformaciones de la original
-					referenceList.add(
+				// Creamos la referencia a los datos con las transformaciones de la original
+				referenceList.add(
 						fac.newReference(
-							dataXmlUri, // Aqui siempre vale ""
-							digestMethod,
-							currentTransformList,
-							XMLConstants.OBJURI,
-							referenceId
-						)
-					);
+								referenceUri, // Aqui siempre vale ""
+								digestMethod,
+								currentTransformList,
+								XMLConstants.OBJURI,
+								referenceId
+								)
+						);
 
+			}
+			// Firmas enveloping y detached
+			else {
+
+				final String dataNodeId = referenceUri.substring(referenceUri.startsWith("#") ? 1 : 0); //$NON-NLS-1$
+				Element dataObjectElement = null;
+				final Element docElement = docSig.getDocumentElement();
+
+				// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
+				Node nodeAttributeId = docElement.getAttributes() != null ?
+						docElement.getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+				if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+					dataObjectElement = docElement;
 				}
-				// Firmas enveloping y detached
 				else {
+					// Recorremos los hijos al reves para acceder antes a los datos y las firmas
+					final NodeList rootChildNodes = docElement.getChildNodes();
+					for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
 
-					final String dataNodeId = dataXmlUri.substring(dataXmlUri.startsWith("#") ? 1 : 0); //$NON-NLS-1$
-					Element dataObjectElement = null;
-					final Element docElement = docSig.getDocumentElement();
-
-					// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
-					Node nodeAttributeId = docElement.getAttributes() != null ?
-						docElement.getAttributes().getNamedItem(ID_IDENTIFIER) :
-							null;
-					if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
-						dataObjectElement = docElement;
-					}
-					else {
-						// Recorremos los hijos al reves para acceder antes a los datos y las firmas
-						final NodeList rootChildNodes = docElement.getChildNodes();
-						for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
-
-							nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ?
+						nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ?
 								rootChildNodes.item(j).getAttributes().getNamedItem(ID_IDENTIFIER) :
 									null;
-							if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
-								dataObjectElement = (Element) rootChildNodes.item(j);
-								break;
-							}
+								if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+									dataObjectElement = (Element) rootChildNodes.item(j);
+									break;
+								}
 
-							// Si es un nodo de firma tambien miramos en sus nodos hijos
-							if (SIGNATURE_TAG.equals(rootChildNodes.item(j).getLocalName())) {
-								final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
-								for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
-									nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
-										subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) :
-											null;
-									if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
-										dataObjectElement = (Element) subChildsNodes.item(k);
+								// Si es un nodo de firma tambien miramos en sus nodos hijos
+								if (SIGNATURE_TAG.equals(rootChildNodes.item(j).getLocalName())) {
+									final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
+									for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
+										nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
+												subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) :
+													null;
+												if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+													dataObjectElement = (Element) subChildsNodes.item(k);
+													break;
+												}
+									}
+									if (dataObjectElement != null) {
 										break;
 									}
 								}
-								if (dataObjectElement != null) {
-									break;
-								}
-							}
-						}
 					}
-					if (dataObjectElement != null) {
-						if (mimeType == null) {
-							mimeType = dataObjectElement.getAttribute("MimeType"); //$NON-NLS-1$
-						}
-						if (encoding == null) {
-							encoding = dataObjectElement.getAttribute("Encoding"); //$NON-NLS-1$
-						}
+				}
+				if (dataObjectElement != null) {
+					if (mimeType == null) {
+						mimeType = dataObjectElement.getAttribute("MimeType"); //$NON-NLS-1$
 					}
+					if (encoding == null) {
+						encoding = dataObjectElement.getAttribute("Encoding"); //$NON-NLS-1$
+					}
+				}
 
-					final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
+				final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
 						XMLConstants.DSIGNNS, SIGNATURE_TAG
-					).item(0).getChildNodes();
-					for (int j = 0; j < signatureChildNodes.getLength(); j++) {
-						final Node subNode = signatureChildNodes.item(j);
-						final NamedNodeMap nnm = subNode.getAttributes();
-						if (nnm != null) {
-							final Node idAttrNode = nnm.getNamedItem(ID_IDENTIFIER);
-							if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
-								isEnveloping = true;
-							}
+						).item(0).getChildNodes();
+				for (int j = 0; j < signatureChildNodes.getLength(); j++) {
+					final Node subNode = signatureChildNodes.item(j);
+					final NamedNodeMap nnm = subNode.getAttributes();
+					if (nnm != null) {
+						final Node idAttrNode = nnm.getNamedItem(ID_IDENTIFIER);
+						if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
+							isEnveloping = true;
 						}
 					}
+				}
 
-					if (isEnveloping && dataObjectElement != null) {
-						// crea el nuevo elemento Object que con el documento afirmar
-						final List<XMLStructure> structures = new ArrayList<>(1);
-						structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
+				if (isEnveloping && dataObjectElement != null) {
+					// crea el nuevo elemento Object que con el documento afirmar
+					final List<XMLStructure> structures = new ArrayList<>(1);
+					structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
 
-						final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-						envelopingObject = fac.newXMLObject(
+					final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+					envelopingObject = fac.newXMLObject(
 							structures,
 							objectId,
 							mimeType,
 							encoding
-						);
+							);
 
-						// Agregamos la referencia al nuevo objeto de datos
-						referenceList.add(
+					// Agregamos la referencia al nuevo objeto de datos
+					referenceList.add(
 							fac.newReference(
-								"#" + objectId, //$NON-NLS-1$
-								digestMethod,
-								currentTransformList,
-								XMLConstants.OBJURI,
-								referenceId
-							)
-						);
+									"#" + objectId, //$NON-NLS-1$
+									digestMethod,
+									currentTransformList,
+									referenceType != null ? referenceType : XMLConstants.OBJURI,
+									referenceId
+									)
+							);
 
-					}
-					// Firma detached
-					else {
-						// Agregamos la referencia a los datos ya existentes
-						referenceList.add(
+				}
+				// Firma detached
+				else {
+					// Agregamos la referencia a los datos ya existentes
+					referenceList.add(
 							fac.newReference(
-								((Element) currentElement).getAttribute("URI"), //$NON-NLS-1$
-								digestMethod,
-								currentTransformList,
-								XMLConstants.OBJURI,
-								referenceId
-							)
-						);
-
-					}
+									referenceUri,
+									digestMethod,
+									currentTransformList,
+									referenceType != null ? referenceType : XMLConstants.OBJURI,
+									referenceId
+									)
+							);
 
 				}
-				if (oid == null && mimeType != null) {
-					try {
-						oid = MimeHelper.transformMimeTypeToOid(mimeType);
-					} catch (final IOException e) {
-						LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
-					}
+
+			}
+			if (oid == null && mimeType != null) {
+				try {
+					oid = MimeHelper.transformMimeTypeToOid(mimeType);
+				} catch (final IOException e) {
+					LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
 				}
-				if (oid != null) {
-					objectIdentifier = new ObjectIdentifierImpl(
-							"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				}
+			}
+			if (oid != null) {
+				objectIdentifier = new ObjectIdentifierImpl(
+						"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 		}
 
@@ -495,5 +547,37 @@ public final class XAdESCoSigner {
 			null,
 			null
 		);
+	}
+
+	/**
+	 * Busca un nodo con el identificador especificado.
+	 * @param nodeId Identificador del nodo que queremos encontrar.
+	 * @param parentElement Nodo padre en el que buscar.
+	 * @return Nodo con el identificador indicado o {@code null} si no
+	 * se encuentra el nodo o si lo que se encuentra no es un &uacute;nico nodo.
+	 */
+	private static Node findNodeById(final String nodeId, final Node parentElement) {
+		final XPath xpath = XPathFactory.newInstance().newXPath();
+
+		Node node;
+		try {
+			node = (Node) xpath.evaluate("//*[@Id='" + nodeId + "']", parentElement, XPathConstants.NODE); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Lo encontrado con el Id " + nodeId + " no es un nodo", e); //$NON-NLS-1$ //$NON-NLS-2$
+			node = null;
+		}
+		return node;
+	}
+
+	/**
+	 * Compara que el nombre de un nodo se corresponda con el que se desea, teniendo en cuenta
+	 * que el nombre del nodo puede contener el espacio de nombres XML.
+	 * @param nodeName Nombre del nodo que se quiere comprobar.
+	 * @param name Nombre que comprobamos.
+	 * @return {@code true} si el nodo tiene ese nombre sin contar el espacio de nombres,
+	 * {@code false} en caso contrario.
+	 */
+	private static boolean equalsNodeName(final String nodeName, final String name) {
+		return nodeName.equals(name) || nodeName.endsWith(":" + name);
 	}
 }
