@@ -6,6 +6,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -61,6 +62,8 @@ public final class TestXAdESWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
+	@Deprecated
 	public void testXadesEnvelopingUseManifestBinary() throws Exception {
 
 		System.out.println("Firma XAdES enveloping con Manifest de datos binarios"); //$NON-NLS-1$
@@ -95,6 +98,8 @@ public final class TestXAdESWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
+	@Deprecated
 	public void testXadesEnvelopingUseManifestXML() throws Exception {
 
 		System.out.println("Firma XAdES Enveloping con Manifest de XML"); //$NON-NLS-1$
@@ -129,6 +134,8 @@ public final class TestXAdESWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test(expected=es.gob.afirma.core.AOUnsupportedSignFormatException.class)
+	@Ignore
+	@Deprecated
 	public void testXadesEnvelopedUseManifest() throws Exception {
 
 		System.out.println("Firma XAdES Enveloped con Manifest"); //$NON-NLS-1$

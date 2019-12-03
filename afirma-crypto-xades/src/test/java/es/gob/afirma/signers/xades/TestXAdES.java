@@ -117,7 +117,7 @@ public final class TestXAdES {
 //            "sample-encoding-UTF-8.xml", //$NON-NLS-1$
 //            "sample-internal-dtd.xml", //$NON-NLS-1$
 //            "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
-//            	"xmlwithremotestyle.xml" //$NON-NLS-1$
+            	"xmlwithremotestyle.xml" //$NON-NLS-1$
 
     };
 
@@ -640,7 +640,7 @@ public final class TestXAdES {
 
             AOTreeModel tree = signer.getSignersStructure(result, false);
             Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-            Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+            //Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
 
             tree = signer.getSignersStructure(result, true);
             Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$

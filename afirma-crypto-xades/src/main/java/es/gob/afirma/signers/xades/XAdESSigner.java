@@ -702,13 +702,15 @@ public final class XAdESSigner {
 						encoding);
 
 				// Crea la referencia al nuevo elemento Object o al nodo especifico a firmar
-				// si asi se hubiese indicado
+				// si asi se hubiese indicado. El tipo de la referencia sera Object, si no
+				// se proporciono un nodo a firmar o nulo si se proporciono.
+
 				referenceList.add(
 					fac.newReference(
 						"#" + (nodeToSign != null ? nodeToSign : objectId), //$NON-NLS-1$
 						digestMethod,
 						transformList,
-						XMLConstants.OBJURI,
+						nodeToSign != null ? null : XMLConstants.OBJURI,
 						referenceId
 					)
 				);
@@ -763,7 +765,7 @@ public final class XAdESSigner {
 							canonicalizationTransform != null ?
 								Collections.singletonList(canonicalizationTransform) :
 									new ArrayList<Transform>(0),
-							XMLConstants.OBJURI,
+							null,
 							referenceStyleId
 						)
 					);
@@ -796,10 +798,10 @@ public final class XAdESSigner {
 					// documento
 					referenceList.add(
 						fac.newReference(
-							tmpUri,
+							tmpUri, // Puede ser el nodo CONTENT o un nodo concreto dentro del mismo
 							digestMethod,
 							transformList,
-							XMLConstants.OBJURI, // Es un nodo de datos a firmar
+							null, // El tipo referenciado no es Object ni ningun otro
 							referenceId
 						)
 					);
@@ -819,7 +821,7 @@ public final class XAdESSigner {
 							tmpStyleUri,
 							digestMethod,
 							Collections.singletonList(canonicalizationTransform),
-							XMLConstants.OBJURI, // Es un nodo de datos a firmar
+							null, // El nodo de datos es de tipo STYLE
 							referenceStyleId
 						)
 					);
@@ -850,7 +852,7 @@ public final class XAdESSigner {
 							canonicalizationTransform != null ?
 								Collections.singletonList(canonicalizationTransform) :
 									new ArrayList<Transform>(0),
-							XMLConstants.OBJURI,
+							null,	// Nodo de tipo STYLE
 							referenceStyleId
 						)
 					);
@@ -929,7 +931,7 @@ public final class XAdESSigner {
 								refData.getUri(),
 								dm,
 								null,
-								XMLConstants.OBJURI,
+								null, // A las referencias externas no se les pone tipo
 								refData.getId(),
 								refData.getMessageDigest()));
 					}
@@ -966,7 +968,7 @@ public final class XAdESSigner {
 								refData.getUri(),
 								dm,
 								null,
-								XMLConstants.OBJURI,
+								null, // A las referencias externas no se les pone tipo
 								referenceId,
 								refData.getMessageDigest());
 					}
@@ -1035,7 +1037,7 @@ public final class XAdESSigner {
 						nodeToSign != null ? "#" + nodeToSign : "", //$NON-NLS-1$ //$NON-NLS-2$
 						digestMethod,
 						transformList,
-						XMLConstants.OBJURI,
+						null,	// La referencia enveloped no tiene tipo
 						referenceId
 					)
 				);
@@ -1062,7 +1064,7 @@ public final class XAdESSigner {
 							canonicalizationTransform != null ?
 								Collections.singletonList(canonicalizationTransform) :
 									new ArrayList<Transform>(0),
-							XMLConstants.OBJURI,
+							null, // Las referencias externas no tienen tipo
 							referenceStyleId
 						)
 					);
@@ -1174,7 +1176,7 @@ public final class XAdESSigner {
 						canonicalizationTransform != null ?
 							Collections.singletonList(canonicalizationTransform) :
 								new ArrayList<Transform>(0),
-						XMLConstants.OBJURI, // Es un nodo a firmar
+						XMLConstants.OBJURI, // Es un nodo Object que se firma
 						referenceStyleId
 					)
 				);
@@ -1493,7 +1495,7 @@ public final class XAdESSigner {
 					uri,
 					digestMethod,
 					null,
-					XMLConstants.OBJURI,
+					null, // Las referencias externas no tienen tipo
 					referenceId,
 					MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm()))
 						.digest(
@@ -1524,7 +1526,7 @@ public final class XAdESSigner {
 					uri,
 					digestMethod,
 					null,
-					XMLConstants.OBJURI,
+					null, // Las referencias externas no tienen tipo
 					referenceId,
 					md
 				);

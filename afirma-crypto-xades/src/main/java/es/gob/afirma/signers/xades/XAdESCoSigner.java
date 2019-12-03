@@ -423,7 +423,7 @@ public final class XAdESCoSigner {
 									"#" + objectId, //$NON-NLS-1$
 									digestMethod,
 									currentTransformList,
-									referenceType != null ? referenceType : XMLConstants.OBJURI,
+									referenceType,
 									referenceId
 									)
 							);
@@ -437,7 +437,7 @@ public final class XAdESCoSigner {
 									referenceUri,
 									digestMethod,
 									currentTransformList,
-									referenceType != null ? referenceType : XMLConstants.OBJURI,
+									referenceType,
 									referenceId
 									)
 							);
