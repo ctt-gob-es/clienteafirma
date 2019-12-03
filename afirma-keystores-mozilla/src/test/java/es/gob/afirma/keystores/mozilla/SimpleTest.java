@@ -76,7 +76,7 @@ public final class SimpleTest {
 
 
     	Provider provider = ksm.getKeyStore().getProvider();
-    	System.out.println("Proveedor almacen: " + provider.getName() + ": " + provider.getInfo());
+    	System.out.println("Proveedor almacen: " + provider.getName() + ": " + provider.getInfo()); //$NON-NLS-1$ //$NON-NLS-2$
 
     	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
     	sig.initSign(
@@ -88,7 +88,7 @@ public final class SimpleTest {
 
 
     	provider = sig.getProvider();
-    	System.out.println("Proveedor firma: " + provider.getName() + ": " + provider.getInfo());
+    	System.out.println("Proveedor firma: " + provider.getName() + ": " + provider.getInfo()); //$NON-NLS-1$ //$NON-NLS-2$
 
     	System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false)); //$NON-NLS-1$
     }

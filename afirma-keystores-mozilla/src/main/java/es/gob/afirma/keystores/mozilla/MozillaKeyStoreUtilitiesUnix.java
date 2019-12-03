@@ -17,6 +17,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.Platform;
+
 final class MozillaKeyStoreUtilitiesUnix {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -116,6 +118,9 @@ final class MozillaKeyStoreUtilitiesUnix {
 					Integer.getInteger(firefoxDirectories.get(i));
 				}
 				catch (final Exception e) {
+					LOGGER.warning(
+						"El perfil '" + directoryLib.getAbsolutePath().replace(Platform.getUserHome(), "USERHOME") + "' no tiene declarada su version: " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					);
 					firefoxDirectories.remove(i);
 				}
 			}
@@ -135,6 +140,24 @@ final class MozillaKeyStoreUtilitiesUnix {
 			return firefoxDirectories.get(0);
 		}
 		return ""; //$NON-NLS-1$
+	}
+
+	/** Recupera el listado de dependencias de la biblioteca "libsoftkn3.so" para
+	 * sistemas operativos UNIX (Linux, Solaris). Los nombres apareceran ordenados de tal forma las
+	 * bibliotecas no tengan dependencias de otra que no haya aparecido
+	 * anterioremente en la lista.
+	 * @param nssPath Ruta al directorio de NSS (terminado en barra).
+	 * @return Listado con los nombres de las bibliotecas. */
+	static String[] getSoftkn3DependenciesUnix(final String nssPath) {
+		return new String[] {
+			nssPath + "libnspr4.so",      // Firefox 2 y superior //$NON-NLS-1$
+			nssPath + "libplds4.so",      // Firefox 2 y superior //$NON-NLS-1$
+			nssPath + "libplc4.so",       // Firefox 2 y superior //$NON-NLS-1$
+			nssPath + "libnssutil3.so",   // Firefox 2 y superior //$NON-NLS-1$
+			nssPath + "libsqlite3.so",    // Firefox 2            //$NON-NLS-1$
+			nssPath + "libmozsqlite3.so", // Firefox 3 y superior //$NON-NLS-1$
+			nssPath + "libsqlite3.so.0"   // Variante de SQLite en ciertos Debian //$NON-NLS-1$
+		};
 	}
 
 }

@@ -135,7 +135,7 @@ public final class MozillaKeyStoreUtilities {
 	 * @param libDir Directorio que contiene las bibliotecas NSS.
 	 * @return Fichero con las propiedades de configuracion del proveedor
 	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a NSS. */
-	static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
+	public static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
 		final String softoknLib;
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
@@ -399,7 +399,7 @@ public final class MozillaKeyStoreUtilities {
 	 * que esto se har&iacute;a autom&aacute;ticamente si las dependencias
 	 * estuviesen en el PATH del sistema.
 	 * @param nssDirectory Directorio en donde se encuentran las bibliotecas de NSS. */
-	static void loadNSSDependencies(final String nssDirectory) {
+	public static void loadNSSDependencies(final String nssDirectory) {
 
 		final String dependList[];
 
@@ -466,15 +466,7 @@ public final class MozillaKeyStoreUtilities {
 			return MozillaKeyStoreUtilitiesWindows.getSoftkn3DependenciesWindows(nssPath);
 		}
 		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
-			return new String[] {
-				nssPath + "libnspr4.so",      // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libplds4.so",      // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libplc4.so",       // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libnssutil3.so",   // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libsqlite3.so",    // Firefox 2            //$NON-NLS-1$
-				nssPath + "libmozsqlite3.so", // Firefox 3 y superior //$NON-NLS-1$
-				nssPath + "libsqlite3.so.0"   // Variante de SQLite en ciertos Debian //$NON-NLS-1$
-			};
+			return MozillaKeyStoreUtilitiesUnix.getSoftkn3DependenciesUnix(nssPath);
 		}
 
 		LOGGER.warning(
@@ -606,7 +598,7 @@ public final class MozillaKeyStoreUtilities {
 			catch (final Exception ex) {
 
 				LOGGER.info(
-					"No se ha podido cargar NSS en modo SQLite, se intentara en modo Berkeley: " + ex //$NON-NLS-1$
+					"No se ha podido cargar NSS en modo SQLite (con prefijo 'sql:/'), se intentara en modo Berkeley (sin prefijo 'sql:/'): " + ex //$NON-NLS-1$
 				);
 
 				// Realizamos un ultimo intento configurando NSS para que utilice la base de
@@ -697,6 +689,7 @@ public final class MozillaKeyStoreUtilities {
 	                                                           ClassNotFoundException {
 
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+		LOGGER.info("Directorio de bibliotecas NSS: " + nssDirectory); //$NON-NLS-1$
 
 		String profileDir = useSharedNss ?
 			SharedNssUtil.getSharedUserProfileDirectory() :

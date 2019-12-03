@@ -61,7 +61,7 @@ public final class SharedNssUtil {
 		).length > 0;
 	}
 
-	/** Obtiene el directorio de bases de datos de NSS compartido.
+	/** Obtiene el directorio de bases de datos de NSS compartido (que usa Google Chrome).
 	 * El programa busca siempre primero el directorio del usuario, y solo si este no existe
 	 * redirecciona al del sistema.
 	 * @return Directorio de bases de datos de NSS compartido (<b>no</b> contiene el prefijo <i>sql:/</i>).
@@ -75,7 +75,7 @@ public final class SharedNssUtil {
 				return path;
 			}
 		}
-		throw new FileNotFoundException();
+		throw new FileNotFoundException("No se ha encontrado un directorio de perfil de NSS compartido"); //$NON-NLS-1$
 	}
 
 	/** Obtiene las rutas completas hacia las bibliotecas (.so de UNIX) de los
