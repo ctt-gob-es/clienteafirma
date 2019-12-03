@@ -12,6 +12,7 @@ package es.gob.afirma.keystores.mozilla;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 final class FirefoxKeyStoreMessages {
 
@@ -27,6 +28,9 @@ final class FirefoxKeyStoreMessages {
             return RESOURCE_BUNDLE.getString(key);
         }
         catch (final MissingResourceException e) {
+        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+    			"No se ha encontrado el recurso textual con clave '" + key + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
+			);
             return '!' + key + '!';
         }
     }

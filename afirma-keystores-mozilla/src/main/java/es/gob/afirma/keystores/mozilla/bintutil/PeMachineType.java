@@ -56,24 +56,24 @@ public enum PeMachineType {
 		return this.description;
 	}
 
-	private static final Hashtable<String, PeMachineType> machineTypes;
+	private static final Hashtable<String, PeMachineType> MACHINE_TYPES;
 
 	static {
-		machineTypes = new Hashtable<>(10);
-		machineTypes.put("00-00", UNKNOWN); //$NON-NLS-1$
-		machineTypes.put("01-D3", MATSUSHITA_AM33); //$NON-NLS-1$
-		machineTypes.put("86-64", X64); //$NON-NLS-1$
-		machineTypes.put("01-C0", ARM_LITTLE_ENDIAN); //$NON-NLS-1$
-		machineTypes.put("0E-BC", EFI_BYTECODE); //$NON-NLS-1$
-		machineTypes.put("01-4C", INTEL_386); //$NON-NLS-1$
-		machineTypes.put("02-00", INTEL_ITANIUM); //$NON-NLS-1$
-		machineTypes.put("90-41", MITSUBISHI_M32R_LITTLE_ENDIAN); //$NON-NLS-1$
-		machineTypes.put("02-66", MIPS16); //$NON-NLS-1$
-		machineTypes.put("03-66", MIPS_FPU); //$NON-NLS-1$
+		MACHINE_TYPES = new Hashtable<>(10);
+		MACHINE_TYPES.put("00-00", UNKNOWN); //$NON-NLS-1$
+		MACHINE_TYPES.put("01-D3", MATSUSHITA_AM33); //$NON-NLS-1$
+		MACHINE_TYPES.put("86-64", X64); //$NON-NLS-1$
+		MACHINE_TYPES.put("01-C0", ARM_LITTLE_ENDIAN); //$NON-NLS-1$
+		MACHINE_TYPES.put("0E-BC", EFI_BYTECODE); //$NON-NLS-1$
+		MACHINE_TYPES.put("01-4C", INTEL_386); //$NON-NLS-1$
+		MACHINE_TYPES.put("02-00", INTEL_ITANIUM); //$NON-NLS-1$
+		MACHINE_TYPES.put("90-41", MITSUBISHI_M32R_LITTLE_ENDIAN); //$NON-NLS-1$
+		MACHINE_TYPES.put("02-66", MIPS16); //$NON-NLS-1$
+		MACHINE_TYPES.put("03-66", MIPS_FPU); //$NON-NLS-1$
 	}
 
 	static PeMachineType getPeMachineType(final String id) {
-		return machineTypes.get(id);
+		return MACHINE_TYPES.get(id);
 	}
 
 }

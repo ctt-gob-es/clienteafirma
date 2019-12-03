@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -161,6 +162,9 @@ public final class AOSecMod {
                     }
                 }
                 catch (final Exception e) {
+                	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            			"Se omite un modulo PKCS#11 de Mozilla: " + e //$NON-NLS-1$
+        			);
                     continue;
                 }
             }
