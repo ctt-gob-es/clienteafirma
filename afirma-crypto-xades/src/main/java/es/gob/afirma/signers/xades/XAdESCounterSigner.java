@@ -145,7 +145,7 @@ public final class XAdESCounterSigner {
 
 			// Si no es un documento cofirma se anade temporalmente el nodo raiz
 			// AFIRMA para que las operaciones de contrafirma funcionen correctamente
-			if (root.getNodeName().equals(AOXAdESSigner.SIGNATURE_NODE_NAME)) {
+			if (root.getLocalName().equals(AOXAdESSigner.SIGNATURE_NODE_NAME)) {
 				esFirmaSimple = true;
 				doc = AOXAdESSigner.insertarNodoAfirma(doc);
 				root = doc.getDocumentElement();

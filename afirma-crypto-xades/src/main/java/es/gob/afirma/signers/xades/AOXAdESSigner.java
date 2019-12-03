@@ -256,8 +256,7 @@ import es.uji.crypto.xades.jxades.util.XMLUtils;
  *    (<code>URI=""</code>), lo cual indica que la firma aplica a la totalidad del documento original.
  *   </p>
  *  </dd>
- * </dl>
- * @version 0.3.1 */
+ * </dl> */
 public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
@@ -266,6 +265,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     /** Etiqueta de los nodos firma de los XML firmados. */
     public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
+
+    /** Etiqueta de los nodos de sello de tiempo. */
+	private static final String TIMESTAMP_TAG = "Timestamp"; //$NON-NLS-1$
 
     /** URI que define la versi&oacute;n por defecto de XAdES. */
     static final String XADESNS = "http://uri.etsi.org/01903/v1.3.2#"; //$NON-NLS-1$
@@ -279,7 +281,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     static final String AFIRMA = "AFIRMA"; //$NON-NLS-1$
     static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
     static final String XADES_SIGNATURE_PREFIX = "xades"; //$NON-NLS-1$
-    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
+    static final String SIGNATURE_NODE_NAME = "Signature"; //$NON-NLS-1$
     static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT"; //$NON-NLS-1$
     static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE"; //$NON-NLS-1$
 
@@ -290,6 +292,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
+
 
     static {
     	Utils.installXmlDSigProvider(true);
@@ -985,13 +988,17 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             final Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
             final List<Node> signNodes = new ArrayList<>();
-            if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+            if (rootNode.getLocalName().equals(SIGNATURE_NODE_NAME)) {
                 signNodes.add(rootNode);
             }
 
             final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
             for (int i = 0; i < signatures.getLength(); i++) {
-                signNodes.add(signatures.item(i));
+            	// Omitimos las firmas extraidas de sellos de tiempo
+            	final Node parentNode = signatures.item(i).getParentNode();
+            	if (parentNode == null || !TIMESTAMP_TAG.equals(parentNode.getLocalName())) {
+            		signNodes.add(signatures.item(i));
+            	}
             }
 
             // Si no se encuentran firmas, no es un documento de firma

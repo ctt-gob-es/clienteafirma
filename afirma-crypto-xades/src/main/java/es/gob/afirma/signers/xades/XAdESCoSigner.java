@@ -182,7 +182,7 @@ public final class XAdESCoSigner {
 
 			// Si el documento contiene una firma simple se inserta como raiz el
 			// nodo AFIRMA
-			if (rootSig.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+			if (rootSig.getLocalName().equals(SIGNATURE_NODE_NAME)) {
 				docSig = AOXAdESSigner.insertarNodoAfirma(docSig);
 				rootSig = docSig.getDocumentElement();
 			}
