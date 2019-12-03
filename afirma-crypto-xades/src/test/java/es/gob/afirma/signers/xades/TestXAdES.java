@@ -807,11 +807,19 @@ public final class TestXAdES {
     @SuppressWarnings("static-method")
 	@Test
     public void testDetection() throws Exception {
-    	final String[] files = new String[] { "firmaIgae.xsig.xml" }; //$NON-NLS-1$
+    	final String[][] files = new String[][] {
+    			{ "firmaIgae.xsig.xml", "true"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	    	{"XAdES-XL_con_sello_binario.xml", "true" }, //$NON-NLS-1$ //$NON-NLS-2$
+    			{"XAdES-XL_con_sello_xml.xml", "true" } //$NON-NLS-1$ //$NON-NLS-2$
+    	};
     	final AOSigner signer = new AOXAdESSigner();
-    	for (final String f : files) {
-    		Assert.assertTrue("La firma " + f + " no se reconoce como XAdES", signer.isSign(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(f)))); //$NON-NLS-1$ //$NON-NLS-2$
+    	for (final String[] f : files) {
+    		if (Boolean.parseBoolean(f[1])) {
+    			Assert.assertTrue("La firma " + f + " no se reconoce como XAdES", signer.isSign(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(f[0])))); //$NON-NLS-1$ //$NON-NLS-2$
+    		}
+    		else {
+    			Assert.assertFalse("La firma " + f + " se ha reconocido como XAdES", signer.isSign(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(f[0])))); //$NON-NLS-1$ //$NON-NLS-2$
+    		}
     	}
     }
-
 }
