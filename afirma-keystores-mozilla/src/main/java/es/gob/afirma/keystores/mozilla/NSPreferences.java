@@ -9,17 +9,13 @@
 
 package es.gob.afirma.keystores.mozilla;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.mozilla.ProfilesIni.FirefoxProfile;
+import es.gob.afirma.keystores.mozilla.ProfilesIni.StateInfo;
 
 /** M&eacute;todos de utilidad para Mozilla Firefox y Nestcape.
  * Inspirada en la clase com.sun.deploy.net.proxy.NSPreferences de Sun
@@ -47,7 +43,7 @@ final class NSPreferences {
 
         if (iniFile == null) {
             throw new IllegalArgumentException(
-        		"El fichero INI es nulo y no se podra determinar el directorio del usuario de Firefox" //$NON-NLS-1$
+        		"El fichero de perfiles es nulo y no se podra determinar el directorio del usuario de Firefox" //$NON-NLS-1$
     		);
         }
 
@@ -61,36 +57,37 @@ final class NSPreferences {
 
         // Leemos el fichero con la informacion de los perfiles y buscamos el
         // activo(el que esta bloqueado)
-        final FirefoxProfile[] profiles = readProfiles(iniFile);
-        for (final FirefoxProfile profile : profiles) {
-        	if (isDummyProfile(profile)) {
-	    		continue;
-	    	}
-            if (profile.isLocked()) {
-                currentProfilePath = profile.getAbsolutePath();
-                LOGGER.info("Se utilizara el perfil bloqueado para Mozilla: '" + profile.getAbsolutePath().replace(Platform.getUserHome(), "USERHOME") + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                break;
-            }
+        final ProfilesIni profilesIni = loadProfilesIni(iniFile);
+
+        final FirefoxProfile activeProfile = getActiveProfile(profilesIni);
+
+        // Comprobamos si se ha encontrado un perfil activo y si este es valido, en cuyo caso, lo devolvemos
+        if (activeProfile != null && !isDummyProfile(activeProfile)) {
+        	currentProfilePath = activeProfile.getAbsolutePath();
+        	LOGGER.info("Se utilizara el perfil activo de Mozilla: '" + //$NON-NLS-1$
+        			getCleanPath(currentProfilePath));
         }
 
-        // Si no hay ninguno actualmente activo, tomamos el por defecto
+        // Si no hay perfil activo o no es valido, tomamos el por defecto
         if (currentProfilePath == null) {
-            for (final FirefoxProfile profile : profiles) {
-            	if (isDummyProfile(profile)) {
-		    		continue;
-    		    }
-                if (profile.isDefault()) {
-                    currentProfilePath = profile.getAbsolutePath();
-                    LOGGER.info("Se utilizara el perfil por defecto para Mozilla"); //$NON-NLS-1$
-                    break;
-                }
-            }
+        	final FirefoxProfile[] profiles = profilesIni.getProfilesList().toArray(new FirefoxProfile[0]);
+        	for (final FirefoxProfile profile : profiles) {
+        		if (isDummyProfile(profile)) {
+        			continue;
+        		}
+        		if (profile.isDefault()) {
+        			currentProfilePath = profile.getAbsolutePath();
+        			LOGGER.info("Se utilizara el perfil por defecto para Mozilla : " + getCleanPath(currentProfilePath)); //$NON-NLS-1$
+        			break;
+        		}
+        	}
         }
 
         // Si no hay ninguno actualmente activo y el perfil por defecto esta bloqueado, se elige el que haya sufrido una ultima modificacion mas reciente
         // Esto se debe a problemas con los perfiles en versiones de Mozilla Firefox a partir de la 69
         if (currentProfilePath == null) {
         	long lastModified = 0;
+        	final FirefoxProfile[] profiles = profilesIni.getProfilesList().toArray(new FirefoxProfile[0]);
 		    for (final FirefoxProfile profile : profiles) {
 		    	if (isDummyProfile(profile)) {
 		    		continue;
@@ -98,32 +95,94 @@ final class NSPreferences {
 		    	if (new File(profile.getAbsolutePath()).lastModified() > lastModified) {
 		    		lastModified = new File(profile.getAbsolutePath()).lastModified();
 		    		currentProfilePath = profile.getAbsolutePath();
-		    		LOGGER.info(
-		    			"Ultima modificacion del perfil '" + profile.getAbsolutePath().replace(Platform.getUserHome(), "USERHOME") + "': " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	    					+ new File(profile.getAbsolutePath()).lastModified()
-		    		);
+		    		LOGGER.info("Se usara el ultimo perfil modificado de Mozilla: " +  getCleanPath(currentProfilePath)); //$NON-NLS-1$
 		    	}
 		    }
         }
 
         // Si no hay ninguno por defecto, se toma el primero
-        if (currentProfilePath == null && profiles.length > 0) {
-            currentProfilePath = profiles[0].getAbsolutePath();
-            LOGGER.info("Se utilizara el primer perfil encontrado"); //$NON-NLS-1$
+        if (currentProfilePath == null && !profilesIni.getProfilesList().isEmpty()) {
+            currentProfilePath = profilesIni.getProfilesList().get(0).getAbsolutePath();
+            LOGGER.info("Se utilizara el primer perfil encontrado de Mozilla: " +  getCleanPath(currentProfilePath)); //$NON-NLS-1$
         }
 
         return currentProfilePath;
     }
 
-    private static boolean isDummyProfile(final FirefoxProfile profile) {
-    	// Si el perfil tiene menos de 10 ficheros o no se puede leer ninguno de los ficheros .db del perfil, damos el perfil por invalido
-    	if (new File(profile.getAbsolutePath()).list().length < MIN_FIREFOX_FILES_ON_PROFILE ||
-    		!new File(profile.getAbsolutePath(), "key4.db").canRead() && !new File(profile.getAbsolutePath(), "key3.db").canRead()) { //$NON-NLS-1$ //$NON-NLS-2$
-    		LOGGER.info(
-    			"Se descarta el perfil '" + profile.getAbsolutePath().replace(Platform.getUserHome(), "USERHOME") + "' con " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					new File(profile.getAbsolutePath()).list().length + " archivos por no pertenecer al usuario activo o ser invalido" //$NON-NLS-1$
+    /**
+     * Omite el directorio del usuario del path del perfil de FireFox.
+     * @param profilePath Ruta del directorio de perfil.
+     * @return Ruta ofuscada.
+     */
+    private static String getCleanPath(final String profilePath) {
+    	return profilePath.replace(Platform.getUserHome(), "USERHOME"); //$NON-NLS-1$
+    }
+
+    /**
+     * Obtiene cual deberia ser el perfil de Mozilla activo seg&uacute;n se declara en el fichero
+     * de perfiles.
+     * @param profilesIni Informaci&oacute;n cargada del fichero de perfiles.
+     * @return Perfil activo o {@code null} si no se identific&oacute;.
+     */
+    private static FirefoxProfile getActiveProfile(final ProfilesIni profilesIni) {
+
+    	FirefoxProfile activeProfile = null;
+
+    	// Version 1 del fichero "profiles.ini"
+        if (profilesIni.getGeneralInfo().getVersion() == 1) {
+            for (final FirefoxProfile profile : profilesIni.getProfilesList()) {
+            	if (isDummyProfile(profile)) {
+            		continue;
+            	}
+            	if (profile.isLocked()) {
+            		activeProfile = profile;
+            		LOGGER.info("Se toma como perfil activo de Mozilla el primer perfil valido bloqueado"); //$NON-NLS-1$
+            		break;
+            	}
+            }
+        }
+        // Version 2 y cualquiera que se defina en el futuro del fichero "profiles.ini"
+        else {
+        	final StateInfo stateInfo = profilesIni.getStateInfo();
+        	if (stateInfo != null) {
+        		final String profilePath = stateInfo.getDefaultProfilePath();
+        		if (profilePath != null) {
+        			for (final FirefoxProfile profile : profilesIni.getProfilesList()) {
+        				if (profilePath.equals(profile.getPath())) {
+        					activeProfile = profile;
+        					LOGGER.info("Se toma como perfil activo de Mozilla el indicado en el 'profiles.ini' v2 o sup."); //$NON-NLS-1$
+        					break;
+        				}
+        			}
+        		}
+        	}
+        }
+
+        if (activeProfile == null) {
+        	LOGGER.info("No se encontro el perfil activo de Mozilla"); //$NON-NLS-1$
+        }
+
+		return activeProfile;
+	}
+
+	private static boolean isDummyProfile(final FirefoxProfile profile) {
+    	// Si el perfil tiene menos de 10 ficheros o no se puede leer ninguno de los ficheros .db
+		// del perfil, damos el perfil por invalido
+
+    	if (new File(profile.getAbsolutePath()).list().length < MIN_FIREFOX_FILES_ON_PROFILE) {
+    		LOGGER.fine(
+    			"Se descarta el perfil '" + getCleanPath(profile.getAbsolutePath()) + //$NON-NLS-1$
+    			"' por no alcanzar el numero de archivos de un perfil valido" //$NON-NLS-1$
     		);
     		return true;
+    	}
+    	if (!new File(profile.getAbsolutePath(), "key4.db").canRead() && //$NON-NLS-1$
+    			!new File(profile.getAbsolutePath(), "key3.db").canRead()) { //$NON-NLS-1$
+    		LOGGER.fine(
+    			"Se descarta el perfil '" + getCleanPath(profile.getAbsolutePath()) + //$NON-NLS-1$
+    			"' por no tener un almacen de claves legible" //$NON-NLS-1$
+    		);
+        	return true;
     	}
     	return false;
     }
@@ -136,146 +195,16 @@ final class NSPreferences {
      * @return Listado de perfiles completos encontrados.
      * @throws IOException Cuando se produce un error durante la lectura de la
      *                     configuraci&oacute;n. */
-    private static FirefoxProfile[] readProfiles(final File iniFile) throws IOException {
+    private static ProfilesIni loadProfilesIni(final File iniFile) throws IOException {
 
-        final String nameAtr = "name="; //$NON-NLS-1$
-        final String isRelativeAtr = "isrelative="; //$NON-NLS-1$
-        final String pathProfilesAtr = "path="; //$NON-NLS-1$
-        final String isDefaultAtr = "default="; //$NON-NLS-1$
+    	ProfilesIni profilesIni;
+    	try {
+    		profilesIni = new ProfilesIni(iniFile);
+    	}
+    	catch (final Exception e) {
+    		throw new IOException("No se pudo cargar el fichero de perfiles de Firefox", e); //$NON-NLS-1$
+    	}
 
-        String line = null;
-        final List<FirefoxProfile> profiles = new ArrayList<>();
-
-        try (
-	        final BufferedReader in = new BoundedBufferedReader(
-	    		new FileReader(iniFile),
-				1024, // Maximo 1024 lineas
-				4096 // Maximo 4KB por linea
-			);
-		) {
-
-	        while ((line = in.readLine()) != null) {
-
-	            // Buscamos un nuevo bloque de perfil
-	            if (!line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-	                continue;
-	            }
-
-	            final FirefoxProfile profile = new FirefoxProfile();
-	            while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-	                if (line.trim().toLowerCase().startsWith(nameAtr)) {
-	                    profile.setName(line.trim().substring(nameAtr.length()));
-	                }
-	                else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
-	                    profile.setRelative(
-                    		line.trim().substring(isRelativeAtr.length()).equals("1") //$NON-NLS-1$
-	                    );
-	                }
-	                else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
-	                    profile.setPath(
-                    		line.trim().substring(pathProfilesAtr.length())
-	                    );
-	                }
-	                else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
-	                    profile.setDefault(
-                    		line.trim().substring(isDefaultAtr.length()).equals("1") //$NON-NLS-1$
-	                    );
-	                }
-	                else {
-	                    break;
-	                }
-	            }
-
-	            // Debemos encontrar al menos el nombre y la ruta del perfil
-	            if (profile.getName() != null || profile.getPath() != null) {
-	                profile.setAbsolutePath(profile.isRelative() ?
-	            		new File(iniFile.getParent(), profile.getPath()).toString() :
-	            			profile.getPath());
-
-	                profiles.add(profile);
-	            }
-
-	            profile.setLocked(
-            		new File(profile.getAbsolutePath(), "lock").exists() || // En UNIX //$NON-NLS-1$
-            			Files.isSymbolicLink(new File(profile.getAbsolutePath(), "lock").toPath()) || // En UNIX y Firefox 69 o superiores //$NON-NLS-1$
-            				new File(profile.getAbsolutePath(), "parent.lock").exists() // En Windows //$NON-NLS-1$
-        		);
-
-	        }
-        }
-        return profiles.toArray(new FirefoxProfile[profiles.size()]);
-    }
-
-    /** Almacena la configuraci&oacute;n para la identificaci&oacute;n de un
-     * perfil de Mozilla Firefox. */
-    static final class FirefoxProfile {
-
-        private String name = null;
-
-        String getName() {
-            return this.name;
-        }
-
-        void setName(final String n) {
-            this.name = n;
-        }
-
-        private boolean relative = true;
-
-        boolean isRelative() {
-            return this.relative;
-        }
-
-        void setRelative(final boolean r) {
-            this.relative = r;
-        }
-
-        private String path = null;
-
-        String getPath() {
-            return this.path;
-        }
-
-        void setPath(final String p) {
-            this.path = p;
-        }
-
-        private String absolutePath = null;
-
-        String getAbsolutePath() {
-            return this.absolutePath;
-        }
-
-        void setAbsolutePath(final String ap) {
-            this.absolutePath = ap;
-        }
-
-        private boolean def = false;
-
-        boolean isDefault() {
-            return this.def;
-        }
-
-        void setDefault(final boolean d) {
-            this.def = d;
-        }
-
-        private boolean locked = false;
-
-        boolean isLocked() {
-        	return this.locked;
-        }
-
-        void setLocked(final boolean lock) {
-        	this.locked = lock;
-        }
-
-        @Override
-		public String toString() {
-        	return "Perfil de Firefox" + //$NON-NLS-1$
-    			(this.locked ? " bloqueado" : " no bloqueado") + //$NON-NLS-1$ //$NON-NLS-2$
-    			(this.def ? " y por defecto " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-    			(this.absolutePath != null ? " situado en: " + this.absolutePath : ""); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+    	return profilesIni;
     }
 }
