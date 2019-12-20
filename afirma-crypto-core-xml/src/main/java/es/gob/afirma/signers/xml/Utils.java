@@ -45,6 +45,7 @@ import javax.xml.transform.OutputKeys;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -213,12 +214,13 @@ public final class Utils {
                 final NodeList transformsNodeList = tmpNodeList.item(i).getChildNodes();
 
                 for (int j = 0; j < transformsNodeList.getLength(); j++) {
-
-                    transformList.add(Utils.getDOMFactory().newTransform(getTransformAlgorithm(transformsNodeList.item(j)),
-                                                       getTransformParameterSpec(transformsNodeList.item(j), namespacePrefix)));
+                	// Comprobamos que sean nodos de elementos, para evitar problemas con comentarios espaciado entre nodos
+                	if (transformsNodeList.item(j).getNodeType() == Node.ELEMENT_NODE) {
+                		transformList.add(Utils.getDOMFactory().newTransform(getTransformAlgorithm(transformsNodeList.item(j)),
+                				getTransformParameterSpec(transformsNodeList.item(j), namespacePrefix)));
+                	}
                 }
-                break; // Si ya hemos encontrado el nodo "Transforms" dejamos de
-                       // buscar
+                break; // Si ya hemos encontrado el nodo "Transforms" dejamos de buscar
             }
         }
 
@@ -230,14 +232,17 @@ public final class Utils {
      * @param transformNode Nodo de transformaci&oacute;n.
      * @return Algoritmo de transformaci&oacute;n. */
     private static String getTransformAlgorithm(final Node transformNode) {
-        if (transformNode == null) {
-            return null;
-        }
-        final Node algorithmNode = transformNode.getAttributes().getNamedItem("Algorithm"); //$NON-NLS-1$
-        if (algorithmNode != null) {
-            return algorithmNode.getNodeValue();
-        }
-        return null;
+    	String algorithm = null;
+    	if (transformNode != null) {
+    		final NamedNodeMap attrs = transformNode.getAttributes();
+    		if (attrs != null) {
+    			final Node algorithmNode = attrs.getNamedItem("Algorithm"); //$NON-NLS-1$
+    			if (algorithmNode != null) {
+    				algorithm = algorithmNode.getNodeValue();
+    			}
+    		}
+    	}
+        return algorithm;
     }
 
     /** Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
