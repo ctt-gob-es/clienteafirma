@@ -529,8 +529,8 @@ class CommandProcessorThread extends Thread {
 			readingTries = 0;
 			do {
 				readingTries++;
-				socketIs.read(reqBuffer);
-				insert = new String(reqBuffer, StandardCharsets.UTF_8);
+				int bytesRead = socketIs.read(reqBuffer);
+				insert = new String(reqBuffer, 0, bytesRead, StandardCharsets.UTF_8);
 			} while (insert.trim().isEmpty() && readingTries <= MAX_READING_BUFFER_TRIES);
 
 			// Para evitar un error de memoria, si llegamos al maximo numero de intentos en el
