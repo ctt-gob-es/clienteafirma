@@ -11,6 +11,8 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
@@ -28,6 +30,12 @@ final class NSPreferences {
 	 * sea v&aacute;lido. */
 	private static final int MIN_FIREFOX_FILES_ON_PROFILE = 10;
 
+
+    /** Cachea los directorios de perfil activos. Normalmente, s&oacute;lo habr&aacute;
+     * uno. */
+    private static Map<String, String> activeProfilesDir = null;
+
+
     private NSPreferences() {
         // No permitimos la instanciacion
     }
@@ -35,7 +43,9 @@ final class NSPreferences {
     /** Devuelve el directorio del perfil activo de Firefox. Si no hubiese perfil
      * activo, devolver&iacute;a el directorio del perfil por defecto y si
      * tampoco lo hubiese, el del primer perfil encontrado. Si no hubiese
-     * perfiles configurados, devolver&iacute;a {@code null}.
+     * perfiles configurados, devolver&iacute;a {@code null}. Este metodo cachea
+     * la ruta del directorio de perfil segun el fichero "profiles.ini" indicado
+     * para evitar que deba cargarse y analizarse m&uacute;ltiples veces.
      * @param iniFile Fichero con la informaci&oacute;n de los perfiles de Firefox.
      * @return Directorio con la informaci&oacute;n del perfil.
      * @throws IOException Cuando ocurre un error abriendo o leyendo el fichero. */
@@ -45,6 +55,16 @@ final class NSPreferences {
             throw new IllegalArgumentException(
         		"El fichero de perfiles es nulo y no se podra determinar el directorio del usuario de Firefox" //$NON-NLS-1$
     		);
+        }
+
+        if (activeProfilesDir == null) {
+        	activeProfilesDir = new HashMap<>();
+        }
+
+        // Comprobamos si ya lo hemos mapeado previamente
+        final String iniFilePath = iniFile.getCanonicalPath();
+        if (activeProfilesDir.containsKey(iniFilePath)) {
+        	return activeProfilesDir.get(iniFilePath);
         }
 
         if (!iniFile.isFile()) {
@@ -105,6 +125,8 @@ final class NSPreferences {
             currentProfilePath = profilesIni.getProfilesList().get(0).getAbsolutePath();
             LOGGER.info("Se utilizara el primer perfil encontrado de Mozilla: " +  getCleanPath(currentProfilePath)); //$NON-NLS-1$
         }
+
+        activeProfilesDir.put(iniFilePath, currentProfilePath);
 
         return currentProfilePath;
     }
@@ -202,6 +224,7 @@ final class NSPreferences {
     		profilesIni = new ProfilesIni(iniFile);
     	}
     	catch (final Exception e) {
+    		profilesIni = null;
     		throw new IOException("No se pudo cargar el fichero de perfiles de Firefox", e); //$NON-NLS-1$
     	}
 

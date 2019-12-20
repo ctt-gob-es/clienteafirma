@@ -62,6 +62,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 	// Firefox x
 	private static final String NSS3_DLL = "nss3.dll"; //$NON-NLS-1$
 
+	private static String appData = null;
+
 	private MozillaKeyStoreUtilitiesWindows() {
 		// No permitimos la instanciacion
 	}
@@ -225,8 +227,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 			nssPath + FREEBL3_DLL     // Firefox 3 y superior
 		};
 	}
-
-	private static String appData = null;
 
 	static String getWindowsAppDataDir() {
 
