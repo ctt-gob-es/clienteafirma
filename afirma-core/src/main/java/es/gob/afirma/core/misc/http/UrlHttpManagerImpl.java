@@ -76,7 +76,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final String KEYSTORE_PASS = "javax.net.ssl.keyStorePassword"; //$NON-NLS-1$
 	private static final String KEYSTORE_TYPE = "javax.net.ssl.keyStoreType"; //$NON-NLS-1$
 	private static final String KEYSTORE_DEFAULT_TYPE = "JKS"; //$NON-NLS-1$
-	private static final String KEYMANAGER_INSTANCE = "SunX509";//$NON-NLS-1$
 	private static final String SSL_CONTEXT = "SSL";//$NON-NLS-1$
 
 	private static KeyStore sslKeyStore = null;
@@ -426,7 +425,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 			kstorePassword = keyStorePassword != null ? keyStorePassword.toCharArray() : new char[0];
 		}
-		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KEYMANAGER_INSTANCE);
+		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		keyFac.init(
 			kstore,
 			kstorePassword
