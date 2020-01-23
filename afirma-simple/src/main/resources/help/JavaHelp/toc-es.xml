@@ -8,10 +8,13 @@
         </tocitem>
         -->
 	<tocitem text="AutoFirma" target="AutoFirma">
-	<tocitem text="Pantalla de espera" target="PantallaEspera" />
-	<tocitem text="Pantalla de firma" target="PantallaFirma" />
-	<tocitem text="Pantalla de detalle de firma" target="PantallaDetalle" />
-	<tocitem text="Men&uacute; de Preferencias" target="MenuPreferencias" />
-	<tocitem text="Licencias" target="Licencia" />
+		<tocitem text="Pantalla de espera" target="PantallaEspera" />
+		<tocitem text="Pantalla de firma" target="PantallaFirma" />
+		<tocitem text="Pantalla de detalle de firma" target="PantallaDetalle" />
+		<tocitem text="Men&uacute; de Preferencias" target="MenuPreferencias" />
+		<tocitem text="Ventana de configuraci&oacute;n de plugins" target="MenuPlugins" />
+		<tocitem text="Ventana de configuraci&oacute;n de proxy" target="VentanaConfigurarProxy" />
+		<tocitem text="Ventana de configuraci&oacute;n de firma visible PDF" target="VentanaPdfVisible" />
+		<tocitem text="Licencias" target="Licencia" />
 	</tocitem>
 </toc>

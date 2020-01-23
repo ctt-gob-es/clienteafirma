@@ -7,5 +7,8 @@
 	<mapID target="PantallaFirma" url="../Spanish.lproj/pgs/PantallaFirma.html" />
 	<mapID target="PantallaDetalle" url="../Spanish.lproj/pgs/PantallaDetalle.html" />
 	<mapID target="MenuPreferencias" url="../Spanish.lproj/pgs/MenuPreferencias.html" />
+	<mapID target="MenuPlugins" url="../Spanish.lproj/pgs/MenuPlugins.html" />
+	<mapID target="VentanaConfigurarProxy" url="../Spanish.lproj/pgs/VentanaConfigurarProxy.html" />
+	<mapID target="VentanaPdfVisible" url="../Spanish.lproj/pgs/VentanaPdfVisible.html" />
 	<mapID target="Licencia" url="../Spanish.lproj/pgs/Licencia.html" />
 </map>

@@ -6,5 +6,8 @@
 	<indexitem text="Pantalla de firma" target="PantallaFirma" />
 	<indexitem text="Pantalla de detalle de firma" target="PantallaDetalle" />
 	<indexitem text="Men&uacute; de Preferencias" target="MenuPreferencias" />
+	<indexitem text="Ventana de configuraci&oacute;n de plugins" target="MenuPlugins" />
+	<indexitem text="Ventana de configuraci&oacute;n de proxy" target="VentanaConfigurarProxy" />
+	<indexitem text="Ventana de configuraci&oacute;n de firma visible PDF" target="VentanaPdfVisible" />
 	<indexitem text="Licencia" target="Licencia" />
 </index>

@@ -18,24 +18,26 @@
   PDF.
   </p>
   <ul>
-  	<li>X: N&uacute;mero de pixeles en el eje X en el que se encuentra el cursor del ratón con respecto a la imagen
-  	escalada de la p&aacute;gina del PDF.</li>
-  	<li>Y: N&uacute;mero de pixeles en el eje Y en el que se encuentra el cursor del ratón con respecto a la imagen
-  	escalada de la p&aacute;gina del PDF.</li>
-  	<li>(Previsualizaci&oacute;n de la p&aacute;gina del PDF): El usuario debe hacer clic sostenido y arrastrar
-  	el rat&oacute;n sobre este &aacute;rea para seleccionar el &aacute;rea visible de firma.</li>
-  	<li>&lt;&lt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la primera p&aacute;gina del PDF.</li>
-  	<li>&lt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la p&aacute;gina anterior del PDF. Puede
+  	<li><b>X</b>: N&uacute;mero de p&iacute;xeles en el eje X en el empieza el &aacute;rea de firma.</li>
+  	<li><b>Y</b>: N&uacute;mero de p&iacute;xeles en el eje Y en el empieza el &aacute;rea de firma.</li>
+  	<li><b>Anchura</b>: N&uacute;mero de p&iacute;xeles que se extiende en horizontal el &aacute;rea de firma.</li>
+  	<li><b>Altura</b>: N&uacute;mero de p&iacute;xeles que se extiende en vertical el &aacute;rea de firma.</li>
+  	<li><b>(Previsualizaci&oacute;n de la p&aacute;gina del PDF)</b>: El usuario debe hacer clic sostenido y arrastrar
+  	el rat&oacute;n sobre este &aacute;rea para seleccionar el &aacute;rea visible de firma. Las posiciones y el tama&ntilde;o
+  	del &aacute;rea de firma se expresa en p&iacute;xeles con respecto a la escala en la que se muestra la imagen de la
+  	p&aacute;gina.</li>
+  	<li><b>&lt;&lt;</b>: Bot&oacute;n para desplazar la visualizaci&oacute;n a la primera p&aacute;gina del PDF.</li>
+  	<li><b>&lt;</b>: Bot&oacute;n para desplazar la visualizaci&oacute;n a la p&aacute;gina anterior del PDF. Puede
   	reproducirse este comportamiento pulsando la tecla "cursor izquierdo" de su teclado.</li>
-  	<li>&gt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la siguiente p&aacute;gina del PDF. Puede
+  	<li><b>&gt;</b>: Bot&oacute;n para desplazar la visualizaci&oacute;n a la siguiente p&aacute;gina del PDF. Puede
   	reproducirse este comportamiento pulsando la tecla "cursor derecho" de su teclado. Si nos encontramos en la
-  	&uacute;ltima p&aacute;gina del PDF esta opci&opacute; nos permitir&aacute; crear una p&aacute;gina en blanco
+  	&uacute;ltima p&aacute;gina del PDF esta opci&oacute; nos permitir&aacute; crear una p&aacute;gina en blanco
   	al final del documento en la que se podr&aacute; insertar la firma.</li>
-  	<li>&gt;&gt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la &uacute;ltima p&aacute;gina del PDF.</li>
+  	<li><b>&gt;&gt;</b>: Bot&oacute;n para desplazar la visualizaci&oacute;n a la &uacute;ltima p&aacute;gina del PDF.</li>
   </ul>
   <p>
   El &aacute;rea de firma desaparecera al cambiar de pantalla del PDF. Seleccione el &aacute;re para la firma visible
-  del PDF y a continuaci&oacute;n, pulse el bot&oacute;n "Siguiente". 
+  del PDF y a continuaci&oacute;n, pulse el bot&oacute;n <b>Siguiente</b>. 
   </p>
   <p>
   A continuaci&oacute;n, se mostrar&aacute; una nueva ventana en la que el usuario podr&aacute; configurar el aspecto
@@ -48,38 +50,38 @@
   Este interfaz permite configurar las siguientes propiedades para la firma visible:
   </p>
 	<ul>
-	<li>Imagen de r&uacute;brica a insertar. Puede configurarse el fichero de imagen pulsando sobre
+	<li><b>Vista previa</b>. Puede configurarse el fichero de imagen pulsando sobre
 	la previsualizaci&oacute;n de la firma. No se permiten im&aacute;genes con transparencias.</li>
-	<li>
-	Formato del texto con el que se pueden configurar los siguientes atributos a todo el texto:
-		<ul>
-			<li>Fuente de letra.</li>
-			<li>Tamaño de letra.</li>
-			<li>Color del texto.</li>
-			<li>Estilo de fuente (Negrita, Cursiva, Subrayado o Tachado).</li>
-		</ul>
-	</li>
-	<li>Texto a incluir en la firma.</li>
+	<li><b>Configuraci&oacute;n de firma:</b></li>
+	<ul>
+	  <li><b>Imagen de firma:</b> Ruta de la imagen con la r&uacute;brica de firma. Puede seleccionarse
+	  mediante el bot&oacute;n <b>Examinar</b> y eliminarse mediante el bot&oacute;n <b>Limpiar</b>.</li>
+	  <li><b>Texto de firma: </b> Texto a mostrar en la firma del PDF.   Para la configuraci&oacute;n del
+	  texto que se desea mostrar en la firma es posible utilizar una serie de palabras clave que ser&aacute;n
+	  sustituidas por los textos apropiados del titular o emisor del certificado de firma en el momento de
+	  firmar. Estas son:</li>
+	  <ul>
+	  	<p><li><b>$$SUBJECTCN$$</b><ul><li>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del titular del certificado de firma.</li></ul></li></p>
+	  	<p><li><b>$$ISSUERCN$$</b><ul><li>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del emisor del certificado de firma.</li></ul></li></p>
+	  	<p><li><b>$$CERTSERIAL$$</b><ul><li>N&uacute;mero de serie del certificado de firma.</li></ul></li></p>
+	  	<p><li><b>$$SIGNDATE=PATR&Oacute;N$$</b><ul><li>Fecha de la firma, donde PATR&Oacute;N debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema definido por Oracle para la clase SimpleDateFormat.</li></ul></li></p>
+	  	<p><li><b>$$GIVENNAME$$</b><ul><li>Nombre del titular (G, Given Name) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+		<p><li><b>$$SURNAME$$</b><ul><li>Apellidos del titular (SN, Surname) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+		<p><li><b>$$ORGANIZATION$$</b><ul><li>Organizaci&oacute;n (O, Organization) del titular declarada en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+		<p><li><b>$$REASON$$</b><ul><li>Raz&oacute;n por la que se firma el PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+		<p><li><b>$$LOCATION$$</b><ul><li>Ciudad en la que se firma el PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+		<p><li><b>$$CONTACT$$</b><ul><li>Informaci&oacute;n de contacto del firmante del PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+	  </ul>
+	  <li>Al texto se le pueden aplicar las siguientes opciones de formato:</li>
+	  <ul>
+		<li>Fuente de letra.</li>
+		<li>Tamaño de letra.</li>
+		<li>Rotaci&oacute;n del texto.</li>
+		<li>Estilo de fuente (Negrita, Cursiva, Subrayado o Tachado).</li>
+		<li>Color del texto.</li>
+	  </ul>
+	  <p>La casilla "Recordar configuraci&oacute;n" permite guardar la configuración establecida (texto, imagen y estilos) para utilizarla en las siguientes firmas. El botón "Restaurar configuraci&oacute;n por defecto" devolverá la configuración del panel a los valores por defecto.</p>
 	</ul>
-  <p>
-  Para la configuraci&oacute;n del texto que se desea mostrar en la firma es posible utilizar serie de
-  palabras clave que serán sustituidas por los textos apropiados del titular o emisor del certificado de
-  firma en el momento de firmar. Estos son:
-  </p>
-  <ul>
-  	<li><b>$$SUBJECTCN$$</b><p>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del titular del certificado de firma.</p></li>
-  	<li><b>$$ISSUERCN$$</b><p>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del emisor del certificado de firma.</p></li>
-  	<li><b>$$CERTSERIAL$$</b><p>N&uacute;mero de serie del certificado de firma.</p></li>
-  	<li><b>$$SIGNDATE=PATR&Oacute;N$$</b><p>Fecha de la firma, donde PATR&Oacute;N debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema definido por Oracle para la clase SimpleDateFormat.</p></li>
-  	<li><b>$$GIVENNAME$$</b><p>Nombre del titular (G, Given Name) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</p></li>
-	<li><b>$$SURNAME$$</b><p>Apellidos del titular (SN, Surname) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</p></li>
-	<li><b>$$ORGANIZATION$$</b><p>Organizaci&oacute;n (O, Organization) del titular declarada en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</p></li>
-	<li><b>$$REASON$$</b><p>Raz&oacute;n por la que se firma el PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</p></li>
-	<li><b>$$LOCATION$$</b><p>Ciudad en la que se firma el PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</p></li>
-	<li><b>$$CONTACT$$</b><p>Informaci&oacute;n de contacto del firmante del PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</p></li>
-  </ul>
-  <p>La casilla "Recordar configuraci&oacute;n" permite guardar la configuración establecida (texto, imagen y estilos) para utilizarla en las siguientes firmas. El botón "Restaurar configuraci&oacute;n por defecto" devolverá la configuración del panel a los valores por defecto.
-  </p>
   <p>
   Si no se desea agregar una firma visible al PDF, antes de pulsar el bot&oacute;n firmar en la pantalla de firma, aseg&uacute;rese
   de que no se encuentra seleccionada la casilla &quot;Hacer la firma visible dentro del PDF&quot;.
@@ -96,30 +98,31 @@
   PDF.
   </p>
   <ul>
-  	<li>Seleccionar imagen: Al pulsar este botón se abrir&aacute; una ventana en la que podr&aacute; seleccionar 
+  	<li><b>Seleccionar imagen:</b> Al pulsar este botón se abrir&aacute; una ventana en la que podr&aacute; seleccionar 
   	la imagen de marca.</li>
-  	<li>X: N&uacute;mero de pixeles en el eje X en el que se encuentra el cursor del ratón con respecto a la imagen
-  	escalada de la p&aacute;gina del PDF.</li>
-  	<li>Y: N&uacute;mero de pixeles en el eje Y en el que se encuentra el cursor del ratón con respecto a la imagen
-  	escalada de la p&aacute;gina del PDF.</li>
-  	<li>(Previsualizaci&oacute;n de la p&aacute;gina del PDF): El usuario debe hacer clic sostenido y arrastrar
+  	<li><b>X</b>: N&uacute;mero de p&iacute;xeles en el eje X en el que situar la marca.</li>
+  	<li><b>Y</b>: N&uacute;mero de p&iacute;xeles en el eje Y en el que situar la marca.</li>
+  	<li><b>Anchura</b>: N&uacute;mero de p&iacute;xeles que se debe extender en horizontal la marca.</li>
+  	<li><b>Altura</b>: N&uacute;mero de p&iacute;xeles que se debe extender en vertical la marca.</li>
+  	<li><b>(Previsualizaci&oacute;n de la p&aacute;gina del PDF):</b> El usuario debe hacer clic sostenido y arrastrar
   	el rat&oacute;n sobre este &aacute;rea para seleccionar el &aacute;rea en el que se colocará la marca.</li>
-  	<li>&lt;&lt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la primera p&aacute;gina del PDF.</li>
-  	<li>&lt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la p&aacute;gina anterior del PDF. Puede
+  	<li><b>&lt;&lt;:</b> Bot&oacute;n para desplazar la visualizaci&oacute;n a la primera p&aacute;gina del PDF.</li>
+  	<li><b>&lt;:</b> Bot&oacute;n para desplazar la visualizaci&oacute;n a la p&aacute;gina anterior del PDF. Puede
   	reproducirse este comportamiento pulsando la tecla "cursor izquierdo" de su teclado.</li>
-  	<li>&gt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la siguiente p&aacute;gina del PDF. Puede
+  	<li><b>&gt;:</b> Bot&oacute;n para desplazar la visualizaci&oacute;n a la siguiente p&aacute;gina del PDF. Puede
   	reproducirse este comportamiento pulsando la tecla "cursor derecho" de su teclado.</li>
-  	<li>&gt;&gt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la &uacute;ltima p&aacute;gina del PDF.</li>
-  	<li>Todas las p&aacute;ginas: Bot&oacute;n para aplicar la marca a todas las p&aacute;ginas del PDF.</li>
+  	<li><b>&gt;&gt;:</b> Bot&oacute;n para desplazar la visualizaci&oacute;n a la &uacute;ltima p&aacute;gina del PDF.</li>
+  	<li><b>Incluir imagen en todas las p&aacute;ginas:</b> Casilla para seleccionar que la marca se inserte en todas
+  	las p&aacute;ginas del PDF.</li>
   </ul>
   <p>
   El &aacute;rea de marca desaparecera al cambiar de p&aacute;gina del PDF. Seleccione la página, imagen y &aacute;rea para la marca visible
-  en el PDF y a continuaci&oacute;n, pulse el bot&oacute;n "Aceptar". 
+  en el PDF y a continuaci&oacute;n, pulse el bot&oacute;n <b>Aceptar</b>. 
   </p>
   
   <p>
   Si no se desea agregar una marca visible al PDF, antes de pulsar el bot&oacute;n firmar en la pantalla de firma, aseg&uacute;rese
-  de que no se encuentra seleccionada la casilla &quot;Insertar una marca visible dentro del PDF&quot;.
+  de que no se encuentra seleccionada la casilla &quot;<b>Insertar una marca visible dentro del PDF</b>&quot;.
   </p>
   
  </body>

@@ -35,6 +35,10 @@
 			<param name="Local" value="Spanish.lproj\pgs\MenuPlugins.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Ventana de configuraci&oacute;n de proxy">
+			<param name="Local" value="Spanish.lproj\pgs\VentanaConfigurarProxy.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Ventana de configuraci&oacute;n de elementos visibles en PDF">
 			<param name="Local" value="Spanish.lproj\pgs\VentanaPdfVisible.html">
 			</OBJECT>
