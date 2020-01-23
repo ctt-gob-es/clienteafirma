@@ -568,7 +568,6 @@ Section "uninstall"
 	; ==== Desinstalador MSI - INICIO ====
    
 	;Se fuerza el cierre de Firefox y Chrome si estan abiertos
-	
 ;	loopFirefox:
 ;	${nsProcess::FindProcess} "firefox.exe" $R2
 ;	StrCmp $R2 0 0 +4
@@ -630,7 +629,7 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	Push "$INSTDIR\AutoFirma\AutoFirma"
+	Push "$INSTDIR\AutoFirma"
 	Call un.RemoveFromPath
 
 SectionEnd
