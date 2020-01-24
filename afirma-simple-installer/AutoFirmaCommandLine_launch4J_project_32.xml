@@ -24,7 +24,7 @@
     <runtimeBits>64/32</runtimeBits>
     <initialHeapSize>512</initialHeapSize>
     <maxHeapSize>1536</maxHeapSize>
-    <opt>-Xms512m -Xmx1g</opt>
+    <opt>-Xms256m -Xmx1g</opt>
   </jre>
   <versionInfo>
     <fileVersion>1.7.0.0</fileVersion>

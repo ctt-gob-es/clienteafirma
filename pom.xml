@@ -51,7 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.7-SNAPSHOT</clienteafirma.version>
-		<afirma.legible.version>1_6_5</afirma.legible.version>
+		<afirma.legible.version>1_7_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		
 		<jdk.version>1.7</jdk.version>
@@ -243,7 +243,22 @@
 				
 			</modules>
 			
-			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo -->
+			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo.
+			     Aqui se agregan unas genericas por si fuese necesario -->
+			<build>
+       			<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
+							<fork>true</fork>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 			
 		</profile>
 		
