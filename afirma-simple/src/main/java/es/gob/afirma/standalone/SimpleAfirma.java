@@ -349,6 +349,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         System.exit(exitCode);
     }
 
+    /** Cierra la aplicaci&oacute;n.
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+     *                 indica error y cero indica salida normal. */
+    public static void forceCloseApplication(final int exitCode) {
+       	Runtime.getRuntime().halt(exitCode);
+    }
+
     /** Obtiene el <code>AOKeyStoreManager</code> en uso en la aplicaci&oacute;n.
      * @return <code>AOKeyStoreManager</code> en uso en la aplicaci&oacute;n */
     public synchronized AOKeyStoreManager getAOKeyStoreManager() {
@@ -561,13 +568,18 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	// Se define el look and feel
     	LookAndFeelManager.applyLookAndFeel();
 
-    	// Se establece la configuracion del proxy
+    	// Uso en modo linea de comandos
     	if (isUsingCommnadLine(args)) {
     		CommandLineLauncher.main(args);
     		return;
     	}
 
+    	// Se establece la configuracion del proxy
        	ProxyUtil.setProxySettings();
+
+		// Establecemos si deben respetarse las comprobaciones de seguridad de las conexiones de red
+		HttpManager.setSecureConnections(PreferencesManager.getBoolean(
+				PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
 
        	// Comprobamos si es necesario buscar actualizaciones
        	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
@@ -651,7 +663,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     			//							la aplicacion, que debera permanecer abierta hasta que se cierre
     			//							el socket.
     			if (!args[0].startsWith(WEBSOCKET_REQUEST_PREFIX)) {
-    				System.exit(0);
+    				forceCloseApplication(0);
     			}
     		}
     		// Invocacion normal modo grafico

@@ -19,7 +19,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
-import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +36,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
@@ -67,6 +67,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
+
+	private final JCheckBox secureConnections = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.173")); //$NON-NLS-1$
 
 	private final DisposableInterface disposableInterface;
 	DisposableInterface getDisposableInterface() {
@@ -280,7 +282,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		mainPanel.add(signConfigPanel, gbc);
 
-		final JPanel innerPanel = new JPanel(new GridBagLayout());
 		final JPanel signGeneralPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		signGeneralPanel.setBorder(
 			BorderFactory.createTitledBorder(
@@ -290,7 +291,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.gridy = 0;
-		c.insets = new Insets(0, 7, 4, 7);
+		c.insets = new Insets(0, 0, 4, 7);
 		c.anchor = GridBagConstraints.LINE_START;
 
 		final JLabel signatureAlgorithmsLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.18")); //$NON-NLS-1$
@@ -313,6 +314,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		signatureAlgorithmsLabel.setLabelFor(this.signatureAlgorithms);
 		this.signatureAlgorithms.setEnabled(!isBlocked());
 
+		final JPanel innerPanel = new JPanel(new GridBagLayout());
 		signGeneralPanel.add(innerPanel);
 
 		c.gridx = 0;
@@ -353,11 +355,22 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		massiveSignaturePanel.add(this.massiveOverwrite);
 
-		final JPanel netConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		final JPanel netConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		netConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("PreferencesPanel.125") //$NON-NLS-1$
 			)
+		);
+
+		final JPanel netConfigInnerPanel = new JPanel(new GridBagLayout());
+		netConfigPanel.add(netConfigInnerPanel);
+
+		this.secureConnections.setMnemonic('c');
+		this.secureConnections.setToolTipText(
+			SimpleAfirmaMessages.getString("PreferencesPanel.174") //$NON-NLS-1$
+		);
+		this.secureConnections.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.174") //$NON-NLS-1$
 		);
 
 		final JButton proxyConfigButton = new JButton(
@@ -375,8 +388,16 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
 
-		netConfigPanel.add(proxyLabel);
-		netConfigPanel.add(proxyConfigButton);
+		final GridBagConstraints netConstraints = new GridBagConstraints();
+		netConstraints.insets = new Insets(0, 0, 4, 7);
+		netConstraints.gridx = 0;
+		netConstraints.gridy = 0;
+		netConstraints.anchor = GridBagConstraints.LINE_START;
+		netConfigInnerPanel.add(this.secureConnections, netConstraints);
+		netConstraints.gridy++;
+		netConfigInnerPanel.add(proxyLabel, netConstraints);
+		netConstraints.gridx++;
+		netConfigInnerPanel.add(proxyConfigButton, netConstraints);
 
 
 		gbc.gridy++;
@@ -401,88 +422,32 @@ final class PreferencesPanelGeneral extends JScrollPane {
     	// Cursor en espera
     	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-    	final ProxyPanel proxyDlg = new ProxyPanel();
+    	final ProxyPanel proxyPanel = new ProxyPanel();
 
     	// Cursor por defecto
     	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
     	if(AOUIFactory.showConfirmDialog(
 				container,
-				proxyDlg,
+				proxyPanel,
 				SimpleAfirmaMessages.getString("ProxyDialog.0"), //$NON-NLS-1$
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.DEFAULT_OPTION
 		) == JOptionPane.OK_OPTION) {
 
-			if (proxyDlg.isProxySelected()) {
-				final String host = proxyDlg.getHost();
-				final String port = proxyDlg.getPort();
-
-				if(host == null || host == "") { //$NON-NLS-1$
-					AOUIFactory.showErrorMessage(
+    		try {
+    			proxyPanel.saveData();
+    		}
+    		catch (final ConfigurationException e) {
+    			AOUIFactory.showErrorMessage(
 						null,
-						SimpleAfirmaMessages.getString("ProxyDialog.1"), //$NON-NLS-1$
+						e.getMessage(),
 						SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
-					);
-					changeProxyDlg(container);
-					LOGGER.warning("El host no puede ser nulo o vacio"); //$NON-NLS-1$
-				}
-				else if(port == null || port == "") { //$NON-NLS-1$
-					AOUIFactory.showErrorMessage(
-						null,
-						SimpleAfirmaMessages.getString("ProxyDialog.3"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
-					);
-					changeProxyDlg(container);
-					LOGGER.warning("El puerto no puede ser nulo, vacio o tener mas de 4 digitos"); //$NON-NLS-1$
-				}
-				else {
-					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST, host);
-					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, port);
-
-					// Si no se establece usuario, nos aseguramos de eliminar el actual. Si se establece, lo guardamos.
-					if (proxyDlg.getUsername() == null || proxyDlg.getUsername().isEmpty()) {
-						PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
-					}
-					else {
-						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, proxyDlg.getUsername());
-					}
-
-					// Si no se establece contrasena, nos aseguramos de eliminar la actual. Si se establece,
-					// la guardamos cifrada.
-					final char[] password = proxyDlg.getPassword();
-					if (password == null || password.length == 0) {
-						PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
-					}
-					else {
-						try {
-							final String cipheredPwd = ProxyUtil.cipherPassword(password);
-							if (cipheredPwd != null) {
-								PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
-							}
-						}
-						catch (final GeneralSecurityException e) {
-							LOGGER.severe("Error cifrando la contrasena del Proxy: " + e); //$NON-NLS-1$
-							JOptionPane.showMessageDialog(container, SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
-							PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
-						}
-					}
-				}
+						);
+    			changeProxyDlg(container);
+    			return;
 			}
-			else {
-				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST);
-				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT);
-				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
-				PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
-			}
-
-			PreferencesManager.putBoolean(
-				PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED,
-				proxyDlg.isProxySelected()
-			);
-
 			// Aplicamos los valores tanto si el checkbox esta marcado o no, en un caso lo establecera y en en otro lo
 			// eliminara
 			ProxyUtil.setProxySettings();
@@ -542,6 +507,10 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS, this.secureConnections.isSelected());
+
+		// Segun lo configurado establecemos el uso de conexiones de seguras
+		HttpManager.setSecureConnections(this.secureConnections.isSelected());
 	}
 
 	void loadPreferences() {
@@ -578,6 +547,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		}
 
 		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
+
+		this.secureConnections.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
 	}
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel general

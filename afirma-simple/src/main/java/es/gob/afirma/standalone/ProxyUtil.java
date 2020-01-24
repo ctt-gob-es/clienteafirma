@@ -15,14 +15,17 @@ import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.ProxySelector;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
+import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
@@ -32,30 +35,39 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class ProxyUtil {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Indica si las variables del Proxy que pudiesen encontrarse en las variables de entorno de Java
-	 * provienen de un establecimiento externo (en cuyo caso no se alteran nunca) o si han sido establecidas a
-	 * trav&eacute;s del GUI de AutoFirma, en cuyo caso deben limpiarse al desmarcar la casilla "Usar proxy",
-	 * para efectivamente dejar de usar un proxy de red. */
-	private static boolean clearOnUncheck = false;
+	private static ProxySelector defaultProxySelector = null;
 
 	private ProxyUtil() {
 		// No instanciable
 	}
 
-	private static void setDefaultProxy() {
-		final ProxySearch ps = ProxySearch.getDefaultProxySearch();
-		final ProxySelector psel = ps.getProxySelector();
-		if (psel == null) {
+	/** Establece la configuraci&oacute;n para el servidor <i>Proxy</i> seg&uacute;n los valores
+     * de configuraci&oacute;n encontrados. */
+    public static void setProxySettings() {
+
+    	// Guardamos copia del selector de proxy por defecto de Java
+    	if (defaultProxySelector == null) {
+    		defaultProxySelector = ProxySelector.getDefault();
+    	}
+
+    	// Identificamos si se ha configurador el proxy del sistema, uno personalizado o
+    	// si no hay proxy y operamos segun corresponda
+    	final ProxyConfig.ConfigType proxyType = getProxyType();
+
+    	final ProxySelector proxySelector = getProxySelector(proxyType);
+    	if (proxySelector == null) {
 			LOGGER.info("No se usara proxy para las conexiones de red"); //$NON-NLS-1$
 			return;
 		}
-		ProxySelector.setDefault(psel);
+
+    	// Establecemos el selector del proxy
+		ProxySelector.setDefault(proxySelector);
 
 		// Este bloque es solo para el log
 		try {
-			List<Proxy> proxies = psel.select(new URI("http://www.theregister.co.uk")); //$NON-NLS-1$
+			List<Proxy> proxies = proxySelector.select(new URI("http://www.theregister.co.uk")); //$NON-NLS-1$
 			if (proxies.isEmpty() || proxies.get(0).address() == null) {
 				LOGGER.info("No se usara proxy para las conexiones HTTP"); //$NON-NLS-1$
 			}
@@ -63,7 +75,7 @@ public final class ProxyUtil {
 		        final InetSocketAddress addr = (InetSocketAddress) proxies.get(0).address();
 				LOGGER.info("Se usara proxy para las conexiones HTTP: " + addr.getHostName() + ":" + addr.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			proxies = psel.select(new URI("https://www.google.com")); //$NON-NLS-1$
+			proxies = proxySelector.select(new URI("https://www.google.com")); //$NON-NLS-1$
 			if (proxies.isEmpty() || proxies.get(0).address() == null) {
 				LOGGER.info("No se usara proxy para las conexiones HTTPS"); //$NON-NLS-1$
 			}
@@ -76,123 +88,149 @@ public final class ProxyUtil {
 			// No debe pasar
 			throw new IllegalStateException("La URI de pruebas del proxy es invalida: " + e, e); //$NON-NLS-1$
 		}
+    }
+
+    private static ProxyConfig.ConfigType getProxyType() {
+
+    	ProxyConfig.ConfigType proxyType;
+    	final String proxyTypeString = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_TYPE);
+    	if (proxyTypeString == null) {
+    		final boolean proxySelected = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED);
+    		if (!proxySelected) {
+    			proxyType = ProxyConfig.ConfigType.SYSTEM;
+    		}
+    		else {
+    			final String proxyHost = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST);
+        		final String proxyPort = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT);
+        		if (proxyHost != null && !proxyHost.trim().isEmpty() &&
+        				proxyPort != null && !proxyPort.trim().isEmpty()) {
+        			proxyType = ProxyConfig.ConfigType.CUSTOM;
+        		}
+        		else {
+        			proxyType = ProxyConfig.ConfigType.NONE;
+        		}
+    		}
+    	}
+    	else {
+    		try {
+    			proxyType = ProxyConfig.ConfigType.valueOf(proxyTypeString);
+    		}
+    		catch (final Exception e) {
+    			LOGGER.warning("El tipo de proxy configurado no era valido. No se usara proxy: " + e); //$NON-NLS-1$
+    			proxyType = ProxyConfig.ConfigType.NONE;
+			}
+    	}
+
+    	return proxyType;
+    }
+
+    /**
+     * Obtiene la configuracion actualmente seleccionada (que puede no ser la guardada) del proxy.
+     * @param proxyType
+     * @return
+     */
+    private static ProxySelector getProxySelector(final ProxyConfig.ConfigType proxyType) {
+
+    	ProxySelector proxySelector;
+    	switch (proxyType) {
+		case SYSTEM:
+			proxySelector = getSystemProxySelector();
+			break;
+		case CUSTOM:
+			proxySelector = getCustomProxySelector();
+			break;
+		case NONE:
+		default:
+			proxySelector = getNoProxySelector();
+			break;
+		}
+    	return proxySelector;
+    }
+
+	/**
+	 * Obtiene el selector de proxy que emula la configuraci&oacute;n de proxy del sistema.
+	 * @return Selector de proxy.
+	 */
+	private static ProxySelector getSystemProxySelector() {
+
+		// IMPORTANTE: En Java 8 se ha encontrado que, cuando hay un ProxySelector
+		// con proxies ya establecido, la deteccion automatica no funciona. Para
+		// solucionarlo, eliminamos la configuracion por defecto de proxy que hubiese,
+		// identificamos la configuracion del sistema (que puede que mas adelante se
+		// establezca) y volvemos a establecer la que hubiese
+
+		// Obtenemos la configuracion establecida y la eliminamos guardando copia
+		final ProxySelector proxyDefault = ProxySelector.getDefault();
+		ProxySelector.setDefault(getNoProxySelector());
+
+		// Busqueda de proxies configurados en el sistema
+		final ProxySearch proxySearch = new ProxySearch();
+		proxySearch.addStrategy(Strategy.OS_DEFAULT);
+		proxySearch.addStrategy(Strategy.BROWSER);
+
+		final ProxySelector newSelector = proxySearch.getProxySelector();
+
+		// Establecemos el ProxySelector original
+		ProxySelector.setDefault(proxyDefault);
+
+		return newSelector;
 	}
 
-	/** Establece la configuraci&oacute;n para el servidor <i>Proxy</i> seg&uacute;n los valores
-     * de configuraci&oacute;n encontrados. */
-    public static void setProxySettings() {
+	private static ProxySelector getCustomProxySelector() {
 
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED)) {
+		final String proxyHost = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST);
+		final String proxyPort = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT);
+		final String proxyUsername = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
+		final String cipheredProxyPassword = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
+		final String excludedUrls = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_EXCLUDED_URLS);
 
-    		final String proxyHost = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST);
-    		final String proxyPort = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT);
-    		final String proxyUsername = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
-    		final String cipheredProxyPassword = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
+		// Configuracion de host y puerto del proxy
+		System.setProperty("http.proxyHost", proxyHost); //$NON-NLS-1$
+		System.setProperty("http.proxyPort", proxyPort); //$NON-NLS-1$
+		System.setProperty("https.proxyHost", proxyHost); //$NON-NLS-1$
+		System.setProperty("https.proxyPort", proxyPort); //$NON-NLS-1$
+		System.setProperty("ftp.proxHost", proxyHost); //$NON-NLS-1$
+		System.setProperty("ftp.proxyPort", proxyPort); //$NON-NLS-1$
+		System.setProperty("socksProxyHost", proxyHost); //$NON-NLS-1$
+		System.setProperty("socksProxyPort", proxyPort); //$NON-NLS-1$
 
-    		if (proxyHost != null &&
-    				!proxyHost.trim().isEmpty() &&
-    					proxyPort != null &&
-    						!proxyPort.trim().isEmpty()) {
+		// Listado de excepciones
+		if (excludedUrls != null && !excludedUrls.trim().isEmpty()) {
+			System.setProperty("http.nonProxyHosts", excludedUrls.trim()); //$NON-NLS-1$
+			System.setProperty("ftp.nonProxyHosts", excludedUrls.trim()); //$NON-NLS-1$
+		}
 
-    			LOGGER.info(
-					"Establecido Proxy de red desde el GUI de la aplicacion: " + proxyHost + ":" + proxyPort //$NON-NLS-1$ //$NON-NLS-2$
-				);
+		// Se cnfigura si es necesario el usuario y contrasena del proxy
+		if (proxyUsername != null && !proxyUsername.trim().isEmpty() &&
+				cipheredProxyPassword != null && !cipheredProxyPassword.trim().isEmpty()) {
+			char[] proxyPassword;
+			try {
+				proxyPassword = decipherPassword(cipheredProxyPassword);
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudo descifrar la contrasena del proxy. No se configurara el usuario y contrasena: " + e); //$NON-NLS-1$
+				proxyPassword = null;
+			}
 
-    			System.setProperty("http.proxyHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("http.proxyPort", proxyPort); //$NON-NLS-1$
+			// Establecemos a nivel general un autenticador que utilice el usuario y contrasena
+			// frente al proxy
+			Authenticator auth = null;
+			if (proxyPassword != null) {
+				auth = getPasswordAuthentication(proxyUsername, proxyPassword);
+			}
+			Authenticator.setDefault(auth);
+		}
 
-    			System.setProperty("https.proxyHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("https.proxyPort", proxyPort); //$NON-NLS-1$
+		return defaultProxySelector;
+	}
 
-    			System.setProperty("ftp.proxHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("ftp.proxyPort", proxyPort); //$NON-NLS-1$
-
-    			System.setProperty("socksProxyHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("socksProxyPort", proxyPort); //$NON-NLS-1$
-
-        		if (proxyUsername != null &&
-        				!proxyUsername.trim().trim().isEmpty() &&
-        					cipheredProxyPassword != null &&
-        						!cipheredProxyPassword.trim().trim().isEmpty()) {
-
-        			final char[] proxyPassword;
-					try {
-						proxyPassword = decipherPassword(cipheredProxyPassword);
-					}
-					catch (final Exception e) {
-						LOGGER.warning("No se pudo descifrar la contrasena del proxy. No se configurara el usuario y contrasena: " + e); //$NON-NLS-1$
-						Authenticator.setDefault(null);
-						return;
-					}
-
-        			Authenticator.setDefault(
-    					new Authenticator() {
-	    			        @Override
-	    					public PasswordAuthentication getPasswordAuthentication() {
-	    			            return new PasswordAuthentication(
-    			            		proxyUsername,
-    			            		proxyPassword
-			            		);
-	    			        }
-	    			    }
-					);
-        		}
-
-        		clearOnUncheck = true;
-    		}
-    		// Indicar que si se quiere usar proxy pero con los valores en blanco se entiende
-    		// como limpiar valores que pudiesen estar ya establecidos en Java
-    		else {
-    			clearJavaProxy();
-    		}
-    	}
-    	// Si no se indica nada en el GUI de AutoFirma, se dejan los valores por defecto de
-    	// la JVM tal y como estaban, nunca se sobreescriben, a menos que estos mismos valores
-    	// hubiesen sido establecidos con el mismo AutoFirma.
-    	else {
-    		// Si se establecio el Proxy con AutoFirma y se desmarca, se borra con AutoFirma
-    		if (clearOnUncheck) {
-    			clearJavaProxy();
-    		}
-    		// Si no esta marcado en AutoFirma pero hay un Proxy establecido externamente, se respeta
-    		else {
-
-	    		final String javaProxyHost = System.getProperty("http.proxyHost"); //$NON-NLS-1$
-	    		final String javaProxyPort = System.getProperty("http.proxyPort"); //$NON-NLS-1$
-	    		// Si hay un proxy establecido a nivel de JVM...
-	    		if (javaProxyHost != null &&
-	    				javaProxyPort != null &&
-	    					!javaProxyHost.trim().isEmpty() &&
-	    						!javaProxyPort.trim().isEmpty()) {
-	    			LOGGER.info(
-						"Se usara el Proxy por defecto de Java para las conexiones de red: " + javaProxyHost + ":" + javaProxyPort //$NON-NLS-1$ //$NON-NLS-2$
-					);
-	    			return;
-	    		}
-
-	    		// No no esta marcado ni hay uno externo, vemos si hay establecido un proxy a nivel de SO
-	    		// (usando ProxyVole), en cuyo caso, se usa.
-	    		setDefaultProxy();
-    		}
-    	}
-    }
-
-    private static void clearJavaProxy() {
-		LOGGER.info("No se usara Proxy para las conexiones de red"); //$NON-NLS-1$
-		System.clearProperty("http.proxyHost"); //$NON-NLS-1$
-		System.clearProperty("http.proxyPort"); //$NON-NLS-1$
-		System.clearProperty("http.nonProxyHosts"); //$NON-NLS-1$
-		System.clearProperty("https.proxyHost"); //$NON-NLS-1$
-		System.clearProperty("https.proxyPort"); //$NON-NLS-1$
-		System.clearProperty("https.nonProxyHosts"); //$NON-NLS-1$
-		System.clearProperty("ftp.proxHost"); //$NON-NLS-1$
-		System.clearProperty("ftp.proxyPort"); //$NON-NLS-1$
-		System.clearProperty("ftp.nonProxyHosts"); //$NON-NLS-1$
-		System.clearProperty("socks.proxyHost"); //$NON-NLS-1$
-		System.clearProperty("socks.proxyPort"); //$NON-NLS-1$
-		System.clearProperty("socks.nonProxyHosts"); //$NON-NLS-1$
-		Authenticator.setDefault(null);
-    }
+	/**
+	 * Obtiene un selector de proxy que no configura proxy.
+	 * @return Selector de proxy que indica que las conexiones se hagan de forma directa.
+	 */
+	private static ProxySelector getNoProxySelector() {
+		return new NoProxySelector();
+	}
 
     private static final char[] PWD_CIPHER_KEY = new char[] {'8', 'W', '{', 't', '2', 'r', ',', 'B'};
 
@@ -230,4 +268,61 @@ public final class ProxyUtil {
 		);
     	return new String(p, StandardCharsets.UTF_8).toCharArray();
     }
+
+    /**
+     * Devuelve el proxy configurado en el sistema (sistema operativo, el navegador o Java)
+     * para el acceso a una URL concreta.
+     * @param url URL para la que se quiere obtener el proxy a utilizar segun la
+     * configuraci&oacute;n del sistema.
+     * @return Proxy a utilizar para el acceso a la URL.
+     */
+	public static Proxy getDefaultProxyToUrl(final String url) {
+
+		Proxy proxy = null;
+		final ProxySelector proxySelector = getSystemProxySelector();
+		if (proxySelector != null) {
+			final URI home = URI.create(url);
+			// Listado de proxies disponibles
+			final List<Proxy> proxyList = proxySelector.select(home);
+			if (proxyList != null && !proxyList.isEmpty()) {
+				proxy = proxyList.get(0);
+			}
+		}
+		return proxy;
+	}
+
+	/**
+	 * Establece la logica de autenticaci&oacute;n frente al proxy del sistema.
+	 * @param user Usuario del proxy.
+	 * @param pwd Contrase&ntilde;a del proxy.
+	 */
+	private static Authenticator getPasswordAuthentication(final String user, final char[] pwd) {
+		return new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				if (getRequestorType() == RequestorType.PROXY) {
+					return new PasswordAuthentication(user, pwd);
+				}
+				return super.getPasswordAuthentication();
+			}
+		};
+	}
+
+	/**
+	 * Selector que no utiliza proxy.
+	 */
+	public static class NoProxySelector extends ProxySelector {
+
+		@Override
+		public List<Proxy> select(final URI uri) {
+			final List<Proxy> proxies = new ArrayList<>();
+			proxies.add(Proxy.NO_PROXY);
+			return proxies;
+		}
+
+		@Override
+		public void connectFailed(final URI uri, final SocketAddress sa, final IOException ioe) {
+			LOGGER.warning("No se puede acceder a la URL sin proxy: " + ioe); //$NON-NLS-1$
+		}
+	}
 }

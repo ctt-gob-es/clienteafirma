@@ -21,9 +21,9 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
@@ -125,7 +125,7 @@ public final class Updater {
 			return null;
 		}
 		try {
-			version = new String(UrlHttpManagerFactory.getInstalledManager().readUrl(url, UrlHttpMethod.GET)).trim();
+			version = new String(new HttpManager().readUrl(url, UrlHttpMethod.GET)).trim();
 		}
 		catch (final Exception e) {
 			LOGGER.severe(

@@ -330,46 +330,68 @@ public class ProxyPanelHandler {
 	 * @param addr Direcci&oacute;n del proxy.
 	 * @param port Puerto al que conectarse.
 	 * @return estado de la conexi&oacute;n: <code>true</code> si la conexi&oacute;n es correcta y <code>false</code> en caso contrario.*/
-	private boolean checkConnection(final String addr, final String port) {
+	private void checkConnection(final String host, final String port) {
+		new CheckConnectionThread(this.view, host, port).start();
+	}
 
-		LOGGER.info("Verificando conexion...."); //$NON-NLS-1$
+	private class CheckConnectionThread extends Thread {
 
-		this.view.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-		boolean connectionStatus = false;
-		try {
-			final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(addr, Integer.parseInt(port)));
-			final URL url = new URL(URL_CHECK_CONNECTION);
+		private final Logger SUBLOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-			final HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
-			uc.connect();
-			connectionStatus = true;
+		private final Component parent;
+		private final String proxyHost;
+		private final String proxyPort;
+
+		public CheckConnectionThread(final Component parent, final String proxyHost, final String proxyPort) {
+			this.parent = parent;
+			this.proxyHost = proxyHost;
+			this.proxyPort = proxyPort;
 		}
-		catch (final Exception e) {
-		    LOGGER.log(Level.WARNING, "Error conectando con el proxy: " + e, e); //$NON-NLS-1$
-		    connectionStatus = false;
-		}
 
-		if (connectionStatus) {
-			LOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
-			AOUIFactory.showMessageDialog(
-				this.view,
-				SimpleAfirmaMessages.getString("ProxyDialog.9"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-				AOUIFactory.INFORMATION_MESSAGE
-			);
-		}
-		else {
-			LOGGER.info("Conexion proxy incorrecta"); //$NON-NLS-1$
-			AOUIFactory.showMessageDialog(
-				this.view,
-				SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-				AOUIFactory.ERROR_MESSAGE
-			);
-		}
-		this.view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		@Override
+		public void run() {
+			this.SUBLOGGER.info("Verificando conexion...."); //$NON-NLS-1$
 
+			if (this.parent != null) {
+				this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			}
+			boolean connectionStatus = false;
+			try {
+				final Proxy proxy = new Proxy(
+						Proxy.Type.HTTP,
+						new InetSocketAddress(this.proxyHost, Integer.parseInt(this.proxyPort)));
+				final URL url = new URL(URL_CHECK_CONNECTION);
 
-		return connectionStatus;
+				final HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
+				uc.connect();
+				connectionStatus = true;
+			}
+			catch (final Exception e) {
+				this.SUBLOGGER.log(Level.WARNING, "Error conectando con el proxy: " + e, e); //$NON-NLS-1$
+			    connectionStatus = false;
+			}
+
+			if (connectionStatus) {
+				this.SUBLOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
+				AOUIFactory.showMessageDialog(
+					this.parent,
+					SimpleAfirmaMessages.getString("ProxyDialog.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
+					AOUIFactory.INFORMATION_MESSAGE
+				);
+			}
+			else {
+				this.SUBLOGGER.info("Conexion proxy incorrecta"); //$NON-NLS-1$
+				AOUIFactory.showMessageDialog(
+					this.parent,
+					SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
+					AOUIFactory.ERROR_MESSAGE
+				);
+			}
+			if (this.parent != null) {
+				this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+		}
 	}
 }

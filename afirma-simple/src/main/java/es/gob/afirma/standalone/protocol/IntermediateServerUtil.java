@@ -10,10 +10,9 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
+import es.gob.afirma.standalone.HttpManager;
 
 /**
  * Clases para la interaccion con el servidor intermedio.
@@ -21,9 +20,9 @@ import es.gob.afirma.core.misc.http.UrlHttpMethod;
 public class IntermediateServerUtil {
 
 	private static final String METHOD_OP_PUT = "put"; //$NON-NLS-1$
-	private static final String SYNTAX_VERSION = "1_0"; //$NON-NLS-1$
+	private static final String METHOD_OP_GET = "get"; //$NON-NLS-1$
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final String SYNTAX_VERSION = "1_0"; //$NON-NLS-1$
 
 	private static Object semaphore = null;
 
@@ -59,15 +58,26 @@ public class IntermediateServerUtil {
 		send(url);
 	}
 
+	/** Recupera datos del servidor intermedio.
+	 * @param retrieveServiceUrl URL del servicio de recuperaci&oacute;n.
+	 * @param id Identificador a asignar a los datos a subir al servidor.
+	 * @throws IOException Si hay problemas recuperando los datos. */
+	public static byte[] retrieveData(final String retrieveServiceUrl, final String id) throws IOException {
+		final StringBuilder url = new StringBuilder(retrieveServiceUrl)
+				.append("?op=").append(METHOD_OP_GET) //$NON-NLS-1$
+				.append("&v=").append(SYNTAX_VERSION) //$NON-NLS-1$
+				.append("&id=").append(id); //$NON-NLS-1$
+
+		return send(url);
+	}
+
 	/** Env&iacute;a datos al servidor intermedio.
 	 * @param url URL del servicio de guardado.
 	 * @throws IOException Si hay problemas durante el env&iacute;o. */
-	private static void send(final StringBuilder url) throws IOException {
+	private static byte[] send(final StringBuilder url) throws IOException {
 
 		// Llamamos al servicio para guardar los datos
-		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), UrlHttpMethod.POST);
-
-		LOGGER.info("Resultado: " + new String(result)); //$NON-NLS-1$
+		return new HttpManager().readUrl(url.toString(), UrlHttpMethod.POST);
 	}
 
 	/**

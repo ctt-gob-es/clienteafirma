@@ -52,6 +52,9 @@ public final class PreferencesManager {
 	 * y un valor de <code>false</code> que no usar&aacute; <i>proxy</i> en las conexiones de red. */
 	public static final String PREFERENCE_GENERAL_PROXY_SELECTED = "proxySelected"; //$NON-NLS-1$
 
+	/** Tipo de configuraci&oacute;n de proxy. */
+	public static final String PREFERENCE_GENERAL_PROXY_TYPE = "proxyType"; //$NON-NLS-1$
+
 	/** Host del servidor <i>proxy</i> configurado. */
 	public static final String PREFERENCE_GENERAL_PROXY_HOST = "proxyHost"; //$NON-NLS-1$
 
@@ -63,6 +66,9 @@ public final class PreferencesManager {
 
 	/** Contrase&ntilde;a del servidor <i>proxy</i> configurado. */
 	public static final String PREFERENCE_GENERAL_PROXY_PASSWORD = "proxyPassword"; //$NON-NLS-1$
+
+	/** Listado de URLs excluidas del uso de proxy. */
+	public static final String PREFERENCE_GENERAL_PROXY_EXCLUDED_URLS = "proxyExcludedUrls"; //$NON-NLS-1$
 
 	/** Proteger cambios en preferencias.
 	 * Un valor de <code>true</code> en esta preferencia indica que deben limitarse las opciones de configuraci&oacute;n
@@ -172,6 +178,9 @@ public final class PreferencesManager {
 	/** Indica si en los procesos de firma masiva se deben sobreescribir o no los ficheros que
 	 * se encuentren en el directorio de salida. */
 	public static final String PREFERENCE_GENERAL_MASSIVE_OVERWRITE = "massiveOverride"; //$NON-NLS-1$
+
+	/** Indica si debe validarse el certificado SSL en las conexiones de red. */
+	public static final String PREFERENCE_GENERAL_SECURE_CONNECTIONS = "secureConnections"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS GENERALES ******************************************************************************
 	//**************************************************************************************************************************
@@ -453,12 +462,22 @@ public final class PreferencesManager {
 	public static final String LASTCHECKDATE_DATEFORMAT = "yyyyMMdd"; //$NON-NLS-1$
 
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
-	 * aplicaci&oacute;n.
+	 * aplicaci&oacute;n o, si no se encuentra, devuelve el valor por defecto para esa
+	 * propiedad.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
+	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
 	public static String get(final String key) {
 
 		return preferences.get(key, getDefaultPreference(key));
+	}
+
+	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
+	 * aplicaci&oacute;n.
+	 * @param key Clave del valor que queremos recuperar.
+	 * @return El valor almacenado de la propiedad o {@code null} si no se encontr&oacute;. */
+	public static String getConfiguredProperty(final String key) {
+
+		return preferences.get(key, null);
 	}
 
 	/**

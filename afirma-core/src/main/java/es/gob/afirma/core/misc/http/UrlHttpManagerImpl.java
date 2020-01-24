@@ -210,11 +210,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final URL uri = new URL(request != null ? request : url);
 
-		final boolean disableSslChecks = Boolean.parseBoolean(
-				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "true") //$NON-NLS-1$
+		final boolean needDisableSslChecks = Boolean.parseBoolean(
+				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false") //$NON-NLS-1$
 		);
 
-		if (disableSslChecks && uri.getProtocol().equals(HTTPS)) {
+		if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
 			try {
 				disableSslChecks();
 			}
@@ -308,7 +308,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			data = AOUtil.getDataFromInputStream(is);
 		}
 
-		if (disableSslChecks && uri.getProtocol().equals(HTTPS)) {
+		if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
 		}
 
