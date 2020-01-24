@@ -18,6 +18,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherSave {
 
@@ -30,17 +31,30 @@ final class ProtocolInvocationLauncherSave {
 		// No instanciable
 	}
 
-	static String processSave(final UrlParametersToSave  options, final boolean bySocket) throws SocketOperationException {
+	/** Procesa una peticion de guardado de datos en disco en invocaci&oacute;n
+	 * por protocolo.
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return La cadena OK o una cadena descriptiva con el mensaje de error.
+	 * @throws SocketOperationException Si hay errores en la
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	static String processSave(final UrlParametersToSave  options,
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
-			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					Integer.valueOf(protocolVersion),
+					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 		}
 
 		try {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				ServiceInvocationManager.focusApplication();
+				MacUtils.focusApplication();
 			}
 			AOUIFactory.getSaveDataToFile(
 				options.getData(),

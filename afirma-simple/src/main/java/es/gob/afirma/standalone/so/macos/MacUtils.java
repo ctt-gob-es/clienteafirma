@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 
 /**
@@ -112,6 +113,36 @@ public class MacUtils {
 		}
 		catch (final IOException e) {
 			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
+		}
+	}
+
+	/** Mata el proceso de AutoFirma cuando estamos en macOS. En el resto de sistemas
+	 * no hace nada.
+	 * @param processIdText Texto que permite identificar el proceso. */
+	public static void closeMacService(final String processIdText) {
+		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
+		final AppleScript script = new AppleScript(
+				"kill -9 $(ps -ef | grep " + processIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
+				);
+		try {
+			script.run();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido cerrar la aplicacion: " + e); //$NON-NLS-1$
+		}
+	}
+
+	/** Coge el foco del sistema en macOS. En el resto de sistemas no hace nada. */
+	public static void focusApplication() {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			final String scriptCode = "tell me to activate"; //$NON-NLS-1$
+			final AppleScript script = new AppleScript(scriptCode);
+			try {
+				script.run();
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Fallo cogiendo el foco en macOS: " + e); //$NON-NLS-1$
+			}
 		}
 	}
 }

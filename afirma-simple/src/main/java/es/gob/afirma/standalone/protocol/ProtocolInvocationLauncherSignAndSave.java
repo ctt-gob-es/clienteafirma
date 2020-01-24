@@ -60,6 +60,7 @@ import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherSignAndSave {
 
@@ -73,8 +74,18 @@ final class ProtocolInvocationLauncherSignAndSave {
 		// No instanciable
 	}
 
+	/** Procesa una peticion de firma y guardado en invocaci&oacute;n por protocolo y obtiene
+	 * la firma junto con una serie de metadatos en forma de cadena.
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return Resultado de la operaci&oacute;n o mensaje de error.
+	 * @throws SocketOperationException Si hay errores en la
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String process(final UrlParametersToSignAndSave options,
-			              final boolean bySocket) throws SocketOperationException {
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
@@ -89,12 +100,11 @@ final class ProtocolInvocationLauncherSignAndSave {
 			);
 		}
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format(
 				"Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-				options.getMinimumVersion(),
-				ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)
-			);
+				Integer.valueOf(protocolVersion),
+				Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(
 				ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE
 			);
@@ -170,7 +180,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final File selectedDataFile;
 			try {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-					ServiceInvocationManager.focusApplication();
+					MacUtils.focusApplication();
 				}
 
 				selectedDataFile = AOUIFactory.getLoadFiles(
@@ -345,7 +355,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
 			try {
-				ServiceInvocationManager.focusApplication();
+				MacUtils.focusApplication();
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
 					true, // checkValidity
 					filters,
@@ -635,7 +645,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 				dataToSend.append(CypherDataManager.cipherData(certEncoded, options.getDesKey()));
 				dataToSend.append(CERT_SIGNATURE_SEPARATOR);
 				dataToSend.append(CypherDataManager.cipherData(sign, options.getDesKey()));
-				if (inputFilename != null) {
+
+				// A partir del protocolo version 3, si se cargo un fichero, se devuelve el nombre
+				if (inputFilename != null && protocolVersion >= 3) {
 					dataToSend.append(CERT_SIGNATURE_SEPARATOR);
 					dataToSend.append(CypherDataManager.cipherData(buildExtraDataResult(inputFilename)
 							.getBytes(StandardCharsets.UTF_8), options.getDesKey()));
@@ -665,7 +677,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 			// Se hace una doble codigicacion Base64, una de los datos y otras del cifrado, que si bien este ultimo
 			// no se realiza, si se mantiene la codificacion
 			dataToSend.append(Base64.encode(sign, true));
-			if (inputFilename != null) {
+
+			// A partir del protocolo version 3, si se cargo un fichero, se devuelve el nombre
+			if (inputFilename != null && protocolVersion >= 3) {
 				dataToSend.append(CERT_SIGNATURE_SEPARATOR);
 				dataToSend.append(Base64.encode(buildExtraDataResult(inputFilename)
 						.getBytes(StandardCharsets.UTF_8), true));

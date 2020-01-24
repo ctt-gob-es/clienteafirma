@@ -163,25 +163,20 @@ public final class ProtocolInvocationUriParser {
 		final Map<String, String> params = new HashMap<>();
 		final String[] parameters = uri.substring(uri.indexOf('?') + 1).split("&"); //$NON-NLS-1$
 		for (final String param : parameters) {
-			if (param.indexOf('=') > 0) {
+			final int eqPos = param.indexOf('=');
+			if (eqPos > 0) {
 				try {
-					// // Parseamos el campo para extraer la clave-valor del parametro.
-					// Si el parametro tiene mas de 1000 caracteres, presuponemos que es un
-					// campo de datos en base 64 URL SAFE y no lo decodicaremos como URL por
-					// el coste de esta operacion
 					params.put(
-						param.substring(0, param.indexOf('=')),
-						param.indexOf('=') == param.length() - 1 ?
+						param.substring(0, eqPos),
+						eqPos == param.length() - 1 ?
 							"" : //$NON-NLS-1$
-								param.length() > 1000 ?
-										param.substring(param.indexOf('=') + 1) :
-										URLDecoder.decode(param.substring(param.indexOf('=') + 1), ProtocolInvocationUriParserUtil.DEFAULT_URL_ENCODING)
+							URLDecoder.decode(param.substring(eqPos + 1), ProtocolInvocationUriParserUtil.DEFAULT_URL_ENCODING)
 					);
 				}
 				catch (final UnsupportedEncodingException e) {
 					params.put(
-						param.substring(0, param.indexOf('=')),
-						param.indexOf('=') == param.length() - 1 ? "" : param.substring(param.indexOf('=') + 1) //$NON-NLS-1$
+						param.substring(0, eqPos),
+						eqPos == param.length() - 1 ? "" : param.substring(eqPos + 1) //$NON-NLS-1$
 					);
 				}
 			}

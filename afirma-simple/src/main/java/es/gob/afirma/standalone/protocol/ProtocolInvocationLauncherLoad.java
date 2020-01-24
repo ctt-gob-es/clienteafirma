@@ -23,6 +23,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherLoad {
 
@@ -42,11 +43,22 @@ final class ProtocolInvocationLauncherLoad {
 		// No instanciable
 	}
 
-	static String processLoad(final UrlParametersToLoad options, final boolean bySocket) throws SocketOperationException {
-
+	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return Datos cargados o mensaje de error.
+	 * @throws SocketOperationException Si hay errores en la
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	static String processLoad(final UrlParametersToLoad options,
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
-			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					Integer.valueOf(protocolVersion),
+					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 		}
@@ -57,7 +69,7 @@ final class ProtocolInvocationLauncherLoad {
 		// dialogo de seleccion de fichero
 		try {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				ServiceInvocationManager.focusApplication();
+				MacUtils.focusApplication();
 			}
 
 			selectedDataFiles = AOUIFactory.getLoadFiles(options.getTitle(),

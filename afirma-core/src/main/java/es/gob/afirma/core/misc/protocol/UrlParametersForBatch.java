@@ -150,9 +150,6 @@ public final class UrlParametersForBatch extends UrlParameters {
 			);
 		}
 
-		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
-		setDefaultKeyStoreLib(UrlParameters.getDefaultKeyStoreLib(params));
-
 		setBatchPostsignerUrl(
 			validateURL(
 				params.get(PARAM_BATCH_POSTSIGNER)

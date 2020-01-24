@@ -12,7 +12,9 @@ public enum ProtocolVersion {
 	/** Versi&oacute;n 1: introduce cambios en el cifrado de los datos para el servidor intermedio. */
 	VERSION_1 (1),
 	/** Versi&oacute;n 2: realiza cambios en la codificaci&oacute;n del par&aacute;metro keystore. */
-	VERSION_2 (2);
+	VERSION_2 (2),
+	/** Versi&oacute;n 3: devuelve el nombre del fichero seleccionado en las operaciones de firma. */
+	VERSION_3 (3);
 
 	private int version;
 

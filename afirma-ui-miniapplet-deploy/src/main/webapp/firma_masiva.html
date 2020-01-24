@@ -3,8 +3,8 @@
   <head>
 	<title>P&aacute;gina de prueba de firma masiva</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-	<script type="text/javascript" src="js/miniapplet.js"></script>
-	
+	<!-- <script type="text/javascript" src="js/miniapplet_1_6_5.js"></script> -->
+	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript">
 	
 		// Compression: packed
@@ -117,13 +117,21 @@
 			return creationTime;
 		}
 		
+		var result;
+		//var consoleText;
+		
 		function showSignResultCallback(signatureB64, certificateB64) {
-			showLog("Firma " + indiceN3 + ": " + signatureB64);
+			
+			
 			if (indiceN3 == 0) {
-				document.getElementById('result').value += signatureB64;	
+				result = signatureB64;
+				document.getElementById('console').value = "Firma " + indiceN3 + ": " + signatureB64;
+				//consoleText = "Firma " + indiceN3 + ": " + signatureB64;
 			}
 			else {
-				document.getElementById('result').value += ":" + signatureB64;
+				result += ":" + signatureB64;
+				document.getElementById('console').value += "\nFirma " + indiceN3 + ": " + signatureB64;
+				//consoleText += "\nFirma " + indiceN3 + ": " + signatureB64;
 			}
 			
 			if (indiceN3 < docs.length) {
@@ -132,6 +140,11 @@
 				
 				if (indiceN3 == docs.length) {
 					document.getElementById("newDocParam").value = "Fin";
+					
+					document.getElementById('result').value = result;
+					
+					//document.getElementById('console').value = consoleText;
+					
 					indiceN3 = 0;
 				}
 			}
@@ -199,8 +212,7 @@
 		<div>
 		 <span>Consola</span>
 		 <br>
-		 <textarea id="console" cols="150" rows="10">
-		 </textarea>
+		 <textarea id="console" cols="150" rows="10"></textarea>
 		</div>
 		
 		<div>

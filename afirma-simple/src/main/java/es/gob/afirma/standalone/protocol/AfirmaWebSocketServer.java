@@ -9,33 +9,34 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
+import javax.swing.Timer;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
 
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.so.macos.MacUtils;
+
 /** Gestor de la invocaci&oacute;n por <i>WebSocket</i>. */
 public final class AfirmaWebSocketServer extends WebSocketServer {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Par&aacute;metro de entrada con la versi&oacute;n del protocolo que se va a utilizar. */
-	private static final String PROTOCOL_VERSION_PARAM = "v"; //$NON-NLS-1$
+	/** Prefijo de la URL de invocaci&oacute;n. */
+	private static final String URL_PREFIX = "afirma://"; //$NON-NLS-1$
 
 	/** Versi&oacute;n de protocolo m&aacute;s avanzada soportada. */
-	private static final int CURRENT_PROTOCOL_VERSION = 1;
+	private static final int CURRENT_PROTOCOL_VERSION = 3;
 
 	/** Listado de versiones de protocolo soportadas. */
 	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { CURRENT_PROTOCOL_VERSION };
@@ -46,20 +47,41 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 	/** Respuesta que se debe enviar ante las peticiones de echo. */
 	private static final String ECHO_RESPONSE = "OK"; //$NON-NLS-1$
 
-
+	/** Puerto a trav&eacute;s del que se realiza la comunicaci&oacute;n. */
 	private static final int PORT = 63117;
+
+	private static final int SOCKET_TIMEOUT = 60000;
+
+	private static Timer inactivityTimer;
+
+	private static int protocolVersion = -1;
 
 	static AfirmaWebSocketServer instance = null;
 
-	public static void startService(final String url) throws UnsupportedProtocolException, GeneralSecurityException, IOException {
 
-		checkSupportProtocol(getVersion(url));
+	public static void startService(final int requestedProtocolVersion) throws UnsupportedProtocolException, GeneralSecurityException, IOException {
+
+		checkSupportProtocol(requestedProtocolVersion);
+
+		protocolVersion = requestedProtocolVersion;
 
 		instance = new AfirmaWebSocketServer(PORT);
 
 		final SSLContext sc = SecureSocketUtils.getSecureSSLContext();
 		instance.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sc));
 		instance.start();
+
+		// Temporizador para cerrar la aplicaci&oacute;n cuando pase un determinado tiempo
+		// sin haber recibido peticiones por el socket. Cuando se recibe la primera peticion,
+		// se desactiva.
+		inactivityTimer = new Timer(SOCKET_TIMEOUT, evt -> {
+			LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				MacUtils.closeMacService(URL_PREFIX);
+			}
+			Runtime.getRuntime().halt(0);
+		});
+		inactivityTimer.start();
 	}
 
 
@@ -108,6 +130,14 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
 		LOGGER.info("Recibimos una peticion en el socket"); //$NON-NLS-1$
+
+		// Si aun corre el temporizador de inactividad, lo detenemos para que no
+		// cierre la aplicacion
+		if (inactivityTimer != null) {
+			inactivityTimer.stop();
+			inactivityTimer = null;
+		}
+
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {
 			broadcast(ECHO_RESPONSE, Collections.singletonList(ws));
@@ -115,7 +145,7 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 		// Si recibimos cualquier cosa distinta de un eco, consideraremos que es una peticion de operacion y
 		// la procesaremos como tal
 		else {
-			broadcast(ProtocolInvocationLauncher.launch(message, true), Collections.singletonList(ws));
+			broadcast(ProtocolInvocationLauncher.launch(message, protocolVersion, true), Collections.singletonList(ws));
 		}
 	}
 
@@ -124,66 +154,16 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 		LOGGER.log(Level.SEVERE, "Error en el socket", ex); //$NON-NLS-1$
 	}
 
-
-	/** Obtiene el par&aacute;metro de versi&oacute;n declarado en la URL.
-	 * @param url URL de la que extraer la versi&oacute;n.
-	 * @return Valor del par&aacute;metro de versi&oacute;n ('v') o {@code null} si no est&aacute; definido. */
-	private static String getVersion(final String url) {
-
-		final URI u;
-		try {
-			u = new URI(url);
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException("La URI " + url + "de invocacion no es valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		final String query = u.getQuery();
-		checkNullParameter(query, "La URI de invocacion no contiene parametros: " + url); //$NON-NLS-1$
-		final Properties p = new Properties();
-		try {
-			p.load(new ByteArrayInputStream(query.replace("&", "\n").getBytes())); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		catch (final IOException e) {
-			throw new IllegalArgumentException(
-				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url //$NON-NLS-1$
-			, e);
-		}
-		return p.getProperty(PROTOCOL_VERSION_PARAM);
-	}
-
 	/** Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.
 	 * @param protocolId Identificador de la versi&oacute;n del protocolo.
 	 * @throws UnsupportedProtocolException Cuando la versi&oacute;n de protocolo utilizada no se encuentra
 	 *                                      entre las soportadas. */
-	private static void checkSupportProtocol(final String protocolId) throws UnsupportedProtocolException {
-		int protocolVersion = 1;
-		if (protocolId != null) {
-			try {
-				protocolVersion = Integer.parseInt(protocolId.trim());
-			}
-			catch (final Exception e) {
-				LOGGER.info(
-					"El ID de protocolo indicado no es un numero entero (" + protocolId + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				protocolVersion = -1;
-			}
-		}
-
-		for (final int version : SUPPORTED_PROTOCOL_VERSIONS) {
-			if (version == protocolVersion) {
+	private static void checkSupportProtocol(final int version) throws UnsupportedProtocolException {
+		for (final int supportedVersion : SUPPORTED_PROTOCOL_VERSIONS) {
+			if (supportedVersion == version) {
 				return;
 			}
 		}
-
-		throw new UnsupportedProtocolException(protocolVersion, protocolVersion > CURRENT_PROTOCOL_VERSION);
-	}
-
-	/** Comprueba que un par&aacute;metro no sea nulo.
-	 * @param parameter Par&aacute;metro que se debe comprobar que no sea nulo.
-	 * @param excepcionText Texto que se debe lanzar con la excepci&oacute;n. */
-	private static void checkNullParameter (final Object parameter, final String excepcionText){
-		if (parameter == null) {
-			throw new IllegalArgumentException(excepcionText);
-		}
+		throw new UnsupportedProtocolException(version, version > CURRENT_PROTOCOL_VERSION);
 	}
 }

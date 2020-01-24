@@ -25,11 +25,22 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 		// No instanciable
 	}
 
-	static String processGetCurrentLog(final UrlParametersToGetCurrentLog options, final boolean bySocket) throws SocketOperationException {
-
+	/** Procesa una petici&oacute;n de recuperaci&oacute;n de log.
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return Log cargado o mensaje de error.
+	 * @throws SocketOperationException Si hay errores en la
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	static String processGetCurrentLog(final UrlParametersToGetCurrentLog options,
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
-			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					Integer.valueOf(protocolVersion),
+					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 		}

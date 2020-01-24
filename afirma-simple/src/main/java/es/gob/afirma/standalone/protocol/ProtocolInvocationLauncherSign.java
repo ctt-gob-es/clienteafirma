@@ -58,6 +58,7 @@ import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherSign {
 
@@ -71,8 +72,18 @@ final class ProtocolInvocationLauncherSign {
 		// No instanciable
 	}
 
+	/** Procesa una peticion de firma en invocaci&oacute;n por protocolo y obtiene
+	 * la firma junto con una serie de metadatos en forma de cadena.
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return Resultado de la operaci&oacute;n o mensaje de error.
+	 * @throws SocketOperationException Si hay errores en la
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String processSign(final UrlParametersToSign options,
-			                  final boolean bySocket) throws SocketOperationException {
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
@@ -89,11 +100,11 @@ final class ProtocolInvocationLauncherSign {
 			);
 		}
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(
 				String.format(
 					"Version de protocolo no soportada (%1s). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					options.getMinimumVersion(),
+					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())
 				)
 			);
@@ -174,7 +185,7 @@ final class ProtocolInvocationLauncherSign {
 			final File selectedDataFile;
 			try {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-					ServiceInvocationManager.focusApplication();
+					MacUtils.focusApplication();
 				}
 				selectedDataFile = AOUIFactory.getLoadFiles(
 					dialogTitle,
@@ -362,7 +373,7 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
 			try {
-				ServiceInvocationManager.focusApplication();
+				MacUtils.focusApplication();
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 					ksm,
 					null,
@@ -618,7 +629,9 @@ final class ProtocolInvocationLauncherSign {
 				dataToSend.append(CypherDataManager.cipherData(certEncoded, options.getDesKey()));
 				dataToSend.append(RESULT_SEPARATOR);
 				dataToSend.append(CypherDataManager.cipherData(sign, options.getDesKey()));
-				if (inputFilename != null) {
+
+				// A partir del protocolo version 3, si se cargo un fichero, se devuelve el nombre
+				if (inputFilename != null && protocolVersion >= 3) {
 					dataToSend.append(RESULT_SEPARATOR);
 					dataToSend.append(CypherDataManager.cipherData(buildExtraDataResult(inputFilename)
 							.getBytes(StandardCharsets.UTF_8), options.getDesKey()));
@@ -649,7 +662,9 @@ final class ProtocolInvocationLauncherSign {
 			// del cifrado. La codificacion se realiza incluso si el cifrado
 			// no se hiciera
 			dataToSend.append(Base64.encode(sign, true));
-			if (inputFilename != null) {
+
+			// A partir del protocolo version 3, si se cargo un fichero, se devuelve el nombre
+			if (inputFilename != null && protocolVersion >= 3) {
 				dataToSend.append(RESULT_SEPARATOR);
 				dataToSend.append(Base64.encode(buildExtraDataResult(inputFilename)
 						.getBytes(StandardCharsets.UTF_8), true));

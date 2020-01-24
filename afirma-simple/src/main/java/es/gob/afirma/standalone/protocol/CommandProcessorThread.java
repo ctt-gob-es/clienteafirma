@@ -71,10 +71,13 @@ class CommandProcessorThread extends Thread {
 
 	private final String idSession;
 
-	public CommandProcessorThread(final Socket socket, final Timer timer, final String idSession) {
+	private final int protocolVersion;
+
+	public CommandProcessorThread(final Socket socket, final Timer timer, final String idSession, final int protocolVersion) {
 		this.localSocket = socket;
 		this.timer = timer;
 		this.idSession = idSession;
+		this.protocolVersion = protocolVersion;
 	}
 
 	@Override
@@ -284,7 +287,7 @@ class CommandProcessorThread extends Thread {
 			// Si la operacion es de guardado (Respuesta fija)
 			if (totalhttpRequest.toString().startsWith("afirma://save?") || totalhttpRequest.toString().startsWith("afirma://save/?")){ //$NON-NLS-1$  //$NON-NLS-2$
 			    isSave = true;
-				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
+				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), this.protocolVersion, true);
 				if (operationResult.equals(OK)){
 					sendData(createHttpResponse(true, SAVE_OK), socket, "Operacion save realizada con exito"); //$NON-NLS-1$
 				}
@@ -299,7 +302,7 @@ class CommandProcessorThread extends Thread {
 			}
 			// Si hay que devolver el valor obtenido
 			else {
-				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
+				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), this.protocolVersion, true);
 				calculateNumberPartsResponse(operationResult);
 			}
 		}
@@ -325,7 +328,7 @@ class CommandProcessorThread extends Thread {
 			this.timer.stop();
 			LOGGER.info("Comando URI recibido por HTTP: " + cmdUri); //$NON-NLS-1$
 			if (cmdUri.startsWith(SAVE) || cmdUri.startsWith(SAVE2)) {
-				final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), true);
+				final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), this.protocolVersion, true);
 				if (operationResult.equals(OK)) {
 					sendData(createHttpResponse(true, SAVE_OK), socket, "Guardar datos"); //$NON-NLS-1$
 				}
@@ -341,7 +344,7 @@ class CommandProcessorThread extends Thread {
 			else {
 				if (toSend.isEmpty()){
 					// Usamos la url que acabamos de recibir sin fragmentar
-					final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), true);
+					final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), this.protocolVersion, true);
 					calculateNumberPartsResponse(operationResult);
 				}
 				sendData(createHttpResponse(true, Integer.toString(parts)), socket, "Se mandaran " + parts + " partes"); //$NON-NLS-1$ //$NON-NLS-2$

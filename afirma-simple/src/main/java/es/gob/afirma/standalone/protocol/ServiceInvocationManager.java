@@ -30,7 +30,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /** Gestor de la invocaci&oacute;n por <i>socket</i>. */
 public final class ServiceInvocationManager {
@@ -41,14 +41,11 @@ public final class ServiceInvocationManager {
 	/** Tiempo de espera de cada <i>socket</i> en milisegundos. */
 	private static int SOCKET_TIMEOUT = 90000;
 
-	/** Par&aacute;metro de entrada con la versi&oacute;n del protocolo que se va a utilizar. */
-	private static final String PROTOCOL_VERSION_PARAM = "v"; //$NON-NLS-1$
-
 	/** Versi&oacute;n de protocolo m&aacute;s avanzada soportada. */
-	private static final int CURRENT_PROTOCOL_VERSION = 1;
+	private static final int CURRENT_PROTOCOL_VERSION = 3;
 
 	/** Listado de versiones de protocolo soportadas. */
-	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { CURRENT_PROTOCOL_VERSION };
+	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { 1, 2, CURRENT_PROTOCOL_VERSION };
 
 	private static final String IDSESSION = "idsession"; //$NON-NLS-1$
 
@@ -99,20 +96,6 @@ public final class ServiceInvocationManager {
 			"TLS_DHE_DSS_WITH_AES_128_CBC_SHA" //$NON-NLS-1$
 	};
 
-	/** Coge el foco del sistema en macOS. En el resto de sistemas no hace nada. */
-	public static void focusApplication() {
-		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			final String scriptCode = "tell me to activate"; //$NON-NLS-1$
-			final AppleScript script = new AppleScript(scriptCode);
-			try {
-				script.run();
-			}
-			catch (final Exception e) {
-				LOGGER.warning("Fallo cogiendo el foco en macOS: " + e); //$NON-NLS-1$
-			}
-		}
-	}
-
 	/** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
 	private ServiceInvocationManager(){
 		// No instanciable
@@ -121,12 +104,11 @@ public final class ServiceInvocationManager {
 	/** Inicia el servicio. Se intenta establecer un <code>socket</code> que escuche en el puerto pasado por la URL.
 	 * @param url URL (debe indicarse el puerto).
 	 * @throws UnsupportedProtocolException Si no se soporta el protocolo o la versi&oacute;n de este. */
-	static void startService(final String url) throws UnsupportedProtocolException {
+	static void startService(final String url, final int protocolVersion) throws UnsupportedProtocolException {
 
-		checkSupportProtocol(getVersion(url));
+		checkSupportProtocol(protocolVersion);
 
 		try {
-
 			final SSLContext sc = SecureSocketUtils.getSecureSSLContext();
 
 			LOGGER.info("Iniciando servicio local de firma: " + url); //$NON-NLS-1$
@@ -151,15 +133,15 @@ public final class ServiceInvocationManager {
 			final Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
 				LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-					closeMacService(channelInfo.getIdSession());
+					MacUtils.closeMacService(channelInfo.getIdSession());
 				}
-				System.exit(-4);
+				Runtime.getRuntime().halt(0);
 			});
 			timer.start();
 
 			while (true){
 				try {
-					new CommandProcessorThread(ssocket.accept(), timer, channelInfo.getIdSession()).start();
+					new CommandProcessorThread(ssocket.accept(), timer, channelInfo.getIdSession(), protocolVersion).start();
 				}
 				catch (final SocketTimeoutException e) {
 					LOGGER.severe("Tiempo de espera del socket terminado: " + e); //$NON-NLS-1$
@@ -240,32 +222,6 @@ public final class ServiceInvocationManager {
 		return new ChannelInfo(idSession, ports);
 	}
 
-	/** Obtiene el par&aacute;metro de versi&oacute;n declarado en la URL.
-	 * @param url URL de la que extraer la versi&oacute;n.
-	 * @return Valor del par&aacute;metro de versi&oacute;n ('v') o {@code null} si no est&aacute; definido. */
-	private static String getVersion(final String url) {
-
-		final URI u;
-		try {
-			u = new URI(url);
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException("La URI " + url + "de invocacion no es valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		final String query = u.getQuery();
-		checkNullParameter(query, "La URI de invocacion no contiene parametros: " + url); //$NON-NLS-1$
-		final Properties p = new Properties();
-		try {
-			p.load(new ByteArrayInputStream(query.replace("&", "\n").getBytes())); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		catch (final IOException e) {
-			throw new IllegalArgumentException(
-				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url //$NON-NLS-1$
-			, e);
-		}
-		return p.getProperty(PROTOCOL_VERSION_PARAM);
-	}
-
 	/** Intenta realizar una conexi&oacute; por <i>socket</i> en los puertos que se pasan por par&aacute;metro.
 	 * @param ports Puertos a probar.
 	 * @param socket <i>Socket</i> que se intenta conectar.
@@ -307,20 +263,7 @@ public final class ServiceInvocationManager {
 	 * @param protocolId Identificador de la versi&oacute;n del protocolo.
 	 * @throws UnsupportedProtocolException Cuando la versi&oacute;n de protocolo utilizada no se encuentra
 	 *                                      entre las soportadas. */
-	private static void checkSupportProtocol(final String protocolId) throws UnsupportedProtocolException {
-		int protocolVersion = 1;
-		if (protocolId != null) {
-			try {
-				protocolVersion = Integer.parseInt(protocolId.trim());
-			}
-			catch (final Exception e) {
-				LOGGER.info(
-					"El ID de protocolo indicado no es un numero entero (" + protocolId + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				protocolVersion = -1;
-			}
-		}
-
+	private static void checkSupportProtocol(final int protocolVersion) throws UnsupportedProtocolException {
 		for (final int version : SUPPORTED_PROTOCOL_VERSIONS) {
 			if (version == protocolVersion) {
 				return;
@@ -328,23 +271,6 @@ public final class ServiceInvocationManager {
 		}
 
 		throw new UnsupportedProtocolException(protocolVersion, protocolVersion > CURRENT_PROTOCOL_VERSION);
-	}
-
-
-	/** Mata el proceso de AutoFirma cuando estamos en macOS. En el resto de sistemas
-	 * no hace nada.
-	 * @param idSession Identificador de sesi&oacute;n utilizado para identificar al cliente. */
-	static void closeMacService(final String idSession) {
-		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
-		final AppleScript script = new AppleScript(
-				"kill -9 $(ps -ef | grep " + idSession + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
-				);
-		try {
-			script.run();
-		}
-		catch (final Exception e) {
-			LOGGER.warning("No se ha podido cerrar la aplicacion: " + e); //$NON-NLS-1$
-		}
 	}
 
 	private static class ChannelInfo {

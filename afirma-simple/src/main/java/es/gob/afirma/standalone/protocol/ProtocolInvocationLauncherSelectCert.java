@@ -28,6 +28,7 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherSelectCert {
 
@@ -39,8 +40,18 @@ final class ProtocolInvocationLauncherSelectCert {
 		// No instanciable
 	}
 
-	static String processSelectCert(final UrlParametersToSelectCert options, final boolean bySocket)
-			throws SocketOperationException {
+	/** Procesa una peticion de selecci&oacute;n de certificado en invocaci&oacute;n
+	 * por protocolo.
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return Certificado en base 64 o mensaje de error.
+	 * @throws SocketOperationException Si hay errores en la
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	static String processSelectCert(final UrlParametersToSelectCert options,
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
@@ -52,10 +63,11 @@ final class ProtocolInvocationLauncherSelectCert {
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_NULL_URI);
 		}
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format(
 					"Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED));
+					Integer.valueOf(protocolVersion),
+					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
@@ -108,7 +120,7 @@ final class ProtocolInvocationLauncherSelectCert {
 			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
 
 			try {
-				ServiceInvocationManager.focusApplication();
+				MacUtils.focusApplication();
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 					ksm,
 					null,

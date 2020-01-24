@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /** Gestiona los errores de la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
  * por protocolo.
@@ -116,7 +117,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		final String desc = ProtocolMessages.getString("ProtocolLauncher.28") + "\n(" + code + ": " + message + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (!HEADLESS) {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				ServiceInvocationManager.focusApplication();
+				MacUtils.focusApplication();
 			}
 			AOUIFactory.showErrorMessage(
 				null,

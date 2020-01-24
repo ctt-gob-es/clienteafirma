@@ -32,6 +32,7 @@ import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherBatch {
 
@@ -47,17 +48,21 @@ final class ProtocolInvocationLauncherBatch {
 
 	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
 	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
 	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return XML de respuesta del procesado.
 	 * @throws SocketOperationException Si hay errores en la
 	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String processBatch(final UrlParametersForBatch options,
-			                   final boolean bySocket) throws SocketOperationException {
+			final int protocolVersion,
+			final boolean bySocket) throws SocketOperationException {
 
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
-			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					Integer.valueOf(protocolVersion),
+					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
 		}
@@ -105,7 +110,7 @@ final class ProtocolInvocationLauncherBatch {
 
 			try {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-					ServiceInvocationManager.focusApplication();
+					MacUtils.focusApplication();
 				}
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 					ksm,
