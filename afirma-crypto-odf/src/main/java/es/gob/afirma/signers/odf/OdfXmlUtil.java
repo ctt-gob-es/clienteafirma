@@ -28,5 +28,4 @@ final class OdfXmlUtil {
 		canonicalizer.write(xomElement);
 		return baos.toByteArray();
 	}
-
 }

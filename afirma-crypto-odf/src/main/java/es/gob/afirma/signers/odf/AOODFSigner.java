@@ -36,6 +36,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.crypto.XMLStructure;
@@ -71,7 +72,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -109,6 +109,8 @@ public final class AOODFSigner implements AOSigner {
     private static final String DEFAULT_DIGEST_METHOD = DigestMethod.SHA1;
 
     private static final String DIGEST_METHOD_ALGORITHM_NAME = "SHA1"; //$NON-NLS-1$
+
+    private static final String ENTRY_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
     static {
         SUPPORTED_FORMATS = new HashSet<>();
@@ -178,6 +180,7 @@ public final class AOODFSigner implements AOSigner {
 	            // carga el fichero zip
 	            final ZipFile zf = new ZipFile(zipFile);
     		) {
+
             	final byte[] manifestData;
             	try (
 		            // obtiene el archivo manifest.xml, que indica los ficheros que
@@ -553,28 +556,19 @@ public final class AOODFSigner implements AOSigner {
     	}
 
         try {
-            // genera el archivo zip temporal a partir del InputStream de entrada
-            final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
-            try (
-        		final FileOutputStream fos = new FileOutputStream(zipFile);
-    		) {
-            	fos.write(sign);
-            	fos.flush();
-            }
-
             final AOTreeNode tree = new AOTreeNode("Datos"); //$NON-NLS-1$
-
             try (
-	            // carga el fichero zip
-	            final ZipFile zf = new ZipFile(zipFile);
-
-	            // obtiene el archivo de firmas
-	            final InputStream signIs = zf.getInputStream(zf.getEntry(SIGNATURES_PATH));
+            	ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(sign));
     		) {
+            	final ZipEntry entry = getEntry(zis, SIGNATURES_PATH);
+            	if (entry == null) {
+            		return new AOTreeModel(tree);
+            	}
+
 	            // recupera la raiz del documento de firmas
 	            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	            dbf.setNamespaceAware(true);
-	            final Element root = dbf.newDocumentBuilder().parse(signIs).getDocumentElement();
+	            final Element root = dbf.newDocumentBuilder().parse(zis).getDocumentElement();
 
 	            // obtiene todas las firmas
 	            final NodeList signatures = root.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Signature"); //$NON-NLS-1$
@@ -628,8 +622,6 @@ public final class AOODFSigner implements AOSigner {
 	            }
             }
 
-            zipFile.deleteOnExit();
-
             return new AOTreeModel(tree);
         }
         catch (final Exception e) {
@@ -651,23 +643,13 @@ public final class AOODFSigner implements AOSigner {
         	return false;
         }
 
-    	final File odfFile;
-    	try {
-    		odfFile = createTempFile(signData);
-    		odfFile.deleteOnExit();
-    	}
-    	catch (final Exception e) {
-    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false: " + e); //$NON-NLS-1$
-			return false;
-		}
+        ZipEntry entry = null;
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(signData))) {
+	    	// Comprueba si existe el fichero de firmas
+        	entry = getEntry(zis, AOODFSigner.SIGNATURES_PATH);
+        }
 
-    	// carga el fichero zip
-    	try (
-			final ZipFile zf = new ZipFile(odfFile);
-    	) {
-	    	// obtiene el archivo mimetype
-	    	return zf.getEntry(AOODFSigner.SIGNATURES_PATH) != null;
-    	}
+        return entry != null;
     }
 
     /** Indica si los datos son un documento ODF susceptible de ser firmado.
@@ -681,24 +663,13 @@ public final class AOODFSigner implements AOSigner {
     		return false;
     	}
 
-
-    	final File odfFile;
-    	try {
-    		odfFile = createTempFile(data);
-    		odfFile.deleteOnExit();
-    	}
-    	catch (final Exception e) {
-    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false: " + e); //$NON-NLS-1$
-			return false;
-		}
-
         // Si el mimetype del fichero no se ajusta a alguno de los MimeTypes soportados
         // para firma ODF se lanzara una excepcion, en ese caso deducimos que no es un
         // fichero valido
         String mimetype = null;
-        try {
-            mimetype = AOODFSigner.getODFMimeType(odfFile);
-        }
+    	try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(data))) {
+    		mimetype = AOODFSigner.getODFMimeType(zis);
+    	}
         catch (final Exception e) {
             return false;
         }
@@ -713,9 +684,18 @@ public final class AOODFSigner implements AOSigner {
      * @param data Datos a comprobar.
      * @return {@code true} si los datos son un ZIP, {@code false} en caso contrario.
      */
-    private static boolean isZipData(final byte[] data) {
-    	return new MimeHelper(data).isZipData();
-    }
+	private static boolean isZipData(final byte[] data) {
+
+		if (data == null || data.length < 4) {
+			return false;
+		}
+
+		// Los 4 primeros bytes pueden ser 0x504B0304, 0x504B0506 o 0x504B0708
+		return data[0] == (byte) 0x50 && data[1] == (byte) 0x4B && (
+				data[2] == (byte) 0x03 && data[3] == (byte) 0x04 ||
+				data[2] == (byte) 0x05 && data[3] == (byte) 0x06 ||
+				data[2] == (byte) 0x07 && data[3] == (byte) 0x08);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -789,34 +769,31 @@ public final class AOODFSigner implements AOSigner {
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
     }
 
-    private static String getODFMimeType(final File odfFile) throws IOException {
-        // carga el fichero zip
-        try (
-        	final ZipFile zf = new ZipFile(odfFile);
-        ) {
-	        // obtiene el archivo mimetype
-	        final ZipEntry entry = zf.getEntry("mimetype"); //$NON-NLS-1$
-	        if (entry != null) {
-	            return new String(AOUtil.getDataFromInputStream(zf.getInputStream(entry)));
-	        }
-        }
-        return null;
+    private static String getODFMimeType(final ZipInputStream odfZis) throws IOException {
+    	String mimetypeContent = null;
+    	final ZipEntry entry = getEntry(odfZis, ENTRY_MIMETYPE);
+    	if (entry != null) {
+    		final byte[] content = AOUtil.getDataFromInputStream(odfZis);
+    		mimetypeContent = content != null ? new String(content) : "";  //$NON-NLS-1$
+    	}
+    	return mimetypeContent;
     }
 
-    /** Crea un fichero temporal con los datos.
-     * @param data Datos del fichero.
-     * @return Fichero generado.
-     * @throws IOException Cuando se produce un error durante la generaci&oacute;n. */
-    private static File createTempFile(final byte[] data) throws IOException {
-    	// Genera el archivo zip temporal a partir del InputStream de entrada
-        final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
-        try (
-    		final FileOutputStream fos = new FileOutputStream(zipFile);
-		) {
-	        fos.write(data);
-	        fos.flush();
-        }
-        return zipFile;
-    }
-
+	/**
+	 * Busca una entrada dentro de un ZIP en memoria.
+	 * @param zis Flujo de datos del fichero comprimido.
+	 * @param entryName Entrada a buscar.
+	 * @return Entrada buscada o {@code null} si no se encontr&oacute;.
+	 * @throws IOException Cuando ocurre un error durante la lectura del fichero.
+	 */
+	private static ZipEntry getEntry(final ZipInputStream zis, final String entryName) throws IOException {
+		ZipEntry entry = null;
+		boolean found = false;
+		while (!found && (entry = zis.getNextEntry()) != null) {
+			if (entry.getName().equals(entryName)) {
+				found = true;
+			}
+		}
+		return found ? entry : null;
+	}
 }
