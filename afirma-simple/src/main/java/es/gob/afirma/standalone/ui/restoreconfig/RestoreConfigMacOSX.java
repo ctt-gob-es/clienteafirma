@@ -420,6 +420,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 		catch (final AOException e1) {
 			LOGGER.warning("La configuracion de NSS para macOS X ha fallado: " + e1); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.19")); //$NON-NLS-1$
 		}
 
 		// Se instalan los certificados en el almacen de Apple
@@ -431,6 +432,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 		catch (final Exception e1) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e1, e1); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
 		}
 		finally {
 			if (sslCerFile != null) {

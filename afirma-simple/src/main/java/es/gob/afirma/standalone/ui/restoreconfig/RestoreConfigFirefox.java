@@ -272,17 +272,23 @@ final class RestoreConfigFirefox {
 	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n. */
 	static void installRootCAMozillaKeyStore(final File targetDir, final File certFile)
 			throws MozillaProfileNotFoundException, IOException, KeyStoreException {
+
 		final ArrayList<File> firefoxProfilesDir = getFirefoxProfilesDir();
 		if (firefoxProfilesDir == null || firefoxProfilesDir.isEmpty()) {
 			throw new MozillaProfileNotFoundException();
 		}
 
-		Set<File> profile = null;
+		Set<File> profiles = null;
 
 		for (final File firefoxDir : firefoxProfilesDir) {
 			// En Windows recibimos un unico directorio de perfil, lo convertimos a una estructura Set<File>
-			profile = new HashSet<>(Arrays.asList(firefoxDir.listFiles()));
-			RestoreConfigFirefox.importCARootOnFirefoxKeyStore(targetDir, certFile, profile);
+			profiles = new HashSet<>(Arrays.asList(firefoxDir.listFiles()));
+			try {
+				RestoreConfigFirefox.importCARootOnFirefoxKeyStore(targetDir, certFile, profiles);
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudo instalar el certificado de CA en todos los perfiles de Firefox: " + e); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -381,7 +387,7 @@ final class RestoreConfigFirefox {
 			+ " | grep AutoFirma | wc -l);for ((i=0; i<$max; i++));do " //$NON-NLS-1$
 			+ escapePath(certutilFile.getAbsolutePath())
 			+ " -D -d " //$NON-NLS-1$
-			+ escapePath(profile.getAbsolutePath())
+			+ "sql:" + escapePath(profile.getAbsolutePath()) //$NON-NLS-1$
 			+ " -n \"SocketAutoFirma\";done"; //$NON-NLS-1$
 			final String[] certutilCommands = scriptUninstall.split(" "); //$NON-NLS-1$
 
@@ -512,7 +518,7 @@ final class RestoreConfigFirefox {
 					escapePath(certUtilPath),
 					"-A", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
-					escapePath(profileDir.getAbsolutePath()),
+					"sql:" + escapePath(profileDir.getAbsolutePath()), //$NON-NLS-1$
 					"-i", //$NON-NLS-1$
 					escapePath(certificateFile.getAbsolutePath()),
 					"-n", //$NON-NLS-1$
@@ -698,9 +704,7 @@ final class RestoreConfigFirefox {
 			executeCertUtilToImport(workingDir, certFile, profilesDir);
 
 		} catch (final Exception e) {
-			LOGGER.warning("No se pudo instalar la CA del certificado SSL para el socket en el almacen de Firefox. Probablemente no se este ejecutando AutoFirma como administrador: " + e //$NON-NLS-1$
-			);
-
+			LOGGER.warning("No se pudo instalar la CA del certificado SSL para el socket en todos los perfiles de Firefox. Probablemente alguno de los perfiles nunca haya sido iniciado o no se este ejecutando AutoFirma como administrador: " + e); //$NON-NLS-1$
 			throw new KeyStoreException("Error al instalar la CA de confianza en el almacen de Firefox", e); //$NON-NLS-1$
 		}
 
@@ -753,7 +757,7 @@ final class RestoreConfigFirefox {
 							"\"" + certUtilPath + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-D", //$NON-NLS-1$
 							"-d", //$NON-NLS-1$
-							"\"" + profileDir.getAbsolutePath() + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+							"\"sql:" + profileDir.getAbsolutePath() + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-n", //$NON-NLS-1$
 							"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					};
@@ -885,6 +889,7 @@ final class RestoreConfigFirefox {
 	 * @return Array de Files con los perfiles de usuarios de Firefox
 	 */
 	private static ArrayList<File> getFirefoxProfilesDir() {
+
 		final ArrayList<File> fileList = new ArrayList<>();
 
 		//Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente

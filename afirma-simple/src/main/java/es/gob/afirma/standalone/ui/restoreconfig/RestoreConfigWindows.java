@@ -77,7 +77,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// Verifica si se tiene permisos para escribir en el directorio de instalacion
 		boolean usingAlternativeDirectory;
 		File workingDirectory;
-		if(Files.isWritable(appDir.toPath())) {
+		if (Files.isWritable(appDir.toPath())) {
 			workingDirectory = appDir;
 			usingAlternativeDirectory = false;
 		} else {
@@ -86,15 +86,38 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 
 		LOGGER.info("Ruta de trabajo:  " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
+
+		final boolean needRebuildCerts = isRebuildCertNeeded(appDir);
+
 		// Regeneramos los certificados que sean necesario (raiz y ssl) y los guardamos en disco
 		CertificateFile sslRoot;
-		try {
-			sslRoot = rebuildCertificates(configPanel, workingDirectory);
+		if (needRebuildCerts) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.38")); //$NON-NLS-1$
+			try {
+				sslRoot = rebuildCertificates(configPanel, workingDirectory);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza: " + e); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.33")); //$NON-NLS-1$
+				sslRoot = null;
+			}
 		}
-		catch (final Exception e) {
-			LOGGER.severe("No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza: " + e); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.33")); //$NON-NLS-1$
-			sslRoot = null;
+		else {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.39")); //$NON-NLS-1$
+			try {
+				// Si vamos a trabajar desde un directorio distinto al de instalacion,
+				// copiamos los certificados
+				if (!appDir.equals(workingDirectory)) {
+					copyCerts(appDir, workingDirectory);
+				}
+				// Cargamos el certificado de CA
+				sslRoot = loadRootCertificate(workingDirectory);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("No se ha podido cargar el certificado de CA del directorio de instalacion. No se instalara en los almacenes de confianza: " + e); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.4")); //$NON-NLS-1$
+				sslRoot = null;
+			}
 		}
 
 		// Instalacion del certificado raiz en Windows
@@ -110,16 +133,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 
 		// Si no se han creado directamente los certificados en el directorio alternativo
-		// y este existe, lo copiamos ahora
+		// y este existe, los copiamos ahora
 		if (!usingAlternativeDirectory) {
 			final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
 			if (alternativeDir.exists()) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.36")); //$NON-NLS-1$
 				try {
-					Files.copy(
-							new File(workingDirectory, SSL_KEYSTORE_FILENAME).toPath(),
-							new File(alternativeDir, SSL_KEYSTORE_FILENAME).toPath(),
-							StandardCopyOption.REPLACE_EXISTING);
+					copyCerts(workingDirectory, alternativeDir);
+
 				} catch (final IOException e) {
 					LOGGER.warning("No se ha podido copiar el almacen del certificado SSL al directorio alternativo de instalacion: " + e); //$NON-NLS-1$
 					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.37")); //$NON-NLS-1$
@@ -142,6 +163,24 @@ final class RestoreConfigWindows implements RestoreConfig {
 		configureChrome();
 
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.8")); //$NON-NLS-1$
+	}
+
+	/**
+	 * Copia los certificado SSL y de CA de un directorio a otro.
+	 * @param source Directorio en el que se encuentran los ficheros.
+	 * @param target Directorio de destino.
+	 * @throws IOException Cuando falla el proceso de copia.
+	 */
+	private static void copyCerts(final File source, final File target) throws IOException {
+		Files.copy(
+				new File(source, SSL_KEYSTORE_FILENAME).toPath(),
+				new File(target, SSL_KEYSTORE_FILENAME).toPath(),
+				StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(
+				new File(source, CA_CERTIFICATE_FILENAME).toPath(),
+				new File(target, CA_CERTIFICATE_FILENAME).toPath(),
+				StandardCopyOption.REPLACE_EXISTING);
+
 	}
 
 	/**
@@ -343,7 +382,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(installDir, certFile.getFile());
 			// Elimino certutil tras su uso
 			RestoreConfigFirefox.removeConfigurationFiles(installDir);
-
 		}
 		catch (final IOException | KeyStoreException e) {
 			LOGGER.log(Level.SEVERE, "Error instalando el certificado raiz: " + e, e); //$NON-NLS-1$
@@ -514,6 +552,25 @@ final class RestoreConfigWindows implements RestoreConfig {
 		return sslRoot;
 	}
 
+	/**
+	 * Comprueba si es necesario regenerar los certificados SSL (PFX y certificado de CA).
+	 * @param certsDir Directorio en el que deben encontrarse los certificados.
+	 * @return {@code true} si no se encuentran ya creados los certificados en el directorio,
+	 * {@code false} en caso contrario.
+	 */
+	private static boolean isRebuildCertNeeded(final File certsDir) {
+		return !new File(certsDir, CA_CERTIFICATE_FILENAME).isFile() ||
+				!new File(certsDir, SSL_KEYSTORE_FILENAME).isFile();
+	}
+
+	private static CertificateFile loadRootCertificate(final File caDir) throws IOException {
+
+		final File caFile = new File(caDir, CA_CERTIFICATE_FILENAME);
+		final CertificateFile certFile = new CertificateFile(CertUtil.loadCertificate(caFile));
+		certFile.setFile(caFile);
+
+		return certFile;
+	}
 
 	/** Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos.
