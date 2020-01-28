@@ -37,7 +37,7 @@ public final class SimpleTest {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
     @Test
-    //@Ignore // Necesita NSS
+    @Ignore // Necesita NSS
     public void testKeyStoreManagerCreation() throws Exception {
 
     	System.setProperty(

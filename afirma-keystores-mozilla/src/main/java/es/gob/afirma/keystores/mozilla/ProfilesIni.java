@@ -1,7 +1,6 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -85,8 +84,13 @@ class ProfilesIni {
 				}
 				// Bloque de estado (a partir de Firefox 69)
 				else if (line.toLowerCase().startsWith("[install")) { //$NON-NLS-1$
+					// El fichero puede declarar mas de un bloque de este tipo. Si hay mas de uno,
+					// utilizamos el declare el perfil bloqueado
 					try {
-						this.stateInfo = readStateInfo(in);
+						final StateInfo newStateInfo = readStateInfo(in);
+						if (this.stateInfo == null || !this.stateInfo.isLockedDeclared()) {
+							this.stateInfo = newStateInfo;
+						}
 					}
 					catch (final Exception e) {
 						LOGGER.warning("No se ha podido leer la seccion " + line + " con el perfil activo de Firefox: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -345,6 +349,8 @@ class ProfilesIni {
 
 		private boolean locked = true;
 
+		private boolean lockedDeclared = false;
+
 		public String getDefaultProfilePath() {
 			return this.defaultProfilePath;
 		}
@@ -359,6 +365,11 @@ class ProfilesIni {
 
 		public void setLocked(final boolean locked) {
 			this.locked = locked;
+			this.lockedDeclared = true;
+		}
+
+		public boolean isLockedDeclared() {
+			return this.lockedDeclared;
 		}
 	}
 }
