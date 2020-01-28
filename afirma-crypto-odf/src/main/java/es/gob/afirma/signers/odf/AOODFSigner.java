@@ -72,6 +72,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -659,7 +660,7 @@ public final class AOODFSigner implements AOSigner {
 	public boolean isValidDataFile(final byte[] data) {
 
     	// Si no es un ZIP, no se trata de un ODF
-    	if (!isZipData(data)) {
+    	if (!new MimeHelper(data).isZipData()) {
     		return false;
     	}
 
@@ -678,24 +679,6 @@ public final class AOODFSigner implements AOSigner {
         // soportados
         return mimetype != null && SUPPORTED_FORMATS.contains(mimetype);
     }
-
-    /**
-     * Comprueba si unos datos tienen formato ZIP.
-     * @param data Datos a comprobar.
-     * @return {@code true} si los datos son un ZIP, {@code false} en caso contrario.
-     */
-	private static boolean isZipData(final byte[] data) {
-
-		if (data == null || data.length < 4) {
-			return false;
-		}
-
-		// Los 4 primeros bytes pueden ser 0x504B0304, 0x504B0506 o 0x504B0708
-		return data[0] == (byte) 0x50 && data[1] == (byte) 0x4B && (
-				data[2] == (byte) 0x03 && data[3] == (byte) 0x04 ||
-				data[2] == (byte) 0x05 && data[3] == (byte) 0x06 ||
-				data[2] == (byte) 0x07 && data[3] == (byte) 0x08);
-	}
 
     /** {@inheritDoc} */
     @Override

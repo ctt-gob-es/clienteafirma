@@ -9,14 +9,11 @@
 
 package es.gob.afirma.core.misc;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.zip.ZipFile;
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
  * identificadores de tipo de contenido. */
@@ -73,7 +70,7 @@ public final class MimeHelper {
             throw new IllegalArgumentException("No se han indicado los datos que se desean analizar"); //$NON-NLS-1$
         }
 
-        this.data = data.clone();
+        this.data = data;
         this.mimeInfo = new MimeInfo();
 
         try {
@@ -247,7 +244,7 @@ public final class MimeHelper {
      * @return Extensi&oacute;n que le corresponde a un fichero con esos datos o
      * {@code null} si no se conoce.
      */
-    private static String verifyExtension(String mimeType) {
+    private static String verifyExtension(final String mimeType) {
 
     	if (DEFAULT_MIMETYPE.equals(mimeType)) {
     		return null;
@@ -302,7 +299,7 @@ public final class MimeHelper {
      * @return Descripci&oacute;n que le corresponde a un fichero con esos datos o
      * {@code null} si no se conoce.
      */
-    private static String verifyDescription(String mimeType) {
+    private static String verifyDescription(final String mimeType) {
 
     	if (XML_MIMETYPE.equals(mimeType)) {
     		return XML_DESCRIPTION;
@@ -324,34 +321,23 @@ public final class MimeHelper {
      * @return {@code true} si los datos son un ZIP, {@code false} en caso de que no
      * sean un ZIP o que no se puedan analizar.
      */
-    public boolean isZipData() {
+	public boolean isZipData() {
 
     	// Comprobamos si JMimeMagic lo detecto como ZIP
     	if (this.mimeInfo != null) {
    			return ZIP_MIMETYPE.equals(this.mimeInfo.getMimeType());
     	}
 
-    	// Si no tenemos el analisis de JMimeMagic, intentamos cargarlo como ZIP
-    	boolean isZip = true;
-    	File dataFile = null;
-    	try {
-    		dataFile = AOFileUtils.createTempFile(this.data);
-    		new ZipFile(dataFile).close();
-    	}
-    	catch (final Exception e) {
-    		isZip = false;
+		if (this.data.length < 4) {
+			return false;
 		}
 
-    	if (dataFile != null) {
-			try {
-				Files.delete(dataFile.toPath());
-			} catch (final IOException e) {
-				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
-			}
-		}
-
-    	return isZip;
-    }
+		// Los 4 primeros bytes pueden ser 0x504B0304, 0x504B0506 o 0x504B0708
+		return this.data[0] == (byte) 0x50 && this.data[1] == (byte) 0x4B && (
+				this.data[2] == (byte) 0x03 && this.data[3] == (byte) 0x04 ||
+				this.data[2] == (byte) 0x05 && this.data[3] == (byte) 0x06 ||
+				this.data[2] == (byte) 0x07 && this.data[3] == (byte) 0x08);
+	}
 
     /** Almacena la informaci&oacute;n identificada del tipo de datos. */
     static class MimeInfo {
@@ -389,7 +375,7 @@ public final class MimeHelper {
 			return this.mTypeVerified;
 		}
 
-        void setMimeTypeVerified(boolean mTypeVerified) {
+        void setMimeTypeVerified(final boolean mTypeVerified) {
 			this.mTypeVerified = mTypeVerified;
 		}
 
@@ -405,7 +391,7 @@ public final class MimeHelper {
 			return this.extensionVerified;
 		}
 
-        void setExtensionVerified(boolean extensionVerified) {
+        void setExtensionVerified(final boolean extensionVerified) {
 			this.extensionVerified = extensionVerified;
 		}
 
@@ -421,7 +407,7 @@ public final class MimeHelper {
 			return this.descriptionVerified;
 		}
 
-        void setDescriptionVerified(boolean descriptionVerified) {
+        void setDescriptionVerified(final boolean descriptionVerified) {
 			this.descriptionVerified = descriptionVerified;
 		}
     }
