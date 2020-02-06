@@ -439,11 +439,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
     		}
     		catch (final ConfigurationException e) {
     			AOUIFactory.showErrorMessage(
-						null,
-						e.getMessage(),
-						SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
-						);
+					null,
+					e.getMessage(),
+					SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
     			changeProxyDlg(container);
     			return;
 			}

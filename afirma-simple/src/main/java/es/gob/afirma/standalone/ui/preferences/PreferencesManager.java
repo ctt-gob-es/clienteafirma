@@ -22,23 +22,25 @@ public final class PreferencesManager {
 
 	/** Objecto general de preferencias donde se guarda la configuraci&oacute;n de la
 	 * aplicaci&oacute;n. */
-	private static final Preferences preferences;
-	private static final Properties properties;
+	private static final Preferences PREFERENCES;
+	private static final Properties PROPERTIES;
 	static {
-		preferences = Preferences.userNodeForPackage(PreferencesManager.class);
+		PREFERENCES = Preferences.userNodeForPackage(PreferencesManager.class);
 
-		properties = new Properties();
+		PROPERTIES = new Properties();
 		try {
-			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
-		} catch (final Exception e) {
+			PROPERTIES.load(PreferencesManager.class.getResourceAsStream("/PROPERTIES/PREFERENCES.properties")); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
 			LOGGER.severe(
-					"No han podido cargarse los valores por defecto del fichero de configuracion de preferencias, se usaran los valores por defecto: " //$NON-NLS-1$
-							+ e);
+				"No han podido cargarse los valores por defecto del fichero de configuracion de preferencias, se usaran los valores por defecto: " //$NON-NLS-1$
+					+ e
+			);
 		}
 	}
 
 	private PreferencesManager() {
-		/** No permitimos la instanciacion */
+		// No permitimos la instanciacion
 	}
 
 	//**************************************************************************************************************************
@@ -116,10 +118,10 @@ public final class PreferencesManager {
 	/** Algoritmo de huella para firma.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
-	 *  <li>SHA1withRSA</li>
-	 *  <li>SHA256withRSA</li>
-	 *  <li>SHA384withRSA</li>
-	 *  <li>SHA512withRSA</li>
+	 *  <li>SHA1</li>
+	 *  <li>SHA256</li>
+	 *  <li>SHA384</li>
+	 *  <li>SHA512</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_SIGNATURE_ALGORITHM = "signatureHashAlgorithm"; //$NON-NLS-1$
 
@@ -468,7 +470,7 @@ public final class PreferencesManager {
 	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
 	public static String get(final String key) {
 
-		return preferences.get(key, getDefaultPreference(key));
+		return PREFERENCES.get(key, getDefaultPreference(key));
 	}
 
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
@@ -477,7 +479,7 @@ public final class PreferencesManager {
 	 * @return El valor almacenado de la propiedad o {@code null} si no se encontr&oacute;. */
 	public static String getConfiguredProperty(final String key) {
 
-		return preferences.get(key, null);
+		return PREFERENCES.get(key, null);
 	}
 
 	/**
@@ -485,7 +487,7 @@ public final class PreferencesManager {
 	 *  @param key Clave del valor que queremos recuperar.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static String getDefaultPreference(final String key) {
-		return properties.getProperty(key);
+		return PROPERTIES.getProperty(key);
 	}
 
 	/** Recupera el valor {@code true} o {@code false} almacenado entre las preferencias de la
@@ -493,7 +495,7 @@ public final class PreferencesManager {
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static boolean getBoolean(final String key) {
-		return preferences.getBoolean(key, getBooleanDefaultPreference(key));
+		return PREFERENCES.getBoolean(key, getBooleanDefaultPreference(key));
 	}
 
 	/**
@@ -501,7 +503,7 @@ public final class PreferencesManager {
 	 *  @param key Clave del valor que queremos recuperar.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static boolean getBooleanDefaultPreference(final String key) {
-		return Boolean.parseBoolean(properties.getProperty(key));
+		return Boolean.parseBoolean(PROPERTIES.getProperty(key));
 
 	}
 
@@ -511,7 +513,7 @@ public final class PreferencesManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void put(final String key, final String value) {
-		preferences.put(key, value);
+		PREFERENCES.put(key, value);
 	}
 
 	/** Establece un {@code true} o {@code false} en la configuraci&oacute;n de la aplicaci&oacute;n
@@ -520,13 +522,13 @@ public final class PreferencesManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void putBoolean(final String key, final boolean value) {
-		preferences.putBoolean(key, value);
+		PREFERENCES.putBoolean(key, value);
 	}
 
 	/** Elimina una clave de entre la configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @param key Clave que eliminar. */
 	public static void remove(final String key) {
-		preferences.remove(key);
+		PREFERENCES.remove(key);
 	}
 
 	/**
@@ -534,14 +536,14 @@ public final class PreferencesManager {
 	 * @throws BackingStoreException Si ocurre un error eliminando las preferencias.
 	 */
 	public static void clearAll() throws BackingStoreException {
-		preferences.clear();
+		PREFERENCES.clear();
 	}
 
 	/** Almacena en las preferencias de la aplicaci&oacute;n todos los valores
 	 * establecidos hasta el momento.
 	 * @throws BackingStoreException Cuando ocurre un error durante el guardado. */
 	public static void flush() throws BackingStoreException {
-		preferences.flush();
+		PREFERENCES.flush();
 	}
 
 	/**

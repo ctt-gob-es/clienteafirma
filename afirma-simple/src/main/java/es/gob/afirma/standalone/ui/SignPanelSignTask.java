@@ -204,7 +204,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
         	}
         	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
-        		signatureAlgorithm = signatureHashAlgorithm + "withDSA"; //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
         	}
         	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
         		signatureAlgorithm = signatureHashAlgorithm + "withECDSA"; //$NON-NLS-1$
@@ -361,56 +361,61 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
      * @throws IOException Cuando se produce un error relacionado a la lectura de los datos a firmar.
      * @throws SingleSignatureException Cuando se produce un error en una firma dentro de un proceso masivo.
      */
-    private static byte[] signData(final byte[] data, final AOSigner signer, final CryptoOperation cop, final String algorithm,
-    		final PrivateKeyEntry pke, final Properties extraParams, final boolean onlyOneFile, final Component parent)
-    				throws AOException, IOException, SingleSignatureException {
-
+    private static byte[] signData(final byte[] data,
+    						       final AOSigner signer,
+    						       final CryptoOperation cop,
+    						       final String algorithm,
+    						       final PrivateKeyEntry pke,
+    						       final Properties extraParams,
+    						       final boolean onlyOneFile,
+    						       final Component parent) throws AOException,
+                                                                  IOException,
+                                                                  SingleSignatureException {
     	byte[] signResult;
-
     	try {
     		switch (cop) {
     		case COSIGN:
     			signResult = signer.cosign(
-    					data,
-    					algorithm,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     			break;
 
     		case COUNTERSIGN_LEAFS:
     			signResult = signer.countersign(
-    					data,
-    					algorithm,
-    					CounterSignTarget.LEAFS,
-    					null,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					CounterSignTarget.LEAFS,
+					null,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     			break;
 
     		case COUNTERSIGN_TREE:
     			signResult = signer.countersign(
-    					data,
-    					algorithm,
-    					CounterSignTarget.TREE,
-    					null,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					CounterSignTarget.TREE,
+					null,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     			break;
 
     		default:	// Firma
     			signResult = signer.sign(
-    					data,
-    					algorithm,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     		}
     	}
     	catch(final PdfIsCertifiedException e) {
