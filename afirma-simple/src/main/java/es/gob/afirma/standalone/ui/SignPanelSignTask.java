@@ -204,7 +204,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
         	}
         	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
-        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withDSA"; //$NON-NLS-1$
         	}
         	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
         		signatureAlgorithm = signatureHashAlgorithm + "withECDSA"; //$NON-NLS-1$
