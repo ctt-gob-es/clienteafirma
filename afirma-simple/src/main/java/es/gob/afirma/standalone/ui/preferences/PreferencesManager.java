@@ -107,13 +107,13 @@ public final class PreferencesManager {
 	 * har&aacute; que no se env&iacute;e ning&uacute;n dato. */
 	public static final String PREFERENCE_GENERAL_USEANALYTICS = "useAnalytics"; //$NON-NLS-1$
 
-	/** Mantiene habilitado el funcionamiento de JMulticard.
+	/** Mantiene habilitado el funcionamiento de JMultiCard.
 	 * Un valor de <code>true</code> en esta preferencia hace que la aplicacion deje el comportamiento
 	 * por defecto de JMulticard, que usaria las tarjetas DNIe y CERES. Un valor de <code>false</code>
 	 * har&aacute; que no se desactive el uso de JMulticard para estas tarjetas. */
 	public static final String PREFERENCE_GENERAL_ENABLED_JMULTICARD = "enabledJmulticard"; //$NON-NLS-1$
 
-	/** Algoritmo de firma.
+	/** Algoritmo de huella para firma.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
 	 *  <li>SHA1withRSA</li>
@@ -121,7 +121,7 @@ public final class PreferencesManager {
 	 *  <li>SHA384withRSA</li>
 	 *  <li>SHA512withRSA</li>
 	 * </ul> */
-	public static final String PREFERENCE_GENERAL_SIGNATURE_ALGORITHM = "signatureAlgorithm"; //$NON-NLS-1$
+	public static final String PREFERENCE_GENERAL_SIGNATURE_ALGORITHM = "signatureHashAlgorithm"; //$NON-NLS-1$
 
 	/** Formato de firma por defecto para documentos PDF.
 	 * Esta preferencia debe tener uno de estos valores:

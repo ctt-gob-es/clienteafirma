@@ -178,7 +178,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	signConfig.addExtraParam(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
             }
 
-            final String signatureAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
+            final String signatureHashAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
 
             byte[] data;
             try {
@@ -196,12 +196,37 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	final byte[] dataToSign = pluginsPreProcess(
         		data,
-        		signConfig.getSignatureFormatName());
+        		signConfig.getSignatureFormatName()
+    		);
+        	final String signatureAlgorithm;
+        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
+        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
+        	}
+        	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
+        	}
+        	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withECDSA"; //$NON-NLS-1$
+        	}
+        	else {
+        		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.123", certAlgo)); //$NON-NLS-1$
+        		this.signExecutor.finishTask();
+        		return;
+        	}
 
         	// Ejecutamos la operacion de firma apropiada
             try {
-                signResult = signData(dataToSign, currentSigner, signConfig.getCryptoOperation(),
-                		signatureAlgorithm, pke, signConfig.getExtraParams(), onlyOneFile, this.parent);
+                signResult = signData(
+            		dataToSign,
+            		currentSigner,
+            		signConfig.getCryptoOperation(),
+            		signatureAlgorithm,
+            		pke,
+            		signConfig.getExtraParams(),
+            		onlyOneFile,
+            		this.parent
+        		);
             }
             catch(final AOCancelledOperationException e) {
             	this.signExecutor.finishTask();
