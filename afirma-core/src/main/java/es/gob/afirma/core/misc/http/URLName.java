@@ -518,7 +518,7 @@ final class URLName {
 	 * @since 1.2
 	 */
 
-	/** Decodes a &quot;x-www-form-urlencoded&quot; to a <tt>String</tt>.
+	/** Decodes a &quot;x-www-form-urlencoded&quot; to a <code>String</code>.
 	 * @param s The <code>String</code> to decode.
 	 * @return The newly decoded <code>String</code>. */
 	static String decode(final String s) {

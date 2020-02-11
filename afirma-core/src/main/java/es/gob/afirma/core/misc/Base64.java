@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
  * <br>
  * <code>byte[] myByteArray = Base64.decode( encoded );</code>
  *
- * <p>The <tt>options</tt> parameter, which appears in a few places, is used to pass
+ * <p>The <code>options</code> parameter, which appears in a few places, is used to pass
  * several pieces of information to the encoder. In the "higher level" methods such as
  * encodeBytes( bytes, options ) the options parameter can be used to indicate such
  * things as not inserting linefeeds,
