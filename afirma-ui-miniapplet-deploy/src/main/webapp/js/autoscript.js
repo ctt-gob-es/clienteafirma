@@ -124,11 +124,15 @@ var AutoScript = ( function ( window, undefined ) {
 
 		/**
 		 * Determina con un boolean si nuestro cliente es iOS.
+		 * Desde iOS 13 el useragent de los iPad pasa a ser el mismo que para MacOS,
+		 * mientras no exista un MacOS con multitouch la única manera de detectar un
+		 * iPad es detectando que sea MacOS con multitouch.
 		 */
 		function isIOS() {
 			return (navigator.userAgent.toUpperCase().indexOf("IPAD") != -1) ||
 			(navigator.userAgent.toUpperCase().indexOf("IPOD") != -1) ||
-			(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1);
+			(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1)||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 		}
 
 		/** Determina con un boolean si nos encontramos en un sistema Linux. */
