@@ -366,6 +366,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		netConfigPanel.add(netConfigInnerPanel);
 
 		this.secureConnections.setMnemonic('c');
+		this.secureConnections.addItemListener(modificationListener);
+		this.secureConnections.addKeyListener(keyListener);
 		this.secureConnections.setToolTipText(
 			SimpleAfirmaMessages.getString("PreferencesPanel.174") //$NON-NLS-1$
 		);
