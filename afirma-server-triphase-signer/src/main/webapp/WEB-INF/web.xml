@@ -7,7 +7,7 @@
 	<display-name>TriPhaseSignerServer</display-name>
 	
 	<servlet>
-		<description>Servicio de firma electronica en 3 fases v2.10</description>
+		<description>Servicio de firma electronica en 3 fases v2.20</description>
 		<servlet-name>SignatureService</servlet-name>
 		<servlet-class>es.gob.afirma.triphase.server.SignatureService</servlet-class>
 	</servlet>
@@ -18,7 +18,7 @@
 	</servlet-mapping>
 
 	<servlet>
-		<description>Realiza la primera fase de un proceso de firma por lote v1.3</description>
+		<description>Realiza la primera fase de un proceso de firma por lote v1.4</description>
 		<servlet-name>BatchPresigner</servlet-name>
 		<servlet-class>es.gob.afirma.signers.batch.server.BatchPresigner</servlet-class>
 	</servlet>
@@ -29,7 +29,7 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote v1.3</description>
+		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote v1.4</description>
 		<servlet-name>BatchPostsigner</servlet-name>
 		<servlet-class>es.gob.afirma.signers.batch.server.BatchPostsigner</servlet-class>
 	</servlet>

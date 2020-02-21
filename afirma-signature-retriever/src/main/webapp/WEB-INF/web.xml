@@ -5,7 +5,7 @@
     version="2.5">
   <display-name>SignatureRetrieverServer</display-name>
   <servlet>
-    <description>Servicio para la recuperacion de firmas v1.2</description>
+    <description>Servicio para la recuperacion de firmas v1.3</description>
     <servlet-name>RetrieveService</servlet-name>
     <servlet-class>es.gob.afirma.signfolder.server.proxy.RetrieveService</servlet-class>
   </servlet>

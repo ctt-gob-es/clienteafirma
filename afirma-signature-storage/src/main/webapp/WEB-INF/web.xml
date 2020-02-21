@@ -5,7 +5,7 @@
          version="2.5">
   <display-name>SignatureStorageServer</display-name>
   <servlet>
-    <description>Servicio de almacenamiento temporal de firmas v1.4</description>
+    <description>Servicio de almacenamiento temporal de firmas v1.5</description>
     <servlet-name>StorageService</servlet-name>
     <servlet-class>es.gob.afirma.signfolder.server.proxy.StorageService</servlet-class>
   </servlet>
