@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +23,13 @@ final class RetrieveConfig {
 	/** <i>Log</i> para registrar las acciones del servicio. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
+	/** Variable de entorno que designa el directorio en el que se encuentra el
+	 * fichero de configuraci&oacute;n. */
+	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
+
+	/** Fichero de configuraci&oacute;n. */
+	private static final String CONFIG_FILE = "intermediate_config.properties"; //$NON-NLS-1$
+
 	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
 	private static final String TMP_DIR_KEY = "tmpDir"; //$NON-NLS-1$
 
@@ -31,6 +37,10 @@ final class RetrieveConfig {
 
 	/** Directorio temporal por defecto. */
 	private static String defaultTmpDir;
+
+	private static final String SYS_PROP_PREFIX = "${"; //$NON-NLS-1$
+
+	private static final String SYS_PROP_SUFIX = "}"; //$NON-NLS-1$
 
 	/** Milisegundos que, por defecto, tardan los mensajes en caducar. */
 	private static final long DEFAULT_EXPIRATION_TIME = 60000; // 1 minuto
@@ -41,15 +51,10 @@ final class RetrieveConfig {
 	/** Modo de depuraci&oacute;n activo o no, en el que no se borran los ficheros en servidor ni se dan por caducados. */
 	static final boolean DEBUG;
 
-	/** Fichero de configuraci&oacute;n. */
-	private static final String DEFAULT_CFG_FILE = "configuration.properties"; //$NON-NLS-1$
-
 	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
 	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
 
 	private static final long EXPIRATION_TIME;
-
-	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "AFIRMA_CONFIG_DIR"; //$NON-NLS-1$
 
 	static {
 
@@ -57,14 +62,13 @@ final class RetrieveConfig {
 		final Properties config = new Properties();
 		try {
 			final String configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
-
 			if (configDir != null) {
-				final File configFile = new File(configDir, DEFAULT_CFG_FILE).getCanonicalFile();
+				final File configFile = new File(configDir, CONFIG_FILE).getCanonicalFile();
 				if (!configFile.isFile() || !configFile.canRead()) {
 					LOGGER.warning(
-						"No se encontro el fichero " + DEFAULT_CFG_FILE + " en el directorio configurado en la variable " + //$NON-NLS-1$ //$NON-NLS-2$
-							ENVIRONMENT_VAR_CONFIG_DIR + " (" + configFile.getAbsolutePath() + //$NON-NLS-1$
-								"), se buscara en el CLASSPATH."); //$NON-NLS-1$
+						"No se encontro o no se pudo leer el fichero " + CONFIG_FILE + //$NON-NLS-1$
+						" en el directorio configurado en la variable " + ENVIRONMENT_VAR_CONFIG_DIR + //$NON-NLS-1$
+						" (" + configFile.getAbsolutePath() + "), se buscara en el CLASSPATH."); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				else {
 					LOGGER.info("Se carga un fichero de configuracion externo: " + configFile.getAbsolutePath()); //$NON-NLS-1$
@@ -74,7 +78,7 @@ final class RetrieveConfig {
 
 			if (is == null) {
 				LOGGER.info("Se carga el fichero de configuracion del classpath"); //$NON-NLS-1$
-				is = RetrieveConfig.class.getClassLoader().getResourceAsStream(DEFAULT_CFG_FILE);
+				is = RetrieveConfig.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
 			}
 
 			config.load(is);
@@ -90,11 +94,11 @@ final class RetrieveConfig {
 				}
 			}
 			LOGGER.severe(
-				"No se ha podido cargar el fichero con las propiedades (" + DEFAULT_CFG_FILE + "), se usaran los valores por defecto: " + e.toString() //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido cargar el fichero con las propiedades (" + CONFIG_FILE + "), se usaran los valores por defecto: " + e.toString() //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
-		DEBUG = Boolean.parseBoolean(config.getProperty(DEBUG_KEY));
+		DEBUG = Boolean.parseBoolean(getProperty(config, DEBUG_KEY, null));
 		if (DEBUG) {
 			LOGGER.warning("Modo de depuracion activado, no se borraran los ficheros en servidor"); //$NON-NLS-1$
 		}
@@ -119,10 +123,11 @@ final class RetrieveConfig {
 			}
 		}
 
-		File tmpDir = new File(config.getProperty(TMP_DIR_KEY, defaultTmpDir).trim());
-		if (!tmpDir.isDirectory() || !tmpDir.canRead()) {
+		final String filePath = getProperty(config, TMP_DIR_KEY, ""); //$NON-NLS-1$
+		File tmpDir = filePath != null ? new File(filePath.trim()) : null;
+		if (tmpDir == null || !tmpDir.isDirectory() || !tmpDir.canRead()) {
 			LOGGER.warning(
-				"El directorio temporal indicado en el fichero de propiedades (" + config.getProperty(TMP_DIR_KEY, defaultTmpDir) + ") no existe, se usara el por defecto: " +  defaultTmpDir //$NON-NLS-1$ //$NON-NLS-2$
+				"El directorio temporal indicado en el fichero de propiedades (" + tmpDir + ") no existe, se usara el por defecto: " +  defaultTmpDir //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			tmpDir = new File(defaultTmpDir);
 			if (!tmpDir.isDirectory() ||!tmpDir.canRead()) {
@@ -132,14 +137,15 @@ final class RetrieveConfig {
 		TMP_DIR = tmpDir;
 
 		long expTime;
+		final String expTimeValue = getProperty(config, EXPIRATION_TIME_KEY, null);
 		try {
-			expTime = config.containsKey(EXPIRATION_TIME_KEY) ?
-				Long.parseLong(config.getProperty(EXPIRATION_TIME_KEY)) :
+			expTime = expTimeValue != null ?
+				Long.parseLong(expTimeValue) :
 					DEFAULT_EXPIRATION_TIME;
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-				"Tiempo de expiracion invalido en el fichero de configuracion (" + DEFAULT_CFG_FILE + "), se usara " + DEFAULT_EXPIRATION_TIME + ": " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"Tiempo de expiracion invalido en el fichero de configuracion (" + expTimeValue + "), se usara " + DEFAULT_EXPIRATION_TIME + ": " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
 			expTime = DEFAULT_EXPIRATION_TIME;
 		}
@@ -159,5 +165,53 @@ final class RetrieveConfig {
 	 *         caduque. */
 	static long getExpirationTime() {
 		return EXPIRATION_TIME;
+	}
+
+	/**
+	 * Carga una propiedad de la configuraci&oacute;n traduciendo su contenido por lo indicado
+	 * mediante variables de entorno si es necesario.
+	 * @param config Configuraci&oacute;n establecida.
+	 * @param key Propiedad a recuperar.
+	 * @param defaultValue Valor a devolver si la propiedad no est&aacute; asignada. Tambi&eacute;n
+	 * se traducir&aacute;n las variables de entorno.
+	 * @return Valor de la propiedad o valor por defecto.
+	 */
+	private static String getProperty(final Properties config, final String key, final String defaultValue) {
+
+		String value = config.getProperty(key, defaultValue);
+		if (value != null) {
+			value = mapSystemProperties(value);
+		}
+		return value;
+	}
+
+	/**
+	 * Mapea las propiedades del sistema que haya en el texto que se referencien de
+	 * la forma: ${propiedad}
+	 * @param text Texto en el que se pueden encontrar las referencias a las propiedades
+	 * del sistema.
+	 * @return Cadena con las particulas traducidas a los valores indicados como propiedades
+	 * del sistema. Si no se encuentra la propiedad definida, no se modificar&aacute;
+	 */
+	private static String mapSystemProperties(final String text) {
+
+		if (text == null) {
+			return null;
+		}
+
+		int pos = -1;
+		int pos2 = 0;
+		String mappedText = text;
+		while ((pos = mappedText.indexOf(SYS_PROP_PREFIX, pos + 1)) > -1 && pos2 > -1) {
+			pos2 = mappedText.indexOf(SYS_PROP_SUFIX, pos + SYS_PROP_PREFIX.length());
+			if (pos2 > pos) {
+				final String prop = mappedText.substring(pos + SYS_PROP_PREFIX.length(), pos2);
+				final String value = System.getProperty(prop, null);
+				if (value != null) {
+					mappedText = mappedText.replace(SYS_PROP_PREFIX + prop + SYS_PROP_SUFIX, value);
+				}
+			}
+		}
+		return mappedText;
 	}
 }

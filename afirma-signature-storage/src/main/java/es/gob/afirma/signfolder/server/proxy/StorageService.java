@@ -156,7 +156,7 @@ public final class StorageService extends HttpServlet {
 		}
 		else {
 			dataText = URLDecoder.decode(data, DEFAULT_ENCODING);
-			if (dataText.getBytes().length > StorageConfig.getMaxDataSize() && !StorageConfig.DEBUG) {
+			if ((dataText.getBytes().length > StorageConfig.getMaxDataSize() || StorageConfig.getMaxDataSize() == 0) && !StorageConfig.DEBUG) {
 				LOGGER.warning(
 					"El tamano de los datos (" + dataText.getBytes().length + ") es mayor de lo permitido: " + StorageConfig.getMaxDataSize() //$NON-NLS-1$ //$NON-NLS-2$
 				);

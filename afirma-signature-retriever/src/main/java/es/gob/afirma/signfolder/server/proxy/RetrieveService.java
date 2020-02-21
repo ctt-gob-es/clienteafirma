@@ -150,11 +150,13 @@ public final class RetrieveService extends HttpServlet {
 	 * de vida configurado.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
 	private static void removeExpiredFiles() {
+
+		if (RetrieveConfig.DEBUG) {
+			// No se limpia el directorio temporal por estar en modo depuracion
+			return;
+		}
+
 		if (RetrieveConfig.getTempDir() != null && RetrieveConfig.getTempDir().isDirectory()) {
-			if (RetrieveConfig.DEBUG) {
-				// No se limpia el directorio temporal por estar en modo depuracion
-				return;
-			}
 			for (final File file : RetrieveConfig.getTempDir().listFiles()) {
 				try {
 					if (file.isFile() && isExpired(file, RetrieveConfig.getExpirationTime())) {

@@ -10,10 +10,7 @@
 package es.gob.afirma.triphase.server;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
@@ -87,69 +84,24 @@ public final class SignatureService extends HttpServlet {
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK NEWID="; //$NON-NLS-1$
 
-	private static final String CONFIG_FILE = "tpsconfig.properties"; //$NON-NLS-1$
-
-	private static final String OLD_CONFIG_FILE = "config.properties"; //$NON-NLS-1$
-
-	/** Variable de entorno que determina el directorio en el que buscar el fichero de configuraci&oacute;n. */
-	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
-
-	private static final String CONFIG_PARAM_DOCUMENT_MANAGER_CLASS = "document.manager"; //$NON-NLS-1$
-	private static final String CONFIG_PARAM_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
-	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
-
 	private static final String EXTRA_PARAM_HEADLESS = "headless"; //$NON-NLS-1$
-
-	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
-	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
-
-	private static String configDir;
-
-	private static final Properties config;
 
 	static {
 
-		try {
-			configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-				"No se ha podido obtener el directorio del fichero de configuracion: " + e //$NON-NLS-1$
-			);
-			configDir = null;
-		}
-
-		// Cargamos la configuracion del servicio
-		Properties configProperties = loadConfigFile(CONFIG_FILE);
-		if (configProperties == null) {
-			configProperties = loadConfigFile(OLD_CONFIG_FILE);
-		}
-
-		if (configProperties == null) {
-			throw new RuntimeException("No se ha encontrado el fichero de configuracion del servicio"); //$NON-NLS-1$
-		}
-
-		config = configProperties;
-
-		if (!config.containsKey(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS)) {
-			throw new IllegalArgumentException(
-				"No se ha indicado el document manager (" + CONFIG_PARAM_DOCUMENT_MANAGER_CLASS + ") en el fichero de propiedades" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-
 		final Class<?> docManagerClass;
+		final String docManagerClassName = ConfigManager.getDocManagerClassName();
 		try {
-			docManagerClass = Class.forName(config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS));
+			docManagerClass = Class.forName(docManagerClassName);
 		}
 		catch (final ClassNotFoundException e) {
 			throw new RuntimeException(
-				"La clase DocumentManager indicada no existe (" + config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS) + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				"La clase DocumentManager indicada no existe (" + docManagerClassName + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
 		try {
 			final Constructor<?> docManagerConstructor = docManagerClass.getConstructor(Properties.class);
-			DOC_MANAGER = (DocumentManager) docManagerConstructor.newInstance(config);
+			DOC_MANAGER = (DocumentManager) docManagerConstructor.newInstance(ConfigManager.getConfig());
 		}
 		catch (final Exception e) {
 			try {
@@ -162,52 +114,6 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 		LOGGER.info("Se usara el siguiente 'DocumentManager' para firma trifasica: " + DOC_MANAGER.getClass().getName()); //$NON-NLS-1$
-	}
-
-	/** Intenta cargar un fichero propiedades del directorio indicado mediante variable de entorno
-	 * o del <i>classpath</i> si no se encuentra.
-	 * @param configFilename Nombre del fichero de propedades.
-	 * @return Propiedades cargadas o {@code null} si no se pudo cargar el fichero. */
-	private static Properties loadConfigFile(final String configFilename) {
-
-		LOGGER.info("Se cargara el fichero de configuracion " + configFilename); //$NON-NLS-1$
-
-		Properties configProperties = null;
-
-		if (configDir != null) {
-			try {
-				final File configFile = new File(configDir, configFilename).getCanonicalFile();
-				try (final InputStream configIs = new FileInputStream(configFile);) {
-					configProperties = new Properties();
-					configProperties.load(configIs);
-				}
-			}
-			catch (final Exception e) {
-				LOGGER.warning(
-						"No se pudo cargar el fichero de configuracion " + configFilename + //$NON-NLS-1$
-						" desde el directorio " + configDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				configProperties = null;
-			}
-		}
-
-		if (configProperties == null) {
-			LOGGER.info(
-				"Se cargara el fichero de configuracion " + configFilename + " desde el CLASSPATH" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-
-			try (final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(configFilename);) {
-				configProperties = new Properties();
-				configProperties.load(configIs);
-			}
-			catch (final Exception e) {
-				LOGGER.warning(
-					"No se pudo cargar el fichero de configuracion " + configFilename + " desde el CLASSPATH: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				configProperties = null;
-			}
-		}
-
-		return configProperties;
 	}
 
 	@Override
@@ -236,7 +142,7 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 
-		final String allowOrigin = config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN, ALL_ORIGINS_ALLOWED);
+		final String allowOrigin = ConfigManager.getAccessControlAllowOrigin();
 
 		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("text/plain"); //$NON-NLS-1$
@@ -393,12 +299,7 @@ public final class SignatureService extends HttpServlet {
 			}
 			else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
-						final boolean installXmlDSig = Boolean.parseBoolean(
-							config.getProperty(
-								CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()
-							)
-						);
-						prep = new XAdESTriPhasePreProcessor(installXmlDSig);
+						prep = new XAdESTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			}
 			else if (AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_CADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
@@ -406,34 +307,19 @@ public final class SignatureService extends HttpServlet {
 			}
 			else if (AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_XADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
-						final boolean installXmlDSig = Boolean.parseBoolean(
-							config.getProperty(
-								CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()
-							)
-						);
-						prep = new XAdESASiCSTriPhasePreProcessor(installXmlDSig);
+						prep = new XAdESASiCSTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			}
 			else if (AOSignConstants.SIGN_FORMAT_FACTURAE.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_FACTURAE_TRI.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1.equalsIgnoreCase(format)) {
-						final boolean installXmlDSig = Boolean.parseBoolean(
-							config.getProperty(
-								CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()
-							)
-						);
-						prep = new FacturaETriPhasePreProcessor(installXmlDSig);
+						prep = new FacturaETriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			}
 			else if (AOSignConstants.SIGN_FORMAT_PKCS1.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_PKCS1_TRI.equalsIgnoreCase(format)) {
 						prep = new Pkcs1TriPhasePreProcessor();
 			}
 			else if (AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
-				final boolean installXmlDSig = Boolean.parseBoolean(
-					config.getProperty(
-						CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()
-					)
-				);
-				prep = new AutoTriPhasePreProcessor(installXmlDSig);
+				prep = new AutoTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			}
 			else {
 				LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
