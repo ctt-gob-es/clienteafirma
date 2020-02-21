@@ -27,8 +27,6 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var retrieverServletAddress = null;
 
-		var jnlpServiceAddress = "";
-
 		var severeTimeDelay = false;
 
 		var selectedLocale = null;
@@ -38,7 +36,7 @@ var AutoScript = ( function ( window, undefined ) {
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
 				checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
-				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema antes de continuar.",
+				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta página antes de continuar.",
 				checktime_local_time: "Hora de su sistema",
 				checktime_server_time: "Hora del servidor"
 		};
@@ -98,105 +96,29 @@ var AutoScript = ( function ( window, undefined ) {
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
 		// entre la pagina web y AutoFirma
 		var forceWSMode = false;
-
-		// Variable que devuelve si funciona el modo JNLP
-		var bJNLP = true;	
-																	 
-		/* ------------------------------------ */
-		/* Funciones de comprobacion de entorno */
-		/* ------------------------------------ */
-
-		/**
-		 * Determina con un boolean si nuestro cliente es Android
-		 */
-		function isAndroid() {
-			return navigator.userAgent.toUpperCase().indexOf("ANDROID") != -1 ||
-				navigator.appVersion.toUpperCase().indexOf("ANDROID") != -1 ||
-				// Para la deteccion de los Kindle Fire
-				navigator.userAgent.toUpperCase().indexOf("SILK/") != -1 ||
-				navigator.userAgent.toUpperCase().indexOf("KFJWI") != -1 ||
-				navigator.userAgent.toUpperCase().indexOf("KFJWA") != -1 ||
-				navigator.userAgent.toUpperCase().indexOf("KFTT") != -1 ||
-				navigator.userAgent.toUpperCase().indexOf("KFOT") != -1 ||
-				navigator.userAgent.toUpperCase().indexOf("KINDLE FIRE") != -1
-				;
-		}
-
-		/**
-		 * Determina con un boolean si nuestro cliente es iOS.
-		 */
-		function isIOS() {
-			return (navigator.userAgent.toUpperCase().indexOf("IPAD") != -1) ||
-			(navigator.userAgent.toUpperCase().indexOf("IPOD") != -1) ||
-			(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1);
-		}
-
-		/** Determina con un boolean si nos encontramos en un sistema Linux. */
-		function isLinux() {
-			return getOSName() == "linux";
-		}
-
-		/**
-		 * Identifica el sistema operativo del usuario para notificarselo al servicio
-		 * de generacion del fichero de despliegue JNLP.
-		 * @returns Codigo del sistema operativo o "unknown" si no se conoce.
-		 */
-		function getOSName() {
-			var osName="unknown";
-			if (navigator.appVersion.indexOf("Win")!=-1) osName="windows";
-			if (navigator.appVersion.indexOf("Mac")!=-1) osName="mac";
-			if (navigator.appVersion.indexOf("Linux")!=-1) osName="linux";
-			return osName;
-		}
-
-		/** Indica si el navegador es Internet Explorer 7 o inferior. */
-		function isInternetExplorer7orLower() {
-			var myNav = navigator.userAgent.toLowerCase();
-			return 7 >= (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
-		}
-
-		/**
-		 * Determina con un boolean si se accede a la web con Firefox
-		 */
-		function isFirefox(){
-			return navigator.userAgent.toUpperCase().indexOf("FIREFOX") != -1
-		}
-
-		/**
-		 * Determina con un boolean si se accede a la web con Chrome
-		 */
-		function isChrome() {
-			return navigator.userAgent.toUpperCase().indexOf("CHROME/") != -1 ||
-				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
-		}
-
-        /**
-         * Informa si el usuario necesitar&aacute; instalar la aplicacion nativa para
-         * completar el proceso de firma.
-         */
-        function needNativeAppInstalled() {
-        	return isLinux() || isAndroid() || isIOS();
-        }
         
         /**
          * Indica si el navegador soporta WebSockets.
          */
-        function supportWebSockets() {
-        	return 'WebSocket' in window || 'MozWebSocket' in window;
+        function checkWebSocket() {
+        	var supported = 'WebSocket' in window || 'MozWebSocket' in window;
+        	// Si soporta WebSockets y estamos en Internet Explorer, hacemos un
+        	// primer intento de conexion (aunque no este disponible el servidor)
+        	// Esto es necesario para que funcione posteriormente con determinadas
+        	// opciones de red
+        	if (supported && Platform.isInternetExplorer()) {
+	        	var wsTest;
+	        	try {
+	        		wsTest = new WebSocket("wss:\\127.0.0.1:63117");
+	        		wsTest.close();
+	        	}
+	        	catch (e) {
+	        		// La creacion del socket con errores hace saltar esta excepcion en IE y Edge Legacy.
+	        		// La ignoramos. 
+	        	}
+        	}
+        	return supported;
         }
-
-        /**
-         * Determina con un boolean si se ejecuta mediante JNLP
-         */
-        function isJNLP() {
-        	return bJNLP;
-        }
-
-		/** Indica si el navegador detecta Java. Este valor no es completamente fiable, ya que
-		 * Internet Explorer siempre indica que si esta activado. */
-		function isJavaEnabled() {
-			return navigator.javaEnabled();
-		}
 
 		/** Comprueba si una cadena de texto es una URL (http/https). La alternativa implicaria ser un Base64. */ 
 		function isValidUrl(data) { 
@@ -285,7 +207,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			httpRequest.send();
 		}
-
+		
 		function getHttpRequest() {
             var xmlHttp = null;
             
@@ -324,18 +246,38 @@ var AutoScript = ( function ( window, undefined ) {
 			forceWSMode = force;
 		}
 		
+        /**
+         * DEPRECADO - Siempre devuelve true.
+         * Informaba de si el usuario necesitaba instalar la aplicacion nativa para
+         * completar el proceso de firma. Ahora siempre es necesario.
+         */
+        function needNativeAppInstalled() {
+        	return true;
+        }
+
+        /**
+         * DEPRECADO - Siempre devuelve false.
+         * Determinaba si se realizaba un despliegue JNLP de AutoFirma WebStart.
+         * Ahora nunca se usa AutoFirma WebStart.
+         */
+        function isJNLP() {
+        	return false;
+        }
+		
 		/** DEPRECADO - No tiene efecto.<br>
-		 * Permitia forzar el uso de la aplicacion nativa de firma en lugar del MiniApplet. */
+		 * Permitia forzar el uso de la aplicacion nativa de firma en lugar del MiniApplet.
+		 * Ahora nunca se usa el MiniApplet. */
 		var setForceAFirma = function (force) {
 			
 		}
 
-		/** Establece la direccion servicio para la generacion del JNLP de
-		 * carga de AutoFirma. */
-		var setJnlpService = function (jnlp){
-			jnlpServiceAddress = jnlp;
-		}
+		/** DEPRECADO - No tiene efecto.<br>
+		 * Establece la direccion servicio para la generacion del JNLP de
+		 * carga de AutoFirma. Ahora nunca se usa AutoFirma WebStart. */
+		var setJnlpService = function (jnlp) {
 
+		}
+		
 		/** Permite habilitar la comprobacion de la hora local contra la hora del servidor y
 		 * establecer un tiempo maximo permitido y el comportamiento si se supera.
 		 * Parametros:
@@ -346,16 +288,20 @@ var AutoScript = ( function ( window, undefined ) {
 		 * Cuando el HTML es local, no se realiza ningun tipo de comprobacion.
 		 */
 		var checkTime = function (checkType, maxMillis, checkURL) {
+
+			if (!checkType || checkType == CHECKTIME_NO || (!!maxMillis && maxMillis <= 0)) {
+				return;
+			}
+
+			// Si no se establecio un tiempo de desfase, se tomaran 5 minutos 
+			if (!maxMillis) {
+				maxMillis = 300000;
+			}
+			
 			try {
-
-				if (checkType == undefined || checkType == null || checkType == CHECKTIME_NO
-						|| maxMillis == undefined || maxMillis == null || maxMillis <= 0) {
-					return;
-				}
-
 				// Si checkURL existe mandamos la peticion ahi, en caso contrario nos inventamos una url.
 				var URL;
-				if (checkURL) {
+				if (!!checkURL) {
 					URL = checkURL;
 				}
 				else {
@@ -375,8 +321,11 @@ var AutoScript = ( function ( window, undefined ) {
 					// No hacemos nada si estamos en local 
 					return;
 				}
-	
-				// Evaluamos la desincronizacion 
+
+				// Evaluamos la desincronizacion
+				console.log("Hora cliente: " + clientDate);
+				console.log("Hora servidor: " + serverDate);
+				
 				var delay =  Math.abs(clientDate.getTime() - serverDate.getTime());
 				if (delay > maxMillis) {
 					 if (checkType == CHECKTIME_RECOMMENDED) {
@@ -393,8 +342,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 			}
 			catch (e) {
-				// No hacemos nada si estamos en local 
-				//console.log("Error en la obtencion de la hora del servidor: " + e);
+				console.log("Error en la obtencion de la hora del servidor: " + e);
 				return;
 			}
 		}
@@ -402,13 +350,13 @@ var AutoScript = ( function ( window, undefined ) {
 		/** Obtiene el nombre del almacen que corresponde al presente navegador o, si se debe acceder
 		 * al almacen del sistema, se devuelve null. */
 		function getDefaultKeystore() {
-			if(isFirefox()){
+			if(Platform.isFirefox()){
 				return KEYSTORE_MOZILLA;
 			}
 			return null;
 		}
 		
-		/** Carga el MiniApplet. */
+		/** Establece el almacen. */
 		var setKeyStore = function (ksType) {
 			clienteFirma.setKeyStore(ksType != null ? ksType : defaultKeyStore);
 			
@@ -425,14 +373,17 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var coSign = function (signB64, dataB64, algorithm, format, params, successCallback, errorCallback) {
-			clienteFirma.coSign(signB64, dataB64, algorithm, format, params, successCallback, errorCallback);
+			clienteFirma.coSign(signB64, algorithm, format, params, successCallback, errorCallback);
 		}
-
+		
+		var cosign = function (signB64, algorithm, format, params, successCallback, errorCallback) {
+			clienteFirma.coSign(signB64, algorithm, format, params, successCallback, errorCallback);
+		}
 		
 		var counterSign = function (signB64, algorithm, format, params, successCallback, errorCallback) {
 			clienteFirma.counterSign(signB64, algorithm, format, params, successCallback, errorCallback);
 		}
-
+		
 		var signAndSaveToFile = function (operationId, dataB64, algorithm, format, params, outputFileName, successCallback, errorCallback) {
 			clienteFirma.signAndSaveToFile(operationId, dataB64, algorithm, format, params, outputFileName, successCallback, errorCallback);
 		}
@@ -482,7 +433,6 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var setLocale = function (locale) {
-			selectedLocale = locale;
 			currentLocale = (locale == null || LOCALIZED_STRINGS[locale] == null ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]); 
 		}
 
@@ -513,7 +463,7 @@ var AutoScript = ( function ( window, undefined ) {
 			// Usamos el modo de invocacion mas apropiado segun el entorno
 			
 			// Redireccion del navegador
-			if (isChrome() || isIOS()) {
+			if (Platform.isChrome() || Platform.isIOS()) {
 				// Usamos document.location porque tiene mejor soporte por los navegadores que
 				// window.location que es el mecanismo estandar
 				document.location = url;
@@ -577,7 +527,7 @@ var AutoScript = ( function ( window, undefined ) {
 			iframeElem.setAttributeNode(widthAttr);
 			
 			// Ocultamos el frame en los sistemas en los que podemos mediante CSS
-			if (!isInternetExplorer7orLower()) {
+			if (!Platform.isInternetExplorer7orLower()) {
 				var styleAttr = document.createAttribute("style");
 				styleAttr.value = "display: none;";
 				iframeElem.setAttributeNode(styleAttr);
@@ -585,16 +535,6 @@ var AutoScript = ( function ( window, undefined ) {
 
 			document.body.appendChild(iframeElem);				
 		}
-		
-		/**************************************************************
-		 **************************************************************
-		 **************************************************************
-		 **************************************************************
-		 *  FUNCIONES DEL CLIENTE JAVASCRIPT						  *
-		 **************************************************************
-		 **************************************************************
-		 **************************************************************
-		 **************************************************************/
 
 		/**
 		 * Crea e inicializa el objeto JavaScript encargado de transmitir las
@@ -617,10 +557,17 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				return;
 			}
-			
-			if (!forceWSMode && !isIOS() && !isAndroid() && supportWebSockets()) {
-				clienteFirma = new AppAfirmaWebSocketClient(clientAddress, window, undefined);
+
+			// Si se fuerza el uso de servidor intermedio o estamos en un dispositivo movil,
+			// usamos servidor intermedio
+			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
+				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
 			}
+			// Si podemos utilizar un WebSocket local, usamos WebSockets 
+			else if (checkWebSocket()) {
+				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
+			}
+			// En cualquier otro caso, usaremos servidor intermedio
 			else {
 				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
 				if (!!storageServletAddress || !!retrieverServletAddress) {
@@ -632,17 +579,71 @@ var AutoScript = ( function ( window, undefined ) {
 				keystore = getDefaultKeystore();
 			}
 			clienteFirma.setKeyStore(keystore);
-
-			// Si se dan las condiciones que requieren el uso de la aplicacion nativa,
-			// por entorno o porque se haya configurado para su uso, se intenta cargar
-			// esta version
-			if (!avoidJnlpLoad && !needNativeAppInstalled() && !!jnlpServiceAddress) {
-				// Aplicamos un retardo en la carga de la aplicacion WebStart para dar tiempo a cargar la pagina
-				var jnlpUrl = "jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://service?op=install", true);
-				setTimeout(openUrl, 2000, jnlpUrl);
-			}
 		}
 
+		/**
+		 * Funciones de comprobacion de entorno.
+		 */
+		var Platform = ( function (window, undefined) {
+			/** Indica si el sistema operativo es Android. */
+			function isAndroid() {
+				return navigator.userAgent.toUpperCase().indexOf("ANDROID") != -1 ||
+					navigator.appVersion.toUpperCase().indexOf("ANDROID") != -1 ||
+					// Para la deteccion de los Kindle Fire
+					navigator.userAgent.toUpperCase().indexOf("SILK/") != -1 ||
+					navigator.userAgent.toUpperCase().indexOf("KFJWI") != -1 ||
+					navigator.userAgent.toUpperCase().indexOf("KFJWA") != -1 ||
+					navigator.userAgent.toUpperCase().indexOf("KFTT") != -1 ||
+					navigator.userAgent.toUpperCase().indexOf("KFOT") != -1 ||
+					navigator.userAgent.toUpperCase().indexOf("KINDLE FIRE") != -1
+					;
+			}
+
+			/** Indica si el sistema operativo es iOS. */
+			function isIOS() {
+				return (navigator.userAgent.toUpperCase().indexOf("IPAD") != -1) ||
+				(navigator.userAgent.toUpperCase().indexOf("IPOD") != -1) ||
+				(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1);
+			}
+
+			/** Indica si el navegador es Internet Explorer. */
+			function isInternetExplorer() {
+				return !!(navigator.userAgent.match(/MSIE/))	/* Internet Explorer 10 o inferior */
+				|| !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv:11/)) /* Internet Explorer 11 (Opcion 1) */
+				|| !!navigator.userAgent.match(/Trident.*rv[ :]*11\./); /* Internet Explorer 11 (Opcion 2) */
+			}
+			
+			/** Indica si el navegador es Internet Explorer 7 o inferior. */
+			function isInternetExplorer7orLower() {
+				var myNav = navigator.userAgent.toLowerCase();
+				return 7 >= (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+			}
+
+			/** Indica si el navegador es Firefox. */
+			function isFirefox() {
+				return navigator.userAgent.toUpperCase().indexOf("FIREFOX") != -1
+			}
+
+			/** Indica si el navegador es Chrome. */
+			function isChrome() {
+				return navigator.userAgent.toUpperCase().indexOf("CHROME/") != -1 ||
+					navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
+			}
+			
+			/* Metodos que publicamos del objeto */
+			return {
+				isAndroid : isAndroid,
+				isIOS : isIOS,
+				isInternetExplorer : isInternetExplorer,
+				isInternetExplorer7orLower : isInternetExplorer7orLower,
+				isFirefox : isFirefox,
+				isChrome : isChrome				
+			};
+		})(window, undefined);
+		
+		/**
+		 * Funciones de utilidad.
+		 */
 		var AfirmaUtils = ( function (window, undefined) {
 				
 				/* Mayor entero. */
@@ -694,13 +695,15 @@ var AutoScript = ( function ( window, undefined ) {
 		/**
 		 * Cliente para la conexi&oacute;n con el Cliente @firma a traves de Secure WebSockets.
 		 */
-		var AppAfirmaWebSocketClient = ( function (clientAddress, window, undefined) {
+		var AppAfirmaWebSocketClient = ( function (window, undefined) {
 			
 			var PROTOCOL_VERSION = 3;
 			
-			var PORT = "63117";
+			var SERVER_HOST = "127.0.0.1";
+
+			var SERVER_PORT = "63117";
 			
-			var URL_REQUEST = "wss://127.0.0.1:" + PORT;
+			var URL_REQUEST = "wss://" + SERVER_HOST + ":" + SERVER_PORT;
 			
 			var OPERATION_LOAD = "load";
 			
@@ -767,7 +770,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Inicia el proceso de cofirma de una firma electr&oacute;nica. 
 			 */
-			var coSign = function (signB64, dataB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
+			var coSign = function (signB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
 				signOperation("cosign", signB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction);
 			};
 
@@ -1017,12 +1020,12 @@ var AutoScript = ( function ( window, undefined ) {
 					// Invocamos a la aplicacion cliente
 					openNativeApp();
 					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
-					setTimeout(waitAppAndProcessRequest, 3000, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
+					setTimeout(waitAppAndProcessRequest, 3000, AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
 				}
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
 				else {
 					console.log("Enviamos el mensaje al socket abierto");
-					processRequest (MiniApplet.AUTOFIRMA_CONNECTION_RETRIES)
+					processRequest (AutoScript.AUTOFIRMA_CONNECTION_RETRIES)
 				}
 			}
 
@@ -1033,17 +1036,8 @@ var AutoScript = ( function ( window, undefined ) {
 		
 			/** Abre la aplicacion para que empiece a escuchar en el puerto por defecto. */
 			function openNativeApp () {
-
 				idSession = AfirmaUtils.generateNewIdSession();
-
-				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
-					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://websocket?v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession, true));
-				}
-				// En caso contrario, cargamos la version nativa
-				else {
-					bJNLP = false;
-					openUrl("afirma://websocket?v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
-				}
+				openUrl("afirma://websocket?v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
 			}
 			
 
@@ -1093,25 +1087,16 @@ var AutoScript = ( function ( window, undefined ) {
 						// Abrimos el websocket
 						ws = createWebSocket(URL_REQUEST);
 
-						setTimeout(waitAppAndProcessRequest, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, retries - 1);
+						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, retries - 1);
 					}
 					else {
-						// Si se ejecutaba la aplicacion nativa, devolvemos un error
-						if (!bJNLP) {
-							processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
-						}
-						// Si se ejecutaba el cliente WebStart, se reintenta con la aplicacion nativa y se vuelven
-						// a iniciar los intentos de conexion
-						else {
-							openNativeApp();
-							setTimeout(waitAppAndProcessRequest, 3000, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
-						}
+						processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
 					}
 				}
 				else {
 					// Enviamos la peticion
 					console.log("Enviamos el mensaje al socket");
-					processRequest (MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
+					processRequest (AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
 				}
 			}
 			
@@ -1163,7 +1148,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				catch (ex) {
 					console.log("Error en echo: " + ex);
-					setTimeout(sendEcho, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, ws, idSession, retries - 1);
+					setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ws, idSession, retries - 1);
 				}
 			}
 
@@ -1196,7 +1181,7 @@ var AutoScript = ( function ( window, undefined ) {
 					return;
 				}
 
-				// Operaciones de carga
+				// Operaciones de carga y guardado
 				if (currentOperation == OPERATION_WITHOUT_RETURN) {
 					processResponseWithoutReturn(data);
 				}
@@ -1226,11 +1211,12 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 			}
 			
-			
 			/**
 			 * Procesa la respuesta cuando se detecta un error.
 			 */
-			function processErrorResponse(exception, message){
+			function processErrorResponse(exception, message) {
+				errorType = exception;
+				errorMessage = message;
 				if (!!errorCallback) {
 					errorCallback(exception, message);
 				}
@@ -1320,7 +1306,7 @@ var AutoScript = ( function ( window, undefined ) {
 					console.log("No se ha proporcionado funcion callback para procesar el certificado seleccionado");
 				}
 			}
-			
+
 			/**
 			 * Procesa la respuesta de una operacion que firma de lote.
 			 */
@@ -1461,15 +1447,12 @@ var AutoScript = ( function ( window, undefined ) {
 				getCurrentLog : getCurrentLog				
 			}
 	});
-	
+
 		/**
 		 * Cliente para la conexi&oacute;n con el Cliente @firma a trav&eacute;s de un servidor intermedio.
 		 */
 		var AppAfirmaJSWebService = ( function (clientAddress, window, undefined) {
 
-			/* Longitud maxima de una URL en despliegues JNLP. */
-			var MAX_LONG_JNLP_URL = 500;
-			
 			/* Longitud maxima que generalmente se permite a una URL. */
 			var MAX_LONG_GENERAL_URL = 2000;
 			
@@ -1477,11 +1460,11 @@ var AutoScript = ( function ( window, undefined ) {
 			var PROTOCOL_VERSION = 3;
 			
 			/** Tiempo de espera entre intentos de obtener el resultado de la operacion. */
-			var WAITING_CYCLE_MILLIS = isAndroid() || isIOS() ? 4000 : 3000;
+			var WAITING_CYCLE_MILLIS = Platform.isAndroid() || Platform.isIOS() ? 4000 : 3000;
 			
 			/** Numero de intentos maximo para obtener el resultado de la operacion sin respuesta
 			 * de la aplicacion. */
-			var NUM_MAX_ITERATIONS = isAndroid() || isIOS() ? 15 : 10;
+			var NUM_MAX_ITERATIONS = Platform.isAndroid() || Platform.isIOS() ? 15 : 10;
 			
 			/** Indica si ya se ha detectado que la aplicacion no esta instalada  */
 			var wrongInstallation = true;
@@ -1529,7 +1512,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 				currentOperation = OPERATION_SELECT_CERTIFICATE;
 				
-				var idSession = generateNewIdSession();
+				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
 				var opId = "selectcert";
@@ -1552,7 +1535,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
 				if (extraParams != null && extraParams != undefined) {	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 			
 				var url = buildUrl(opId, params);
 
@@ -1584,10 +1567,10 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Inicia el proceso de cofirma de una firma electr&oacute;nica. 
 			 */
-			function coSign (signB64, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
+			function coSign (signB64, algorithm, format, extraParams, successCallback, errorCallback) {
 				signOperation("cosign", signB64, algorithm, format, extraParams, successCallback, errorCallback);
 			}
-
+			
 			/**
 			 * Inicia el proceso de contrafirma de una firma electr&oacute;nica.
 			 */
@@ -1640,7 +1623,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
 				if (algorithm != null && algorithm != undefined) {		params[i++] = {key:"algorithm", value:algorithm}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(signId, params);
@@ -1711,7 +1694,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (outputFileName != null &&
 						outputFileName != undefined) {					params[i++] = {key:"filename", value:outputFileName}; }
-				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(opId, params);
@@ -1773,8 +1756,8 @@ var AutoScript = ( function ( window, undefined ) {
 				if (batchPostSignerUrl != null &&
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"needcert", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } // Espera activa
 				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
 
 				var url = buildUrl(opId, params);
@@ -1819,7 +1802,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (filename != null && filename != undefined) {		params[i++] = {key:"filename", value:filename}; }
 				if (extension != null && extension != undefined) {		params[i++] = {key:"extension", value:extension}; }
 				if (description != null && description != undefined) {	params[i++] = {key:"description", value:description}; }
-				if (!isAndroid() && !isIOS()) {							params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[i++] = {key:"dat", value:dataB64}; }
 				
 				
@@ -1926,13 +1909,6 @@ var AutoScript = ( function ( window, undefined ) {
 			 * GET en un Sistema/Navegador concreto.
 			 */
 			function isURLTooLong(url) {
-
-				// En las llamadas al esquema JNLP, Java soporta una cantidad
-				// limitada de caracteres en la URL
-				if (bJNLP) {
-					return url.length > MAX_LONG_JNLP_URL;
-				}
-
 				return url.length > MAX_LONG_GENERAL_URL;
 			}
 			
@@ -2081,19 +2057,9 @@ var AutoScript = ( function ( window, undefined ) {
 				wrongInstallation = false;
 			
 				// Invocamos al cliente de firma
-				
-				// Si no se pide cargar la aplicacion nativa, ni el entorno lo requiere y
-				// si se ha configurado el servicio JNLP, cargamos la aplicacion JNLP
-				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
-					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + '&arg=' + Base64.encode(intentURL, true));
-				}
-				// En caso contrario, desplegamos la version nativa
-				else {
-					bJNLP = false;
-					openUrl(intentURL);
-				}
+				openUrl(intentURL);
 
-				// Preguntamos repetidamente por el resultado
+					// Preguntamos repetidamente por el resultado
 				if (!!idSession && (!!successCallback || !!errorCallback)) {
 					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, intentURL, successCallback, errorCallback);
 				}
@@ -2117,7 +2083,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// En el caso de Chrome en Android, construimos la URL en forma de Intent
 				var url;
-				if (isChrome() && isAndroid()) {
+				if (Platform.isChrome() && Platform.isAndroid()) {
 					url = 'intent://' + op + '?' + urlParams + "#Intent;scheme=afirma;package=es.gob.afirma;end";
 				}
 				else {
@@ -2441,14 +2407,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
-					// Si estabamos lanzando la aplicacion nativa, interpretamos que no estaba instalada
-					// y devolvemos un error
-					if (!bJNLP) {
-						errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
-						return;
-					}
-					// Si era un despliegue JNLP, configuramos el uso de la aplicacion nativa y reintentamos
-					execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback);
+					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
 					return;
 				}
 				iterations++;
@@ -2551,7 +2510,6 @@ var AutoScript = ( function ( window, undefined ) {
 				getFileNameContentBase64: getFileNameContentBase64,
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				setServlets : setServlets,
-				setJnlpService: setJnlpService,
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
@@ -2560,8 +2518,6 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 		});
 		
-		
-
 		/* Metodos que publicamos del objeto cliente. */
 		return {
 			
@@ -2576,8 +2532,13 @@ var AutoScript = ( function ( window, undefined ) {
 			JAVA_ARGUMENTS : JAVA_ARGUMENTS,
 			SYSTEM_PROPERTIES : SYSTEM_PROPERTIES,
 			setForceAFirma : setForceAFirma,
+			cargarMiniApplet : cargarAppAfirma,
+			echo : echo,
+			setJnlpService: setJnlpService,
+			isJNLP : isJNLP,
+			needNativeAppInstalled : needNativeAppInstalled,
 			
-			/* Publicamos las variables para configurar un almacen de certificados concreto. */		
+			/* Variables para configurar un almacen de certificados concreto. */		
 			KEYSTORE_WINDOWS : KEYSTORE_WINDOWS,
 			KEYSTORE_APPLE : KEYSTORE_APPLE,
 			KEYSTORE_PKCS12 : KEYSTORE_PKCS12,
@@ -2589,41 +2550,47 @@ var AutoScript = ( function ( window, undefined ) {
 			KEYSTORE_JAVACE : KEYSTORE_JAVACE,
 			KEYSTORE_DNIE : KEYSTORE_DNIE,
 
-			/* Constantes para la deteccion de la aplicacion de autofirma */
+			/* Constantes para la configuracion de reintentos de conexion */
 			AUTOFIRMA_LAUNCHING_TIME : AUTOFIRMA_LAUNCHING_TIME,
 			AUTOFIRMA_CONNECTION_RETRIES : AUTOFIRMA_CONNECTION_RETRIES,
-
-			/* Variable para forzar el uso del mecanismo de comunicacion por servidor intermedio */
-			setForceWSMode : setForceWSMode,
-			/* Metodos visibles. */
-			cargarMiniApplet : cargarAppAfirma,
+			
+			/* Metodos de conexion con la aplicacion nativa. */
 			cargarAppAfirma : cargarAppAfirma,
-			echo : echo,
-			checkTime : checkTime,
 			sign : sign,
 			coSign : coSign,
+			cosign : cosign,
 			counterSign : counterSign,
+			countersign : counterSign,
 			signBatch : signBatch,
 			selectCertificate : selectCertificate,
-			saveDataToFile : saveDataToFile,
 			signAndSaveToFile : signAndSaveToFile,
+			getCurrentLog : getCurrentLog,
+			
+			/* Gestion de ficheros. */
+			saveDataToFile : saveDataToFile,
 			getFileNameContentBase64: getFileNameContentBase64,
 			getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
+
+			/* Configuracion */
+			checkTime : checkTime,
+			setKeyStore : setKeyStore,
+			setForceWSMode : setForceWSMode,
+			setServlets : setServlets,
+			setStickySignatory : setStickySignatory,
+			setLocale : setLocale,
+			
+			/* Gestion de errores */
+			getErrorMessage : getErrorMessage,
+			getErrorType : getErrorType,
+			
+			/* Utilidad JavaScript*/
 			getBase64FromText : getBase64FromText,
 			getTextFromBase64 : getTextFromBase64,
 			downloadRemoteData : downloadRemoteData,
-			setKeyStore : setKeyStore,
-			setServlets : setServlets,
-			setJnlpService: setJnlpService,
-			setStickySignatory : setStickySignatory,
-			setLocale : setLocale,
-			getErrorMessage : getErrorMessage,
-			getErrorType : getErrorType,
-			getCurrentLog : getCurrentLog,
-			isAndroid : isAndroid,
-			isIOS : isIOS,
-			isJNLP : isJNLP,
-			needNativeAppInstalled : needNativeAppInstalled
+			
+			/* Comprobacion de entorno */
+			isAndroid : Platform.isAndroid,
+			isIOS : Platform.isIOS
 		};
 })(window, undefined);
 
