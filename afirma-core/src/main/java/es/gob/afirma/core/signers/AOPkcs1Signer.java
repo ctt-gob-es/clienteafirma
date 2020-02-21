@@ -10,8 +10,9 @@
 package es.gob.afirma.core.signers;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.interfaces.DSAPrivateKey;
@@ -37,7 +38,15 @@ public final class AOPkcs1Signer implements AOSigner {
 	 * @param key Clave privada a usar para la firma.
 	 * @param certChain Se ignora, esta clase no necesita la cadena de certificados.
 	 * @param data Datos a firmar.
-	 * @param extraParams Se ignora, esta clase no acepta par&aacute;metros adicionales.
+	 * @param extraParams Es posible indicar como par&aacute;metro un proveedor de seguridad espec&iacute;fico para un
+	 *                    determinado tipo de clave privada.
+	 *                    Para ello debe indicarse como clave de propiedad el nombre cualificado de la clase precedido
+	 *                    de "Provider." y como valor el nombre del proveedor. Posibles ejemplos de este uso ser&iacute;an:
+	 *                    <p><code>
+	 *                    	Provider.com.aet.android.providerPKCS15.SEPrivateKey=AETProvider<br>
+	 *                      Provider.es.gob.jmulticard.jse.provider.DniePrivateKey=DNIeJCAProvider<br>
+	 *                      Provider.es.gob.jmulticard.jse.provider.ceres.CeresPrivateKey=CeresJCAProvider
+	 *                    </code></p>
 	 * @return Firma PKCS#1 en binario puro no tratado.
 	 * @throws AOException en caso de cualquier problema durante la firma. */
 	@Override
@@ -54,45 +63,36 @@ public final class AOPkcs1Signer implements AOSigner {
 		}
 
 		if (key instanceof RSAPrivateKey && !(algorithm.toLowerCase().endsWith("withrsa") || algorithm.toLowerCase().endsWith("withrsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.warning(
+			LOGGER.info(
 				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo RSA" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		else if (key instanceof ECPrivateKey && !(algorithm.toLowerCase().endsWith("withecdsa") || algorithm.toLowerCase().endsWith("withecdsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.warning(
+			LOGGER.info(
 				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo ECDSA" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		else if (key instanceof DSAPrivateKey && !(algorithm.toLowerCase().endsWith("withdsa") || algorithm.toLowerCase().endsWith("withdsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.warning(
+			LOGGER.info(
 				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo DSA" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
-		final Signature sig;
+		final Provider p;
+		if (extraParams != null) {
+			final String providerName = extraParams.getProperty("Provider." + key.getClass().getName()); //$NON-NLS-1$
+			p = Security.getProvider(providerName);
+		}
+		else {
+			p = null;
+		}
 
+		final Signature sig;
 		try {
-			// En Android las capacidades de los proveedores, aunque se declaren bien, no se manejan adecuadamente
-			if ("com.aet.android.providerPKCS15.SEPrivateKey".equals(key.getClass().getName())) { //$NON-NLS-1$
-				sig = Signature.getInstance(algorithm, "AETProvider"); //$NON-NLS-1$
-			}
-			else if ("es.gob.jmulticard.jse.provider.DniePrivateKey".equals(key.getClass().getName())) { //$NON-NLS-1$
-				java.util.logging.Logger.getLogger("es.gob.afirma").info("Detectada clave privada DNIe 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
-				sig = Signature.getInstance(algorithm, "DNIeJCAProvider"); //$NON-NLS-1$
-			}
-			else if ("es.gob.jmulticard.jse.provider.ceres.CeresPrivateKey".equals(key.getClass().getName())) { //$NON-NLS-1$
-				java.util.logging.Logger.getLogger("es.gob.afirma").info("Detectada clave privada CERES 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
-				sig = Signature.getInstance(algorithm, "CeresJCAProvider"); //$NON-NLS-1$
-			}
-			else {
-				sig = Signature.getInstance(algorithm);
-			}
+			sig = p != null ? Signature.getInstance(algorithm, p) : Signature.getInstance(algorithm);
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOException("No se soporta el algoritmo de firma (" + algorithm + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		catch (final NoSuchProviderException e) {
-			throw new AOException("No hay un proveedor para el algoritmo '" + algorithm + "' con el tipo de clave '" + key.getAlgorithm() + "': " + e, e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		try {

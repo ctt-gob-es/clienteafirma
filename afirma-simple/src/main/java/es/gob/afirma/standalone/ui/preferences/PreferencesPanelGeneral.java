@@ -304,10 +304,10 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.signatureAlgorithms.setModel(
 			new DefaultComboBoxModel<>(
 				new String[] {
-					"SHA1withRSA", //$NON-NLS-1$
-					"SHA512withRSA", //$NON-NLS-1$
-					"SHA384withRSA", //$NON-NLS-1$
-					"SHA256withRSA" //$NON-NLS-1$
+					"SHA1", //$NON-NLS-1$
+					"SHA512", //$NON-NLS-1$
+					"SHA384", //$NON-NLS-1$
+					"SHA256" //$NON-NLS-1$
 				}
 			)
 		);
@@ -347,8 +347,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		);
 
 		this.massiveOverwrite.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.160") //$NON-NLS-1$
-				);
+			SimpleAfirmaMessages.getString("PreferencesPanel.160") //$NON-NLS-1$
+		);
 		this.massiveOverwrite.setMnemonic('S');
 		this.massiveOverwrite.addItemListener(modificationListener);
 		this.massiveOverwrite.addKeyListener(keyListener);
@@ -401,7 +401,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		netConstraints.gridx++;
 		netConfigInnerPanel.add(proxyConfigButton, netConstraints);
 
-
 		gbc.gridy++;
 		mainPanel.add(signGeneralPanel, gbc);
 		gbc.gridy++;
@@ -442,11 +441,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
     		}
     		catch (final ConfigurationException e) {
     			AOUIFactory.showErrorMessage(
-						null,
-						e.getMessage(),
-						SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
-						);
+					null,
+					e.getMessage(),
+					SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
     			changeProxyDlg(container);
     			return;
 			}
@@ -568,4 +567,3 @@ final class PreferencesPanelGeneral extends JScrollPane {
 	}
 
 }
-

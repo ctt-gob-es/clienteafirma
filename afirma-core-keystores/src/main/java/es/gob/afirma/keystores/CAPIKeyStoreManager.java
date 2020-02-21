@@ -257,7 +257,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
             return null;
         }
 
-        X509Certificate cert = null;
+        final X509Certificate cert;
         try {
             cert = (X509Certificate) capiKsMy.getCertificate(alias);
         }
@@ -269,7 +269,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
             LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
-        return  cert;
+        return cert;
 
     }
 

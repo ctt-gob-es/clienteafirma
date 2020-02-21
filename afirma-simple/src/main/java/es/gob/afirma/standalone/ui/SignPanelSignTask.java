@@ -178,7 +178,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	signConfig.addExtraParam(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
             }
 
-            final String signatureAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
+            final String signatureHashAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
 
             byte[] data;
             try {
@@ -196,12 +196,37 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	final byte[] dataToSign = pluginsPreProcess(
         		data,
-        		signConfig.getSignatureFormatName());
+        		signConfig.getSignatureFormatName()
+    		);
+        	final String signatureAlgorithm;
+        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
+        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
+        	}
+        	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
+        	}
+        	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
+        		signatureAlgorithm = signatureHashAlgorithm + "withECDSA"; //$NON-NLS-1$
+        	}
+        	else {
+        		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.123", certAlgo)); //$NON-NLS-1$
+        		this.signExecutor.finishTask();
+        		return;
+        	}
 
         	// Ejecutamos la operacion de firma apropiada
             try {
-                signResult = signData(dataToSign, currentSigner, signConfig.getCryptoOperation(),
-                		signatureAlgorithm, pke, signConfig.getExtraParams(), onlyOneFile, this.parent);
+                signResult = signData(
+            		dataToSign,
+            		currentSigner,
+            		signConfig.getCryptoOperation(),
+            		signatureAlgorithm,
+            		pke,
+            		signConfig.getExtraParams(),
+            		onlyOneFile,
+            		this.parent
+        		);
             }
             catch(final AOCancelledOperationException e) {
             	this.signExecutor.finishTask();
@@ -336,56 +361,61 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
      * @throws IOException Cuando se produce un error relacionado a la lectura de los datos a firmar.
      * @throws SingleSignatureException Cuando se produce un error en una firma dentro de un proceso masivo.
      */
-    private static byte[] signData(final byte[] data, final AOSigner signer, final CryptoOperation cop, final String algorithm,
-    		final PrivateKeyEntry pke, final Properties extraParams, final boolean onlyOneFile, final Component parent)
-    				throws AOException, IOException, SingleSignatureException {
-
+    private static byte[] signData(final byte[] data,
+    						       final AOSigner signer,
+    						       final CryptoOperation cop,
+    						       final String algorithm,
+    						       final PrivateKeyEntry pke,
+    						       final Properties extraParams,
+    						       final boolean onlyOneFile,
+    						       final Component parent) throws AOException,
+                                                                  IOException,
+                                                                  SingleSignatureException {
     	byte[] signResult;
-
     	try {
     		switch (cop) {
     		case COSIGN:
     			signResult = signer.cosign(
-    					data,
-    					algorithm,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     			break;
 
     		case COUNTERSIGN_LEAFS:
     			signResult = signer.countersign(
-    					data,
-    					algorithm,
-    					CounterSignTarget.LEAFS,
-    					null,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					CounterSignTarget.LEAFS,
+					null,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     			break;
 
     		case COUNTERSIGN_TREE:
     			signResult = signer.countersign(
-    					data,
-    					algorithm,
-    					CounterSignTarget.TREE,
-    					null,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					CounterSignTarget.TREE,
+					null,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     			break;
 
     		default:	// Firma
     			signResult = signer.sign(
-    					data,
-    					algorithm,
-    					pke.getPrivateKey(),
-    					pke.getCertificateChain(),
-    					extraParams
-    					);
+					data,
+					algorithm,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
+					extraParams
+				);
     		}
     	}
     	catch(final PdfIsCertifiedException e) {

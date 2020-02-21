@@ -88,7 +88,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	}
 
 	/** Establece la opci&oacute;n de configuraci&oacute;n needcert
-	 * @param needcert Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 * @param certNeeded Opci&oacute;n de configuraci&oacute;n que determina si se debe
 	 *         devolver el certificado utilizado para firmar el lote ({@code true}) o
 	 *         no ({@code false}). */
 	public void setCertNeeded(final boolean certNeeded) {
