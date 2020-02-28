@@ -220,7 +220,7 @@ public final class SignatureService extends HttpServlet {
 		try {
 			params = new String(AOUtil.getDataFromInputStream(request.getInputStream())).split("&"); //$NON-NLS-1$
 		}
-		catch (final Exception e) {
+		catch (final Exception | Error e) {
 			LOGGER.severe("No se pudieron leer los parametros de la peticion: " + e); //$NON-NLS-1$
 			return;
 		}
