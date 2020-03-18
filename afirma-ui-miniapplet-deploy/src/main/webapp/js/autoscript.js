@@ -100,24 +100,8 @@ var AutoScript = ( function ( window, undefined ) {
         /**
          * Indica si el navegador soporta WebSockets.
          */
-        function checkWebSocket() {
-        	var supported = 'WebSocket' in window || 'MozWebSocket' in window;
-        	// Si soporta WebSockets y estamos en Internet Explorer, hacemos un
-        	// primer intento de conexion (aunque no este disponible el servidor)
-        	// Esto es necesario para que funcione posteriormente con determinadas
-        	// opciones de red
-        	if (supported && Platform.isInternetExplorer()) {
-	        	var wsTest;
-	        	try {
-	        		wsTest = new WebSocket("wss:\\127.0.0.1:63117");
-	        		wsTest.close();
-	        	}
-	        	catch (e) {
-	        		// La creacion del socket con errores hace saltar esta excepcion en IE y Edge Legacy.
-	        		// La ignoramos. 
-	        	}
-        	}
-        	return supported;
+        function isWebSocketsSupported() {
+        	return 'WebSocket' in window || 'MozWebSocket' in window;
         }
 
 		/** Comprueba si una cadena de texto es una URL (http/https). La alternativa implicaria ser un Base64. */ 
@@ -563,9 +547,15 @@ var AutoScript = ( function ( window, undefined ) {
 			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
 				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
 			}
-			// Si podemos utilizar un WebSocket local, usamos WebSockets 
-			else if (checkWebSocket()) {
+			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
+			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
+			// una opcion de red concreta), usamos WebSockets 
+			else if (isWebSocketsSupported() && !Platform.isInternetExplorer()) {
 				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
+			}
+			// Si no se esta en una version antigua de Internet Explorer o Safari
+			else if (!Platform.isInternetExplorer10orLower() && !Platforma.isSafari10()) {
+				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 			}
 			// En cualquier otro caso, usaremos servidor intermedio
 			else {
@@ -613,12 +603,37 @@ var AutoScript = ( function ( window, undefined ) {
 				|| !!navigator.userAgent.match(/Trident.*rv[ :]*11\./); /* Internet Explorer 11 (Opcion 2) */
 			}
 			
+			/** Indica si el navegador es Internet Explorer 10 o inferior. */
+			function isInternetExplorer10orLower() {
+				return !!(navigator.userAgent.match(/MSIE/));
+			}
+			
 			/** Indica si el navegador es Internet Explorer 7 o inferior. */
 			function isInternetExplorer7orLower() {
 				var myNav = navigator.userAgent.toLowerCase();
 				return 7 >= (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
 			}
 
+			/** Determina con un boolean si se accede a la web con Safari 10. */
+			function isSafari10() {
+				navigator.sayswho= (function(){
+				    var ua= navigator.userAgent, tem, 
+				    M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+				    if(/trident/i.test(M[1])){
+				        tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+				        return 'IE '+(tem[1] || '');
+				    }
+				    if(M[1]=== 'Chrome'){
+				        tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+				        if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+				    }
+				    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+				    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+				    return M.join(' ');
+				})();
+				return navigator.sayswho == 'Safari 10';
+			}
+			
 			/** Indica si el navegador es Firefox. */
 			function isFirefox() {
 				return navigator.userAgent.toUpperCase().indexOf("FIREFOX") != -1
@@ -635,7 +650,9 @@ var AutoScript = ( function ( window, undefined ) {
 				isAndroid : isAndroid,
 				isIOS : isIOS,
 				isInternetExplorer : isInternetExplorer,
+				isInternetExplorer10orLower : isInternetExplorer10orLower,
 				isInternetExplorer7orLower : isInternetExplorer7orLower,
+				isSafari10 : isSafari10,
 				isFirefox : isFirefox,
 				isChrome : isChrome				
 			};
@@ -1446,7 +1463,1093 @@ var AutoScript = ( function ( window, undefined ) {
 				getErrorType : getErrorType,
 				getCurrentLog : getCurrentLog				
 			}
-	});
+		});
+
+		/**
+		 * Cliente para la conexi&oacute;n con el Cliente @firma a traves de una conexion directa
+		 * por un socket seguro.
+		 */
+		var AppAfirmaJSSocket = ( function (clientAddress, window, undefined) {
+
+			/**
+			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
+			 */
+			var errorMessage = '';
+			var errorType = '';
+
+			/** Puerto a traves del que se ha conectado con la aplicacion nativa. */
+			var port = "";
+			
+			var idSession;
+			
+			var PROTOCOL_VERSION = 1;
+			
+			/* Tiempo de retardo para peticiones */
+			var WAITING_TIME = 500;
+			
+			var URL_REQUEST = "https://127.0.0.1:";
+			
+			/* Respuesta del socket a la peticion realizada */
+			var totalResponseRequest = "";
+			
+			/* Numero de fragmentos recibidos del socket */
+			var recibidos = 0;
+			
+			/* Variable de control para la operacion seleccion de certificado */ 
+			var isSelectCertOperation = false;
+			
+			/* Variable de control para la operacion guardar */
+			var isSaveOperation = false;
+			
+			/* Variable de control para la operacion de ejecutar operacion criptografica y guardar */
+			var isOpAndSaveOperation = false;
+			
+			/* Variable de control para la operacion batch */
+			var isBatchOperation = false;
+			
+			/* URL de la peticion HTTPS */
+			var urlHttpRequest = "";
+			
+			/* Maxima longitud permitida para una URL. Si la url se excede se divide
+			 * la peticion en fragmentos. Con Internet Explorer y Firefox a partir de
+			 * la version 49 se producen corrupciones de datos con el valor original
+			 * de 1Mb, asi que se reduce este a un valor seguro para ese navegador. */
+			var URL_MAX_SIZE = Platform.isInternetExplorer() ? 12000 : Platform.isFirefox() ? 458752 : 1048576;
+			
+			/* Indica si se ha establecido la conexion o no */
+			var connection = false;
+		
+			/* Dominio desde el que se realiza la llamada al servicio */
+			var baseUri = clientAddress;
+
+			/* Almacen de claves cargado por defecto */
+			var defaultKeyStore = null;
+
+			/* Funcion callback que se lanza al obtener un resultado */ 
+			var successCallback = null;
+			
+			/* Funcion error callback */
+			var errorCallback = null;
+
+			/* URL de la operacion que se solicita actualmente. */
+			var currentOperationUrl = null;
+			
+			/**
+			 * Establece el almacen de certificados de que se debe utilizar por defecto.
+			 */
+			function setKeyStore (keystore) {
+				defaultKeyStore = keystore;
+			}
+			
+			/**
+			 * Inicia el proceso de seleccion de certificado.
+			 */
+			function selectCertificate (extraParams, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				selectCertByService(extraParams);
+			}
+
+			function selectCertByService (extraParams) {
+				
+				var data = new Object();
+				data.op = generateDataKeyValue ("op", "selectcert");
+				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? defaultKeyStore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+				
+				execAppIntent(buildUrl(data));
+			}
+			
+			/**
+			 * Inicia el proceso de firma electronica.
+			 * Implementada en el applet Java de firma
+			 */
+			function sign (dataB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signByService("sign", dataB64, algorithm, format, extraParams);
+			}
+
+			/**
+			 * Inicia el proceso de cofirma de una firma electr&oacute;nica. 
+			 * Implementada en el applet Java de firma.
+			 */
+			function coSign (signB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signByService("cosign", signB64, algorithm, format, extraParams);
+			}
+
+			/**
+			 * Inicia el proceso de contrafirma de una firma electr&oacute;nica.
+			 * Implementada en el applet Java de firma. 
+			 */
+			function counterSign (signB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signByService("countersign", signB64, algorithm, format, extraParams);
+			}
+
+			/**
+			 * Realiza una operacion de firma/multifirma comunicandose con la aplicacion nativa por socket.
+			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
+			 * @param dataB64 Datos o firma en base 64.
+			 * @param algorithm Algoritmo de firma.
+			 * @param format Formato de firma.
+			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
+			 */
+			function signByService (signId, dataB64, algorithm, format, extraParams) {
+
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var data = generateDataToSign(signId, algorithm, format, extraParams, dataB64, defaultKeyStore);
+				
+				execAppIntent(buildUrl(data));
+			}
+
+			/**
+			 * Inicia el proceso de firma por lotes.
+			 */
+			function signAndSaveToFile (opId, dataB64, algorithm, format, extraParams, outputFileName, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signAndSaveFileByService(opId, dataB64, algorithm, format, extraParams, outputFileName);
+			}
+
+			/**
+			 * Realiza una operacion de firma/multifirma seguida del guardado del resultado comunicandose
+			 * con la aplicacion nativa por socket.
+			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
+			 * @param dataB64 Datos o firma en base 64.
+			 * @param algorithm Algoritmo de firma.
+			 * @param format Formato de firma.
+			 * @param extraParams Parametros para la configuraci&oacute;n de la operaci&oacute;n.
+			 */
+			function signAndSaveFileByService (signId, dataB64, algorithm, format, extraParams, outputFileName) {
+
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var data = generateDataToSignAndSave(signId, algorithm, format, extraParams, outputFileName, dataB64, defaultKeyStore);
+
+				execAppIntent(buildUrl(data));
+			}
+
+			/**
+			 * Inicia el proceso de firma por lotes.
+			 */
+			function signBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signBatchByService(batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams);
+			}
+			
+			function signBatchByService (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams) {
+				
+				if (batchB64 == undefined || batchB64 == "") {
+					batchB64 = null;
+				}
+				
+				if (batchB64 != null) {
+					batchB64 = batchB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+				
+				var data = generateDataToBatch(defaultKeyStore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64);
+				execAppIntent(buildUrl(data));
+			}
+			
+			/**
+			 * Genera el objeto con los datos de la transaccion para la firma
+			 */
+			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op","batch");
+				data.keystore = generateDataKeyValue("keystore", keystore != null ? keystore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
+				data.batchpresignerurl = generateDataKeyValue("batchpresignerurl", batchPreSignerUrl);
+				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
+				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+
+				return data;
+			}
+
+			/**
+			 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
+			 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
+			 */
+			function buildUrl (arr) {
+
+				// Operacion seleccionada
+				var intentURL;
+				var params = [];
+				// Convertimos el objeto con los datos en un array del tipo key value
+				for(var x in arr){
+				  params.push(arr[x]);
+				}
+
+				if (params != null && params != undefined && params.length > 0) {
+					intentURL = 'afirma://' + encodeURIComponent(arr.op.value) + '?';	// Agregamos como dominio el identificador del tipo de operacion
+					for (var i = 0; i < params.length; i++) {
+						if (params[i].value != null && params[i].value != "null") {
+							intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
+						}
+					}
+				}
+				return intentURL;
+			}
+			
+			function execAppIntent (url) {
+				
+				// Primera ejecucion, no hay puerto definido
+				if (port == "") {
+					// Calculamos los puertos
+					var ports = getRandomPorts();
+					// Invocamos a la aplicacion nativa
+					openNativeApp(ports);
+					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
+					setTimeout(executeEchoByServiceByPort, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, url);
+				}
+				// Se ha ejecutado anteriormente y tenemos un puerto calculado.
+				else {
+					connection = false;
+					executeEchoByService (port, url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES)
+				}
+			}
+			
+			/**
+			 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
+			 */
+			function getRandomPorts () {
+				var MIN_PORT = 49152;
+				var MAX_PORT = 65535;
+				var ports = new Array();
+				ports[0] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
+				ports[1] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
+				ports[2] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
+				return ports;
+			}
+		
+		
+			function openNativeApp (ports) {
+			
+				var portsLine = "";
+				for (var i = 0; i < ports.length; i++) {
+					portsLine += ports[i];
+					if (i < (ports.length - 1)) {
+						portsLine += ",";
+					}
+				}
+				idSession = AfirmaUtils.generateNewIdSession();
+				
+				// Si no se dan las condiciones que requieren el uso de la aplicacion nativa,
+				// por entorno y si se ha configurado la URL del servicio, cargamos la version JNLP
+				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://service?ports=" + portsLine + "&amp;v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession, true));
+				}
+				// En caso contrario, cargamos la version nativa
+				else {
+					bJNLP = false;
+					openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
+				}
+			}
+
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de firma/multifirma
+			 */
+			function generateDataToSign(signId, algorithm, format, extraParams, dataB64, keystore) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op", signId);
+				data.keystore = generateDataKeyValue ("keystore", keystore != null ? keystore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
+				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
+				data.format = generateDataKeyValue ("format", format); 
+				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+
+				return data;
+			}
+
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de firma/multifirma seguida del guardado del resultado
+			 */
+			function generateDataToSignAndSave(signId, algorithm, format, extraParams, outputFileName, dataB64, keystore) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op", "signandsave");
+				data.cryptoOp = generateDataKeyValue("cop", signId);
+				data.keystore = generateDataKeyValue ("keystore", keystore != null ? keystore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
+				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
+				data.format = generateDataKeyValue ("format", format);
+				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.filename = generateDataKeyValue ("filename", outputFileName);
+				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+
+				return data;
+			}
+			
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de carga/multicarga
+			 */
+			function generateDataToLoad(loadId, title, extensions, description, filePath, multiload) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op", loadId);
+				data.title = generateDataKeyValue("title", title);
+				data.extensions = generateDataKeyValue("exts", extensions);
+				data.description = generateDataKeyValue("desc", description);
+				data.filePath = generateDataKeyValue("filePath", filePath);
+				data.multiload = generateDataKeyValue("multiload", multiload);
+				return data;
+			}
+			
+			function executeEchoByServiceByPort (ports, url) {
+				connection = false;
+				var semaphore = new Object();
+				semaphore.locked = false;
+				executeEchoByService (ports[0], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
+				executeEchoByService (ports[1], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
+				executeEchoByService (ports[2], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
+			}
+
+			/**
+			* Intenta conectar con la aplicacion nativa mandando una peticion echo al puerto.
+			* Si la aplicacion responde lanzamos la ejecucion del servicio.
+			* Si la aplicacion no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
+			* peticion sea aceptada.
+			*/
+			function executeEchoByService (currentPort, url, timeoutResetCounter, semaphore) {
+
+				
+				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada porque
+				// al invocar muchas peticiones consecutivas, en caso de introducir un retardo con setTimeout,
+				// queremos que las peticiones se realicen siempre para la ultima operacion establecida y no
+				// la que hubiese antes de empezar la espera (lo que ocurriria si le pasasemos la URL como
+				// parametro).
+				currentOperationUrl = url;
+				
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", URL_REQUEST + currentPort + "/afirma", true);
+				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				httpRequest.onreadystatechange = function() {
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText, true) == "OK" && !connection) {
+						port = currentPort;
+						urlHttpRequest = URL_REQUEST + port + "/afirma";
+						connection = true;
+						if (semaphore) {
+							semaphore.locked = true;
+						}
+						// Comprobamos si es una operacion de seleccion de certificado
+						isSelectCertOperation = currentOperationUrl.indexOf("afirma://selectcert") > -1;
+						// Comprobamos si es una operacion de guardado.
+						isSaveOperation = currentOperationUrl.indexOf("afirma://save") > -1;
+						// Comprobamos si es una operacion de firma por lotes
+						isBatchOperation = currentOperationUrl.indexOf("afirma://batch") > -1;
+						// Comprobamos si es una operacion criptografica mas guardado del resultado
+						isOpAndSaveOperation = currentOperationUrl.indexOf("afirma://signandsave") > -1;
+						executeOperationByService();
+					}
+					else if ((!semaphore || !semaphore.locked) && !connection && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
+						timeoutResetCounter--;
+						
+						// Si ya se conecto antes con la aplicacion pero ahora llevamos la mitad de los intentos
+						// sin conectar, consideramos que se ha tumbado y hay que relanzarla
+						if (port != "" && timeoutResetCounter < AutoScript.AUTOFIRMA_CONNECTION_RETRIES/2) {
+							port = "";
+							if (semaphore) {
+								semaphore.locked = true;
+							}
+							timeoutResetCounter = AutoScript.AUTOFIRMA_CONNECTION_RETRIES;
+							execAppIntent(currentOperationUrl);							
+						}
+						// Si hemos agotado todos los reintentos consideramos que la aplicacion no esta instalada
+						else if (timeoutResetCounter == 0) {
+							if (!semaphore || !semaphore.locked) {
+								if (semaphore) {
+									semaphore.locked = true;
+								}
+								errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
+							}
+							return;
+						}
+						// Aun quedan reintentos
+						else {
+							setTimeout(executeEchoByServiceDelayed, AutoScript.AUTOFIRMA_LAUNCHING_TIME, currentPort, timeoutResetCounter, semaphore);
+						}
+					}
+				}
+				
+				if (!connection) {
+					// Mandamos un echo con - por lo que las variables de control se resetearan
+					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa
+					// que ha llegado al final y no se quede en espera
+					httpRequest.send("echo=-idsession=" + idSession + "@EOF");
+					//console.log("probamos puerto " +currentPort)
+				}
+			}
+
+			/** Funcion que ejecuta la llamada a la funcion eco previa a una llamada de operacion
+			 * de tal forma que esta preparada para ser lanzada desde un setTimeout. Esta funcion
+			 * toma la URL de la operacion de la variable global "currentOperationUrl" ya que, en
+			 * una ejecucion rapida de firmas en serie, si se pasase por parametro, en el momento
+			 * de la ejecucion podria ejecutar la operacion con una URL de una operacion anterior. */
+			function executeEchoByServiceDelayed (currentPort, timeoutResetCounter, semaphore) {
+				executeEchoByService (currentPort, currentOperationUrl, timeoutResetCounter, semaphore);
+			}
+			
+			
+			/**
+			* Comprueba si hay que dividir los datos que se se mandan a la aplicacion nativa.
+			* Si hay que dividirlos se llama a la funcion executeOperationRecursive.
+			* Si cabe en un solo envio se manda directamente.
+			*/
+			function executeOperationByService () {
+				
+				var url = currentOperationUrl;
+				
+				// Si el envio se debe fragmentar, llamamos a una funcion que se encarga
+				// de mandar la peticion recursivamente
+				if (url.length > URL_MAX_SIZE) {
+					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
+					return;
+				}
+				
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				
+				// El envio no se fragmenta
+				httpRequest.onreadystatechange = function() {
+					if (httpRequest.status == 404) {
+						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+					}
+					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
+					if (isSaveOperation) {
+						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						}
+						return;
+					}
+					// El resto de operaciones deben componer el resultado
+					else {
+						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+								return;
+							}
+							// Juntamos los fragmentos
+							totalResponseRequest = "";
+							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+						}
+						// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
+						else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
+							setTimeout(executeOperationByService, WAITING_TIME);
+						}
+					}
+				}
+				try {
+					httpRequest.onerror = function(e) {
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0) {
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// error desconocido 
+						else {
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
+					}
+				}
+				catch (e) {
+					// Vacio
+				}
+				// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+				httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession + "@EOF");
+			}
+			
+			/**
+			* Manda los datos a la aplicacion nativa en varios fragmentos porque ha habido que dividir los datos.
+			* Se va mandando cada peticion cuando se reciba la anterior.
+			*/
+			function executeOperationRecursive (url, i, iFinal) {
+				
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				var urlToSend = url.substring(((i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
+				httpRequest.onreadystatechange = function (evt) {
+					if (httpRequest.status == 404) {
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						return;
+					}
+					// Respuesta afirmativa, hay que mandar mas fragmentos
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "" ) {
+						recibidos++;
+						
+						// Faltan mas peticiones por enviar
+						if (Base64.decode(httpRequest.responseText, true) == "MORE_DATA_NEED") {
+							if (recibidos < iFinal ){
+								//console.log("recibido el fragmento "+recibidos + "de "+iFinal)
+								executeOperationRecursive(url, i+1, iFinal);
+							}
+						}
+						// Todas las peticiones se han recibido, hay que mandar operacion firma
+						// Respuesta es OK
+						else if (Base64.decode(httpRequest.responseText, true) == "OK") {
+							if(recibidos == iFinal){
+								//console.log("recibido todo, realizamos la operacion");
+								recibidos = 0;
+								doFirm();
+							}
+						}
+						else if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						}
+					}
+					else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
+						setTimeout(executeOperationRecursive, WAITING_TIME, url, i, iFinal);
+					}
+				}
+				try {
+					httpRequest.onerror = function(e) { 
+						// Status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// Error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
+					}
+				}
+				catch (e) {
+					// Vacio
+				}
+				// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+				httpRequest.send("fragment=@" + i + "@" + iFinal + "@"  + Base64.encode(urlToSend, true) + "idsession=" + idSession +"@EOF");
+				//console.log("mandado parte "+i+" de"+iFinal);
+	
+			}
+			
+			/**
+			 * Realiza una operacion que se ha mandando en varios fragmentos.
+			 */
+			function doFirm () {
+				httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				httpRequest.onreadystatechange = function() {
+
+					if (httpRequest.status == 404) {
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+					}
+
+					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
+					// porque no requiere respuesta
+					if (isSaveOperation) {
+						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						}
+						return;
+					}
+					else {
+						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+							if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+								successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+							}
+							totalResponseRequest = "";
+							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+						}
+						// No recibimos la respuesta, volvemos a llamar.
+						else {
+							if (httpRequest.status == 0 && httpRequest.readyState == 0 ) {
+								setTimeout(doFirm, WAITING_TIME);	
+							}
+						}
+					}
+				}
+				try {
+					httpRequest.onerror = function(e) { 
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
+					}
+				}
+				catch (e) {
+					// Vacio
+				}
+				httpRequest.send("firm=idsession=" + idSession +"@EOF");
+			}
+
+			/**
+			 * Se encarga de solicitar y montar la respuesta de la operacion realizada.
+			 */
+			function addFragmentRequest (part, totalParts){
+				httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				httpRequest.onreadystatechange = function() {
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+						if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+							return;
+						}
+						//console.log("recibida la parte " + part);
+						totalResponseRequest += Base64.decode(httpRequest.responseText, true);
+						// Si estan todas las partes llamamos al successcallback
+						if (part == totalParts) {
+							// Es una operacion de firma por lotes y tiene un callback propio
+							if (isBatchOperation) {
+								successBatchResponseFunction(totalResponseRequest);
+								isBatchOperation = false;
+							}
+							// Es una operacion de seleccion de certificados y tiene un callback propio
+							else if (isSelectCertOperation) {
+								successSelectCertServiceResponseFunction(totalResponseRequest);
+								isSelectCertOperation = false;
+							}
+							// Es cualquier otra operacion que requiere respuesta
+							else {
+								successServiceResponseFunction(totalResponseRequest);
+							}
+							totalResponseRequest = "";
+						}
+						else {
+							addFragmentRequest(part + 1, totalParts);
+						}
+					}
+					else {
+						if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0){
+							setTimeout(addFragmentRequest, WAITING_TIME, part, totalParts);
+						}
+					}
+				}
+				try {
+					httpRequest.onerror = function(e) { 
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+						}
+						// error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
+					}
+				}
+				catch (e) {
+					// Vacio
+				}
+				if (part <= totalParts){
+					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+					httpRequest.send("send=@"+part+"@"+totalParts+"idsession=" + idSession +"@EOF");
+					//console.log("solicitarmos la parte "+part+" de "+ totalParts)
+				}
+			}
+			
+			/**
+			 * Lee el resultado devuelto por el servicio, 'CANCEL' o empieza por 'SAF-', ejecutara el metodo
+			 * de error, si es 'OK' o cualquier otra cosa (que se intepretara como el resultado en base 64)
+			 * se ejecutara el metodo de exito. En este ultimo caso, se descifrara el resultado. 
+			 * @param data Resultado obtenido.
+			 */
+			function successSelectCertServiceResponseFunction (data) {
+				// No se ha obtenido respuesta o se notifica la cancelacion
+				if (data == undefined || data == null || data == "CANCEL") {
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					return;
+				}
+
+				// Se ha producido un error
+				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+					errorCallback("java.lang.Exception", data);
+					return;
+				}
+
+				// Se ha producido un error y no se ha identificado el tipo
+				if (data == "NULL") {
+					errorCallback("java.lang.Exception", "Error desconocido");
+					return;
+				}
+
+				successCallback(data.replace(/\-/g, "+").replace(/\_/g, "/"));
+			}
+
+			/**
+			 * Lee el resultado devuelto por el servicio, 'CANCEL' o empieza por 'SAF-', ejecutara el metodo
+			 * de error, si es 'OK' o cualquier otra cosa (que se intepretara como el resultado en base 64)
+			 * se ejecutara el metodo de exito. En este ultimo caso, se descifrara el resultado. 
+			 * @param data Resultado obtenido.
+			 */
+			function successServiceResponseFunction (data) {
+				// No se ha obtenido respuesta o se notifica la cancelacion
+				if (data == undefined || data == null || data == "CANCEL") {
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					return;
+				}
+				
+				// Termina bien y no devuelve ningun resultado o es una operacion guardado
+				if (data == "OK") {
+					successCallback(data, null);
+					return;
+				}
+				
+				// Error de memoria
+				if (data == "MEMORY_ERROR") {
+					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					return;
+				}
+				
+				// Se ha producido un error
+				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+					errorCallback("java.lang.Exception", data);
+					return;
+				}
+
+				// Se ha producido un error y no se ha identificado el tipo
+				if (data == "NULL") {
+					errorCallback("java.lang.Exception", "Error desconocido");
+					return;
+				}
+				
+				// Operacion guardado con exito
+				if (data == "SAVE_OK") {
+					if (successCallback) {
+						successCallback(data);
+					}
+					return;
+				}
+				
+				// Vengo de getCurrentLog
+				if (data.length > 150 && data.substr(0, 150).indexOf("<log>") != -1) {
+					var log = " === JAVASCRIPT INFORMATION === " +
+					"\nnavigator.appCodeName: " + navigator.appCodeName +
+					"\nnavigator.appName: " +  navigator.appName +
+					"\nnavigator.appVersion: " + navigator.appVersion +
+					"\nnavigator.platform: " + navigator.platform +
+					"\nnavigator.userAgent: " + navigator.userAgent+
+					"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
+					"\nscreen.width: " + (window.screen ? screen.width : 0) +
+					"\nscreen.height: " + (window.screen ? screen.height : 0) +
+					"\n\n   === CLIENTE LOG === \n" + data;
+					successCallback(log);
+					return;
+				}
+				
+				// Compruebo si se trata de una operacion de carga/multicarga (load).
+				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
+				// Devolveremos un array en el que cada posicion sera uno de estos pares: "filename-n:dataBase64-n".
+				// La funcion de callback realizara el tratamiento deseado,
+				// pudiendo obtener cada dato del par teniendo en cuenta el
+				// separador ":"
+				if (data.indexOf(":") > 0) {
+					
+					var fileNamesDataBase64 = data.split("|");
+					
+					if (fileNamesDataBase64.length == 1) {
+						
+						var sepPos = fileNamesDataBase64[0].indexOf(":");
+						var fileNameDataBase64 = fileNamesDataBase64[0];
+						
+						if (sepPos == -1) {
+							fileName = Base64.decode(fileNameDataBase64, true);
+						}
+						else {
+							fileName = fileNameDataBase64.substring(0, sepPos);
+							dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+						}
+						
+						successCallback(fileName,dataB64);
+						
+						return;
+						
+					} else if (fileNamesDataBase64.length > 1 ) {
+						
+						var fileNameArray = new Array();
+						var dataB64Array = new Array();
+						
+						for (i = 0; i < fileNamesDataBase64.length; i++) {
+							var sepPos = fileNamesDataBase64[i].indexOf(":");
+							
+							if (sepPos == -1) {
+								fileNameArray.push(fileNamesDataBase64[i]);
+								dataB64Array.push("");
+							}
+							else {
+								fileNameArray.push(fileNamesDataBase64[i].substring(0, sepPos));
+								dataB64Array.push(fileNamesDataBase64[i].substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/"));
+							}
+						}
+										
+					}
+					
+					successCallback(fileNameArray,dataB64Array);
+					
+					return;
+				}
+				
+				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
+				var signature;
+				var certificate = null;
+				var sepPos = data.indexOf("|");
+				
+				if (sepPos == -1) {
+					signature = Base64.decode(data, true).replace(/\-/g, "+").replace(/\_/g, "/");
+				}
+				else {
+					certificate = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
+					signature = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+				}
+				successCallback(signature, certificate);
+			}
+			
+			function errorServiceResponseFunction(exception, message){
+				if (errorCallback) {
+					errorCallback(exception, message);
+				}
+			}
+			
+			function successBatchResponseFunction (data) {
+				// No se ha obtenido respuesta o se notifica la cancelacion
+				if (data == undefined || data == null || data == "CANCEL") {
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					return;
+				}
+				
+				// Se ha producido un error
+				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+					errorCallback("java.lang.Exception", data);
+					return;
+				}
+
+				// Se ha producido un error y no se ha identificado el tipo
+				if (data == "NULL") {
+					errorCallback("java.lang.Exception", "Error desconocido");
+					return;
+				}
+				successCallback(data);
+			}
+			
+			/**
+			 * Inicia el proceso de guardado de una firma.
+			 */
+			function saveDataToFile (dataB64, title, filename, extension, description, successCallbackSave, errorCallbackSave) {
+				successCallback = successCallbackSave;
+				errorCallback = errorCallbackSave;
+				saveByService(dataB64, title, filename, extension, description);
+			}
+
+			function saveByService ( dataB64, title, filename, extension, description) {
+				
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var data = generateDataToSave(dataB64, title, filename, extension, description);
+				
+				execAppIntent(buildUrl(data));
+			}
+
+			/**
+			* Genera el objeto de datos para la operacion de guardar
+			*/
+			function generateDataToSave(dataB64, title, filename, extension, description) {
+				var data = new Object();
+				data.op = generateDataKeyValue ("op", "save");
+				data.title = generateDataKeyValue ("title", title);
+				data.filename = generateDataKeyValue ("filename", filename);
+				data.extension = generateDataKeyValue ("exts", extension);
+				data.description = generateDataKeyValue ("desc", description);
+				data.dat = generateDataKeyValue ("dat",  dataB64 == "" ? null : dataB64);
+				
+				return data;
+			}
+
+			function generateDataKeyValue(key, value) {
+				var data  = new Object();
+				data.key = key;
+				data.value = value;
+				return data;
+			}
+			
+			/**
+			 * Convierte texto plano en texto base 64.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getBase64FromText (plainText, charset) {
+				return plainText != null ? Base64.encode(plainText) : null;
+			}
+
+			/**
+			 * Convierte texto base 64 en texto plano.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getTextFromBase64 (base64Text, charset) {
+				return base64Text != null ? Base64.decode(base64Text) : null;
+			}
+
+			
+			/**
+			 * Inicia el proceso de carga de un fichero.
+			 * Implementada tambien en el applet Java de firma
+			 * @param title Titulo de la ventana de dialogo
+			 * @param extensions Extensiones permitidasg
+			 * @param description Descripcion del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
+			 */
+			function getFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getLoadContentBase64ByService("load", title, extensions, description, filePath, false);
+			}
+
+			/**
+			 * Inicia el proceso de carga de uno o varios ficheros.
+			 * Implementada tambien en el applet Java de firma
+			 * @param title Titulo de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripcion del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
+			 */
+			function getMultiFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getLoadContentBase64ByService("load", title, extensions, description, filePath, true);
+			}
+			
+			/**
+			 * Inicia el proceso de obtencion del log actual de la aplicacion.
+			 * Implementada tambien en el applet Java de firma
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
+			 */
+			function getCurrentLog (successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getCurrentLogByService("getLog");
+			}
+			
+			/**
+			 * Realiza una operacion de carga de fichero comunicandose con la
+			 * aplicacion nativa por socket.
+			 * @param loadId Identificador de la operacion a realizar (load).
+			 * @param title Titulo de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripcion del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
+			 * @param multiload true si permite la seleccion de varios ficheros,
+			 * false si solo se permite seleccionar un fichero.
+			 */
+			function getLoadContentBase64ByService (loadId, title, extensions, description, filePath, multiload) {
+				
+				var data = generateDataToLoad(loadId, title, extensions, description, filePath, multiload);
+				
+				execAppIntent(buildUrl(data));
+			}
+			
+			/**
+			 * Realiza una operacion de obtencion de log actual de la aplicacion
+			 */
+			function getCurrentLogByService() {
+				
+				var data = generateDataToLoad("getLog");
+				
+				execAppIntent(buildUrl(data));
+			} 
+
+			/** 
+			 * Funcion para la comprobacion de existencia del objeto. No hace nada.
+			 * Implementada en el applet Java de firma.
+			 */
+			function echo () {
+				return "Cliente JavaScript";
+			}
+			
+			/**
+			 * Recupera el mensaje de error asociado al ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorMessage () {
+				return errorMessage;
+			}
+
+			/**
+			 * Recupera el tipo del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorType () {
+				return errorType;
+			}
+
+			/**
+			 * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
+			 */
+			function getType () {
+				return "javascript";
+			}
+
+			/**
+			 * Establece el error indicado como error interno y lanza una excepcion.
+			 */
+			function throwException (type, message) {
+				errorType = type;
+				errorMessage = message;
+				throw new Error();
+			}
+
+			/* Metodos que publicamos del objeto AppAfirmaJS */
+			return {
+				echo : echo,
+				checkTime : checkTime,
+				setKeyStore : setKeyStore,
+				sign : sign,
+				coSign : coSign,
+				counterSign : counterSign,
+				signBatch : signBatch,
+				selectCertificate : selectCertificate,
+				saveDataToFile : saveDataToFile,
+				signAndSaveToFile : signAndSaveToFile,
+				getFileNameContentBase64: getFileNameContentBase64,
+				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
+				getBase64FromText : getBase64FromText,
+				getTextFromBase64 : getTextFromBase64,
+				setStickySignatory : setStickySignatory,
+				setLocale : setLocale,
+				getErrorMessage : getErrorMessage,
+				getErrorType : getErrorType,
+				getCurrentLog : getCurrentLog				
+			}
+		});
+
 
 		/**
 		 * Cliente para la conexi&oacute;n con el Cliente @firma a trav&eacute;s de un servidor intermedio.
@@ -2587,7 +3690,7 @@ var AutoScript = ( function ( window, undefined ) {
 			getBase64FromText : getBase64FromText,
 			getTextFromBase64 : getTextFromBase64,
 			downloadRemoteData : downloadRemoteData,
-			
+
 			/* Comprobacion de entorno */
 			isAndroid : Platform.isAndroid,
 			isIOS : Platform.isIOS
