@@ -189,7 +189,7 @@ public final class AOFacturaESigner implements AOSigner {
     			!"tercero".equals(claimedRole) && //$NON-NLS-1$
     			!"supplier".equals(claimedRole) && //$NON-NLS-1$
     			!"customer".equals(claimedRole) && //$NON-NLS-1$
-    			!"hird party".equals(claimedRole) //$NON-NLS-1$
+    			!"third party".equals(claimedRole) //$NON-NLS-1$
     		) {
     			throw new IllegalArgumentException(
     				"El papel '" + claimedRole + "' no es valido para una factura electronica" //$NON-NLS-1$ //$NON-NLS-2$
