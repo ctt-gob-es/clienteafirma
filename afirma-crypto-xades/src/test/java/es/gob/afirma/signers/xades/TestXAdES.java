@@ -69,7 +69,9 @@ public final class TestXAdES {
         p1.setProperty("policyQualifier", "http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("addKeyInfoKeyValue", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("addKeyInfoKeyName", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-
+//        p1.setProperty("tsaURL", "https://psis.catcert.net/psis/catcert/tsp"); //$NON-NLS-1$ //$NON-NLS-2$
+//        p1.setProperty("tsaRequireCert", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+//        p1.setProperty("tsaPolicy", "0.4.0.2023.1.1"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final Properties p2 = new Properties();
         p2.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
@@ -95,13 +97,13 @@ public final class TestXAdES {
 
 
         XADES_MODES = new Properties[] {
-                p1, p2, p3, p4, p5, p6
+                p1 , p2, p3, p4, p5, p6
         };
     }
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+//            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
 //            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 //            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA

@@ -28,13 +28,6 @@
   			<artifactId>jxades</artifactId>
 		</dependency>
 
-		<!-- Compatibilidad con Java 9 y superiores -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.4.0-b180830.0359</version>
-		</dependency>
-
 		<!-- Para el sellado de tiempo -->		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>

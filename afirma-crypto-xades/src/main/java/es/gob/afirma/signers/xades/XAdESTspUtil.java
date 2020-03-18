@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.xml.bind.DatatypeConverter;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -194,9 +194,19 @@ public final class XAdESTspUtil {
 		}
 		final Node signingTimeNode = nl.item(0);
 
-		return DatatypeConverter.parseDateTime(
-			signingTimeNode.getTextContent()
-		);
+		GregorianCalendar calendar;
+		try {
+			calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(
+						signingTimeNode.getTextContent().trim()
+					).toGregorianCalendar();
+		} catch (final Exception ex) {
+			throw new RuntimeException("No se pudo instanciar la factoria para le parseo de una fecha del XML", ex); //$NON-NLS-1$
+		}
+
+		return calendar;
+//		return DatatypeConverter.parseDateTime(
+//			signingTimeNode.getTextContent()
+//		);
 	}
 
 	private static byte[] getSignatureNodeDigest(final Document doc,
