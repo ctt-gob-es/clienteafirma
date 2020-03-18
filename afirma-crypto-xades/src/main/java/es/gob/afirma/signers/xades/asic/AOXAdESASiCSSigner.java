@@ -192,7 +192,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException,
 			                                                    IOException {
-		return new AOXAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(signData));
+		return new AOXAdESSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(signData));
 	}
 
 	/** Establece los par&aacute;metros necesarios (modificando los actuales incompatibles si fuese necesario)
