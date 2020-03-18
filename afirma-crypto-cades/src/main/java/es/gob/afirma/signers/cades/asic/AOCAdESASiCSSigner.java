@@ -120,7 +120,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-		return new AOCAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
+		return new AOCAdESSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
 	}
 
     /** Cofirma en formato CAdES los datos encontrados en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
