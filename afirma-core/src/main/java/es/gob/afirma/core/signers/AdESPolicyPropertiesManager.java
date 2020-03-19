@@ -52,6 +52,9 @@ final class AdESPolicyPropertiesManager {
 
 	static final String FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
+	private static final String HTTP_PREFIX = "http://"; //$NON-NLS-1$
+	private static final String HTTPS_PREFIX = "https://"; //$NON-NLS-1$
+
 	/** Manejador del log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -75,6 +78,12 @@ final class AdESPolicyPropertiesManager {
 	 * 			usar&aacute;n los gen&eacute;ricos de la pol&iacute;tica. */
 	static void setProperties(final Properties prop, final String policyId, final String format) {
 
+		// Comprobamos primero si el formato de firma admite la expansion de politica.
+		// En caso negativo, se suspende la expansion.
+		if (!isSupportedConfiguration(policyId, format)) {
+			return;
+		}
+
 		String value = getProperty(policyId, PROPERTY_POLICY_IDENTIFIER, format);
 		if (value != null) {
 			setProperty(prop, PROPERTY_POLICY_IDENTIFIER, value);
@@ -95,6 +104,28 @@ final class AdESPolicyPropertiesManager {
 		if (value != null) {
 			setProperty(prop, PROPERTY_POLICY_DESCRIPTION, value);
 		}
+	}
+
+	/**
+	 * Comprueba que una configuraci&oacute;n de pol&iacute;tica est&aacute; soportada comprobando
+	 * que tiene una huella digital definida o que puede calcularse la huella a trav&eacute;s de
+	 * su identificador.
+	 * @param policyId Identificador de pol&iacute;tica.
+	 * @param format Formato de firma normalizado.
+	 * @return {@code true} si la pol&iacute;tica de la firma puede expandirse, {@code false} en
+	 * caso contrario.
+	 */
+	private static boolean isSupportedConfiguration(final String policyId, final String format) {
+
+		final String hash = getProperty(policyId, PROPERTY_POLICY_HASH, format);
+		if (hash == null || hash.trim().isEmpty()) {
+			final String identifier = getProperty(policyId, PROPERTY_POLICY_IDENTIFIER, format);
+			if (!identifier.toLowerCase().startsWith(HTTP_PREFIX) ||
+					!identifier.toLowerCase().startsWith(HTTPS_PREFIX)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/** Recupera una propiedad de la configuraci&oacute;n establecida de pol&iacute;ticas de firma.

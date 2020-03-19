@@ -122,70 +122,157 @@ public final class ExtraParamsProcessor {
 	 * @param format Formato de firma.
 	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
 	private static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) throws IncompatiblePolicyException {
-		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
-
-			final String policy = p.getProperty(EXPANDIBLE_POLICY_KEY);
-			// Si es AGE 1.8 solo aceptamos CAdES y XAdES
-			if (AdESPolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policy) &&
-				!AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.US).startsWith(
-						format.toLowerCase(Locale.US)) &&
-				!AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format) &&
-					!AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) &&
-					!AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
-				throw new IncompatiblePolicyException(
-					"La politica de firma 1.8 de la AGE solo puede usarse con XAdES o CAdES, y no con " + format //$NON-NLS-1$
-				);
-			}
-
-			// Consideraciones de la politica 1.8 de la AGE y la ultima version de esta misma politica
-			if (AdESPolicyPropertiesManager.POLICY_ID_AGE.equals(policy) ||
-					AdESPolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policy)) {
-
-				String normalizedFormat = null;
-				if (format != null) {
-					if (format.toLowerCase(Locale.US).startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.US)) ||
-							format.toLowerCase(Locale.US).startsWith(AOSignConstants.SIGN_FORMAT_XADES_TRI.toLowerCase(Locale.US))) {
-						normalizedFormat = AdESPolicyPropertiesManager.FORMAT_XADES;
-
-						// La firma XAdES conforme a la politica de firma de la AGE debe ser Detached o Enveloped
-						if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equalsIgnoreCase(p.getProperty("format")) && //$NON-NLS-1$
-								!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(p.getProperty("format"))) { //$NON-NLS-1$
-							if (p.containsKey("format")) { //$NON-NLS-1$
-								LOGGER.warning("La siguiente propiedad se ignora en favor del valor derivado de la politica establecida: format"); //$NON-NLS-1$
-							}
-							p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
-						}
-					}
-					else if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_CADES) ||
-							format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_CADES_TRI)) {
-						normalizedFormat = AdESPolicyPropertiesManager.FORMAT_CADES;
-
-						// La politica indica que la firma debe ser implicita siempre que el tamano
-						// del documento sea razonable. Como no se especifica que tamano es razonable
-						// respetaremos el modo indicado por el integrador. En caso de no haberlo
-						// indicado, establecemos el limite en 1Mb. Esto solo aplicaria a CAdES ya que
-						// PAdES siempre es implicita e ignora este parametro.
-						if (!p.containsKey("mode") && signedData != null) { //$NON-NLS-1$
-							p.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
-								AOSignConstants.SIGN_MODE_IMPLICIT :
-									AOSignConstants.SIGN_MODE_EXPLICIT);
-						}
-					}
-					else if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PDF) ||
-							 format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PADES) ||
-							 format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PDF_TRI) ||
-							 format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PADES_TRI)) {
-						if (!ETSI_CADES_DETACHED.equals(p.getProperty("signatureSubFilter", ETSI_CADES_DETACHED))) { //$NON-NLS-1$
-							throw new IncompatiblePolicyException("En PAdES con politica firma AGE debe usarse siempre el filtro 'ETSI.CAdES.detached'"); //$NON-NLS-1$
-						}
-						p.setProperty("signatureSubFilter", ETSI_CADES_DETACHED); //$NON-NLS-1$
-						normalizedFormat = AdESPolicyPropertiesManager.FORMAT_PADES;
-					}
-				}
-				AdESPolicyPropertiesManager.setProperties(p, policy, normalizedFormat);
-			}
-			p.remove(EXPANDIBLE_POLICY_KEY);
+		if (!p.containsKey(EXPANDIBLE_POLICY_KEY)) {
+			return;
 		}
+
+		final String policyName = p.getProperty(EXPANDIBLE_POLICY_KEY);
+
+		// Comprobamos que se trate de una politica reconocida que admita la expansion de atributos
+		if (!isSupportedPolicy(policyName)) {
+			p.remove(EXPANDIBLE_POLICY_KEY);
+			throw new IncompatiblePolicyException("No se soporta la expansion de atributos para la politica: " + policyName); //$NON-NLS-1$
+		}
+
+		// Normalizamos el nombre de formato para simplificar las comprobaciones futuras
+		final String normalizedFormat = normalizeFormat(format);
+
+		// Firma CAdES de la AGE
+		if (normalizedFormat.equals(AdESPolicyPropertiesManager.FORMAT_CADES) &&
+				(AdESPolicyPropertiesManager.POLICY_ID_AGE.equals(policyName) ||
+						AdESPolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policyName))) {
+			setCAdESPolicyAGEAttributes(policyName, p, signedData);
+		}
+		// Firma XAdES de la AGE
+		else if (normalizedFormat.equals(AdESPolicyPropertiesManager.FORMAT_XADES) &&
+				(AdESPolicyPropertiesManager.POLICY_ID_AGE.equals(policyName) ||
+						AdESPolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policyName))) {
+			setXAdESPolicyAGEAttributes(policyName, p);
+		}
+		// Firma PAdES de la AGE (Soportada a partir de la politica 1.9)
+		else if (normalizedFormat.equals(AdESPolicyPropertiesManager.FORMAT_XADES) &&
+				AdESPolicyPropertiesManager.POLICY_ID_AGE.equals(policyName)) {
+			setPAdESPolicyAGEAttributes(policyName, p);
+		}
+		// Cualquier otra combinacion no esta soportada
+		else {
+			p.remove(EXPANDIBLE_POLICY_KEY);
+			throw new IncompatiblePolicyException(String.format(
+					"El formato de firma %1s no esta soportado por la politica %2s", //$NON-NLS-1$
+					format, policyName));
+		}
+		p.remove(EXPANDIBLE_POLICY_KEY);
+	}
+
+	/**
+	 * Normaliza el nombre de formato de firma para simplificar comprobaciones posteriores.
+	 * @param format Nombre del formato de firma.
+	 * @return Nombre homogenizado del formato de firma o la misma cadena de entrada si no es
+	 * uno de los nombres de formato soportados.
+	 */
+	private static String normalizeFormat(final String format) {
+		String normalizedFormat = null;
+
+		// Admitimos las variables normal y trifasica de CAdES. No se admite "CAdES-ASiC"
+		if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_CADES) ||
+				format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_CADES_TRI)) {
+			normalizedFormat = AdESPolicyPropertiesManager.FORMAT_CADES;
+		}
+		// Admitimos las variables normal y trifasica de XAdES y cualquiera del tipo
+		// "XAdES Detached" o similar. No se admite "XAdES-ASiC"
+		else if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES) ||
+				format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_TRI) ||
+				format.toLowerCase(Locale.US).startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.US) + " ")) { //$NON-NLS-1$
+			normalizedFormat = AdESPolicyPropertiesManager.FORMAT_XADES;
+		}
+		// Admitimos las variables normal y trifasica de PAdES y PDF.
+		else if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PDF) ||
+				format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PADES) ||
+				format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PDF_TRI) ||
+				format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PADES_TRI)) {
+			normalizedFormat = AdESPolicyPropertiesManager.FORMAT_PADES;
+		}
+		return normalizedFormat != null ? normalizedFormat : format;
+	}
+
+	/**
+	 * Indica si la expansi&oacute;n de propiedades est&aacute; habilitada para una
+	 * pol&iacute;tica de firma concreta.
+	 * @param policyName Nombre de la pol&iacute;tica de firma.
+	 * @return {@code true} si la pol&iacute;tica esta soportada, {@code false} en
+	 * caso contrario.
+	 */
+	private static boolean isSupportedPolicy(final String policyName) {
+		return AdESPolicyPropertiesManager.POLICY_ID_AGE.equals(policyName) ||
+				AdESPolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policyName);
+	}
+
+	/**
+	 * Establece los atributos correspondientes a las firmas CAdES para la policita de
+	 * firma de la AGE.
+	 * @param policyName Nombre de la pol&iacute;tica de firma.
+	 * @param params Conjunto de propiedades en donde hay que establecer los atributos
+	 * de la pol&iacute;tica de firma.
+	 * @param signedData Datos firmados.
+	 */
+	private static void setCAdESPolicyAGEAttributes(final String policyName, final Properties params,
+			final byte[] signedData) {
+
+		// La politica indica que la firma debe ser implicita siempre que el tamano
+		// del documento sea razonable. Como no se especifica que tamano es razonable
+		// respetaremos el modo indicado por el integrador. En caso de no haberlo
+		// indicado, establecemos el limite en 1Mb. Esto solo aplicaria a CAdES ya que
+		// PAdES siempre es implicita e ignora este parametro.
+		if (!params.containsKey("mode") && signedData != null) { //$NON-NLS-1$
+			params.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
+				AOSignConstants.SIGN_MODE_IMPLICIT :
+					AOSignConstants.SIGN_MODE_EXPLICIT);
+		}
+		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_CADES);
+	}
+
+	/**
+	 * Establece los atributos correspondientes a las firmas XAdES para la policita de
+	 * firma de la AGE.
+	 * @param policyName Nombre de la pol&iacute;tica de firma.
+	 * @param params Conjunto de propiedades en donde hay que establecer los atributos
+	 * de la pol&iacute;tica de firma.
+	 */
+	private static void setXAdESPolicyAGEAttributes(final String policyName, final Properties params) {
+
+		// La firma XAdES conforme a la politica de firma de la AGE debe ser Detached o Enveloped. Si se declara
+		// un valor distinto a estos, se fuerza a Detached.
+		final String format = params.getProperty("format"); //$NON-NLS-1$
+		if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equalsIgnoreCase(format) &&
+				!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(format)) {
+			if (format != null) {
+				LOGGER.warning("La siguiente propiedad se ignora en favor del valor derivado de la politica establecida: format"); //$NON-NLS-1$
+			}
+			params.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
+		}
+		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_XADES);
+	}
+
+	/**
+	 * Establece los atributos correspondientes a las firmas PAdES para la policita de
+	 * firma de la AGE.
+	 * @param policyName Nombre de la pol&iacute;tica de firma.
+	 * @param params Conjunto de propiedades en donde hay que establecer los atributos
+	 * de la pol&iacute;tica de firma.
+	 */
+	private static void setPAdESPolicyAGEAttributes(final String policyName, final Properties params)
+			throws IncompatiblePolicyException {
+
+		// El subfiltro de las PAdES acorde politica de la AGE debe ser el de CAdES Detached de la ETSI. Si se
+		// declara otro, se lanza un error
+		if (params.containsKey("signatureSubFilter") && //$NON-NLS-1$
+				!ETSI_CADES_DETACHED.equals(params.getProperty("signatureSubFilter"))) { //$NON-NLS-1$
+			throw new IncompatiblePolicyException("En PAdES con politica firma AGE debe usarse siempre el filtro '" + //$NON-NLS-1$
+				ETSI_CADES_DETACHED + "'"); //$NON-NLS-1$
+		}
+		params.setProperty("signatureSubFilter", ETSI_CADES_DETACHED); //$NON-NLS-1$
+
+		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_PADES);
 	}
 
 	/** Pol&iacute;tica de firma incompatible con el formato o la configuraci&oacute;n de firma. */
