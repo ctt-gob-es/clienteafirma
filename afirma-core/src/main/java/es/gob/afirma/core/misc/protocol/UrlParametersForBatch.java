@@ -36,6 +36,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Par&aacute;metro de entrada que nos dice si tenemos que usar una clave prefijada o establecer una nueva. */
 	private static final String PARAM_STICKY = "sticky"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada que nos dice si tenemos que ignorar
+	 * cla <code>PrivateKeyEntry</code> fijada. */
+	private static final String RESET_STICKY_PARAM = "resetsticky"; //$NON-NLS-1$
+
 	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el dice si tenemos que usar una clave prefijada o establecer una nueva. */
 	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
@@ -47,6 +51,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. */
 	private boolean sticky;
+
+	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe ignorar
+	 * cualquier certificado prefijado. */
+	private boolean resetSticky;
 
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe devolver
 	 * el certificado utilizado para firmar o no. */
@@ -62,14 +70,6 @@ public final class UrlParametersForBatch extends UrlParameters {
 		this.batchPreSignerUrl = url;
 	}
 
-	/** Obtiene la opci&oacute;n de configuraci&oacute;n sticky
-	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
-	 *         mantener el primer certificado seleccionado ({@code true}) o se
-	 *         debe pedir siempre que el usuario elija uno ({@code false}). */
-	public boolean getSticky() {
-		return this.sticky;
-	}
-
 	/** Establece la opci&oacute;n de configuraci&oacute;n sticky
 	 * @param sticky Opci&oacute;n de configuraci&oacute;n que determina si se debe
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
@@ -78,6 +78,29 @@ public final class UrlParametersForBatch extends UrlParameters {
 		this.sticky = sticky;
 	}
 
+	/** Obtiene la opci&oacute;n de configuraci&oacute;n sticky
+	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         mantener el primer certificado seleccionado ({@code true}) o se
+	 *         debe pedir siempre que el usuario elija uno ({@code false}). */
+	public boolean getSticky() {
+		return this.sticky;
+	}
+
+	/** Establece la opci&oacute;n de configuraci&oacute;n <i>resetsticky</i>.
+	 * @param resetSticky Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         ignorar el certificado mantener el primer certificado seleccionado ({@code true})
+	 *         o si se puede utilizar en caso de que se solicite ({@code false}). */
+	public void setResetSticky(final boolean resetSticky) {
+		this.resetSticky = resetSticky;
+	}
+
+	/** Obtiene la opci&oacute;n de configuraci&oacute;n <i>resetsticky</i>.
+	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         ignorar el cualquier certificado seleccionado ({@code true}) o si
+	 *         deber&iacute;a usarse este si as&iacute; se indica ({@code false}). */
+	public boolean getResetSticky() {
+		return this.resetSticky;
+	}
 
 	/** Obtiene la opci&oacute;n de configuraci&oacute;n needcert
 	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
@@ -205,6 +228,14 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 		else {
 			setSticky(false);
+		}
+
+		// Valor de parametro resetsticky
+		if (params.containsKey(RESET_STICKY_PARAM)) {
+			setResetSticky(Boolean.parseBoolean(params.get(RESET_STICKY_PARAM)));
+		}
+		else {
+			setResetSticky(false);
 		}
 
 		// Valor del parametro needCert

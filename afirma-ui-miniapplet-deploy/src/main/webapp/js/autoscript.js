@@ -32,6 +32,8 @@ var AutoScript = ( function ( window, undefined ) {
 		var selectedLocale = null;
 		
 		var stickySignatory = false;
+		
+		var resetStickySignatory = false;
 
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
@@ -345,35 +347,43 @@ var AutoScript = ( function ( window, undefined ) {
 			clienteFirma.setKeyStore(ksType != null ? ksType : defaultKeyStore);
 			
 			// Al haber cambiado el almacen, el certificado dejara de estar fijado
-			setStickySignatory(false);
+			resetStickySignatory = true;
+			
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
 			clienteFirma.selectCertificate(params, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 			
 		var sign = function (dataB64, algorithm, format, params, successCallback, errorCallback) {
 			clienteFirma.sign(dataB64, algorithm, format, params, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 
 		var coSign = function (signB64, dataB64, algorithm, format, params, successCallback, errorCallback) {
 			clienteFirma.coSign(signB64, algorithm, format, params, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 		
 		var cosign = function (signB64, algorithm, format, params, successCallback, errorCallback) {
 			clienteFirma.coSign(signB64, algorithm, format, params, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 		
 		var counterSign = function (signB64, algorithm, format, params, successCallback, errorCallback) {
 			clienteFirma.counterSign(signB64, algorithm, format, params, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 		
 		var signAndSaveToFile = function (operationId, dataB64, algorithm, format, params, outputFileName, successCallback, errorCallback) {
 			clienteFirma.signAndSaveToFile(operationId, dataB64, algorithm, format, params, outputFileName, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 
 		var signBatch = function (batchB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
 			clienteFirma.signBatch(batchB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback);
+			resetStickySignatory = false;
 		}
 		
 		var getBase64FromText = function (plainText) {
@@ -411,6 +421,13 @@ var AutoScript = ( function ( window, undefined ) {
 		 * caduque la conexion en caso de invocacion por protocolo/socket
 		 */
 		var setStickySignatory = function(sticky) {
+			
+			// Si estaba activada la fijacion de certificado y ahora se desactiva,
+			// se pedira expresamente al cliente que no lo deje fijado
+			if (stickySignatory && !sticky) {
+				resetStickySignatory = true;
+			}
+			
 			// Se establecera la variable con el valor seleccionado para su
 			// posterior uso en cada invocacion por protocolo
 			stickySignatory = sticky;
@@ -554,7 +571,7 @@ var AutoScript = ( function ( window, undefined ) {
 				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
 			}
 			// Si no se esta en una version antigua de Internet Explorer o Safari
-			else if (!Platform.isInternetExplorer10orLower() && !Platforma.isSafari10()) {
+			else if (!Platform.isInternetExplorer10orLower() && !Platform.isSafari10()) {
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 			}
 			// En cualquier otro caso, usaremos servidor intermedio
@@ -908,6 +925,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
 				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
+				}
 				
 				return data;
 			}
@@ -921,6 +941,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
 				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
+				}
 				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
 				
 				return data;
@@ -946,6 +969,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.filename = createKeyValuePair ("filename", outputFileName);
 				data.ksb64 = createKeyValuePair ("ksb64", !!defaultKeyStore ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
+				}
 				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
 				
 				return data;
@@ -962,6 +988,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
 				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
+				}
 				data.needcert = createKeyValuePair ("needcert", true);
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
 				
@@ -1414,7 +1443,7 @@ var AutoScript = ( function ( window, undefined ) {
 				data.avoidEncoding = !!avoidUrlEncoding;
 				return data;
 			}
-
+			
 			/** 
 			 * Funcion para la comprobacion de existencia del objeto. Siempre devuelve
 			 * la cadena "Cliente JavaScript".
@@ -1558,6 +1587,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? defaultKeyStore : null);
 				data.ksb64 = generateDataKeyValue ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
+				}
 				
 				execAppIntent(buildUrl(data));
 			}
@@ -1684,6 +1716,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
+				}
 
 				return data;
 			}
@@ -1782,6 +1817,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
+				}
 
 				return data;
 			}
@@ -1802,6 +1840,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.filename = generateDataKeyValue ("filename", outputFileName);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
+				if (resetStickySignatory) {
+					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
+				}
 
 				return data;
 			}
@@ -2621,7 +2662,7 @@ var AutoScript = ( function ( window, undefined ) {
 				var opId = "selectcert";
 				
 				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !!stickyCertificate) {
+				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				
@@ -2705,7 +2746,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !!stickyCertificate) {
+				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				
@@ -2771,7 +2812,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !!stickyCertificate) {
+				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				
@@ -2834,7 +2875,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !!stickyCertificate) {
+				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				

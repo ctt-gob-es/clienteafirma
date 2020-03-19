@@ -322,7 +322,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 
-		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
+		if (options.getSticky() && !options.getResetSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 		}
 		else {

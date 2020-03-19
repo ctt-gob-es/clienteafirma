@@ -336,7 +336,7 @@ final class ProtocolInvocationLauncherSign {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 
-		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
+		if (options.getSticky() && !options.getResetSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 
 			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
