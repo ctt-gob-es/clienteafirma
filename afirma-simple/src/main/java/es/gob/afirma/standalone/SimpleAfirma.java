@@ -569,7 +569,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	LookAndFeelManager.applyLookAndFeel();
 
     	// Uso en modo linea de comandos
-    	if (isUsingCommnadLine(args)) {
+    	if (isUsingCommnadLine(args) || isHeadlessMode()) {
     		CommandLineLauncher.main(args);
     		return;
     	}
@@ -666,9 +666,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     				forceCloseApplication(0);
     			}
     		}
-    		// Invocacion normal modo grafico
+    		// Invocacion normal modo grafico (salvo que la JVM no permita entornos graficos
     		else {
-
     			if (!isSimpleAfirmaAlreadyRunning()) {
 
         			printSystemInfo();
@@ -754,6 +753,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		}
     	}
     	catch (final HeadlessException he) {
+    		LOGGER.log(Level.WARNING, "No se puede crear el entorno grafico. Se tratar la peticion como una llamada por consola"); //$NON-NLS-1$
     		CommandLineLauncher.main(args);
     	}
     	catch (final Exception e) {
@@ -946,6 +946,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return {@code true} si la llamada se debe procesar como si se hubiese recibido por l&iacute;nea de comandos. */
 	private static boolean isUsingCommnadLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
+	}
+
+	/** Indica si la JVM est&aacute; configurada para funcionar s&oacute;lo en modo consola.
+	 * @return {@code true} si la JVM s&oacute;lo admite el modo consola. */
+	private static boolean isHeadlessMode() {
+		return Boolean.getBoolean("java.awt.headless"); //$NON-NLS-1$
 	}
 
 	/** Establece si las actualizaciones est&aacute;n permitidas o si se desactivaron mediante
