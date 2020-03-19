@@ -31,6 +31,12 @@
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xades</artifactId>
 			<version>${clienteafirma.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+		    		<artifactId>xmlsec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
