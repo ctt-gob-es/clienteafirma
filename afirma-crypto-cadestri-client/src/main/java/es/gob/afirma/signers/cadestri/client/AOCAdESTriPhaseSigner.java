@@ -13,9 +13,11 @@ import static es.gob.afirma.signers.cadestri.client.ProtocolConstants.PROPERTY_N
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -51,6 +53,9 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 
 	/** Nombre de la propiedad con los nodos objetivo para la contrafirma. */
 	private static final String PROPERTY_NAME_CS_TARGET = "target"; //$NON-NLS-1$
+
+	/** Prefijo del mensaje de error del servicio de prefirma. */
+	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
 
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
@@ -239,6 +244,16 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 		}
 		catch (final IOException e) {
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
+		}
+
+		// Comprobamos que no se trate de un error
+		if (preSignResult.length > 8) {
+			final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
+			if (headMsg.startsWith(ERROR_PREFIX)) {
+				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
+				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
+				throw new AOException("Error durante la prefirma: " + msg); //$NON-NLS-1$
+			}
 		}
 
 		// ----------

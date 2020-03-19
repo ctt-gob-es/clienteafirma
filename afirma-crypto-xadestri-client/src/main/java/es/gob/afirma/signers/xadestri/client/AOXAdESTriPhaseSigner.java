@@ -12,10 +12,12 @@ package es.gob.afirma.signers.xadestri.client;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -105,6 +107,9 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
+
+	/** Prefijo del mensaje de error del servicio de prefirma. */
+	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
 
 	// Nombres de las propiedades intercambiadas con el servidor como Properties
 
@@ -391,7 +396,15 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
-		LOGGER.info("Tamano de la prefirma XAdES: " + preSignResult.length + " octetos."); //$NON-NLS-1$ //$NON-NLS-2$
+		// Comprobamos que no se trate de un error
+		if (preSignResult.length > 8) {
+			final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
+			if (headMsg.startsWith(ERROR_PREFIX)) {
+				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
+				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
+				throw new AOException("Error durante la prefirma: " + msg); //$NON-NLS-1$
+			}
+		}
 
 		// ----------
 		// FIRMA

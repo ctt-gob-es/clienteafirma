@@ -12,8 +12,10 @@ package es.gob.afirma.signers.padestri.client;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -39,6 +41,9 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
 	private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
+
+	/** Prefijo del mensaje de error del servicio de prefirma. */
+	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
 
 	/** Tama&ntilde;o m&iacute;nimo de un PDF.
 	 * <a href="https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf">
@@ -88,6 +93,16 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		catch (final IOException e) {
 			LOGGER.warning("La prefirma no esta en el formato esperado: " + e); //$NON-NLS-1$
+		}
+
+		// Comprobamos que no se trate de un error
+		if (preSignResult.length > 8) {
+			final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
+			if (headMsg.startsWith(ERROR_PREFIX)) {
+				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
+				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
+				throw new AOException("Error durante la prefirma: " + msg); //$NON-NLS-1$
+			}
 		}
 
 		// ----------

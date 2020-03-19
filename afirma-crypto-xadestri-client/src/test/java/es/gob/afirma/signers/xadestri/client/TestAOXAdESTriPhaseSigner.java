@@ -23,6 +23,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -50,9 +51,9 @@ public class TestAOXAdESTriPhaseSigner {
 	//private static final String SERVER_URL = "https://prevalide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 	//private static final String SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 	private static final String SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
+	//private static final String SERVER_URL = "http://127.0.0.1:8080/triphase-signer/SignatureService"; //$NON-NLS-1$
 
-	private static final Properties[] CONFIGS;
-
+	  private static final Properties[] CONFIGS;
 
 	static {
 		CONFIGS = new Properties[3];
@@ -83,6 +84,9 @@ public class TestAOXAdESTriPhaseSigner {
 		config2.setProperty("signerClaimedRoles", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
 		config2.setProperty("facturaeSign", "true"); //$NON-NLS-1$ //$NON-NLS-2$:P
 		CONFIGS[2] = config2;
+
+		// Desactiva la comprobacion SSL
+		System.setProperty(UrlHttpManagerImpl.JAVA_PARAM_DISABLE_SSL_CHECKS, Boolean.TRUE.toString());
 	}
 
 	/** Prueba de firma XAdES-ASiC-S.
