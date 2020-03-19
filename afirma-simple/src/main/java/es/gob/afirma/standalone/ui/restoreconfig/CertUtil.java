@@ -75,6 +75,8 @@ final class CertUtil {
 
 	private static final String PROVIDER = "SC"; //$NON-NLS-1$
 
+	private static final String DEFAULT_LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
 	static class CertPack {
@@ -137,7 +139,7 @@ final class CertUtil {
 			AF_ROOT_SUBJECT_PRINCIPAL
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			"127.0.0.1", //$NON-NLS-1$
+			DEFAULT_LOCALHOST,
 			caCertificatePrivateKeyEntry
 		);
 		return new CertPack(

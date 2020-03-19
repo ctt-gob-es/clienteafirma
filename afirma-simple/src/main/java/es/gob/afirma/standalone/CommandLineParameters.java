@@ -264,6 +264,9 @@ final class CommandLineParameters {
 		return this.format != null ? this.format : DEFAULT_FORMAT;
 	}
 
+	/** Recupera la contrase&ntilde;a configurada para acceder al almac&eacute;n de claves.
+	 * @return Contrase&ntilde;a del almac&eacuten o {@code null} si no se configur&oacute;.
+	 */
 	public String getPassword() {
 		return this.password;
 	}

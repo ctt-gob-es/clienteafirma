@@ -136,7 +136,7 @@ public final class RetrieveService extends HttpServlet {
 				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
-				LOGGER.severe("Error recupendo el fichero '" + inFile.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.severe("Error recuperando el fichero " + inFile.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA));
 				return;
 			}

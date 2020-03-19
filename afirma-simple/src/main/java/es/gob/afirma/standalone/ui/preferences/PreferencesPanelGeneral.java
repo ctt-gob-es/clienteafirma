@@ -387,18 +387,23 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			SimpleAfirmaMessages.getString("PreferencesPanel.127") //$NON-NLS-1$
 		);
 
-		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
+		final JLabel proxyLabel = new JLabel("<html>" + //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanel.128") + //$NON-NLS-1$
+				"</html>"); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
 
 		final GridBagConstraints netConstraints = new GridBagConstraints();
 		netConstraints.insets = new Insets(0, 0, 4, 7);
 		netConstraints.gridx = 0;
 		netConstraints.gridy = 0;
+		netConstraints.gridwidth = 2;
 		netConstraints.anchor = GridBagConstraints.LINE_START;
 		netConfigInnerPanel.add(this.secureConnections, netConstraints);
+		netConstraints.gridwidth = 1;
 		netConstraints.gridy++;
 		netConfigInnerPanel.add(proxyLabel, netConstraints);
 		netConstraints.gridx++;
+		netConstraints.anchor = GridBagConstraints.LINE_END;
 		netConfigInnerPanel.add(proxyConfigButton, netConstraints);
 
 		gbc.gridy++;
@@ -519,6 +524,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.signatureAlgorithms.setSelectedItem(
 			PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM)
 		);
+		// Si el valor establecido no es valido, establecemos el valor por defecto
+		if (this.signatureAlgorithms.getSelectedItem() == null) {
+			this.signatureAlgorithms.setSelectedItem(
+					PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM));
+		}
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 

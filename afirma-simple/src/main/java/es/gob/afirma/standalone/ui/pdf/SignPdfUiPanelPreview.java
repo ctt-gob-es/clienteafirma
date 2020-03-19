@@ -48,6 +48,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -90,7 +91,6 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.text.DefaultFormatter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.PdfExtraParams;
@@ -951,7 +951,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			try {
 				loadSignImage(imagePath);
 			} catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
 			}
 		}
 
@@ -1068,7 +1068,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT);
 		}
 
-		if (params.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE) != null) {
+		if (params.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE) != null &&
+				this.signatureImagePath.getText() != null) {
 			PreferencesManager.put(
 				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, this.signatureImagePath.getText()
 			);
@@ -1135,7 +1136,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	static String getInsertImageBase64(final BufferedImage bi) {
 		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
 			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
-			return Base64.encode(osImage.toByteArray());
+			return Base64.getEncoder().encodeToString(osImage.toByteArray());
 		}
         catch (final Exception e1) {
         	LOGGER.severe(
@@ -1146,7 +1147,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	}
 
 	void setInsertImageBase64(final String base64Image) {
-		try (final ByteArrayInputStream isImage = new ByteArrayInputStream(Base64.decode(base64Image))) {
+		try (final ByteArrayInputStream isImage = new ByteArrayInputStream(Base64.getDecoder().decode(base64Image))) {
 			final BufferedImage bi = ImageIO.read(isImage);
 
 			if(bi == null) {

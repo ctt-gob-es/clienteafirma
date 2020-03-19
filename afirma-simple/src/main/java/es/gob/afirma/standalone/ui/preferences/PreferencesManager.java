@@ -29,7 +29,7 @@ public final class PreferencesManager {
 
 		PROPERTIES = new Properties();
 		try {
-			PROPERTIES.load(PreferencesManager.class.getResourceAsStream("/PROPERTIES/PREFERENCES.properties")); //$NON-NLS-1$
+			PROPERTIES.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
@@ -469,7 +469,6 @@ public final class PreferencesManager {
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
 	public static String get(final String key) {
-
 		return PREFERENCES.get(key, getDefaultPreference(key));
 	}
 
@@ -478,7 +477,6 @@ public final class PreferencesManager {
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return El valor almacenado de la propiedad o {@code null} si no se encontr&oacute;. */
 	public static String getConfiguredProperty(final String key) {
-
 		return PREFERENCES.get(key, null);
 	}
 

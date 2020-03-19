@@ -24,7 +24,7 @@ public class TriConfigManager {
 
 	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String CONFIG_FILE = "tpsconfig.properties"; //$NON-NLS-1$
+	private static final String CONFIG_FILE = "tps_config.properties"; //$NON-NLS-1$
 
 	private static final String OLD_CONFIG_FILE = "config.properties"; //$NON-NLS-1$
 

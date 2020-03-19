@@ -205,7 +205,8 @@ public final class MainMenu extends JMenuBar {
 		createHashFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_H, Toolkit.getDefaultToolkit()
 						.getMenuShortcutKeyMask()));
-		createHashFileMenuItem.addActionListener(e -> CreateHashDialog.startHashCreation(getParentComponent())
+		createHashFileMenuItem.addActionListener(
+				e -> CreateHashDialog.startHashCreation(getParentComponent())
 		);
 		huellaFileMenu.add(createHashFileMenuItem);
 
