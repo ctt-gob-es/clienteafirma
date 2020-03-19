@@ -214,6 +214,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			configurator.configure();
 		}
 		catch (final Exception | Error e) {
+			LOGGER.log(Level.SEVERE, "Error grave durante el proceso de configuracion", e); //$NON-NLS-1$
 			configurator.closeApplication(-1, config.isNeedKeep());
 		}
 

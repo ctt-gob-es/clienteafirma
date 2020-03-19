@@ -14,10 +14,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
@@ -26,7 +34,7 @@ import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 /** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de AutoFirma. */
 final class ConfiguratorLinux implements Configurator {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_V56_OR_LOWER_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
@@ -596,7 +604,53 @@ final class ConfiguratorLinux implements Configurator {
 
     @Override
     public void uninstall(final Console console) {
-        // No es necesario hacer nada porque el  proceso de desinstalacion de linux
-        // eliminara el directorio de aplicacion con todo su contenido.
+        // No es necesario hacer nada mas  alla de eliminar los elementos creados por la aplicacion
+    	// porque el  proceso de desinstalacion de linux eliminara el directorio de aplicacion con
+    	// todo su contenido.
+
+    	// Eliminamos si existe el directorio alternativo usado para el guardado de certificados
+    	// SSL durante el proceso de restauracion de la instalacion
+    	final File alternativeDir = getLinuxAlternativeAppDir();
+    	if (alternativeDir.isDirectory()) {
+    		try {
+    			Files.walkFileTree(
+    					alternativeDir.toPath(),
+    					new HashSet<FileVisitOption>(),
+    					Integer.MAX_VALUE,
+    					new SimpleFileVisitor<Path>() {
+    						@Override
+    						public FileVisitResult visitFile(final Path file, final BasicFileAttributes attr) {
+    							try {
+    								Files.delete(file);
+    							}
+    							catch (final Exception e) {
+    								LOGGER.warning("No se pudo eliminar el fichero: " + file); //$NON-NLS-1$
+    							}
+    							return FileVisitResult.CONTINUE;
+    						}
+    						@Override
+    						public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) {
+    							try {
+    								Files.delete(dir);
+    							} catch (final IOException e) {
+    								LOGGER.warning("No se pudo eliminar el directorio: " + dir); //$NON-NLS-1$
+    							}
+    							return FileVisitResult.CONTINUE;
+    						}
+    					});
+    		}
+    		catch (final Exception e) {
+    			LOGGER.log(Level.WARNING, "No se ha podido eliminar por completo el directorio alternativo para el certificado SSL", e); //$NON-NLS-1$
+    		}
+    	}
     }
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Linux.
+	 * @return Directorio de instalaci&oacute;n.
+	 */
+	private static File getLinuxAlternativeAppDir() {
+		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
+	}
 }

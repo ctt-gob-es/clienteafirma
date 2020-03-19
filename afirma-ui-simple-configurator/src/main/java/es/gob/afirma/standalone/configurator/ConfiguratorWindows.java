@@ -14,12 +14,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -154,27 +160,27 @@ final class ConfiguratorWindows implements Configurator {
 		return new File(appDir, KS_FILENAME).exists();
 	}
 
-	/**
-	 * Devuelve el listado de directorios en el que com&uacute;nmente se instala
-	 * AutoFirma en este sistema operativo.
-	 * @return Listado de directorios.
-	 */
-	private static File[] getDefaultInstallationDirs() {
-
-		final List<File> dirs = new ArrayList<>();
-		final String subPath = "AutoFirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
-		final String basePath = System.getenv("PROGRAMFILES"); //$NON-NLS-1$
-		if (basePath != null) {
-			dirs.add(new File(basePath, subPath));
-			if (basePath.endsWith(" (x86)")) { //$NON-NLS-1$
-				dirs.add(new File(basePath.substring(0,  basePath.lastIndexOf(" (x86)")), subPath)); //$NON-NLS-1$
-			}
-			else {
-				dirs.add(new File(basePath + " (x86)", subPath)); //$NON-NLS-1$
-			}
-		}
-		return dirs.toArray(new File[dirs.size()]);
-	}
+//	/**
+//	 * Devuelve el listado de directorios en el que com&uacute;nmente se instala
+//	 * AutoFirma en este sistema operativo.
+//	 * @return Listado de directorios.
+//	 */
+//	private static File[] getDefaultInstallationDirs() {
+//
+//		final List<File> dirs = new ArrayList<>();
+//		final String subPath = "AutoFirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
+//		final String basePath = System.getenv("PROGRAMFILES"); //$NON-NLS-1$
+//		if (basePath != null) {
+//			dirs.add(new File(basePath, subPath));
+//			if (basePath.endsWith(" (x86)")) { //$NON-NLS-1$
+//				dirs.add(new File(basePath.substring(0,  basePath.lastIndexOf(" (x86)")), subPath)); //$NON-NLS-1$
+//			}
+//			else {
+//				dirs.add(new File(basePath + " (x86)", subPath)); //$NON-NLS-1$
+//			}
+//		}
+//		return dirs.toArray(new File[dirs.size()]);
+//	}
 
 	@Override
 	public void uninstall(final Console console) {
@@ -189,6 +195,42 @@ final class ConfiguratorWindows implements Configurator {
 
 		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
 		configureChrome(null, false);
+
+		// Eliminamos el directorio alternativo en el que se instalan los certificados SSL
+		// durante el proceso de restauracion de la instalacion
+		final File alternativeDir = getWindowsAlternativeAppDir();
+		if (alternativeDir.isDirectory()) {
+			try {
+				Files.walkFileTree(
+						alternativeDir.toPath(),
+						new HashSet<FileVisitOption>(),
+						Integer.MAX_VALUE,
+						new SimpleFileVisitor<Path>() {
+							@Override
+							public FileVisitResult visitFile(final Path file, final BasicFileAttributes attr) {
+								try {
+									Files.delete(file);
+								}
+								catch (final Exception e) {
+									LOGGER.warning("No se pudo eliminar el fichero: " + file); //$NON-NLS-1$
+								}
+								return FileVisitResult.CONTINUE;
+							}
+							@Override
+							public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) {
+								try {
+									Files.delete(dir);
+								} catch (final IOException e) {
+									LOGGER.warning("No se pudo eliminar el directorio: " + dir); //$NON-NLS-1$
+								}
+								return FileVisitResult.CONTINUE;
+							}
+						});
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se ha podido eliminar por completo el directorio alternativo para el certificado SSL", e); //$NON-NLS-1$
+			}
+		}
 
 		// No es necesario eliminar nada mas porque el proceso de desinstalacion de Windows
 		// eliminara el directorio de aplicacion con todo su contenido
@@ -326,5 +368,14 @@ final class ConfiguratorWindows implements Configurator {
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Windows: " + e); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Windows.
+	 * @return Directorio de instalaci&oacute;n.
+	 */
+	private static File getWindowsAlternativeAppDir() {
+		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
+		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
 	}
 }

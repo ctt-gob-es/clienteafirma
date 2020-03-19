@@ -18,6 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -30,6 +36,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,12 +63,12 @@ import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
  * AutoFirma. */
 final class ConfiguratorMacOSX implements Configurator {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "/autofirma.pfx"; //$NON-NLS-1$
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
-	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
+	private static final String CERT_CN = "localhost"; //"127.0.0.1"; //$NON-NLS-1$
 	private static final String CERT_CN_ROOT = "'AutoFirma ROOT'"; //$NON-NLS-1$
 	private static final String MACOSX_CERTIFICATE = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
 	private static final String KEYCHAIN_PATH = "/Library/Keychains/System.keychain"; //$NON-NLS-1$
@@ -107,13 +114,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		console.print(Messages.getString("ConfiguratorMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado"); //$NON-NLS-1$
 
-	}
-
-	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
-	 * @param appDir Directorio de la aplicaci&oacute;n.
-	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
-	private static boolean checkSSLKeyStoreGenerated(final File appDir) {
-		return new File(appDir, KS_FILENAME).exists();
 	}
 
 	 /** Genera el <i>script</i> que elimina el warning al ejecutar AutoFirma desde Chrome.
@@ -202,7 +202,8 @@ final class ConfiguratorMacOSX implements Configurator {
 		uninstallProcess(appDir);
 
 		// Se instalan los certificados en el almacen de Apple
-		JOptionPane.showMessageDialog(console.getParentComponent(), Messages.getString("ConfiguratorMacOSX.20")); //$NON-NLS-1$
+		final JLabel msgLabel = new JLabel("<html>" + Messages.getString("ConfiguratorMacOSX.20") + "</html>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		JOptionPane.showMessageDialog(console.getParentComponent(), msgLabel);
 		console.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
@@ -327,6 +328,42 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 
 		uninstallProcess(resourcesDir);
+
+		// Eliminamos si existe el directorio alternativo usado para el guardado de certificados
+		// SSL durante el proceso de restauracion de la instalacion
+		final File alternativeDir = getMacOSAlternativeAppDir();
+		if (alternativeDir.isDirectory()) {
+			try {
+				Files.walkFileTree(
+						alternativeDir.toPath(),
+						new HashSet<FileVisitOption>(),
+						Integer.MAX_VALUE,
+						new SimpleFileVisitor<Path>() {
+							@Override
+							public FileVisitResult visitFile(final Path file, final BasicFileAttributes attr) {
+								try {
+									Files.delete(file);
+								}
+								catch (final Exception e) {
+									LOGGER.warning("No se pudo eliminar el fichero: " + file); //$NON-NLS-1$
+								}
+								return FileVisitResult.CONTINUE;
+							}
+							@Override
+							public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) {
+								try {
+									Files.delete(dir);
+								} catch (final IOException e) {
+									LOGGER.warning("No se pudo eliminar el directorio: " + dir); //$NON-NLS-1$
+								}
+								return FileVisitResult.CONTINUE;
+							}
+						});
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se ha podido eliminar por completo el directorio alternativo para el certificado SSL", e); //$NON-NLS-1$
+			}
+		}
 	}
 
 	/** Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
@@ -844,5 +881,14 @@ final class ConfiguratorMacOSX implements Configurator {
 			);
 		}
 		return path.replace(" ", "\\ "); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas macOS.
+	 * @return Directorio de instalaci&oacute;n.
+	 */
+	private static File getMacOSAlternativeAppDir() {
+		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
+		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
 	}
 }

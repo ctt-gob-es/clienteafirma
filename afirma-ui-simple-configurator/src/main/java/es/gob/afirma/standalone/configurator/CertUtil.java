@@ -63,7 +63,9 @@ final class CertUtil {
 
 	private static final String PROVIDER = "SC"; //$NON-NLS-1$
 
-	private static final String DEFAULT_LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+	private static final String DEFAULT_LOCALHOST_IP = "127.0.0.1"; //$NON-NLS-1$
+
+	private static final String DEFAULT_LOCALHOST_HOSTNAME = "localhost"; //$NON-NLS-1$
 
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
@@ -131,8 +133,8 @@ final class CertUtil {
 		return getCertPackForHostSsl(
 			sslCertificateAlias,
 			storePassword,
-			DEFAULT_LOCALHOST,
-			null,
+			DEFAULT_LOCALHOST_IP,
+			new String[] { DEFAULT_LOCALHOST_HOSTNAME },
 			ROOT_CERTIFICATE_PRINCIPAL
 		);
 	}
@@ -142,7 +144,7 @@ final class CertUtil {
 	 * @param sslCertificateAlias Alias con el que identificar el certificado SSL.
 	 * @param storePassword Contrase&ntilde;a del almac&eacute;n de claves a generar.
 	 * @param ipAddress Direcci&oacute;n IP del <i>host</i>.
-	 * @param hostName Nombre de <i>host</i> SSL.
+	 * @param hostNames Listado de nombres de dominio SSL.
 	 * @param rootName Principal X&#46;500 de la CA a crear (por ejemplo <i>CN=Nombre</i>).
 	 * @return Tupla con un certificado de CA y un certificado SSL.
 	 * @throws NoSuchAlgorithmException Si no se soporta un algoritmo necesario.
@@ -151,7 +153,7 @@ final class CertUtil {
 	static CertPack getCertPackForHostSsl(final String sslCertificateAlias,
 			                              final String storePassword,
 			                              final String ipAddress,
-			                              final String hostName,
+			                              final String[] hostNames,
 			                              final String rootName) throws NoSuchAlgorithmException,
 	                                                                    CertificateException,
 	                                                                    IOException {
@@ -161,7 +163,7 @@ final class CertUtil {
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
 			ipAddress,
-			hostName,
+			hostNames,
 			caCertificatePrivateKeyEntry
 		);
 		return new CertPack(
@@ -269,7 +271,7 @@ final class CertUtil {
 	}
 
 	private static PrivateKeyEntry generateSslCertificate(final String ipAddress,
-			                                              final String hostName,
+			                                              final String[] hostNames,
 			                                              final PrivateKeyEntry issuerKeyEntry) {
 		// Generamos las claves...
 		final X509Certificate cert;
@@ -286,12 +288,15 @@ final class CertUtil {
 				(X509Certificate) issuerKeyEntry.getCertificate()
 			).getSubject();
 
+			final String commonName = hostNames != null && hostNames.length > 0 && hostNames[0] != null ?
+					hostNames[0] : ipAddress;
+
 			final X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
 				issuerDN,
 				BigInteger.valueOf(new Random().nextInt()),
 				new Date(),
 	    		expirationDate,
-	    		new X500Name("CN=" + (hostName != null ? hostName : ipAddress)), //$NON-NLS-1$
+	    		new X500Name("CN=" + commonName), //$NON-NLS-1$
 				pair.getPublic()
 			);
 
@@ -317,8 +322,12 @@ final class CertUtil {
 
 			final List<GeneralName> altNames = new ArrayList<>();
 			altNames.add(new GeneralName(GeneralName.iPAddress, ipAddress));
-			if (hostName != null) {
-				altNames.add(new GeneralName(GeneralName.dNSName, hostName));
+			if (hostNames != null) {
+				for (final String hostName : hostNames) {
+					if (hostName != null) {
+						altNames.add(new GeneralName(GeneralName.dNSName, hostName));
+					}
+				}
 			}
 			final GeneralNames subjectAltName = new GeneralNames(
 				altNames.toArray(new GeneralName [altNames.size()])
