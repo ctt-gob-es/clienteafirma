@@ -18,7 +18,7 @@ public final class EFacturaAlreadySignedException extends AOInvalidFormatExcepti
 
 	private static final long serialVersionUID = -2721087059930025508L;
 
-	EFacturaAlreadySignedException() {
+	public EFacturaAlreadySignedException() {
 		super("La factura ya tiene una firma electronica y no admite firmas adicionales"); //$NON-NLS-1$
 	}
 

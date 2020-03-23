@@ -29,6 +29,7 @@ import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
@@ -252,7 +253,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			if (headMsg.startsWith(ERROR_PREFIX)) {
 				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
 				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw new AOException("Error durante la prefirma: " + msg); //$NON-NLS-1$
+				throw buildInternalException(msg);
 			}
 		}
 
@@ -317,5 +318,23 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
 			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
+	}
+
+	/** Construye una excepci&oacute;n a partir del mensaje interno de error
+	 * notificado por el servidor trif&aacute;sico.
+	 * @param msg Mensaje de error devuelto por el servidor trif&aacute;sico.
+	 * @return Excepci&oacute;n construida.
+	 */
+	private static AOException buildInternalException(final String msg) {
+		AOException exception;
+		final int internalExceptionPos = msg.indexOf(":", msg.indexOf(":") + 1); //$NON-NLS-1$ //$NON-NLS-2$
+		if (internalExceptionPos > 0) {
+			final String intMessage = msg.substring(internalExceptionPos + 1).trim();
+			exception = AOTriphaseException.parseException(intMessage);
+		}
+		else {
+			exception = new AOException(msg);
+		}
+		return exception;
 	}
 }

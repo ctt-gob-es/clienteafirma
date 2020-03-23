@@ -17,7 +17,7 @@ public class InvalidEFacturaDataException extends AOInvalidFormatException {
 
 	private static final long serialVersionUID = -7465457150119381288L;
 
-	InvalidEFacturaDataException() {
+	public InvalidEFacturaDataException() {
 		super("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
 	}
 

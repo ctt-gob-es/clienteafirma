@@ -21,7 +21,7 @@ public final class PdfIsPasswordProtectedException extends AOException {
 	/** Crea una excepci&oacute;n que indica que el PDF no ha podido abrirse o firmarse por estar protegido por una contrase&ntilde;a
      * y no se ha proporciondo ninguna.
 	 * @param e Causa inicial de la excepci&oacute;n */
-	PdfIsPasswordProtectedException(final Throwable e) {
+	public PdfIsPasswordProtectedException(final Throwable e) {
 		super("La contrasena proporcionada no es valida para el PDF actual o no se proporciono ninguna contrasena", e); //$NON-NLS-1$
 	}
 

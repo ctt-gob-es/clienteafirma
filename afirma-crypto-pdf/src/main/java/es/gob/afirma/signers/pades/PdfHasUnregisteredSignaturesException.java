@@ -19,7 +19,7 @@ public final class PdfHasUnregisteredSignaturesException extends AOException {
 
 	/** Crea una excepci&oacute;n que indica que el PDF no ha podido firmarse por contener firmas previas
 	 * no registradas en campos (<i>AcroFields</i>). */
-	PdfHasUnregisteredSignaturesException() {
+	public PdfHasUnregisteredSignaturesException() {
 		super("El PDF no se ha firmado por contener firmas no registradas"); //$NON-NLS-1$
 	}
 

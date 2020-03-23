@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.protocol.UrlParameters;
+import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 
 final class ProtocolInvocationLauncherUtil {
@@ -74,5 +75,53 @@ final class ProtocolInvocationLauncherUtil {
 		}
 
 		return data;
+	}
+
+	/**
+	 * Construye la excepci&oacute;n interna notificada por una excepci&oacute;n
+	 * en el servicio de firma trif&aacute;sica.
+	 * @param ex Excepci&oacute;n del servicio de firma trif&aacute;sica.
+	 * @return Excepci&oacute;n interna o, si no se pudo obtener, la misma
+	 * excepci&oacute;n recibida por par&aacute;metro.
+	 */
+	static Exception getInternalException(final AOTriphaseException ex) {
+
+		Class<Exception> exceptionClass;
+		try {
+			exceptionClass = (Class<Exception>) Class.forName(ex.getServerExceptionClassname());
+		}
+		catch (final Throwable e) {
+			LOGGER.warning("No se pudo identificar la excepcion enviada por el servidor: " + e); //$NON-NLS-1$
+			return ex;
+		}
+
+		// Buscamos algun constructor que nos permita generar la excepcion
+		try {
+			return exceptionClass.
+					getDeclaredConstructor(String.class).
+					newInstance(ex.getMessage());
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+		try {
+			return exceptionClass.
+					getDeclaredConstructor(String.class, Throwable.class).
+					newInstance(ex.getMessage(), null);
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+		try {
+			return exceptionClass.
+					getDeclaredConstructor(Throwable.class).
+					newInstance((Throwable) null);
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+		try {
+			return exceptionClass.
+					getDeclaredConstructor().
+					newInstance();
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+
+		LOGGER.warning("No se encontro un constructor para reconstruir la excepcion del servidor"); //$NON-NLS-1$
+		return ex;
 	}
 }

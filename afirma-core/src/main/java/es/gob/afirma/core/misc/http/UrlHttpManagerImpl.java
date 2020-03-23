@@ -313,7 +313,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		return data;
-
 	}
 
 	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su

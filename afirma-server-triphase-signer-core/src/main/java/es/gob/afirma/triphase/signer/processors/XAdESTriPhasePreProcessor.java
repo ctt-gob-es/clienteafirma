@@ -28,10 +28,13 @@ import org.xml.sax.SAXException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
+import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
+import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide;
@@ -86,10 +89,14 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Prefirma XAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		// Con FacturaE solo podemos firmar facturas
-		if (this.facturae && !new AOFacturaESigner().isValidDataFile(data)) {
-			throw new AOInvalidFormatException(
-				"Los datos proporcionados no son una factura electronica compatible" //$NON-NLS-1$
-			);
+		final AOSigner facturaESigner = new AOFacturaESigner();
+		if (this.facturae && !facturaESigner.isValidDataFile(data)) {
+			throw new InvalidEFacturaDataException();
+		}
+
+		// Las facturas solo pueden contener una firma
+		if (this.facturae && facturaESigner.isSign(data)) {
+			throw new EFacturaAlreadySignedException();
 		}
 
 		// Si es FacturaE modificamos los parametros adicionales

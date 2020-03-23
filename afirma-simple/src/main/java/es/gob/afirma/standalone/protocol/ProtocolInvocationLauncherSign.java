@@ -37,6 +37,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.OptionalDataInterface;
@@ -54,6 +55,7 @@ import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
+import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
@@ -434,50 +436,55 @@ final class ProtocolInvocationLauncherSign {
 
 		final byte[] sign;
 		try {
-			switch (options.getOperation()) {
-			case SIGN:
-				sign = signer.sign(
-					options.getData(),
-					options.getSignatureAlgorithm(),
-					pke.getPrivateKey(),
-					pke.getCertificateChain(),
-					options.getExtraParams()
-				);
-				break;
-			case COSIGN:
-				sign = signer.cosign(
-					options.getData(),
-					options.getSignatureAlgorithm(),
-					pke.getPrivateKey(),
-					pke.getCertificateChain(),
-					options.getExtraParams()
-				);
-				break;
-			case COUNTERSIGN:
-				sign = signer.countersign(
-					options.getData(),
-					options.getSignatureAlgorithm(),
-					"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? //$NON-NLS-1$ //$NON-NLS-2$
-						CounterSignTarget.TREE : CounterSignTarget.LEAFS,
-					null, // Targets
-					pke.getPrivateKey(),
-					pke.getCertificateChain(),
-					options.getExtraParams()
-				);
-				break;
-			default:
-				LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(
-					ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
-				);
-				if (!bySocket) {
-					throw new SocketOperationException(
-						ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
-					);
+			try {
+				switch (options.getOperation()) {
+				case SIGN:
+					sign = signer.sign(
+							options.getData(),
+							options.getSignatureAlgorithm(),
+							pke.getPrivateKey(),
+							pke.getCertificateChain(),
+							options.getExtraParams()
+							);
+					break;
+				case COSIGN:
+					sign = signer.cosign(
+							options.getData(),
+							options.getSignatureAlgorithm(),
+							pke.getPrivateKey(),
+							pke.getCertificateChain(),
+							options.getExtraParams()
+							);
+					break;
+				case COUNTERSIGN:
+					sign = signer.countersign(
+							options.getData(),
+							options.getSignatureAlgorithm(),
+							"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? //$NON-NLS-1$ //$NON-NLS-2$
+									CounterSignTarget.TREE : CounterSignTarget.LEAFS,
+									null, // Targets
+									pke.getPrivateKey(),
+									pke.getCertificateChain(),
+									options.getExtraParams()
+							);
+					break;
+				default:
+					LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
+					ProtocolInvocationLauncherErrorManager.showError(
+							ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
+							);
+					if (!bySocket) {
+						throw new SocketOperationException(
+								ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
+								);
+					}
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+							ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
+							);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
-					ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
-				);
+			}
+			catch (final AOTriphaseException tex) {
+				throw ProtocolInvocationLauncherUtil.getInternalException(tex);
 			}
 		}
 		catch (final SocketOperationException e) {
@@ -518,6 +525,15 @@ final class ProtocolInvocationLauncherSign {
 			}
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA);
+		}
+		catch (final InvalidEFacturaDataException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_FACTURAE);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_FACTURAE);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_FACTURAE);
 		}
 		catch (final EFacturaAlreadySignedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$

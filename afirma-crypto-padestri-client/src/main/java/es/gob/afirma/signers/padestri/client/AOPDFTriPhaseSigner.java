@@ -10,7 +10,6 @@
 package es.gob.afirma.signers.padestri.client;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -26,6 +25,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
@@ -88,12 +88,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// ---------
 
 		final byte[] preSignResult = PDFTriPhaseSignerUtil.doPresign(signServerUrl, algorithm, certChain, documentId, extraParams);
-		try {
-			LOGGER.info("Recibido el XML de prefirma PAdES:\n" + new String(Base64.decode(new String(preSignResult), true))); //$NON-NLS-1$
-		}
-		catch (final IOException e) {
-			LOGGER.warning("La prefirma no esta en el formato esperado: " + e); //$NON-NLS-1$
-		}
 
 		// Comprobamos que no se trate de un error
 		if (preSignResult.length > 8) {
@@ -101,7 +95,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			if (headMsg.startsWith(ERROR_PREFIX)) {
 				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
 				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw new AOException("Error durante la prefirma: " + msg); //$NON-NLS-1$
+				throw buildInternalException(msg);
 			}
 		}
 
@@ -236,4 +230,21 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		return true;
 	}
 
+	/** Construye una excepci&oacute;n a partir del mensaje interno de error
+	 * notificado por el servidor trif&aacute;sico.
+	 * @param msg Mensaje de error devuelto por el servidor trif&aacute;sico.
+	 * @return Excepci&oacute;n construida.
+	 */
+	private static AOException buildInternalException(final String msg) {
+		AOException exception;
+		final int internalExceptionPos = msg.indexOf(":", msg.indexOf(":") + 1); //$NON-NLS-1$ //$NON-NLS-2$
+		if (internalExceptionPos > 0) {
+			final String intMessage = msg.substring(internalExceptionPos + 1).trim();
+			exception = AOTriphaseException.parseException(intMessage);
+		}
+		else {
+			exception = new AOException(msg);
+		}
+		return exception;
+	}
 }

@@ -20,7 +20,7 @@ public final class InvalidPdfException extends AOFormatFileException {
 
 	/** Crea una excepci&oacute;n para notificar que se ha proporcionado un fichero que no es un PDF
 	 * @param e Excepci&oacute;n de orien */
-	public InvalidPdfException(final Exception e) {
+	public InvalidPdfException(final Throwable e) {
 		super("El fichero no es un PDF o es un PDF no soportado", e); //$NON-NLS-1$
 	}
 

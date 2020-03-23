@@ -66,6 +66,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_PDF_CERTIFIED = "SAF_35"; //$NON-NLS-1$
 	static final String ERROR_CANNOT_FIND_SSL_KEYSTORE = "SAF_36"; //$NON-NLS-1$
 	static final String ERROR_CANNOT_ACCESS_SSL_KEYSTORE = "SAF_37"; //$NON-NLS-1$
+	static final String ERROR_INVALID_FACTURAE = "SAF_38"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
@@ -107,6 +108,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_PDF_CERTIFIED, ProtocolMessages.getString("ProtocolLauncher.45")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_FIND_SSL_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.46")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_ACCESS_SSL_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.47")); //$NON-NLS-1$
+		ERRORS.put(ERROR_INVALID_FACTURAE, ProtocolMessages.getString("ProtocolLauncher.48")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {
