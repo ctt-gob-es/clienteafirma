@@ -60,12 +60,12 @@ public final class TsaParams {
 	 * @param exts Extensiones de la petici&oacute;n a la TSA.
 	 * @param hashAlgorithm Algoritmo de huella digital a usar.
 	 * @param sslKeyStoreFile Almac&eacute;n que contiene el certificado SSL cliente que pedir&aacute; la TSA al
-	 *                        establecer la coneci&oacute;s HTTPS.
+	 *                        establecer la conexi&oacute;n HTTPS.
 	 * @param sslKeyStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
 	 *                            cliente para las conexiones HTTPS.
 	 * @param sslKeyStoreType Tipo de almac&eacute;n que contiene el certificado SSL cliente.
 	 * @param sslTrustStore Almac&eacute;n que contiene los certificados SSL cliente que pedir&aacute; la TSA al
-	 *                      establecer la coneci&oacute;s HTTPS.
+	 *                      establecer la conexi&oacute;n HTTPS.
 	 * @param sslTrustStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
 	 *                              cliente para las conexiones HTTPS.
 	 * @param sslTrustStoreType Tipo de almac&eacute;n que contiene los certificado de CA reconocidas.
