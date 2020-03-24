@@ -117,7 +117,8 @@ final class PDFTriPhaseSignerUtil {
 	static byte[] doSign(final byte[] preSignResult,
 			             final String algorithm,
 			             final PrivateKey key,
-			             final Certificate[] certChain) throws AOException {
+			             final Certificate[] certChain,
+			             final Properties extraParams) throws AOException {
 
 		// Convertimos la respuesta del servidor en un objeto TriphaseData
 		final TriphaseData triphaseData;
@@ -134,7 +135,8 @@ final class PDFTriPhaseSignerUtil {
 			algorithm,
 			key,
 			certChain,
-			triphaseData
+			triphaseData,
+			extraParams
 		).toString().getBytes();
 
 	}
