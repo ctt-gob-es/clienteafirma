@@ -15,9 +15,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -62,21 +59,9 @@ public final class AOPkcs1Signer implements AOSigner {
 			);
 		}
 
-		if (key instanceof RSAPrivateKey && !(algorithm.toLowerCase().endsWith("withrsa") || algorithm.toLowerCase().endsWith("withrsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info(
-				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo RSA" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-		else if (key instanceof ECPrivateKey && !(algorithm.toLowerCase().endsWith("withecdsa") || algorithm.toLowerCase().endsWith("withecdsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info(
-				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo ECDSA" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-		else if (key instanceof DSAPrivateKey && !(algorithm.toLowerCase().endsWith("withdsa") || algorithm.toLowerCase().endsWith("withdsaencryption"))) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info(
-				"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo DSA" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
+		LOGGER.info(
+			"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo " + key.getAlgorithm() //$NON-NLS-1$ //$NON-NLS-2$
+		);
 
 		final Provider p;
 		if (extraParams != null) {
@@ -144,10 +129,7 @@ public final class AOPkcs1Signer implements AOSigner {
 
 	@Override
 	public boolean isValidDataFile(final byte[] is) {
-		if (is != null && is.length > 0) {
-			return true;
-		}
-		return false;
+		return is != null && is.length > 0;
 	}
 
 	@Override
