@@ -220,11 +220,11 @@ public final class BatchSigner {
 		byte[] ret;
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-					batchPresignerUrl + "?" + //$NON-NLS-1$
-							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
-							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
-							UrlHttpMethod.POST
-					);
+				batchPresignerUrl + "?" + //$NON-NLS-1$
+					BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
+				UrlHttpMethod.POST
+			);
 		}
 		catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
@@ -239,18 +239,19 @@ public final class BatchSigner {
 			getAlgorithm(batchB64),
 			pk,
 			certificates,
-			td1
+			td1,
+			null // Sin ExtraParams para el PKCS#1 en lotes
 		);
 
 		// Llamamos al servidor de nuevo para el postproceso
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-					batchPostSignerUrl + "?" + //$NON-NLS-1$
-							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
-							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-							BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(DEFAULT_CHARSET), true),
-							UrlHttpMethod.POST
-					);
+				batchPostSignerUrl + "?" + //$NON-NLS-1$
+					BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
+					BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(DEFAULT_CHARSET), true),
+				UrlHttpMethod.POST
+			);
 		}
 		catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e.getResponseDescription()); //$NON-NLS-1$
