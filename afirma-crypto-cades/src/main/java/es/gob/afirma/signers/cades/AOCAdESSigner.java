@@ -211,7 +211,8 @@ public final class AOCAdESSigner implements AOSigner {
                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
                    claimedRoles,
                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                   doNotIncludePolicyOnSigningCertificate
+                   doNotIncludePolicyOnSigningCertificate,
+                   extraParams
             );
         }
         catch (final Exception e) {
