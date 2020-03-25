@@ -31,6 +31,7 @@ import com.aowagie.text.pdf.PdfSignatureAppearance;
 import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 
@@ -168,6 +169,18 @@ public final class PdfSessionManager {
 		// *****************************
 		// **** Texto firma visible ****
 
+		// Por defecto, siempre se ofuscara la informacion del certificado, salvo que usemos un certificado
+		// de seudonimo
+		boolean obfuscate = true;
+		if (extraParams.containsKey(PdfExtraParams.OBFUSCATE_CERT_DATA)) {
+			obfuscate = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.OBFUSCATE_CERT_DATA));
+		}
+		if (obfuscate && AOUtil.isPseudonymCert((X509Certificate) certChain[0])) {
+			obfuscate = false;
+		}
+
+		final String pdfMaskConfig = extraParams.getProperty(PdfExtraParams.OBFUSCATION_MASK);
+
 		// Texto en capa 4
 		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
@@ -175,17 +188,25 @@ public final class PdfSessionManager {
 			signTime,
 			reason,
 			signatureProductionCity,
-			signerContact
+			signerContact,
+			obfuscate,
+			pdfMaskConfig
 		);
 
 		// Texto en capa 2
+		String configuredLayer2Text = extraParams.getProperty(PdfExtraParams.LAYER2_TEXT);
+		if (configuredLayer2Text == null && !extraParams.containsKey(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE)) {
+			configuredLayer2Text = getDefaultLayer2Text(reason != null, signatureProductionCity != null);
+		}
 		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
-			extraParams.getProperty(PdfExtraParams.LAYER2_TEXT),
+			configuredLayer2Text,
 			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
 			signTime,
 			reason,
 			signatureProductionCity,
-			signerContact
+			signerContact,
+			obfuscate,
+			pdfMaskConfig
 		);
 
 		// Tipo de letra en capa 2
@@ -536,4 +557,17 @@ public final class PdfSessionManager {
 		return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
     }
 
+    private static String getDefaultLayer2Text(final boolean hasReason, final boolean hasLocation) {
+    	final StringBuilder buf = new StringBuilder();
+    	buf.append("Firmado por ") //$NON-NLS-1$
+    	.append(PdfVisibleAreasUtils.LAYERTEXT_TAG_SUBJECTCN).append('\n')
+    	.append("Fecha: ").append(PdfVisibleAreasUtils.LAYERTEXT_TAG_DATE_PREFIX).append("=dd/MM/yyyy HH:mm:ss z$$"); //$NON-NLS-1$ //$NON-NLS-2$
+    	if (hasReason) {
+    		buf.append('\n').append("Motivo: ").append(PdfVisibleAreasUtils.LAYERTEXT_TAG_REASON); //$NON-NLS-1$
+    	}
+    	if (hasLocation) {
+    		buf.append('\n').append("Lugar de firma: ").append(PdfVisibleAreasUtils.LAYERTEXT_TAG_LOCATION); //$NON-NLS-1$
+    	}
+    	return buf.toString();
+    }
 }

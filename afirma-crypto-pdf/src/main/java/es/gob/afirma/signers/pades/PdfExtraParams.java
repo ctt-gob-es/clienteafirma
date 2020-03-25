@@ -266,6 +266,27 @@ public final class PdfExtraParams {
      * Es posible combinar estilos aplicando la operaci&oacute;n l&oacute;gica <cite>o</cite> sobre los valores num&eacute;ricos a combinar. */
     public static final String LAYER2_FONTSTYLE  = "layer2FontStyle";//$NON-NLS-1$
 
+    /** Par&aacute;metro que indica si se debe ofuscar los datos sensibles del
+     * certificado de usuario en la firma visible PDF. */
+   public static final String OBFUSCATE_CERT_DATA  = "obfuscateCertText";//$NON-NLS-1$
+
+   /** Par&aacute;metro con la mascara de ofuscaci&oacute;n a aplicar. La cadena con la m&aacute;scara
+    * debe tener la forma:<br>
+    * {@code caracterSustitutivo;longitudDigitos;posiciones;desplazamiento}<br>
+    * Aqu&iacute;:
+    * <ul>
+    * <li>{@code caracterSustitutivo}: Es el car&aacute;cter que debemos usar para ofuscar caracteres.</li>
+    * <li>{@code longitudDigitos}: Es el n&uacute;mero m&iacute;nimo de d&iacute;gitos que debe tener
+    * una cadena de texto para que se considere que debe ofuscarse.</li>
+    * <li>{@code posiciones}: Es el listado de posiciones que indica qu&eacute; caracteres deben mostrarse.
+    * El listado se expresar&aacute; por una sucesi&oacute;n {@code true}/{@code false} separados por comas
+    * (','), en donde {@code true} indica que el car&aacute;cter debe mostrarse y {@code false} que no. Las
+    * posiciones a ofucar al final del patr&oacute;n se sobreentender&aacute;n.</li>
+    * <li>{@code desplazamiento}: Indica si se admite el desplazamiento de posiciones de la m&aacute;scara para
+    * mostrar todos los caracteres indicados ({@code true}) o si esta debe respetarse ({@code false}).</li>
+    * </ul> */
+   public static final String OBFUSCATION_MASK  = "obfuscationMask";//$NON-NLS-1$
+
     /** Color del texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
      * tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son textuales (se ignora entre may&uacute;sculas
      * y min&uacute;sculas), soport&aacute;ndose:

@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_FORMAT;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_OBFUSCATE_CERT_INFO;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
@@ -96,6 +97,7 @@ final class PreferencesPanelPades extends JScrollPane {
 	private final JTextField padesSignerContact = new JTextField();
 
 	private final JCheckBox visiblePdfSignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.79")); //$NON-NLS-1$
+	private final JCheckBox obfuscateCertificateInfo = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.175")); //$NON-NLS-1$
 	private final JCheckBox visiblePdfStamp = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.172")); //$NON-NLS-1$
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
@@ -139,6 +141,8 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.visiblePdfSignature.setMnemonic('i');
 		this.visiblePdfSignature.addItemListener(modificationListener);
 		this.visiblePdfSignature.addKeyListener(keyListener);
+		this.obfuscateCertificateInfo.addItemListener(modificationListener);
+		this.obfuscateCertificateInfo.addKeyListener(keyListener);
 		this.visiblePdfStamp.addItemListener(modificationListener);
     	this.visiblePdfStamp.addKeyListener(keyListener);
 
@@ -349,6 +353,8 @@ final class PreferencesPanelPades extends JScrollPane {
 		c.gridwidth = 2;
 		innerPanel.add(this.visiblePdfSignature, c);
 		c.gridy++;
+		innerPanel.add(this.obfuscateCertificateInfo, c);
+		c.gridy++;
 		innerPanel.add(this.visiblePdfStamp, c);
 
 		final JPanel signatureOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -376,6 +382,7 @@ final class PreferencesPanelPades extends JScrollPane {
 	void savePreferences() {
 		// Firma PDF visible
 		PreferencesManager.put(PREFERENCE_PADES_VISIBLE, Boolean.toString(this.visiblePdfSignature.isSelected()));
+		PreferencesManager.put(PREFERENCE_PADES_OBFUSCATE_CERT_INFO, Boolean.toString(this.obfuscateCertificateInfo.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_STAMP, Boolean.toString(this.visiblePdfStamp.isSelected()));
 
 		if ("".equals(this.padesSignerContact.getText())) { //$NON-NLS-1$
@@ -427,6 +434,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.padesSignProductionCity.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY));
 		this.padesSignerContact.setText(PreferencesManager.get(PREFERENCE_PADES_SIGNER_CONTACT));
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_VISIBLE));
+		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP));
 
         final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
@@ -470,6 +478,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.padesSignProductionCity.setText(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_SIGN_PRODUCTION_CITY));
 		this.padesSignerContact.setText(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_SIGNER_CONTACT));
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_VISIBLE));
+		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_STAMP));
 
         if (this.padesBasicFormat.getItemCount() > 0) {

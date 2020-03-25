@@ -31,6 +31,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.security.auth.x500.X500Principal;
+
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
 public final class AOUtil {
@@ -283,6 +285,15 @@ public final class AOUtil {
         return null;
     }
 
+    /** Identifica si un certificado es de seud&oacute;nimo.
+     * @param cert Certificado que hay que comprobar.
+     * @return Devuelve {@code true} si es un certificado de seud&oacute;nimo, {@code false} en caso contrario. */
+    public static boolean isPseudonymCert(final X509Certificate cert) {
+    	// El certificado es de seudonimo si declara la extension 2.5.4.65
+    	return getRDNvalueFromLdapName("2.5.4.65",
+    			cert.getSubjectX500Principal().getName(X500Principal.RFC2253)) != null;
+    }
+
     /** Equivalencias de hexadecimal a texto por la posici&oacute;n del vector.
      * Para ser usado en <code>hexify()</code> */
     private static final char[] HEX_CHARS = {
@@ -513,6 +524,5 @@ public final class AOUtil {
 		}
 	    return value.matches("^[0-9]+$"); //$NON-NLS-1$
 	}
-
 }
 

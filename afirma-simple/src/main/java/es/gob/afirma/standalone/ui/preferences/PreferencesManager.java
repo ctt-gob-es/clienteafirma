@@ -308,6 +308,10 @@ public final class PreferencesManager {
 	 * documento. */
 	public static final String PREFERENCE_PADES_VISIBLE = "padesVisibleSignature"; //$NON-NLS-1$
 
+	/** Si est&aacute; establecido a <code>true</code> se ofuscan los identificadores de usuario del CN
+	 * y DN del certificado antes de mostrarlos en la firma visible del PDF. */
+	public static final String PREFERENCE_PADES_OBFUSCATE_CERT_INFO = "obfuscateCertificateInfo"; //$NON-NLS-1$
+
 	/** Si est&aacute; establecido a <code>true</code> se pide al usuario que determine mediante di&aacute;logos
 	 * gr&aacute;ficos los par&aacute;metros de una marca visible en PDF y se inserta como tal en el
 	 * documento. */

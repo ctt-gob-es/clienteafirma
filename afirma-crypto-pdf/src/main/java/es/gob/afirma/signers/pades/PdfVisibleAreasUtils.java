@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
@@ -43,17 +44,17 @@ final class PdfVisibleAreasUtils {
     private static final String BLACK = "black"; //$NON-NLS-1$
 
 	private static final String LAYERTEXT_TAG_DELIMITER = "$$"; //$NON-NLS-1$
-	private static final String LAYERTEXT_TAG_DATE_PREFIX = LAYERTEXT_TAG_DELIMITER + "SIGNDATE"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_DATE_PREFIX = LAYERTEXT_TAG_DELIMITER + "SIGNDATE"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_DATE_DELIMITER = "="; //$NON-NLS-1$
-	private static final String LAYERTEXT_TAG_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_SUBJECTDN = "$$SUBJECTDN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_ISSUERCN = "$$ISSUERCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CERTSERIAL = "$$CERTSERIAL$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_GIVENNAME = "$$GIVENNAME$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_SURNAME = "$$SURNAME$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_ORGANIZATION = "$$ORGANIZATION$$"; //$NON-NLS-1$
-	private static final String LAYERTEXT_TAG_REASON = "$$REASON$$"; //$NON-NLS-1$
-	private static final String LAYERTEXT_TAG_LOCATION = "$$LOCATION$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_REASON = "$$REASON$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_LOCATION = "$$LOCATION$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CONTACT = "$$CONTACT$$"; //$NON-NLS-1$
 
 	private static final Map<String, ColorValues> COLORS = new HashMap<>(7);
@@ -150,7 +151,10 @@ final class PdfVisibleAreasUtils {
 							   final Calendar signDate,
 							   final String reason,
 							   final String signatureProductionCity,
-							   final String signerContact) {
+							   final String signerContact,
+							   final boolean obfuscate,
+							   final String maskConfig) {
+
 		if (txt == null) {
 			return null;
 		}
@@ -159,13 +163,22 @@ final class PdfVisibleAreasUtils {
 
 		// Se mapean los datos relativos al certificado de firma
 		if (cert != null) {
-			ret = ret.replace(LAYERTEXT_TAG_SUBJECTCN, AOUtil.getCN(cert))
+
+			final PdfTextMask mask = prepareMask(obfuscate, maskConfig);
+			String cn = AOUtil.getCN(cert);
+			if (cn != null && mask != null) {
+				cn = obfuscate(cn, mask);
+			}
+			ret = ret.replace(LAYERTEXT_TAG_SUBJECTCN, cn)
 					.replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
 					.replace(LAYERTEXT_TAG_CERTSERIAL, cert.getSerialNumber().toString());
 
 			// Se mapea el principal del subject del certificado
-			final String subjectPrincipal = cert.getSubjectX500Principal().toString();
-			ret = ret.replace(LAYERTEXT_TAG_SUBJECTDN, cert.getSubjectX500Principal().toString());
+			String subjectPrincipal = cert.getSubjectX500Principal().toString();
+			if (subjectPrincipal != null && mask != null) {
+				subjectPrincipal = obfuscate(subjectPrincipal, mask);
+			}
+			ret = ret.replace(LAYERTEXT_TAG_SUBJECTDN, subjectPrincipal);
 
 			// Se mapea el nombre declarado en el subject del certificado
 			final String givenName = AOUtil.getRDNvalueFromLdapName("GIVENNAME", subjectPrincipal);  //$NON-NLS-1$
@@ -173,6 +186,9 @@ final class PdfVisibleAreasUtils {
 
 			// Se mapea el apellido declarado en el subject del certificado
 			final String surname = AOUtil.getRDNvalueFromLdapName("SURNAME", subjectPrincipal); //$NON-NLS-1$
+			if (subjectPrincipal != null && obfuscate) {
+				subjectPrincipal = obfuscate(subjectPrincipal, mask);
+			}
 			ret = ret.replace(LAYERTEXT_TAG_SURNAME, surname != null ? surname : ""); //$NON-NLS-1$
 
 			// Se mapea la organizacion declarada en el subject del certificado
@@ -218,6 +234,32 @@ final class PdfVisibleAreasUtils {
 			ret = ret.replace(sdTag, date);
 		}
 		return ret;
+	}
+
+	/**
+	 * Genera una mascara de ofuscacion si se solicita ofuscar.
+	 * @param obfuscate Indica si se debe ofuscar texto o no.
+	 * @param maskConfig Configuraci&oacute;n de la mascara a aplicar o {@code null}
+	 * si se quiere usar la por defecto.
+	 * @return M&aacute;scara de ofuscaci&oacute;n.
+	 */
+	private static PdfTextMask prepareMask(final boolean obfuscate, final String maskConfig) {
+
+		PdfTextMask mask = null;
+		if (obfuscate) {
+			if (maskConfig != null) {
+				try {
+					mask = PdfTextMask.parseParam(maskConfig);
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "La mascara de ofuscacion no esta bien definida. Se usara la por defecto", e); //$NON-NLS-1$
+				}
+			}
+			else {
+				mask = new PdfTextMask();
+			}
+		}
+		return mask;
 	}
 
 	private static final class ColorValues {
@@ -271,8 +313,8 @@ final class PdfVisibleAreasUtils {
         final float lly = pageRect.getBottom();
 
         // Parametros de rectangulo utilizado para crear el texto
-        final float widthTxt = (degrees == 0 || degrees == 180) ? width : height;
-        final float heightTxt = (degrees == 0 || degrees == 180) ? height : width;
+        final float widthTxt = degrees == 0 || degrees == 180 ? width : height;
+        final float heightTxt = degrees == 0 || degrees == 180 ? height : width;
 
         // La firma visible se configura inicialmente de forma horizontal.
         appearance.setVisibleSignature(
@@ -295,9 +337,9 @@ final class PdfVisibleAreasUtils {
     		final ByteBuffer internalBuffer = t.getInternalBuffer();
 		) {
 	        internalBuffer.write(n2Layer.getInternalBuffer().toByteArray());
-	        Font f = appearance.getLayer2Font();
+	        final Font f = appearance.getLayer2Font();
             // Traduccion de la fuente a una fuente PDF
-            BaseFont bf = f.getCalculatedBaseFont(false);
+            final BaseFont bf = f.getCalculatedBaseFont(false);
 	        t.setFontAndSize(bf, f.getSize());
 
 	        n2Layer.reset();
@@ -331,4 +373,147 @@ final class PdfVisibleAreasUtils {
     	return PdfUtil.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
 
+    /**
+     * Ofusca de un texto las part&iacute;culas que pueden ser interpretables
+     * como un identificador de usuario.
+     * @param text Texto del que ofuscar.
+     * @param mask Configuraci&oacute;n con la m&aacute;scara a aplicar.
+     * @return Texto ofuscado.
+     */
+    static String obfuscate(final String text, final PdfTextMask mask) {
+
+    	final char[] chars = text.toCharArray();
+
+    	int digitCount = 0;
+    	int pos = 0;
+    	boolean found = false;
+    	for (int i = 0; i < chars.length; i++) {
+    		if (Character.isLetterOrDigit(chars[i])) {
+    			if (Character.isDigit(chars[i])) {
+    				digitCount++;
+    				if (digitCount == mask.getMinLength()) {
+    					found = true;
+    				}
+    			}
+    			else {
+    				digitCount = 0;
+    			}
+    		}
+    		else {
+    			if (found) {
+    				obfuscate(chars, pos, i - pos, mask);
+    				found = false;
+    			}
+   				pos = i + 1;
+    		}
+    	}
+    	if (found) {
+			obfuscate(chars, pos, chars.length - pos, mask);
+			found = false;
+		}
+
+    	return new String(chars);
+    }
+
+    /**
+     * Aplica el algoritmo de ofuscaci&oacute;n sobre un fragmento determinado
+     * de un texto.
+     * @param text Array de caracteres del texto.
+     * @param pos Posici&oacute;n del texto a partir de la cual aplicar el
+     * algoritmo de ofuscaci&oacute;n.
+     * @param length Longitud de la subcadena sobre la que hay que aplicar la
+     * ofuscaci&oacute;n.
+     * @param mask Configuraci&oacute;n con la m&aacute;scara a aplicar.
+     */
+    private static void obfuscate (final char[] text, final int pos, final int length, final PdfTextMask mask) {
+
+    	final int numDigits = countDigits(text);
+    	final int plainDigits = countPlainPositions(mask.getPositions());
+    	final boolean applyOnlyDigits = numDigits >= plainDigits;
+
+		// Si hay suficientes digitos para aplicar la mascara,
+		// esta se aplicara solo sobre los digitos
+    	if (applyOnlyDigits) {
+
+    		boolean[] posMasked = mask.getPositions();
+
+    		// Si no hay suficientes digitos en el texto para aplicar la mascara
+    		// completa, se adaptara la mascara para omitir posiciones ofuscadas
+    		// del inicio del texto
+    		if (mask.isShiftSupported() && numDigits < posMasked.length) {
+
+    			posMasked = new boolean[numDigits];
+    			final boolean[] maskPositions = mask.getPositions();
+
+    			int currentCount = 0;
+    			final int omitCount = maskPositions.length - numDigits;
+    			for (int i = 0; i < maskPositions.length; i++) {
+    				if (maskPositions[i] || currentCount >= omitCount) {
+    					posMasked[i - currentCount] = maskPositions[i];
+    				}
+    				else {
+    					currentCount++;
+    				}
+    			}
+    		}
+
+    		// Omitiremos todas las letras y los digitos que se encuentren en
+    		// una posicion a ofuscar segun la mascara
+    		for (int i = 0, j = 0; i < length; i++) {
+    			if (Character.isDigit(text[pos + i])) {
+    				if (j >= posMasked.length || !posMasked[j]) {
+    					text[pos + i] = mask.getObfuscatedChar();
+    				}
+    				j++;
+    			}
+    			else {
+    				text[pos + i] = mask.getObfuscatedChar();
+    			}
+    		}
+    	}
+    	// Si no hay suficientes digitos para aplicar la mascara
+    	// aplicaremos la mascara desde atras
+    	else {
+    		final boolean[] posMasked = mask.getPositions();
+    		int posMaskedPos = posMasked.length - 1;
+    		for (int i = pos + length - 1; i >= pos; i--) {
+    			if (posMaskedPos < 0 || !posMasked[posMaskedPos]) {
+    				text[i] = mask.getObfuscatedChar();
+    			}
+				posMaskedPos--;
+    		}
+    	}
+    }
+
+    /**
+     * Cuenta el n&uacute;mero de caracteres en claro que admite la
+     * m&aacute;scara.
+     * @param positions Posiciones contempladas por la m&aacute;scara.
+     * @return N&uacute;mero de caracteres que la m&aacute;scara no
+     * ofuscar&aacute;.
+     */
+    private static int countPlainPositions(final boolean[] positions) {
+    	int count = 0;
+    	for (int i = 0; i < positions.length; i++) {
+    		if (positions[i]) {
+    			count++;
+    		}
+    	}
+		return count;
+	}
+
+    /**
+     * Cuenta el n&uacute;mero de d&iacute;gitos de una cadena de texto.
+     * @param text Cadena de texto.
+     * @return N&uacute;mero de d&iacute;gitos en la cadena.
+     */
+    private static int countDigits(final char[] text) {
+    	int digitsCount = 0;
+    	for (final char c : text) {
+    		if (Character.isDigit(c)) {
+    			digitsCount++;
+    		}
+    	}
+    	return digitsCount;
+    }
 }

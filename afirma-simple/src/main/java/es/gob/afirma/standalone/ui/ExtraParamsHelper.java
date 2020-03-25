@@ -178,6 +178,11 @@ final class ExtraParamsHelper {
         if (subfilter != null && !subfilter.trim().isEmpty()) {
         	p.put(PdfExtraParams.SIGNATURE_SUBFILTER, subfilter);
         }
+
+        // Ofuscacion de los datos del certificado de firma
+        final boolean obfuscate = Boolean.parseBoolean(PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
+       	p.put(PdfExtraParams.OBFUSCATE_CERT_DATA, Boolean.toString(obfuscate));
+
 		return p;
 	}
 
