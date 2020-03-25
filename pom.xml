@@ -51,6 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.7-SNAPSHOT</clienteafirma.version>
+		<jmulticard.version>1.6-SNAPSHOT</jmulticard.version>
 		<afirma.legible.version>1_7_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		
@@ -73,19 +74,19 @@
 			<dependency>
 				<groupId>es.gob.afirma.jmulticard</groupId>
 				<artifactId>jmulticard</artifactId>
-				<version>1.5</version>
+				<version>${jmulticard.version}</version>
 			</dependency>
 			
 			<dependency>
 				<groupId>es.gob.afirma.jmulticard</groupId>
 				<artifactId>jmulticard-jse</artifactId>
-				<version>1.5</version>
+				<version>${jmulticard.version}</version>
 			</dependency>
 			
 			<dependency>
 				<groupId>es.gob.afirma.jmulticard</groupId>
 				<artifactId>jmulticard-ui</artifactId>
-				<version>1.5</version>
+				<version>${jmulticard.version}</version>
 			</dependency>
 			
 			<dependency>
