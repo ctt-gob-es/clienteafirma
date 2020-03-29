@@ -116,30 +116,44 @@ public final class SignValidity {
     /** Error que invalida la firma o hace que la validez sea desconocida. */
     private final VALIDITY_ERROR error;
 
-    /**
-     * Identifica la validez de una firma.
+    /** Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
+    private final Exception errorException;
+
+    /** Identifica la validez de una firma.
      * @param type Validez de la firma.
      * @param error Error que invalida o impide comprobar la firma.
-     */
-    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
+     * @param ex Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
+     *           Si la validaci&oacute;n fue correcta, puede indicarse <code>null</code>. */
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error, final Exception ex) {
         this.validity = type;
         this.error = error;
+        this.errorException = ex;
     }
 
-    /**
-     * Recupera la validez de la firma.
-     * @return Validez de la firma.
-     */
+    /** Identifica la validez de una firma.
+     * @param type Validez de la firma.
+     * @param error Error que invalida o impide comprobar la firma. */
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
+    	this(type, error, null);
+    }
+
+    /** Recupera la validez de la firma.
+     * @return Validez de la firma. */
     public SIGN_DETAIL_TYPE getValidity() {
         return this.validity;
     }
 
-    /**
-     * Recupera el error que invalida la firma. Si no existe ning&uacute;n error o este es desconocido,
+    /** Recupera el error que invalida la firma. Si no existe ning&uacute;n error o este es desconocido,
      * se devolver&aacute; {@code null}.
-     * @return Error que invalida la firma o impide comprobar su validez.
-     */
+     * @return Error que invalida la firma o impide comprobar su validez. */
     public VALIDITY_ERROR getError() {
         return this.error;
+    }
+
+    /** Recupera la excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
+     * Devuelve <code>null</code> en una validaci&oacute;n sin errores.
+     * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
+    public Exception getErrorException() {
+    	return this.errorException;
     }
 }
