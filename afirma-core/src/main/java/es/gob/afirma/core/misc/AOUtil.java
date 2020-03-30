@@ -290,7 +290,7 @@ public final class AOUtil {
      * @return Devuelve {@code true} si es un certificado de seud&oacute;nimo, {@code false} en caso contrario. */
     public static boolean isPseudonymCert(final X509Certificate cert) {
     	// El certificado es de seudonimo si declara la extension 2.5.4.65
-    	return getRDNvalueFromLdapName("2.5.4.65",
+    	return getRDNvalueFromLdapName("2.5.4.65", //$NON-NLS-1$
     			cert.getSubjectX500Principal().getName(X500Principal.RFC2253)) != null;
     }
 

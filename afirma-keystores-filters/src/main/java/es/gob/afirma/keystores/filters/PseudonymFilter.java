@@ -10,32 +10,27 @@
 package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.misc.AOUtil;
 
 
 /** Filtro de certificados de seud&oacute;nimo.
  * Este filtro muestra los certificados de seud&oacute;nimo ocultando los certificados
- * que tambi&eacute;n contenga el mismo almacen que hayan sido emitidos por el mismo emisor
+ * que tambi&eacute;n contenga el mismo almacen que hayan sido emitidos por el mismo emisor,
  * para el mismo prop&oacute;sito y con el mismo periodo de validez.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class PseudonymFilter extends CertificateFilter {
 
-	private static final String PSEUDONYM_POLICY_OID = "2.16.724.1.2.1.102.41"; //$NON-NLS-1$
-
-	private static final CertificateFilter PSEUDONYM_POLICY_FILTER = new PolicyIdFilter(
-		Collections.singletonList(
-			PSEUDONYM_POLICY_OID
-		)
-	);
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
 	public boolean matches(final X509Certificate cert) {
-		return PSEUDONYM_POLICY_FILTER.matches(cert);
+		return AOUtil.isPseudonymCert(cert);
 	}
 
 	@Override
@@ -43,7 +38,7 @@ public final class PseudonymFilter extends CertificateFilter {
 		final Map<String, X509Certificate> certsByAlias = new ConcurrentHashMap<>(aliases.length);
 		final Map<String, X509Certificate> psudoByAlias = new ConcurrentHashMap<>();
 
-		// Creamos dos listas, una con los certificados normales y otros con los de alias
+		// Creamos dos listas, una con los certificados de seudonimo y otra con el resto
 		for (final String alias : aliases) {
 			final X509Certificate cert = ksm.getCertificate(alias);
 			if (matches(cert)) {
@@ -54,56 +49,46 @@ public final class PseudonymFilter extends CertificateFilter {
 			}
 		}
 
+		// Si no hay certificados de seudonimo, se mostraran todos los que hay
 		if (psudoByAlias.isEmpty()) {
 			return aliases;
 		}
 
-		final Set<String> pseuAliases = psudoByAlias.keySet();
-		for (final String pseuAlias : pseuAliases) {
+		// Omitimos del listado de certificados normales todos aquellos que tengan un
+		// certificado de seudonimo asociado, ya que en ese caso solo se debera mostrar
+		// el de seudonimo.
+		for (final String pseuAlias : psudoByAlias.keySet()) {
 			final X509Certificate pseuCert = psudoByAlias.get(pseuAlias);
-			final Set<String> certAliases = certsByAlias.keySet();
-			for (final String certAlias : certAliases) {
+			for (final String certAlias : certsByAlias.keySet()) {
 				final X509Certificate normCert = certsByAlias.get(certAlias);
 				if (isPseudonymFor(pseuCert, normCert)) {
+					LOGGER.info(String.format("Se omite el certificado '%s' por haber un certificado de seudonimo equivalente")); //$NON-NLS-1$
 					certsByAlias.remove(certAlias);
 				}
 			}
 		}
 
+		// Unificamos los listados de certificados de seudonimo junto con el de
+		// certiificados normales que no tienen uno de seudonimo asociado
 		psudoByAlias.putAll(certsByAlias);
 		return psudoByAlias.keySet().toArray(new String[0]);
 	}
 
+	/**
+	 * Comprueba que un certificado sea el certificado de seud&oacute;nimo de otro comparando
+	 * que compartan ciertas propiedades.
+	 * @param pseudonymCert Certificado de seud&oacute;nimo.
+	 * @param otherCert Certificado que comprobar.
+	 * @return {@code true} si ambos certificados comparten los atributos necesarios como para considerar
+	 * que uno es seud&oacute;nimo del otro, {@code false} en caso contrario.
+	 */
 	private static boolean isPseudonymFor(final X509Certificate pseudonymCert, final X509Certificate otherCert) {
-		if (pseudonymCert == null || otherCert == null) {
-			return false;
-		}
-		if (
+		return pseudonymCert != null && otherCert != null &&
+			// Que hayan sido expedidos por el mismo emisor
 			pseudonymCert.getIssuerX500Principal().equals(otherCert.getIssuerX500Principal()) &&
-			compareArrays(pseudonymCert.getKeyUsage(), otherCert.getKeyUsage())
-		) {
-			return true;
-		}
-		return false;
+			// Que ambos declaren los mismos usos para su clave
+			Arrays.equals(pseudonymCert.getKeyUsage(), otherCert.getKeyUsage()) &&
+			// Que no transcurriesen mas de 60 segundos entre la emision de ambos certificados
+			Math.abs(pseudonymCert.getNotAfter().getTime() - otherCert.getNotAfter().getTime()) < 60000;
 	}
-
-	private static boolean compareArrays(final boolean[] array1, final boolean[] array2) {
-        if (array1 != null && array2 != null){
-          if (array1.length != array2.length) {
-			return false;
-          }
-          for (int i = 0; i < array2.length; i++) {
-		      if (array2[i] != array1[i]) {
-		          return false;
-		      }
-          }
-        }
-        else {
-          return false;
-        }
-        return true;
-    }
-
-
-
 }
