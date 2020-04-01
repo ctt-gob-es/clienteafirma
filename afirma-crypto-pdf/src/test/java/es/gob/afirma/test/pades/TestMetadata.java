@@ -10,6 +10,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.junit.Test;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +35,7 @@ import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.pades.PdfPreProcessor;
 
 /** Pruebas de operaciones sobre XMP.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -53,9 +56,45 @@ public final class TestMetadata {
 			"  <stEvt:when>" + TAG_DATE + "</stEvt:when>\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"</rdf:li>"; //$NON-NLS-1$
 
+	/** Prueba del establecimiento de informaci&oacute;n adicional en el diccionario PDF.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testMoreInfo() throws Exception {
+
+		// PDF de ejemplo
+		final PdfReader reader = new PdfReader(
+			AOUtil.getDataFromInputStream(
+				ClassLoader.getSystemResourceAsStream("PDF-A1B.pdf") //$NON-NLS-1$
+			)
+		);
+
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final Calendar globalDate = new GregorianCalendar();
+
+		final PdfStamper stamper = new PdfStamper(reader, baos, globalDate);
+
+		final HashMap<String, String> p = new HashMap<>(2);
+		p.put("Primera propiedad", "Portafirmas"); //$NON-NLS-1$ //$NON-NLS-2$
+		p.put("Segunda propiedad", "JCCM"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		PdfPreProcessor.addMoreInfo(p, stamper);
+
+		stamper.close(globalDate);
+
+		reader.close();
+
+		try (
+			final OutputStream fos = new FileOutputStream(File.createTempFile("PDF_DICT_", ".pdf")) //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+			fos.write(baos.toByteArray());
+		}
+
+	}
+
 	/** Main para pruebas.
 	 * @param args No se usa.
-	 * @throws Exception en cuauqluier error. */
+	 * @throws Exception en cualquier error. */
 	public static void main(final String[] args) throws Exception {
 
 		// PDF de ejemplo
