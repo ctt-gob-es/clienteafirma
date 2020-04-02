@@ -185,18 +185,16 @@ public final class CAdESExtraParams {
      */
     static final String TSA_USR = "tsaUsr";//$NON-NLS-1$
 
-    /**
-     *  Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.
-     */
+    /** Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido
+     * adem&aacute;s <code>tsaUsr</code>. */
     static final String TSA_PWD_KEY = "tsaPwd";//$NON-NLS-1$
 
-    /**
-     *  Nombre del fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute; la TSA al establecer la coneci&oacute;s HTTPS.*/
+    /** Nombre del fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute;
+     * la TSA al establecer la conexi&oacute;n HTTPS.*/
     static final String TSA_SSL_PKCS12_FILE = "tsaSslPkcs12File";//$NON-NLS-1$
 
-    /**
-     *  Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS.
-     */
+    /** Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para
+     * las conexiones HTTPS. */
     static final String TSA_SSL_PKCS12_FILE_PASSWORD_KEY = "tsaSslPkcs12FilePassword";//$NON-NLS-1$
 
     /**

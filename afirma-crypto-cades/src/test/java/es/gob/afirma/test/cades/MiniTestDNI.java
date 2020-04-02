@@ -80,7 +80,8 @@ public final class MiniTestDNI {
         		null,
         		null,
         		null,
-        		false // SI incluir politica en SigningCertificate
+        		false, // SI incluir politica en SigningCertificate
+        		null // Sin parametros para el PKCS#1)
 		);
 
         Assert.assertNotNull(firma);

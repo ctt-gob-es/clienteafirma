@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -84,6 +85,7 @@ public final class GenCAdESEPESSignedData {
      *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
      *                                               si se establece a <code>false</code> se incluye siempre que el certificado
      *                                               la declare.
+     * @param pkcs1ExtraParams Par&aacute;metros adicionales para el PKCS#1.
      * @return La firma generada codificada en ASN.1 binario.
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
     public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
@@ -101,7 +103,8 @@ public final class GenCAdESEPESSignedData {
                                             final List<CommitmentTypeIndicationBean> ctis,
                                             final String[] claimedRoles,
                                             final CAdESSignerMetadata csm,
-                                            final boolean doNotIncludePolicyOnSigningCertificate) throws AOException {
+                                            final boolean doNotIncludePolicyOnSigningCertificate,
+                                            final Properties pkcs1ExtraParams) throws AOException {
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }
@@ -130,7 +133,13 @@ public final class GenCAdESEPESSignedData {
             doNotIncludePolicyOnSigningCertificate
         );
 
-        final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, key, certChain, null);
+        final byte[] signature = new AOPkcs1Signer().sign(
+    		preSignature,
+    		signatureAlgorithm,
+    		key,
+    		certChain,
+    		pkcs1ExtraParams
+		);
 
         return CAdESTriPhaseSigner.postSign(
             signatureAlgorithm,

@@ -104,7 +104,13 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// ----------
 
 		final String preResultAsBase64 = Base64.encode(
-			PDFTriPhaseSignerUtil.doSign(preSignResult, algorithm, key, certChain),
+			PDFTriPhaseSignerUtil.doSign(
+				preSignResult,
+				algorithm,
+				key,
+				certChain,
+				extraParams
+			),
 			true
 		);
 

@@ -12,6 +12,7 @@ package es.gob.afirma.core.signers;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
@@ -40,13 +41,16 @@ public final class TriphaseDataSigner {
 	 * @param key Clave privada para la firma.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param triphaseData Datos de sesi&oacute;n trif&aacute;sica.
+	 * @param extraParams Par&aacute;metros adicionales (aqu&iacute; solo aplican a la
+	 *                    firma PKCS#1.
 	 * @return Sesi&oacute;n trif&aacute;sica con las firmas PKCS#1 incluidas.
 	 * @throws AOException Si ocurre cualquier error durante la firma. */
 	public static TriphaseData doSign(final AOPkcs1Signer signer,
 			                          final String algorithm,
 			                          final PrivateKey key,
 			                          final Certificate[] certChain,
-			                          final TriphaseData triphaseData) throws AOException {
+			                          final TriphaseData triphaseData,
+			                          final Properties extraParams) throws AOException {
 
 		if (triphaseData.getSignsCount() < 1) {
 			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
@@ -74,7 +78,7 @@ public final class TriphaseDataSigner {
 				algorithm,
 				key,
 				certChain,
-				null // No hay parametros en PKCS#1
+				extraParams // Parametros para PKCS#1
 			);
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
@@ -90,7 +94,6 @@ public final class TriphaseDataSigner {
 		}
 
 		return triphaseData;
-
 	}
 
 }

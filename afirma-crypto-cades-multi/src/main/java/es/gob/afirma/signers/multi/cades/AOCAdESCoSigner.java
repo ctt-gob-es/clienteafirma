@@ -140,7 +140,8 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 				claimedRoles,
 				Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
 				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-				doNotIncludePolicyOnSigningCertificate
+				doNotIncludePolicyOnSigningCertificate,
+				extraParams
 			);
 
 		}
@@ -239,7 +240,8 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			    claimedRoles,
 			    Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
 			    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-			    doNotIncludePolicyOnSigningCertificate
+			    doNotIncludePolicyOnSigningCertificate,
+			    extraParams
 			);
 		}
         catch (final Exception e) {

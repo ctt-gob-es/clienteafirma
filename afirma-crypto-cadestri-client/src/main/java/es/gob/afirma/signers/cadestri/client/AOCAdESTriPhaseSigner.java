@@ -269,13 +269,17 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
 
-		final String preResultAsBase64 = Base64.encode(TriphaseDataSigner.doSign(
-			new AOPkcs1Signer(),
-			algorithm,
-			key,
-			certChain,
-			triphaseData
-		).toString().getBytes(), true);
+		final String preResultAsBase64 = Base64.encode(
+			TriphaseDataSigner.doSign(
+				new AOPkcs1Signer(),
+				algorithm,
+				key,
+				certChain,
+				triphaseData,
+				extraParams
+			).toString().getBytes(),
+			true
+		);
 
 		// ---------
 		// POSTFIRMA

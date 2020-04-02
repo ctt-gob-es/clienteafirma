@@ -19,7 +19,7 @@
 					showSaveOkCallback,
 					showErrorCallback);
 		}
-
+	
 		function showSaveOkCallback() {
 			showLog("Guardado OK");
 		}
@@ -30,11 +30,13 @@
 				var extras = JSON.parse(extraData);
 				showLog("Fichero cargado: " + extras.filename);
 			}
+			//showLog("Certificado:\n" + certificateB64);
 			document.getElementById('result').value = signatureB64;
 		}
 		
 		function showBatchResultCallback(resultB64, certificateB64) {
 			showLog("Firma de lote OK");
+			showLog("Certificado:\n" + certificateB64);
 			document.getElementById('result').value = resultB64;
 		}
 
@@ -101,7 +103,7 @@
 		function downloadedErrorCallback(e) {
 			showLog("Error en la descarga de los datos: " + e);
 		}
-
+		
 		function doSignBatch() {
 			try {
 				var batch = createBatchConfiguration();
@@ -238,7 +240,6 @@
 				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
 						+ AutoScript.getErrorMessage());
 			}
-
 		}
 
 		function showGetCurrentLogResultCallback(log) {
@@ -338,11 +339,11 @@
 		<script>
 			//AutoScript.setForceWSMode(true);
 			//AutoScript.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
-			AutoScript.cargarAppAfirma(Constants.URL_BASE_APPLET);
+			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",
 					Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
-
+			
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
 		<div>
 		 <input id="data" type="hidden">
@@ -385,7 +386,7 @@
 		 <select id="algorithm">
 		 <option value="SHA1withRSA">SHA1 con RSA</option>
 		 <option value="SHA256withRSA">SHA256 con RSA</option>
-		 <option value="SHA512withRSA">SHA512 con RSA</option>
+		 <option value="SHA512withRSA" selected>SHA512 con RSA</option>
 		 </select>
 		</div>
 

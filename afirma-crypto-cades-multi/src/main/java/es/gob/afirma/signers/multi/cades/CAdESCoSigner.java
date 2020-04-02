@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 import org.spongycastle.asn1.ASN1Encodable;
 import org.spongycastle.asn1.ASN1EncodableVector;
@@ -166,6 +167,7 @@ final class CAdESCoSigner {
      *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
      *                                               si se establece a <code>false</code> se incluye siempre que el certificado
      *                                               la declare.
+     * @param pkcs1ExtraParams Par&aacute;metros adicionales para el PKCS#1.
 	 * @return El archivo de firmas con la nueva firma.
 	 * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
 	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
@@ -186,9 +188,10 @@ final class CAdESCoSigner {
 			        final String[] claimedRoles,
 			        final boolean includeSigningTimeAttribute,
 			        final CAdESSignerMetadata csm,
-                    final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
-			                                                                     NoSuchAlgorithmException,
-			                                                                     CertificateException {
+                    final boolean doNotIncludePolicyOnSigningCertificate,
+                    final Properties pkcs1ExtraParams) throws IOException,
+			                                                  NoSuchAlgorithmException,
+			                                                  CertificateException {
 		final SignedData sd = readData(signature);
 
 		// 3. CONTENTINFO
@@ -298,7 +301,12 @@ final class CAdESCoSigner {
 
 		final ASN1OctetString sign2;
 		try {
-			sign2 = firma(signatureAlgorithm, key, certChain);
+			sign2 = firma(
+				signatureAlgorithm,
+				key,
+				certChain,
+				pkcs1ExtraParams
+			);
 		}
 		catch (final AOException ex) {
 			throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
@@ -345,6 +353,7 @@ final class CAdESCoSigner {
      *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
      *                                               si se establece a <code>false</code> se incluye siempre que el certificado
      *                                               la declare.
+     * @param pkcs1ExtraParams Par&aacute;metros adicionales para el PKCS#1.
 	 * @return El archivo de firmas con la nueva firma.
 	 * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
 	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
@@ -365,10 +374,11 @@ final class CAdESCoSigner {
 			        final String[] claimedRoles,
 			        final boolean includeSigningTimeAttribute,
                     final CAdESSignerMetadata csm,
-                    final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
-			                                                                     NoSuchAlgorithmException,
-			                                                                     CertificateException,
-			                                                                     ContainsNoDataException {
+                    final boolean doNotIncludePolicyOnSigningCertificate,
+                    final Properties pkcs1ExtraParams) throws IOException,
+			                                                  NoSuchAlgorithmException,
+			                                                  CertificateException,
+			                                                  ContainsNoDataException {
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		final ASN1Sequence dsq;
 		try (
@@ -517,7 +527,12 @@ final class CAdESCoSigner {
 
 		final ASN1OctetString sign2;
 		try {
-			sign2 = firma(signatureAlgorithm, key, certChain);
+			sign2 = firma(
+				signatureAlgorithm,
+				key,
+				certChain,
+				pkcs1ExtraParams
+			);
 		}
 		catch (final AOException ex) {
 			throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
@@ -546,12 +561,13 @@ final class CAdESCoSigner {
 	 *        Algoritmo para la firma
 	 * @param key Clave para firmar.
 	 * @param certChain Cadena de certificados del firmante.
+	 * @param extraParams Par&aacute;metros adicionales para el PKCS#1.
 	 * @return Firma de los atributos.
 	 * @throws AOException Cuando ocurre cualquier tipo de error */
 	private ASN1OctetString firma(final String signatureAlgorithm,
 			                      final PrivateKey key,
-			                      final java.security.cert.Certificate[] certChain) throws AOException {
-
+			                      final java.security.cert.Certificate[] certChain,
+			                      final Properties extraParams) throws AOException {
 		final byte[] tmp;
 		try {
 			tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
@@ -560,7 +576,15 @@ final class CAdESCoSigner {
 			throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
 		}
 
-		return new DEROctetString(new AOPkcs1Signer().sign(tmp, signatureAlgorithm, key, certChain, null));
+		return new DEROctetString(
+			new AOPkcs1Signer().sign(
+				tmp,
+				signatureAlgorithm,
+				key,
+				certChain,
+				extraParams
+			)
+		);
 
 	}
 }

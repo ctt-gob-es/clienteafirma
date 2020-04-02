@@ -44,6 +44,17 @@ public final class TestRFC2254CertificateFilter {
 			"cn=*DNIE*" //$NON-NLS-1$
 		);
 		Assert.assertTrue(filter.matches(cert));
+
+		final X509Certificate certApe = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+			ClassLoader.getSystemResourceAsStream("Certicficado_AP_CarlosGG.cer") //$NON-NLS-1$
+		);
+
+		filter = new RFC2254CertificateFilter(
+			null,
+			"cn=*AC Administraci*" //$NON-NLS-1$
+		);
+		Assert.assertTrue(filter.matches(certApe));
+		Assert.assertFalse(filter.matches(cert));
 	}
 
 	/** Prueba recursiva por emisor de filtro RFC 2254.

@@ -20,4 +20,11 @@ public interface SignValider {
      * @return Validez de la firma.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
     SignValidity validate(final byte[] sign) throws IOException;
+
+	/** Valida una firma del tipo del validador instanciado.
+     * @param sign Firma a validar
+	 * @param checkCertificates Indica si debe comprobarse o no el periodo de validez de los certificados.
+     * @return Validez de la firma.
+	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
+    SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException;
 }

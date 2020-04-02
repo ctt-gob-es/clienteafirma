@@ -2,8 +2,10 @@ package es.gob.afirma.envelopers.cms;
 
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,6 +23,12 @@ public final class TestEnvelopes {
     private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+
+    static {
+    	if (Security.getProvider(org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME) == null) {
+    		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    	}
+    }
 
 	/** Prueba de apertura de sobre.
 	 * @throws Exception En cualquier error. */
@@ -89,6 +97,57 @@ public final class TestEnvelopes {
 		);
 
 		// Y comprobacion de que abre bien
+		final byte[] recoveredData = new AOCMSEnveloper().recoverData(envelope, pkeOpen);
+		Assert.assertArrayEquals(
+			"El contenido desensobrado no coincide con el ensobrado", //$NON-NLS-1$
+			content,
+			recoveredData
+		);
+
+		System.out.println(new String(recoveredData));
+
+	}
+
+	/** Prueba de creaci&oacute;n de sobre con curva el&iacute;ptica.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void createAndOpenEnvelopeEc() throws Exception {
+
+		final byte[] content ="Hola mundo".getBytes(); //$NON-NLS-1$
+
+		// Destinatario del sobre
+		final X509Certificate recipientCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+			TestEnvelopes.class.getResourceAsStream(
+				"/juaneliptico.cer" // <- DESTINATARIO EN DIRECTORIO DE RECURSOS DE PRUEBA //$NON-NLS-1$
+			)
+		);
+
+		final byte[] envelope = new AOCMSEnveloper().createCMSEnvelopedData(
+			content,
+			null,
+			new AOCipherConfig(
+				AOCipherAlgorithm.AES,
+				AOCipherBlockMode.ECB,
+				AOCipherPadding.PKCS5PADDING
+			),
+			new X509Certificate[] { recipientCert },
+			Integer.valueOf(128) // <- CAMBIAR A 256 SI SE TIENE DESACTIVADA LA RESTRICCION EN EL JRE
+		);
+
+		// Ahora abrimos el sobre para comprobar que todo esta bien
+
+		final KeyStore ksOpen = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ksOpen.load(TestEnvelopes.class.getResourceAsStream("/juaneliptico.p12"), "12341234".toCharArray()); //$NON-NLS-1$ //$NON-NLS-2$
+		final Enumeration<String> aliases = ksOpen.aliases();
+		final String alias = aliases.nextElement();
+
+		final PrivateKeyEntry pkeOpen = (PrivateKeyEntry) ksOpen.getEntry(
+			alias,
+			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
+
+		// Comprobacion de que abre bien
 		final byte[] recoveredData = new AOCMSEnveloper().recoverData(envelope, pkeOpen);
 		Assert.assertArrayEquals(
 			"El contenido desensobrado no coincide con el ensobrado", //$NON-NLS-1$

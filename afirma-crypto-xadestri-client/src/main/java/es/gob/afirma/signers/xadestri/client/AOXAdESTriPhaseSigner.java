@@ -429,7 +429,8 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 				algorithm,
 				key,
 				certChain,
-				triphaseData
+				triphaseData,
+				extraParams
 			).toString().getBytes(),
 			true
 		);

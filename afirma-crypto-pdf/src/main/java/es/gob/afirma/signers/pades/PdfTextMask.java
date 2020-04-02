@@ -8,6 +8,10 @@ public class PdfTextMask {
 	/** Caracter sustitutivo a utilizar por defecto. */
 	private static final char DEFAULT_OBFUSCATED_CHAR = '*';
 
+	/** Longitud m&iacute;nima de digitos consecutivos para considerar que un
+	 * texto es un identificador a ser ofuscado */
+	private static final int DEFAULT_MIN_NUMBER_LENGTH = 3;
+
 	/** Caracter sustitutivo. */
 	private char obfuscatedChar;
 
@@ -27,7 +31,7 @@ public class PdfTextMask {
 	/** Genera la m&aacute;scara por defecto. */
 	PdfTextMask() {
 		this.obfuscatedChar = DEFAULT_OBFUSCATED_CHAR;
-		this.minLength = 3;
+		this.minLength = DEFAULT_MIN_NUMBER_LENGTH;
 		this.positions = new boolean[] { false, false, false, true, true, true, true};
 		this.shiftSupported = true;
 	}

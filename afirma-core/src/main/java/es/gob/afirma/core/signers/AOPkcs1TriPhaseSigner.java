@@ -291,11 +291,12 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 		byte[] pkcs1;
 		try {
 			pkcs1 = new AOPkcs1Signer().sign(
-					Base64.decode(tri.getProperty(PROPERTY_NAME_PRESIGN)),
-					algorithm,
-					key,
-					certChain,
-					extraParams);
+				Base64.decode(tri.getProperty(PROPERTY_NAME_PRESIGN)),
+				algorithm,
+				key,
+				certChain,
+				extraParams
+			);
 		}
 		catch (final IOException e) {
 			LOGGER.severe("Error al decodificar la prefirma de los datos: " + e); //$NON-NLS-1$
