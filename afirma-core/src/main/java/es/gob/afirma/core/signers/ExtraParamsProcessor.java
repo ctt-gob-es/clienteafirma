@@ -150,7 +150,7 @@ public final class ExtraParamsProcessor {
 			setXAdESPolicyAGEAttributes(policyName, p);
 		}
 		// Firma PAdES de la AGE (Soportada a partir de la politica 1.9)
-		else if (normalizedFormat.equals(AdESPolicyPropertiesManager.FORMAT_XADES) &&
+		else if (normalizedFormat.equals(AdESPolicyPropertiesManager.FORMAT_PADES) &&
 				AdESPolicyPropertiesManager.POLICY_ID_AGE.equals(policyName)) {
 			setPAdESPolicyAGEAttributes(policyName, p);
 		}
