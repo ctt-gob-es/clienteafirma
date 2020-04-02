@@ -109,6 +109,11 @@ public final class PreferencesManager {
 	 * har&aacute; que no se env&iacute;e ning&uacute;n dato. */
 	public static final String PREFERENCE_GENERAL_USEANALYTICS = "useAnalytics"; //$NON-NLS-1$
 
+	/** Mostrar certificados caducados.
+	 * Un valor de <code>true</code> en esta preferencia hace que el di&aacute;logo de selecci&oacute;n
+	 * de certificados muestre los certificados caducados. */
+	public static final String PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS = "showExpiredCerts"; //$NON-NLS-1$
+
 	/** Mantiene habilitado el funcionamiento de JMultiCard.
 	 * Un valor de <code>true</code> en esta preferencia hace que la aplicacion deje el comportamiento
 	 * por defecto de JMulticard, que usaria las tarjetas DNIe y CERES. Un valor de <code>false</code>

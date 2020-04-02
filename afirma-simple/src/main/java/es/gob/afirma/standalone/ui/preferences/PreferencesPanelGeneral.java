@@ -64,6 +64,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox sendAnalytics = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.89")); //$NON-NLS-1$
 
+	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.176")); //$NON-NLS-1$
+
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
@@ -267,6 +269,15 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.sendAnalytics.addKeyListener(keyListener);
 		signConfigPanel.add(this.sendAnalytics, signConstraint);
 		signConstraint.gridy++;
+
+		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.177") //$NON-NLS-1$
+				);
+		this.showExpiredCerts.setMnemonic('M');
+		this.showExpiredCerts.addItemListener(modificationListener);
+		this.showExpiredCerts.addKeyListener(keyListener);
+		signConfigPanel.add(this.showExpiredCerts, signConstraint);
+			signConstraint.gridy++;
 
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
@@ -511,6 +522,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		}
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS, this.secureConnections.isSelected());
@@ -548,6 +560,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		else {
 			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS));
 		}
+
+		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 
 		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {
 			this.enableJMulticard.setSelected(false);

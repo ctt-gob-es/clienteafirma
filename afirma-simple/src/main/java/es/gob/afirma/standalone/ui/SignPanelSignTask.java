@@ -570,7 +570,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			this.ksm,
 			this.parent,
 			true,             // Comprobar claves privadas
-			false,            // Mostrar certificados caducados
+			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS), // Mostrar certificados caducados
 			true,             // Comprobar validez temporal del certificado
 			this.certFilters, // Filtros
 			false             // mandatoryCertificate

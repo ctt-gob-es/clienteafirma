@@ -390,11 +390,15 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 			try {
 				MacUtils.focusApplication();
-				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
-					true, // checkValidity
-					filters,
-					mandatoryCertificate
-				);
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+						ksm,
+						null,
+						true,
+						true, // showExpiredCertificates
+						true, // checkValidity
+						filters,
+						mandatoryCertificate
+						);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
