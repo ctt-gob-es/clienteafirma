@@ -34,6 +34,7 @@ import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
 import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.spongycastle.util.Store;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -67,8 +68,16 @@ public final class ValidateBinarySignature implements SignValider{
     		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
 
+    	AOSigner signer = new AOCAdESSigner();
+    	if (!signer.isSign(sign)) {
+    	    signer = new AOCMSSigner();
+    	    if (!signer.isSign(sign)) {
+    	        return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+    	    }
+    	}
+
     	try {
-			if (data == null && new AOCAdESSigner().getData(sign) == null) {
+			if (data == null && signer.getData(sign) == null) {
 				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 					"Se ha pedido validar una firma explicita sin proporcionar los datos firmados" //$NON-NLS-1$
 				);
@@ -81,14 +90,12 @@ public final class ValidateBinarySignature implements SignValider{
 			);
     		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
-
-    	AOSigner signer = new AOCAdESSigner();
-    	if (!signer.isSign(sign)) {
-    	    signer = new AOCMSSigner();
-    	    if (!signer.isSign(sign)) {
-    	        return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
-    	    }
-    	}
+    	catch (final AOException e1) {
+    		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Se encontraron datos en la firma y no se pudieron extraer: " + e1  //$NON-NLS-1$
+			);
+    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
+		}
 
     	try {
     		verifySignatures(sign, data != null ? data : new AOCAdESSigner().getData(sign));

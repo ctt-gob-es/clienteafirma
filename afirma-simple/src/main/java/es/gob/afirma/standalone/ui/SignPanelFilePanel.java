@@ -18,6 +18,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DropTarget;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -28,11 +29,13 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
@@ -83,7 +86,8 @@ final class SignPanelFilePanel extends JPanel {
     			NumberFormat.getNumberInstance().format(signConfig.getDataFile().length() / 1024),
     			signConfig.getDataFile(),
     			new Date(signConfig.getDataFile().lastModified()),
-    			signConfig.getCryptoOperation()
+    			signConfig.getCryptoOperation(),
+    			signConfig.getInvalidSignatureText()
     			));
     }
 
@@ -93,7 +97,8 @@ final class SignPanelFilePanel extends JPanel {
     			  final String fileSize,
                   final File file,
                   final Date fileLastModified,
-                  final CryptoOperation operation) {
+                  final CryptoOperation operation,
+                  final String invalidSignatureText) {
 
         setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new GridBagLayout());
@@ -116,6 +121,12 @@ final class SignPanelFilePanel extends JPanel {
     		SimpleAfirmaMessages.getString("SignPanel.49") + (fileSize.equals("0") ? "<1" : fileSize) + " KB" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
 
+        JLabel invalidSignatureErrorLabel = null;
+        if (invalidSignatureText != null) {
+        	final BufferedImage errorIcon = ImageLoader.loadImage("ko_icon.png"); //$NON-NLS-1$
+        	invalidSignatureErrorLabel = new JLabel(invalidSignatureText, new ImageIcon(errorIcon), SwingConstants.LEFT);
+        }
+
         final JPanel detailPanel = new JPanel();
         detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
         detailPanel.add(pathLabel);
@@ -126,6 +137,10 @@ final class SignPanelFilePanel extends JPanel {
         detailPanel.add(dateLabel);
         detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
         detailPanel.add(sizeLabel);
+        if (invalidSignatureErrorLabel != null) {
+        	detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        	detailPanel.add(invalidSignatureErrorLabel);
+        }
 
         // Definimos aqui el boton
         JButton openFileButton = null;
@@ -163,6 +178,9 @@ final class SignPanelFilePanel extends JPanel {
         	descLabel.setLabelFor(openFileButton);
         	dateLabel.setLabelFor(openFileButton);
         	sizeLabel.setLabelFor(openFileButton);
+//        	if (invalidSignatureErrorLabel != null) {
+//        		invalidSignatureErrorLabel.setLabelFor(openFileButton);
+//        	}
         }
 
         // Establecemos la configuracion de color
@@ -256,11 +274,11 @@ final class SignPanelFilePanel extends JPanel {
      * @return {@code true} si el nombre del fichero tiene extensi&oacute;nde ejecutable,
      * {@code false} en caso contrario.
      */
-	private static boolean isExecutable(String ext) {
+	private static boolean isExecutable(final String ext) {
 		return DataFileAnalizer.isExecutableExtension(ext);
 	}
 
-	private static boolean isLink(String ext) {
+	private static boolean isLink(final String ext) {
 		return "LNK".equals(ext.toUpperCase()); //$NON-NLS-1$
 	}
 
@@ -270,7 +288,7 @@ final class SignPanelFilePanel extends JPanel {
      * @return {@code true} si el nombre del fichero tiene extensi&oacute;nde ejecutable,
      * {@code false} en caso contrario.
      */
-	private static String getExtension(File file) {
+	private static String getExtension(final File file) {
 
 		String ext = null;
 		final String filename = file.getName();

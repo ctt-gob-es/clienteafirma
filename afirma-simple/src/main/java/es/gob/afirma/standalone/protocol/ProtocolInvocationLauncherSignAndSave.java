@@ -59,6 +59,12 @@ import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.InvalidXMLException;
+import es.gob.afirma.signvalidation.InvalidSignatureException;
+import es.gob.afirma.signvalidation.SignValider;
+import es.gob.afirma.signvalidation.SignValiderFactory;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
@@ -174,9 +180,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 				ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
 					ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
 
-			final String fileExts = options.getExtraParams().getProperty("filenameExts"); //$NON-NLS-1$
+			final String fileExts = options.getExtraParams().getProperty(AfirmaExtraParams.LOAD_FILE_EXTS);
 
-			final String fileDesc = options.getExtraParams().getProperty("filenameDescription", ProtocolMessages.getString("ProtocolLauncher.32")) +  //$NON-NLS-1$//$NON-NLS-2$
+			final String fileDesc = options.getExtraParams().getProperty(AfirmaExtraParams.LOAD_FILE_DESCRIPTION, ProtocolMessages.getString("ProtocolLauncher.32")) +  //$NON-NLS-1$
 				(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			final File selectedDataFile;
@@ -187,8 +193,8 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 				selectedDataFile = AOUIFactory.getLoadFiles(
 					dialogTitle,
-					options.getExtraParams().getProperty("filenameCurrentDir"), // currentDir //$NON-NLS-1$
-					options.getExtraParams().getProperty("filenameActualName"), // fileName //$NON-NLS-1$
+					options.getExtraParams().getProperty(AfirmaExtraParams.LOAD_FILE_CURRENT_DIR), // currentDir
+					options.getExtraParams().getProperty(AfirmaExtraParams.LOAD_FILE_FILENAME), // fileName
 					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
 					fileDesc,
 					false, // Select dir
@@ -304,6 +310,33 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 		}
 
+		// Si se ha pedido comprobar las firmas antes de agregarle la nueva firma, lo hacemos ahora
+		if (options.getData() != null &&
+				Boolean.parseBoolean(options.getExtraParams().getProperty(AfirmaExtraParams.CHECK_SIGNATURES))) {
+			final SignValider validator = SignValiderFactory.getSignValider(signer);
+			if (validator != null) {
+				SignValidity validity;
+				try {
+					validity = validator.validate(options.getData());
+				} catch (final IOException e) {
+					LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
+					validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
+				}
+				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
+						!(options.getOperation() == Operation.SIGN && validity.getError() == VALIDITY_ERROR.NO_SIGN)) {
+					LOGGER.severe("La firma indicada no es valida"); //$NON-NLS-1$
+					if (!bySocket) {
+						throw new SocketOperationException(
+								ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE
+								);
+					}
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+							ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE
+							);
+				}
+			}
+		}
+
 		// Una vez se tienen todos los parametros necesarios expandimos los extraParams
 		// de la operacion para obtener la configuracion final
 		try {
@@ -328,7 +361,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 		}
 		else {
-
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 			final String aoksLib = options.getDefaultKeyStoreLib();
 			final AOKeyStoreManager ksm;
@@ -436,7 +468,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 					sign = signer.countersign(
 							options.getData(),
 							options.getSignatureAlgorithm(),
-							"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? //$NON-NLS-1$ //$NON-NLS-2$
+							"tree".equalsIgnoreCase(options.getExtraParams().getProperty(AfirmaExtraParams.TARGET)) ? //$NON-NLS-1$
 									CounterSignTarget.TREE :
 										CounterSignTarget.LEAFS,
 										null, // Targets
@@ -566,6 +598,28 @@ final class ProtocolInvocationLauncherSignAndSave {
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD);
 		}
+		catch (final UnsupportedOperationException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION
+			);
+		}
+		catch (final InvalidSignatureException e) {
+			LOGGER.log(Level.SEVERE, "La firma de entrada no es valida: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showErrorDetail(
+					ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE,
+					e.getMessage()
+					);
+			if (!bySocket) {
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE);
+			}
+			return ProtocolInvocationLauncherErrorManager
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE);
+		}
 		catch (final AOException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showErrorDetail(
@@ -589,16 +643,16 @@ final class ProtocolInvocationLauncherSignAndSave {
 		}
 
 		// Damos la opcion de guardar la firma generada
-		final String fileExts = options.getExtraParams().getProperty("filenameSaveExts"); //$NON-NLS-1$
+		final String fileExts = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_EXTS);
 
-		final String fileDesc = options.getExtraParams().getProperty("filenameSaveDescription", ProtocolMessages.getString("ProtocolLauncher.30")) +  //$NON-NLS-1$//$NON-NLS-2$
+		final String fileDesc = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_DESCRIPTION, ProtocolMessages.getString("ProtocolLauncher.30")) +  //$NON-NLS-1$
 			(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		try {
 			AOUIFactory.getSaveDataToFile(
 				sign,
 				ProtocolMessages.getString("ProtocolLauncher.31"), // Titulo del dialogo //$NON-NLS-1$
-				options.getExtraParams().getProperty("filenameSaveCurrentDir"), // Directorio de guardado //$NON-NLS-1$
+				options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_CURRENT_DIR), // Directorio de guardado
 				getFilename(options, inputFilename, signer),
 				Collections.singletonList(
 					new GenericFileFilter(
@@ -782,7 +836,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		return format != null &&
 			   format.toLowerCase().startsWith("xades") && //$NON-NLS-1$
 			   config != null &&
-			   AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")); //$NON-NLS-1$
+			   AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(AfirmaExtraParams.MODE));
 	}
 
 	/**

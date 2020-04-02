@@ -37,6 +37,10 @@ import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signvalidation.InvalidSignatureException;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide;
 import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide.Op;
 import es.gob.afirma.triphase.signer.xades.XmlPreSignException;
@@ -61,7 +65,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Nombre de la propiedad que guarda la codificaci&oacute;n del XML de firma. */
 	private static final String PROPERTY_NAME_XML_ENCODING = "ENCODING"; //$NON-NLS-1$
 
-	/** Nombre de la propiedad que de configuraci&oacute;n que indica qu&eacute; nodos deben
+	/** Nombre de la propiedad de configuraci&oacute;n que indica qu&eacute; nodos deben
 	 * contrafirmarse. */
 	private static final String EXTRAPARAM_NAME_TARGET = "target"; //$NON-NLS-1$
 
@@ -84,7 +88,8 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                              final String algorithm,
 			                              final X509Certificate[] cert,
-			                              final Properties extraParams) throws IOException,
+			                              final Properties extraParams,
+				                          final boolean checkSignatures) throws IOException,
 	                                                                           AOException {
 		LOGGER.info("Prefirma XAdES - Firma - INICIO"); //$NON-NLS-1$
 
@@ -113,9 +118,18 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
-			                          final Properties extraParams) throws IOException, AOException {
+			                          final Properties extraParams,
+			                          final boolean checkSignatures) throws IOException, AOException {
 
 		LOGGER.info("Prefirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
+
+		// Comprobamos la validez de la firma de entrada si se solicito
+        if (checkSignatures) {
+        	final SignValidity validity = new ValidateXMLSignature().validate(data);
+        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("La firma que se trata de cofirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
+        	}
+        }
 
 		final TriphaseData presign = preProcessPre(data, algorithm, cert, extraParams, Op.COSIGN);
 
@@ -130,9 +144,18 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targets) throws IOException,
+			                               final CounterSignTarget targets,
+				                           final boolean checkSignatures) throws IOException,
 			                                                                       AOException {
 		LOGGER.info("Prefirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
+
+		// Comprobamos la validez de la firma de entrada si se solicito
+        if (checkSignatures) {
+        	final SignValidity validity = new ValidateXMLSignature().validate(sign);
+        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("La firma que se trata de contrafirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
+        	}
+        }
 
 		extraParams.setProperty(EXTRAPARAM_NAME_TARGET, targets.name());
 

@@ -65,7 +65,7 @@ public final class ValidateXMLSignature implements SignValider {
             doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
         }
 
         // Obtenemos el elemento Signature

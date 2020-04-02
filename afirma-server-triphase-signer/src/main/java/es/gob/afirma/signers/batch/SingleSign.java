@@ -519,6 +519,9 @@ public final class SingleSign {
 			this.signId = id;
 		}
 
+		public Result getResult() {
+			return this.result;
+		}
 	}
 
 }

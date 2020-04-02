@@ -27,13 +27,14 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
-			                        final Properties xParams) throws IOException,
+			                        final Properties xParams,
+		                            final boolean checkSignatures) throws IOException,
 			                                                         AOException {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 		extraParams.put("mode", "explicit"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		return super.preProcessPreSign(data, algorithm, cert, extraParams);
+		return super.preProcessPreSign(data, algorithm, cert, extraParams, checkSignatures);
 	}
 
 	@Override
@@ -73,7 +74,8 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
-			                          final Properties xParams) throws IOException, AOException {
+			                          final Properties xParams,
+		                               final boolean checkSignatures) throws IOException, AOException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -100,7 +102,8 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targets) throws IOException, AOException {
+			                               final CounterSignTarget targets,
+			                               final boolean checkSignatures) throws IOException, AOException {
 		throw new UnsupportedOperationException();
 	}
 

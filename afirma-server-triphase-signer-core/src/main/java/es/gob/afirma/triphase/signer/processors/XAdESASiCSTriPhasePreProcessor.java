@@ -34,13 +34,15 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
-			                        final Properties extraParams) throws IOException,
+			                        final Properties extraParams,
+			                        final boolean checkSignatures) throws IOException,
 			                                                             AOException {
 		return super.preProcessPreSign(
 			data,
 			algorithm,
 			cert,
-			AOXAdESASiCSSigner.setASiCProperties(extraParams, data)
+			AOXAdESASiCSSigner.setASiCProperties(extraParams, data),
+			checkSignatures
 		);
 	}
 
@@ -83,7 +85,8 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
-			                          final Properties extraParams) throws IOException,
+			                          final Properties extraParams,
+			                          final boolean checkSignatures) throws IOException,
 			                                                               AOException {
 		throw new UnsupportedOperationException();
 	}
@@ -115,7 +118,8 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targets) throws IOException,
+			                               final CounterSignTarget targets,
+				                           final boolean checkSignatures) throws IOException,
 			                                                                       AOException {
 		throw new UnsupportedOperationException();
 	}

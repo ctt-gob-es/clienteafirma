@@ -61,6 +61,10 @@ import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signvalidation.SignValider;
+import es.gob.afirma.signvalidation.SignValiderFactory;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -451,12 +455,62 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 						 );
 			 }
 		 }
+
+		 // Si los datos seleccionados son una firma para segun el firmador con el que se vaya
+		 // a utilizar, se validan con el
+		 if (config.getSigner().isSign(data)) {
+			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
+			 final SignValidity validity = validator.validate(data);
+			 if (validity != null && validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO) {
+				 config.setInvalidSignatureText(buildErrorText(validity.getError()));
+			 }
+		 }
+
 		 config.setSignatureFormatName(getSignatureName(config.getSigner()));
 		 config.setExtraParams(ExtraParamsHelper.loadExtraParamsForSigner(config.getSigner()));
 	 }
 
 
-	 /** Identifica el tipo de firma asociado a un firmador. Si no identifica el firmador,
+	 private static String buildErrorText(final VALIDITY_ERROR error) {
+
+		 final String errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
+		 switch (error) {
+			case NO_DATA:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.125"); //$NON-NLS-1$ //$NON-NLS-2$
+			case CORRUPTED_SIGN:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.126"); //$NON-NLS-1$ //$NON-NLS-2$
+			case NO_MATCH_DATA:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.127"); //$NON-NLS-1$ //$NON-NLS-2$
+			case NO_SIGN:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.128"); //$NON-NLS-1$ //$NON-NLS-2$
+			case CERTIFICATE_PROBLEM:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.129"); //$NON-NLS-1$ //$NON-NLS-2$
+			case CERTIFICATE_EXPIRED:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.130"); //$NON-NLS-1$ //$NON-NLS-2$
+			case CERTIFICATE_NOT_VALID_YET:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.131"); //$NON-NLS-1$ //$NON-NLS-2$
+			case ALGORITHM_NOT_SUPPORTED:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.132"); //$NON-NLS-1$ //$NON-NLS-2$
+			case CA_NOT_SUPPORTED:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.133"); //$NON-NLS-1$ //$NON-NLS-2$
+			case CRL_PROBLEM:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.134"); //$NON-NLS-1$ //$NON-NLS-2$
+			case PDF_UNKOWN_VALIDITY:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.135"); //$NON-NLS-1$ //$NON-NLS-2$
+			case OOXML_UNKOWN_VALIDITY:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.136"); //$NON-NLS-1$ //$NON-NLS-2$
+			case ODF_UNKOWN_VALIDITY:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.137"); //$NON-NLS-1$ //$NON-NLS-2$
+			case UNKOWN_ERROR:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.138"); //$NON-NLS-1$ //$NON-NLS-2$
+			case UNKOWN_SIGNATURE_FORMAT:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.139"); //$NON-NLS-1$ //$NON-NLS-2$
+			default:
+				return errorMsg;
+		}
+	}
+
+	/** Identifica el tipo de firma asociado a un firmador. Si no identifica el firmador,
 	  * devuelte el tipo por defecto.
 	  * @param signer Firmador.
 	  * @return Tipo de firma que se debe ejecutar. */

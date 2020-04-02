@@ -52,7 +52,7 @@ final class SignPanelMultiFilePanel extends JPanel {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	SignPanelMultiFilePanel(List<SignOperationConfig> operations,
+	SignPanelMultiFilePanel(final List<SignOperationConfig> operations,
                        final DropTarget dropTarget) {
         super(true);
 
@@ -62,7 +62,7 @@ final class SignPanelMultiFilePanel extends JPanel {
         SwingUtilities.invokeLater(() -> createUI(operations));
     }
 
-    void createUI(List<SignOperationConfig> operations) {
+    void createUI(final List<SignOperationConfig> operations) {
 
         setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new GridBagLayout());
@@ -79,12 +79,12 @@ final class SignPanelMultiFilePanel extends JPanel {
 
         // Definimos que al hacer doble clic sobre una firma del listado, se visualicen sus datos
         fileList.addMouseListener(new MouseListener() {
-			@Override public void mouseReleased(MouseEvent e) { /* No hacemos nada */ }
-			@Override public void mousePressed(MouseEvent e) { /* No hacemos nada */ }
-			@Override public void mouseExited(MouseEvent e) { /* No hacemos nada */ }
-			@Override public void mouseEntered(MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseReleased(final MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mousePressed(final MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseExited(final MouseEvent e) { /* No hacemos nada */ }
+			@Override public void mouseEntered(final MouseEvent e) { /* No hacemos nada */ }
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					if (e.getSource() instanceof JList<?>) {
 						final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
@@ -96,10 +96,10 @@ final class SignPanelMultiFilePanel extends JPanel {
 		});
 
         fileList.addKeyListener(new KeyListener() {
-			@Override public void keyTyped(KeyEvent e) { /* No hacemos nada */ }
-			@Override public void keyPressed(KeyEvent e) { /* No hacemos nada */ }
+			@Override public void keyTyped(final KeyEvent e) { /* No hacemos nada */ }
+			@Override public void keyPressed(final KeyEvent e) { /* No hacemos nada */ }
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && e.getSource() instanceof JList<?>) {
 					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
 					final int index = fileList.getSelectedIndex();
@@ -139,14 +139,11 @@ final class SignPanelMultiFilePanel extends JPanel {
 		if (index >= 0) {
 			final SignOperationConfig item = list.getModel().getElementAt(index);
 			if (item.getDataFile() != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							Desktop.getDesktop().open(item.getDataFile());
-						} catch (final IOException ex) {
-							LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
-						}
+				SwingUtilities.invokeLater(() -> {
+					try {
+						Desktop.getDesktop().open(item.getDataFile());
+					} catch (final IOException ex) {
+						LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
 					}
 				});
 			}
@@ -202,15 +199,15 @@ final class SignPanelMultiFilePanel extends JPanel {
     		add(this.sizeLabel, c);
     	}
 
-    	void setFileNameColumnTitle(String title) {
+    	void setFileNameColumnTitle(final String title) {
     		this.fileNameLabel.setText(title);
     	}
 
-    	void setSignatureFormatColumnTitle(String title) {
+    	void setSignatureFormatColumnTitle(final String title) {
     		this.formatNameLabel.setText(title);
     	}
 
-    	void setSizeColumnTitle(String title) {
+    	void setSizeColumnTitle(final String title) {
     		this.sizeLabel.setText(title);
     	}
     }
@@ -290,8 +287,8 @@ final class SignPanelMultiFilePanel extends JPanel {
 		}
 
 		@Override
-		public Component getListCellRendererComponent(JList<? extends SignOperationConfig> list,
-				SignOperationConfig value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(final JList<? extends SignOperationConfig> list,
+				final SignOperationConfig value, final int index, final boolean isSelected, final boolean cellHasFocus) {
 
 			if (this.basePathLength == 0) {
 				this.basePathLength = calculateBasePathLength(list.getModel());
@@ -300,9 +297,18 @@ final class SignPanelMultiFilePanel extends JPanel {
 			final ScalablePane typeIcon = (ScalablePane) value.getFileType().getIcon();
 			typeIcon.setPreferredSize(this.iconDimension);
 
+
 			this.icon.setIcon(new ImageIcon(typeIcon.getScaledInstanceToFit(typeIcon.getMaster(), this.iconDimension)));
 
-			this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
+			if (value.getInvalidSignatureText() == null) {
+				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
+				this.fileNameLabel.setForeground(Color.BLACK);
+			}
+			else {
+				this.fileNameLabel.setText((value.getDataFile().getAbsolutePath() + " (Firma inv\u00E1lida)").substring(this.basePathLength));
+				this.fileNameLabel.setForeground(Color.RED);
+			}
+
 			this.formatNameLabel.setText(value.getSignatureFormatName());
 			this.sizeLabel.setText(calculateSize(value.getDataFile().length()));
 
@@ -311,6 +317,13 @@ final class SignPanelMultiFilePanel extends JPanel {
 			return this;
 		}
 
+		/**
+		 * Calcula el n&uacute;mero de caracteres del directorio padre com&uacute;n a todos los
+		 * ficheros seleccionados para poder omitir de la visualizaci&oacute;n ese fragmento de
+		 * las rutas.
+		 * @param signConfigs Configuraci&oacute;n con todos los ficheros a procesar.
+		 * @return Longitud del directorio padre com&uacute;n.
+		 */
 		private int calculateBasePathLength(final ListModel<? extends SignOperationConfig> signConfigs) {
 			int parentLength = Integer.MAX_VALUE;
 			for (int i = 0; i < signConfigs.getSize(); i++) {
@@ -335,7 +348,7 @@ final class SignPanelMultiFilePanel extends JPanel {
 		 * @param size Bytes del fichero.
 		 * @return Tama&ntilde;o del fichero.
 		 */
-		private String calculateSize(long size) {
+		private String calculateSize(final long size) {
 			if (size == 0) {
 				return "0 KB"; //$NON-NLS-1$
 			}

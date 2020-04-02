@@ -73,20 +73,25 @@ final class SingleSignPreProcessor {
 			extraParams = sSign.getExtraParams();
 		}
 
+		// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
+        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
+
 		switch(sSign.getSubOperation()) {
 			case SIGN:
 				return prep.preProcessPreSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
-						extraParams
+						extraParams,
+						checkSignatures
 					);
 			case COSIGN:
 				return prep.preProcessPreCoSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
-						extraParams
+						extraParams,
+						checkSignatures
 					);
 			case COUNTERSIGN:
 				final CounterSignTarget target = CounterSignTarget.getTarget(
@@ -102,7 +107,8 @@ final class SingleSignPreProcessor {
 						algorithm.toString(),
 						certChain,
 						extraParams,
-						target
+						target,
+						checkSignatures
 					);
 			default:
 				throw new UnsupportedOperationException(

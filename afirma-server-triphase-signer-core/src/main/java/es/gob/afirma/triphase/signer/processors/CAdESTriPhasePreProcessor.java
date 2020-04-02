@@ -34,6 +34,10 @@ import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
+import es.gob.afirma.signvalidation.InvalidSignatureException;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCoSigner;
 import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCounterSigner;
 
@@ -61,7 +65,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
-			                        final Properties params) throws IOException, AOException {
+			                        final Properties params,
+		                               final boolean checkSignatures) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
@@ -236,7 +241,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreCoSign(final byte[] sign,
 			final String algorithm,
 			final X509Certificate[] cert,
-			final Properties params) throws IOException, AOException {
+			final Properties params,
+            final boolean checkSignatures) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
@@ -245,6 +251,14 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		final Properties extraParams = params != null ? params : new Properties();
+
+		// Comprobamos la validez de la firma de entrada si se solicito
+        if (checkSignatures) {
+        	final SignValidity validity = ValidateBinarySignature.validate(sign, null);
+        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("La firma que se trata de cofirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
+        	}
+        }
 
 		boolean signingCertificateV2;
 		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
@@ -413,10 +427,19 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targetType) throws IOException,
+			                               final CounterSignTarget targetType,
+			                               final boolean checkSignatures) throws IOException,
 			                                                                          AOException {
 
 		LOGGER.info("Prefirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
+
+		// Comprobamos la validez de la firma de entrada si se solicito
+        if (checkSignatures) {
+        	final SignValidity validity = ValidateBinarySignature.validate(sign, null);
+        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("La firma que se trata de contrafirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
+        	}
+        }
 
 		return AOCAdESTriPhaseCounterSigner.preCountersign(
 				sign,

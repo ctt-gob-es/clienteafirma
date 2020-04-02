@@ -16,6 +16,7 @@ public final class SignOperationConfig {
 	private AOSigner signer;
 	private Properties extraParams;
 	private String signatureFormatName;
+	private String invalidSignatureText;
 
 	/** Construye la configuraci&oacute;n de firma. */
 	public SignOperationConfig() {
@@ -101,6 +102,18 @@ public final class SignOperationConfig {
 	 * @param signatureFormatName Descripci&oacute;n del formato. */
 	public void setSignatureFormatName(final String signatureFormatName) {
 		this.signatureFormatName = signatureFormatName;
+	}
+
+	/** Recupera el texto descriptivo del error de la firma cargada.
+	 * @return Error de la firma o {@code null} si no hay ninguno. */
+	public String getInvalidSignatureText() {
+		return this.invalidSignatureText;
+	}
+
+	/** Establece el texto descriptivo del error de la firma cargada.
+	 * @param invalidSignatureText Error de la firma. */
+	public void setInvalidSignatureText(final String invalidSignatureText) {
+		this.invalidSignatureText = invalidSignatureText;
 	}
 
 	/** Recupera el fichero con los datos que se van a firmar.

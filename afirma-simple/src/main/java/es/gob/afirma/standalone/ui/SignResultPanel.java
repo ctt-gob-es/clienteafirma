@@ -15,13 +15,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.KeyListener;
-import java.io.InputStream;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -55,30 +53,21 @@ final class SignResultPanel extends JPanel {
         String iconFilename;
         switch (validity.getValidity()) {
         case KO:
-            iconFilename = "ko_icon.png"; //$NON-NLS-1$
+            iconFilename = "ko_icon_large.png"; //$NON-NLS-1$
             break;
         case OK:
         case GENERATED:
-            iconFilename = "ok_icon.png"; //$NON-NLS-1$
+            iconFilename = "ok_icon_large.png"; //$NON-NLS-1$
             break;
         default:
-            iconFilename = "unknown_icon.png"; //$NON-NLS-1$
+            iconFilename = "unknown_icon_large.png"; //$NON-NLS-1$
         }
 
-        ScalablePane resultOperationIcon;
-        try (
-    		final InputStream is = this.getClass().getResourceAsStream("/resources/" + iconFilename); //$NON-NLS-1$
-		) {
-        	final Image image = ImageIO.read(is);
-        	resultOperationIcon = new ScalablePane(image);
-            resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
-            resultOperationIcon.setFocusable(false);
-            resultOperationIcon.setMinimumSize(new Dimension(120, 120));
-        }
-        catch (final Exception e) {
-        	LOGGER.warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$
-            resultOperationIcon = null;
-        }
+        final BufferedImage image = ImageLoader.loadImage(iconFilename);
+        final ScalablePane resultOperationIcon = new ScalablePane(image, true);
+        resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
+        resultOperationIcon.setFocusable(false);
+        resultOperationIcon.setMinimumSize(new Dimension(120, 120));
 
         String errorMessage;
         final String resultOperationIconTooltip;
@@ -150,9 +139,8 @@ final class SignResultPanel extends JPanel {
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.13"); //$NON-NLS-1$
                 break;
         }
-        if (resultOperationIcon != null) {
-        	resultOperationIcon.setToolTipText(resultOperationIconTooltip);
-        }
+
+        resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
         final EditorFocusManager editorFocusManager = new EditorFocusManager(
     		this.descTextLabel,
@@ -203,9 +191,7 @@ final class SignResultPanel extends JPanel {
         c.weighty = 1.0;
         c.gridheight = 2;
         c.insets = new Insets(11, 11, 0, 5);
-        if (resultOperationIcon != null) {
-        	this.add(resultOperationIcon, c);
-        }
+       	this.add(resultOperationIcon, c);
         c.weightx = 1.0;
         c.weighty = 0.0;
         c.gridx = 1;

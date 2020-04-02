@@ -459,13 +459,13 @@ final class SignPdfUiPanel extends JPanel implements
 	BufferedImage getFragmentImage(final Properties p) {
 		final int pageNumber;
 		final BufferedImage page;
-		if (p.getProperty("signaturePage").equals("append")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (p.getProperty(PdfExtraParams.SIGNATURE_PAGE).equals("append")) { //$NON-NLS-1$
 			pageNumber = 0;
 			page = this.appendPage;
 		}
 		else {
-			pageNumber = Integer.parseInt(p.getProperty("signaturePage")) - 1; //$NON-NLS-1$
-			page = this.pdfPages.get(Integer.parseInt(p.getProperty("signaturePage")) - 1); //$NON-NLS-1$
+			pageNumber = Integer.parseInt(p.getProperty(PdfExtraParams.SIGNATURE_PAGE)) - 1;
+			page = this.pdfPages.get(pageNumber);
 		}
 
 		final int newWidth = (int) this.pdfPageSizes.get(pageNumber).getWidth();
@@ -491,10 +491,10 @@ final class SignPdfUiPanel extends JPanel implements
 
 		graphics2D.dispose();
 
-		final int uxr = Math.max(0 ,Integer.parseInt(p.getProperty("signaturePositionOnPageUpperRightX")) - 4); //$NON-NLS-1$
-		final int uyr = Math.max(0, Integer.parseInt(p.getProperty("signaturePositionOnPageUpperRightY"))); //$NON-NLS-1$
-		final int lxl = Math.max(0, Integer.parseInt(p.getProperty("signaturePositionOnPageLowerLeftX"))); //$NON-NLS-1$
-		final int lyl = Math.max(0, Integer.parseInt(p.getProperty("signaturePositionOnPageLowerLeftY"))); //$NON-NLS-1$
+		final int uxr = Math.max(0 ,Integer.parseInt(p.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)) - 4);
+		final int uyr = Math.max(0, Integer.parseInt(p.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY)));
+		final int lxl = Math.max(0, Integer.parseInt(p.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX)));
+		final int lyl = Math.max(0, Integer.parseInt(p.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY)));
 		final int y = Math.max(0, newHeight - uyr);
 
 		final BufferedImage imSign = im.getSubimage(lxl, y, uxr - lxl, uyr - lyl);

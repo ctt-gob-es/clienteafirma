@@ -15,7 +15,6 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,14 +26,12 @@ import java.awt.event.MouseListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -424,8 +421,8 @@ final class MassiveResultProcessPanel extends JPanel {
 		private final JLabel sizeLabel;
 		private final JLabel resultIcon;
 
-		private Image okIcon = null;
-		private Image koIcon = null;
+		private ImageIcon okIcon = null;
+		private ImageIcon koIcon = null;
 
 		private final NumberFormat formatter;
 
@@ -502,12 +499,12 @@ final class MassiveResultProcessPanel extends JPanel {
 			if (value.getSignatureFile() != null) {
 				this.fileNameLabel.setText(value.getSignatureFile().getAbsolutePath().substring(this.basePathLength));
 				this.sizeLabel.setText(calculateSize(value.getSignatureFile().length()));
-				this.resultIcon.setIcon(new ImageIcon(getResultIcon(true)));
+				this.resultIcon.setIcon(getResultIcon(true));//new ImageIcon(getResultIcon(true)));
 			}
 			else {
 				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath());
 				this.sizeLabel.setText(calculateSize(0));
-				this.resultIcon.setIcon(new ImageIcon(getResultIcon(false)));
+				this.resultIcon.setIcon(getResultIcon(false));//new ImageIcon(getResultIcon(false)));
 			}
 
 			setBorder(cellHasFocus ? this.focusedBorder : this.unfocusedBorder);
@@ -538,11 +535,11 @@ final class MassiveResultProcessPanel extends JPanel {
 		 * Recupera el icono de exito o error.
 		 * @param ok {@code true} para solicitar el icono de firma correcta, {@code false}
 		 * para solicitar el de error.
-		 * @return Componente con el icono deseado.
+		 * @return Icono deseado.
 		 */
-		private Image getResultIcon(final boolean ok) {
+		private ImageIcon getResultIcon(final boolean ok) {
 
-			Image icon;
+			ImageIcon icon;
 			if (ok) {
 				if (this.okIcon == null) {
 					this.okIcon = buildIcon(ok);
@@ -558,22 +555,18 @@ final class MassiveResultProcessPanel extends JPanel {
 			return icon;
 		}
 
-		private static Image buildIcon(final boolean ok) {
-			Image resultIcon;
-			final String imageName = ok ? "ok_icon.png" : "ko_icon.png"; //$NON-NLS-1$ //$NON-NLS-2$
-	        try (
-	    		final InputStream is = MassiveResultProcessPanel.class.getResourceAsStream("/resources/" + imageName); //$NON-NLS-1$
-			) {
-	        	final Image image = ImageIO.read(is);
-	        	final ScalablePane resultOperationIcon = new ScalablePane(image);
-	            resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
-	            resultOperationIcon.setFocusable(false);
-	            resultIcon = resultOperationIcon.getScaledInstanceToFit(image, new Dimension(32,  32));
-	        }
-	        catch (final Exception e) {
-	            LOGGER.warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$
-	            resultIcon = null;
-	        }
+		private static ImageIcon buildIcon(final boolean ok) {
+			ImageIcon resultIcon;
+			final String imageName = ok ? "ok_icon_large.png" : "ko_icon_large.png"; //$NON-NLS-1$ //$NON-NLS-2$
+
+//			final Image image = ImageLoader.loadImage(imageName);
+//			final ScalablePane resultOperationIcon = new ScalablePane(image);
+//			resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
+//			resultOperationIcon.setFocusable(false);
+//			resultIcon = resultOperationIcon.getScaledInstanceToFit(image, new Dimension(32,  32));
+
+			resultIcon = ImageLoader.loadIcon(imageName, ImageLoader.SMALL_ICON);
+
 	        return resultIcon;
 		}
 

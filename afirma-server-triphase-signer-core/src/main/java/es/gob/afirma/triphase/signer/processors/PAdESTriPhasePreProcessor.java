@@ -29,6 +29,10 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.PdfSignResult;
+import es.gob.afirma.signvalidation.InvalidSignatureException;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.ValidatePdfSignature;
 
 /** Procesador de firmas trif&aacute;sicas PAdES.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -56,9 +60,18 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
-			                        final Properties extraParams) throws IOException,
+			                        final Properties extraParams,
+			                        final boolean checkSignatures) throws IOException,
 			                                                             AOException {
 		LOGGER.info("Prefirma PAdES - Firma - INICIO"); //$NON-NLS-1$
+
+		// Comprobamos la validez de la firma de entrada si se solicito
+        if (checkSignatures && new AOPDFSigner().isSign(data)) {
+        	final SignValidity validity = new ValidatePdfSignature().validate(data);
+        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
+        	}
+        }
 
 		final GregorianCalendar signTime = new GregorianCalendar();
 
@@ -200,9 +213,10 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String signatureAlgorithm,
 			                          final X509Certificate[] cert,
-			                          final Properties extraParams) throws IOException,
+			                          final Properties extraParams,
+				                      final boolean checkSignatures) throws IOException,
 			                                                               AOException {
-		return preProcessPreSign(data, signatureAlgorithm, cert, extraParams);
+		return preProcessPreSign(data, signatureAlgorithm, cert, extraParams, checkSignatures);
 	}
 
 	@Override
@@ -232,7 +246,8 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final String signatureAlgorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targets) throws IOException, AOException {
+			                               final CounterSignTarget targets,
+					                       final boolean checkSignatures) throws IOException, AOException {
 		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
 

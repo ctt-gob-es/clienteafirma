@@ -44,6 +44,12 @@
 			<artifactId>afirma-crypto-pdf</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-validation</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
 
 	</dependencies>
 

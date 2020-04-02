@@ -40,7 +40,8 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                              final String algorithm,
 			                              final X509Certificate[] cert,
-			                              final Properties params) throws IOException,
+			                              final Properties params,
+			                              final boolean checkSignatures) throws IOException,
 	                                                                      AOException {
 		LOGGER.info("Prefirma PKCS#1 - Firma - INICIO"); //$NON-NLS-1$
 
@@ -114,7 +115,8 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreCoSign(final byte[] sign,
 			final String algorithm,
 			final X509Certificate[] cert,
-			final Properties params) throws IOException, AOException {
+			final Properties params,
+            final boolean checkSignatures) throws IOException, AOException {
 
 		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
 	}
@@ -144,7 +146,8 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targetType) throws IOException,
+			                               final CounterSignTarget targetType,
+				                           final boolean checkSignatures) throws IOException,
 			                                                                          AOException {
 		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
 	}

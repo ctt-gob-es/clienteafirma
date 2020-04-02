@@ -534,9 +534,12 @@ public final class ProtocolInvocationLauncher {
                 }
                 // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
                 catch(final SocketOperationException e) {
-                    LOGGER.severe("La operacion indicada no esta soportada: " + e); //$NON-NLS-1$
+                    LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
                     if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
                         sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
+                    }
+                    else if (e.getMessage() != null){
+                    	sendErrorToServer(e.getErrorCode() + ": " + e.getMessage(), params.getStorageServletUrl().toString(), params.getId()); //$NON-NLS-1$
                     }
                     else {
                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());

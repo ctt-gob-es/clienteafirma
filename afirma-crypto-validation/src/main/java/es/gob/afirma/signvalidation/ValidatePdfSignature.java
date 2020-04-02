@@ -43,12 +43,20 @@ public final class ValidatePdfSignature implements SignValider{
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
 	public SignValidity validate(final byte[] sign) throws IOException {
-		final PdfReader reader = new PdfReader(sign);
-		final AcroFields af = reader.getAcroFields();
+
+		AcroFields af;
+		try {
+			final PdfReader reader = new PdfReader(sign);
+			af = reader.getAcroFields();
+		}
+		catch (final Exception e) {
+			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+		}
+
 		final List<String> sigNames = af.getSignatureNames();
 
 		if (sigNames.size() == 0) {
-			throw new IOException("No se encontraron firmas en el PDF"); //$NON-NLS-1$
+			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
 
 		for (final String name : sigNames) {

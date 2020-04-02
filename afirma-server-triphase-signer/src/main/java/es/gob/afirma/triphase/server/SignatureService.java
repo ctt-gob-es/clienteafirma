@@ -31,6 +31,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
@@ -272,7 +273,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch (final Throwable e) {
 					LOGGER.warning("Error al recuperar el documento: " + e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(14) + ": " + e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(14) + ": " + new AOTriphaseException(e.toString(), e)); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -332,6 +333,9 @@ public final class SignatureService extends HttpServlet {
 
 				LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
 
+				// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
+		        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
+
 				final TriphaseData preRes;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
@@ -339,7 +343,8 @@ public final class SignatureService extends HttpServlet {
 							docBytes,
 							algorithm,
 							signerCertChain,
-							extraParams
+							extraParams,
+							checkSignatures
 						);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
@@ -347,7 +352,8 @@ public final class SignatureService extends HttpServlet {
 							docBytes,
 							algorithm,
 							signerCertChain,
-							extraParams
+							extraParams,
+							checkSignatures
 						);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
@@ -365,7 +371,8 @@ public final class SignatureService extends HttpServlet {
 							algorithm,
 							signerCertChain,
 							extraParams,
-							target
+							target,
+							checkSignatures
 						);
 					}
 					else {

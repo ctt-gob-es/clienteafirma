@@ -16,11 +16,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,7 +44,6 @@ import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -68,11 +66,11 @@ final class SignDataPanel extends JPanel {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
-    private static final String FILE_ICON_SIGN = "/resources/icon_sign.png"; //$NON-NLS-1$
-    private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.png"; //$NON-NLS-1$
-    private static final String FILE_ICON_OOXML_WIN = "/resources/icon_office_win.png"; //$NON-NLS-1$
-    private static final String FILE_ICON_ODF = "/resources/icon_openoffice.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_PDF = "icon_pdf.png";  //$NON-NLS-1$
+    private static final String FILE_ICON_SIGN = "icon_sign.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_FACTURAE = "icon_facturae.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_OOXML_WIN = "icon_office_win.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_ODF = "icon_openoffice.png"; //$NON-NLS-1$
 
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -148,7 +146,9 @@ final class SignDataPanel extends JPanel {
                 fileIcon = FILE_ICON_SIGN;
                 fileTooltip = SimpleAfirmaMessages.getString("SignDataPanel.31"); //$NON-NLS-1$
             }
-            final JLabel iconLabel = new JLabel(new ImageIcon(SignDataPanel.class.getResource(fileIcon)));
+
+            final BufferedImage fileIconImage = ImageLoader.loadImage(fileIcon);
+            final JLabel iconLabel = new JLabel(new ImageIcon(fileIconImage));
             iconLabel.setToolTipText(fileTooltip);
             iconLabel.setFocusable(false);
             filePathPanel.add(iconLabel);
@@ -163,25 +163,22 @@ final class SignDataPanel extends JPanel {
             openFileButton.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.4")); //$NON-NLS-1$
             openFileButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.5")); //$NON-NLS-1$
             openFileButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.6")); //$NON-NLS-1$
-            openFileButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent ae) {
-                    try {
-                        Desktop.getDesktop().open(signFile);
-                    }
-                    catch (final Exception e) {
-                    	LOGGER.warning(
-                			"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
-            			);
-                    	AOUIFactory.showErrorMessage(
-                            SignDataPanel.this,
-                            SimpleAfirmaMessages.getString("SignDataPanel.7"), //$NON-NLS-1$
-                            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                    }
-                }
-            });
+            openFileButton.addActionListener(ae -> {
+			    try {
+			        Desktop.getDesktop().open(signFile);
+			    }
+			    catch (final Exception e) {
+			    	LOGGER.warning(
+						"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
+					);
+			    	AOUIFactory.showErrorMessage(
+			            SignDataPanel.this,
+			            SimpleAfirmaMessages.getString("SignDataPanel.7"), //$NON-NLS-1$
+			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			            JOptionPane.ERROR_MESSAGE
+			        );
+			    }
+			});
         }
 
 
@@ -216,12 +213,10 @@ final class SignDataPanel extends JPanel {
 	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
 
-	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
-                    @Override
-                    public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-                        openCertificate(cert, SignDataPanel.this);
-                    }
-                });
+	            final EditorFocusManager editorFocusManager = new EditorFocusManager (
+	            	this.certDescription,
+	            	(he, linkIndex) -> openCertificate(cert, SignDataPanel.this)
+	            );
                 this.certDescription.addFocusListener(editorFocusManager);
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
@@ -445,17 +440,14 @@ final class SignDataPanel extends JPanel {
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        final TreeFocusManager treeFocusManager = new TreeFocusManager(tree, new TreeFocusManagerAction() {
-            @Override
-            public void openTreeNode(final Object nodeInfo) {
-                if (nodeInfo instanceof AOSimpleSignInfo) {
-                    openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0], parent);
-                }
-                else if (nodeInfo instanceof ShowFileLinkAction) {
-                    ((ShowFileLinkAction) nodeInfo).action();
-                }
-            }
-        });
+        final TreeFocusManager treeFocusManager = new TreeFocusManager(tree, nodeInfo -> {
+		    if (nodeInfo instanceof AOSimpleSignInfo) {
+		        openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0], parent);
+		    }
+		    else if (nodeInfo instanceof ShowFileLinkAction) {
+		        ((ShowFileLinkAction) nodeInfo).action();
+		    }
+		});
 
         tree.addMouseMotionListener(treeFocusManager);
         tree.addFocusListener(treeFocusManager);

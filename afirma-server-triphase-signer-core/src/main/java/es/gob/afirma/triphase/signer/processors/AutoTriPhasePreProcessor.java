@@ -38,11 +38,12 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
-			                        final Properties extraParams) throws IOException,
+			                        final Properties extraParams,
+		                            final boolean checkSignatures) throws IOException,
 			                                                             AOException {
 		final String format = getSignFormat(data);
 		final TriPhasePreProcessor prep = getPreProcessor(format);
-		final TriphaseData preSign = prep.preProcessPreSign(data, algorithm, cert, extraParams);
+		final TriphaseData preSign = prep.preProcessPreSign(data, algorithm, cert, extraParams, checkSignatures);
 		preSign.setFormat(format);
 		return preSign;
 	}
@@ -51,11 +52,12 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
-			                          final Properties extraParams) throws IOException,
+			                          final Properties extraParams,
+		                              final boolean checkSignatures) throws IOException,
 			                                                               AOException {
 		final String format = getSignFormat(data);
 		final TriPhasePreProcessor prep = getPreProcessor(format);
-		final TriphaseData preSign = prep.preProcessPreCoSign(data, algorithm, cert, extraParams);
+		final TriphaseData preSign = prep.preProcessPreCoSign(data, algorithm, cert, extraParams, checkSignatures);
 		preSign.setFormat(format);
 		return preSign;
 	}
@@ -65,11 +67,12 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
-			                               final CounterSignTarget targets) throws IOException,
+			                               final CounterSignTarget targets,
+			                               final boolean checkSignatures) throws IOException,
 			                                                                       AOException {
 		final String format = getSignFormat(sign);
 		final TriPhasePreProcessor prep = getPreProcessor(format);
-		final TriphaseData preSign = prep.preProcessPreCounterSign(sign, algorithm, cert, extraParams, targets);
+		final TriphaseData preSign = prep.preProcessPreCounterSign(sign, algorithm, cert, extraParams, targets, checkSignatures);
 		preSign.setFormat(format);
 		return preSign;
 	}
