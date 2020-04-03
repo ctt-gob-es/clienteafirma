@@ -324,8 +324,8 @@ public final class TestXAdES {
 //          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
 //        }
 
-        //for (final String algo : ALGOS) {
-        final String algo = ALGOS[1];
+        for (final String algo : ALGOS) {
+
           for(final String[] signfile : TEST_FILES_MULTISIGN) {
 
         	final String filename = signfile[0];
@@ -367,7 +367,7 @@ public final class TestXAdES {
           }
         }
 
-    //}
+    }
 
     /** Pruebas de cofirmacon Manifest.
      * @throws Exception Cuando ocurre un error */
@@ -394,7 +394,7 @@ public final class TestXAdES {
           for(final String[] signfile : TEST_FILES_MULTISIGN) {
 
         	final String filename = signfile[0];
-        	final boolean isEnveloped = Boolean.parseBoolean(signfile[1]);
+        	boolean isEnveloped = Boolean.parseBoolean(signfile[1]);
 
             prueba = "Cofirma XAdES con manifest, algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -416,14 +416,11 @@ public final class TestXAdES {
             catch (final AOUnsupportedSignFormatException e) {
             	if (isEnveloped) {
             		System.out.println("Las firmas enveloped no se pueden firmar con manifest. Se pasa a la siguiente"); //$NON-NLS-1$
+            		isEnveloped = false;
             		continue;
             	}
 				throw e;
 			}
-
-            if (isEnveloped) {
-            	Assert.fail("Las firmas enveloped con manifest no existen y deben lanzar un error"); //$NON-NLS-1$
-            }
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             try (
