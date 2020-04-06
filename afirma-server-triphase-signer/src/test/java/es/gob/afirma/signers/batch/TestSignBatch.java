@@ -218,7 +218,8 @@ public final class TestSignBatch {
 			SignAlgorithm.SHA512WITHRSA.toString(),
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
-			td1
+			td1,
+			null
 		);
 
 		System.out.println(td2);
@@ -273,7 +274,8 @@ public final class TestSignBatch {
 			SignAlgorithm.SHA512WITHRSA.toString(),
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
-			td1
+			td1,
+			null
 		);
 
 		//System.out.println(td2);
@@ -330,7 +332,8 @@ public final class TestSignBatch {
 			SignAlgorithm.SHA512WITHRSA.toString(),
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
-			td1
+			td1,
+			null
 		);
 
 		System.out.println(td2);
