@@ -9,20 +9,19 @@
 
 package es.gob.afirma.signers.ooxml;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Clase con m&eacute;todos de utilidad para las firmas OOXML. */
@@ -56,28 +55,27 @@ final class OOXMLUtil {
     /** Cuenta el n&uacute;mero de firmas del documento OOXML. Si se produce
      * alg&uacute;n error durante el an&aacute;lisis del fichero, se
      * devolver&aacute; 0.
-     * @param ooxmlFile Documento OOXML.
+     * @param ooxmlData Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML.
      * @throws ParserConfigurationException Cuando hay problemas con el analizador SAX.
      * @throws IOException Cuando hay incosistencias de formato OOXML en los XML internos del fichero.
      * @throws SAXException Cuando alguno de los XML internos del fichero no est&aacute; bien formado. */
-    private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
+    private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlData) throws IOException, SAXException, ParserConfigurationException {
 
         final List<Relationship> relations = new ArrayList<>();
 
-        final File tempFile = AOFileUtils.createTempFile(ooxmlFile);
-    	try (final ZipFile zipFile = new ZipFile(tempFile)) {
-
-	        // Comprobamos si existe la relacion de firmas del documento
-	        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+        // Cargamos la entrada con las relaciones del documento
+        try {
+       		final List<ZipEntry> entries = getEntryList(ooxmlData);
+        	final byte[] signatureRels = getSignaturesRels(ooxmlData, entries);
 
 	        // Si no existe el fichero de relaciones, el documento no contiene firmas
-	        if (relsEntry == null) {
+	        if (signatureRels == null) {
 	            throw new IOException("No se ha encontrado el listado de relaciones"); //$NON-NLS-1$
 	        }
 
 	        // Analizamos el fichero de relaciones
-	        final RelationshipsParser parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
+	        final RelationshipsParser parser = new RelationshipsParser(new ByteArrayInputStream(signatureRels));
 
 	        // Contamos las relaciones de firma
 	        for (final Relationship rel : parser.getRelationships()) {
@@ -90,38 +88,30 @@ final class OOXMLUtil {
             LOGGER.severe("No se pudieron leer las firmas del documento OOXML: " + e); //$NON-NLS-1$
         }
 
-    	if (tempFile != null) {
-    		try {
-				Files.delete(tempFile.toPath());
-			} catch (final IOException e) {
-				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
-			}
-    	}
-
         return relations.toArray(new Relationship[0]);
     }
 
     /** Recupera las firmas XMLdSig empotradas en el documento OOXML.
-     * @param ooxmlFile Documento OOXML.
+     * @param ooxmlData Documento OOXML.
      * @return Firmas empotradas en el documento.
      * @throws ParserConfigurationException Cuando hay problemas con el analizador SAX.
      * @throws IOException Cuando hay incosistencias de formato OOXML en los XML internos del fichero.
      * @throws SAXException Cuando alguno de los XML internos del fichero no est&aacute; bien formado. */
-    static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
+    static byte[][] getOOXMLSignatures(final byte[] ooxmlData) throws IOException, SAXException, ParserConfigurationException {
+
     	final List<byte[]> relations = new ArrayList<>();
 
     	boolean error = false;
-    	final File tempFile = AOFileUtils.createTempFile(ooxmlFile);
-    	try (final ZipFile zipFile = new ZipFile(tempFile)) {
-
+    	try {
     		// Comprobamos si existe la relacion de firmas del documento
-    		final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
-    		if (relsEntry == null) {
+    		final List<ZipEntry> entries = getEntryList(ooxmlData);
+    		final byte[] signatureRels = getSignaturesRels(ooxmlData, entries);
+    		if (signatureRels == null) {
     			throw new IOException("No se han contrado relaciones en el documento"); //$NON-NLS-1$
     		}
 
     		// Analizamos el fichero de relaciones
-    		final RelationshipsParser parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
+    		final RelationshipsParser parser = new RelationshipsParser(new ByteArrayInputStream(signatureRels));
 
     		// Contamos las relaciones de firma
     		for (final Relationship rel : parser.getRelationships()) {
@@ -129,17 +119,21 @@ final class OOXMLUtil {
 
     				// Comprobamos que exista el firma referenciada
     				final String target = rel.getTarget();
-    				ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target); //$NON-NLS-1$
-    				if (signEntry == null) {
-    					signEntry = zipFile.getEntry("_xmlsignatures\\" + target); //$NON-NLS-1$
+
+    				byte[] signEntryData;
+    				if (hasEntry(entries, "_xmlsignatures/" + target)) { //$NON-NLS-1$
+    					signEntryData = readEntry(ooxmlData, "_xmlsignatures/" + target); //$NON-NLS-1$
     				}
-    				if (signEntry == null) {
+    				else if (hasEntry(entries, "_xmlsignatures\\" + target)) { //$NON-NLS-1$
+    					signEntryData = readEntry(ooxmlData, "_xmlsignatures\\" + target); //$NON-NLS-1$
+    				}
+    				else {
     					LOGGER.severe("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
     					throw new IOException("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
     				}
 
     				// Guardamos la firma
-    				relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
+    				relations.add(signEntryData);
     			}
     		}
     	}
@@ -147,14 +141,6 @@ final class OOXMLUtil {
             LOGGER.severe("No se pudieron leer las firmas del documento OOXML: " + e); //$NON-NLS-1$
             error = true;
         }
-
-    	if (tempFile != null) {
-    		try {
-				Files.delete(tempFile.toPath());
-			} catch (final IOException e) {
-				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
-			}
-    	}
 
     	if (error) {
     		return new byte[0][];
@@ -164,32 +150,42 @@ final class OOXMLUtil {
     }
 
     /** Recupera la entrada con la relaci&oacute;n de firmas del documento.
-     * @param ooxmlZipFile Fichero OOXML.
-     * @return Entrada con la relaci&oacute;n de firmas. */
-    private static ZipEntry getSignaturesRelsEntry(final ZipFile ooxmlZipFile) {
-        ZipEntry relsEntry = ooxmlZipFile.getEntry("_rels/.rels"); //$NON-NLS-1$
-        if (relsEntry == null) {
-            relsEntry = ooxmlZipFile.getEntry("_rels\\.rels"); //$NON-NLS-1$
-        }
+     * @param ooxmlData Datos OOXML.
+     * @return Entrada con la relaci&oacute;n de firmas.
+     * @throws IOException Cuando ocurre un error durante la lectura. */
+    private static byte[] getSignaturesRels(final byte[] ooxmlData, final List<ZipEntry> entries) throws IOException {
+
+   		byte[] relsData;
+   		if (hasEntry(entries, "_rels/.rels")) { //$NON-NLS-1$
+   			relsData = readEntry(ooxmlData, "_rels/.rels"); //$NON-NLS-1$
+   		}
+   		else if (hasEntry(entries, "_rels\\.rels")) { //$NON-NLS-1$
+   			relsData = readEntry(ooxmlData, "_rels\\.rels"); //$NON-NLS-1$
+   		}
+   		else {
+   			return null;
+   		}
 
         // Analizamos el fichero de relaciones
         final RelationshipsParser parser;
-        try {
-            parser = new RelationshipsParser(ooxmlZipFile.getInputStream(relsEntry));
+        try (InputStream relsIs = new ByteArrayInputStream(relsData)) {
+            parser = new RelationshipsParser(relsIs);
         }
         catch (final Exception e) {
             LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$
             return null;
         }
 
-        ZipEntry signsEntry = null;
+        byte[] signsEntry = null;
         for (final Relationship rel : parser.getRelationships()) {
             if (OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE.equals(rel.getType())) {
                 final String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1); //$NON-NLS-1$
                 final String target = rel.getTarget().substring("_xmlsignatures".length() + 1); //$NON-NLS-1$
-                signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels/" + target + ".rels"); //$NON-NLS-1$ //$NON-NLS-2$
-                if (signsEntry == null) {
-                    signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels\\" + target + ".rels"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (hasEntry(entries, middleTarget + "_rels/" + target + ".rels")) { //$NON-NLS-1$ //$NON-NLS-2$
+                	signsEntry = readEntry(ooxmlData, middleTarget + "_rels/" + target + ".rels"); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+                else if (hasEntry(entries, middleTarget + "_rels\\" + target + ".rels")) { //$NON-NLS-1$ //$NON-NLS-2$
+                	signsEntry = readEntry(ooxmlData, middleTarget + "_rels\\" + target + ".rels"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 break;
             }
@@ -197,4 +193,62 @@ final class OOXMLUtil {
 
         return signsEntry;
     }
+
+
+	/**
+	 * Recupera el listado de entradas del ZIP en memoria.
+	 * @param zis Flujo de datos del fichero comprimido.
+	 * @return Listado de entradas del ZIP.
+	 * @throws IOException Cuando ocurre un error durante la lectura del fichero.
+	 */
+	static List<ZipEntry> getEntryList(final byte[] zipData) throws IOException {
+		ZipEntry entry = null;
+		final List<ZipEntry> entryList = new ArrayList<>();
+		try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipData))) {
+			while ((entry = zis.getNextEntry()) != null) {
+				entryList.add(entry);
+			}
+		}
+		return entryList;
+	}
+
+	/**
+	 * Comprueba si entre un listado de entradas de un ZIP se encuentra una en concreto.
+	 * @param entryList Listado de entradas.
+	 * @param entryName Nombre de la entrada buscada.
+	 * @return {@code true} si se encuentra la entrada, {@code false} en caso contrario.
+	 */
+	static boolean hasEntry(final List<ZipEntry> entryList, final String entryName) {
+		int i = 0;
+		boolean found = false;
+		while (!found && i < entryList.size()) {
+			if (entryName.equals(entryList.get(i).getName())) {
+				found = true;
+			}
+			i++;
+		}
+		return found;
+	}
+
+	/**
+	 * Comprueba si entre un listado de entradas de un ZIP se encuentra una en concreto.
+	 * @param entryList Listado de entradas.
+	 * @param entryName Nombre de la entrada buscada.
+	 * @return {@code true} si se encuentra la entrada, {@code false} en caso contrario.
+	 * @throws IOException Cuando ocurre un error en la lectura.
+	 */
+	static byte[] readEntry(final byte[] ooxmlData, final String entryName) throws IOException {
+		ZipEntry entry;
+		byte[] data = null;
+		boolean found = false;
+		try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(ooxmlData))) {
+			while (!found && (entry = zis.getNextEntry()) != null) {
+				if (entryName.equals(entry.getName())) {
+					data = AOUtil.getDataFromInputStream(zis);
+					found = true;
+				}
+			}
+		}
+		return data;
+	}
 }

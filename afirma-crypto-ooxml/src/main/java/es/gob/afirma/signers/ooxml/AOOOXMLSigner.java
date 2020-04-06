@@ -9,23 +9,21 @@
 
 package es.gob.afirma.signers.ooxml;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.OfficeAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -104,32 +102,25 @@ public final class AOOOXMLSigner implements AOSigner {
     	}
 
     	boolean result = true;
-    	final File tempFile = AOFileUtils.createTempFile(data);
-    	try (final ZipFile zipFile = new ZipFile(tempFile)) {
+    	try {
+
+    		final List<ZipEntry> entryList = OOXMLUtil.getEntryList(data);
     		// Se separa en varios "if" para simplificar la condicional
-    		if (zipFile.getEntry("[Content_Types].xml") == null) { //$NON-NLS-1$
+    		if (!OOXMLUtil.hasEntry(entryList, "[Content_Types].xml")) { //$NON-NLS-1$
     			result = false;
     		}
-    		else if (zipFile.getEntry("_rels/.rels") == null && zipFile.getEntry("_rels\\.rels") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+    		else if (!OOXMLUtil.hasEntry(entryList, "_rels/.rels") && !OOXMLUtil.hasEntry(entryList, "_rels\\.rels")) { //$NON-NLS-1$ //$NON-NLS-2$
     			result = false;
     		}
-    		else if (zipFile.getEntry("docProps/app.xml") == null && zipFile.getEntry("docProps\\app.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+    		else if (!OOXMLUtil.hasEntry(entryList, "docProps/app.xml") && !OOXMLUtil.hasEntry(entryList, "docProps\\app.xml")) { //$NON-NLS-1$ //$NON-NLS-2$
     			result = false;
     		}
-    		else if (zipFile.getEntry("docProps/core.xml") == null && zipFile.getEntry("docProps\\core.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+    		else if (!OOXMLUtil.hasEntry(entryList, "docProps/core.xml") && !OOXMLUtil.hasEntry(entryList, "docProps\\core.xml")) { //$NON-NLS-1$ //$NON-NLS-2$
     			result = false;
     		}
     	}
     	catch (final Exception e) {
     		result = false;
-    	}
-
-    	if (tempFile != null) {
-    		try {
-				Files.delete(tempFile.toPath());
-			} catch (final IOException e) {
-				LOGGER.warning("No se ha podido eliminar el fichero temporal:  " + e); //$NON-NLS-1$
-			}
     	}
 
         return result;
