@@ -322,7 +322,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      				configs.add(prepareSignConfig(dataFile));
      			}
      			catch (final Exception e) {
-     				LOGGER.warning(String.format("Error cargar el fichero %s, se salta al siguiente", dataFile.getAbsolutePath())); //$NON-NLS-1$
+     				LOGGER.log(Level.WARNING,
+     						String.format("Error al cargar el fichero %s, se salta al siguiente", dataFile.getAbsolutePath()), //$NON-NLS-1$
+     						e);
      			}
      		}
      		this.lowerPanel.loadDataInfo(configs);
@@ -460,9 +462,11 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 // a utilizar, se validan con el
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
-			 final SignValidity validity = validator.validate(data);
-			 if (validity != null && validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO) {
-				 config.setInvalidSignatureText(buildErrorText(validity.getError()));
+			 if (validator != null) {
+				 final SignValidity validity = validator.validate(data);
+				 if (validity != null && validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO) {
+					 config.setInvalidSignatureText(buildErrorText(validity.getError()));
+				 }
 			 }
 		 }
 
