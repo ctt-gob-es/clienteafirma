@@ -3159,12 +3159,14 @@ var AutoScript = ( function ( window, undefined ) {
 							execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
 						}
 						else {
+							console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
 							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function(e) {
+						console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
 						errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
 					}
 				}
