@@ -49,7 +49,7 @@ public class TestProtocolInvocation {
 	/** Prueba de protocolo con firma visible de PDF. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Requiere de servidor remoto y UI
+	@Ignore // Requiere de servidor remoto y UI
 	public void testSignVisiblePdf() {
 		SimpleAfirma.main(new String[] { LINE_SIGN_PDF });
 	}
