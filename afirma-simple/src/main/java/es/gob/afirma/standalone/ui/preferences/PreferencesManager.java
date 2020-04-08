@@ -114,6 +114,11 @@ public final class PreferencesManager {
 	 * de certificados muestre los certificados caducados. */
 	public static final String PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS = "showExpiredCerts"; //$NON-NLS-1$
 
+	/** Permitir la multifirma de firmas inv&aacute;lidas.
+	 * Un valor de <code>true</code> en esta preferencia hace que se puedan multifirmar firmas a pesar
+	 * de haberse detectado que no son v&aacute;lidas. */
+	public static final String PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES = "allowInvalidSignatures"; //$NON-NLS-1$
+
 	/** Mantiene habilitado el funcionamiento de JMultiCard.
 	 * Un valor de <code>true</code> en esta preferencia hace que la aplicacion deje el comportamiento
 	 * por defecto de JMulticard, que usaria las tarjetas DNIe y CERES. Un valor de <code>false</code>

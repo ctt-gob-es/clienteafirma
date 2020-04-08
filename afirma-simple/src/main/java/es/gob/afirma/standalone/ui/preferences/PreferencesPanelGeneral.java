@@ -66,6 +66,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.176")); //$NON-NLS-1$
 
+	private final JCheckBox allowSignInvalidSignatures = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.178")); //$NON-NLS-1$
+
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
@@ -277,7 +279,15 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.showExpiredCerts.addItemListener(modificationListener);
 		this.showExpiredCerts.addKeyListener(keyListener);
 		signConfigPanel.add(this.showExpiredCerts, signConstraint);
-			signConstraint.gridy++;
+		signConstraint.gridy++;
+
+		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.178") //$NON-NLS-1$
+				);
+		this.allowSignInvalidSignatures.addItemListener(modificationListener);
+		this.allowSignInvalidSignatures.addKeyListener(keyListener);
+		signConfigPanel.add(this.allowSignInvalidSignatures, signConstraint);
+		signConstraint.gridy++;
 
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
@@ -523,6 +533,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		}
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES, this.allowSignInvalidSignatures.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS, this.secureConnections.isSelected());
@@ -562,6 +573,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		}
 
 		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
+		this.allowSignInvalidSignatures.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES));
 
 		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {
 			this.enableJMulticard.setSelected(false);

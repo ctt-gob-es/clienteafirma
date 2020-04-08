@@ -44,6 +44,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -64,6 +65,7 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
@@ -187,6 +189,22 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
     /** Firma el fichero actualmente cargado. */
     public void sign() {
+
+    	// Si se trata de firmar un documento que sabemos que es una firma invalida y no se
+    	// se permite esto, se lanza un error
+    	if (this.signOperationConfigs.size() == 1 &&
+    			this.signOperationConfigs.get(0).getSignValidity() != null &&
+    			this.signOperationConfigs.get(0).getSignValidity().getValidity() == SIGN_DETAIL_TYPE.KO &&
+    			!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES)) {
+
+    		AOUIFactory.showErrorMessage(
+    				this,
+    				SimpleAfirmaMessages.getString("SimpleAfirma.9"), //$NON-NLS-1$,
+    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE
+    			);
+    		return;
+    	}
 
     	// Mostramos el dialogo de espera
     	this.signWaitDialog = new CommonWaitDialog(
@@ -464,8 +482,11 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
 				 final SignValidity validity = validator.validate(data);
-				 if (validity != null && validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO) {
-					 config.setInvalidSignatureText(buildErrorText(validity.getError()));
+				 if (validity != null) {
+					 config.setSignValidity(validity);
+					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO) {
+						 config.setInvalidSignatureText(buildErrorText(validity.getError()));
+					 }
 				 }
 			 }
 		 }

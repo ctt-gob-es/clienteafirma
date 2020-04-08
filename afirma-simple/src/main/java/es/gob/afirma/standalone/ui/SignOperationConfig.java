@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.signvalidation.SignValidity;
 
 /** Configuraci&oacute;n de una operaci&oacute;n de firma. */
 public final class SignOperationConfig {
@@ -16,6 +17,7 @@ public final class SignOperationConfig {
 	private AOSigner signer;
 	private Properties extraParams;
 	private String signatureFormatName;
+	private SignValidity signValidity;
 	private String invalidSignatureText;
 
 	/** Construye la configuraci&oacute;n de firma. */
@@ -102,6 +104,18 @@ public final class SignOperationConfig {
 	 * @param signatureFormatName Descripci&oacute;n del formato. */
 	public void setSignatureFormatName(final String signatureFormatName) {
 		this.signatureFormatName = signatureFormatName;
+	}
+
+	/** Recupera la informaci&oacute;n de validaci&oacute;n de la firma.
+	 * @return Resultado de la validaci&oacute;n de la firma. */
+	public SignValidity getSignValidity() {
+		return this.signValidity;
+	}
+
+	/** Establece la informaci&oacute;n de validaci&oacute;n de la firma.
+	 * @param signValidity Resultado de la validaci&&oacute;n de la firma. */
+	public void setSignValidity(final SignValidity signValidity) {
+		this.signValidity = signValidity;
 	}
 
 	/** Recupera el texto descriptivo del error de la firma cargada.

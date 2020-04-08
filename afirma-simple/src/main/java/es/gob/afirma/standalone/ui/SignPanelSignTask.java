@@ -50,6 +50,7 @@ import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
@@ -166,6 +167,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         // Realizamos la firma de cada documento
         byte[] signResult = null;
         for (final SignOperationConfig signConfig : this.signConfigs) {
+
+        	// Evitamos agregar nuevas firmas a los documentos con firmas no validas
+        	if (signConfig.getSignValidity() != null &&
+        		signConfig.getSignValidity().getValidity() == SIGN_DETAIL_TYPE.KO &&
+        		!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES)) {
+        		LOGGER.severe("La entrada es una firma invalida. Se omitira"); //$NON-NLS-1$
+        		continue;
+        	}
+
 
         	final AOSigner currentSigner = signConfig.getSigner();
 
