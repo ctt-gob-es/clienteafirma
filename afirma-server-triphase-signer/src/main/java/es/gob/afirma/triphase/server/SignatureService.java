@@ -125,7 +125,7 @@ public final class SignatureService extends HttpServlet {
 		final Map<String, String> parameters = new HashMap<>();
 		final String[] params;
 		try {
-			params = new String(AOUtil.getDataFromInputStream(request.getInputStream())).split("&"); //$NON-NLS-1$
+			params = new String(AOUtil.getDataFromInputStream(request.getInputStream()), URL_DEFAULT_CHARSET).split("&"); //$NON-NLS-1$
 		}
 		catch (final Exception | Error e) {
 			LOGGER.severe("No se pudieron leer los parametros de la peticion: " + e); //$NON-NLS-1$
