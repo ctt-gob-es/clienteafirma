@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
@@ -28,6 +27,8 @@ import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 public final class Pkcs11Txt {
 
 	private static final String NAME_SEARCH_TOKEN = "name=\""; //$NON-NLS-1$
+
+	private static final String LIBRARY_SEARCH_TOKEN = "library="; //$NON-NLS-1$
 
 	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
 
@@ -82,31 +83,37 @@ public final class Pkcs11Txt {
 		    		foundName = null;
 		    		continue;
 		    	}
-		    	final String lib = AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		    	if (lib != null && !lib.trim().isEmpty()) {
-		    		if (line.contains(NAME_SEARCH_TOKEN)) {
-			    		ret.add(
-		    				new ModuleName(
-								lib.trim(),
-								line.substring(
-								   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
-								   line.indexOf(
-									   '"',
-									   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
-								   )
-								)
-							)
-						);
-			    		foundLib = null;
-			    		foundName = null;
+
+		    	// La documentacion de los modulos PKCS#11 establece que este fichero se compone de propiedades
+		    	// y valores que pueden estar separados por un espacio en blanco
+		    	// (https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/PKCS11/Module_Specs), pero en
+		    	// la realidad no es asi. Se realiza una valoracion intermedia en la que se soportaria que la
+		    	// clave "library" no estuviese al principio de una linea y que estuviese seguido por la clave
+		    	// "name" en la misma linea. No se puede interpretar que un espacio en blanco separa las claves
+		    	// porque impediria establecer librerias con rutas con espacios
+		    	int libPos = -1;
+		    	if (line.startsWith(LIBRARY_SEARCH_TOKEN)) {
+		    		libPos = LIBRARY_SEARCH_TOKEN.length();
+		    	}
+		    	else if (line.indexOf(" " + LIBRARY_SEARCH_TOKEN) != -1) { //$NON-NLS-1$
+		    		libPos = line.indexOf(" " + LIBRARY_SEARCH_TOKEN) + //$NON-NLS-1$
+		    				(" " + LIBRARY_SEARCH_TOKEN).length(); //$NON-NLS-1$
+		    	}
+		    	if (libPos != -1) {
+		    		int namePos = line.indexOf(" " + NAME_SEARCH_TOKEN, libPos); //$NON-NLS-1$
+		    		if (namePos != -1) {
+		    			foundLib = line.substring(libPos, namePos).trim();
+		    			namePos += (" " + NAME_SEARCH_TOKEN).length(); //$NON-NLS-1$
+		    			foundName = line.substring(namePos, line.indexOf('"', namePos));
 		    		}
 		    		else {
-		    			foundLib = lib.trim();
+		    			foundLib = line.substring(libPos).trim();
 		    		}
 		    	}
 		    	else if (line.startsWith("name=")){ //$NON-NLS-1$
 		    		foundName = line.substring("name=".length()).trim(); //$NON-NLS-1$
 		    	}
+
 		    	if (foundLib != null && foundName != null && !foundLib.isEmpty() && !foundName.isEmpty()){
 		    		ret.add(new ModuleName(foundLib, foundName));
 		    		foundLib = null;
