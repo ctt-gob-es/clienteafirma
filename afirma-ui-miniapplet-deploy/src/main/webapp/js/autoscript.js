@@ -1794,16 +1794,8 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				idSession = AfirmaUtils.generateNewIdSession();
 				
-				// Si no se dan las condiciones que requieren el uso de la aplicacion nativa,
-				// por entorno y si se ha configurado la URL del servicio, cargamos la version JNLP
-				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
-					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://service?ports=" + portsLine + "&amp;v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession, true));
-				}
-				// En caso contrario, cargamos la version nativa
-				else {
-					bJNLP = false;
-					openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
-				}
+				// Lanzamos la aplicacion nativa
+				openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
 			}
 
 			/**
