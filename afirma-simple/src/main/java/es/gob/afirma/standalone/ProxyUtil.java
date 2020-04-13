@@ -182,7 +182,7 @@ public final class ProxyUtil {
 		final String proxyPort = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT);
 		final String proxyUsername = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME);
 		final String cipheredProxyPassword = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD);
-		final String excludedUrls = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_EXCLUDED_URLS);
+		String excludedUrls = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_EXCLUDED_URLS);
 
 		// Configuracion de host y puerto del proxy
 		System.setProperty("http.proxyHost", proxyHost); //$NON-NLS-1$
@@ -196,11 +196,13 @@ public final class ProxyUtil {
 
 		// Listado de excepciones
 		if (excludedUrls != null && !excludedUrls.trim().isEmpty()) {
-			System.setProperty("http.nonProxyHosts", excludedUrls.trim()); //$NON-NLS-1$
-			System.setProperty("ftp.nonProxyHosts", excludedUrls.trim()); //$NON-NLS-1$
+			excludedUrls = excludedUrls.trim();
+			System.setProperty("http.nonProxyHosts", excludedUrls); //$NON-NLS-1$
+			System.setProperty("https.nonProxyHosts", excludedUrls); //$NON-NLS-1$
+			System.setProperty("ftp.nonProxyHosts", excludedUrls); //$NON-NLS-1$
 		}
 
-		// Se cnfigura si es necesario el usuario y contrasena del proxy
+		// Se configura si es necesario el usuario y contrasena del proxy
 		if (proxyUsername != null && !proxyUsername.trim().isEmpty() &&
 				cipheredProxyPassword != null && !cipheredProxyPassword.trim().isEmpty()) {
 			char[] proxyPassword;

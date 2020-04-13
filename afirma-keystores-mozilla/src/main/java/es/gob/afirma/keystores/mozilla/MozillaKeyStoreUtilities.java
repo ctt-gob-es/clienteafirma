@@ -403,9 +403,12 @@ public final class MozillaKeyStoreUtilities {
 
 		final String dependList[];
 
-		// Compobamos despues el caso especifico de NSS partido entre /usr/lib y
-		// /lib, que se da en Fedora
-		if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
+		// Comprobamos despues el caso especifico de NSS partido entre /usr/lib y
+		// /lib, que se da en versiones de Fedora muy antiguas y solo en 32 bits
+		if (Platform.OS.LINUX.equals(Platform.getOS())
+                && "32".equals(Platform.getJavaArch()) //$NON-NLS-1$
+                && new File("/usr/lib/" + SOFTOKN3_SO).exists() //$NON-NLS-1$
+                && new File(LIB_NSPR4_SO).exists()) {
 			dependList = new String[] {
 					"/lib/libmozglue.so", //$NON-NLS-1$
 					"/usr/lib/libmozglue.so", //$NON-NLS-1$
@@ -744,19 +747,7 @@ public final class MozillaKeyStoreUtilities {
 		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return ""; //$NON-NLS-1$
 		}
-		final String winDir = System.getenv("SystemRoot"); //$NON-NLS-1$
-		if (winDir == null) {
-			return ""; //$NON-NLS-1$
-		}
-		// Si java es 64 bits, no hay duda de que Windows es 64 bits y buscamos bibliotecas
-		// de 64 bits
-		if ("64".equals(Platform.getJavaArch())) { //$NON-NLS-1$
-			return winDir + "\\System32\\";  //$NON-NLS-1$
-		}
-		if (new File(winDir + "\\SysWOW64\\").exists()) { //$NON-NLS-1$
-			return winDir + "\\SysWOW64\\"; //$NON-NLS-1$
-		}
-		return winDir + "\\System32\\"; //$NON-NLS-1$
+		return Platform.getSystemLibDir() + "\\"; //$NON-NLS-1$
 	}
 
 	private static boolean isModuleIncluded(final Map<String, String> externalStores, final String moduleName) {
