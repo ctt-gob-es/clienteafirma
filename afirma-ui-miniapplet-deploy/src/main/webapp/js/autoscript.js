@@ -613,7 +613,7 @@ var AutoScript = ( function ( window, undefined ) {
 				(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1) ||
 				 // En iOS 13, Safari tiene el mismo userAgent que el Safari de macOS,
 				 // asi que lo distinguimos por los puntos de presion admitidos
-            	(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+				 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 			}
 
 			/** Indica si el navegador es Internet Explorer. */
