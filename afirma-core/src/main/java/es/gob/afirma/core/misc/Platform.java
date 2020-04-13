@@ -216,20 +216,7 @@ public final class Platform {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return File.separator;
         }
-        String systemRoot = System.getProperty("SystemRoot"); //$NON-NLS-1$
-        if (systemRoot == null) {
-            final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
-            final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32"); //$NON-NLS-1$
-            if (winSys32.exists() && winSys32.isDirectory()) {
-                return defaultSystemRoot;
-            }
-        }
-        if (systemRoot == null) {
-            LOGGER
-            .warning("No se ha encontrado el directorio ra&iacute;z del sistema, se devolver&aacute;: " + File.separator); //$NON-NLS-1$
-            systemRoot = File.separator;
-        }
-        return systemRoot;
+        return System.getProperty("SystemRoot"); //$NON-NLS-1$
     }
 
     /** Devuelve el directorio principal de bibliotecas del sistema.
@@ -253,6 +240,26 @@ public final class Platform {
             }
 
             return systemRoot + "System32"; //$NON-NLS-1$
+        }
+
+        // ALL UNIX VARIANTS FOLLOWING FHS
+        // There are, generally, two kind of Unix flavours:
+        // a) Those whose libdir has explicit bit set: /usr/lib64 or /usr/lib32
+        // b) Those whose libdir does not include it: /usr/lib
+        //
+        // In the case of X bits and /usr/libX exists, it is clear that we
+        // are safe.
+        // In the case of X bits and /usr/libX does not exist, it is probably
+        // due to either the case:
+        //     Platform is 64, and folders /usr/lib and /usr/lib32 exist
+        // or
+        //     Platform is 32, and folders /usr/lib and /usr/lib64 exist
+        //
+        // In any case, the *safe* route is to first try the a) case before b).
+
+        final String canonicalLibDir = "/usr/lib" + Platform.getJavaArch(); //$NON-NLS-1$
+        if (new File(canonicalLibDir).exists()) {
+            return canonicalLibDir;
         }
         return "/usr/lib"; //$NON-NLS-1$
     }
