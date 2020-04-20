@@ -42,6 +42,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
@@ -87,6 +88,7 @@ final class SignPanelFilePanel extends JPanel {
     			signConfig.getDataFile(),
     			new Date(signConfig.getDataFile().lastModified()),
     			signConfig.getCryptoOperation(),
+    			signConfig.getSignValidity(),
     			signConfig.getInvalidSignatureText()
     			));
     }
@@ -98,6 +100,7 @@ final class SignPanelFilePanel extends JPanel {
                   final File file,
                   final Date fileLastModified,
                   final CryptoOperation operation,
+                  final SignValidity validity,
                   final String invalidSignatureText) {
 
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -123,7 +126,13 @@ final class SignPanelFilePanel extends JPanel {
 
         JLabel invalidSignatureErrorLabel = null;
         if (invalidSignatureText != null) {
-        	final BufferedImage errorIcon = ImageLoader.loadImage("ko_icon.png"); //$NON-NLS-1$
+        	final BufferedImage errorIcon;
+        	if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+        		errorIcon = ImageLoader.loadImage("unknown_icon.png"); //$NON-NLS-1$
+        	}
+        	else {
+        		errorIcon = ImageLoader.loadImage("ko_icon.png"); //$NON-NLS-1$
+        	}
         	invalidSignatureErrorLabel = new JLabel(invalidSignatureText, new ImageIcon(errorIcon), SwingConstants.LEFT);
         }
 

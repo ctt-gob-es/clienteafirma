@@ -484,8 +484,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				 final SignValidity validity = validator.validate(data);
 				 if (validity != null) {
 					 config.setSignValidity(validity);
-					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO) {
-						 config.setInvalidSignatureText(buildErrorText(validity.getError()));
+					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO ||
+							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+						config.setInvalidSignatureText(
+								buildErrorText(validity.getValidity(), validity.getError()));
 					 }
 				 }
 			 }
@@ -495,10 +497,15 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 config.setExtraParams(ExtraParamsHelper.loadExtraParamsForSigner(config.getSigner()));
 	 }
 
+	 private static String buildErrorText(final SIGN_DETAIL_TYPE result, final VALIDITY_ERROR error) {
 
-	 private static String buildErrorText(final VALIDITY_ERROR error) {
-
-		 final String errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
+		 final String errorMsg;
+		 if (result == SIGN_DETAIL_TYPE.UNKNOWN) {
+			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.141"); //$NON-NLS-1$
+		 }
+		 else {
+			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
+		 }
 		 switch (error) {
 			case NO_DATA:
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.125"); //$NON-NLS-1$ //$NON-NLS-2$

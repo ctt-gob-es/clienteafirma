@@ -21,7 +21,7 @@ public final class SignValidity {
 			return "Firma valida"; //$NON-NLS-1$
 		}
 		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
-			return "Validez de la firma desconocida"; //$NON-NLS-1$
+			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
 		}
 		final String ret = "Firma no valida"; //$NON-NLS-1$
 		if (this.error == null) {
