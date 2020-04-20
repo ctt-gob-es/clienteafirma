@@ -207,7 +207,7 @@ final class ProtocolInvocationLauncherSign {
 				)[0];
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
+				LOGGER.info("Carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket) {
 					throw new SocketOperationException(getResultCancel());
 				}
@@ -369,7 +369,6 @@ final class ProtocolInvocationLauncherSign {
 
 		if (options.getSticky() && !options.getResetSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
-
 		}
 		else {
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
@@ -648,6 +647,13 @@ final class ProtocolInvocationLauncherSign {
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
 				ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE
 			);
+		}
+		catch (final AOCancelledOperationException e) {
+			LOGGER.log(Level.SEVERE, "Operacion cancelada por el usuario: " + e, e); //$NON-NLS-1$
+			if (!bySocket) {
+				throw new SocketOperationException(getResultCancel());
+			}
+			return getResultCancel();
 		}
 		catch (final AOException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
