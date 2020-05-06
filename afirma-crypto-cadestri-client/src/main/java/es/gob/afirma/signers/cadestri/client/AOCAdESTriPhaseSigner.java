@@ -122,7 +122,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 
 		// Comprobamos si es un tipo de contrafirma soportado
     	if (targetType != CounterSignTarget.TREE && targetType != CounterSignTarget.LEAFS) {
-    		throw new UnsupportedOperationException("El objetivo indicado para la contrafirma no esta soportado: " + targetType); //$NON-NLS-1$
+    		throw new IllegalArgumentException("El objetivo indicado para la contrafirma no esta soportado: " + targetType); //$NON-NLS-1$
     	}
 
 		extraParams.setProperty(PROPERTY_NAME_CS_TARGET, targetType.toString());

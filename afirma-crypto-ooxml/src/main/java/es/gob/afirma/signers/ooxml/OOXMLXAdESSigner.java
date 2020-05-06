@@ -97,7 +97,7 @@ final class OOXMLXAdESSigner {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
-			throw new UnsupportedOperationException(
+			throw new IllegalArgumentException(
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}

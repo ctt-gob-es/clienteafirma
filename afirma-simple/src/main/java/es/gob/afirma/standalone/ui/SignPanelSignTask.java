@@ -245,7 +245,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             catch(final AOFormatFileException e) {
             	LOGGER.warning("La firma o el documento no son aptos para firmar: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
-            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.102")); //$NON-NLS-1$
+            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.102") + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
             		this.signExecutor.finishTask();
             		return;
             	}
@@ -267,7 +267,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             catch(final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error durante el proceso de firma: " + e, e); //$NON-NLS-1$
             	if (onlyOneFile) {
-            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.65")); //$NON-NLS-1$
+            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.65") + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
             		this.signExecutor.finishTask();
             		return;
             	}

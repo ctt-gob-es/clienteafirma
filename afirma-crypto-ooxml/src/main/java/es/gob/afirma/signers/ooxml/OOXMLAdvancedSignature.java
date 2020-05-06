@@ -36,6 +36,7 @@ import es.uji.crypto.xades.jxades.security.xml.XmlWrappedKeyInfo;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XMLAdvancedSignature;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBasicAttributes;
 
 final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 
@@ -65,7 +66,9 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
       final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
       if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certChain != null && certChain.length > 0) {
-          this.xades.setSigningCertificate(certChain[0]);
+    	  if (this.xades instanceof XadesWithBasicAttributes) {
+    		  ((XadesWithBasicAttributes) this.xades).setSigningCertificate(certChain[0]);
+    	  }
       }
 
       addXMLObject(
