@@ -19,6 +19,7 @@
  *    <td>XAdES-X</td>
  *    <td>XAdES-XL</td>
  *    <td>XAdES-A</td>
+ *    <td>XAdES-B-LEVEL</td>
  *   </tr>
  *   <tr>
  *    <td style="background-color: green;">Si</td>

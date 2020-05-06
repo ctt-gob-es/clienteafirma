@@ -10,7 +10,6 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.PrivateKey;
@@ -44,10 +43,9 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
-import es.uji.crypto.xades.jxades.util.XMLUtils;
 
 /** Manejador de firmas XML XAdES
- * <p>Soporta XAdES-BES y XAdES-EPES.</p>
+ * <p>Soporta XAdES-BES, XAdES-EPES y Baseline B-LEVEL.</p>
  * <p>
  *  Debido a errores en algunas versiones del entorno de ejecuci&oacute;n de Java, esta clase puede generar ocasionalmente
  *  mensajes en consola del tipo: <code>[Fatal Error] :1:1: Content is not allowed in prolog.</code>. Estos
@@ -60,6 +58,7 @@ import es.uji.crypto.xades.jxades.util.XMLUtils;
  * <ul>
  *  <li><i>SigningTime</i></li>
  *  <li><i>SigningCerticate</i></li>
+ *  <li><i>SigningCerticateV2</i></li>
  *  <li><i>IssuerSerial</i></li>
  *  <li><i>SignedDataObjectProperties</i></li>
  * </ul>
@@ -670,10 +669,10 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         }
 
         // convierte el documento obtenido en un array de bytes
-        final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
-        XMLUtils.writeXML(baosSig, elementRes, false);
+//        final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
+//        XMLUtils.writeXML(baosSig, elementRes, false);
 
-        return baosSig.toByteArray();
+        return Utils.writeXML(elementRes, null, null, null);
     }
 
     private void removeEnvelopedSignatures(final Element rootSig) {

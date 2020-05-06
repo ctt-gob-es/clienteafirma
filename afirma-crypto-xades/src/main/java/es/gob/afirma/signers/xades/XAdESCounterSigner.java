@@ -38,6 +38,7 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -45,8 +46,7 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 
 /** Contrafirmador XAdES. */
 public final class XAdESCounterSigner {
@@ -118,9 +118,28 @@ public final class XAdESCounterSigner {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
-			throw new UnsupportedOperationException(
+			throw new IllegalArgumentException(
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
 			);
+		}
+
+		// Perfil de firma XAdES que se desea aplicar
+		final String profile = extraParams.getProperty(
+		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
+
+		// Comprobacion del perfil de firma con la configuracion establecida
+		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
+			if (XMLConstants.URL_SHA1_RSA.equals(algoUri) || XMLConstants.URL_SHA1_ECDSA.equals(algoUri)) {
+				throw new IllegalArgumentException(
+						"Las firmas baseline no permiten el uso del algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			final String digestMethodAlgorithm = extraParams.getProperty(
+			        XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
+			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
+				throw new IllegalArgumentException(
+						"Las firmas baseline no permiten generar referencias con el algoritmo SHA1"); //$NON-NLS-1$
+			}
 		}
 
 		// Nueva instancia de DocumentBuilderFactory que permita espacio de
@@ -163,6 +182,7 @@ public final class XAdESCounterSigner {
 					certChain,
 					extraParams,
 				    algorithm,
+				    profile,
 				    doc
 			    );
 			}
@@ -173,6 +193,7 @@ public final class XAdESCounterSigner {
 					certChain,
 					extraParams,
 					algorithm,
+					profile,
 					doc
 				);
 			}
@@ -184,6 +205,7 @@ public final class XAdESCounterSigner {
 					certChain,
 					extraParams,
 					algorithm,
+					profile,
 					doc
 				);
 			}
@@ -195,6 +217,7 @@ public final class XAdESCounterSigner {
 					certChain,
 					extraParams,
 					algorithm,
+					profile,
 					doc
 				);
 			}
@@ -235,18 +258,20 @@ public final class XAdESCounterSigner {
 	}
 
 	/** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.
-	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
-	 * @param key Clave privada para la firma
-	 * @param certChain Cadena de certificados del firmante
-	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
-	 * @param algorithm Algoritmo de firma XML
-	 * @param doc Documento DOM XML a contrafirmar
+	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas.
+	 * @param key Clave privada para la firma.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma.
+	 * @param algorithm Algoritmo de firma XML.
+	 * @param profile Perfil de firma.
+	 * @param doc Documento DOM XML a contrafirmar.
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignLeafs(final Element root,
 			                             final PrivateKey key,
 			                             final Certificate[] certChain,
 			                             final Properties extraParams,
 			                             final String algorithm,
+			                             final String profile,
 			                             final Document doc) throws AOException {
 
 		// obtiene todas las firmas
@@ -264,7 +289,7 @@ public final class XAdESCounterSigner {
 
 				// y crea sus contrafirmas
 				if (numCounterSigns == 0) {
-					cs(signature, key, certChain, extraParams, algorithm, doc);
+					cs(signature, key, certChain, extraParams, algorithm, profile, doc);
 					numSignatures++;
 					i++;
 				}
@@ -283,6 +308,7 @@ public final class XAdESCounterSigner {
 	 * @param certChain Cadena de certificados del firmante
 	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
+	 * @param profile Perfil de firma.
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignNodes(final Element root,
@@ -291,6 +317,7 @@ public final class XAdESCounterSigner {
 			                             final Certificate[] certChain,
 			                             final Properties extraParams,
 			                             final String algorithm,
+			                             final String profile,
 			                             final Document doc) throws AOException {
 
 		// descarta las posiciones que esten repetidas
@@ -323,7 +350,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		try {
 			for (final Element node : nodes) {
-				cs(node, key, certChain, extraParams, algorithm, doc);
+				cs(node, key, certChain, extraParams, algorithm, profile, doc);
 			}
 		} catch (final Exception e) {
 			throw new AOException(
@@ -339,6 +366,7 @@ public final class XAdESCounterSigner {
 	 * @param certChain Cadena de certificados del firmante
 	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
+	 * @param profile Perfil de firma.
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignSigners(final Element root,
@@ -347,6 +375,7 @@ public final class XAdESCounterSigner {
 			                               final Certificate[] certChain,
 			                               final Properties extraParams,
 			                               final String algorithm,
+			                               final String profile,
 			                               final Document doc) throws AOException {
 
 		// obtiene todas las firmas
@@ -369,7 +398,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		final Iterator<Element> i = nodes.iterator();
 		while (i.hasNext()) {
-			cs(i.next(), key, certChain, extraParams, algorithm, doc);
+			cs(i.next(), key, certChain, extraParams, algorithm, profile, doc);
 		}
 	}
 
@@ -379,6 +408,7 @@ public final class XAdESCounterSigner {
 	 * @param certChain Cadena de certificados del firmante
 	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
+	 * @param profile Perfil de firma.
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignTree(final Element root,
@@ -386,6 +416,7 @@ public final class XAdESCounterSigner {
 			                            final Certificate[] certChain,
 			                            final Properties extraParams,
 			                            final String algorithm,
+			                            final String profile,
 			                            final Document doc) throws AOException {
 
 		// obtiene todas las firmas
@@ -407,6 +438,7 @@ public final class XAdESCounterSigner {
 					certChain,
 					extraParams,
 					algorithm,
+					profile,
 					doc
 				);
 			}
@@ -429,6 +461,7 @@ public final class XAdESCounterSigner {
 			               final Certificate[] certChain,
 			               final Properties xParams,
 			               final String algorithm,
+			               final String profile,
 			               final Document doc) throws AOException {
 
 	    String sigPrefix = XAdESUtil.guessXAdESNamespacePrefix(signature);
@@ -540,30 +573,31 @@ public final class XAdESCounterSigner {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
 
-		// nueva instancia XADES_EPES del nodo a contrafirmar
-		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
-                XAdES.EPES,
+		// Instancia XAdES
+		final XAdESBase xades = XAdESUtil.newInstance(
+                profile,
 				xadesNamespace,
 				sigPrefix,
 				AOXAdESSigner.XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
 				counterSignature.getOwnerDocument(),
-				counterSignature
+				counterSignature,
+				(X509Certificate) certChain[0]
 		);
 
-		// establece el certificado
-		final X509Certificate cert = (X509Certificate) certChain[0];
-		xades.setSigningCertificate(cert);
-
+		// Metadatos de firma
 		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
-		// DataObjectFormats
-		final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
-		final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
-		final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();
-		dataObjectFormats.add(dataObjectFormat);
-
-		xades.setDataObjectFormats(dataObjectFormats);
+		// Agregamos el DataObjectFormats, salvo en firma baseline, en las que no
+		// se debe agregar a las contrafirmas: ETSI EN 319 132-1 V1.1.1 (2016-04)
+		// Apartado 6.3, aclaracion k)
+		if (!profile.equalsIgnoreCase(AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL)) {
+			final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
+			final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
+			final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();
+			dataObjectFormats.add(dataObjectFormat);
+			xades.setDataObjectFormats(dataObjectFormats);
+		}
 
 		// crea la firma
 		final AOXMLAdvancedSignature xmlSignature = XAdESUtil.getXmlAdvancedSignature(
@@ -601,7 +635,7 @@ public final class XAdESCounterSigner {
 			}
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new UnsupportedOperationException(
+			throw new IllegalArgumentException(
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}

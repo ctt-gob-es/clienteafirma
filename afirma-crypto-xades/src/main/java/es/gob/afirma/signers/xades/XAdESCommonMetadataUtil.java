@@ -10,6 +10,8 @@
 package es.gob.afirma.signers.xades;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -21,9 +23,16 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlace;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlaceImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlaceV2;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlaceV2Impl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRole;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRoleImpl;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRoleV2;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRoleV2Impl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBaselineAttributes;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBasicAttributes;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithExplicitPolicy;
 
 final class XAdESCommonMetadataUtil {
 
@@ -31,34 +40,55 @@ final class XAdESCommonMetadataUtil {
 		// No instanciable
 	}
 
-	static void addCommonMetadata(final XAdES_EPES xades, final Properties extraParams) throws AOException {
+	static void addCommonMetadata(final XAdESBase xades, final Properties extraParams) throws AOException {
 
 		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi;
-		try {
-			spi = getPolicy(extraParams);
-		}
-		catch (final NoSuchAlgorithmException e1) {
-			throw new AOException(
-				"El algoritmo indicado para la politica (" + extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH_ALGORITHM) + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-		if (spi != null) {
-			xades.setSignaturePolicyIdentifier(spi);
-		}
-
-		// SignatureProductionPlace
-		final SignatureProductionPlace spp = getSignatureProductionPlace(extraParams);
-		if (spp != null) {
-			xades.setSignatureProductionPlace(spp);
+		if (xades instanceof XadesWithExplicitPolicy) {
+			final SignaturePolicyIdentifier spi;
+			try {
+				spi = getPolicy(extraParams);
+			}
+			catch (final NoSuchAlgorithmException e1) {
+				throw new AOException(
+						"El algoritmo indicado para la politica (" + extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH_ALGORITHM) + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+						);
+			}
+			if (spi != null) {
+				((XadesWithExplicitPolicy) xades).setSignaturePolicyIdentifier(spi);
+			}
 		}
 
-		// SignerRole
-		final SignerRole signerRole = parseSignerRole(extraParams);
-		if (signerRole != null) {
-			xades.setSignerRole(signerRole);
+		// BES attributes
+		if (xades instanceof XadesWithBasicAttributes) {
+
+			// SignatureProductionPlace
+			final SignatureProductionPlace spp = getSignatureProductionPlace(extraParams);
+			if (spp != null) {
+				((XadesWithBasicAttributes) xades).setSignatureProductionPlace(spp);
+			}
+
+			// SignerRole
+			final SignerRole signerRole = parseSignerRole(extraParams);
+			if (signerRole != null) {
+				((XadesWithBasicAttributes) xades).setSignerRole(signerRole);
+			}
 		}
 
+		// Baseline B-Level attributes
+		if (xades instanceof XadesWithBaselineAttributes) {
+
+			// SignatureProductionPlaceV2
+			final SignatureProductionPlaceV2 spp = getSignatureProductionPlaceV2(extraParams);
+			if (spp != null) {
+				((XadesWithBaselineAttributes) xades).setSignatureProductionPlaceV2(spp);
+			}
+
+			// SignerRoleV2
+			final SignerRoleV2 signerRole = parseSignerRoleV2(extraParams);
+			if (signerRole != null) {
+				((XadesWithBaselineAttributes) xades).setSignerRoleV2(signerRole);
+			}
+		}
 	}
 
 	private static SignerRole parseSignerRole(final Properties extraParams) {
@@ -66,20 +96,45 @@ final class XAdESCommonMetadataUtil {
 			return null;
 		}
 		SignerRole signerRole = null;
-		try {
-			final String claimedRole = extraParams.getProperty(XAdESExtraParams.SIGNER_CLAIMED_ROLES);
+		final String[] claimedRoles = parseClaimedRoles(extraParams);
+		if (claimedRoles != null) {
 			signerRole = new SignerRoleImpl();
-			if (claimedRole != null) {
-				final String[] roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
-				for (final String role : roles) {
-					signerRole.addClaimedRole(role);
-				}
+			for (final String role : claimedRoles) {
+				signerRole.addClaimedRole(role);
 			}
 		}
-		catch (final Exception e) {
-			// Se ignoran los errores, el parametro es opcional
+		return signerRole;
+	}
+
+	private static SignerRoleV2 parseSignerRoleV2(final Properties extraParams) {
+		if (extraParams == null) {
+			return null;
+		}
+		SignerRoleV2 signerRole = null;
+		final String[] claimedRoles = parseClaimedRoles(extraParams);
+		if (claimedRoles != null) {
+			signerRole = new SignerRoleV2Impl();
+			for (final String role : claimedRoles) {
+				signerRole.addClaimedRole(role);
+			}
 		}
 		return signerRole;
+	}
+
+	private static String[] parseClaimedRoles(final Properties extraParams) {
+		String[] claimedRoles = null;
+		final String claimedRolesParam = extraParams.getProperty(XAdESExtraParams.SIGNER_CLAIMED_ROLES);
+		if (claimedRolesParam != null) {
+			claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
+			final List<String> preClaimedRolesList = new ArrayList<>();
+			for (final String role : claimedRoles) {
+				if (!role.trim().isEmpty()) {
+					preClaimedRolesList.add(role);
+				}
+			}
+			claimedRoles = preClaimedRolesList.toArray(new String[0]);
+		}
+		return claimedRoles;
 	}
 
 	private static SignatureProductionPlace getSignatureProductionPlace(final Properties extraParams) {
@@ -94,14 +149,37 @@ final class XAdESCommonMetadataUtil {
 		);
 	}
 
-    private static SignatureProductionPlace getSignatureProductionPlace(final String city,
-                                                                        final String province,
-                                                                        final String postalCode,
-                                                                        final String country) {
-    	if (city == null && province == null && postalCode == null && country == null) {
+	private static SignatureProductionPlace getSignatureProductionPlace(final String city,
+			final String province,
+			final String postalCode,
+			final String country) {
+		if (city == null && province == null && postalCode == null && country == null) {
+			return null;
+		}
+		return new SignatureProductionPlaceImpl(city, province, postalCode, country);
+	}
+
+	private static SignatureProductionPlaceV2 getSignatureProductionPlaceV2(final Properties extraParams) {
+		if (extraParams == null) {
+			return null;
+		}
+		return getSignatureProductionPlaceV2(
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_CITY),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCCTION_STREET_ADDRESS),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_PROVINCE),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_COUNTRY)
+		);
+	}
+
+    private static SignatureProductionPlaceV2 getSignatureProductionPlaceV2(
+    		final String city, final String streetAddress, final String province,
+    		final String postalCode, final String country) {
+    	if (city == null && streetAddress == null && province == null &&
+    			postalCode == null && country == null) {
     		return null;
     	}
-    	return new SignatureProductionPlaceImpl(city, province, postalCode, country);
+    	return new SignatureProductionPlaceV2Impl(city, streetAddress, province, postalCode, country);
     }
 
 	private static SignaturePolicyIdentifier getPolicy(final Properties extraParams) throws NoSuchAlgorithmException {

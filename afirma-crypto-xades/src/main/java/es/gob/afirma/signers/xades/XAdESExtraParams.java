@@ -97,12 +97,17 @@ public final class XAdESExtraParams {
      */
     public static final String FORMAT = "format";//$NON-NLS-1$
 
+    /**
+     * Perfil de firma XAdES que se desea generar.
+     */
+	public static final String PROFILE = "profile"; //$NON-NLS-1$
+
     /** Algoritmo de huella digital a usar en las referencias XML
      * (referencesDigestMethod). Debe indicarse como una URL, acept&aacute;ndose
      * los siguientes valores:
      * <ul>
-     *  <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
-     *  <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
+     *  <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1, valor deprecado)</li>
+     *  <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256)</li>
      *  <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
      * </ul>
      */
@@ -277,6 +282,11 @@ public final class XAdESExtraParams {
      * Propiedad compartida con CAdES y PAdES.
      */
     static final String SIGNATURE_PRODUCTION_CITY = "signatureProductionCity";//$NON-NLS-1$
+
+    /**
+     * Calle de la direcci&oacute;n en la que se realiza la firma.
+     */
+    static final String SIGNATURE_PRODUCCTION_STREET_ADDRESS = "signatureProductionStreetAddress";//$NON-NLS-1$
 
     /**
      * Provincia en la que se realiza la firma.

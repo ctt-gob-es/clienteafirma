@@ -9,9 +9,11 @@
 
 package es.gob.afirma.signers.xades;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -33,6 +35,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.GeneralName;
+import org.spongycastle.asn1.x509.GeneralNames;
+import org.spongycastle.asn1.x509.IssuerSerial;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -40,12 +46,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.Utils;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndicationImpl;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SigningCertificateV2Info;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBaselineAttributes;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBasicAttributes;
 
 /** Utilidades varias para firmas XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -80,7 +91,7 @@ public final class XAdESUtil {
         return true;
     }
 
-	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdES_EPES xades,
+	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdESBase xades,
 			                                              final String signedPropertiesTypeUrl,
 			                                              final String digestMethodAlgorithm,
 			                                              final String canonicalizationAlgorithm) throws AOException {
@@ -135,8 +146,8 @@ public final class XAdESUtil {
 		return (Element) nodeList.item(0);
 	}
 
-	/** Obtiene la lista de <i>CommitmentTypeIndication</i> declarados en el fichero de
-	 * propiedades de par&aacute;metros adicionales.
+	/** Obtiene la lista de <i>CommitmentTypeIndication</i> declarados entre los
+	 * par&aacute;metros adicionales.
 	 * @param xParams Par&aacute;metros adicionales para la firma.
 	 * @param signedDataId Identificador del nodo a firmar (<i>Data Object</i>).
 	 * @return Lista de <i>CommitmentTypeIndication</i> a incluir en la firma XAdES. */
@@ -426,4 +437,60 @@ public final class XAdESUtil {
 
         return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
+
+    /**
+     * Crea una nueva instancia para firmar.
+     * @param xadesProfile Perfil de firma XAdES que se quiere generar.
+     * @param xadesNamespace Espacio de nombres XAdES.
+     * @param xadesSignaturePrefix Prefijo de los elementos XAdES.
+     * @param xmlSignaturePrefix Prefijo de los elementos XML.
+     * @param digestMethodAlgorithm Algoritmo de huella para la firma firma.
+     * @param ownerDocument Documento a firmar.
+     * @param rootSig Nodo que se firma.
+     * @param signingCertificate Certificado que se va a utilizar si ya se conoce.
+     * @return Estructura XAdES en base a la que componer la firma.
+     * @throws AOException Cuando ocurre un error durante la composici&oacute;n de los atributos.
+     */
+	public static XAdESBase newInstance(final String profile, final String xadesNamespace, final String xadesSignaturePrefix,
+			final String xmlSignaturePrefix, final String digestMethodAlgorithm, final Document ownerDocument, final Element rootSig,
+			final X509Certificate signingCertificate) throws AOException {
+
+		XAdES xadesProfile = XAdES.EPES;
+		if (profile != null && XAdES.B_LEVEL.getNickname().equalsIgnoreCase(profile)) {
+			xadesProfile = XAdES.B_LEVEL;
+		}
+
+		final XAdESBase xades = XAdES.newInstance(
+				xadesProfile,
+				xadesNamespace,
+				xadesSignaturePrefix,
+				xmlSignaturePrefix,
+				digestMethodAlgorithm,
+				ownerDocument,
+				rootSig);
+
+		// establece el certificado
+		if (signingCertificate != null) {
+			if (xades instanceof XadesWithBaselineAttributes) {
+		        final GeneralNames gns = new GeneralNames(new GeneralName(
+		        		X500Name.getInstance(signingCertificate.getIssuerX500Principal().getEncoded())));
+		        final IssuerSerial issuerSerial = new IssuerSerial(gns, signingCertificate.getSerialNumber());
+		        final String issuerSerialB64;
+		        try {
+		        	issuerSerialB64 = Base64.encode(issuerSerial.getEncoded());
+		        }
+		        catch (final IOException e) {
+		        	throw new AOException("No se pudo codificar la informacion del certificado para las firmas baseline", e);
+				}
+				((XadesWithBaselineAttributes) xades).setSigningCertificateV2(
+						signingCertificate,
+						new SigningCertificateV2Info(issuerSerialB64));
+			}
+			else if (xades instanceof XadesWithBasicAttributes) {
+				((XadesWithBasicAttributes) xades).setSigningCertificate(signingCertificate);
+			}
+		}
+
+		return xades;
+	}
 }

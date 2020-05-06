@@ -149,6 +149,26 @@ public final class AOSignConstants {
 	/** Operaci&oacute;n masiva por defecto. */
 	public static final String DEFAULT_MASSIVE_OPERATION = MASSIVE_OPERATION_SIGN;
 
+	// ************************************************************
+	// ****************** PERFILES DE FIRMA ***********************
+	// ************************************************************
+
+	/** Perfil de firma BES (Basic). */
+	public static final String SIGN_PROFILE_BES = "BES"; //$NON-NLS-1$
+
+	/** Perfil de firma EPES (Explicit Policy). */
+	public static final String SIGN_PROFILE_EPES = "EPES"; //$NON-NLS-1$
+
+	/** Perfil de firma Baseline B-LEVEL. */
+	public static final String SIGN_PROFILE_BASELINE_B_LEVEL = "B-B-Level"; //$NON-NLS-1$
+
+	/** Perfil de firma por defecto. */
+	public static final String DEFAULT_SIGN_PROFILE = SIGN_PROFILE_BES;
+
+	// ************************************************************
+	// ****************** ATRIBUTOS DE CMS ************************
+	// ************************************************************
+
 	/** Envoltorio binario de tipo <i>Data</i> (datos envueltos en un envoltorio
 	 * PKCS#7). */
 	public static final String CMS_CONTENTTYPE_DATA = "Data"; //$NON-NLS-1$

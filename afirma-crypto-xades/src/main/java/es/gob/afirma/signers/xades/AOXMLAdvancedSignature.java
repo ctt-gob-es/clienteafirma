@@ -38,9 +38,8 @@ import org.w3c.dom.Element;
 
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
-import es.uji.crypto.xades.jxades.security.xml.WrappedKeyStorePlace;
 import es.uji.crypto.xades.jxades.security.xml.XmlWrappedKeyInfo;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_BES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XMLAdvancedSignature;
 
 /** Derivado de <code>es.uji.crypto.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
@@ -56,7 +55,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
 	static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
-    private AOXMLAdvancedSignature(final XAdES_BES xades) {
+    private AOXMLAdvancedSignature(final XAdESBase xades) {
         super(xades);
     }
 
@@ -149,10 +148,6 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
         final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
-        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certificates != null && certificates.size() > 0) {
-            this.xades.setSigningCertificate((X509Certificate) certificates.get(0));
-        }
-
         addXMLObject(
     		marshalXMLSignature(
 				this.xadesNamespace,
@@ -182,7 +177,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         	documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
         }
 
-        this.signature =fac.newXMLSignature(
+        this.signature = fac.newXMLSignature(
     		fac.newSignedInfo(
 				fac.newCanonicalizationMethod(
 					this.canonicalizationMethod,
@@ -231,10 +226,10 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     }
 
     /** Obtiene una instancia de la clase.
-     * @param xades Datos de la firma XAdES-BES
+     * @param xades Datos de la firma XAdES
      * @return Instancia de la clase
      * @throws GeneralSecurityException Cuando se especifica una XAdES con un algoritmo de huella digital no soportado. */
-    public static AOXMLAdvancedSignature newInstance(final XAdES_BES xades) throws GeneralSecurityException {
+    public static AOXMLAdvancedSignature newInstance(final XAdESBase xades) throws GeneralSecurityException {
         final AOXMLAdvancedSignature result = new AOXMLAdvancedSignature(xades);
         result.setDigestMethod(xades.getDigestMethod());
         result.setXadesNamespace(xades.getXadesNamespace());

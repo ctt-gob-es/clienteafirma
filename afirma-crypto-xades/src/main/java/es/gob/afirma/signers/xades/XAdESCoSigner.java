@@ -56,13 +56,13 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 
 /** Co-firmador XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -112,7 +112,7 @@ public final class XAdESCoSigner {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
-			throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IllegalArgumentException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final Properties extraParams = xParams != null ? xParams: new Properties();
@@ -166,6 +166,23 @@ public final class XAdESCoSigner {
 					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e //$NON-NLS-1$
 				);
 			}
+		}
+
+		// Perfil de firma XAdES que se desea aplicar
+		final String profile = extraParams.getProperty(
+		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
+
+		// Comprobacion del perfil de firma con la configuracion establecida
+		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
+				if (XMLConstants.URL_SHA1_RSA.equals(algoUri) || XMLConstants.URL_SHA1_ECDSA.equals(algoUri)) {
+					throw new IllegalArgumentException(
+							"Las firmas baseline no permiten el uso del algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
+					throw new IllegalArgumentException(
+							"Las firmas baseline no permiten generar referencias con el algoritmo SHA1"); //$NON-NLS-1$
+				}
 		}
 
 		// nueva instancia de DocumentBuilderFactory que permita espacio de
@@ -458,20 +475,19 @@ public final class XAdESCoSigner {
 			}
 		}
 
-		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
-				XAdES.EPES,
+		// Instancia XAdES
+		final XAdESBase xades = XAdESUtil.newInstance(
+				profile,
 				xadesNamespace,
 				XADES_SIGNATURE_PREFIX,
 				XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
 				rootSig.getOwnerDocument(),
-				rootSig
+				rootSig,
+				(X509Certificate) certChain[0]
 				);
 
-		// establece el certificado
-		final X509Certificate cert = (X509Certificate) certChain[0];
-		xades.setSigningCertificate(cert);
-
+		// Metadatos de firma
 		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
 		// DataObjectFormat
@@ -533,7 +549,7 @@ public final class XAdESCoSigner {
 			}
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new UnsupportedOperationException(
+			throw new IllegalArgumentException(
 				"No se soporta el algoritmo de firma '" + algorithm + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}

@@ -246,10 +246,17 @@ public final class ExtraParamsProcessor {
 		if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equalsIgnoreCase(format) &&
 				!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(format)) {
 			if (format != null) {
-				LOGGER.warning("La siguiente propiedad se ignora en favor del valor derivado de la politica establecida: format"); //$NON-NLS-1$
+				LOGGER.warning("Se ignora la configuracion del parametro 'format' en favor de los requisitos establecidos por la politica de firma"); //$NON-NLS-1$
 			}
 			params.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
 		}
+
+		final String profile = params.getProperty("profile"); //$NON-NLS-1$
+		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
+			LOGGER.warning("Se ignora la configuracion del parametro 'profile' en favor de los requisitos establecidos por la politica de firma"); //$NON-NLS-1$
+		}
+		params.setProperty("profile", AOSignConstants.SIGN_PROFILE_BES); //$NON-NLS-1$
+
 		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_XADES);
 	}
 

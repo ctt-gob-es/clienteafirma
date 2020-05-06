@@ -65,8 +65,7 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
-import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 
 /** Firmador simple XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -208,7 +207,7 @@ public final class XAdESSigner {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
-			throw new UnsupportedOperationException(
+			throw new IllegalArgumentException(
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
@@ -305,6 +304,23 @@ public final class XAdESSigner {
 				);
 			}
 		}
+
+		// Perfil de firma XAdES que se desea aplicar
+		final String profile = extraParams.getProperty(
+		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
+
+		// Comprobacion del perfil de firma con la configuracion establecida
+		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
+			if (XMLConstants.URL_SHA1_RSA.equals(algoUri) || XMLConstants.URL_SHA1_ECDSA.equals(algoUri)) {
+				throw new IllegalArgumentException(
+						"Las firmas baseline no permiten el uso del algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
+				throw new IllegalArgumentException(
+						"Las firmas baseline no permiten generar referencias con el algoritmo SHA1"); //$NON-NLS-1$
+			}
+	}
 
 		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
@@ -1090,9 +1106,9 @@ public final class XAdESSigner {
 			}
 		}
 
-		// Instancia XADES_EPES
-		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
-			XAdES.EPES,                           // XAdES
+		// Instancia XAdES
+		final XAdESBase xades = XAdESUtil.newInstance(
+			profile,                           	  // Perfil XAdES
 			xadesNamespace,                       // XAdES NameSpace
 			AOXAdESSigner.XADES_SIGNATURE_PREFIX, // XAdES Prefix
 			AOXAdESSigner.XML_SIGNATURE_PREFIX,   // XMLDSig Prefix
@@ -1100,12 +1116,11 @@ public final class XAdESSigner {
 			docSignature,                         // Document
 			signatureInsertionNode != null ?      // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
 				signatureInsertionNode:
-					docSignature.getDocumentElement()
+					docSignature.getDocumentElement(),
+			(X509Certificate) certChain[0]		  // Certificado de firma
 		);
 
-		// SigningCertificate
-		xades.setSigningCertificate((X509Certificate) certChain[0]);
-
+		// Metadatos de firma
 		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
 		// DataObjectFormats
@@ -1227,7 +1242,7 @@ public final class XAdESSigner {
 
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new UnsupportedOperationException(
+			throw new IllegalArgumentException(
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "':" + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
