@@ -311,7 +311,7 @@ public final class TsaParams {
 			p.put("tsaPwd", getTsaPwd().toString()); //$NON-NLS-1$
 		}
 		if (getTsaPolicy() != null && !getTsaPolicy().isEmpty()) {
-			p.put("tsaPwd", getTsaPolicy().toString()); //$NON-NLS-1$
+			p.put("tsaPolicy", getTsaPolicy().toString()); //$NON-NLS-1$
 		}
 		if (getExtensions() != null && getExtensions().length > 0) {
 			p.put("tsaExtensionOid", getExtensions()[0].getOid()); //$NON-NLS-1$
