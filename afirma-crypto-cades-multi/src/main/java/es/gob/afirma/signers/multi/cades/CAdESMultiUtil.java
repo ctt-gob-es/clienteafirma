@@ -31,7 +31,7 @@ import org.spongycastle.cms.SignerInformation;
 
 import es.gob.afirma.core.AOFormatFileException;
 
-final class CAdESMultiUtil {
+public final class CAdESMultiUtil {
 
 	private static final ASN1ObjectIdentifier ARCHIVE_TIMESTAMP_V2_OID = new ASN1ObjectIdentifier(
 		"1.2.840.113549.1.9.16.2.48" //$NON-NLS-1$
@@ -73,7 +73,7 @@ final class CAdESMultiUtil {
 		return new BERSet(vCertsSig);
 	}
 
-	static void checkUnsupportedAttributes(final byte[] signedDataBytes) throws AOFormatFileException, IOException {
+	public static void checkUnsupportedAttributes(final byte[] signedDataBytes) throws AOFormatFileException, IOException {
 		final CMSSignedData signedData;
 		try {
 			signedData = new CMSSignedData(signedDataBytes);

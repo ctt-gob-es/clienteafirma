@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -33,6 +34,7 @@ import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
+import es.gob.afirma.signers.multi.cades.CAdESMultiUtil;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -251,6 +253,17 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		final Properties extraParams = params != null ? params : new Properties();
+
+		// Comprobamos si la cofirma de este tipo de firma esta soportada
+		try {
+			CAdESMultiUtil.checkUnsupportedAttributes(sign);
+		}
+		catch (final IOException e) {
+			throw new AOFormatFileException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new AOFormatFileException("No se ha proporcionado una firma CAdES que se pueda cofirmar", e); //$NON-NLS-1$
+		}
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
