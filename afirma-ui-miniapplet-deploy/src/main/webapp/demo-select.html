@@ -20,7 +20,7 @@
 		OBJECT   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 	</style>
-	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
@@ -33,12 +33,12 @@
 			mostrarDialogoEspera();
 			
 			try {
-				MiniApplet.selectCertificate(null, successCallback, errorCallback);
+				AutoScript.selectCertificate(null, successCallback, errorCallback);
 			}
 			catch (excep) {
-				errorCallback(MiniApplet.getErrorType(), MiniApplet.getErrorMessage());
+				errorCallback(AutoScript.getErrorType(), AutoScript.getErrorMessage());
 				//Se puede recuperar el mensaje de error y pintarlo en la pantalla
-				var msg = MiniApplet.getErrorMessage();
+				var msg = AutoScript.getErrorMessage();
 				if (msg==undefined || msg==null) msg = excep.message;
 				if (msg==undefined || msg==null) msg = '';
 				divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al recuperar el certificado</div><br>' + msg + '<br>';
@@ -71,14 +71,14 @@
 			document.getElementById("cargandoApplet").style.display = "none";
 			document.getElementById("pantalla").style.display = "block";
 			
-			if (MiniApplet.isIOS()) {				
+			if (AutoScript.isIOS()) {				
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
 				storeLink.innerHTML = "Descargue el Cliente @firma iOS";
 				
 				document.getElementById("faq_link").style.display = "none";
 			}
-			else if (MiniApplet.isAndroid()) {
+			else if (AutoScript.isAndroid()) {
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://play.google.com/store/apps/details?id=es.gob.afirma";
 				storeLink.innerHTML = "Descargue el Cliente @firma Android";
@@ -95,8 +95,8 @@
 			document.getElementById("dialogoEspera").style.display = "none";
 		}
 	-->
-		MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
-		MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+		AutoScript.cargarAppAfirma();
+		AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->

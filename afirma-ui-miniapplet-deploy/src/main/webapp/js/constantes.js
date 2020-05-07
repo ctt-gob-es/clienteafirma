@@ -5,8 +5,5 @@ var Constants = {
 	// SI NO SE HACE ASI, AUTOFIRMA BLOQUEARA LA FIRMA POR SEGURIDAD
 	
 	/* DESARROLLO */
-	
-	URL_BASE_APPLET : "http://appprueba:8080/afirma-ui-miniapplet-deploy",
-
 	URL_BASE_SERVICES : "http://appprueba:8080"
 };
