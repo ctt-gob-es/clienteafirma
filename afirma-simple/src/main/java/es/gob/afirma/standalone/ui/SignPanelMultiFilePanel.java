@@ -44,6 +44,7 @@ import javax.swing.border.Border;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.VisorFirma;
 
 final class SignPanelMultiFilePanel extends JPanel {
 
@@ -133,19 +134,27 @@ final class SignPanelMultiFilePanel extends JPanel {
 	/**
 	 * Abre un fichero de la lista.
 	 * @param list Lista con los ficheros cargados.
-	 * @param index Indice del fichero seleccionado.
+	 * @param index &Iacute;ndice del fichero seleccionado.
 	 */
     static void openDataFileItem(final JList<SignOperationConfig> list, final int index) {
 		if (index >= 0) {
 			final SignOperationConfig item = list.getModel().getElementAt(index);
 			if (item.getDataFile() != null) {
-				SwingUtilities.invokeLater(() -> {
-					try {
-						Desktop.getDesktop().open(item.getDataFile());
-					} catch (final IOException ex) {
-						LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
-					}
-				});
+				// Los ficheros de los que se tenga informacion de validacion son documentos de firma
+				// y se abriran con el visor, mientras que el resto a traves de la aplicacion asociada
+				// en el sistema
+				if (item.getSignValidity() != null) {
+					new VisorFirma(false, null).initialize(false, item.getDataFile());
+				}
+				else {
+					SwingUtilities.invokeLater(() -> {
+						try {
+							Desktop.getDesktop().open(item.getDataFile());
+						} catch (final IOException ex) {
+							LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
+						}
+					});
+				}
 			}
 		}
     }
