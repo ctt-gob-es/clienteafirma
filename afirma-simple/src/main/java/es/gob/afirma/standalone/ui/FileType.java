@@ -80,7 +80,6 @@ enum FileType {
         scalableIcon.setBackground(new Color(255, 255, 255, 0));
 
         return scalableIcon;
-
 	}
 
 	Component getIcon() {
@@ -90,5 +89,4 @@ enum FileType {
 	String getFileDescription() {
 		return this.fileDescription;
 	}
-
 }

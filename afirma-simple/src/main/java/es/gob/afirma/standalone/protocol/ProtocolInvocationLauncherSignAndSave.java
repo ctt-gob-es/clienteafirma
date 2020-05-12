@@ -121,6 +121,13 @@ final class ProtocolInvocationLauncherSignAndSave {
 			);
 		}
 
+
+		//TODO: Deshacer cuando se permita la generacion de firmas baseline
+		options.getExtraParams().remove("profile");
+
+
+
+
 		// En caso de que no se haya solicitado una operacion de multifirma con el formato AUTO
 		// configuramos el servidor en base al nombre de formato
 		AOSigner signer = null;
@@ -444,8 +451,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 		}
 
-		LOGGER.info("Iniciando operacion de firma..."); //$NON-NLS-1$
-
 		final byte[] sign;
 		try {
 			try {
@@ -511,6 +516,17 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+		}
+		catch (final AOTriphaseException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showErrorDetail(
+					ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT, e.getMessage());
+			if (!bySocket) {
+				throw new SocketOperationException(
+						ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT,
+						e.getMessage());
+			}
+			return ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT + ": " + e.getMessage(); //$NON-NLS-1$
 		}
 		catch (final InvalidPdfException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma: " + e, e); //$NON-NLS-1$

@@ -50,7 +50,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 final class PreferencesPanelCades extends JScrollPane {
 
@@ -324,7 +323,7 @@ final class PreferencesPanelCades extends JScrollPane {
 	void loadPreferences() {
 		this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
 
-        final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
+        final List<PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
     		new PolicyItem(
 				SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -351,7 +350,7 @@ final class PreferencesPanelCades extends JScrollPane {
 
 		this.signatureMode.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_IMPLICIT));
 
-		final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
+		final List<PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -441,9 +440,9 @@ final class PreferencesPanelCades extends JScrollPane {
 	 * Carga el panel de pol&iacute;tica con las preferencias guardadas
 	 */
 	private void loadCadesPolicy() {
-		// Si el panel no está cargado lo obtengo de las preferencias guardadas
+		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.cadesPolicyDlg == null) {
-			final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
+			final List<PolicyItem> cadesPolicies = new ArrayList<>();
 			cadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_CADES_PADES_AGE_1_9));
 

@@ -124,6 +124,13 @@ final class ProtocolInvocationLauncherSign {
 			);
 		}
 
+
+		//TODO: Deshacer cuando se permita la generacion de firmas baseline
+		options.getExtraParams().remove("profile");
+
+
+
+
 		// En caso de que no se haya solicitado una operacion de multifirma con
 		// el formato AUTO
 		// configuramos el servidor en base al nombre de formato
@@ -322,7 +329,8 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		// Si se ha pedido comprobar las firmas antes de agregarle la nueva firma, lo hacemos ahora
-		if (Boolean.parseBoolean(options.getExtraParams().getProperty(AfirmaExtraParams.CHECK_SIGNATURES))) {
+		if (options.getData() != null &&
+				Boolean.parseBoolean(options.getExtraParams().getProperty(AfirmaExtraParams.CHECK_SIGNATURES))) {
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
 			if (validator != null) {
 				SignValidity validity;
@@ -458,7 +466,6 @@ final class ProtocolInvocationLauncherSign {
 					ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE
 				);
 			}
-
 		}
 
 		final byte[] sign;

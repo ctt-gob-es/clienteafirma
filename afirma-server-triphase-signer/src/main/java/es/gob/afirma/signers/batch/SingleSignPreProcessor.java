@@ -76,6 +76,13 @@ final class SingleSignPreProcessor {
 		// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
         final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
 
+
+
+		//TODO: Deshacer cuando se permita la generacion de firmas baseline
+		extraParams.remove("profile");
+
+
+
 		switch(sSign.getSubOperation()) {
 			case SIGN:
 				return prep.preProcessPreSign(

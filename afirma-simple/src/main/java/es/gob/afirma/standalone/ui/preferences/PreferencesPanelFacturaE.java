@@ -23,8 +23,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +45,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 /** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de facturaE.
  * @author Mariano Mart&iacute;nez. */
@@ -243,16 +240,13 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		);
 
 		restoreConfigButton.setMnemonic('R');
-		restoreConfigButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.158"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+		restoreConfigButton.addActionListener(ae -> {
+			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.158"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-					loadDefaultPreferences();
+				loadDefaultPreferences();
 
-				}
 			}
 		});
 		restoreConfigButton.getAccessibleContext()
@@ -350,7 +344,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		this.facturaeSignatureProductionCountry.setText(
 			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY)
 		);
-		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
+		final List<PolicyItem> facturaePolicies = new ArrayList<>();
 
 		facturaePolicies.add(
     		new PolicyItem(
@@ -408,7 +402,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY)
 		);
 
-		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
+		final List<PolicyItem> facturaePolicies = new ArrayList<>();
 
 		facturaePolicies.add(
     		new PolicyItem(
@@ -513,7 +507,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
 	 * {@code false} en caso contrario.
 	 */
-	public void setBlocked(boolean blocked) {
+	public void setBlocked(final boolean blocked) {
 		this.blocked = blocked;
 	}
 }

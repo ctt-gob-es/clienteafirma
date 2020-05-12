@@ -17,60 +17,30 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.dnd.DropTarget;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.util.Date;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
-import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
-import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
-final class SignPanelFilePanel extends JPanel {
+final class SignPanelFilePanel extends JPanel implements Scrollable {
 
     private static final long serialVersionUID = -8648491975442788750L;
 
-    private final JCheckBox pdfVisible = new JCheckBox(
-		SimpleAfirmaMessages.getString("SignPanel.44"), //$NON-NLS-1$
-		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE)
-	);
-
-    boolean isVisibleSignature() {
-    	return this.pdfVisible.isSelected();
-    }
-
-    private final JCheckBox pdfStamp = new JCheckBox(
-		SimpleAfirmaMessages.getString("SignPanel.120"), //$NON-NLS-1$
-		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_STAMP)
-	);
-
-    boolean isVisibleStamp() {
-    	return this.pdfStamp.isSelected();
-    }
+    private SignatureConfigInfoPanel configInfoPanel;
 
     SignPanelFilePanel(final SignOperationConfig signConfig,
     		final DropTarget dropTarget) {
@@ -80,78 +50,28 @@ final class SignPanelFilePanel extends JPanel {
     	// Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
     	setDropTarget(dropTarget);
 
-    	SwingUtilities.invokeLater(() -> createUI(
-    			signConfig.getFileType(),
-    			signConfig.getSigner(),
-    			signConfig.getSignatureFormatName(),
-    			NumberFormat.getNumberInstance().format(signConfig.getDataFile().length() / 1024),
-    			signConfig.getDataFile(),
-    			new Date(signConfig.getDataFile().lastModified()),
-    			signConfig.getCryptoOperation(),
-    			signConfig.getSignValidity(),
-    			signConfig.getInvalidSignatureText()
-    			));
+    	SwingUtilities.invokeLater(() -> createUI(signConfig));
     }
 
-    void createUI(final FileType fileType,
-    			  final AOSigner signer,
-    			  final String signatureName,
-    			  final String fileSize,
-                  final File file,
-                  final Date fileLastModified,
-                  final CryptoOperation operation,
-                  final SignValidity validity,
-                  final String invalidSignatureText) {
+    void createUI(final SignOperationConfig signConfig) {
 
-        setBorder(BorderFactory.createLineBorder(Color.black));
+    	final FileType fileType = signConfig.getFileType();
+    	final File file = signConfig.getDataFile();
+
         setLayout(new GridBagLayout());
 
-        final JLabel pathLabel = new JLabel(file.getAbsolutePath());
-        pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
-
-
-        final JLabel signLabel = new JLabel(
-        		SimpleAfirmaMessages.getString("SignPanel.103", signatureName)); //$NON-NLS-1$
-        final JLabel descLabel = new JLabel(
-        		SimpleAfirmaMessages.getString("SignPanel.46", fileType.getFileDescription())); //$NON-NLS-1$
-        final JLabel dateLabel = new JLabel(
-        		SimpleAfirmaMessages.getString("SignPanel.47",  //$NON-NLS-1$
-        				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
-        				.format(fileLastModified))
-        		);
-
-        final JLabel sizeLabel = new JLabel(
-    		SimpleAfirmaMessages.getString("SignPanel.49") + (fileSize.equals("0") ? "<1" : fileSize) + " KB" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		);
-
-        JLabel invalidSignatureErrorLabel = null;
-        if (invalidSignatureText != null) {
-        	final BufferedImage errorIcon;
-        	if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
-        		errorIcon = ImageLoader.loadImage("unknown_icon.png"); //$NON-NLS-1$
-        	}
-        	else {
-        		errorIcon = ImageLoader.loadImage("ko_icon.png"); //$NON-NLS-1$
-        	}
-        	invalidSignatureErrorLabel = new JLabel(invalidSignatureText, new ImageIcon(errorIcon), SwingConstants.LEFT);
+        // Establecemos la configuracion de color
+        Color bgColor = Color.WHITE;
+        // Configuramos los colores
+        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	bgColor = LookAndFeelManager.WINDOW_COLOR;
         }
+        setBackground(bgColor);
 
-        final JPanel detailPanel = new JPanel();
-        detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
-        detailPanel.add(pathLabel);
-        detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        detailPanel.add(signLabel);
-        detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        detailPanel.add(descLabel);
-        detailPanel.add(dateLabel);
-        detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        detailPanel.add(sizeLabel);
-        if (invalidSignatureErrorLabel != null) {
-        	detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        	detailPanel.add(invalidSignatureErrorLabel);
-        }
+        // Panel con el detalle del documenot
+        final JPanel detailPanel = createDetailsPanel(signConfig, bgColor);
 
-        // Definimos aqui el boton
+        // Boton para la apertura del fichero
         JButton openFileButton = null;
 
         final String ext = getExtension(file);
@@ -183,77 +103,27 @@ final class SignPanelFilePanel extends JPanel {
         				}
         			}
         			);
-        	pathLabel.setLabelFor(openFileButton);
-        	descLabel.setLabelFor(openFileButton);
-        	dateLabel.setLabelFor(openFileButton);
-        	sizeLabel.setLabelFor(openFileButton);
-//        	if (invalidSignatureErrorLabel != null) {
-//        		invalidSignatureErrorLabel.setLabelFor(openFileButton);
-//        	}
-        }
-
-        // Establecemos la configuracion de color
-        Color bgColor = Color.WHITE;
-        // Configuramos los colores
-        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-        	bgColor = LookAndFeelManager.WINDOW_COLOR;
-        }
-        setBackground(bgColor);
-        detailPanel.setBackground(bgColor);
-
-        if (signer instanceof AOPDFSigner) {
-            this.pdfVisible.setMnemonic('H');
-            this.pdfVisible.setBackground(bgColor);
-            detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-            detailPanel.add(this.pdfVisible);
-
-            this.pdfStamp.setMnemonic('S');
-            this.pdfStamp.setBackground(bgColor);
-            detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-            detailPanel.add(this.pdfStamp);
-
-            if(operation == CryptoOperation.COSIGN) {
-            	this.pdfStamp.setSelected(false);
-            	this.pdfStamp.setEnabled(false);
-                detailPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-                detailPanel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121"))); //$NON-NLS-1$
-            }
-        }
-
-        // Habilita boton de opciones avanzadas de multifirma
-        if (fileType == FileType.SIGN_CADES || fileType == FileType.SIGN_XADES) {
-        	final JButton avanzado = new JButton(SimpleAfirmaMessages.getString("SignPanel.119")); //$NON-NLS-1$
-
-        	detailPanel.add(Box.createRigidArea(new Dimension(0, 6)));
-        	avanzado.setMnemonic('a');
-        	avanzado.addActionListener(
-    			ae -> {
-    				if(fileType == FileType.SIGN_CADES) {
-    					PreferencesDialog.show(null, true, 2);
-    				}
-    				else {
-    					PreferencesDialog.show(null, true, 3);
-    				}
-    			}
-        	);
-            detailPanel.add(avanzado);
         }
 
     	final GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.weighty = 1.0;
-        c.ipadx = 60;
-        c.ipady = 60;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.0;
         c.insets = new Insets(11, 0, 11, 11);
         c.anchor = GridBagConstraints.NORTHWEST;
         final Component icon = fileType.getIcon();
         if (icon != null) {
-        	icon.setMinimumSize(new Dimension(110,  110));
+        	icon.setMinimumSize(new Dimension(128, 128));
         	add(icon, c);
         }
 
+        c.weightx = 1.0;
+        c.gridx = 1;
+        c.ipadx = 0;
+        c.ipady = 0;
+        c.insets = new Insets(14, 0, 11, 5);
+        add(detailPanel, c);
+
         if (openFileButton != null) {
-        	c.fill = GridBagConstraints.HORIZONTAL;
         	c.weightx = 0.0;
         	c.weighty = 0.0;
         	c.gridx = 2;
@@ -263,19 +133,7 @@ final class SignPanelFilePanel extends JPanel {
         	c.anchor = GridBagConstraints.NORTHEAST;
         	add(openFileButton, c);
         }
-
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-        c.gridx = 1;
-        c.ipadx = 0;
-        c.ipady = 0;
-        c.insets = new Insets(14, 0, 11, 5);
-        c.anchor = GridBagConstraints.NORTH;
-        add(detailPanel, c);
     }
-
-
 
     /**
      * Indica si el fichero es un ejecutable en base a la extensi&oacute;n de su nombre.
@@ -289,6 +147,54 @@ final class SignPanelFilePanel extends JPanel {
 
 	private static boolean isLink(final String ext) {
 		return "LNK".equals(ext.toUpperCase()); //$NON-NLS-1$
+	}
+
+	private static JPanel createDetailsPanel(final SignOperationConfig signConfig, final Color bgColor) {
+
+    	final File file = signConfig.getDataFile();
+
+		final JLabel pathLabel = new JLabel(file.getAbsolutePath());
+        pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
+
+        // Panel de informacion del documento
+        final JLabel documentInfoLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.145")); //$NON-NLS-1$
+        documentInfoLabel.setFont(documentInfoLabel.getFont().deriveFont(Font.BOLD));
+
+        final JPanel documentInfoPanel = new DocumentInfoPanel(signConfig, bgColor);
+
+        // Panel de configuracion de firma
+		final JLabel signConfigLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.142")); //$NON-NLS-1$
+		signConfigLabel.setFont(signConfigLabel.getFont().deriveFont(Font.BOLD));
+        final JPanel signConfigPanel = new SignatureConfigInfoPanel(signConfig, bgColor);
+
+        // Componemos el panel
+		final JPanel detailPanel = new JPanel(new GridBagLayout());
+		detailPanel.setBackground(bgColor);
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridy = 0;
+        detailPanel.add(pathLabel, c);
+        c.gridy++;
+        c.insets = new Insets(11, 0, 0, 0);
+        detailPanel.add(documentInfoLabel, c);
+        c.gridy++;
+        c.insets = new Insets(4, 11, 0, 0);
+
+        c.fill = GridBagConstraints.NONE;
+
+
+        detailPanel.add(documentInfoPanel, c);
+    	c.gridy++;
+    	c.insets = new Insets(11, 0, 0, 0);
+    	detailPanel.add(signConfigLabel, c);
+        c.gridy++;
+        c.insets = new Insets(4, 11, 0, 0);
+        detailPanel.add(signConfigPanel, c);
+
+        return detailPanel;
 	}
 
     /**
@@ -306,5 +212,38 @@ final class SignPanelFilePanel extends JPanel {
 			ext = filename.substring(dotPos + 1);
 		}
 		return ext;
+	}
+
+    boolean isVisibleSignature() {
+    	return this.configInfoPanel.isPdfVisibleSignatureSelected();
+    }
+
+    boolean isVisibleStamp() {
+    	return this.configInfoPanel.isPdfStampSignatureSelected();
+    }
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
+		return 30;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
+		return 30;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return true;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
 	}
 }

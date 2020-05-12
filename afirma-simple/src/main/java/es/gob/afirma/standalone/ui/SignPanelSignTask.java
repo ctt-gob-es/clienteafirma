@@ -282,6 +282,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	}
             	continue;
             }
+        	catch (final Error e) {
+        		LOGGER.log(Level.SEVERE, "Error interno durante el proceso de firma", e); //$NON-NLS-1$
+        		if (onlyOneFile) {
+            		showErrorMessage(this.parent, SimpleAfirmaMessages.getString("SignPanel.65") + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+            		this.signExecutor.finishTask();
+            		return;
+            	}
+            	continue;
+    		}
 
 			signResult = pluginsPostProcess(signResult, signConfig.getSignatureFormatName(), pke.getCertificateChain());
 

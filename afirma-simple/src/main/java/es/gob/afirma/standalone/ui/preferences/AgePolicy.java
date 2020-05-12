@@ -14,7 +14,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /**
  * Clase auxiliar para tratar las pol&iacute;ticas de firma de la AGE.
  */
-class AgePolicy {
+public class AgePolicy {
 
 	private static final String URN_OID_PREFIX = "urn:oid:"; //$NON-NLS-1$
 	private static final String OID_AGE_1_9 = "2.16.724.1.3.1.1.2.1.9"; //$NON-NLS-1$
@@ -28,7 +28,7 @@ class AgePolicy {
 	 * @return {@code true} si el identificador se corresponde con el de alguna
 	 * pol&iacute;tica de la AGE, {@code false} en caso contrario.
 	 */
-	public static boolean isAGEPolicy(String oid, String format) {
+	public static boolean isAGEPolicy(final String oid, final String format) {
 
 		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) ||
 				AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format)) {
@@ -39,5 +39,27 @@ class AgePolicy {
 				return OID_AGE_1_9.equals(oid) || (URN_OID_PREFIX + OID_AGE_1_9).equalsIgnoreCase(oid);
 		}
 		return false;
+	}
+
+	/**
+	 * Comprueba si el identificador proporcionado es el correspondiente al de la
+	 * pol&iacute;tica de firma de la AGE versi&oacute;n 1.8.
+	 * @param oid Identificador de pol&iacute;tica.
+	 * @return {@code true} si el identificador es el de la  pol&iacute;tica de la AGE v1.8,
+	 * {@code false} en caso contrario.
+	 */
+	public static boolean isAGEPolicy18(final String oid) {
+		return OID_AGE_1_8.equals(oid) || (URN_OID_PREFIX + OID_AGE_1_8).equalsIgnoreCase(oid);
+	}
+
+	/**
+	 * Comprueba si el identificador proporcionado es el correspondiente al de la
+	 * pol&iacute;tica de firma de la AGE versi&oacute;n 1.9.
+	 * @param oid Identificador de pol&iacute;tica.
+	 * @return {@code true} si el identificador es el de la  pol&iacute;tica de la AGE v1.9,
+	 * {@code false} en caso contrario.
+	 */
+	public static boolean isAGEPolicy19(final String oid) {
+		return OID_AGE_1_9.equals(oid) || (URN_OID_PREFIX + OID_AGE_1_9).equalsIgnoreCase(oid);
 	}
 }

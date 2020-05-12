@@ -92,7 +92,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/** Anchura por defecto con la que se muestra inicialmente la pantalla principal. */
 	private static final int DEFAULT_WINDOW_WIDTH = 780;
 	/** Altura por defecto con la que se muestra inicialmente la pantalla principal. */
-	private static final int DEFAULT_WINDOW_HEIGHT = 550;
+	private static final int DEFAULT_WINDOW_HEIGHT = 580;
 
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
 	private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$

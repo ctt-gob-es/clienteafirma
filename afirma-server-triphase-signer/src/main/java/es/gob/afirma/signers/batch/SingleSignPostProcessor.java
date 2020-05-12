@@ -82,6 +82,13 @@ final class SingleSignPostProcessor {
 			extraParams = sSign.getExtraParams();
 		}
 
+
+		//TODO: Deshacer cuando se permita la generacion de firmas baseline
+		extraParams.remove("profile");
+
+
+
+
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {
 			case SIGN:

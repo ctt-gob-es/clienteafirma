@@ -91,7 +91,7 @@ public final class MainScreen extends JFrame {
      * Reemplaza el panel que se muestra actualmente por el indicado.
      * @param panel Panel a mostrar.
      */
-    public void replaceShowingPanel(JPanel panel ) {
+    public void replaceShowingPanel(final JPanel panel ) {
     	if (this.scrollPane != null) {
     		this.scrollPane.setViewportView(panel);
     	}

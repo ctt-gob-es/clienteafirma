@@ -56,7 +56,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
 final class PreferencesPanelPades extends JScrollPane {
@@ -446,7 +445,7 @@ final class PreferencesPanelPades extends JScrollPane {
 			}
 		}
 
-		final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
+		final List<PolicyItem> padesPolicies = new ArrayList<>();
         padesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -499,7 +498,7 @@ final class PreferencesPanelPades extends JScrollPane {
 
 		this.padesBasicFormat.setEnabled(!isBlocked());
 
-		final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
+		final List<PolicyItem> padesPolicies = new ArrayList<>();
         padesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -601,7 +600,7 @@ final class PreferencesPanelPades extends JScrollPane {
 	private void loadPadesPolicy() {
 		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.padesPolicyDlg == null) {
-			final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
+			final List<PolicyItem> padesPolicies = new ArrayList<>();
 			padesPolicies.add(
 				new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 				POLICY_CADES_PADES_AGE_1_9)

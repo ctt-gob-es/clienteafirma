@@ -41,7 +41,7 @@ public final class AutoFirmaUtil {
 		AutoFirmaUtil.class.getResource("/resources/afirma_ico.png") //$NON-NLS-1$
 	);
 
-	/** Obtiene el icono por defecto para los di&aacute;logos gr&aacute;fcos.
+	/** Obtiene el icono por defecto para los di&aacute;logos gr&aacute;ficos.
 	 * @return Icono por defecto para los di&aacute;logos gr&aacute;ficos. */
 	public static Image getDefaultDialogsIcon() {
 		return ICON;

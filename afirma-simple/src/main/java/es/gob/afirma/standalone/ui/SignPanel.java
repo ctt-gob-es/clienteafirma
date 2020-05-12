@@ -46,12 +46,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -90,7 +93,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /** Anchura m&iacute;nima que deber&aacute; tener el panel. */
 	private static final int MINIMUM_PANEL_WIDTH = 600;
 	/** Altura m&iacute;nima que deber&aacute; tener el panel. */
-	private static final int MINIMUM_PANEL_HEIGHT = 475;
+	private static final int MINIMUM_PANEL_HEIGHT = 520;
 
     private static String[][] signersTypeRelation = new String[][] {
     	{"es.gob.afirma.signers.pades.AOPDFSigner", SimpleAfirmaMessages.getString("SignPanel.104")}, //$NON-NLS-1$ //$NON-NLS-2$
@@ -154,6 +157,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         this.lowerPanel = new LowerPanel(this);
         c.weighty = 1.0;
         c.gridy++;
+
         this.add(this.lowerPanel, c);
 
         // Panel adicional en el que se mostraran los botones de los plugins.
@@ -740,7 +744,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	    private final LoadDataFileListener loadDataListener;
 
-	    private JPanel filePanel;
+	    private JScrollPane filePanel;
 
 	    private final JButton signButton;
 
@@ -757,19 +761,42 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        setLayout(new BorderLayout(5, 5));
 	        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-	        this.filePanel = new ResizingTextPanel(SimpleAfirmaMessages.getString("SignPanel.41")); //$NON-NLS-1$
-	        this.filePanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignPanel.42")); //$NON-NLS-1$
-	        this.filePanel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignPanel.43")); //$NON-NLS-1$
-	        this.filePanel.setToolTipText(SimpleAfirmaMessages.getString("SignPanel.42")); //$NON-NLS-1$
-	        this.filePanel.setFocusable(false);
+	        // Identificamos el color de fondo
+	        Color bgColor = Color.WHITE;
+	        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+	        	bgColor = LookAndFeelManager.WINDOW_COLOR;
+	        }
+
+	        final JPanel panel = new ResizingTextPanel(SimpleAfirmaMessages.getString("SignPanel.41")); //$NON-NLS-1$
+	        panel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignPanel.42")); //$NON-NLS-1$
+	        panel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignPanel.43")); //$NON-NLS-1$
+	        panel.setToolTipText(SimpleAfirmaMessages.getString("SignPanel.42")); //$NON-NLS-1$
+	        panel.setFocusable(false);
 
 	       this.dropTarget = new DropTarget(
-	        		this.filePanel,
+	        		panel,
 	        		DnDConstants.ACTION_COPY,
 	        		new DropDataFileListener(this.loadDataListener),
 	        		true);
 
+	        this.filePanel = new JScrollPane();
+	        this.filePanel.setBackground(bgColor);
+	        this.filePanel.getViewport().setBackground(bgColor);
+	        this.filePanel.getHorizontalScrollBar().setUnitIncrement(30);
+	        this.filePanel.getVerticalScrollBar().setUnitIncrement(30);
+
+
+	        // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
+	        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+	        	this.filePanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+	        	this.filePanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+	        }
+	        else {
+	        	this.filePanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+	        	this.filePanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	        }
 	        this.filePanel.setDropTarget(this.dropTarget);
+	        this.filePanel.setViewportView(panel);
 
 	        this.add(this.filePanel, BorderLayout.CENTER);
 
@@ -787,8 +814,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        // Establecemos la configuracion de color
 	        if (!LookAndFeelManager.HIGH_CONTRAST) {
 	            setBackground(LookAndFeelManager.WINDOW_COLOR);
-	            this.filePanel.setBackground(Color.DARK_GRAY);
-	            this.filePanel.setForeground(Color.LIGHT_GRAY);
+	            panel.setBackground(Color.DARK_GRAY);
+	            panel.setForeground(Color.LIGHT_GRAY);
 	            buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
 	        }
 
@@ -797,19 +824,16 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	    public void loadDataInfo(final List<SignOperationConfig> configs) {
 
-	         remove(this.filePanel);
-
 	         if (configs.size() == 1) {
-	        	 this.filePanel = new SignPanelFilePanel(
+	        	 this.filePanel.setViewportView(new SignPanelFilePanel(
 	        			 configs.get(0),
-	        			 this.dropTarget);
+	        			 this.dropTarget));
 	         }
 	         else if (configs.size() > 1) {
-	        	 this.filePanel = new SignPanelMultiFilePanel(
+	        	 this.filePanel.setViewportView(new SignPanelMultiFilePanel(
 	        			 configs,
-	        			 this.dropTarget);
+	        			 this.dropTarget));
 	         }
-
 
 	         add(this.filePanel);
 	         revalidate();
@@ -833,7 +857,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	    }
 
 	    JPanel getFilePanel() {
-	    	return this.filePanel;
+	    	return (JPanel) this.filePanel.getViewport().getView();
 	    }
 	}
 

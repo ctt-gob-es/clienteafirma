@@ -13,10 +13,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -31,13 +35,15 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.JPopupMenu;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
@@ -46,7 +52,7 @@ import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
 
-final class SignPanelMultiFilePanel extends JPanel {
+final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
     /** Serial Id. */
 	private static final long serialVersionUID = 6644719944157037807L;
@@ -65,7 +71,6 @@ final class SignPanelMultiFilePanel extends JPanel {
 
     void createUI(final List<SignOperationConfig> operations) {
 
-        setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new GridBagLayout());
 
         final FileOperationTitleRenderer titlePanel = new FileOperationTitleRenderer();
@@ -86,15 +91,25 @@ final class SignPanelMultiFilePanel extends JPanel {
 			@Override public void mouseEntered(final MouseEvent e) { /* No hacemos nada */ }
 			@Override
 			public void mouseClicked(final MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					if (e.getSource() instanceof JList<?>) {
-						final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
+				if (e.getSource() instanceof JList<?>) {
+					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
+					if (e.getButton() == MouseEvent.BUTTON3) {
 						final int index = list.locationToIndex(e.getPoint());
-						openDataFileItem(list, index);
+						if (index >= 0) {
+							final SignOperationConfig signConfig = list.getModel().getElementAt(index);
+							new ContextualMenu(signConfig, (Component) e.getSource()).show(
+									e.getComponent(), e.getX(), e.getY());
+						}
+					}
+					else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+						final int index = list.locationToIndex(e.getPoint());
+						if (index >= 0) {
+							openDataFileItem(list.getModel().getElementAt(index));
+						}
 					}
 				}
 			}
-		});
+        });
 
         fileList.addKeyListener(new KeyListener() {
 			@Override public void keyTyped(final KeyEvent e) { /* No hacemos nada */ }
@@ -104,22 +119,12 @@ final class SignPanelMultiFilePanel extends JPanel {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && e.getSource() instanceof JList<?>) {
 					final JList<SignOperationConfig> list = (JList<SignOperationConfig>) e.getSource();
 					final int index = fileList.getSelectedIndex();
-					openDataFileItem(list, index);
+					if (index >= 0) {
+						openDataFileItem(list.getModel().getElementAt(index));
+					}
 				}
 			}
 		});
-
-        final JScrollPane scrollPane = new JScrollPane(fileList);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-        // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-        	scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        }
-        else {
-        	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        }
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -128,35 +133,31 @@ final class SignPanelMultiFilePanel extends JPanel {
         this.add(titlePanel, c);
         c.weighty = 1.0;
         c.gridy++;
-        this.add(scrollPane, c);
+        this.add(fileList, c);
     }
 
 	/**
-	 * Abre un fichero de la lista.
-	 * @param list Lista con los ficheros cargados.
-	 * @param index &Iacute;ndice del fichero seleccionado.
+	 * Abre el fichero al que corresponde una configuraci&oacute;n de firma.
+	 * @param signConfig Configuraci&oacute;n de operaci&oacute;n de firma.
 	 */
-    static void openDataFileItem(final JList<SignOperationConfig> list, final int index) {
-		if (index >= 0) {
-			final SignOperationConfig item = list.getModel().getElementAt(index);
-			if (item.getDataFile() != null) {
-				// Los ficheros de los que se tenga informacion de validacion son documentos de firma
-				// y se abriran con el visor, mientras que el resto a traves de la aplicacion asociada
-				// en el sistema
-				if (item.getSignValidity() != null) {
-					new VisorFirma(false, null).initialize(false, item.getDataFile());
-				}
-				else {
-					SwingUtilities.invokeLater(() -> {
-						try {
-							Desktop.getDesktop().open(item.getDataFile());
-						} catch (final IOException ex) {
-							LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + item.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
-						}
-					});
-				}
-			}
-		}
+    static void openDataFileItem(final SignOperationConfig signConfig) {
+    	if (signConfig.getDataFile() != null) {
+    		// Los ficheros de los que se tenga informacion de validacion son documentos de firma
+    		// y se abriran con el visor, mientras que el resto a traves de la aplicacion asociada
+    		// en el sistema
+    		if (signConfig.getSignValidity() != null) {
+    			new VisorFirma(false, null).initialize(false, signConfig.getDataFile());
+    		}
+    		else {
+    			SwingUtilities.invokeLater(() -> {
+    				try {
+    					Desktop.getDesktop().open(signConfig.getDataFile());
+    				} catch (final IOException ex) {
+    					LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + signConfig.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
+    				}
+    			});
+    		}
+    	}
     }
 
     /**
@@ -314,7 +315,8 @@ final class SignPanelMultiFilePanel extends JPanel {
 				this.fileNameLabel.setForeground(Color.BLACK);
 			}
 			else {
-				this.fileNameLabel.setText((value.getDataFile().getAbsolutePath() + " (Firma inv\u00E1lida)").substring(this.basePathLength));
+				this.fileNameLabel.setText(
+						(value.getDataFile().getAbsolutePath() + " " + SimpleAfirmaMessages.getString("SignPanel.147")).substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
 				this.fileNameLabel.setForeground(Color.RED);
 			}
 
@@ -371,4 +373,66 @@ final class SignPanelMultiFilePanel extends JPanel {
 			return this.mbFormatter.format(size / (1024 * 1024)) + " MB"; //$NON-NLS-1$
 		}
     }
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
+		return 30;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
+		return 30;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return true;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
+	}
+
+	private class ContextualMenu extends JPopupMenu implements ActionListener {
+
+		/** Serial Id. */
+		private static final long serialVersionUID = 4803487514272887434L;
+
+		private final SignOperationConfig config;
+		private final Component parent;
+
+		private final JMenuItem openFileItem;
+		private final JMenuItem seeAttributesItem;
+
+	    public ContextualMenu(final SignOperationConfig signConfig, final Component element) {
+
+	    	this.config = signConfig;
+	    	this.parent = element;
+
+	    	this.openFileItem = new JMenuItem(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
+	    	this.openFileItem.setFont(this.openFileItem.getFont().deriveFont(Font.BOLD));
+	    	this.openFileItem.addActionListener(this);
+	        add(this.openFileItem);
+	        this.seeAttributesItem = new JMenuItem(SimpleAfirmaMessages.getString("SignPanel.148")); //$NON-NLS-1$
+	        this.seeAttributesItem.addActionListener(this);
+	        add(this.seeAttributesItem);
+	    }
+
+	    @Override
+	    public void actionPerformed(final ActionEvent e) {
+	    	if (e.getSource() == this.openFileItem) {
+	    		openDataFileItem(this.config);
+	    	}
+	    	else if (e.getSource() == this.seeAttributesItem) {
+	    		final JDialog dialog = SignatureAttributesDialog.newInstance(this.parent, this.config);
+	    		dialog.setVisible(true);
+	    	}
+	    }
+	}
 }

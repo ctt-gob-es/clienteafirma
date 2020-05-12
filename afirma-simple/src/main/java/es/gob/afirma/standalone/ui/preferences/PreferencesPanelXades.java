@@ -55,7 +55,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 final class PreferencesPanelXades extends JScrollPane {
 
@@ -468,7 +467,7 @@ final class PreferencesPanelXades extends JScrollPane {
 		);
 		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
 
-		final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
+		final List<PolicyItem> xadesPolicies = new ArrayList<>();
         xadesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -529,7 +528,7 @@ final class PreferencesPanelXades extends JScrollPane {
 			this.xadesSignFormat.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGN_FORMAT));
 		}
 
-		final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
+		final List<PolicyItem> xadesPolicies = new ArrayList<>();
         xadesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -658,7 +657,7 @@ final class PreferencesPanelXades extends JScrollPane {
 	private void loadXadesPolicy() {
 		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.xadesPolicyDlg == null) {
-			final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
+			final List<PolicyItem> xadesPolicies = new ArrayList<>();
 			xadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_XADES_AGE_1_9));
 
