@@ -64,11 +64,13 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox sendAnalytics = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.89")); //$NON-NLS-1$
 
+	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
+
+	private final JCheckBox confirmToSign = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.179")); //$NON-NLS-1$
+
 	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.176")); //$NON-NLS-1$
 
 	private final JCheckBox allowSignInvalidSignatures = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.178")); //$NON-NLS-1$
-
-	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 
@@ -270,23 +272,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.sendAnalytics.addItemListener(modificationListener);
 		this.sendAnalytics.addKeyListener(keyListener);
 		signConfigPanel.add(this.sendAnalytics, signConstraint);
-		signConstraint.gridy++;
 
-		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.177") //$NON-NLS-1$
-				);
-		this.showExpiredCerts.setMnemonic('M');
-		this.showExpiredCerts.addItemListener(modificationListener);
-		this.showExpiredCerts.addKeyListener(keyListener);
-		signConfigPanel.add(this.showExpiredCerts, signConstraint);
-		signConstraint.gridy++;
-
-		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.178") //$NON-NLS-1$
-				);
-		this.allowSignInvalidSignatures.addItemListener(modificationListener);
-		this.allowSignInvalidSignatures.addKeyListener(keyListener);
-		signConfigPanel.add(this.allowSignInvalidSignatures, signConstraint);
 		signConstraint.gridy++;
 
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
@@ -360,21 +346,44 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		c.gridx = 1;
 		innerPanel.add(configureFormatsButton, c);
 
-		final JPanel massiveSignaturePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-		massiveSignaturePanel.setBorder(
-			BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.159") //$NON-NLS-1$
-			)
-		);
+		c.gridx = 0;
+		c.gridwidth = 2;
+		c.insets = new Insets(4, 0, 3, 7);
+
+		c.gridy++;
+
+		this.confirmToSign.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.180")); //$NON-NLS-1$
+		this.confirmToSign.setMnemonic('N');
+		this.confirmToSign.addItemListener(modificationListener);
+		this.confirmToSign.addKeyListener(keyListener);
+		innerPanel.add(this.confirmToSign, c);
+
+		c.gridy++;
+
+		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
+		this.showExpiredCerts.setMnemonic('M');
+		this.showExpiredCerts.addItemListener(modificationListener);
+		this.showExpiredCerts.addKeyListener(keyListener);
+		innerPanel.add(this.showExpiredCerts, c);
+
+		c.gridy++;
+
+		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.178")); //$NON-NLS-1$
+		this.allowSignInvalidSignatures.addItemListener(modificationListener);
+		this.allowSignInvalidSignatures.addKeyListener(keyListener);
+		innerPanel.add(this.allowSignInvalidSignatures, c);
+
+		c.gridy++;
 
 		this.massiveOverwrite.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.160") //$NON-NLS-1$
-		);
+				SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 		this.massiveOverwrite.setMnemonic('S');
 		this.massiveOverwrite.addItemListener(modificationListener);
 		this.massiveOverwrite.addKeyListener(keyListener);
-
-		massiveSignaturePanel.add(this.massiveOverwrite);
+		innerPanel.add(this.massiveOverwrite, c);
 
 		final JPanel netConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		netConfigPanel.setBorder(
@@ -429,8 +438,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		gbc.gridy++;
 		mainPanel.add(signGeneralPanel, gbc);
-		gbc.gridy++;
-		mainPanel.add(massiveSignaturePanel, gbc);
 		gbc.gridy++;
 		mainPanel.add(netConfigPanel, gbc);
 		gbc.weighty = 1.0;
@@ -527,6 +534,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// Opciones varias
 		PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signatureAlgorithms.getSelectedItem().toString());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN, this.confirmToSign.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
 		if (SimpleAfirma.isUpdatesEnabled()) {
 			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
@@ -553,6 +561,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 					PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM));
 		}
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
+		this.confirmToSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 
 		if (!SimpleAfirma.isUpdatesEnabled()) {
@@ -571,6 +580,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		else {
 			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS));
 		}
+
 
 		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 		this.allowSignInvalidSignatures.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES));

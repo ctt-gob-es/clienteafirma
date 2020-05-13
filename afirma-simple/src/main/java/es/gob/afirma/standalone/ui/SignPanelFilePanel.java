@@ -18,7 +18,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.dnd.DropTarget;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -42,13 +41,8 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 
     private SignatureConfigInfoPanel configInfoPanel;
 
-    SignPanelFilePanel(final SignOperationConfig signConfig,
-    		final DropTarget dropTarget) {
-
+    SignPanelFilePanel(final SignOperationConfig signConfig) {
     	super(true);
-
-    	// Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
-    	setDropTarget(dropTarget);
 
     	SwingUtilities.invokeLater(() -> createUI(signConfig));
     }
@@ -120,12 +114,12 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         c.gridx = 1;
         c.ipadx = 0;
         c.ipady = 0;
-        c.insets = new Insets(14, 0, 11, 5);
+        c.insets = new Insets(11, 0, 11, 5);
+        c.anchor = GridBagConstraints.NORTH;
         add(detailPanel, c);
 
         if (openFileButton != null) {
         	c.weightx = 0.0;
-        	c.weighty = 0.0;
         	c.gridx = 2;
         	c.ipadx = 0;
         	c.ipady = 0;
@@ -149,7 +143,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 		return "LNK".equals(ext.toUpperCase()); //$NON-NLS-1$
 	}
 
-	private static JPanel createDetailsPanel(final SignOperationConfig signConfig, final Color bgColor) {
+	private JPanel createDetailsPanel(final SignOperationConfig signConfig, final Color bgColor) {
 
     	final File file = signConfig.getDataFile();
 
@@ -165,7 +159,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         // Panel de configuracion de firma
 		final JLabel signConfigLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.142")); //$NON-NLS-1$
 		signConfigLabel.setFont(signConfigLabel.getFont().deriveFont(Font.BOLD));
-        final JPanel signConfigPanel = new SignatureConfigInfoPanel(signConfig, bgColor);
+		this.configInfoPanel = new SignatureConfigInfoPanel(signConfig, bgColor);
 
         // Componemos el panel
 		final JPanel detailPanel = new JPanel(new GridBagLayout());
@@ -192,7 +186,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
     	detailPanel.add(signConfigLabel, c);
         c.gridy++;
         c.insets = new Insets(4, 11, 0, 0);
-        detailPanel.add(signConfigPanel, c);
+        detailPanel.add(this.configInfoPanel, c);
 
         return detailPanel;
 	}

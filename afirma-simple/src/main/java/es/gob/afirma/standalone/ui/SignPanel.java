@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -270,6 +271,33 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     				}
     			}
     		}
+
+    		// Si procede, solicitamos confirmacion para firmar
+    		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN)) {
+    			final ConfirmSignatureDialog dialog = new ConfirmSignatureDialog(
+    					this, this.signOperationConfigs.size());
+    			dialog.setVisible(true);
+
+    			// Si se cancela el dialogo, se interrumpe la operacion
+    			if (dialog.getResult() == null) {
+    				return;
+    			}
+
+    			// Si se solicita recordar la decision (solo en caso de permitir la firma)
+    			// guardamos la preferencia
+    			if (dialog.getResult().booleanValue()) {
+    				PreferencesManager.putBoolean(
+    						PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN,
+    						false);
+    				try {
+						PreferencesManager.flush();
+					} catch (final BackingStoreException e) {
+						LOGGER.warning("No se pudo guardar la preferencia del usuario: " + //$NON-NLS-1$
+								PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN);
+					}
+    			}
+    		}
+
     		initSignTask(this.signOperationConfigs);
     	}
     }
@@ -782,6 +810,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.filePanel = new JScrollPane();
 	        this.filePanel.setBackground(bgColor);
 	        this.filePanel.getViewport().setBackground(bgColor);
+
 	        this.filePanel.getHorizontalScrollBar().setUnitIncrement(30);
 	        this.filePanel.getVerticalScrollBar().setUnitIncrement(30);
 
@@ -795,7 +824,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        	this.filePanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 	        	this.filePanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	        }
-	        this.filePanel.setDropTarget(this.dropTarget);
+	        //this.filePanel.setDropTarget(this.dropTarget);
+	        this.filePanel.getViewport().setDropTarget(this.dropTarget);
+
 	        this.filePanel.setViewportView(panel);
 
 	        this.add(this.filePanel, BorderLayout.CENTER);
@@ -826,13 +857,11 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	         if (configs.size() == 1) {
 	        	 this.filePanel.setViewportView(new SignPanelFilePanel(
-	        			 configs.get(0),
-	        			 this.dropTarget));
+	        			 configs.get(0)));
 	         }
 	         else if (configs.size() > 1) {
 	        	 this.filePanel.setViewportView(new SignPanelMultiFilePanel(
-	        			 configs,
-	        			 this.dropTarget));
+	        			 configs));
 	         }
 
 	         add(this.filePanel);

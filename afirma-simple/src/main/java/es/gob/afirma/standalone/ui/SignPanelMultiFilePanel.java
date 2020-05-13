@@ -18,7 +18,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -59,12 +58,8 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	SignPanelMultiFilePanel(final List<SignOperationConfig> operations,
-                       final DropTarget dropTarget) {
+	SignPanelMultiFilePanel(final List<SignOperationConfig> operations) {
         super(true);
-
-        // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
-        setDropTarget(dropTarget);
 
         SwingUtilities.invokeLater(() -> createUI(operations));
     }

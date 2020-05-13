@@ -114,6 +114,12 @@ public final class PreferencesManager {
 	 * de certificados muestre los certificados caducados. */
 	public static final String PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS = "showExpiredCerts"; //$NON-NLS-1$
 
+	/** Solicitar confirmaci&oacute;n antes de firmar.
+	 * Un valor de <code>true</code> en esta preferencia hace que se muestre un di&aacute;logo de
+	 * confirmaci&oacute;n con las implicaciones de firma al iniciar una firma desde la interfaz
+	 * de escritorio. */
+	public static final String PREFERENCE_GENERAL_CONFIRMTOSIGN = "confirmToSign"; //$NON-NLS-1$
+
 	/** Permitir la multifirma de firmas inv&aacute;lidas.
 	 * Un valor de <code>true</code> en esta preferencia hace que se puedan multifirmar firmas a pesar
 	 * de haberse detectado que no son v&aacute;lidas. */
