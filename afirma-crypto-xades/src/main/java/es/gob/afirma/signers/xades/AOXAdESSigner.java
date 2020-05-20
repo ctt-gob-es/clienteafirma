@@ -292,7 +292,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
-
     static {
     	Utils.installXmlDSigProvider(true);
     }
@@ -414,6 +413,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                        final PrivateKey key,
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
+
+    	final Properties extraParams = getExtraParams(xParams);
+
 		// La firma generada con el AOSigner se le pasa al sellador de tiempo,
 		// pero este solo estampara un sello si asi se le ha indicado en los
 		// parametros adicionales, no haciendo nada en caso contrario
@@ -423,9 +425,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     					algorithm,
     					key,
     					certChain,
-    					xParams
+    					extraParams
     					),
-    			xParams
+    			extraParams
     			);
     }
 
@@ -756,7 +758,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                          final Certificate[] certChain,
                          final Properties xParams) throws AOException {
 
-    		return XAdESCoSigner.cosign(sign, algorithm, key, certChain, xParams);
+    		return cosign(sign, algorithm, key, certChain, xParams);
     }
 
     /** Cofirma datos en formato XAdES.
@@ -796,7 +798,10 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 	    	if (!isSign(sign)) {
 	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
 	    	}
-	    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, extraParams);
+
+	    	final Properties newExtraParams = getExtraParams(extraParams);
+
+	    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, newExtraParams);
     }
 
     /** Contrafirma firmas en formato XAdES.
@@ -836,19 +841,22 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                               final Object[] targets,
                               final PrivateKey key,
                               final Certificate[] certChain,
-                              final Properties xParams) throws AOException {
+                              final Properties extraParams) throws AOException {
 	    	if (!isSign(sign)) {
 	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
 	    	}
+
+	    	final Properties newExtraParams = getExtraParams(extraParams);
+
 	    	return XAdESCounterSigner.countersign(
-			sign,
-			algorithm,
-			targetType,
-			targets,
-			key,
-			certChain,
-			xParams
-		);
+	    			sign,
+	    			algorithm,
+	    			targetType,
+	    			targets,
+	    			key,
+	    			certChain,
+	    			newExtraParams
+	    			);
     }
 
     /** {@inheritDoc} */
@@ -1108,5 +1116,15 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	// Externally Detached y no se trate de una firma manifest
     	return !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(XAdESExtraParams.FORMAT)) &&
     			!Boolean.parseBoolean(config.getProperty(XAdESExtraParams.USE_MANIFEST));
+    }
+
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = extraParams != null ?
+    			(Properties) extraParams.clone() : new Properties();
+
+    	// Eliminamos configuraciones que no deseemos que se utilicen desde el exterior
+    	newExtraParams.remove(XAdESExtraParams.INTERNAL_VALIDATE_PKCS1);
+
+    	return newExtraParams;
     }
 }

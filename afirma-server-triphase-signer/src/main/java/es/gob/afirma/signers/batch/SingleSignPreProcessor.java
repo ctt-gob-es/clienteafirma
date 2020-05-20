@@ -24,6 +24,8 @@ import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
 final class SingleSignPreProcessor {
 
+	private static final String EXTRA_PARAM_CHECK_SIGNATURES = "checkSignatures"; //$NON-NLS-1$
+
 	private SingleSignPreProcessor() {
 		// No instanciable
 	}
@@ -73,33 +75,33 @@ final class SingleSignPreProcessor {
 			extraParams = sSign.getExtraParams();
 		}
 
+		// Eliminamos configuraciones que no deseemos que se utilicen extenamente
+		extraParams.remove("profile"); //TODO: Deshacer cuando se permita la generacion de firmas baseline
+
 		// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
-        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
+        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty(EXTRA_PARAM_CHECK_SIGNATURES));
 
-
-
-		//TODO: Deshacer cuando se permita la generacion de firmas baseline
-		extraParams.remove("profile");
-
-
+        TriphaseData td;
 
 		switch(sSign.getSubOperation()) {
 			case SIGN:
-				return prep.preProcessPreSign(
+				td = prep.preProcessPreSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
 						extraParams,
 						checkSignatures
 					);
+				break;
 			case COSIGN:
-				return prep.preProcessPreCoSign(
+				td = prep.preProcessPreCoSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
 						extraParams,
 						checkSignatures
 					);
+				break;
 			case COUNTERSIGN:
 				final CounterSignTarget target = CounterSignTarget.getTarget(
 					extraParams.getProperty("target", CounterSignTarget.LEAFS.name()) //$NON-NLS-1$
@@ -109,7 +111,7 @@ final class SingleSignPreProcessor {
 						"Objetivo de contrafirma no soportado en proceso por lotes: " + target //$NON-NLS-1$
 					);
 				}
-				return prep.preProcessPreCounterSign(
+				td = prep.preProcessPreCounterSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
@@ -117,12 +119,22 @@ final class SingleSignPreProcessor {
 						target,
 						checkSignatures
 					);
+				break;
 			default:
 				throw new UnsupportedOperationException(
 					"Operacion no soportada: " + sSign.getSubOperation() //$NON-NLS-1$
 				);
 		}
 
+		// Agregamos los codigos de verificacion para posteriormente poder comprobar
+		// que el PKCS#1 recibido se genero con el certificado de firma
+		try {
+			TriPhaseHelper.addVerificationCodes(td, certChain[0]);
+		} catch (final Exception e) {
+			throw new AOException("No se pudo agregar le codigo de verfificacion de firmas", e); //$NON-NLS-1$
+		}
+
+		return td;
 	}
 
 

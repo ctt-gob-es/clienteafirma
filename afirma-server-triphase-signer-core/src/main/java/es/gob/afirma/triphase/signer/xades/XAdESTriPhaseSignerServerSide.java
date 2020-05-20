@@ -52,6 +52,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESCoSigner;
 import es.gob.afirma.signers.xades.XAdESCounterSigner;
+import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xades.XAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
 
@@ -95,7 +96,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @param data Datos a prefirmar
 	 * @param algorithm Algoritmo de firma
 	 * @param certChain Cadena de certificados del firmante
-	 * @param extraParams Par&aacute;metros adicionales de la firma
+	 * @param xParams Par&aacute;metros adicionales de la firma
 	 * @param op Operaci&oacute;n espec&iacute;fica de firma a realizar
 	 * @return Listado de prefirma XML
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
@@ -111,7 +112,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	public static XmlPreSignResult preSign(final byte[] data,
 			                               final String algorithm,
 			                               final Certificate[] certChain,
-			                               final Properties extraParams,
+			                               final Properties xParams,
 			                               final Op op) throws NoSuchAlgorithmException,
 			                                                   AOException,
 			                                                   SAXException,
@@ -140,8 +141,6 @@ public final class XAdESTriPhaseSignerServerSide {
 		Document xml = null;
 		String xmlEncoding = XML_DEFAULT_ENCODING;
 		try {
-			//xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-
 			// Si los datos eran XML, comprobamos y almacenamos las firmas previas
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
@@ -187,6 +186,11 @@ public final class XAdESTriPhaseSignerServerSide {
 			}
 		}
 
+		// Desactivamos la validacion del PKCS#1 para evitar errores por el uso
+		// de una clave de firma mock durante la prefirma
+		final Properties extraParams = getExtraParams(xParams);
+		extraParams.setProperty(XAdESExtraParams.INTERNAL_VALIDATE_PKCS1, Boolean.FALSE.toString());
+
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
 		final PublicKey publicKey = ((X509Certificate)certChain[0]).getPublicKey();
 		final PrivateKey prk = KeyHelperFactory.getKeyHelper(publicKey).getPrivateKey(publicKey);
@@ -213,7 +217,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				break;
 			case COUNTERSIGN:
 				final CounterSignTarget targets =
-					extraParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
+					CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
 						CounterSignTarget.LEAFS : CounterSignTarget.TREE;
 
 				result = XAdESCounterSigner.countersign(
@@ -374,4 +378,10 @@ public final class XAdESTriPhaseSignerServerSide {
 		public Key getKey() { return this.pk; }
 	}
 
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = extraParams != null ?
+    			(Properties) extraParams.clone() : new Properties();
+
+    	return newExtraParams;
+    }
 }

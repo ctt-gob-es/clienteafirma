@@ -6,12 +6,15 @@ import java.security.PrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.logging.Logger;
 
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 
 /** Utilidades de claves criptogr&aacute;ficas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class KeyUtil {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private KeyUtil() {
 		// No instanciable
@@ -33,7 +36,7 @@ public final class KeyUtil {
 			ret = keyFactory.generatePrivate(kspec);
 		}
 		catch(final NoSuchAlgorithmException | InvalidKeySpecException e) {
-			System.out.println(
+			LOGGER.info(
 				"No se ha podido convertir la clave de BC a JRE, es posible que falle el proceso: " + e //$NON-NLS-1$
 			);
 			return bcKey;
@@ -41,7 +44,7 @@ public final class KeyUtil {
 		if (ret instanceof ECPrivateKey) {
 			return (ECPrivateKey) ret;
 		}
-		System.out.println(
+		LOGGER.info(
 			"No se ha podido convertir la clave de BC a JRE, es posible que falle el proceso" //$NON-NLS-1$
 		);
 		return bcKey;

@@ -56,9 +56,9 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			           final String algorithm,
 			           final PrivateKey key,
 			           final Certificate[] certChain,
-			           final Properties extraParams) throws AOException {
+			           final Properties xParams) throws AOException {
 
-		if (extraParams == null) {
+		if (xParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}
 		if (key == null) {
@@ -70,6 +70,8 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		if (data == null) {
 			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
 		}
+
+		final Properties extraParams = getExtraParams(xParams);
 
 		// Comprobamos la direccion del servidor
 		final URL signServerUrl;
@@ -253,4 +255,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		return exception;
 	}
+
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = (Properties) extraParams.clone();
+
+    	return newExtraParams;
+    }
 }

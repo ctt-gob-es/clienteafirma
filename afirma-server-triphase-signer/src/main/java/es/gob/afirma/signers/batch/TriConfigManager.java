@@ -39,6 +39,8 @@ public class TriConfigManager {
 
 	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
 
+	private static final String CONFIG_PARAM_VERIFICATION_KEY = "verification.key"; //$NON-NLS-1$
+
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
 	private static final String DEFAULT_CONFIG_PARAM_ALLOW_ORIGIN = "*"; //$NON-NLS-1$
 
@@ -76,6 +78,11 @@ public class TriConfigManager {
 
 	public static boolean needInstallXmlDSig() {
 		return Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
+	}
+
+	static String getHMacKey() {
+		final String verificationKey = config.getProperty(CONFIG_PARAM_VERIFICATION_KEY);
+		return verificationKey != null && verificationKey.length() > 0 ? verificationKey : null;
 	}
 
 	/**

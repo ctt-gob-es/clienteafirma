@@ -74,6 +74,11 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
+    /** Par&aacute;metro interno (no se puede usar desde el exterior) para
+     * desactivar la validacion del PKCS#1 generado frente al certificado
+     * utilizado. */
+	private static final String PROPERTY_VALIDATE_PKCS1 = "validatePkcs1"; //$NON-NLS-1$
+
 	/** Identificador de la operaci&oacute;n de prefirma en servidor. */
 	private static final String OPERATION_PRESIGN = "pre"; //$NON-NLS-1$
 
@@ -338,8 +343,10 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			);
 		}
 
-		// Retiramos del extraParams la URL del servidor de firma sin mutar los parametros de entrada
+		// Retiramos del extraParams las propiedades que no se utilizaran o no
+		// se deberian configurar desde el exterior
 		final Properties xParams = (Properties) extraParams.clone();
+		xParams.remove(PROPERTY_VALIDATE_PKCS1);
 		xParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
 		// Decodificamos el identificador del documento
@@ -348,7 +355,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// Preparamos el parametro de cadena de certificados
-		final String cerChainParamContent;
+		String cerChainParamContent;
 		try {
 			cerChainParamContent = TriphaseUtil.prepareCertChainParam(certChain, xParams);
 		}

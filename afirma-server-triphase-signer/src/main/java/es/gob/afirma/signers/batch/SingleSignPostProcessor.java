@@ -67,6 +67,13 @@ final class SingleSignPostProcessor {
 
 		final TriphaseData td = cleanTriphaseData(tdata, sSign.getId());
 
+		try {
+			TriPhaseHelper.checkSignaturesIntegrity(td, certChain[0]);
+		}
+		catch (final Exception e) {
+			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
+		}
+
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
@@ -85,8 +92,6 @@ final class SingleSignPostProcessor {
 
 		//TODO: Deshacer cuando se permita la generacion de firmas baseline
 		extraParams.remove("profile");
-
-
 
 
 		final byte[] signedDoc;

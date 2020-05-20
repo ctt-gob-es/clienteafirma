@@ -305,6 +305,10 @@ public final class XAdESSigner {
 			}
 		}
 
+		// Comprobamos si se ha indicado validar el PKCS#1 generado (por defecto, si)
+		final boolean validatePkcs1 = Boolean.parseBoolean(extraParams.getProperty(
+				XAdESExtraParams.INTERNAL_VALIDATE_PKCS1, Boolean.TRUE.toString()));
+
 		// Perfil de firma XAdES que se desea aplicar
 		final String profile = extraParams.getProperty(
 		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
@@ -1237,7 +1241,8 @@ public final class XAdESSigner {
 				addKeyInfoKeyValue,
 				addKeyInfoKeyName,
 				addKeyInfoX509IssuerSerial,
-				keepKeyInfoUnsigned
+				keepKeyInfoUnsigned,
+				validatePkcs1
 			);
 
 		}

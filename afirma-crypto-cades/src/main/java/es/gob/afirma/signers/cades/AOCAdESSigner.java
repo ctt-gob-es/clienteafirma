@@ -99,7 +99,7 @@ public final class AOCAdESSigner implements AOSigner {
     	//****************************************************************************************************
     	//*************** LECTURA PARAMETROS ADICIONALES *****************************************************
 
-        final Properties extraParams = xParams != null ? xParams : new Properties();
+        final Properties extraParams = getExtraParams(xParams);
 
         // Forzado del SigningCertificateV2
         final boolean signingCertificateV2;
@@ -144,13 +144,8 @@ public final class AOCAdESSigner implements AOSigner {
         String[] claimedRoles = null;
         final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
 
-
-        System.out.println("Parametro signatureClaimedRoles: " + claimedRolesParam);
-
         if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
         	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
-
-        	System.out.println("Numero de parametros: " + claimedRoles.length);
         }
 
     	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
@@ -281,11 +276,13 @@ public final class AOCAdESSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties extraParams) throws AOException, IOException {
+                         final Properties xParams) throws AOException, IOException {
 
     	checkAlgorithm(algorithm);
 
     	new SCChecker().checkSpongyCastle();
+
+    	final Properties extraParams = getExtraParams(xParams);
 
         try {
 			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
@@ -318,7 +315,6 @@ public final class AOCAdESSigner implements AOSigner {
         catch (final SecurityException e) {
         	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por falta de permisos: " + e, e); //$NON-NLS-1$
 		}
-
     }
 
     /** Cofirma una firma CAdES o CMS existente en formato CAdES. Para realizar la
@@ -367,25 +363,25 @@ public final class AOCAdESSigner implements AOSigner {
         	throw new AOException("Error en tratamiento de datos para la cofirma: " + e, e); //$NON-NLS-1$
 		}
         catch (final InstantiationException e) {
-			throw new AOException("No se ha podido instanciar el cofirmador: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalAccessException e) {
-        	throw new AOException("No tienen permisos para instanciar el cofirmador: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por acceso ilegal: " + e, e); //$NON-NLS-1$
 		}
         catch (final ClassNotFoundException e) {
-        	throw new AOException("No se ha encontrado el cofirmador: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha encontrado la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalArgumentException e) {
-        	throw new AOException("No se ha podido instanciar el cofirmador: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final InvocationTargetException e) {
-        	throw new AOException("No se ha podido instanciar el cofirmador: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por error en la invocacion al constructor: " + e, e); //$NON-NLS-1$
 		}
         catch (final NoSuchMethodException e) {
-        	throw new AOException("No se ha podido instanciar el cofirmador por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
 		}
         catch (final SecurityException e) {
-        	throw new AOException("No se ha podido instanciar el cofirmador por motivos de seguridad: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por falta de permisos: " + e, e); //$NON-NLS-1$
 		}
     }
 
@@ -577,4 +573,10 @@ public final class AOCAdESSigner implements AOSigner {
     	}
     }
 
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = extraParams != null ?
+    			(Properties) extraParams.clone() : new Properties();
+
+    	return newExtraParams;
+    }
 }

@@ -411,6 +411,13 @@ public final class XAdESExtraParams {
      */
     public static final String ROOT_XML_NODE_NAMESPACE_PREFIX = "RootXmlNodeNamespacePrefix"; //$NON-NLS-1$
 
+
+    /**
+     * Parametro interno (no se puede usar desde el exterior) para desactivar la validacion del
+     * PKCS#1 generado frente al certificado utilizado.
+     */
+    public static final String INTERNAL_VALIDATE_PKCS1 = "validatePkcs1"; //$NON-NLS-1$
+
     /**
      * Constructor vac&iacute;o privado para que no se pueda instanciar la clase
      * ya que es est&aacute;tico.

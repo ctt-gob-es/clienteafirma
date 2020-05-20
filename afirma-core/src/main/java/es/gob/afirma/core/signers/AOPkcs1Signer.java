@@ -94,12 +94,35 @@ public final class AOPkcs1Signer implements AOSigner {
 			throw new AOException("Error al configurar los datos a firmar: " + e, e); //$NON-NLS-1$
 		}
 
+		byte[] signature;
 		try {
-			return sig.sign();
+			signature = sig.sign();
 		}
 		catch (final Exception e) {
 			throw new AOException("Error durante el proceso de firma PKCS#1: " + e, e); //$NON-NLS-1$
 		}
+
+		// Siguiendo la recomendacion de la ETSI TS 119 102-1, verificamos que el dispositivo de
+        // creacion de firma realmente ha generado el PKCS#1 usando la clave privada del
+        // certificado proporcionado
+		if (certChain != null && certChain.length > 0) {
+			try {
+				final Signature sigVerifier = Signature.getInstance(algorithm);
+				sigVerifier.initVerify(certChain[0].getPublicKey());
+				sigVerifier.update(data);
+				if (!sigVerifier.verify(signature)) {
+					throw new AOException("El PKCS#1 de firma obtenido no se genero con el certificado indicado"); //$NON-NLS-1$
+				}
+			}
+			catch (final Exception e) {
+				throw new AOException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$
+			}
+		}
+		else {
+			LOGGER.warning("No se ha proporcionado el certificado para comprobar la integridad del PKCS#1"); //$NON-NLS-1$
+		}
+
+		return signature;
 	}
 
 	@Override

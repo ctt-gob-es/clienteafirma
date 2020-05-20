@@ -15,14 +15,25 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +46,7 @@ import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
@@ -87,6 +99,24 @@ public final class SignatureService extends HttpServlet {
 
 	private static final String EXTRA_PARAM_HEADLESS = "headless"; //$NON-NLS-1$
 
+	private static final String EXTRA_PARAM_VALIDATE_PKCS1 = "validatePkcs1"; //$NON-NLS-1$
+
+	/** Algoritmo para el c&aacute;lculo de los valores de integridad. */
+	private static final String HMAC_ALGORITHM = "HmacSHA256"; //$NON-NLS-1$
+
+	/** Propiedad de la informacion trifasica en la que se almacenan las prefirmas. */
+	private static final String TRIPHASE_PROP_PRESIGN = "PRE"; //$NON-NLS-1$
+
+	/** Propiedad de la informacion trifasica en la que se almacenan las prefirmas. */
+	private static final String TRIPHASE_PROP_PKCS1 = "PK1"; //$NON-NLS-1$
+
+	/** Propiedad de la informacion trifasica en la que se almacenan los c&oacute;digos
+	 * de verificaci&oacute;n de integridad. */
+	private static final String TRIPHASE_PROP_HMAC = "HMAC"; //$NON-NLS-1$
+
+	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
+	private static final Charset CHARSET = StandardCharsets.UTF_8;
+
 	static {
 
 		final Class<?> docManagerClass;
@@ -129,6 +159,11 @@ public final class SignatureService extends HttpServlet {
 		}
 		catch (final Exception | Error e) {
 			LOGGER.severe("No se pudieron leer los parametros de la peticion: " + e); //$NON-NLS-1$
+			try {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			} catch (final IOException e1) {
+				LOGGER.log(Level.SEVERE, "No se pudo enviar un error al cliente", e); //$NON-NLS-1$
+			}
 			return;
 		}
 
@@ -196,6 +231,10 @@ public final class SignatureService extends HttpServlet {
 				out.flush();
 				return;
 			}
+
+			// Eliminamos configuraciones que no deseemos que se utilicen extenamente
+			extraParams.remove(EXTRA_PARAM_VALIDATE_PKCS1);
+
 
 			// Introducimos los parametros necesarios para que no se traten
 			// de mostrar dialogos en servidor
@@ -388,6 +427,21 @@ public final class SignatureService extends HttpServlet {
 					return;
 				}
 
+				// Si se ha definido una clave HMAC para la comprobacion de integridad de
+				// las firmas, agregamos a la respuesta la informacion de integridad que
+				// asocie las prefirmas con el certificado de firma
+				if (ConfigManager.getHMacKey() != null) {
+					try {
+						addVerificationCodes(preRes, signerCertChain[0]);
+					}
+					catch (final Exception e) {
+						LOGGER.log(Level.SEVERE, "Error al generar los codigos de verificacion de las firmas: " + e, e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(16) + ": " + e); //$NON-NLS-1$
+						out.flush();
+						return;
+					}
+				}
+
 				out.print(
 					Base64.encode(
 						preRes.toString().getBytes(),
@@ -403,6 +457,40 @@ public final class SignatureService extends HttpServlet {
 
 				LOGGER.info(" == POSTFIRMA en servidor"); //$NON-NLS-1$
 
+				TriphaseData triphaseData;
+				try {
+					triphaseData = TriphaseData.parser(sessionData);
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.SEVERE, "El formato de los parametros de operacion requeridos incorrecto", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(19) + ": " + e); //$NON-NLS-1$
+					out.flush();
+					return;
+				}
+
+				// Si se ha definido una clave HMAC para la comprobacion de
+				// integridad de las firmas, comprobamos que las prefirmas y el
+				// certificado de firma no se hayan modificado durante en
+				// ningun punto de la operacion y que los PKCS#1 proporcionados
+				// esten realizados con ese certificado
+				if (ConfigManager.getHMacKey() != null) {
+					try {
+						checkSignaturesIntegrity(triphaseData, signerCertChain[0], algorithm);
+					}
+					catch (final InvalidVerificationCodeException e) {
+						LOGGER.log(Level.SEVERE, "Las prefirmas y/o el certificado obtenido no se corresponden con los generados en la prefirma", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(17) + ": " + e); //$NON-NLS-1$
+						out.flush();
+						return;
+					}
+					catch (final Exception e) {
+						LOGGER.log(Level.SEVERE, "Error al comprobar los codigos de verificacion de las firmas", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(17) + ": " + e); //$NON-NLS-1$
+						out.flush();
+						return;
+					}
+				}
+
 				final byte[] signedDoc;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
@@ -411,7 +499,7 @@ public final class SignatureService extends HttpServlet {
 							algorithm,
 							signerCertChain,
 							extraParams,
-							sessionData
+							triphaseData
 						);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
@@ -420,7 +508,7 @@ public final class SignatureService extends HttpServlet {
 							algorithm,
 							signerCertChain,
 							extraParams,
-							sessionData
+							triphaseData
 						);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
@@ -438,7 +526,7 @@ public final class SignatureService extends HttpServlet {
 							algorithm,
 							signerCertChain,
 							extraParams,
-							sessionData,
+							triphaseData,
 							target
 						);
 					}
@@ -496,5 +584,126 @@ public final class SignatureService extends HttpServlet {
 			}
         	return;
         }
+	}
+
+	/**
+	 * Agrega a la informaci&oacute;n de firma trif&aacute;sica un c&oacute;digo de verificaci&oacute;n
+	 * con el que se podr&aacute; comprobar que la prefirma y el certificado no se han modificado entre
+	 * las operaciones de prefirma y postfirma.
+	 * @param triphaseData Informaci&oacute;n trif&aacute;sica de la operaci&oacute;n.
+	 * @param cert Certificado utilizado para crear la prefirma.
+	 * @throws NoSuchAlgorithmException Nunca se deber&iacute;a dar.
+	 * @throws InvalidKeyException Cuando la clave para la generaci&oacute;n del c&oacute;digo de
+	 * verificaci&oacute;n no sea v&aacute;lida.
+	 * @throws CertificateEncodingException Cuando no se puede codificar el certificado.
+	 * @throws IllegalStateException Nunca se deber&iacute;a dar.
+	 */
+	private static void addVerificationCodes(final TriphaseData triphaseData, final X509Certificate cert)
+			throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException,
+			IllegalStateException {
+
+		final SecretKeySpec key = new SecretKeySpec(ConfigManager.getHMacKey().getBytes(CHARSET), HMAC_ALGORITHM);
+		for (final TriSign triSign : triphaseData.getTriSigns()) {
+
+			final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
+
+			final Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+			mac.init(key);
+			mac.update(preSign.getBytes(CHARSET));
+			mac.update(ConfigManager.getHMacKey().getBytes(CHARSET));
+			mac.update(cert.getEncoded());
+
+			final byte[] hmac = mac.doFinal();
+			triSign.addProperty(TRIPHASE_PROP_HMAC, Base64.encode(hmac));
+		}
+	}
+
+
+	/**
+	 * Comprueba que la prefirma y el certificado estuviesen asociados a un mismo proceso de
+	 * prefirma anterior validando el c&oacute;digo MAC de verificaci&oacute;n que acompa&ntilde;a
+	 * al PKCS#1. Después, comprueba que con la clave privada de ese certificado se generase
+	 * ese PKCS#1.
+	 * //TODO: Esto podr&iacute;a ser mas robusto en las firmas XAdES, en la que no se utiliza la
+	 * prefirma (par&aacute;metro PRE) para completar la firma, sino el parametro BASE. Habr&iacute;a
+	 * que extraer la prefirma del BASE en lugar de coger la que se pasa como par&aacute;metro (que
+	 * ya podr&iacute;a dejar de pasarse).
+	 * @param triphaseData Informaci&oacute;n de la firma.
+	 * @param cert Certificado que se declara haber usado en la prefirma.
+	 * @param signatureAlgorithm Algoritmo de firma.
+	 * @throws InvalidVerificationCodeException Cuando el PKCS#1 de la firma no se generase con el
+	 * certificado indicado o cuando no se pudiese comprobar.
+	 * @throws IOException Cuando falla la decodificaci&oacute;n Base 64 de los datos.
+	 * @throws CertificateEncodingException Cuando no se pueda decodificar el certificado.
+	 */
+	private static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert,
+			final String signatureAlgorithm) throws InvalidVerificationCodeException, IOException {
+
+		final SecretKeySpec key = new SecretKeySpec(ConfigManager.getHMacKey().getBytes(CHARSET), HMAC_ALGORITHM);
+		for (final TriSign triSign : triphaseData.getTriSigns()) {
+
+			final String verificationHMac = triSign.getProperty(TRIPHASE_PROP_HMAC);
+			if (verificationHMac == null) {
+				throw new InvalidVerificationCodeException("Alguna de las firmas no contenida el codigo de verificacion"); //$NON-NLS-1$
+			}
+
+			final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
+
+			byte[] hmac;
+			try {
+				final Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+				mac.init(key);
+				mac.update(preSign.getBytes(CHARSET));
+				mac.update(ConfigManager.getHMacKey().getBytes(CHARSET));
+				mac.update(cert.getEncoded());
+				hmac = mac.doFinal();
+			}
+			catch (final Exception e) {
+				throw new InvalidVerificationCodeException("No se pudo completar la verificacion de integridad de la firma", e); //$NON-NLS-1$
+			}
+
+			if (!Arrays.equals(hmac, Base64.decode(verificationHMac))) {
+				throw new InvalidVerificationCodeException("Se ha detectado un error de integridad en los datos de firma"); //$NON-NLS-1$
+			}
+
+			final String signatureValue = triSign.getProperty(TRIPHASE_PROP_PKCS1);
+			if (signatureValue == null) {
+				throw new InvalidVerificationCodeException("No se ha proporcionado el PKCS#1 de la firma"); //$NON-NLS-1$
+			}
+			verifyPkcs1(Base64.decode(signatureValue), cert.getPublicKey(), signatureAlgorithm);
+		}
+	}
+
+    /**
+     * Verifica que un PKCS#1 se haya generado con la clave privada correspondiente a una clave
+     * p&uacute;blica dada.
+     * @param signatureValue PKCS#1 de la firma.
+     * @param publicKey Clave p&uacute;blica con la que validar la firma.
+     * @param signatureAlgoritm Algoritmo de firma.
+     * @throws InvalidVerificationCodeException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
+     * el PKCS#1 se gener&oacute; con una clave privada distinta a la esperada.
+     */
+    private static void verifyPkcs1(final byte[] signatureValue, final PublicKey publicKey,
+    		final String signatureAlgoritm) throws InvalidVerificationCodeException {
+    	try {
+    		final int cipherAlgoPos = signatureAlgoritm.lastIndexOf("with") + "with".length(); //$NON-NLS-1$ //$NON-NLS-2$
+    		final String cipherAlgo = signatureAlgoritm.substring(cipherAlgoPos);
+    		final Cipher cipher = Cipher.getInstance(cipherAlgo.toUpperCase());
+    		cipher.init(Cipher.DECRYPT_MODE, publicKey);
+    		cipher.doFinal(signatureValue);
+    	}
+    	catch (final Exception e) {
+    		throw new InvalidVerificationCodeException("El PKCS#1 de la firma no se ha generado con el certificado indicado", e); //$NON-NLS-1$
+    	}
+    }
+
+	private static class InvalidVerificationCodeException extends GeneralSecurityException {
+		private static final long serialVersionUID = -4647005073272724194L;
+		public InvalidVerificationCodeException(final String msg) {
+			super(msg);
+		}
+		public InvalidVerificationCodeException(final String msg, final Throwable cause) {
+			super(msg, cause);
+		}
 	}
 }

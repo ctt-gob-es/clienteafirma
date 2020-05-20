@@ -379,7 +379,7 @@ public final class SingleSign {
 	/**
 	 * Recupera los datos que se deben procesar.
 	 * @param stored {@code} true, indica que en caso de tratarse de datos remotos, estos ya
-	 * se estar&aacute;n cargados en un temporal y deben tomarse de este; {@code false} indica
+	 * estar&aacute;n cargados en un temporal y deben tomarse de este; {@code false} indica
 	 * que se deber&aacute;n cargar los datos desde la fuente y, en caso de ser remotos, se
 	 * crear&aacute; un temporal para ellos.
 	 * @return Datos.

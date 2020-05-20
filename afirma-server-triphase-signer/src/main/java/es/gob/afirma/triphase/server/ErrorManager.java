@@ -31,6 +31,10 @@ final class ErrorManager {
 		errorMessages.put(Integer.valueOf(13), "No se indicado una sub-operacion valida a realizar (firma, cofirma,...)"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(14), "Error al recuperar el documento"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(15), "El formato de los datos de sesion suministrados es erroneo"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(16), "Error al generar el codigo de verificacion de las firmas"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(17), "Error al comprobar el codigo de verificacion de las firmas"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(18), "Error de integridad en la firma"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(19), "El formato de los datos de operacion suministrados es erroneo"); //$NON-NLS-1$
 	}
 
 	static String getErrorMessage(final int errNo) {

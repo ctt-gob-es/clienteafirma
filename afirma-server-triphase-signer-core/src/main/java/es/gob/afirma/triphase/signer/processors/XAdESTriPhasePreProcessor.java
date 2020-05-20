@@ -58,6 +58,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Firma PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
+	/** Indica si la postfirma requiere la prefirma. */
+	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
+
 	/** Nombre de la propiedad que guarda la estructura b&aacute;sica con la composici&oacute;n
 	 * de la firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SCHEMA_BASE = "BASE"; //$NON-NLS-1$
@@ -232,6 +235,10 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				Base64.encode(preSignature.getSignedInfos().get(i))
 			);
 
+			//TODO: Borrar. La prefirma se deberia tomar en la postfirma del parametro BASE en lugar
+			// de tener que reenviarla directamente
+			signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
+
 			// Pasamos como datos de sesion el documento base en donde se realizan las sustituciones,
 			// pero solo lo haremos en la primera prefirma ya que todos serian iguales
 			if (i == 0) {
@@ -245,6 +252,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 						)
 					)
 				);
+
 				if (preSignature.getEncoding() != null) {
 					signConfig.put(
 						PROPERTY_NAME_XML_ENCODING,
@@ -412,9 +420,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 
-		byte[] counterSignature;
+		byte[] completeSignature;
 		try {
-			counterSignature = XAdESTriPhaseSignerUtil.insertCommonParts(
+			completeSignature = XAdESTriPhaseSignerUtil.insertCommonParts(
 				xmlBase.getBytes(preSignature.getEncoding()),
 				preSignature.getXmlSign(),
 				extraParams
@@ -425,7 +433,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				"Error insertando los datos a firmar y la cadena de certificados: " + e, e //$NON-NLS-1$
 			);
 		}
-		return counterSignature;
+		return completeSignature;
 	}
 
 }

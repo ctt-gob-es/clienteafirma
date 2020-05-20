@@ -349,8 +349,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final Map<String, String> signConfig = new ConcurrentHashMap<>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, presignB64);
-		signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.toString(true));
-		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.toString(true));
+		signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.TRUE.toString());
+		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
 
 		triphaseData.addSignOperation(
 			new TriSign(

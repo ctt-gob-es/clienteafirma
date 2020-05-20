@@ -483,6 +483,10 @@ public final class XAdESCounterSigner {
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
 		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE);
 
+		// Comprovamos si se ha indicado validar el PKCS#1 generado (por defecto, si)
+		final boolean validatePkcs1 = Boolean.parseBoolean(extraParams.getProperty(
+				XAdESExtraParams.INTERNAL_VALIDATE_PKCS1, Boolean.TRUE.toString()));
+
 		// Buscamos un nodo UnsignedProperties
 		final NodeList up = signature.getElementsByTagNameNS(
 				"*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -630,7 +634,8 @@ public final class XAdESCounterSigner {
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString())),
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString())),
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_X509_ISSUER_SERIAL, Boolean.FALSE.toString())),
-					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()))
+					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString())),
+					validatePkcs1
 				);
 			}
 		}
