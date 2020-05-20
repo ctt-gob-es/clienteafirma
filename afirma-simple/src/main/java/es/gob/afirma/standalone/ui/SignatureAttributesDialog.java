@@ -33,6 +33,18 @@ public class SignatureAttributesDialog {
 	private static final String PROP_PROFILE = "profile"; //$NON-NLS-1$
 	private static final String PROFILE_B_LEVEL = "B-B-Level"; //$NON-NLS-1$
 
+	/** Valores que hay que comprobar para saber si en la configuraci&oacute;n de firma
+	 * se encuentran atributos de firma adicionales a los datos, el certificado y la
+	 * hora de firma. */
+	private static final String[] SIGNED_ATTR_FLAGS = new String[] {
+			PROP_POLICY_ID,
+			PROP_PLACE_STREET,
+			PROP_PLACE_CITY,
+			PROP_PLACE_PROVINCE,
+			PROP_PLACE_PC,
+			PROP_PLACE_COUNTRY,
+			PROP_ROLES
+	};
 
 	public static JDialog newInstance(final Component parent, final SignOperationConfig config) {
 
@@ -60,7 +72,10 @@ public class SignatureAttributesDialog {
 		c.gridx = 0;
 
 		c.gridwidth = 2;
-		panel.add(new JLabel(SimpleAfirmaMessages.getString("SignatureAttributesDialog.1")), c); //$NON-NLS-1$
+
+		// Si tiene  atributos de firma adicionales definidos, mostramos el detalle.
+		if (hasAdditionalSignedAttributes(config)) {
+			panel.add(new JLabel(SimpleAfirmaMessages.getString("SignatureAttributesDialog.1")), c); //$NON-NLS-1$
 
 			final Properties p = config.getExtraParams();
 			if (p.containsKey(PROP_POLICY_ID)) {
@@ -108,10 +123,27 @@ public class SignatureAttributesDialog {
 				addHeader(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.14")); //$NON-NLS-1$
 				addData(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.15"), p.getProperty(PROP_ROLES)); //$NON-NLS-1$
 			}
-
-
+		}
+		// Si no hay atributos de firma adicionales, mostramos la informacion basica
+		else {
+			panel.add(new JLabel(SimpleAfirmaMessages.getString("SignatureAttributesDialog.16")), c); //$NON-NLS-1$
+		}
 
 		return panel;
+	}
+
+	/**
+	 * Comprueba si en una configuraci&oacute;n de firma hay atributos de firma adicionales.
+	 * @param config Configuraci&oacute;n de firma.
+	 * @return {@code true} si hay atributos adicionales de firma, {@code false} en caso contrario.
+	 */
+	private static boolean hasAdditionalSignedAttributes(final SignOperationConfig config) {
+		for (final String flag : SIGNED_ATTR_FLAGS) {
+			if (config.getExtraParams().containsKey(flag)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static void addHeader(final Container panel, final GridBagConstraints c, final String text) {

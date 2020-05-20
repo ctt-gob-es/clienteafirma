@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -82,14 +83,21 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 		String policyId = null;
 		String roles = null;
+		boolean definedPlace = false;
 		if (config.getExtraParams() != null) {
-			policyId = config.getExtraParams().getProperty("policyIdentifier"); //$NON-NLS-1$
-			roles = config.getExtraParams().getProperty("signerClaimedRoles"); //$NON-NLS-1$
+			final Properties exParams = config.getExtraParams();
+			policyId = exParams.getProperty("policyIdentifier"); //$NON-NLS-1$
+			roles = exParams.getProperty("signerClaimedRoles"); //$NON-NLS-1$
+			definedPlace = exParams.containsKey("signatureProductionStreetAddress") || //$NON-NLS-1$
+					exParams.containsKey("signatureProductionCity") || //$NON-NLS-1$
+					exParams.containsKey("signatureProductionProvince") || //$NON-NLS-1$
+					exParams.containsKey("signatureProductionPostalCode") || //$NON-NLS-1$
+					exParams.containsKey("signatureProductionCountry"); //$NON-NLS-1$
 		}
 
 		// Para mostrar este apartado debe haber declarada una politica
 		// de firma o un rol de firmante
-		if (policyId == null && roles == null) {
+		if (policyId == null && roles == null && !definedPlace) {
 			return null;
 		}
 
@@ -107,6 +115,13 @@ public class SignatureConfigInfoPanel extends JPanel {
 				policyDescription = SimpleAfirmaMessages.getString("PreferencesPanel.26"); //$NON-NLS-1$
 			}
 			panel.add(new JLabel(" - " + policyDescription)); //$NON-NLS-1$
+			panel.add(Box.createRigidArea(new Dimension(0, 4)));
+		}
+
+		// Resumen del lugar de firma
+		if (definedPlace) {
+			final String placeDescription = SimpleAfirmaMessages.getString("SignPanel.149"); //$NON-NLS-1$
+			panel.add(new JLabel(" - " + placeDescription)); //$NON-NLS-1$
 			panel.add(Box.createRigidArea(new Dimension(0, 4)));
 		}
 
