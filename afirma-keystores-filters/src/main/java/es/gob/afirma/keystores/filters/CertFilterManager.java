@@ -94,13 +94,18 @@ public final class CertFilterManager {
 
 		// Obtenemos los distintos filtros disyuntivos declarados
 		final List<String> filterValues = getFilterValues(propertyFilters);
-		if (filterValues.isEmpty()) {
-			return;
-		}
 
-		// Creamos el filtro adecuado a cada uno de esos filtros
+		// Agregamos el filtro correspondiente a cada uno de los filtros desclarados
 		for (final String filterValue : filterValues) {
 			this.filters.add(parseFilter(filterValue));
+		}
+
+		// Siguiendo los criterios de la ETSI TS 119 102-1, un usuario no deberia firmar nunca con
+		// un certificado caducado, asi que, si no se definio ningun tipo de filtrado, se agregara
+		// un filtro omitiendo estos certificados. Si se agregaron filtros, se considerara que es
+		// el integrador estara definiendo sus preferencias concretas de filtrado
+		if (this.filters.isEmpty()) {
+			this.filters.add(new ExpiredCertificateFilter(false));
 		}
 	}
 
@@ -165,7 +170,9 @@ public final class CertFilterManager {
 				filtersList.add(new KeyUsageFilter(kuPattern));
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_NON_EXPIRED)) {
-				filtersList.add(new ExpiredCertificateFilter());
+				final boolean showExpired = filter.equalsIgnoreCase(FILTER_TYPE_NON_EXPIRED) ?
+						false : Boolean.parseBoolean(filter.substring(FILTER_TYPE_NON_EXPIRED.length()));
+				filtersList.add(new ExpiredCertificateFilter(showExpired));
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_SSCD)) {
 				filtersList.add(new SscdFilter());

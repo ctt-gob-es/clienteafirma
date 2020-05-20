@@ -18,14 +18,36 @@ import java.util.Date;
  */
 public final class ExpiredCertificateFilter extends CertificateFilter {
 
+	private boolean showExpired = false;
+
+	/**
+	 * Inicializa el filtro indicando no se muestren los certificados
+	 * caducados.
+	 */
+	public ExpiredCertificateFilter() {
+		this.showExpired = false;
+	}
+
+	/**
+	 * Inicializa el filtro indicando si se deben mostrar o no los certificados
+	 * caducados.
+	 * @param showExpired {@code true} para mostrar los certificados caducados,
+	 * {@code false} en caso contrario.
+	 */
+	public ExpiredCertificateFilter(final boolean showExpired) {
+		this.showExpired = showExpired;
+	}
+
 	/** {@inheritDoc} */
 	@Override
     public boolean matches(final X509Certificate cert) {
-		try {
-			cert.checkValidity(new Date());
-		}
-		catch (final Exception e) {
-			return false;
+		if (!this.showExpired) {
+			try {
+				cert.checkValidity(new Date());
+			}
+			catch (final Exception e) {
+				return false;
+			}
 		}
 		return true;
 	}
