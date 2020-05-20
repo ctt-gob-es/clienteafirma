@@ -165,7 +165,7 @@ public final class AOPDFSigner implements AOSigner {
 			           final Properties xParams) throws AOException,
 			                                            IOException {
 
-        final Properties extraParams = xParams != null ? xParams : new Properties();
+        final Properties extraParams = getExtraParams(xParams);
 
         final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ?
     		new X509Certificate[] { (X509Certificate) certChain[0] } :
@@ -406,6 +406,10 @@ public final class AOPDFSigner implements AOSigner {
     			LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
     			return new AOTreeModel(root);
     		}
+    		catch (final AOCancelledOperationException e2) {
+    			LOGGER.warning("No se introdujo la contrasena. Se propaga la excepcion: " + e2); //$NON-NLS-1$
+    			throw e2;
+    		}
     		catch (final Exception e3) {
     			LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3); //$NON-NLS-1$
     			return new AOTreeModel(root);
@@ -638,4 +642,10 @@ public final class AOPDFSigner implements AOSigner {
     	}
     }
 
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = extraParams != null ?
+    			(Properties) extraParams.clone() : new Properties();
+
+    	return newExtraParams;
+    }
 }
