@@ -171,7 +171,7 @@ public final class CertFilterManager {
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_NON_EXPIRED)) {
 				final boolean showExpired = filter.equalsIgnoreCase(FILTER_TYPE_NON_EXPIRED) ?
-						false : Boolean.parseBoolean(filter.substring(FILTER_TYPE_NON_EXPIRED.length()));
+						false : !Boolean.parseBoolean(filter.substring(FILTER_TYPE_NON_EXPIRED.length()));
 				filtersList.add(new ExpiredCertificateFilter(showExpired));
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_SSCD)) {
