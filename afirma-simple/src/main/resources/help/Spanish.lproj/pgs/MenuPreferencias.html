@@ -33,8 +33,6 @@
      permitir al usuario seleccionar el certificado de firma de entre los disponibles en el almacén del sistema.</li>
      <li><b>Buscar actualizaciones al inicio:</b> Permite configurar si se deben b&uacute;scar si hay actualizaciones disponibles al iniciar la aplicacion.</li>
      <li><b>Enviar estad&iacute;sticas de uso de forma an&oacute;nima para ayudar a mejorar la aplicaci&oacute;n:</b> Permite configurar si se desea permitir el env&iacute;o de estad&iacute;sticas de uso.</li>
-	 <li><b>Permitir el uso de certificados caducados:</b> Al estar habilitada esta opci&oacute;n, los certificados caducados aparecer&aacute;n en el di&aacute;logo de selecci&oacute;n de certificados de firma, lo que permitir&aacute; firmar con ellos.</li>
-	 <li><b>Permitir agregar nuevas firmas a documentos con firmas no v&aacute;lidas:</b> Al habilitar esta opci&oacute;n, AutoFirma no impedir&aacute; agregar nuevas firmas (cofirma o contrafirma) a documentos en los que se encuentre que ya hay firmas y estas no sean v&aacute;lidas (est&eacute;n corruptas o con certificados caducados).</li>
      <li><b>Habilitar JMulticard para el uso de las tarjetas de la FNMT y DNIe:</b> Configura si debe utilizarse el controlador integrado en AutoFirma para el uso de las tarjetas de FNMT y DNIe. En caso de desactivarse, se utilizar&aacute;n los controladores encontrados en el sistema. El uso de esta funci&oacute;n permite usar las tarjetas compatibles cuando el usuario no tiene instalado su controlador o existe alguna incompatibilidad con &eacute;l. Esta funci&oacute;n puede ocasionar que se solicite al usuario m&uacute;ltiples veces la inserci&oacute;n del PIN de la tarjeta en procesos de firma masiva. Esta configuraci&oacute;n no tendr&aacute; efecto hasta la pr&oacute;xima vez que se abra la aplicaci&oacute;n.</li>
     </ul>
    </li>
@@ -60,15 +58,14 @@
 	  <p><b><u>ADVERTENCIA:</u></b> No se recomienda que se modifique que las facturas electr&oacute;nicas se
       firmen en un formato distinto al de factura electr&oacute;nica.
       </p>
-     </li>
-     <li><b>Firma masiva:</b>
-      <ul>
-       <li><b>Sobreescribir ficheros en el directorio de salida:</b> Opci&oacute;n para configurar si se desea
+	 <li><b>Solicitar confirmaci&oacute;n para firmar:</b>
+	   Cuando est&aacute; habilitada esta opci&oacute;n se solicita confirmaci&oacute;n al usuario antes de firmar.</li>
+	 <li><b>Permitir el uso de certificados caducados:</b> Al estar habilitada esta opci&oacute;n, los certificados caducados aparecer&aacute;n en el di&aacute;logo de selecci&oacute;n de certificados de firma, lo que permitir&aacute; firmar con ellos.</li>
+	 <li><b>Permitir agregar nuevas firmas a documentos con firmas no v&aacute;lidas:</b> Al habilitar esta opci&oacute;n, AutoFirma no impedir&aacute; agregar nuevas firmas (cofirma o contrafirma) a documentos en los que se encuentre que ya hay firmas y estas no sean v&aacute;lidas (est&eacute;n corruptas o con certificados caducados).</li>
+     <li><b>Sobreescribir ficheros en el directorio de salida:</b> Opci&oacute;n para configurar si se desea
        que, al generar la estructura de directorios de firmas resultante de un proceso de firma masiva, y en caso
        de encontrar un fichero con el mismo nombre con el que se va a guardar una firma, se sobreescriba el
        fichero preexistente por el nuevo fichero de firma o se guarde la firma utilizando un nuevo nombre.</li>
-     </ul>
-    </li>
     </ul>
    </li>
    <li><b>Configuraci&oacute;n de red:</b>
