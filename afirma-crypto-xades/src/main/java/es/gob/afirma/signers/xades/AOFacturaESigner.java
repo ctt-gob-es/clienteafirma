@@ -50,7 +50,7 @@ public final class AOFacturaESigner implements AOSigner {
 		null
 	);
 
-    private static final AOSigner XADES_SIGNER = new AOXAdESSigner();
+    private static final AOXAdESSigner XADES_SIGNER = new AOXAdESSigner();
 
     private static final Set<String> ALLOWED_PARAMS = new HashSet<>(5);
     static {
@@ -237,27 +237,68 @@ public final class AOFacturaESigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] is) throws IOException {
-        return XADES_SIGNER.isSign(is) && isValidDataFile(is);
+	public boolean isSign(final byte[] sign) throws IOException {
+
+        if (sign == null || sign.length == 0) {
+            return false;
+        }
+
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        final Document signDocument;
+        try {
+        	signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        }
+        catch (final Exception e) {
+            return false;
+        }
+        return isSign(signDocument);
+    }
+
+    /** {@inheritDoc} */
+	public static boolean isSign(final Document signDocument) {
+        return isValidDataFile(signDocument) && AOXAdESSigner.isSign(signDocument);
     }
 
     /** Indica si los datos son una factura electr&oacute;nica.
      * Importante: El que los datos sean una factura electr&oacute;nica no implica que puedan ser firmados, si esta
      * ya est&aacute; firmada el a&ntilde;adido de una firma adicional invalidar&iacute;a la factura
-     * @param is Datos a comprobar
+     * @param data Datos a comprobar.
      * @return <code>true</code> si los datos son una <a href="http://www.facturae.es/">factura electr&oacute;nica</a>,
      *         <code>false</code> en caso contrario */
     @Override
-	public boolean isValidDataFile(final byte[] is) {
-        if (is == null || is.length == 0) {
+	public boolean isValidDataFile(final byte[] data) {
+        if (data == null || data.length == 0) {
             return false;
         }
+
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
+        Document dataDocument;
         try {
-            final Document doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(is));
-            final Element rootNode = doc.getDocumentElement();
+        	dataDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(data));
+        }
+        catch (final Exception e) {
+            return false;
+        }
+        return isValidDataFile(dataDocument);
+    }
+
+    /** Indica si los datos son una factura electr&oacute;nica.
+     * Importante: El que los datos sean una factura electr&oacute;nica no implica que puedan ser firmados, si esta
+     * ya est&aacute; firmada el a&ntilde;adido de una firma adicional invalidar&iacute;a la factura
+     * @param signDocument Documento XML a comprobar
+     * @return <code>true</code> si los datos son una <a href="http://www.facturae.es/">factura electr&oacute;nica</a>,
+     *         <code>false</code> en caso contrario */
+	public static boolean isValidDataFile(final Document dataDocument) {
+        if (dataDocument == null) {
+            return false;
+        }
+
+        try {
+            final Element rootNode = dataDocument.getDocumentElement();
             final String rootNodePrefix = rootNode.getPrefix();
 
             if (!((rootNodePrefix != null ? rootNodePrefix + ":" : "") + "Facturae").equals(rootNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

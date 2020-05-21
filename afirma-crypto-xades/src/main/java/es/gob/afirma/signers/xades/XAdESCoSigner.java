@@ -76,6 +76,25 @@ public final class XAdESCoSigner {
 		// No permitimos la instanciacion
 	}
 
+	public static byte[] cosign(final byte[] sign,
+			final String algorithm,
+			final PrivateKey pk,
+			final Certificate[] certChain,
+			final Properties xParams) throws AOException {
+
+		Document signDocument;
+		try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+			signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+		}
+		catch (final Exception e) {
+			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
+		}
+
+		return cosign(signDocument, algorithm, pk, certChain, xParams);
+	}
+
 	/** Cofirma datos en formato XAdES.
 	 * <p>
 	 *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
@@ -90,7 +109,7 @@ public final class XAdESCoSigner {
 	 *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
 	 *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
 	 * </p>
-	 * @param sign Documento con las firmas iniciales.
+	 * @param signDocument Documento XML con las firmas iniciales.
 	 * @param algorithm Algoritmo a usar para la firma.
 	 * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
 	 * <ul>
@@ -104,7 +123,7 @@ public final class XAdESCoSigner {
 	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
 	 * @return Cofirma en formato XAdES
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-	public static byte[] cosign(final byte[] sign,
+	public static byte[] cosign(final Document signDocument,
 			                    final String algorithm,
 			                    final PrivateKey pk,
 			                    final Certificate[] certChain,
@@ -189,27 +208,18 @@ public final class XAdESCoSigner {
 				}
 		}
 
-		// nueva instancia de DocumentBuilderFactory que permita espacio de
-		// nombres (necesario para XML)
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-
-		// Carga el documento XML de firmas y su raiz
-		Document docSig;
-		Element rootSig;
-		try {
-			docSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-			rootSig = docSig.getDocumentElement();
-
-			// Si el documento contiene una firma simple se inserta como raiz el
-			// nodo AFIRMA
-			if (rootSig.getLocalName().equals(SIGNATURE_NODE_NAME)) {
+		// Si el documento contiene una firma simple se inserta como raiz el
+		// nodo AFIRMA
+		Document docSig = signDocument;
+		Element rootSig = signDocument.getDocumentElement();
+		if (rootSig.getLocalName().equals(SIGNATURE_NODE_NAME)) {
+			try {
 				docSig = AOXAdESSigner.insertarNodoAfirma(docSig);
 				rootSig = docSig.getDocumentElement();
 			}
-		}
-		catch (final Exception e) {
-			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
+			catch (final Exception e) {
+				throw new AOException("No se ha estructurar el documento XML de firmas", e); //$NON-NLS-1$
+			}
 		}
 
 		// Propiedades del documento XML original

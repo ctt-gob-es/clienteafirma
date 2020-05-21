@@ -105,27 +105,95 @@ public final class XAdESCounterSigner {
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
 
-		final Properties extraParams = xParams != null ?
-			xParams :
-				new Properties();
+		// Nueva instancia de DocumentBuilderFactory que permita espacio de
+		// nombres (necesario para XML)
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
 
-		final String outputXmlEncoding = extraParams.getProperty(XAdESExtraParams.OUTPUT_XML_ENCODING);
+		Document signDocument;
+		try {
+			signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+		}
+		catch (final Exception e) {
+			throw new AOException("No se ha podido cargar el documento de firmas", e); //$NON-NLS-1$
+		}
 
-		if (sign == null) {
+		return countersign(signDocument, algorithm, targetType, targets, key, certChain, xParams);
+	}
+
+		/** Contrafirma firmas en formato XAdES.
+		 * <p>
+		 * Contrafirma los nodos de firma indicados de un
+		 * documento de firma.
+		 * </p>
+		 * @param signDocument Documento XML con las firmas iniciales.
+		 * @param algorithm
+		 *            Algoritmo a usar para la firma.
+		 *            <p>
+		 *            Se aceptan los siguientes algoritmos en el par&aacute;metro
+		 *            <code>algorithm</code>:
+		 *            </p>
+		 *            <ul>
+		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+		 *            </ul>
+		 * @param targetType
+		 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
+		 *            deben contrafirmar.
+		 *            <p>
+		 *            Las distintas opciones son:
+		 *            </p>
+		 *            <ul>
+		 *             <li>Todos los nodos del &aacute;rbol de firma</li>
+		 *             <li>Los nodos hoja del &aacute;rbol de firma</li>
+		 *             <li>Los nodos de firma cuyas posiciones se especifican en
+		 *              <code>target</code></li>
+		 *             <li>Los nodos de firma realizados por los firmantes cuyo
+		 *              <i>Common Name</i> se indica en <code>target</code></li>
+		 *            </ul>
+		 *            <p>
+		 *            Cada uno de estos tipos se define en
+		 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
+		 * @param targets Listado de nodos o firmantes que se deben contrafirmar
+		 *                seg&uacute;n el {@code targetType} seleccionado.
+		 * @param key Clave privada a usar para firmar.
+		 * @param certChain Cadena de certificados del firmante.
+		 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+		 * @return Contrafirma en formato XAdES.
+		 * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
+	public static byte[] countersign(final Document signDocument,
+			final String algorithm,
+			final CounterSignTarget targetType,
+			final Object[] targets,
+			final PrivateKey key,
+			final Certificate[] certChain,
+			final Properties xParams) throws AOException {
+
+		if (signDocument == null) {
 			throw new IllegalArgumentException(
 					"El objeto de firma no puede ser nulo"); //$NON-NLS-1$
 		}
 
+		final Properties extraParams = xParams != null ?
+				xParams :
+					new Properties();
+
+		final String outputXmlEncoding = extraParams.getProperty(XAdESExtraParams.OUTPUT_XML_ENCODING);
+
+
+
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new IllegalArgumentException(
-				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
-			);
+					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
+					);
 		}
 
 		// Perfil de firma XAdES que se desea aplicar
 		final String profile = extraParams.getProperty(
-		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
+				XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
 
 		// Comprobacion del perfil de firma con la configuracion establecida
 		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
@@ -135,7 +203,7 @@ public final class XAdESCounterSigner {
 			}
 
 			final String digestMethodAlgorithm = extraParams.getProperty(
-			        XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
+					XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
 			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
 				throw new IllegalArgumentException(
 						"Las firmas baseline no permiten generar referencias con el algoritmo SHA1"); //$NON-NLS-1$
@@ -154,13 +222,11 @@ public final class XAdESCounterSigner {
 		final Map<String, String> originalXMLProperties;
 
 		// Se carga el documento XML y su raiz
-		Element root;
-		Document doc;
-		try {
 
-			doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(doc, outputXmlEncoding);
-			root = doc.getDocumentElement();
+		Document doc = signDocument;
+		Element root = signDocument.getDocumentElement();
+		try {
+			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(signDocument, outputXmlEncoding);
 
 			// Si no es un documento cofirma se anade temporalmente el nodo raiz
 			// AFIRMA para que las operaciones de contrafirma funcionen correctamente
@@ -177,49 +243,49 @@ public final class XAdESCounterSigner {
 		try {
 			if (targetType == CounterSignTarget.TREE) {
 				countersignTree(
-					root,
-					key,
-					certChain,
-					extraParams,
-				    algorithm,
-				    profile,
-				    doc
-			    );
+						root,
+						key,
+						certChain,
+						extraParams,
+						algorithm,
+						profile,
+						doc
+						);
 			}
 			else if (targetType == CounterSignTarget.LEAFS) {
 				countersignLeafs(
-					root,
-					key,
-					certChain,
-					extraParams,
-					algorithm,
-					profile,
-					doc
-				);
+						root,
+						key,
+						certChain,
+						extraParams,
+						algorithm,
+						profile,
+						doc
+						);
 			}
 			else if (targetType == CounterSignTarget.NODES) {
 				countersignNodes(
-					root,
-					targets,
-					key,
-					certChain,
-					extraParams,
-					algorithm,
-					profile,
-					doc
-				);
+						root,
+						targets,
+						key,
+						certChain,
+						extraParams,
+						algorithm,
+						profile,
+						doc
+						);
 			}
 			else if (targetType == CounterSignTarget.SIGNERS) {
 				countersignSigners(
-					root,
-					targets,
-					key,
-					certChain,
-					extraParams,
-					algorithm,
-					profile,
-					doc
-				);
+						root,
+						targets,
+						key,
+						certChain,
+						extraParams,
+						algorithm,
+						profile,
+						doc
+						);
 			}
 		}
 		catch (final Exception e) {
@@ -233,28 +299,28 @@ public final class XAdESCounterSigner {
 			try {
 				final Document newdoc = dbf.newDocumentBuilder().newDocument();
 				newdoc.appendChild(
-					newdoc.adoptNode(
-						doc.getElementsByTagNameNS(
-							XMLConstants.DSIGNNS,
-							AOXAdESSigner.SIGNATURE_TAG
-						).item(0)
-					)
-				);
+						newdoc.adoptNode(
+								doc.getElementsByTagNameNS(
+										XMLConstants.DSIGNNS,
+										AOXAdESSigner.SIGNATURE_TAG
+										).item(0)
+								)
+						);
 				doc = newdoc;
 			}
 			catch (final Exception e) {
 				LOGGER.info(
-					"No se ha eliminado el nodo padre '<AFIRMA>': " + e //$NON-NLS-1$
-				);
+						"No se ha eliminado el nodo padre '<AFIRMA>': " + e //$NON-NLS-1$
+						);
 			}
 		}
 
 		return Utils.writeXML(
-			doc.getDocumentElement(),
-			originalXMLProperties,
-			null,
-			null
-		);
+				doc.getDocumentElement(),
+				originalXMLProperties,
+				null,
+				null
+				);
 	}
 
 	/** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.

@@ -591,22 +591,43 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     /** {@inheritDoc} */
     @Override
 	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
-        // nueva instancia de DocumentBuilderFactory que permita espacio de
+
+    	// Nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
+        Document doc;
+        try {
+            doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        }
+        catch (final Exception ex) {
+            throw new AOInvalidFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
+        }
+
+        return getData(doc);
+    }
+
+    /** Recupera los datos originalmente firmados de una firma.
+     * En el caso de que la firma no contenga los datos firmados, se
+     * devuelve <code>null</code>.
+     * @param signDocument Documento XML de firma.
+     * @return Datos originalmente firmados.
+     * @throws es.gob.afirma.core.AOInvalidFormatException
+     *         Si no se ha introducido un fichero de firma v&aacute;lido o no
+     *         ha podido leerse la firma. */
+    public static byte[] getData(final Document signDocument) throws AOInvalidFormatException {
+
+        // Comprueba que sea una documento de firma valido
+        if (!isSign(signDocument)) {
+            throw new AOInvalidFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
+        }
+
         final Element rootSig;
         Element elementRes = null;
         try {
-
-            // Comprueba que sea una documento de firma valido
-            if (!isSign(sign)) {
-                throw new AOInvalidFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
-            }
-
             // Obtiene la raiz del documento de firmas
-            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            rootSig = signDocument.getDocumentElement();
 
             // Si es detached
             if (AOXAdESSigner.isDetached(rootSig)) {
@@ -624,16 +645,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                 elementRes = (Element) firstChild.getFirstChild();
             }
 
-            // Si es externally detached
-            else if (AOXAdESSigner.isExternallyDetached(rootSig)) {
-            	elementRes = null;
-            }
-
-            // Si es una firma de Manifest
-            else if (AOXAdESSigner.isManifestSignature(rootSig)) {
-            	elementRes = null;
-            }
-
             // Si es enveloped
             else if (AOXAdESSigner.isEnveloped(rootSig)) {
 
@@ -642,8 +653,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                 elementRes = rootSig;
             }
 
-            // Si es enveloping
-            else if (AOXAdESSigner.isEnveloping(rootSig)) {
+            // Si es enveloping y no es manifest (porque de estas ultimas no podemos extraer los datos)
+            else if (AOXAdESSigner.isEnveloping(rootSig) && !AOXAdESSigner.isManifestSignature(rootSig)) {
 
                 // Obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
@@ -677,7 +688,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         return Utils.writeXML(elementRes, null, null, null);
     }
 
-    private void removeEnvelopedSignatures(final Element rootSig) {
+    private static void removeEnvelopedSignatures(final Element rootSig) {
         // obtiene las firmas y las elimina
     	final NodeList mainChildNodes = rootSig.getChildNodes();
     	for (int i = 0; i < mainChildNodes.getLength(); i++) {
@@ -790,18 +801,46 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
-	public byte[] cosign(final byte[] sign,
+    public byte[] cosign(final byte[] sign,
+    		final String algorithm,
+    		final PrivateKey key,
+    		final Certificate[] certChain,
+    		final Properties extraParams) throws AOException {
+
+    	Document signDocument;
+    	try {
+    		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    		dbf.setNamespaceAware(true);
+    		signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    	}
+    	catch (final Exception e) {
+    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    	}
+
+    	final Properties newExtraParams = getExtraParams(extraParams);
+
+    	return cosign(signDocument, algorithm, key, certChain, newExtraParams);
+    }
+
+    /** Cofirma datos en formato XAdES.
+     * @param sign Documento con las firmas iniciales.
+     * @param algorithm Algoritmo a usar para la firma.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @return Cofirma en formato XAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+	private static byte[] cosign(final Document signDocument,
                          final String algorithm,
                          final PrivateKey key,
                          final Certificate[] certChain,
                          final Properties extraParams) throws AOException {
-	    	if (!isSign(sign)) {
-	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
-	    	}
 
-	    	final Properties newExtraParams = getExtraParams(extraParams);
+		if (!isSign(signDocument)) {
+			throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
+		}
 
-	    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, newExtraParams);
+		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
     }
 
     /** Contrafirma firmas en formato XAdES.
@@ -842,20 +881,53 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                               final PrivateKey key,
                               final Certificate[] certChain,
                               final Properties extraParams) throws AOException {
-	    	if (!isSign(sign)) {
+
+    	Document signDocument;
+    	try {
+    		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    		dbf.setNamespaceAware(true);
+    		signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    	}
+    	catch (final Exception e) {
+    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    	}
+
+    	final Properties newExtraParams = getExtraParams(extraParams);
+
+    	return countersign(signDocument, algorithm, targetType, targets, key, certChain, newExtraParams);
+    }
+
+    /** Contrafirma firmas en formato XAdES.
+     * @param sign Documento con las firmas iniciales.
+     * @param algorithm Algoritmo a usar para la firma.
+     * @param targetType Mecanismo de selecci&oacute;n de los nodos de firma que se deben
+     * contrafirmar.
+     * @param targets Listado de nodos o firmantes que se deben contrafirmar seg&uacute;n el
+     * {@code targetType} seleccionado.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @return Contrafirma en formato XAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+	private static byte[] countersign(final Document signDocument,
+                              final String algorithm,
+                              final CounterSignTarget targetType,
+                              final Object[] targets,
+                              final PrivateKey key,
+                              final Certificate[] certChain,
+                              final Properties extraParams) throws AOException {
+	    	if (!isSign(signDocument)) {
 	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
 	    	}
 
-	    	final Properties newExtraParams = getExtraParams(extraParams);
-
 	    	return XAdESCounterSigner.countersign(
-	    			sign,
+	    			signDocument,
 	    			algorithm,
 	    			targetType,
 	    			targets,
 	    			key,
 	    			certChain,
-	    			newExtraParams
+	    			extraParams
 	    			);
     }
 
@@ -863,11 +935,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
 			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException {
-	    	if (!isSign(sign)) {
-	    		throw new AOInvalidFormatException(
-    				"Los datos indicados no son una firma XAdES compatible" //$NON-NLS-1$
-			);
-	    	}
 
         // Obtenemos el arbol del documento
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -881,59 +948,89 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             return null;
         }
 
-        // Obtenemos todas las firmas del documento y el SignatureValue de cada
-        // una de ellas
-        final NodeList signatures = signDoc.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
+        return getSignersStructure(signDoc, asSimpleSignInfo);
+    }
 
-        // Mantendremos 3 listas: la de identificadores de firma, la de identificadores a las
-        // que referencia cada firma (cadena vacia salvo para las contrafirmas) y los objetos
-        // con los que representaremos cada uno de los nodos de firma.
-        final List<String> arrayIds = new ArrayList<>();
-        final List<String> arrayRef = new ArrayList<>();
-        final List<AOTreeNode> arrayNodes = new ArrayList<>();
+    /** Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
+     * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el <i>CommonName</i> (CN X.500)
+     * del titular del certificado u objetos de tipo <code>AOSimpleSignInfo</code> con la
+     * informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
+     * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
+     * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
+     * aparecen en la firma electr&oacute;nica.<br>
+     * La propia estructura de firma se considera el nodo ra&iacute;z, la firma y cofirmas
+     * pender&aacute;n directamentede de este.
+     * @param signDocument Documento XML de la firma de la que se desea obtener la estructura.
+     * @param asSimpleSignInfo
+     *        Si es <code>true</code> se devuelve un &aacute;rbol con la
+     *        informaci&oacute;n b&aacute;sica de cada firma individual
+     *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
+     *        titulares de los certificados.
+     * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error.
+     * @throws AOInvalidFormatException
+     *         Si no se ha introducido un fichero de firma v&aacute;lido del formato correspondiente. */
+    public static AOTreeModel getSignersStructure(final Document signDocument, final boolean asSimpleSignInfo)
+    		throws AOInvalidFormatException {
 
-        // Rellenamos cada las listas con los datos de las firmas del documento
-        for (int i = 0; i < signatures.getLength(); i++) {
-            final Element signature = (Element) signatures.item(i);
+    	if (!isSign(signDocument)) {
+    		throw new AOInvalidFormatException(
+    				"Los datos indicados no son una firma XAdES compatible" //$NON-NLS-1$
+    				);
+    	}
 
-            // Recogemos el identificador del nodo de firma
-            arrayIds.add(signature.getAttribute(ID_IDENTIFIER));
+    	// Obtenemos todas las firmas del documento y el SignatureValue de cada
+    	// una de ellas
+    	final NodeList signatures = signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
 
-            // Recogemos los objetos que identificaran a los nodos de firma
-            arrayNodes.add(
-        		new AOTreeNode(
-    				asSimpleSignInfo ?
-						Utils.getSimpleSignInfoNode(
-							XAdESUtil.guessXAdESNamespaceURL(
-								signDoc.getDocumentElement()
-							),
-                            signature
-                        ) :
-                        	Utils.getStringInfoNode(signature)
-            	)
-    		);
+    	// Mantendremos 3 listas: la de identificadores de firma, la de identificadores a las
+    	// que referencia cada firma (cadena vacia salvo para las contrafirmas) y los objetos
+    	// con los que representaremos cada uno de los nodos de firma.
+    	final List<String> arrayIds = new ArrayList<>();
+    	final List<String> arrayRef = new ArrayList<>();
+    	final List<AOTreeNode> arrayNodes = new ArrayList<>();
 
-            // Recogemos el identificador de la firma a la que se referencia (si
-            // no es contrafirma sera cadena vacia)
-            if (signature.getParentNode().getNodeName().equals(XADES_SIGNATURE_PREFIX + ":CounterSignature")) { //$NON-NLS-1$
-                arrayRef.add(Utils.getCounterSignerReferenceId(signature, signDoc.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue"))); //$NON-NLS-1$
-            }
-            else {
-                arrayRef.add(""); //$NON-NLS-1$
-            }
-        }
+    	// Rellenamos cada las listas con los datos de las firmas del documento
+    	for (int i = 0; i < signatures.getLength(); i++) {
+    		final Element signature = (Element) signatures.item(i);
 
-        // Se crea el que sera el nodo raiz del arbol
-        final AOTreeNode treeRoot = new AOTreeNode("Datos"); //$NON-NLS-1$
+    		// Recogemos el identificador del nodo de firma
+    		arrayIds.add(signature.getAttribute(ID_IDENTIFIER));
 
-        // Se crea el arbol componiendo las subrama de cada firma directa de los
-        // datos
-        for (int i = 0; i < arrayRef.size(); i++) {
-            if (arrayRef.get(i).equals("")) { //$NON-NLS-1$
-                treeRoot.add(generateSignsTree(i, signatures.getLength() - 1, arrayNodes, arrayIds, arrayRef)[i]);
-            }
-        }
-        return new AOTreeModel(treeRoot);
+    		// Recogemos los objetos que identificaran a los nodos de firma
+    		arrayNodes.add(
+    				new AOTreeNode(
+    						asSimpleSignInfo ?
+    								Utils.getSimpleSignInfoNode(
+    										XAdESUtil.guessXAdESNamespaceURL(
+    												signDocument.getDocumentElement()
+    												),
+    										signature
+    										) :
+    											Utils.getStringInfoNode(signature)
+    						)
+    				);
+
+    		// Recogemos el identificador de la firma a la que se referencia (si
+    		// no es contrafirma sera cadena vacia)
+    		if (signature.getParentNode().getNodeName().equals(XADES_SIGNATURE_PREFIX + ":CounterSignature")) { //$NON-NLS-1$
+    			arrayRef.add(Utils.getCounterSignerReferenceId(signature, signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue"))); //$NON-NLS-1$
+    		}
+    		else {
+    			arrayRef.add(""); //$NON-NLS-1$
+    		}
+    	}
+
+    	// Se crea el que sera el nodo raiz del arbol
+    	final AOTreeNode treeRoot = new AOTreeNode("Datos"); //$NON-NLS-1$
+
+    	// Se crea el arbol componiendo las subrama de cada firma directa de los
+    	// datos
+    	for (int i = 0; i < arrayRef.size(); i++) {
+    		if (arrayRef.get(i).equals("")) { //$NON-NLS-1$
+    			treeRoot.add(generateSignsTree(i, signatures.getLength() - 1, arrayNodes, arrayIds, arrayRef)[i]);
+    		}
+    	}
+    	return new AOTreeModel(treeRoot);
     }
 
     /** M&eacute;todo recursivo para la obtenci&oacute;n de la estructura de
@@ -944,7 +1041,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param arrayIds Array de identificadores
      * @param arrayRef Array de referencias
      * @return Array de objetos <code>TreeNode</code> */
-    private AOTreeNode[] generateSignsTree(final int i,
+    private static AOTreeNode[] generateSignsTree(final int i,
                                          final int j,
                                          final List<AOTreeNode> arrayNodes,
                                          final List<String> arrayIds,
@@ -982,23 +1079,38 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             return false;
         }
 
+        Document signDocument;
         try {
             // Carga el documento a validar
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
 
-            // JXades no captura un nodo de firma si se pasa este como raiz del
-            // arbol de firmas, asi
-            // que nos vemos obligados a crear un nodo padre, del que colgara
-            // todo el arbol de firmas,
-            // para que lo detecte correctamente
-            final Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        }
+        catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "No se pudo cargar el documento como XML", e); //$NON-NLS-1$
+            return false;
+        }
+        return isSign(signDocument);
+    }
 
+    public static boolean isSign(final Document signDocument) {
+
+        if (signDocument == null) {
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
+        }
+
+        try {
+            final Element rootNode = signDocument.getDocumentElement();
             final List<Node> signNodes = new ArrayList<>();
+
+            // Comprobamos si el nodo raiz es una firma
             if (rootNode.getLocalName().equals(SIGNATURE_NODE_NAME)) {
                 signNodes.add(rootNode);
             }
 
+            // Identificamos las firmas internas del XML
             final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
             for (int i = 0; i < signatures.getLength(); i++) {
             	// Omitimos las firmas extraidas de sellos de tiempo
@@ -1008,12 +1120,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             	}
             }
 
-            // Si no se encuentran firmas, no es un documento de firma
+            // Si no se encuentran firmas o si estas no son firmas XAdES, entonces este no sera
+            // un documento de firma XAdES
             if (signNodes.size() == 0 || !XAdESUtil.checkSignNodes(signNodes)) {
                 return false;
             }
         }
         catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "Error al analizar si el XML era una firma XAdES", e); //$NON-NLS-1$
             return false;
         }
         return true;
@@ -1066,40 +1180,57 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
-        if (!isSign(sign)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
-        }
-
-        final AOSignInfo signInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_XADES);
-
-        // Analizamos mas en profundidad la firma para obtener el resto de datos
-
         // Tomamos la raiz del documento
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Element rootSig = null;
+        Document signDocument;
         try {
-            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+        	signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$
-            rootSig = null;
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un documento XML", e); //$NON-NLS-1$
         }
 
+        return getSignInfo(signDocument);
+    }
+
+    /** Obtiene la informaci&oacute;n general de un objeto de firma. Ya que un objeto de
+     * firma puede contener muchas firmas, se considera informaci&oacute;n
+     * general la com&uacute;n que aplique a todo el objeto.
+     * @param signDocument
+     *        Firma XAdES que se desea analizar.
+     * @return Informaci&oacute;n sobre la firma electr&oacute;nica.
+     * @throws AOException
+     *         Ocurri&oacute; un error durante la recuperaci&oacute;n de los
+     *         datos. */
+    public static AOSignInfo getSignInfo(final Document signDocument) throws AOException {
+        if (signDocument == null) {
+            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
+        }
+
+        if (!isSign(signDocument)) {
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+        }
+
+        // Tomamos la raiz del documento
+        final Element rootSig = signDocument.getDocumentElement();
+
+        // Componemos el objeto con la informacion de firma
+        final AOSignInfo signInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_XADES);
+
         // Establecemos la variante de firma
-        if (rootSig != null) {
-            if (isDetached(rootSig)) {
-                signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-            }
-            else if (isExternallyDetached(rootSig)) {
-            	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
-            }
-            else if (isEnveloped(rootSig)) {
-                signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
-            }
-            else if (isEnveloping(rootSig)) {
-                signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
-            }
+        if (isDetached(rootSig)) {
+        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+        }
+        else if (isExternallyDetached(rootSig)) {
+        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+        }
+        else if (isEnveloped(rootSig)) {
+        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+        }
+        else if (isEnveloping(rootSig)) {
+        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
         }
 
         // Aqui vendria el analisis de la firma buscando alguno de los otros
