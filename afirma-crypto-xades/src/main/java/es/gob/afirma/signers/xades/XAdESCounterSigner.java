@@ -196,17 +196,15 @@ public final class XAdESCounterSigner {
 				XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
 
 		// Comprobacion del perfil de firma con la configuracion establecida
-		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
-			if (XMLConstants.URL_SHA1_RSA.equals(algoUri) || XMLConstants.URL_SHA1_ECDSA.equals(algoUri)) {
-				throw new IllegalArgumentException(
-						"Las firmas baseline no permiten el uso del algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
+				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			final String digestMethodAlgorithm = extraParams.getProperty(
 					XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
 			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
-				throw new IllegalArgumentException(
-						"Las firmas baseline no permiten generar referencias con el algoritmo SHA1"); //$NON-NLS-1$
+				LOGGER.warning("El algoritmo SHA1 no esta recomendado para generar referencias en las firmas baseline"); //$NON-NLS-1$
 			}
 		}
 
@@ -661,7 +659,7 @@ public final class XAdESCounterSigner {
 		// Agregamos el DataObjectFormats, salvo en firma baseline, en las que no
 		// se debe agregar a las contrafirmas: ETSI EN 319 132-1 V1.1.1 (2016-04)
 		// Apartado 6.3, aclaracion k)
-		if (!profile.equalsIgnoreCase(AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL)) {
+		if (!profile.equalsIgnoreCase(AOSignConstants.SIGN_PROFILE_BASELINE)) {
 			final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
 			final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
 			final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();

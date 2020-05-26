@@ -9,7 +9,6 @@
 
 package es.gob.afirma.signers.xades;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -35,10 +34,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x509.GeneralName;
-import org.spongycastle.asn1.x509.GeneralNames;
-import org.spongycastle.asn1.x509.IssuerSerial;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -46,7 +41,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.Utils;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
@@ -472,21 +466,32 @@ public final class XAdESUtil {
 		// establece el certificado
 		if (signingCertificate != null) {
 			if (xades instanceof XadesWithBaselineAttributes) {
-		        final GeneralNames gns = new GeneralNames(new GeneralName(
-		        		X500Name.getInstance(signingCertificate.getIssuerX500Principal().getEncoded())));
-		        final IssuerSerial issuerSerial = new IssuerSerial(gns, signingCertificate.getSerialNumber());
-		        final String issuerSerialB64;
-		        try {
-		        	issuerSerialB64 = Base64.encode(issuerSerial.getEncoded());
-		        }
-		        catch (final IOException e) {
-		        	throw new AOException("No se pudo codificar la informacion del certificado para las firmas baseline", e);
-				}
+
+				// El las firmas B-Level el signingCertificateV2 incluira solo el certificado
+				// de firma. Se proporciona un IssuerSerialV2 nulo para que no se incluya en
+				// el elemento, tal como se recomienda en el ETSI EN 319 132-1 V1.1.1,
+				// apartado 6.3, anotacion j).
+
+//		        final GeneralNames gns = new GeneralNames(new GeneralName(
+//		        		X500Name.getInstance(signingCertificate.getIssuerX500Principal().getEncoded())));
+//		        final IssuerSerial issuerSerial = new IssuerSerial(gns, signingCertificate.getSerialNumber());
+//		        final String issuerSerialB64;
+//		        try {
+//		        	issuerSerialB64 = Base64.encode(issuerSerial.getEncoded());
+//		        }
+//		        catch (final IOException e) {
+//		        	throw new AOException("No se pudo codificar la informacion del certificado para las firmas baseline", e);
+//				}
+//				SigningCertificateV2Info issuerInfo = new SigningCertificateV2Info(issuerSerialB64)
+				final SigningCertificateV2Info issuerInfo = null;
 				((XadesWithBaselineAttributes) xades).setSigningCertificateV2(
 						signingCertificate,
-						new SigningCertificateV2Info(issuerSerialB64));
+						issuerInfo);
 			}
 			else if (xades instanceof XadesWithBasicAttributes) {
+				// El las firmas BES/EPES el signingCertificate incluira el certificado de firma
+				// y la referencia al certificado del emisor (IssuerSerial), que sera creada por
+				// el propio JXAdES
 				((XadesWithBasicAttributes) xades).setSigningCertificate(signingCertificate);
 			}
 		}

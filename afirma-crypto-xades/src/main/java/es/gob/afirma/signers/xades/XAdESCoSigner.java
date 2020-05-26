@@ -196,15 +196,13 @@ public final class XAdESCoSigner {
 		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
 
 		// Comprobacion del perfil de firma con la configuracion establecida
-		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
-				if (XMLConstants.URL_SHA1_RSA.equals(algoUri) || XMLConstants.URL_SHA1_ECDSA.equals(algoUri)) {
-					throw new IllegalArgumentException(
-							"Las firmas baseline no permiten el uso del algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+				if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
+					LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
-					throw new IllegalArgumentException(
-							"Las firmas baseline no permiten generar referencias con el algoritmo SHA1"); //$NON-NLS-1$
+					LOGGER.warning("El algoritmo SHA1 no esta recomendado para generar referencias en las firmas baseline"); //$NON-NLS-1$
 				}
 		}
 

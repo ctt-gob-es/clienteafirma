@@ -98,7 +98,7 @@ public final class XAdESExtraParams {
     public static final String FORMAT = "format";//$NON-NLS-1$
 
     /**
-     * Perfil de firma XAdES que se desea generar.
+     * Perfil de firma que se desea generar.
      */
 	public static final String PROFILE = "profile"; //$NON-NLS-1$
 
