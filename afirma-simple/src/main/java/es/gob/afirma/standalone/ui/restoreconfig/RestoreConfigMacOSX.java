@@ -365,7 +365,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	/** Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple.
 	 * @param appDir Directorio de aplicaci&oacute;n.
-	 * @param workingDir Directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
 	 * @param rootCertFile Certificado ra&iacute;z a instalar.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso.
@@ -444,8 +443,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de Apple en el
 	 * <i>script</i> de instalaci&oacute;n.
 	 * @param appDir Directorio de la aplicaci&oacute;n, donde est&aacute; el certificado.
-	 * @param workingDir Directorio actual de trabajo.
-	 * @param appDir Directorio de aplicaci&oacute;n.
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException, IOException {
@@ -681,7 +678,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	}
 
 	/**
-	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
+	 * Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
 	 * @param appDir Directorio en donde se encontran los certificados.
 	 * @throws IOException Si hay problemas borrando los ficheros. */

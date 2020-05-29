@@ -173,7 +173,7 @@ public class PluginsManager {
 	/**
 	 * Guarda el listado de plugins en el fichero de plugins instalados.
 	 * @param relationsFile Fichero de plugins instalados.
-	 * @param infos Listado de plugins cargados.
+	 * @param plugins Listado de plugins cargados.
 	 * @throws IOException Cuando ocurre un error al guardar el listado de plugins.
 	 */
 	private static void savePluginsList(final File relationsFile, final List<AfirmaPlugin> plugins)

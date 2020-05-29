@@ -68,10 +68,11 @@ public class FileIconProvider {
 
 	/**
 	 * Devuelve el ic&oacute;no de fichero gen&eacute;rico.
+	 * @param iconName Nombre del fichero de icono.
 	 * @return Imagen del icono o {@code null} si no se pudo cargar.
 	 * @throws IOException Cuando ocurre alghun error durante la carga de la imagen.
 	 */
-	private static BufferedImage loadIconImage(String iconName) throws IOException {
+	private static BufferedImage loadIconImage(final String iconName) throws IOException {
     	BufferedImage iconImage;
     	try (InputStream is = ClassLoader.getSystemResourceAsStream("resources/file_icons/" + iconName)) { //$NON-NLS-1$
     		iconImage = ImageIO.read(is);

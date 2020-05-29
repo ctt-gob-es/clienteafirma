@@ -113,7 +113,7 @@ public final class SignOperationConfig {
 	}
 
 	/** Establece la informaci&oacute;n de validaci&oacute;n de la firma.
-	 * @param signValidity Resultado de la validaci&&oacute;n de la firma. */
+	 * @param signValidity Resultado de la validaci&oacute;n de la firma. */
 	public void setSignValidity(final SignValidity signValidity) {
 		this.signValidity = signValidity;
 	}

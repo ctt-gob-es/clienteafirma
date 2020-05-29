@@ -326,10 +326,10 @@ public class ProxyPanelHandler {
 		}
 	}
 
-	/** Test de connexi&oacute;n de red.
-	 * @param addr Direcci&oacute;n del proxy.
+	/** Prueba de connexi&oacute;n de red a trav&eacute;s de un hilo de ejecuci&oacute;n.
+	 * @param host Direcci&oacute;n del proxy.
 	 * @param port Puerto al que conectarse.
-	 * @return estado de la conexi&oacute;n: <code>true</code> si la conexi&oacute;n es correcta y <code>false</code> en caso contrario.*/
+	 */
 	private void checkConnection(final String host, final String port) {
 		new CheckConnectionThread(this.view, host, port).start();
 	}

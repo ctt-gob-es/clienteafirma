@@ -375,6 +375,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
      * @param algorithm Algoritmo de firma.
      * @param pke Referencia al certificado y clave de firma.
      * @param extraParams Configuraci&oacute;n de firma.
+     * @param onlyOneFile {@code true} si s&oacute;lo se carga un fichero en el panel,
+     * {@code false} si se carga m&aacute;s de uno.
+     * @param parent Componente padre.
      * @return Firma electr&oacute;nica generada.
      * @throws AOException Cuando se produce un error relacionado a la generaci&oacute;n del formato de firma.
      * @throws IOException Cuando se produce un error relacionado a la lectura de los datos a firmar.
@@ -650,6 +653,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     /** Guarda datos en un directorio con un nombre concreto.
 	 * @param data Datos a guardar.
 	 * @param defaultOutFile Fichero de salida por defecto.
+	 * @param overwrite Si se permite sobreescribir el fichero de salida.
 	 * @return Fichero en el que se guardan los datos.
 	 * @throws IOException Cuando se produce un error durante el guardado. */
 	private static File saveDataToFile(final byte[] data, final File defaultOutFile, final boolean overwrite) throws IOException {
@@ -679,6 +683,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
 
 	/** Muestra un di&aacute;logo con un mensaje de error.
+	 * @param parent Componente padre.
      * @param message Mensaje de error. */
     static void showErrorMessage(final Component parent, final String message) {
 		AOUIFactory.showErrorMessage(
@@ -691,7 +696,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
     /** Muestra un di&aacute;logo para indicar al usuario que se ha encontrado una dificultad durante
      * la operaci&oacute;n y consultarle si desea continuar o no con ella.
-     * @param message Mensaje de advertencia. */
+     * @param parent Componente padre.
+     * @param message Mensaje de advertencia.
+     * @return Si el usuario acepto el di&aacute;logo.
+     */
     static boolean showConfirmRequest(final Component parent, final String message) {
 		final int response = AOUIFactory.showConfirmDialog(
 			parent,

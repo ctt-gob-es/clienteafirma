@@ -483,12 +483,19 @@ public final class MainMenu extends JMenuBar {
      * de men&uacute; del sistema operativo.
      * @param event Evento que desencadena la acci&oacute;n.
      * @param response Respuesta que se debe devolver.
+     * @return {@code true} si se acepta salir de la aplicaci&oacute;n, {@code false} en
+     * caso contrario.
      */
-    @SuppressWarnings("unused")
 	boolean exitApplication(final EventObject event, final Object response) {
     	return this.saf.askForClosing();
     }
 
+	/**
+     * M&eacute;todo para salir de la aplicaci&oacute;n mediante la opci&oacute;n
+     * de men&uacute; del sistema operativo.
+     * @return {@code true} si se acepta salir de la aplicaci&oacute;n, {@code false} en
+     * caso contrario.
+     */
     boolean exitApplication() {
         return this.saf.askForClosing();
     }

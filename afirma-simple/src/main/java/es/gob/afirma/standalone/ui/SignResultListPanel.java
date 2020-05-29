@@ -85,10 +85,9 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
 	}
 
 	/** Agrega el contenido gr&aacute;fico al panel.
-     * @param signature Firma creada.
-     * @param sigPath Ruta del fichero firmado.
-     * @param signingCert Certificado usado para firmar.
-     * @param signValidity Validez de la firma. */
+     * @param signConfigList Listado de operaci&oacute;nes de firma a realizar.
+     * @param outDir Directorio de salida.
+     * @param signingCert Certificado usado para firmar. */
     private void createUI(final List<SignOperationConfig> signConfigList, final File outDir,
                           final X509Certificate signingCert) {
 
@@ -189,7 +188,7 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
 			button.getGraphicButton().addActionListener(new PluginButtonActionListener(
 					this,
 					this.currentSigningCert,
-					(SignatureProcessAction) button.getButton().getAction()));
+					button.getButton().getAction()));
     	}
 
     	EventQueue.invokeLater(() -> {

@@ -126,8 +126,8 @@ public final class ProxyUtil {
 
     /**
      * Obtiene la configuracion actualmente seleccionada (que puede no ser la guardada) del proxy.
-     * @param proxyType
-     * @return
+     * @param proxyType Tipo de configuraci&oacute;n de proxy.
+     * @return Selector de proxy a utilizar.
      */
     private static ProxySelector getProxySelector(final ProxyConfig.ConfigType proxyType) {
 
@@ -297,6 +297,7 @@ public final class ProxyUtil {
 	 * Establece la logica de autenticaci&oacute;n frente al proxy del sistema.
 	 * @param user Usuario del proxy.
 	 * @param pwd Contrase&ntilde;a del proxy.
+	 * @return Objeto para la autenticaci&oacute;n del proxy.
 	 */
 	private static Authenticator getPasswordAuthentication(final String user, final char[] pwd) {
 		return new Authenticator() {

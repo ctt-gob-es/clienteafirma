@@ -155,7 +155,7 @@ public final class AfirmaWebSocketServer extends WebSocketServer {
 	}
 
 	/** Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.
-	 * @param protocolId Identificador de la versi&oacute;n del protocolo.
+	 * @param version Identificador de la versi&oacute;n del protocolo.
 	 * @throws UnsupportedProtocolException Cuando la versi&oacute;n de protocolo utilizada no se encuentra
 	 *                                      entre las soportadas. */
 	private static void checkSupportProtocol(final int version) throws UnsupportedProtocolException {

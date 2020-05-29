@@ -47,7 +47,8 @@ final class Pdf2ImagesConverter {
 	 * necesitar del PDF. Estas son las primeras, las &uacute;ltimas y las del entorno
 	 * de la p&aacute;gina actual.
 	 * @param inPdf Documento PDF.
-	 * @return Listado de imagenes.
+	 * @param currentPage P&aacute;gina mostrada actualmente.
+	 * @return Listado de im&aacute;genes.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
 	 * la generaci&oacute;n de las im&aacute;genes.
 	 */

@@ -61,6 +61,7 @@ public class IntermediateServerUtil {
 	/** Recupera datos del servidor intermedio.
 	 * @param retrieveServiceUrl URL del servicio de recuperaci&oacute;n.
 	 * @param id Identificador a asignar a los datos a subir al servidor.
+	 * @return Datos recuperados.
 	 * @throws IOException Si hay problemas recuperando los datos. */
 	public static byte[] retrieveData(final String retrieveServiceUrl, final String id) throws IOException {
 		final StringBuilder url = new StringBuilder(retrieveServiceUrl)
@@ -73,6 +74,7 @@ public class IntermediateServerUtil {
 
 	/** Env&iacute;a datos al servidor intermedio.
 	 * @param url URL del servicio de guardado.
+	 * @return Respuesta del env&iacute;o.
 	 * @throws IOException Si hay problemas durante el env&iacute;o. */
 	private static byte[] send(final StringBuilder url) throws IOException {
 

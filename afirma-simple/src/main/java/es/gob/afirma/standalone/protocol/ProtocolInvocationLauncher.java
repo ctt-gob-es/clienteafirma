@@ -753,6 +753,7 @@ public final class ProtocolInvocationLauncher {
 
 	/**
 	 * Parsea la cadena con la versi&oacute;n del protocolo de comunicacion solicitada.
+	 * @param version Declarada del protocolo.
 	 * @return Version de protocolo o {@code 1} si no era una cadena v&aacute;lida.
 	 */
 	private static int parseProtocolVersion(final String version) {

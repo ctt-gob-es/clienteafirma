@@ -330,7 +330,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 	/**
 	 * Muestra al usuario la informaci&oacute;n de un plugin.
-	 * @param info
+	 * @param info Informaci&oacute;n del plugin.
 	 */
 	void showPluginDetails(final PluginInfo info) {
 

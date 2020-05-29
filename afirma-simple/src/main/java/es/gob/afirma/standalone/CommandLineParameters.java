@@ -265,7 +265,7 @@ final class CommandLineParameters {
 	}
 
 	/** Recupera la contrase&ntilde;a configurada para acceder al almac&eacute;n de claves.
-	 * @return Contrase&ntilde;a del almac&eacuten o {@code null} si no se configur&oacute;.
+	 * @return Contrase&ntilde;a del almac&eacute;n o {@code null} si no se configur&oacute;.
 	 */
 	public String getPassword() {
 		return this.password;

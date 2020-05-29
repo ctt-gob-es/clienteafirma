@@ -508,7 +508,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 }
 		 }
 
-		 // Si los datos seleccionados son una firma para segun el firmador con el que se vaya
+		 // Si los datos seleccionados son considerados firma por el firmador con el que se vaya
 		 // a utilizar, se validan con el
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());

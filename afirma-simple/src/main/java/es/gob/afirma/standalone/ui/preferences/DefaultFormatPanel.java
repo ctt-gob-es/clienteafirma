@@ -189,7 +189,7 @@ class DefaultFormatPanel extends JPanel {
 	}
 
 	/**
-	 * Establece que aparezcan bloqueados las opciones de este di&aacute:logo.
+	 * Establece que aparezcan bloqueados las opciones de este di&aacute;logo.
 	 * @param blocked {@code true} para que aparezcan bloqueadas las opciones del
 	 * di&aacute;logo, {@code false} en caso contrario.
 	 */

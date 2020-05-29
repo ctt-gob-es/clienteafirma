@@ -989,7 +989,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Comprueba que la versi&oacute;n de Java ejecutada sea compatible. Si no lo es y se encuentra
 	 * configurado el que se compruebe, se mostrar&aacute; una advertencia al usuario. Si no lo es y
-	 * se encuentra configurado que se advierta, se mostrar&aacute;a un mensaje al usuario.<br/>
+	 * se encuentra configurado que se advierta, se mostrar&aacute;a un mensaje al usuario.<br>
 	 * En caso de ser compatible la versi&oacute;n, si se configur&oacute; anteriormente que no se
 	 * volviera a mostrar la advertencia, se modificar&aacute; esto para que si se muestre cuando vuelva
 	 * a ser no compatible.

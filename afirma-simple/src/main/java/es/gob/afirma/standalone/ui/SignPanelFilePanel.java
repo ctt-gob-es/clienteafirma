@@ -131,7 +131,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 
     /**
      * Indica si el fichero es un ejecutable en base a la extensi&oacute;n de su nombre.
-     * @param file Fichero.
+     * @param ext Extensi&oacute;n de fichero.
      * @return {@code true} si el nombre del fichero tiene extensi&oacute;nde ejecutable,
      * {@code false} en caso contrario.
      */

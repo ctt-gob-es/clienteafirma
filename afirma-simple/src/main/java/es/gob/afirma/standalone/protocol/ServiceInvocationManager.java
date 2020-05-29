@@ -103,6 +103,7 @@ public final class ServiceInvocationManager {
 
 	/** Inicia el servicio. Se intenta establecer un <code>socket</code> que escuche en el puerto pasado por la URL.
 	 * @param url URL (debe indicarse el puerto).
+	 * @param protocolVersion Versi&oacute;n declarada del protocolo.
 	 * @throws UnsupportedProtocolException Si no se soporta el protocolo o la versi&oacute;n de este. */
 	static void startService(final String url, final int protocolVersion) throws UnsupportedProtocolException {
 
@@ -260,7 +261,7 @@ public final class ServiceInvocationManager {
 	}
 
 	/** Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.
-	 * @param protocolId Identificador de la versi&oacute;n del protocolo.
+	 * @param protocolVersion Identificador de la versi&oacute;n del protocolo.
 	 * @throws UnsupportedProtocolException Cuando la versi&oacute;n de protocolo utilizada no se encuentra
 	 *                                      entre las soportadas. */
 	private static void checkSupportProtocol(final int protocolVersion) throws UnsupportedProtocolException {

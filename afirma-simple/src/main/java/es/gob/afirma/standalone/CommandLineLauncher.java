@@ -366,9 +366,10 @@ final class CommandLineLauncher {
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @return Mensaje con el resultado de la operaci&oacute;n.
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
-	 * @throws IOException
-	 * @throws AOException */
-	private static String signByCommandLine(final CommandLineCommand command, final CommandLineParameters params) throws CommandLineException, IOException, AOException {
+	 * @throws IOException Cuando no se puede imprimir texto en la l&iacute;nea de comandos.
+	 * @throws AOException Cuando falla la operaci&oacute;n de firma. */
+	private static String signByCommandLine(final CommandLineCommand command, final CommandLineParameters params)
+			throws CommandLineException, IOException, AOException {
 
 		if (params.getInputFile() == null) {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$

@@ -223,7 +223,7 @@ final class ExtraParamsHelper {
 
 	/**
 	 * Agrega a la configuraci&oacute;n de firma la opci&oacute;n para permitir firmar documentos certificados.
-	 * @param extraParams Configuraci&oaucte;n a la que agregar la opci&oacute;n.
+	 * @param extraParams Configuraci&oacute;n a la que agregar la opci&oacute;n.
 	 */
 	public static void addParamToCertifiedPdf(final Properties extraParams) {
 		extraParams.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, Boolean.TRUE.toString());
@@ -232,7 +232,7 @@ final class ExtraParamsHelper {
 	/**
 	 * Agrega a la configuraci&oacute;n de firma la opci&oacute;n para permitir firmar documentos con
 	 * firmas previas no registradas.
-	 * @param extraParams Configuraci&oaucte;n a la que agregar la opci&oacute;n.
+	 * @param extraParams Configuraci&oacute;n a la que agregar la opci&oacute;n.
 	 */
 	public static void addParamToUnregisteredPdf(final Properties extraParams) {
 		extraParams.setProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES, Boolean.TRUE.toString());
