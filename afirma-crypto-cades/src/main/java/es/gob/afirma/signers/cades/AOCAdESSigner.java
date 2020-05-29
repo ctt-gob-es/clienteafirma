@@ -11,31 +11,24 @@ package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 import es.gob.afirma.signers.pkcs7.SCChecker;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
@@ -78,8 +71,7 @@ public final class AOCAdESSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    @SuppressWarnings("nls")
-	@Override
+    @Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKey key,
@@ -92,123 +84,25 @@ public final class AOCAdESSigner implements AOSigner {
     	    throw new IllegalArgumentException("La cadena de certificados debe contener al menos un elemento"); //$NON-NLS-1$
     	}
 
-    	checkAlgorithm(algorithm);
+        final Properties extraParams = getExtraParams(xParams);
+
+    	checkAlgorithm(algorithm, extraParams);
 
     	new SCChecker().checkSpongyCastle();
 
-    	//****************************************************************************************************
-    	//*************** LECTURA PARAMETROS ADICIONALES *****************************************************
+    	noticeIncompatibleConfig(algorithm, extraParams);
 
-        final Properties extraParams = getExtraParams(xParams);
-
-        // Forzado del SigningCertificateV2
-        final boolean signingCertificateV2;
-        if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
-        	signingCertificateV2 = true;
-        	if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
-        		LOGGER.warning("Se ignorara la propiedad '" + CAdESExtraParams.SIGNING_CERTIFICATE_V2 + //$NON-NLS-1$
-        				"' porque las firmas SHA2 siempre usan SigningCertificateV2"); //$NON-NLS-1$
-        	}
-        }
-        else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
-       		signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
-        }
-        else {
-        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
-        }
-
-        // Algoritmo usado cuando se proporciona la huella digital precalculada
-        final String precalculatedDigestAlgorithmName = extraParams.getProperty(CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
-        final String mode = extraParams.getProperty(CAdESExtraParams.MODE, AOSignConstants.DEFAULT_SIGN_MODE);
-
-        if (precalculatedDigestAlgorithmName != null && extraParams.containsKey(CAdESExtraParams.MODE)) {
-        	LOGGER.warning("Se ignorara el parametro '" + CAdESExtraParams.MODE + //$NON-NLS-1$
-        			"' por haberse proporcionado tambien el parametro '" + CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM + //$NON-NLS-1$
-        			"'. La firma sera explicita."); //$NON-NLS-1$
-        }
-
-        boolean omitContent = false;
-        if (AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(mode) || precalculatedDigestAlgorithmName != null) {
-            omitContent = true;
-        }
-
-        final String contentTypeOid = extraParams.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
-        final String contentDescription = extraParams.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION);
-
-        final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
-    		extraParams.getProperty(
-				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()
-			)
-		);
-
-        String[] claimedRoles = null;
-        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
-
-        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
-        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
-        }
-
-    	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
-    	//****************************************************************************************************
-
-        final byte[] dataDigest;
-        final String digestAlgorithmName;
-        if (precalculatedDigestAlgorithmName != null) {
-        	digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(precalculatedDigestAlgorithmName);
-            dataDigest = data;
-        }
-        else {
-        	digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(algorithm);
-            try {
-				dataDigest = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(data);
-			}
-            catch (final NoSuchAlgorithmException e) {
-				throw new AOException("Algoritmo no soportado: " + e, e); //$NON-NLS-1$
-			}
-        }
-
-        String altContentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-        String altContentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+    	// Determinamos la configuracion de la firma a partir de los datos introducidos,
+    	// el algoritmo y los parametros adicionales
+        final CAdESParameters cadesConfig = CAdESParameters.load(data, algorithm, extraParams);
 
         final byte[] cadesSignedData;
-
         try {
-
-			if (data != null && (contentTypeOid == null || contentDescription == null)) {
-				try {
-					final MimeHelper mimeHelper = new MimeHelper(data);
-					altContentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-					altContentDescription = mimeHelper.getDescription();
-				}
-				catch (final Exception e) {
-					LOGGER.warning(
-						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e //$NON-NLS-1$
-					);
-				}
-			}
-
 			cadesSignedData = GenCAdESEPESSignedData.generateSignedData(
-				   new P7ContentSignerParameters(
-					   precalculatedDigestAlgorithmName != null ? null : data,
-			    	   algorithm
-				   ),
-                   omitContent,
-                   AdESPolicy.buildAdESPolicy(extraParams),
-                   signingCertificateV2,
-                   key,
-                   Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain,
-                   dataDigest,
-                   digestAlgorithmName,
-                   Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                   Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.PADES_MODE, Boolean.FALSE.toString())),
-                   contentTypeOid != null ? contentTypeOid : altContentTypeOid,
-                   contentDescription != null ? contentDescription : altContentDescription,
-                   CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                   claimedRoles,
-                   CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                   doNotIncludePolicyOnSigningCertificate,
-                   extraParams
-            );
+					algorithm,
+					key,
+					certChain,
+					cadesConfig);
         }
         catch (final Exception e) {
         	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
@@ -266,7 +160,8 @@ public final class AOCAdESSigner implements AOSigner {
      * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
      * @param algorithm Algoritmo a usar para la firma.
      * @param key Clave privada a usar para firmar.
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @param certChain Cadena de certificaci&oacute;n del certificado de firma.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Firma CAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
      * @throws IOException Si hay problemas en el tratamiento de datos. */
@@ -278,11 +173,12 @@ public final class AOCAdESSigner implements AOSigner {
                          final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException, IOException {
 
-    	checkAlgorithm(algorithm);
-
-    	new SCChecker().checkSpongyCastle();
 
     	final Properties extraParams = getExtraParams(xParams);
+
+    	checkAlgorithm(algorithm, extraParams);
+
+    	new SCChecker().checkSpongyCastle();
 
         try {
 			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
@@ -339,8 +235,9 @@ public final class AOCAdESSigner implements AOSigner {
      * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
      * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
      * @param algorithm Algoritmo a usar para la firma.
-     * @param key Clave privada a usar para firmar
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificaci&oacute;n del certificado de firma.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -348,9 +245,11 @@ public final class AOCAdESSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties extraParams) throws AOException {
+                         final Properties xParams) throws AOException {
 
-    	checkAlgorithm(algorithm);
+    	final Properties extraParams = getExtraParams(xParams);
+
+    	checkAlgorithm(algorithm, extraParams);
 
     	new SCChecker().checkSpongyCastle();
 
@@ -399,8 +298,9 @@ public final class AOCAdESSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * @param targetType Tipo de objetivo de la contrafirma
      * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma
-     * @param key Clave privada a usar para firmar
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificaci&oacute;n del certificado de firma.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Contrafirma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -410,9 +310,11 @@ public final class AOCAdESSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKey key,
                               final java.security.cert.Certificate[] certChain,
-                              final Properties extraParams) throws AOException {
+                              final Properties xParams) throws AOException {
 
-    	checkAlgorithm(algorithm);
+    	final Properties extraParams = getExtraParams(xParams);
+
+    	checkAlgorithm(algorithm, extraParams);
 
     	new SCChecker().checkSpongyCastle();
 
@@ -564,13 +466,22 @@ public final class AOCAdESSigner implements AOSigner {
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_CADES);
     }
 
-    private static void checkAlgorithm(final String algorithm) throws AOException {
+    private static void checkAlgorithm(final String algorithm, final Properties extraParams) throws AOException {
     	if (algorithm == null) {
     		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
     	}
     	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
     		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
     	}
+
+    	final String profile = extraParams.getProperty(CAdESExtraParams.PROFILE);
+
+		// Comprobacion del perfil de firma con la configuracion establecida
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
+				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
     }
 
     private static Properties getExtraParams(final Properties extraParams) {
@@ -578,5 +489,29 @@ public final class AOCAdESSigner implements AOSigner {
     			(Properties) extraParams.clone() : new Properties();
 
     	return newExtraParams;
+    }
+
+    /**
+     * Informa a traves de mensajes de consola si se han establecido par&aacute;metros de
+     * configuraci&oacute;n que se ignoraran por ser incompatibles.
+     * @param algorithm Algoritmo de firma.
+     * @param extraParams Configuracion establecida.
+     */
+    private static void noticeIncompatibleConfig(final String algorithm, final Properties extraParams) {
+
+        if (extraParams != null && extraParams.containsKey(CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM) &&
+        		extraParams.containsKey(CAdESExtraParams.MODE)) {
+        	LOGGER.warning("Se ignorara el parametro '" + CAdESExtraParams.MODE + //$NON-NLS-1$
+        			"' por haberse proporcionado tambien el parametro '" + CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM + //$NON-NLS-1$
+        			"'. La firma sera explicita."); //$NON-NLS-1$
+        	extraParams.remove(CAdESExtraParams.MODE);
+        }
+
+ 	   if (algorithm != null && extraParams != null && AOSignConstants.isSHA2SignatureAlgorithm(algorithm) &&
+ 			   extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
+		   LOGGER.warning("Se ignorara la propiedad '" + CAdESExtraParams.SIGNING_CERTIFICATE_V2 + //$NON-NLS-1$
+				   "' porque las firmas SHA2 siempre usan SigningCertificateV2"); //$NON-NLS-1$
+		   extraParams.remove(CAdESExtraParams.SIGNING_CERTIFICATE_V2);
+	   }
     }
 }

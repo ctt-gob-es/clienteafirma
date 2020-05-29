@@ -44,7 +44,6 @@ import org.spongycastle.cms.CMSProcessableByteArray;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -143,42 +142,16 @@ public final class CAdESTriPhaseSigner {
     }
 
     /** Genera los atributos firmados CAdES (prefirma).
-     * @param digestAlgorithmName Algoritmo de huella digital
-     * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
      * @param signerCertificateChain Cadena de certificados del firmante
-     * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
-     * @param dataDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
-     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo. Este atributo nunca se incluye en el modo PAdES.
-     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
-     * @param contentType Tipo de contenido definido por su OID.
-     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
-     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-     * @param claimedRoles Roles declarados por el usuario.
-     * @param csm Metadatos sobre el firmante.
-     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
-     * @return Atributos CAdES a firmar (prefirma) en formato ASN.1.
+     * @param config Configuraci&oacute;n con el detalle de la firma a montar.
+     * @return Atributos CAdES a firmar (prefirma) codificados en ASN.1.
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
-    public static byte[] preSign(final String digestAlgorithmName,
-                          final byte[] content,
-                          final Certificate[] signerCertificateChain,
-                          final AdESPolicy policy,
-                          final boolean signingCertificateV2,
-                          final byte[] dataDigest,
-                          final Date signDate,
-                          final boolean includeSigningTimeAttribute,
-                          final boolean padesMode,
-                          final String contentType,
-                          final String contentDescription,
-                          final List<CommitmentTypeIndicationBean> ctis,
-                          final String[] claimedRoles,
-                          final CAdESSignerMetadata csm,
-                          final boolean doNotIncludePolicyOnSigningCertificate) throws AOException {
+    public static byte[] preSign(
+    		final Certificate[] signerCertificateChain,
+    		final Date signDate,
+    		final CAdESParameters config
+                          ) throws AOException {
 
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
@@ -187,33 +160,22 @@ public final class CAdESTriPhaseSigner {
         // Atributos firmados
         final ASN1Set signedAttributes;
         try {
-            signedAttributes = SigUtils.getAttributeSet(
-               new AttributeTable(
-                  CAdESUtils.generateSignerInfo(
-                     signerCertificateChain[0],
-                     digestAlgorithmName,
-                     content,
-                     policy,
-                     signingCertificateV2,
-                     dataDigest,
-                     signDate,
-                     includeSigningTimeAttribute,
-                     padesMode,
-                     contentType,
-                     contentDescription,
-                     ctis,
-                     claimedRoles,
-                     csm,
-                     false,  // No es contrafirma
-                     doNotIncludePolicyOnSigningCertificate
-                  )
-               )
-            );
+        	final ASN1EncodableVector signedAttributesVector =
+        			CAdESUtils.generateSignedAttributes(
+        					signerCertificateChain[0],
+        					config,
+        					false  // No es contrafirma
+        					);
+
+        	signedAttributes = SigUtils.getAttributeSet(
+                    new AttributeTable(signedAttributesVector)
+                 );
         }
         catch(final Exception e) {
             throw new AOException("Error obteniendo los atributos a firmar: " + e, e); //$NON-NLS-1$
         }
 
+        // Codificamos y devolvemos la prefirma
         try {
             return signedAttributes.getEncoded(ASN1Encoding.DER);
         }
@@ -227,14 +189,14 @@ public final class CAdESTriPhaseSigner {
      * @param signatureAlgorithm Algoritmo de firma electr&oacute;nica.
      * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma).
      * @param signerCertificateChain Cadena de certificados del firmante.
-     * @param signature Firma PKCS#1 v1.5 de los atributos firmados.
+     * @param signatureValue Firma PKCS#1 v1.5 de los atributos firmados.
      * @param signedAttributes Atributos firmados (prefirma).
      * @return Firma CAdES completa.
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] postSign(final String signatureAlgorithm,
                                   final byte[] content,
                                   final Certificate[] signerCertificateChain,
-                                  final byte[] signature,
+                                  final byte[] signatureValue,
                                   final byte[] signedAttributes) throws AOException {
 
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
@@ -288,7 +250,7 @@ public final class CAdESTriPhaseSigner {
         }
 
         // Firma PKCS#1 codificada
-        final ASN1OctetString encodedPKCS1Signature = new DEROctetString(signature);
+        final ASN1OctetString encodedPKCS1Signature = new DEROctetString(signatureValue);
 
         // Atributos firmados
         final ASN1Set asn1SignedAttributes;

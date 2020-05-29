@@ -13,26 +13,19 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
-import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cades.CAdESExtraParams;
-import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
-import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
+import es.gob.afirma.signers.cades.CAdESParameters;
 
 /** Contrafirmador CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
-    private static final String SHA1_ALGORITHM = "SHA1"; //$NON-NLS-1$
 	private final AOSimpleSigner ss;
 	private final Date date;
 
@@ -69,65 +62,25 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                     final Properties xParams) throws AOException,
                                                                      IOException {
 
-        final Properties extraParams = xParams != null ? xParams : new Properties();
+        final Properties extraParams = getExtraParams(xParams);
 
-        // Control general para todo el metodo de la inclusion de la cadena completa o solo el certificado del firmante
-		final java.security.cert.Certificate[] certChain = Boolean.parseBoolean(
-			extraParams.getProperty(
-				CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE,
-				Boolean.FALSE.toString()
-			)
-		) ? new X509Certificate[] { (X509Certificate) cChain[0] } : cChain;
+        final CAdESParameters config = CAdESParameters.load(null, algorithm, extraParams);
 
-        boolean signingCertificateV2;
-        if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
-        	signingCertificateV2 = true;
-        	if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
-        		LOGGER.warning("Se ignorara la propiedad '" + CAdESExtraParams.SIGNING_CERTIFICATE_V2 + //$NON-NLS-1$
-        				"' porque las firmas SHA2 siempre usan SigningCertificateV2"); //$NON-NLS-1$
-        	}
+        // Si se indico que debia generarse la contrafirma con una fecha
+        // concreta, la usamos
+        if (this.date != null) {
+        	config.setSigningTime(this.date);
         }
-        else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
-        	signingCertificateV2 = Boolean.parseBoolean(
-    			extraParams.getProperty(
-					CAdESExtraParams.SIGNING_CERTIFICATE_V2
-				)
-			);
-        }
-        else {
-        	signingCertificateV2 = !SHA1_ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
-        }
-
-        final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
-    		extraParams.getProperty(
-				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()
-			)
-		);
-
-        String[] claimedRoles = null;
-        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
-        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
-        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
-        }
-
-    	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
-    	//****************************************************************************************************
-
 
         // Creamos el contrafirmador
-        final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner();
-
-        // Le asignamos el firmador PKCS#1 a medida y la fecha prefijada si procede
-        if (this.ss != null) {
-        	cadesCountersigner.setPkcs1Signer(this.ss, this.date);
-        }
+        final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner(this.ss);
 
         // Ya no se soportan la contrafirma de nodos y de firmantes
         if (targetType == CounterSignTarget.NODES || targetType == CounterSignTarget.SIGNERS) {
             throw new AOException("No se soporta la firma de nodos individuales"); //$NON-NLS-1$
         }
 
-     // CASO DE CONTRAFIRMA DE ARBOL U HOJAS (Por defecto)
+        // CASO DE CONTRAFIRMA DE ARBOL U HOJAS (Por defecto)
         byte[] dataSigned = null;
         try {
         	dataSigned = cadesCountersigner.counterSign(
@@ -135,29 +88,24 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         			sign,
         			targetType != null ? targetType : CounterSignTarget.LEAFS,
 					key,
-					certChain,
-					AdESPolicy.buildAdESPolicy(extraParams),
-					signingCertificateV2,
-					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-					claimedRoles,
-					Boolean.parseBoolean(
-							extraParams.getProperty(
-									CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,
-									Boolean.FALSE.toString()
-									)
-							),
-					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-					doNotIncludePolicyOnSigningCertificate
+					cChain,
+					config
         	);
         }
         catch (final NoSuchAlgorithmException e) {
-        	throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
+        	throw new AOException("Algoritmo de firma o huella digital no soportado", e); //$NON-NLS-1$
 		}
         catch (final CertificateException e) {
-        	throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
+        	throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
 		}
 
     	return dataSigned;
     }
 
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = extraParams != null ?
+    			(Properties) extraParams.clone() : new Properties();
+
+    	return newExtraParams;
+    }
 }

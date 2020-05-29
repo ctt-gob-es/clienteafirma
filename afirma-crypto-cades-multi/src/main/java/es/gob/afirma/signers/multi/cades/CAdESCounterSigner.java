@@ -16,10 +16,8 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.spongycastle.asn1.ASN1Encodable;
 import org.spongycastle.asn1.ASN1EncodableVector;
@@ -51,11 +49,9 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
-import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cades.CAdESSignerMetadata;
+import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESUtils;
-import es.gob.afirma.signers.cades.CommitmentTypeIndicationBean;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -114,81 +110,25 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * </pre> */
 final class CAdESCounterSigner {
 
-    private AOSimpleSigner ss = new AOPkcs1Signer();
-    private Date date = null;
+    private final AOSimpleSigner ss;
 
-
-    void setPkcs1Signer(final AOSimpleSigner p1Signer, final Date d) {
-    	if (p1Signer == null) {
-    		throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
-    	}
-    	if (d == null) {
-    		Logger.getLogger("es.gob.afirma").warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$ //$NON-NLS-2$
-    	}
-    	this.ss = p1Signer;
-    	this.date = d;
+    /**
+     * Construye el firmador con un firmador PKCS#1 concreto.
+     * @param p1Signer Firmador para la generaci&oacute;n del PKCS#1.
+     */
+    CAdESCounterSigner(final AOSimpleSigner p1Signer) {
+    	this.ss = p1Signer != null ? p1Signer : new AOPkcs1Signer();
     }
 
     /** Crea una contrafirma a partir de los datos del firmante, el archivo que se firma y
      * del archivo que contiene las firmas.
-     * <p>El fichero de firmas tiene esta estructura:</p>
-     * <pre>
-     *  SEQUENCE {
-     *  	OBJECT IDENTIFIER { 1.2.840.113549.1.7.2 }, // El OID de SignedData
-     *  	ContextSpecific {
-     *  		SignedData
-     *  	}
-     *  }
-     * </pre>
-     * <p>Y la estructura <i>SignedData</i> este esquema:</p>
-     * <pre>
-     * SignedData ::= SEQUENCE {
-     * 		version Version,
-     *		digestAlgorithms DigestAlgorithmIdentifiers,
-     *		contentInfo ContentInfo,
-     *		certificates [0] IMPLICIT ExtendedCertificatesAndCertificates OPTIONAL,
-     *		crls [1] IMPLICIT CertificateRevocationLists OPTIONAL,
-     *		signerInfos SignerInfos
-     * }
-     * </pre>
-     * <p>
-     *  Siguiendo con ls tipos de datos, <i>SignerInfos</i>, que es la estructura objetivo,
-     *  tiene este esquema:
-     * </p>
-     * <pre>
-     * SignerInfos ::= SET OF SignerInfo
-     *
-     * SignerInfo ::= SEQUENCE {
-     *		version Version,
-     *		issuerAndSerialNumber IssuerAndSerialNumber,
-     *		digestAlgorithm DigestAlgorithmIdentifier,
-     *		authenticatedAttributes [0] IMPLICIT Attributes OPTIONAL,
-     *		digestEncryptionAlgorithm DigestEncryptionAlgorithmIdentifier,
-     *		encryptedDigest EncryptedDigest,
-     *		unauthenticatedAttributes [1] IMPLICIT Attributes OPTIONAL
-     * }
-     *
-     * EncryptedDigest ::= OCTET STRING
-     * </pre>
      * @param algorithm Algoritmo de firma.
      * @param signature Archivo que contiene las firmas.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *                   las hojas, un nodo determinado o unos determinados firmantes.
-     * @param key Clave privada a usar para firmar.
-     * @param certChain Cadena de certificados del firmante.
-     * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2 <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *                             atributo <i>Signing Certificate</i> <code>false</code> para
-     *                             usar la versi&oacute;n 1
-     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-     * @param claimedRoles Roles declarados por el usuario.
-     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo.
-     * @param csm Metadatos sobre el firmante.
-     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
+	 * @param key Clave privada usada para firmar.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param config Configuraci&oacute;n de la firma a generar.
      * @return El archivo de firmas con la nueva firma.
      * @throws IOException Cuando se produce algun error con la lectura o escritura de datos.
      * @throws NoSuchAlgorithmException Cuando no se encuentra el algoritmo de firma.
@@ -201,13 +141,7 @@ final class CAdESCounterSigner {
                        final CounterSignTarget targetType,
                        final PrivateKey key,
                        final java.security.cert.Certificate[] certChain,
-                       final AdESPolicy policy,
-                       final boolean signingCertificateV2,
-                       final List<CommitmentTypeIndicationBean> ctis,
-                       final String[] claimedRoles,
-                       final boolean includeSigningTimeAttribute,
-                       final CAdESSignerMetadata csm,
-                       final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
+                       final CAdESParameters config) throws IOException,
                                                                                     NoSuchAlgorithmException,
                                                                                     CertificateException,
                                                                                     AOException {
@@ -246,14 +180,8 @@ final class CAdESCounterSigner {
     		algorithm,
     		key,
     		certChain,
-            policy,
-            signingCertificateV2,
-            ctis,
-            claimedRoles,
-            includeSigningTimeAttribute,
-            csm,
-            targetType,
-            doNotIncludePolicyOnSigningCertificate
+            config,
+            targetType
         );
 
         // Construimos y devolvemos la nueva firma (atributo identificador del signedData mas el propio signedData).
@@ -276,20 +204,9 @@ final class CAdESCounterSigner {
      * @param signerInfosRaiz <i>SignerInfos</i> con los <i>SignerInfo</i> que se deben firmar.
      * @param algorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
-     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
-     *                             para usar <i>SigningCertificateV1</i>.
      * @param certChain Cadena de certificados del firmante.
-     * @param policy Pol&iacute;tica de firma.
-     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-     * @param claimedRoles Roles declarados por el usuario.
-     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo.
-     * @param csm Metadatos sobre el firmante.
+     * @param config Configuraci&oacute;n con el detalle de la firma a generar.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo y s&oacute;lo los nodos hoja.
-     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
      * @return Conjunto de <i>SignerInfo</i> con todos los nodos, los anteriores y las contrafirmas de estos.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores en el tratamiento de datos.
@@ -299,17 +216,11 @@ final class CAdESCounterSigner {
                                                        final String algorithm,
                                                        final PrivateKey key,
                                                        final java.security.cert.Certificate[] certChain,
-                                                       final AdESPolicy policy,
-                                                       final boolean signingCertificateV2,
-                                                       final List<CommitmentTypeIndicationBean> ctis,
-                                                       final String[] claimedRoles,
-                                                       final boolean includeSigningTimeAttribute,
-                                                       final CAdESSignerMetadata csm,
-                                                       final CounterSignTarget targetType,
-                                                       final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
-                                                                                                                    IOException,
-                                                                                                                    CertificateException,
-                                                                                                                    AOException {
+                                                       final CAdESParameters config,
+                                                       final CounterSignTarget targetType) throws NoSuchAlgorithmException,
+                                                                                                  IOException,
+                                                                                                  CertificateException,
+                                                                                                  AOException {
         // Vector donde almacenaremos la nueva estructura de SignerInfo
     	final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
@@ -324,14 +235,8 @@ final class CAdESCounterSigner {
         			algorithm,
         			key,
         			certChain,
-                    policy,
-                    signingCertificateV2,
-                    ctis,
-                    claimedRoles,
-                    includeSigningTimeAttribute,
-                    csm,
-                    targetType,
-                    doNotIncludePolicyOnSigningCertificate
+                    config,
+                    targetType
                 )
             );
         }
@@ -347,20 +252,9 @@ final class CAdESCounterSigner {
      * @param algorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param policy Pol&iacute;tica de firma.
-     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
-     *        para usar <i>SigningCertificateV1</i>.
-     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-     * @param claimedRoles Roles declarados por el usuario.
-     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo.
-     * @param csm Metadatos sobre el firmante.
+     * @param config Configuraci&oacute;n con los detalles internos para la composici&oacute;n de la firma.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *                   las hojas, un nodo determinado o unos determinados firmantes.
-     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
      * @return <i>SignerInfo</i> ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
@@ -371,14 +265,9 @@ final class CAdESCounterSigner {
                                              final String algorithm,
                                              final PrivateKey key,
                                              final java.security.cert.Certificate[] certChain,
-                                             final AdESPolicy policy,
-                                             final boolean signingCertificateV2,
-                                             final List<CommitmentTypeIndicationBean> ctis,
-                                             final String[] claimedRoles,
-                                             final boolean includeSigningTimeAttribute,
-                                             final CAdESSignerMetadata csm,
-                                             final CounterSignTarget targetType,
-                                             final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
+                                             final CAdESParameters config,
+                                             final CounterSignTarget targetType
+                                             ) throws NoSuchAlgorithmException,
                                                                                                           IOException,
                                                                                                           CertificateException,
                                                                                                           AOException {
@@ -413,14 +302,8 @@ final class CAdESCounterSigner {
                 				algorithm,
                 				key,
                 				certChain,
-                				policy,
-                				signingCertificateV2,
-                				ctis,
-                				claimedRoles,
-                				includeSigningTimeAttribute,
-                				csm,
-                				targetType,
-                				doNotIncludePolicyOnSigningCertificate
+                				config,
+                				targetType
             				)
                 		);
                     }
@@ -429,9 +312,7 @@ final class CAdESCounterSigner {
                 else {
                 	newUnauthenticatedAttributesList.add(unauthenticatedAttribute);
                 }
-
             }
-
         }
 
         // Vuelta de la recursividad, si toca firmar este nodo, creamos la contrafirma
@@ -443,13 +324,7 @@ final class CAdESCounterSigner {
 					algorithm,
 					key,
 					certChain,
-					policy,
-					signingCertificateV2,
-					ctis,
-					claimedRoles,
-					includeSigningTimeAttribute,
-					csm,
-					doNotIncludePolicyOnSigningCertificate
+					config
 				)
 			);
         }
@@ -478,63 +353,54 @@ final class CAdESCounterSigner {
      * @param signatureAlgorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param policy Pol&iacute;tica de firma.
-     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
-     *        para usar <i>SigningCertificateV1</i>.
-     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-     * @param claimedRoles Roles declarados por el usuario.
-     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo.
-     * @param csm Metadatos sobre el firmante.
-     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
+     * @param config Configuraci&oacute;n con el detalle de la firma a generar.
      * @return <i>SignerInfo</i> contrafirmado.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
-    private SignerInfo signSignerInfo(final SignerInfo si,
-    								  final String signatureAlgorithm,
-                                      final PrivateKey key,
-                                      final java.security.cert.Certificate[] certChain,
-                                      final AdESPolicy policy,
-                                      final boolean signingCertificateV2,
-                                      final List<CommitmentTypeIndicationBean> ctis,
-                                      final String[] claimedRoles,
-                                      final boolean includeSigningTimeAttribute,
-                                      final CAdESSignerMetadata csm,
-                                      final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
+    private SignerInfo signSignerInfo(
+    		final SignerInfo si,
+    		final String signatureAlgorithm,
+    		final PrivateKey key,
+    		final java.security.cert.Certificate[] certChain,
+    		final CAdESParameters config
+                                      ) throws NoSuchAlgorithmException,
                                                                                                    IOException,
                                                                                                    CertificateException {
-        // buscamos que timo de algoritmo es y lo codificamos con su OID
-        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+
+    	// Realizamos los cambios de configuracion que corresponden a las contrafirmas
+
+        // La firma se realiza sobre una firma previa
+        config.setContentData(si.getEncryptedDigest().getOctets());
+
+        // Dejamos que el hash se calcule internamente en base a los datos que acabamos de introducir
+        config.setDataDigest(null);
+
+        //TODO: Introducir la excepcion de las Baseline
+        // En las contrafirmas BES, el tipo declarado en el contentHint siempre
+        // sera Data y no contendra descripcion
+//        if (BES) {
+        config.setContentTypeOid(PKCSObjectIdentifiers.data.toString());
+        config.setContentDescription(null);
+//        }
+        // En las contrafirmas Baseline, las contrafirmas no deben incluir el
+        // atributo ContentHint
+//        else if (BASELINE){
+//        	config.setContentTypeOid(null);
+//            config.setContentDescription(null);
+//        }
 
         // authenticatedAttributes
-        final ASN1EncodableVector contextExcepcific = CAdESUtils.generateSignerInfo(
+        final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(
              certChain[0],
-             digestAlgorithm,
-             si.getEncryptedDigest().getOctets(),
-             policy,
-             signingCertificateV2,
-             null,
-             this.date != null ? this.date : new Date(), // Usamos fecha y hora actual nueva si no se nos ha indicado otra distinta
-    		 includeSigningTimeAttribute,
-             false,
-             PKCSObjectIdentifiers.data.toString(), // El ContentType de las contrafirmas siempre sera id-data
-			 null,	// No agregamos content-description
-             ctis,
-             claimedRoles,
-             csm,
-             true,  // Es contrafirma
-             doNotIncludePolicyOnSigningCertificate
-        );
+             config,
+             true);	// Es contrafirma
 
-        final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
+        final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(signedAttributes));
 
-        final ASN1OctetString sign2;
+        final ASN1OctetString signValue;
         try {
-            sign2 = new DEROctetString(
+            signValue = new DEROctetString(
         		pkcs1Sign(
     				signedAttr.getEncoded(ASN1Encoding.DER),
     				signatureAlgorithm,
@@ -546,6 +412,9 @@ final class CAdESCounterSigner {
         catch (final AOException ex) {
             throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
         }
+
+        // Identificamos el algoritmo
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
 
         // AlgorithmIdentifier
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
@@ -562,12 +431,11 @@ final class CAdESCounterSigner {
     		X500Name.getInstance(tbs.getIssuer()),
     		tbs.getSerialNumber().getValue()
 		);
+
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
-        // UNAUTHENTICATEDATTRIBUTES
-        final ASN1Set unsignedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
 
-        return new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);
+        return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, signValue, null);
 
     }
 

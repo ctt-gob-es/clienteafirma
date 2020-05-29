@@ -173,7 +173,7 @@ public final class TestSignBatch {
 	}
 
 	/** Prueba de un lote construido manualmente.
-	 * @throws Exception */
+	 * @throws Exception Cuando falla de forma no controlada el test. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore //Requiere servicio servidor
@@ -240,7 +240,7 @@ public final class TestSignBatch {
 	}
 
 	/** Prueba de un lote construido manualmente.
-	 * @throws Exception */
+	 * @throws Exception Cuando falla de forma no controlada el test. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore //Requiere servicio servidor
@@ -294,7 +294,7 @@ public final class TestSignBatch {
 	}
 
 	/** Prueba de un lote construido manualmente.
-	 * @throws Exception */
+	 * @throws Exception Cuando falla de forma no controlada el test. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore //Requiere servicio servidor

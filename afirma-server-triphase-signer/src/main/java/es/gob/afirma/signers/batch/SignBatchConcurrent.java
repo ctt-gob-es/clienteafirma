@@ -292,7 +292,7 @@ public final class SignBatchConcurrent extends SignBatch {
 
 	/**
 	 * Detiene la ejecuci&oacute;n de las operaciones concurrentes.
-	 * @param executorService
+	 * @param executorService Servicio de ejecuci&oacute;n.
 	 */
 	private static void stopExecution(final ExecutorService executorService) {
 		executorService.shutdown();

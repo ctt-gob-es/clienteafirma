@@ -10,7 +10,6 @@
 package es.gob.afirma.triphase.signer.processors;
 
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -19,22 +18,18 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
-import es.gob.afirma.signers.cades.CAdESExtraParams;
-import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
+import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
-import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.multi.cades.CAdESMultiUtil;
+import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -66,7 +61,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
-			                        final X509Certificate[] cert,
+			                        final X509Certificate[] certChain,
 			                        final Properties params,
 		                               final boolean checkSignatures) throws IOException, AOException {
 
@@ -76,77 +71,15 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("Los datos no pueden ser nulos"); //$NON-NLS-1$
 		}
 
-		final Properties extraParams = params != null ? params : new Properties();
+		final Properties extraParams = getExtraParams(params);
 
-		boolean signingCertificateV2;
-		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
-			signingCertificateV2 = true;
-		}
-		else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
-			signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
-		}
-		else {
-			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
-		}
-
-		boolean omitContent = true;
-		if (extraParams.containsKey(CAdESExtraParams.MODE)) {
-			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty(CAdESExtraParams.MODE)); //$NON-NLS-1$
-		}
-
-        String[] claimedRoles = null;
-        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
-        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
-        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
-        }
-
-		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
-
-		try {
-			final MimeHelper mimeHelper = new MimeHelper(data);
-			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-			contentDescription = mimeHelper.getDescription();
-		}
-		catch(final Exception e) {
-			LOGGER.warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$
-		}
-
-		final byte[] messageDigest;
-		final String digestAlgorithm;
-		final String precalculatedHashAlgorithm = extraParams.getProperty(CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
-		if (precalculatedHashAlgorithm != null) {
-			digestAlgorithm = precalculatedHashAlgorithm;
-			messageDigest = data;
-		}
-		else {
-			digestAlgorithm = AOSignConstants.getDigestAlgorithmName(algorithm);
-			try {
-				messageDigest = MessageDigest.getInstance(digestAlgorithm).digest(data);
-			}
-			catch (final NoSuchAlgorithmException e) {
-				throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + digestAlgorithm, e); //$NON-NLS-1$
-			}
-		}
+		final CAdESParameters parameters = CAdESParameters.load(data, algorithm, extraParams);
 
 		LOGGER.info("Se invocan las funciones internas de prefirma CAdES"); //$NON-NLS-1$
 		final byte[] presign = CAdESTriPhaseSigner.preSign(
-				digestAlgorithm,
-				omitContent ? null : data,
-					cert,
-					AdESPolicy.buildAdESPolicy(extraParams),
-					signingCertificateV2,
-					messageDigest,
-					new Date(),
-					Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-					false,           // PAdES Mode
-					contentTypeOid,
-					contentDescription,
-					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-					claimedRoles,
-					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-					Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()))
-				);
+				certChain,
+				new Date(),
+				parameters);
 
 		LOGGER.info("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
 
@@ -156,7 +89,9 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final Map<String, String> signConfig = new ConcurrentHashMap<>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(presign));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
-		if (!omitContent) {
+		// Si se guardo el contenido dentro de la configuracion es que se habia pedido incluir
+		// los datos en la firma
+		if (parameters.isContentNeeded()) {
 			signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.TRUE.toString());
 		}
 
@@ -252,8 +187,6 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("Las firma no puede ser nula ni vacia"); //$NON-NLS-1$
 		}
 
-		final Properties extraParams = params != null ? params : new Properties();
-
 		// Comprobamos si la cofirma de este tipo de firma esta soportada
 		try {
 			CAdESMultiUtil.checkUnsupportedAttributes(sign);
@@ -273,44 +206,20 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
         	}
         }
 
-		boolean signingCertificateV2;
-		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
-			signingCertificateV2 = true;
-		}
-		else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
-			signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
-		}
-		else {
-			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
-		}
+		final Properties extraParams = getExtraParams(params);
 
-        String[] claimedRoles = null;
-        final String claimedRolesParam = extraParams.getProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES);
-        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
-        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
-        }
-
-		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
+
+		final CAdESParameters parameters = CAdESParameters.load(data, algorithm, extraParams);
+
+		// Si los datos no estaban contenidos en la firma, habra que obtener la huella para firmar
+		// de la firma previa
 		if (data == null) {
-			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
+			final byte[] messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
 			if (messageDigest == null) {
-				throw new AOException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo: " + algorithm); //$NON-NLS-1$
+				throw new ContainsNoDataException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo: " + algorithm); //$NON-NLS-1$
 			}
-		}
-
-		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
-
-		if (data != null) {
-			try {
-				final MimeHelper mimeHelper = new MimeHelper(data);
-				contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-				contentDescription = mimeHelper.getDescription();
-			}
-			catch(final Exception e) {
-				LOGGER.warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$
-			}
+			parameters.setDataDigest(messageDigest);
 		}
 
 		LOGGER.info("Se invocan las funciones internas de pre-cofirma CAdES"); //$NON-NLS-1$
@@ -320,17 +229,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				data,
 				algorithm,
 				cert,
-				AdESPolicy.buildAdESPolicy(extraParams),
-				signingCertificateV2,
-				messageDigest,
-				contentTypeOid,
-				contentDescription,
-				new Date(),
-				Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-				claimedRoles,
-				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()))
+				parameters
 			);
 		}
 		catch (final CertificateEncodingException e) {
@@ -415,9 +314,9 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		config.deleteProperty(PROPERTY_NAME_PRESIGN);
 
 		LOGGER.info("Se invocan las funciones internas de post-cofirma CAdES"); //$NON-NLS-1$
-		final byte[] signature;
+		final byte[] coSignature;
 		try {
-			signature = AOCAdESTriPhaseCoSigner.postCoSign(
+			coSignature = AOCAdESTriPhaseCoSigner.postCoSign(
 					pk1,
 					presign,
 					data, // Contenido
@@ -432,7 +331,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Postfirma CAdES - Cofirma - FIN"); //$NON-NLS-1$
 
-		return signature;
+		return coSignature;
 	}
 
 	@Override
@@ -504,4 +403,11 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				triphaseData
 			);
 	}
+
+    private static Properties getExtraParams(final Properties extraParams) {
+    	final Properties newExtraParams = extraParams != null ?
+    			(Properties) extraParams.clone() : new Properties();
+
+    	return newExtraParams;
+    }
 }

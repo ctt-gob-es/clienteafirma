@@ -17,15 +17,14 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
 import java.security.Security;
-import java.util.Properties;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Pruebas espec&iacute;ficas de CAdES para DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -56,39 +55,26 @@ public final class MiniTestDNI {
 
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(DNI_SIGN_ALIAS, new KeyStore.PasswordProtection(DNI_PIN));
 
-        final P7ContentSignerParameters p7ContentSignerParameters = new P7ContentSignerParameters(
-        		TEXTO_FIRMAR.getBytes(StandardCharsets.UTF_8),
-        		"SHA1withRSA" //$NON-NLS-1$
-    		);
-
-        final boolean omitContent = false;
-        final byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar.
+        final CAdESParameters parameters = new CAdESParameters();
+        parameters.setContentData(TEXTO_FIRMAR.getBytes(StandardCharsets.UTF_8));
+        parameters.setDataDigest(null);// Se calcula internamente el digest de los datos a firmar.
+        parameters.setDigestAlgorithm("SHA-512"); //$NON-NLS-1$
+        parameters.setSigningCertificateV2(true);
+        parameters.setIncludedIssuerSerial(true);
+        parameters.setIncludedPolicyOnSigningCertificate(true);
+        parameters.setSigningTime(new Date());
 
         final byte[] firma = GenCAdESEPESSignedData.generateSignedData(
-        		p7ContentSignerParameters,
-        		omitContent,
-        		AdESPolicy.buildAdESPolicy(new Properties()),
-        		false,
+        		"SHA512withRSA", //$NON-NLS-1$
         		pke.getPrivateKey(),
         		pke.getCertificateChain(),
-        		messageDigest,
-        		"SHA-512", //$NON-NLS-1$
-        		false,
-        		false,
-        		null,
-        		null,
-        		null,
-        		null,
-        		null,
-        		false, // SI incluir politica en SigningCertificate
-        		null // Sin parametros para el PKCS#1)
-		);
+        		parameters);
 
         Assert.assertNotNull(firma);
 
-//        java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo"+ (omitContent ? "Expl" : "Impl") + ".csig");
-//        fos.write(firma);
-//        try { fos.close(); } catch (Exception e) { }
+        final java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo.csig"); //$NON-NLS-1$
+        fos.write(firma);
+        try { fos.close(); } catch (final Exception e) { }
     }
 
 }

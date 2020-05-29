@@ -146,8 +146,7 @@ public class TriPhaseHelper {
      * privada con la que en .
      * @param signatureValue PKCS#1 de la firma.
      * @param publicKey Clave p&uacute;blica con la que validar la firma.
-     * @param signatureAlgoritm Algoritmo de firma.
-     * @throws InvalidVerificationCodeException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
+     * @throws SecurityException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
      * el PKCS#1 se gener&oacute; con una clave privada distinta a la esperada.
      */
     public static void verifyPkcs1(final byte[] signatureValue, final PublicKey publicKey) throws SecurityException {

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>afirma-crypto-cades-multi</artifactId>
+	<packaging>jar</packaging>
+
+	<name>afirma-crypto-cades-multi</name>
+	<description>Modulo para la generacion de multifirmas CAdES</description>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.7-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-cades</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-core-pkcs7</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>prov</artifactId>
+		</dependency>
+
+	</dependencies>
+</project>

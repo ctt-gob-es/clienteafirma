@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -47,10 +46,8 @@ import org.spongycastle.cms.CMSProcessable;
 import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AdESPolicy;
-import es.gob.afirma.signers.cades.CAdESSignerMetadata;
+import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESUtils;
-import es.gob.afirma.signers.cades.CommitmentTypeIndicationBean;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -66,22 +63,7 @@ public final class AOCAdESTriPhaseCoSigner {
 	 * @param content Contenido a cofirmar
 	 * @param signatureAlgorithm Algoritmo de firma
 	 * @param signerCertificateChain Cadena de certificados del firmante
-	 * @param policy Pol&iacute;tica de firma
-	 * @param signingCertificateV2 Si se establece a <code>true</code> se usa SigningCertificateV2, y se usa
-	 *                             SigningCertificateV1 en caso contrario
-	 * @param messageDigest Huella digital de los datos a firmar (necesario si no se indica el contenido a firmar)
-	 * @param contentType Tipo de los datos a firmar
-	 * @param contentDescription Contenido de los datos a firmar
-	 * @param signDate Fecha de la firma
-	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo.
-	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-	 * @param claimedRoles Roles declarados por el usuario.
-	 * @param csm Metadatos sobre el firmante
-	 * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
+	 * @param config Configuraci&oacute;n con el detalle de firma.
 	 * @return Pre-cofirma CAdES (SignedAttributes de CAdES)
 	 * @throws CertificateEncodingException Si alguno de los certificados proporcionados tienen problemas de formatos
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario
@@ -89,74 +71,19 @@ public final class AOCAdESTriPhaseCoSigner {
 	public static byte[] preCoSign(final byte[] content,
 			                       final String signatureAlgorithm,
 			                       final X509Certificate[] signerCertificateChain,
-			                       final AdESPolicy policy,
-			                       final boolean signingCertificateV2,
-			                       final byte[] messageDigest,
-			                       final String contentType,
-			                       final String contentDescription,
-			                       final Date signDate,
-			                       final boolean includeSigningTimeAttribute,
-			                       final List<CommitmentTypeIndicationBean> ctis,
-			                       final String[] claimedRoles,
-			                       final CAdESSignerMetadata csm,
-                                   final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
+			                       final CAdESParameters config
+                                   ) throws CertificateEncodingException,
 			                                                                                    NoSuchAlgorithmException,
 			                                                                                    IOException {
-		return getSignedAttributes(
-			messageDigest,
-			signerCertificateChain,
-			AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-			content,
-			signingCertificateV2,
-			policy,
-			contentType,
-			contentDescription,
-			signDate,
-			includeSigningTimeAttribute,
-			ctis,
-			claimedRoles,
-			csm,
-			doNotIncludePolicyOnSigningCertificate
-		).getEncoded(ASN1Encoding.DER);
+
+		final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(
+				signerCertificateChain[0],
+				config,
+				false  // No es contrafirma
+			);
+		return SigUtils.getAttributeSet(new AttributeTable(signedAttributes)).getEncoded(ASN1Encoding.DER);
 	}
 
-	private static ASN1Set getSignedAttributes(final byte[] messageDigest,
-			                                   final X509Certificate[] signerCertificateChain,
-			                                   final String digestAlgorithm,
-			                                   final byte[] content,
-			                                   final boolean signingCertificateV2,
-			                                   final AdESPolicy policy,
-			                                   final String contentType,
-			                                   final String contentDescription,
-			                                   final Date signDate,
-			                                   final boolean includeSigningTimeAttribute,
-			                                   final List<CommitmentTypeIndicationBean> ctis,
-			                                   final String[] claimedRoles,
-			                                   final CAdESSignerMetadata csm,
-	                                           final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
-			                                                                                                 NoSuchAlgorithmException,
-			                                                                                                 IOException {
-
-		final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
-			signerCertificateChain[0],
-			digestAlgorithm,
-			content,
-			policy,
-			signingCertificateV2,
-			messageDigest,
-			signDate,
-			includeSigningTimeAttribute,
-			false,
-			contentType,
-			contentDescription,
-			ctis,
-			claimedRoles,
-			csm,
-            false,  // No es contrafirma
-            doNotIncludePolicyOnSigningCertificate
-		);
-		return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-	}
 
 
 	/** Realiza una post-cofirma CAdES.
@@ -278,7 +205,6 @@ public final class AOCAdESTriPhaseCoSigner {
 	}
 
 	private static ASN1Sequence getContentSignedData(final byte[] sign) {
-		// LEEMOS LOS DATOS PROPORCIONADOS (la firma previa)
 		final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
 		final Enumeration<?> e = dsq.getObjects();
 		// Elementos que contienen los elementos OID SignedData

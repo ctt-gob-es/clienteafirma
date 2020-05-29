@@ -48,7 +48,6 @@ public final class ObtainContentSignedData {
 	public static byte[] obtainData(final byte[] data) throws AOInvalidFormatException {
 		byte[] contenido = null;
 
-		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		ASN1ObjectIdentifier doi;
 		ASN1TaggedObject doj;
 		try {
@@ -80,7 +79,7 @@ public final class ObtainContentSignedData {
 				contenido = ((DEROctetString) ci.getContent()).getOctets();
 			}
 			else {
-				LOGGER.warning("No existe contenido en esta firma."); //$NON-NLS-1$
+				LOGGER.info("No existe contenido en esta firma. Se devolvera null"); //$NON-NLS-1$
 			}
 		}
 		else {
@@ -102,7 +101,6 @@ public final class ObtainContentSignedData {
 	 * @throws IOException Si no se pueden leer los datos */
 	public static byte[] obtainMessageDigest(final byte[] signature, final String digestAlgorithm) throws IOException {
 
-		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		final ASN1Sequence dsq;
 		try (
 			final ASN1InputStream is = new ASN1InputStream(signature);

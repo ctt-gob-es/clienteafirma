@@ -40,9 +40,9 @@ public class TestPAdES {
 	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
 	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
-    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
 
     private static final Properties[] PADES_MODES;
 
@@ -78,8 +78,7 @@ public class TestPAdES {
     private final static String[] ALGOS = new String[] {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA
     };
 
     /** Main para pruebas sin JUNit.
@@ -484,7 +483,7 @@ public class TestPAdES {
         }
     }
 
-    /** Prueba de la verificaci&oacute;n de la versi&oacute:n de iText.
+    /** Prueba de la verificaci&oacute;n de la versi&oacute;n de iText.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test

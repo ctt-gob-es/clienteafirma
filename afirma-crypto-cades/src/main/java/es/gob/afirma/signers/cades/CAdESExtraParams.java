@@ -44,6 +44,11 @@ public final class CAdESExtraParams {
     public static final String MODE = "mode"; //$NON-NLS-1$
 
     /**
+     * Perfil de firma que se desea generar.
+     */
+	public static final String PROFILE = "profile"; //$NON-NLS-1$
+
+    /**
      * Descripci&oacute;n textual del tipo de contenido a firmar. Necesita que se establezca tambi&eacute;n la propiedad <code>contentTypeOid</code>.
      */
     public static final String CONTENT_DESCRIPTION = "contentDescription"; //$NON-NLS-1$
@@ -65,11 +70,6 @@ public final class CAdESExtraParams {
      *  <br>Propiedad compartida con XAdES, no aplica a contrafirmas
      */
     public static final String CONTENT_TYPE_OID = "contentTypeOid"; //$NON-NLS-1$
-
-    /**
-     * <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
-     */
-    static final String PADES_MODE = "padesMode"; //$NON-NLS-1$
 
     /**
      *  Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique

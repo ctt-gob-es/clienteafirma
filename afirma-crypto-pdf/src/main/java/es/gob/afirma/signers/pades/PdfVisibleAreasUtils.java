@@ -144,6 +144,10 @@ final class PdfVisibleAreasUtils {
 	 * @param reason Raz&oacute;n de firma del PDF.
 	 * @param signatureProductionCity Ciudad en la que se firma el PDF.
 	 * @param signerContact Informaci&oacute;n de contacto del firmante.
+	 * @param obfuscate Indica si se deben ofuscar los identificadores
+	 * encontrados en los campos que se incorporan al texto.
+	 * @param maskConfig M&aacute;scara con los par&aacute;metros para la
+	 * identificaci&oacute;n de los identificados de los campos.
 	 * @return Texto que mostrar en el campo de firma PDF.
 	 */
 	static String getLayerText(final String txt,

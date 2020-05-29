@@ -3,7 +3,6 @@ package es.gob.afirma.test.cades;
 import java.io.InputStream;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -55,10 +54,10 @@ public class TestCadesValidator {
 
 	/**
 	 * Comprueba que una firma con ClaimedRole se considere v&aacute;lida.
-	 * @throws Exception
+	 * @throws Exception Cuando no se puede cargar la firma.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testCadesSignedDataWithClaimedRole() throws Exception {
 
 		try (

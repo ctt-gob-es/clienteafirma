@@ -12,14 +12,9 @@ package es.gob.afirma.signers.cades;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
-import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AdESPolicy;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Generaci&oacute;n de firmas digitales CMS Advanced Electronic Signatures
  * (CAdES).
@@ -55,97 +50,50 @@ public final class GenCAdESEPESSignedData {
         // No permitimos la instanciacion
     }
 
-    /** Genera una firma digital usando una estructura PKCS#7.
-     * SignedData. Puede incluir el contenido del fichero codificado.
-     * o s&oacute;lo una referencia a este.
-     * @param parameters Par&aacute;metros necesarios para obtener los datos de
-     *                   SignedData.
-     * @param omitContent <code>false</code> si en la firma se desea incluir el contenido del
-     *                    fichero o <code>true</code> si s&oacute;lo se desea usar una referencia.
-     * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2 <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *                             atributo <i>SigningCertificate</i> <code>false</code> para
-     *                             usar la versi&oacute;n 1
-     * @param key Clave privada para firma.
-     * @param certChain Cadena de certificados del firmante
-     * @param dataDigest Huella digital de los datos a firmar cuando esta se proporciona precalculada. Si los datos a firmar (que se proporcionan
-     *                   en el par&aacute;metro <code>parameters</code> (de tipo <code>P7ContentSignerParameters</code>) <u>no</u> son nulos este valor
-     *                   se ignora, us&aacute;ndose &uacute;nicamente cuando el par&aacute;metro <code>parameters</code> es nulo.
-     * @param dataDigestAlgorithmName Algoritmo de huella digital usado para calcular el valor indicado en el par&aacute;metro <code>dataDigest</code>.
-     *                                Si <code>dataDigest</code> es nulo el valor de este par&aacute;metro se ignora.
-     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
-     *                                    <code>false</code> para no incluirlo. Este atributo nunca se incluye en el modo PAdES.
-     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
-     * @param contentType Tipo de contenido definido por su OID.
-     * @param contentDescription Descripci&oacute;n textual del tipo de contenido.
-     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
-     * @param claimedRoles Roles declarados por el usuario.
-     * @param csm Metadatos sobre el firmante.
-     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
-     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
-     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
-     *                                               la declare.
-     * @param pkcs1ExtraParams Par&aacute;metros adicionales para el PKCS#1.
+    /** Genera una firma digital usando una estructura PKCS#7 SignedData.
+     * @param signatureAlgorithm Algoritmo de firma que se deber&acute; usar.
+     * @param key Referencia a la cl@ve privada de firme.
+     * @param certChain Cadena de certificaci&oacute;n del certificado de firma.
+     * @param config Configurac&oacute;n de la firma a generar.
      * @return La firma generada codificada en ASN.1 binario.
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
-    public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
-                                            final boolean omitContent,
-                                            final AdESPolicy policy,
-                                            final boolean signingCertificateV2,
-                                            final PrivateKey key,
-                                            final Certificate[] certChain,
-                                            final byte[] dataDigest,
-                                            final String dataDigestAlgorithmName,
-                                            final boolean includeSigningTimeAttribute,
-                                            final boolean padesMode,
-                                            final String contentType,
-                                            final String contentDescription,
-                                            final List<CommitmentTypeIndicationBean> ctis,
-                                            final String[] claimedRoles,
-                                            final CAdESSignerMetadata csm,
-                                            final boolean doNotIncludePolicyOnSigningCertificate,
-                                            final Properties pkcs1ExtraParams) throws AOException {
-        if (parameters == null) {
-            throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
+    public static byte[] generateSignedData(
+    		final String signatureAlgorithm,
+            final PrivateKey key,
+            final Certificate[] certChain,
+            final CAdESParameters config) throws AOException {
+
+    	if (config == null) {
+            throw new IllegalArgumentException("No se ha introducido configuracion para la construccion de la firma"); //$NON-NLS-1$
         }
-        final String signatureAlgorithm = parameters.getSignatureAlgorithm();
 
         final Date signDate = new Date();
 
-        // Ya que el contenido de la firma puede ser grande, lo obtenemos solo al principio
-        final byte[] content = parameters.getContent();
+        final Certificate[] aplicableCertificateChain = config.isIncludedOnlySigningCertificate() ?
+        		new Certificate[] { certChain[0] } : certChain;
 
+        // Obtenemos la estructura con los atributos que hay que firmar (Prefirma)
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
-    		AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName),
-            omitContent ? null : content,
-            certChain,
-            policy,
-            signingCertificateV2,
-            dataDigest,
-            signDate,
-            includeSigningTimeAttribute,
-            padesMode,
-            contentType,
-            contentDescription,
-            ctis,
-            claimedRoles,
-            csm,
-            doNotIncludePolicyOnSigningCertificate
+        		aplicableCertificateChain,
+                signDate,
+                config
         );
 
-        final byte[] signature = new AOPkcs1Signer().sign(
+        // Firmamos la prefirma (PKCS#1)
+        final byte[] signatureValue = new AOPkcs1Signer().sign(
     		preSignature,
     		signatureAlgorithm,
     		key,
-    		certChain,
-    		pkcs1ExtraParams
+    		aplicableCertificateChain,
+    		config.getExtraParams()
 		);
 
+        // Componemos la firma completa (Postfirma)
         return CAdESTriPhaseSigner.postSign(
             signatureAlgorithm,
-            omitContent ? null : content,
-            certChain,
-            signature,
+            config.getContentData(),
+            aplicableCertificateChain,
+            signatureValue,
             preSignature
         );
 

@@ -44,7 +44,7 @@ public final class TestCAdES {
     private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
 
 	private static final String[] DATA_FILES = {
-		"txt", //$NON-NLS-1$
+//		"txt", //$NON-NLS-1$
 		"xml" //$NON-NLS-1$
 	};
 
@@ -52,7 +52,7 @@ public final class TestCAdES {
 	static {
 		for (final String dataFile : DATA_FILES) {
 			try {
-				DATA.add(AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(dataFile)));
+				DATA.add(AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream("/" + dataFile))); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas '" + dataFile + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -93,23 +93,25 @@ public final class TestCAdES {
         p4.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		CADES_MODES = new Properties[] {
-				p1, p2, p3
+				//p1,
+				p2, p3,
+				//p4
 		};
 	}
 
 	/** Algoritmos de firma a probar. */
 	private final static String[] ALGOS = new String[] {
-		AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+//		AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 		AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-		AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-		AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+//		AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+//		AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
 	};
 
 	/** Prueba de firma de JPEG para establecimiento de ContentHint.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	public void testXmlSign() throws Exception {
+	public void testJpegSign() throws Exception {
 
 		final PrivateKeyEntry pke;
 
@@ -124,7 +126,7 @@ public final class TestCAdES {
 
 		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream("/rubric.jpg")); //$NON-NLS-1$
 
-		final byte[] sign = signer.sign(data, "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), p); //$NON-NLS-1$
+		final byte[] sign = signer.sign(data, "SHA512withRSA", pke.getPrivateKey(), pke.getCertificateChain(), p); //$NON-NLS-1$
 
 		try (
 			final OutputStream fos = new FileOutputStream(File.createTempFile("JPG_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -163,7 +165,7 @@ public final class TestCAdES {
 		for (final Properties extraParams : CADES_MODES) {
 			for (final String algo : ALGOS) {
 				for (int i = 0; i < DATA_FILES.length; i++) {
-					if (DATA.get(i) == null) {
+					if (DATA.get(i) == null || DATA.get(i).length == 0) {
 						continue;
 					}
 

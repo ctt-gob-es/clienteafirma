@@ -18,7 +18,6 @@ import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
@@ -27,12 +26,9 @@ import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.SignEnhancer;
-import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
+import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
-import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
@@ -151,7 +147,7 @@ public final class PAdESTriPhaseSigner {
     }
 
     /** Obtiene la pre-firma PAdES/CAdES de un PDF (atributos CAdES a firmar)
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma.
+     * @param signatureAlgorithm Nombre del algoritmo de firma.
      *                            Debe usarse exactamente el mismo valor en la post-firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
      * <ul>
@@ -170,7 +166,7 @@ public final class PAdESTriPhaseSigner {
      * @throws IOException En caso de errores de entrada / salida
      * @throws AOException En caso de cualquier otro tipo de error
      * @throws InvalidPdfException En caso de errores al generar los datos de sesi&oacute;n */
-    public static PdfSignResult preSign(final String digestAlgorithmName,
+    public static PdfSignResult preSign(final String signatureAlgorithm,
                                         final byte[] inPDF,
                                         final Certificate[] signerCertificateChain,
                                         final GregorianCalendar signTime,
@@ -182,53 +178,46 @@ public final class PAdESTriPhaseSigner {
 
         final PdfTriPhaseSession ptps = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
 
-	    // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificate, y en cualquier
-	    // otro caso deberia usarse SigningCertificateV2
-	    boolean signingCertificateV2;
-	    if (extraParams.containsKey(PdfExtraParams.SIGNING_CERTIFICATE_V2)) {
-	    	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNING_CERTIFICATE_V2));
-	    }
-	    else {
-	    	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName));	 //$NON-NLS-1$
-	    }
+        // Rango de bytes del PDF que debe firmarse
+        final byte[] pdfRangeBytes = AOUtil.getDataFromInputStream(ptps.getSAP().getRangeStream());
 
-        String[] claimedRoles = null;
-        final String claimedRolesParam = extraParams.getProperty(PdfExtraParams.SIGNER_CLAIMED_ROLES);
-        if (claimedRolesParam != null && !claimedRolesParam.isEmpty()) {
-        	claimedRoles = claimedRolesParam.split(Pattern.quote("|")); //$NON-NLS-1$
-        }
+        final CAdESParameters parameters = CAdESParameters.load(null, signatureAlgorithm, extraParams);
 
-        final byte[] original = AOUtil.getDataFromInputStream(ptps.getSAP().getRangeStream());
+        // --- INICIO: Particularidades de las firmas CAdES introducidas en PAdES ---
 
-        // Calculamos el MessageDigest
+        // Los datos a firmar son el rango procesable del PDF (que no va incluido en la firma) y la
+        // huella de la firma CAdES debe ser la huella de este rango
         final byte[] md;
         try {
-            md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName)).digest(original);
+            md = MessageDigest.getInstance(parameters.getDigestAlgorithm()).digest(pdfRangeBytes);
         }
         catch (final NoSuchAlgorithmException e) {
             throw new AOException("El algoritmo de huella digital no es valido: " + e, e); //$NON-NLS-1$
         }
+        parameters.setDataDigest(md);
+
+        // La informacion de localizacion se agrega a la firma PDF, pero no a la firma CAdES interna
+        parameters.setMetadata(null);
+
+        // El tipo de datos firmados siempre sera PDF
+        parameters.setContentTypeOid(PDF_OID);
+        parameters.setContentDescription(PDF_DESC);
+
+        // La marca de tiempo no se incluira en la firma
+        parameters.setSigningTime(null);
+
+        // --- FIN: Particularidades de las firmas CAdES introducidas en PAdES ---
 
         // Pre-firma CAdES
+        final byte[] cadesPresign = CAdESTriPhaseSigner.preSign(
+        		signerCertificateChain, // Cadena de certificados del firmante
+        		signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)
+        		parameters
+        );
+
         return new PdfSignResult(
             ptps.getFileID(),
-            CAdESTriPhaseSigner.preSign(
-                AOSignConstants.getDigestAlgorithmName(digestAlgorithmName), // Algoritmo de huella digital
-                null, // Datos a firmar (null por ser explicita))
-                signerCertificateChain, // Cadena de certificados del firmante
-                AdESPolicy.buildAdESPolicy(extraParams), // Politica de firma
-                signingCertificateV2, // signingCertificateV2
-                md, // Valor de la huella digital del contenido
-                signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)
-                false, // En PAdES nunca se incluye el SigningTime en la CAdES contenida
-                true, // Modo PAdES
-                PDF_OID,
-                PDF_DESC,
-                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                claimedRoles,
-                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false")) //$NON-NLS-1$
-            ),
+            cadesPresign,
             null, // Sello de tiempo
             signTime,
             extraParams

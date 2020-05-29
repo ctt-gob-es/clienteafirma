@@ -622,7 +622,7 @@ public final class SignatureService extends HttpServlet {
 	/**
 	 * Comprueba que la prefirma y el certificado estuviesen asociados a un mismo proceso de
 	 * prefirma anterior validando el c&oacute;digo MAC de verificaci&oacute;n que acompa&ntilde;a
-	 * al PKCS#1. Después, comprueba que con la clave privada de ese certificado se generase
+	 * al PKCS#1. Despu&eacute;s, comprueba que con la clave privada de ese certificado se generase
 	 * ese PKCS#1.
 	 * //TODO: Esto podr&iacute;a ser mas robusto en las firmas XAdES, en la que no se utiliza la
 	 * prefirma (par&aacute;metro PRE) para completar la firma, sino el parametro BASE. Habr&iacute;a
@@ -634,7 +634,6 @@ public final class SignatureService extends HttpServlet {
 	 * @throws InvalidVerificationCodeException Cuando el PKCS#1 de la firma no se generase con el
 	 * certificado indicado o cuando no se pudiese comprobar.
 	 * @throws IOException Cuando falla la decodificaci&oacute;n Base 64 de los datos.
-	 * @throws CertificateEncodingException Cuando no se pueda decodificar el certificado.
 	 */
 	private static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert,
 			final String signatureAlgorithm) throws InvalidVerificationCodeException, IOException {

@@ -76,7 +76,7 @@ public class PdfTextMask {
 
 	/** Recupera las posiciones de la m&aacute;scara que deben no mostrarse
 	 * ({@code false}) y las que si ({@code true}).
-	 * @param positions Posiciones que deben ocultarse o mostrarse.
+	 * @return Posiciones que deben ocultarse o mostrarse.
 	 */
 	public boolean[] getPositions() {
 		return this.positions != null ? this.positions.clone() : null;

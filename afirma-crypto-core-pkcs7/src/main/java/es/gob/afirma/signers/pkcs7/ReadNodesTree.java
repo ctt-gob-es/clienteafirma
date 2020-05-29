@@ -126,6 +126,7 @@ public final class ReadNodesTree {
                 final Date signingTime = getSigningTime(si);
                 final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
+                aossi.setSignAlgorithm(getSignatureAlgorithm(si));
                 this.rama = new AOTreeNode(aossi);
                 this.listaCert.add(nameSigner);
                 getUnsignedAtributes(true, si.getUnauthenticatedAttributes(), this.rama, certificates);
@@ -148,6 +149,42 @@ public final class ReadNodesTree {
 
         return new AOTreeModel(raiz);
     }
+
+    private static String getSignatureAlgorithm(final SignerInfo signerInfo) {
+    	final String digestAlgoOid = translateDigestOid(signerInfo.getDigestAlgorithm().getAlgorithm());
+    	final String encryptionAlgoOid = translateEncryptionOid(signerInfo.getDigestEncryptionAlgorithm().getAlgorithm());
+
+    	return digestAlgoOid + "with" + encryptionAlgoOid; //$NON-NLS-1$
+    }
+
+    private static String translateDigestOid(final ASN1ObjectIdentifier oid) {
+
+    	final String oidString = oid.toString();
+    	if (oidString.equals("2.16.840.1.101.3.4.2.3")) {	// Huella SHA512 //$NON-NLS-1$
+    		return "SHA512"; //$NON-NLS-1$
+    	} else if (oidString.equals("2.16.840.1.101.3.4.2.1")) {	// Huella SHA256 //$NON-NLS-1$
+    		return "SHA256"; //$NON-NLS-1$
+    	} else if (oidString.equals("2.16.840.1.101.3.4.2.2")) {	// Huella SHA384 //$NON-NLS-1$
+    		return "SHA384"; //$NON-NLS-1$
+    	} else if (oidString.equals("1.3.14.3.2.26")) {	// Huella SHA1 //$NON-NLS-1$
+     		return "SHA1"; //$NON-NLS-1$
+     	}
+    	return oidString;
+    }
+
+    private static String translateEncryptionOid(final ASN1ObjectIdentifier oid) {
+
+    	final String oidString = oid.toString();
+    	if (oidString.equals("1.2.840.113549.1.1.1")) {	// Firma RSA //$NON-NLS-1$
+    		return "RSA"; //$NON-NLS-1$
+    	} else if (oidString.equals("1.2.840.10040.4.1")) {	// Firma DSA	//TODO: Sin verificar //$NON-NLS-1$
+    		return "DSA"; //$NON-NLS-1$
+    	} else if (oidString.equals("1.2.840.10045.4")) {	// Firma ECDSA	//TODO: Sin verificar //$NON-NLS-1$
+    		return "ECDSA"; //$NON-NLS-1$
+    	}
+    	return oidString;
+    }
+
     /** M&eacute;todo para obtener las contrafirmas.
      * @param withCertificates <code>true</code> para hacer la obtenci&oacute;n con certificados, <code>false</code>
      *                         en caso contrario.
@@ -176,6 +213,7 @@ public final class ReadNodesTree {
                                 final Date signingTime = getSigningTime(si);
                                 final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
+                                aossi.setSignAlgorithm(getSignatureAlgorithm(si));
                                 this.rama2 = new AOTreeNode(aossi);
                                 this.listaCert.add(nameSigner);
                                 ramahija.add(this.rama2);
