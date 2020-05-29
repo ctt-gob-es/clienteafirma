@@ -518,6 +518,7 @@ public final class XAdESCounterSigner {
 	 * @param certChain Cadena de certificados del firmante
 	 * @param xParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
+	 * @param profile Perfil de firma a aplicar.
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void cs(final Element signature,

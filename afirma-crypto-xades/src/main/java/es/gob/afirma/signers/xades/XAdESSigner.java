@@ -1490,12 +1490,12 @@ public final class XAdESSigner {
 
 	/**
 	 * Crea una referencia a datos externos a partir de
-	 * @param uri
-	 * @param fac
-	 * @param digestMethod
+	 * @param uri URI a los datos externos.
+	 * @param fac Factor&iacute;a de firmas XML.
+	 * @param digestMethod Identificador del algoritmo de huella digital.
 	 * @param referenceId Identificador que se asignara a la nueva referencia.
-	 * @return
-	 * @throws AOException
+	 * @return Referencia a datos.
+	 * @throws AOException Cuando falla la creaci&oacute;n de la referencia.
 	 */
 	private static Reference createExternalReferenceFromUri(
 			final String uri,

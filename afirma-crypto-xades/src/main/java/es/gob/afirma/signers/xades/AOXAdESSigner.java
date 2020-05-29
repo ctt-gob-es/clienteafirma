@@ -823,7 +823,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     }
 
     /** Cofirma datos en formato XAdES.
-     * @param sign Documento con las firmas iniciales.
+     * @param signDocument Documento XML con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
@@ -870,7 +870,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * {@code targetType} seleccionado.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Contrafirma en formato XAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -898,7 +898,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     }
 
     /** Contrafirma firmas en formato XAdES.
-     * @param sign Documento con las firmas iniciales.
+     * @param signDocument Documento XML con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * @param targetType Mecanismo de selecci&oacute;n de los nodos de firma que se deben
      * contrafirmar.
@@ -906,7 +906,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * {@code targetType} seleccionado.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Contrafirma en formato XAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static byte[] countersign(final Document signDocument,
@@ -1088,7 +1088,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-        	LOGGER.log(Level.WARNING, "No se pudo cargar el documento como XML", e); //$NON-NLS-1$
+        	LOGGER.log(Level.INFO, "El documento no es un XML"); //$NON-NLS-1$
             return false;
         }
         return isSign(signDocument);

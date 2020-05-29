@@ -10,7 +10,7 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 
 /**
- * Conjunto de pruebas de extracci&oiacute;n de los datos firmados de los distintos tipos de firma.
+ * Conjunto de pruebas de extracci&oacute;n de los datos firmados de los distintos tipos de firma.
  */
 public class TestExtractData {
 

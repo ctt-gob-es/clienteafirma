@@ -252,10 +252,10 @@ public final class ExtraParamsProcessor {
 		}
 
 		final String profile = params.getProperty("profile"); //$NON-NLS-1$
-		if (AOSignConstants.SIGN_PROFILE_BASELINE_B_LEVEL.equalsIgnoreCase(profile)) {
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
 			LOGGER.warning("Se ignora la configuracion del parametro 'profile' en favor de los requisitos establecidos por la politica de firma"); //$NON-NLS-1$
 		}
-		params.setProperty("profile", AOSignConstants.SIGN_PROFILE_BES); //$NON-NLS-1$
+		params.setProperty("profile", AOSignConstants.SIGN_PROFILE_ADVANCED); //$NON-NLS-1$
 
 		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_XADES);
 	}
@@ -266,6 +266,8 @@ public final class ExtraParamsProcessor {
 	 * @param policyName Nombre de la pol&iacute;tica de firma.
 	 * @param params Conjunto de propiedades en donde hay que establecer los atributos
 	 * de la pol&iacute;tica de firma.
+	 * @throws IncompatiblePolicyException Cuando se ha declarado utilizar un subfiltro
+	 * no permitido por la pol&iacute;tica de firma de la AGE.
 	 */
 	private static void setPAdESPolicyAGEAttributes(final String policyName, final Properties params)
 			throws IncompatiblePolicyException {

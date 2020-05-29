@@ -94,7 +94,7 @@ public class ExternalReferenceData {
 
 	/**
 	 * Recupera el mimetype que define el tipo de los datos referenciados.
-	 * @return MimeType de los datos.
+	 * @return Identificador del tipo de dato.
 	 */
 	public String getOid() {
 		return this.oid;
@@ -102,7 +102,7 @@ public class ExternalReferenceData {
 
 	/**
 	 * Establece el mimetype que define el tipo de los datos referenciados.
-	 * @param mimeType MimeType de los datos.
+	 * @param oid Identificador del tipo de dato.
 	 */
 	public void setOid(final String oid) {
 		this.oid = oid;

@@ -289,9 +289,9 @@ public final class AOFacturaESigner implements AOSigner {
     /** Indica si los datos son una factura electr&oacute;nica.
      * Importante: El que los datos sean una factura electr&oacute;nica no implica que puedan ser firmados, si esta
      * ya est&aacute; firmada el a&ntilde;adido de una firma adicional invalidar&iacute;a la factura
-     * @param signDocument Documento XML a comprobar
-     * @return <code>true</code> si los datos son una <a href="http://www.facturae.es/">factura electr&oacute;nica</a>,
-     *         <code>false</code> en caso contrario */
+     * @param dataDocument Documento a comprobar.
+     * @return {@code true} si los datos son una <a href="http://www.facturae.es/">factura electr&oacute;nica</a>,
+     *         {@code false} en caso contrario */
 	public static boolean isValidDataFile(final Document dataDocument) {
         if (dataDocument == null) {
             return false;

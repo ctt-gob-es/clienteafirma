@@ -153,17 +153,14 @@ public final class AOSignConstants {
 	// ****************** PERFILES DE FIRMA ***********************
 	// ************************************************************
 
-	/** Perfil de firma BES (Basic). */
-	public static final String SIGN_PROFILE_BES = "BES"; //$NON-NLS-1$
+	/** Perfil de firma avanzada corriente (BES, EPES, T, etc.). */
+	public static final String SIGN_PROFILE_ADVANCED = "advanced"; //$NON-NLS-1$
 
-	/** Perfil de firma EPES (Explicit Policy). */
-	public static final String SIGN_PROFILE_EPES = "EPES"; //$NON-NLS-1$
-
-	/** Perfil de firma Baseline B-LEVEL. */
-	public static final String SIGN_PROFILE_BASELINE_B_LEVEL = "B-B-Level"; //$NON-NLS-1$
+	/** Perfil de firma Baseline (B-Level, T-Level, etc.). */
+	public static final String SIGN_PROFILE_BASELINE = "baseline"; //$NON-NLS-1$
 
 	/** Perfil de firma por defecto. */
-	public static final String DEFAULT_SIGN_PROFILE = SIGN_PROFILE_BES;
+	public static final String DEFAULT_SIGN_PROFILE = SIGN_PROFILE_ADVANCED;
 
 	// ************************************************************
 	// ****************** ATRIBUTOS DE CMS ************************
@@ -363,5 +360,15 @@ public final class AOSignConstants {
 			   SIGN_ALGORITHM_SHA256WITHECDSA.equals(algorithm) ||
 			   SIGN_ALGORITHM_SHA384WITHECDSA.equals(algorithm) ||
 			   SIGN_ALGORITHM_SHA512WITHECDSA.equals(algorithm);
+	}
+
+	/** Comprueba si un algoritmo de firma utiliza el algoritmo de huella digital
+	 * SHA-1.
+	 * @param algorithm Algoritmo de firma.
+	 * @return {@code true} cuando el algoritmo es SHA-1, {@code false} en caso contrario. */
+	public static boolean isSHA1SignatureAlgorithm(final String algorithm) {
+		return SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)   ||
+			   SIGN_ALGORITHM_SHA1WITHDSA.equals(algorithm)   ||
+			   SIGN_ALGORITHM_SHA1WITHECDSA.equals(algorithm);
 	}
 }
