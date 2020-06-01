@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.XMLStructure;
@@ -43,10 +42,6 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -84,9 +79,7 @@ public final class XAdESCoSigner {
 
 		Document signDocument;
 		try {
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-			signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+			signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
 		}
 		catch (final Exception e) {
 			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
@@ -287,7 +280,7 @@ public final class XAdESCoSigner {
 				// Si es una referencia interna, comprobamos que no sea el KeyInfo o el SignedProperties
 				if (uri.startsWith("#")) { //$NON-NLS-1$
 					final String elementId = uri.substring(1);
-					final Node referencedNode = findNodeById(elementId, docSig);
+					final Node referencedNode = XAdESUtil.findElementById(elementId, docSig.getDocumentElement(), false);
 					if (referencedNode == null) {
 						throw new AOException("No se ha encontrado el nodo correspondiente a una referencia interna"); //$NON-NLS-1$
 					}
@@ -576,26 +569,6 @@ public final class XAdESCoSigner {
 			null,
 			null
 		);
-	}
-
-	/**
-	 * Busca un nodo con el identificador especificado.
-	 * @param nodeId Identificador del nodo que queremos encontrar.
-	 * @param parentElement Nodo padre en el que buscar.
-	 * @return Nodo con el identificador indicado o {@code null} si no
-	 * se encuentra el nodo o si lo que se encuentra no es un &uacute;nico nodo.
-	 */
-	private static Node findNodeById(final String nodeId, final Node parentElement) {
-		final XPath xpath = XPathFactory.newInstance().newXPath();
-
-		Node node;
-		try {
-			node = (Node) xpath.evaluate("//*[@Id='" + nodeId + "']", parentElement, XPathConstants.NODE); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "Lo encontrado con el Id " + nodeId + " no es un nodo", e); //$NON-NLS-1$ //$NON-NLS-2$
-			node = null;
-		}
-		return node;
 	}
 
 	/**

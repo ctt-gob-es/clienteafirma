@@ -31,6 +31,9 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -72,6 +75,28 @@ public final class XAdESUtil {
 	    "http://uri.etsi.org/01903/v1.4.1#" //$NON-NLS-1$
 	};
 
+	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
+			"http://uri.etsi.org/01903#SignedProperties", //$NON-NLS-1$
+		    "http://uri.etsi.org/01903/v1.2.2#SignedProperties", //$NON-NLS-1$
+		    "http://uri.etsi.org/01903/v1.3.2#SignedProperties", //$NON-NLS-1$
+		    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
+		};
+
+
+	private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
+
+	static {
+		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+		try {
+			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "No se ha podido establecer la propiedad de seguridad en la factoria XML", e); //$NON-NLS-1$
+		}
+		SECURE_BUILDER_FACTORY.setValidating(false);
+		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
+	}
+
 	private XAdESUtil() {
 		// No permitimos la instanciacion
 	}
@@ -90,6 +115,21 @@ public final class XAdESUtil {
             }
         }
         return true;
+    }
+
+    /**
+     * Indica si un tipo se corresponde con el que se debe declarar en la referencia a las
+     * propiedades firmadas de una firma.
+     * @param type Tipo declarado.
+     * @return {@code true} si es un tipo SignedProperties, {@code false} en caso contrario.
+     */
+    static boolean isSignedPropertiesType(final String type) {
+    	for (final String signedPropertiesType : SIGNED_PROPERTIES_TYPES) {
+    		if (signedPropertiesType.equals(type)) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
 
 	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdESBase xades,
@@ -145,6 +185,46 @@ public final class XAdESUtil {
 			);
 		}
 		return (Element) nodeList.item(0);
+	}
+
+	/**
+	 * Busca un nodo con el atributo 'Id' indicado.
+	 * @param nodeId Identificador del nodo que queremos encontrar.
+	 * @param currentElement Elemento en el que queremos buscar.
+	 * @param omitSignatures Si es {@code true}, se omite la b&uacute;squeda dentro de cualquier
+	 * nodo de nombre "Signature", aunque podr&iacute;a referenciarse al propio nodo, {@code false}
+	 * en caso contrario.
+	 * @return Nodo con el identificador indicado o {@code null} si no
+	 * se encuentra el nodo.
+	 */
+	static Element findElementById(final String nodeId, final Element currentElement, final boolean omitSignatures) {
+
+		// Si es este el nodo, lo devolvemos
+		if (nodeId.equals(currentElement.getAttribute("Id"))) { //$NON-NLS-1$
+			return currentElement;
+		}
+
+		// Se podria referenciar a un nodo llamado "Signature", pero omitiriamos
+		// la busqueda dentro de cualquier nodo con dicho nombre si asi se indica
+		if (omitSignatures && currentElement.getLocalName().equals("Signature")) { //$NON-NLS-1$
+			return null;
+		}
+
+		// Si no, lo buscamos en cada uno de los hijos, deteniendonos
+		// en cuanto se encuentre
+		Node item;
+		final NodeList childList = currentElement.getChildNodes();
+		for (int i = 0; i < childList.getLength(); i++) {
+			item = childList.item(i);
+			if (item.getNodeType() == Node.ELEMENT_NODE) {
+				final Element el = findElementById(nodeId, (Element) item, omitSignatures);
+				if (el != null) {
+					return el;
+				}
+			}
+		}
+		// si no lo encontramos en ninguno de los nodos hijo, devolvemos nulo
+		return null;
 	}
 
 	/** Obtiene la lista de <i>CommitmentTypeIndication</i> declarados entre los
@@ -507,5 +587,14 @@ public final class XAdESUtil {
 		}
 
 		return xades;
+	}
+
+	/**
+	 * Obtiene un objeto para la composici&oacute;n de documentos DOM.
+	 * @return Objeto para la composici&oacute;n de documentos DOM.
+	 * @throws ParserConfigurationException Cuando no se puede obtener el objeto.
+	 */
+	static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
+		return SECURE_BUILDER_FACTORY.newDocumentBuilder();
 	}
 }

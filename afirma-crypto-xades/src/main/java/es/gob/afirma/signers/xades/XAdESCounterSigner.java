@@ -29,7 +29,6 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -105,14 +104,9 @@ public final class XAdESCounterSigner {
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
 
-		// Nueva instancia de DocumentBuilderFactory que permita espacio de
-		// nombres (necesario para XML)
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-
 		Document signDocument;
 		try {
-			signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+			signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
 		}
 		catch (final Exception e) {
 			throw new AOException("No se ha podido cargar el documento de firmas", e); //$NON-NLS-1$
@@ -208,11 +202,6 @@ public final class XAdESCounterSigner {
 			}
 		}
 
-		// Nueva instancia de DocumentBuilderFactory que permita espacio de
-		// nombres (necesario para XML)
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-
 		// Flag que indica si el documento tiene una firma simple o esta cofirmado
 		// por defecto se considera que es un documento cofirmado
 		boolean esFirmaSimple = false;
@@ -295,7 +284,7 @@ public final class XAdESCounterSigner {
 		// y se vuelve a dejar como raiz el nodo Signature original
 		if (esFirmaSimple) {
 			try {
-				final Document newdoc = dbf.newDocumentBuilder().newDocument();
+				final Document newdoc = XAdESUtil.getNewDocumentBuilder().newDocument();
 				newdoc.appendChild(
 						newdoc.adoptNode(
 								doc.getElementsByTagNameNS(

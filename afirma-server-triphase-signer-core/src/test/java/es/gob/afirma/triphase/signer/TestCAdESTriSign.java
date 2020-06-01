@@ -120,7 +120,7 @@ public class TestCAdESTriSign {
 		final File saveFile = saveTempFile(result);
 		System.out.println("Prueba " + new TestCAdESTriSign() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		checkSign(result, algorithm, true);
+		checkSign(result, algorithm, false);
 	}
 
 	/**

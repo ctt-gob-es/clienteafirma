@@ -10,12 +10,12 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Transform;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -265,6 +265,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     /** Etiqueta de los nodos firma de los XML firmados. */
     public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
 
+    /** Etiqueta de los nodos SignedInfo. */
+    public static final String SIGNEDINFO_TAG = "SignedInfo"; //$NON-NLS-1$
+
+    /** Etiqueta de los nodos con las referencias de firma. */
+    public static final String REFERENCE_TAG = "Reference"; //$NON-NLS-1$
+
     /** Etiqueta de los nodos de sello de tiempo. */
 	private static final String TIMESTAMP_TAG = "Timestamp"; //$NON-NLS-1$
 
@@ -276,6 +282,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     /** URI que define una referencia de tipo MANIFEST. */
     static final String MANIFESTURI = "http://www.w3.org/2000/09/xmldsig#Manifest"; //$NON-NLS-1$
+
+    /** Transformaci&oacute;n XPATH para eliminar todas las firmas de un XML. */
+    private static final String XPATH_ENVELOPED_EQ = "not(ancestor-or-self::%1$s:Signature)"; //$NON-NLS-1$
+
+    /** Transformaci&oacute;n XPATH equivalente a la transformaci&oacute;n enveloped. Elimina la firma actual. */
+    private static final String XPATH_ENVELOPED_EQ2 = "count(ancestor-or-self::%1$s:Signature|here()/ancestor::%1$s:Signature[1])>count(ancestor-or-self::%1$s:Signature)"; //$NON-NLS-1$
 
     static final String AFIRMA = "AFIRMA"; //$NON-NLS-1$
     static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
@@ -431,175 +443,418 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     			);
     }
 
-    // TODO: Hacer mas fiables los metodos de deteccion de los tipos de formato (isDetached, isEnveloping, etc)
-
-    /** Comprueba si la firma es <i>detached</i>. Previamente debe haberse comprobado que el XML se
-     * corresponde con una firma XAdES.
+    /** Comprueba si la firma es <i>internally detached</i>. Seg&uacute;n la definici&oacute;n del est&aacute;ndar:<br>
+     * <p><b><i>Signature, Detached</i></b></p>
+     * <p><i>The signature is over content external to the Signature element,
+     * and can be identified via a URI or transform. Consequently, the signature is "detached" from
+     * the content it signs. This definition typically applies to separate data objects, but it also
+     * includes the instance where the Signature and data object reside within the same XML document
+     * but are sibling elements.</i></p>
+     * <p>En el caso que nos ocupa, la referencia sera a un nodo hermano a la propia firma. Es decir, un
+     * nodo referenciado mediante un fragmento o transformaci&oacute;n pero que no se encuentre dentro
+     * de la propia firma.</p>
+     * <p>Este m&eacute;todo s&oacute;lo comprueba que sea <i>internally detached</i> la primera
+     * firma encontrada en el XML.</p>
      * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
      *                quiere comprobar
      * @return <code>true</code> si la firma es <i>detached</i>, <code>false</code> en caso contrario. */
     public static boolean isDetached(final Element element) {
-        if (element == null) {
-            return false;
-        }
 
-        try {
-        	String dataNodeId = null;
-        	final NodeList mainChildNodes = element.getChildNodes();
-        	for (int i = 0; i < mainChildNodes.getLength(); i++) {
-        		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
-        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
-        			break;
-        		}
-        	}
-        	if (dataNodeId == null || dataNodeId.length() == 0) {
-        		return false;
-        	}
+    	// Obtenemos la primera firma encontrada en el elemento XML
+    	final Element signatureElement = getFirstSignatureElement(element);
 
-        	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
-        	for (int i = 0; i < referenceList.getLength(); i++) {
-        		if (((Element) referenceList.item(i)).getAttribute("URI").equals('#' + dataNodeId)) { //$NON-NLS-1$
-        			return true;
-        		}
-        	}
-        }
-        catch (final Exception e) {
-        	return false;
-        }
+    	// Si no se encuentran firmas, no es una firma
+    	if (signatureElement == null) {
+    		return false;
+    	}
 
-        return false;
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
+
+    	return isSignatureElementInternallyDetached(element, dataReferenceList);
     }
 
-    /** Comprueba si la firma es <i>externally detached</i>. Previamente debe haberse
-     * comprobado que el XML se corresponde con una firma XAdES.
+    /**
+     * Indica si la firma a la que pertenecen las referencias usadas es internally detached.
+     * @param docElement Elemento ra&iacute;z del XML.
+     * @param references Referencias a datos encontrados en la firma.
+     * @return {@code true} si la firma es internally detached, {@code false} en caso contrario.
+     */
+    private static boolean isSignatureElementInternallyDetached(final Element docElement, final List<Element> references) {
+
+    	if (docElement == null || references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos internally detached si alguno de los datos referenciados esta contenido dentro
+    	// del XML padre, sin entrar en ninguna firma.
+    	// NOTA: Una cofirma de una firma enveloping podria considerarse
+    	// internally detached, ya que tendria una referencia a los datos contenidos en la otra firma, que es
+    	// externa a ella misma. Se omite la busqueda en todas las firmas para omitir, ademas de otros posibles,
+    	// este caso de uso
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && uri.startsWith("#")) { //$NON-NLS-1$
+				final Node referencedNode = XAdESUtil.findElementById(uri.substring(1), docElement, true);
+				// Si los datos referenciados estan contenidos dentro del XML padre y fuera de las firmas,
+				// se trata de una firma internally detached
+				if (referencedNode != null) {
+					return true;
+				}
+    		}
+    	}
+    	// Se supone que los datos estarian dentro de alguna de las firmas o fuera del XML
+    	return false;
+	}
+
+	/** Comprueba si la firma es <i>externally detached</i>. Seg&uacute;n la definici&oacute;n del est&aacute;ndar:<br>
+     * <p><b><i>Signature, Detached</i></b></p>
+     * <p><i>The signature is over content external to the Signature element,
+     * and can be identified via a URI or transform. Consequently, the signature is "detached" from
+     * the content it signs. This definition typically applies to separate data objects, but it also
+     * includes the instance where the Signature and data object reside within the same XML document
+     * but are sibling elements.</i></p>
+     * <p>En el caso que nos ocupa, la referencia sera una referencia externa al XML. Es decir, un
+     * nodo referenciado mediante una URI externa, por lo que se comprobar&aacute; si la URI utiliza
+     * el esquema http o https. En caso afirmativo, se considerara una firma externally detached.</p>
+     * <p>Este m&eacute;todo s&oacute;lo comprueba que sea <i>externally detached</i> la primera
+     * firma encontrada en el XML.</p>
      * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
      *                quiere comprobar
      * @return {@code true} si la firma es <i>externally detached</i>, {@code false}
      * en caso contrario. */
     public static boolean isExternallyDetached(final Element element) {
-        if (element == null) {
-            return false;
-        }
+    	// Obtenemos la primera firma encontrada en el elemento XML
+    	final Element signatureElement = getFirstSignatureElement(element);
 
-        try {
-        	String dataNodeId = null;
-        	final NodeList mainChildNodes = element.getChildNodes();
-        	for (int i = 0; i < mainChildNodes.getLength(); i++) {
-        		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
-        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
-        			break;
-        		}
-        	}
-        	if (dataNodeId == null || dataNodeId.length() == 0) {
-        		return false;
-        	}
+    	// Si no se encuentran firmas, no es una firma
+    	if (signatureElement == null) {
+    		return false;
+    	}
 
-        	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
-        	for (int i = 0; i < referenceList.getLength(); i++) {
-        		try {
-        			new URI(((Element) referenceList.item(i)).getAttribute("URI")); //$NON-NLS-1$
-        		}
-        		catch (final URISyntaxException e) {
-        			LOGGER.warning("Una de las referencias introducidas no tiene un formato valido: " + ((Element) referenceList.item(i)).getAttribute("URI")); //$NON-NLS-1$ //$NON-NLS-2$
-        			continue;
-				}
-        		catch (final Exception e) {
-        			LOGGER.log(Level.WARNING, "Una de las referencias introducidas no es valida", e); //$NON-NLS-1$
-        			continue;
-				}
-        		// Es una referencia externa con URI valida, ya que las internas empiezan por '#'
-        		return true;
-        	}
-        }
-        catch (final Exception e) {
-        	return false;
-        }
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
 
-        return false;
+    	return isSignatureElementExternallyDetached(dataReferenceList);
     }
 
-    /** Comprueba si una firma de manifest. Previamente debe haberse comprobado que el XML se
-     * corresponde con una firma XAdES.
+    /**
+     * Indica si la firma a la que pertenecen las referencias usadas es externally detached.
+     * @param references Referencias a datos encontrados en la firma.
+     * @return {@code true} si la firma es externally detached, {@code false} en caso contrario.
+     */
+    private static boolean isSignatureElementExternallyDetached(final List<Element> references) {
+
+    	if (references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos externally detached si se encuentra una referencia que utilice el
+    	// esquema http o https
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && (uri.toLowerCase(Locale.US).startsWith("http://") || //$NON-NLS-1$
+    				uri.toLowerCase(Locale.US).startsWith("https://"))) { //$NON-NLS-1$
+    			return true;
+    		}
+    	}
+    	return false;
+	}
+
+    /** Comprueba si una firma de manifest. Seg&uacute;n la definici&oacute;n del est&aacute;ndar:<br>
+     * <p><b><i>Signature, Detached</i></b></p>
+     * <p><i>The signature is over content external to the Signature element,
+     * and can be identified via a URI or transform. Consequently, the signature is "detached" from
+     * the content it signs. This definition typically applies to separate data objects, but it also
+     * includes the instance where the Signature and data object reside within the same XML document
+     * but are sibling elements.</i></p>
+     * <p>Este m&eacute;todo s&oacute;lo comprueba que sea una firma <i>manifest</i> la primera
+     * firma encontrada en el XML.</p>
      * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
      *                quiere comprobar
      * @return {@code true} si es una firma con <i>manifest</i>, {@code false} en caso contrario. */
     public static boolean isManifestSignature(final Element element) {
-        if (element == null) {
-            return false;
-        }
+    	// Obtenemos la primera firma encontrada en el elemento XML
+    	final Element signatureElement = getFirstSignatureElement(element);
 
-        try {
-        	String dataNodeId = null;
-        	final NodeList mainChildNodes = element.getChildNodes();
-        	for (int i = 0; i < mainChildNodes.getLength(); i++) {
-        		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
-        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
-        			break;
-        		}
-        	}
-        	if (dataNodeId == null || dataNodeId.length() == 0) {
-        		return false;
-        	}
+    	// Si no se encuentran firmas, no es una firma
+    	if (signatureElement == null) {
+    		return false;
+    	}
 
-        	final NodeList referenceList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
-        	for (int i = 0; i < referenceList.getLength(); i++) {
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
 
-        		final String referenceType = ((Element) referenceList.item(i)).getAttribute("Type"); //$NON-NLS-1$
-        		if (referenceType != null && referenceType.equals(MANIFESTURI)) {
-	        		// Si la firma tiene una referencia de tipo manifest, es manifest
-	        		return true;
-        		}
-        	}
-        }
-        catch (final Exception e) {
-        	return false;
-        }
-
-        return false;
+    	return isSignatureWithManifest(dataReferenceList);
     }
 
-    /** Comprueba si la firma es <i>enveloped</i>. Previamente debe haberse comprabado que el XML se
-     * corresponde con una firma XAdES.
+    /**
+     * Indica si la firma utiliza un manifest para referenciar datos.
+     * @param references Referencias a datos encontrados en la firma.
+     * @return {@code true} si es una firma con manifest, {@code false} en caso contrario.
+     */
+    static boolean isSignatureWithManifest(final List<Element> references) {
+
+    	if (references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos firma con manifest si alguna de las referencias que firma esta
+    	// declarada como de tipo manifest
+    	for (int i = 0; i < references.size(); i++) {
+    		final String type = references.get(i).getAttribute("Type"); //$NON-NLS-1$
+    		if (type != null && type.equals(MANIFESTURI)) {
+    			return true;
+    		}
+    	}
+    	return false;
+	}
+
+	/** Comprueba si la firma es <i>enveloped</i>. Seg&uacute;n la definici&oacute;n del est&aacute;ndar:<br>
+     * <p><b><i>Signature, Enveloped</i></b></p>
+     * <p><i>The signature is over the XML content that contains the signature as an element. The
+     * content provides the root XMLdocument element. Obviously, enveloped signatures must take
+     * care not to include their own value in the calculation of the SignatureValue.</i></p>
+     * <p>En la pr&aacute;ctica, se evaluara que la URI a los datos este vac&iacute;a (lo que,
+     * seg&uacute;n el est&aacute;ndar "<i>Identifies the node-set (minus any comment nodes)
+     * of theXML resource containing the signature</i>") y que se declare la transformaci&oacute;n
+     * enveloped o una de las transformacines XPATH sugeridas en el est&aacute;ndar:</p>
+     * <p>{@code not(ancestor-or-self::dsig:Signature)}</p>
+     * <p>o</p>
+     * <p>{@code count(ancestor-or-self::dsig:Signature |
+     * here()/ancestor::dsig:Signature[1]) >
+     * count(ancestor-or-self::dsig:Signature) }</p>
+     * <p>Este m&eacute;todo s&oacute;lo comprueba que sea <i>enveloped</i> la primera
+     * firma encontrada en el XML.</p>
      * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
      *        	      quiere comprobar
      * @return <code>true</code> cuando la firma es <i>enveloped</i>, <code>false</code> en caso
      *         contrario. */
     public static boolean isEnveloped(final Element element) {
-        final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
-        for (int i = 0; i < transformList.getLength(); i++) {
-            if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) { //$NON-NLS-1$
-                return true;
-            }
-        }
-        return false;
+    	// Obtenemos la primera firma encontrada en el elemento XML
+    	final Element signatureElement = getFirstSignatureElement(element);
+
+    	// Si no se encuentran firmas, no es una firma
+    	if (signatureElement == null) {
+    		return false;
+    	}
+
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
+
+    	return isSignatureElementEnveloped(signatureElement, dataReferenceList);
     }
 
-    /** Comprueba si la firma es <i>enveloping</i>. Previamente debe haberse comprabado que el XML se
-     * corresponde con una firma XAdES.
+    /**
+     * Comprueba a trav&eacute;s de las referencias a datos declaradas en una firma si se
+     * trata de una firma enveloped.
+     * @param signatureElement Elemento con la firma a comprobar.
+     * @param references Referencias a datos declaradas en la firma.
+     * @return {@code true} si es una firma enveloped, {@code false} en caso contrario.
+     */
+    static boolean isSignatureElementEnveloped(final Element signatureElement, final List<Element> references) {
+
+    	if (references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos enveloping si alguno de los datos referenciados esta contenido dentro de
+    	// la propia firma.
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && uri.isEmpty()) {
+    			final NodeList transformList = references.get(i).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
+    			for (int j = 0; j < transformList.getLength(); j++) {
+    				final String algorithm = ((Element) transformList.item(j)).getAttribute("Algorithm"); //$NON-NLS-1$
+    				if (Transform.ENVELOPED.equals(algorithm)) {
+    					return true;
+    				}
+    				else if (Transform.XPATH.equals(algorithm)) {
+    					final String signaturePrefix = signatureElement.getPrefix();
+    					final String xPath = transformList.item(j).getTextContent().replaceAll("\\s+", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    					if (String.format(XPATH_ENVELOPED_EQ, signaturePrefix).equals(xPath) ||
+    							String.format(XPATH_ENVELOPED_EQ2, signaturePrefix).equals(xPath)) {
+    						return true;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return false;
+    }
+
+    /** Comprueba si la firma es <i>enveloping</i>. Seg&uacute;n la definici&oacute;n del est&aacute;ndar:<br>
+     * <p><b><i>Signature, Enveloping</i></b></p>
+     * <p><i>The signature is over content found within an Object element of the signature itself. The
+     * Object (or its content) is identified via a Reference (via a URI fragment identifier or transform).</i>
+     * <p>En la pr&aacute;ctica, comprobaremos que la firma se encuentra en un nodo "object" contenido en
+     * la firma.</p>
+     * <p>Este m&eacute;todo s&oacute;lo comprueba que sea <i>enveloping</i> la primera
+     * firma encontrada en el XML. Tengase en cuenta, que una firma Manifest ser&aacute; considerada
+     * enveloping cuando el manifest se encuentre dentro de la propia firma.</p>
      * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
      *                quiere comprobar.
      * @return <code>true</code> cuando la firma es <i>enveloping</i>, <code>false</code> en caso
      *         contrario. */
     public static boolean isEnveloping(final Element element) {
-        if (element.getLocalName().equals(SIGNATURE_TAG) ||
-           element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG)) {
-            return true;
-        }
-        return false;
+
+    	// Obtenemos la primera firma encontrada en el elemento XML
+    	final Element signatureElement = getFirstSignatureElement(element);
+
+    	// Si no se encuentran firmas, no es una firma
+    	if (signatureElement == null) {
+    		return false;
+    	}
+
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
+
+    	return isSignatureElementEnveloping(signatureElement, dataReferenceList);
+    }
+
+    /**
+     * Comprueba a trav&eacute;s de las referencias a datos declaradas en una firma si se
+     * trata de una firma enveloping.
+     * @param signatureElement Elemento con la firma a comprobar.
+     * @param references Referencias a datos declaradas en la firma.
+     * @return {@code true} si es una firma enveloping, {@code false} en caso contrario.
+     */
+    static boolean isSignatureElementEnveloping(final Element signatureElement, final List<Element> references) {
+
+    	if (signatureElement == null || references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos enveloping si alguno de los datos referenciados esta contenido dentro de
+    	// la propia firma.
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && uri.startsWith("#")) { //$NON-NLS-1$
+				final Node referencedNode = XAdESUtil.findElementById(uri.substring(1), signatureElement, false);
+				// Si los datos referenciados estan contenidos en la firma, se trata de una firma enveloping
+				if (referencedNode != null) {
+					return true;
+				}
+    		}
+    	}
+    	return false;
+    }
+
+    /**
+     * Obtiene la primera firma encontrada en el elemento XML.
+     * @param element Elemento XML.
+     * @return Primera firma encontrada o nulo si no se encuentra ninguna.
+     */
+    private static Element getFirstSignatureElement(final Element element) {
+
+    	if (element == null) {
+    		return null;
+    	}
+
+    	// Localizamos el primer nodo de firma
+    	Element signatureElement = null;
+    	if (SIGNATURE_TAG.equals(element.getLocalName())) {
+    		signatureElement = element;
+    	}
+    	else {
+    		final NodeList signatures = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
+    		if (signatures.getLength() > 0) {
+    			signatureElement = (Element) signatures.item(0);
+    		}
+    	}
+    	return signatureElement;
+    }
+
+    /**
+     * Obtiene un listado con las referencias a datos de la firma proporcionada.
+     * Se considera referencia a datos toda aquella que no sea referencia al
+     * SignedProperties ni a un objeto KeyInfo de la firma.
+     * @param element Elemento XML.
+     * @return Listado de referencias encontradas o nulo si no se encontr&oacute;
+     * ninguna firma.
+     */
+    private static List<Element> getSignatureDataReferenceList(final Element element) {
+    	// Localizamos el primer nodo de firma
+    	Element signatureElement;
+    	if (SIGNATURE_TAG.equals(element.getLocalName())) {
+    		signatureElement = element;
+    	}
+    	else {
+    		final NodeList signatures = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
+    		if (signatures == null || signatures.getLength() == 0) {
+    			return null;
+    		}
+    		signatureElement = (Element) signatures.item(0);
+    	}
+
+    	// Obtemos el nodo SignedInfo
+    	int i = 0;
+    	Element signedInfoElement = null;
+    	final NodeList childs = signatureElement.getChildNodes();
+    	while (i < childs.getLength() && signedInfoElement == null) {
+    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
+    				childs.item(i).getLocalName().equals(SIGNEDINFO_TAG)) {
+    			signedInfoElement = (Element) childs.item(i);
+    		}
+    		i++;
+    	}
+    	if (signedInfoElement == null) {
+    		return null;
+    	}
+
+    	// Obtenemos las referencias declaradas en la firma
+    	final NodeList references = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_TAG);
+
+    	// Omitimos del listado la referencia a los atributos firmados
+    	final List<Element> dataReferences = new ArrayList<>();
+    	for (i = 0; i < references.getLength(); i++) {
+    		final Element reference = (Element) references.item(i);
+    		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
+			if (type != null && !type.isEmpty()) {
+				if (!XAdESUtil.isSignedPropertiesType(type)) {
+					dataReferences.add(reference);
+				}
+			}
+			// Si no se establecio el tipo de referencia, lo comprobamos a partir de la URI
+			else {
+				final String uri = reference.getAttribute("URI"); //$NON-NLS-1$
+
+				// Si es una referencia interna, comprobamos que no sea el KeyInfo o el SignedProperties
+				if (uri != null && uri.startsWith("#")) { //$NON-NLS-1$
+					final String elementId = uri.substring(1);
+					final Node referencedNode = XAdESUtil.findElementById(elementId, signatureElement, false);
+
+					// Si el nodo referenciado no esta dentro del nodo de firma, es que es una referencia
+					// externa a datos
+					if (referencedNode == null) {
+						dataReferences.add(reference);
+					}
+					// Si no, comprobamos que no sea una referencia al KeyInfo o al SignedProperties
+					else {
+						final String nodeName = referencedNode.getLocalName();
+						if (!nodeName.equals("KeyInfo") && !nodeName.equals("SignedProperties")) { //$NON-NLS-1$ //$NON-NLS-2$
+							dataReferences.add(reference);
+						}
+					}
+				}
+				// Cualquier referencia no interna hay que firmarla
+				else {
+					dataReferences.add(reference);
+				}
+			}
+    	}
+
+    	return dataReferences;
     }
 
     /** {@inheritDoc} */
     @Override
 	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
 
-    	// Nueva instancia de DocumentBuilderFactory que permita espacio de
-        // nombres (necesario para XML)
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
+    	// Construimos el arbol DOM
         Document doc;
         try {
-            doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            doc = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception ex) {
             throw new AOInvalidFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
@@ -607,6 +862,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
         return getData(doc);
     }
+
+    //TODO: Mejorar el proceso de extraccion de datos para que se extraigan a partir de las referencias
+    // y no dando por hecho la distribucion de la firma
 
     /** Recupera los datos originalmente firmados de una firma.
      * En el caso de que la firma no contenga los datos firmados, se
@@ -623,21 +881,47 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             throw new AOInvalidFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
         }
 
-        final Element rootSig;
-        Element elementRes = null;
+        // Obtenemos la primera firma encontrada en el elemento XML
+    	final Element signatureElement = getFirstSignatureElement(signDocument.getDocumentElement());
+
+    	// Si no se encuentran firmas, no se recuperan los datos
+    	if (signatureElement == null) {
+    		return null;
+    	}
+
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
+
+        Element elementRes;
         try {
             // Obtiene la raiz del documento de firmas
-            rootSig = signDocument.getDocumentElement();
+            final Element docElement = signDocument.getDocumentElement();
 
-            // Si es detached
-            if (AOXAdESSigner.isDetached(rootSig)) {
+            // Si la firma es externally detached o de tipo Manifest, consideramos que los datos
+            // son externos y no se devolveran. Esto se hace asi por seguridad, incluso si se
+            // pudiese acceder a los datos  traves de URLs externas
+            if (isSignatureElementExternallyDetached(dataReferenceList) ||
+            		isSignatureWithManifest(dataReferenceList)) {
+            	elementRes = null;
+            }
 
-                final Element firstChild = (Element) rootSig.getFirstChild();
+            // Si es enveloped
+            else if (isSignatureElementEnveloped(signatureElement, dataReferenceList)) {
+
+            	removeEnvelopedSignatures(docElement);
+
+                elementRes = docElement;
+            }
+
+            // Si es internally detached
+            else if (isSignatureElementInternallyDetached(docElement, dataReferenceList)) {
+
+                final Element firstChild = (Element) docElement.getFirstChild();
 
                 // Si el contenido firmado es un nodo de texto, lo extramos como tal
                 if (firstChild.getFirstChild().getNodeType() == Node.TEXT_NODE) {
                 	// Si existe una transformacion Base64, la deshacemos
-                	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute(ID_IDENTIFIER)) ?
+                	return isBase64TransformationDeclared(docElement, firstChild.getAttribute(ID_IDENTIFIER)) ?
         				Base64.decode(firstChild.getTextContent()) :
         					firstChild.getTextContent().getBytes();
                 }
@@ -645,19 +929,11 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                 elementRes = (Element) firstChild.getFirstChild();
             }
 
-            // Si es enveloped
-            else if (AOXAdESSigner.isEnveloped(rootSig)) {
-
-            	removeEnvelopedSignatures(rootSig);
-
-                elementRes = rootSig;
-            }
-
             // Si es enveloping y no es manifest (porque de estas ultimas no podemos extraer los datos)
-            else if (AOXAdESSigner.isEnveloping(rootSig) && !AOXAdESSigner.isManifestSignature(rootSig)) {
+            else if (isSignatureElementEnveloping(signatureElement, dataReferenceList)) {
 
                 // Obtiene el nodo Object de la primera firma
-                final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
+                final Element object = (Element) docElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
                 // Si el documento es un xml se extrae como tal
                 if (object.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) object.getFirstChild();
@@ -666,10 +942,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                 // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	// Se deshace el Base64 si existe la transformacion Base64
-                	return isBase64TransformationDeclared(rootSig, object.getAttribute(ID_IDENTIFIER)) ?
+                	return isBase64TransformationDeclared(docElement, object.getAttribute(ID_IDENTIFIER)) ?
         				Base64.decode(object.getTextContent()) :
         					object.getTextContent().getBytes();
                 }
+            }
+            // No se ha podido identificar el tipo de firma
+            else {
+            	elementRes = null;
             }
         }
         catch (final Exception ex) {
@@ -682,9 +962,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         }
 
         // convierte el documento obtenido en un array de bytes
-//        final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
-//        XMLUtils.writeXML(baosSig, elementRes, false);
-
         return Utils.writeXML(elementRes, null, null, null);
     }
 
@@ -693,7 +970,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	final NodeList mainChildNodes = rootSig.getChildNodes();
     	for (int i = 0; i < mainChildNodes.getLength(); i++) {
     		if (mainChildNodes.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				mainChildNodes.item(i).getNodeName().endsWith(":" + SIGNATURE_TAG)) { //$NON-NLS-1$
+    				mainChildNodes.item(i).getLocalName().equals(SIGNATURE_TAG)) {
     			rootSig.removeChild(mainChildNodes.item(i));
     			removeEnvelopedSignatures(rootSig);
     			return;
@@ -809,9 +1086,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	Document signDocument;
     	try {
-    		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    		dbf.setNamespaceAware(true);
-    		signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    		signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
     	}
     	catch (final Exception e) {
     		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
@@ -884,9 +1159,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	Document signDocument;
     	try {
-    		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    		dbf.setNamespaceAware(true);
-    		signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    		signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
     	}
     	catch (final Exception e) {
     		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
@@ -937,11 +1210,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException {
 
         // Obtenemos el arbol del documento
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
         final Document signDoc;
         try {
-            signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            signDoc = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
             LOGGER.warning("Se ha producido un error al obtener la estructura de firmas: " + e); //$NON-NLS-1$
@@ -1012,7 +1283,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     		// Recogemos el identificador de la firma a la que se referencia (si
     		// no es contrafirma sera cadena vacia)
-    		if (signature.getParentNode().getNodeName().equals(XADES_SIGNATURE_PREFIX + ":CounterSignature")) { //$NON-NLS-1$
+    		if (signature.getParentNode() != null && "CounterSignature".equals(signature.getParentNode().getLocalName())) { //$NON-NLS-1$
     			arrayRef.add(Utils.getCounterSignerReferenceId(signature, signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue"))); //$NON-NLS-1$
     		}
     		else {
@@ -1081,11 +1352,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
         Document signDocument;
         try {
-            // Carga el documento a validar
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-
-            signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
         	LOGGER.log(Level.INFO, "El documento no es un XML"); //$NON-NLS-1$
@@ -1156,13 +1423,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @throws ParserConfigurationException Cuando se produce un error al analizar el XML. */
     static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
-        // Nueva instancia de DocumentBuilderFactory que permita espacio de
-        // nombres (necesario para XML)
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
         // Crea un nuevo documento con la raiz "AFIRMA"
-        final Document docAfirma = dbf.newDocumentBuilder().newDocument();
+        final Document docAfirma = XAdESUtil.getNewDocumentBuilder().newDocument();
         final Element rootAfirma = docAfirma.createElement(AFIRMA);
         rootAfirma.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
 
@@ -1180,12 +1442,10 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
-        // Tomamos la raiz del documento
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        // Cargamos el arbol DOM del documento
         Document signDocument;
         try {
-        	signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        	signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$
@@ -1219,17 +1479,23 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         // Componemos el objeto con la informacion de firma
         final AOSignInfo signInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_XADES);
 
+        // Identificamos el tipo de la firma por medio de las referencias de la primera de ellas
+    	final Element signatureElement = getFirstSignatureElement(signDocument.getDocumentElement());
+
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = getSignatureDataReferenceList(signatureElement);
+
         // Establecemos la variante de firma
-        if (isDetached(rootSig)) {
-        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-        }
-        else if (isExternallyDetached(rootSig)) {
-        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
-        }
-        else if (isEnveloped(rootSig)) {
+    	if (isSignatureElementEnveloped(signatureElement, dataReferenceList)) {
         	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
         }
-        else if (isEnveloping(rootSig)) {
+        else if (isSignatureElementExternallyDetached(dataReferenceList)) {
+        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+        }
+        else if (isSignatureElementInternallyDetached(rootSig, dataReferenceList)) {
+        	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+        }
+        else if (isSignatureElementEnveloping(signatureElement, dataReferenceList)) {
         	signInfo.setVariant(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
         }
 
@@ -1258,4 +1524,27 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	return newExtraParams;
     }
+
+    public static void main(final String[] args) throws Exception {
+
+    	final DocumentBuilder docBuilder = XAdESUtil.getNewDocumentBuilder();
+    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Documents\\Afirma\\Repositorios_GitHub\\clienteafirma\\afirma-crypto-xades\\src\\test\\resources\\78353__XAdES_A_Detached.xml"));
+    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\78353__XAdES_A_Detached.xml"));
+    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\78353__XAdES_A_Enveloping.xml"));
+    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\enveloped_mod.xml"));
+    	final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\1__firmaIgae.xsig.xml"));
+
+
+    	System.out.println("Enveloping: " + isEnveloping(doc.getDocumentElement()));
+    	System.out.println("Enveloped: " + isEnveloped(doc.getDocumentElement()));
+    	System.out.println("Detached: " + isDetached(doc.getDocumentElement()));
+    	System.out.println("Externally Detached: " + isExternallyDetached(doc.getDocumentElement()));
+    	System.out.println("Manifest: " + isManifestSignature(doc.getDocumentElement()));
+//    	final Element rootElement = doc.getDocumentElement();
+//    	final NamedNodeMap attrs = rootElement.getAttributes();
+//    	((Attr) attrs.item(0)).isId().getNodeType() == Node.ATTRIBUTE_NODE
+
+//    	final NodeList signatureList = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+//    	System.out.println("Firmas encontradas: " + signatureList.getLength());
+	}
 }
