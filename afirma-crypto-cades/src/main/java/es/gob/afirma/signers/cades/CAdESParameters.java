@@ -54,6 +54,8 @@ public class CAdESParameters {
 
 	private Properties extraParams;
 
+	private String profileSet = AOSignConstants.DEFAULT_SIGN_PROFILE;
+
 	public CAdESParameters() {
 		// No se permite construir el objeto externamente
 	}
@@ -94,7 +96,7 @@ public class CAdESParameters {
 		if (precalculatedDigestAlgorithm != null || AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(mode)) {
 			omitContent = true;
 		}
-		dataConfig.setContentIncluded(!omitContent);
+		dataConfig.setContentNeeded(!omitContent);
 
 		// Algoritmo de huella interna usado finalmente
 		final byte[] dataDigest;
@@ -192,10 +194,18 @@ public class CAdESParameters {
 		final boolean baselineProfile = AOSignConstants.SIGN_PROFILE_BASELINE.equals(
 				config.getProperty(CAdESExtraParams.PROFILE));
 
+		// Almacenamos el perfil configurado que, en caso de no ser baseline, sera el avanzado
+		if (baselineProfile) {
+			dataConfig.setProfileSet(AOSignConstants.SIGN_PROFILE_BASELINE);
+		} else {
+			dataConfig.setProfileSet(AOSignConstants.SIGN_PROFILE_ADVANCED);
+		}
 
-		// Insertaremos el numero de serie del emisor del certificado en el SigningCertificate(V2)
-		// de la firma salvo en el caso de firmas baseline, en donde no debe hacerse
-		dataConfig.setIncludedIssuerSerial(!baselineProfile);
+		// En el estandar baseline ETSI EN 319 122-1 V1.1.1 se indica expresamente que no se
+		// deberia incluir el IssuerSerial en el atributo del certificado firmante. Sin embargo,
+		// los validadores suelen emitir advertencias cuando se omite este atributo, asi que
+		// se seguira agregando
+		//dataConfig.setIncludedIssuerSerial(!baselineProfile);
 
 		// Configuracion establecida, que puede contener mas informacion que la requerida para la generacion de la firma CAdES
 		dataConfig.setExtraParams(config);
@@ -309,7 +319,7 @@ public class CAdESParameters {
 	 * @param contentNeeded {@code true} si se deben incluirse los datos,
 	 * {@code false} en caso contrario.
 	 */
-	public void setContentIncluded(final boolean contentNeeded) {
+	public void setContentNeeded(final boolean contentNeeded) {
 		this.contentNeeded = contentNeeded;
 	}
 
@@ -489,5 +499,25 @@ public class CAdESParameters {
 	 */
 	public void setExtraParams(final Properties extraParams) {
 		this.extraParams = extraParams;
+	}
+
+	/**
+	 * Obtiene el juego de perfiles de firma configurado: Avanzados (BES, EPES) o Baseline (B-Level).
+	 * @return Juego de perfiles a emplear.
+	 * @see AOSignConstants#SIGN_PROFILE_ADVANCED
+	 * @see AOSignConstants#SIGN_PROFILE_BASELINE
+	 */
+	public String getProfileSet() {
+		return this.profileSet;
+	}
+
+	/**
+	 * Establece el juego de perfiles de firma configurado: Avanzados (BES, EPES) o Baseline (B-Level).
+	 * @param profileSet Juego de perfiles a emplear.
+	 * @see AOSignConstants#SIGN_PROFILE_ADVANCED
+	 * @see AOSignConstants#SIGN_PROFILE_BASELINE
+	 */
+	public void setProfileSet(final String profileSet) {
+		this.profileSet = profileSet;
 	}
 }

@@ -376,19 +376,18 @@ final class CAdESCounterSigner {
         // Dejamos que el hash se calcule internamente en base a los datos que acabamos de introducir
         config.setDataDigest(null);
 
-        //TODO: Introducir la excepcion de las Baseline
         // En las contrafirmas BES, el tipo declarado en el contentHint siempre
         // sera Data y no contendra descripcion
-//        if (BES) {
-        config.setContentTypeOid(PKCSObjectIdentifiers.data.toString());
-        config.setContentDescription(null);
-//        }
+        if (AOSignConstants.SIGN_PROFILE_ADVANCED.equals(config.getProfileSet())) {
+        	config.setContentTypeOid(PKCSObjectIdentifiers.data.toString());
+        	config.setContentDescription(null);
+        }
         // En las contrafirmas Baseline, las contrafirmas no deben incluir el
         // atributo ContentHint
-//        else if (BASELINE){
-//        	config.setContentTypeOid(null);
-//            config.setContentDescription(null);
-//        }
+        else if (AOSignConstants.SIGN_PROFILE_BASELINE.equals(config.getProfileSet())){
+        	config.setContentTypeOid(null);
+        	config.setContentDescription(null);
+        }
 
         // authenticatedAttributes
         final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(

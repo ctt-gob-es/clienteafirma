@@ -15,8 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import org.spongycastle.asn1.ASN1EncodableVector;
@@ -31,6 +29,7 @@ import org.spongycastle.asn1.DERUTCTime;
 import org.spongycastle.asn1.DERUTF8String;
 import org.spongycastle.asn1.cms.Attribute;
 import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.esf.SignerLocation;
 import org.spongycastle.asn1.ess.ContentHints;
 import org.spongycastle.asn1.ess.ESSCertID;
 import org.spongycastle.asn1.ess.ESSCertIDv2;
@@ -484,60 +483,64 @@ public final class CAdESUtils {
         // 4.5.9 signer-location Attribute
         // For all profiles covered in the present document the signer-location attribute shall not be present.
         // NOTE: The location can be indicated by the value of the Location entry in the signature dictionary.
-        if (config.getMetadata() != null &&
-        		CAdESSignerMetadataHelper.getSignerLocation(config.getMetadata().getSignerLocation()) != null) {
-    		contextSpecific.add(
-				new Attribute(
-					PKCSObjectIdentifiers.id_aa_ets_signerLocation,
-					new DERSet(
-						CAdESSignerMetadataHelper.getSignerLocation(config.getMetadata().getSignerLocation())
-					)
-				)
-			);
+        if (config.getMetadata() != null) {
+        	final SignerLocation location = CAdESSignerMetadataHelper.getSignerLocation(config.getMetadata().getSignerLocation());
+        	if (location != null) {
+        		contextSpecific.add(
+        				new Attribute(
+        						PKCSObjectIdentifiers.id_aa_ets_signerLocation,
+        						new DERSet(location)
+        				)
+        		);
+        	}
         }
 
-        // Roles declarados (Segun ETSI TS 101 733 V2.1.1 (2012-03))
+        // Roles del firmante. De entre los distintos roles que pueden agregarse a una firma,
+        // solo se soporta agregar los roles declarados. La estructua para la declaracion de
+        // estos roles nellos, solo se soportan El como se declaran varia segun se utilicen los perfiles
+        // avanzados tradicionales (BES, EPES, etc) o los baseline (B-Level, etc):
+        //  - En el caso de los perfiles tradicionales, se utilizara signer-attributes segun el estandar ETSI TS 101 733 V2.1.1 (2012-03).
         //
-        // SignerAttribute ::= SEQUENCE OF CHOICE {
-        //    claimedAttributes   [0] ClaimedAttributes,
-        //    certifiedAttributes [1] CertifiedAttributes
-        // }
+        //		SignerAttribute ::= SEQUENCE OF CHOICE {
+        //			claimedAttributes   [0] ClaimedAttributes, OPTIONAL
+        //			certifiedAttributes [1] CertifiedAttributes	OPTIONAL (No lo implementamos)
+        //		}
+        //		ClaimedAttributes ::= SEQUENCE OF Attribute
         //
-        // ClaimedAttributes ::= SEQUENCE OF Attribute
-        // CertifiedAttributes ::= AttributeCertificate -- as defined in RFC 3281: see clause 4.1. (No lo implementamos)
+        //  - En el caso de los pergiles baseline, se utilizara signer-attributes-v2 segun el estandar ETSI EN 319 122-1 V1.1.1 (2016-04).
+        //
+        //		SignerAttributeV2 ::= SEQUENCE {
+        //			claimedAttributes [0] ClaimedAttributes OPTIONAL,
+        //			certifiedAttributesV2 [1] CertifiedAttributesV2 OPTIONAL, (No lo implementamos)
+        //			signedAssertions [2] SignedAssertions OPTIONAL (No lo implementamos)
+        //		}
+        //		ClaimedAttributes ::= SEQUENCE OF Attribute
         if (config.getClaimedRoles() != null && config.getClaimedRoles().length > 0) {
 
-        	// Creamos un listado de roles con el ID de rol utilizado en los certificados
-        	final List<Attribute> claimedRolesAttrs = new ArrayList<>();
-        	for (final String role : config.getClaimedRoles()) {
-        		if (role != null && !role.isEmpty()) {
-        			claimedRolesAttrs.add(
-    					new Attribute(
-							X509AttributeIdentifiers.id_at_role,
-							new DERSet(new DERUTF8String(role))
-						)
-					);
+        	final ASN1EncodableVector claimedRoles = getSignerClaimedRoles(config.getClaimedRoles());
+        	if (claimedRoles != null) {
+        		// Identificamos el OID con el que se van a declarar los roles, que dependera del perfil
+        		ASN1ObjectIdentifier signerAttrOid = null;
+        		if (AOSignConstants.SIGN_PROFILE_ADVANCED.equals(config.getProfileSet()) ) {
+        			signerAttrOid = PKCSObjectIdentifiers.id_aa_ets_signerAttr;
+        		}
+        		else if (AOSignConstants.SIGN_PROFILE_BASELINE.equals(config.getProfileSet()) ) {
+        			signerAttrOid = new ASN1ObjectIdentifier("0.4.0.19122.1.1"); // id-aa-ets-signerAttrV2 OID //$NON-NLS-1$
+        		}
+        		// Agregamos los roles
+        		if (signerAttrOid != null) {
+        			contextSpecific.add(
+        					new Attribute(
+        							signerAttrOid,
+        							new DERSet(
+        									new DERSequence(
+        											new DERTaggedObject(0, new DERSequence(claimedRoles))
+        											)
+        									)
+        							)
+        					);
         		}
         	}
-
-        	// Agregamos el listado de roles al SignerAttribute, que sera un atributo firmado
-        	if (!claimedRolesAttrs.isEmpty()) {
-        		final ASN1EncodableVector roles = new ASN1EncodableVector();
-        		for (final Attribute attr : claimedRolesAttrs) {
-        			roles.add(attr);
-        		}
-        		contextSpecific.add(
-    				new Attribute(
-						PKCSObjectIdentifiers.id_aa_ets_signerAttr,
-						new DERSet(
-							new DERSequence(
-								new DERTaggedObject(0, new DERSequence(roles))
-							)
-						)
-					)
-				);
-        	}
-
         }
 
         // La fecha de firma (https://tools.ietf.org/html/rfc3852#section-11.3), no se anade a
@@ -557,7 +560,31 @@ public final class CAdESUtils {
         return contextSpecific;
     }
 
-    /** Obtiene un <i>PolicyInformation</i> a partir de los datos de la pol&iacute;tica de un certificado.
+    /**
+     * Crea un vector de atributos con los claimed roles declarados.
+     * @param claimedRoles Roles declarados.
+     * @return Vector de atributos con los roles para su uso en signer-attributes
+     * o signer-attributes-v2.
+     */
+    private static ASN1EncodableVector getSignerClaimedRoles(final String[] claimedRoles) {
+
+    	// Creamos un listado de roles con el ID de rol utilizado en los certificados
+    	final ASN1EncodableVector roles = new ASN1EncodableVector();
+    	for (final String role : claimedRoles) {
+    		if (role != null && !role.isEmpty()) {
+    			roles.add(
+    					new Attribute(
+    							X509AttributeIdentifiers.id_at_role,
+    							new DERSet(new DERUTF8String(role))
+    					)
+    			);
+    		}
+    	}
+
+		return roles.size() > 0 ? roles : null;
+	}
+
+	/** Obtiene un <i>PolicyInformation</i> a partir de los datos de la pol&iacute;tica de un certificado.
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
      * datos de la pol&iacute;tica.
      *
