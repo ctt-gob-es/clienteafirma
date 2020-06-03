@@ -124,14 +124,18 @@ public final class PdfSessionManager {
 			}
 		}
 
-		// Se verifica la politica de firma
-		final String policyID = extraParams.getProperty(PdfExtraParams.POLICY_IDENTIFIER);
-
 		// Nombre del subfiltro de firma en el diccionario PDF
 		String signatureSubFilter = extraParams.getProperty(PdfExtraParams.SIGNATURE_SUBFILTER);
 
-		// Si existe una politica de firma el subfiltro a definir sera siempre "ETSI.CAdES.detached" (de firma PAdES-BES)
-		if (policyID != null) {
+		// Obtenemos el id de la politica de firma
+		final String policyID = extraParams.getProperty(PdfExtraParams.POLICY_IDENTIFIER);
+
+		// Obtenemos el perfil de firma configurado
+		final String profile = extraParams.getProperty(PdfExtraParams.PROFILE);
+
+		// Si existe una politica de firma o si la firma sigue el perfil baseline, el subfiltro
+		// siempre debera ser "ETSI.CAdES.detached"
+		if (policyID != null || AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile)) {
 			signatureSubFilter = AOSignConstants.PADES_SUBFILTER_BES;
 			extraParams.setProperty(PdfExtraParams.SIGNATURE_SUBFILTER, AOSignConstants.PADES_SUBFILTER_BES);
     	}

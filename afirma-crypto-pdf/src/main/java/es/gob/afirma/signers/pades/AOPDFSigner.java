@@ -167,6 +167,8 @@ public final class AOPDFSigner implements AOSigner {
 
         final Properties extraParams = getExtraParams(xParams);
 
+        checkParams(signatureAlgorithm, extraParams);
+
         final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ?
     		new X509Certificate[] { (X509Certificate) certChain[0] } :
     			certChain;
@@ -453,6 +455,7 @@ public final class AOPDFSigner implements AOSigner {
 				);
     			continue;
     		}
+
     		if (asSimpleSignInfo) {
 
        			final X509Certificate[] certChain = new X509Certificate[pkcs7.getSignCertificateChain().length];
@@ -470,6 +473,9 @@ public final class AOPDFSigner implements AOSigner {
     			if (pkcs1 != null) {
     				ssi.setPkcs1(pkcs1);
     			}
+
+    			// Obtenemos el algoritmo de firma
+    			ssi.setSignAlgorithm(pkcs7.getDigestAlgorithm());
 
     			root.add(new AOTreeNode(ssi));
     		}
@@ -615,9 +621,10 @@ public final class AOPDFSigner implements AOSigner {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
-        return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
         // Aqui podria venir el analisis de la firma buscando alguno de los
         // otros datos de relevancia que se almacenan en el objeto AOSignInfo
+
+        return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
     }
 
     /** Configura, cuando no lo esten ya, las propiedades necesarias para que las firmas
@@ -647,5 +654,48 @@ public final class AOPDFSigner implements AOSigner {
     			(Properties) extraParams.clone() : new Properties();
 
     	return newExtraParams;
+    }
+
+    private static void checkParams(final String algorithm, final Properties extraParams) throws AOException {
+    	if (algorithm == null) {
+    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
+    		throw new AOException("PAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
+
+    	final String profile = extraParams.getProperty(PdfExtraParams.PROFILE);
+
+		// Comprobacion del perfil de firma con la configuracion establecida
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
+				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			if (extraParams.containsKey(PdfExtraParams.SIGNATURE_SUBFILTER)) {
+				LOGGER.warning("Se ignorara el valor establecido en el parametro '" + //$NON-NLS-1$
+						PdfExtraParams.SIGNATURE_SUBFILTER +
+						"' ya que en las firmas baseline el subfiltro siempre sera " + //$NON-NLS-1$
+						AOSignConstants.PADES_SUBFILTER_BES);
+				extraParams.remove(PdfExtraParams.SIGNATURE_SUBFILTER);
+			}
+		}
+
+		// Si se indico una politica de firma y una razon de firma, se omitira la razon de firma
+		if (extraParams.containsKey(PdfExtraParams.SIGN_REASON) &&
+				extraParams.containsKey(PdfExtraParams.POLICY_IDENTIFIER)) {
+				LOGGER.warning("Se ignorara la razon de firma establecida por haberse indicado una politica de firma"); //$NON-NLS-1$
+				extraParams.remove(PdfExtraParams.SIGN_REASON);
+		}
+
+		// Si se declaran commintment type indications y una razon de firma,
+		// solo se tendra en cuenta la razon de firma. El uso de la comprobacion
+		// anterior y esta, permitiria usar porlitica de firma y  commitment
+		// type indications simultaneamente
+		if (extraParams.containsKey(PdfExtraParams.SIGN_REASON) &&
+				extraParams.containsKey(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS)) {
+				LOGGER.warning("Se ignoraran los commitment type indications establecidos por haberse indicado una razon de firma"); //$NON-NLS-1$
+				extraParams.remove(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS);
+		}
     }
 }

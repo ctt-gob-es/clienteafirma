@@ -134,9 +134,6 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PAdESTriPhaseSigner {
 
-	private static final String PDF_OID = "1.2.826.0.1089.1.5"; //$NON-NLS-1$
-	private static final String PDF_DESC = "Documento en formato PDF"; //$NON-NLS-1$
-
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -1;
 
@@ -199,9 +196,9 @@ public final class PAdESTriPhaseSigner {
         // La informacion de localizacion se agrega a la firma PDF, pero no a la firma CAdES interna
         parameters.setMetadata(null);
 
-        // El tipo de datos firmados siempre sera PDF
-        parameters.setContentTypeOid(PDF_OID);
-        parameters.setContentDescription(PDF_DESC);
+        // El tipo de datos firmados nunca se declara
+        parameters.setContentTypeOid(null);
+        parameters.setContentDescription(null);
 
         // La marca de tiempo no se incluira en la firma
         parameters.setSigningTime(null);

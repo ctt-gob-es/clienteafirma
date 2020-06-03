@@ -43,6 +43,9 @@ public final class PdfExtraParams {
      *  Se toma siempre como zona horaria la establecida en la m&aacute;quina donde se ejecuta el firmador. */
     static final String SIGN_TIME = "signTime";//$NON-NLS-1$
 
+    /** Perfil de firma que se desea generar. */
+	public static final String PROFILE = "profile"; //$NON-NLS-1$
+
     /** Si se establece a <code>true</code> se permite firmar un PDF incluso si este contiene firmas previas
      * no registradas dentro de campos Acrobat (AcroFields).
      * El firmar un PDF que contenga firmas no registradas puede dar como resultado que se invaliden estas firmas previas,
@@ -314,30 +317,30 @@ public final class PdfExtraParams {
     /** Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID)
      * que identifique un&iacute;vocamente la pol&iacute;tica en formato ASN.1 procesable.
      * (propiedad compartida con XAdES y CAdES) */
-    static final String POLICY_IDENTIFIER  = "policyIdentifier";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER  = "policyIdentifier";//$NON-NLS-1$
 
     /** Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
      * Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
      * universalmente se lanzar&aacute; una Excepci&oacute;n, mientras que si no se indica una huella digital pero el par&aacute;metro
      * <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
      * digital <i>al vuelo</i>. */
-    static final String POLICY_IDENTIFIER_HASH  = "policyIdentifierHash";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH  = "policyIdentifierHash";//$NON-NLS-1$
 
     /** Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      * Es obligatorio indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      * (propiedad compartida con XAdES y CAdES). */
-    static final String POLICY_IDENTIFIER_HASH_ALGORITHM  = "policyIdentifierHashAlgorithm";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH_ALGORITHM  = "policyIdentifierHashAlgorithm";//$NON-NLS-1$
 
     /** URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual)
      * (propiedad compartida con XAdES y CAdES). */
-    static final String POLICY_QUALIFIER  = "policyQualifier";//$NON-NLS-1$
+    public static final String POLICY_QUALIFIER  = "policyQualifier";//$NON-NLS-1$
 
     /**
      * Lista de cargos atribuidos al firmante separados por el car&uacute;cter
      * '|'. Los cargos de la lista no pueden contener el car&uacute;cter '|' (ya
      * que este se usa como separador).
      */
-    static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
+    public static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
 
     /** Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.
      * No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256. */
@@ -417,6 +420,42 @@ public final class PdfExtraParams {
     /** Si se indica a <code>true</code> se utilizar&aacute; SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
      * Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto (propiedad compartida con CAdES). */
     static final String SIGNING_CERTIFICATE_V2  = "signingCertificateV2";//$NON-NLS-1$
+
+    /**
+     *  N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma.<br>
+     *  En los par&aacute;metros siguientes, los <i>CommitmentTypeIndications</i> se numeran a partir de 0 (cero).
+     */
+    public static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
+
+    /**
+     * Prefijo de las claves con las que se indican las propiedades de los <i>Commitment
+     * Type Indications</i>. Se utilizar&aacute; este prefijo, seguido el n&uacute;mero del
+     * commitmentTypeIndication al que queramos referirnos y la clave de la propiedad en
+     * cuesti&oacute;n. As&iacute; pues, los par&aacute;metros son:
+     * <ul>
+     *  <li>commitmentTypeIndication<i>n</i>Identifier</li>
+     *  <li>commitmentTypeIndication<i>n</i>CommitmentTypeQualifiers</li>
+     * </ul>
+     */
+    public static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication";//$NON-NLS-1$
+    /**
+     * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
+     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
+     */
+    public static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
+    /**
+     *  Tipo de <i>CommitmentTypeIndication</i> para el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
+     *  (contando desde cero). Atributo obligatorio. Valores:
+     *  <ul>
+     *  <li><i>1</i> = Prueba de origen</li>
+     *  <li><i>2</i> = Prueba de recepci&oacute;n</li>
+     *  <li><i>3</i> = Prueba de entrega</li>
+     *  <li><i>4</i> = Prueba de env&iacute;o</li>
+     *  <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
+     *  <li><i>6</i> = Prueba de creaci&oacute;n</li>
+     *  </ul>
+     */
+    public static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
 
     /** Texto a escribir dentro de la "capa 4" de la firma visible.<br>
      * Este texto se escribe &uacute;nicamente si no se ha especificado una imagen de r&uacute;brica. */

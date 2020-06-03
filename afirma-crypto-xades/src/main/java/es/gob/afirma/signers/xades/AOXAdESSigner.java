@@ -10,7 +10,6 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Transform;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -1524,27 +1522,4 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	return newExtraParams;
     }
-
-    public static void main(final String[] args) throws Exception {
-
-    	final DocumentBuilder docBuilder = XAdESUtil.getNewDocumentBuilder();
-    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Documents\\Afirma\\Repositorios_GitHub\\clienteafirma\\afirma-crypto-xades\\src\\test\\resources\\78353__XAdES_A_Detached.xml"));
-    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\78353__XAdES_A_Detached.xml"));
-    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\78353__XAdES_A_Enveloping.xml"));
-    	//final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\enveloped_mod.xml"));
-    	final Document doc = docBuilder.parse(new File("C:\\Users\\carlos.gamuci\\Desktop\\borrar\\1__firmaIgae.xsig.xml"));
-
-
-    	System.out.println("Enveloping: " + isEnveloping(doc.getDocumentElement()));
-    	System.out.println("Enveloped: " + isEnveloped(doc.getDocumentElement()));
-    	System.out.println("Detached: " + isDetached(doc.getDocumentElement()));
-    	System.out.println("Externally Detached: " + isExternallyDetached(doc.getDocumentElement()));
-    	System.out.println("Manifest: " + isManifestSignature(doc.getDocumentElement()));
-//    	final Element rootElement = doc.getDocumentElement();
-//    	final NamedNodeMap attrs = rootElement.getAttributes();
-//    	((Attr) attrs.item(0)).isId().getNodeType() == Node.ATTRIBUTE_NODE
-
-//    	final NodeList signatureList = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
-//    	System.out.println("Firmas encontradas: " + signatureList.getLength());
-	}
 }

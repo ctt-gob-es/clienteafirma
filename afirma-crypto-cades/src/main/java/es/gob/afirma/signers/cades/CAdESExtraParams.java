@@ -124,9 +124,8 @@ public final class CAdESExtraParams {
     static final String SIGNATURE_PRODUCTION_COUNTRY = "signatureProductionCountry";//$NON-NLS-1$
 
     /**
-     *  N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma XAdES.<br>
+     *  N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma.<br>
      *  En los par&aacute;metros siguientes, los <i>CommitmentTypeIndications</i> se numeran a partir de 0 (cero).
-     *  <br> Propiedad compartida con XAdES.
      */
     static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
 
