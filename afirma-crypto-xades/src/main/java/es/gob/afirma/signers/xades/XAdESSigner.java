@@ -217,6 +217,10 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
+		// Comprobamos que no se hayan configurado opciones incompatibles y, en caso afirmativo,
+		// omitimos las que correspondan
+		checkParams(algorithm, extraParams);
+
 		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED, Boolean.FALSE.toString()));
 
@@ -236,7 +240,7 @@ public final class XAdESSigner {
 		        XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
 
 		final String digestMethodAlgorithm = extraParams.getProperty(
-		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, XAdESConstants.DEFAULT_DIGEST_METHOD);
 
 		// Algoritmo de huella usado en las referencias externas (manifest)
 		final String externalReferencesHashAlgorithm = extraParams.getProperty(
@@ -250,10 +254,10 @@ public final class XAdESSigner {
 		}
 
 		final String xadesNamespace = extraParams.getProperty(
-		        XAdESExtraParams.XADES_NAMESPACE, AOXAdESSigner.XADESNS);
+		        XAdESExtraParams.XADES_NAMESPACE, XAdESConstants.DEFAULT_NAMESPACE_XADES);
 
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
-		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE);
+		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, XAdESConstants.REFERENCE_TYPE_SIGNED_PROPERTIES);
 
 		final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.IGNORE_STYLE_SHEETS, Boolean.FALSE.toString()));
@@ -312,17 +316,6 @@ public final class XAdESSigner {
 		// Perfil de firma XAdES que se desea aplicar
 		final String profile = extraParams.getProperty(
 		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
-
-		// Comprobacion del perfil de firma con la configuracion establecida
-		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
-			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
-				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
-				LOGGER.warning("El algoritmo SHA1 no esta recomendado para generar referencias en las firmas baseline"); //$NON-NLS-1$
-			}
-		}
 
 		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
@@ -628,12 +621,12 @@ public final class XAdESSigner {
 		}
 
 		final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-		final String referenceStyleId = AOXAdESSigner.STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
+		final String referenceStyleId = "StyleReference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 
 		final List<Transform> transformList = new ArrayList<>();
 
 		// Primero anadimos las transformaciones a medida
-		Utils.addCustomTransforms(transformList, extraParams, AOXAdESSigner.XML_SIGNATURE_PREFIX);
+		Utils.addCustomTransforms(transformList, extraParams, XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX);
 
 		final Transform canonicalizationTransform;
 		if (canonicalizationAlgorithm != null) {
@@ -1039,9 +1032,9 @@ public final class XAdESSigner {
 						fac.newTransform(
 							Transform.XPATH,
 							new XPathFilterParameterSpec(
-								"not(ancestor-or-self::" + AOXAdESSigner.XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+								"not(ancestor-or-self::" + XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
 								Collections.singletonMap(
-									AOXAdESSigner.XML_SIGNATURE_PREFIX,
+										XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,
 									XMLSignature.XMLNS
 								)
 							)
@@ -1101,7 +1094,7 @@ public final class XAdESSigner {
 		// Nodo donde insertar la firma
 		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
 			if (envelopedNodeXPath != null) {
-				signatureInsertionNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
+				signatureInsertionNode = XAdESUtil.getFirstElementFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
 			}
 			else if (nodeToSign != null) {
 				signatureInsertionNode = CustomUriDereferencer.getElementById(docSignature, nodeToSign);
@@ -1110,16 +1103,16 @@ public final class XAdESSigner {
 
 		// Instancia XAdES
 		final XAdESBase xades = XAdESUtil.newInstance(
-			profile,                           	  // Perfil XAdES
-			xadesNamespace,                       // XAdES NameSpace
-			AOXAdESSigner.XADES_SIGNATURE_PREFIX, // XAdES Prefix
-			AOXAdESSigner.XML_SIGNATURE_PREFIX,   // XMLDSig Prefix
-			digestMethodAlgorithm,                // DigestMethod
-			docSignature,                         // Document
-			signatureInsertionNode != null ?      // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
+			profile,                           	  			// Perfil XAdES
+			xadesNamespace,                       			// XAdES NameSpace
+			XAdESConstants.DEFAULT_XADES_SIGNATURE_PREFIX,	// XAdES Prefix
+			XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,	// XMLDSig Prefix
+			digestMethodAlgorithm,                			// DigestMethod
+			docSignature,                         			// Document
+			signatureInsertionNode != null ?      			// Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
 				signatureInsertionNode:
 					docSignature.getDocumentElement(),
-			(X509Certificate) certChain[0]		  // Certificado de firma
+			(X509Certificate) certChain[0]		  			// Certificado de firma
 		);
 
 		// Metadatos de firma
@@ -1261,13 +1254,13 @@ public final class XAdESSigner {
 		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
 			try {
 				if (docSignature.getElementsByTagNameNS(XMLConstants.DSIGNNS,
-						AOXAdESSigner.SIGNATURE_TAG).getLength() == 1) {
+						XAdESConstants.TAG_SIGNATURE).getLength() == 1) {
 					final Document newdoc = dbf.newDocumentBuilder().newDocument();
 					newdoc.appendChild(
 						newdoc.adoptNode(
 							docSignature.getElementsByTagNameNS(
 								XMLConstants.DSIGNNS,
-								AOXAdESSigner.SIGNATURE_TAG
+								XAdESConstants.TAG_SIGNATURE
 							).item(0)
 						)
 					);
@@ -1294,6 +1287,42 @@ public final class XAdESSigner {
 					null
 		);
 
+	}
+
+	/**
+	 * Comprueba que no existan incompatibilidades entre los par&aacute;metros proporcionados
+	 * y elimina aquellos que se vayan a ignorar. Tambi&eacute;n muestra advertencias sobre
+	 * opciones de configuraci&oacute;n no recomendadas.
+	 * @param algorithm Algoritmo de firma.
+	 * @param extraParams Par&aacute;metros de configuraci&oacute;n.
+	 */
+	private static void checkParams(final String algorithm, final Properties extraParams) {
+
+		// Comprobacion del perfil de firma y el algoritmo de firma seleccionado
+		final String profile = extraParams.getProperty(XAdESExtraParams.PROFILE);
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
+				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			final String digestMethodAlgorithm = extraParams.getProperty(
+			        XAdESExtraParams.REFERENCES_DIGEST_METHOD);
+			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
+				LOGGER.warning("El algoritmo SHA1 no esta recomendado para generar referencias en las firmas baseline"); //$NON-NLS-1$
+			}
+		}
+
+		// Si se pide realizar una firma baseline junto con un espacio de nombres
+		// que no lo soporta, se ignorara el espacio de nombres y la URL del tipo
+		// de signedProperties que se hubiese indicado
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile) &&
+				extraParams.containsKey(XAdESExtraParams.XADES_NAMESPACE) &&
+				!XAdESUtil.isBaselineCompatible(extraParams.getProperty(XAdESExtraParams.XADES_NAMESPACE))) {
+			LOGGER.warning("Se ha indicado realizar una firma baseline con un espacio de nombres que no lo soporta. " //$NON-NLS-1$
+					+ "Se ignorara el espacio de nombres indicado"); //$NON-NLS-1$
+			extraParams.remove(XAdESExtraParams.XADES_NAMESPACE);
+			extraParams.remove(XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL);
+		}
 	}
 
 	/**

@@ -48,4 +48,42 @@ public final class TestXAdESASiC {
         }
     }
 
+    /** Prueba de firma simple XAdES ASiC-S.
+     * @throws Exception En culaquier error. */
+    @SuppressWarnings("static-method")
+    @Test
+	public void TestCosignASiCS() throws Exception {
+
+        final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOXAdESASiCSSigner();
+
+        final byte[] signature = signer.sign(
+        		"<?xml version=\"1.0\" encoding=\"UTF-8\" ?><NODO>Valor</NODO>".getBytes(), //$NON-NLS-1$
+        		"SHA512withRSA", //$NON-NLS-1$
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		null
+		);
+
+
+        final byte[] coSignature = signer.cosign(
+        		signature,
+        		"SHA512withRSA", //$NON-NLS-1$
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		null
+		);
+
+        try (
+    		final OutputStream os = new FileOutputStream(File.createTempFile("ASIC-XAdES-",  ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+        	os.write(coSignature);
+        }
+    }
+
 }

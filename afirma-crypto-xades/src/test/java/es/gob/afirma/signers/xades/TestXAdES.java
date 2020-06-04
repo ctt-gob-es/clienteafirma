@@ -23,12 +23,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
@@ -505,7 +505,7 @@ public final class TestXAdES {
      * @throws Exception Cuando ocurre un error */
     @SuppressWarnings("static-method")
 	@Test
-    public void testCounterSignManifes() throws Exception {
+    public void testCounterSignManifest() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -768,27 +768,31 @@ public final class TestXAdES {
      * de la firma XAdES contiene atributos. Busca el nodo con el namespace
      * indicado.
      * @param sign Firma.
-     * @param namespace Espacio de nombres a utilizar.
+     * @param namespacePrefix Espacio de nombres a utilizar.
      * @return {@code false} si se encuentra el nodo UnsignedSignatureProperties
      * vac&iacute;o, {@code true} en caso contrario. */
-    private static boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
+    private static boolean isValidUnsignedProperties(final InputStream sign, final String namespacePrefix) {
 
         final Document document;
         try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(sign);
+            document = XAdESUtil.getNewDocumentBuilder().parse(sign);
         }
         catch (final Exception e) {
             System.out.println("No es una firma valida: " + e); //$NON-NLS-1$
             return false;
         }
 
-        final String xadesNamespace = namespace != null ? namespace : XAdESUtil.guessXAdESNamespaceURL(document.getFirstChild());
+        String xadesPrefix = namespacePrefix;
+        if (xadesPrefix == null) {
+        	final Element signedPropertiesElement = XAdESUtil.getSignedPropertiesElement(XAdESUtil.getFirstSignatureElement(document.getDocumentElement()));
+        	xadesPrefix = signedPropertiesElement.getPrefix();
+        }
 
-        final NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
+        final NodeList upNodes = document.getElementsByTagName(xadesPrefix + ":UnsignedProperties"); //$NON-NLS-1$
         for (int i = 0; i < upNodes.getLength(); i++) {
             final NodeList uspNodes = upNodes.item(i).getChildNodes();
             for (int j = 0; j < uspNodes.getLength(); j++) {
-                if (uspNodes.item(i).getNodeName().equals(xadesNamespace + ":UnsignedSignatureProperties")) { //$NON-NLS-1$
+                if (uspNodes.item(i).getNodeName().equals(xadesPrefix + ":UnsignedSignatureProperties")) { //$NON-NLS-1$
                     if (uspNodes.item(i).getChildNodes().getLength() == 0) {
                         return false;
                     }

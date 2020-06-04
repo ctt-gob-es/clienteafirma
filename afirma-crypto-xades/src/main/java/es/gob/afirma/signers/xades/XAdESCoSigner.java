@@ -9,15 +9,6 @@
 
 package es.gob.afirma.signers.xades;
 
-import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -129,17 +120,13 @@ public final class XAdESCoSigner {
 
 		final Properties extraParams = xParams != null ? xParams: new Properties();
 
+		checkParams(algorithm, extraParams);
+
 		final String digestMethodAlgorithm = extraParams.getProperty(
-		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, XAdESConstants.DEFAULT_DIGEST_METHOD);
 
 		final String canonicalizationAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
-
-		final String xadesNamespace = extraParams.getProperty(
-		        XAdESExtraParams.XADES_NAMESPACE, XADESNS);
-
-		final String signedPropertiesTypeUrl = extraParams.getProperty(
-		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, XADES_SIGNED_PROPERTIES_TYPE);
 
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString()));
@@ -180,30 +167,19 @@ public final class XAdESCoSigner {
 			}
 		}
 
-		// Comprovamos si se ha indicado validar el PKCS#1 generado (por defecto, si)
+		// Comprobamos si se ha indicado validar el PKCS#1 generado (por defecto, si)
 		final boolean validatePkcs1 = Boolean.parseBoolean(extraParams.getProperty(
 				XAdESExtraParams.INTERNAL_VALIDATE_PKCS1, Boolean.TRUE.toString()));
 
 		// Perfil de firma XAdES que se desea aplicar
-		final String profile = extraParams.getProperty(
+		String profile = extraParams.getProperty(
 		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
-
-		// Comprobacion del perfil de firma con la configuracion establecida
-		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
-				if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
-					LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-
-				if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
-					LOGGER.warning("El algoritmo SHA1 no esta recomendado para generar referencias en las firmas baseline"); //$NON-NLS-1$
-				}
-		}
 
 		// Si el documento contiene una firma simple se inserta como raiz el
 		// nodo AFIRMA
 		Document docSig = signDocument;
 		Element rootSig = signDocument.getDocumentElement();
-		if (rootSig.getLocalName().equals(SIGNATURE_NODE_NAME)) {
+		if (rootSig.getLocalName().equals(XAdESConstants.TAG_SIGNATURE)) {
 			try {
 				docSig = AOXAdESSigner.insertarNodoAfirma(docSig);
 				rootSig = docSig.getDocumentElement();
@@ -234,66 +210,31 @@ public final class XAdESCoSigner {
 		// Localizamos la primera firma (primer nodo "Signature") en profundidad en el arbol de firma.
 		// Se considera que todos los objetos "Signature" del documento firman (referencian) los mismos
 		// objetos, por lo que podemos extraerlos de cualquiera de ellas.
-		// Buscamos dentro del SignedInfo de ese Signature todas las referencias que apunten a datos
-		// para firmarlas.
-		final Element signatureElement = (Element) docSig.
-				getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0);
-		final Element signedInfo = (Element) signatureElement.
-				getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignedInfo").item(0); //$NON-NLS-1$
-		final NodeList referencesNl = signedInfo.
-				getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+		// Buscamos dentro de la firma la refencia a los atributos firmados y, mediante esta referencia
+		// y el propio nodo de atributos, obtenemos la URL del tipo que declara y el espacio de nombres
+		// de XAdES que se debe utilizar
+		final Element signatureElement = XAdESUtil.getFirstSignatureElement(docSig.getDocumentElement());
+		final Element signedPropertiesReference = XAdESUtil.getSignedPropertiesReference(signatureElement);
 
-		// Se deben firmar todas las referencias a datos de la firma que cofirmamos. Para ello
-		// comprobaremos sus refencias y, segun sea, se firmara o no:
-		// - Un elemento interno de tipo KeyInfo: No se firma
-		// - Un elemento interno de tipo SignedProperties: No se firma.
-		// - Cualquier otra cosa (URI vacia, manifest, hoja de estilo, elemento externo...): Se firma.
-		final List<Node> objectReferencesList = new ArrayList<>();
-		for (int i = 0; i < referencesNl.getLength(); i++) {
-			final Node currentReference = referencesNl.item(i);
+		// Identificamos el Almacenaremos ademas, el tipo con el que se declara la referencia de los SignedPropeties y el
+		// Id del propio nodo SignedPropeties para poder generar la nueva firma con los mismos datos.
+		String signedPropertiesType = signedPropertiesReference.getAttribute("Type"); //$NON-NLS-1$
+		if (signedPropertiesType == null || signedPropertiesType.isEmpty()) {
+			signedPropertiesType = XAdESConstants.REFERENCE_TYPE_SIGNED_PROPERTIES;
+		}
+		final Element signedPropertiesElement = XAdESUtil.getSignedPropertiesElement(signatureElement, signedPropertiesReference);
+		String xadesNamespace = signedPropertiesElement.getNamespaceURI();
+		if (xadesNamespace == null) {
+			xadesNamespace = XAdESConstants.DEFAULT_NAMESPACE_XADES;
+		}
 
-			final NamedNodeMap referenceAttributes = currentReference.getAttributes();
-
-			// Si tiene declarado el tipo de la referencia es de SignedProperties, se ignora,
-			// si tiene otro valor (objeto de datos, manifest u hoja de estilo), se agrega,
-			// si no esta establecido, se comprueba
-			final Node referenceType = referenceAttributes != null ?
-					referenceAttributes.getNamedItem("Type") : null; //$NON-NLS-1$
-
-			if (referenceType != null) {
-				if (referenceType.getNodeValue() != null &&
-						!referenceType.getNodeValue().endsWith("#SignedProperties")) { //$NON-NLS-1$
-					objectReferencesList.add(currentReference);
-				}
-			}
-			// Si no se establecio el tipo de referencia, lo comprobamos a partir de la URI
-			else {
-				final Node referenceUri = referenceAttributes != null ?
-						referenceAttributes.getNamedItem("URI") : null; //$NON-NLS-1$
-
-				// Omitimos las referencias cuya
-				String uri;
-				if (referenceUri == null || (uri = referenceUri.getNodeValue()) == null) {
-					throw new AOException("Se ha encontrado una referencia sin URI"); //$NON-NLS-1$
-				}
-
-				// Si es una referencia interna, comprobamos que no sea el KeyInfo o el SignedProperties
-				if (uri.startsWith("#")) { //$NON-NLS-1$
-					final String elementId = uri.substring(1);
-					final Node referencedNode = XAdESUtil.findElementById(elementId, docSig.getDocumentElement(), false);
-					if (referencedNode == null) {
-						throw new AOException("No se ha encontrado el nodo correspondiente a una referencia interna"); //$NON-NLS-1$
-					}
-					final String nodeName = referencedNode.getNodeName();
-					if (!equalsNodeName(nodeName, "KeyInfo") && !equalsNodeName(nodeName, "SignedProperties")) { //$NON-NLS-1$ //$NON-NLS-2$
-						objectReferencesList.add(currentReference);
-					}
-				}
-				// Cualquier referencia no interna hay que firmarla
-				else {
-					objectReferencesList.add(currentReference);
-				}
-			}
+		// Si se solicito realizar una cofirma XAdES baseline, pero el espacio de nombres
+		// de firma original no lo soporta, se ignora el perfil
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile) &&
+				!XAdESUtil.isBaselineCompatible(xadesNamespace)) {
+			LOGGER.warning("La firma original utiliza un espacio de nombres no compatible con baseline (" //$NON-NLS-1$
+					+ xadesNamespace + "). No se generara una firma baseline"); //$NON-NLS-1$
+			profile = AOSignConstants.SIGN_PROFILE_ADVANCED;
 		}
 
 		// Creamos el listado de referencias que deberan aparecer en la firma
@@ -305,13 +246,14 @@ public final class XAdESCoSigner {
 		XMLObject envelopingObject = null;
 		boolean isEnveloping = false;
 		String referenceId = null;
-		for (final Node currentReference : objectReferencesList) {
+		final List<Element> dataReferencesList = XAdESUtil.getSignatureDataReferenceList(signatureElement);
+		for (final Element currentReference : dataReferencesList) {
 
 			// Buscamos las transformaciones declaradas en la Referencia,
 			// para anadirlas tambien en la nueva
 			final List<Transform> currentTransformList;
 			try {
-				currentTransformList = Utils.getObjectReferenceTransforms(currentReference, XML_SIGNATURE_PREFIX);
+				currentTransformList = Utils.getObjectReferenceTransforms(currentReference, XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX);
 			}
 			catch (final NoSuchAlgorithmException e) {
 				throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e); //$NON-NLS-1$
@@ -320,13 +262,12 @@ public final class XAdESCoSigner {
 				throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e); //$NON-NLS-1$
 			}
 
-			// Creamos un identificador de referencia para el objeto a firmar y la almacenamos
+			// Creamos un identificador de referencia para el objeto a firmar y lo almacenamos
 			// para mantener un listado con todas. En el caso de las hojas de estilo lo creamos con un
 			// identificador descriptivo
-			final NamedNodeMap referenceAttributes = currentReference.getAttributes();
-			if (referenceAttributes.getNamedItem(ID_IDENTIFIER) != null &&
-					referenceAttributes.getNamedItem(ID_IDENTIFIER).getNodeValue().startsWith(STYLE_REFERENCE_PREFIX)) {
-				referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
+			if (currentReference.getAttribute(ID_IDENTIFIER) != null &&
+					currentReference.getAttribute(ID_IDENTIFIER).startsWith("StyleReference-")) { //$NON-NLS-1$
+				referenceId = "StyleReference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 			}
 			else {
 				referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
@@ -334,8 +275,8 @@ public final class XAdESCoSigner {
 
 
 			// Buscamos y analizamos el nodo de datos para obtener su tipo
-			final String referenceUri = ((Element) currentReference).getAttribute("URI"); //$NON-NLS-1$
-			String referenceType = ((Element) currentReference).getAttribute("Type"); //$NON-NLS-1$
+			final String referenceUri = currentReference.getAttribute("URI"); //$NON-NLS-1$
+			String referenceType = currentReference.getAttribute("Type"); //$NON-NLS-1$
 			if (referenceType != null && referenceType.isEmpty()) {
 				referenceType = null;
 			}
@@ -386,7 +327,7 @@ public final class XAdESCoSigner {
 								}
 
 								// Si es un nodo de firma tambien miramos en sus nodos hijos
-								if (SIGNATURE_TAG.equals(rootChildNodes.item(j).getLocalName())) {
+								if (XAdESConstants.TAG_SIGNATURE.equals(rootChildNodes.item(j).getLocalName())) {
 									final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
 									for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
 										nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
@@ -413,7 +354,7 @@ public final class XAdESCoSigner {
 				}
 
 				final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
-						XMLConstants.DSIGNNS, SIGNATURE_TAG
+						XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE
 						).item(0).getChildNodes();
 				for (int j = 0; j < signatureChildNodes.getLength(); j++) {
 					final Node subNode = signatureChildNodes.item(j);
@@ -484,8 +425,8 @@ public final class XAdESCoSigner {
 		final XAdESBase xades = XAdESUtil.newInstance(
 				profile,
 				xadesNamespace,
-				XADES_SIGNATURE_PREFIX,
-				XML_SIGNATURE_PREFIX,
+				XAdESConstants.DEFAULT_XADES_SIGNATURE_PREFIX,
+				XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
 				rootSig.getOwnerDocument(),
 				rootSig,
@@ -512,7 +453,7 @@ public final class XAdESCoSigner {
 		// crea la firma
 		final AOXMLAdvancedSignature xmlSignature = XAdESUtil.getXmlAdvancedSignature(
 			xades,
-			signedPropertiesTypeUrl,
+			signedPropertiesType,
 			digestMethodAlgorithm,
 			canonicalizationAlgorithm
 		);
@@ -572,14 +513,37 @@ public final class XAdESCoSigner {
 	}
 
 	/**
-	 * Compara que el nombre de un nodo se corresponda con el que se desea, teniendo en cuenta
-	 * que el nombre del nodo puede contener el espacio de nombres XML.
-	 * @param nodeName Nombre del nodo que se quiere comprobar.
-	 * @param name Nombre que comprobamos.
-	 * @return {@code true} si el nodo tiene ese nombre sin contar el espacio de nombres,
-	 * {@code false} en caso contrario.
+	 * Comprueba que no existan incompatibilidades entre los par&aacute;metros proporcionados
+	 * y elimina aquellos que se vayan a ignorar. Tambi&eacute;n muestra advertencias sobre
+	 * opciones de configuraci&oacute;n no recomendadas.
+	 * @param algorithm Algoritmo de firma.
+	 * @param extraParams Par&aacute;metros de configuraci&oacute;n.
 	 */
-	private static boolean equalsNodeName(final String nodeName, final String name) {
-		return nodeName.equals(name) || nodeName.endsWith(":" + name);
+	private static void checkParams(final String algorithm, final Properties extraParams) {
+
+		// Comprobacion del perfil de firma y el algoritmo de firma seleccionado
+		final String profile = extraParams.getProperty(XAdESExtraParams.PROFILE);
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
+				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			final String digestMethodAlgorithm = extraParams.getProperty(
+					XAdESExtraParams.REFERENCES_DIGEST_METHOD);
+			if (XMLConstants.URL_SHA1.equals(digestMethodAlgorithm)) {
+				LOGGER.warning("El algoritmo SHA1 no esta recomendado para generar referencias en las firmas baseline"); //$NON-NLS-1$
+			}
+		}
+
+		// En las cofirmas siempre se usara el espacio de nombres y la URL del
+		// tipo de datos firmados de la firma original
+		if (extraParams.containsKey(XAdESExtraParams.XADES_NAMESPACE)) {
+			LOGGER.warning("Se ignorara el espacio de nombres indicado. En las cofirmas siempre se usara el mismo espacio de nombres que la firma original"); //$NON-NLS-1$
+			extraParams.remove(XAdESExtraParams.XADES_NAMESPACE);
+		}
+		if (extraParams.containsKey(XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL)) {
+			LOGGER.warning("Se ignorara la URL indicada para el tipo SignedProperties. En las cofirmas siempre se usara la misma URL que la firma original"); //$NON-NLS-1$
+			extraParams.remove(XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL);
+		}
 	}
 }

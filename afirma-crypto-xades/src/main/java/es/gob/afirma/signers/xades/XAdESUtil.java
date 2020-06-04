@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndicationImpl;
@@ -163,7 +163,7 @@ public final class XAdESUtil {
 		return xmlSignature;
 	}
 
-	static Element getFirstElmentFromXPath(final String xpathExpression, final Element sourceElement) throws AOException {
+	static Element getFirstElementFromXPath(final String xpathExpression, final Element sourceElement) throws AOException {
 		final NodeList nodeList;
 		try {
 			 nodeList = (NodeList)XPathFactory.newInstance().newXPath().evaluate(xpathExpression, sourceElement, XPathConstants.NODESET);
@@ -352,7 +352,7 @@ public final class XAdESUtil {
 	static Element getRootElement(final Document docSignature, final Properties extraParams) {
 
 		final Properties xParams = extraParams != null ? extraParams : new Properties();
-		final String nodeName            = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAME , AOXAdESSigner.AFIRMA);
+		final String nodeName            = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAME , XAdESConstants.TAG_PARENT_NODE);
 		final String nodeNamespace       = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAMESPACE);
 		final String nodeNamespacePrefix = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAMESPACE_PREFIX);
 
@@ -414,7 +414,7 @@ public final class XAdESUtil {
 				canonicalizationTransform != null ?
 					Collections.singletonList(canonicalizationTransform) :
 						new ArrayList<Transform>(0),
-				AOXAdESSigner.MANIFESTURI,
+						XAdESConstants.REFERENCE_TYPE_MANIFEST,
 				"Manifest" + referenceId //$NON-NLS-1$
 			)
 		);
@@ -459,65 +459,167 @@ public final class XAdESUtil {
 	}
 
 	 /** Intenta determinar el prefijo del espacio de nombres de XAdES.
-     * @param el Firma XAdES.
+     * @param signatureElement Firma XAdES.
      * @return Prefijo del espacio de nombres o nulo si no se ha
      * establecido prefijo o si no se encuentra el espacio de nombres. */
-    static String guessXAdESNamespacePrefix(final Element el) {
-        final String signatureText = new String(Utils.writeXML(el, null, null, null));
+//    static String guessXAdESNamespacePrefix(final Element el) {
+//        final String signatureText = new String(Utils.writeXML(el, null, null, null));
+//
+//        // Buscamos los espacios de nombres declarados en la firma y despues vemos
+//        // si alguno es el de XAdES. En cuanto se detecta uno, se utiliza ese
+//        int idx = 0;
+//        String ns = null;
+//        while (ns == null && (idx = signatureText.indexOf(" xmlns:", idx)) != -1) { //$NON-NLS-1$
+//        	final int eqIdx = signatureText.indexOf("=", idx); //$NON-NLS-1$
+//        	if (eqIdx != -1) {
+//        		final String xadesNsPrefix = signatureText.substring(
+//        				eqIdx,
+//        				Math.min(eqIdx + "=\"http://uri.etsi.org/".length(), signatureText.length())); //$NON-NLS-1$
+//        		if ("=\"http://uri.etsi.org/".equals(xadesNsPrefix)) { //$NON-NLS-1$
+//        			ns = signatureText.substring(idx + " xmlns:".length(), eqIdx); //$NON-NLS-1$
+//        		}
+//        	}
+//        	idx++;
+//        }
+//        return ns;
+//    }
+//    static String guessXAdESNamespacePrefix(final Element signatureElement) {
+//
+//    	// Obtenemos la referencia a los atributos firmados de la firma
+//    	final Element referenceNode = getSignedPropertiesReference(signatureElement);
+//    	if (referenceNode == null) {
+//    		return null;
+//    	}
+//
+//    	// Recuperamos el identificador del elementos con los atributos firmados
+//    	final String uri = referenceNode.getAttribute("URI"); //$NON-NLS-1$
+//    	if (uri == null || !uri.startsWith("#")) { //$NON-NLS-1$
+//    		return null;
+//    	}
+//
+//    	// Recuperamos el nodo con los elemento firmados
+//    	final String signedPropertiesId = uri.substring(1);
+//    	final Element signedPropertiesElement = findElementById(signedPropertiesId, signatureElement, false);
+//    	if (signedPropertiesElement == null) {
+//    		return null;
+//    	}
+//
+//    	// Obtenemos el prefijo del nodo
+//    	return signedPropertiesElement.getPrefix();
+//    }
 
-        // Buscamos los espacios de nombres declarados en la firma y despues vemos
-        // si alguno es el de XAdES. En cuanto se detecta uno, se utiliza ese
-        int idx = 0;
-        String ns = null;
-        while (ns == null && (idx = signatureText.indexOf(" xmlns:", idx)) != -1) { //$NON-NLS-1$
-        	final int eqIdx = signatureText.indexOf("=", idx); //$NON-NLS-1$
-        	if (eqIdx != -1) {
-        		final String xadesNsPrefix = signatureText.substring(
-        				eqIdx,
-        				Math.min(eqIdx + "=\"http://uri.etsi.org/".length(), signatureText.length())); //$NON-NLS-1$
-        		if ("=\"http://uri.etsi.org/".equals(xadesNsPrefix)) { //$NON-NLS-1$
-        			ns = signatureText.substring(idx + " xmlns:".length(), eqIdx); //$NON-NLS-1$
-        		}
-        	}
-        	idx++;
-        }
-        return ns;
+    /**
+     * Obtiene la primera firma encontrada en el elemento XML.
+     * @param element Elemento XML.
+     * @return Primera firma encontrada o nulo si no se encuentra ninguna.
+     */
+    static Element getFirstSignatureElement(final Element element) {
+
+    	if (element == null) {
+    		return null;
+    	}
+
+    	// Localizamos el primer nodo de firma
+    	Element signatureElement = null;
+    	if (XAdESConstants.TAG_SIGNATURE.equals(element.getLocalName())) {
+    		signatureElement = element;
+    	}
+    	else {
+    		final NodeList signatures = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+    		if (signatures.getLength() > 0) {
+    			signatureElement = (Element) signatures.item(0);
+    		}
+    	}
+    	return signatureElement;
     }
 
-    /** Intenta determinar la URL de declaraci&oacute;n de espacio de nombres de
-     * XAdES de una firma XAdES.
-     * @param el Firma XAdES.
-     * @return URL de la declaraci&oacute;n del espacio de nombres. */
-    static String guessXAdESNamespaceURL(final Node el) {
+    /**
+     * Obtiene el elemento con la referencia a los atributos firmados de la firma
+     * XAdES indicado.
+     * @param signatureElement Elemento "Signature" de una firma XAdES.
+     * @return Elemento con la referencia a los atributos firmados o nulo si no se
+     * encontr&oacute;.
+     */
+    static Element getSignedPropertiesReference(final Element signatureElement) {
 
-        final String latest = "\"http://uri.etsi.org/01903#\""; //$NON-NLS-1$
-        final String xades122 = "\"http://uri.etsi.org/01903/v1.2.2#\""; //$NON-NLS-1$
-        final String xades132 = "\"http://uri.etsi.org/01903/v1.3.2#\""; //$NON-NLS-1$
-        final String xades141 = "\"http://uri.etsi.org/01903/v1.4.1#\""; //$NON-NLS-1$
+    	// Obtemos el nodo SignedInfo
+    	int i = 0;
+    	Element signedInfoElement = null;
+    	final NodeList childs = signatureElement.getChildNodes();
+    	while (i < childs.getLength() && signedInfoElement == null) {
+    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
+    				childs.item(i).getLocalName().equals(XAdESConstants.TAG_SIGNEDINFO)) {
+    			signedInfoElement = (Element) childs.item(i);
+    		}
+    		i++;
+    	}
+    	if (signedInfoElement == null) {
+    		return null;
+    	}
 
-        final String signatureText = new String(Utils.writeXML(el, null, null, null));
+    	// Obtenemos las referencias declaradas en la firma
+    	final NodeList references = signedInfoElement.getElementsByTagNameNS(
+    			XMLConstants.DSIGNNS, XAdESConstants.TAG_REFERENCE);
 
-        final int numLatest   = Utils.countSubstring(signatureText, latest);
-        final int numXades122 = Utils.countSubstring(signatureText, xades122);
-        final int numXades132 = Utils.countSubstring(signatureText, xades132);
-        final int numXades141 = Utils.countSubstring(signatureText, xades141);
-
-        // Prioridad: xades132 > latest > xades141 > xades122
-        if (numXades132 >= numLatest && numXades132 >= numXades141 && numXades132 >= numXades122) {
-            return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        if (numLatest >= numXades132 && numLatest >= numXades141 && numLatest >= numXades122) {
-            return latest.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        if (numXades141 >= numLatest && numXades141 >= numXades132 && numXades141 >= numXades122) {
-            return xades141.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        if (numXades122 >= numXades132 && numXades122 >= numLatest && numXades122 >= numXades141) {
-            return xades122.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    	// Buscamos entre las referencias hasta encontrar la que declare el tipo
+    	// correspondiente a los atributos firmados
+    	for (i = 0; i < references.getLength(); i++) {
+    		final Element reference = (Element) references.item(i);
+    		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
+			if (type != null && !type.isEmpty() && isSignedPropertiesType(type)) {
+				return reference;
+			}
+    	}
+    	// Si no se encontro la referencia, se devuelve nulo
+    	return null;
     }
+
+    /**
+     * Obtiene el elemento SignedProperties de una firma XAdES.
+     * @param signatureElement Elemento "Signature" de una firma XAdES.
+     * @param signedPropertiesReference Elemento "Reference" que contiene
+     * la referencia a los atributos firmados de la firma indicada.
+     * @return Elemento "SignedProperties" de una firma XAdES.
+     */
+    static Element getSignedPropertiesElement(final Element signatureElement, final Element signedPropertiesReference) {
+
+    	// Recuperamos el identificador del elementos con los atributos firmados
+    	final String uri = signedPropertiesReference.getAttribute("URI"); //$NON-NLS-1$
+    	if (uri == null || !uri.startsWith("#")) { //$NON-NLS-1$
+    		return null;
+    	}
+
+    	// Recuperamos el nodo con los elemento firmados
+    	final String signedPropertiesId = uri.substring(1);
+
+    	return findElementById(signedPropertiesId, signatureElement, false);
+    }
+
+    /**
+     * Obtiene el elemento SignedProperties de una firma XAdES.
+     * @param signatureElement Elemento "Signature" de una firma XAdES.
+     * @return Elemento "SignedProperties" de una firma XAdES.
+     */
+    static Element getSignedPropertiesElement(final Element signatureElement) {
+
+    	// Obtenemos la referencia a los atributos firmados de la firma
+    	final Element referenceNode = getSignedPropertiesReference(signatureElement);
+    	if (referenceNode == null) {
+    		return null;
+    	}
+
+    	// Recuperamos el identificador del elementos con los atributos firmados
+    	final String uri = referenceNode.getAttribute("URI"); //$NON-NLS-1$
+    	if (uri == null || !uri.startsWith("#")) { //$NON-NLS-1$
+    		return null;
+    	}
+
+    	// Recuperamos el nodo con los elemento firmados
+    	final String signedPropertiesId = uri.substring(1);
+
+    	return findElementById(signedPropertiesId, signatureElement, false);
+    }
+
 
     /**
      * Crea una nueva instancia para firmar.
@@ -597,4 +699,85 @@ public final class XAdESUtil {
 	static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
 		return SECURE_BUILDER_FACTORY.newDocumentBuilder();
 	}
+
+	/**
+	 * Indica si un espacio de nombres de XAdES es compatible los perfiles baseline de firma.
+	 * Los espacios de nombres compatibles con baseline son los de XAdES 1.3.2 y 1.4.1.
+	 * @param xadesNamespace URL del espacio de nombres.
+	 * @return {@code true} si es un espacio de nombres compatibles con los perfiles baseline,
+	 * {@code false} en caso contrario.
+	 */
+	static boolean isBaselineCompatible(final String xadesNamespace) {
+		return XAdESConstants.NAMESPACE_XADES_1_3_2.equals(xadesNamespace) ||
+				XAdESConstants.NAMESPACE_XADES_1_4_1.equals(xadesNamespace);
+	}
+
+	/**
+     * Obtiene un listado con las referencias a datos de la firma proporcionada.
+     * Se considera referencia a datos toda aquella que no sea referencia al
+     * SignedProperties ni a un objeto KeyInfo de la firma.
+     * @param signatureElement Elemento XML "Signature" de firma.
+     * @return Listado con las referencias a datos encontradas.
+     */
+    static List<Element> getSignatureDataReferenceList(final Element signatureElement) {
+
+    	// Obtemos el nodo SignedInfo
+    	int i = 0;
+    	Element signedInfoElement = null;
+    	final NodeList childs = signatureElement.getChildNodes();
+    	while (i < childs.getLength() && signedInfoElement == null) {
+    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
+    				childs.item(i).getLocalName().equals(XAdESConstants.TAG_SIGNEDINFO)) {
+    			signedInfoElement = (Element) childs.item(i);
+    		}
+    		i++;
+    	}
+    	if (signedInfoElement == null) {
+    		return null;
+    	}
+
+    	// Obtenemos las referencias declaradas en la firma
+    	final NodeList references = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_REFERENCE);
+
+    	// Omitimos del listado la referencia a los atributos firmados
+    	final List<Element> dataReferences = new ArrayList<>();
+    	for (i = 0; i < references.getLength(); i++) {
+    		final Element reference = (Element) references.item(i);
+    		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
+			if (type != null && !type.isEmpty()) {
+				if (!XAdESUtil.isSignedPropertiesType(type)) {
+					dataReferences.add(reference);
+				}
+			}
+			// Si no se establecio el tipo de referencia, lo comprobamos a partir de la URI
+			else {
+				final String uri = reference.getAttribute("URI"); //$NON-NLS-1$
+
+				// Si es una referencia interna, comprobamos que no sea el KeyInfo o el SignedProperties
+				if (uri != null && uri.startsWith("#")) { //$NON-NLS-1$
+					final String elementId = uri.substring(1);
+					final Node referencedNode = XAdESUtil.findElementById(elementId, signatureElement, false);
+
+					// Si el nodo referenciado no esta dentro del nodo de firma, es que es una referencia
+					// externa a datos
+					if (referencedNode == null) {
+						dataReferences.add(reference);
+					}
+					// Si no, comprobamos que no sea una referencia al KeyInfo o al SignedProperties
+					else {
+						final String nodeName = referencedNode.getLocalName();
+						if (!nodeName.equals("KeyInfo") && !nodeName.equals("SignedProperties")) { //$NON-NLS-1$ //$NON-NLS-2$
+							dataReferences.add(reference);
+						}
+					}
+				}
+				// Cualquier referencia no interna hay que firmarla
+				else {
+					dataReferences.add(reference);
+				}
+			}
+    	}
+
+    	return dataReferences;
+    }
 }

@@ -49,8 +49,8 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESCoSigner;
+import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESCounterSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xades.XAdESSigner;
@@ -165,7 +165,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 			final NodeList signatureNodeList = xml.getElementsByTagNameNS(
 					XMLSignature.XMLNS,
-					AOXAdESSigner.SIGNATURE_TAG
+					XAdESConstants.TAG_SIGNATURE
 					);
 
 			for (int i = 0; i < signatureNodeList.getLength(); i++) {
@@ -306,7 +306,7 @@ public final class XAdESTriPhaseSignerServerSide {
 			new ByteArrayInputStream(xmlSign)
 		).getElementsByTagNameNS(
 			XMLSignature.XMLNS,
-			AOXAdESSigner.SIGNATURE_TAG
+			XAdESConstants.TAG_SIGNATURE
 		);
 		if (signatureNodeList.getLength() == 0) {
 			throw new IllegalArgumentException("Se ha proporcionado un XML sin firmas"); //$NON-NLS-1$

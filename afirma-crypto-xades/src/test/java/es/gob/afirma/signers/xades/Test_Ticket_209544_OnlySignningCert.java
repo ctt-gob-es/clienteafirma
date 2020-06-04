@@ -18,8 +18,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -137,10 +135,7 @@ public final class Test_Ticket_209544_OnlySignningCert {
                     }
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
-                    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    factory.setNamespaceAware(true);
-
-                    final Document doc = factory.newDocumentBuilder().parse(
+                    final Document doc = XAdESUtil.getNewDocumentBuilder().parse(
                     		new ByteArrayInputStream(result));
 
                     final NodeList nl = doc.getElementsByTagNameNS(es.gob.afirma.signers.xml.XMLConstants.DSIGNNS, "X509Data"); //$NON-NLS-1$
@@ -231,10 +226,7 @@ public final class Test_Ticket_209544_OnlySignningCert {
 
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
-                    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    factory.setNamespaceAware(true);
-
-                    final Document doc = factory.newDocumentBuilder().parse(
+                    final Document doc = XAdESUtil.getNewDocumentBuilder().parse(
                     		new ByteArrayInputStream(cosignResult));
 
                     final NodeList nl = doc.getElementsByTagNameNS(es.gob.afirma.signers.xml.XMLConstants.DSIGNNS, "X509Data"); //$NON-NLS-1$
@@ -326,10 +318,7 @@ public final class Test_Ticket_209544_OnlySignningCert {
                     }
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
-                    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    factory.setNamespaceAware(true);
-
-                    final Document doc = factory.newDocumentBuilder().parse(
+                    final Document doc = XAdESUtil.getNewDocumentBuilder().parse(
                     		new ByteArrayInputStream(countersignResult));
 
                     final NodeList nl = doc.getElementsByTagNameNS(es.gob.afirma.signers.xml.XMLConstants.DSIGNNS, "X509Data"); //$NON-NLS-1$
