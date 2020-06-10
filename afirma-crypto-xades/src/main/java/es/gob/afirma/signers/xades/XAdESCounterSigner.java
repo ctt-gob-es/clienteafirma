@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -121,14 +122,14 @@ public final class XAdESCounterSigner {
 		 * documento de firma.
 		 * </p>
 		 * @param signDocument Documento XML con las firmas iniciales.
-		 * @param algorithm
+		 * @param signAlgorithm
 		 *            Algoritmo a usar para la firma.
 		 *            <p>
 		 *            Se aceptan los siguientes algoritmos en el par&aacute;metro
 		 *            <code>algorithm</code>:
 		 *            </p>
 		 *            <ul>
-		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i> (No recomendado)</li>
 		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
 		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
 		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
@@ -158,7 +159,7 @@ public final class XAdESCounterSigner {
 		 * @return Contrafirma en formato XAdES.
 		 * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
 	public static byte[] countersign(final Document signDocument,
-			final String algorithm,
+			final String signAlgorithm,
 			final CounterSignTarget targetType,
 			final Object[] targets,
 			final PrivateKey key,
@@ -170,16 +171,17 @@ public final class XAdESCounterSigner {
 					"El objeto de firma no puede ser nulo"); //$NON-NLS-1$
 		}
 
+		final String algorithm = signAlgorithm != null ? signAlgorithm : AOSignConstants.DEFAULT_SIGN_ALGO;
+		final Properties extraParams = xParams != null ? xParams : new Properties();
+
+		checkParams(algorithm, extraParams);
+
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new IllegalArgumentException(
 					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 		}
-
-		final Properties extraParams = xParams != null ? xParams : new Properties();
-
-		checkParams(algorithm, extraParams);
 
 		final String outputXmlEncoding = extraParams.getProperty(XAdESExtraParams.OUTPUT_XML_ENCODING);
 
@@ -715,6 +717,10 @@ public final class XAdESCounterSigner {
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n.
 	 */
 	private static void checkParams(final String algorithm, final Properties extraParams) {
+
+    	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
+    		throw new IllegalArgumentException("XAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
 
 		// Comprobacion del perfil de firma y el algoritmo de firma seleccionado
 		final String profile = extraParams.getProperty(XAdESExtraParams.PROFILE);

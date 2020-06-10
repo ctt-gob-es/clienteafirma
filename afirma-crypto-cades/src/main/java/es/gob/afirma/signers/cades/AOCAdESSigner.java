@@ -480,7 +480,8 @@ public final class AOCAdESSigner implements AOSigner {
 		// Comprobacion del perfil de firma con la configuracion establecida
 		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
 			if (AOSignConstants.isSHA1SignatureAlgorithm(algorithm)) {
-				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso en las firmas baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El algoritmo '" + algorithm + "' no esta recomendado para su uso " //$NON-NLS-1$ //$NON-NLS-2$
+						+ "en las firmas baseline por no cumplir los requisitos de seguridad actuales"); //$NON-NLS-1$
 			}
 		}
     }

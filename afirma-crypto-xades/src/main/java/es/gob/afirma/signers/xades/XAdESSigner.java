@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -183,7 +184,7 @@ public final class XAdESSigner {
      *  </li>
      * </ul>
      * @param data Datos que deseamos firmar.
-     * @param algorithm
+     * @param signAlgorithm
      *            Algoritmo a usar para la firma.
      *            <p>
      *              Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:
@@ -200,10 +201,17 @@ public final class XAdESSigner {
      * @return Firma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	public static byte[] sign(final byte[] data,
-			                  final String algorithm,
+			                  final String signAlgorithm,
 			                  final PrivateKey pk,
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
+
+		final String algorithm = signAlgorithm != null ? signAlgorithm : AOSignConstants.DEFAULT_SIGN_ALGO;
+		final Properties extraParams = xParams != null ? xParams : new Properties();
+
+		// Comprobamos que no se hayan configurado opciones incompatibles y, en caso afirmativo,
+		// omitimos las que correspondan
+		checkParams(algorithm, extraParams);
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -215,11 +223,6 @@ public final class XAdESSigner {
 		// ***********************************************************************************************
 		// ********** LECTURA PARAMETROS ADICIONALES *****************************************************
 
-		final Properties extraParams = xParams != null ? xParams : new Properties();
-
-		// Comprobamos que no se hayan configurado opciones incompatibles y, en caso afirmativo,
-		// omitimos las que correspondan
-		checkParams(algorithm, extraParams);
 
 		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED, Boolean.FALSE.toString()));
@@ -1295,8 +1298,14 @@ public final class XAdESSigner {
 	 * opciones de configuraci&oacute;n no recomendadas.
 	 * @param algorithm Algoritmo de firma.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n.
+	 * @throws IllegalArgumentException Cuando se proporciona una configuracion de firma no v&aacute;lida e
+	 * incorregible.
 	 */
 	private static void checkParams(final String algorithm, final Properties extraParams) {
+
+    	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
+    		throw new IllegalArgumentException("XAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
 
 		// Comprobacion del perfil de firma y el algoritmo de firma seleccionado
 		final String profile = extraParams.getProperty(XAdESExtraParams.PROFILE);

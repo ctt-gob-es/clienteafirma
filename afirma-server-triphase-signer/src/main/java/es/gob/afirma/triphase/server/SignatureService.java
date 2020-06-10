@@ -26,6 +26,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -319,13 +320,13 @@ public final class SignatureService extends HttpServlet {
 			}
 
 			// Obtenemos el algoritmo de firma
-			final String algorithm = parameters.get(PARAM_NAME_ALGORITHM);
+			String algorithm = parameters.get(PARAM_NAME_ALGORITHM);
 			if (algorithm == null) {
-				LOGGER.warning("No se ha indicado algoritmo de firma"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(3));
-				out.flush();
-				return;
-			}
+				LOGGER.warning("No se ha indicado algoritmo de firma. Se utilizara " + AOSignConstants.DEFAULT_SIGN_ALGO); //$NON-NLS-1$
+				algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
+			} else if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
+	    		throw new IllegalArgumentException("Las firmas electronicas no permiten huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+	    	}
 
 			// Instanciamos el preprocesador adecuado
 			final TriPhasePreProcessor prep;

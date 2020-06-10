@@ -259,7 +259,7 @@ public final class ExtraParamsProcessor {
 			params.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
 		}
 
-		// La politica de firma 1.9 de la AGE no es compatible con los perfiles baseline
+		// La politica de firma 1.9 de la AGE no es compatible con los perfiles baseline de XAdES
 		final String profile = params.getProperty("profile"); //$NON-NLS-1$
 		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
 			LOGGER.warning("Se ignora la configuracion del parametro 'profile' en favor de los requisitos establecidos por la politica de firma"); //$NON-NLS-1$
@@ -289,13 +289,6 @@ public final class ExtraParamsProcessor {
 				ETSI_CADES_DETACHED + "'"); //$NON-NLS-1$
 		}
 		params.setProperty("signatureSubFilter", ETSI_CADES_DETACHED); //$NON-NLS-1$
-
-		// La politica de firma 1.9 de la AGE no es compatible con los perfiles baseline
-		final String profile = params.getProperty("profile"); //$NON-NLS-1$
-		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
-			LOGGER.warning("Se ignora la configuracion del parametro 'profile' en favor de los requisitos establecidos por la politica de firma"); //$NON-NLS-1$
-		}
-		params.setProperty("profile", AOSignConstants.SIGN_PROFILE_ADVANCED); //$NON-NLS-1$
 
 		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_PADES);
 	}

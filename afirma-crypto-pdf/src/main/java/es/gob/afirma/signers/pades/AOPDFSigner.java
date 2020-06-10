@@ -150,7 +150,7 @@ public final class AOPDFSigner implements AOSigner {
      *  igualmente cifrado y protegido con contrase&ntilde;a..
      * </p>
      * @param inPDF Documento PDF a firmar.
-     * @param signatureAlgorithm Algoritmo a usar para la firma.
+     * @param signAlgorithm Algoritmo a usar para la firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
@@ -159,15 +159,16 @@ public final class AOPDFSigner implements AOSigner {
      * @throws IOException Cuando hay errores en el tratamiento de datos. */
     @Override
 	public byte[] sign(final byte[] inPDF,
-			           final String signatureAlgorithm,
+			           final String signAlgorithm,
 			           final PrivateKey key,
 			           final java.security.cert.Certificate[] certChain,
 			           final Properties xParams) throws AOException,
 			                                            IOException {
 
+		final String algorithm = signAlgorithm != null ? signAlgorithm : AOSignConstants.DEFAULT_SIGN_ALGO;
         final Properties extraParams = getExtraParams(xParams);
 
-        checkParams(signatureAlgorithm, extraParams);
+        checkParams(algorithm, extraParams);
 
         final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ?
     		new X509Certificate[] { (X509Certificate) certChain[0] } :
@@ -190,7 +191,7 @@ public final class AOPDFSigner implements AOSigner {
         final PdfSignResult pre;
         try {
 			pre = PAdESTriPhaseSigner.preSign(
-				signatureAlgorithm,
+					algorithm,
 				data,
 				certificateChain,
 				signTime,
@@ -206,7 +207,7 @@ public final class AOPDFSigner implements AOSigner {
         try {
 	        interSign = new AOPkcs1Signer().sign(
 	    		pre.getSign(),
-	    		signatureAlgorithm,
+	    		algorithm,
 	    		key,
 	    		certificateChain,
 	    		extraParams
@@ -222,7 +223,7 @@ public final class AOPDFSigner implements AOSigner {
         // Postfirma
         try {
 			return PAdESTriPhaseSigner.postSign(
-				signatureAlgorithm,
+					algorithm,
 				data,
 				certificateChain,
 				interSign,
@@ -656,12 +657,10 @@ public final class AOPDFSigner implements AOSigner {
     	return newExtraParams;
     }
 
-    private static void checkParams(final String algorithm, final Properties extraParams) throws AOException {
-    	if (algorithm == null) {
-    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
-    	}
+    private static void checkParams(final String algorithm, final Properties extraParams) {
+
     	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
-    		throw new AOException("PAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("PAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
     	}
 
     	final String profile = extraParams.getProperty(PdfExtraParams.PROFILE);
@@ -681,7 +680,17 @@ public final class AOPDFSigner implements AOSigner {
 			}
 		}
 
-		// Si se indico una politica de firma y una razon de firma, se omitira la razon de firma
+		// Las firmas BES no pueden declarar commitmentTypeIndications. Solo esta
+		// permitido para las firmas EPES y B-Level.
+		if (extraParams.containsKey(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS)
+				&& !AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)
+				&& !extraParams.containsKey(PdfExtraParams.POLICY_IDENTIFIER)) {
+			LOGGER.warning("Se ignoraran los commitment type indications establecidos por no estar permitidos en las firmas PAdES-EPES"); //$NON-NLS-1$
+			extraParams.remove(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS);
+		}
+
+		// Si se indico una politica de firma y una razon de firma, se omitira la
+		// razon de firma
 		if (extraParams.containsKey(PdfExtraParams.SIGN_REASON) &&
 				extraParams.containsKey(PdfExtraParams.POLICY_IDENTIFIER)) {
 				LOGGER.warning("Se ignorara la razon de firma establecida por haberse indicado una politica de firma"); //$NON-NLS-1$
