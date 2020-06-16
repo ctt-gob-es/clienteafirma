@@ -33,7 +33,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica que la operacion que se debe realizar es la de desinstalaci&oacute;n. */
 	public static final String PARAMETER_UNINSTALL = "-uninstall"; //$NON-NLS-1$
 
+	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
+	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
+
 	private Configurator configurator;
+
+	private final ConfigArgs config;
 
 	private Console mainScreen;
 
@@ -76,10 +81,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	}
 
 	/** Configurador de AutoFirma. */
-	public AutoFirmaConfiguratorSilent() {
+	public AutoFirmaConfiguratorSilent(final ConfigArgs config) {
+
+		this.config = config;
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false);
+			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(false);
@@ -164,27 +171,60 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	 * @param args No usa par&aacute;metros. */
 	public static void main(final String[] args) {
 
-		final AutoFirmaConfiguratorSilent configurator = new AutoFirmaConfiguratorSilent();
+		final ConfigArgs config = new ConfigArgs(args);
+		final AutoFirmaConfiguratorSilent configurator = new AutoFirmaConfiguratorSilent(config);
 
 		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
-		if (args != null && args.length > 0 && PARAMETER_UNINSTALL.equalsIgnoreCase(args[0])) {
+		if (config.isUninstallation()) {
 			configurator.uninstall();
-			configurator.closeApplication(0);
-			return;
 		}
-
-		// Iniciamos la configuracion
-		try {
-			configurator.configure();
-		}
-		catch (final Exception | Error e) {
-			ConsoleManager.showErrorMessage(
-				configurator.getParentComponent(),
-				Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
-			);
-			configurator.closeApplication(-1);
+		// Si no, instalamos
+		else {
+			try {
+				configurator.configure();
+			}
+			catch (final Exception | Error e) {
+				ConsoleManager.showErrorMessage(
+						configurator.getParentComponent(),
+						Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
+						);
+				configurator.closeApplication(-1);
+			}
 		}
 
 		configurator.closeApplication(0);
+	}
+
+	/** Operaciones admitidas. */
+	private static enum Operation {
+		INSTALLATION,
+		UNINSTALLATION
+	}
+
+	/** Configuraci&oacute;n establecida para la ejecuci&oacute;n del configurador. */
+	private static class ConfigArgs {
+
+		private Operation op = Operation.INSTALLATION;
+		private boolean firefoxSecurityRoots = false;
+
+		public ConfigArgs(final String[] args) {
+			if (args != null) {
+				for (final String arg : args) {
+					if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
+						this.op = Operation.UNINSTALLATION;
+					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
+						this.firefoxSecurityRoots = true;
+					}
+				}
+			}
+		}
+
+		public boolean isUninstallation() {
+			return this.op == Operation.UNINSTALLATION;
+		}
+
+		public boolean isFirefoxSecurityRoots() {
+			return this.firefoxSecurityRoots;
+		}
 	}
 }

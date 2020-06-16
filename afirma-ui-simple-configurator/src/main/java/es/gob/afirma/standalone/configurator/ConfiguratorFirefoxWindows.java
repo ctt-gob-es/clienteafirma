@@ -12,11 +12,13 @@ package es.gob.afirma.standalone.configurator;
 import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
@@ -44,6 +46,15 @@ final class ConfiguratorFirefoxWindows {
 	private static final String CERTUTIL_EXE = "certutil.exe"; //$NON-NLS-1$
 	private static final String CERTUTIL_RESOURCE = "/windows/certutil.windows.zip"; //$NON-NLS-1$
 
+	private static final String CUSTOM_PROFILE_PREFERENCES_FILENAME = "user.js"; //$NON-NLS-1$
+	private static final String MOZ_PREFERENCE_FILE_HEADER =
+			"// === PROPIEDADES PERSONALIZADAS DE CONFIGURACION ===\r\n"; //$NON-NLS-1$
+	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER =
+			"\r\n// Confianza en los certificados raices del almacen del sistema\r\n"; //$NON-NLS-1$
+	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS = "security.enterprise_roots.enabled"; //$NON-NLS-1$
+
+	private static final String BREAK_LINE = "\r\n"; //$NON-NLS-1$
+
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
 	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
@@ -53,7 +64,6 @@ final class ConfiguratorFirefoxWindows {
 	private static final String ENV_VARIABLE_SYSTEMDRIVE = "SystemDrive"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
 
 	private static String PROFILES_INI_RELATIVE_PATH;
 	private static String USERS_PATH;
@@ -131,7 +141,8 @@ final class ConfiguratorFirefoxWindows {
 			importCACertOnMozillaKeyStore(appDir, profileDir, window);
 		}
 
-		window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
+		// Se elimina el directorio de copiado en el directorio de instalacion
+		//window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
 		//removeCertUtilFromDisk(appDir);
 	}
 
@@ -612,5 +623,95 @@ final class ConfiguratorFirefoxWindows {
 			sb.append(' ');
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Configur el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
+	 * sistema operativo como almacen de confianza de Firefox.
+	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
+	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
+	 * {@code false} en caso contrario.
+	 * @param profileDirs Listado de directorios de perfil de Firefox.
+	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
+	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado pergiles de Firefox.
+	 */
+	static void configureUseSystemTrustStore(final boolean enable, final Console window) throws IOException, MozillaProfileNotFoundException {
+
+		// Obtenemos el listado de perfiles de Firefox
+		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
+
+		if (mozillaProfileDirs == null || mozillaProfileDirs.length == 0) {
+			throw new MozillaProfileNotFoundException("No se han encontrado perfiles de Mozilla en el sistema"); //$NON-NLS-1$
+		}
+
+		if (enable) {
+			window.print(Messages.getString("ConfiguratorWindows.19")); //$NON-NLS-1$
+		}
+		else {
+			window.print(Messages.getString("ConfiguratorWindows.20")); //$NON-NLS-1$
+		}
+
+		// Las preferencias personalizadas se establecen a traves de un fichero user.js en el
+		// directorio de perfil de Firefox. Por cada directorio, comprobamos si existe este
+		// fichero. Si no existe, se crea con la propiedad personalizada. Si existe, se modifica
+		// el valor que tuviese, o se agrega la propiedad si no estuviera.
+		for (final File profileDir : mozillaProfileDirs) {
+			final File customPrefsFile = new File(profileDir, CUSTOM_PROFILE_PREFERENCES_FILENAME);
+
+			// Si existe el fichero, comprobamos si existe la propiedad
+			if (customPrefsFile.isFile()) {
+
+				// Buscamos la propiedad en el fichero y, si existe, cambiamos su valor
+				boolean propertyFound = false;
+				final StringBuilder customFileContent = new StringBuilder();
+				try (InputStream is = new FileInputStream(customPrefsFile);
+						Reader isr = new InputStreamReader(is);
+						BufferedReader br = new BufferedReader(isr);) {
+
+					String line;
+					while ((line = br.readLine()) != null) {
+						if (line.contains(MOZ_PREFERENCE_ENTERPRISE_ROOTS)) {
+							propertyFound = true;
+							customFileContent.append(getUseSystemTrustStoreConfigContent(enable));
+						}
+						else {
+							customFileContent.append(line).append(BREAK_LINE);
+						}
+					}
+				}
+
+				// Si no existe la linea de configuracion, la agregamos
+				if (!propertyFound) {
+					customFileContent.append(MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER)
+						.append(getUseSystemTrustStoreConfigContent(enable));
+				}
+
+				// Rescribimos el fichero
+				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
+					fos.write(customFileContent.toString().getBytes(StandardCharsets.UTF_8));
+				}
+			}
+			// Si no existe el fichero, lo creamos con la propiedad
+			else {
+				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
+					final String content = MOZ_PREFERENCE_FILE_HEADER
+							+ MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER
+							+ getUseSystemTrustStoreConfigContent(enable);
+					fos.write(content.getBytes(StandardCharsets.UTF_8));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Obtiene la l&iacute;nea de configuraci&oacute;n para activar o desactivar el uso del
+	 * almac&eacute;n de confianza del sistema.
+	 * @param enable {@code true} para habilitar el almac&eacute;n de confianza del sistema,
+	 * {@code false} para desactivarlo.
+	 * @return L&iacute;nea de configuraci&oacute;n.
+	 */
+	private static String getUseSystemTrustStoreConfigContent(final boolean enable) {
+		return "user_pref(\"" + MOZ_PREFERENCE_ENTERPRISE_ROOTS //$NON-NLS-1$
+				+ "\", " + enable + ");" + BREAK_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

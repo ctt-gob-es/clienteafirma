@@ -52,9 +52,11 @@ final class ConfiguratorWindows implements Configurator {
 	private static final String CHROME_V57_OR_HIGHER_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Default/Preferences"; //$NON-NLS-1$
 
 	private final boolean jnlpInstance;
+	private final boolean firefoxSecurityRoots;
 
-	public ConfiguratorWindows(final boolean jnlpInstance) {
+	public ConfiguratorWindows(final boolean jnlpInstance, final boolean firefoxSecurityRoots) {
 		this.jnlpInstance = jnlpInstance;
+		this.firefoxSecurityRoots = firefoxSecurityRoots;
 	}
 
 	@Override
@@ -98,6 +100,16 @@ final class ConfiguratorWindows implements Configurator {
 				JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
 				window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
 				importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
+			}
+
+
+			if (this.firefoxSecurityRoots) {
+				window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
+				try {
+					ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
+				} catch (final MozillaProfileNotFoundException e) {
+					window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 		}
 		else {

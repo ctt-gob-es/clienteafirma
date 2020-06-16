@@ -19,7 +19,7 @@ import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;
 
-/** Clase para la configuraci&oacute;n de la instalaci&oacute;n de AutoFirma. Identifica el entorno, genera un
+/** Configurador de la instalaci&oacute;n de AutoFirma. Identifica el entorno, genera un
  * certificado de firma y lo instala en los almacenes pertinentes. */
 public class AutoFirmaConfigurator implements ConsoleListener {
 
@@ -45,9 +45,12 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	/** Indica que se realiza una carga mediante JNLP. */
 	public static final String PARAMETER_JNLP_INSTANCE = "-jnlp"; //$NON-NLS-1$
 
+	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
+	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
+
 	private Configurator configurator;
 
-	private final  ConfigArgs config;
+	private final ConfigArgs config;
 
 	private Console mainScreen;
 
@@ -110,7 +113,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(jnlpDeployment);
+			this.configurator = new ConfiguratorWindows(jnlpDeployment, this.config.isFirefoxSecurityRoots());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
@@ -235,6 +238,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		private boolean needKeep = false;
 		private boolean headless = false;
 		private boolean jnlpInstance = false;
+		private boolean firefoxSecurityRoots = false;
 
 		public ConfigArgs(final String[] args) {
 			if (args != null) {
@@ -249,6 +253,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 						this.headless = true;
 					} else if (PARAMETER_JNLP_INSTANCE.equalsIgnoreCase(arg)) {
 						this.jnlpInstance = true;
+					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
+						this.firefoxSecurityRoots = true;
 					}
 				}
 			}
@@ -268,6 +274,10 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 		public boolean isJnlpInstance() {
 			return this.jnlpInstance;
+		}
+
+		public boolean isFirefoxSecurityRoots() {
+			return this.firefoxSecurityRoots;
 		}
 	}
 }

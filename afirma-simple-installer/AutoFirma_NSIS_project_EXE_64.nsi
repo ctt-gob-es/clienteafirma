@@ -31,6 +31,8 @@ SetCompressor lzma
   !insertmacro MUI_PAGE_LICENSE "licencia.txt"
   ;Pagina donde se selecciona el directorio donde instalar nuestra aplicacion
   !insertmacro MUI_PAGE_DIRECTORY
+  ;Pagina personalizada con las opciones de configuracion
+  Page custom createConfigPage leaveConfigPage
   ;Pagina de instalacion de ficheros
   !insertmacro MUI_PAGE_INSTFILES
   ;Pagina final
@@ -41,8 +43,73 @@ SetCompressor lzma
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
+
+
+; Creamos la pagina de configuracion personalizada
+!include nsDialogs.nsh
+
+; Variables para el guardado de los componentes de la pagina de configuracion
+Var StartMenu_Integration_Checkbox
+Var StartMenu_Integration_Checkbox_State
+Var Shorcut_Integration_Checkbox
+Var Shorcut_Integration_Checkbox_State
+Var Firefox_Integration_Checkbox
+Var Firefox_Integration_Checkbox_State
+
+Function .onInit
+
+	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
+	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
+
+FunctionEnd
+
+Function createConfigPage
+  !insertmacro MUI_HEADER_TEXT "Opciones de integración avanzadas" "Seleccione las opciones de integración que desee que configure AutoFirma"
   
- 
+  nsDialogs::Create 1018
+  Pop $0
+
+  ${If} $0 == error
+    Abort
+  ${EndIf}
+
+  ; Creamos los elementos de interfaz
+  ${NSD_CreateCheckbox} 0 0 100% 10u "Agregar al menú inicio."
+  Pop $StartMenu_Integration_Checkbox
+  
+  ${NSD_CreateCheckbox} 0 17u 100% 10u "Crear acceso directo en el escritorio."
+  Pop $Shorcut_Integration_Checkbox
+
+  ${NSD_CreateCheckbox} 0 34u 100% 10u "Configurar Firefox para que confíe en los certificados raíces del sistemas."
+  Pop $Firefox_Integration_Checkbox
+  
+  ; Restablecemos el valor por si hubiese cambio de pantalla
+  ${If} $StartMenu_Integration_Checkbox_State == ${BST_CHECKED}
+    ${NSD_Check} $StartMenu_Integration_Checkbox
+  ${EndIf}
+  ${If} $Shorcut_Integration_Checkbox_State == ${BST_CHECKED}
+    ${NSD_Check} $Shorcut_Integration_Checkbox
+  ${EndIf}
+  ${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
+    ${NSD_Check} $Firefox_Integration_Checkbox
+  ${EndIf}
+  
+  ; Establecemos el mismo comportamiento al pulsar Atras en la pagina que al continuar
+  ${NSD_OnBack} "leaveConfigPage"
+
+nsDialogs::Show
+  
+FunctionEnd  
+
+Function leaveConfigPage
+
+	${NSD_GetState} $StartMenu_Integration_Checkbox $StartMenu_Integration_Checkbox_State
+	${NSD_GetState} $Shorcut_Integration_Checkbox $Shorcut_Integration_Checkbox_State
+	${NSD_GetState} $Firefox_Integration_Checkbox $Firefox_Integration_Checkbox_State
+
+FunctionEnd
+
+
 ;--------------------------------
 ;Idiomas
  
@@ -52,6 +119,7 @@ SetCompressor lzma
 ;  !insertmacro MUI_LANGUAGE ${LANGUAGE}
 ; De esta forma pasando la variable LANGUAGE al compilador podremos generar
 ; paquetes en distintos idiomas sin cambiar el script
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Configuration General ;
@@ -204,16 +272,17 @@ Section "Programa" sPrograma
 	
 	Sleep 2000
 
-	;creamos un acceso directo en el escitorio
-	MessageBox MB_YESNO "¿Desea instalar un acceso directo a AutoFirma en su escritorio?" /SD IDYES IDNO +2
+	;Si se ha configurado, creamos un acceso directo en el escritorio
+	${If} $Shorcut_Integration_Checkbox_State == 1
 		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	${Endif}
 
-	;Menu items
-	CreateDirectory "$SMPROGRAMS\AutoFirma"
-	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
-
-	
+	;Si se ha configurado, creamos el grupo de accesos en el menu inicio
+	${If} $StartMenu_Integration_Checkbox_State == 1
+		CreateDirectory "$SMPROGRAMS\AutoFirma"
+		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+		CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
+	${Endif}
 	;Anade una entrada en la lista de "Program and Features"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "AutoFirma"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "UninstallString" "$INSTDIR\uninstall.exe"
@@ -287,7 +356,12 @@ Section "Programa" sPrograma
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
-	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
+	StrCpy $R0 ""
+	${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
+		StrCpy $R0 "-firefox_roots"
+	${Endif}
+	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" $R0 /passive'
+	
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
 
