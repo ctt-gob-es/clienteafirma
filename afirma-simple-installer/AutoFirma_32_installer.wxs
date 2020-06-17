@@ -16,11 +16,12 @@
 	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
 
 		<Property Id="CREATE_ICON" Value="true" Admin="yes" />
-
+		<Property Id="FIREFOX_SECURITY_ROOTS" Value="false" Admin="yes" />
+		
 		<!-- Ejecucion del instalador -->
 		<CustomAction Id='QtExecInstall'
 					  FileKey='$(var.ProjectName)Generator.exe'
-					  ExeCommand='/S CREATE_ICON=[CREATE_ICON]'
+					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON]'
                       Execute="deferred"
                       Return="check"
 					  Impersonate="no" />

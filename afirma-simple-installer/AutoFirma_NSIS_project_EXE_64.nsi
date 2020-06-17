@@ -80,7 +80,7 @@ Function createConfigPage
   ${NSD_CreateCheckbox} 0 17u 100% 10u "Crear acceso directo en el escritorio."
   Pop $Shorcut_Integration_Checkbox
 
-  ${NSD_CreateCheckbox} 0 34u 100% 10u "Configurar Firefox para que confíe en los certificados raíces del sistemas."
+  ${NSD_CreateCheckbox} 0 34u 100% 10u "Configurar Firefox para que confíe en los certificados raíz del sistema."
   Pop $Firefox_Integration_Checkbox
   
   ; Restablecemos el valor por si hubiese cambio de pantalla

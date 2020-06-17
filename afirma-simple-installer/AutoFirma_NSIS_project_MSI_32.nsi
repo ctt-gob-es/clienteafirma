@@ -85,6 +85,8 @@ XPStyle on
 Var PATH
 ;Parametro que indica si se debe crear el acceso directo en el escritorio
 Var CREATE_ICON
+;Parametro que indica si se debe activar el uso del almacen del sistema en Firefox
+Var FIREFOX_SECURITY_ROOTS					  
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
@@ -110,7 +112,10 @@ SetCompress auto
 Function .onInit
   ${GetParameters} $R0
     ClearErrors
-  ${GetOptions} $R0 "CREATE_ICON=" $CREATE_ICON
+  ;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
+  ;Este delimitador se agrega en el .wxs del instalador MSI
+  ${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
+  ${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS  
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -262,7 +267,11 @@ Section "Programa" sPrograma
 	Sleep 2000
 	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
-	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" /passive'
+	StrCpy $R4 ""
+	StrCmp $FIREFOX_SECURITY_ROOTS "true" 0 +2
+		StrCpy $R4 "-firefox_roots"
+	
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 /passive'
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
 	
