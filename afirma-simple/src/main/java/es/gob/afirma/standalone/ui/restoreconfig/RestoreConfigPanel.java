@@ -19,6 +19,7 @@ import java.awt.event.KeyListener;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -54,6 +55,12 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	 * &Aacute;rea de texto para mostrar los mensajes de progreso de la tarea de restauraci&oacute;n
 	 */
 	JTextArea taskOutput;
+
+	/**
+	 * Casilla de verificaci&oacute;n con la que se puede activar o desactivar la opci&oacute;n de que Firefox
+	 * utilice el almac&eacute;n del sistema.
+	 */
+	JCheckBox firefoxIntegrationCb;
 
 
 	/**Constructor con par&aacute;metro de la clase
@@ -102,13 +109,26 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
     	c.gridy++;
         this.add(jsPanel, c);
 
+        this.firefoxIntegrationCb = new JCheckBox(SimpleAfirmaMessages.getString("RestoreConfigPanel.7")); //$NON-NLS-1$
+        this.firefoxIntegrationCb.setToolTipText(SimpleAfirmaMessages.getString("RestoreConfigPanel.8")); //$NON-NLS-1$
+
+        // La opcion de configurar Firefox para que use el almacen de confianza del sistema solo estara disponible
+        // en sistemas Windows y macOS.
+        if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.MACOSX) {
+        	c.fill = GridBagConstraints.HORIZONTAL;
+        	c.insets = new Insets(7, 15,  0,  15);
+        	c.gridy++;
+        	c.weighty = 0.0;
+        	this.add(this.firefoxIntegrationCb, c);
+        }
+
         // Creamos un panel para el boton de restauracion
         final JPanel buttonsPanel = createButtonsPanel();
 
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(11, 15,  15,  15);
-		c.gridy++;
-		c.weighty = 0.0;
+        c.insets = new Insets(7, 11,  0,  11);
+        c.gridy++;
+        c.weighty = 0.0;
 		c.ipady = 11;
 		add(buttonsPanel, c);
 	}
@@ -149,7 +169,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			restoreButton.setEnabled(true);
 
 		});
-
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {

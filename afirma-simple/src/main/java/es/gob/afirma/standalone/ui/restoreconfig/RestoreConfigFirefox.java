@@ -16,6 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -59,22 +62,41 @@ final class RestoreConfigFirefox {
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
-	private static String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+	private static String WINDOWS_MOZILLA_PATH;
+	private static String USERS_WINDOWS_PATH;
+
 	private static final String GET_USER_SCRIPT = "scriptGetUsers";//$NON-NLS-1$
 	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
 
-	private static String USERS_WINDOWS_PATH;
-
 	static {
-		try {
-			USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath() + File.separator; //$NON-NLS-1$;
-		}
-		catch (final Exception e) {
-			LOGGER.warning("No se ha podido identificar el directorio de usuarios: " + e); //$NON-NLS-1$
-			USERS_WINDOWS_PATH = "C:/Users/"; //$NON-NLS-1$
+
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			// Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
+			String osName;
+			try {
+				osName = System.getProperty("os.name"); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se pudo obtener el nombre del sistema operativo", e); //$NON-NLS-1$
+				osName = ""; //$NON-NLS-1$
+			}
+			if (osName.contains("XP")) { //$NON-NLS-1$
+				WINDOWS_MOZILLA_PATH = "\\Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+				USERS_WINDOWS_PATH = "C:\\Documents and Settings\\"; //$NON-NLS-1$
+			}
+			else {
+				WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+				try {
+					USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath() + File.separator; //$NON-NLS-1$;
+				}
+				catch (final Exception e) {
+					LOGGER.warning("No se ha podido identificar el directorio de usuarios: " + e); //$NON-NLS-1$
+					USERS_WINDOWS_PATH = "C:/Users/"; //$NON-NLS-1$
+				}
+			}
 		}
 	}
 
@@ -329,9 +351,7 @@ final class RestoreConfigFirefox {
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox: " + e); //$NON-NLS-1$
 		}
-
 	}
-
 
 	/** Genera y ejecuta el <i>script</i> de desinstalaci&oacute;n del certificado de Firefox
 	 * para macOS.
@@ -340,28 +360,23 @@ final class RestoreConfigFirefox {
 	 * @throws IOException Cuando hay errores leyendo o escribiendo datos. */
 	static void generateUninstallScriptMac(final File targetDir, final List<String> usersDirs) throws IOException {
 
-		final StringBuilder sb = new StringBuilder(RestoreConfigMacOSX.OSX_GET_USERS_COMMAND);
-		final File scriptFile = File.createTempFile(GET_USER_SCRIPT, SCRIPT_EXT);
-
-		try {
-			RestoreConfigMacOSX.writeScriptFile(scriptFile.getAbsolutePath(), sb, true);
-		}
-		catch (final IOException e) {
-			LOGGER.log(Level.WARNING, " Ha ocurrido un error al generar el script de desinstalacion: " + e, e); //$NON-NLS-1$
-		}
-		RestoreConfigMacOSX.addExexPermissionsToFile(scriptFile);
-
-
-		scriptFile.delete();
+		// XXX: Comprobar que este codigo comentado no sirve para nada y eliminarlo en dicho caso
+//		final StringBuilder sb = new StringBuilder(RestoreConfigMacOSX.OSX_GET_USERS_COMMAND);
+//		final File scriptFile = File.createTempFile(GET_USER_SCRIPT, SCRIPT_EXT);
+//
+//		try {
+//			RestoreConfigMacOSX.writeScriptFile(scriptFile.getAbsolutePath(), sb, true);
+//		}
+//		catch (final IOException e) {
+//			LOGGER.log(Level.WARNING, " Ha ocurrido un error al generar el script de desinstalacion: " + e, e); //$NON-NLS-1$
+//		}
+//		RestoreConfigMacOSX.addExexPermissionsToFile(scriptFile);
+//
+//
+//		scriptFile.delete();
 
 		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
 		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
-		// Si no se encuentra el fichero de perfiles de firefox, abortamos la operacion
-		if (mozillaUsersProfilesPath == null) {
-			LOGGER.info("No se encuentra el fichero de perfiles de Firefox, por lo que no se desinstalaran certificados"); //$NON-NLS-1$
-			return;
-		}
-
 		// para cada usuario tenemos sus distintos directorios de perfiles
 		final Set <File> profiles = getProfiles(mozillaUsersProfilesPath);
 		if (profiles.isEmpty()) {
@@ -533,8 +548,7 @@ final class RestoreConfigFirefox {
 		if (error) {
 			throw new KeyStoreException(
 				"Error en la instalacion del certificado de CA en alguno de los perfiles de usuario " //$NON-NLS-1$
-					+ "de Firefox. Es posible que la aplicacion funcione en su propio perfil. Si desea que la aplicacion se " //$NON-NLS-1$
-					+ "ejecute correctamente en todos los perfiles, desinstalela y vuelvala a instalar." //$NON-NLS-1$
+					+ "de Firefox. Es posible que la aplicacion funcione en su propio perfil." //$NON-NLS-1$
 			);
 		}
 
@@ -724,16 +738,9 @@ final class RestoreConfigFirefox {
 		final File usersBaseDir = new File(USERS_WINDOWS_PATH);
 		final String[] userDirNames = usersBaseDir.list((current, name) -> new File(current, name).isDirectory());
 
-		//Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
-		if(System.getProperty("os.name") != null && System.getProperty("os.name").contains("XP")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			WINDOWS_MOZILLA_PATH = "\\Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
-			USERS_WINDOWS_PATH = "C:\\Documents and Settings\\"; //$NON-NLS-1$
-		}
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
-
 		boolean error = false;
-
-		for(final String userDirName : userDirNames) {
+		for (final String userDirName : userDirNames) {
 
 			// Nos saltamos siempre el usuario por defecto del sistema para
 			// evitar corromperlo
@@ -741,11 +748,12 @@ final class RestoreConfigFirefox {
 				continue;
 			}
 
-			LOGGER.info("Se comprueba la existencia del perfil de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
-			if(new File(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH).exists()) {
+			final String profilesIniPath = USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH;
+			if (new File(profilesIniPath).exists()) {
+				LOGGER.info("Se ha encontrado el perfil de Firefox: " + profilesIniPath); //$NON-NLS-1$
 				final File profilesDir = new File(
 						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-								USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH
+								profilesIniPath
 								)
 						).getParentFile();
 				for (final File profileDir : profilesDir.listFiles()) {
@@ -778,7 +786,7 @@ final class RestoreConfigFirefox {
 							) {
 						while ((line = resReader.readLine()) != null) {
 							error = true;
-							LOGGER.severe(line);
+							LOGGER.severe("Error devuelto por certutilen el flujo de salida: " + line); //$NON-NLS-1$
 						}
 					}
 
@@ -792,7 +800,7 @@ final class RestoreConfigFirefox {
 							) {
 						while ((line = errReader.readLine()) != null) {
 							error = true;
-							LOGGER.severe(line);
+							LOGGER.severe("Error devuelto por certutilen el flujo de error: " + line); //$NON-NLS-1$
 						}
 					}
 				}
@@ -892,13 +900,6 @@ final class RestoreConfigFirefox {
 
 		final ArrayList<File> fileList = new ArrayList<>();
 
-		//Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
-		LOGGER.info("Version de Windows detectada: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
-		if(System.getProperty("os.name") != null && System.getProperty("os.name").contains("XP")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			WINDOWS_MOZILLA_PATH = "\\Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
-			USERS_WINDOWS_PATH = "C:\\Documents and Settings\\"; //$NON-NLS-1$
-		}
-
 		// Se obtienen todos los usuarios para los que se va a instalar el
 		// certificado en Firefox
 		final File usersBaseDir = new File(USERS_WINDOWS_PATH);
@@ -939,21 +940,23 @@ final class RestoreConfigFirefox {
 		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			pathProfile = MACOSX_MOZILLA_PATH;
 		}
+		else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			pathProfile = WINDOWS_MOZILLA_PATH;
+		}
 		else {
 			throw new IllegalArgumentException("Sistema operativo no soportado: " + Platform.getOS()); //$NON-NLS-1$
 		}
 		for (final String usr: users){
-			final File mozillaPath = new File(usr + pathProfile);
+			final File mozillaPath = new File(usr, pathProfile);
 			// comprobamos que el fichero exista
 			if (mozillaPath.exists() && mozillaPath.isFile()){
 				path.add(mozillaPath);
-				LOGGER.info("Ruta: " + mozillaPath ); //$NON-NLS-1$
 			}
 		}
 		return path;
 	}
 
-	/** Devuelve un listado de directorios donde se encuentran los perfiles de usuario de firefox en Linux.
+	/** Devuelve un listado de directorios donde se encuentran los perfiles de usuario de firefox.
 	 * @param profilesPath Listado de directorios que contienen un fichero <i>profiles.ini</i>.
 	 * @return Listado de directorios donde se encuentran los perfiles de usuario de Firefox. */
 	private static Set<File> getProfiles(final List<File> profilesPath){
@@ -973,7 +976,7 @@ final class RestoreConfigFirefox {
 					if (line.startsWith(PATH)){
 						final File file = new File(
 							path.getAbsolutePath().substring(
-								0, path.getAbsolutePath().lastIndexOf("/") + 1) + line.substring(PATH.length() //$NON-NLS-1$
+								0, path.getAbsolutePath().lastIndexOf(File.separator) + 1) + line.substring(PATH.length()
 							)
 						);
 						if (file.exists() && file.isDirectory()){
@@ -1039,5 +1042,129 @@ final class RestoreConfigFirefox {
 		}
 
 		return false;
+	}
+
+
+	private static final String CUSTOM_PROFILE_PREFERENCES_FILENAME = "user.js"; //$NON-NLS-1$
+	private static final String MOZ_PREFERENCE_FILE_HEADER =
+			"// === PROPIEDADES PERSONALIZADAS DE CONFIGURACION ===\r\n"; //$NON-NLS-1$
+	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER =
+			"\r\n// Confianza en los certificados raices del almacen del sistema\r\n"; //$NON-NLS-1$
+	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS = "security.enterprise_roots.enabled"; //$NON-NLS-1$
+
+	private static final String BREAK_LINE = "\r\n"; //$NON-NLS-1$
+
+	/**
+	 * Configur el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
+	 * sistema operativo como almacen de confianza de Firefox.
+	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
+	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
+	 * {@code false} en caso contrario.
+	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
+	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado perfiles de Firefox.
+	 */
+	static void configureUseSystemTrustStore(final boolean enable) throws IOException, MozillaProfileNotFoundException {
+
+		// Obtenemos el directorio de usuarios
+		final List<String> userDirPaths = getUsersDirectories();
+		configureUseSystemTrustStore(enable, userDirPaths);
+	}
+
+	/**
+	 * Configur el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
+	 * sistema operativo como almacen de confianza de Firefox.
+	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
+	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
+	 * {@code false} en caso contrario.
+	 * @param userDirPaths Listado de directorios de los usuarios.
+	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
+	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado perfiles de Firefox.
+	 */
+	static void configureUseSystemTrustStore(final boolean enable, final List<String> userDirPaths) throws IOException, MozillaProfileNotFoundException {
+
+		// Dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
+		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(userDirPaths);
+		// Para cada usuario tenemos sus distintos directorios de perfiles
+		final Set <File> mozillaProfileDirs = getProfiles(mozillaUsersProfilesPath);
+		if (mozillaProfileDirs.isEmpty()) {
+			throw new MozillaProfileNotFoundException();
+		}
+
+		// Las preferencias personalizadas se establecen a traves de un fichero user.js en el
+		// directorio de perfil de Firefox. Por cada directorio, comprobamos si existe este
+		// fichero. Si no existe, se crea con la propiedad personalizada. Si existe, se modifica
+		// el valor que tuviese, o se agrega la propiedad si no estuviera.
+		for (final File profileDir : mozillaProfileDirs) {
+			final File customPrefsFile = new File(profileDir, CUSTOM_PROFILE_PREFERENCES_FILENAME);
+
+			// Si existe el fichero, comprobamos si existe la propiedad
+			if (customPrefsFile.isFile()) {
+
+				// Buscamos la propiedad en el fichero y, si existe, cambiamos su valor
+				boolean propertyFound = false;
+				final StringBuilder customFileContent = new StringBuilder();
+				try (InputStream is = new FileInputStream(customPrefsFile);
+						Reader isr = new InputStreamReader(is);
+						BufferedReader br = new BufferedReader(isr);) {
+
+					String line;
+					while ((line = br.readLine()) != null) {
+						if (line.contains(MOZ_PREFERENCE_ENTERPRISE_ROOTS)) {
+							propertyFound = true;
+							customFileContent.append(getUseSystemTrustStoreConfigContent(enable));
+						}
+						else {
+							customFileContent.append(line).append(BREAK_LINE);
+						}
+					}
+				}
+
+				// Si no existe la linea de configuracion, la agregamos
+				if (!propertyFound) {
+					customFileContent.append(MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER)
+						.append(getUseSystemTrustStoreConfigContent(enable));
+				}
+
+				// Rescribimos el fichero
+				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
+					fos.write(customFileContent.toString().getBytes(StandardCharsets.UTF_8));
+				}
+			}
+			// Si no existe el fichero, lo creamos con la propiedad
+			else {
+				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
+					final String content = MOZ_PREFERENCE_FILE_HEADER
+							+ MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER
+							+ getUseSystemTrustStoreConfigContent(enable);
+					fos.write(content.getBytes(StandardCharsets.UTF_8));
+				}
+			}
+		}
+	}
+
+	private static List<String> getUsersDirectories() {
+
+		final List<String> userDirPaths = new ArrayList<>();
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			final File usersBaseDir = new File(USERS_WINDOWS_PATH);
+			final File[] userDirs = usersBaseDir.listFiles((current, name) -> new File(current, name).isDirectory());
+			for (final File userDir : userDirs) {
+				userDirPaths.add(userDir.getAbsolutePath());
+			}
+		}
+
+		return userDirPaths;
+	}
+
+	/**
+	 * Obtiene la l&iacute;nea de configuraci&oacute;n para activar o desactivar el uso del
+	 * almac&eacute;n de confianza del sistema.
+	 * @param enable {@code true} para habilitar el almac&eacute;n de confianza del sistema,
+	 * {@code false} para desactivarlo.
+	 * @return L&iacute;nea de configuraci&oacute;n.
+	 */
+	private static String getUseSystemTrustStoreConfigContent(final boolean enable) {
+		return "user_pref(\"" + MOZ_PREFERENCE_ENTERPRISE_ROOTS //$NON-NLS-1$
+				+ "\", " + enable + ");" + BREAK_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

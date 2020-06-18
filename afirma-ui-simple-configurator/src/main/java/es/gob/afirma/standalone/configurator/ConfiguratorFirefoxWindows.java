@@ -630,10 +630,11 @@ final class ConfiguratorFirefoxWindows {
 	 * sistema operativo como almacen de confianza de Firefox.
 	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
 	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
-	 * {@code false} en caso contrario.
+	 * {@code false} en de que s&oacute;lo se desee confiar en el almac&eacute;n del navegador.
 	 * @param profileDirs Listado de directorios de perfil de Firefox.
+	 * @param window Consola en la que se mostrar&aacute;n los mensajes de progreso.
 	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
-	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado pergiles de Firefox.
+	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado perfiles de Firefox.
 	 */
 	static void configureUseSystemTrustStore(final boolean enable, final Console window) throws IOException, MozillaProfileNotFoundException {
 

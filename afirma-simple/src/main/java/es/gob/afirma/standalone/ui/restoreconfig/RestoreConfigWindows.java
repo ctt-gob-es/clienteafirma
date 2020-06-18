@@ -74,6 +74,9 @@ final class RestoreConfigWindows implements RestoreConfig {
 		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
+		// Comprobamos si se debe configurar Firefox para que use el almacen de confianza del sistema
+		final boolean firefoxSecurityRoots = configPanel.firefoxIntegrationCb.isSelected();
+
 		// Verifica si se tiene permisos para escribir en el directorio de instalacion
 		boolean usingAlternativeDirectory;
 		File workingDirectory;
@@ -86,6 +89,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 
 		LOGGER.info("Ruta de trabajo:  " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
+		if (!workingDirectory.exists()) {
+			try {
+				workingDirectory.mkdirs();
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se ha podido crear el directorio: " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
+			}
+		}
 
 		final boolean needRebuildCerts = isRebuildCertNeeded(appDir);
 
@@ -97,7 +108,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				sslRoot = rebuildCertificates(configPanel, workingDirectory);
 			}
 			catch (final Exception e) {
-				LOGGER.severe("No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza", e); //$NON-NLS-1$
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.33")); //$NON-NLS-1$
 				sslRoot = null;
 			}
@@ -114,7 +125,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				sslRoot = loadRootCertificate(workingDirectory);
 			}
 			catch (final Exception e) {
-				LOGGER.severe("No se ha podido cargar el certificado de CA del directorio de instalacion. No se instalara en los almacenes de confianza: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se ha podido cargar el certificado de CA del directorio de instalacion. No se instalara en los almacenes de confianza", e); //$NON-NLS-1$
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.4")); //$NON-NLS-1$
 				sslRoot = null;
 			}
@@ -142,7 +153,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 					copyCerts(workingDirectory, alternativeDir);
 
 				} catch (final IOException e) {
-					LOGGER.warning("No se ha podido copiar el almacen del certificado SSL al directorio alternativo de instalacion: " + e); //$NON-NLS-1$
+					LOGGER.log(Level.WARNING, "No se ha podido copiar el almacen del certificado SSL al directorio alternativo de instalacion", e); //$NON-NLS-1$
 					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.37")); //$NON-NLS-1$
 				}
 			}
@@ -154,13 +165,33 @@ final class RestoreConfigWindows implements RestoreConfig {
 			restoreProtocolRegistry(appDir.getAbsoluteFile(), workingDirectory.getAbsoluteFile());
 		}
 		catch (final Exception e) {
-			LOGGER.warning("Error restaurando los valores del protocolo 'afirma': " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error restaurando los valores del protocolo 'afirma'", e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.25")); //$NON-NLS-1$
 		}
 
 		// Configuramos el protocolo afirma en Chrome para que no muestre advertencias al llamarlo
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.23")); //$NON-NLS-1$
 		configureChrome();
+
+		// Configuramos Firefox para que confie o no en los prestadores dados de alta en el almacen de confianza
+		// del sistema
+
+		if (firefoxSecurityRoots) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.41")); //$NON-NLS-1$
+		} else {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.42")); //$NON-NLS-1$
+		}
+		try {
+			RestoreConfigFirefox.configureUseSystemTrustStore(firefoxSecurityRoots);
+		}
+		catch (final MozillaProfileNotFoundException e) {
+			LOGGER.info("No se encontraron perfiles de Firefox en los que configurar la confianza en el almacen del sistema"); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.44")); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error configurando la confianza de Firefox en el almacen del sistema (activando: " + firefoxSecurityRoots + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.43")); //$NON-NLS-1$
+		}
 
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.8")); //$NON-NLS-1$
 	}
@@ -337,9 +368,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 				installed = true;
 			}
 			catch (final KeyStoreException e) {
-				LOGGER.warning(
-					"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
-				);
+				LOGGER.log(Level.WARNING,
+						"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows", //$NON-NLS-1$
+						e
+						);
 				final int result = JOptionPane.showConfirmDialog(
 					null,
 					SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
@@ -474,7 +506,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				sslRoot = new CertificateFile(certPack.getCaCertificate());
 			}
 			catch (final GeneralSecurityException e) {
-				LOGGER.severe("No se ha podido generar el certificado SSL: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se ha podido generar el certificado SSL", e); //$NON-NLS-1$
 				throw new IOException("No se ha podido generar el certificado SSL", e); //$NON-NLS-1$
 			}
 
@@ -486,7 +518,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRootFile);
 			}
 			catch (final Exception e) {
-				LOGGER.severe("No se ha podido guardar en disco los certificados SSL. Los almacenaresmos en un directorio alternativo:  " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco los certificados SSL. Los almacenaresmos en un directorio alternativod", e); //$NON-NLS-1$
 				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
 				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
 					throw new IOException("No se ha podido guardar en disco los certificados SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
@@ -497,7 +529,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 					RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRootFile);
 				}
 				catch (final Exception ex) {
-					LOGGER.severe("No se ha podido guardar en el directorio alternativo los certificados SSL: " + e); //$NON-NLS-1$
+					LOGGER.log(Level.SEVERE, "No se ha podido guardar en el directorio alternativo los certificados SSL", e); //$NON-NLS-1$
 					throw new IOException("Error guardando en el directorio alternativo los certificados SSL", e); //$NON-NLS-1$
 				}
 			}
@@ -514,7 +546,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				sslRoot = new CertificateFile(chain[chain.length - 1]);
 			}
 			catch(final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error al extraer el certificado raiz del PKCS#12: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al extraer el certificado raiz del PKCS#12", e); //$NON-NLS-1$
 				throw new IOException("Error al generar el certificado SSL", e); //$NON-NLS-1$
 			}
 
@@ -525,7 +557,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				RestoreConfigUtil.installFile(sslRoot.getCert().getEncoded(), sslRootFile);
 			}
 			catch (final Exception e) {
-				LOGGER.severe("No se ha podido guardar en disco el certificado raiz SSL. Lo extraemos a un directorio alternativo: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco el certificado raiz SSL. Lo extraemos a un directorio alternativo", e); //$NON-NLS-1$
 				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
 				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
 					throw new IOException("No se ha podido guardar en disco el certificado raiz SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
@@ -535,7 +567,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 					sslRootFile = new File(alternativeDir, CA_CERTIFICATE_FILENAME);
 				}
 				catch (final Exception ex) {
-					LOGGER.severe("No se ha podido guardar en disco el certificado raiz SSL: " + e); //$NON-NLS-1$
+					LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco el certificado raiz SSL", e); //$NON-NLS-1$
 					throw new IOException("Error guardando en disco el certificado raiz SSL", e); //$NON-NLS-1$
 				}
 			}
@@ -610,7 +642,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			os.flush();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion", e); //$NON-NLS-1$
 			return 2; // ERROR_FILE_NOT_FOUND
 		}
 
@@ -627,7 +659,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			os.flush();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion", e); //$NON-NLS-1$
 			return 2; // ERROR_FILE_NOT_FOUND
 		}
 
@@ -640,7 +672,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			result = process.waitFor();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "Error durante la ejecucion del proceso de restauracion del protocolo \"afirma\": " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error durante la ejecucion del proceso de restauracion del protocolo \"afirma\"", e); //$NON-NLS-1$
 		}
 
 		// Esperamos 1 segundo para poder eliminar los ficheros
@@ -657,7 +689,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			Files.delete(batFile.toPath());
 		}
 		catch (final IOException e) {
-			LOGGER.warning("No se pudo eliminar el ejecutable para el registro del protocolo \"afirma\": " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo eliminar el ejecutable para el registro del protocolo \"afirma\"", e); //$NON-NLS-1$
 		}
 
 		return result;

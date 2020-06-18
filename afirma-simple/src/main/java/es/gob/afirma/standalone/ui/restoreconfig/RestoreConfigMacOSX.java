@@ -105,6 +105,9 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		userDirs = getSystemUsersHomes();
 
+		// Comprobamos si se debe configurar Firefox para que use el almacen de confianza del sistema
+		final boolean firefoxSecurityRoots = configPanel.firefoxIntegrationCb.isSelected();
+
 		// Tomamos como directorio de aplicacion aquel en el que podemos generar
 		// los certificados SSL para despues usarlos
 		final File appDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
@@ -124,7 +127,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 		catch (final Exception e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.15")); //$NON-NLS-1$
-			LOGGER.severe("Error creando script temporal. Se aborta la operacion: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error creando script temporal. Se aborta la operacion", e); //$NON-NLS-1$
 		}
 
 		// Iniciamos la restauracion de los certificados SSL
@@ -135,9 +138,26 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		closeChrome();
 		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirs);
 
+		if (firefoxSecurityRoots) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.21")); //$NON-NLS-1$
+		} else {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.22")); //$NON-NLS-1$
+		}
+		try {
+			final List<String> usersDirectories = getSystemUsersHomes();
+			RestoreConfigFirefox.configureUseSystemTrustStore(firefoxSecurityRoots, usersDirectories);
+		}
+		catch (final MozillaProfileNotFoundException e) {
+			LOGGER.info("No se encontraron perfiles de Firefox en los que configurar la confianza en el almacen del sistema"); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.24")); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error configurando la confianza de Firefox en el almacen del sistema (activando: " + firefoxSecurityRoots + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.23")); //$NON-NLS-1$
+		}
+
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado" ); //$NON-NLS-1$
-
 	}
 
 	/** Restaura la configuraci&oacute;n de los certificados SSL para la comunicaci&oacute;n
