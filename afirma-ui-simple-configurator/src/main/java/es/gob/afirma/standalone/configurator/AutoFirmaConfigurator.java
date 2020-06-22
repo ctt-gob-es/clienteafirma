@@ -119,7 +119,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
-            this.configurator = new ConfiguratorMacOSX(this.config.isFirefoxSecurityRoots());
+            this.configurator = new ConfiguratorMacOSX(this.config.isHeadless(), this.config.isFirefoxSecurityRoots());
         }
 		else {
 			LOGGER.warning(

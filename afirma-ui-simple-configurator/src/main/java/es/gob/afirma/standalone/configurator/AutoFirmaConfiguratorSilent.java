@@ -92,7 +92,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		    this.configurator = new ConfiguratorLinux(false);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
-            this.configurator = new ConfiguratorMacOSX(this.config.isFirefoxSecurityRoots());
+            this.configurator = new ConfiguratorMacOSX(true, this.config.isFirefoxSecurityRoots());
         }
 		else {
 			LOGGER.warning(

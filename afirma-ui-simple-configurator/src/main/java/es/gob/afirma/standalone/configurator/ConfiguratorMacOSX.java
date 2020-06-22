@@ -93,10 +93,12 @@ final class ConfiguratorMacOSX implements Configurator {
     /** Directorios de los usuarios del sistema. */
     private static String[] userDirs = null;
 
+    private final boolean headless;
     private final boolean firefoxSecurityRoots;
 
-    public ConfiguratorMacOSX(final boolean firefoxSecurityRoots) {
-		this.firefoxSecurityRoots = firefoxSecurityRoots;
+    public ConfiguratorMacOSX(final boolean headless, final boolean firefoxSecurityRoots) {
+		this.headless = headless;
+    	this.firefoxSecurityRoots = firefoxSecurityRoots;
 	}
 
 	@Override
@@ -117,9 +119,24 @@ final class ConfiguratorMacOSX implements Configurator {
 		// Eliminamos los warnings de Chrome
 		createScriptsRemoveChromeWarnings(resourcesDir, userDirs);
 
-		// Si se ha indicado, configuramos Firefox para que confie en los certificados
-		// raiz del llavero del sistema
-		if (this.firefoxSecurityRoots) {
+		// Si se ha configurado en modo headless, se usaran los parametros de configuracion
+		// ya proporcionados y se configurara Firefox para que confie en los certificados
+		// raiz del llavero del sistema segun se haya indicado
+		boolean needConfigureFirefoxSecurityRoots;
+		if (this.headless) {
+			needConfigureFirefoxSecurityRoots = this.firefoxSecurityRoots;
+		}
+		// Si se ha pedido ejecutar con interfaz grafica, le preguntaremos al usuario que desea hacer
+		else {
+			final int result = JOptionPane.showConfirmDialog(
+					console.getParentComponent(),
+					Messages.getString("ConfiguratorMacOSX.23"), //$NON-NLS-1$
+					Messages.getString("ConfiguratorMacOSX.24"), //$NON-NLS-1$
+					JOptionPane.QUESTION_MESSAGE);
+			needConfigureFirefoxSecurityRoots = result == JOptionPane.OK_OPTION;
+		}
+
+		if (needConfigureFirefoxSecurityRoots) {
 			console.print(Messages.getString("ConfiguratorMacOSX.22")); //$NON-NLS-1$
 			try {
 				ConfiguratorFirefoxMac.configureUseSystemTrustStore(true, userDirs, console);
@@ -130,7 +147,6 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		console.print(Messages.getString("ConfiguratorMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado"); //$NON-NLS-1$
-
 	}
 
 	 /** Genera el <i>script</i> que elimina el warning al ejecutar AutoFirma desde Chrome.
@@ -603,7 +619,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * directorio de la aplicaci&oacute;n.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe una plantilla de confianza, {@code false} en caso contrario. */
-	private static boolean checkTrutsTemplateInstalled(final File appDir) {
+	private static boolean checkTrustsTemplateInstalled(final File appDir) {
 		return new File(appDir, TRUST_SETTINGS_FILE).exists();
 	}
 
@@ -613,7 +629,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @throws IOException En cualquier error. */
 	private static void deleteTrustTemplate(final File appDir) throws IOException {
 
-		if (checkTrutsTemplateInstalled(appDir)) {
+		if (checkTrustsTemplateInstalled(appDir)) {
 
 			final File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
 
