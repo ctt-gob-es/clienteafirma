@@ -89,6 +89,13 @@ public final class XAdESUtil {
 		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 		try {
 			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+
+			// Los siguientes atributos deberia establececerlos automaticamente la implementacion de
+			// la biblioteca al habilitar la caracteristica anterior. Por si acaso, los establecemos
+			// expresamente
+			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
+			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido establecer la propiedad de seguridad en la factoria XML", e); //$NON-NLS-1$
