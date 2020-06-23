@@ -240,8 +240,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		console.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
-			ConfiguratorMacUtils.addExexPermissionsToFile(new File(mac_script_path));
-			executeScriptFile(mac_script_path, true, true);
+			final File scriptFile = new File(mac_script_path);
+			ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
+			executeScriptFile(scriptFile, true, true);
 		}
 		catch (final Exception e1) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e1, e1); //$NON-NLS-1$
@@ -251,12 +252,13 @@ final class ConfiguratorMacOSX implements Configurator {
 		console.print(Messages.getString("ConfiguratorMacOSX.13")); //$NON-NLS-1$
 		final String[] userHomes = getSystemUsersHomes();
 		try {
-			ConfiguratorFirefoxMac.createScriptToInstallOnMozillaKeyStore(appDir, userHomes, new File(mac_script_path));
+			final File scriptFile = new File(mac_script_path);
+			ConfiguratorFirefoxMac.createScriptToInstallOnMozillaKeyStore(appDir, userHomes, scriptFile);
 			LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
 			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
 
-			ConfiguratorMacUtils.addExexPermissionsToFile(new File(mac_script_path));
-			executeScriptFile(mac_script_path, true, true);
+			ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
+			executeScriptFile(scriptFile, true, true);
 
 		}
 		catch (final MozillaProfileNotFoundException e) {
@@ -540,26 +542,27 @@ final class ConfiguratorMacOSX implements Configurator {
 	}
 
 	/** Ejecuta un fichero de scripts.
-	 * @param path Ruta donde se encuentra el <i>script</i>.
-	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
-	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-	 * @return El objeto que da como resultado el <i>script</i>.
-	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
-	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n del script. */
-	private static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
+	 * @param scriptFile Ruta del fichero de <i>script</i>.
+	 * @param administratorMode {@code true} el <i>script</i> se ejecuta con permisos de adminsitrador,
+	 * {@code false} en caso contrario.
+	 * @param delete {@code true} borra el fichero despu&eacute;s de haberse ejecutado, {@code false} no hace nada.
+	 * @return La cadena que da como resultado el <i>script</i>.
+	 * @throws IOException Cuando ocurre un error en la ejecuci&oacute;n del <i>script</i>.
+     * @throws InterruptedException  Cuando se interrumpe la ejecuci&oacute;n del script (posiblemente por el usuario). */
+	public static String executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		final AppleScript script = new AppleScript(new File(path), delete);
+		LOGGER.info("Se ejecuta el script: " + scriptFile); //$NON-NLS-1$
 
-		LOGGER.info("Path del script: " + path); //$NON-NLS-1$
+		final AppleScript script = new AppleScript(scriptFile, delete);
 		try {
-			Object o;
+			String result;
 			if (administratorMode) {
-				o = script.runAsAdministrator();
+				result = script.runAsAdministrator();
 			}
 			else {
-				o = script.run();
+				result = script.run();
 			}
-			return o;
+			return result;
 		}
 		catch (final IOException e) {
 			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
@@ -685,7 +688,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		try {
 			final File getUsersScriptFile = createGetUsersScript();
-			final Object o = executeScriptFile(getUsersScriptFile.getAbsolutePath(), false, true);
+			final Object o = executeScriptFile(getUsersScriptFile, false, true);
 			final Set<String> dirs = new HashSet<>();
 			try (
 					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());

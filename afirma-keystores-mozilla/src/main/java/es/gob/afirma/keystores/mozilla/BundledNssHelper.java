@@ -18,6 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 
 final class BundledNssHelper {
 
@@ -40,7 +41,7 @@ final class BundledNssHelper {
 		uncompressZip(getNssZipResourceName(), bundledNssDir);
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return MozillaKeyStoreUtilitiesWindows.getShort(bundledNssDir.getAbsolutePath());
+			return KeyStoreUtilities.getWindowsShortName(bundledNssDir.getAbsolutePath());
 		}
 		final String ret = bundledNssDir.getAbsolutePath();
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$

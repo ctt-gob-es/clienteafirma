@@ -54,7 +54,6 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.so.macos.MacUtils;
@@ -245,39 +244,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/** Detecta si el proceso de Firefox est&aacute; abierto.
-	 * @return <code>true</code> si el proceso de Firefox est&aacute; abierto,
-	 *         <code>false</code> en caso contrario. */
-	private static boolean isChromeOpen() {
-
-		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa de Firefox
-		try {
-			final ProcessBuilder psProcessBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
-			final Process ps = psProcessBuilder.start();
-
-			String line;
-			try (
-					final InputStream resIs = ps.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					if (line.contains("Google Chrome.app")) { //$NON-NLS-1$
-						return true;
-					}
-				}
-			}
-		}
-		catch (final IOException e) {
-			LOGGER.warning("No se pudo completar la deteccion del proceso de Firefox. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
-		}
-
-		return false;
-	}
-
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
 	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL,
@@ -446,11 +412,12 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
-			addExexPermissionsToFile(new File(mac_script_path));
-			executeScript(mac_script_path, true, true);
+			final File scriptFile = new File(mac_script_path);
+			addExexPermissionsToFile(scriptFile);
+			MacUtils.executeScriptFile(scriptFile, true, true);
 		}
-		catch (final Exception e1) {
-			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e1, e1); //$NON-NLS-1$
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e, e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
 		}
 		finally {
@@ -526,29 +493,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		LOGGER.info("Comando de instalacion de ajustes de confianza: " + trustCmd); //$NON-NLS-1$
 		writeScriptFile(mac_script_path, new StringBuilder(trustCmd), true);
 
-	}
-
-	/** Ejecuta un script en OS X.
-	 * @param path Ruta donde se encuentra el <i>script</i>.
-	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
-	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-	 * @return El objeto que da como resultado el <i>script</i>.
-	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
-	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n del script. */
-	public static Object executeScript(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
-
-		LOGGER.info("Se ejecuta el fichero: " + path); //$NON-NLS-1$
-
-		String result;
-		final AppleScript appleScript = new AppleScript(new File(path), delete);
-		if (administratorMode) {
-			result = appleScript.runAsAdministrator();
-		}
-		else {
-			result = appleScript.run();
-		}
-
-		return result;
 	}
 
 	/**
@@ -781,38 +725,57 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/** Detecta si el proceso de Firefox est&aacute; abierto.
-	 * @return <code>true</code> si el proceso de Firefox est&aacute; abierto,
+	/** Detecta si Firefox est&aacute; abierto.
+	 * @return <code>true</code> si Firefox est&aacute; abierto,
 	 *         <code>false</code> en caso contrario. */
 	private static boolean isFirefoxOpen() {
 
-		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa de Firefox
+		// Comprobamos si esta abierto el proceos de Firefox
 		try {
-			final ProcessBuilder psProcessBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
-			final Process ps = psProcessBuilder.start();
+			return checkProcess("Firefox.app"); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
+		}
+		return false;
+	}
 
+	/** Detecta si Chrome est&aacute; abierto.
+	 * @return <code>true</code> si Chrome est&aacute; abierto,
+	 *         <code>false</code> en caso contrario. */
+	private static boolean isChromeOpen() {
+
+		// Comprobamos si esta abierto el proceos de Chrome
+		try {
+			return checkProcess("Google Chrome.app"); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
+		}
+		return false;
+	}
+
+	private static boolean checkProcess(final String processName) throws IOException {
+
+		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa del proceso
+		final ProcessBuilder pBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
+		final Process ps = pBuilder.start();
+
+		try (
+				final InputStream resIs = ps.getInputStream();
+				final BufferedReader resReader = new BoundedBufferedReader(
+						new InputStreamReader(resIs),
+						256, // Maximo 256 lineas de salida
+						1024 // Maximo 1024 caracteres por linea
+						);
+				) {
 			String line;
-			try (
-					final InputStream resIs = ps.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					if (line.contains("Firefox.app") //$NON-NLS-1$
-							|| line.contains("FirefoxNightly.app") //$NON-NLS-1$
-							|| line.contains("FirefoxDeveloperEdition.app")) { //$NON-NLS-1$
-						return true;
-					}
+			while ((line = resReader.readLine()) != null) {
+				if (line.contains(processName)) {
+					return true;
 				}
 			}
 		}
-		catch (final IOException e) {
-			LOGGER.warning("No se pudo completar la deteccion del proceso de Firefox. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
-		}
-
 		return false;
 	}
 

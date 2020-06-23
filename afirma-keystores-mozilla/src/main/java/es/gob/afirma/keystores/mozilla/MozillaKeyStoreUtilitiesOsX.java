@@ -82,7 +82,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		}
 
 		for (final String lib : libs) {
-			if (new File(nssBinDir + lib).exists()) {
+			if (new File(nssBinDir, lib).exists()) {
 				sb.append("ln -s "); //$NON-NLS-1$
 				sb.append(nssBinDir);
 				sb.append(lib);

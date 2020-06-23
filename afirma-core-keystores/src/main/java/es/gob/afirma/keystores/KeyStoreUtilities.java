@@ -20,6 +20,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
@@ -65,11 +66,15 @@ public final class KeyStoreUtilities {
 	 * si se desea <b>no</b> usar el controlador Java de tarjetas G&amp;D SmartCafe interno del programa. */
 	public static final String ENABLE_GYDSC_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.enableGYDSCNativeDriver"; //$NON-NLS-1$
 
+	/** Longitud maxima que permitimos para un alias. Si se excede, se considerara que no se trata de tal,
+	 * sino de un PrincipalName. */
+	private static final int ALIAS_MAX_LENGTH = 120;
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
     }
-
-    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe, CERES y TIF
      * que no tienen implementados el algoritmo SHA1withRSA. */
@@ -153,15 +158,16 @@ public final class KeyStoreUtilities {
     		}
     	}
 
-    	// Si lo creemos necesario, utilizamos la forma corta de la ruta
+    	// Calculamos el nombre corto de la ruta si contiene parentesis (caso comun cuando las bibliotcas
+    	// estan en "Program files (x86)"), ya que la carga del PKCS#11 falla cuando estos caracteres
+    	// se encuentran en la ruta de la biblioteca
     	String libPath = resultFile.getAbsolutePath();
     	if (libPath.contains(")") || libPath.contains("(")) { //$NON-NLS-1$ //$NON-NLS-2$
-        	libPath = getShort(libPath);
+        	libPath = getWindowsShortName(libPath);
         }
+    	LOGGER.info(String.format("La ruta de la libreria '%s' se interpretara como '%s'", lib, libPath)); //$NON-NLS-1$
 		return libPath;
 	}
-
-	private static final int ALIAS_MAX_LENGTH = 120;
 
     /** Obtiene una mapa con las descripciones usuales de los alias de
      * certificados (como claves de estas &uacute;ltimas). Se aplicar&aacute;n los
@@ -317,23 +323,35 @@ public final class KeyStoreUtilities {
 	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
 	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
 	 *         obtenerse la versi&oacute;n corta */
-	public static String getShort(final String originalPath) {
+	public static String getWindowsShortName(final String originalPath) {
 		if (originalPath == null || !Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return originalPath;
 		}
-		final File dir = new File(originalPath);
-		if (!dir.exists()) {
+
+		// Realizamos comprobaciones y modificaciones de seguridad para evitar inyeccion de
+		// codigo
+		final String path = originalPath.replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		File dir;
+		try {
+			dir = new File(path).getCanonicalFile();
+		}catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "La ruta de fichero a acortar no es valida", e); //$NON-NLS-1$
+			dir = null;
+		}
+		if (dir == null || !dir.exists()) {
 			return originalPath;
 		}
+
 		try {
 			final Process p = new ProcessBuilder(
-					"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"cmd.exe", "/c", "for %f in (\"" + path + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			).start();
 			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
 		return originalPath;
 	}
 

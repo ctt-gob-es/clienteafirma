@@ -17,16 +17,13 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -44,10 +41,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyUsage;
 import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Platform;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
@@ -258,7 +252,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 	}
 
-	private static List<CertificateLine> createCertLines(NameCertificateBean[] certBeans) {
+	private static List<CertificateLine> createCertLines(final NameCertificateBean[] certBeans) {
 		final List<CertificateLine> certLines = new ArrayList<>();
 		for (final NameCertificateBean nameCert : certBeans) {
 			CertificateLine certLine;
@@ -373,133 +367,139 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	}
 
 	private static CertificateLine createCertLine(final String friendlyName, final X509Certificate cert) {
-		final CertificateLine certLine = new CertificateLine(friendlyName, cert);
+		final CertificateLine certLine = new DefaultCertificateLine(friendlyName, cert);
 		certLine.setFocusable(true);
 		return certLine;
 	}
 
-	private static final class CertificateLine extends JPanel {
-
-		/** Serial Version */
-		private static final long serialVersionUID = 5012625058876812352L;
-
-		private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
-		private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
-
-		private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
-
-		private JLabel propertiesLink = null;
-
-		private final String friendlyName;
-		private final X509Certificate cert;
-
-		private static ImageIcon getIcon(final X509Certificate cert) {
-			final long notAfter = cert.getNotAfter().getTime();
-			final long actualDate = new Date().getTime();
-			if (actualDate >= notAfter || actualDate <= cert.getNotBefore().getTime()) {
-				return CertificateIconManager.getExpiredIcon(cert);
-			}
-			if (notAfter - actualDate < EXPIRITY_WARNING_LEVEL) {
-				return CertificateIconManager.getWarningIcon(cert);
-			}
-			return CertificateIconManager.getNormalIcon(cert);
-		}
-
-		CertificateLine(final String friendlyName, final X509Certificate cert) {
-			this.friendlyName = friendlyName;
-			this.cert = cert;
-			createUI();
-		}
-
-		X509Certificate getCertificate() {
-			return this.cert;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return this.friendlyName;
-		}
-
-		private void createUI() {
-			setLayout(new GridBagLayout());
-
-			setBackground(Color.WHITE);
-
-			final GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 1;
-			c.gridy = 1;
-			c.gridheight = 4;
-
-			final ImageIcon imageIcon = getIcon(this.cert);
-			final JLabel icon = new JLabel(imageIcon);
-			setToolTipText(imageIcon.getDescription());
-
-			c.insets = new Insets(2, 2, 2, 5);
-			add(icon, c);
-
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.weightx = 1.0;
-			c.gridx++;
-			c.gridheight = 1;
-			c.insets = new Insets(5, 0, 0, 5);
-
-			final JLabel alias = new JLabel(this.friendlyName);
-			alias.setFont(SUBJECT_FONT);
-			add(alias, c);
-
-			c.gridy++;
-			c.insets = new Insets(0, 0, 0, 5);
-
-			final JLabel issuer = new JLabel(
-				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + " " + AOUtil.getCN(this.cert.getIssuerDN().toString()) + //$NON-NLS-1$ //$NON-NLS-2$
-					". " + CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.6") + " " + new KeyUsage(this.cert).toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			);
-			issuer.setFont(DETAILS_FONT);
-			add(issuer, c);
-
-			c.gridy++;
-
-			final JLabel dates = new JLabel(
-				CertificateSelectionDialogMessages.getString(
-					"CertificateSelectionPanel.3", //$NON-NLS-1$
-					new String[] {
-						formatDate(this.cert.getNotBefore()),
-						formatDate(this.cert.getNotAfter())
-					}
-				)
-			);
-			dates.setFont(DETAILS_FONT);
-			add(dates, c);
-
-			c.gridy++;
-
-			this.propertiesLink = new JLabel(
-		        "<html><u>" + //$NON-NLS-1$
-        		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
-		        "</u></html>" //$NON-NLS-1$
-	        );
-			// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
-			// inicia su importacion
-			if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-				this.propertiesLink.setFont(DETAILS_FONT);
-				add(this.propertiesLink, c);
-			}
-		}
-
-		/** Devuelve la fecha con formato.
-		 * @param date Fecha.
-		 * @return Texto que representativo de la fecha. */
-		private static String formatDate(final Date date) {
-			return new SimpleDateFormat("dd/MM/yyyy").format(date); //$NON-NLS-1$
-		}
-
-		/** Recupera el rect&aacute;ngulo ocupado por el enlace para la carga del certificado.
-		 * @return Recuadro con el enlace. */
-		Rectangle getCertificateLinkBounds() {
-			return this.propertiesLink.getBounds();
-		}
+	/** {@inheritDoc} */
+	@Override
+	public void valueChanged(final ListSelectionEvent e) {
+		this.selectedIndex = this.certList.getSelectedIndex();
 	}
+
+//	private static final class CertificateLine extends JPanel {
+//
+//		/** Serial Version */
+//		private static final long serialVersionUID = 5012625058876812352L;
+//
+//		private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
+//		private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
+//
+//		private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
+//
+//		private JLabel propertiesLink = null;
+//
+//		private final String friendlyName;
+//		private final X509Certificate cert;
+//
+//		private static ImageIcon getIcon(final X509Certificate cert) {
+//			final long notAfter = cert.getNotAfter().getTime();
+//			final long actualDate = new Date().getTime();
+//			if (actualDate >= notAfter || actualDate <= cert.getNotBefore().getTime()) {
+//				return CertificateIconManager.getExpiredIcon(cert);
+//			}
+//			if (notAfter - actualDate < EXPIRITY_WARNING_LEVEL) {
+//				return CertificateIconManager.getWarningIcon(cert);
+//			}
+//			return CertificateIconManager.getNormalIcon(cert);
+//		}
+//
+//		CertificateLine(final String friendlyName, final X509Certificate cert) {
+//			this.friendlyName = friendlyName;
+//			this.cert = cert;
+//			createUI();
+//		}
+//
+//		X509Certificate getCertificate() {
+//			return this.cert;
+//		}
+//
+//		/** {@inheritDoc} */
+//		@Override
+//		public String toString() {
+//			return this.friendlyName;
+//		}
+//
+//		private void createUI() {
+//			setLayout(new GridBagLayout());
+//
+//			setBackground(Color.WHITE);
+//
+//			final GridBagConstraints c = new GridBagConstraints();
+//			c.gridx = 1;
+//			c.gridy = 1;
+//			c.gridheight = 4;
+//
+//			final ImageIcon imageIcon = getIcon(this.cert);
+//			final JLabel icon = new JLabel(imageIcon);
+//			setToolTipText(imageIcon.getDescription());
+//
+//			c.insets = new Insets(2, 2, 2, 5);
+//			add(icon, c);
+//
+//			c.fill = GridBagConstraints.HORIZONTAL;
+//			c.weightx = 1.0;
+//			c.gridx++;
+//			c.gridheight = 1;
+//			c.insets = new Insets(5, 0, 0, 5);
+//
+//			final JLabel alias = new JLabel(this.friendlyName);
+//			alias.setFont(SUBJECT_FONT);
+//			add(alias, c);
+//
+//			c.gridy++;
+//			c.insets = new Insets(0, 0, 0, 5);
+//
+//			final JLabel issuer = new JLabel(
+//				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + " " + AOUtil.getCN(this.cert.getIssuerDN().toString()) + //$NON-NLS-1$ //$NON-NLS-2$
+//					". " + CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.6") + " " + new KeyUsage(this.cert).toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//			);
+//			issuer.setFont(DETAILS_FONT);
+//			add(issuer, c);
+//
+//			c.gridy++;
+//
+//			final JLabel dates = new JLabel(
+//				CertificateSelectionDialogMessages.getString(
+//					"CertificateSelectionPanel.3", //$NON-NLS-1$
+//					new String[] {
+//						formatDate(this.cert.getNotBefore()),
+//						formatDate(this.cert.getNotAfter())
+//					}
+//				)
+//			);
+//			dates.setFont(DETAILS_FONT);
+//			add(dates, c);
+//
+//			c.gridy++;
+//
+//			this.propertiesLink = new JLabel(
+//		        "<html><u>" + //$NON-NLS-1$
+//        		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
+//		        "</u></html>" //$NON-NLS-1$
+//	        );
+//			// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
+//			// inicia su importacion
+//			if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+//				this.propertiesLink.setFont(DETAILS_FONT);
+//				add(this.propertiesLink, c);
+//			}
+//		}
+//
+//		/** Devuelve la fecha con formato.
+//		 * @param date Fecha.
+//		 * @return Texto que representativo de la fecha. */
+//		private static String formatDate(final Date date) {
+//			return new SimpleDateFormat("dd/MM/yyyy").format(date); //$NON-NLS-1$
+//		}
+//
+//		/** Recupera el rect&aacute;ngulo ocupado por el enlace para la carga del certificado.
+//		 * @return Recuadro con el enlace. */
+//		Rectangle getCertificateLinkBounds() {
+//			return this.propertiesLink.getBounds();
+//		}
+//	}
 
 	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
 	private static final class CertListCellRendered implements ListCellRenderer<CertificateLine> {
@@ -531,12 +531,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public void valueChanged(final ListSelectionEvent e) {
-		this.selectedIndex = this.certList.getSelectedIndex();
-	}
-
 	/** Manejador de eventos de raton para la lista de certificados. */
 	private final class CertLinkMouseListener extends MouseAdapter {
 
@@ -551,7 +545,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		public void mouseClicked(final MouseEvent me) {
 			final JList<?> tmpList = (JList<?>) me.getSource();
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
-			if (tmpLine != null &&
+			if (tmpLine != null && tmpLine.getCertificateLinkBounds() != null &&
 				me.getClickCount() == 1 &&
 						me.getY() < CERT_LIST_ELEMENT_HEIGHT * tmpList.getModel().getSize() &&
 					tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {

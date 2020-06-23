@@ -9,12 +9,12 @@ public final class TestShortName {
 	/** Main.
 	 * @param args No se usa. */
 	public static void main(final String[] args) {
-		System.out.println(KeyStoreUtilities.getShort("C:\\Program Files\\Nightly\\fnmt")); //$NON-NLS-1$
-		System.out.println(KeyStoreUtilities.getShort("C:")); //$NON-NLS-1$
-		System.out.println(KeyStoreUtilities.getShort("C:\\")); //$NON-NLS-1$
-		System.out.println(KeyStoreUtilities.getShort("lala")); //$NON-NLS-1$
-		System.out.println(KeyStoreUtilities.getShort("c:\\Users\\tomas")); //$NON-NLS-1$
-		System.out.println(KeyStoreUtilities.getShort("moricons.dll")); //$NON-NLS-1$
+		System.out.println(KeyStoreUtilities.getWindowsShortName("C:\\Program Files\\Nightly\\fnmt")); //$NON-NLS-1$
+		System.out.println(KeyStoreUtilities.getWindowsShortName("C:")); //$NON-NLS-1$
+		System.out.println(KeyStoreUtilities.getWindowsShortName("C:\\")); //$NON-NLS-1$
+		System.out.println(KeyStoreUtilities.getWindowsShortName("lala")); //$NON-NLS-1$
+		System.out.println(KeyStoreUtilities.getWindowsShortName("c:\\Users\\tomas")); //$NON-NLS-1$
+		System.out.println(KeyStoreUtilities.getWindowsShortName("moricons.dll")); //$NON-NLS-1$
 	}
 
 }
