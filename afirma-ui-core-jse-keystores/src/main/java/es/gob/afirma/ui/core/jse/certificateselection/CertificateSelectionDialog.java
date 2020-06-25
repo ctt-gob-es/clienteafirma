@@ -154,8 +154,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			return null;
 		}
 
+		// Obtenemos el alias del certificado seleccionado
 		final String selectedAlias = this.csd.getSelectedCertificateAlias();
 
+		// Guardamos la vista seleccionada
+		this.csd.savePreferredCertificateView();
+
+		// Cerramos el dialogo
 		this.certDialog.dispose();
 		this.certDialog = null;
 
@@ -188,11 +193,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	}
 
 	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
-	public void refresh() {
-
-		// Ya que al refrescarga el dialogo pueden aparecer otros nuevos (como alguno de solicitud de PIN),
-		// dejamos de obligar a que este este siempre encima
-		this.certDialog.setAlwaysOnTop(false);
+	public void refreshKeystore() {
 
 		try {
 			this.ksdm.refresh();
@@ -211,6 +212,18 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 		Arrays.sort(certs, CERT_NAME_COMPARATOR);
 
+		refreshDialog(certs);
+	}
+
+	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
+	 * mostrando los certificados indicados.
+	 * @param certs Lista de certificados que se deben mostrar. */
+	private void refreshDialog(final NameCertificateBean[] certs) {
+
+		// Ya que al refrescarga el dialogo pueden aparecer otros nuevos (como alguno de solicitud de PIN),
+		// dejamos de obligar a que este este siempre encima
+		this.certDialog.setAlwaysOnTop(false);
+
 		try {
 			this.csd.refresh(certs);
 		}
@@ -218,6 +231,17 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			LOGGER.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
 		}
 		this.certDialog.pack();
+	}
+
+	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
+	 * mostrando los certificados indicados con la vista seleccionada.
+	 * @param certs Lista de certificados que se deben mostrar.
+	 * @param view Vista de certificados que se debe aplicar. */
+	public void refreshDialog(final NameCertificateBean[] certs, final CertificateLineView view) {
+
+		this.csd.setCertLineView(view);
+
+		refreshDialog(certs);
 	}
 
 	/** Cambia el almac&eacute;n de claves actual.

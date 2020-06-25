@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -141,4 +142,15 @@ final class CertificateUtils {
     	}
     	return null;
     }
+
+	/**
+	 * Indica si un certificado est&aacute; fuera de su periodo de vigencia.
+	 * @param cert Certificado a comprobar.
+	 * @return {@code true} si el certificado est&aacute;caducado o a&uacute;n no es v&aacute;lido,
+	 * {@code false} en caso contrario.
+	 */
+	static boolean isExpired(final X509Certificate cert) {
+		final long currentDate = new Date().getTime();
+		return currentDate >= cert.getNotAfter().getTime() || currentDate <= cert.getNotBefore().getTime();
+	}
 }

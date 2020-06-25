@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -94,7 +95,20 @@ final class UtilActions {
 			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}
 
-		selectionDialog.refresh();
+		selectionDialog.refreshKeystore();
+
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
+
+	static void doChangeView(final NameCertificateBean[] nameCertificates, final CertificateLineView view,
+			final CertificateSelectionDialog selectionDialog, final Component parent) {
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		}
+
+		selectionDialog.refreshDialog(nameCertificates, view);
 
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
