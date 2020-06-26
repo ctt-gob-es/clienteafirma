@@ -12,19 +12,11 @@ package es.gob.afirma.ui.core.jse.certificateselection;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
-import java.io.File;
 import java.net.URI;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 
 final class UtilActions {
 
@@ -45,29 +37,6 @@ final class UtilActions {
 			"helpUrl", //$NON-NLS-1$
 			"http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:adenda_-_uso_del_dialogo_grafico_de_seleccion_de_certificados" //$NON-NLS-1$
 		);
-	}
-
-	private static final String[] EXTS;
-	private static final String EXTS_DESC;
-	static {
-		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			EXTS = new String[] {
-				"pfx", "p12", "jks", "dylib", "so" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-			};
-			EXTS_DESC = " (*.p12, *.pfx, *.jks, *.dylib, *.so)"; //$NON-NLS-1$
-		}
-		else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			EXTS = new String[] {
-				"pfx", "p12", "jks", "dll" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			};
-			EXTS_DESC = " (*.p12, *.pfx, *.jks, *.dll)"; //$NON-NLS-1$
-		}
-		else {
-			EXTS = new String[] {
-				"pfx", "p12", "jks", "so" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			};
-			EXTS_DESC = " (*.p12, *.pfx, *.jks, *.so)"; //$NON-NLS-1$
-		}
 	}
 
 	private UtilActions() {
@@ -115,74 +84,15 @@ final class UtilActions {
 		}
 	}
 
-	static void doOpen(final CertificateSelectionDialog selectionDialog, final Object parent) {
-		final File[] ksFile;
-		try {
-			ksFile = AOUIFactory.getLoadFiles(
-				CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
-				null,
-				null,
-				EXTS,
-				CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.1") + EXTS_DESC, //$NON-NLS-1$
-				false,
-				false,
-				null,
-				parent
-			);
-		}
-		catch(final AOCancelledOperationException e) {
-			// Se ignora
-			return;
+	static void doChangeKeyStore(final int keyStoreType, final CertificateSelectionDialog selectionDialog, final Component parent) {
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}
 
-		if (ksFile != null && ksFile.length > 0) {
-			AOKeyStoreManager ksm;
-			try {
+		selectionDialog.changeKeyStore(keyStoreType);
 
-				if (hasLibraryExtension(ksFile[0])) {
-					ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-							AOKeyStore.PKCS11,
-							ksFile[0].getAbsolutePath(),
-							null,
-							AOKeyStore.PKCS11.getStorePasswordCallback(parent),
-							parent);
-				}
-				else {
-					ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-							AOKeyStore.PKCS12,
-							ksFile[0].getAbsolutePath(),
-							null,
-							AOKeyStore.PKCS12.getStorePasswordCallback(parent),
-							parent);
-				}
-			}
-			catch (final Exception e) {
-				LOGGER.log(
-						Level.WARNING,
-						"No se ha podido cargar la biblioteca o almacen de certificados seleccionado", //$NON-NLS-1$
-						e);
-				AOUIFactory.showErrorMessage(
-					parent,
-					CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.4"), //$NON-NLS-1$
-					CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE
-				);
-				return;
-			}
-
-			selectionDialog.changeKeyStore(ksm);
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
-
-	/**
-	 * Comprueba si un fichero tiene la extensi&oacute;n propia de una biblioteca.
-	 * @param libraryFile Fichero del que se quiere comprobar el nombre.
-	 * @return {@code true} si tiene extensi&oacute;n de biblioteca, {@code false}
-	 * en caso contrario.
-	 */
-	private static boolean hasLibraryExtension(final File libraryFile) {
-		final String name = libraryFile.getName().toLowerCase();
-		return name.endsWith(".dll") || name.endsWith(".so") || name.endsWith(".dlib"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }

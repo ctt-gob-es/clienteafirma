@@ -13,8 +13,6 @@ import java.awt.Component;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 
-import es.gob.afirma.core.misc.Platform;
-
 final class CertificateSelectionDispatcherListener implements KeyEventDispatcher {
 
 	private final Component parent;
@@ -35,13 +33,7 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				return false;
 			}
 
-			// En OS X el modificador es distinto (la tecla Meta es el "Command" de Mac)
-			if (!Platform.OS.MACOSX.equals(Platform.getOS()) && ke.isControlDown() || ke.isMetaDown()) {
-				if (KeyEvent.VK_O == ke.getKeyCode()) {
-					UtilActions.doOpen(this.selectionDialog, this.parent);
-				}
-			}
-			else if (KeyEvent.VK_F5 == ke.getKeyCode()) {
+			if (KeyEvent.VK_F5 == ke.getKeyCode()) {
 				UtilActions.doRefresh(this.selectionDialog, this.parent);
 			}
 		}

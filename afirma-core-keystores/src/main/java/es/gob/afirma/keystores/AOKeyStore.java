@@ -22,7 +22,7 @@ public enum AOKeyStore {
 
     /** Windows / Internet Explorer (CAPI, certificados de usuario). */
     WINDOWS(
-		"Windows / Internet Explorer", //$NON-NLS-1$
+		"Windows", //$NON-NLS-1$
 		0,
 		"Windows-MY", //$NON-NLS-1$
 		new CachePasswordCallback("winmydummy".toCharArray()), //$NON-NLS-1$
@@ -30,7 +30,7 @@ public enum AOKeyStore {
 	),
     /** Apple Mac OS X / Safari Keychain. */
     APPLE(
-		"Mac OS X / Safari", //$NON-NLS-1$
+		"Llavero de Mac", //$NON-NLS-1$
 		1,
 		"KeychainStore", //$NON-NLS-1$
 		new CachePasswordCallback("osxdummy".toCharArray()), //$NON-NLS-1$

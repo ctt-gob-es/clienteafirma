@@ -27,8 +27,6 @@ class DefaultCertificateLine extends CertificateLine {
 	private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
 	private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
 
-	private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
-
 	private JLabel propertiesLink = null;
 
 	/**
@@ -52,7 +50,7 @@ class DefaultCertificateLine extends CertificateLine {
 		c.gridy = 1;
 		c.gridheight = 4;
 
-		final ImageIcon imageIcon = getIcon(getCertificate());
+		final ImageIcon imageIcon = CertificateIconManager.getIcon(getCertificate());
 		final JLabel icon = new JLabel(imageIcon);
 
 		c.insets = new Insets(2, 2, 2, 5);
@@ -126,17 +124,5 @@ class DefaultCertificateLine extends CertificateLine {
 	@Override
 	Rectangle getCertificateLinkBounds() {
 		return this.propertiesLink.getBounds();
-	}
-
-	private static ImageIcon getIcon(final X509Certificate cert) {
-		final long notAfter = cert.getNotAfter().getTime();
-		final long currentDate = new Date().getTime();
-		if (currentDate >= notAfter || currentDate <= cert.getNotBefore().getTime()) {
-			return CertificateIconManager.getExpiredIcon(cert);
-		}
-		if (notAfter - currentDate < EXPIRITY_WARNING_LEVEL) {
-			return CertificateIconManager.getWarningIcon(cert);
-		}
-		return CertificateIconManager.getNormalIcon(cert);
 	}
 }

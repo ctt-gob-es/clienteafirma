@@ -34,6 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -166,28 +167,40 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 			// Boton de apertura de almacen externo
 			if (allowExternalStores) {
-				final JButton open = new JButton(
+
+				final JPopupMenu keystoresMenu = new JPopupMenu();
+
+				final JMenuItem menuItemOpenSystemKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
+				menuItemOpenSystemKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1));
+				keystoresMenu.add(menuItemOpenSystemKs);
+
+				final JMenuItem menuItemOpenFirefoxKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
+				menuItemOpenFirefoxKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2));
+				keystoresMenu.add(menuItemOpenFirefoxKs);
+
+				final JMenuItem menuItemOpenFileKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
+				menuItemOpenFileKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3));
+				keystoresMenu.add(menuItemOpenFileKs);
+
+				final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
+				menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4));
+				keystoresMenu.add(menuItemOpenDnieKs);
+
+				final JDropDownButton openButton = new JDropDownButton(
 					new ImageIcon(
 						CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
 						CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 					)
 				);
-				open.setBorder(BorderFactory.createEmptyBorder());
-				open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				open.getAccessibleContext().setAccessibleDescription(
+				openButton.setComponentPopupMenu(keystoresMenu);
+				openButton.setBorder(BorderFactory.createEmptyBorder());
+				openButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				openButton.getAccessibleContext().setAccessibleDescription(
 					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 				);
-				open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
-				open.addActionListener(
-					new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							UtilActions.doOpen(selectionDialog, CertificateSelectionPanel.this);
-						}
-					}
-				);
-				open.setBackground(Color.WHITE);
-				this.add(open, c);
+				openButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
+				openButton.setBackground(Color.WHITE);
+				this.add(openButton, c);
 			}
 
 
@@ -214,8 +227,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			menuItemPseudonymView.setSelected(this.certLineView == CertificateLineView.PSEUDONYM);
 			certViewsGroup.add(menuItemPseudonymView);
 			popupMenu.add(menuItemPseudonymView);
-
-
 
 			final JDropDownButton dropDownButton = new JDropDownButton(
 					new ImageIcon(
@@ -624,6 +635,24 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 					this.view,
 					this.dialog,
 					this.panel);
+		}
+	}
+
+	private class ChangeKeyStoreActionListener implements ActionListener {
+
+		private final CertificateSelectionPanel panel;
+		private final CertificateSelectionDialog dialog;
+		private final int keyStoreType;
+
+		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final int keyStoreType) {
+			this.panel = panel;
+			this.dialog = dialog;
+			this.keyStoreType = keyStoreType;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel);
 		}
 	}
 }
