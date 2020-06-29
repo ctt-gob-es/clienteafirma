@@ -51,7 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.7-SNAPSHOT</clienteafirma.version>
-		<jmulticard.version>1.6-SNAPSHOT</jmulticard.version>
+		<jmulticard.version>1.5</jmulticard.version>
 		<afirma.lib.itex.version>1.3-SNAPSHOT</afirma.lib.itex.version>
 		<spongycastle.version>1.56.0.0</spongycastle.version>
 		<afirma.legible.version>1_7_0</afirma.legible.version>

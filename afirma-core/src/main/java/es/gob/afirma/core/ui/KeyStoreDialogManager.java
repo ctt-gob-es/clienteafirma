@@ -9,6 +9,7 @@
 
 package es.gob.afirma.core.ui;
 
+import java.awt.Component;
 import java.io.IOException;
 
 import es.gob.afirma.core.AOException;
@@ -28,9 +29,25 @@ public interface KeyStoreDialogManager {
 	 * @return Listado de certificados con alias. */
 	NameCertificateBean[] getNameCertificates();
 
-	/** Cambia el almacen que gestiona internamente el di&aacute;logo.
+	/** Cambia el almac&eacute;n que gestiona internamente el di&aacute;logo.
 	 * @param ksm Almac&eacute;n de certificados. */
 	void setKeyStoreManager(KeyStoreManager ksm);
+
+	/**
+	 * Cambia el almacen cargado en el di&aacute;logo al correspondiente al que corresponde
+	 * al indicado. Tipos de almac&eacute;n:
+	 * <ul>
+	 * <li>1: Almac&eacute;n del sistema.</li>
+	 * <li>2: Almac&eacute;n de Firefox.</li>
+	 * <li>3: Almac&eacute;n en fichero (PFX/PKCS#12).</li>
+	 * <li>4: DNI electr&oacute;nico.</li>
+	 * </ul>
+	 * @param keyStoreId Identificador de almac&eacute;n.
+	 * @param parent Componente padre sobre el que mostrar cualquier di&aacute;logo gr&aacute;fico.
+	 * @return {@code true} si se completa el cambio de almac&eacute;n, {@code false} en caso
+	 * contrario.
+	 */
+	boolean changeKeyStoreManager(int keyStoreId, Component parent);
 
 	/** Devuelve la clave asociada a un alias.
 	 * @param alias Alias de la clave que se desea recuperar.
@@ -60,4 +77,9 @@ public interface KeyStoreDialogManager {
 	 * @return <code>true</code> si se permite la apertura de almacenes externos,
 	 *         <code>false</code> en caso contrario. */
 	boolean isExternalStoresOpeningAllowed();
+
+	/** Obtiene el nombre del tipo de almac&eacute;n del que se muestran los
+	 * certificados en el di&aacute;logo.
+	 * @return nombre del tipo de almac&eacute;n o {@code null} si no se conoce. */
+	String getKeyStoreName();
 }

@@ -79,5 +79,4 @@ public interface KeyStoreManager {
 	 * @param parent Componente padre para la modalidad de los di&aacute;logos gr&aacute;ficos
 	 *               (t&iacute;picamente un <code>java.awt.Component</code>). */
 	void setParentComponent(Object parent);
-
 }

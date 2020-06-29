@@ -9,6 +9,8 @@
 
 package es.gob.afirma.keystores;
 
+import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateExpiredException;
@@ -16,12 +18,14 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
@@ -31,6 +35,9 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String[] EXTS = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String EXTS_DESC = " (*.p12, *.pfx)"; //$NON-NLS-1$
 
 	private KeyStoreManager ksm;
 	private final Object parentComponent;
@@ -141,8 +148,217 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			((AggregatedKeyStoreManager) this.ksm).removeAll();
 			((AggregatedKeyStoreManager) this.ksm).addKeyStoreManager((AOKeyStoreManager) ksm);
 		}
+		else {
+			this.ksm = ksm;
+		}
+	}
 
-		this.ksm = ksm;
+	@Override
+	public boolean changeKeyStoreManager(final int keyStoreId, final Component parent) {
+
+		AOKeyStoreManager newKsm = null;
+
+		try {
+			switch (keyStoreId) {
+			// Almacen de Firefox
+			case 2:
+				newKsm = openMozillaKeyStore(parent);
+				break;
+
+			// Almacen PKCS#12
+			case 3:
+				newKsm = openPkcs12KeyStore(parent);
+				break;
+
+			// DNIe
+			case 4:
+				newKsm = openDnieKeyStore(parent);
+				break;
+
+			// Almacen del sistema
+			case 1:
+			default:
+				newKsm = openSystemKeyStore(parent);
+				break;
+			}
+		}
+		catch (final AOCancelledOperationException e) {
+			LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+			return false;
+		}
+		catch (final AOKeystoreAlternativeException e) {
+			LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+			return false;
+		}
+		catch (final Exception e) {
+			AOUIFactory.showErrorMessage(
+					parent,
+					KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+					KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+					AOUIFactory.ERROR_MESSAGE
+					);
+			return false;
+		}
+
+
+		// Establece el nuevo almacen cargado como el actual
+		setKeyStoreManager(newKsm);
+
+		return true;
+	}
+
+	@Override
+	public String getKeyStoreName() {
+		AOKeyStoreManager aoKsm = null;
+		if (this.ksm instanceof AggregatedKeyStoreManager) {
+			final List<AOKeyStoreManager> ksmList = ((AggregatedKeyStoreManager) this.ksm).getKeyStoreManagers();
+			if (ksmList != null && ksmList.size() > 0) {
+				aoKsm = ksmList.get(0);
+			}
+			else {
+				aoKsm = (AOKeyStoreManager) this.ksm;
+			}
+		}
+		else if (this.ksm instanceof AOKeyStoreManager) {
+			aoKsm = (AOKeyStoreManager) this.ksm;
+		}
+		return aoKsm != null ? aoKsm.getType().getName() : null;
+	}
+
+	/**
+	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
+	 * si no se pudo cargar o si se cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	private static AOKeyStoreManager openMozillaKeyStore(final Component parent) throws Exception {
+
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.MOZ_UNI,
+					null,
+					null,
+					AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
+					parent);
+		} catch (final AOCancelledOperationException e) {
+			throw e;
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla", e); //$NON-NLS-1$
+			throw e;
+		}
+	}
+
+
+	/**
+	 * Permite seleccionar un fichero PKCS#12, introducir su contrase&ntilde;a y cargarlo.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n PKCS#12 o {@code null} si no se pudo cargar o si se
+	 * cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	private static AOKeyStoreManager openPkcs12KeyStore(final Component parent) throws Exception {
+
+		final File[] ksFile;
+		ksFile = AOUIFactory.getLoadFiles(
+				KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
+				null,
+				null,
+				EXTS,
+				KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
+				false,
+				false,
+				null,
+				parent);
+
+		// Cargamos el almacen
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.PKCS12,
+					ksFile[0].getAbsolutePath(),
+					null,
+					AOKeyStore.PKCS12.getStorePasswordCallback(parent),
+					parent);
+		} catch (final AOCancelledOperationException e) {
+			throw e;
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado", e); //$NON-NLS-1$
+			throw e;
+		}
+	}
+
+	/**
+	 * Carga el almac&eacute;n de claves del DNIe.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra un DNIe insertado,
+	 * si no se pudo cargar o si se cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	private static AOKeyStoreManager openDnieKeyStore(final Component parent) throws Exception {
+
+		final AOKeyStoreManager ksm = new AOKeyStoreManager();
+		try {
+			// Proporcionamos el componente padre como parametro
+			ksm.init(
+					AOKeyStore.DNIEJAVA,
+					null,
+					null,
+					new Object[] { parent },
+					true);
+		} catch (final AOCancelledOperationException e) {
+			throw e;
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el DNIe", e); //$NON-NLS-1$
+			throw e;
+		}
+		return ksm;
+	}
+
+
+	/**
+	 * Carga el almac&eacute;n de claves del DNIe.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra un DNIe insertado,
+	 * si no se pudo cargar o si se cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws AOKeystoreAlternativeException Cuando no se identifica el sistema operativo como uno de
+	 * los soportados.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	private static AOKeyStoreManager openSystemKeyStore(final Component parent) throws AOKeystoreAlternativeException,
+		Exception {
+
+		AOKeyStore ks;
+		final Platform.OS currentOs = Platform.getOS();
+		if (currentOs == Platform.OS.WINDOWS) {
+			ks = AOKeyStore.WINDOWS;
+		}
+		else if (currentOs == Platform.OS.LINUX || currentOs == Platform.OS.SOLARIS) {
+			ks = AOKeyStore.SHARED_NSS;
+		}
+		else if (currentOs == Platform.OS.MACOSX) {
+			ks = AOKeyStore.APPLE;
+		}
+		else {
+			throw new AOKeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible"); //$NON-NLS-1$
+		}
+
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					ks,
+					null,
+					null,
+					ks.getStorePasswordCallback(parent),
+					parent);
+		} catch (final AOCancelledOperationException e) {
+			throw e;
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen del sistema", e); //$NON-NLS-1$
+			throw e;
+		}
 	}
 
 	@Override

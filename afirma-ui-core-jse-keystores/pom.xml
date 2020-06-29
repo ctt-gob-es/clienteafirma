@@ -23,13 +23,16 @@
 		</dependency>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-core-keystores</artifactId>
-			<version>${clienteafirma.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-core-jse</artifactId>
 			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<!--  Dependencias para pruebas -->
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core-keystores</artifactId>
+			<version>${clienteafirma.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
