@@ -143,6 +143,7 @@ public final class PdfTimestamper {
 	        		sap.setSignDate(signTime);
 
 	        		final PdfSignature pdfSignature = new PdfSignature(
+        				new PdfName("DocTimeStamp"), //$NON-NLS-1$
 	    				PdfName.ADOBE_PPKLITE,
 	    				new PdfName(TIMESTAMP_SUBFILTER)
 	    			);
