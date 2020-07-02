@@ -9,7 +9,10 @@
 
 package es.gob.afirma.keystores.mozilla.shared;
 
+import java.io.InputStream;
 import java.util.Map;
+
+import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -28,7 +31,7 @@ public final class SharedNssKeyStoreManager extends MozillaUnifiedKeyStoreManage
 	}
 
 	@Override
-	protected final Map<String, String> getExternalStores() {
+	protected Map<String, String> getExternalStores() {
 		return SharedNssUtil.getSharedNssPKCS11Modules(
 			!(Boolean.getBoolean(INCLUDE_NATIVE_DNIE_P11) || Boolean.parseBoolean(System.getenv(INCLUDE_NATIVE_DNIE_P11_ENV))), // Excluir modulos nativos DNIe
 			true  // Incluir los PKCS#11 que esten instalados en el sistema pero no en Mozilla
@@ -40,4 +43,13 @@ public final class SharedNssKeyStoreManager extends MozillaUnifiedKeyStoreManage
 		return new NssKeyStoreManager(getParentComponent(), true);
 	}
 
+	/** Inicializa la clase gestora de almacenes de claves. */
+	@Override
+	public void init(final AOKeyStore type,
+			               final InputStream store,
+			               final PasswordCallback pssCallBack,
+			               final Object[] params,
+			               final boolean forceReset) {
+		super.init(AOKeyStore.SHARED_NSS, store, pssCallBack, params, forceReset);
+	}
 }

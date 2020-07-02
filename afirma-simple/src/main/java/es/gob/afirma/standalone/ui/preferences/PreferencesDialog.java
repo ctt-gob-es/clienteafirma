@@ -25,7 +25,7 @@ public final class PreferencesDialog extends JDialog{
 	/** Constructor del panel de preferencias.
 	 * @param parent Padre del panel de preferencias.
 	 * @param modal Indica si las preferencias deben mostrarse de forma <i>modal</i>.
-	 * @param selectedPreferencesTabIndex &Iacute;dice de la pesta&ntilde;a de configuraci&oacute;n seleccionada por defecto. */
+	 * @param selectedPreferencesTabIndex &Iacute;ndice de la pesta&ntilde;a de configuraci&oacute;n seleccionada por defecto. */
 	public PreferencesDialog(final Frame parent, final boolean modal, final int selectedPreferencesTabIndex) {
 		super(parent, modal);
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.24")); //$NON-NLS-1$

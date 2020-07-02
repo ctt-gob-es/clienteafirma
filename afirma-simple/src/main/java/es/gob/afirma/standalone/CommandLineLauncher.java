@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.keystores.CertificateContext;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -385,7 +387,7 @@ final class CommandLineLauncher {
 
 		byte[] res;
 		try {
-			final AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
+			AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
 
 			String selectedAlias;
 			if (params.isCertGui()) {
@@ -401,7 +403,16 @@ final class CommandLineLauncher {
 						false);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
-				selectedAlias = dialog.getSelectedAlias();
+
+				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
+		    	// que se indico originalmente por haberlo cambiado desde el dialogo de seleccion)
+				// y de ahi sacamos la referencia a la clave
+				final CertificateContext context = dialog.getSelectedCertificateContext();
+				final KeyStoreManager selectedKsm = context.getKeyStoreManager();
+				if (selectedKsm instanceof AOKeyStoreManager) {
+					ksm = (AOKeyStoreManager) selectedKsm;
+				}
+				selectedAlias = context.getAlias();
 			}
 			else {
 				selectedAlias = params.getAlias();
