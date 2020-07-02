@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
@@ -39,7 +40,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private static final String[] EXTS = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String EXTS_DESC = " (*.p12, *.pfx)"; //$NON-NLS-1$
 
-	private KeyStoreManager ksm;
+	private final AggregatedKeyStoreManager ksm;
 	private final Object parentComponent;
 	private final boolean checkPrivateKeys;
 	private final boolean checkValidity;
@@ -102,7 +103,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
     		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
     	}
 
-		this.ksm = ksm;
+		this.ksm = new AggregatedKeyStoreManager(ksm);
 		this.parentComponent = parentComponent;
 		this.checkPrivateKeys = checkPrivateKeys;
 		this.checkValidity = checkValidity;
@@ -144,13 +145,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	@Override
 	public void setKeyStoreManager(final KeyStoreManager ksm) {
-		if (this.ksm instanceof AggregatedKeyStoreManager && ksm instanceof AOKeyStoreManager) {
-			((AggregatedKeyStoreManager) this.ksm).removeAll();
-			((AggregatedKeyStoreManager) this.ksm).addKeyStoreManager((AOKeyStoreManager) ksm);
-		}
-		else {
-			this.ksm = ksm;
-		}
+		this.ksm.removeAll();
+		this.ksm.addKeyStoreManager((AOKeyStoreManager) ksm);
 	}
 
 	@Override
@@ -161,22 +157,22 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		try {
 			switch (keyStoreId) {
 			// Almacen de Firefox
-			case 2:
+			case KEYSTORE_ID_MOZILLA:
 				newKsm = openMozillaKeyStore(parent);
 				break;
 
 			// Almacen PKCS#12
-			case 3:
+			case KEYSTORE_ID_PKCS12:
 				newKsm = openPkcs12KeyStore(parent);
 				break;
 
 			// DNIe
-			case 4:
+			case KEYSTORE_ID_DNIE:
 				newKsm = openDnieKeyStore(parent);
 				break;
 
 			// Almacen del sistema
-			case 1:
+			case KEYSTORE_ID_SYSTEM:
 			default:
 				newKsm = openSystemKeyStore(parent);
 				break;
@@ -208,21 +204,52 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public String getKeyStoreName() {
-		AOKeyStoreManager aoKsm = null;
-		if (this.ksm instanceof AggregatedKeyStoreManager) {
-			final List<AOKeyStoreManager> ksmList = ((AggregatedKeyStoreManager) this.ksm).getKeyStoreManagers();
-			if (ksmList != null && ksmList.size() > 0) {
-				aoKsm = ksmList.get(0);
+	public int[] getAvailablesKeyStores() {
+
+		// En linux no se puede cambiar entre el almacen central del sistema y el almacen de
+		// Mozilla por un error en NSS que sigue cargando el almacen que ya tuviese aunque se le
+		// indique otro. Por eso, solo damos la opcion de almacen central o almacen de Firefox,
+		// segun el almacen que se cargue primero
+		int[] keystoreTypes;
+		if (Platform.getOS() == Platform.OS.LINUX) {
+			if (this.ksm.getType() == AOKeyStore.SHARED_NSS ||
+					this.ksm.getKeyStoreManagers().size() > 0 && this.ksm.getKeyStoreManagers().get(0).getType() == AOKeyStore.SHARED_NSS) {
+				keystoreTypes = new int[] {
+						KEYSTORE_ID_SYSTEM,
+						KEYSTORE_ID_PKCS12,
+						KEYSTORE_ID_DNIE
+					};
 			}
 			else {
-				aoKsm = (AOKeyStoreManager) this.ksm;
+				keystoreTypes = new int[] {
+						KEYSTORE_ID_MOZILLA,
+						KEYSTORE_ID_PKCS12,
+						KEYSTORE_ID_DNIE
+					};
 			}
 		}
-		else if (this.ksm instanceof AOKeyStoreManager) {
-			aoKsm = (AOKeyStoreManager) this.ksm;
+		else {
+			keystoreTypes = new int[] {
+				KEYSTORE_ID_SYSTEM,
+				KEYSTORE_ID_MOZILLA,
+				KEYSTORE_ID_PKCS12,
+				KEYSTORE_ID_DNIE
+			};
 		}
-		return aoKsm != null ? aoKsm.getType().getName() : null;
+		return keystoreTypes;
+	}
+
+	@Override
+	public String getKeyStoreName() {
+		AOKeyStoreManager aoKsm = null;
+		final List<AOKeyStoreManager> ksmList = this.ksm.getKeyStoreManagers();
+		if (ksmList != null && ksmList.size() > 0) {
+			aoKsm = ksmList.get(0);
+		}
+		else {
+			aoKsm = this.ksm;
+		}
+		return aoKsm != null && aoKsm.getType() != null ? aoKsm.getType().getName() : null;
 	}
 
 	/**
@@ -450,6 +477,11 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	@Override
 	public String getSelectedAlias() {
 		return this.selectedAlias;
+	}
+
+	@Override
+	public CertificateContext getSelectedCertificateContext() {
+		return new CertificateContext(this.ksm, this.selectedAlias);
 	}
 
 	@Override

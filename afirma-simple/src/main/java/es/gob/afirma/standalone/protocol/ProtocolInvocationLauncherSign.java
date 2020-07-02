@@ -29,6 +29,8 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.keystores.CertificateContext;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
@@ -422,7 +424,13 @@ final class ProtocolInvocationLauncherSign {
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
-				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
+
+				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
+		    	// que se indico originalmente por haberlo cambiado desde el dialogo de seleccion)
+				// y de ahi sacamos la referencia a la clave
+				final CertificateContext context = dialog.getSelectedCertificateContext();
+		    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
+				pke = currentKsm.getKeyEntry(context.getAlias());
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);

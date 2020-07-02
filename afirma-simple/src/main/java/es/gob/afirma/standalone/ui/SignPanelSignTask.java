@@ -34,6 +34,8 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.keystores.CertificateContext;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -598,9 +600,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			false             // mandatoryCertificate
 		);
     	dialog.show();
-    	this.ksm.setParentComponent(this.parent);
 
-    	return this.ksm.getKeyEntry(dialog.getSelectedAlias());
+    	final CertificateContext context = dialog.getSelectedCertificateContext();
+
+    	// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
+    	// que se indico originalmente por haberlo cambiado desde el dialogo de seleccion)
+    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
+    	currentKsm.setParentComponent(this.parent);
+
+    	return currentKsm.getKeyEntry(context.getAlias());
 	}
 
 	/**

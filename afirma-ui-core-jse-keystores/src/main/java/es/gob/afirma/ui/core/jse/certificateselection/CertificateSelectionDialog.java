@@ -86,7 +86,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
     		dialogHeadline,
     		dialogSubHeadline,
     		showControlButons,
-    		ksdm.isExternalStoresOpeningAllowed()
+    		ksdm.isExternalStoresOpeningAllowed(),
+    		this.ksdm.getAvailablesKeyStores()
 		);
 		this.optionPane = certs.length > 1 ?
 			new CertOptionPane(this.csd) :
@@ -175,23 +176,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		if (me.getClickCount() == 2 && this.optionPane != null && !this.disableSelection) {
 			this.optionPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
 		}
-	}
-
-	private static final class CertOptionPane extends JOptionPane {
-
-		private static final long serialVersionUID = 1L;
-
-		private final CertificateSelectionPanel selectionPanel;
-
-		CertOptionPane(final CertificateSelectionPanel csd) {
-			this.selectionPanel = csd;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-        public void selectInitialValue() {
-			this.selectionPanel.selectCertificateList();
-        }
 	}
 
 	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
@@ -288,4 +272,22 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			}
 		}
 	};
+
+
+	private static final class CertOptionPane extends JOptionPane {
+
+		private static final long serialVersionUID = 1L;
+
+		private final CertificateSelectionPanel selectionPanel;
+
+		CertOptionPane(final CertificateSelectionPanel csd) {
+			this.selectionPanel = csd;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+        public void selectInitialValue() {
+			this.selectionPanel.selectCertificateList();
+        }
+	}
 }

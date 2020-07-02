@@ -91,7 +91,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			                  final String dialogHeadline,
 			                  final String dialogSubHeadline,
 				              final boolean showControlButons,
-				              final boolean allowExternalStores) {
+				              final boolean allowExternalStores,
+				              final int[] availablesKeyStoreTypes) {
 
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
 		this.dialogSubHeadline = dialogSubHeadline;
@@ -102,14 +103,16 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			selectionDialog,
 			dialogHeadline,
 			showControlButons,
-			allowExternalStores
+			allowExternalStores,
+			availablesKeyStoreTypes
 		);
 	}
 
 	private void createUI(final CertificateSelectionDialog selectionDialog,
 			              final String dialogHeadline,
 			              final boolean showControlButons,
-			              final boolean allowExternalStores) {
+			              final boolean allowExternalStores,
+			              final int[] availablesKeyStoreTypes) {
 
 		setLayout(new GridBagLayout());
 
@@ -166,25 +169,33 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridx++;
 
 			// Boton de apertura de almacen externo
-			if (allowExternalStores) {
+			if (allowExternalStores && availablesKeyStoreTypes != null && availablesKeyStoreTypes.length > 0) {
 
 				final JPopupMenu keystoresMenu = new JPopupMenu();
 
-				final JMenuItem menuItemOpenSystemKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
-				menuItemOpenSystemKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1));
-				keystoresMenu.add(menuItemOpenSystemKs);
+				if (contains(availablesKeyStoreTypes, 1)) {
+					final JMenuItem menuItemOpenSystemKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
+					menuItemOpenSystemKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1));
+					keystoresMenu.add(menuItemOpenSystemKs);
+				}
 
-				final JMenuItem menuItemOpenFirefoxKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
-				menuItemOpenFirefoxKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2));
-				keystoresMenu.add(menuItemOpenFirefoxKs);
+				if (contains(availablesKeyStoreTypes, 2)) {
+					final JMenuItem menuItemOpenFirefoxKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
+					menuItemOpenFirefoxKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2));
+					keystoresMenu.add(menuItemOpenFirefoxKs);
+				}
 
-				final JMenuItem menuItemOpenFileKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
-				menuItemOpenFileKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3));
-				keystoresMenu.add(menuItemOpenFileKs);
+				if (contains(availablesKeyStoreTypes, 3)) {
+					final JMenuItem menuItemOpenFileKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
+					menuItemOpenFileKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3));
+					keystoresMenu.add(menuItemOpenFileKs);
+				}
 
-				final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
-				menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4));
-				keystoresMenu.add(menuItemOpenDnieKs);
+				if (contains(availablesKeyStoreTypes, 4)) {
+					final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
+					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4));
+					keystoresMenu.add(menuItemOpenDnieKs);
+				}
 
 				final JDropDownButton openButton = new JDropDownButton(
 					new ImageIcon(
@@ -310,6 +321,21 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.addMouseListener(mouseListener);
 
 		this.add(this.certListPanel, c);
+	}
+
+	/** Indica si un valor entero se encuentra dentro de un array.
+	 * @param elements Array con los valores entre los que buscar.
+	 * @param value Valor a buscar.
+	 * @return {@code true} si se encuentra el valor, {@code false}
+	 * en caso contrario.
+	 */
+	private static boolean contains(final int[] elements, final int value) {
+		for (final int e : elements) {
+			if (e == value) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void setCertLineView(final CertificateLineView certLineView) {
