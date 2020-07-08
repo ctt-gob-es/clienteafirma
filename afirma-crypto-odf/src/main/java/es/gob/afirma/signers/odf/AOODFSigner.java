@@ -248,23 +248,26 @@ public final class AOODFSigner implements AOSigner {
 	            if (!useOpenOffice31Mode) {
 
 	                // mimetype es una referencia simple, porque no es XML
-	                referenceList.add(
-	            		fac.newReference(
-	        				"mimetype", //$NON-NLS-1$
-	        				dm,
-	        				null,
-	        				null,
-	        				null,
-	        				md.digest(
-	    						AOUtil.getDataFromInputStream(
-									// Recupera el fichero
-									zf.getInputStream(
-										zf.getEntry("mimetype") //$NON-NLS-1$
+	            	try (
+            			final InputStream zis = zf.getInputStream(
+							zf.getEntry("mimetype") //$NON-NLS-1$
+						)
+        			) {
+		                referenceList.add(
+		            		fac.newReference(
+		        				"mimetype", //$NON-NLS-1$
+		        				dm,
+		        				null,
+		        				null,
+		        				null,
+		        				md.digest(
+		    						AOUtil.getDataFromInputStream(
+										zis
 									)
 								)
 							)
-						)
-					);
+						);
+	            	}
 
 	                referenceList.add(
 	            		fac.newReference(
@@ -285,38 +288,57 @@ public final class AOODFSigner implements AOSigner {
 	        		);
 	            }
 
-	            // para cada nodo de manifest.xml
+	            // Para cada nodo de manifest.xml
 	            Reference reference;
 	            for (int i = 0; i < listFileEntry.getLength(); i++) {
 	                fullPath = ((Element) listFileEntry.item(i)).getAttribute("manifest:full-path"); //$NON-NLS-1$
 
-	                // si es un archivo
+	                // Si es un archivo
 	                if (!fullPath.endsWith("/")) { //$NON-NLS-1$
 
 	                    // y es uno de los siguientes archivos xml
-	                    if (fullPath.equals("content.xml") || fullPath.equals("meta.xml") //$NON-NLS-1$ //$NON-NLS-2$
-	                        || fullPath.equals("styles.xml") //$NON-NLS-1$
-	                        || fullPath.equals("settings.xml")) { //$NON-NLS-1$
+	                    if (fullPath.equals("content.xml") || //$NON-NLS-1$
+	                    	fullPath.equals("meta.xml")    || //$NON-NLS-1$
+	                        fullPath.equals("styles.xml")  || //$NON-NLS-1$
+	                        fullPath.equals("settings.xml")) { //$NON-NLS-1$
 
-	                        // crea la referencia
-	                        reference = fac.newReference(fullPath.replaceAll(" ", "%20"), dm, transformList, null, null, //$NON-NLS-1$ //$NON-NLS-2$
-	                        // Obtiene su forma canonica y su DigestValue
-	                    		md.digest(
-	                				OdfXmlUtil.canonicalizeXml(
-	            						dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement(),
-	            						CANONICAL_XML_ALGORITHM
-	        						)
-	            				)
-	                		);
+	                        // Crea la referencia
+	                    	try (
+                    			final InputStream zis = zf.getInputStream(zf.getEntry(fullPath))
+                			) {
+		                        reference = fac.newReference(
+	                        		fullPath.replaceAll(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
+	                        		dm,
+	                        		transformList,
+	                        		null,
+	                        		null,
+	                        		// Obtiene su forma canonica y su DigestValue
+		                    		md.digest(
+		                				OdfXmlUtil.canonicalizeXml(
+		            						dbf.newDocumentBuilder().parse(zis).getDocumentElement(),
+		            						CANONICAL_XML_ALGORITHM
+		        						)
+		            				)
+		                		);
+	                    	}
 	                    }
 
-	                    // si no es uno de los archivos xml
+	                    // Si no es uno de los archivos XML
 	                    else {
 
-	                        // crea la referencia
-	                        reference = fac.newReference(fullPath.replaceAll(" ", "%20"), dm, null, null, null, md.digest(AOUtil.getDataFromInputStream( //$NON-NLS-1$ //$NON-NLS-2$
-	                        // Recupera el fichero
-	                        zf.getInputStream(zf.getEntry(fullPath)))));
+	                        // Crea la referencia
+	                    	try (
+                				final InputStream zis = zf.getInputStream(zf.getEntry(fullPath))
+                			) {
+		                        reference = fac.newReference(
+	                        		fullPath.replaceAll(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
+	                        		dm,
+	                        		null,
+	                        		null,
+	                        		null,
+	                        		md.digest(AOUtil.getDataFromInputStream(zis))
+	                    		);
+	                    	}
 
 	                    }
 
@@ -336,12 +358,18 @@ public final class AOODFSigner implements AOSigner {
 	            	isCofirm = true;
 	            }
 
-	            Document docSignatures;
-	            Element rootSignatures;
+	            final Document docSignatures;
+	            final Element rootSignatures;
 	            // si es cofirma
 	            if (isCofirm) {
 	                // recupera el documento de firmas y su raiz
-	                docSignatures = dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(SIGNATURES_PATH)));
+	            	try (
+            			final InputStream zis = zf.getInputStream(zf.getEntry(SIGNATURES_PATH))
+        			) {
+		                docSignatures = dbf.newDocumentBuilder().parse(
+	                		zis
+	            		);
+	            	}
 	                rootSignatures = docSignatures.getDocumentElement();
 	            }
 	            else {
@@ -446,7 +474,15 @@ public final class AOODFSigner implements AOSigner {
 		                zeOut = new ZipEntry(ze.getName());
 		                if (!ze.getName().equals(SIGNATURES_PATH) && !ze.getName().equals(MANIFEST_PATH)) {
 		                    zos.putNextEntry(zeOut);
-		                    zos.write(AOUtil.getDataFromInputStream(zf.getInputStream(ze)));
+		                    try (
+	                    		final InputStream zis = zf.getInputStream(ze)
+                    		) {
+			                    zos.write(
+		                    		AOUtil.getDataFromInputStream(
+	                    				zis
+	                				)
+	                    		);
+		                    }
 		                }
 		            }
 
