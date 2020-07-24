@@ -12,9 +12,11 @@ package es.gob.afirma.standalone.ui.restoreconfig;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -25,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -43,7 +46,7 @@ final class RestoreConfigLinux implements RestoreConfig {
     private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
     private static final String PROTOCOL_HANDLER_CONFIG_FILE = "AutoFirma.js"; //$NON-NLS-1$
-    private static final String PROTOCOL_HANDLER_CONFIG_DIR = "/etc/firefox/pref/"; //$NON-NLS-1$
+    private static final String DEFAULT_PROTOCOL_HANDLER_CONFIG_DIR = "/etc/firefox/pref"; //$NON-NLS-1$
     static final String EXPORT_PATH = "export PATH=$PATH:"; //$NON-NLS-1$
     static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
 
@@ -64,7 +67,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 				workingDir = getLinuxAlternativeAppDir();
 			} catch (final IOException e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.1")); //$NON-NLS-1$
-				LOGGER.severe("No se puede utilizar el directorio alternativo de trabajo: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se puede utilizar el directorio alternativo de trabajo", e); //$NON-NLS-1$
 				return;
 			}
 		}
@@ -76,12 +79,18 @@ final class RestoreConfigLinux implements RestoreConfig {
 			usersDir = getSystemUsersHomes();
 		} catch (final IOException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.6")); //$NON-NLS-1$
-			LOGGER.severe("No se puede utilizar el directorio alternativo de trabajo: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se puede utilizar el directorio alternativo de trabajo"); //$NON-NLS-1$
 		}
 
 		// Se restaura la instalacion de los certificados SSL
 		if (usersDir != null) {
-			restoreSslCertificates(appDir, workingDir, usersDir, configPanel);
+			try {
+				restoreSslCertificates(appDir, workingDir, usersDir, configPanel);
+			}
+			catch (final AOCancelledOperationException e) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.19")); //$NON-NLS-1$
+				return;
+			}
 		}
 
 		// Se restaura el registro del protocolo afirma
@@ -91,7 +100,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			restoreProtocolHandler(workingDir);
 		} catch (final RuntimeException | IOException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.16")); //$NON-NLS-1$
-			LOGGER.warning("Error en la restauracion del protocolo afirma: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error en la restauracion del protocolo afirma", e); //$NON-NLS-1$
 		}
 
 		// Se restaura la confianza en el protocolo afirma en Chrome
@@ -120,7 +129,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 				certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
 			} catch (final Exception e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.2")); //$NON-NLS-1$
-				LOGGER.severe("Error al generar los certificados SSL: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al generar los certificados SSL", e); //$NON-NLS-1$
 				return;
 			}
 
@@ -138,12 +147,12 @@ final class RestoreConfigLinux implements RestoreConfig {
 			}
 			catch (final IOException e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.4")); //$NON-NLS-1$
-				LOGGER.severe("Error al copiar los certificados SSL a disco: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al copiar los certificados SSL a disco", e); //$NON-NLS-1$
 				return;
 			}
 			catch (final Exception e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.4")); //$NON-NLS-1$
-				LOGGER.severe("Error al extraer los certificados SSL para copiarlos a disco: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al extraer los certificados SSL para copiarlos a disco", e); //$NON-NLS-1$
 				return;
 			}
 		}
@@ -165,7 +174,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			}
 			catch (final Exception e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.4")); //$NON-NLS-1$
-				LOGGER.severe("Error al copiar los certificados SSL a disco: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al copiar los certificados SSL a disco", e); //$NON-NLS-1$
 				return;
 			}
 		}
@@ -197,7 +206,13 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		LOGGER.info("Se va a instalar el certificado CA raiz en Mozilla Firefox"); //$NON-NLS-1$
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.13")); //$NON-NLS-1$
-		closeFirefox();
+		try {
+			closeFirefox();
+		}
+		catch (final AOCancelledOperationException e) {
+			LOGGER.log(Level.INFO, "El usuario cancelo la operacion de restauracion al solicitarsele cerrar Firefox"); //$NON-NLS-1$
+			throw e;
+		}
 
 		// Desinstalamos previamente los certificados que haya actualmente
 		RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(workingDir);
@@ -221,7 +236,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		boolean searchAllUser = true;
 		try {
-			final Process p = new ProcessBuilder("id", "-u").start(); //$NON-NLS-1$ //$NON-NLS-2$
+			final Process p = executeProcess("id", "-u"); //$NON-NLS-1$ //$NON-NLS-2$
 			p.waitFor();
 
 			final byte[] out = new byte[100];
@@ -257,7 +272,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 				};
 
 		try {
-			final Process process = new ProcessBuilder(command).start();
+			final Process process = executeProcess(command);
 
 			String line;
 			// arraylist con todos los directorios de usuario
@@ -317,11 +332,16 @@ final class RestoreConfigLinux implements RestoreConfig {
 	private static void closeFirefox() {
 
 		while (isProcessRunningLinux("/usr/lib/firefox/firefox").booleanValue()) { //$NON-NLS-1$
-			JOptionPane.showMessageDialog(
+			final int result = JOptionPane.showConfirmDialog(
 					null,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
+
+			if (result != JOptionPane.OK_OPTION) {
+				throw new AOCancelledOperationException("El usuario cancelo el cierre de Mozilla Firefox"); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -355,7 +375,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			final String[] commands = { "/bin/bash", "-c", "ps -aux"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-			p = new ProcessBuilder(commands).start();
+			p = executeProcess(commands);
 
 			try (final BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 
@@ -401,55 +421,58 @@ final class RestoreConfigLinux implements RestoreConfig {
 			throw new IOException("No se pudo copiar a disco el fichero de configuracion ", e); //$NON-NLS-1$
 		}
 
-		final String[] command = {
-				"pkexec", //$NON-NLS-1$
-				"mv", //$NON-NLS-1$
-				"-f", //$NON-NLS-1$
-				configFile.getAbsolutePath(),
-				PROTOCOL_HANDLER_CONFIG_DIR + PROTOCOL_HANDLER_CONFIG_FILE};
+		// Obtenemos los directorios de bibliotecas e identificamos donde esta instalado
+		// firefox para copiar alli el fichero de definicion del protocolo afirmaa
+		final String libraryPath = System.getProperty("java.library.path"); //$NON-NLS-1$
+		final List<String> paths = new ArrayList<>();
+		for (final String path : libraryPath.split(File.pathSeparator)) {
+			paths.add(path + File.separator + "firefox" + File.separator + "defaults" + //$NON-NLS-1$ //$NON-NLS-2$
+					File.separator + "pref"); //$NON-NLS-1$
+		}
+		paths.add(DEFAULT_PROTOCOL_HANDLER_CONFIG_DIR);
 
+		// Creamos un script para el copiado del fichero de configuracion del protocolo en
+		// todos los directorios en donde encontremos las preferencias de firefox
+		final StringBuilder scriptContent = new StringBuilder();
+		scriptContent.append("#!/bin/sh\n"); //$NON-NLS-1$
+		for (final String firefoxPreferencesPath : paths) {
+			if (new File(firefoxPreferencesPath).isDirectory()) {
+				scriptContent.append("cp -f \"") .append(configFile.getAbsolutePath()).append("\" \"") //$NON-NLS-1$ //$NON-NLS-2$
+				.append(firefoxPreferencesPath + File.separator + PROTOCOL_HANDLER_CONFIG_FILE).append("\"\n"); //$NON-NLS-1$
+			}
+		}
+
+		// Agregamos la orden de eliminar el fichero de de configuracion original
+		scriptContent.append("rm \"").append(configFile.getAbsolutePath()).append("\"\n");  //$NON-NLS-1$//$NON-NLS-2$
+
+		// Guardamos el script en disco
+		final File scriptFile = new File(workingDir, "restoreprotocol.sh"); //$NON-NLS-1$
+		try (final FileOutputStream fout = new FileOutputStream(scriptFile)) {
+			fout.write(scriptContent.toString().getBytes(StandardCharsets.UTF_8));
+		}
+
+		// Ejecutamos el script con permisos de administrador y comprobamos su correcta ejecucion
 		int result;
 		Process process;
 		try {
-			process = new ProcessBuilder(command).start();
+			executeProcess("chmod", "755", scriptFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+			process = executeProcess("pkexec", scriptFile.getAbsolutePath()); //$NON-NLS-1$
 			result = process.waitFor();
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException("Error en la ejecucion del script de restauracion del protocolo", e); //$NON-NLS-1$
 		}
-
 		if (result != 0) {
+			final byte[] errorResult = AOUtil.getDataFromInputStream(process.getErrorStream());
+			LOGGER.warning("Mensaje de error devuelto por el script: " + new String(errorResult)); //$NON-NLS-1$
 			throw new RuntimeException("El script de restauracion del protocolo devolvio un resultado incorrecto"); //$NON-NLS-1$
 		}
-//		pref("network.protocol-handler.app.afirma","/usr/bin/AutoFirma");
-//		pref("network.protocol-handler.warn-external.afirma",false);
-//		pref("network.protocol-handler.external.afirma",true);
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		sb.append("pref(\"network.protocol-handler.app.afirma\",\"/usr/bin/AutoFirma\");"); //$NON-NLS-1$
-//		sb.append(newline);
-//		sb.append("pref(\"network.protocol-handler.warn-external.afirma\",false);"); //$NON-NLS-1$
-//		sb.append(newline);
-//		sb.append("pref(\"network.protocol-handler.external.afirma\",true);"); //$NON-NLS-1$
-//
-//		// Obtenemos la ruta de los scripts
-//		final String path = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).getAbsolutePath(); //$NON-NLS-1$
-//		final File protocolScript = new File(path);
-//
-//		if (new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).exists()) { //$NON-NLS-1$
-//
-//			final File afirmaProtocol = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME); //$NON-NLS-1$
-//
-//			if (!afirmaProtocol.delete()) {
-//				throw new IOException("No puedo eliminar AutoFirma.js"); //$NON-NLS-1$
-//			}
-//		}
-//
-//		try (final FileOutputStream fout = new FileOutputStream(protocolScript, true)) {
-//			fout.write(sb.toString().getBytes());
-//		}
-//
-//		return Boolean.FALSE;
+
+		// Eliminamos la copia del fichero en el directorio de configuracion
+		try {
+			process = executeProcess("rm", scriptFile.getAbsolutePath()); //$NON-NLS-1$
+		} catch (final IOException e) {
+			LOGGER.fine("No se pudo eliminar la copia del fichero " + configFile.getName() + " del directorio de trabajo"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 
@@ -475,5 +498,17 @@ final class RestoreConfigLinux implements RestoreConfig {
 			throw new IOException("No ha podido crearse el directorio para los ficheros de aplicacion"); //$NON-NLS-1$
 		}
 		return appDir;
+	}
+
+	static Process executeProcess(final String... command) throws IOException {
+
+		if (LOGGER.isLoggable(Level.INFO)) {
+			final StringBuilder buffer = new StringBuilder();
+			for (final String particle : command) {
+				buffer.append(particle).append(" "); //$NON-NLS-1$
+			}
+			LOGGER.info("Ejecutamos el comando:\n" + buffer.toString()); //$NON-NLS-1$
+		}
+		return new ProcessBuilder(command).start();
 	}
 }
