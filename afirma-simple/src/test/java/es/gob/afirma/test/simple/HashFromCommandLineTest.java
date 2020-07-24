@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.ui.hash.HashHelper;
+import es.gob.afirma.standalone.ui.hash.HashUIHelper;
 
 /** pruebas de huellas digitales desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -15,7 +15,7 @@ public final class HashFromCommandLineTest {
 	@Test
 	@Ignore
 	public void testHashCheck() {
-		HashHelper.checkHashUI("C:\\Users\\tomas\\AppData\\Local\\Temp\\sample-facturae.xml"); //$NON-NLS-1$
+		HashUIHelper.checkHashUI("C:\\Users\\tomas\\AppData\\Local\\Temp\\sample-facturae.xml"); //$NON-NLS-1$
 	}
 
 	/** Prueba de comprobaci&oacute;n de huellas de directorio desde l&iacute;nea de comandos. */

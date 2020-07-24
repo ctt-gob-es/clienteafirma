@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Date;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -56,8 +58,6 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 	private static final long serialVersionUID = 3581001930027153381L;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private static final String[] HASH_ALGOS = new String[] {
 		"SHA-256", //$NON-NLS-1$
@@ -265,14 +265,21 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		generateButton.setMnemonic('G');
 		generateButton.addActionListener(
 			e -> {
-				doHashProcess(
-					parent,
-					getFileTextField().getText(),
-					getSelectedHashAlgorithm(),
-					getSelectedHashFormat(),
-					isCopyToClipBoardChecked(),
-					CreateHashDialog.this
-				);
+				try {
+					doHashProcess(
+							parent,
+							getFileTextField().getText(),
+							getSelectedHashAlgorithm(),
+							getSelectedHashFormat(),
+							isCopyToClipBoardChecked(),
+							CreateHashDialog.this
+							);
+				}
+				catch (final AOCancelledOperationException ex) {
+					// El usuario cancelo el dialogo de guardado. Salimos del proceso para evitar que
+					// se cierre la pantalla.
+					return;
+				}
 				CreateHashDialog.this.setVisible(false);
 				CreateHashDialog.this.dispose();
 			}
@@ -351,7 +358,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
                               final String hashAlgorithm,
                               final HashFormat format,
                               final boolean copyToClipboard,
-                              final Window currentFrame) {
+                              final Window currentFrame) throws AOCancelledOperationException {
 
 		final CommonWaitDialog dialog = new CommonWaitDialog(
 			null,
@@ -360,84 +367,38 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		);
 
 		// Arrancamos el proceso en un hilo aparte
-		final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+		final SwingWorker<byte[], Void> worker = new SwingWorker<byte[], Void>() {
 			@Override
-			protected Void doInBackground() {
+			protected byte[] doInBackground() {
+
+				final long startTime = new Date().getTime();
+
+				byte[] calculatedHash;
 				try ( final InputStream is = new FileInputStream(file); ) {
 
 					if (currentFrame != null) {
 						currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					}
 
-					final byte[] hash = HashUtil.getFileHash(hashAlgorithm, file);
-
-					final String ext;
-					final byte[] dataToSave;
-					switch(format) {
-						case HEX:
-							ext = ".hexhash"; //$NON-NLS-1$
-							dataToSave = (AOUtil.hexify(hash, false) + "h").getBytes(); //$NON-NLS-1$
-							break;
-						case BASE64:
-							ext = ".hashb64"; //$NON-NLS-1$
-							dataToSave = Base64.encode(hash).getBytes();
-							break;
-						case BINARY:
-							dataToSave = hash;
-							ext = ".hash"; //$NON-NLS-1$
-							break;
-						default:
-							throw new IllegalStateException(
-								"Formato de huella no contemplado: " + format //$NON-NLS-1$
-							);
-					}
-
-					dialog.dispose();
-					AOUIFactory.getSaveDataToFile(
-						dataToSave,
-						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$
-						null,
-						AutoFirmaUtil.getCanonicalFile(new File(file)).getName() + ext,
-						Collections.singletonList(
-							new GenericFileFilter(
-								new String[] { ext },
-								SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")"  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-							)
-						),
-						parent
-					);
-					// Si se selecciona Base64 se usa Base64 en portapapeles, en cualquier otro caso, HEX pasado a ASCII.
-					if (copyToClipboard) {
-						copyToClipBoard(
-							HashFormat.BASE64.equals(format) ? new String(dataToSave) : AOUtil.hexify(hash, false)
-						);
-					}
+					calculatedHash = HashUtil.getFileHash(hashAlgorithm, file);
 				}
 				catch(final OutOfMemoryError ooe) {
+					LOGGER.log(Level.SEVERE, "Fichero demasiado grande", ooe); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
 						parent,
 						SimpleAfirmaMessages.getString("CreateHashDialog.18"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-					LOGGER.severe(
-						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
-					);
-					return null;
-				}
-				catch(final AOCancelledOperationException aocoe) {
-					// Operacion cancelada
 					return null;
 				}
 				catch (final Exception ioe) {
+					LOGGER.log(Level.SEVERE, "Error generando o guardando la huella digital", ioe); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
 						parent,
 						SimpleAfirmaMessages.getString("CreateHashDialog.13"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
-					);
-					LOGGER.severe(
-						"Error generando o guardando la huella digital: " + ioe //$NON-NLS-1$
 					);
 					return null;
 				}
@@ -447,7 +408,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 					}
 				}
 
-				return null;
+				final long processTime = new Date().getTime() - startTime;
+				LOGGER.info("Tiempo total de generacion del hash: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				return calculatedHash;
 			}
 			@Override
 			protected void done() {
@@ -457,9 +421,85 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 		};
 		worker.execute();
 
-		if (new File(file).length() > SIZE_WAIT) {
-			// Se muestra la ventana de espera
-			dialog.setVisible(true);
+		// Se muestra la ventana de espera
+		dialog.setVisible(true);
+
+		// Esperamos al calculo del resultado
+		byte[] calculatedHash;
+		try {
+			calculatedHash = worker.get();
+		}
+		catch (final Exception ioe) {
+			LOGGER.log(Level.SEVERE, "Error generando o guardando la huella digital", ioe); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+				parent,
+				SimpleAfirmaMessages.getString("CreateHashDialog.13"), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+			return;
+		}
+
+		// Si se produjo algun error, el resultado sera nulo y terminaremos el proceso
+		if (calculatedHash == null) {
+			return;
+		}
+
+		// Identificamos el formato de guardado
+		final String ext;
+		final byte[] dataToSave;
+		switch(format) {
+			case HEX:
+				ext = "hexhash"; //$NON-NLS-1$
+				dataToSave = (AOUtil.hexify(calculatedHash, false) + "h").getBytes(); //$NON-NLS-1$
+				break;
+			case BASE64:
+				ext = "hashb64"; //$NON-NLS-1$
+				dataToSave = Base64.encode(calculatedHash).getBytes();
+				break;
+			case BINARY:
+				ext = "hash"; //$NON-NLS-1$
+				dataToSave = calculatedHash;
+				break;
+			default:
+				throw new IllegalStateException(
+					"Formato de huella no contemplado: " + format //$NON-NLS-1$
+				);
+		}
+
+		// Guardamos los datos
+		try {
+			AOUIFactory.getSaveDataToFile(
+					dataToSave,
+					SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$
+					null,
+					AutoFirmaUtil.getCanonicalFile(new File(file)).getName() + "." + ext, //$NON-NLS-1$
+					Collections.singletonList(
+							new GenericFileFilter(
+									new String[] { ext },
+									SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*." + ext + ")"  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+									)
+							),
+					parent
+					);
+			// Si se selecciona Base64 se usa Base64 en portapapeles, en cualquier otro caso, HEX pasado a ASCII.
+			if (copyToClipboard) {
+				copyToClipBoard(
+						HashFormat.BASE64.equals(format) ? new String(dataToSave) : AOUtil.hexify(dataToSave, false)
+						);
+			}
+		}
+		catch (final AOCancelledOperationException e) {
+			throw e;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Error durante el guardado del hash", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+				parent,
+				SimpleAfirmaMessages.getString("CreateHashDialog.27"), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 		}
 	}
 

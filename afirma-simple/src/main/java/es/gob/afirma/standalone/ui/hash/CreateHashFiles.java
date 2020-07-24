@@ -19,25 +19,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
-import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -47,23 +41,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
@@ -77,9 +56,8 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 public final class CreateHashFiles extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = -7224732001218823361L;
-	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String[] HASH_ALGOS = new String[] {
 		"SHA-256", //$NON-NLS-1$
@@ -88,8 +66,9 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		"SHA-512" //$NON-NLS-1$
 	};
 
-	private static final String FILEEXT_XML = ".hashfiles"; //$NON-NLS-1$
-	private static final String FILEEXT_CSV = ".csv"; //$NON-NLS-1$
+	private static final String FILEEXT_XML = "hashfiles"; //$NON-NLS-1$
+	private static final String FILEEXT_TXT = "txthashfiles"; //$NON-NLS-1$
+	private static final String FILEEXT_CSV = "csv"; //$NON-NLS-1$
 
 	private final JComboBox<String> hashAlgorithms = new JComboBox<>(HASH_ALGOS);
 	private final JTextField selectedFile = new JTextField();
@@ -98,22 +77,6 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 	private final JCheckBox recursive = new JCheckBox(
 		SimpleAfirmaMessages.getString("CreateHashFiles.16") //$NON-NLS-1$
 	);
-
-	/** Fichero a evitar. */
-	private final static Set<String> FILES_TO_AVOID = new HashSet<>(
-		Arrays.asList(
-			".fseventsd", //$NON-NLS-1$
-			".Spotlight-V100", //$NON-NLS-1$
-			".Trashes", //$NON-NLS-1$
-			"._.Trashes", //$NON-NLS-1$
-			".DS_Store", //$NON-NLS-1$
-			".desktop", //$NON-NLS-1$
-			"thumbs.db", //$NON-NLS-1$
-			"$Recycle.Bin" //$NON-NLS-1$
-		)
-	);
-
-	boolean isRecursiveSelected = false;
 
 	/** Inicia el proceso de creaci&oacute;n de huella digital de directorios.
 	 * @param parent Componente padre para la modalidad. */
@@ -189,11 +152,16 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 			)
 		);
 
+		// CheckBox que indica si debe calcularse el hash de los ficheros en los subdirectorios
+		this.recursive.setSelected(
+			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_RECURSIVE)
+		);
+
 		this.recursive.addKeyListener(this);
-		this.recursive.addActionListener(actionEvent -> {
-			final AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
-			CreateHashFiles.this.isRecursiveSelected = abstractButton.getModel().isSelected();
-		}
+		this.recursive.addActionListener(actionEvent ->
+			PreferencesManager.putBoolean(
+				PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_RECURSIVE,
+				isRecursive())
 		);
 		this.recursive.setMnemonic('R');
 
@@ -203,16 +171,21 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		this.generateButton.addKeyListener(this);
 		this.generateButton.addActionListener(ae -> {
 
-			doHashProcess(
-				parent,
-				getFileTextField().getText(),
-				getSelectedHashAlgorithm(),
-				CreateHashFiles.this.isRecursiveSelected
-			);
+			try {
+				doHashProcess(
+						parent,
+						getFileTextField().getText(),
+						getSelectedHashAlgorithm(),
+						isRecursive()
+						);
+			}
+			catch (final AOCancelledOperationException e) {
+				// Operacion cancelada. Terminamos la ejecucion para no cerrar la ventana
+				return;
+			}
 
 			CreateHashFiles.this.setVisible(false);
 			CreateHashFiles.this.dispose();
-
 		}
 		);
 		this.generateButton.setEnabled(false);
@@ -266,7 +239,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 	static void doHashProcess(final Frame parent,
 			                  final String dir,
 			                  final String hashAlgorithm,
-			                  final boolean recursive) {
+			                  final boolean recursive) throws AOCancelledOperationException {
 
 		// Se crea la ventana de espera.
 		final CommonWaitDialog dialog = new CommonWaitDialog(
@@ -280,12 +253,21 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 
 			@Override
 			protected java.util.Map<String, byte[]> doInBackground() throws Exception {
-				final Map<String, byte[]> hashs = generateDirectoryHash(
-					Paths.get(dir),
-					recursive,
-					hashAlgorithm
-				);
-				return hashs;
+
+				final Map<String, byte[]> result = Collections.synchronizedMap(new HashMap<>());
+
+				final long startTime = new Date().getTime();
+
+				final ForkJoinPool pool = new ForkJoinPool(10);
+				final RecursiveAction recursiveAction = new CreateHashAction(Paths.get(dir), new File(dir), recursive, hashAlgorithm, result, pool);
+				pool.invoke(recursiveAction);
+				recursiveAction.join();
+
+				final long processTime = new Date().getTime() - startTime;
+				LOGGER.info("Tiempo total de generacion en la hashes: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info("Numero de ficheros procesados: " + result.size()); //$NON-NLS-1$
+
+				return result;
 			}
 
 			@Override
@@ -296,10 +278,8 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		};
 		worker.execute();
 
-		if (getSize(new File(dir)) > SIZE_WAIT) {
-			// Se muestra la ventana de espera
-			dialog.setVisible(true);
-		}
+		// Se muestra la ventana de progreso
+		dialog.setVisible(true);
 
 		try {
 
@@ -310,41 +290,48 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 				null,
 				SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$
 				null,
-				AutoFirmaUtil.getCanonicalFile(new File(dir)).getName() + FILEEXT_XML,
+				AutoFirmaUtil.getCanonicalFile(new File(dir)).getName() + "." + FILEEXT_XML, //$NON-NLS-1$
 				Arrays.asList(
 					new GenericFileFilter[] {
 						new GenericFileFilter(
 							new String[] { FILEEXT_XML },
-							SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + FILEEXT_XML + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+							SimpleAfirmaMessages.getString("CreateHashDialog.26") + " (*." + FILEEXT_XML + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 						),
 //						new GenericFileFilter(
 //							new String[] { FILEEXT_CSV },
-//							SimpleAfirmaMessages.getString("CreateHashDialog.24") + " (*" + FILEEXT_CSV + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-//						)
+//							SimpleAfirmaMessages.getString("CreateHashDialog.24") + " (*." + FILEEXT_CSV + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+//						),
+						new GenericFileFilter(
+							new String[] { FILEEXT_TXT },
+							SimpleAfirmaMessages.getString("CreateHashDialog.25") + " (*." + FILEEXT_TXT + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						)
 					}
 				),
 				parent
 			);
 
-			final byte[] dataToSave;
-			if (!saveFile.getName().endsWith(FILEEXT_CSV)) {
-				dataToSave = generateHashXML(
-					hashs,
-					hashAlgorithm,
-					recursive
-				).getBytes();
+			String format;
+			if (saveFile.getName().endsWith("." + FILEEXT_CSV)) { //$NON-NLS-1$
+//				format = HashDocumentFactory.FORMAT_CSV;
+				format = HashDocumentFactory.FORMAT_XML;
+			}
+			else if (saveFile.getName().endsWith("." + FILEEXT_TXT)) { //$NON-NLS-1$
+				format = HashDocumentFactory.FORMAT_TXT;
 			}
 			else {
-				dataToSave = generateCsv(hashs).getBytes(
-					Platform.OS.WINDOWS.equals(Platform.getOS()) ? StandardCharsets.ISO_8859_1 : StandardCharsets.UTF_8
-				);
+				format = HashDocumentFactory.FORMAT_XML;
 			}
-            try (
-        		final OutputStream fos = new FileOutputStream(saveFile);
-    		) {
+
+			final HashDocument hashDocument = HashDocumentFactory.getHashDocument(format);
+			hashDocument.setHashes(hashs);
+			hashDocument.setRecursive(recursive);
+			hashDocument.setAlgorithm(hashAlgorithm);
+			hashDocument.setCharset(StandardCharsets.UTF_8);
+
+			final byte[] dataToSave = hashDocument.generate();
+
+            try (final OutputStream fos = new FileOutputStream(saveFile);) {
                 fos.write(dataToSave);
-                fos.flush();
-                fos.close();
             }
             catch (final Exception ex) {
                 LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
@@ -357,7 +344,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
             }
 		}
 		catch (final AOCancelledOperationException e) {
-			// Operacion cancelada
+			throw e;
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof java.lang.OutOfMemoryError) {
@@ -420,248 +407,16 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		this.generateButton.setEnabled(true);
 	}
 
-	private static String generateCsv(final Map<String, byte[]> hashs) {
-		if (hashs == null || hashs.size() < 1) {
-			LOGGER.warning("No hay huellas, se genera un CSV vacio"); //$NON-NLS-1$
-			return ""; //$NON-NLS-1$
-		}
-		final StringBuilder sb = new StringBuilder();
-		for (final Map.Entry<String, byte[]> entry : hashs.entrySet()) {
-		    sb.append("\"" + entry.getKey() + "\",\"" + AOUtil.hexify(entry.getValue(), false) + "h\"\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		return sb.toString();
-	}
-
-	/** Genera un XML con las huellas digitales.
-	 * El XML tendr&aacute; el siguiente esquema:
-	 * <pre>
-	 * &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
-	 *	&lt;xs:element name="entries"&gt;
-	 *		&lt;xs:complexType&gt;
-	 * 			&lt;xs:sequence&gt;
-	 *   			&lt;xs:element name="entry" maxOccurs="unbounded" minOccurs="0"&gt;
-	 *     				&lt;xs:complexType&gt;
-	 *       				&lt;xs:simpleContent&gt;
-	 *         					&lt;xs:extension base="xs:string"&gt;
-	 *           					&lt;xs:attribute type="xs:string" name="hash" use="required"/&gt;
-	 *           					&lt;xs:attribute type="xs:string" name="name" use="required"/&gt;
-	 *           					&lt;xs:attribute type="xs:string" name="hexhash"/&gt;
-	 *         					&lt;\xs:extension&gt;
-	 *       				&lt;\xs:simpleContent&gt;
-	 *				     &lt;\xs:complexType&gt;
-	 *   			&lt;\xs:element&gt;
-	 *		 	&lt;\xs:sequence&gt;
-	 *		 &lt;xs:attribute name="hashAlgorithm"&gt;
-	 * 			&lt;xs:simpleType&gt;
-	 *				&lt;xs:restriction base="xs:string"&gt;
-	 * 					&lt;xs:enumeration value="SHA-1"/&gt;
-	 *					&lt;xs:enumeration value="SHA-256"/&gt;
-	 *					&lt;xs:enumeration value="SHA-384"/&gt;
-	 *					&lt;xs:enumeration value="SHA-512"/&gt;
-	 *				&lt;\xs:restriction&gt;
-	 *			&lt;\xs:simpleType&gt;
-	 * 		  &lt;\xs:attribute&gt;
-	 * 	     &lt;xs:attribute type="xs:boolean" name="recursive" use="required"/&gt;
-	 * 	   &lt;\xs:complexType&gt;
-	 *	 &lt;\xs:element&gt;
-	 * &lt;\xs:schema&gt;
-	 * </pre>
-	 * @param hashs Mapa con los nombres de fichero y sus huellas.
-	 * @param algorithm Algoritmo con el que fueron generadas las huellas digitales.
-	 * @param isRecursive Si se ha elegido que el recorrido por el directorio sea
-	 *                    recursivo o no.
-	 * @return String que contiene el XML.
-	 * @throws ParserConfigurationException Si hay error en el analizador XML.
-	 * @throws TransformerException Si hay error en la escritura del XML. */
-	static String generateHashXML(final Map<String, byte[]> hashs,
-			                      final String algorithm,
-			                      final boolean isRecursive) throws ParserConfigurationException, TransformerException {
-
-		final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// Elemento raiz
-		final Document doc = docBuilder.newDocument();
-		final Element rootElement = doc.createElement("entries"); //$NON-NLS-1$
-		doc.appendChild(rootElement);
-		final Attr hashAlg = doc.createAttribute("hashAlgorithm"); //$NON-NLS-1$
-		hashAlg.setValue(algorithm);
-		rootElement.setAttributeNode(hashAlg);
-		final Attr recursive = doc.createAttribute("recursive"); //$NON-NLS-1$
-		recursive.setValue(String.valueOf(isRecursive));
-		rootElement.setAttributeNode(recursive);
-
-		final Set<String> paths = hashs.keySet();
-		for (final String path : paths) {
-			final byte[] hash = hashs.get(path);
-
-			// Elemento entry
-			final Element entry = doc.createElement("entry"); //$NON-NLS-1$
-			rootElement.appendChild(entry);
-
-			// Se inicializa el atributo name
-			final Attr name = doc.createAttribute("name"); //$NON-NLS-1$
-			name.setValue(path);
-			entry.setAttributeNode(name);
-
-			// Se inicializa el atributo hash
-			final Attr hashAttribute = doc.createAttribute("hash"); //$NON-NLS-1$
-			hashAttribute.setValue(Base64.encode(hash, true));
-			entry.setAttributeNode(hashAttribute);
-
-			// Se inicializa el atributo hexhash
-			final Attr hexHashAttribute = doc.createAttribute("hexhash"); //$NON-NLS-1$
-			hexHashAttribute.setValue(AOUtil.hexify(hash, false) + "h"); //$NON-NLS-1$
-			entry.setAttributeNode(hexHashAttribute);
-		}
-		final StringWriter sw = new StringWriter();
-		final TransformerFactory tf = TransformerFactory.newInstance();
-		final Transformer transformer = tf.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
-		transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1"); //$NON-NLS-1$
-		}
-		else {
-			transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
-		}
-
-		transformer.transform(
-			new DOMSource(doc), new StreamResult(sw)
-		);
-
-		return sw.toString();
-
-	}
-
-	/** Obtiene un informe de huellas en XML del directorio indicado.
-	 * @param dir Directorio sobre cuyos ficheros se desea calcular las huellas.
-	 * @param isRecursive Si se desea se recorra el directorio recursivamente.
-	 * @param algorithm Algoritmo para las huellas digitales.
-	 * @return Informe XML de huellas.
-	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huellas.
-	 * @throws IOException Si hay problemas en el tratamiento de los ficheros.
-	 * @throws ParserConfigurationException Si hay problemas con el analizador XML.
-	 * @throws TransformerException Si hay problemas escribiendo el XML. */
-	public static String getHashReport(final String dir, final boolean isRecursive, final String algorithm) throws NoSuchAlgorithmException,
-	                                                                                                      IOException,
-	                                                                                                      ParserConfigurationException,
-	                                                                                                      TransformerException {
-		final Map<String, byte[]> retMap = generateDirectoryHash(
-			Paths.get(new File(dir).toURI()),
-			isRecursive,
-			algorithm
-		);
-		return generateHashXML(retMap, algorithm, isRecursive);
-	}
-
-	/** Genera la huella digital de los ficheros de un directorio.
-	 * @param dir Directorio que ha elegido el usuario para generar la firma
-	 *            digital.
-	 * @param isRecursive Si se ha elegido que el recorrido por el directorio sea
-	 *                    recursivo o no.
-	 * @param algorithm Algoritmo con el que fue generada la huella digital.
-	 * @return Valores hash para cada elemento del directorio.
-	 * @throws IOException Error al abrir o cerrar el fichero seleccionado.
-	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella. */
-	static Map<String, byte[]> generateDirectoryHash(final Path dir,
-			                                         final boolean isRecursive,
-			                                         final String algorithm) throws IOException,
-			                                                                        NoSuchAlgorithmException {
-		final Map<String, byte[]> directoryHash = new HashMap<>();
-		if (Files.exists(dir)) {
-			if (isRecursive) {
-				directoryHash.putAll(
-					recursiveDirectoryHash(null, dir, directoryHash, algorithm)
-				);
-			}
-			else {
-				try (Stream<Path> paths = Files.list(dir)) {
-					final Iterator<Path> it = paths.iterator();
-					while (it.hasNext()) {
-						final Path path = it.next();
-						if (!Files.isDirectory(path) &&
-							!path.getFileName().toString().contains("~$") && //$NON-NLS-1$
-							!FILES_TO_AVOID.contains(path.getFileName().toString())) {
-								directoryHash.put(
-									path.getFileName().toString(),
-									HashUtil.getFileHash(algorithm, path)
-								);
-						}
-					}
-				}
-			}
-		}
-		return directoryHash;
-	}
-
-	/** Recorre el directorio recursivamente.
-	 * @param relativePath Nombre relativo del directorio.
-	 * @param path Directorio a recorrer recursivamente.
-	 * @param directoryHash Contiene el nombre del fichero y su respecitiva firma digital.
-	 * @param algorithm Algoritmo para las huellas digitales.
-	 * @return Mapa con los valores de huella para cada elemento del directorio.
-	 * @throws IOException Indica si ha habido un error al abrir o cerrar un fichero.
-	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella. */
-	private static Map<String, byte[]> recursiveDirectoryHash(final String relativePath,
-			                                                  final Path path,
-			                                                  final Map<String, byte[]> directoryHash,
-			                                                  final String algorithm) throws IOException, NoSuchAlgorithmException {
-		if (Files.exists(path)) {
-			if (Files.isDirectory(path)) {
-				try (Stream<Path> paths = Files.list(path)) {
-					final Iterator<Path> it = paths.iterator();
-					while (it.hasNext()) {
-						final Path subPath = it.next();
-						if (relativePath != null) {
-							directoryHash.putAll(
-								recursiveDirectoryHash(
-									relativePath + File.separator + subPath.getFileName().toString(),
-									subPath,
-									directoryHash,
-									algorithm
-								)
-							);
-						}
-						else {
-							directoryHash.putAll(
-								recursiveDirectoryHash(
-									subPath.getFileName().toString(), subPath, directoryHash, algorithm
-								)
-							);
-						}
-					}
-				} // Si no es un directorio
-			}
-			else {
-				if (!relativePath.contains("~$") && !FILES_TO_AVOID.contains(path.getFileName().toString())) { //$NON-NLS-1$
-					directoryHash.put(
-						relativePath,
-						HashUtil.getFileHash(algorithm, path)
-					);
-				}
-			}
-		}
-		return directoryHash;
-	}
-
-	static long getSize(final File file) {
-	    long size;
-	    if (file.isDirectory()) {
-	        size = 0;
-	        for (final File child : file.listFiles()) {
-	            size += getSize(child);
-	        }
-	        return size;
-	    }
-		return file.length();
-	}
-
 	/** Obtiene el tipo de algoritmo seleccionado por el usuario.
 	 * @return Algoritmo seleccionado por el usuario. */
 	String getSelectedHashAlgorithm() {
 		return this.hashAlgorithms.getSelectedItem().toString();
+	}
+
+	/** Indica si se encuentra seleccionado el calculo de hashes en los subdirectorios.
+	 * @return {@code true} si se encuentra seleccionado, {@code false} en caso contrario. */
+	boolean isRecursive() {
+		return this.recursive.isSelected();
 	}
 
 	/** Obtiene el nombre del directorio seleccionado por el usuario.

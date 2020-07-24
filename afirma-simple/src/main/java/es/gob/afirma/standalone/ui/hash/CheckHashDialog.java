@@ -23,6 +23,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -47,7 +50,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = 2431770911918905439L;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
@@ -120,15 +123,11 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
-					);
+					LOGGER.log(Level.SEVERE, "Fichero demasiado grande", ooe); //$NON-NLS-1$
 					return;
 				}
 				catch(final Exception ex) {
-					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-						"No ha sido posible comprobar las huellas digitales: " + ex //$NON-NLS-1$
-					);
+					LOGGER.log(Level.SEVERE, "No ha sido posible comprobar las huellas digitales", ex); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
 						CheckHashDialog.this,
 						SimpleAfirmaMessages.getString("CheckHashDialog.6"), //$NON-NLS-1$
@@ -288,6 +287,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 			@Override
 			protected Boolean doInBackground() throws Exception {
+
 				byte[] hashBytes;
 				try (InputStream fis = new FileInputStream(fileNameHash)) {
 					hashBytes = AOUtil.getDataFromInputStream(fis);
@@ -295,25 +295,29 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 				if (Base64.isBase64(hashBytes)) {
 					hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
 				}
-				else if(isHexa(hashBytes)) {
-					hashBytes = hexStringToByteArray(
+				else if(HexUtils.isHexadecimal(hashBytes)) {
+					hashBytes = HexUtils.hexStringToByteArray(
 						new String(hashBytes).substring(0, hashBytes.length -1)
 					);
 				}
+
+				final long startTime = new Date().getTime();
+
+				final byte[] calculatedHash;
 				try {
-					return Boolean.valueOf(
-						arrayEquals(
-							hashBytes,
-							HashUtil.getFileHash(
-								getHashAlgorithm(hashBytes),
-								fileNameData
-							)
-						)
-					);
+					calculatedHash = HashUtil.getFileHash(
+							getHashAlgorithm(hashBytes),
+							fileNameData);
 				}
 				catch (final NoSuchAlgorithmException e) {
 					throw new IOException(e);
 				}
+
+				final long processTime = new Date().getTime() - startTime;
+				LOGGER.info("Tiempo total de comprobacion del hash: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				return Boolean.valueOf(Arrays.equals(hashBytes, calculatedHash));
+
 			}
 			@Override
 			protected void done() {
@@ -322,7 +326,6 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 			}
 		};
 		worker.execute();
-
 
 		if (new File(fileNameData).length() > SIZE_WAIT) {
 			// Se muestra la ventana de espera
@@ -403,24 +406,4 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		chkd.setLocationRelativeTo(parent);
 		chkd.setVisible(true);
 	}
-
-	static byte[] hexStringToByteArray(final String s) {
-	    final int len = s.length();
-	    final byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
-	}
-
-	static boolean isHexa(final byte[] data) {
-		if (data == null || data.length == 0) {
-			return false;
-		}
-		final String strData = new String(data);
-
-		return strData.endsWith("h") && //$NON-NLS-1$
-			strData.substring(0, strData.length() - 1).matches("^[0-9a-fA-F]+$") && //$NON-NLS-1$
-				(data.length - 1) % 2 == 0;
-    }
 }

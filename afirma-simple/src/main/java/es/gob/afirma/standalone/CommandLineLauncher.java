@@ -54,7 +54,7 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
-import es.gob.afirma.standalone.ui.hash.HashHelper;
+import es.gob.afirma.standalone.ui.hash.HashUIHelper;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -229,7 +229,7 @@ final class CommandLineLauncher {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 		}
 
-		HashHelper.createHashUI(params.getInputFile().getAbsolutePath());
+		HashUIHelper.createHashUI(params.getInputFile().getAbsolutePath());
 	}
 
 	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales mostrando los di&aacute;logos
@@ -242,7 +242,7 @@ final class CommandLineLauncher {
 		if (inputFile == null) {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 		}
-		HashHelper.checkHashUI(params.getInputFile().getAbsolutePath());
+		HashUIHelper.checkHashUI(params.getInputFile().getAbsolutePath());
 	}
 
 	/** Mostramos el panel de validaci&oacute;n de certificados y firmas.

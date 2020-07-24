@@ -443,6 +443,9 @@ public final class PreferencesManager {
 	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de directorio. */
 	public static final String PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM = "createHashDirectoryAlgorithm"; //$NON-NLS-1$
 
+	/** Si se debe calcular la huella digital de los ficheros en los subdirectorios del directorio seleccionado. */
+	public static final String PREFERENCE_CREATE_HASH_DIRECTORY_RECURSIVE = "createHashDirectoryRecursive"; //$NON-NLS-1$
+
 	//**************** FIN PREFERENCIAS DE HUELLAS DIGITALES *******************************************************************
 	//**************************************************************************************************************************
 
