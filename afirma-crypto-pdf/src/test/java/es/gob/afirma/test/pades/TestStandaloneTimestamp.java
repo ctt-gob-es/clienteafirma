@@ -2,6 +2,7 @@ package es.gob.afirma.test.pades;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.GregorianCalendar;
 import java.util.Properties;
@@ -36,9 +37,14 @@ public final class TestStandaloneTimestamp {
     @Test
     @Ignore
 	public void testTimestampCosignedPdf() throws Exception {
-    	final byte[] inPdf = AOUtil.getDataFromInputStream(
-			TestStandaloneTimestamp.class.getResourceAsStream("/cosigned.pdf") //$NON-NLS-1$
-		);
+    	final byte[] inPdf;
+    	try (
+			final InputStream is = TestStandaloneTimestamp.class.getResourceAsStream("/cosigned.pdf") //$NON-NLS-1$
+		) {
+	    	inPdf = AOUtil.getDataFromInputStream(
+				is
+			);
+    	}
     	final byte[] outPdf = PdfTimestamper.timestampPdf(
 			inPdf,
 			EXTRAPARAMS,
@@ -47,6 +53,35 @@ public final class TestStandaloneTimestamp {
     	try (
 	    	final OutputStream fos = new FileOutputStream(
 				File.createTempFile("COSIGNED_TIMESTAMPED_", ".pdf") //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		) {
+    		fos.write(outPdf);
+    		fos.flush();
+    	}
+    }
+
+    /** Prueba de sello a nivel de documento de un PDF normal.
+     * @throws Exception en cualquier error. */
+    @SuppressWarnings("static-method")
+    @Test
+    @Ignore
+	public void testTimestampPdf() throws Exception {
+    	final byte[] inPdf;
+    	try (
+			final InputStream is = TestStandaloneTimestamp.class.getResourceAsStream("/multipage.pdf") //$NON-NLS-1$
+		) {
+	    	inPdf = AOUtil.getDataFromInputStream(
+				is
+			);
+    	}
+    	final byte[] outPdf = PdfTimestamper.timestampPdf(
+			inPdf,
+			EXTRAPARAMS,
+			new GregorianCalendar()
+		);
+    	try (
+	    	final OutputStream fos = new FileOutputStream(
+				File.createTempFile("NORMAL_TIMESTAMPED_", ".pdf") //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		) {
     		fos.write(outPdf);
