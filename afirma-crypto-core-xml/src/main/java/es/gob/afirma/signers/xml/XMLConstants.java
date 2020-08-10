@@ -142,4 +142,13 @@ public final class XMLConstants {
 
     /** URI que define una referencia de tipo OBJECT. */
     public static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
+
+    /** Nombre del nodo de firma ("Signature"). */
+    public static final String TAG_SIGNATURE = "Signature"; //$NON-NLS-1$
+
+    /** Nombre del nodo "SignedInfo" con la informaci&oacute;n de firma. */
+    public static final String TAG_SIGNEDINFO = "SignedInfo"; //$NON-NLS-1$
+
+	/** Nombre del nodo de las referencias de firma. */
+    public static final String TAG_REFERENCE = "Reference"; //$NON-NLS-1$
 }

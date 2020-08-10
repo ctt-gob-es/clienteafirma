@@ -182,7 +182,7 @@ public final class XAdESCoSigner {
 		// nodo AFIRMA
 		Document docSig = signDocument;
 		Element rootSig = signDocument.getDocumentElement();
-		if (rootSig.getLocalName().equals(XAdESConstants.TAG_SIGNATURE)) {
+		if (rootSig.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
 			try {
 				docSig = AOXAdESSigner.insertarNodoAfirma(docSig);
 				rootSig = docSig.getDocumentElement();
@@ -330,7 +330,7 @@ public final class XAdESCoSigner {
 								}
 
 								// Si es un nodo de firma tambien miramos en sus nodos hijos
-								if (XAdESConstants.TAG_SIGNATURE.equals(rootChildNodes.item(j).getLocalName())) {
+								if (XMLConstants.TAG_SIGNATURE.equals(rootChildNodes.item(j).getLocalName())) {
 									final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
 									for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
 										nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
@@ -357,7 +357,7 @@ public final class XAdESCoSigner {
 				}
 
 				final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
-						XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE
+						XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE
 						).item(0).getChildNodes();
 				for (int j = 0; j < signatureChildNodes.getLength(); j++) {
 					final Node subNode = signatureChildNodes.item(j);

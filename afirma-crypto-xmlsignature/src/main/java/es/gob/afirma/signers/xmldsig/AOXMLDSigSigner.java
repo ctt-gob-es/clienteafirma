@@ -91,7 +91,6 @@ public final class AOXMLDSigSigner implements AOSigner {
     /** URI que define la versi&oacute;n por defecto de XAdES. */
     private static final String XADESNS = "http://uri.etsi.org/01903#"; //$NON-NLS-1$
 
-    private static final String SIGNATURE_STR = "Signature"; //$NON-NLS-1$
     private static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     private static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
     private static final String REFERENCE_STR = "Reference"; //$NON-NLS-1$
@@ -1137,7 +1136,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("Error al generar la firma XMLdSig: " + e, e); //$NON-NLS-1$
         }
 
-        final String signatureNodeName = (xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR; //$NON-NLS-1$ //$NON-NLS-2$
+        final String signatureNodeName = (xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + XMLConstants.TAG_SIGNATURE; //$NON-NLS-1$ //$NON-NLS-2$
         // Si se esta realizando una firma enveloping simple no tiene sentido el
         // nodo raiz,
         // asi que sacamos el nodo de firma a un documento aparte
@@ -1204,8 +1203,8 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (element == null) {
             return false;
         }
-        return SIGNATURE_STR.equals(element.getLocalName()) ||
-        		AFIRMA.equals(element.getNodeName()) && SIGNATURE_STR.equals(element.getFirstChild().getLocalName());
+        return XMLConstants.TAG_SIGNATURE.equals(element.getLocalName()) ||
+        		AFIRMA.equals(element.getNodeName()) && XMLConstants.TAG_SIGNATURE.equals(element.getFirstChild().getLocalName());
     }
 
     /** {@inheritDoc} */
@@ -1243,10 +1242,14 @@ public final class AOXMLDSigSigner implements AOSigner {
             // si es enveloped
             else if (AOXMLDSigSigner.isEnveloped(rootSig)) {
                 // obtiene las firmas y las elimina
-                final NodeList signatures = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+                final NodeList signatures = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
                 final int numSignatures = signatures.getLength();
                 for (int i = 0; i < numSignatures; i++) {
-                    rootSig.removeChild(signatures.item(0));
+                	// Comprobamos que no sean nulas, ya que las contrafirmas
+                	// han podido eliminarse al eliminar alguna otra firma
+                	if (signatures.item(i) != null) {
+                		rootSig.removeChild(signatures.item(i));
+                	}
                 }
                 elementRes = rootSig;
             }
@@ -1364,7 +1367,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el documento contiene una firma simple se inserta como raiz el
             // nodo AFIRMA
-            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + XMLConstants.TAG_SIGNATURE)) { //$NON-NLS-1$ //$NON-NLS-2$
                 docSig = insertarNodoAfirma(docSig);
                 rootSig = docSig.getDocumentElement();
             }
@@ -1395,9 +1398,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        // Localizamos la primera firma (primer nodo SIGNATURE_STR) en profundidad
+        // Localizamos la primera firma (primer nodo XMLConstants.TAG_SIGNATURE) en profundidad
         // en el arbol de firma.
-        // Se considera que todos los objetos SIGNATURE_STR del documento firman
+        // Se considera que todos los objetos XMLConstants.TAG_SIGNATURE del documento firman
         // (referencian) los mismos
         // objetos, por lo que podemos extraerlos de cualquiera de las firmas
         // actuales.
@@ -1405,7 +1408,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // datos para firmarlas
         final ArrayList<String> referencesIds = new ArrayList<>();
         Node currentReference;
-        final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
+        final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
 
         // Se considera que la primera referencia de la firma son los datos que
         // debemos firmar, ademas
@@ -1659,10 +1662,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             // las que cuelgan otras
             // y despues intentar eliminar estas, las buscamos y eliminamos de
             // una en una
-            NodeList signatures = rootData.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+            NodeList signatures = rootData.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
             while (signatures.getLength() > 0) {
                 rootData.removeChild(signatures.item(0));
-                signatures = rootData.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+                signatures = rootData.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
             }
 
             docData.appendChild(rootData);
@@ -1808,7 +1811,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el nodo raiz del documento es una firma simple, se inserta como raiz el
             // nodo AFIRMA
-            if (root.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (root.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + XMLConstants.TAG_SIGNATURE)) { //$NON-NLS-1$ //$NON-NLS-2$
                 this.doc = insertarNodoAfirma(this.doc);
                 root = this.doc.getDocumentElement();
             }
@@ -1854,7 +1857,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                                  final String xmlSignaturePrefix) throws AOException {
 
         // obtiene todas las firmas
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 
         final Element[] nodes = new Element[signatures.getLength()];
         for (int i = 0; i < signatures.getLength(); i++) {
@@ -1891,7 +1894,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                                   final String xmlSignaturePrefix) throws AOException {
 
         // obtiene todas las firmas y las referencias
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
         final NodeList references = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
 
         // obtenemos el ID de los SignatureValue de cada una de las firmas recuperadas
@@ -1959,7 +1962,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     	}
 
         // obtiene todas las firmas y las referencias
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 
         // obtenemos el ID de los SignatureValue de cada una de las firmas recuperadas
         final String signatureValuesID[] = new String[signatures.getLength()];
@@ -2054,7 +2057,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                                     final String xmlSignaturePrefix) throws AOException {
 
         // obtiene todas las firmas
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
         final int numSignatures = signatures.getLength();
 
         final List<Object> signers = Arrays.asList(targets);
@@ -2221,7 +2224,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             // un nodo raiz previo para que la lectura de las firmas del
             // documento
             // se haga correctamente
-            if (root.getNodeName().equals(completePrefix + SIGNATURE_STR)) {
+            if (root.getNodeName().equals(completePrefix + XMLConstants.TAG_SIGNATURE)) {
                 this.doc = insertarNodoAfirma(this.doc);
                 root = this.doc.getDocumentElement();
             }
@@ -2234,7 +2237,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final AOTreeNode tree = new AOTreeNode("Datos"); //$NON-NLS-1$
 
         // Obtenemos todas las firmas y los signature value
-        final NodeList signatures = root.getElementsByTagName(completePrefix + SIGNATURE_STR);
+        final NodeList signatures = root.getElementsByTagName(completePrefix + XMLConstants.TAG_SIGNATURE);
         final NodeList signatureValues = root.getElementsByTagName(completePrefix + SIGNATURE_VALUE);
 
         final int numSignatures = signatures.getLength();
@@ -2313,14 +2316,14 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
             final Element rootNode = signDoc.getDocumentElement();
 
-            final String xmlSignatureName = XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
+            final String xmlSignatureName = XML_SIGNATURE_PREFIX + ":" + XMLConstants.TAG_SIGNATURE; //$NON-NLS-1$
 
             final ArrayList<Node> signNodes = new ArrayList<>();
             if (rootNode.getNodeName().equals(xmlSignatureName)) {
                 signNodes.add(rootNode);
             }
 
-            final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
+            final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
             for (int i = 0; i < signatures.getLength(); i++) {
                 signNodes.add(signatures.item(i));
             }
@@ -2465,7 +2468,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 				}
 
 				// Si es un nodo de firma tambien miramos en sus nodos hijos
-				if (SIGNATURE_STR.equals(rootChildNodes.item(j).getLocalName())) {
+				if (XMLConstants.TAG_SIGNATURE.equals(rootChildNodes.item(j).getLocalName())) {
 					final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
 					for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
 						nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ? subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) : null;

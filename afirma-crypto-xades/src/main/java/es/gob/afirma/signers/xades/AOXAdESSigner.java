@@ -50,7 +50,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * </p>
  * <p>
  *  Los atributos espec&iacute;ficos XAdES implementados por esta clase (adem&aacute;s de los
- *  relativos a las politicas de firma) son:
+ *  relativos a las pol&iacute;ticas de firma) son:
  * </p>
  * <ul>
  *  <li><i>SigningTime</i></li>
@@ -631,21 +631,18 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	// La consideraremos enveloping si alguno de los datos referenciados esta contenido dentro de
     	// la propia firma.
     	for (int i = 0; i < references.size(); i++) {
-    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
-    		if (uri != null && uri.isEmpty()) {
-    			final NodeList transformList = references.get(i).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
-    			for (int j = 0; j < transformList.getLength(); j++) {
-    				final String algorithm = ((Element) transformList.item(j)).getAttribute("Algorithm"); //$NON-NLS-1$
-    				if (Transform.ENVELOPED.equals(algorithm)) {
+    		final NodeList transformList = references.get(i).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
+    		for (int j = 0; j < transformList.getLength(); j++) {
+    			final String algorithm = ((Element) transformList.item(j)).getAttribute("Algorithm"); //$NON-NLS-1$
+    			if (Transform.ENVELOPED.equals(algorithm)) {
+    				return true;
+    			}
+    			else if (Transform.XPATH.equals(algorithm)) {
+    				final String signaturePrefix = signatureElement.getPrefix();
+    				final String xPath = transformList.item(j).getTextContent().replaceAll("\\s+", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    				if (String.format(XPATH_ENVELOPED_EQ, signaturePrefix).equals(xPath) ||
+    						String.format(XPATH_ENVELOPED_EQ2, signaturePrefix).equals(xPath)) {
     					return true;
-    				}
-    				else if (Transform.XPATH.equals(algorithm)) {
-    					final String signaturePrefix = signatureElement.getPrefix();
-    					final String xPath = transformList.item(j).getTextContent().replaceAll("\\s+", ""); //$NON-NLS-1$ //$NON-NLS-2$
-    					if (String.format(XPATH_ENVELOPED_EQ, signaturePrefix).equals(xPath) ||
-    							String.format(XPATH_ENVELOPED_EQ2, signaturePrefix).equals(xPath)) {
-    						return true;
-    					}
     				}
     			}
     		}
@@ -833,7 +830,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	final NodeList mainChildNodes = rootSig.getChildNodes();
     	for (int i = 0; i < mainChildNodes.getLength(); i++) {
     		if (mainChildNodes.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				mainChildNodes.item(i).getLocalName().equals(XAdESConstants.TAG_SIGNATURE)) {
+    				mainChildNodes.item(i).getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
     			rootSig.removeChild(mainChildNodes.item(i));
     			removeEnvelopedSignatures(rootSig);
     			return;
@@ -1114,7 +1111,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	// Obtenemos todas las firmas del documento y el SignatureValue de cada
     	// una de ellas
-    	final NodeList signatures = signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+    	final NodeList signatures = signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 
     	// Mantendremos 3 listas: la de identificadores de firma, la de identificadores a las
     	// que referencia cada firma (cadena vacia salvo para las contrafirmas) y los objetos
@@ -1236,12 +1233,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             final List<Node> signNodes = new ArrayList<>();
 
             // Comprobamos si el nodo raiz es una firma
-            if (rootNode.getLocalName().equals(XAdESConstants.TAG_SIGNATURE)) {
+            if (rootNode.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
                 signNodes.add(rootNode);
             }
 
             // Identificamos las firmas internas del XML
-            final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+            final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
             for (int i = 0; i < signatures.getLength(); i++) {
             	// Omitimos las firmas extraidas de sellos de tiempo
             	final Node parentNode = signatures.item(i).getParentNode();
