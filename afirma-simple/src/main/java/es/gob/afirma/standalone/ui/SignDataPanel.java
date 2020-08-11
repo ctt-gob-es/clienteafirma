@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -346,20 +347,20 @@ final class SignDataPanel extends JPanel {
             signInfo.setSignInfo(signer.getSignInfo(signData));
         }
         catch (final Exception e) {
-        	LOGGER.warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$
+        	LOGGER.log(Level.WARNING, "Error al leer la informacion de la firma", e); //$NON-NLS-1$
         }
         try {
         	signInfo.setSignsTree(signer.getSignersStructure(signData, true));
         }
         catch (final Exception e) {
-        	LOGGER.warning("Error al extraer el arbol de firmantes: " + e);  //$NON-NLS-1$
+        	LOGGER.log(Level.WARNING, "Error al extraer el arbol de firmantes", e);  //$NON-NLS-1$
         	signInfo.setSignsTree(null);
         }
         try {
             signInfo.setData(signer.getData(signData));
         }
         catch (final Exception e) {
-        	LOGGER.warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$
+        	LOGGER.log(Level.WARNING, "Error al extraer los datos firmados", e);  //$NON-NLS-1$
         }
         try {
         	signInfo.setTimestampsInfo(
@@ -367,7 +368,7 @@ final class SignDataPanel extends JPanel {
 			);
         }
         catch (final Exception e) {
-        	LOGGER.warning("Error al extraer los sellos de tiempo: " + e);  //$NON-NLS-1$
+        	LOGGER.log(Level.WARNING, "Error al extraer los sellos de tiempo", e);  //$NON-NLS-1$
         }
         return signInfo;
     }

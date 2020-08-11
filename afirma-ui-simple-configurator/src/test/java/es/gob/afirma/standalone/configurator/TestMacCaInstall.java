@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 
 /** Pruebas de instalaci&oacute;n de certificado ra&iacute;z en OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -32,7 +32,7 @@ public final class TestMacCaInstall {
 		System.out.println(cmd);
 		System.out.println();
 
-		final AppleScript script = new AppleScript(cmd);
+		final ShellScript script = new ShellScript(cmd);
 		try {
 			final String result = script.runAsAdministrator();
 			System.out.println("Contenido: " + result); //$NON-NLS-1$

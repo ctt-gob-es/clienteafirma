@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 
 /**
  * Funciones de utilidad para la configuraci&oacute;n de Mac.
@@ -98,7 +97,7 @@ public class MacUtils {
      * @throws InterruptedException Cuando el proceso se ve interrumpido (posiblemente por el usuario). */
 	public static Object executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		final AppleScript script = new AppleScript(scriptFile, delete);
+		final ShellScript script = new ShellScript(scriptFile, delete);
 
 		LOGGER.info("Path del script: " + scriptFile); //$NON-NLS-1$
 		try {
@@ -112,7 +111,7 @@ public class MacUtils {
 			return o;
 		}
 		catch (final IOException e) {
-			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
+			throw new IOException("Error en la ejecucion del script: " + e, e); //$NON-NLS-1$
 		}
 	}
 
@@ -121,7 +120,7 @@ public class MacUtils {
 	 * @param processIdText Texto que permite identificar el proceso. */
 	public static void closeMacService(final String processIdText) {
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
-		final AppleScript script = new AppleScript(
+		final ShellScript script = new ShellScript(
 				"kill -9 $(ps -ef | grep " + processIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
 				);
 		try {

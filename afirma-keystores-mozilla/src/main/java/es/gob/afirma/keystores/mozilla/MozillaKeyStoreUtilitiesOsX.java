@@ -11,12 +11,14 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 
 /** Utilidades para la gesti&oacute;n de almacenes de claves Mozilla NSS en Apple OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -82,7 +84,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		}
 
 		for (final String lib : libs) {
-			if (new File(nssBinDir + lib).exists()) {
+			if (new File(nssBinDir, lib).exists()) {
 				sb.append("ln -s "); //$NON-NLS-1$
 				sb.append(nssBinDir);
 				sb.append(lib);
@@ -94,7 +96,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
-			final AppleScript script = new AppleScript(sb.toString());
+			final ShellScript script = new ShellScript(sb.toString());
 			script.runAsAdministrator();
 		}
 		catch(final Exception e) {
@@ -140,4 +142,54 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		return nssLibDir;
 	}
 
+	public static void main(final String[] args) throws IOException {
+
+		final String originalLibraryPath = System.getProperty("java.library.path");
+
+		System.out.println("VARIABLES DE ENTORNO:");
+		System.out.println("----------------");
+		final Map<String, String> envs = System.getenv();
+		for (final String key : envs.keySet().toArray(new String[0])) {
+			System.out.println(key + ": " + envs.get(key));
+		}
+		System.out.println("----------------");
+
+		System.out.println("Original java.library.path: " + originalLibraryPath);
+
+		System.setProperty("java.library.path", "/Applications/Firefox.app/Contents/MacOS");
+
+		System.out.println("Nuevo java.library.path: " + System.getProperty("java.library.path"));
+
+		System.out.println("Directorio actual: " + new File(".").getCanonicalFile().getAbsolutePath());
+
+		System.out.println(" --- Cargamos mozglue");
+		//System.load("/Applications/Firefox.app/Contents/MacOS/libmozglue.dylib");
+		System.loadLibrary("libmozglue");
+		System.out.println(" --- Cargamos nss3");
+		//System.load("/Applications/Firefox.app/Contents/MacOS/libnss3.dylib");
+		System.loadLibrary("libnss3");
+		System.out.println(" --- Cargamos softokn3");
+		//System.load("/Applications/Firefox.app/Contents/MacOS/libsoftokn3.dylib");
+		System.loadLibrary("libsoftokn3");
+
+		System.setProperty("java.library.path", originalLibraryPath);
+	}
+
+//	private static void addLibraryPath(String pathToAdd) {
+//
+//		Lookup cl = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
+//		cl.findStatic(null, name, MethodType.)
+//
+//		String[] paths = ;
+//
+//		for (String path : paths) {
+//			if (path.equals(pathToAdd)) {
+//				return;
+//			}
+//		}
+//
+//		String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
+//		newPaths[newPaths.length - 1] = pathToAdd;
+//		usrPathsField.set(null, newPaths);
+//	}
 }

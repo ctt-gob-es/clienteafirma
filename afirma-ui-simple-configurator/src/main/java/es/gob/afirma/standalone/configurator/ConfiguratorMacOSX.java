@@ -56,7 +56,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 
 /** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
@@ -548,7 +548,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n del script. */
 	private static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		final AppleScript script = new AppleScript(new File(path), delete);
+		final ShellScript script = new ShellScript(new File(path), delete);
 
 		LOGGER.info("Path del script: " + path); //$NON-NLS-1$
 		try {
@@ -871,7 +871,8 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandInstall1;
 	}
 
-	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
+	/** Genera los <i>scripts</i> para eliminar las advertencias cuando se invoque al
+	 * protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>.*/
