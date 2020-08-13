@@ -116,20 +116,20 @@ public class MacUtils {
 		}
 	}
 
-	/** Mata el proceso intermedio de AutoFirma cuando estamos en macOS. En el resto de sistemas
-	 * no hace nada. El proceso intermedio no es la aplicaci&oacute;n Java, sino el ejecutable que
-	 * traslada los parametros proporcionados por el navegador Web a la aplicaci&oacute;n Java.
-	 * @param processIdText Texto que permite identificar el proceso. */
-	public static void closeMacService(final String processIdText) {
+	/** Mata el proceso intermedio de AutoFirma cuando estamos en macOS. El proceso intermedio
+	 * no es la aplicaci&oacute;n Java, sino el ejecutable que traslada los par&aacute;metros
+	 * proporcionados por el navegador Web a la aplicaci&oacute;n Java.
+	 * @param sessionIdText Texto contenido en la llamada al proceso y que permite identificarlo. */
+	public static void closeMacService(final String sessionIdText) {
 
-		if (processIdText == null) {
+		if (sessionIdText == null) {
 			LOGGER.warning("No se ha proporcionado el id del proceso que hay que cerrar"); //$NON-NLS-1$
 			return;
 		}
 
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
 		final AppleScript script = new AppleScript(
-				"kill -9 $(ps -ef | grep " + processIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
+				"kill -9 $(ps -ef | grep " + sessionIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
 				);
 		try {
 			script.run();
