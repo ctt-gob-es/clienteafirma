@@ -132,7 +132,7 @@ final class ConfiguratorMacOSX implements Configurator {
 					console.getParentComponent(),
 					Messages.getString("ConfiguratorMacOSX.23"), //$NON-NLS-1$
 					Messages.getString("ConfiguratorMacOSX.24"), //$NON-NLS-1$
-					JOptionPane.QUESTION_MESSAGE);
+					JOptionPane.OK_CANCEL_OPTION);
 			needConfigureFirefoxSecurityRoots = result == JOptionPane.OK_OPTION;
 		}
 
