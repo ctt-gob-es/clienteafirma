@@ -76,12 +76,11 @@ public final class XAdESUtil {
 	};
 
 	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
-			"http://uri.etsi.org/01903#SignedProperties", //$NON-NLS-1$
-		    "http://uri.etsi.org/01903/v1.2.2#SignedProperties", //$NON-NLS-1$
-		    "http://uri.etsi.org/01903/v1.3.2#SignedProperties", //$NON-NLS-1$
-		    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
-		};
-
+		"http://uri.etsi.org/01903#SignedProperties", //$NON-NLS-1$
+	    "http://uri.etsi.org/01903/v1.2.2#SignedProperties", //$NON-NLS-1$
+	    "http://uri.etsi.org/01903/v1.3.2#SignedProperties", //$NON-NLS-1$
+	    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
+	};
 
 	private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
 
@@ -89,10 +88,16 @@ public final class XAdESUtil {
 		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 		try {
 			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+
+			// Estas opciones deberian ser innecesarias una vez establecida la propiedad anterior,
+			// pero las establecemos para mayor seguridad
+			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido establecer la propiedad de seguridad en la factoria XML", e); //$NON-NLS-1$
 		}
+
 		SECURE_BUILDER_FACTORY.setValidating(false);
 		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
 	}

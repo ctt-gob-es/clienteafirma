@@ -50,11 +50,11 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xades.XAdESCoSigner;
-import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESCounterSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xades.XAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XMLConstants;
 
 /** Parte servidora del firmador trif&aacute;sico XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -165,7 +165,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 			final NodeList signatureNodeList = xml.getElementsByTagNameNS(
 					XMLSignature.XMLNS,
-					XAdESConstants.TAG_SIGNATURE
+					XMLConstants.TAG_SIGNATURE
 					);
 
 			for (int i = 0; i < signatureNodeList.getLength(); i++) {
@@ -306,7 +306,7 @@ public final class XAdESTriPhaseSignerServerSide {
 			new ByteArrayInputStream(xmlSign)
 		).getElementsByTagNameNS(
 			XMLSignature.XMLNS,
-			XAdESConstants.TAG_SIGNATURE
+			XMLConstants.TAG_SIGNATURE
 		);
 		if (signatureNodeList.getLength() == 0) {
 			throw new IllegalArgumentException("Se ha proporcionado un XML sin firmas"); //$NON-NLS-1$
