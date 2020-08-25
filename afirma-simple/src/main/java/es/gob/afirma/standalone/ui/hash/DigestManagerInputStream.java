@@ -1,19 +1,19 @@
 /*
 * Este fichero forma parte de la plataforma de @firma.
-* La plataforma de @firma es de libre distribución cuyo código fuente puede ser consultado
+* La plataforma de @firma es de libre distribucion cuyo codigo fuente puede ser consultado
 * y descargado desde http://administracionelectronica.gob.es
 *
-* Copyright 2005-2019 Gobierno de España
-* Este fichero se distribuye bajo las licencias EUPL versión 1.1, según las
-* condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este
-* fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+* Copyright 2005-2019 Gobierno de Espana
+* Este fichero se distribuye bajo las licencias EUPL version 1.1, segun las
+* condiciones que figuran en el fichero 'LICENSE.txt' que se acompana.  Si se   distribuyera este
+* fichero individualmente, deben incluirse aqui las condiciones expresadas alla.
 */
 
 /**
  * <p>Fichero: DigestManagerInputStream.java</p>
- * <p>Descripción: </p>
+ * <p>Descripci&oacute;n: </p>
  * <p>Empresa: Telvent Interactiva </p>
- * <p>Fecha creación: 23-may-2006</p>
+ * <p>Fecha creaci&oacute;n: 23-may-2006</p>
  * @author SEJLHA
  * @version 1.0
  *

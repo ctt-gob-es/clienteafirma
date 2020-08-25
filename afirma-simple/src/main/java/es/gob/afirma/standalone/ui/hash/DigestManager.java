@@ -45,6 +45,12 @@ public class DigestManager {
 	public static final int SIZE_100KB = 100000;
 	// 1 MB
 	public static final int SIZE_1MB = 1000000;
+	// 5 MB
+	public static final int SIZE_5MB = 5 * 1024 * 1024;
+	// 15 MB
+	public static final int SIZE_15MB = 15 * 1024 * 1024;
+	// 25 MB
+	public static final int SIZE_25MB = 25 * 1024 * 1024;
 
 	/**
 	 * Constructor. Crea una instancia MessageDigest para el procesamiento

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Documento con los hashes calculados de los ficheros de un directorio.
  */
-abstract class HashDocument {
+public abstract class HashDocument {
 
 	private static final String DEFAULT_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 
@@ -65,7 +65,7 @@ abstract class HashDocument {
 	 * @return Contenido del documento.
 	 * @throws DocumentException Cuando ocurre un error durante la generaci&oacute;n del documento.
 	 */
-	abstract byte[] generate() throws DocumentException;
+	public abstract byte[] generate() throws DocumentException;
 
 	/**
 	 * Carga un documento de hashes.

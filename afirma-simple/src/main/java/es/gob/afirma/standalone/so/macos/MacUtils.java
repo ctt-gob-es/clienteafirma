@@ -99,19 +99,20 @@ public class MacUtils {
 
 		final ShellScript script = new ShellScript(scriptFile, delete);
 
-		LOGGER.info("Path del script: " + scriptFile); //$NON-NLS-1$
 		try {
 			Object o;
 			if (administratorMode) {
+				LOGGER.info("Se ejecuta con permisos de administrador el script: " + scriptFile); //$NON-NLS-1$
 				o = script.runAsAdministrator();
 			}
 			else {
+				LOGGER.info("Se ejecuta el script: " + scriptFile); //$NON-NLS-1$
 				o = script.run();
 			}
 			return o;
 		}
 		catch (final IOException e) {
-			throw new IOException("Error en la ejecucion del script: " + e, e); //$NON-NLS-1$
+			throw new IOException("Error en la ejecucion del script", e); //$NON-NLS-1$
 		}
 	}
 

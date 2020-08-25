@@ -11,6 +11,7 @@ package es.gob.afirma.standalone.ui.hash;
 
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -270,7 +272,8 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 	}
 
-	static boolean checkHash(final String fileNameHash, final String fileNameData) {
+	static boolean checkHash(final String fileNameHash, final String fileNameData)
+			throws InterruptedException, ExecutionException {
 		if (fileNameHash == null || fileNameHash.isEmpty() || fileNameData == null || fileNameData.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -282,6 +285,21 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 			SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
 		);
 
+		return checkHash(new File(fileNameHash), new File(fileNameData), dialog);
+	}
+
+	/**
+	 * Comprueba que el hash de un fichero sea correcto.
+	 * @param hashFile Fichero con el hash del fichero de datos.
+	 * @param dataFile Fichero de datos del que comprobar el hash.
+	 * @param waitingDialog Di&aacute;logo gr&aacute;fico de espera.
+	 * @return Devuelve {@code true} si el hash es correcto, {@code false} en caso contrario.
+	 * @throws InterruptedException Si se interrumpe la comprobaci&oacute;n.
+	 * @throws ExecutionException Si ocurre un error durante la comprobaci&oacute;n.
+	 */
+	public static boolean checkHash(final File hashFile, final File dataFile, final Dialog waitingDialog)
+			throws InterruptedException, ExecutionException {
+
 		// Arrancamos el proceso en un hilo aparte
 		final SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 
@@ -289,7 +307,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 			protected Boolean doInBackground() throws Exception {
 
 				byte[] hashBytes;
-				try (InputStream fis = new FileInputStream(fileNameHash)) {
+				try (InputStream fis = new FileInputStream(hashFile)) {
 					hashBytes = AOUtil.getDataFromInputStream(fis);
 				}
 				if (Base64.isBase64(hashBytes)) {
@@ -307,7 +325,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 				try {
 					calculatedHash = HashUtil.getFileHash(
 							getHashAlgorithm(hashBytes),
-							fileNameData);
+							dataFile);
 				}
 				catch (final NoSuchAlgorithmException e) {
 					throw new IOException(e);
@@ -322,25 +340,19 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 			@Override
 			protected void done() {
 				super.done();
-				dialog.dispose();
+				if (waitingDialog != null) {
+					waitingDialog.dispose();
+				}
 			}
 		};
 		worker.execute();
 
-		if (new File(fileNameData).length() > SIZE_WAIT) {
+		if (waitingDialog != null && dataFile.length() > SIZE_WAIT) {
 			// Se muestra la ventana de espera
-			dialog.setVisible(true);
+			waitingDialog.setVisible(true);
 		}
 
-		try {
-			return worker.get().booleanValue();
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-				"Error en el proceso en segundo plano de comparacion de huellas: " + e //$NON-NLS-1$
-			);
-			return false;
-		}
+		return worker.get().booleanValue();
 	}
 
 	static String getHashAlgorithm(final byte[] hash) {

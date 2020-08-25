@@ -11,7 +11,7 @@ public class CsvHashDocument extends HashDocument {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
-	byte[] generate() throws DocumentException {
+	public byte[] generate() throws DocumentException {
 
 		final Map<String, byte[]> hashes = getHashes();
 		if (hashes == null || hashes.size() < 1) {

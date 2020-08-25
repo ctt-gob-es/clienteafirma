@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ForkJoinPool;
@@ -60,7 +59,6 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
@@ -73,8 +71,6 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 	private static final long serialVersionUID = 5969239673119761747L;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-	private static final String REPORT_EXT = "hashreport"; //$NON-NLS-1$
 
 	private final JTextField reportTextField = new JTextField();
 	private final JTextField directoryTextField = new JTextField();
@@ -142,7 +138,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 
 							final HashReport report = new HashReport();
 							try {
-								checkHash(Paths.get(getDirectorioText()), getReportPath(), report);
+								checkHash(Paths.get(getDirectorioText()), new File(getReportPath()), report);
 							}
 							catch (final Exception ex) {
 								return new CheckResult(ex);
@@ -186,19 +182,10 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 								);
 					}
 
-					AOUIFactory.getSaveDataToFile(
-						generateXMLReport(report).getBytes(report.getCharset()),
-						SimpleAfirmaMessages.getString("CheckHashFiles.15"), //$NON-NLS-1$ ,,,
-						null,
-						new java.io.File(SimpleAfirmaMessages.getString("CheckHashFiles.16")).getName() + "." + REPORT_EXT, //$NON-NLS-1$ //$NON-NLS-2$
-						Collections.singletonList(
-							new GenericFileFilter(
-								new String[] { REPORT_EXT },
-								SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*." +  REPORT_EXT + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-							)
-						),
-						parent
-					);
+					// Guardamos el informe
+					final byte[] reportContent = generateXMLReport(report).getBytes(report.getCharset());
+					HashUIHelper.showSaveReportDialog(reportContent, new File(getDirectorioText()).getParent(), parent);
+
 					checkButton.setEnabled(false);
 					CheckHashFiles.this.setVisible(false);
 					CheckHashFiles.this.dispose();
@@ -412,11 +399,11 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 	 * @throws DocumentException Cuando se proporcione un documento de hashes no soportado.
 	 * @throws CorruptedDocumentException Cuando se ha identificado que el documento est&aacute; corrupto.
 	 * @throws NoSuchAlgorithmException Error al construir la implementacion de un algoritmo. */
-	static void checkHash(final Path dir, final String hashDocumentPath, final HashReport report)
+	public static void checkHash(final Path dir, final File hashDocumentPath, final HashReport report)
 			throws IOException, DocumentException, CorruptedDocumentException {
 
 		// Cargamos el documento de hashes
-		final byte[] hashDocumentContent = loadData(hashDocumentPath);
+		final byte[] hashDocumentContent = loadData(hashDocumentPath.getAbsolutePath());
 
 		final HashDocument hashDocument = HashDocumentFactory.loadDocument(hashDocumentContent, getExtension(hashDocumentPath));
 
@@ -435,7 +422,6 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		final long processTime = new Date().getTime() - startTime;
 		LOGGER.info("Tiempo total de comprobacion de hashes: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Numero de ficheros procesados: " + report.getProcessedFilesCount()); //$NON-NLS-1$
-
 
 		// Agregamos al informe las entradas que no se procesaron
 		for (final String pathname : hashDocument.getHashes().keySet()) {
@@ -525,7 +511,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 	 * @return Informe de coincidencias de huellas en XML.
 	 * @throws ParserConfigurationException Si no se puede obtener en analizador XML.
 	 * @throws TransformerException Si hay errores escribiendo el XML. */
-	static String generateXMLReport(final HashReport mapReport)
+	public static String generateXMLReport(final HashReport mapReport)
 			throws ParserConfigurationException, TransformerException {
 
 		final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -668,8 +654,8 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 	 * @param path Ruta o nombre del fichero.
 	 * @return Extensi&oacute;n del fichero sin punto o {@code null} si no ten&iacute;a.
 	 */
-	private static String getExtension(final String path) {
-		final String filename = new File(path).getName();
+	private static String getExtension(final File file) {
+		final String filename = file.getName();
 		final int pos = filename.lastIndexOf('.');
 		return pos == -1 || pos == filename.length() - 1 ? null : filename.substring(pos + 1);
 	}

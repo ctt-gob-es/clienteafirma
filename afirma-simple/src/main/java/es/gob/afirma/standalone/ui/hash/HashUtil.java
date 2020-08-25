@@ -59,7 +59,7 @@ final class HashUtil {
 		final DigestManager digestManager = new DigestManager(algorithm, null);
 		try (	final FileInputStream in = new FileInputStream(dataFile);
 				final DigestManagerInputStream managerStreamHash = new DigestManagerInputStream(in, digestManager);) {
-			managerStreamHash.readOptimized(DigestManager.SIZE_100KB);
+			managerStreamHash.readOptimized(DigestManager.SIZE_25MB);
 			result = managerStreamHash.digest();
 		}
 		return result;

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class HashDocumentFactory {
+public class HashDocumentFactory {
 
 	static final String FORMAT_XML = "xml"; //$NON-NLS-1$
 
@@ -29,7 +29,7 @@ class HashDocumentFactory {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static HashDocument getHashDocument(final String format) {
+	public static HashDocument getHashDocument(final String format) {
 
 		if (format == null) {
 			throw new IllegalArgumentException("El formato de documento no puede ser nulo"); //$NON-NLS-1$

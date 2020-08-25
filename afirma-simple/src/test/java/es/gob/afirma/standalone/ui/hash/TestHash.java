@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.ui.hash;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +20,9 @@ public final class TestHash {
 		try {
 			CreateHashFiles.doHashProcess(
 				null,
-				"c://temp", //$NON-NLS-1$
+				new File("c://temp"), //$NON-NLS-1$
+				null,
+				null,
 				"SHA-512", //$NON-NLS-1$
 				true
 			);

@@ -14,7 +14,7 @@ import java.util.List;
  * para comprobar el resultado, no deben agregarse nuevos ficheros al informe. No hay
  * garant&iacute;a de que los nuevos ficheros aparezcan en los listados.
  */
-class HashReport {
+public class HashReport {
 
 	private final List<String> matchingHash;
 	private final List<String> noMatchingHash;

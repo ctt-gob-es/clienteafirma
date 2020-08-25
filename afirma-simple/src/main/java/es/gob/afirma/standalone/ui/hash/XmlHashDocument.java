@@ -191,7 +191,7 @@ public class XmlHashDocument extends HashDocument {
 						node.getAttributes().getNamedItem("hexhash").getNodeValue() //$NON-NLS-1$
 						);
 
-				if (Arrays.compare(hashFromB64, hashFromHex) != 0) {
+				if (!Arrays.equals(hashFromB64, hashFromHex)) {
 					throw new CorruptedDocumentException("Se han encontrado que se han declarado dos hashes distintos para un fichero. Uno en hexadecimal y otro en Base 64"); //$NON-NLS-1$
 				}
 

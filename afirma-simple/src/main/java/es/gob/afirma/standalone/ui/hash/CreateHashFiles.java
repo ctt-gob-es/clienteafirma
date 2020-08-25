@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui.hash;
 
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -21,12 +22,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.logging.Level;
@@ -174,8 +177,10 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 			try {
 				doHashProcess(
 						parent,
-						getFileTextField().getText(),
+						new File(getFileTextField().getText()),
+						null,
 						getSelectedHashAlgorithm(),
+						null,
 						isRecursive()
 						);
 			}
@@ -237,8 +242,10 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 	}
 
 	static void doHashProcess(final Frame parent,
-			                  final String dir,
+			                  final File dir,
+			                  final File outputFile,
 			                  final String hashAlgorithm,
+			                  final String defaultHashFormat,
 			                  final boolean recursive) throws AOCancelledOperationException {
 
 		// Se crea la ventana de espera.
@@ -248,80 +255,43 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 			SimpleAfirmaMessages.getString("CreateHashFiles.20") //$NON-NLS-1$
 		);
 
-		// Arrancamos el proceso en un hilo aparte
-		final SwingWorker<Map<String, byte[]>, Void> worker = new SwingWorker<Map<String, byte[]>, Void>() {
-
-			@Override
-			protected java.util.Map<String, byte[]> doInBackground() throws Exception {
-
-				final Map<String, byte[]> result = Collections.synchronizedMap(new HashMap<>());
-
-				final long startTime = new Date().getTime();
-
-				final ForkJoinPool pool = new ForkJoinPool(10);
-				final RecursiveAction recursiveAction = new CreateHashAction(Paths.get(dir), new File(dir), recursive, hashAlgorithm, result, pool);
-				pool.invoke(recursiveAction);
-				recursiveAction.join();
-
-				final long processTime = new Date().getTime() - startTime;
-				LOGGER.info("Tiempo total de generacion en la hashes: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
-				LOGGER.info("Numero de ficheros procesados: " + result.size()); //$NON-NLS-1$
-
-				return result;
-			}
-
-			@Override
-			protected void done() {
-				super.done();
-				dialog.dispose();
-			}
-		};
-		worker.execute();
-
-		// Se muestra la ventana de progreso
-		dialog.setVisible(true);
-
 		try {
+			final Map<String, byte[]> hashs = calculateHashes(dir, recursive, hashAlgorithm, dialog);
 
-			final Map<String, byte[]> hashs = worker.get();
+			final String defaultExtension = getDefaultExtension(defaultHashFormat);
 
 			// El fichero de huellas se almacenaria en la carpeta que eligiese el usuario.
 			final File saveFile = AOUIFactory.getSaveDataToFile(
 				null,
 				SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$
-				null,
-				AutoFirmaUtil.getCanonicalFile(new File(dir)).getName() + "." + FILEEXT_XML, //$NON-NLS-1$
-				Arrays.asList(
-					new GenericFileFilter[] {
-						new GenericFileFilter(
-							new String[] { FILEEXT_XML },
-							SimpleAfirmaMessages.getString("CreateHashDialog.26") + " (*." + FILEEXT_XML + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-						),
-//						new GenericFileFilter(
-//							new String[] { FILEEXT_CSV },
-//							SimpleAfirmaMessages.getString("CreateHashDialog.24") + " (*." + FILEEXT_CSV + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-//						),
-						new GenericFileFilter(
-							new String[] { FILEEXT_TXT },
-							SimpleAfirmaMessages.getString("CreateHashDialog.25") + " (*." + FILEEXT_TXT + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-						)
-					}
-				),
+				outputFile != null && outputFile.getParentFile() != null ?
+						outputFile.getParentFile().getAbsolutePath() :
+						null,
+				outputFile != null ?
+						outputFile.getName() :
+						AutoFirmaUtil.getCanonicalFile(dir).getName() + "." + defaultExtension, //$NON-NLS-1$
+				buildFilterList(defaultExtension),
 				parent
 			);
 
+			// El formato del fichero guardado vendra finalmente dado por la
+			// extension indicada por el usuario en el dialogo de seleccion
 			String format;
-			if (saveFile.getName().endsWith("." + FILEEXT_CSV)) { //$NON-NLS-1$
+			final String ext = saveFile.getName().indexOf('.') == -1 ?
+					"" : //$NON-NLS-1$
+					saveFile.getName().substring(saveFile.getName().lastIndexOf('.'));
+			if (ext.equalsIgnoreCase("." + FILEEXT_CSV) || ext.equalsIgnoreCase("." + HashDocumentFactory.FORMAT_CSV)) { //$NON-NLS-1$ //$NON-NLS-2$
 //				format = HashDocumentFactory.FORMAT_CSV;
 				format = HashDocumentFactory.FORMAT_XML;
 			}
-			else if (saveFile.getName().endsWith("." + FILEEXT_TXT)) { //$NON-NLS-1$
+			else if (ext.equalsIgnoreCase("." + FILEEXT_TXT) || ext.equalsIgnoreCase("." + HashDocumentFactory.FORMAT_TXT)) { //$NON-NLS-1$ //$NON-NLS-2$
 				format = HashDocumentFactory.FORMAT_TXT;
 			}
 			else {
 				format = HashDocumentFactory.FORMAT_XML;
 			}
 
+			// Configuramos el documento de hashes
 			final HashDocument hashDocument = HashDocumentFactory.getHashDocument(format);
 			hashDocument.setHashes(hashs);
 			hashDocument.setRecursive(recursive);
@@ -405,6 +375,128 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 		}
 		this.selectedFile.setText(file.getAbsolutePath());
 		this.generateButton.setEnabled(true);
+	}
+
+	/**
+	 * Calcula los hashes de los ficheros de un directorio.
+	 * @param dir Directorio.
+	 * @param recursive {@code true} para procesar los ficheros de los subdirectorios,
+	 * {@code false} en caso contrario.
+	 * @param hashAlgorithm Algoritmo de hash.
+	 * @param waitingDialog  Di&aacute;logo de espera o {@code null} para no requerir
+	 * interfaz gr&aacute;fica.
+	 * @return Conjunto de referencias a los ficheros procesados y sus hashes.
+	 * @throws InterruptedException Cuando no se interrumpe la operaci&oacute;n.
+	 * @throws ExecutionException Cuando falla la operaci&oacute;n.
+	 */
+	public static Map<String, byte[]> calculateHashes(final File dir, final boolean recursive,
+			final String hashAlgorithm, final Dialog waitingDialog)
+					throws InterruptedException, ExecutionException {
+
+		// Arrancamos el proceso en un hilo aparte
+		final SwingWorker<Map<String, byte[]>, Void> worker = new SwingWorker<Map<String, byte[]>, Void>() {
+
+			@Override
+			protected java.util.Map<String, byte[]> doInBackground() throws Exception {
+
+				final Map<String, byte[]> result = Collections.synchronizedMap(new HashMap<>());
+
+				final long startTime = new Date().getTime();
+
+				final ForkJoinPool pool = new ForkJoinPool(10);
+				final RecursiveAction recursiveAction = new CreateHashAction(dir.toPath(), dir, recursive, hashAlgorithm, result, pool);
+				pool.invoke(recursiveAction);
+				recursiveAction.join();
+
+				final long processTime = new Date().getTime() - startTime;
+				LOGGER.info("Tiempo total de generacion en la hashes: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info("Numero de ficheros procesados: " + result.size()); //$NON-NLS-1$
+
+				return result;
+			}
+
+			@Override
+			protected void done() {
+				super.done();
+				if (waitingDialog != null) {
+					waitingDialog.dispose();
+				}
+			}
+		};
+		worker.execute();
+
+		// Se muestra la ventana de progreso
+		if (waitingDialog != null) {
+			waitingDialog.setVisible(true);
+		}
+
+		return worker.get();
+	}
+
+	/**
+	 * Recupera la extension de fichero asociada al formato indicado.
+	 * @param hashFormat Formato en el que se guardaran los hashes.
+	 * @return Extensi&oacute;n por defecto del nombre de fichero que
+	 * deber&iacute;a almacenar esos hashes.
+	 */
+	private static String getDefaultExtension(final String hashFormat) {
+		switch (hashFormat) {
+		case HashDocumentFactory.FORMAT_XML:
+			return FILEEXT_XML;
+		case HashDocumentFactory.FORMAT_TXT:
+			return FILEEXT_TXT;
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * Construye el listado de filtros de fichero permitidos para el guardado
+	 * de los hashes del directorio. Se configura por defecto (el primero de la
+	 * lista) el filtro correspondiente al formato del fichero de salida
+	 * indicado.
+	 * @param defaultFormat Formato de hash
+	 * @return
+	 */
+	private static List<GenericFileFilter> buildFilterList(final String extension) {
+
+		final GenericFileFilter[] filters = new GenericFileFilter[] {
+				new GenericFileFilter(
+					new String[] { FILEEXT_XML },
+					SimpleAfirmaMessages.getString("CreateHashDialog.26") + " (*." + FILEEXT_XML + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				),
+//				new GenericFileFilter(
+//					new String[] { FILEEXT_CSV },
+//					SimpleAfirmaMessages.getString("CreateHashDialog.24") + " (*." + FILEEXT_CSV + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+//				),
+				new GenericFileFilter(
+					new String[] { FILEEXT_TXT },
+					SimpleAfirmaMessages.getString("CreateHashDialog.25") + " (*." + FILEEXT_TXT + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				)
+			};
+
+		List<GenericFileFilter> filterList;
+		if (extension == null) {
+			filterList = Arrays.asList(filters);
+		}
+		else {
+
+			// Primero, agregamos al listado el filtro correspondiente a su formato
+			filterList = new ArrayList<>();
+			for (final GenericFileFilter filter : filters) {
+				if (extension.equals(filter.getExtensions()[0])) {
+					filterList.add(filter);
+				}
+			}
+			// Despues agregamos los filtros correspondientes al resto de formatos
+			for (final GenericFileFilter filter : filters) {
+				if (!extension.equals(filter.getExtensions()[0])) {
+					filterList.add(filter);
+				}
+			}
+		}
+
+		return filterList;
 	}
 
 	/** Obtiene el tipo de algoritmo seleccionado por el usuario.

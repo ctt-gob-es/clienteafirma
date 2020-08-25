@@ -1,5 +1,7 @@
 package es.gob.afirma.test.simple;
 
+import java.io.File;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -15,7 +17,7 @@ public final class HashFromCommandLineTest {
 	@Test
 	@Ignore
 	public void testHashCheck() {
-		HashUIHelper.checkHashUI("C:\\Users\\tomas\\AppData\\Local\\Temp\\sample-facturae.xml"); //$NON-NLS-1$
+		HashUIHelper.checkHashUI(new File("C:\\Users\\tomas\\AppData\\Local\\Temp\\sample-facturae.xml"), null); //$NON-NLS-1$
 	}
 
 	/** Prueba de comprobaci&oacute;n de huellas de directorio desde l&iacute;nea de comandos. */

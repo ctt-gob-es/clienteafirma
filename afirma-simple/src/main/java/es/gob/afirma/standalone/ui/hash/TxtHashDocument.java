@@ -27,7 +27,7 @@ public class TxtHashDocument extends HashDocument {
 	}
 
 	@Override
-	byte[] generate() throws DocumentException {
+	public byte[] generate() throws DocumentException {
 
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append(";charset=").append(getCharset()).append("\r\n") //$NON-NLS-1$ //$NON-NLS-2$
