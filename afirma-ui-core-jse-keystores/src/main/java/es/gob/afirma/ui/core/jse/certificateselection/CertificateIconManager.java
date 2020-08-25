@@ -10,10 +10,14 @@
 package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import javax.swing.ImageIcon;
 
 final class CertificateIconManager {
+
+	/** Tiempo de antelaci&oacute;n desde el que se empezar&aacute; a advertir que hay certificados pr&oacute;ximos a caducar. */
+	private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
 
 	private static final ImageIcon ICON_ACCV_NORMAL = new ImageIcon(
 		CertificateSelectionPanel.class.getClassLoader().getResource("resources/accvicon.png") //$NON-NLS-1$
@@ -192,5 +196,18 @@ final class CertificateIconManager {
 			return ICON_FNMT_ERROR;
 		}
 		return ICON_OTHER_ERROR;
+	}
+
+
+	static ImageIcon getIcon(final X509Certificate cert) {
+		final long notAfter = cert.getNotAfter().getTime();
+		final long currentDate = new Date().getTime();
+		if (currentDate >= notAfter || currentDate <= cert.getNotBefore().getTime()) {
+			return CertificateIconManager.getExpiredIcon(cert);
+		}
+		if (notAfter - currentDate < EXPIRITY_WARNING_LEVEL) {
+			return CertificateIconManager.getWarningIcon(cert);
+		}
+		return CertificateIconManager.getNormalIcon(cert);
 	}
 }

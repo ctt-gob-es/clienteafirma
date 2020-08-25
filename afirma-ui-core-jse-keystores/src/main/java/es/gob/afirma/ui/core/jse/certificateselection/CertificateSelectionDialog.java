@@ -25,10 +25,8 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
-import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
  * @author Carlos Gamuci
@@ -40,6 +38,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	private final JOptionPane optionPane;
 	private final Component parent;
 	private final KeyStoreDialogManager ksdm;
+	private String currentKeyStoreTypeName;
 
 	private final boolean disableSelection;
 
@@ -76,6 +75,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		this.parent = parent;
 	    this.ksdm = ksdm;
 
+	    this.currentKeyStoreTypeName = this.ksdm.getKeyStoreName();
+
 	    final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 
 	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
@@ -85,7 +86,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
     		dialogHeadline,
     		dialogSubHeadline,
     		showControlButons,
-    		ksdm.isExternalStoresOpeningAllowed()
+    		ksdm.isExternalStoresOpeningAllowed(),
+    		this.ksdm.getAvailablesKeyStores()
 		);
 		this.optionPane = certs.length > 1 ?
 			new CertOptionPane(this.csd) :
@@ -109,13 +111,14 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
 	 * cancela el di&aacute;logo o cierra sin seleccionar.
-	 * @throws AOCertificatesNotFoundException Cuando no el usuario cierra el
+	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
 	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
-	public String showDialog() throws AOCertificatesNotFoundException {
+	public String showDialog() throws  CertificatesNotFoundException {
 
 		this.certDialog = this.optionPane.createDialog(
 			this.parent,
-			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
+			CertificateSelectionDialogMessages.getString(
+					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName) //$NON-NLS-1$
 		);
 
 		this.certDialog.setBackground(Color.WHITE);
@@ -145,7 +148,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		// cerrar el dialogo, consideramos que el problema es que el usuario no tiene certificados
 		// validos
 		if (this.csd.getShowedCertsCount() == 0) {
-			throw new AOCertificatesNotFoundException("No habia certificados validos en el almacen del usuario"); //$NON-NLS-1$
+			throw new CertificatesNotFoundException("No habia certificados validos en el almacen del usuario"); //$NON-NLS-1$
 		}
 
 		// Si el usuario cancelo el dialogo, lo cerramos
@@ -154,8 +157,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			return null;
 		}
 
+		// Obtenemos el alias del certificado seleccionado
 		final String selectedAlias = this.csd.getSelectedCertificateAlias();
 
+		// Guardamos la vista seleccionada
+		this.csd.savePreferredCertificateView();
+
+		// Cerramos el dialogo
 		this.certDialog.dispose();
 		this.certDialog = null;
 
@@ -170,29 +178,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 	}
 
-	private static final class CertOptionPane extends JOptionPane {
-
-		private static final long serialVersionUID = 1L;
-
-		private final CertificateSelectionPanel selectionPanel;
-
-		CertOptionPane(final CertificateSelectionPanel csd) {
-			this.selectionPanel = csd;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-        public void selectInitialValue() {
-			this.selectionPanel.selectCertificateList();
-        }
-	}
-
 	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
-	public void refresh() {
-
-		// Ya que al refrescarga el dialogo pueden aparecer otros nuevos (como alguno de solicitud de PIN),
-		// dejamos de obligar a que este este siempre encima
-		this.certDialog.setAlwaysOnTop(false);
+	public void refreshKeystore() {
 
 		try {
 			this.ksdm.refresh();
@@ -211,6 +198,18 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 		Arrays.sort(certs, CERT_NAME_COMPARATOR);
 
+		refreshDialog(certs);
+	}
+
+	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
+	 * mostrando los certificados indicados.
+	 * @param certs Lista de certificados que se deben mostrar. */
+	private void refreshDialog(final NameCertificateBean[] certs) {
+
+		// Ya que al refrescarga el dialogo pueden aparecer otros nuevos (como alguno de solicitud de PIN),
+		// dejamos de obligar a que este este siempre encima
+		this.certDialog.setAlwaysOnTop(false);
+
 		try {
 			this.csd.refresh(certs);
 		}
@@ -220,11 +219,39 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		this.certDialog.pack();
 	}
 
+	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
+	 * mostrando los certificados indicados con la vista seleccionada.
+	 * @param certs Lista de certificados que se deben mostrar.
+	 * @param view Vista de certificados que se debe aplicar. */
+	public void refreshDialog(final NameCertificateBean[] certs, final CertificateLineView view) {
+
+		this.csd.setCertLineView(view);
+
+		refreshDialog(certs);
+	}
+
 	/** Cambia el almac&eacute;n de claves actual.
-	 * @param ksm Gestor de almacenes de claves. */
-	public void changeKeyStore(final KeyStoreManager ksm) {
-		this.ksdm.setKeyStoreManager(ksm);
-		refreshDialog();
+	 * @param ksType Tipo de almac&eacute;n de claves. */
+	public void changeKeyStore(final int ksType) {
+
+		// Ya que el cambio de dialogo puede hacer aparecer otros nuevos (como alguno
+		// de seleccion de fichero o de solicitud de PIN), dejamos de obligar a que
+		// este este siempre encima
+		this.certDialog.setAlwaysOnTop(false);
+
+		// Cambiamos de almacen
+		final boolean changed = this.ksdm.changeKeyStoreManager(ksType, this.parent);
+
+		// Si se ha completado el cambio de almacen, refrescamos el dialogo
+		if (changed) {
+			// Actualizamos el dialogo para cargar los nuevos certificados
+			refreshDialog();
+
+			// Cambiamos el titulo del dialogo
+			this.currentKeyStoreTypeName = this.ksdm.getKeyStoreName();
+			this.certDialog.setTitle(CertificateSelectionDialogMessages.getString(
+					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName)); //$NON-NLS-1$
+		}
 	}
 
 	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
@@ -245,4 +272,22 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			}
 		}
 	};
+
+
+	private static final class CertOptionPane extends JOptionPane {
+
+		private static final long serialVersionUID = 1L;
+
+		private final CertificateSelectionPanel selectionPanel;
+
+		CertOptionPane(final CertificateSelectionPanel csd) {
+			this.selectionPanel = csd;
+		}
+
+		/** {@inheritDoc} */
+		@Override
+        public void selectInitialValue() {
+			this.selectionPanel.selectCertificateList();
+        }
+	}
 }

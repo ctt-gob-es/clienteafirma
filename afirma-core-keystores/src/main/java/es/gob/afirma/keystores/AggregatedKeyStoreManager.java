@@ -46,6 +46,18 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
      * @param alias Alias de la entrada para la cual se desea conocer su tipo de almac&eacute;n.
      * @return Tipo de almac&eacute;n de claves para el alias indicado. */
     @Override
+	public AOKeyStore getType() {
+    	AOKeyStore type = super.getType();
+    	if (type == null && this.ksms != null && this.ksms.size() > 0) {
+    		type = this.ksms.get(0).getType();
+    	}
+    	return type;
+    }
+
+    /** Devuelve el tipo de almac&eacute;n de claves para un alias determinado.
+     * @param alias Alias de la entrada para la cual se desea conocer su tipo de almac&eacute;n.
+     * @return Tipo de almac&eacute;n de claves para el alias indicado. */
+    @Override
 	protected AOKeyStore getType(final String alias) {
     	for (final AOKeyStoreManager ksm : this.ksms) {
     		if (ksm.getCertificate(alias) != null) {
@@ -220,6 +232,13 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		);
 	}
 
+	@Override
+	public void deactivateEntry(final String certificateThumbprint) {
+		for (final AOKeyStoreManager ksm : this.ksms) {
+			ksm.deactivateEntry(certificateThumbprint);
+		}
+	}
+
 	/** Recupera la lista (no mutable) de almacenes del almac&eacute;n agregado.
 	 * @return Lista de almacenes. */
 	List<AOKeyStoreManager> getKeyStoreManagers() {
@@ -229,5 +248,6 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	/** Elimina todos los almacenes del de claves del almac&eacute;n agregado. */
 	public void removeAll() {
 		this.ksms.clear();
+		setKeyStoreType(null);
 	}
 }

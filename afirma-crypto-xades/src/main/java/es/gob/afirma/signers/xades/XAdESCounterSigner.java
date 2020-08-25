@@ -200,7 +200,7 @@ public final class XAdESCounterSigner {
 
 			// Si no es un documento, se anade temporalmente el nodo raiz
 			// AFIRMA para que las operaciones de contrafirma funcionen correctamente
-			if (root.getLocalName().equals(XAdESConstants.TAG_SIGNATURE)) {
+			if (root.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
 				esFirmaSimple = true;
 				doc = AOXAdESSigner.insertarNodoAfirma(doc);
 				root = doc.getDocumentElement();
@@ -268,7 +268,7 @@ public final class XAdESCounterSigner {
 						newdoc.adoptNode(
 								doc.getElementsByTagNameNS(
 										XMLConstants.DSIGNNS,
-										XAdESConstants.TAG_SIGNATURE
+										XMLConstants.TAG_SIGNATURE
 										).item(0)
 								)
 						);
@@ -306,7 +306,7 @@ public final class XAdESCounterSigner {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 		int numSignatures = signatures.getLength();
 
 		// comprueba cuales son hojas
@@ -314,7 +314,7 @@ public final class XAdESCounterSigner {
 			for (int i = 0; i < numSignatures; i++) {
 				final Element signature = (Element) signatures.item(i);
 				final int numCounterSigns = signature.getElementsByTagNameNS(
-						XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE)
+						XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE)
 						.getLength();
 
 				// y crea sus contrafirmas
@@ -359,7 +359,7 @@ public final class XAdESCounterSigner {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 
 		// obtiene los nodos indicados en targets
 		final Element[] nodes = new Element[targets.length];
@@ -406,7 +406,7 @@ public final class XAdESCounterSigner {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 
 		final List<Object> signers = Arrays.asList(targets);
 		final List<Element> nodes = new ArrayList<>();
@@ -445,7 +445,7 @@ public final class XAdESCounterSigner {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
 		final int numSignatures = signatures.getLength();
 
 		final Element[] nodes = new Element[numSignatures];

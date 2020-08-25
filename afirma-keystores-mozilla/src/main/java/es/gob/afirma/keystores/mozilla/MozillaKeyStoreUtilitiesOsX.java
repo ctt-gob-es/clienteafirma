@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 
 /** Utilidades para la gesti&oacute;n de almacenes de claves Mozilla NSS en Apple OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -48,6 +48,8 @@ public final class MozillaKeyStoreUtilitiesOsX {
 
 		// Intentamos la carga, para ver si es necesaria la reconfiguracion
 		try {
+			System.load(nssBinDir + "libmozglue.dylib"); //$NON-NLS-1$
+			System.load(nssBinDir + "libnss3.dylib"); //$NON-NLS-1$
 			System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
 			return; // Si funciona salimos sin hacer nada
 		}
@@ -62,6 +64,10 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			);
 		}
 
+
+
+		// Si sigue sin funcionar, tendremos que crear enlaces simbolicos de las dependencias en un
+		// directorio desde el que se traten de cargar
 		final String[] libs = new String[] {
 				"libmozglue.dylib", // Firefox 11 y superiores //$NON-NLS-1$
 				"libmozutils.dylib", // Firefox 9 y 10 //$NON-NLS-1$
@@ -94,7 +100,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
-			final AppleScript script = new AppleScript(sb.toString());
+			final ShellScript script = new ShellScript(sb.toString());
 			script.runAsAdministrator();
 		}
 		catch(final Exception e) {
@@ -139,5 +145,4 @@ public final class MozillaKeyStoreUtilitiesOsX {
 
 		return nssLibDir;
 	}
-
 }

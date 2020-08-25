@@ -56,7 +56,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
+import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 
 /** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
@@ -132,7 +132,7 @@ final class ConfiguratorMacOSX implements Configurator {
 					console.getParentComponent(),
 					Messages.getString("ConfiguratorMacOSX.23"), //$NON-NLS-1$
 					Messages.getString("ConfiguratorMacOSX.24"), //$NON-NLS-1$
-					JOptionPane.QUESTION_MESSAGE);
+					JOptionPane.OK_CANCEL_OPTION);
 			needConfigureFirefoxSecurityRoots = result == JOptionPane.OK_OPTION;
 		}
 
@@ -551,9 +551,7 @@ final class ConfiguratorMacOSX implements Configurator {
      * @throws InterruptedException  Cuando se interrumpe la ejecuci&oacute;n del script (posiblemente por el usuario). */
 	public static String executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		LOGGER.info("Se ejecuta el script: " + scriptFile); //$NON-NLS-1$
-
-		final AppleScript script = new AppleScript(scriptFile, delete);
+		final ShellScript script = new ShellScript(scriptFile, delete);
 		try {
 			String result;
 			if (administratorMode) {
@@ -874,7 +872,8 @@ final class ConfiguratorMacOSX implements Configurator {
 		return commandInstall1;
 	}
 
-	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
+	/** Genera los <i>scripts</i> para eliminar las advertencias cuando se invoque al
+	 * protocolo <code>afirma</code>.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>.*/

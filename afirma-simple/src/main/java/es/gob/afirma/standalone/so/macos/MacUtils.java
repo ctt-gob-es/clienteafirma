@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.mozilla.apple.AppleScript;
 
 /**
  * Funciones de utilidad para la configuraci&oacute;n de Mac.
@@ -98,21 +97,21 @@ public class MacUtils {
      * @throws InterruptedException  Cuando se interrumpe la ejecuci&oacute;n del script (posiblemente por el usuario). */
 	public static String executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		LOGGER.info("Se ejecuta el script: " + scriptFile); //$NON-NLS-1$
-
-		final AppleScript script = new AppleScript(scriptFile, delete);
+		final ShellScript script = new ShellScript(scriptFile, delete);
 		try {
 			String result;
 			if (administratorMode) {
+				LOGGER.info("Se ejecuta con permisos de administrador el script: " + scriptFile); //$NON-NLS-1$
 				result = script.runAsAdministrator();
 			}
 			else {
+				LOGGER.info("Se ejecuta el script: " + scriptFile); //$NON-NLS-1$
 				result = script.run();
 			}
 			return result;
 		}
 		catch (final IOException e) {
-			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
+			throw new IOException("Error en la ejecucion del script", e); //$NON-NLS-1$
 		}
 	}
 
@@ -128,7 +127,7 @@ public class MacUtils {
 		}
 
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
-		final AppleScript script = new AppleScript(
+		final ShellScript script = new ShellScript(
 				"kill -9 $(ps -ef | grep " + sessionIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
 				);
 		try {

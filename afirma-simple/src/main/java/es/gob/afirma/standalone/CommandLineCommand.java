@@ -10,24 +10,30 @@
 package es.gob.afirma.standalone;
 
 enum CommandLineCommand {
-	LIST("listaliases"), //$NON-NLS-1$
-	SIGN("sign"), //$NON-NLS-1$
-	COSIGN("cosign"), //$NON-NLS-1$
-	COUNTERSIGN("countersign"), //$NON-NLS-1$
-	MASSIVE("massive"), //$NON-NLS-1$
-	VERIFY("verify"), //$NON-NLS-1$
-	CREATEHASH("createdigest"), //$NON-NLS-1$
-	CHECKHASH("checkdigest"), //$NON-NLS-1$
-	BATCHSIGN("batchsign"); //$NON-NLS-1$
+	LIST("listaliases", false), //$NON-NLS-1$
+	SIGN("sign", false), //$NON-NLS-1$
+	COSIGN("cosign", false), //$NON-NLS-1$
+	COUNTERSIGN("countersign", false), //$NON-NLS-1$
+	MASSIVE("massive", false), //$NON-NLS-1$
+	VERIFY("verify", false), //$NON-NLS-1$
+	CREATEHASH("createdigest", true), //$NON-NLS-1$
+	CHECKHASH("checkdigest", true), //$NON-NLS-1$
+	BATCHSIGN("batchsign", false); //$NON-NLS-1$
 
 	private String op;
+	private boolean mainFileNeeded;
 
-	private CommandLineCommand(final String op) {
+	private CommandLineCommand(final String op, final boolean mainFileNeeded) {
 		this.op = op;
+		this.mainFileNeeded = mainFileNeeded;
 	}
 
 	public String getOp() {
 		return this.op;
+	}
+
+	public boolean isMainFileNeeded() {
+		return this.mainFileNeeded;
 	}
 
 	/** Obtiene el comando que se responde a la cadena indicada.

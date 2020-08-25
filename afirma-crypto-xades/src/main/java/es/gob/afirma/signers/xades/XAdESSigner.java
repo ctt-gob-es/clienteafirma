@@ -1257,13 +1257,13 @@ public final class XAdESSigner {
 		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
 			try {
 				if (docSignature.getElementsByTagNameNS(XMLConstants.DSIGNNS,
-						XAdESConstants.TAG_SIGNATURE).getLength() == 1) {
+						XMLConstants.TAG_SIGNATURE).getLength() == 1) {
 					final Document newdoc = dbf.newDocumentBuilder().newDocument();
 					newdoc.appendChild(
 						newdoc.adoptNode(
 							docSignature.getElementsByTagNameNS(
 								XMLConstants.DSIGNNS,
-								XAdESConstants.TAG_SIGNATURE
+								XMLConstants.TAG_SIGNATURE
 							).item(0)
 						)
 					);

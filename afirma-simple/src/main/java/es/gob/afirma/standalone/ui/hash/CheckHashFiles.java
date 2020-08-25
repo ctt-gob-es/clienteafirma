@@ -18,27 +18,21 @@ import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -47,7 +41,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -57,23 +50,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
@@ -87,27 +72,9 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private final JTextField xml = new JTextField();
-	private final JTextField directory = new JTextField();
-	private static Map<String, List<String>> reportXML;
-	private static String algorithm = null;
-	private static Boolean isRecursive = null;
-	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
+	private final JTextField reportTextField = new JTextField();
+	private final JTextField directoryTextField = new JTextField();
 
-
-	/** Fichero a evitar. */
-	private final static Set<String> FILES_TO_AVOID	= new HashSet<>(
-		Arrays.asList(
-			".fseventsd",		//$NON-NLS-1$
-			".Spotlight-V100",	//$NON-NLS-1$
-			".Trashes",			//$NON-NLS-1$
-			"._.Trashes",		//$NON-NLS-1$
-			".DS_Store",		//$NON-NLS-1$
-			".desktop",			//$NON-NLS-1$
-			"thumbs.db",		//$NON-NLS-1$
-			"$Recycle.Bin"		//$NON-NLS-1$
-		)
-	);
 
 	/** Inicia el proceso de comprobaci&oacute;n de huella digital de
 	 * directorios.
@@ -164,13 +131,19 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 					);
 
 					// Arrancamos el proceso en un hilo aparte
-					final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					final SwingWorker<CheckResult, Void> worker = new SwingWorker<CheckResult, Void>() {
 
 						@Override
-						protected Void doInBackground() throws Exception {
-							setReportXML(new HashMap<String, List<String>>());
-							checkHashXML(Paths.get(getDirectorioText()), getXMLText());
-							return null;
+						protected CheckResult doInBackground() throws Exception {
+
+							final HashReport report = new HashReport();
+							try {
+								checkHash(Paths.get(getDirectorioText()), new File(getReportPath()), report);
+							}
+							catch (final Exception ex) {
+								return new CheckResult(ex);
+							}
+							return new CheckResult(report);
 						}
 						@Override
 						protected void done() {
@@ -180,47 +153,39 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 					};
 					worker.execute();
 
-					if (CreateHashFiles.getSize(new File(getDirectorioText().toString())) > SIZE_WAIT) {
-						// Se muestra la ventana de espera
-						dialog.setVisible(true);
+					// Se muestra la ventana de espera
+					dialog.setVisible(true);
+
+					final CheckResult result = worker.get();
+
+					// Si el proceso genero un error, lo relanzamos
+					if (result.getException() != null) {
+						throw result.getException();
 					}
 
-					worker.get();
-					if (!(getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
-						  getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
-						  getReportXML().containsKey("CheckHashFiles.10"))) { //$NON-NLS-1$
-								AOUIFactory.showMessageDialog(
-									CheckHashFiles.this,
-									SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
-									SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
-									JOptionPane.INFORMATION_MESSAGE
+					final HashReport report = result.getReport();
+
+					if (!report.hasErrors()) {
+						AOUIFactory.showMessageDialog(
+								CheckHashFiles.this,
+								SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
+								SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
+								JOptionPane.INFORMATION_MESSAGE
 								);
 					}
 					else {
 						AOUIFactory.showMessageDialog(
-							CheckHashFiles.this, SimpleAfirmaMessages.getString("CheckHashFiles.18"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CheckHashFiles.17"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE
-						);
+								CheckHashFiles.this,
+								SimpleAfirmaMessages.getString("CheckHashFiles.18"), //$NON-NLS-1$
+								SimpleAfirmaMessages.getString("CheckHashFiles.17"), //$NON-NLS-1$
+								JOptionPane.WARNING_MESSAGE
+								);
 					}
-					final String ext = SimpleAfirmaMessages.getString("CheckHashFiles.20"); //$NON-NLS-1$
-					AOUIFactory.getSaveDataToFile(
-						generateXMLReport(
-							getReportXML(),
-							getAlgorithm(),
-							getIsRecursive()
-						).getBytes(),
-						SimpleAfirmaMessages.getString("CheckHashFiles.15"), //$NON-NLS-1$ ,,,
-						null,
-						new java.io.File(SimpleAfirmaMessages.getString("CheckHashFiles.16")).getName() + ext, //$NON-NLS-1$
-						Collections.singletonList(
-							new GenericFileFilter(
-								new String[] { ext },
-								SimpleAfirmaMessages.getString("CheckHashFiles.11") + " (*" + ext + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-							)
-						),
-						parent
-					);
+
+					// Guardamos el informe
+					final byte[] reportContent = generateXMLReport(report).getBytes(report.getCharset());
+					HashUIHelper.showSaveReportDialog(reportContent, new File(getDirectorioText()).getParent(), parent);
+
 					checkButton.setEnabled(false);
 					CheckHashFiles.this.setVisible(false);
 					CheckHashFiles.this.dispose();
@@ -232,17 +197,31 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-					LOGGER.severe(
-						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
-					);
+					LOGGER.log(Level.SEVERE, "Fichero demasiado grande", ooe); //$NON-NLS-1$
 				}
-				catch (final AOCancelledOperationException ex1) {
+				catch (final AOCancelledOperationException ex) {
 					// Operacion cancelada por el usuario
 				}
-				catch (final Exception ex2) {
-					LOGGER.severe(
-						"No ha sido posible comprobar las huellas digitales: " + ex2 //$NON-NLS-1$
+				catch (final DocumentException ex) {
+					LOGGER.log(Level.WARNING, "El documento seleccionado no es un documento de hashes soportado"); //$NON-NLS-1$
+					AOUIFactory.showErrorMessage(
+						CheckHashFiles.this,
+						SimpleAfirmaMessages.getString("CheckHashDialog.17"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CheckHashDialog.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
 					);
+				}
+				catch (final CorruptedDocumentException ex) {
+					LOGGER.log(Level.WARNING, "El documento seleccionado es un documento de hashes corrupto o manipulado", ex); //$NON-NLS-1$
+					AOUIFactory.showErrorMessage(
+						CheckHashFiles.this,
+						SimpleAfirmaMessages.getString("CheckHashDialog.18"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CheckHashDialog.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+				}
+				catch (final Exception ex) {
+					LOGGER.log(Level.SEVERE, "No ha sido posible comprobar las huellas digitales", ex); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
 						CheckHashFiles.this,
 						SimpleAfirmaMessages.getString("CheckHashDialog.6"), //$NON-NLS-1$
@@ -254,10 +233,10 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		);
 		checkButton.setEnabled(false);
 
-		this.xml.setEditable(false);
-		this.xml.setFocusable(false);
-		this.xml.setColumns(10);
-		this.xml.addKeyListener(this);
+		this.reportTextField.setEditable(false);
+		this.reportTextField.setFocusable(false);
+		this.reportTextField.setColumns(10);
+		this.reportTextField.addKeyListener(this);
 
 		final JButton xmlExamineButton = new JButton(
 			SimpleAfirmaMessages.getString("CreateHashDialog.5") //$NON-NLS-1$
@@ -267,12 +246,12 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		xmlExamineButton.addKeyListener(this);
 		xmlExamineButton.addActionListener(e -> {
 			try {
-				setXMLText(
+				setReportPath(
 					AOUIFactory.getLoadFiles(
 						SimpleAfirmaMessages.getString("CreateHashDialog.5"), //$NON-NLS-1$
 						null,
 						null,
-						new String[] { "hashfiles" }, //$NON-NLS-1$
+						new String[] { "hashfiles", "txthashfiles" }, //$NON-NLS-1$ //$NON-NLS-2$
 						SimpleAfirmaMessages.getString("CheckHashFiles.19"), //$NON-NLS-1$
 						false,
 						false,
@@ -280,7 +259,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 						CheckHashFiles.this
 					)[0].getAbsolutePath()
 				);
-				final String hashFile = getXMLText();
+				final String hashFile = getReportPath();
 				if (!(hashFile == null) && !hashFile.isEmpty()) {
 					checkButton.setEnabled(true);
 				}
@@ -291,10 +270,10 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		}
 		);
 
-		this.directory.setEditable(false);
-		this.directory.setFocusable(false);
-		this.directory.setColumns(10);
-		this.directory.addKeyListener(this);
+		this.directoryTextField.setEditable(false);
+		this.directoryTextField.setFocusable(false);
+		this.directoryTextField.setColumns(10);
+		this.directoryTextField.addKeyListener(this);
 
 		final JButton directoryExamineButton = new JButton(
 			SimpleAfirmaMessages.getString("CreateHashDialog.5") //$NON-NLS-1$
@@ -304,7 +283,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		directoryExamineButton.addKeyListener(this);
 		directoryExamineButton.addActionListener(e -> {
 			try {
-				setDirectorioText(
+				setDirectoryPath(
 					AOUIFactory.getLoadFiles(
 						SimpleAfirmaMessages.getString("CreateHashDialog.5"), //$NON-NLS-1$
 						null,
@@ -317,7 +296,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 						CheckHashFiles.this
 					)[0].getAbsolutePath()
 				);
-				final String hashFile = getXMLText();
+				final String hashFile = getReportPath();
 				if (!(hashFile == null) && !hashFile.isEmpty()) {
 					checkButton.setEnabled(true);
 				}
@@ -331,7 +310,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		final JButton exitButton = new JButton(SimpleAfirmaMessages.getString("CheckHashFiles.12") //$NON-NLS-1$
 		);
 
-		if (!getXMLText().isEmpty() && !getDirectorioText().isEmpty()) {
+		if (!getReportPath().isEmpty() && !getDirectorioText().isEmpty()) {
 			checkButton.setEnabled(true);
 		}
 		exitButton.setMnemonic('C');
@@ -362,14 +341,14 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		final JLabel directoryLabel = new JLabel(
 			SimpleAfirmaMessages.getString("CheckHashFiles.13") //$NON-NLS-1$
 		);
-		directoryLabel.setLabelFor(this.directory);
+		directoryLabel.setLabelFor(this.directoryTextField);
 		final JLabel xmlLabel = new JLabel(SimpleAfirmaMessages.getString("CheckHashFiles.14")); //$NON-NLS-1$
-		xmlLabel.setLabelFor(this.xml);
+		xmlLabel.setLabelFor(this.reportTextField);
 
 		c.add(directoryLabel, gbc);
 		gbc.insets = new Insets(0, 10, 0, 10);
 		gbc.gridy++;
-		c.add(this.directory, gbc);
+		c.add(this.directoryTextField, gbc);
 		gbc.weightx = 0.0;
 		c.add(directoryExamineButton, gbc);
 		gbc.insets = new Insets(15, 10, 5, 10);
@@ -378,7 +357,7 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		c.add(xmlLabel, gbc);
 		gbc.insets = new Insets(0, 10, 0, 10);
 		gbc.gridy++;
-		c.add(this.xml, gbc);
+		c.add(this.reportTextField, gbc);
 		gbc.weightx = 0.0;
 		c.add(xmlExamineButton, gbc);
 		gbc.insets = new Insets(15, 10, 5, 10);
@@ -410,204 +389,44 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		return Arrays.equals(newHash, expectedFileHash);
 	}
 
-	/** Comprueba las huellas digitales de los ficheros de un directorio.
-	 * @param dir Directorio a comparar con el XML.
-	 * @param isRec <code>true</code> si se recorri&oacute; el directorio de forma recursiva,
-	 *              <code>false</code> en caso contrario.
-	 * @param directoryHash Mapa con los nombres de fichero analizados y sus huellas digitales.
-	 * @param alg Algoritmo con el que fue generada la huella digital.
-	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella.
-	 * @throws IOException Error en el tratamiento de los ficheros. */
-	private static void checkDirectoryHash(final Path dir,
-			                               final boolean isRec,
-			                               final Map<String, byte[]> directoryHash,
-			                               final String alg) throws IOException,
-			                                                        NoSuchAlgorithmException {
-		if (Files.exists(dir)) {
-			if (isRec) {
-				checkDirectoryRecursively(null, dir, directoryHash, alg);
-			}
-			else {
-				checkDirectoryNonRecursively(dir, directoryHash, alg);
-			}
-		}
-	}
-
-	private static void checkDirectoryNonRecursively(final Path dir,
-                                                     final Map<String, byte[]> directoryHash,
-                                                     final String alg) throws IOException, NoSuchAlgorithmException {
-		String messageCode = null;
-		final String auxMessageCode = "CheckHashDialog.3"; //$NON-NLS-1$
-		try (Stream<Path> paths = Files.list(dir)) {
-			final Iterator<Path> it = paths.iterator();
-			while (it.hasNext()) {
-				final Path path = it.next();
-				if (!Files.isDirectory(path)) {
-					if (!FILES_TO_AVOID.contains(path.getFileName().toString()) && !path.getFileName().toString().contains("~$")) { //$NON-NLS-1$
-
-						if (directoryHash.containsKey(path.getFileName().toString())) {
-							if (!checkFileHash(path, directoryHash.get(path.getFileName().toString()), alg)) {
-								messageCode = "CheckHashDialog.5"; //$NON-NLS-1$
-								List<String> filenameList = getReportXML().get(messageCode);
-								if (filenameList == null) {
-									filenameList = new ArrayList<>();
-									getReportXML().put(messageCode, filenameList);
-								}
-								getReportXML().get(messageCode).add(path.getFileName().toString());
-							}
-							else {
-								List<String> filenameList = getReportXML().get(auxMessageCode);
-								if (filenameList == null) {
-									filenameList = new ArrayList<>();
-									getReportXML().put(auxMessageCode, filenameList);
-								}
-								getReportXML().get(auxMessageCode).add(path.getFileName().toString());
-							}
-							directoryHash.remove(path.getFileName().toString());
-						}
-						else {
-							messageCode = "CheckHashFiles.10"; //$NON-NLS-1$
-							List<String> filenameList = getReportXML().get(messageCode);
-							if (filenameList == null) {
-								filenameList = new ArrayList<>();
-								getReportXML().put(messageCode, filenameList);
-							}
-							getReportXML().get(messageCode).add(path.getFileName().toString());
-						}
-					}
-
-				} // if (!Files.isDirectory(path))
-			} // while
-		}
-	}
-
-	private static void checkDirectoryRecursively(final String relativePath,
-			                                      final Path dir,
-			                                      final Map<String, byte[]> directoryHash,
-			                                      final String alg) throws IOException, NoSuchAlgorithmException {
-
-		final String auxMessageCode = "CheckHashDialog.3"; //$NON-NLS-1$
-		String messageCode = null;
-		if (Files.exists(dir)) {
-			if (Files.isDirectory(dir)) {
-				try (Stream<Path> paths = Files.list(dir)) {
-					final Iterator<Path> it = paths.iterator();
-					while (it.hasNext()) {
-						final Path path = it.next();
-						if (relativePath != null) {
-							checkDirectoryRecursively(
-								relativePath + File.separator + path.getFileName().toString(),
-								path,
-								directoryHash,
-								alg
-							);
-						}
-						else {
-							checkDirectoryRecursively(path.getFileName().toString(), path, directoryHash, alg);
-						}
-					}
-				} // No es un directorio
-			}
-			else {
-
-				if (!FILES_TO_AVOID.contains(dir.getFileName().toString()) && !relativePath.contains("~$")) { //$NON-NLS-1$
-					if (directoryHash.containsKey(relativePath)) {
-						if (!checkFileHash(dir, directoryHash.get(relativePath), getAlgorithm())) {
-							messageCode = "CheckHashDialog.5"; //$NON-NLS-1$
-							List<String> filenameList = getReportXML().get(messageCode);
-							if (filenameList == null) {
-								filenameList = new ArrayList<>();
-								getReportXML().put(messageCode, filenameList);
-							}
-							getReportXML().get(messageCode).add(relativePath);
-						}
-						else {
-							List<String> filenameList = getReportXML().get(auxMessageCode);
-							if (filenameList == null) {
-								filenameList = new ArrayList<>();
-								getReportXML().put(auxMessageCode, filenameList);
-							}
-							getReportXML().get(auxMessageCode).add(relativePath);
-						}
-						directoryHash.remove(relativePath);
-					}
-					else {
-						messageCode = "CheckHashFiles.10"; //$NON-NLS-1$
-						List<String> filenameList = getReportXML().get(messageCode);
-						if (filenameList == null) {
-							filenameList = new ArrayList<>();
-							getReportXML().put(messageCode, filenameList);
-						}
-						getReportXML().get(messageCode).add(relativePath);
-					}
-				}
-			}
-		}
-	}
-
-	/** Recorre el fichero XML seleccionado por el usuario.
+	/** Analiza el fichero para identificar si se trata de alguno de los formatos soportados
+	 * de documentos de hashes y comprueba que los hashes de los ficheros del directorio
+	 * indicado se correspondan con los del documento.
 	 * @param dir Directorio seleccionado.
-	 * @param xmlPath Fichero que cotiene el XML.
+	 * @param hashDocumentPath Ruta del documento de hashes.
+	 * @param report Informe en el que registrar el resultado de la comprobaci&oacute;n.
 	 * @throws IOException Error al abrir o cerrar el fichero seleccionado.
-	 * @throws SAXException Error al analizar el XML.
-	 * @throws ParserConfigurationException Error al procesar un documento de tipo XML.
+	 * @throws DocumentException Cuando se proporcione un documento de hashes no soportado.
+	 * @throws CorruptedDocumentException Cuando se ha identificado que el documento est&aacute; corrupto.
 	 * @throws NoSuchAlgorithmException Error al construir la implementacion de un algoritmo. */
-	static void checkHashXML(final Path dir, final String xmlPath) throws SAXException,
-	                                                               IOException,
-	                                                               ParserConfigurationException,
-	                                                               NoSuchAlgorithmException {
+	public static void checkHash(final Path dir, final File hashDocumentPath, final HashReport report)
+			throws IOException, DocumentException, CorruptedDocumentException {
 
-		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder builder = factory.newDocumentBuilder();
+		// Cargamos el documento de hashes
+		final byte[] hashDocumentContent = loadData(hashDocumentPath.getAbsolutePath());
 
-		try (InputStream is = new FileInputStream(xmlPath)) {
-			validateAgainstXSD(is, CheckHashFiles.class.getResourceAsStream("/schemas/folderhashes.xsd")); //$NON-NLS-1$
+		final HashDocument hashDocument = HashDocumentFactory.loadDocument(hashDocumentContent, getExtension(hashDocumentPath));
+
+		// El informe se genera en base a la misma configuracion que tuviese el documento de hashes
+		report.setAlgorithm(hashDocument.getAlgorithm());
+		report.setRecursive(hashDocument.isRecursive());
+
+		final long startTime = new Date().getTime();
+
+		final ForkJoinPool pool = new ForkJoinPool(10);
+		final RecursiveAction recursiveAction = new CheckHashAction(
+				dir, dir.toFile(), hashDocument, report, pool);
+		pool.invoke(recursiveAction);
+		recursiveAction.join();
+
+		final long processTime = new Date().getTime() - startTime;
+		LOGGER.info("Tiempo total de comprobacion de hashes: " + processTime / 1000.0 + " seg"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Numero de ficheros procesados: " + report.getProcessedFilesCount()); //$NON-NLS-1$
+
+		// Agregamos al informe las entradas que no se procesaron
+		for (final String pathname : hashDocument.getHashes().keySet()) {
+			report.reportHashWithoutFile(pathname);
 		}
-		final Document doc = builder.parse(xmlPath);
-		doc.getDocumentElement().normalize();
-
-		final Map<String, byte[]> dirEntries = new HashMap<>();
-
-		final NodeList nodeListEntries = doc.getElementsByTagName("entries"); //$NON-NLS-1$
-		final Node nodeEntries = nodeListEntries.item(0);
-		setAlgorithm(nodeEntries.getAttributes().getNamedItem("hashAlgorithm").getNodeValue()); //$NON-NLS-1$
-		setIsRecursive(
-			Boolean.valueOf(nodeEntries.getAttributes().getNamedItem("recursive").getNodeValue()) //$NON-NLS-1$
-		);
-
-		final NodeList nodeList = doc.getElementsByTagName("entry"); //$NON-NLS-1$
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			final Node node = nodeList.item(i);
-
-			final byte[] hash = Base64.decode(
-				node.getAttributes().getNamedItem("hash").getNodeValue(), true //$NON-NLS-1$
-			);
-			final String name = node.getAttributes().getNamedItem("name").getNodeValue(); //$NON-NLS-1$
-			dirEntries.put(name, hash);
-		}
-		checkDirectoryHash(dir, getIsRecursive(), dirEntries, getAlgorithm());
-
-		if (dirEntries.keySet().size() > 0) {
-			final String messageCode = "CheckHashFiles.1"; //$NON-NLS-1$
-			List<String> filenameList = getReportXML().get(messageCode);
-			if (filenameList == null) {
-				filenameList = new ArrayList<>();
-				getReportXML().put(messageCode, filenameList);
-			}
-
-			for (final String pathName : dirEntries.keySet()) {
-				getReportXML().get(messageCode).add(pathName);
-			}
-		}
-	}
-
-	private static void validateAgainstXSD(final InputStream isxml,
-			                               final InputStream xsd) throws SAXException, IOException {
-
-		final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		final Schema schema = factory.newSchema(new StreamSource(xsd));
-		final Validator validator = schema.newValidator();
-		validator.validate(new StreamSource(isxml));
 	}
 
 	/** Genera el XML donde est&aacute;n almacenadas las comparaciones de las
@@ -687,13 +506,13 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 	 * </pre>
 	 * @param mapReport Mapa con la informacion para generar el report el XML.
 	 * @param alg Algoritmo con el que fue generado el XML.
-	 * @param isRec Si se ha elegido que el recorrido por el directorio sea
+	 * @param recursive Si se ha elegido que el recorrido por el directorio sea
 	 *        recursivo o no.
 	 * @return Informe de coincidencias de huellas en XML.
 	 * @throws ParserConfigurationException Si no se puede obtener en analizador XML.
 	 * @throws TransformerException Si hay errores escribiendo el XML. */
-	static String generateXMLReport(final Map<String, List<String>> mapReport, final String alg, final boolean isRec) throws ParserConfigurationException,
-	                                                                                                                         TransformerException {
+	public static String generateXMLReport(final HashReport mapReport)
+			throws ParserConfigurationException, TransformerException {
 
 		final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -701,65 +520,86 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		// Elemento raiz
 		final Document doc = docBuilder.newDocument();
 		final Element rootElement = doc.createElement("entries"); //$NON-NLS-1$
-		final Attr hashAlg = doc.createAttribute("hashAlgorithm"); //$NON-NLS-1$
-		hashAlg.setValue(alg);
-		rootElement.setAttributeNode(hashAlg);
-		final Attr recursive = doc.createAttribute("recursive"); //$NON-NLS-1$
-		recursive.setValue(String.valueOf(isRec));
-		rootElement.setAttributeNode(recursive);
+		final Attr hashAlgAttr = doc.createAttribute("hashAlgorithm"); //$NON-NLS-1$
+		hashAlgAttr.setValue(mapReport.getAlgorithm());
+		rootElement.setAttributeNode(hashAlgAttr);
+		final Attr recursiveAttr = doc.createAttribute("recursive"); //$NON-NLS-1$
+		recursiveAttr.setValue(Boolean.toString(mapReport.isRecursive()));
+		rootElement.setAttributeNode(recursiveAttr);
 		doc.appendChild(rootElement);
 
-		for (final String code : mapReport.keySet()) {
-			Element entriesHeader = doc.createElement("matching_hash"); //$NON-NLS-1$
-			// Elemento header
-			if (code.equals("CheckHashDialog.5")) {//$NON-NLS-1$
-				entriesHeader = doc.createElement("not_matching_hash"); //$NON-NLS-1$
-			}
-			else if (code.equals("CheckHashFiles.1")) {//$NON-NLS-1$
-				entriesHeader = doc.createElement("hash_without_file"); //$NON-NLS-1$
-			}
-			else if (code.equals("CheckHashFiles.10")) {//$NON-NLS-1$
-				entriesHeader = doc.createElement("file_without_hash"); //$NON-NLS-1$
+		// El hash del fichero coincide con el hash almacenado
+		final Iterator<String> machingHashIt = mapReport.getMatchingHashIterator();
+		if (machingHashIt.hasNext()) {
+			final Element entriesHeader = doc.createElement("matching_hash"); //$NON-NLS-1$
+			while (machingHashIt.hasNext()) {
+				entriesHeader.appendChild(createReportEntry(doc, machingHashIt.next()));
 			}
 			rootElement.appendChild(entriesHeader);
-			for (final String path : mapReport.get(code)) {
-				// Elemento entry
-				final Element entry = doc.createElement("entry"); //$NON-NLS-1$
-				entriesHeader.appendChild(entry);
-				// Se inicializa el atributo name
-				final Attr name = doc.createAttribute("name"); //$NON-NLS-1$
-				name.setValue(path);
-				entry.setAttributeNode(name);
-			}
 		}
+
+		// El hash del fichero no coincide con el hash almacenado
+		final Iterator<String> noMachingHashIt = mapReport.getNoMatchingHashIterator();
+		if (noMachingHashIt.hasNext()) {
+			final Element entriesHeader = doc.createElement("not_matching_hash"); //$NON-NLS-1$
+			while (noMachingHashIt.hasNext()) {
+				entriesHeader.appendChild(createReportEntry(doc, noMachingHashIt.next()));
+			}
+			rootElement.appendChild(entriesHeader);
+		}
+
+		// No se ha encontrado el fichero correspondiente a un hash almacenado
+		final Iterator<String> hashWithoutFileIt = mapReport.getHashWithoutFileIterator();
+		if (hashWithoutFileIt.hasNext()) {
+			final Element entriesHeader = doc.createElement("hash_without_file"); //$NON-NLS-1$
+			while (hashWithoutFileIt.hasNext()) {
+				entriesHeader.appendChild(createReportEntry(doc, hashWithoutFileIt.next()));
+			}
+			rootElement.appendChild(entriesHeader);
+		}
+
+		// No se ha encontrado un hash almacenado que corresponda al fichero
+		final Iterator<String> fileWithoutHashIt = mapReport.getFileWithoutHashIterator();
+		if (fileWithoutHashIt.hasNext()) {
+			final Element entriesHeader = doc.createElement("file_without_hash"); //$NON-NLS-1$
+			while (fileWithoutHashIt.hasNext()) {
+				entriesHeader.appendChild(createReportEntry(doc, fileWithoutHashIt.next()));
+			}
+			rootElement.appendChild(entriesHeader);
+		}
+
+		// Componemos el XML
 		final StringWriter sw = new StringWriter();
 		final TransformerFactory tf = TransformerFactory.newInstance();
 		final Transformer transformer = tf.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1"); //$NON-NLS-1$
-		}
-		else {
-			transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
-		}
+		transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 
 		transformer.transform(new DOMSource(doc), new StreamResult(sw));
 		return sw.toString();
+	}
 
+	private static Element createReportEntry(final Document doc, final String path) {
+		final Element entry = doc.createElement("entry"); //$NON-NLS-1$
+		final Attr name = doc.createAttribute("name"); //$NON-NLS-1$
+		name.setValue(path);
+		entry.setAttributeNode(name);
+
+		return entry;
 	}
 
 	/** Obtiene el nombre del fichero seleccionado por el usuario.
 	 * @return Nombre del fichero seleccionado por el usuario. */
-	String getXMLText() {
-		return this.xml.getText();
+	String getReportPath() {
+		return this.reportTextField.getText();
 	}
 
 	/** Establece el nombre del fichero seleccionado por el usuario.
-	 * @param text Nombre del fichero seleccionado por el usuario. */
-	void setXMLText(final String text) {
-		this.xml.setText(text);
+	 * @param path Nombre del fichero seleccionado por el usuario. */
+	void setReportPath(final String path) {
+		this.reportTextField.setText(path);
 	}
 
 	/** Obtiene el nombre del fichero con la huella digital seleccionada por el
@@ -767,52 +607,14 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 	 * @return Nombre del fichero con la huella digital seleccionada por el
 	 *         usuario. */
 	String getDirectorioText() {
-		return this.directory.getText();
+		return this.directoryTextField.getText();
 	}
 
 	/** Establece el nombre del fichero con la huella digital seleccionada por
 	 * el usuario.
-	 * @param text Nombre de la huella digital seleccionada por el usuario. */
-	void setDirectorioText(final String text) {
-		this.directory.setText(text);
-	}
-
-	/** Indica si se ha establecido el proceso recursivo.
-	 * @return <code>true</code> si se ha establecido el proceso recursivo,
-	 *         <code>false</code> en caso contrario. */
-	static boolean getIsRecursive() {
-		return isRecursive.booleanValue();
-	}
-
-	/** Establece el modo recursivo.
-	 * @param isRecursive <code>true</code> si se desea un proceso recursivo de los directorios,
-	 *         <code>false</code> en caso contrario. */
-	static void setIsRecursive(final Boolean isRecursive) {
-		CheckHashFiles.isRecursive = isRecursive;
-	}
-
-	/** Obtiene los datos del informe de huellas.
-	 * @return Datos del informe de huellas. */
-	static Map<String, List<String>> getReportXML() {
-		return reportXML;
-	}
-
-	/** Establece los datos del informe de huellas.
-	 * @param reportXML Datos del informe de huellas. */
-	static void setReportXML(final Map<String, List<String>> reportXML) {
-		CheckHashFiles.reportXML = reportXML;
-	}
-
-	/** Obtiene el algoritmo elegido para generar la huella digital.
-	 * @return Valor del algoritmo elegido para generar la huella digital. */
-	static String getAlgorithm() {
-		return algorithm;
-	}
-
-	/** Establece el algoritmo elegido para generar la huella digital.
-	 * @param algorithm Algoritmo elegido para generar la huella digital. */
-	static void setAlgorithm(final String algorithm) {
-		CheckHashFiles.algorithm = algorithm;
+	 * @param path Nombre de la huella digital seleccionada por el usuario. */
+	void setDirectoryPath(final String path) {
+		this.directoryTextField.setText(path);
 	}
 
 	@Override
@@ -827,6 +629,58 @@ public final class CheckHashFiles extends JDialog implements KeyListener {
 		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 			setVisible(false);
 			dispose();
+		}
+	}
+
+	/**
+	 * Carga los datos de un fichero.
+	 * @param path Ruta del fichero del que cargar los datos.
+	 * @return Contenido del fichero.
+	 * @throws IOException Cuando no se puede completar la carga de los datos.
+	 */
+	private static byte[] loadData(final String path) throws IOException {
+		URI pathUri;
+		try {
+			pathUri = AOUtil.createURI(path);
+		}
+		catch (final Exception e) {
+			throw new IOException("No se pudo componer la ruta del fichero", e); //$NON-NLS-1$
+		}
+		return AOUtil.getDataFromInputStream(AOUtil.loadFile(pathUri));
+	}
+
+	/**
+	 * Recupera la extensi&oacute;n del fichero.
+	 * @param path Ruta o nombre del fichero.
+	 * @return Extensi&oacute;n del fichero sin punto o {@code null} si no ten&iacute;a.
+	 */
+	private static String getExtension(final File file) {
+		final String filename = file.getName();
+		final int pos = filename.lastIndexOf('.');
+		return pos == -1 || pos == filename.length() - 1 ? null : filename.substring(pos + 1);
+	}
+
+	class CheckResult {
+
+		private final Exception exception;
+		private final HashReport report;
+
+		public CheckResult(final HashReport report) {
+			this.report = report;
+			this.exception = null;
+		}
+
+		public CheckResult(final Exception exception) {
+			this.report = null;
+			this.exception = exception;
+		}
+
+		public Exception getException() {
+			return this.exception;
+		}
+
+		public HashReport getReport() {
+			return this.report;
 		}
 	}
 }

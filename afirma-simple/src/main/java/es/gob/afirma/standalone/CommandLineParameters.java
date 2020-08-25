@@ -17,59 +17,93 @@ import java.net.URL;
  * l&iacute;nea de comandos. */
 final class CommandLineParameters {
 
-	private static final String PARAM_INPUT   = "-i"; //$NON-NLS-1$
-	private static final String PARAM_OUTPUT  = "-o"; //$NON-NLS-1$
-	private static final String PARAM_ALIAS   = "-alias"; //$NON-NLS-1$
-	private static final String PARAM_FILTER  = "-filter"; //$NON-NLS-1$
-	private static final String PARAM_STORE   = "-store"; //$NON-NLS-1$
-	private static final String PARAM_FORMAT  = "-format"; //$NON-NLS-1$
-	private static final String PARAM_PASSWD  = "-password"; //$NON-NLS-1$
-	private static final String PARAM_XML     = "-xml"; //$NON-NLS-1$
-	private static final String PARAM_ALGO    = "-algorithm"; //$NON-NLS-1$
-	private static final String PARAM_CONFIG  = "-config"; //$NON-NLS-1$
-	private static final String PARAM_OP	  = "-operation"; //$NON-NLS-1$
-	private static final String PARAM_GUI     = "-gui"; //$NON-NLS-1$
-	private static final String PARAM_CERT_GUI= "-certgui"; //$NON-NLS-1$
-	private static final String PARAM_PREURL  = "-preurl"; //$NON-NLS-1$
-	private static final String PARAM_POSTURL = "-posturl"; //$NON-NLS-1$
+	private static final String PARAM_INPUT       = "-i"; //$NON-NLS-1$
+	private static final String PARAM_OUTPUT      = "-o"; //$NON-NLS-1$
+	private static final String PARAM_ALIAS       = "-alias"; //$NON-NLS-1$
+	private static final String PARAM_FILTER      = "-filter"; //$NON-NLS-1$
+	private static final String PARAM_STORE       = "-store"; //$NON-NLS-1$
+	private static final String PARAM_FORMAT      = "-format"; //$NON-NLS-1$
+	private static final String PARAM_PASSWD      = "-password"; //$NON-NLS-1$
+	private static final String PARAM_XML         = "-xml"; //$NON-NLS-1$
+	private static final String PARAM_ALGO        = "-algorithm"; //$NON-NLS-1$
+	private static final String PARAM_CONFIG      = "-config"; //$NON-NLS-1$
+	private static final String PARAM_OP	      = "-operation"; //$NON-NLS-1$
+	private static final String PARAM_GUI         = "-gui"; //$NON-NLS-1$
+	private static final String PARAM_CERT_GUI    = "-certgui"; //$NON-NLS-1$
+	private static final String PARAM_PREURL      = "-preurl"; //$NON-NLS-1$
+	private static final String PARAM_POSTURL     = "-posturl"; //$NON-NLS-1$
+	private static final String PARAM_HASH_FORMAT = "-hformat"; //$NON-NLS-1$
+	private static final String PARAM_HASH_ALGO   = "-halgorithm"; //$NON-NLS-1$
+	private static final String PARAM_RECURSIVE   = "-r"; //$NON-NLS-1$
 
 	public static final String FORMAT_AUTO     = "auto"; //$NON-NLS-1$
 	public static final String FORMAT_XADES    = "xades"; //$NON-NLS-1$
 	public static final String FORMAT_PADES    = "pades"; //$NON-NLS-1$
 	public static final String FORMAT_CADES    = "cades"; //$NON-NLS-1$
 	public static final String FORMAT_FACTURAE = "facturae"; //$NON-NLS-1$
-	public static final String FORMAT_OOXML = "ooxml"; //$NON-NLS-1$
-	public static final String FORMAT_ODF = "odf"; //$NON-NLS-1$
+	public static final String FORMAT_OOXML    = "ooxml"; //$NON-NLS-1$
+	public static final String FORMAT_ODF      = "odf"; //$NON-NLS-1$
 	public static final String DEFAULT_FORMAT  = FORMAT_AUTO;
+
+	public static final String FORMAT_HASH_FILE_HEX     = "hex"; //$NON-NLS-1$
+	public static final String FORMAT_HASH_FILE_BASE64  = "b64"; //$NON-NLS-1$
+	public static final String FORMAT_HASH_FILE_BIN     = "bin"; //$NON-NLS-1$
+	public static final String FORMAT_HASH_DIR_PLAIN    = "txt"; //$NON-NLS-1$
+	public static final String FORMAT_HASH_DIR_XML      = "xml"; //$NON-NLS-1$
+	public static final String DEFAULT_FORMAT_FILE_HASH = FORMAT_HASH_FILE_HEX;
+	public static final String DEFAULT_FORMAT_DIR_HASH  = FORMAT_HASH_DIR_XML;
 
 	public static final String MASSIVE_OP_SIGN			= "sign"; //$NON-NLS-1$
 	public static final String MASSIVE_OP_COSIGN		= "cosign"; //$NON-NLS-1$
 	public static final String MASSIVE_OP_COUNTERSIGN	= "countersign"; //$NON-NLS-1$
-	private static final String DEFAULT_MASSIVE_OP = MASSIVE_OP_SIGN;
+	private static final String DEFAULT_MASSIVE_OP      = MASSIVE_OP_SIGN;
 
-	private static final String DEFAULT_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
+	private static final String DEFAULT_ALGORITHM      = "SHA512withRSA"; //$NON-NLS-1$
+	private static final String DEFAULT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 
 	private String store = null;
 	private String alias = null;
 	private String filter = null;
+	private File mainFile = null;
 	private File inputFile = null;
 	private File outputFile = null;
 	private String format = null;
+	private String hashFormat = null;
 	private String password = null;
 	private String algorithm = null;
+	private String hashAlgorithm = null;
 	private String extraParams = null;
 	private String massiveOp = null;
 	private boolean xml = false;
 	private boolean gui = false;
 	private boolean certgui = false;
+	private boolean recursive = false;
 	private final boolean help = false;
 	private URL postUrl = null;
 	private URL preUrl = null;
 
-	public CommandLineParameters(final String[] params) throws CommandLineException {
+	public CommandLineParameters(final CommandLineCommand command, final String[] params) throws CommandLineException {
 
-		// Ignoramos el primer parametro (la operacion) y parseamos el resto
-		for (int i = 1; i < params.length; i++) {
+		// El comando exige que se haya indicado un fichero principal de entrada
+		int i = 1;
+		if (command.isMainFileNeeded()) {
+			if (params.length < 2) {
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.120")); //$NON-NLS-1$
+			}
+
+			this.mainFile = new File(params[i]);
+
+			if (!this.mainFile.exists()) {
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.121", params[i])); //$NON-NLS-1$
+			}
+			if (!this.mainFile.canRead()) {
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.122", params[i])); //$NON-NLS-1$
+			}
+			i++;
+		}
+
+		// Parseamos el resto de parametros
+		for (; i < params.length; i++) {
 
 			if (PARAM_XML.equals(params[i])) {
 				this.xml = true;
@@ -106,6 +140,9 @@ final class CommandLineParameters {
 			else if (PARAM_CERT_GUI.equals(params[i])) {
 				this.certgui = true;
 			}
+			else if (PARAM_RECURSIVE.equals(params[i])) {
+				this.recursive = true;
+			}
 			else if (PARAM_STORE.equals(params[i])) {
 				if (this.store != null) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
@@ -125,6 +162,13 @@ final class CommandLineParameters {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
 				}
 				this.algorithm = params[i+1];
+				i++;
+			}
+			else if (PARAM_HASH_ALGO.equals(params[i])) {
+				if (this.hashAlgorithm != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+				}
+				this.hashAlgorithm = params[i+1];
 				i++;
 			}
 			else if (PARAM_CONFIG.equals(params[i])) {
@@ -199,6 +243,21 @@ final class CommandLineParameters {
 				}
 				i++;
 			}
+			else if (PARAM_HASH_FORMAT.equals(params[i])) {
+				if (this.hashFormat != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+				}
+
+				this.hashFormat = params[i+1].toLowerCase();
+				if (!this.hashFormat.equals(FORMAT_HASH_FILE_HEX) &&
+						!this.hashFormat.equals(FORMAT_HASH_FILE_BIN) &&
+						!this.hashFormat.equals(FORMAT_HASH_FILE_BASE64) &&
+						!this.hashFormat.equals(FORMAT_HASH_DIR_XML) &&
+						!this.hashFormat.equals(FORMAT_HASH_DIR_PLAIN)) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.89", params[i + 1])); //$NON-NLS-1$
+				}
+				i++;
+			}
 			else if (PARAM_OUTPUT.equals(params[i])) {
 				if (this.outputFile != null) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
@@ -242,6 +301,14 @@ final class CommandLineParameters {
 	}
 
 	/**
+	 * Recupera el fichero de entrada establecido inmediatemente a continuaci&oacute;n del comando.
+	 * @return Fichero de entrada o {@code null} si no se ha establecido.
+	 */
+	public File getMainFile() {
+		return this.mainFile;
+	}
+
+	/**
 	 * Recupera el fichero de entrada configurado.
 	 * @return Fichero de entrada o {@code null} si no se ha establecido.
 	 */
@@ -262,6 +329,54 @@ final class CommandLineParameters {
 	 * @return Formato de firma o "AUTO" para indicar que se seleccione el m&aacute;s apropiado. */
 	public String getFormat() {
 		return this.format != null ? this.format : DEFAULT_FORMAT;
+	}
+
+	/** Recupera el formato de salida de la huella digital configurado. Si no se ha indicado,
+	 * devuelve {@code null}.
+	 * @return Formato de huella digital configurado por par&aacute;metro o {@code null}. */
+	public String getHashFormat() {
+		return this.hashFormat;
+	}
+
+	/**
+	 * Recupera el formato de salida de huella digital cuando la entrada es un directorio.
+	 * @return Formato del documento con las huellas digitales del directorio.
+	 * @throws CommandLineException Cuando el formato de salida indicado no era v&aacute;lido.
+	 */
+	String getHashDirectoryFormat() throws CommandLineException {
+		String formatResult;
+		if (this.hashFormat == null) {
+			formatResult = DEFAULT_FORMAT_DIR_HASH;
+		}
+		else if (this.hashFormat.equals(FORMAT_HASH_DIR_XML) ||
+				this.hashFormat.equals(FORMAT_HASH_DIR_PLAIN)) {
+			formatResult = this.hashFormat;
+		}
+		else {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.90", this.hashFormat)); //$NON-NLS-1$
+		}
+		return formatResult;
+	}
+
+	/**
+	 * Recupera el formato de salida de huella digital cuando la entrada es un fichero.
+	 * @return Formato del documento con la huella digital del fichero.
+	 * @throws CommandLineException Cuando el formato de salida indicado no era v&aacute;lido.
+	 */
+	String getHashFileFormat() throws CommandLineException {
+		String formatResult;
+		if (this.hashFormat == null) {
+			formatResult = DEFAULT_FORMAT_FILE_HASH;
+		}
+		else if (this.hashFormat.equals(FORMAT_HASH_FILE_HEX) ||
+				this.hashFormat.equals(FORMAT_HASH_FILE_BASE64) ||
+				this.hashFormat.equals(FORMAT_HASH_FILE_BIN)) {
+			formatResult = this.hashFormat;
+		}
+		else {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.91", this.hashFormat)); //$NON-NLS-1$
+		}
+		return formatResult;
 	}
 
 	/** Recupera la contrase&ntilde;a configurada para acceder al almac&eacute;n de claves.
@@ -285,6 +400,13 @@ final class CommandLineParameters {
 		return this.algorithm != null ? this.algorithm : DEFAULT_ALGORITHM;
 	}
 
+	/** Recupera el algoritmo de huella digital configurado o, si no se ha indicado, el
+	 * algoritmo por defecto.
+	 * @return Algoritmo de huella digital. */
+	public String getHashAlgorithm() {
+		return this.hashAlgorithm != null ? this.hashAlgorithm : DEFAULT_HASH_ALGORITHM;
+	}
+
 	public String getExtraParams() {
 		return this.extraParams;
 	}
@@ -299,6 +421,10 @@ final class CommandLineParameters {
 
 	public boolean isCertGui() {
 		return this.certgui;
+	}
+
+	public boolean isRecursive() {
+		return this.recursive;
 	}
 
 	public boolean isHelp() {
@@ -339,8 +465,8 @@ final class CommandLineParameters {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-			.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-			.append("options\n\n") //$NON-NLS-1$
+			.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+			.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_CERT_GUI).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.76")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -382,8 +508,8 @@ final class CommandLineParameters {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-			.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-			.append("options\n\n") //$NON-NLS-1$
+			.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+			.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.62")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_OUTPUT).append(" outputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.63")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_STORE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.31")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -415,8 +541,8 @@ final class CommandLineParameters {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-		.append("options\n\n") //$NON-NLS-1$
+		.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append(PARAM_OP).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.55")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  \t sign\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.56")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		.append("  \t cosign\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.57")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -458,8 +584,8 @@ final class CommandLineParameters {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-		.append("options\n\n") //$NON-NLS-1$
+		.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		//.append("  ").append(PARAM_GUI).append(" \t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_INPUT).append(" inputfile\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
@@ -476,10 +602,23 @@ final class CommandLineParameters {
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-		.append("options\n\n") //$NON-NLS-1$
-		.append("  ").append(PARAM_INPUT).append(" inputfile\t (").append(CommandLineMessages.getString("CommandLineLauncher.67")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		// Sintaxis
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  AutoFirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(CommandLineMessages.getString("CommandLineLauncher.108")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  AutoFirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(CommandLineMessages.getString("CommandLineLauncher.109")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		// Parametros
+		.append(CommandLineMessages.getString("CommandLineLauncher.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append("FICHERO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.106")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		.append("  ").append("DIRECTORIO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.107")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		// Opciones de fichero
+		.append(CommandLineMessages.getString("CommandLineLauncher.116")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_INPUT).append(" FICHERO\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.67")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		// Opciones de directorio
+		.append(CommandLineMessages.getString("CommandLineLauncher.117")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_INPUT).append(" FICHERO\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.105")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.97")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		return sb.toString();
 	}
@@ -494,10 +633,32 @@ final class CommandLineParameters {
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-		.append("options\n\n") //$NON-NLS-1$
-		.append("  ").append(PARAM_INPUT).append(" inputfile\t (").append(CommandLineMessages.getString("CommandLineLauncher.68")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		// Sintaxis
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  AutoFirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(CommandLineMessages.getString("CommandLineLauncher.110")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  AutoFirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(CommandLineMessages.getString("CommandLineLauncher.111")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		// Parametros
+		.append(CommandLineMessages.getString("CommandLineLauncher.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append("FICHERO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.112")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		.append("  ").append("DIRECTORIO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.113")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		// Opciones de fichero
+		.append(CommandLineMessages.getString("CommandLineLauncher.116")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.118")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_HASH_ALGO).append(" ALGORITMO\t (").append(CommandLineMessages.getString("CommandLineLauncher.77")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_HASH_FORMAT).append(" FORMATO\t (").append(CommandLineMessages.getString("CommandLineLauncher.78")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  \t ").append(FORMAT_HASH_FILE_HEX).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.81")).append(") (").append(CommandLineMessages.getString("CommandLineLauncher.79")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		.append("  \t ").append(FORMAT_HASH_FILE_BASE64).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.82")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  \t ").append(FORMAT_HASH_FILE_BIN).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.83")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		// Opciones de directorio
+		.append(CommandLineMessages.getString("CommandLineLauncher.117")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.96")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_HASH_ALGO).append(" ALGORITMO\t (").append(CommandLineMessages.getString("CommandLineLauncher.77")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_HASH_FORMAT).append(" FORMATO\t (").append(CommandLineMessages.getString("CommandLineLauncher.78")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  \t ").append(FORMAT_HASH_DIR_XML).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.85")).append(") (").append(CommandLineMessages.getString("CommandLineLauncher.79")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		.append("  \t ").append(FORMAT_HASH_DIR_PLAIN).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.86")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_RECURSIVE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.92")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		return sb.toString();
 	}
@@ -513,8 +674,8 @@ final class CommandLineParameters {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
-		.append("options\n\n") //$NON-NLS-1$
+		.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append(PARAM_STORE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.31")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  \t auto\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.36")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		.append("  \t windows\t (").append(CommandLineMessages.getString("CommandLineLauncher.37")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

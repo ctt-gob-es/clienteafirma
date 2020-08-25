@@ -3,7 +3,7 @@
   <head>
 	<title>Ejemplo de firma por lotes del MiniApplet @firma</title>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
 
@@ -24,8 +24,8 @@
 				
 				showLog(batch);
 				
-				MiniApplet.signBatch(
-					MiniApplet.getBase64FromText(batch),
+				AutoScript.signBatch(
+					AutoScript.getBase64FromText(batch),
 					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
 					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
 					document.getElementById("filters").value,
@@ -34,7 +34,7 @@
 
 			} catch(e) {
 				try {
-					showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+					showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
 				} catch(ex) {
 					showLog("Error: " + e);
 				}
@@ -42,7 +42,7 @@
 		}
 
 		function addSingleSign() {
-			singleSigns[singleSigns.length] = MiniApplet.getBase64FromText(buildSingleSign(generateUUID()));
+			singleSigns[singleSigns.length] = AutoScript.getBase64FromText(buildSingleSign(generateUUID()));
 			document.getElementById("signButton").disabled = "";
 		}
 		
@@ -63,20 +63,20 @@
 			
 			var datasource = document.getElementById("datasourceValue").value;
 			if (document.getElementById("datasource").value == "text") {
-				datasource = MiniApplet.getBase64FromText(datasource);
+				datasource = AutoScript.getBase64FromText(datasource);
 			}
 			
 			var format = document.getElementById("format").value;
 			var suboperation = document.getElementById("suboperation").value;
-			var extraParams = MiniApplet.getBase64FromText(document.getElementById("params").value);
+			var extraParams = AutoScript.getBase64FromText(document.getElementById("params").value);
 			var target = document.getElementById("target").value;
 
 			var config;
 			if (target == "es.gob.afirma.signers.batch.SignSaverFile") {
-				config = MiniApplet.getBase64FromText("FileName=" + document.getElementById("targetValue1").value);
+				config = AutoScript.getBase64FromText("FileName=" + document.getElementById("targetValue1").value);
 			}
 			else {
-				config = MiniApplet.getBase64FromText("PostUrl=" + document.getElementById("targetValue1").value +
+				config = AutoScript.getBase64FromText("PostUrl=" + document.getElementById("targetValue1").value +
 						"\nPostParamName=" + document.getElementById("targetValue2").value);
 			}
 			
@@ -107,7 +107,7 @@
 			configuration += ">";
 			
 			for (var i=0; i < singleSigns.length; i++) {
-				configuration += MiniApplet.getTextFromBase64(singleSigns[i]);
+				configuration += AutoScript.getTextFromBase64(singleSigns[i]);
 			}
 			configuration += "</signbatch>";
 			
@@ -116,9 +116,9 @@
 
 		function showAppletLog() {
 			try {
-				showLog(MiniApplet.getCurrentLog());
+				showLog(AutoScript.getCurrentLog());
 			} catch(e) {
-				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
 			}
 		}
 
@@ -168,15 +168,15 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
-			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.cargarAppAfirma();
+			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
 		
 		<fieldset><legend>Configuraci&oacute;n general</legend>
 			<div>
 			 <label for="algorithm">Algoritmo</label>
 			 <select id="algorithm">
-			 <option value="SHA1withRSA">SHA1 con RSA</option>
+			 <option value="SHA256withRSA">SHA1 con RSA</option>
 			 <option value="SHA512withRSA">SHA512 con RSA</option>
 			 </select>
 			</div>

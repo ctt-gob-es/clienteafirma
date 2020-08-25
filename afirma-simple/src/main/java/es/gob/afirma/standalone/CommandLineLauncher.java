@@ -20,17 +20,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.keystores.CertificateContext;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -52,7 +57,16 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
-import es.gob.afirma.standalone.ui.hash.HashHelper;
+import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
+import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
+import es.gob.afirma.standalone.ui.hash.CorruptedDocumentException;
+import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
+import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
+import es.gob.afirma.standalone.ui.hash.DocumentException;
+import es.gob.afirma.standalone.ui.hash.HashDocument;
+import es.gob.afirma.standalone.ui.hash.HashDocumentFactory;
+import es.gob.afirma.standalone.ui.hash.HashReport;
+import es.gob.afirma.standalone.ui.hash.HashUIHelper;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -113,7 +127,7 @@ final class CommandLineLauncher {
 			// Cargamos los parametros
 			final CommandLineParameters params;
 			try {
-				params = new CommandLineParameters(args);
+				params = new CommandLineParameters(command, args);
 			}
 			catch (final CommandLineException e) {
 				closeApp(STATUS_ERROR, pw, CommandLineParameters.buildSyntaxError(command, e.getMessage()));
@@ -145,10 +159,28 @@ final class CommandLineLauncher {
 						closeApp(STATUS_SUCCESS, pw, response);
 						return;
 					case CREATEHASH:
-						createHashByGui(params);
+						if (params.isGui()) {
+							createHashByGui(params);
+						}
+						else {
+							final String createHashResponse = createHashByCommandLine(params);
+							closeApp(STATUS_SUCCESS, pw, createHashResponse);
+						}
 						return;
 					case CHECKHASH:
-						checkHashByGui(params);
+						if (params.isGui()) {
+							checkHashByGui(params);
+						}
+						else {
+							final boolean checkHashSuccess = checkHashByCommandLine(params);
+							if (checkHashSuccess) {
+								closeApp(STATUS_SUCCESS, pw, CommandLineMessages.getString("CommandLineLauncher.123")); //$NON-NLS-1$
+							}
+							else {
+								throw new AOException(
+										CommandLineMessages.getString("CommandLineLauncher.124")); //$NON-NLS-1$
+							}
+						}
 						return;
 					case MASSIVE:
 						//TODO: Implementar
@@ -216,18 +248,187 @@ final class CommandLineLauncher {
 		Logger.getLogger(handlerName).setLevel(Level.SEVERE);
 	}
 
+	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
+	 * @throws IOException Cuando ocurre algun error en la lectura o guardado de ficheros.
+	 * @throws AOException Cuando ocurre algun error al procesar la petici&oacute;n. */
+	private static String createHashByCommandLine(final CommandLineParameters params)
+			throws CommandLineException, IOException, AOException {
+
+		final File inputFile = params.getMainFile();
+		if (inputFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		if (!inputFile.exists()) {
+			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.87", inputFile.getAbsolutePath())); //$NON-NLS-1$
+		}
+		if (!inputFile.canRead()) {
+			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.88", inputFile.getAbsolutePath())); //$NON-NLS-1$
+		}
+
+		// Operamos segun la entrada sea un directorio o fichero
+		byte[] hashesDocumentData;
+		try {
+			if (inputFile.isDirectory()) {
+
+				// Se obtiene el formato de salida para los hashes del directorio
+				final String outputFormat = params.getHashDirectoryFormat();
+
+				// Hacemos el calculo
+				final Map<String, byte[]> hashes = CreateHashFiles.calculateHashes(inputFile, params.isRecursive(), params.getHashAlgorithm(), null);
+
+				// Generamos el informe
+				final HashDocument hashDocument = HashDocumentFactory.getHashDocument(outputFormat);
+				hashDocument.setHashes(hashes);
+				hashDocument.setRecursive(params.isRecursive());
+				hashDocument.setAlgorithm(params.getHashAlgorithm());
+				hashDocument.setCharset(StandardCharsets.UTF_8);
+
+				try {
+					hashesDocumentData = hashDocument.generate();
+				} catch (final DocumentException e) {
+					throw new AOException(CommandLineMessages.getString("CommandLineLauncher.93"), e); //$NON-NLS-1$
+				}
+			}
+			// Si es un fichero
+			else {
+
+				// Se obtiene el formato de salida de hash del fichero
+				final String outputFormat = params.getHashFileFormat();
+
+				final byte[] calculatedHash = CreateHashDialog.calculateHash(inputFile, params.getHashAlgorithm(), null);
+
+				// Codificamos como sea necesario segun el formato de guardado
+				if (outputFormat.equals(CommandLineParameters.FORMAT_HASH_FILE_BASE64)) {
+					hashesDocumentData = Base64.encode(calculatedHash).getBytes();
+				}
+				else if (outputFormat.equals(CommandLineParameters.FORMAT_HASH_FILE_BIN)) {
+					if (params.getOutputFile() != null) {
+						hashesDocumentData = calculatedHash;
+					}
+					else {
+						throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.119")); //$NON-NLS-1$
+					}
+				}
+				else {
+					hashesDocumentData = (AOUtil.hexify(calculatedHash, false) + "h").getBytes(); //$NON-NLS-1$
+				}
+			}
+		}
+		catch (final InterruptedException | ExecutionException e) {
+			throw new AOException(CommandLineMessages.getString("CommandLineLauncher.94"), e); //$NON-NLS-1$
+		}
+
+		// Si se ha proporcionado un fichero de salida, se guarda el resultado de la firma en el.
+		// Si no, se imprime en consola
+		String result;
+		if (params.getOutputFile() != null) {
+			try (final OutputStream fos = new FileOutputStream(params.getOutputFile());) {
+				fos.write(hashesDocumentData);
+			}
+			catch(final Exception e) {
+				throw new IOException(CommandLineMessages.getString(
+						"CommandLineLauncher.21", //$NON-NLS-1$
+						params.getOutputFile().getAbsolutePath())
+						, e);
+			}
+			result = CommandLineMessages.getString("CommandLineLauncher.22"); //$NON-NLS-1$
+		}
+		else {
+			result = new String(hashesDocumentData);
+		}
+		return result;
+	}
+
 	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales mostrando los di&aacute;logos
 	 * que fuesen necesarios.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
 	private static void createHashByGui(final CommandLineParameters params) throws CommandLineException {
 
-		final File inputFile = params.getInputFile();
-		if (inputFile == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		HashUIHelper.createHashUI(
+				params.getMainFile(),
+				params.getOutputFile(),
+				params.getHashAlgorithm(),
+				params.getHashFormat(),
+				params.isRecursive());
+	}
+
+	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales a trav&eacute;s de consola.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @return {@code true} si la operaci&oacute;n termino correctamente, {@code false} en caso contrario.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
+	 * @throws IOException
+	 * @throws AOException */
+	private static boolean checkHashByCommandLine(final CommandLineParameters params)
+			throws CommandLineException, IOException, AOException {
+
+		final File dataFile = params.getMainFile();
+		if (!dataFile.exists()) {
+			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.87", dataFile.getAbsolutePath())); //$NON-NLS-1$
+		}
+		if (!dataFile.canRead()) {
+			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.88", dataFile.getAbsolutePath())); //$NON-NLS-1$
 		}
 
-		HashHelper.createHashUI(params.getInputFile().getAbsolutePath());
+		final File hashFile = params.getInputFile();
+		if (hashFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+		if (!hashFile.exists()) {
+			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.98", hashFile.getAbsolutePath())); //$NON-NLS-1$
+		}
+		if (!hashFile.canRead()) {
+			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.99", hashFile.getAbsolutePath())); //$NON-NLS-1$
+		}
+
+
+		boolean result;
+		if (dataFile.isDirectory()) {
+
+			final HashReport report = new HashReport();
+			try {
+				CheckHashFiles.checkHash(dataFile.toPath(), hashFile, report);
+			} catch (final IOException e) {
+				throw new IOException(CommandLineMessages.getString("CommandLineLauncher.101"), e); //$NON-NLS-1$
+			} catch (final DocumentException e) {
+				throw new AOException(CommandLineMessages.getString("CommandLineLauncher.102"), e); //$NON-NLS-1$
+			} catch (final CorruptedDocumentException e) {
+				throw new AOException(CommandLineMessages.getString("CommandLineLauncher.103"), e); //$NON-NLS-1$
+			}
+			result = !report.hasErrors();
+
+			if (params.getOutputFile() != null)  {
+				byte[] reportData;
+				try {
+					reportData = CheckHashFiles.generateXMLReport(report).getBytes(report.getCharset());
+				} catch (final Exception e) {
+					throw new AOException(CommandLineMessages.getString("CommandLineLauncher.104"), e); //$NON-NLS-1$
+				}
+				try (final OutputStream fos = new FileOutputStream(params.getOutputFile());) {
+					fos.write(reportData);
+				}
+				catch(final Exception e) {
+					throw new IOException(CommandLineMessages.getString(
+							"CommandLineLauncher.21", //$NON-NLS-1$
+							params.getOutputFile().getAbsolutePath())
+							, e);
+				}
+			}
+		}
+		else {
+			try {
+				result = CheckHashDialog.checkHash(hashFile, dataFile, null);
+			}
+			catch (final InterruptedException | ExecutionException e) {
+				throw new AOException(CommandLineMessages.getString("CommandLineLauncher.94"), e); //$NON-NLS-1$
+			}
+		}
+
+
+		return result;
 	}
 
 	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales mostrando los di&aacute;logos
@@ -236,11 +437,12 @@ final class CommandLineLauncher {
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
 	private static void checkHashByGui(final CommandLineParameters params) throws CommandLineException {
 
-		final File inputFile = params.getInputFile();
-		if (inputFile == null) {
+		final File dataFile = params.getMainFile();
+		if (dataFile == null) {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 		}
-		HashHelper.checkHashUI(params.getInputFile().getAbsolutePath());
+		final File hashFile = params.getInputFile();
+		HashUIHelper.checkHashUI(dataFile, hashFile);
 	}
 
 	/** Mostramos el panel de validaci&oacute;n de certificados y firmas.
@@ -385,7 +587,7 @@ final class CommandLineLauncher {
 
 		byte[] res;
 		try {
-			final AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
+			AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
 
 			String selectedAlias;
 			if (params.isCertGui()) {
@@ -401,7 +603,16 @@ final class CommandLineLauncher {
 						false);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
-				selectedAlias = dialog.getSelectedAlias();
+
+				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
+		    	// que se indico originalmente por haberlo cambiado desde el dialogo de seleccion)
+				// y de ahi sacamos la referencia a la clave
+				final CertificateContext context = dialog.getSelectedCertificateContext();
+				final KeyStoreManager selectedKsm = context.getKeyStoreManager();
+				if (selectedKsm instanceof AOKeyStoreManager) {
+					ksm = (AOKeyStoreManager) selectedKsm;
+				}
+				selectedAlias = context.getAlias();
 			}
 			else {
 				selectedAlias = params.getAlias();
@@ -795,7 +1006,7 @@ final class CommandLineLauncher {
 		processCommandLine( args );
 	}
 
-	private static Properties buildProperties(final String propertiesParams) throws IOException {
+	private static Properties buildProperties(final String propertiesParams) {
 		final Properties properties = new Properties();
 		if (propertiesParams != null) {
 			final String params = propertiesParams.trim();

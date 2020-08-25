@@ -57,6 +57,7 @@ import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.so.macos.ShellScript;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
@@ -88,6 +89,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
 	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
 
+	private static final String CHANGE_OWN_COMMAND = "chown %USERNAME% \"%DIR%\""; //$NON-NLS-1$
 
 	static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
@@ -120,13 +122,27 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			LOGGER.severe("No se puede utilizar el directorio alternativo de trabajo por no ser un directorio y no poder crearse"); //$NON-NLS-1$
 		}
 
-		// Generamos un fichero que utilizaremos para guardar y ejecutar AppleScripts
+		// Generamos un fichero que utilizaremos para guardar y ejecutar un script
 		try {
 			mac_script_path = File.createTempFile(MAC_SCRIPT_NAME, MAC_SCRIPT_EXT).getAbsolutePath();
 		}
 		catch (final Exception e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.15")); //$NON-NLS-1$
 			LOGGER.log(Level.SEVERE, "Error creando script temporal. Se aborta la operacion", e); //$NON-NLS-1$
+		}
+
+		// Cambiamos el propietario del directorio alternativo para que sea el usuario. Sino, este directorio
+		// perteneceria si no al administrador y despues el usuario no tendria permisos de escritura sobre el
+		final String username = System.getenv("USER"); //$NON-NLS-1$
+		changeDirectoryProperty(appDir, username);
+
+		// Ejecutamos el script de inmediato porque necesitamos estos permisos para seguir. Despues se ejecutara
+		// de nuevo con el resto de comandos
+		addExexPermissionsToFile(new File(mac_script_path));
+		try {
+			executeScript(mac_script_path, true, false);
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido cambiar la propiedad del directorio de AutoFirma", e); //$NON-NLS-1$
 		}
 
 		// Iniciamos la restauracion de los certificados SSL
@@ -157,6 +173,24 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado" ); //$NON-NLS-1$
+	}
+
+	/**
+	 * Escribe en el script de ejecuci&oacute;n el comando para el cambio de propiedad
+	 * de un fichero/directorio a un usuario.
+	 * @param appDir Directorio/fichero del que se desea cambiar la propiedad.
+	 * @param username Nombre del usuario al que se le desea asignar la propiedad.
+	 */
+	private static void changeDirectoryProperty(final File file, final String username) {
+		final String cmd = CHANGE_OWN_COMMAND
+				.replace("%DIR%", file.getAbsolutePath()) //$NON-NLS-1$
+				.replace("%USERNAME%", username); //$NON-NLS-1$
+		try {
+			writeScriptFile(mac_script_path, new StringBuilder(cmd), true);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido agregar al script el comando para el cambio de propiedad de: " + file.getAbsolutePath(), e); //$NON-NLS-1$
+		}
 	}
 
 	/** Restaura la configuraci&oacute;n de los certificados SSL para la comunicaci&oacute;n
@@ -307,6 +341,10 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		try {
 			final File getUsersScriptFile = createGetUsersScript();
 			final Object o = MacUtils.executeScriptFile(getUsersScriptFile, false, true);
+			if (o == null) {
+				userDirs = null;
+			}
+			else {
 			userDirs = new ArrayList<>();
 			try (
 					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
@@ -323,6 +361,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 					}
 				}
 			}
+		}
 		}
 		catch (final IOException | InterruptedException e) {
 			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
@@ -417,7 +456,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			MacUtils.executeScriptFile(scriptFile, true, true);
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
 		}
 		finally {
@@ -495,6 +534,29 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	}
 
+	/** Ejecuta un script en OS X.
+	 * @param path Ruta donde se encuentra el <i>script</i>.
+	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
+	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
+	 * @return El objeto que da como resultado el <i>script</i>.
+	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
+	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n del script. */
+	public static Object executeScript(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
+
+		LOGGER.info("Se ejecuta el fichero: " + path); //$NON-NLS-1$
+
+		String result;
+		final ShellScript appleScript = new ShellScript(new File(path), delete);
+		if (administratorMode) {
+			result = appleScript.runAsAdministrator();
+		}
+		else {
+			result = appleScript.run();
+		}
+
+		return result;
+	}
+
 	/**
 	 * Da permisos de ejecuci&oacute;n a todos los ficheros de un directorio dado.
 	 * @param dir Directorio al que dar permiso.
@@ -537,13 +599,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 
 	/**
-	 * Genera el script de desinstalaci&oacute;n del llavero OS X mediante AppleScript del certificado generado
-	 * y elimina los links simb&oacute;licos.
+	 * Agrega al script de ejecuci&oacute;n los comandos para la desinstalaci&oacute;n
+	 * del certificado generado del llavero OS X y elimina los links simb&oacute;licos.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
 	 */
 	private static void uninstallRootCAMacOSXKeyStore() throws IOException {
 		LOGGER.info("Desinstalamos los certificados y eliminamos los enlaces simbolicos:"); //$NON-NLS-1$
-		// Creamos comandos para eliminar enlaces simbolicos de firfox y certificados del llavero
+		// Creamos comandos para eliminar enlaces simbolicos de firefox y certificados del llavero
 		final String deleteLinks = "ls -ln /usr/local/lib | grep Firefox | awk '{print $9}' | xargs -I {} rm /usr/local/lib/{}"; //$NON-NLS-1$
 		final String deleteCaCerts = "security find-certificate -c " + CERT_CN + " -a -Z|grep SHA-1|awk '{ print $NF }' | xargs -I {} security delete-certificate -Z {}"; //$NON-NLS-1$ //$NON-NLS-2$
 		final String deleteKsCerts = "security find-certificate -c " + CERT_CN_ROOT + " -a -Z|grep SHA-1|awk '{ print $NF }' | xargs -I {} security delete-certificate -Z {}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -554,7 +616,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		sb.append(";"); //$NON-NLS-1$
 		sb.append(deleteKsCerts);
 		writeScriptFile(mac_script_path, sb, true);
-
 	}
 
 	private static void editTrustFile(final File appDir, final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
@@ -703,7 +764,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	static void writeScriptFile(final String path, final StringBuilder data, final boolean append) throws IOException{
-		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + data.toString()); //$NON-NLS-1$
+		LOGGER.fine("Se escribira en fichero (" + path + ") el siguiente comando:\n" + data.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		final File macScript = new File(path);
 		data.append("\n"); //$NON-NLS-1$
 		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {

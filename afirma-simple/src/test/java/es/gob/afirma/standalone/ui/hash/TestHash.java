@@ -1,11 +1,10 @@
 package es.gob.afirma.standalone.ui.hash;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-
-import org.junit.Test;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -15,23 +14,15 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestHash {
 
-	/** Prueba de generaci&oacute;n de huellas de directorio.
-	 * @throws Exception En cualquier error. */
-	@SuppressWarnings("static-method")
-	@Test
-	public void testDirHashGeneration() throws Exception {
-		System.out.println(
-			CreateHashFiles.getHashReport("c://temp", true, "SHA-512") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-	}
-
 	/** Prueba de generaci&oacute;n de huellas de directorio con GUI.
 	 * @param args No se usa. */
 	public static void main(final String[] args) {
 		try {
 			CreateHashFiles.doHashProcess(
 				null,
-				"c://temp", //$NON-NLS-1$
+				new File("c://temp"), //$NON-NLS-1$
+				null,
+				null,
 				"SHA-512", //$NON-NLS-1$
 				true
 			);

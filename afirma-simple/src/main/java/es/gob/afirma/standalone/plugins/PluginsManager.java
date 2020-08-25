@@ -356,7 +356,7 @@ public class PluginsManager {
 			MacUtils.addAllPermissionsToFile(scriptFile);
 			MacUtils.executeScriptFile(scriptFile, true, true);
 		} catch (final Exception e) {
-			LOGGER.warning("Error al ejecutar el AppleScript para la importacion del plugin"); //$NON-NLS-1$
+			LOGGER.warning("Error al ejecutar el Script para la importacion del plugin"); //$NON-NLS-1$
 			try {
 				Files.delete(scriptFile.toPath());
 			} catch (final IOException ex) {

@@ -22,16 +22,22 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
@@ -59,6 +65,11 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/** Altura de un elemento de la lista de certificados. */
 	private static final int CERT_LIST_ELEMENT_HEIGHT = 86;
 
+	/** Nombre de la preferencia que almacena el nombre de &uacute;ltima la vista de certificado seleccionada. */
+	private static final String PREFERENCE_CERT_VIEW = "certView"; //$NON-NLS-1$
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private JList<CertificateLine> certList;
 
 	JScrollPane sPane;
@@ -73,27 +84,35 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private final String dialogSubHeadline;
 
+	private CertificateLineView certLineView;
+
 	CertificateSelectionPanel(final NameCertificateBean[] el,
 			                  final CertificateSelectionDialog selectionDialog,
 			                  final String dialogHeadline,
 			                  final String dialogSubHeadline,
 				              final boolean showControlButons,
-				              final boolean allowExternalStores) {
+				              final boolean allowExternalStores,
+				              final int[] availablesKeyStoreTypes) {
 
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
 		this.dialogSubHeadline = dialogSubHeadline;
+
+		this.certLineView = loadPreferredCertificateView();
+
 		createUI(
 			selectionDialog,
 			dialogHeadline,
 			showControlButons,
-			allowExternalStores
+			allowExternalStores,
+			availablesKeyStoreTypes
 		);
 	}
 
 	private void createUI(final CertificateSelectionDialog selectionDialog,
 			              final String dialogHeadline,
 			              final boolean showControlButons,
-			              final boolean allowExternalStores) {
+			              final boolean allowExternalStores,
+			              final int[] availablesKeyStoreTypes) {
 
 		setLayout(new GridBagLayout());
 
@@ -122,6 +141,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.gridx++;
 
 		if (showControlButons) {
+
+			// Boton de refresco del almacen
 			final JButton refresh = new JButton(
 				new ImageIcon(
 					CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
@@ -147,31 +168,96 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 			c.gridx++;
 
-			if (allowExternalStores) {
-				final JButton open = new JButton(
+			// Boton de apertura de almacen externo
+			if (allowExternalStores && availablesKeyStoreTypes != null && availablesKeyStoreTypes.length > 0) {
+
+				final JPopupMenu keystoresMenu = new JPopupMenu();
+
+				if (contains(availablesKeyStoreTypes, 1)) {
+					final JMenuItem menuItemOpenSystemKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
+					menuItemOpenSystemKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1));
+					keystoresMenu.add(menuItemOpenSystemKs);
+				}
+
+				if (contains(availablesKeyStoreTypes, 2)) {
+					final JMenuItem menuItemOpenFirefoxKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
+					menuItemOpenFirefoxKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2));
+					keystoresMenu.add(menuItemOpenFirefoxKs);
+				}
+
+				if (contains(availablesKeyStoreTypes, 3)) {
+					final JMenuItem menuItemOpenFileKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
+					menuItemOpenFileKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3));
+					keystoresMenu.add(menuItemOpenFileKs);
+				}
+
+				if (contains(availablesKeyStoreTypes, 4)) {
+					final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
+					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4));
+					keystoresMenu.add(menuItemOpenDnieKs);
+				}
+
+				final JDropDownButton openButton = new JDropDownButton(
 					new ImageIcon(
 						CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
 						CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 					)
 				);
-				open.setBorder(BorderFactory.createEmptyBorder());
-				open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				open.getAccessibleContext().setAccessibleDescription(
+				openButton.setComponentPopupMenu(keystoresMenu);
+				openButton.setBorder(BorderFactory.createEmptyBorder());
+				openButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				openButton.getAccessibleContext().setAccessibleDescription(
 					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 				);
-				open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
-				open.addActionListener(
-					new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							UtilActions.doOpen(selectionDialog, CertificateSelectionPanel.this);
+				openButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
+				openButton.setBackground(Color.WHITE);
+				this.add(openButton, c);
 						}
-					}
-				);
-				open.setBackground(Color.WHITE);
-				this.add(open, c);
-			}
 
+
+			// Boton para el cambio de vista de certificados
+			c.gridx++;
+
+			final JPopupMenu popupMenu = new JPopupMenu();
+
+			final ButtonGroup certViewsGroup = new ButtonGroup();
+			final JRadioButtonMenuItem menuItemPersonalView = new JRadioButtonMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.25")); //$NON-NLS-1$
+			menuItemPersonalView.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.PERSONAL));
+			menuItemPersonalView.setSelected(this.certLineView == CertificateLineView.PERSONAL);
+			certViewsGroup.add(menuItemPersonalView);
+			popupMenu.add(menuItemPersonalView);
+
+			final JRadioButtonMenuItem menuItemRepresentativeView = new JRadioButtonMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.26")); //$NON-NLS-1$
+			menuItemRepresentativeView.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.REPRESENTATIVE));
+			menuItemRepresentativeView.setSelected(this.certLineView == CertificateLineView.REPRESENTATIVE);
+			certViewsGroup.add(menuItemRepresentativeView);
+			popupMenu.add(menuItemRepresentativeView);
+
+			final JRadioButtonMenuItem menuItemPseudonymView = new JRadioButtonMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.27")); //$NON-NLS-1$
+			menuItemPseudonymView.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.PSEUDONYM));
+			menuItemPseudonymView.setSelected(this.certLineView == CertificateLineView.PSEUDONYM);
+			certViewsGroup.add(menuItemPseudonymView);
+			popupMenu.add(menuItemPseudonymView);
+
+			final JDropDownButton dropDownButton = new JDropDownButton(
+					new ImageIcon(
+						CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow.png"), //$NON-NLS-1$
+						CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
+					)
+				);
+			dropDownButton.setComponentPopupMenu(popupMenu);
+			dropDownButton.setBorder(BorderFactory.createEmptyBorder());
+			dropDownButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			dropDownButton.getAccessibleContext().setAccessibleDescription(
+				CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
+			);
+			dropDownButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.4")); //$NON-NLS-1$
+
+			dropDownButton.setBackground(Color.WHITE);
+			this.add(dropDownButton, c);
+
+
+			// Boton de ayuda
 			c.insets = new Insets(13, 0, 8, 15);
 			c.gridx++;
 
@@ -199,7 +285,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			this.add(help, c);
 		}
 
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.insets = new Insets(0, 15, 4, 15);
 		c.gridx = 0;
 		c.gridy++;
@@ -237,27 +323,55 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.add(this.certListPanel, c);
 	}
 
+	/** Indica si un valor entero se encuentra dentro de un array.
+	 * @param elements Array con los valores entre los que buscar.
+	 * @param value Valor a buscar.
+	 * @return {@code true} si se encuentra el valor, {@code false}
+	 * en caso contrario.
+	 */
+	private static boolean contains(final int[] elements, final int value) {
+		for (final int e : elements) {
+			if (e == value) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void setCertLineView(final CertificateLineView certLineView) {
+		this.certLineView = certLineView;
+	}
+
 	/** Recarga el di&aacute;logo para mostrar un grupo distinto de certificados.
 	 * @param certs Conjunto de datos de los certificados a mostrar. */
 	void refresh(final NameCertificateBean[] certs) {
 
 		this.certificateBeans = certs.clone();
 
+		// Devolvemos el scroll al inicio antes de refrescar la lista
+		if (this.sPane.getVerticalScrollBar() != null) {
+			this.sPane.getVerticalScrollBar().setValue(0);
+		}
+
+		// Actualizamos el listado
 		updateCertListInfo(certs);
 
-		// Mostramos y seleccionamos el primer elemento
+		// Seleccionamos el primer elemento
 		if (certs.length > 0) {
 			this.certList.setSelectedIndex(0);
-			this.sPane.getVerticalScrollBar().setValue(0);
 		}
 	}
 
-	private static List<CertificateLine> createCertLines(final NameCertificateBean[] certBeans) {
+	private static List<CertificateLine> createCertLines(
+			final NameCertificateBean[] certBeans,
+			final CertificateLineView view) {
+
+		final CertificateLineFactory certLineFactory = CertificateLineFactory.newInstance(view);
 		final List<CertificateLine> certLines = new ArrayList<>();
 		for (final NameCertificateBean nameCert : certBeans) {
 			CertificateLine certLine;
 		    try {
-		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
+		    	certLine = certLineFactory.buildCertificateLine(nameCert.getName(), nameCert.getCertificate());
 		    }
 		    catch(final Exception e) {
 		        continue;
@@ -269,13 +383,28 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	}
 
 	/**
-	 * Actualiza el texto mostrado en el di&aacute;logo seg&uacute;n el numero de
-	 * certificados mostrados y el propio listado de certificados.
-	 * @param certs Certificados.
+	 * Reconstruye el di&aacute;logo para recargar los datos de los certificados ya cargados.
+	 * S&oacute;lo ser&aacute; perceptible visualmente si con anterioridad se ha cambiado la
+	 * vista con la que deben mostrarse los certificados.
 	 */
-	private void updateCertListInfo(final NameCertificateBean[] certs) {
+	void updateCertListInfo() {
+		updateCertListInfo(this.certificateBeans);
 
-		final List<CertificateLine> certLines = createCertLines(certs);
+		// Mostramos y seleccionamos el primer elemento
+		if (this.certificateBeans.length > 0) {
+			this.certList.setSelectedIndex(0);
+			this.sPane.getVerticalScrollBar().setValue(0);
+		}
+	}
+
+	/**
+	 * Reconstruye el di&aacute;logo para mostrar los datos de los certificados indicados.
+	 * Actualiza la dimensi&oacute;n del di&aacute;logo, su texto y el listado de certificados.
+	 * @param certs Certificados que se deben mostrar.
+	 */
+	void updateCertListInfo(final NameCertificateBean[] certs) {
+
+		final List<CertificateLine> certLines = createCertLines(certs, this.certLineView);
 
 		// Actualizamos el mensaje del dialogo en base al numero de certificados
 		// Mostramos un texto de cabecera si corresponde
@@ -318,6 +447,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			this.selectedIndex = -1;
 		}
 
+		// Actualizamos las dimensiones del dialogo
 		final JScrollPane jScrollPane = new JScrollPane(
 				this.certList,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -359,6 +489,18 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		return this.certificateBeans == null ? 0 : this.certificateBeans.length;
 	}
 
+	/**
+	 * Obtiene cual es la vista de certificado que se est&aacute; aplicando en el di&aacute;logo.
+	 * @return Vista de certificado.
+	 */
+	public CertificateLineView getCertLineView() {
+		return this.certLineView;
+	}
+
+	NameCertificateBean[] getCertificateBeans() {
+		return this.certificateBeans;
+	}
+
 	/** Agrega un gestor de eventos de rat&oacute;n a la lista de certificados para poder
 	 * gestionar a trav&eacute;s de &eacute;l eventos especiales sobre la lista.
 	 * @param listener Manejador de eventos de rat&oacute;n. */
@@ -366,140 +508,11 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.addMouseListener(listener);
 	}
 
-	private static CertificateLine createCertLine(final String friendlyName, final X509Certificate cert) {
-		final CertificateLine certLine = new DefaultCertificateLine(friendlyName, cert);
-		certLine.setFocusable(true);
-		return certLine;
-	}
-
 	/** {@inheritDoc} */
 	@Override
 	public void valueChanged(final ListSelectionEvent e) {
 		this.selectedIndex = this.certList.getSelectedIndex();
 	}
-
-//	private static final class CertificateLine extends JPanel {
-//
-//		/** Serial Version */
-//		private static final long serialVersionUID = 5012625058876812352L;
-//
-//		private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
-//		private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
-//
-//		private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
-//
-//		private JLabel propertiesLink = null;
-//
-//		private final String friendlyName;
-//		private final X509Certificate cert;
-//
-//		private static ImageIcon getIcon(final X509Certificate cert) {
-//			final long notAfter = cert.getNotAfter().getTime();
-//			final long actualDate = new Date().getTime();
-//			if (actualDate >= notAfter || actualDate <= cert.getNotBefore().getTime()) {
-//				return CertificateIconManager.getExpiredIcon(cert);
-//			}
-//			if (notAfter - actualDate < EXPIRITY_WARNING_LEVEL) {
-//				return CertificateIconManager.getWarningIcon(cert);
-//			}
-//			return CertificateIconManager.getNormalIcon(cert);
-//		}
-//
-//		CertificateLine(final String friendlyName, final X509Certificate cert) {
-//			this.friendlyName = friendlyName;
-//			this.cert = cert;
-//			createUI();
-//		}
-//
-//		X509Certificate getCertificate() {
-//			return this.cert;
-//		}
-//
-//		/** {@inheritDoc} */
-//		@Override
-//		public String toString() {
-//			return this.friendlyName;
-//		}
-//
-//		private void createUI() {
-//			setLayout(new GridBagLayout());
-//
-//			setBackground(Color.WHITE);
-//
-//			final GridBagConstraints c = new GridBagConstraints();
-//			c.gridx = 1;
-//			c.gridy = 1;
-//			c.gridheight = 4;
-//
-//			final ImageIcon imageIcon = getIcon(this.cert);
-//			final JLabel icon = new JLabel(imageIcon);
-//			setToolTipText(imageIcon.getDescription());
-//
-//			c.insets = new Insets(2, 2, 2, 5);
-//			add(icon, c);
-//
-//			c.fill = GridBagConstraints.HORIZONTAL;
-//			c.weightx = 1.0;
-//			c.gridx++;
-//			c.gridheight = 1;
-//			c.insets = new Insets(5, 0, 0, 5);
-//
-//			final JLabel alias = new JLabel(this.friendlyName);
-//			alias.setFont(SUBJECT_FONT);
-//			add(alias, c);
-//
-//			c.gridy++;
-//			c.insets = new Insets(0, 0, 0, 5);
-//
-//			final JLabel issuer = new JLabel(
-//				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + " " + AOUtil.getCN(this.cert.getIssuerDN().toString()) + //$NON-NLS-1$ //$NON-NLS-2$
-//					". " + CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.6") + " " + new KeyUsage(this.cert).toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//			);
-//			issuer.setFont(DETAILS_FONT);
-//			add(issuer, c);
-//
-//			c.gridy++;
-//
-//			final JLabel dates = new JLabel(
-//				CertificateSelectionDialogMessages.getString(
-//					"CertificateSelectionPanel.3", //$NON-NLS-1$
-//					new String[] {
-//						formatDate(this.cert.getNotBefore()),
-//						formatDate(this.cert.getNotAfter())
-//					}
-//				)
-//			);
-//			dates.setFont(DETAILS_FONT);
-//			add(dates, c);
-//
-//			c.gridy++;
-//
-//			this.propertiesLink = new JLabel(
-//		        "<html><u>" + //$NON-NLS-1$
-//        		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
-//		        "</u></html>" //$NON-NLS-1$
-//	        );
-//			// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
-//			// inicia su importacion
-//			if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-//				this.propertiesLink.setFont(DETAILS_FONT);
-//				add(this.propertiesLink, c);
-//			}
-//		}
-//
-//		/** Devuelve la fecha con formato.
-//		 * @param date Fecha.
-//		 * @return Texto que representativo de la fecha. */
-//		private static String formatDate(final Date date) {
-//			return new SimpleDateFormat("dd/MM/yyyy").format(date); //$NON-NLS-1$
-//		}
-//
-//		/** Recupera el rect&aacute;ngulo ocupado por el enlace para la carga del certificado.
-//		 * @return Recuadro con el enlace. */
-//		Rectangle getCertificateLinkBounds() {
-//			return this.propertiesLink.getBounds();
-//		}
-//	}
 
 	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
 	private static final class CertListCellRendered implements ListCellRenderer<CertificateLine> {
@@ -580,5 +593,92 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			}
 		}
 
+	}
+
+	/**
+	 * Carga de las preferencias del usuario cu&aacute;l ha sido la &uacute;ltima vista de
+	 * certificados seleccionada.
+	 * @return Vista de certificados.
+	 */
+	private static CertificateLineView loadPreferredCertificateView() {
+		CertificateLineView view = null;
+		try {
+			final Preferences pref = Preferences.userNodeForPackage(CertificateSelectionPanel.class);
+			final String certView = pref.get(PREFERENCE_CERT_VIEW, null);
+			if (certView != null) {
+				view = CertificateLineView.valueOf(certView);
+}
+		}
+		catch (final Exception e) {
+			view = null;
+			LOGGER.log(Level.WARNING,
+					"No se pudo cargar la vista de certificado de las preferencias del usuario. Se usara la por defecto", e); //$NON-NLS-1$
+		}
+
+		// Si no se pudo cargar cual es la vista configurada, se establece la por defecto
+		if (view == null) {
+			view = CertificateLineView.PERSONAL;
+		}
+		return view;
+	}
+
+	/**
+	 * guarda en las preferencias del usuario la &uacute;ltima vista de certificados seleccionada.
+	 * @param view Vista de certificados.
+	 */
+	void savePreferredCertificateView() {
+		try {
+			final Preferences pref = Preferences.userNodeForPackage(CertificateSelectionPanel.class);
+			if (this.certLineView != null) {
+				pref.put(PREFERENCE_CERT_VIEW, this.certLineView.name());
+			}
+			else {
+				pref.remove(PREFERENCE_CERT_VIEW);
+			}
+			pref.sync();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo guardar la vista utilizada en las preferencias del usuario", e); //$NON-NLS-1$
+		}
+	}
+
+	private class ChangeViewActionListener implements ActionListener {
+
+		private final CertificateSelectionPanel panel;
+		private final CertificateSelectionDialog dialog;
+		private final CertificateLineView view;
+
+		public ChangeViewActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final CertificateLineView view) {
+			this.panel = panel;
+			this.dialog = dialog;
+			this.view = view;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			UtilActions.doChangeView(
+					this.panel.getCertificateBeans(),
+					this.view,
+					this.dialog,
+					this.panel);
+		}
+	}
+
+	private class ChangeKeyStoreActionListener implements ActionListener {
+
+		private final CertificateSelectionPanel panel;
+		private final CertificateSelectionDialog dialog;
+		private final int keyStoreType;
+
+		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final int keyStoreType) {
+			this.panel = panel;
+			this.dialog = dialog;
+			this.keyStoreType = keyStoreType;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel);
+		}
 	}
 }

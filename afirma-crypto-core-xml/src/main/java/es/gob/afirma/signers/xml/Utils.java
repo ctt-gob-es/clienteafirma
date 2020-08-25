@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.Transform;
@@ -516,14 +517,21 @@ public final class Utils {
         // Recupera la fecha de firma
         Date signingTime = null;
         if (namespace != null) {
-            try {
-                signingTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse( //$NON-NLS-1$
-            		((Element) signature.getElementsByTagNameNS(namespace, "SigningTime").item(0)).getTextContent() //$NON-NLS-1$
-        		);
-            }
-            catch (final Exception e) {
-                LOGGER.warning("No se ha podido recuperar la fecha de firma: " + e); //$NON-NLS-1$
-            }
+
+        	final Element signingTimeElement = (Element) signature.getElementsByTagNameNS(namespace, "SigningTime").item(0); //$NON-NLS-1$
+        	if (signingTimeElement != null) {
+        		try {
+        			signingTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse( //$NON-NLS-1$
+        					signingTimeElement.getTextContent()
+        					);
+        		}
+        		catch (final Exception e) {
+        			LOGGER.log(Level.WARNING, "No se ha podido recuperar la fecha de firma", e); //$NON-NLS-1$
+        		}
+        	}
+        	else {
+        		LOGGER.info("No se ha encontrado la hora de firma de una firma"); //$NON-NLS-1$
+        	}
         }
 
         final List<X509Certificate> certChain = new ArrayList<>();
@@ -540,7 +548,7 @@ public final class Utils {
             pkcs1 = Base64.decode(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0)).getTextContent()); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            LOGGER.warning("No se pudo extraer el PKCS#1 de una firma: " + e); //$NON-NLS-1$
+            LOGGER.log(Level.WARNING, "No se pudo extraer el PKCS#1 de una firma", e); //$NON-NLS-1$
             pkcs1 = null;
         }
         ssi.setPkcs1(pkcs1);

@@ -82,7 +82,6 @@ public final class XAdESUtil {
 		    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
 		};
 
-
 	private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
 
 	static {
@@ -95,11 +94,12 @@ public final class XAdESUtil {
 			// expresamente
 			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
 			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
-			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
+			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$		}
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido establecer la propiedad de seguridad en la factoria XML", e); //$NON-NLS-1$
 		}
+
 		SECURE_BUILDER_FACTORY.setValidating(false);
 		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
 	}
@@ -528,11 +528,11 @@ public final class XAdESUtil {
 
     	// Localizamos el primer nodo de firma
     	Element signatureElement = null;
-    	if (XAdESConstants.TAG_SIGNATURE.equals(element.getLocalName())) {
+    	if (XMLConstants.TAG_SIGNATURE.equals(element.getLocalName())) {
     		signatureElement = element;
     	}
     	else {
-    		final NodeList signatures = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE);
+    		final NodeList signatures = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
     		if (signatures.getLength() > 0) {
     			signatureElement = (Element) signatures.item(0);
     		}
@@ -555,7 +555,7 @@ public final class XAdESUtil {
     	final NodeList childs = signatureElement.getChildNodes();
     	while (i < childs.getLength() && signedInfoElement == null) {
     		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				childs.item(i).getLocalName().equals(XAdESConstants.TAG_SIGNEDINFO)) {
+    				childs.item(i).getLocalName().equals(XMLConstants.TAG_SIGNEDINFO)) {
     			signedInfoElement = (Element) childs.item(i);
     		}
     		i++;
@@ -566,7 +566,7 @@ public final class XAdESUtil {
 
     	// Obtenemos las referencias declaradas en la firma
     	final NodeList references = signedInfoElement.getElementsByTagNameNS(
-    			XMLConstants.DSIGNNS, XAdESConstants.TAG_REFERENCE);
+    			XMLConstants.DSIGNNS, XMLConstants.TAG_REFERENCE);
 
     	// Buscamos entre las referencias hasta encontrar la que declare el tipo
     	// correspondiente a los atributos firmados
@@ -734,7 +734,7 @@ public final class XAdESUtil {
     	final NodeList childs = signatureElement.getChildNodes();
     	while (i < childs.getLength() && signedInfoElement == null) {
     		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				childs.item(i).getLocalName().equals(XAdESConstants.TAG_SIGNEDINFO)) {
+    				childs.item(i).getLocalName().equals(XMLConstants.TAG_SIGNEDINFO)) {
     			signedInfoElement = (Element) childs.item(i);
     		}
     		i++;
@@ -744,7 +744,7 @@ public final class XAdESUtil {
     	}
 
     	// Obtenemos las referencias declaradas en la firma
-    	final NodeList references = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_REFERENCE);
+    	final NodeList references = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_REFERENCE);
 
     	// Omitimos del listado la referencia a los atributos firmados
     	final List<Element> dataReferences = new ArrayList<>();

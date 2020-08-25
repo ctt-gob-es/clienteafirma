@@ -51,16 +51,19 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
-	public final void init(final AOKeyStore type,
+	public void init(final AOKeyStore type,
 			               final InputStream store,
 			               final PasswordCallback pssCallBack,
 			               final Object[] params,
 			               final boolean forceReset) {
 
+		LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
+
 		this.passwordCallback = pssCallBack;
 		this.configParams = params;
 
-		// Vaciamos el listado de almacenes agregados
+		// Vaciamos el listado de almacenes agregados ya que esta llamada puede realizarse como
+		// parte de una operacion de refresco del almacen
 		removeAll();
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
@@ -163,9 +166,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 		if (lacksKeyStores()) {
 			LOGGER.warning(
-				"No se ha podido inicializar ningun almacen, interno o externo, de Firefox, ni los almacenes preferentes" //$NON-NLS-1$
+				"No se ha podido inicializar ningun almacen, interno o externo, de Mozilla, ni los almacenes preferentes" //$NON-NLS-1$
 			);
 		}
+
+		setKeyStoreType(type);
 
 		this.initialized = true;
 	}
