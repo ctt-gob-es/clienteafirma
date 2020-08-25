@@ -89,7 +89,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
 	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
 
-	private static final String CHANGE_OWN_COMMAND = "chown %USERNAME% %DIR%"; //$NON-NLS-1$
+	private static final String CHANGE_OWN_COMMAND = "chown %USERNAME% \"%DIR%\""; //$NON-NLS-1$
 
 	static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
@@ -131,10 +131,19 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			LOGGER.log(Level.SEVERE, "Error creando script temporal. Se aborta la operacion", e); //$NON-NLS-1$
 		}
 
-		// Asociamos el directorio alternativo al propio usuario, ya que de lo contrario se a nombre del
-		// administrador y despues el usuario no tendria permisos de escritura sobre el mismo
+		// Cambiamos el propietario del directorio alternativo para que sea el usuario. Sino, este directorio
+		// perteneceria si no al administrador y despues el usuario no tendria permisos de escritura sobre el
 		final String username = System.getenv("USER"); //$NON-NLS-1$
 		changeDirectoryProperty(appDir, username);
+
+		// Ejecutamos el script de inmediato porque necesitamos estos permisos para seguir. Despues se ejecutara
+		// de nuevo con el resto de comandos
+		addExexPermissionsToFile(new File(mac_script_path));
+		try {
+			executeScript(mac_script_path, true, false);
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido cambiar la propiedad del directorio de AutoFirma", e); //$NON-NLS-1$
+		}
 
 		// Iniciamos la restauracion de los certificados SSL
 		restoreSslCertificates(appDir, configPanel);
@@ -173,7 +182,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param username Nombre del usuario al que se le desea asignar la propiedad.
 	 */
 	private static void changeDirectoryProperty(final File file, final String username) {
-
 		final String cmd = CHANGE_OWN_COMMAND
 				.replace("%DIR%", file.getAbsolutePath()) //$NON-NLS-1$
 				.replace("%USERNAME%", username); //$NON-NLS-1$
@@ -366,19 +374,24 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		try {
 			final File getUsersScriptFile = createGetUsersScript();
 			final Object o = MacUtils.executeScriptFile(getUsersScriptFile, false, true);
-			userDirs = new ArrayList<>();
-			try (
-					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							2048, // Maximo 2048 lineas de salida (256 perfiles)
-							2048 // Maximo 2048 caracteres por linea
-							);
-					) {
-				String line;
-				while ((line = resReader.readLine()) != null) {
-					if (line.startsWith(USER_DIR_LINE_PREFIX)){
-						userDirs.add(line.substring(USER_DIR_LINE_PREFIX.length()));
+			if (o == null) {
+				userDirs = null;
+			}
+			else {
+				userDirs = new ArrayList<>();
+				try (
+						final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
+						final BufferedReader resReader = new BoundedBufferedReader(
+								new InputStreamReader(resIs),
+								2048, // Maximo 2048 lineas de salida (256 perfiles)
+								2048 // Maximo 2048 caracteres por linea
+								);
+						) {
+					String line;
+					while ((line = resReader.readLine()) != null) {
+						if (line.startsWith(USER_DIR_LINE_PREFIX)){
+							userDirs.add(line.substring(USER_DIR_LINE_PREFIX.length()));
+						}
 					}
 				}
 			}
@@ -474,8 +487,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			addExexPermissionsToFile(new File(mac_script_path));
 			executeScript(mac_script_path, true, true);
 		}
-		catch (final Exception e1) {
-			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e1, e1); //$NON-NLS-1$
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
 		}
 		finally {
@@ -783,7 +796,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	static void writeScriptFile(final String path, final StringBuilder data, final boolean append) throws IOException{
-		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + data.toString()); //$NON-NLS-1$
+		LOGGER.fine("Se escribira en fichero (" + path + ") el siguiente comando:\n" + data.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		final File macScript = new File(path);
 		data.append("\n"); //$NON-NLS-1$
 		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
