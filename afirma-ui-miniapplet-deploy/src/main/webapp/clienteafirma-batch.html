@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html> <!-- Ejemplo basico de lanzador de la aplicacion -->
+  <head>
+	<title>Ejemplo de firma por lotes del MiniApplet @firma</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	<script type="text/javascript" src="js/autoscript.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
+	<script type="text/javascript">
+
+		var singleSigns = new Array();
+	
+		function showResultCallback(signatureB64, certificateB64) {
+			showLog("Firma OK");
+			document.getElementById('result').value = signatureB64;
+		}
+
+		function showLogCallback(errorType, errorMessage) {
+			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+		}
+
+		function doSignBatch() {
+			try {
+				var batch = createBatchConfiguration();
+				
+				showLog(batch);
+				
+				AutoScript.signBatch(
+					AutoScript.getBase64FromText(batch),
+					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
+					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
+					document.getElementById("filters").value,
+					showResultCallback,
+					showLogCallback);
+
+			} catch(e) {
+				try {
+					showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
+				} catch(ex) {
+					showLog("Error: " + e);
+				}
+			}
+		}
+
+		function addSingleSign() {
+			singleSigns[singleSigns.length] = AutoScript.getBase64FromText(buildSingleSign(generateUUID()));
+			document.getElementById("signButton").disabled = "";
+		}
+		
+		function generateUUID(){
+		    var d = new Date().getTime();
+		    if(window.performance && typeof window.performance.now === "function"){
+		        d += performance.now();; //use high-precision timer if available
+		    }
+		    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = (d + Math.random()*16)%16 | 0;
+		        d = Math.floor(d/16);
+		        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+		    });
+		    return uuid;
+		}
+		
+		function buildSingleSign(id) {
+			
+			var datasource = document.getElementById("datasourceValue").value;
+			if (document.getElementById("datasource").value == "text") {
+				datasource = AutoScript.getBase64FromText(datasource);
+			}
+			
+			var format = document.getElementById("format").value;
+			var suboperation = document.getElementById("suboperation").value;
+			var extraParams = AutoScript.getBase64FromText(document.getElementById("params").value);
+			var target = document.getElementById("target").value;
+
+			var config;
+			if (target == "es.gob.afirma.signers.batch.SignSaverFile") {
+				config = AutoScript.getBase64FromText("FileName=" + document.getElementById("targetValue1").value);
+			}
+			else {
+				config = AutoScript.getBase64FromText("PostUrl=" + document.getElementById("targetValue1").value +
+						"\nPostParamName=" + document.getElementById("targetValue2").value);
+			}
+			
+			return "<singlesign Id=\"" + id + "\">"
+				+ "<datasource>" + datasource + "</datasource>"
+				+ "<format>" + format + "</format>"
+				+ "<suboperation>" + suboperation + "</suboperation>"
+				+ "<extraparams>" + extraParams + "</extraparams>"
+				+ "<signsaver>"
+				+ "<class>" + target + "</class>" 
+				+ "<config>" + config + "</config>"
+				+ "</signsaver>"
+				+ "</singlesign>";
+		}
+		
+		function createBatchConfiguration() {
+			
+			var stopOnError = document.getElementById("stopOnError").checked;
+			var algorithm = document.getElementById("algorithm").value;
+			var concurrentTimeOut = document.getElementById("concurrentTimeOut").value;
+			
+			var configuration = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n"
+				+ "<signbatch stoponerror=\"" + stopOnError + "\" algorithm=\"" + algorithm + "\" ";
+			
+			if (concurrentTimeOut) {
+				configuration += "concurrenttimeout=\"" + concurrentTimeOut + "\"";
+			}
+			configuration += ">";
+			
+			for (var i=0; i < singleSigns.length; i++) {
+				configuration += AutoScript.getTextFromBase64(singleSigns[i]);
+			}
+			configuration += "</signbatch>";
+			
+			return configuration;
+		}
+
+		function showAppletLog() {
+			try {
+				showLog(AutoScript.getCurrentLog());
+			} catch(e) {
+				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
+			}
+		}
+
+		function cleanDataField(dataField, textDiv) {
+			textDiv.innerHTML = "";
+			dataField.value = null;
+		}
+		
+		function selectSignManager() {
+			
+			var select = document.getElementById("target");
+			var newValue = select.options[select.selectedIndex].value;
+			
+			if (newValue == "es.gob.afirma.signers.batch.SignSaverFile") {
+				document.getElementById('targetValue1').style.display = "block";
+				document.getElementById('targetValue1Label').style.display = "block";
+				document.getElementById('targetValue1Label').innerHTML = "FileName:";
+				document.getElementById('targetValue2').style.display = "none";
+				document.getElementById('targetValue2Label').style.display = "none";
+			}
+			else if (newValue == "es.gob.afirma.signers.batch.SignSaverHttpPost") {
+				document.getElementById('targetValue1').display = "block";
+				document.getElementById('targetValue1Label').style.display = "block";
+				document.getElementById('targetValue1Label').innerHTML = "PostUrl:";
+				document.getElementById('targetValue2').style.display = "block";
+				document.getElementById('targetValue2Label').style.display = "block";
+				document.getElementById('targetValue2Label').innerHTML = "PostParamName:";
+			}
+		}
+		
+		function addExtraParam(newParamId, listParamsId) {
+			var paramsList = document.getElementById(listParamsId);
+			paramsList.value = paramsList.value + document.getElementById(newParamId).value + "\n";
+			document.getElementById(newParamId).value = "";
+		}
+		
+		function cleanExtraParams(newParamId, listParamsId) {
+			document.getElementById(listParamsId).value = "";
+			document.getElementById(newParamId).value = "";
+		}
+		
+		function showLog(newLog) {
+			document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+		}
+
+	</script>
+  </head>
+	<body>
+		<script type="text/javascript">
+			AutoScript.cargarAppAfirma();
+			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+		</script>
+		
+		<fieldset><legend>Configuraci&oacute;n general</legend>
+			<div>
+			 <label for="algorithm">Algoritmo</label>
+			 <select id="algorithm">
+			 <option value="SHA256withRSA">SHA1 con RSA</option>
+			 <option value="SHA512withRSA">SHA512 con RSA</option>
+			 </select>
+			</div>
+			
+			<div>
+			 <input type="checkbox" id="stopOnError" />Parar en caso de error
+			</div>
+			<div>
+			 <label for="concurrentTimeOut">Tiempo m&aacute;ximo por fase en los procesos concurrentes:</label>&nbsp;<input type="text" id="concurrentTimeOut" /> Segundos
+			</div>
+			
+			<div>
+			 <label for="filter">Filtros</label>
+			 <input id="filter" type="text"><input type="button" value="Agregar" onclick="addExtraParam('filter', 'filters');">&nbsp;
+			 <input type="button" value="Limpiar" onclick="cleanExtraParams('filter', 'filters');">&nbsp;
+			 <span>(Insertar las propiedades de una en una)</span>
+			 <br>
+			 <textarea id="filters" cols="50" rows="5" readonly></textarea>
+			</div>
+		</fieldset>
+		
+		<fieldset><legend>Configuraci&oacute;n de firmas particulares</legend>
+			<fieldset><legend>Fuente de datos</legend>
+			<select id="datasource">
+				 <option value="text" selected>Texto plano</option>
+				 <option value="base64">Base64</option>
+				 <option value="url">URL</option>
+			</select>
+			<br>
+			<input type="text" name="datasourceValue" id="datasourceValue" style="width: 600px;"/>
+			</fieldset>
+			<div>
+			 <label for="format">Formato</label>
+			 <select id="format">
+				 <option value="CAdES" selected>CAdES</option>
+				 <option value="PAdES">PAdES</option>
+				 <option value="XAdES">XAdES</option>
+				 <option value="FacturaE">FacturaE</option>
+			 </select>
+			</div>
+			
+			<div>
+			 <label for="suboperation">Operaci&oacute;n</label>
+			 <select id="suboperation">
+			 <option value="sign">Firma</option>
+			 <option value="cosign">Cofirma</option>
+			 <option value="countersign">Contrafirma</option>
+			 </select>
+			</div>
+			
+			<div>
+			 <label for="newParam">ExtraParams</label>
+			 <input id="newParam" type="text"><input type="button" value="Agregar" onclick="addExtraParam('newParam', 'params');">&nbsp;
+			 <input type="button" value="Limpiar" onclick="cleanExtraParams('newParam', 'params');">&nbsp;
+			 <span>(Insertar las propiedades de una en una)</span>
+			 <br>
+			 <textarea id="params" cols="50" rows="5" readonly></textarea>
+			</div>
+			<div>
+				<label for="target">Manejador para el guardado de la firma:</label><br>
+				<select id="target" name="target" onchange="selectSignManager();">
+					 <option value="es.gob.afirma.signers.batch.SignSaverFile" selected>SignSaverFile</option>
+					 <option value="es.gob.afirma.signers.batch.SignSaverHttpPost">SignSaverHttpPost</option>
+				</select>
+				<br>
+				<label id="targetValue1Label" for="targetValue1">Ruta completa de salida:</label><input type="text" name="targetValue1" id="targetValue1" style="width: 600px;"/>
+				<label id="targetValue2Label" for="targetValue2"  style="display: none;"></label><input type="text" name="targetValue2" id="targetValue2" style="width: 600px; display: none;"/>
+				<div style="font-weight: bold;">NOTA: Los aqu&iacute; presentados son manejadores de pruebas y no deben usarse tal cual en los entornos de producción</div>
+			</div>
+		
+			<input type="button" value="Agregar firma" onclick="addSingleSign();">
+		</fieldset>
+		
+		<br/>
+
+		<input type="button" id="signButton" value="Firmar" onclick="doSignBatch();" disabled="disabled">&nbsp;
+		<br/>
+		<br/>
+		
+		<div>
+		 <span>Consola</span>
+		 <br>
+		 <textarea id="console" cols="150" rows="10">
+		 </textarea>
+		</div>
+		
+		<div>
+		 <span>Resultado</span>
+		 <br>
+		 <textarea id="result" cols="150" rows="10">
+		 </textarea>
+		</div>
+	</body>
+</html>	
