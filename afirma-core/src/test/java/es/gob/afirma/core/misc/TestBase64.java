@@ -1,5 +1,6 @@
 package es.gob.afirma.core.misc;
 
+import java.io.InputStream;
 import java.util.zip.CRC32;
 
 import org.junit.Assert;
@@ -26,7 +27,12 @@ public final class TestBase64 {
 	@Test
 	public void testBase64Encoding() throws Exception {
 		for (final String f : TEST_FILES) {
-			final byte[] data = AOUtil.getDataFromInputStream(TestBase64.class.getResourceAsStream(f));
+			final byte[] data;
+			try (
+				final InputStream is = TestBase64.class.getResourceAsStream(f)
+			) {
+				data = AOUtil.getDataFromInputStream(is);
+			}
 
 			// Calculamos el CRC
 			final CRC32 crc = new CRC32();
