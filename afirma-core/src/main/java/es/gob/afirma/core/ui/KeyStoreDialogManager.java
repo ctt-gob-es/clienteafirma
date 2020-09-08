@@ -49,7 +49,7 @@ public interface KeyStoreDialogManager {
 	void setKeyStoreManager(KeyStoreManager ksm);
 
 	/**
-	 * Cambia el almacen cargado en el di&aacute;logo al correspondiente al que corresponde
+	 * Cambia el almac&eacute;n cargado en el di&aacute;logo al correspondiente al que corresponde
 	 * al indicado. Los tipos de almac&eacute;n a los que se puede cambiar se declaran en esta
 	 * misma interfaz.
 	 * @param keyStoreId Identificador de almac&eacute;n.
@@ -80,7 +80,7 @@ public interface KeyStoreDialogManager {
 	String show() throws AOException;
 
 	/** Recupera el alias del certificado seleccionado;. Este m&eacute;todo no deber&iacute;a
-	 * usarse cuando se permite la carga de almacenes externos. En su lugar, se debe utilizar {@link getCertificateContext()}
+	 * usarse cuando se permite la carga de almacenes externos. En su lugar, se debe utilizar {@link #getSelectedCertificateContext()}
 	 * @return Alias de certificado. */
 	String getSelectedAlias();
 
@@ -107,6 +107,6 @@ public interface KeyStoreDialogManager {
 
 	/** Obtiene el nombre del tipo de almac&eacute;n del que se muestran los
 	 * certificados en el di&aacute;logo.
-	 * @return nombre del tipo de almac&eacute;n o {@code null} si no se conoce. */
+	 * @return Nombre del tipo de almac&eacute;n o {@code null} si no se conoce. */
 	String getKeyStoreName();
 }
