@@ -148,10 +148,18 @@ public final class OfficeAnalizer {
     	final File tempFile = AOFileUtils.createTempFile(data);
     	try (final ZipFile zipFile = new ZipFile(tempFile)) {
     		if (isODFFile(zipFile)) {
-    			mimetype = getODFMimeType(zipFile.getInputStream(zipFile.getEntry("mimetype"))); //$NON-NLS-1$
+    			try (
+					final InputStream is = zipFile.getInputStream(zipFile.getEntry("mimetype")); //$NON-NLS-1$
+				) {
+    				mimetype = getODFMimeType(is);
+    			}
     		}
     		else if (isOOXMLFile(zipFile)) {
-    			mimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml"))); //$NON-NLS-1$
+    			try (
+					final InputStream is = zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml")) //$NON-NLS-1$
+				) {
+    				mimetype = getOOXMLMimeType(is);
+    			}
     		}
     		else {
     			mimetype = getMimeTypeOffice97(data);

@@ -9,6 +9,7 @@
 
 package es.gob.afirma.core.signers;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Properties;
@@ -62,10 +63,14 @@ public final class AdESPolicy {
         	this.policyIdentifierHashAlgorithm = identifierHashAlgorithm == null ?
         			DEFAULT_HASH_ALGORITHM : AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
 
-            try {
+            try (
+        		final InputStream is = new URL(identifier).openStream()
+    		) {
                 this.policyIdentifierHash =  Base64.encode(
-                		MessageDigest.getInstance(this.policyIdentifierHashAlgorithm).digest(
-                				AOUtil.getDataFromInputStream(new URL(identifier).openStream())));
+            		MessageDigest.getInstance(this.policyIdentifierHashAlgorithm).digest(
+        				AOUtil.getDataFromInputStream(is)
+    				)
+        		);
             }
             catch(final Exception e) {
                 throw new IllegalArgumentException("Si no se especifica la huella digital de la politica es necesario que el identificador sea una URL accesible universalmente: " + e, e); //$NON-NLS-1$

@@ -178,24 +178,20 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				break;
 			}
 		}
-		catch (final AOCancelledOperationException e) {
-			LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-			return false;
-		}
-		catch (final AOKeystoreAlternativeException e) {
-			LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+		catch (final AOCancelledOperationException | AOKeystoreAlternativeException e) {
+			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 			return false;
 		}
 		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-					parent,
-					KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
-					KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE
-					);
+				parent,
+				KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+				KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+				AOUIFactory.ERROR_MESSAGE
+			);
 			return false;
 		}
-
 
 		// Establece el nuevo almacen cargado como el actual
 		setKeyStoreManager(newKsm);
@@ -215,17 +211,17 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			if (this.ksm.getType() == AOKeyStore.SHARED_NSS ||
 					this.ksm.getKeyStoreManagers().size() > 0 && this.ksm.getKeyStoreManagers().get(0).getType() == AOKeyStore.SHARED_NSS) {
 				keystoreTypes = new int[] {
-						KEYSTORE_ID_SYSTEM,
-						KEYSTORE_ID_PKCS12,
-						KEYSTORE_ID_DNIE
-					};
+					KEYSTORE_ID_SYSTEM,
+					KEYSTORE_ID_PKCS12,
+					KEYSTORE_ID_DNIE
+				};
 			}
 			else {
 				keystoreTypes = new int[] {
-						KEYSTORE_ID_MOZILLA,
-						KEYSTORE_ID_PKCS12,
-						KEYSTORE_ID_DNIE
-					};
+					KEYSTORE_ID_MOZILLA,
+					KEYSTORE_ID_PKCS12,
+					KEYSTORE_ID_DNIE
+				};
 			}
 		}
 		else {
@@ -241,7 +237,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	@Override
 	public String getKeyStoreName() {
-		AOKeyStoreManager aoKsm = null;
+		final AOKeyStoreManager aoKsm;
 		final List<AOKeyStoreManager> ksmList = this.ksm.getKeyStoreManagers();
 		if (ksmList != null && ksmList.size() > 0) {
 			aoKsm = ksmList.get(0);
@@ -264,15 +260,18 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.MOZ_UNI,
-					null,
-					null,
-					AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
-					parent);
-		} catch (final AOCancelledOperationException e) {
+				AOKeyStore.MOZ_UNI,
+				null,
+				null,
+				AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
 			throw e;
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
 	}
@@ -290,28 +289,32 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 		final File[] ksFile;
 		ksFile = AOUIFactory.getLoadFiles(
-				KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
-				null,
-				null,
-				EXTS,
-				KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
-				false,
-				false,
-				null,
-				parent);
+			KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
+			null,
+			null,
+			EXTS,
+			KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
+			false,
+			false,
+			null,
+			parent
+		);
 
 		// Cargamos el almacen
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.PKCS12,
-					ksFile[0].getAbsolutePath(),
-					null,
-					AOKeyStore.PKCS12.getStorePasswordCallback(parent),
-					parent);
-		} catch (final AOCancelledOperationException e) {
+				AOKeyStore.PKCS12,
+				ksFile[0].getAbsolutePath(),
+				null,
+				AOKeyStore.PKCS12.getStorePasswordCallback(parent),
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
 			throw e;
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
 	}
@@ -330,15 +333,18 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		try {
 			// Proporcionamos el componente padre como parametro
 			ksm.init(
-					AOKeyStore.DNIEJAVA,
-					null,
-					null,
-					new Object[] { parent },
-					true);
-		} catch (final AOCancelledOperationException e) {
+				AOKeyStore.DNIEJAVA,
+				null,
+				null,
+				new Object[] { parent },
+				true
+			);
+		}
+		catch (final AOCancelledOperationException e) {
 			throw e;
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el DNIe", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el DNIe: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
 		return ksm;
@@ -356,9 +362,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
 	private static AOKeyStoreManager openSystemKeyStore(final Component parent) throws AOKeystoreAlternativeException,
-		Exception {
-
-		AOKeyStore ks;
+		                                                                               Exception {
+		final AOKeyStore ks;
 		final Platform.OS currentOs = Platform.getOS();
 		if (currentOs == Platform.OS.WINDOWS) {
 			ks = AOKeyStore.WINDOWS;
@@ -375,15 +380,18 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					ks,
-					null,
-					null,
-					ks.getStorePasswordCallback(parent),
-					parent);
-		} catch (final AOCancelledOperationException e) {
+				ks,
+				null,
+				null,
+				ks.getStorePasswordCallback(parent),
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
 			throw e;
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen del sistema", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen del sistema: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
 	}
