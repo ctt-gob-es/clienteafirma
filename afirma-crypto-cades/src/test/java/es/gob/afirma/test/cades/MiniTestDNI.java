@@ -65,16 +65,19 @@ public final class MiniTestDNI {
         parameters.setSigningTime(new Date());
 
         final byte[] firma = GenCAdESEPESSignedData.generateSignedData(
-        		"SHA512withRSA", //$NON-NLS-1$
-        		pke.getPrivateKey(),
-        		pke.getCertificateChain(),
-        		parameters);
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		parameters
+		);
 
         Assert.assertNotNull(firma);
+        try (
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo.csig"); //$NON-NLS-1$
+		) {
+            fos.write(firma);
+        }
 
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo.csig"); //$NON-NLS-1$
-        fos.write(firma);
-        try { fos.close(); } catch (final Exception e) { }
     }
 
 }
