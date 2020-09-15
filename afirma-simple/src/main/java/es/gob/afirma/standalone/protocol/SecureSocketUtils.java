@@ -25,7 +25,6 @@ class SecureSocketUtils {
 	private static final String KEYSTORE_NAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String CA_ROOT_NAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
-	private static final String KEY_MANAGER_TYPE = "SunX509"; //$NON-NLS-1$
 	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
 
 	/**
@@ -52,8 +51,8 @@ class SecureSocketUtils {
 		try (InputStream is = new FileInputStream(sslKeyStoreFile)) {
 			ks.load(is, ksPass);
 		}
-		// key manager factory de tipo SunX509
-		final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KEY_MANAGER_TYPE);
+		// key manager factory por defecto (de tipo SunX509 en OpenJDK, o de tipo ibmX509 en IBM JVM)
+		final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		kmf.init(ks, ctPass);
 
 		final SSLContext sc = SSLContext.getInstance(SSLCONTEXT);

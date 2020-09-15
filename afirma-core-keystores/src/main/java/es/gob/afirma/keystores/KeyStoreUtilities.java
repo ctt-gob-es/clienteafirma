@@ -356,6 +356,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacén de tipo DNIe: " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -375,6 +378,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getCeres430KeyStoreManager(parentComponent));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacén de tipo CERES 4.30 o superior: " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -387,6 +393,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacén de tipo CERES (otras): " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -406,6 +415,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getSmartCafeKeyStoreManager(parentComponent));
 				return true; // Si instancia SmartCafe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacén de tipo G&D SmartCafe: " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
