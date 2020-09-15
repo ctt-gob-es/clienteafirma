@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -272,12 +273,16 @@ public final class CMSTimestamper {
     private static byte[] getTSAResponseExternalSocket(final byte[] request, final Socket socket) throws IOException {
 
     	// Envio de datos...
-    	final DataOutputStream dataoutputstream = new DataOutputStream(socket.getOutputStream());
-    	dataoutputstream.writeInt(request.length + 1);
-    	dataoutputstream.writeByte(0);
-    	dataoutputstream.write(request);
-    	dataoutputstream.flush();
-    	socket.getOutputStream().flush();
+    	try (
+			final OutputStream os = socket.getOutputStream();
+			final DataOutputStream dataoutputstream = new DataOutputStream(os);
+		) {
+	    	dataoutputstream.writeInt(request.length + 1);
+	    	dataoutputstream.writeByte(0);
+	    	dataoutputstream.write(request);
+	    	dataoutputstream.flush();
+	    	os.flush();
+    	}
 
     	// Y recogida de la respuesta
     	final DataInputStream datainputstream = new DataInputStream(socket.getInputStream());
@@ -318,20 +323,25 @@ public final class CMSTimestamper {
     private static byte[] getTSAResponseHttp(final byte[] requestBytes, final URLConnection conn) throws IOException {
 
     	try (
-			final OutputStream out = conn.getOutputStream();
+			final OutputStream out = conn.getOutputStream()
 		) {
 	         out.write(requestBytes);
 	         out.flush();
     	}
 
-         final byte[] respBytes = AOUtil.getDataFromInputStream(conn.getInputStream());
+    	final byte[] respBytes;
+    	try (
+			final InputStream is = conn.getInputStream()
+		) {
+    		respBytes = AOUtil.getDataFromInputStream(is);
+    	}
 
-         final String encoding = conn.getContentEncoding();
-         if (encoding != null && encoding.equalsIgnoreCase("base64")) { //$NON-NLS-1$
+        final String encoding = conn.getContentEncoding();
+        if (encoding != null && encoding.equalsIgnoreCase("base64")) { //$NON-NLS-1$
              return Base64.decode(new String(respBytes));
-         }
+        }
 
-         return respBytes;
+        return respBytes;
      }
 
     /**
