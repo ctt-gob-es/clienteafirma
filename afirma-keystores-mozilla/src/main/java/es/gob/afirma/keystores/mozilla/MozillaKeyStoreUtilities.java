@@ -718,23 +718,16 @@ public final class MozillaKeyStoreUtilities {
 		// registro para evitar mostrar datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		try {
-			final Provider p = AOUtil.isJava9orNewer() ?
-				loadNssJava9(nssDirectory, p11NSSConfigFile) :
-					loadNssJava8(nssDirectory, p11NSSConfigFile);
+		final Provider p = AOUtil.isJava9orNewer() ?
+			loadNssJava9(nssDirectory, p11NSSConfigFile) :
+				loadNssJava8(nssDirectory, p11NSSConfigFile);
 
-			Security.addProvider(p);
+		Security.addProvider(p);
 
-			LOGGER.info(
-				"Proveedor PKCS#11 para NSS anadido" + (useSharedNss ? " para perfil compartido" : "") + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			);
-			return p;
-		} catch(final ClassNotFoundException e) {
-			LOGGER.warning(
-				"No se ha podido añadir el proveedor PKCS#11 para NSS" + (useSharedNss ? " para perfil compartido" : "") + ": " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			);
-		}
-		return null;
+		LOGGER.info(
+			"Proveedor PKCS#11 para NSS anadido" + (useSharedNss ? " para perfil compartido" : "") + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		);
+		return p;
 	}
 
 	private static boolean isDniePkcs11Library(final String driverName) {
