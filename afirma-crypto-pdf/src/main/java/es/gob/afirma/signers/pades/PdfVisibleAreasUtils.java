@@ -206,11 +206,11 @@ final class PdfVisibleAreasUtils {
 		ret = ret.replace(LAYERTEXT_TAG_CONTACT, signerContact != null ? signerContact : ""); //$NON-NLS-1$
 
 		// Se mapea la fecha con el formato proporcionado
-		if (txt.contains(LAYERTEXT_TAG_DATE_PREFIX)) {
-			final int strIdx = txt.indexOf(LAYERTEXT_TAG_DATE_PREFIX);
-			final String sdTag = txt.substring(
+		while (ret.contains(LAYERTEXT_TAG_DATE_PREFIX)) {
+			final int strIdx = ret.indexOf(LAYERTEXT_TAG_DATE_PREFIX);
+			final String sdTag = ret.substring(
 				strIdx,
-				txt.indexOf(LAYERTEXT_TAG_DELIMITER, strIdx + LAYERTEXT_TAG_DATE_PREFIX.length()) + LAYERTEXT_TAG_DELIMITER.length()
+				ret.indexOf(LAYERTEXT_TAG_DELIMITER, strIdx + LAYERTEXT_TAG_DATE_PREFIX.length()) + LAYERTEXT_TAG_DELIMITER.length()
 			);
 			String date;
 			final Date tbpDate = signDate != null ? signDate.getTime() : new Date();
