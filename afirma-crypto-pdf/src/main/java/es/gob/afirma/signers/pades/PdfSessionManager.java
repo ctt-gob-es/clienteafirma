@@ -471,6 +471,7 @@ public final class PdfSessionManager {
 			sap.setLayer4Text(layer4Text);
 		}
 
+		// Firma visible
 		if (signaturePositionOnPage != null && signatureField == null) {
 			if (signatureRotation == 0) {
 				sap.setVisibleSignature(signaturePositionOnPage, page, null);
@@ -493,6 +494,7 @@ public final class PdfSessionManager {
 				}
 			}
 		}
+		// Firma en un campo preexistente (visile o invisible)
 		else if (signatureField != null) {
 			sap.setVisibleSignature(signatureField);
 		}
