@@ -100,7 +100,10 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		// Metemos una huella SHA512 que se repite hasta completar el hueco
 		final byte[] dummyData = new byte[p1Size];
 		for (int i = 0; i < dummyData.length; i += sha512.length) {
-			System.arraycopy(sha512, 0, dummyData, i, sha512.length);
+			// Calculamos si solo necesitamos un fragmento de la huella para no excedernos
+			// del tamano del buffer
+			final int fragmentSize = p1Size > i + sha512.length ? sha512.length : p1Size - i;
+			System.arraycopy(sha512, 0, dummyData, i, fragmentSize);
 		}
 
 		// Si no existe ya, guardamos el par de PKCS#1 falso y datos a firmar
