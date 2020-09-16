@@ -339,8 +339,9 @@ final class PdfVisibleAreasUtils {
         final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), widthTxt, heightTxt);
         try (
     		final ByteBuffer internalBuffer = t.getInternalBuffer();
+        	final ByteBuffer actualBuffer = n2Layer.getInternalBuffer();
 		) {
-	        internalBuffer.write(n2Layer.getInternalBuffer().toByteArray());
+	        internalBuffer.write(actualBuffer.toByteArray());
 	        final Font f = appearance.getLayer2Font();
             // Traduccion de la fuente a una fuente PDF
             final BaseFont bf = f.getCalculatedBaseFont(false);
@@ -498,8 +499,8 @@ final class PdfVisibleAreasUtils {
      */
     private static int countPlainPositions(final boolean[] positions) {
     	int count = 0;
-    	for (int i = 0; i < positions.length; i++) {
-    		if (positions[i]) {
+    	for (final boolean position : positions) {
+    		if (position) {
     			count++;
     		}
     	}

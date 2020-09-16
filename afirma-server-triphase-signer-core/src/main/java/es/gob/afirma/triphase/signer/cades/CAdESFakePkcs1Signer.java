@@ -36,26 +36,6 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 	private static final String MD_ALGORITHM = "SHA-512";   //$NON-NLS-1$
 
-	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 1024 bits. */
-	private static final Integer PKCS1_DEFAULT_SIZE_1024 = Integer.valueOf(128);
-
-	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 2048 bits. */
-	private static final Integer PKCS1_DEFAULT_SIZE_2048 = Integer.valueOf(256);
-
-	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 4096 bits. */
-	private static final Integer PKCS1_DEFAULT_SIZE_4096 = Integer.valueOf(512);
-
-	private static final Integer KEY_SIZE_1024 = Integer.valueOf(1024);
-	private static final Integer KEY_SIZE_2048 = Integer.valueOf(2048);
-	private static final Integer KEY_SIZE_4096 = Integer.valueOf(4096);
-
-	private static final Map<Integer, Integer> P1_SIZES = new HashMap<>(3);
-	static {
-		P1_SIZES.put(KEY_SIZE_1024, PKCS1_DEFAULT_SIZE_1024);
-		P1_SIZES.put(KEY_SIZE_2048, PKCS1_DEFAULT_SIZE_2048);
-		P1_SIZES.put(KEY_SIZE_4096, PKCS1_DEFAULT_SIZE_4096);
-	}
-
 	private static final String PARAM_PRE = "PRE";   //$NON-NLS-1$
 
 	private static final String PARAM_DUMMY_PK1 = "DPK1";   //$NON-NLS-1$
@@ -94,18 +74,15 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		// puede salir del Certificado
 
 		// Obtenemos el tamano de clave y de PKCS#1
-		final Integer p1Size;
+		final int p1Size;
 		if (certChain[0].getPublicKey() instanceof RSAPublicKey) {
 			final int keySize = ((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength();
-			p1Size = P1_SIZES.get(Integer.valueOf(keySize));
+			p1Size = keySize / 8;
 		}
 		else {
 			throw new AOException(
 				"Tipo de clave no soportada: " + certChain[0].getPublicKey().getAlgorithm() //$NON-NLS-1$
 			);
-		}
-		if (p1Size == null) {
-			throw new AOException("Tamano de clave no soportado: " + p1Size); //$NON-NLS-1$
 		}
 
 		// Calculamos un valor que sera siempre el mismo para los mismos datos y de las dimensiones que
@@ -121,7 +98,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		}
 
 		// Metemos una huella SHA512 que se repite hasta completar el hueco
-		final byte[] dummyData = new byte[p1Size.intValue()];
+		final byte[] dummyData = new byte[p1Size];
 		for (int i = 0; i < dummyData.length; i += sha512.length) {
 			System.arraycopy(sha512, 0, dummyData, i, sha512.length);
 		}

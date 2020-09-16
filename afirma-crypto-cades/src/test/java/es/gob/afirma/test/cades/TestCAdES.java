@@ -12,6 +12,7 @@ package es.gob.afirma.test.cades;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -51,8 +52,10 @@ public final class TestCAdES {
 	private static final List<byte[]> DATA = new ArrayList<>(2);
 	static {
 		for (final String dataFile : DATA_FILES) {
-			try {
-				DATA.add(AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream("/" + dataFile))); //$NON-NLS-1$
+			try (
+				final InputStream is = TestCAdES.class.getResourceAsStream("/" + dataFile) //$NON-NLS-1$
+			) {
+				DATA.add(AOUtil.getDataFromInputStream(is));
 			}
 			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas '" + dataFile + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -116,7 +119,11 @@ public final class TestCAdES {
 		final PrivateKeyEntry pke;
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final AOSigner signer = new AOCAdESSigner();
@@ -124,12 +131,17 @@ public final class TestCAdES {
 		final Properties p = new Properties();
 		p.put("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
-		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream("/rubric.jpg")); //$NON-NLS-1$
+		final byte[] data;
+		try (
+			final InputStream is = TestCAdES.class.getResourceAsStream("/rubric.jpg") //$NON-NLS-1$
+		) {
+			data = AOUtil.getDataFromInputStream(is);
+		}
 
 		final byte[] sign = signer.sign(data, "SHA512withRSA", pke.getPrivateKey(), pke.getCertificateChain(), p); //$NON-NLS-1$
 
 		try (
-			final OutputStream fos = new FileOutputStream(File.createTempFile("JPG_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
+			final OutputStream fos = new FileOutputStream(File.createTempFile("JPG_", ".csig")) //$NON-NLS-1$ //$NON-NLS-2$
 		) {
 			fos.write(sign);
 		}
@@ -155,7 +167,11 @@ public final class TestCAdES {
 		final X509Certificate cert;
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
 
@@ -185,7 +201,7 @@ public final class TestCAdES {
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 					try (
-						final OutputStream os = new FileOutputStream(saveFile);
+						final OutputStream os = new FileOutputStream(saveFile)
 					) {
 						os.write(result);
 						os.flush();
@@ -232,7 +248,11 @@ public final class TestCAdES {
 		final PrivateKeyEntry pke;
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final AOSigner signer = new AOCAdESSigner();
@@ -242,13 +262,13 @@ public final class TestCAdES {
 		extraParams.setProperty(CAdESExtraParams.SIGNER_CLAIMED_ROLES, "Apoderado de empresa|Director de proyecto"); //$NON-NLS-1$
 
 		final byte[] result = signer.sign(
-				DATA.get(0), AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
-				);
+			DATA.get(0), AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
+		);
 
 		final File saveFile = File.createTempFile("CAdES-ClaimedRoles-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
-				final OutputStream os = new FileOutputStream(saveFile);
-				) {
+			final OutputStream os = new FileOutputStream(saveFile)
+		) {
 			os.write(result);
 			os.flush();
 		}

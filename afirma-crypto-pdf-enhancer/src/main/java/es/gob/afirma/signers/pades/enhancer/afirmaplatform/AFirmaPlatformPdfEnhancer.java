@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.pades.enhancer.afirmaplatform;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -22,8 +23,9 @@ import org.apache.axis.client.Service;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
-/** A&ntilde;ade sello de tiempo a un PDF firmado mediante la Plataforma &#64;firma. */
+/** A&ntilde;ade un sello de tiempo a un PDF firmado mediante la Plataforma &#64;firma. */
 final class AFirmaPlatformPdfEnhancer {
+
    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
    private static final String CABECERA = "[TestClient]:"; //$NON-NLS-1$
    //Ruta donde se encuentran los ficheros de entrada a los servicios web
@@ -109,12 +111,14 @@ final class AFirmaPlatformPdfEnhancer {
 		   );
 	   }
 
-
-	   final String xmlTemplate = new String(
-		   AOUtil.getDataFromInputStream(
-			   AFirmaPlatformPdfEnhancer.class.getResourceAsStream("signUpgradeTemplate.xml") //$NON-NLS-1$
-		   )
-	   );
+	   final String xmlTemplate;
+	   try (
+		   final InputStream is = AFirmaPlatformPdfEnhancer.class.getResourceAsStream("signUpgradeTemplate.xml") //$NON-NLS-1$
+	   ) {
+		   xmlTemplate = new String(
+			   AOUtil.getDataFromInputStream(is)
+		   );
+	   }
 
 	   final String responseXml = upgradeSign(
 		   xmlTemplate.replace(APP_NAME_FIELD, applicationName).replace(SIGN_FIELD, Base64.encode(sign)
@@ -142,8 +146,10 @@ final class AFirmaPlatformPdfEnhancer {
       try {
 
          final Properties prop = new Properties();
-         try {
-            prop.load(AFirmaPlatformPdfEnhancer.class.getResourceAsStream("webservices.properties")); //$NON-NLS-1$
+         try (
+    		 final InputStream is = AFirmaPlatformPdfEnhancer.class.getResourceAsStream("webservices.properties") //$NON-NLS-1$
+		 ) {
+            prop.load(is);
          }
          catch (final IOException e) {
             final String msgError = "No se han podido cargar las propiedades de WebServices: " + e.getMessage(); //$NON-NLS-1$

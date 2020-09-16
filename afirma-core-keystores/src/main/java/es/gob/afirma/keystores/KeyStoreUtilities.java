@@ -12,6 +12,7 @@ package es.gob.afirma.keystores;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.Provider;
@@ -327,9 +328,13 @@ public final class KeyStoreUtilities {
 		}
 		try {
 			final Process p = new ProcessBuilder(
-					"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			).start();
-			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
+			try (
+				final InputStream is = p.getInputStream()
+			) {
+				return new String(AOUtil.getDataFromInputStream(is)).trim();
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -356,6 +361,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
+			catch (final NoClassDefFoundError e) {
+				LOGGER.info("No se puede inicializar el almacen de tipo DNIe: " + e); //$NON-NLS-1$
+			}
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -375,6 +383,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getCeres430KeyStoreManager(parentComponent));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacen de tipo CERES 4.30 o superior: " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -387,6 +398,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacen de tipo CERES (otras): " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -406,6 +420,9 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getSmartCafeKeyStoreManager(parentComponent));
 				return true; // Si instancia SmartCafe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
+            catch (final NoClassDefFoundError e) {
+                LOGGER.info("No se puede inicializar el almacen de tipo G&D SmartCafe: " + e); //$NON-NLS-1$
+            }
 			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
@@ -419,16 +436,15 @@ public final class KeyStoreUtilities {
 
 	private static AOKeyStoreManager getDnieKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				AOKeyStore.DNIEJAVA,
-				null,
-				null,
-				null,
-				parentComponent
-			);
-			LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-			tmpKsm.setPreferred(true);
-
-			return tmpKsm;
+			AOKeyStore.DNIEJAVA,
+			null,
+			null,
+			null,
+			parentComponent
+		);
+		LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+		tmpKsm.setPreferred(true);
+		return tmpKsm;
 	}
 
 	private static AOKeyStoreManager getCeres430KeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
