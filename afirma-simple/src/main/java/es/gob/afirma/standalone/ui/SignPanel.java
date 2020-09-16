@@ -221,19 +221,23 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	// Comprobamos primero si se esta firmando un unico PDF con firma visible,
     	// en cuyo caso calculamos las propiedades para la firma visible
     	if (this.signOperationConfigs.size() == 1 &&
-    			this.signOperationConfigs.get(0).getSigner() instanceof AOPDFSigner &&
-    			this.lowerPanel.getFilePanel() instanceof SignPanelFilePanel &&
-    				(((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature() ||
-    				((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp())){
+    			this.signOperationConfigs.get(0).getSigner() instanceof AOPDFSigner) {
 
     		this.signWaitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
+
+    		boolean visibleSignature = false;
+    		boolean visibleStamp = false;
+    		if (this.lowerPanel.getFilePanel() instanceof SignPanelFilePanel) {
+    			visibleSignature = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature();
+    			visibleStamp = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp();
+    		}
 
     		try {
     			VisiblePdfSignatureManager.getVisibleSignatureParams(
     					this.signOperationConfigs.get(0),
     					this,
-    					((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature(),
-    					((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp(),
+    					visibleSignature,
+    					visibleStamp,
     					getWindow());
     		}
     		catch (final AOCancelledOperationException e) {
@@ -247,7 +251,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	else {
     		// Comprobamos si hay casos de multifirma, y aplicamos
     		// la configuracion seleccionada en las preferencias
-    		for(final SignOperationConfig signConfig : this.signOperationConfigs) {
+    		for (final SignOperationConfig signConfig : this.signOperationConfigs) {
     			if(signConfig.getFileType() == FileType.SIGN_CADES) {
     				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)) {
     					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
