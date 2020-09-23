@@ -11,6 +11,7 @@ package es.gob.afirma.signers.xml.style;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
@@ -33,6 +34,9 @@ final class XmlStyleMessages {
             return RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+    			"No se ha encontrado el texto con la clave '" + key + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
             return '!' + key + '!';
         }
     }
@@ -49,6 +53,9 @@ final class XmlStyleMessages {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+    			"No se ha encontrado el texto con la clave '" + key + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
             return '!' + key + '!';
         }
     }

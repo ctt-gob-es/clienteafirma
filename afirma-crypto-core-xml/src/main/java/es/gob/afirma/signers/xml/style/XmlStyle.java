@@ -180,7 +180,11 @@ public final class XmlStyle {
             if (styleURI.getScheme().equals("file")) { //$NON-NLS-1$
                 throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://"); //$NON-NLS-1$
             }
-            xml = AOUtil.getDataFromInputStream(AOUtil.loadFile(styleURI));
+            // AOUtil.loadFile() usa internamente un ByteArrayInputStream, pero externamente es mejor
+            // usar siempre try-with-resources para no depender de esta implementacion concreta
+            try (final InputStream is = AOUtil.loadFile(styleURI)) {
+            	xml = AOUtil.getDataFromInputStream(is);
+            }
         }
         catch (final Exception e) {
 

@@ -25,17 +25,25 @@ public final class XMLConstants {
     /** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
     public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 
+    /** Identificador XMLDSig para el formato de firma SHA1withRSA. */
     public static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
+
     private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
     private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
     private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
+
+    /** Identificador XMLDSig para el formato de huella SHA1. */
     public static final String URL_SHA1        = "http://www.w3.org/2000/09/xmldsig#sha1"; //$NON-NLS-1$
+
     private static final String URL_SHA256      = "http://www.w3.org/2001/04/xmlenc#sha256"; //$NON-NLS-1$
     private static final String URL_SHA384      = "http://www.w3.org/2001/04/xmldsig-more#sha384"; //$NON-NLS-1$
     private static final String URL_SHA512      = "http://www.w3.org/2001/04/xmlenc#sha512"; //$NON-NLS-1$
 
     // Identificadores para ECDSA
+
+    /** Identificador XMLDSig para el formato de firma SHA1withECDSA. */
     public static final String URL_SHA1_ECDSA    = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"; //$NON-NLS-1$
+
     private static final String URL_SHA224_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"; //$NON-NLS-1$
     private static final String URL_SHA256_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"; //$NON-NLS-1$
     private static final String URL_SHA384_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"; //$NON-NLS-1$
