@@ -26,7 +26,7 @@ public final class UiTester {
 	@SuppressWarnings({ "static-method" })
 	@Test
 	public void testFailedDialog() {
-		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, true, false, new SignPdfDialogListener() {
+		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, true, false, null, new SignPdfDialogListener() {
 			@Override
 			public void propertiesCreated(final Properties extraParams) {
 				// Vacio
@@ -44,6 +44,7 @@ public final class UiTester {
 				IS_SIGN,
 				testPdf,
 				null,true, false,
+				null,
 				new SignPdfDialogListener() {
 					@Override
 					public void propertiesCreated(final Properties extraParams) {

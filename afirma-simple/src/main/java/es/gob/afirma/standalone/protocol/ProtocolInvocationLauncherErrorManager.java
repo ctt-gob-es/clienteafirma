@@ -69,6 +69,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_INVALID_FACTURAE = "SAF_38"; //$NON-NLS-1$
 	static final String ERROR_INVALID_SIGNATURE = "SAF_39"; //$NON-NLS-1$
 	static final String ERROR_RECOVER_SERVER_DOCUMENT = "SAF_40"; //$NON-NLS-1$
+	static final String ERROR_VISIBLE_SIGNATURE = "SAF_41"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
@@ -113,6 +114,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_INVALID_FACTURAE, ProtocolMessages.getString("ProtocolLauncher.48")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.49")); //$NON-NLS-1$
 		ERRORS.put(ERROR_RECOVER_SERVER_DOCUMENT, ProtocolMessages.getString("ProtocolLauncher.50")); //$NON-NLS-1$
+		ERRORS.put(ERROR_VISIBLE_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.51")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {

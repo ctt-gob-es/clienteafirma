@@ -120,6 +120,7 @@ public final class VisiblePdfSignatureManager {
 				parent,
 				signatureVisible,
 				stampVisible,
+				null,
 				new SignPdfListener(signConfig, executor)
 			);
     	}
