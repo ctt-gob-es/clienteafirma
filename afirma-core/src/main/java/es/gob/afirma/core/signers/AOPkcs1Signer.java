@@ -59,7 +59,7 @@ public final class AOPkcs1Signer implements AOSigner {
 			);
 		}
 
-		LOGGER.info(
+		LOGGER.fine(
 			"Se ha solicitado una firma '" + algorithm + "' con una clave de tipo " + key.getAlgorithm() //$NON-NLS-1$ //$NON-NLS-2$
 		);
 

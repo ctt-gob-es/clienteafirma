@@ -56,8 +56,6 @@ public class TriPhaseHelper {
 			throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException,
 			IllegalStateException {
 
-		System.out.println("Generacion de codigo de verificacion");
-
 		final String hmacSeed = TriConfigManager.getHMacKey();
 		if (hmacSeed == null) {
 			return;
@@ -96,8 +94,6 @@ public class TriPhaseHelper {
 	// ya podr&iacute;a dejar de pasarse).
 	static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert)
 			throws SecurityException, IOException {
-
-		System.out.println("Comprobacion de integridad");
 
 		final String hmacSeed = TriConfigManager.getHMacKey();
 		if (hmacSeed == null) {

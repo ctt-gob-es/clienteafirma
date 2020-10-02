@@ -101,7 +101,7 @@ public final class LogManager {
 					application + ".afirma.log.xml") //$NON-NLS-1$
 						.replace("%h", Platform.getUserHome()); //$NON-NLS-1$
 		}
-		final File path = new File(new File(logFile).getParent());
+		final File path = new File(logFile).getParentFile();
 		if (!path.exists()) {
 			LOGGER.info("La ruta para el fichero de registro ('" + path + "') no existe, se creara");  //$NON-NLS-1$//$NON-NLS-2$
 			if (!path.mkdirs()) {
