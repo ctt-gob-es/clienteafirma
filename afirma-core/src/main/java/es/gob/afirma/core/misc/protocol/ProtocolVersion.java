@@ -1,10 +1,10 @@
 package es.gob.afirma.core.misc.protocol;
 
-/**
- * Identificadores de las versiones de protocolo en las que se introducen cambios
+import java.util.logging.Logger;
+
+/** Identificadores de las versiones de protocolo en las que se introducen cambios
  * que rompen compatibilidad. Estos identificadores no coindicen con la versi&oacute;n
- * de la aplicaci&oacute;n, sino con la versi&oacute;n del protocolo.
- */
+ * de la aplicaci&oacute;n, sino con la versi&oacute;n del protocolo. */
 public enum ProtocolVersion {
 
 	/** Versi&oacute;n inicial. */
@@ -30,11 +30,9 @@ public enum ProtocolVersion {
 		return this.version;
 	}
 
-	/**
-	 * Comprueba si la version de protocolo indicada esta soportada.
+	/** Comprueba si la versi&oacute;n de protocolo indicada esta soportada.
 	 * @param protocolVersion Versi&oacute;n de protocolo que se desea comprobar.
-	 * @return {@code true} si la versi&oacute;n de protocolo declarada es mayor o igual a la indicada.
-	 */
+	 * @return {@code true} si la versi&oacute;n de protocolo declarada es mayor o igual a la indicada. */
 	public boolean support(final Object protocolVersion) {
 		if (protocolVersion == null) {
 			return false;
@@ -49,15 +47,16 @@ public enum ProtocolVersion {
 			return this.version >= Integer.parseInt(protocolVersion.toString());
 		}
 		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Cadena de protocolo en formato deconocido ('" + protocolVersion + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return false;
 		}
 	}
 
-	/**
-	 * Comprueba si la version de protocolo indicada esta soportada.
+	/** Comprueba si la versi&oacute;n de protocolo indicada esta soportada.
 	 * @param protocolVersion Versi&oacute;n de protocolo que se desea comprobar.
-	 * @return {@code true} si la versi&oacute;n de protocolo declarada es mayor o igual a la indicada.
-	 */
+	 * @return {@code true} si la versi&oacute;n de protocolo declarada es mayor o igual a la indicada. */
 	public boolean support(final int protocolVersion) {
 		return this.version >= protocolVersion;
 	}
