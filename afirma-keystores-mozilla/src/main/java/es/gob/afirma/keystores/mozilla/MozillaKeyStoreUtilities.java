@@ -435,11 +435,12 @@ public final class MozillaKeyStoreUtilities {
 				try {
 					System.load(libPath);
 				}
-				catch (final Error e) {
-					LOGGER.log(Level.WARNING,
-							"Error al cargar la biblioteca " + libPath + " para el acceso al almacen de claves de Mozilla: " + e, //$NON-NLS-1$ //$NON-NLS-2$
-							e
-							);
+				catch (final Exception | Error e) {
+					LOGGER.log(
+						Level.WARNING,
+						"Error al cargar la biblioteca " + libPath + " para el acceso al almacen de claves de Mozilla: " + e, //$NON-NLS-1$ //$NON-NLS-2$
+						e
+					);
 				}
 			}
 		}
