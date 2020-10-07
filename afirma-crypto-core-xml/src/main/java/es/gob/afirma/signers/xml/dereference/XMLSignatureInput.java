@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -109,7 +110,7 @@ final class XMLSignatureInput {
     }
 
     /** Returns the node set from input which was specified as the parameter of
-     * {@link XMLSignatureInput} constructor.
+     * <code>XMLSignatureInput</code> constructor.
      * @return the node set
      * @throws SAXException If error on SAX parsing.
      * @throws IOException If error while reading the data,
@@ -121,7 +122,7 @@ final class XMLSignatureInput {
     }
 
     /** Returns the node set from input which was specified as the parameter of
-     * {@link XMLSignatureInput} constructor.
+     * <code>XMLSignatureInput</code> constructor.
      * @param circumvent If there's need for fixing Java Bug 2650.
      * @return The node set
      * @throws SAXException If error on SAX parsing.
@@ -152,9 +153,9 @@ final class XMLSignatureInput {
     }
 
     /** Returns the Octet stream(byte Stream) from input which was specified as
-     * the parameter of {@link XMLSignatureInput} constructor.
+     * the parameter of <code>XMLSignatureInput</code> constructor.
      * @return The Octet stream(byte Stream) from input which was specified as
-     *         the parameter of {@link XMLSignatureInput} constructor.
+     *         the parameter of <code>XMLSignatureInput</code> constructor.
      * @throws IOException On any data error. */
     public InputStream getOctetStream() throws IOException  {
         if (this.inputOctetStreamProxy != null) {
@@ -168,9 +169,9 @@ final class XMLSignatureInput {
     }
 
     /** Returns the byte array from input which was specified as the parameter of
-     * {@link XMLSignatureInput} constructor.
+     * <code>XMLSignatureInput</code> constructor.
      * @return The byte[] from input which was specified as the parameter of
-     *         {@link XMLSignatureInput} constructor.
+     *         <code>XMLSignatureInput</code> constructor.
      * @throws IOException On any error getting the bytes. */
     public byte[] getBytes() throws IOException  {
         final byte[] inputBytes = getBytesFromInputStream();
@@ -276,10 +277,18 @@ final class XMLSignatureInput {
 				}
     		);
 
-            final Document doc = db.parse(getOctetStream());
+            final Document doc;
+            try (final InputStream is = getOctetStream()) {
+            	doc = db.parse(is);
+            }
             this.subNode = doc;
         }
         catch (final SAXException ex) {
+
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    			"No se ha encontrado un conjunto de nodos bien formado: " + ex //$NON-NLS-1$
+			);
+
             // if a not-wellformed nodeset exists, put a container around it...
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

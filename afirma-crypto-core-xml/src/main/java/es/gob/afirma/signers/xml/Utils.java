@@ -350,6 +350,7 @@ public final class Utils {
      * principales de firma.
      * @param format Formato de firma.
      * @param mode Modo de firma (s&oacute;lo usado en XMLdSig).
+     * @param useManifest Indica si la firma usa MANIFEST o no.
      * @param uri URI del objeto a firmar.
      * @param externallyDetachedHashAlgorithm Algoritmo de huella digital en el caso de estar esta
      *                                        pre-calculada

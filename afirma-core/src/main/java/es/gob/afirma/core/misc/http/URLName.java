@@ -374,13 +374,13 @@ final class URLName {
 				// else, if not both null
 			}
 		}
-		else if (this.host != u2.host) {
+		else if (!this.host.equals(u2.host)) {
 			return false;
 		}
 		// at this point, hosts match
 
 		// compare usernames
-		if (!(this.username == u2.username || this.username != null
+		if (!(this.username.equals(u2.username) || this.username != null
 				&& this.username.equals(u2.username))) {
 			return false;
 		}
@@ -471,7 +471,7 @@ final class URLName {
 	 * @version 1.16, 10/23/99
 	 * @since JDK1.0 */
 	static BitSet dontNeedEncoding;
-	static final int caseDiff = 'a' - 'A';
+	static final int CASE_DIFF = 'a' - 'A';
 
 	/* The list of characters that are not encoded have been determined by
 	 * referencing O'Reilly's "HTML: The Definitive Guide" (page 164). */

@@ -164,9 +164,14 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		if (dir != null) {
 			final File nssP11 = new File(dir, SOFTOKN3_DLL);
-			if (!nssP11.exists() || !nssP11.canRead()) {
+			if (!nssP11.exists()) {
 				throw new FileNotFoundException(
 					"No se ha encontrado un NSS en Windows para el directorio " + dir //$NON-NLS-1$
+				);
+			}
+			if (!nssP11.canRead()) {
+				throw new FileNotFoundException(
+					"No se tiene permiso para leer NSS en Windows para el directorio " + dir //$NON-NLS-1$
 				);
 			}
 			try (

@@ -61,22 +61,16 @@ public final class CustomUriDereferencer implements URIDereferencer {
 		try {
 			return Class.forName(DEFAULT_APACHE_NODESET_DATA);
 		}
-		catch (final Exception e) {
-			return Class.forName(DEFAULT_SUN_NODESET_DATA);
-		}
-		catch (final Error e) {
+		catch (final Exception | Error e) {
 			return Class.forName(DEFAULT_SUN_NODESET_DATA);
 		}
 	}
-	
+
 	private static Class<?> getOctetStreamDataClass() throws ClassNotFoundException {
 		try {
 			return Class.forName(DEFAULT_APACHE_OCTET_STREAM_DATA);
 		}
-		catch (final Exception e) {
-			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
-		}
-		catch (final Error e) {
+		catch (final Exception | Error e) {
 			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
 		}
 	}
@@ -85,10 +79,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 		try {
 			return Class.forName(DEFAULT_APACHE_XML_SIGNATURE_INPUT_CLASSNAME);
 		}
-		catch (final Exception e) {
-			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
-		}
-		catch (final Error e) {
+		catch (final Exception | Error e) {
 			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
 		}
 	}

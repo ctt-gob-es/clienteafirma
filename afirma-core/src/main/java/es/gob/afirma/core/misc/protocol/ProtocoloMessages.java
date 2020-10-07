@@ -10,6 +10,7 @@
 package es.gob.afirma.core.misc.protocol;
 
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 final class ProtocoloMessages {
 	private static final String BUNDLE_NAME = "protocolomessages"; //$NON-NLS-1$
@@ -26,6 +27,9 @@ final class ProtocoloMessages {
 			return RESOURCE_BUNDLE.getString(key);
 		}
 		catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+    			"No se ha encontrado el recurso textual con clave '" + key + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return '!' + key + '!';
 		}
 	}
