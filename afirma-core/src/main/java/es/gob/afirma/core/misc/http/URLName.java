@@ -374,13 +374,13 @@ final class URLName {
 				// else, if not both null
 			}
 		}
-		else if (!this.host.equals(u2.host)) {
+		else if (this.host != u2.host) {
 			return false;
 		}
 		// at this point, hosts match
 
 		// compare usernames
-		if (!(this.username.equals(u2.username) || this.username != null
+		if (!(this.username == u2.username || this.username != null
 				&& this.username.equals(u2.username))) {
 			return false;
 		}
