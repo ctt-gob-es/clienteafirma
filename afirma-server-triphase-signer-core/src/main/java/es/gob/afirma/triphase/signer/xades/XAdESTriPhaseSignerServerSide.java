@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.AlgorithmMethod;
@@ -46,6 +47,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -140,20 +142,26 @@ public final class XAdESTriPhaseSignerServerSide {
 		final List<String> previousSignaturesIds = new ArrayList<>();
 		Document xml = null;
 		String xmlEncoding = XML_DEFAULT_ENCODING;
-		try {
-			// Si los datos eran XML, comprobamos y almacenamos las firmas previas
-			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			dbf.setNamespaceAware(true);
-			xml = dbf.newDocumentBuilder().parse(
-					new ByteArrayInputStream(data)
-					);
 
-			if (xml.getXmlEncoding() != null) {
-				xmlEncoding = xml.getXmlEncoding();
+		if (AOFileUtils.isXML(data)) {
+			try {
+
+				// Si los datos eran XML, comprobamos y almacenamos las firmas previas
+				final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+				dbf.setNamespaceAware(true);
+				xml = dbf.newDocumentBuilder().parse(
+						new ByteArrayInputStream(data)
+						);
+				if (xml.getXmlEncoding() != null) {
+					xmlEncoding = xml.getXmlEncoding();
+				}
+			}
+			catch(final Exception e) {
+				LOGGER.log(Level.WARNING, "Error al cargar el documento XML", e);  //$NON-NLS-1$
 			}
 		}
-		catch(final Exception e) {
-			LOGGER.info("El documento a firmar no es XML, por lo que no contiene firmas previas: " + e);  //$NON-NLS-1$
+		else {
+			LOGGER.info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$
 		}
 
 		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
