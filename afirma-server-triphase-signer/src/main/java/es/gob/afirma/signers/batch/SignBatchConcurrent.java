@@ -140,9 +140,9 @@ public final class SignBatchConcurrent extends SignBatch {
 
 		for (final Future<CallableResult> f : results) {
 
-			final CallableResult tmp;
+			final CallableResult signatureResult;
 			try {
-				tmp = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
+				signatureResult = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "Error en la postfirma en paralelo del lote de firma", e); //$NON-NLS-1$
@@ -158,29 +158,29 @@ public final class SignBatchConcurrent extends SignBatch {
 			if (!ignoreRemaining) {
 
 				// Si hay error
-				if (!tmp.isOk()) {
+				if (!signatureResult.isOk()) {
 
 					error = true;
 
-					getSingleSignById(tmp.getSignatureId()).setProcessResult(
-						new ProcessResult(Result.ERROR_POST, tmp.getError().toString())
+					getSingleSignById(signatureResult.getSignatureId()).setProcessResult(
+						new ProcessResult(Result.ERROR_POST, signatureResult.getError().toString())
 					);
 
 					if (this.stopOnError) {
 						LOGGER.severe(
-								"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se parara el proceso: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
+								"Error en una de las firmas del lote (" + signatureResult.getSignatureId() + "), se parara el proceso: " + signatureResult.getError() //$NON-NLS-1$ //$NON-NLS-2$
 								);
 						ignoreRemaining = true;
 					}
 					else {
 						LOGGER.log(Level.WARNING,
-								"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se continua con el siguiente elemento: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
-								, tmp.getError());
+								"Error en una de las firmas del lote (" + signatureResult.getSignatureId() + "), se continua con el siguiente elemento: " + signatureResult.getError() //$NON-NLS-1$ //$NON-NLS-2$
+								, signatureResult.getError());
 					}
 				}
 				// Si todo fue bien
 				else {
-					getSingleSignById(tmp.getSignatureId()).setProcessResult(
+					getSingleSignById(signatureResult.getSignatureId()).setProcessResult(
 						ProcessResult.PROCESS_RESULT_OK_UNSAVED
 					);
 				}
@@ -188,7 +188,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			// Cuando se indica que se pare en caso de error, se marcan las firmas que no se han
 			// llegado a procesar
 			else {
-				getSingleSignById(tmp.getSignatureId()).setProcessResult(
+				getSingleSignById(signatureResult.getSignatureId()).setProcessResult(
 					ProcessResult.PROCESS_RESULT_SKIPPED
 				);
 			}
