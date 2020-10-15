@@ -21,12 +21,13 @@ import java.security.MessageDigest;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 
 final class TempStoreFileSystem implements TempStore {
 
 	/** N&uacute;mero de recuperaciones de fichero que realizaremos antes de iniciar un
 	 * proceso de limpieza de temporales caducados. */
-	private static final int RETRIEVES_BEFORE_CLEANING = 100;
+	private static final int RETRIEVES_BEFORE_CLEANING = 1000;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 	private static final MessageDigest MD;
@@ -90,7 +91,7 @@ final class TempStoreFileSystem implements TempStore {
 			}
 		}
 
-		final byte[] ret;
+		byte[] ret;
 		try (
 			final InputStream fis = new FileInputStream(
 				new File(
@@ -101,8 +102,6 @@ final class TempStoreFileSystem implements TempStore {
 			final InputStream bis = new BufferedInputStream(fis);
 		) {
 			ret = AOUtil.getDataFromInputStream(bis);
-			bis.close();
-			fis.close();
 		}
 		return ret;
 	}
@@ -124,6 +123,19 @@ final class TempStoreFileSystem implements TempStore {
 	}
 
 	private static String getFilename(final SingleSign ss, final String batchId) {
-		return AOUtil.hexify(MD.digest(ss.getId().getBytes()), false) + "." + batchId; //$NON-NLS-1$
+		byte[] id = ss.getId().getBytes();
+		
+		// Si el ID supera los 20 caracteres, usaremos en su lugar el hash
+		// Esto podria llevar a colisiones si se indican ID superiores a 20
+		// caracteres con un hash que resulta ser el ID de otro documento,
+		// pero esto no deberia ocurrir nunca y, de esta forma, no se
+		// tendra que calcular el hash siempre. Cuando se calcula siempre
+		// el hash, se ha comprobado que el espacio de tiempo que transcurre
+		// entre generar el fichero temporal con la firma y que se recupere
+		// es demasiado corto y a veces no se encuentra ese fichero 
+		if (id.length > 20) {
+			id = MD.digest(id);
+		}
+		return Base64.encode(id, true) + "." + batchId; //$NON-NLS-1$
 	}
 }

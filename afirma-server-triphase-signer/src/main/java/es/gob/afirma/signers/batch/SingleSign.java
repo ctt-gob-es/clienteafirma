@@ -47,7 +47,7 @@ public final class SingleSign {
 	private static final String HTTPS_SCHEME = "https://"; //$NON-NLS-1$
 	private static final String FTP_SCHEME = "ftp://"; //$NON-NLS-1$
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private Properties extraParams;
 
@@ -361,6 +361,7 @@ public final class SingleSign {
 					save(ts.retrieve(SingleSign.this, batchId));
 				}
 				catch(final Exception e) {
+					LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + SingleSign.this.getId()); //$NON-NLS-1$
 					return new CallableResult(getId(), e);
 				}
 				return new CallableResult(getId());
