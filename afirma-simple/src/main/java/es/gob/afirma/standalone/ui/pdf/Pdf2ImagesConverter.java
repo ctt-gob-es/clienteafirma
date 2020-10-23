@@ -23,17 +23,11 @@ import org.apache.pdfbox.rendering.PDFRenderer;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 final class Pdf2ImagesConverter {
 
-	static {
-
-	}
-
-	/**
-	 * Devuelve un listado con las miniaturas de todas las p&aacute;ginas del PDF.
+	/** Devuelve un listado con las miniaturas de todas las p&aacute;ginas del PDF.
 	 * @param inPdf Documento PDF.
-	 * @return Listado de imagenes.
+	 * @return Listado de im&aacute;genes.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
-	 * la generaci&oacute;n de las im&aacute;genes.
-	 */
+	 * la generaci&oacute;n de las im&aacute;genes. */
 	static List<BufferedImage> pdf2Images(final byte[] inPdf) throws IOException {
 		List<BufferedImage> pagesAsImages;
 		try (final PDDocument document = PDDocument.load(new ByteArrayInputStream(inPdf))) {
@@ -73,15 +67,13 @@ final class Pdf2ImagesConverter {
         return pagesAsImages;
 	}
 
-	/**
-	 * Actualiza el array de im&aacute;genes con la nueva selecci&oacute;n de miniaturas necesarias
+	/** Actualiza el array de im&aacute;genes con la nueva selecci&oacute;n de miniaturas necesarias
 	 * en base a la posici&oacute;n se&ntilde;alada, elimina las que ya no son necesarias.
 	 * @param inPdf Documento PDF.
 	 * @param currentPage P&aacute;gina entorno a la cual son necesarias las miniaturas.
 	 * @param pagesAsImages Listado actual de miniaturas.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
-	 * la generaci&oacute;n de las im&aacute;genes.
-	 */
+	 *                     la generaci&oacute;n de las im&aacute;genes. */
 	static void updateUsefulSections(final byte[] inPdf, final int currentPage, final List<BufferedImage> pagesAsImages) throws IOException {
 		try (final PDDocument document = PDDocument.load(new ByteArrayInputStream(inPdf))) {
 			final PDFRenderer pdfRenderer = new PDFRenderer(document);
@@ -99,33 +91,27 @@ final class Pdf2ImagesConverter {
         }
 	}
 
-	/**
-	 * Comprueba si un n&uacute;mero de p&aacute;gina est&acute; al inicio del documento.
+	/** Comprueba si un n&uacute;mero de p&aacute;gina est&acute; al inicio del documento.
 	 * @param page N&uacute;mero de p&aacute;gina.
 	 * @return {@code true} si la p&aacute;gina est&aacute; entre las primeras del documento,
-	 * {@code false} en caso contrario.
-	 */
+	 *         {@code false} en caso contrario. */
 	private static boolean isOfTheFirstPages(final int page) {
 		return page < 4;
 	}
 
-	/**
-	 * Comprueba si un n&uacute;mero de p&aacute;gina est&acute; al final del documento.
+	/** Comprueba si un n&uacute;mero de p&aacute;gina est&acute; al final del documento.
 	 * @param page N&uacute;mero de p&aacute;gina.
 	 * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
 	 * @return {@code true} si la p&aacute;gina est&aacute; entre las &uacute;ltimas del documento,
-	 * {@code false} en caso contrario.
-	 */
+	 *         {@code false} en caso contrario. */
 	private static boolean isOfTheLastPages(final int page, final int totalPages) {
 		return page >= totalPages - 4 && page < totalPages;
 	}
 
-	/**
-	 * Comprueba si un n&uacute;mero de p&aacute;gina es cercana a la p&aacute;gina actual del documento.
+	/** Comprueba si un n&uacute;mero de p&aacute;gina es cercana a la p&aacute;gina actual del documento.
 	 * @param page N&uacute;mero de p&aacute;gina.
 	 * @param currentPage N&uacute;mero de la p&aacute;gina actual.
-	 * @return {@code true} si la p&aacute;gina es cercana a la actual, {@code false} en caso contrario.
-	 */
+	 * @return {@code true} si la p&aacute;gina es cercana a la actual, {@code false} en caso contrario. */
 	private static boolean isNearTheCurrentPage(final int page, final int currentPage) {
 		return Math.abs(page - currentPage) <= 4;
 	}
