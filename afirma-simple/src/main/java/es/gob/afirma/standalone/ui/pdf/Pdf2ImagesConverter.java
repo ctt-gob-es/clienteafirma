@@ -23,6 +23,10 @@ import org.apache.pdfbox.rendering.PDFRenderer;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 final class Pdf2ImagesConverter {
 
+	static {
+
+	}
+
 	/**
 	 * Devuelve un listado con las miniaturas de todas las p&aacute;ginas del PDF.
 	 * @param inPdf Documento PDF.
