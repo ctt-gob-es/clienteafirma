@@ -15,8 +15,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 var AutoScript = ( function ( window, undefined ) {
 
 		var VERSION = "1.7.0";
+		var VERSION_CODE = 2;
 
-		/* ========== DEPRECADO: Se mantiene por compatibilidad con los despliegues del MiniApplet. */
+		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
 		var JAVA_ARGUMENTS = null;
 		var SYSTEM_PROPERTIES = null;
 		/* ========== */
@@ -98,6 +99,9 @@ var AutoScript = ( function ( window, undefined ) {
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
 		// entre la pagina web y AutoFirma
 		var forceWSMode = false;
+		
+		// Version minima del Cliente que se requiere
+		var minimumClientVersion;
         
         /**
          * Indica si el navegador soporta WebSockets.
@@ -230,6 +234,13 @@ var AutoScript = ( function ( window, undefined ) {
 		 * del servidor intermedio. */
 		var setForceWSMode = function (force) {
 			forceWSMode = force;
+		}
+		
+		/**
+		 * Establece la version minima del Cliente @firma que se debe ejecutar.
+		 */
+		var setMinimumClientVersion = function (version) {
+			minimumClientVersion = version;
 		}
 		
         /**
@@ -1031,17 +1042,23 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/** Construye una URL que configura la operacion a realizar. */
-			function buildUrl (arr) {
+			function buildUrl (paramsObject) {
 
-				// Operacion seleccionada
+				// Array con los parametros de llamada
 				var params = [];
-				// Convertimos el objeto con los datos en un array del tipo key value
-				for (var x in arr){
-				  params.push(arr[x]);
+				
+				// Si se establecio una version minima del cliente de firma, se notifica
+				if (minimumClientVersion) {
+					params.push(createKeyValuePair("mcv", minimumClientVersion));
+				}
+				
+				// Convertimos el objeto con los parametros en un array del tipo key value
+				for (var x in paramsObject){
+				  params.push(paramsObject[x]);
 				}
 
 				// Las URL seran del estilo "afirma://" + Id del tipo de operacion
-				var intentURL = 'afirma://' + encodeURIComponent(arr.op.value) + '?';	
+				var intentURL = 'afirma://' + encodeURIComponent(paramsObject.op.value) + '?';
 				for (var i = 0; i < params.length; i++) {
 					if (params[i].value != null && params[i].value != "null") {
 						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' +
@@ -1085,10 +1102,9 @@ var AutoScript = ( function ( window, undefined ) {
 		
 			/** Abre la aplicacion para que empiece a escuchar en el puerto por defecto. */
 			function openNativeApp () {
-				idSession = AfirmaUtils.generateNewIdSession();
-				openUrl("afirma://websocket?v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
+				var url = "afirma://websocket?v=" + PROTOCOL_VERSION + "&jvc=" + VERSION_CODE;
+				openUrl(url);
 			}
-			
 
 			/**
 			 * Crea el websocket con el comportamiento basico.
@@ -1172,9 +1188,9 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/** Funcion que identifica la respuesta de una peticion de echo y envia a la aplicacion la operacion real. */
-			var onMessageEchoFunction = function() {
+			var onMessageEchoFunction = function(echoEvt) {
 				console.log("Respuesta de la peticion de eco");
-				
+			
 				ws.onmessage = function (evt) {
 					console.log("Respuesta obtenida de la operacion enviada");
 					processResponse(evt.data);
@@ -1718,6 +1734,7 @@ var AutoScript = ( function ( window, undefined ) {
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
+				data.needcert = generateDataKeyValue ("needcert",  "true");
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
 				if (resetStickySignatory) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
@@ -1728,24 +1745,27 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/**
 			 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
-			 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
+			 * paramsObject: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
 			 */
-			function buildUrl (arr) {
+			function buildUrl (paramsObject) {
 
-				// Operacion seleccionada
-				var intentURL;
+				// Array con los parametros de llamada
 				var params = [];
-				// Convertimos el objeto con los datos en un array del tipo key value
-				for(var x in arr){
-				  params.push(arr[x]);
+				
+				// Si se establecio una version minima del cliente de firma, se notifica
+				if (minimumClientVersion) {
+					params.push(generateDataKeyValue("mcv", minimumClientVersion));
+				}
+				
+				// Convertimos el objeto con los parametros en un array del tipo key value
+				for (var x in paramsObject){
+				  params.push(paramsObject[x]);
 				}
 
-				if (params != null && params != undefined && params.length > 0) {
-					intentURL = 'afirma://' + encodeURIComponent(arr.op.value) + '?';	// Agregamos como dominio el identificador del tipo de operacion
-					for (var i = 0; i < params.length; i++) {
-						if (params[i].value != null && params[i].value != "null") {
-							intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
-						}
+				var intentURL = 'afirma://' + encodeURIComponent(paramsObject.op.value) + '?';	// Agregamos como dominio el identificador del tipo de operacion
+				for (var i = 0; i < params.length; i++) {
+					if (params[i].value != null && params[i].value != "null") {
+						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
 					}
 				}
 				return intentURL;
@@ -1795,7 +1815,12 @@ var AutoScript = ( function ( window, undefined ) {
 				idSession = AfirmaUtils.generateNewIdSession();
 				
 				// Lanzamos la aplicacion nativa
-				openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
+				var url = "afirma://service?ports=" + portsLine
+					+ "&v=" + PROTOCOL_VERSION
+					+ "&jvc=" + VERSION_CODE
+					+ "&idsession=" + idSession;
+				
+				openUrl(url);
 			}
 
 			/**
@@ -2384,7 +2409,20 @@ var AutoScript = ( function ( window, undefined ) {
 					errorCallback("java.lang.Exception", "Error desconocido");
 					return;
 				}
-				successCallback(data);
+				
+				// Si se nos ha devuelto el resultado y el certificado, se separan para
+				// pasarselos a la funcion callback
+				var result;
+				var certificate = null;
+				var sepPos = data.indexOf("|");
+				if (sepPos == -1) {
+					result = data;
+				}
+				else {
+					result = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
+					certificate = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+				}
+				successCallback(result, certificate);
 			}
 			
 			/**
@@ -2989,7 +3027,7 @@ var AutoScript = ( function ( window, undefined ) {
 					errorCallback(errorType, errorMessage);
 				}
 			}
-						
+
 			/** 
 			 * Funcion para la comprobacion de existencia del objeto. No hace nada.
 			 */
@@ -3014,8 +3052,15 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Recupera la cadena "Applet no cargado".
 			 */
-			function getCurrentLog () {
-				return "Applet no cargado";
+			function getCurrentLog (successCallbackFunction, errorCallbackFunction) {
+				var errorType = "java.lang.UnsupportedOperationException";
+				var errorMessage = "La operacion de obtencion del log no esta disponible por servidor intermedio";
+				if (!errorCallbackFunction) {
+					throwException(errorType, errorMessage);
+				}
+				else {
+					errorCallbackFunction(errorType, errorMessage);
+				}
 			}
 
 			/**
@@ -3169,6 +3214,11 @@ var AutoScript = ( function ( window, undefined ) {
 					// Vacio
 				}
 
+				// Agregamos el indicador de version minima si es necesario
+				if (minimumClientVersion) {
+					params[params.length] = { key:"mcv", value:minimumClientVersion};
+				}
+				
 				var requestData =
 					"op=put&v=1_0&id=" + fileId + "&dat=" + 
 					cipher(buildXML(op, params), cipherKey);
@@ -3213,11 +3263,15 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			function buildUrl (op, params) {
 
-				var urlParams = "";
+				var urlParams = "jvc=" + VERSION_CODE;
+				if (minimumClientVersion) {
+					urlParams += "&mcv=" + encodeURIComponent(minimumClientVersion);
+				}
+				
 				if (params != null && params != undefined) {
 					for (var i = 0; i < params.length; i++) {
 						if (params[i].value != null && params[i].value != "null") {
-							urlParams += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
+							urlParams += '&' + params[i].key + '=' + encodeURIComponent(params[i].value); 
 						}
 					}
 				}
@@ -3567,13 +3621,13 @@ var AutoScript = ( function ( window, undefined ) {
 							}
 						}
 						else {
-							errorResponseFunction(null, httpRequest.responseText, errorCallback);
+							errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
 						}
-					}					
+					}
 				}
 				try {
 					httpRequest.onerror = function() {
-						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion", errorCallback);
+						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
 					}
 				}
 				catch (e) {
@@ -3661,14 +3715,14 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		/* Metodos que publicamos del objeto cliente. */
 		return {
-			
+
 			VERSION : VERSION,
-			
-			/* Publicamos las variables para la comprobacion de hora. */		
+
+			/* Variables para la comprobacion de hora. */		
 			CHECKTIME_NO : CHECKTIME_NO,
 			CHECKTIME_RECOMMENDED : CHECKTIME_RECOMMENDED,
 			CHECKTIME_OBLIGATORY : CHECKTIME_OBLIGATORY,
-			
+
 			/* Parametros y metodos deprecados */
 			JAVA_ARGUMENTS : JAVA_ARGUMENTS,
 			SYSTEM_PROPERTIES : SYSTEM_PROPERTIES,
@@ -3678,8 +3732,8 @@ var AutoScript = ( function ( window, undefined ) {
 			setJnlpService: setJnlpService,
 			isJNLP : isJNLP,
 			needNativeAppInstalled : needNativeAppInstalled,
-			
-			/* Variables para configurar un almacen de certificados concreto. */		
+
+			/* Constantes para configurar un almacen de certificados concreto. */		
 			KEYSTORE_WINDOWS : KEYSTORE_WINDOWS,
 			KEYSTORE_APPLE : KEYSTORE_APPLE,
 			KEYSTORE_PKCS12 : KEYSTORE_PKCS12,
@@ -3694,7 +3748,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/* Constantes para la configuracion de reintentos de conexion */
 			AUTOFIRMA_LAUNCHING_TIME : AUTOFIRMA_LAUNCHING_TIME,
 			AUTOFIRMA_CONNECTION_RETRIES : AUTOFIRMA_CONNECTION_RETRIES,
-			
+
 			/* Metodos de conexion con la aplicacion nativa. */
 			cargarAppAfirma : cargarAppAfirma,
 			sign : sign,
@@ -3706,7 +3760,7 @@ var AutoScript = ( function ( window, undefined ) {
 			selectCertificate : selectCertificate,
 			signAndSaveToFile : signAndSaveToFile,
 			getCurrentLog : getCurrentLog,
-			
+
 			/* Gestion de ficheros. */
 			saveDataToFile : saveDataToFile,
 			getFileNameContentBase64: getFileNameContentBase64,
@@ -3719,11 +3773,12 @@ var AutoScript = ( function ( window, undefined ) {
 			setServlets : setServlets,
 			setStickySignatory : setStickySignatory,
 			setLocale : setLocale,
-			
+			setMinimumClientVersion : setMinimumClientVersion,
+
 			/* Gestion de errores */
 			getErrorMessage : getErrorMessage,
 			getErrorType : getErrorType,
-			
+
 			/* Utilidad JavaScript*/
 			getBase64FromText : getBase64FromText,
 			getTextFromBase64 : getTextFromBase64,
