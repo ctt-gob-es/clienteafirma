@@ -9,18 +9,16 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.SocketTimeoutException;
-import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,20 +100,19 @@ public final class ServiceInvocationManager {
 	}
 
 	/** Inicia el servicio. Se intenta establecer un <code>socket</code> que escuche en el puerto pasado por la URL.
-	 * @param url URL (debe indicarse el puerto).
+	 * @param urlParams Par&aacute;metros de la URL de llamada (debe indicarse el puerto).
 	 * @param protocolVersion Versi&oacute;n declarada del protocolo.
 	 * @throws UnsupportedProtocolException Si no se soporta el protocolo o la versi&oacute;n de este. */
-	static void startService(final String url, final int protocolVersion) throws UnsupportedProtocolException {
+	static void startService(final Map<String, String> urlParams, final int protocolVersion) throws UnsupportedProtocolException {
 
 		checkSupportProtocol(protocolVersion);
 
 		try {
 			final SSLContext sc = SecureSocketUtils.getSecureSSLContext();
 
-			LOGGER.info("Iniciando servicio local de firma: " + url); //$NON-NLS-1$
 			final SSLServerSocketFactory ssocketFactory = sc.getServerSocketFactory();
 
-			final ChannelInfo channelInfo = getChannelInfo(url);
+			final ChannelInfo channelInfo = getChannelInfo(urlParams);
 			final SSLServerSocket ssocket = tryPorts(channelInfo.getPorts(), ssocketFactory);
 			ssocket.setReuseAddress(true);
 
@@ -177,29 +174,13 @@ public final class ServiceInvocationManager {
 
 	/** Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
 	 * Asigna cual es la clave.
-	 * @param url URL de la que extraer los puertos.
+	 * @param urlParams Par&aacute;metros de la URL de entre los que obtener los puertos.
 	 * @return Listados de puertos. */
-	private static ChannelInfo getChannelInfo(final String url) {
-		final URI u;
-		try {
-			u = new URI(url);
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException("La URI (" + url + ") de invocacion no es valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		final String query = u.getQuery();
-		checkNullParameter(query, "La URI de invocacion no contiene parametros: " + url); //$NON-NLS-1$
-		final Properties p = new Properties();
-		try {
-			p.load(new ByteArrayInputStream(query.replace("&", "\n").getBytes())); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		catch (final IOException e) {
-			throw new IllegalArgumentException(
-				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url, //$NON-NLS-1$
-				e);
-		}
-		final String ps = p.getProperty("ports"); //$NON-NLS-1$
-		checkNullParameter(ps, "La URI de invocacion no contiene el parametro 'ports': " + url); //$NON-NLS-1$
+	private static ChannelInfo getChannelInfo(final Map<String, String> urlParams) {
+
+		final String ps = urlParams.get("ports"); //$NON-NLS-1$
+		checkNullParameter(ps, "La URI de invocacion no contiene el parametro 'ports'"); //$NON-NLS-1$
+
 		final String[] portsText = ps.split(","); //$NON-NLS-1$
 		final int[] ports = new int[portsText.length];
 		for (int i=0; i<portsText.length; i++) {
@@ -212,7 +193,7 @@ public final class ServiceInvocationManager {
 				, e);
 			}
 		}
-		final String idSession = p.getProperty(IDSESSION);
+		final String idSession = urlParams.get(IDSESSION);
 		if(idSession != null ){
 		    LOGGER.info("Se ha recibido un idSesion para la transaccion: " + idSession); //$NON-NLS-1$
 		}

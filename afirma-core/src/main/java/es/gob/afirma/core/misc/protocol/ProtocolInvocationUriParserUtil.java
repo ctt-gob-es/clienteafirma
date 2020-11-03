@@ -35,7 +35,7 @@ public final class ProtocolInvocationUriParserUtil {
 		// No instanciable
 	}
 
-	static UrlParametersForBatch getParametersForBatch(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersForBatch getParametersForBatch(final Map<String, String> params) throws ParameterException {
 		final UrlParametersForBatch ret = new UrlParametersForBatch();
 		ret.setCommonParameters(params);
 		ret.setBatchParameters(params);
@@ -48,7 +48,7 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	static UrlParametersToSave getParametersToSave(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersToSave getParametersToSave(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSave ret = new UrlParametersToSave();
 
 		ret.setCommonParameters(params);
@@ -63,9 +63,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	static UrlParametersToLoad getParametersToLoad(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersToLoad getParametersToLoad(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToLoad ret = new UrlParametersToLoad();
 
+		ret.setCommonParameters(params);
 		ret.setLoadParameters(params);
 
 		return ret;
@@ -76,9 +77,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToGetCurrentLog ret = new UrlParametersToGetCurrentLog();
 
+		ret.setCommonParameters(params);
 		ret.setGetCurrentLogParameters(params);
 
 		return ret;
@@ -137,7 +139,7 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param params Par&aacute;metros para el proceso de firma
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	static UrlParametersToSign getParametersToSign(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersToSign getParametersToSign(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSign ret = new UrlParametersToSign();
 		ret.setCommonParameters(params);
 		ret.setSignParameters(params);
@@ -149,7 +151,7 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param params Par&aacute;metros para el proceso de firma
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	static UrlParametersToSignAndSave getParametersToSignAndSave(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersToSignAndSave getParametersToSignAndSave(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSignAndSave ret = new UrlParametersToSignAndSave();
 		ret.setCommonParameters(params);
 		ret.setSignAndSaveParameters(params);
@@ -161,7 +163,7 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param params Par&aacute;metros para el proceso de firma
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params) throws ParameterException {
+	public static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSelectCert ret = new UrlParametersToSelectCert();
 		ret.setCommonParameters(params);
 		ret.setSelectCertParameters(params);

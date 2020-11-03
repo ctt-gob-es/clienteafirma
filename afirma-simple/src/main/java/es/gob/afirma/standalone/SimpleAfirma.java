@@ -1013,11 +1013,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		panel.add(Box.createRigidArea(new Dimension(0, 10)));
     		panel.add(cbDontShow);
 
-    		JOptionPane.showMessageDialog(
-    				parent,
-    				panel,
-    				SimpleAfirmaMessages.getString("SimpleAfirma.50"), //$NON-NLS-1$
-    				JOptionPane.WARNING_MESSAGE);
+            AOUIFactory.showErrorMessage(
+            		parent,
+            		panel,
+                    SimpleAfirmaMessages.getString("SimpleAfirma.50"), //$NON-NLS-1$
+                    JOptionPane.WARNING_MESSAGE
+                );
 
     		if (cbDontShow.isSelected()) {
     			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CHECK_JAVA_VERSION, false);

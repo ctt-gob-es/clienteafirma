@@ -9,17 +9,21 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.EventObject;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
@@ -27,6 +31,7 @@ import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
+import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParserUtil;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.misc.protocol.UrlParametersToGetCurrentLog;
@@ -53,8 +58,18 @@ public final class ProtocolInvocationLauncher {
 
     static final ProtocolVersion MAX_PROTOCOL_VERSION_SUPPORTED = ProtocolVersion.VERSION_3;
 
+    private static final int MIN_JAVASCRIPT_VERSION_CODE_NEEDED = 1;
+
+    private static final int DEFAULT_JAVASCRIPT_VERSION_CODE = 1;
+
 	/** Par&aacute;metro de entrada con la versi&oacute;n del protocolo que se va a utilizar. */
 	private static final String PROTOCOL_VERSION_PARAM = "v"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con la versi&oacute;n del JavaScript de invocaci&oacute;n. */
+	private static final String JAVASCRIPT_VERSION_CODE_PARAM = "jvc"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con la versi&oacute;n m&iacute;nima de aplicaci&oacute;n cliente solicitada. */
+	static final String MIN_REQUESTED_VERSION_PARAM = "mcv"; //$NON-NLS-1$
 
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
@@ -134,15 +149,48 @@ public final class ProtocolInvocationLauncher {
         JMulticardUtilities.configureJMulticard(jMulticardEnabled);
 
         // Por defecto, usaremos la version de protocolo proporcionada para la operacion,
-        // anque se extraera de la URL de llamada en caso de se una peticion de apertura de
+        // aunque se extraera de la URL de llamada en caso de se una peticion de apertura de
         // servicio de sockets o websockets
         requestedProtocolVersion = protocolVersion;
+
+        // Extraemos los parametros de la URL
+        final Map<String, String> urlParams = extractParams(urlString);
+
+        // Comprobamos la version de codigo declarada por el JavaScript y establecemos una
+        // por defecto si no la declara o no es valida
+        int jvc = DEFAULT_JAVASCRIPT_VERSION_CODE;
+        if (urlParams.containsKey(JAVASCRIPT_VERSION_CODE_PARAM)) {
+        	try {
+        	jvc = Integer.parseInt(urlParams.get(JAVASCRIPT_VERSION_CODE_PARAM));
+        	}
+        	catch (final Exception e) {
+        		jvc = DEFAULT_JAVASCRIPT_VERSION_CODE;
+			}
+        }
+
+        // Si la version de codigo JavaScript es menor de la exigida, mostramos
+        // una advertencia
+        if (jvc < MIN_JAVASCRIPT_VERSION_CODE_NEEDED) {
+        	JOptionPane.showMessageDialog(
+        			null,												// Componente padre
+        			ProtocolMessages.getString("ProtocolLauncher.51"),	// Mensaje //$NON-NLS-1$
+        			ProtocolMessages.getString("ProtocolLauncher.52"),	// Titulo //$NON-NLS-1$
+        			JOptionPane.WARNING_MESSAGE);						// Tipo de mensaje
+        }
+
+        //TODO: Mejorar toda la logica de comunicacion:
+        // - La comunicacion por sockets/websockets no deberia utilizar URLs.
+        // - Se utiliza la excepcion SocketOperationException para gestionar los errores
+        //   cuando la comunicacion NO es por sockets (contrariamente a lo indicado en el
+        //   javadoc de los metodos y la excepcion.
+        // - Los errores en el proceso siempre deberian lanzar una excepcion y no devolver
+        //   una cadena con el mensaje del error.
 
         // Se invoca la aplicacion para iniciar la comunicacion por socket
         if (urlString.startsWith("afirma://websocket?") || urlString.startsWith("afirma://websocket/?")) { //$NON-NLS-1$ //$NON-NLS-2$
         	 LOGGER.info("Se inicia el modo de comunicacion por websockets: " + urlString); //$NON-NLS-1$
 
-        	 requestedProtocolVersion = getVersion(urlString);
+        	 requestedProtocolVersion = getVersion(urlParams);
 
         	 try {
         		 AfirmaWebSocketServer.startService(requestedProtocolVersion);
@@ -168,10 +216,10 @@ public final class ProtocolInvocationLauncher {
         else if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se inicia el modo de comunicacion por sockets: " + urlString); //$NON-NLS-1$
 
-       	 	requestedProtocolVersion = getVersion(urlString);
+       	 	requestedProtocolVersion = getVersion(urlParams);
 
             try {
-            	ServiceInvocationManager.startService(urlString, requestedProtocolVersion);
+            	ServiceInvocationManager.startService(urlParams, requestedProtocolVersion);
             }
             catch(final UnsupportedProtocolException e) {
             	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -187,11 +235,13 @@ public final class ProtocolInvocationLauncher {
         // Se solicita una operacion de firma batch
         else if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
         	LOGGER.info("Se invoca a la aplicacion para el procesado de un lote de firma"); //$NON-NLS-1$
-            try {
-                UrlParametersForBatch params = ProtocolInvocationUriParser.getParametersForBatch(urlString);
+
+        	try {
+                UrlParametersForBatch params =
+                		ProtocolInvocationUriParserUtil.getParametersForBatch(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 // Si se indica un identificador de fichero, es que el XML de definicion de lote se tiene que
@@ -226,22 +276,18 @@ public final class ProtocolInvocationLauncher {
                 try {
                     return  ProtocolInvocationLauncherBatch.processBatch(params, requestedProtocolVersion, bySocket);
                 }
-                catch(final SocketOperationException e) {
+                catch (final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma por lotes: " + e); //$NON-NLS-1$
-                    if (e.getErrorCode() == ProtocolInvocationLauncherBatch.getResultCancel()){
-                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
-                    }
-                    else {
-                        sendErrorToServer(
-                    		ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    		params.getStorageServletUrl().toString(),
-                    		params.getId()
-                		);
-                    }
+                    final String msg = e.getErrorCode() == ProtocolInvocationLauncherBatch.getResultCancel()
+                    		? e.getErrorCode()
+                    		: URLEncoder.encode(
+                    				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    				StandardCharsets.UTF_8);
+                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
-            catch(final ParameterException e) {
+            catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showErrorDetail(
                 		ProtocolInvocationLauncherErrorManager.ERROR_PARAMS,
@@ -260,10 +306,11 @@ public final class ProtocolInvocationLauncher {
         	LOGGER.info("Se invoca a la aplicacion para la seleccion de un certificado"); //$NON-NLS-1$
 
             try {
-                UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
+                UrlParametersToSelectCert params =
+                		ProtocolInvocationUriParserUtil.getParametersToSelectCert(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 // Si se indica un identificador de fichero, es que la configuracion de la operacion
@@ -304,7 +351,13 @@ public final class ProtocolInvocationLauncher {
                 }
                 catch (final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de seleccion de certificados: " + e); //$NON-NLS-1$
-                   	return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
+                    final String msg = e.getErrorCode() == ProtocolInvocationLauncherSelectCert.getResultCancel()
+                    		? e.getErrorCode()
+                    		: URLEncoder.encode(
+                    				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    				StandardCharsets.UTF_8);
+                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
             catch (final ParameterException e) {
@@ -326,10 +379,11 @@ public final class ProtocolInvocationLauncher {
             LOGGER.info("Se invoca a la aplicacion para el guardado de datos"); //$NON-NLS-1$
 
             try {
-                UrlParametersToSave params = ProtocolInvocationUriParser.getParametersToSave(urlString);
+                UrlParametersToSave params =
+                		ProtocolInvocationUriParserUtil.getParametersToSave(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 LOGGER.info("Cantidad de datos a guardar: " + (params.getData() == null ? 0 : params.getData().length)); //$NON-NLS-1$
@@ -370,12 +424,12 @@ public final class ProtocolInvocationLauncher {
                 // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
                 catch (final SocketOperationException e) {
                     LOGGER.log(Level.SEVERE, "Error en la operacion de guardado: " + e, e); //$NON-NLS-1$
-                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
-                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
-                    }
-                    else {
-                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
-                    }
+                    final String msg = e.getErrorCode() == ProtocolInvocationLauncherSave.getResultCancel()
+                    		? e.getErrorCode()
+                    		: URLEncoder.encode(
+                    				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    				StandardCharsets.UTF_8);
+                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -409,10 +463,11 @@ public final class ProtocolInvocationLauncher {
             LOGGER.info("Se invoca a la aplicacion para la firma/multifirma y el guardado del resultado"); //$NON-NLS-1$
 
             try {
-                UrlParametersToSignAndSave params = ProtocolInvocationUriParser.getParametersToSignAndSave(urlString);
+                UrlParametersToSignAndSave params =
+                		ProtocolInvocationUriParserUtil.getParametersToSignAndSave(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 LOGGER.info("Cantidad de datos a firmar y guardar: " + (params.getData() == null ? 0 : params.getData().length)); //$NON-NLS-1$
@@ -452,12 +507,12 @@ public final class ProtocolInvocationLauncher {
                 }
                 // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
                 catch(final SocketOperationException e) {
-                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
-                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
-                    }
-                    else {
-                       sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
-                    }
+                	final String msg = e.getErrorCode() == ProtocolInvocationLauncherSignAndSave.getResultCancel()
+                    		? e.getErrorCode()
+                    		: URLEncoder.encode(
+                    				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    				StandardCharsets.UTF_8);
+                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -494,10 +549,11 @@ public final class ProtocolInvocationLauncher {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de firma/multifirma"); //$NON-NLS-1$
 
             try {
-                UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
+                UrlParametersToSign params =
+                		ProtocolInvocationUriParserUtil.getParametersToSign(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 // Si se indica un identificador de fichero, es que la configuracion de la operacion
@@ -535,15 +591,17 @@ public final class ProtocolInvocationLauncher {
                 // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
-                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
-                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
+                    String msg;
+                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()) {
+                    	msg = e.getErrorCode();
+                    } else if (e.getMessage() != null) {
+                    	msg = e.getErrorCode() + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8); //$NON-NLS-1$
+                    } else {
+                    	msg = URLEncoder.encode(
+                    			ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    			StandardCharsets.UTF_8);
                     }
-                    else if (e.getMessage() != null){
-                    	sendErrorToServer(e.getErrorCode() + ": " + e.getMessage(), params.getStorageServletUrl().toString(), params.getId()); //$NON-NLS-1$
-                    }
-                    else {
-                       sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
-                    }
+                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -573,14 +631,15 @@ public final class ProtocolInvocationLauncher {
         }
 
         // Se solicita una operacion de carga de ficheros
-        else if (urlString.startsWith("afirma://load?")) { //$NON-NLS-1$
+        else if (urlString.startsWith("afirma://load?") || urlString.startsWith("afirma://load/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga de uno o varios ficheros"); //$NON-NLS-1$
 
             try {
-                UrlParametersToLoad params = ProtocolInvocationUriParser.getParametersToLoad(urlString);
+                UrlParametersToLoad params =
+                		ProtocolInvocationUriParserUtil.getParametersToLoad(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 // Si se indica un identificador de fichero, es que la configuracion de la operacion
@@ -618,12 +677,12 @@ public final class ProtocolInvocationLauncher {
                 // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
                 catch(final SocketOperationException e) {
                     LOGGER.severe("La operacion indicada no esta soportada: " + e); //$NON-NLS-1$
-                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
-                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
-                    }
-                    else {
-                       sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
-                    }
+                    final String msg = e.getErrorCode() == ProtocolInvocationLauncherLoad.getResultCancel()
+                    		? e.getErrorCode()
+                    		: URLEncoder.encode(
+                    				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    				StandardCharsets.UTF_8);
+                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -652,14 +711,15 @@ public final class ProtocolInvocationLauncher {
             }
         }
         // Se solicita una operacion de recuperacion de logs
-        else if (urlString.startsWith("afirma://getLog?")) { //$NON-NLS-1$
+        else if (urlString.startsWith("afirma://getLog?") || urlString.startsWith("afirma://getLog/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de obtencion del log actual de la aplicacion"); //$NON-NLS-1$
 
             try {
-                final UrlParametersToGetCurrentLog params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(urlString);
+                final UrlParametersToGetCurrentLog params =
+                		ProtocolInvocationUriParserUtil.getParametersToGetCurrentLog(urlParams);
 
                 if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumVersion());
+               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -768,35 +828,16 @@ public final class ProtocolInvocationLauncher {
 	}
 
 
-	/** Obtiene el par&aacute;metro de versi&oacute;n declarado en la URL.
-	 * @param url URL de la que extraer la versi&oacute;n.
-	 * @return Valor del par&aacute;metro de versi&oacute;n ('v') o el valor '1' si no est&aacute; definido. */
-	private static int getVersion(final String url) {
-
-		final URI u;
-		try {
-			u = new URI(url);
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException("La URI " + url + "de invocacion no es valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		final String query = u.getQuery();
-
-		final Properties p = new Properties();
-		if (query != null) {
-			try {
-				p.load(new ByteArrayInputStream(query.replace("&", "\n").getBytes())); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			catch (final IOException e) {
-				throw new IllegalArgumentException(
-						"Los parametros de la URI de invocacion no estan en el formato correcto: " + url //$NON-NLS-1$
-						, e);
-			}
-		}
+	/**
+	 * Obtiene el valor asignado al par&aacute;metro de versi&oacute;n de una URL.
+	 * @param params Par&acute;metros declarados en una URL.
+	 * @return Valor del par&aacute;metro de versi&oacute;n ('v') o el valor '1' si no est&aacute; definido.
+	 */
+	private static int getVersion(final Map<String, String> params) {
 
 		// Si se encuentra el parametro con la version, se devuelve. Si no, se devuelve 1.
 		int protocolVersion = 1;
-		final String protocolId = p.getProperty(PROTOCOL_VERSION_PARAM);
+		final String protocolId = params.get(PROTOCOL_VERSION_PARAM);
 		if (protocolId != null) {
 			try {
 				protocolVersion = Integer.parseInt(protocolId.trim());
@@ -809,5 +850,26 @@ public final class ProtocolInvocationLauncher {
 		}
 
 		return protocolVersion;
+	}
+
+	/**
+	 * Extrae los parametros declarados en una URL con sus valores asignados.
+	 * @param url URL de la que extraer los par&aacute;metros.
+	 * @return Conjunto de par&aacute;metros con sus valores.
+	 */
+	private static Map<String, String> extractParams(final String url) {
+
+		final Map<String, String> params = new HashMap<>();
+
+		final int initPos = url.indexOf('?') + 1;
+		final String[] urlParams = url.substring(initPos).split("&"); //$NON-NLS-1$
+		for (final String param : urlParams) {
+			final int equalsPos = param.indexOf('=');
+			if (equalsPos > 0) {
+				params.put(param.substring(0, equalsPos), URLDecoder.decode(param.substring(equalsPos + 1), StandardCharsets.UTF_8));
+			}
+		}
+
+		return params;
 	}
 }

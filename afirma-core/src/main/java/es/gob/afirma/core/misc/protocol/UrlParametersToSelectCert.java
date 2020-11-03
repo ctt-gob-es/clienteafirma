@@ -46,19 +46,22 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
 
-	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
-	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
-	public String getMinimumVersion() {
-		return this.minimumVerstion;
-	}
-
-	UrlParametersToSelectCert() {
+	/**
+	 * Construye el conjunto de par&aacute;metros vac&iacute;o.
+	 */
+	public UrlParametersToSelectCert() {
 		setData(null);
 		setFileId(null);
 		setRetrieveServletUrl(null);
 	}
 
-	void setMinimumVersion(final String minVer) {
+	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
+	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
+	public String getMinimumProtocolVersion() {
+		return this.minimumVerstion;
+	}
+
+	void setMinimumProtocolVersion(final String minVer) {
 		this.minimumVerstion = minVer;
 	}
 
@@ -99,7 +102,7 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 		return this.resetSticky;
 	}
 
-	void setSelectCertParameters(final Map<String, String> params) throws ParameterException {
+	public void setSelectCertParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
 		String sessionId = null;
@@ -127,10 +130,10 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 
 		// Version minima requerida del protocolo que se debe soportar
 		if (params.containsKey(VER_PARAM)) {
-			setMinimumVersion(params.get(VER_PARAM));
+			setMinimumProtocolVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Si hemos recibido el identificador para la descarga de la configuracion,
