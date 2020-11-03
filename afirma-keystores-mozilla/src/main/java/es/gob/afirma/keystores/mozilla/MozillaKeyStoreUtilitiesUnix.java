@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.mozilla.bintutil.ElfParser;
 
 final class MozillaKeyStoreUtilitiesUnix {
 
@@ -96,7 +97,8 @@ final class MozillaKeyStoreUtilitiesUnix {
 		String nssLibDir = null;
 
 		for (final String path : NSS_PATHS) {
-			if (new File(path, SOFTOKN3_SO).isFile()) {
+			final File tmpFile = new File(path, SOFTOKN3_SO);
+			if (tmpFile.isFile() && ElfParser.archMatches(tmpFile)) {
 				nssLibDir = path;
 				break;
 			}
@@ -166,8 +168,6 @@ final class MozillaKeyStoreUtilitiesUnix {
 		}
 		return maxVersion != null ? maxVersion.toString() : null;
 	}
-
-
 
 	/** Recupera el listado de dependencias de la biblioteca "libsoftkn3.so" para
 	 * sistemas operativos UNIX (Linux, Solaris). Los nombres apareceran ordenados de tal forma las
