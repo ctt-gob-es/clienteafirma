@@ -188,7 +188,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 	}
 
 	/**
-	 * Versi&oacute;n software, formado por particular numericas separadas por puntos.
+	 * Versi&oacute;n software, formado por part&iacute;culas num&eacute;ricas separadas por puntos.
 	 */
 	private static class Version implements Comparable<MozillaKeyStoreUtilitiesUnix.Version> {
 		String text;
