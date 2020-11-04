@@ -1,6 +1,7 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -34,7 +35,11 @@ public final class TestGetShort {
 			final Process p = new ProcessBuilder(
 				command
 			).start();
-			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
+			try (
+				final InputStream is = p.getInputStream()
+			) {
+				return new String(AOUtil.getDataFromInputStream(is)).trim();
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$

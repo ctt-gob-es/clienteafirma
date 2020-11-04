@@ -158,7 +158,8 @@ final class MozillaKeyStoreUtilitiesUnix {
 				}
 				catch (final Exception e) {
 					LOGGER.warning(
-							"Se encontro un numero de version de Firefox no soportado: " + versionText); //$NON-NLS-1$
+						"Se encontro un numero de version de Firefox no soportado (" + versionText + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+					);
 					continue;
 				}
 				if (maxVersion == null || version.compareTo(maxVersion) > 0) {
@@ -204,7 +205,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 					this.versionsParticles[i] = Integer.parseInt(subVersion);
 				}
 				catch (final Exception e) {
-					throw new IllegalArgumentException("Identificador de version no soportado: " + version); //$NON-NLS-1$
+					throw new IllegalArgumentException("Identificador de version no soportado (" + version + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}

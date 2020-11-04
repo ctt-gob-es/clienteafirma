@@ -32,17 +32,17 @@ public final class TestBinParser {
 
 		System.out.println(
 			ElfParser.getMachineType(
-				"C:\\Users\\tgarciameras\\workspace\\afirma-keystores-mozilla\\src\\test\\resources\\elf_arm64"
+				"C:\\Users\\tgarciameras\\workspace\\afirma-keystores-mozilla\\src\\test\\resources\\elf_arm64" //$NON-NLS-1$
 			)
 		);
 		System.out.println(
 			ElfParser.getMachineType(
-				"C:\\Users\\tgarciameras\\workspace\\afirma-keystores-mozilla\\src\\test\\resources\\elf_x64"
+				"C:\\Users\\tgarciameras\\workspace\\afirma-keystores-mozilla\\src\\test\\resources\\elf_x64" //$NON-NLS-1$
 			)
 		);
 		System.out.println(
 			ElfParser.getMachineType(
-				"C:\\Users\\tgarciameras\\workspace\\afirma-keystores-mozilla\\src\\test\\resources\\elf_x86"
+				"C:\\Users\\tgarciameras\\workspace\\afirma-keystores-mozilla\\src\\test\\resources\\elf_x86" //$NON-NLS-1$
 			)
 		);
 	}
