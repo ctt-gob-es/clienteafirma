@@ -10,6 +10,7 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -142,8 +143,10 @@ public final class AOSecMod {
                 throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)"); //$NON-NLS-1$
             }
             final byte[] secMod;
-            try {
-                secMod = AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(secmod.getAbsolutePath())));
+            try (
+        		final InputStream is = AOUtil.loadFile(AOUtil.createURI(secmod.getAbsolutePath()))
+    		) {
+                secMod = AOUtil.getDataFromInputStream(is);
             }
             catch (final Exception e) {
                 throw new AOException("Error leyendo la base de datos de modulos (secmod.db)", e); //$NON-NLS-1$

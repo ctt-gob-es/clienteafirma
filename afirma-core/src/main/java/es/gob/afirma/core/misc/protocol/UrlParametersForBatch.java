@@ -40,13 +40,13 @@ public final class UrlParametersForBatch extends UrlParameters {
 	 * cla <code>PrivateKeyEntry</code> fijada. */
 	private static final String RESET_STICKY_PARAM = "resetsticky"; //$NON-NLS-1$
 
-	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el dice si tenemos que usar una clave prefijada o establecer una nueva. */
+	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
 	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
 
-	private String minimumVersion;
+	private String minimumProtocolVersion;
 
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. */
@@ -128,7 +128,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 		this.batchPostSignerUrl = url;
 	}
 
-	void setBatchParameters(final Map<String, String> params) throws ParameterException {
+	public void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
 		// idSession para el service Web. Con socket no se usa
 		if (params.containsKey(ID_PARAM) || params.containsKey(FILE_ID_PARAM)) {
@@ -150,10 +150,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 		// Version minima requerida del protocolo que se debe soportar
 		if (params.containsKey(PARAM_VER)) {
-			setMinimumVersion(params.get(PARAM_VER));
+			setMinimumProtocolVersion(params.get(PARAM_VER));
 		}
 		else {
-			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Si hemos recibido el identificador para la descarga de la configuracion,
@@ -252,12 +252,12 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
-	public String getMinimumVersion() {
-		return this.minimumVersion;
+	public String getMinimumProtocolVersion() {
+		return this.minimumProtocolVersion;
 	}
 
-	void setMinimumVersion(final String minimumVersion) {
-		this.minimumVersion = minimumVersion;
+	void setMinimumProtocolVersion(final String minimumProtocolVersion) {
+		this.minimumProtocolVersion = minimumProtocolVersion;
 	}
 
 }

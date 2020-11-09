@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.misc.protocol.UrlParametersToGetCurrentLog;
+import es.gob.afirma.standalone.SimpleAfirma;
 
 final class ProtocolInvocationLauncherGetCurrentLog {
 
@@ -37,13 +38,32 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 			final int protocolVersion,
 			final boolean bySocket) throws SocketOperationException {
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
+        // Comprobamos si soportamos la version del protocolo indicada
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
+			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 		}
+
+        // Comprobamos si se exige una version minima del Cliente
+        if (options.getMinimunClientVersion() != null) {
+        	final String minimumRequestedVersion = options.getMinimunClientVersion();
+        	final Version requestedVersion = new Version(minimumRequestedVersion);
+        	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
+				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;
+				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				if (!bySocket){
+					throw new SocketOperationException(errorCode);
+				}
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+        	}
+        }
 
 		// Preparamos el buffer para enviar el resultado
 		final String dataToSend;
@@ -51,12 +71,12 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 			dataToSend = getCurrentLog();
 		} catch (final IOException e) {
 			LOGGER.severe("Error al obtener el registro de log acumulado hasta la ejecucion actual: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG);
-			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG);
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG;
+			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
 			}
-			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 		}
 
 		return dataToSend;

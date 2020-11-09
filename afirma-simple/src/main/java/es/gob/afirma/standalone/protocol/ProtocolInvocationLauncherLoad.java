@@ -23,6 +23,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherLoad {
@@ -55,13 +56,32 @@ final class ProtocolInvocationLauncherLoad {
 			final int protocolVersion,
 			final boolean bySocket) throws SocketOperationException {
 
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
+        // Comprobamos si soportamos la version del protocolo indicada
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE);
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
+			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 		}
+
+        // Comprobamos si se exige una version minima del Cliente
+        if (options.getMinimunClientVersion() != null) {
+        	final String minimumRequestedVersion = options.getMinimunClientVersion();
+        	final Version requestedVersion = new Version(minimumRequestedVersion);
+        	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
+        		final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;
+    			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+    			if (!bySocket){
+    				throw new SocketOperationException(errorCode);
+    			}
+    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+        	}
+        }
 
 		final File[] selectedDataFiles;
 
@@ -120,12 +140,12 @@ final class ProtocolInvocationLauncherLoad {
 			}
 		} catch (final Exception e) {
 			LOGGER.severe("Error en la lectura de los datos a cargar: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_LOAD_DATA);
-			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_LOAD_DATA);
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_LOAD_DATA;
+			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
 			}
-			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_LOAD_DATA);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 		}
 
 		return dataToSend.toString();

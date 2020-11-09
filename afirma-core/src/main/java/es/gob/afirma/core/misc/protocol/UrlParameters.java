@@ -64,6 +64,9 @@ public abstract class UrlParameters {
 	 * activa hasta la devoluci&uacute;on servlet remoto de guardado de datos. */
 	protected static final String ACTIVE_WAITING_PARAM = "aw"; //$NON-NLS-1$
 
+	/** Versi&oacute;n m&iacute;nima de cliente requetida. */
+	protected static final String MINIMUM_CLIENT_VERSION_PARAM = "mcv"; //$NON-NLS-1$
+
 	/** Codificaci&oacute;n por defecto. */
 	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
@@ -73,6 +76,7 @@ public abstract class UrlParameters {
 	private URL retrieveServletUrl = null;
 	private URL storageServer = null;
 	private String id = null;
+	private String minimumClientVersion = null;
 	private boolean activeWaiting = false;
 
 	private String defaultKeyStore = null;
@@ -204,6 +208,23 @@ public abstract class UrlParameters {
 		this.activeWaiting = activeWaiting;
 	}
 
+	/** Obtiene la versi&oacute;n m&iacute;nima del cliente exigida por la
+	 * aplicaci&oacute;n.
+	 * @return Versi&oacute;n m&iacute;nima del cliente o {@code null} si no
+	 * se estableci&oacute;. */
+	public String getMinimunClientVersion() {
+		return this.minimumClientVersion;
+	}
+
+	/**
+	 * Establece qu&eacute; versi&oacute;n m&iacute;nima del cliente exige la
+	 * aplicaci&oacute;n.
+	 * @param minimumClientVersion Versi&oacute;n m&iacute;nima del cliente.
+	 */
+	protected void setMinimunClientVersion(final String minimumClientVersion) {
+		this.minimumClientVersion = minimumClientVersion;
+	}
+
 	/** Obtiene el identificador de sesi&oacute;n.
 	 * @return Identificador de sesi&oacute;n */
 	public String getId() {
@@ -220,6 +241,10 @@ public abstract class UrlParameters {
 
 		setActiveWaiting(params.containsKey(ACTIVE_WAITING_PARAM) &&
 				Boolean.parseBoolean(params.get(ACTIVE_WAITING_PARAM)));
+
+		if (params.containsKey(MINIMUM_CLIENT_VERSION_PARAM)) {
+			setMinimunClientVersion(params.get(MINIMUM_CLIENT_VERSION_PARAM));
+		}
 
 		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
 		// identificador de fichero remoto a descargar y la ruta del

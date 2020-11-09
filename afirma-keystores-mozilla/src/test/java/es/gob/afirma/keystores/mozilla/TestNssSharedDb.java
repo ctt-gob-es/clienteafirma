@@ -2,6 +2,7 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
@@ -23,9 +24,12 @@ public final class TestNssSharedDb {
 	@Test
 	public void testRawPkcs11Txt() throws Exception {
 
-		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
-			TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
-		);
+		final byte[] pkcs11Txt;
+		try (
+			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+		) {
+			pkcs11Txt = AOUtil.getDataFromInputStream(is);
+		}
 
 		try (
 			final BufferedReader br = new BoundedBufferedReader(
@@ -57,9 +61,12 @@ public final class TestNssSharedDb {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtFunction() throws Exception {
-		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
-			TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
-		);
+		final byte[] pkcs11Txt;
+		try (
+			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+		) {
+			pkcs11Txt = AOUtil.getDataFromInputStream(is);
+		}
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
@@ -90,9 +97,12 @@ public final class TestNssSharedDb {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtTest2() throws Exception {
-		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
-			TestNssSharedDb.class.getResourceAsStream("/pkcs11-test2.txt") //$NON-NLS-1$
-		);
+		final byte[] pkcs11Txt;
+		try (
+			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+		) {
+			pkcs11Txt = AOUtil.getDataFromInputStream(is);
+		}
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
@@ -115,9 +125,12 @@ public final class TestNssSharedDb {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtTest3() throws Exception {
-		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
-			TestNssSharedDb.class.getResourceAsStream("/pkcs11-test3.txt") //$NON-NLS-1$
-		);
+		final byte[] pkcs11Txt;
+		try (
+			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+		) {
+			pkcs11Txt = AOUtil.getDataFromInputStream(is);
+		}
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));

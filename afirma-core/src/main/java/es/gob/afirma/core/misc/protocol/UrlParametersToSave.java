@@ -42,7 +42,7 @@ public final class UrlParametersToSave extends UrlParameters {
 	private String filename = null;
 	private String extensions = null;
 	private String fileTypeDescription = null;
-	private String minimumVersion = null;
+	private String minimumProtocolVersion = null;
 
 	/** Establece la descripci&oacute;n del tipo de fichero a guardar.
 	 * @param desc Descripci&oacute;n del tipo de fichero a guardar */
@@ -72,8 +72,8 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	/** Establece la versi&oacute;n m&iacute;nima exigida del protocolo de comunicaci&oacute;n.
 	 * @param minVer Versi&oacute;n m&iacute;nima del protocolo. */
-	void setMinimumVersion(final String minVer) {
-		this.minimumVersion = minVer;
+	void setMinimumProtocolVersion(final String minVer) {
+		this.minimumProtocolVersion = minVer;
 	}
 
 	/** Obtiene la descripci&oacute;n del tipo de fichero a guardar.
@@ -104,11 +104,11 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
-	public String getMinimumVersion() {
-		return this.minimumVersion;
+	public String getMinimumProtocolVersion() {
+		return this.minimumProtocolVersion;
 	}
 
-	void setSaveParameters(final Map<String, String> params) throws ParameterException {
+	public void setSaveParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
 		// identificador de fichero remoto
@@ -147,10 +147,10 @@ public final class UrlParametersToSave extends UrlParameters {
 
 		// Version minima requerida del protocolo que se debe soportar
 		if (params.containsKey(VER_PARAM)) {
-			setMinimumVersion(params.get(VER_PARAM));
+			setMinimumProtocolVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse

@@ -84,7 +84,11 @@ final class MozillaKeyStoreUtilitiesWindows {
 			final Process p = new ProcessBuilder(
 				"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			).start();
-			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
+			try (
+				final InputStream is = p.getInputStream();
+			) {
+				return new String(AOUtil.getDataFromInputStream(is)).trim();
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$

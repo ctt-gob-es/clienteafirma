@@ -95,7 +95,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	private Operation operation;
 	private String signFormat;
 	private String signAlgorithm;
-	private String minimumVersion;
+	private String minimumProtocolVersion;
 
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. */
@@ -105,10 +105,19 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
 
+	/**
+	 * Construye el conjunto de par&aacute;metros vac&iacute;o.
+	 */
+	public UrlParametersToSignAndSave() {
+		setData(null);
+		setFileId(null);
+		setRetrieveServletUrl(null);
+	}
+
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
-	public String getMinimumVersion() {
-		return this.minimumVersion;
+	public String getMinimumProtocolVersion() {
+		return this.minimumProtocolVersion;
 	}
 
 	/** Obtiene el tipo de operaci&oacute;n a realizar (firma, cofirma o contrafirma).
@@ -129,12 +138,6 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		return this.signAlgorithm;
 	}
 
-	UrlParametersToSignAndSave() {
-		setData(null);
-		setFileId(null);
-		setRetrieveServletUrl(null);
-	}
-
 	void setOperation(final Operation operation) {
 		this.operation = operation;
 	}
@@ -149,8 +152,8 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		this.signAlgorithm = algo;
 	}
 
-	void setMinimumVersion(final String minVer) {
-		this.minimumVersion = minVer;
+	void setMinimumProtocolVersion(final String minVer) {
+		this.minimumProtocolVersion = minVer;
 	}
 
 	/** Obtiene la opci&oacute;n de configuraci&oacute;n <i>sticky</i>.
@@ -185,7 +188,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		return this.resetSticky;
 	}
 
-	void setSignAndSaveParameters(final Map<String, String> params) throws ParameterException {
+	public void setSignAndSaveParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
 		String signatureSessionId = null;
@@ -215,10 +218,10 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 
 		// Version minima requerida del protocolo que se debe soportar
 		if (params.containsKey(VER_PARAM)) {
-			setMinimumVersion(params.get(VER_PARAM));
+			setMinimumProtocolVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Tomamos el tipo de operacion

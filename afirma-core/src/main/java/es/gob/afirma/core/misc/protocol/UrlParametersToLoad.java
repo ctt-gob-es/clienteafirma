@@ -33,7 +33,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	private static final String FILEPATH_PARAM = "filePath"; //$NON-NLS-1$
 
 
-	private String minimumVersion;
+	private String minimumProtocolVersion;
 
 	/**
 	 * Atributo que representa si se trata de una operaci&oacute;n de carga ({@code false}}) o multicarga ({@code true}})
@@ -57,18 +57,11 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 */
 	private String filepath;
 
-
-	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
-	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
-	public String getMinimumVersion() {
-		return this.minimumVersion;
-	}
-
 	/**
-	 * Constructor sin argumentos
+	 * Construye el conjunto de par&aacute;metros vac&iacute;o.
 	 */
-	UrlParametersToLoad() {
-		setMinimumVersion(null);
+	public UrlParametersToLoad() {
+		setMinimumProtocolVersion(null);
 		setMultiload(false);
 		setTitle(null);
 		setExtensions(null);
@@ -76,11 +69,17 @@ public final class UrlParametersToLoad extends UrlParameters {
 		setFilepath(null);
 	}
 
+	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
+	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
+	public String getMinimumProtocolVersion() {
+		return this.minimumProtocolVersion;
+	}
+
 	/** Establece la versi&oacute;n m&iacute;nima exigida del protocolo de comunicaci&oacute;n.
 	 * @param minVer Versi&oacute;n m&iacute;nima del protocolo.
 	 */
-	void setMinimumVersion(final String minVer) {
-		this.minimumVersion = minVer;
+	void setMinimumProtocolVersion(final String minVer) {
+		this.minimumProtocolVersion = minVer;
 	}
 
 
@@ -151,14 +150,14 @@ public final class UrlParametersToLoad extends UrlParameters {
 
 	/**Establece los par&aacute;metros propios de la operaci&oacute;n de carga/multicarga.
 	 * @param params Mapa de valores obtenidos de la URL de invocaci&oacute;n de la operaci&oacute;n. */
-	void setLoadParameters(final Map<String, String> params) {
+	public void setLoadParameters(final Map<String, String> params) {
 
 		// Version minima requerida del protocolo que se debe soportar
 		if (params.containsKey(VER_PARAM)) {
-			setMinimumVersion(params.get(VER_PARAM));
+			setMinimumProtocolVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Parametro que indica si se debe utilizar el dialogo de seleccion

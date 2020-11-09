@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.mozilla.bintutil.ElfParser;
 
 final class MozillaKeyStoreUtilitiesUnix {
 
@@ -96,7 +97,8 @@ final class MozillaKeyStoreUtilitiesUnix {
 		String nssLibDir = null;
 
 		for (final String path : NSS_PATHS) {
-			if (new File(path, SOFTOKN3_SO).isFile()) {
+			final File tmpFile = new File(path, SOFTOKN3_SO);
+			if (tmpFile.isFile() && ElfParser.archMatches(tmpFile)) {
 				nssLibDir = path;
 				break;
 			}
@@ -156,7 +158,8 @@ final class MozillaKeyStoreUtilitiesUnix {
 				}
 				catch (final Exception e) {
 					LOGGER.warning(
-							"Se encontro un numero de version de Firefox no soportado: " + versionText); //$NON-NLS-1$
+						"Se encontro un numero de version de Firefox no soportado (" + versionText + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+					);
 					continue;
 				}
 				if (maxVersion == null || version.compareTo(maxVersion) > 0) {
@@ -166,8 +169,6 @@ final class MozillaKeyStoreUtilitiesUnix {
 		}
 		return maxVersion != null ? maxVersion.toString() : null;
 	}
-
-
 
 	/** Recupera el listado de dependencias de la biblioteca "libsoftkn3.so" para
 	 * sistemas operativos UNIX (Linux, Solaris). Los nombres apareceran ordenados de tal forma las
@@ -188,7 +189,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 	}
 
 	/**
-	 * Versi&oacute;n software, formado por particular numericas separadas por puntos.
+	 * Versi&oacute;n software, formado por part&iacute;culas num&eacute;ricas separadas por puntos.
 	 */
 	private static class Version implements Comparable<MozillaKeyStoreUtilitiesUnix.Version> {
 		String text;
@@ -204,7 +205,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 					this.versionsParticles[i] = Integer.parseInt(subVersion);
 				}
 				catch (final Exception e) {
-					throw new IllegalArgumentException("Identificador de version no soportado: " + version); //$NON-NLS-1$
+					throw new IllegalArgumentException("Identificador de version no soportado (" + version + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
