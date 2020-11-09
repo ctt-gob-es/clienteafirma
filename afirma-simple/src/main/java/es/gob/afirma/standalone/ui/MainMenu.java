@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.EventObject;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -33,6 +34,7 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.plugins.GenericMenuOption;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
 import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
 import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
@@ -51,7 +53,7 @@ public final class MainMenu extends JMenuBar {
     private final JMenuItem abrirMenuItem;
 
     private final JFrame parent;
-    JFrame getParentComponent() {
+    public JFrame getParentComponent() {
     	return this.parent;
     }
 
@@ -184,20 +186,6 @@ public final class MainMenu extends JMenuBar {
         );
         toolsMenu.setEnabled(true);
 
-        final JMenu huellaMenu = new JMenu(
-    		SimpleAfirmaMessages.getString("MainMenu.25") //$NON-NLS-1$
-		);
-
-        final JMenu huellaDirMenu = new JMenu(
-				SimpleAfirmaMessages.getString("MainMenu.31") //$NON-NLS-1$
-		);
-		huellaDirMenu.setMnemonic('D');
-
-		final JMenu huellaFileMenu = new JMenu(
-				SimpleAfirmaMessages.getString("MainMenu.30") //$NON-NLS-1$
-		);
-		huellaFileMenu.setMnemonic('F');
-
 		final JMenuItem createHashFileMenuItem = new JMenuItem(
 				SimpleAfirmaMessages.getString("MainMenu.26") //$NON-NLS-1$
 		);
@@ -208,7 +196,6 @@ public final class MainMenu extends JMenuBar {
 		createHashFileMenuItem.addActionListener(
 				e -> CreateHashDialog.startHashCreation(getParentComponent())
 		);
-		huellaFileMenu.add(createHashFileMenuItem);
 
 		final JMenuItem checkHashFileMenuItem = new JMenuItem(
 				SimpleAfirmaMessages.getString("MainMenu.27") //$NON-NLS-1$
@@ -238,16 +225,7 @@ public final class MainMenu extends JMenuBar {
 						.getMenuShortcutKeyMask()));
 		checkHashDirMenuItem.addActionListener(e -> CheckHashFiles.startHashCheck(getParentComponent()));
 
-		huellaDirMenu.add(createHashDirMenuItem);
-		huellaDirMenu.add(checkHashDirMenuItem);
-		huellaFileMenu.add(createHashFileMenuItem);
-		huellaFileMenu.add(checkHashFileMenuItem);
-		huellaMenu.setMnemonic('H');
-		huellaMenu.add(huellaFileMenu);
-		huellaMenu.add(huellaDirMenu);
-
         if (!isMac) {
-        	huellaMenu.setMnemonic('H');
         	createHashFileMenuItem.setMnemonic('l');
         }
 
@@ -268,7 +246,6 @@ public final class MainMenu extends JMenuBar {
         }
 
         this.add(menuArchivo);
-        toolsMenu.add(huellaMenu);
 
 		// Preparamos la opcion de menu para "restaurar la configuracion de los
 		// navegadores" en el menu de herramientas
@@ -326,6 +303,17 @@ public final class MainMenu extends JMenuBar {
 				);
         	}
         }
+        
+        // Comprobamos si existen menus adicionales de plugins que deben ser añdidos a la barra de menu principal.
+        final List<GenericMenuOption> menus = PluginsUiComponentsBuilder.getPluginsMenus();
+		if (menus != null && !menus.isEmpty()) {
+			for (GenericMenuOption menu : menus) {
+				String title = menu.getTitle();
+				JMenu jmenu = new JMenu(title);
+				addSubMenus(jmenu, menu, getParentComponent());
+				this.add(jmenu);
+			}
+		}
 
         // Separador para que la ayuda quede a la derecha, se ignora en Mac OS X
         this.add(Box.createHorizontalGlue());
@@ -386,6 +374,22 @@ public final class MainMenu extends JMenuBar {
         		e.printStackTrace();
 			}
         }
+    }
+    
+    public static void addSubMenus(JMenu jmenu, GenericMenuOption menu, JFrame parent) {
+    	for(GenericMenuOption subMenu : menu.getMenus()) {
+    		JMenu subJMenu = new JMenu(subMenu.getTitle());
+    		if(subMenu.getMenus() != null && !subMenu.getMenus().isEmpty()) {
+    			addSubMenus(subJMenu, subMenu, parent);
+    		}
+    		if(subMenu.getMenus() == null || subMenu.getMenus().isEmpty()) {
+    			JMenuItem leafItem = new JMenuItem(subMenu.getTitle());
+    			leafItem.addActionListener(e -> SimpleAfirma.doMenuAction(subMenu.getAction(), parent));
+    			jmenu.add(leafItem);
+    		} else {
+    		jmenu.add(subJMenu);
+    		}
+    	}
     }
 
     /** Habilita o deshabilita el men&uacute; de operaciones sobre ficheros.
@@ -499,4 +503,5 @@ public final class MainMenu extends JMenuBar {
     boolean exitApplication() {
         return this.saf.askForClosing();
     }
+
 }

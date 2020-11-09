@@ -1,0 +1,43 @@
+{
+	"info": {
+		"name": "hash",
+		"title": "Huellas digitales",
+		"version_code": 1,
+		"version": "1.0",
+		"authors": [
+			"Gobierno de España"
+		],
+		"description": "Plugin para facilitar el cálculo y comprobación de las huellas digitales de las firmas."
+	},
+	"menu": {
+		"title": "Huellas digitales",
+		"items": [
+			{
+				"title": "Fichero",
+				"items": [
+					{
+						"title": "Calcular huella digital",
+						"action": "es.gob.afirma.plugin.hash.action.CalculateHashFileAction"
+					},
+					{
+						"title": "Comprobar huella digital",
+						"action": "es.gob.afirma.plugin.hash.action.CheckHashFileAction"
+					}
+				]
+			},
+			{
+				"title": "Directorio",
+				"items": [
+					{
+						"title": "Calcular huella digital en directorio",
+						"action": "es.gob.afirma.plugin.hash.action.CalculateHashDirAction"
+					},
+					{
+						"title": "Comprobar huella digital en directorio",
+						"action": "es.gob.afirma.plugin.hash.action.CheckHashDirAction"
+					}
+				]
+			}
+		]
+	}
+}

@@ -18,7 +18,7 @@ import java.security.NoSuchAlgorithmException;
 
 /** Utilidades para el c&aacute;culo y comprobaci&oacute;n de huellas digitales.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-final class HashUtil {
+public final class HashUtil {
 
 	private HashUtil() {
 		// No instanciable
@@ -53,7 +53,7 @@ final class HashUtil {
 	 * @throws IOException Si hay errores en el tratamiento del fichero.
 	 * @throws FileNotFoundException Si el fichero indicado no existe.
 	 * @throws NoSuchAlgorithmException Si no se encuentra el algoritmo de huella. */
-	static byte[] getFileHash(final String algorithm, final File dataFile) throws NoSuchAlgorithmException, IOException {
+	public static byte[] getFileHash(final String algorithm, final File dataFile) throws NoSuchAlgorithmException, IOException {
 
 		byte[] result;
 		final DigestManager digestManager = new DigestManager(algorithm, null);

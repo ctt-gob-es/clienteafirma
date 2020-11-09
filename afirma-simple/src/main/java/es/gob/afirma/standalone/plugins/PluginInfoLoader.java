@@ -8,7 +8,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import javax.json.JsonValue;
+import javax.json.JsonString;
 
 /**
  * Clase para la carga de la informaci&oacute;n de los plugins.
@@ -89,22 +89,43 @@ public class PluginInfoLoader {
 		}
 
 		if (!menuObject.containsKey("title") || //$NON-NLS-1$
-				!menuObject.containsKey("items") && !menuObject.containsKey("dialog")) { //$NON-NLS-1$ //$NON-NLS-2$
+				!menuObject.containsKey("items") && !menuObject.containsKey("action")) { //$NON-NLS-1$ //$NON-NLS-2$
 			throw new PluginException("Se han encontrado menus del plugin mal definidos"); //$NON-NLS-1$
 		}
 
 		final GenericMenuOption menu = new GenericMenuOption(menuObject.getString("title")); //$NON-NLS-1$
-		if (menuObject.containsKey("dialog")) { //$NON-NLS-1$
-			menu.setDialogClass(menuObject.getString("dialog")); //$NON-NLS-1$
+		if (menuObject.containsKey("action")) { //$NON-NLS-1$
+			menu.setDialogClass(menuObject.getString("action")); //$NON-NLS-1$
 		}
 		else {
 			final JsonArray items = menuObject.getJsonArray("items"); //$NON-NLS-1$
-			for (final JsonValue item : items) {
-				menu.addSubMenu(parseMenuObject((JsonObject) item));
-			}
+			parseItemsObject(menu, items);
 		}
 
 		return menu;
+	}
+
+	private static void parseItemsObject(GenericMenuOption menu, final JsonArray mainObject) throws PluginException {	
+		if(mainObject != null && mainObject.size() > 0) {
+			for(int i = 0; i < mainObject.size(); i++) {
+				JsonObject subObject = mainObject.getJsonObject(i);
+				if (!subObject.containsKey("title") || //$NON-NLS-1$
+						!subObject.containsKey("items") && !subObject.containsKey("action")) { //$NON-NLS-1$ //$NON-NLS-2$
+					throw new PluginException("Se han encontrado sub-menus del plugin mal definidos"); //$NON-NLS-1$
+				}
+				GenericMenuOption subMenu = new GenericMenuOption(subObject.getString("title"));
+				if(subObject.containsKey("items")) {
+					JsonArray subItems = subObject.getJsonArray("items");
+					if(subItems != null && subItems.size() > 0) {
+						parseItemsObject(subMenu, subItems);
+					}
+				} else if(subObject.containsKey("action")) {
+					JsonString action = subObject.getJsonString("action");
+					subMenu.setAction(action.getString());
+				}
+				menu.addSubMenu(subMenu);
+			}
+		}
 	}
 
 	private static PluginButton[] parseButtonsObject(final JsonObject mainObject) throws PluginException {

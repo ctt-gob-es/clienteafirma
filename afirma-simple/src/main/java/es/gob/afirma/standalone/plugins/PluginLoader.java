@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
@@ -20,6 +22,8 @@ import java.util.ServiceLoader;
 public class PluginLoader {
 
 	private static final String CONFIG_FILE = "/plugin.json"; //$NON-NLS-1$
+	
+	public static Map<String, ClassLoader> classLoaderForPlugin = new HashMap<String, ClassLoader>();
 
 	/**
 	 * Carga la colecci&oacute;n de JARs de un plugin y devuelve un objeto
@@ -69,39 +73,96 @@ public class PluginLoader {
 
 		final AfirmaPlugin plugin = plugins.get(0);
 		final PluginInfo info = loadPluginConfiguration(plugin);
+		
+		storeClassLoader(info, classLoader);
 
-		for (final PluginButton button : info.getButtons()) {
+		// TODO: Puesto que ya almacenamos el classLoader de cada clase del plugin, ya
+		// no es necesario configurar las acciones de los botones de los plugins. Habria
+		// que ver donde se usa cada acción y cargar las clases involucradas a partir de
+		// su classLoader, igual que se hace con los menús.
+		if(info.getButtons() != null) {
+			for (final PluginButton button : info.getButtons()) {
 
-			if (button.getActionClassName() == null) {
-				classLoader.close();
-				throw new PluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
-			}
-			if (button.getWindow() == null) {
-				classLoader.close();
-				throw new PluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
-			}
-			final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
-			if (window == null) {
-				classLoader.close();
-				throw new PluginException(String.format("El plugin '%1s' definio un boton en una ventana desconocida: %2s", //$NON-NLS-1$
-						info.getName(), button.getWindow()));
-			}
-			try {
-				final PluginAction action = getPluginAction(button.getActionClassName(), window, classLoader);
-				action.setPlugin(plugin);
-				button.setAction(action);
-			}
-			catch (final Exception e) {
-				classLoader.close();
-				throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
-						info.getName(), button.getActionClassName()), e);
+				if (button.getActionClassName() == null) {
+					classLoader.close();
+					throw new PluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
+				}
+				if (button.getWindow() == null) {
+					classLoader.close();
+					throw new PluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
+				}
+				final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
+				if (window == null) {
+					classLoader.close();
+					throw new PluginException(String.format("El plugin '%1s' definio un boton en una ventana desconocida: %2s", //$NON-NLS-1$
+							info.getName(), button.getWindow()));
+				}
+				try {
+					final PluginAction action = getPluginAction(button.getActionClassName(), window, classLoader);
+					action.setPlugin(plugin);
+					button.setAction(action);
+				}
+				catch (final Exception e) {
+					classLoader.close();
+					throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
+							info.getName(), button.getActionClassName()), e);
+				}
 			}
 		}
 
 		// Configuramos la informacion obtenida del plugin, en el propio plugin
 		plugin.setInfo(info);
-
+		
 		return plugin;
+	}
+
+	/**
+	 * M&eacute;todo encargado de asociar una lista de actions a un determinado classLoader.
+	 * @param info Informaci&oacute;n asociada al plugin.
+	 * @param classLoader ClassLoader usado para cargar el plugin.
+	 */
+	private static void storeClassLoader(PluginInfo info, URLClassLoader classLoader) {
+		List<String> actions = new ArrayList<String>();
+		getListActions(info, actions);
+		for(String action : actions) {
+			if(!classLoaderForPlugin.containsKey(action)) {
+				classLoaderForPlugin.put(action, classLoader);
+			}
+		}
+	}
+
+	/**
+	 * M&eaacute;todo encargado de recuperar la lista de actions del plugin dado.
+	 * @param info Informaci%oaacute;n del plugin.
+	 * @param actionsList Lista donde almacenar los actions encontrados.
+	 */
+	private static void getListActions(PluginInfo info, List<String> actionsList) {
+		if(info != null) {
+			if(info.getButtons() != null) {
+				for(PluginButton btn : info.getButtons()) {
+					actionsList.add(btn.getActionClassName());				
+				}
+			}
+			if(info.getMenu() != null) {
+				getListActionsFromMenus(info.getMenu(), actionsList);
+			}
+		}
+	}
+
+	/**
+	 * M&eaacute;todo encargado de recuperar la lista de acciones de los menus de un plugin dado.
+	 * @param menu Menu a recorrer para extraer los actions.
+	 * @param actionsList lista donde almacenar los actions encontrados.
+	 */
+	private static void getListActionsFromMenus(GenericMenuOption menu, List<String> actionsList) {
+		if(menu.getAction() != null) {
+			actionsList.add(menu.getAction());
+		}
+		if(menu.getMenus() != null) {
+			for(GenericMenuOption subMenu : menu.getMenus()) {
+				getListActionsFromMenus(subMenu, actionsList);
+			}
+		}
 	}
 
 	/**

@@ -12,6 +12,7 @@ import javax.swing.JButton;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.GenericMenuOption;
 import es.gob.afirma.standalone.plugins.PluginButton;
 import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
@@ -60,6 +61,29 @@ public class PluginsUiComponentsBuilder {
 			}
 		}
 		return jButtons;
+	}
+	
+	/**
+	 * Recupera la lista de menus de los plugins cargados por AutoFirma.
+	 * @return Listado de menus encontrados.
+	 */
+	public static List<GenericMenuOption> getPluginsMenus() {
+		final List<GenericMenuOption> menuList = new ArrayList<>();
+		List<AfirmaPlugin> plugins = null;
+		try {
+			plugins = PluginsManager.getInstance().getPluginsLoadedList();
+		} catch (final PluginException e) {
+			LOGGER.log(Level.SEVERE, "No se han podido cargar los plugins en la aplicacion", e); //$NON-NLS-1$
+		}	
+		if(plugins != null) {
+			for (final AfirmaPlugin plugin : plugins) {
+				GenericMenuOption menu = plugin.getInfo().getMenu();
+				if(menu != null) {
+					menuList.add(menu);
+				}
+			}
+		}
+		return menuList;
 	}
 
 	/**
