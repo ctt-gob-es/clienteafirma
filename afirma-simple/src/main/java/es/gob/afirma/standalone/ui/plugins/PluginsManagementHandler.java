@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,6 +27,8 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.JarNoSignedException;
+import es.gob.afirma.standalone.plugins.JarVerifier;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
@@ -98,6 +101,13 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			pluginFile = selectPluginFile();
 		}
 		catch (final AOCancelledOperationException e) {
+			return;
+		}
+
+		// Comprobamos que el JAR este correctamente firmado y mostramos un dialogo
+		// de advertencia si no lo esta y de informacion en caso de estarlo
+		final boolean allowed = verifyJar(pluginFile);
+		if (!allowed) {
 			return;
 		}
 
@@ -190,6 +200,48 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		// Mostramos la informacion del plugin
 		showPluginInfo(pluginsManager, plugin);
+	}
+
+
+
+	private boolean verifyJar(final File pluginFile) {
+
+		List<X509Certificate[]> certs = null;
+		try {
+			certs = JarVerifier.verify(pluginFile);
+		}
+		catch (final JarNoSignedException e) {
+			final int option = JOptionPane.showConfirmDialog(
+					this.view,
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.20"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.21"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+			return option == JOptionPane.YES_OPTION;
+		}
+		catch (final SecurityException e) {
+			final int option = JOptionPane.showConfirmDialog(
+					this.view,
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.22"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.23"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.ERROR_MESSAGE);
+			return option == JOptionPane.YES_OPTION;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Ocurrio un error durante la lectura del fichero de plugin", e); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.24")); //$NON-NLS-1$
+			return false;
+		}
+
+		// Mostramos un dialogo en el que pedimos al usuario que confirme que confia en el firmante
+		// del plugin
+		final int option = JOptionPane.showConfirmDialog(
+				this.view,
+				new CertificateConfirmPanel(certs.toArray(new X509Certificate[0][])),
+				SimpleAfirmaMessages.getString("PluginsManagementHandler.25"), //$NON-NLS-1$
+				JOptionPane.YES_NO_OPTION);
+		return option == JOptionPane.YES_OPTION;
 	}
 
 	/**
