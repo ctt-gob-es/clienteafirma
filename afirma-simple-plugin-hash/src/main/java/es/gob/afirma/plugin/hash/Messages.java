@@ -19,11 +19,27 @@ public class Messages {
 	 * @param key Clave del mensaje a recuperar.
 	 * @return Mensaje legible.
 	 */
-	public static String getString(String key) {
+	public static String getString(final String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key);
 		} catch (final MissingResourceException e) {
 			return '!' + key + '!';
 		}
 	}
+
+    /** Obtiene un mensaje.
+     * @param key Clave del mensaje
+     * @param params Particulas de texto que se agregan al mensaje.
+     * @return Mensaje correspondiente a la clave */
+    public static String getString(final String key, final String... params) {
+    	String text = getString(key);
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+            	if (params[i] != null) {
+            		text = text.replace("%" + i, params[i]); //$NON-NLS-1$
+            	}
+            }
+        }
+        return text;
+    }
 }

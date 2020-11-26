@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -282,7 +283,7 @@ public final class ProtocolInvocationLauncher {
                     		? e.getErrorCode()
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    				StandardCharsets.UTF_8);
+                    				StandardCharsets.UTF_8.toString());
                     sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
@@ -355,7 +356,7 @@ public final class ProtocolInvocationLauncher {
                     		? e.getErrorCode()
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    				StandardCharsets.UTF_8);
+                    				StandardCharsets.UTF_8.toString());
                     sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
@@ -428,7 +429,7 @@ public final class ProtocolInvocationLauncher {
                     		? e.getErrorCode()
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    				StandardCharsets.UTF_8);
+                    				StandardCharsets.UTF_8.toString());
                     sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
@@ -511,7 +512,7 @@ public final class ProtocolInvocationLauncher {
                     		? e.getErrorCode()
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    				StandardCharsets.UTF_8);
+                    				StandardCharsets.UTF_8.toString());
                     sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
@@ -595,11 +596,11 @@ public final class ProtocolInvocationLauncher {
                     if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()) {
                     	msg = e.getErrorCode();
                     } else if (e.getMessage() != null) {
-                    	msg = e.getErrorCode() + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8); //$NON-NLS-1$
+                    	msg = e.getErrorCode() + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString()); //$NON-NLS-1$
                     } else {
                     	msg = URLEncoder.encode(
                     			ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    			StandardCharsets.UTF_8);
+                    			StandardCharsets.UTF_8.toString());
                     }
                     sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
@@ -681,7 +682,7 @@ public final class ProtocolInvocationLauncher {
                     		? e.getErrorCode()
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    				StandardCharsets.UTF_8);
+                    				StandardCharsets.UTF_8.toString());
                     sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
@@ -866,7 +867,13 @@ public final class ProtocolInvocationLauncher {
 		for (final String param : urlParams) {
 			final int equalsPos = param.indexOf('=');
 			if (equalsPos > 0) {
-				params.put(param.substring(0, equalsPos), URLDecoder.decode(param.substring(equalsPos + 1), StandardCharsets.UTF_8));
+				try {
+					params.put(
+							param.substring(0, equalsPos),
+							URLDecoder.decode(param.substring(equalsPos + 1), StandardCharsets.UTF_8.toString()));
+				} catch (final UnsupportedEncodingException e) {
+					LOGGER.warning("No se pudo decodificar el valor del parametro '" + param.substring(0, equalsPos) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 		}
 

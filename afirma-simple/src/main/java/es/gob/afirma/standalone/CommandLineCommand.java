@@ -16,8 +16,6 @@ enum CommandLineCommand {
 	COUNTERSIGN("countersign", false), //$NON-NLS-1$
 	MASSIVE("massive", false), //$NON-NLS-1$
 	VERIFY("verify", false), //$NON-NLS-1$
-	CREATEHASH("createdigest", true), //$NON-NLS-1$
-	CHECKHASH("checkdigest", true), //$NON-NLS-1$
 	BATCHSIGN("batchsign", false); //$NON-NLS-1$
 
 	private String op;

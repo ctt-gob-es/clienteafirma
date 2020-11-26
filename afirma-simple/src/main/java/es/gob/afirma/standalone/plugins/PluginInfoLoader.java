@@ -2,7 +2,11 @@ package es.gob.afirma.standalone.plugins;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -14,6 +18,8 @@ import javax.json.JsonString;
  * Clase para la carga de la informaci&oacute;n de los plugins.
  */
 public class PluginInfoLoader {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/**
 	 * Obtiene la informaci&oacute;n de un plugin.
@@ -32,6 +38,11 @@ public class PluginInfoLoader {
 
 			info = parseInfoObject(mainObject);
 
+			final Permission[] permissions = parsePermissionsObject(mainObject);
+			if (permissions != null) {
+				info.setPermissions(permissions);
+			}
+
 			final GenericMenuOption menu = parseMenuObject(mainObject);
 			if (menu != null) {
 				info.setMenu(menu);
@@ -40,6 +51,11 @@ public class PluginInfoLoader {
 			final PluginButton[] buttons = parseButtonsObject(mainObject);
 			if (buttons != null) {
 				info.setButtons(buttons);
+			}
+
+			final PluginCommand[] commands = parseCommandsObject(mainObject);
+			if (commands != null) {
+				info.setCommands(commands);
 			}
 		}
 
@@ -82,6 +98,42 @@ public class PluginInfoLoader {
 		return info;
 	}
 
+	/**
+	 * Carga y ordena los
+	 * @param mainObject
+	 * @return
+	 */
+	private static Permission[] parsePermissionsObject(final JsonObject mainObject) {
+
+		final JsonArray permissionsArray = mainObject.getJsonArray("permissions"); //$NON-NLS-1$
+		if (permissionsArray == null) {
+			return new Permission[0];
+		}
+
+		final Set<Permission> permissionsSet = new HashSet<>();
+
+		for (int i = 0; i < permissionsArray.size(); i++) {
+			final JsonString permissionString = (JsonString) permissionsArray.get(i);
+			Permission permission;
+			try {
+				permission = Permission.forName(permissionString.getString());
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Permiso no reconocido: " + permissionString.getString()); //$NON-NLS-1$
+				continue;
+			}
+			permissionsSet.add(permission);
+		}
+
+		final Permission[] permissions = permissionsSet.toArray(new Permission[0]);
+		Arrays.sort(permissions,
+				(o1, o2) -> o1.getOrder() < o2.getOrder()
+							? -1
+							: o1.getOrder() == o2.getOrder() ? 0 : 1);
+
+		return permissions;
+	}
+
 	private static GenericMenuOption parseMenuObject(final JsonObject mainObject) throws PluginException {
 		final JsonObject menuObject = mainObject.getJsonObject("menu"); //$NON-NLS-1$
 		if (menuObject == null) {
@@ -105,23 +157,23 @@ public class PluginInfoLoader {
 		return menu;
 	}
 
-	private static void parseItemsObject(GenericMenuOption menu, final JsonArray mainObject) throws PluginException {	
+	private static void parseItemsObject(final GenericMenuOption menu, final JsonArray mainObject) throws PluginException {
 		if(mainObject != null && mainObject.size() > 0) {
 			for(int i = 0; i < mainObject.size(); i++) {
-				JsonObject subObject = mainObject.getJsonObject(i);
+				final JsonObject subObject = mainObject.getJsonObject(i);
 				if (!subObject.containsKey("title") || //$NON-NLS-1$
 						!subObject.containsKey("items") && !subObject.containsKey("action")) { //$NON-NLS-1$ //$NON-NLS-2$
 					throw new PluginException("Se han encontrado sub-menus del plugin mal definidos"); //$NON-NLS-1$
 				}
-				GenericMenuOption subMenu = new GenericMenuOption(subObject.getString("title"));
-				if(subObject.containsKey("items")) {
-					JsonArray subItems = subObject.getJsonArray("items");
+				final GenericMenuOption subMenu = new GenericMenuOption(subObject.getString("title")); //$NON-NLS-1$
+				if(subObject.containsKey("items")) { //$NON-NLS-1$
+					final JsonArray subItems = subObject.getJsonArray("items"); //$NON-NLS-1$
 					if(subItems != null && subItems.size() > 0) {
 						parseItemsObject(subMenu, subItems);
 					}
-				} else if(subObject.containsKey("action")) {
-					JsonString action = subObject.getJsonString("action");
-					subMenu.setAction(action.getString());
+				} else if(subObject.containsKey("action")) { //$NON-NLS-1$
+					final JsonString action = subObject.getJsonString("action"); //$NON-NLS-1$
+					subMenu.setActionClassName(action.getString());
 				}
 				menu.addSubMenu(subMenu);
 			}
@@ -159,5 +211,32 @@ public class PluginInfoLoader {
 		}
 
 		return buttons.toArray(new PluginButton[buttons.size()]);
+	}
+
+
+	private static PluginCommand[] parseCommandsObject(final JsonObject mainObject) throws PluginException {
+		final JsonArray commandsArray = mainObject.getJsonArray("commands"); //$NON-NLS-1$
+		if (commandsArray == null || commandsArray.size() == 0) {
+			return null;
+		}
+
+		final List<PluginCommand> commands = new ArrayList<>();
+		for (int i = 0; i < commandsArray.size(); i++) {
+			final JsonObject commandObject = (JsonObject) commandsArray.get(i);
+			if (!commandObject.containsKey("name")) { //$NON-NLS-1$
+				throw new PluginException("No se ha indicado el nombre de un comando del plugin"); //$NON-NLS-1$
+			}
+			if (!commandObject.containsKey("action")) { //$NON-NLS-1$
+				throw new PluginException("No se ha definido una clase de accion para un comando"); //$NON-NLS-1$
+			}
+
+			final PluginCommand command = new PluginCommand(commandObject.getString("name")); //$NON-NLS-1$
+			command.setCommandActionClass(commandObject.getString("action")); //$NON-NLS-1$
+			command.setDescription(commandObject.getString("description")); //$NON-NLS-1$
+
+			commands.add(command);
+		}
+
+		return commands.toArray(new PluginCommand[commands.size()]);
 	}
 }

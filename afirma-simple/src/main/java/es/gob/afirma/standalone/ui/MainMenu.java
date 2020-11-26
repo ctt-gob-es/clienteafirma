@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.EventObject;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -35,10 +37,8 @@ import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
-import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
-import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
-import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
-import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
+import es.gob.afirma.standalone.plugins.PluginException;
+import es.gob.afirma.standalone.plugins.PluginLoader;
 import es.gob.afirma.standalone.ui.plugins.PluginsManagementDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigDialog;
@@ -48,6 +48,8 @@ import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigDialog;
 public final class MainMenu extends JMenuBar {
 
     private static final long serialVersionUID = -8361808353554036015L;
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private final JMenuItem firmarMenuItem;
     private final JMenuItem abrirMenuItem;
@@ -77,10 +79,6 @@ public final class MainMenu extends JMenuBar {
      *  <li>Alt+R = Menu herramientas</li>
      *  <li>
      *   <ul>
-     *    <li>Ctrl+H = Calcular huella digital</li>
-     *    <li>Ctrl+U = Comprobar huella digital</li>
-     *    <li>Ctrl+D = Calcular huella digital de un directorio</li>
-     *    <li>Ctrl+K = Comprobar huella digital de un directorio</li>
      *    <li>Ctrl+R = Restaurar instalaci&oacute;n</li>
      *    <li>Ctrl+P = Preferencias</li>
      *   </ul>
@@ -186,49 +184,6 @@ public final class MainMenu extends JMenuBar {
         );
         toolsMenu.setEnabled(true);
 
-		final JMenuItem createHashFileMenuItem = new JMenuItem(
-				SimpleAfirmaMessages.getString("MainMenu.26") //$NON-NLS-1$
-		);
-		createHashFileMenuItem.setMnemonic('a');
-		createHashFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_H, Toolkit.getDefaultToolkit()
-						.getMenuShortcutKeyMask()));
-		createHashFileMenuItem.addActionListener(
-				e -> CreateHashDialog.startHashCreation(getParentComponent())
-		);
-
-		final JMenuItem checkHashFileMenuItem = new JMenuItem(
-				SimpleAfirmaMessages.getString("MainMenu.27") //$NON-NLS-1$
-		);
-		checkHashFileMenuItem.setMnemonic('o');
-		checkHashFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_U, Toolkit.getDefaultToolkit()
-						.getMenuShortcutKeyMask()));
-		checkHashFileMenuItem.addActionListener(e -> CheckHashDialog.launch(getParentComponent())
-		);
-
-		final JMenuItem createHashDirMenuItem = new JMenuItem(
-				SimpleAfirmaMessages.getString("MainMenu.28") //$NON-NLS-1$
-		);
-		createHashDirMenuItem.setMnemonic('a');
-		createHashDirMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_D, Toolkit.getDefaultToolkit()
-						.getMenuShortcutKeyMask()));
-		createHashDirMenuItem.addActionListener(e -> CreateHashFiles.startHashCreation(getParentComponent()));
-
-		final JMenuItem checkHashDirMenuItem = new JMenuItem(
-				SimpleAfirmaMessages.getString("MainMenu.29") //$NON-NLS-1$
-		);
-		checkHashDirMenuItem.setMnemonic('o');
-		checkHashDirMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_K, Toolkit.getDefaultToolkit()
-						.getMenuShortcutKeyMask()));
-		checkHashDirMenuItem.addActionListener(e -> CheckHashFiles.startHashCheck(getParentComponent()));
-
-        if (!isMac) {
-        	createHashFileMenuItem.setMnemonic('l');
-        }
-
         // En Mac OS X el salir lo gestiona el propio OS
         if (!isMac) {
         	menuArchivo.addSeparator();
@@ -303,13 +258,14 @@ public final class MainMenu extends JMenuBar {
 				);
         	}
         }
-        
-        // Comprobamos si existen menus adicionales de plugins que deben ser añdidos a la barra de menu principal.
+
+        // Comprobamos si existen menus adicionales de plugins que deben ser anadidos a la
+        // barra de menu principal
         final List<GenericMenuOption> menus = PluginsUiComponentsBuilder.getPluginsMenus();
 		if (menus != null && !menus.isEmpty()) {
-			for (GenericMenuOption menu : menus) {
-				String title = menu.getTitle();
-				JMenu jmenu = new JMenu(title);
+			for (final GenericMenuOption menu : menus) {
+				final String title = menu.getTitle();
+				final JMenu jmenu = new JMenu(title);
 				addSubMenus(jmenu, menu, getParentComponent());
 				this.add(jmenu);
 			}
@@ -375,16 +331,29 @@ public final class MainMenu extends JMenuBar {
 			}
         }
     }
-    
-    public static void addSubMenus(JMenu jmenu, GenericMenuOption menu, JFrame parent) {
-    	for(GenericMenuOption subMenu : menu.getMenus()) {
-    		JMenu subJMenu = new JMenu(subMenu.getTitle());
+
+    public static void addSubMenus(final JMenu jmenu, final GenericMenuOption menu, final JFrame parent) {
+    	for(final GenericMenuOption subMenu : menu.getMenus()) {
+    		final JMenu subJMenu = new JMenu(subMenu.getTitle());
     		if(subMenu.getMenus() != null && !subMenu.getMenus().isEmpty()) {
     			addSubMenus(subJMenu, subMenu, parent);
     		}
     		if(subMenu.getMenus() == null || subMenu.getMenus().isEmpty()) {
-    			JMenuItem leafItem = new JMenuItem(subMenu.getTitle());
-    			leafItem.addActionListener(e -> SimpleAfirma.doMenuAction(subMenu.getAction(), parent));
+    			final JMenuItem leafItem = new JMenuItem(subMenu.getTitle());
+    			leafItem.addActionListener(ev -> {
+					try {
+						doMenuAction(subMenu.getActionClassName(), parent);
+					}
+					catch (final Exception ex) {
+						LOGGER.log(Level.SEVERE, "Se ha producido un error inesperado durante la ejecucion de la accion del plugin", ex); //$NON-NLS-1$
+						AOUIFactory.showErrorMessage(
+								parent,
+								SimpleAfirmaMessages.getString("SimpleAfirma.52"), //$NON-NLS-1$
+								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+								);
+					}
+				});
     			jmenu.add(leafItem);
     		} else {
     		jmenu.add(subJMenu);
@@ -414,7 +383,6 @@ public final class MainMenu extends JMenuBar {
      * de men&uacute; del sistema operativo.
      * @param event Evento que desencadena la acci&oacute;n.
      */
-	@SuppressWarnings("unused")
 	void showPreferences(final EventObject event) {
 	    PreferencesDialog.show(getParentComponent(), true);
 	}
@@ -463,8 +431,7 @@ public final class MainMenu extends JMenuBar {
      * de men&uacute; del sistema operativo.
      * @param event Evento que desencadena la acci&oacute;n.
      */
-    @SuppressWarnings("unused")
-	void showAbout(final EventObject event) {
+    void showAbout(final EventObject event) {
     	showAbout(getParentComponent() == null ? MainMenu.this : getParentComponent());
     }
 
@@ -504,4 +471,14 @@ public final class MainMenu extends JMenuBar {
         return this.saf.askForClosing();
     }
 
+	/**
+	 * M&eacute;todo que realiza la acci&oacute;n de men&uacute; definida en el
+	 * fichero JSON de un plugin.
+	 * @param actionClass Clase donde se define la acci&oacute;n a realizar.
+	 * @param parent Componente padre sobre el que mostrar di&aacute;logos del plugin.
+	 */
+	public static void doMenuAction(final String actionClass, final Frame parent)
+			throws PluginException{
+		PluginLoader.getPluginAction(actionClass).start(parent);
+	}
 }

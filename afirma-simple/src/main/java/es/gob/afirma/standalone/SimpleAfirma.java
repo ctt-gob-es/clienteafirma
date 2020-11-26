@@ -60,8 +60,6 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.standalone.plugins.PluginLoader;
-import es.gob.afirma.standalone.plugins.PluginMenu;
 import es.gob.afirma.standalone.plugins.PluginsManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncher;
 import es.gob.afirma.standalone.ui.ClosePanel;
@@ -1029,29 +1027,5 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	else if (isSupportedVersion && !needCheck) {
     		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CHECK_JAVA_VERSION, true);
     	}
-	}
-	
-	/**
-	 * M&eacute;todo que realiza la acci&oacute;n de men&uacute; definida en el
-	 * fichero JSON.
-	 * 
-	 * @param actionClass Clase donde se define la acci&oacute;n a realizar.
-	 */
-	@SuppressWarnings("unchecked")
-	public static void doMenuAction(String actionClass, Frame parent) {
-		try { 
-			Class<? extends PluginMenu> clasz = (Class<? extends PluginMenu>) Class.forName(actionClass, true, PluginLoader.classLoaderForPlugin.get(actionClass));
-			if (clasz != null) {
-				PluginMenu cls = clasz.newInstance();
-				cls.init(parent);
-			}
-		} catch (ClassNotFoundException e) {
-			LOGGER.severe(
-					"No ha sido posible encontrar la clase " + actionClass + " definida en el 'action' del plugin.");
-		} catch (IllegalAccessException | InstantiationException e) {
-			LOGGER.severe("No ha sido posible instanciar la clase " + actionClass + ".");
-		} catch (Exception e) {
-			LOGGER.severe("se ha producido un error inesperado durante la ejecucion de la accion del plugin");
-		}
 	}
 }

@@ -1,11 +1,13 @@
 package es.gob.afirma.standalone.ui.plugins;
 
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +26,8 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.Permission;
+import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
 import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
@@ -109,8 +113,32 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		PluginsManager.closePlugin(plugin);
 
+		// Mostramos los permisos requeridos por el plugin y no lo instalamos salvo
+		// que se acepten
+		if (info.getPermissions() != null && info.getPermissions().length > 0) {
+			final boolean accepted = showPermissionDialog(info, this.view.getParentWindow());
+			if (!accepted) {
+				return;
+			}
+		}
+
 		// Lo importamos a la aplicacion
 		addPlugin(pluginFile, info);
+	}
+
+	/**
+	 * Muestra el di&aacute;logo de solicitud de permisos.
+	 * @param info Informaci&oacute;n del plugin con el listado de permisos.
+	 * @param parent Componente sobre el que mostrar el di&aacute;logo.
+	 * @return {@code true} si el usuario concedi&oacute; los permisos al plugin,
+	 * {@code false} en caso contrario.
+	 */
+	private static boolean showPermissionDialog(final PluginInfo info, final Window parent) {
+
+		final PermissionsDialog dialog = new PermissionsDialog(info, parent);
+		dialog.setVisible(true);
+
+		return dialog.isAccepted();
 	}
 
 	private void addPlugin(final File pluginFile, final PluginInfo info) {
@@ -153,6 +181,11 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			LOGGER.log(Level.WARNING, "Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
 			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.2")); //$NON-NLS-1$
 			return;
+		}
+
+		// Si el plugin requiere reiniciar, reiniciamos;
+		if (PermissionChecker.check(plugin.getInfo(), Permission.RESET)) {
+			resetApplication();
 		}
 
 		// Mostramos la informacion del plugin
@@ -273,6 +306,11 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		// Eliminamos la configuracion almacenada del plugin
 		PluginsPreferences.getInstance(plugin).removeConfig();
+
+		// Si el plugin requiere reiniciar, reiniciamos;
+		if (PermissionChecker.check(plugin.getInfo(), Permission.RESET)) {
+			resetApplication();
+		}
 	}
 
 	/**
@@ -291,6 +329,93 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		// Limpiamos el panel de informacion
 		showPluginDetails(null);
+	}
+
+
+	/**
+	 * Si es posible, abre una nueva instancia de la aplicaci&oacute;n y cierra la actual.
+	 * Si no se encuentra un modo de arrancar la nueva instancia de la aplicaci&oacute;n,
+	 * no se hace nada.
+	 */
+	private static void resetApplication() {
+
+		File currentFile;
+		try {
+			currentFile = new File(PluginsManager.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido identificar el fichero ejecutable", e); //$NON-NLS-1$
+			return;
+		}
+
+		// Compone el comando necesario para arrancar la aplicacion
+		final List<String> command = getCommand(currentFile);
+
+		// Ejecutamos una nueva instancia de la aplicacion
+		if (command != null) {
+			// Consultamos si se desea reiniciar la aplicacion
+			final int option = JOptionPane.showConfirmDialog(
+					null,
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.19"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.18"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+			if (option == JOptionPane.YES_OPTION) {
+				try {
+					new ProcessBuilder(command).start();
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se ha podido arrancar la nueva instancia de la aplicacion", e); //$NON-NLS-1$
+				}
+
+				// Salimos de la aplicacion antes de que se llegue a cargar la nueva instancia
+				System.exit(0);
+			}
+		}
+		// Pedimos al usuario que reinicie la aplicacion
+		else {
+			JOptionPane.showMessageDialog(
+					null,
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.17"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.18"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	/**
+	 * Devuelve el comando necesario para ejecutar la aplicaci&oacute;n o {@code null}
+	 * si no hay una forma efectiva de ejecutarla
+	 * @param currentFile Fichero o directorio con la aplicaci&oacute;n.
+	 * @return Par&aacute;meros para la ejecuci&oacute;n de la aplicaci&oacute;n.
+	 */
+	private static List<String> getCommand(final File currentFile) {
+
+		// La aplicacion se ejecutan las clases Java. No va a poder ejecutarse sin las
+		// dependencias, por lo que se omite
+		if (currentFile.isDirectory()) {
+			return null;
+		}
+
+		// La aplicacion se ejecuta desde un JAR
+		List<String> command;
+		if (currentFile.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
+			final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			command = new ArrayList<>();
+			command.add(java);
+			command.add("-jar"); //$NON-NLS-1$
+			command.add(currentFile.getPath());
+		}
+		// La aplicacion es un ejecutable de Windows
+		else if (currentFile.getName().toLowerCase().endsWith(".exe")) { //$NON-NLS-1$
+			command = new ArrayList<>();
+			command.add(currentFile.getPath());
+		}
+		// En cualquier otro caso, no reiniciamos
+		else {
+			command = null;
+		}
+
+		return command;
 	}
 
 	void configPlugin() {

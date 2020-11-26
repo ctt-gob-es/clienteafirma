@@ -8,6 +8,8 @@
 		"authors" : [ "Gobierno de España" ],
 		"description" : "Plugin para la comprobación del estado de certificados de firma.<br><br>Este plugin permite validar los certificados utilizados para firmar con AutoFirma. La validación se realiza mediante mecanismos predefinidos para los certificados de algunos prestadores de servicios de confianza y, en caso de no tener estos mecanismos predefinidos, contra la CRL o el OCSP declarado en el propio certificado.<br><br>Asegúrese de utilizar únicamente certificados emitidos por prestadores de confianza para firmar, ya que un certificado de un origen desconocido podría declarar mecanismos de validación no seguros."
 	},
+	
+"permissions": ["BUTTONS"],
 
 "buttons" : [
 		{

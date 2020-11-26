@@ -28,6 +28,17 @@ public abstract class PluginAction {
 		return new Properties();
 	}
 
+	/**
+	 * Actualiza la configuraci&oacute;n proporcionada para el plugin, permitiendo que se actualice a
+	 * traves de los di&aacute;logos y acciones que ejecuta.
+	 * @param config Configuraci&oacute;n que debe establecerse.
+	 */
+	protected final void saveConfig(final Properties config) {
+		if (this.plugin != null) {
+			PluginPreferences.getInstance(this.plugin).saveConfig(config);
+		}
+	}
+
 	@SuppressWarnings("unused")
 	public void start(final Window parent) {
 		// Por defecto, no se hace nada

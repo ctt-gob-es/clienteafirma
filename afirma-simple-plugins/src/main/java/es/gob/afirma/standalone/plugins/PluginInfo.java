@@ -18,9 +18,13 @@ public class PluginInfo extends MinimalPluginInfo {
 
 	private String configPanel;
 
+	private Permission[] permissions;
+
 	private GenericMenuOption menu;
 
 	private PluginButton[] buttons;
+
+	private PluginCommand[] commands;
 
 	/**
 	 * Crea la informaci&oacute;n b&aacute;sica de un plugin. El nombre interno del plugin,
@@ -146,6 +150,22 @@ public class PluginInfo extends MinimalPluginInfo {
 	}
 
 	/**
+	 * Recupera el listado de permisos solicitados por la aplicaci&oacute;n.
+	 * @return Listado de permisos.
+	 */
+	public Permission[] getPermissions() {
+		return this.permissions;
+	}
+
+	/**
+	 * Establece el listado de permisos solicitados por la aplicaci&oacute;n.
+	 * @param permissions Listado de permisos.
+	 */
+	public void setPermissions(final Permission[] permissions) {
+		this.permissions = permissions;
+	}
+
+	/**
 	 * Recupera el men&uacute; general del plugin.
 	 * @return Men&uacute; general.
 	 */
@@ -175,6 +195,22 @@ public class PluginInfo extends MinimalPluginInfo {
 	 */
 	public void setButtons(final PluginButton[] buttons) {
 		this.buttons = buttons;
+	}
+
+	/**
+	 * Recupera los comandos declarados por el plugin.
+	 * @return Comandos declarados por el plugin.
+	 */
+	public PluginCommand[] getCommands() {
+		return this.commands;
+	}
+
+	/**
+	 * Establece los comandos declarados por el plugin.
+	 * @param commands Comandos declarados por el plugin.
+	 */
+	public void setCommands(final PluginCommand[] commands) {
+		this.commands = commands;
 	}
 
 	@Override

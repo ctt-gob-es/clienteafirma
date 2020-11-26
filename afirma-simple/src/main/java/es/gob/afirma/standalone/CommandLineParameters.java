@@ -24,7 +24,6 @@ final class CommandLineParameters {
 	private static final String PARAM_STORE       = "-store"; //$NON-NLS-1$
 	private static final String PARAM_FORMAT      = "-format"; //$NON-NLS-1$
 	private static final String PARAM_PASSWD      = "-password"; //$NON-NLS-1$
-	private static final String PARAM_XML         = "-xml"; //$NON-NLS-1$
 	private static final String PARAM_ALGO        = "-algorithm"; //$NON-NLS-1$
 	private static final String PARAM_CONFIG      = "-config"; //$NON-NLS-1$
 	private static final String PARAM_OP	      = "-operation"; //$NON-NLS-1$
@@ -35,6 +34,8 @@ final class CommandLineParameters {
 	private static final String PARAM_HASH_FORMAT = "-hformat"; //$NON-NLS-1$
 	private static final String PARAM_HASH_ALGO   = "-halgorithm"; //$NON-NLS-1$
 	private static final String PARAM_RECURSIVE   = "-r"; //$NON-NLS-1$
+
+	public static final String PARAM_XML         = "-xml"; //$NON-NLS-1$
 
 	public static final String FORMAT_AUTO     = "auto"; //$NON-NLS-1$
 	public static final String FORMAT_XADES    = "xades"; //$NON-NLS-1$
@@ -445,10 +446,6 @@ final class CommandLineParameters {
 				return buildOperationVerifySyntaxError(op.getOp(), errorMessage);
 			case BATCHSIGN:
 				return buildOperationBatchSignSyntaxError(op.getOp(), errorMessage);
-			case CHECKHASH:
-				return buildOperationCheckHashSyntaxError(op.getOp(), errorMessage);
-			case CREATEHASH:
-				return buildOperationCreateHashSyntaxError(op.getOp(), errorMessage);
 			default:
 				return errorMessage;
 		}
@@ -588,77 +585,6 @@ final class CommandLineParameters {
 		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		//.append("  ").append(PARAM_GUI).append(" \t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_INPUT).append(" inputfile\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-		return sb.toString();
-	}
-
-	/** Construye la cadena de texto que explica la sintaxis para el uso del comando de
-	 * verificaci&oacute;n de huellas digitales de ficheros.
-	 * @param op Comando.
-	 * @param errorMessage Mensaje que explica el error cometido.
-	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
-	private static String buildOperationCheckHashSyntaxError(final String op, final String errorMessage) {
-		final StringBuilder sb = new StringBuilder();
-		if (errorMessage != null) {
-			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
-		}
-		// Sintaxis
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  AutoFirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(CommandLineMessages.getString("CommandLineLauncher.108")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  AutoFirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(CommandLineMessages.getString("CommandLineLauncher.109")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		// Parametros
-		.append(CommandLineMessages.getString("CommandLineLauncher.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append("FICHERO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.106")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		.append("  ").append("DIRECTORIO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.107")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		// Opciones de fichero
-		.append(CommandLineMessages.getString("CommandLineLauncher.116")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_INPUT).append(" FICHERO\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.67")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		// Opciones de directorio
-		.append(CommandLineMessages.getString("CommandLineLauncher.117")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_INPUT).append(" FICHERO\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.105")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.97")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-		return sb.toString();
-	}
-
-	/** Construye la cadena de texto que explica la sintaxis para el uso del comando de
-	 * generacion de huellas digitales de un fichero o de los ficheros de un directorio.
-	 * @param op Comando.
-	 * @param errorMessage Mensaje que explica el error cometido.
-	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
-	private static String buildOperationCreateHashSyntaxError(final String op, final String errorMessage) {
-		final StringBuilder sb = new StringBuilder();
-		if (errorMessage != null) {
-			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
-		}
-		// Sintaxis
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  AutoFirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(CommandLineMessages.getString("CommandLineLauncher.110")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  AutoFirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(CommandLineMessages.getString("CommandLineLauncher.111")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		// Parametros
-		.append(CommandLineMessages.getString("CommandLineLauncher.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append("FICHERO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.112")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		.append("  ").append("DIRECTORIO").append("\t\t(").append(CommandLineMessages.getString("CommandLineLauncher.113")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		// Opciones de fichero
-		.append(CommandLineMessages.getString("CommandLineLauncher.116")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.118")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_HASH_ALGO).append(" ALGORITMO\t (").append(CommandLineMessages.getString("CommandLineLauncher.77")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_HASH_FORMAT).append(" FORMATO\t (").append(CommandLineMessages.getString("CommandLineLauncher.78")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_HASH_FILE_HEX).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.81")).append(") (").append(CommandLineMessages.getString("CommandLineLauncher.79")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		.append("  \t ").append(FORMAT_HASH_FILE_BASE64).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.82")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_HASH_FILE_BIN).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.83")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		// Opciones de directorio
-		.append(CommandLineMessages.getString("CommandLineLauncher.117")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.95", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.96")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_HASH_ALGO).append(" ALGORITMO\t (").append(CommandLineMessages.getString("CommandLineLauncher.77")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_HASH_FORMAT).append(" FORMATO\t (").append(CommandLineMessages.getString("CommandLineLauncher.78")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_HASH_DIR_XML).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.85")).append(") (").append(CommandLineMessages.getString("CommandLineLauncher.79")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		.append("  \t ").append(FORMAT_HASH_DIR_PLAIN).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.86")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_RECURSIVE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.92")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		return sb.toString();
 	}

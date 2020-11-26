@@ -12,6 +12,8 @@ public abstract class AfirmaPlugin {
 
 	private PluginInfo info = null;
 
+	private ClassLoader classLoader = null;
+
 	/**
 	 * Proporciona la informaci&oacute;n b&aacute;sica de la aplicaci&oacute;n.
 	 * @return Informaci&oacute;n del plugin.
@@ -24,8 +26,24 @@ public abstract class AfirmaPlugin {
 	 * Establece la informaci&oacute;n b&aacute;sica de la aplicaci&oacute;n.
 	 * @param info Informaci&oacute;n del plugin.
 	 */
-	public final void setInfo(PluginInfo info) {
+	public final void setInfo(final PluginInfo info) {
 		this.info = info;
+	}
+
+	/**
+	 * Proporciona la informaci&oacute;n b&aacute;sica de la aplicaci&oacute;n.
+	 * @return Informaci&oacute;n del plugin.
+	 */
+	public final ClassLoader getClassLoader() {
+		return this.classLoader;
+	}
+
+	/**
+	 * Establece el ClassLoader con el que se cargar&aacute;n las clases del plugin.
+	 * @param classLoader ClassLoader con el que se cargar&aacute;n las clases del plugin.
+	 */
+	public final void setClassLoader(final ClassLoader classLoader) {
+		this.classLoader = classLoader;
 	}
 
 	/**
@@ -69,7 +87,7 @@ public abstract class AfirmaPlugin {
 	 * de los datos.
 	 */
 	@SuppressWarnings("static-method")
-	public byte [] preSignProcess(byte[] data, String format)
+	public byte [] preSignProcess(final byte[] data, final String format)
 			throws PluginControlledException {
 		return data;
 	}
@@ -85,7 +103,7 @@ public abstract class AfirmaPlugin {
 	 * de la firma.
 	 */
 	@SuppressWarnings("static-method")
-	public byte [] postSignProcess(byte[] signature, String format, Certificate[] certChain)
+	public byte [] postSignProcess(final byte[] signature, final String format, final Certificate[] certChain)
 			throws PluginControlledException {
 		return signature;
 	}
@@ -112,10 +130,11 @@ public abstract class AfirmaPlugin {
 	}
 
 	/**
-	 * Proceso ejecutado al finalizar un proceso de firma completo. En este proceso pueden
-	 * haberse realizado m&uacute;ltiples firmas como parte de un proceso de firma masiva.
-	 * En este m&eacute;todo se puede configurar lo necesario para restaurar el estado del
-	 * plugin o liberar recursos antes de una nueva operaci&oacute;n.
+	 * M&eacute;todo ejecutado al finalizar un proceso de firma completo. En este
+	 * proceso pueden, por ejemplo, haberse realizado m&uacute;ltiples firmas como
+	 * parte de una operaci&oacute;n de firma masiva.
+	 * En este m&eacute;todo se puede configurar lo necesario para restaurar el
+	 * estado del plugin o liberar recursos antes de una nueva operaci&oacute;n.
 	 * @throws PluginControlledException Cuando falla el proceso de reinicio.
 	 */
 	public void reset() throws PluginControlledException {
@@ -123,7 +142,7 @@ public abstract class AfirmaPlugin {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public final boolean equals(final Object obj) {
 		if (obj != null && obj instanceof AfirmaPlugin) {
 			final PluginInfo myInfo = getInfo();
 			final PluginInfo objInfo = ((AfirmaPlugin) obj).getInfo();

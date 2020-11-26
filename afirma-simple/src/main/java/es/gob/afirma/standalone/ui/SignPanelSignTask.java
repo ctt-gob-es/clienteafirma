@@ -56,8 +56,11 @@ import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.Permission;
+import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
 import es.gob.afirma.standalone.plugins.PluginException;
+import es.gob.afirma.standalone.plugins.PluginInfo;
 import es.gob.afirma.standalone.plugins.PluginsManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
@@ -739,28 +742,31 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
 		byte[] processedData = data;
     	for (final AfirmaPlugin plugin : plugins) {
-    		try {
-    			processedData = plugin.preSignProcess(processedData, format);
+    		final PluginInfo info = plugin.getInfo();
+    		if (PermissionChecker.check(info, Permission.PRESIGN)) {
+    			try {
+    				processedData = plugin.preSignProcess(processedData, format);
+    			}
+    			catch (final PluginControlledException e) {
+    				LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
+    				AOUIFactory.showErrorMessage(
+    						this.parent,
+    						e.getMessage(),
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    						JOptionPane.WARNING_MESSAGE
+    						);
+    			}
+    			catch (Exception | Error e) {
+    				LOGGER.log(Level.SEVERE, "Ocurrio un error grave al preprocesar los datos con el plugin " + plugin + //$NON-NLS-1$
+    						". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
+    				AOUIFactory.showErrorMessage(
+    						this.parent,
+    						SimpleAfirmaMessages.getString("SignPanel.111", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    						JOptionPane.ERROR_MESSAGE
+    						);
+    			}
     		}
-    		catch (final PluginControlledException e) {
-    			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
-    			AOUIFactory.showErrorMessage(
-	                this.parent,
-	                e.getMessage(),
-	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                JOptionPane.WARNING_MESSAGE
-	            );
-			}
-    		catch (Exception | Error e) {
-    			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al preprocesar los datos con el plugin " + plugin + //$NON-NLS-1$
-					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
-    			AOUIFactory.showErrorMessage(
-	                this.parent,
-	                SimpleAfirmaMessages.getString("SignPanel.111", plugin.toString(), e.getMessage()), //$NON-NLS-1$
-	                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                JOptionPane.ERROR_MESSAGE
-	            );
-			}
     	}
 
     	return processedData;
@@ -786,27 +792,30 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
     	byte[] processedSignature = signature;
     	for (final AfirmaPlugin plugin : plugins) {
-    		try {
-    			processedSignature = plugin.postSignProcess(processedSignature, format, certChain);
-    		}
-    		catch (final PluginControlledException e) {
-    			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
-    			AOUIFactory.showErrorMessage(
-					this.parent,
-					e.getMessage(),
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE
-				);
-    		}
-    		catch (Exception | Error e) {
-    			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al postprocesar la firma con el plugin " + plugin + //$NON-NLS-1$
-    					". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
-    			AOUIFactory.showErrorMessage(
-					this.parent,
-					SimpleAfirmaMessages.getString("SignPanel.112", plugin.toString(), e.getMessage()), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
+    		final PluginInfo info = plugin.getInfo();
+    		if (PermissionChecker.check(info, Permission.POSTSIGN)) {
+    			try {
+    				processedSignature = plugin.postSignProcess(processedSignature, format, certChain);
+    			}
+    			catch (final PluginControlledException e) {
+    				LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
+    				AOUIFactory.showErrorMessage(
+    						this.parent,
+    						e.getMessage(),
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    						JOptionPane.WARNING_MESSAGE
+    						);
+    			}
+    			catch (Exception | Error e) {
+    				LOGGER.log(Level.SEVERE, "Ocurrio un error grave al postprocesar la firma con el plugin " + plugin + //$NON-NLS-1$
+    						". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
+    				AOUIFactory.showErrorMessage(
+    						this.parent,
+    						SimpleAfirmaMessages.getString("SignPanel.112", plugin.toString(), e.getMessage()), //$NON-NLS-1$
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    						JOptionPane.ERROR_MESSAGE
+    						);
+    			}
     		}
     	}
 

@@ -6,32 +6,41 @@ import java.util.List;
 public class GenericMenuOption {
 
 	private final String title;
-	private String action;
+	private String actionClassName;
+	private PluginAction action;
 	private String dialogClass = null;
 	private List<GenericMenuOption> menus = null;
 
-	GenericMenuOption(String title) {
+	GenericMenuOption(final String title) {
 		this(title, null);
 	}
-	
-	GenericMenuOption(String title, String action) {
+
+	GenericMenuOption(final String title, final String actionClassName) {
 		this.title = title;
-		this.action = action;
+		this.actionClassName = actionClassName;
 	}
 
 	public String getTitle() {
 		return this.title;
 	}
-	
-	public String getAction() {
-		return action;
+
+	public String getActionClassName() {
+		return this.actionClassName;
 	}
-	
-	public void setAction(String action) {
+
+	public void setActionClassName(final String actionClassName) {
+		this.actionClassName = actionClassName;
+	}
+
+	public PluginAction getActionAction() {
+		return this.action;
+	}
+
+	public void setAction(final PluginAction action) {
 		this.action = action;
 	}
 
-	void addSubMenu(GenericMenuOption subMenu) {
+	void addSubMenu(final GenericMenuOption subMenu) {
 		if (this.menus == null) {
 			this.menus = new ArrayList<>();
 		}
@@ -46,7 +55,7 @@ public class GenericMenuOption {
 		return this.dialogClass;
 	}
 
-	void setDialogClass(String dialogClass) {
+	void setDialogClass(final String dialogClass) {
 		this.dialogClass = dialogClass;
 	}
 }

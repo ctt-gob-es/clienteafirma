@@ -20,18 +20,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.help.UnsupportedOperationException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
@@ -57,16 +57,16 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
-import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
-import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
-import es.gob.afirma.standalone.ui.hash.CorruptedDocumentException;
-import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
-import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
-import es.gob.afirma.standalone.ui.hash.DocumentException;
-import es.gob.afirma.standalone.ui.hash.HashDocument;
-import es.gob.afirma.standalone.ui.hash.HashDocumentFactory;
-import es.gob.afirma.standalone.ui.hash.HashReport;
-import es.gob.afirma.standalone.ui.hash.HashUIHelper;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.Permission;
+import es.gob.afirma.standalone.plugins.PermissionChecker;
+import es.gob.afirma.standalone.plugins.PluginCommand;
+import es.gob.afirma.standalone.plugins.PluginCommandAction;
+import es.gob.afirma.standalone.plugins.PluginControlledException;
+import es.gob.afirma.standalone.plugins.PluginException;
+import es.gob.afirma.standalone.plugins.PluginInfo;
+import es.gob.afirma.standalone.plugins.PluginLoader;
+import es.gob.afirma.standalone.plugins.PluginsManager;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -101,9 +101,7 @@ final class CommandLineLauncher {
 		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
 
 		final Console console = System.console();
-		try (
-			final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out);
-		) {
+		try (final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out)) {
 
 			// Comprobamos si hay que mostrar la sintaxis de la aplicacion
 			if (args == null || args.length < 1 || PARAM_HELP.equalsIgnoreCase(args[0])) {
@@ -112,337 +110,199 @@ final class CommandLineLauncher {
 			}
 
 			// Identificamos el comando
-			final CommandLineCommand command = CommandLineCommand.parse(args[0].toLowerCase());
-			if (command == null) {
-				closeApp(STATUS_ERROR, pw, buildGeneralSyntax(CommandLineMessages.getString("CommandLineLauncher.15", args[0]))); //$NON-NLS-1$
-				return;
-			}
-
-			// Comprobamos si se debe mostrar la ayuda del comando
-			if (args.length > 1 && PARAM_HELP.equalsIgnoreCase(args[1])) {
-				closeApp(STATUS_SUCCESS, pw, CommandLineParameters.buildSyntaxError(command, null));
-				return;
-			}
-
-			// Cargamos los parametros
-			final CommandLineParameters params;
+			String response;
+			final String argCommand = args[0].toLowerCase();
+			final boolean needXmlResponse = checkXmlResponseNeeded(args);
+			final CommandLineCommand command = CommandLineCommand.parse(argCommand);
 			try {
-				params = new CommandLineParameters(command, args);
-			}
-			catch (final CommandLineException e) {
-				closeApp(STATUS_ERROR, pw, CommandLineParameters.buildSyntaxError(command, e.getMessage()));
-				return;
-			}
-
-			// Actuamos segun corresponda para cada comando
-			try {
-				switch(command) {
-					case LIST:
-						final String aliases = listAliasesByCommandLine(params);
-						closeApp(STATUS_SUCCESS, pw, aliases);
-						return;
-					case VERIFY:
-						 verifyByGui(params);
-						 return;
-					case SIGN:
-						if (params.isGui()) {
-							signByGui(params);
-						}
-						else {
-							final String response = signByCommandLine(command, params);
-							closeApp(STATUS_SUCCESS, pw, response);
-						}
-						return;
-					case COSIGN:
-					case COUNTERSIGN:
-						final String response = signByCommandLine(command, params);
-						closeApp(STATUS_SUCCESS, pw, response);
-						return;
-					case CREATEHASH:
-						if (params.isGui()) {
-							createHashByGui(params);
-						}
-						else {
-							final String createHashResponse = createHashByCommandLine(params);
-							closeApp(STATUS_SUCCESS, pw, createHashResponse);
-						}
-						return;
-					case CHECKHASH:
-						if (params.isGui()) {
-							checkHashByGui(params);
-						}
-						else {
-							final boolean checkHashSuccess = checkHashByCommandLine(params);
-							if (checkHashSuccess) {
-								closeApp(STATUS_SUCCESS, pw, CommandLineMessages.getString("CommandLineLauncher.123")); //$NON-NLS-1$
-							}
-							else {
-								throw new AOException(
-										CommandLineMessages.getString("CommandLineLauncher.124")); //$NON-NLS-1$
-							}
-						}
-						return;
-					case MASSIVE:
-						//TODO: Implementar
+				// Si es uno de los comandos reconocidos por la aplicacion, ejecutamos
+				// la operacion
+				if (command != null) {
+					response = processCommand(command, args);
+				}
+				// Si no es es un comando reconocido por la aplicacion, comprobamos si esta
+				// reconocido por alguno de los plugins
+				else {
+					final PluginCommand pluginCommand = getPluginCommand(args[0].toLowerCase());
+					if (pluginCommand != null) {
+						response = processPluginCommand(pluginCommand, args);
+					}
+					// Si no es un comando reconocido ni por la aplicacion ni por los plugins,
+					// mostramos un error
+					else {
 						throw new UnsupportedOperationException(
-							"Firma masiva en linea de comandos aun no implementada" //$NON-NLS-1$
-						);
-					case BATCHSIGN:
-						batchByCommandLine(params);
-						return;
-					default:
-						closeApp(
-							STATUS_ERROR,
-							pw,
-							CommandLineMessages.getString(
-								"CommandLineLauncher.54",  //$NON-NLS-1$
-								command.getOp()
-							)
-						);
-						return;
+								buildGeneralSyntax(
+										CommandLineMessages.getString(
+												"CommandLineLauncher.15", //$NON-NLS-1$
+												args[0])));
+					}
 				}
 			}
 			catch (final CommandLineException e) {
-				closeApp(STATUS_ERROR, pw, CommandLineParameters.buildSyntaxError(command, e.getMessage()));
-				return;
-			}
-			catch (final IOException e) {
-				String msg = e.getMessage();
-				if (params.isXml()) {
-					msg = buildXmlResponse(false, msg, null);
-				}
+				final String msg = CommandLineParameters.buildSyntaxError(command, e.getMessage());
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
 			catch (final AOKeystoreAlternativeException e) {
 				String msg = CommandLineMessages.getString("CommandLineLauncher.49", e.getMessage()); //$NON-NLS-1$
-				if (params.isXml()) {
+				if (needXmlResponse) {
 					msg = buildXmlResponse(false, msg, null);
 				}
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
-			catch (final AOException e) {
-				String msg = e.getMessage();
-				if (params.isXml()) {
-					msg = buildXmlResponse(false, msg, null);
-				}
+			catch (final AOException | PluginControlledException | IOException
+					| IllegalArgumentException | UnsupportedOperationException e) {
+				final String msg = !needXmlResponse
+						? e.getMessage()
+						: buildXmlResponse(false, e.getMessage(), null);
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
 			catch (final Exception e) {
+				e.printStackTrace();
 				String msg = CommandLineMessages.getString("CommandLineLauncher.50", e.getMessage()); //$NON-NLS-1$
-				if (params.isXml()) {
+				if (needXmlResponse) {
 					msg = buildXmlResponse(false, msg, null);
 				}
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
 
+			// Imprimimos elresultado de la operacion
+			closeApp(STATUS_SUCCESS, pw, response);
 		}
+	}
+
+	private static boolean checkXmlResponseNeeded(final String[] args) {
+		boolean found = false;
+		for (int i = 1; i < args.length && !found; i++) {
+			if (CommandLineParameters.PARAM_XML.equalsIgnoreCase(args[i])) {
+				found = true;
+			}
+		}
+		return found;
+	}
+
+	private static String processCommand(final CommandLineCommand command, final String[] args)
+			throws CommandLineException, IOException, AOException, AOKeystoreAlternativeException,
+			UnsupportedOperationException {
+
+		// Comprobamos si se debe mostrar la ayuda del comando
+		if (args.length > 1 && PARAM_HELP.equalsIgnoreCase(args[1])) {
+			return CommandLineParameters.buildSyntaxError(command, null);
+		}
+
+		// Cargamos los parametros
+		final CommandLineParameters params = new CommandLineParameters(command, args);
+
+		// Actuamos segun corresponda para cada comando
+		String result = null;
+		switch(command) {
+		case LIST:
+			result = listAliasesByCommandLine(params);
+			break;
+		case VERIFY:
+			verifyByGui(params);
+			break;
+		case SIGN:
+			if (params.isGui()) {
+				signByGui(params);
+			}
+			else {
+				result = signByCommandLine(command, params);
+			}
+			break;
+		case COSIGN:
+		case COUNTERSIGN:
+			result = signByCommandLine(command, params);
+			break;
+		case MASSIVE:
+			//TODO: Implementar
+			throw new UnsupportedOperationException(
+					"Firma masiva en linea de comandos aun no implementada" //$NON-NLS-1$
+					);
+		case BATCHSIGN:
+			batchByCommandLine(params);
+			break;
+		default:
+			throw new UnsupportedOperationException(
+					CommandLineMessages.getString("CommandLineLauncher.54", command.getOp())); //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
+	/**
+	 * Busca el comando entre aquellos soportados por los plugins instalados.
+	 * @param command Comando proporcionado a la aplicaci&oacute;n.
+	 * @return Informaci&oacute;n del comando soportado.
+	 * @throws PluginException Cuando falla la carga de la informaci&oacute;n del plugin.
+	 */
+	private static PluginCommand[] getPluginCommands() throws PluginException {
+		final List<PluginCommand> commands = new ArrayList<>();
+		for (final AfirmaPlugin plugin : PluginsManager.getInstance().getPluginsLoadedList()) {
+			final PluginInfo info = plugin.getInfo();
+			final PluginCommand[] pluginCommands = info.getCommands();
+			if (pluginCommands != null) {
+				for (final PluginCommand pluginCommand : pluginCommands) {
+					commands.add(pluginCommand);
+				}
+			}
+		}
+		return commands.toArray(new PluginCommand[0]);
+	}
+
+	/**
+	 * Busca el comando entre aquellos soportados por los plugins instalados.
+	 * @param command Comando proporcionado a la aplicaci&oacute;n.
+	 * @return Informaci&oacute;n del comando soportado.
+	 * @throws PluginException Cuando falla la carga de la informaci&oacute;n del plugin.
+	 */
+	private static PluginCommand getPluginCommand(final String command) throws PluginException {
+		for (final AfirmaPlugin plugin : PluginsManager.getInstance().getPluginsLoadedList()) {
+			final PluginInfo info = plugin.getInfo();
+			if (PermissionChecker.check(info, Permission.COMMANDS)) {
+				final PluginCommand[] pluginCommands = info.getCommands();
+				if (pluginCommands != null) {
+					for (final PluginCommand pluginCommand : pluginCommands) {
+						if (pluginCommand.getCommand().equalsIgnoreCase(command)) {
+							return pluginCommand;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Ejecuta la acci&oacute;n asociada a un comando de un plugin.
+	 * @param pluginCommand Comando de un plugin.
+	 * @param args Par&aacute;metros con los que se ha invocado a la aplicaci&oacute;n.
+	 * @return Resultado de la operaci&oacute;n o null si no devolvi&oacute; resultado.
+	 * @throws IllegalArgumentException Cuando los par&aacute;metros no eran v&aacute;lidos.
+	 * @throws PluginControlledException Cuando se produjo un error durante la carga o
+	 * ejecuci&oacute;n de la operaci&oacute;n.
+	 */
+	private static String processPluginCommand(final PluginCommand pluginCommand, final String[] args)
+			throws IllegalArgumentException, PluginControlledException {
+
+		final String commandClass = pluginCommand.getCommandActionClass();
+		PluginCommandAction action;
+		try {
+			action = PluginLoader.getPluginCommandAction(commandClass);
+		} catch (final PluginException e) {
+			throw new PluginControlledException("No se pudo cargar la accion del plugin", e); //$NON-NLS-1$
+		}
+
+		return action.start(args);
 	}
 
 	/** Desactiva el log por consola.
 	 * @param handlerName Nombre del manejador. */
 	private static void deactivateConsoleLog(final String handlerName) {
 		Logger.getLogger(handlerName).setLevel(Level.SEVERE);
-	}
-
-	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
-	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
-	 * @throws IOException Cuando ocurre algun error en la lectura o guardado de ficheros.
-	 * @throws AOException Cuando ocurre algun error al procesar la petici&oacute;n. */
-	private static String createHashByCommandLine(final CommandLineParameters params)
-			throws CommandLineException, IOException, AOException {
-
-		final File inputFile = params.getMainFile();
-		if (inputFile == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
-		}
-
-		if (!inputFile.exists()) {
-			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.87", inputFile.getAbsolutePath())); //$NON-NLS-1$
-		}
-		if (!inputFile.canRead()) {
-			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.88", inputFile.getAbsolutePath())); //$NON-NLS-1$
-		}
-
-		// Operamos segun la entrada sea un directorio o fichero
-		byte[] hashesDocumentData;
-		try {
-			if (inputFile.isDirectory()) {
-
-				// Se obtiene el formato de salida para los hashes del directorio
-				final String outputFormat = params.getHashDirectoryFormat();
-
-				// Hacemos el calculo
-				final Map<String, byte[]> hashes = CreateHashFiles.calculateHashes(inputFile, params.isRecursive(), params.getHashAlgorithm(), null);
-
-				// Generamos el informe
-				final HashDocument hashDocument = HashDocumentFactory.getHashDocument(outputFormat);
-				hashDocument.setHashes(hashes);
-				hashDocument.setRecursive(params.isRecursive());
-				hashDocument.setAlgorithm(params.getHashAlgorithm());
-				hashDocument.setCharset(StandardCharsets.UTF_8);
-
-				try {
-					hashesDocumentData = hashDocument.generate();
-				} catch (final DocumentException e) {
-					throw new AOException(CommandLineMessages.getString("CommandLineLauncher.93"), e); //$NON-NLS-1$
-				}
-			}
-			// Si es un fichero
-			else {
-
-				// Se obtiene el formato de salida de hash del fichero
-				final String outputFormat = params.getHashFileFormat();
-
-				final byte[] calculatedHash = CreateHashDialog.calculateHash(inputFile, params.getHashAlgorithm(), null);
-
-				// Codificamos como sea necesario segun el formato de guardado
-				if (outputFormat.equals(CommandLineParameters.FORMAT_HASH_FILE_BASE64)) {
-					hashesDocumentData = Base64.encode(calculatedHash).getBytes();
-				}
-				else if (outputFormat.equals(CommandLineParameters.FORMAT_HASH_FILE_BIN)) {
-					if (params.getOutputFile() != null) {
-						hashesDocumentData = calculatedHash;
-					}
-					else {
-						throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.119")); //$NON-NLS-1$
-					}
-				}
-				else {
-					hashesDocumentData = (AOUtil.hexify(calculatedHash, false) + "h").getBytes(); //$NON-NLS-1$
-				}
-			}
-		}
-		catch (final InterruptedException | ExecutionException e) {
-			throw new AOException(CommandLineMessages.getString("CommandLineLauncher.94"), e); //$NON-NLS-1$
-		}
-
-		// Si se ha proporcionado un fichero de salida, se guarda el resultado de la firma en el.
-		// Si no, se imprime en consola
-		String result;
-		if (params.getOutputFile() != null) {
-			try (final OutputStream fos = new FileOutputStream(params.getOutputFile());) {
-				fos.write(hashesDocumentData);
-			}
-			catch(final Exception e) {
-				throw new IOException(CommandLineMessages.getString(
-						"CommandLineLauncher.21", //$NON-NLS-1$
-						params.getOutputFile().getAbsolutePath())
-						, e);
-			}
-			result = CommandLineMessages.getString("CommandLineLauncher.22"); //$NON-NLS-1$
-		}
-		else {
-			result = new String(hashesDocumentData);
-		}
-		return result;
-	}
-
-	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales mostrando los di&aacute;logos
-	 * que fuesen necesarios.
-	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
-	private static void createHashByGui(final CommandLineParameters params) throws CommandLineException {
-
-		HashUIHelper.createHashUI(
-				params.getMainFile(),
-				params.getOutputFile(),
-				params.getHashAlgorithm(),
-				params.getHashFormat(),
-				params.isRecursive());
-	}
-
-	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales a trav&eacute;s de consola.
-	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @return {@code true} si la operaci&oacute;n termino correctamente, {@code false} en caso contrario.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
-	 * @throws IOException
-	 * @throws AOException */
-	private static boolean checkHashByCommandLine(final CommandLineParameters params)
-			throws CommandLineException, IOException, AOException {
-
-		final File dataFile = params.getMainFile();
-		if (!dataFile.exists()) {
-			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.87", dataFile.getAbsolutePath())); //$NON-NLS-1$
-		}
-		if (!dataFile.canRead()) {
-			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.88", dataFile.getAbsolutePath())); //$NON-NLS-1$
-		}
-
-		final File hashFile = params.getInputFile();
-		if (hashFile == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
-		}
-		if (!hashFile.exists()) {
-			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.98", hashFile.getAbsolutePath())); //$NON-NLS-1$
-		}
-		if (!hashFile.canRead()) {
-			throw new IOException(CommandLineMessages.getString("CommandLineLauncher.99", hashFile.getAbsolutePath())); //$NON-NLS-1$
-		}
-
-
-		boolean result;
-		if (dataFile.isDirectory()) {
-
-			final HashReport report = new HashReport();
-			try {
-				CheckHashFiles.checkHash(dataFile.toPath(), hashFile, report);
-			} catch (final IOException e) {
-				throw new IOException(CommandLineMessages.getString("CommandLineLauncher.101"), e); //$NON-NLS-1$
-			} catch (final DocumentException e) {
-				throw new AOException(CommandLineMessages.getString("CommandLineLauncher.102"), e); //$NON-NLS-1$
-			} catch (final CorruptedDocumentException e) {
-				throw new AOException(CommandLineMessages.getString("CommandLineLauncher.103"), e); //$NON-NLS-1$
-			}
-			result = !report.hasErrors();
-
-			if (params.getOutputFile() != null)  {
-				byte[] reportData;
-				try {
-					reportData = CheckHashFiles.generateXMLReport(report).getBytes(report.getCharset());
-				} catch (final Exception e) {
-					throw new AOException(CommandLineMessages.getString("CommandLineLauncher.104"), e); //$NON-NLS-1$
-				}
-				try (final OutputStream fos = new FileOutputStream(params.getOutputFile());) {
-					fos.write(reportData);
-				}
-				catch(final Exception e) {
-					throw new IOException(CommandLineMessages.getString(
-							"CommandLineLauncher.21", //$NON-NLS-1$
-							params.getOutputFile().getAbsolutePath())
-							, e);
-				}
-			}
-		}
-		else {
-			try {
-				result = CheckHashDialog.checkHash(hashFile, dataFile, null);
-			}
-			catch (final InterruptedException | ExecutionException e) {
-				throw new AOException(CommandLineMessages.getString("CommandLineLauncher.94"), e); //$NON-NLS-1$
-			}
-		}
-
-
-		return result;
-	}
-
-	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales mostrando los di&aacute;logos
-	 * que fuesen necesarios.
-	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
-	private static void checkHashByGui(final CommandLineParameters params) throws CommandLineException {
-
-		final File dataFile = params.getMainFile();
-		if (dataFile == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
-		}
-		final File hashFile = params.getInputFile();
-		HashUIHelper.checkHashUI(dataFile, hashFile);
 	}
 
 	/** Mostramos el panel de validaci&oacute;n de certificados y firmas.
@@ -944,11 +804,28 @@ final class CommandLineLauncher {
 		//TODO: Descomentar cuando se soporte firma masiva
 		//.append("  ").append(CommandLineCommand.MASSIVE.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.35")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.LIST.getOp())			 .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.11")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(CommandLineCommand.VERIFY.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.29")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(CommandLineCommand.BATCHSIGN.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.69")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(CommandLineCommand.CREATEHASH.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.70")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(CommandLineCommand.CHECKHASH.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.71")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append(CommandLineMessages.getString("CommandLineLauncher.30")) .append("\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append(CommandLineCommand.VERIFY.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.29")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.BATCHSIGN.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.69")).append(")\n\n");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+		// Cargamos la informacion de los plugins instalados
+		PluginCommand[] pluginCommands;
+		try {
+			pluginCommands = getPluginCommands();
+		}
+		catch (final Exception e) {
+			sb.append(CommandLineMessages.getString("CommandLineLauncher.125")); //$NON-NLS-1$
+			pluginCommands = null;
+		}
+		if (pluginCommands != null && pluginCommands.length > 0) {
+			sb.append(CommandLineMessages.getString("CommandLineLauncher.126")).append(":\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			for (final PluginCommand command : pluginCommands) {
+				sb.append("  ").append(command.getCommand()).append("\t (")  .append(command.getDescription()).append(")\n");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+			}
+			sb.append("\n"); //$NON-NLS-1$
+		}
+
+		// Indicacios para el uso de la ayuda
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.30")) ; //$NON-NLS-1$
 
 		return sb.toString();
 	}

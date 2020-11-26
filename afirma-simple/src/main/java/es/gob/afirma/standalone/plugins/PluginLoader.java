@@ -22,8 +22,8 @@ import java.util.ServiceLoader;
 public class PluginLoader {
 
 	private static final String CONFIG_FILE = "/plugin.json"; //$NON-NLS-1$
-	
-	public static Map<String, ClassLoader> classLoaderForPlugin = new HashMap<String, ClassLoader>();
+
+	public static Map<String, AfirmaPlugin> classLoaderForPlugin = new HashMap<>();
 
 	/**
 	 * Carga la colecci&oacute;n de JARs de un plugin y devuelve un objeto
@@ -72,15 +72,17 @@ public class PluginLoader {
 		}
 
 		final AfirmaPlugin plugin = plugins.get(0);
+		plugin.setClassLoader(classLoader);
+
 		final PluginInfo info = loadPluginConfiguration(plugin);
-		
-		storeClassLoader(info, classLoader);
+
+		registryPluginReferences(plugin, info);
 
 		// TODO: Puesto que ya almacenamos el classLoader de cada clase del plugin, ya
 		// no es necesario configurar las acciones de los botones de los plugins. Habria
-		// que ver donde se usa cada acción y cargar las clases involucradas a partir de
-		// su classLoader, igual que se hace con los menús.
-		if(info.getButtons() != null) {
+		// que ver donde se usa cada accion y cargar las clases involucradas a partir de
+		// su classLoader, igual que se hace con los menus.
+		if (info.getButtons() != null) {
 			for (final PluginButton button : info.getButtons()) {
 
 				if (button.getActionClassName() == null) {
@@ -98,7 +100,8 @@ public class PluginLoader {
 							info.getName(), button.getWindow()));
 				}
 				try {
-					final PluginAction action = getPluginAction(button.getActionClassName(), window, classLoader);
+					final PluginAction action = (PluginAction)
+							loadAction(button.getActionClassName(), PluginAction.class, classLoader);
 					action.setPlugin(plugin);
 					button.setAction(action);
 				}
@@ -112,7 +115,7 @@ public class PluginLoader {
 
 		// Configuramos la informacion obtenida del plugin, en el propio plugin
 		plugin.setInfo(info);
-		
+
 		return plugin;
 	}
 
@@ -121,12 +124,12 @@ public class PluginLoader {
 	 * @param info Informaci&oacute;n asociada al plugin.
 	 * @param classLoader ClassLoader usado para cargar el plugin.
 	 */
-	private static void storeClassLoader(PluginInfo info, URLClassLoader classLoader) {
-		List<String> actions = new ArrayList<String>();
+	private static void registryPluginReferences(final AfirmaPlugin plugin, final PluginInfo info) {
+		final List<String> actions = new ArrayList<>();
 		getListActions(info, actions);
-		for(String action : actions) {
-			if(!classLoaderForPlugin.containsKey(action)) {
-				classLoaderForPlugin.put(action, classLoader);
+		for (final String action : actions) {
+			if (!classLoaderForPlugin.containsKey(action)) {
+				classLoaderForPlugin.put(action, plugin);
 			}
 		}
 	}
@@ -136,14 +139,22 @@ public class PluginLoader {
 	 * @param info Informaci%oaacute;n del plugin.
 	 * @param actionsList Lista donde almacenar los actions encontrados.
 	 */
-	private static void getListActions(PluginInfo info, List<String> actionsList) {
-		if(info != null) {
-			if(info.getButtons() != null) {
-				for(PluginButton btn : info.getButtons()) {
-					actionsList.add(btn.getActionClassName());				
+	private static void getListActions(final PluginInfo info, final List<String> actionsList) {
+		if (info != null) {
+			// Acciones asociadas a botones
+			if (info.getButtons() != null) {
+				for(final PluginButton btn : info.getButtons()) {
+					actionsList.add(btn.getActionClassName());
 				}
 			}
-			if(info.getMenu() != null) {
+			// Acciones asociadas a comandos
+			if (info.getCommands() != null) {
+				for(final PluginCommand cmd : info.getCommands()) {
+					actionsList.add(cmd.getCommandActionClass());
+				}
+			}
+			// Acciones asociadas a menus
+			if (info.getMenu() != null) {
 				getListActionsFromMenus(info.getMenu(), actionsList);
 			}
 		}
@@ -154,12 +165,12 @@ public class PluginLoader {
 	 * @param menu Menu a recorrer para extraer los actions.
 	 * @param actionsList lista donde almacenar los actions encontrados.
 	 */
-	private static void getListActionsFromMenus(GenericMenuOption menu, List<String> actionsList) {
-		if(menu.getAction() != null) {
-			actionsList.add(menu.getAction());
+	private static void getListActionsFromMenus(final GenericMenuOption menu, final List<String> actionsList) {
+		if (menu.getActionClassName() != null) {
+			actionsList.add(menu.getActionClassName());
 		}
-		if(menu.getMenus() != null) {
-			for(GenericMenuOption subMenu : menu.getMenus()) {
+		if (menu.getMenus() != null) {
+			for (final GenericMenuOption subMenu : menu.getMenus()) {
 				getListActionsFromMenus(subMenu, actionsList);
 			}
 		}
@@ -193,29 +204,65 @@ public class PluginLoader {
 		return info;
 	}
 
-	private static PluginAction getPluginAction(final String actionClassName,
-			final PluginIntegrationWindow window, final ClassLoader classLoader) throws PluginException {
+	/**
+	 * Carga la acci&oacute;n conocida su clase.
+	 * @param actionClassName Nombre de la acci&oacute;n.
+	 * @return Acci&oacute;n del plugin.
+	 * @throws PluginException Cuando no se pueda cargar la acci&oacute;n.
+	 */
+	public static PluginAction getPluginAction(final String actionClassName)
+			throws PluginException {
+
+		final AfirmaPlugin plugin = classLoaderForPlugin.get(actionClassName);
+
+		final PluginAction action = (PluginAction)
+				loadAction(actionClassName, PluginAction.class, plugin.getClassLoader());
+		action.setPlugin(plugin);
+
+		return action;
+	}
+
+	/**
+	 * Carga una acci&oacute;n de l&iacute;nea de comandos conocida su clase.
+	 * @param actionClassName Nombre de la acci&oacute;n.
+	 * @return Acci&oacute;n de l&iacute;nea de comandos del plugin.
+	 * @throws PluginException Cuando no se pueda cargar la acci&oacute;n.
+	 */
+	public static PluginCommandAction getPluginCommandAction(final String actionClassName)
+			throws PluginException {
+
+		final AfirmaPlugin plugin = classLoaderForPlugin.get(actionClassName);
+
+		final PluginCommandAction action = (PluginCommandAction)
+				loadAction(actionClassName, PluginCommandAction.class, plugin.getClassLoader());
+		action.setPlugin(plugin);
+
+		return action;
+	}
+
+	private static Object loadAction(final String actionClassName, final Class<?> actionClassType,
+			final ClassLoader classLoader) throws PluginException {
 		Class<?> actionClass;
 		try {
-			actionClass = Class.forName(actionClassName, true, classLoader);
+			actionClass = Class.forName(actionClassName, false, classLoader);
 		} catch (final Throwable e) {
 			throw new PluginException(String.format("La clase de accion %1s no existe", //$NON-NLS-1$
 					actionClassName), e);
 		}
-		Object actionObject;
-		try {
-			actionObject = actionClass.newInstance();
-		} catch (final Throwable e) {
-			throw new PluginException(String.format("No se puede instanciar la clase %s. El constructor por defecto deber existir y ser publico", //$NON-NLS-1$
-					actionClassName), e);
-		}
 
-		if (!(actionObject instanceof PluginAction)) {
+		if (!actionClassType.isAssignableFrom(actionClass)) {
 			throw new PluginException(String.format(
 					"Se ha establecido un boton que no define una accion de tipo %1s", //$NON-NLS-1$
 					PluginAction.class.getName()));
 		}
 
-		return (PluginAction) actionObject;
+		Object actionObject;
+		try {
+			actionObject = actionClass.getConstructor().newInstance();
+		} catch (final Throwable e) {
+			throw new PluginException(String.format("No se puede instanciar la clase %s. El constructor por defecto deber existir y ser publico", //$NON-NLS-1$
+					actionClassName), e);
+		}
+		return actionObject;
 	}
 }

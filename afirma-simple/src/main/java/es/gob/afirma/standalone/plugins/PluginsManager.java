@@ -258,22 +258,27 @@ public class PluginsManager {
 			throw new PluginException("No se pudo cargar el plugin recien importado", e); //$NON-NLS-1$
 		}
 
-		// Ejecutamos la operacion de instalacion del propio plugin
-		try {
-			plugin.install();
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.SEVERE, "Ocurrio un error al instalar el plugin. Lo desinstalamos", e); //$NON-NLS-1$
+		final PluginInfo info = plugin.getInfo();
+
+		// Si el plugin tenia el permiso de instalacion, se ejecuta su operacion
+		// de instalacion
+		if (PermissionChecker.check(info, Permission.INSTALL)) {
 			try {
-				uninstallPlugin(plugin);
+				plugin.install();
 			}
-			catch (final Exception ex) {
-				LOGGER.warning("No se han podido eliminar los ficheros importados del plugin"); //$NON-NLS-1$
+			catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Ocurrio un error al instalar el plugin. Lo desinstalamos", e); //$NON-NLS-1$
+				try {
+					uninstallPlugin(plugin);
+				}
+				catch (final Exception ex) {
+					LOGGER.warning("No se han podido eliminar los ficheros importados del plugin"); //$NON-NLS-1$
+				}
+				if (e instanceof PluginControlledException) {
+					throw (PluginControlledException) e;
+				}
+				throw new PluginException("Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
 			}
-			if (e instanceof PluginControlledException) {
-				throw (PluginControlledException) e;
-			}
-			throw new PluginException("Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
 		}
 
 		// Agregamos el plugin a la lista de plugins instalados
@@ -436,15 +441,19 @@ public class PluginsManager {
 	 */
 	public void uninstallPlugin(final AfirmaPlugin plugin) throws IOException {
 
-		// Ejecutamos el proceso de desinstalacion del propio plugin
-		try {
-			plugin.uninstall();
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "El proceso de desinstalacion interno del plugin devolvio un error", e); //$NON-NLS-1$
+		final PluginInfo info = plugin.getInfo();
+
+		// Ejecutamos el proceso de desinstalacion del plugin si este lo tenia declarado
+		if (PermissionChecker.check(info, Permission.UNINSTALL)) {
+			try {
+				plugin.uninstall();
+			} catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "El proceso de desinstalacion interno del plugin devolvio un error", e); //$NON-NLS-1$
+			}
 		}
 
 		// Descargamos el plugin de memoria
-		final String internalName = plugin.getInfo().getInternalName();
+		final String internalName = info.getInternalName();
 		this.pluginsLoadedList.remove(plugin);
 		((URLClassLoader) plugin.getClass().getClassLoader()).close();
 

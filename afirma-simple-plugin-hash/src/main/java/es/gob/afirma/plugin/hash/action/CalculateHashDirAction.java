@@ -1,21 +1,23 @@
 package es.gob.afirma.plugin.hash.action;
 
-import java.awt.Frame;
+import java.awt.Window;
+import java.util.Properties;
 
-import es.gob.afirma.standalone.plugins.PluginMenu;
-import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
+import es.gob.afirma.plugin.hash.CreateHashDirDialog;
+import es.gob.afirma.standalone.plugins.PluginAction;
 
 /**
  * Clase del plugin de huella digital encargada de gestionar la acci&oacute; de calcular la huella digital de un directorio.
  */
-public class CalculateHashDirAction extends PluginMenu {
+public class CalculateHashDirAction extends PluginAction {
 
 	@Override
-	public void init(Frame parent) {
-		CreateHashFiles.startHashCreation(parent);
-		
+	public void start(final Window parent) {
+		final Properties config = getConfig();
+		CreateHashDirDialog.startHashCreation(parent, config);
+		saveConfig(config);
 	}
-	
-	
+
+
 
 }

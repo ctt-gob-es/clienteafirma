@@ -13,8 +13,11 @@ import javax.swing.JButton;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
+import es.gob.afirma.standalone.plugins.Permission;
+import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginButton;
 import es.gob.afirma.standalone.plugins.PluginException;
+import es.gob.afirma.standalone.plugins.PluginInfo;
 import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.PluginsManager;
 
@@ -32,7 +35,7 @@ public class PluginsUiComponentsBuilder {
 	 * @param currentWindow Ventana para la que se solicita el listado de botones.
 	 * @return Listado de botones o {@code null} si no se definen botones.
 	 */
-	public static List<PluginGraphicButton> getPluginsButtons(PluginIntegrationWindow currentWindow) {
+	public static List<PluginGraphicButton> getPluginsButtons(final PluginIntegrationWindow currentWindow) {
 
 		final List<PluginGraphicButton> jButtons = new ArrayList<>();
         List<AfirmaPlugin> plugins = null;
@@ -43,18 +46,21 @@ public class PluginsUiComponentsBuilder {
 		}
 		if (plugins != null) {
 			for (final AfirmaPlugin plugin : plugins) {
-				final PluginButton[] buttons = plugin.getInfo().getButtons();
-				if (buttons != null) {
-					for (final PluginButton button : buttons) {
-						try {
-							final PluginIntegrationWindow targetWindow = PluginIntegrationWindow.getWindow(button.getWindow());
-							if (targetWindow == currentWindow) {
-								final JButton jButton = buildButton(button, plugin.getClass().getClassLoader());
-								jButtons.add(new PluginGraphicButton(button, jButton));
+				final PluginInfo info = plugin.getInfo();
+				if (PermissionChecker.check(info, Permission.BUTTONS)) {
+					final PluginButton[] buttons = info.getButtons();
+					if (buttons != null) {
+						for (final PluginButton button : buttons) {
+							try {
+								final PluginIntegrationWindow targetWindow = PluginIntegrationWindow.getWindow(button.getWindow());
+								if (targetWindow == currentWindow) {
+									final JButton jButton = buildButton(button, plugin.getClass().getClassLoader());
+									jButtons.add(new PluginGraphicButton(button, jButton));
+								}
 							}
-						}
-						catch (final Exception e) {
-							LOGGER.log(Level.WARNING, String.format("El plugin %1s ha declarado botones invalidos", plugin.getInfo().getName()), e); //$NON-NLS-1$
+							catch (final Exception e) {
+								LOGGER.log(Level.WARNING, String.format("El plugin %1s ha declarado botones invalidos", plugin.getInfo().getName()), e); //$NON-NLS-1$
+							}
 						}
 					}
 				}
@@ -62,7 +68,7 @@ public class PluginsUiComponentsBuilder {
 		}
 		return jButtons;
 	}
-	
+
 	/**
 	 * Recupera la lista de menus de los plugins cargados por AutoFirma.
 	 * @return Listado de menus encontrados.
@@ -74,12 +80,15 @@ public class PluginsUiComponentsBuilder {
 			plugins = PluginsManager.getInstance().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se han podido cargar los plugins en la aplicacion", e); //$NON-NLS-1$
-		}	
+		}
 		if(plugins != null) {
 			for (final AfirmaPlugin plugin : plugins) {
-				GenericMenuOption menu = plugin.getInfo().getMenu();
-				if(menu != null) {
-					menuList.add(menu);
+				final PluginInfo info = plugin.getInfo();
+				if (PermissionChecker.check(info, Permission.MENU)) {
+					final GenericMenuOption menu = info.getMenu();
+					if(menu != null) {
+						menuList.add(menu);
+					}
 				}
 			}
 		}
@@ -93,7 +102,7 @@ public class PluginsUiComponentsBuilder {
 	 * @param classLoader ClassLoader a partir del cual cargar los recursos necesarios para el bot&oacute;n.
 	 * @return Bot&oacute;n.
 	 */
-	public static JButton buildButton(PluginButton button, ClassLoader classLoader) {
+	public static JButton buildButton(final PluginButton button, final ClassLoader classLoader) {
 
 		final JButton jButton = new JButton();
 		jButton.setText(button.getTitle());

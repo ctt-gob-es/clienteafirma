@@ -25,7 +25,7 @@ public class PluginButton {
 	 * Establece el texto del bot&oacute;n.
 	 * @param title Texto del bot&oacute;n.
 	 */
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 	/**
@@ -39,7 +39,7 @@ public class PluginButton {
 	 * Establece el icono del bot&oacute;n.
 	 * @param icon Icono del bot&oacute;n.
 	 */
-	public void setIcon(String icon) {
+	public void setIcon(final String icon) {
 		this.icon = icon;
 	}
 	/**
@@ -53,7 +53,7 @@ public class PluginButton {
 	 * Establece el texto de tooltip del bot&oacute;n.
 	 * @param toolTip Texto del tooltip del bot&oacute;n.
 	 */
-	public void setToolTip(String toolTip) {
+	public void setToolTip(final String toolTip) {
 		this.toolTip = toolTip;
 	}
 	/**
@@ -67,7 +67,7 @@ public class PluginButton {
 	 * Establece el texto de descripci&oacute;n accesible del bot&oacute;n.
 	 * @param accesibleDescription Descripci&oacute;n accesible  del bot&oacute;n.
 	 */
-	public void setAccesibleDescription(String accesibleDescription) {
+	public void setAccesibleDescription(final String accesibleDescription) {
 		this.accesibleDescription = accesibleDescription;
 	}
 	/**
@@ -83,7 +83,7 @@ public class PluginButton {
 	 * que debe aparecer el bot&oacute;n.
 	 * @param window Descriptor de ventana de la aplicaci&oacute;n.
 	 */
-	public void setAfirmaWindow(String window) {
+	public void setAfirmaWindow(final String window) {
 		this.afirmaWindow = window;
 	}
 	/**
@@ -97,9 +97,10 @@ public class PluginButton {
 	 * Establece el nombre de clase de la acci&oacute;n asignada al bot&oacute;n.
 	 * @param actionClassName Nombre de la clase de acci&oacute;n.
 	 */
-	public void setActionClassName(String actionClassName) {
+	public void setActionClassName(final String actionClassName) {
 		this.actionClassName = actionClassName;
 	}
+
 	/**
 	 * Recupera la acci&oacute;n asignada al bot&oacute;n.
 	 * @return Acci&oacute;n asignada al bot&oacute;n.
@@ -111,7 +112,7 @@ public class PluginButton {
 	 * Establece la acci&oacute;n asignada al bot&oacute;n.
 	 * @param action Acci&oacute;n asignada al bot&oacute;n.
 	 */
-	public void setAction(PluginAction action) {
+	public void setAction(final PluginAction action) {
 		this.action = action;
 	}
 }

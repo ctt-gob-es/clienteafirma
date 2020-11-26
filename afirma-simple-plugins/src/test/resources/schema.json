@@ -26,6 +26,37 @@
       },
       "required": ["name", "title", "description"]
     },
+    
+    "permissions": {
+	   	"type":		"array",
+		"items":	{
+						"type": "string",
+						"enum": [
+							"INSTALL",
+							"UNINSTALL",
+							"RESET",
+							"PRESIGN",
+							"POSTSIGN",
+							"BUTTONS",
+							"MENU",
+							"COMMANDS" ]
+					},
+		"default":	[]
+    },
+
+    "menu": {
+      "type": "object",
+      "properties": {
+        "title": 	{ "type": "string" },
+        "action":	{ "type": "string" },
+	    "items":	{ 
+				    	"type": "array",
+				        "items": { "$ref": "#/definitions/menu" },
+				        "default": []
+				    }
+      },
+      "required": ["title"]
+    },
 
     "button": {
       "type": "object",
@@ -34,22 +65,39 @@
         "icon":					{ "type": "string" },
         "tooltip":				{ "type": "string" },
         "accesible_description":{ "type": "string" },
-        "window":				{ "type": { "enum": [ "input", "single_result", "multi_result", "visor" ] } },
+        "window":				{ "type": "string", "enum": [ "input", "single_result", "multi_result", "visor" ] },
         "action":				{ "type": "string" }
       },
       "required": ["window", "action"]
+    },
+    
+    "command": {
+      "type": "object",
+      "properties": {
+        "name":					{ "type": "string" },
+        "description":			{ "type": "string" },
+        "action":				{ "type": "string" }
+      },
+      "required": ["name", "action"]
     }
   },
 
   "type": "object",
 
   "properties": {
-    "info": { "$ref": "#/definitions/info" },
-    "buttons": { 
-    	"type": "array",
-        "items": { "$ref": "#/definitions/button" },
-        "default": []
-    }
+    "info": 		{ "$ref": "#/definitions/info" },
+    "permissions":	{ "$ref": "#/definitions/permissions" },
+    "menu":			{ "$ref": "#/definitions/menu" },
+    "buttons":		{ 
+				    	"type": "array",
+				        "items": { "$ref": "#/definitions/button" },
+				        "default": []
+				    },
+    "commands":		{ 
+				    	"type": "array",
+				        "items": { "$ref": "#/definitions/command" },
+				        "default": []
+				    }
   },
   
   "required": ["info"]

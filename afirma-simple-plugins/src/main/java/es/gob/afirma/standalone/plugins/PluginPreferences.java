@@ -19,14 +19,14 @@ public class PluginPreferences {
 	 * @param plugin El plugin en ejecuci&oacute;n.
 	 * @return Preferencias del plugin.
 	 */
-	public static PluginPreferences getInstance(AfirmaPlugin plugin) {
+	public static PluginPreferences getInstance(final AfirmaPlugin plugin) {
 		if (instance == null) {
 			instance = new PluginPreferences(plugin);
 		}
 		return instance;
 	}
 
-	private PluginPreferences(AfirmaPlugin plugin) {
+	private PluginPreferences(final AfirmaPlugin plugin) {
 		this.preferences = Preferences.userNodeForPackage(plugin.getClass());
 	}
 
@@ -34,8 +34,8 @@ public class PluginPreferences {
 	 * Almacenamos la configuraci&oacute;n del plugin.
 	 * @param config Configuraci&oacute;n que deseamos almacenar.
 	 */
-	public void saveConfig(Properties config) {
-		// Eliminamos la configuracion que hubiese nates
+	public void saveConfig(final Properties config) {
+		// Eliminamos la configuracion que hubiese antes
 		try {
 			for (final String key : this.preferences.childrenNames()) {
 				this.preferences.remove(key);
@@ -48,6 +48,12 @@ public class PluginPreferences {
 		// Almacenamos la nueva configuracion
 		for (final String key : config.keySet().toArray(new String[config.size()])) {
 			this.preferences.put(key, config.getProperty(key));
+		}
+		try {
+			this.preferences.flush();
+		} catch (final BackingStoreException e) {
+			Logger.getLogger(PluginPreferences.class.getName()).warning(
+					"No se pudo guardar la nueva configuracion del plugin: " + e); //$NON-NLS-1$
 		}
 	}
 
