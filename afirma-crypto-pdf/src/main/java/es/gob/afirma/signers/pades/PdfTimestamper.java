@@ -11,6 +11,7 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
@@ -64,8 +65,10 @@ public final class PdfTimestamper {
 	 * @throws IOException Si hay problemas en el tratamiento de datos.
 	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital indicado. */
 	public static byte[] timestampPdf(final byte[] inPDF,
-			                   final Properties extraParams,
-			                   final Calendar signTime) throws AOException, IOException, NoSuchAlgorithmException {
+			             final Properties extraParams,
+			             final Calendar signTime) throws AOException,
+	                                                     IOException,
+	                                                     NoSuchAlgorithmException {
     	// Comprobamos si se ha pedido un sello de tiempo
     	if (extraParams != null) {
     		final String tsa = extraParams.getProperty(PdfExtraParams.TSA_URL);
@@ -163,7 +166,12 @@ public final class PdfTimestamper {
 					}
 
 	        		// Obtenemos el rango procesable
-	        		final byte[] original = AOUtil.getDataFromInputStream(sap.getRangeStream());
+	        		final byte[] original;
+	        		try (
+        				final InputStream is = sap.getRangeStream();
+    				) {
+	        			original = AOUtil.getDataFromInputStream(is);
+	        		}
 
 	        		// Obtenemos el sello
 	        		final byte[] tspToken = getTspToken(extraParams, original, signTime);

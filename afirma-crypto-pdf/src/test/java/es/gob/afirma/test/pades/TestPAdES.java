@@ -11,9 +11,11 @@ package es.gob.afirma.test.pades;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +32,7 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Pruebas del m&oacute;dulo PAdES de Afirma.
@@ -93,37 +96,42 @@ public class TestPAdES {
     @SuppressWarnings("static-method")
 	@Test
     public void testIsSign() throws Exception {
-    	Assert.assertFalse("El fichero " + TEST_FILES[0] + " se identifica como firma y no lo es", //$NON-NLS-1$ //$NON-NLS-2$
-			new AOPDFSigner().isSign(
-				AOUtil.getDataFromInputStream(
-					ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+    	try (
+    		final InputStream is0 = ClassLoader.getSystemResourceAsStream(TEST_FILES[0]);
+			final InputStream is1 = ClassLoader.getSystemResourceAsStream(TEST_FILES[1]);
+			final InputStream is2 = ClassLoader.getSystemResourceAsStream(TEST_FILES[2]);
+			final InputStream is3 = ClassLoader.getSystemResourceAsStream(TEST_FILES[3])
+		) {
+	    	Assert.assertFalse("El fichero " + TEST_FILES[0] + " se identifica como firma y no lo es", //$NON-NLS-1$ //$NON-NLS-2$
+				new AOPDFSigner().isSign(
+					AOUtil.getDataFromInputStream(
+						is0
+					)
 				)
-			)
-		);
-    	Assert.assertTrue("El fichero " + TEST_FILES[1] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
-			new AOPDFSigner().isSign(
-				AOUtil.getDataFromInputStream(
-					ClassLoader.getSystemResourceAsStream(TEST_FILES[1])
+			);
+	    	Assert.assertTrue("El fichero " + TEST_FILES[1] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
+				new AOPDFSigner().isSign(
+					AOUtil.getDataFromInputStream(
+						is1
+					)
 				)
-			)
-		);
-
-    	Assert.assertTrue("El fichero " + TEST_FILES[2] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
-			new AOPDFSigner().isSign(
-				AOUtil.getDataFromInputStream(
-					ClassLoader.getSystemResourceAsStream(TEST_FILES[2])
+			);
+	    	Assert.assertTrue("El fichero " + TEST_FILES[2] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
+				new AOPDFSigner().isSign(
+					AOUtil.getDataFromInputStream(
+						is2
+					)
 				)
-			)
-		);
-
-    	System.setProperty("allowCosigningUnregisteredSignatures", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-    	Assert.assertTrue("El fichero " + TEST_FILES[3] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
+			);
+	    	System.setProperty("allowCosigningUnregisteredSignatures", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+	    	Assert.assertTrue("El fichero " + TEST_FILES[3] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
     			new AOPDFSigner().isSign(
     				AOUtil.getDataFromInputStream(
-    					ClassLoader.getSystemResourceAsStream(TEST_FILES[3])
+    					is3
     				)
     			)
     		);
+    	}
     }
 
     /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
@@ -136,12 +144,21 @@ public class TestPAdES {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
-        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
+        final byte[] testPdf;
+        try (
+    		final InputStream is0 = ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(is0);
+        }
 
         final String prueba = "Firma PAdES de PDF con sello de tiempo sobre la firma y el documento"; //$NON-NLS-1$
 
@@ -210,17 +227,135 @@ public class TestPAdES {
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore
+    public void testTimestampedDocument() throws Exception {
+
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOPDFSigner();
+
+        final byte[] testPdf;
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(is);
+        }
+
+        final String prueba = "Firma PAdES de PDF con sello de tiempo sobre el documento"; //$NON-NLS-1$
+
+        System.out.println(prueba);
+
+        final Properties extraParams = new Properties();
+        //********* TSA CATCERT ********************************************************************
+        //******************************************************************************************
+        extraParams.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
+        extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
+        extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("tsType", TsaParams.TS_DOC); //$NON-NLS-1$
+        //******************************************************************************************
+        //********* FIN TSA CATCERT ****************************************************************
+
+        final byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		extraParams
+		);
+
+        final File saveFile = File.createTempFile("TSA-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        try (
+    		final OutputStream os = new FileOutputStream(saveFile);
+		) {
+	        os.write(result);
+	        os.flush();
+        }
+
+        System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+
+        Assert.assertNotNull(prueba, result);
+        Assert.assertTrue(signer.isSign(result));
+
+    }
+
+    /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+	@Ignore
+    public void testTimestampedDocumentWithoutSignature() throws Exception {
+
+        final byte[] testPdf;
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(is);
+        }
+
+        final String prueba = "Firma PAdES de PDF con sello de tiempo sobre el documento y sin firmas adicionales"; //$NON-NLS-1$
+
+        System.out.println(prueba);
+
+        final Properties extraParams = new Properties();
+        //********* TSA CATCERT ********************************************************************
+        //******************************************************************************************
+        extraParams.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
+        extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
+        extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("tsType", TsaParams.TS_DOC); //$NON-NLS-1$
+        //******************************************************************************************
+        //********* FIN TSA CATCERT ****************************************************************
+
+        final byte[] result = PdfTimestamper.timestampPdf(testPdf, extraParams, new GregorianCalendar());
+
+        final File saveFile = File.createTempFile("TSA-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        try (
+    		final OutputStream os = new FileOutputStream(saveFile);
+		) {
+	        os.write(result);
+	        os.flush();
+        }
+
+        System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+
+        Assert.assertNotNull(prueba, result);
+
+    }
+
+    /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+	@Ignore
     public void testTimestampedSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
-        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
+        final byte[] testPdf;
+        try (
+    		final InputStream is0 = ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(is0);
+        }
 
         final String prueba = "Firma PAdES de PDF con sello de tiempo sobre la firma"; //$NON-NLS-1$
 
@@ -270,7 +405,11 @@ public class TestPAdES {
         final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
@@ -281,7 +420,12 @@ public class TestPAdES {
             for (final String algo : ALGOS) {
                 for (final String file : TEST_FILES) {
 
-                    final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(file));
+                    final byte[] testPdf;
+                    try (
+                		final InputStream is = ClassLoader.getSystemResourceAsStream(file)
+            		) {
+                    	testPdf = AOUtil.getDataFromInputStream(is);
+                    }
 
                     Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
 
@@ -343,11 +487,20 @@ public class TestPAdES {
         final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
-        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_CTF2));
+        final byte[] testPdf;
+        try (
+    		final InputStream isCtf = ClassLoader.getSystemResourceAsStream(TEST_FILE_CTF2)
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(isCtf);
+        }
         Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
         String prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando allowSigningCertifiedPdfs=true"; //$NON-NLS-1$
         System.out.println(prueba);
@@ -432,12 +585,21 @@ public class TestPAdES {
         final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
-        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
+        final byte[] testPdf;
+        try (
+    		final InputStream is0 = ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(is0);
+        }
 
         Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
 
@@ -489,7 +651,12 @@ public class TestPAdES {
 	@Test
     public void testIdentyFormat() throws Exception {
 
-    	final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("pades_basic.pdf")); //$NON-NLS-1$
+        final byte[] testPdf;
+        try (
+    		final InputStream isBasic = ClassLoader.getSystemResourceAsStream("pades_basic.pdf") //$NON-NLS-1$
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(isBasic);
+        }
     	final AOSigner signer = AOSignerFactory.getSigner(testPdf);
     	Assert.assertNotNull("No se ha identificado correctamente el formato PAdES", signer); //$NON-NLS-1$
 
