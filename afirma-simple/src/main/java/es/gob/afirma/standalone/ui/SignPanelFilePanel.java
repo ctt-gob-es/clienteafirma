@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -53,6 +54,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
     	final File file = signConfig.getDataFile();
 
         setLayout(new GridBagLayout());
+        setAlignmentY(Component.TOP_ALIGNMENT);
 
         // Establecemos la configuracion de color
         Color bgColor = Color.WHITE;
@@ -99,6 +101,14 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         			);
         }
 
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(bgColor);
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        if (openFileButton != null) {
+        	buttonPanel.add(openFileButton);
+        }
+
     	final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.0;
@@ -118,15 +128,21 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         c.anchor = GridBagConstraints.NORTH;
         add(detailPanel, c);
 
-        if (openFileButton != null) {
-        	c.weightx = 0.0;
-        	c.gridx = 2;
-        	c.ipadx = 0;
-        	c.ipady = 0;
-        	c.insets = new Insets(11, 6, 11, 11);
-        	c.anchor = GridBagConstraints.NORTHEAST;
-        	add(openFileButton, c);
-        }
+    	c.weightx = 0.0;
+    	c.gridx = 2;
+    	c.ipadx = 0;
+    	c.ipady = 0;
+    	c.insets = new Insets(11, 6, 11, 11);
+    	c.anchor = GridBagConstraints.NORTHEAST;
+    	add(buttonPanel, c);
+
+    	c.fill = GridBagConstraints.VERTICAL;
+    	c.anchor = GridBagConstraints.SOUTH;
+    	c.weighty = 1.0;
+    	final JPanel emptyPanel = new JPanel();
+    	emptyPanel.setBackground(bgColor);
+    	add(emptyPanel, c);
+
     }
 
     /**
