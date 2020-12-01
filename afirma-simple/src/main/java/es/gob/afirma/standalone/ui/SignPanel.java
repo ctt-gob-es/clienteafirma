@@ -218,6 +218,32 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			SimpleAfirmaMessages.getString("SignPanel.50") //$NON-NLS-1$
 		);
 
+		// Si procede, solicitamos confirmacion para firmar
+		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN)) {
+			final ConfirmSignatureDialog dialog = new ConfirmSignatureDialog(
+					this, this.signOperationConfigs.size());
+			dialog.setVisible(true);
+
+			// Si se cancela el dialogo, se interrumpe la operacion
+			if (dialog.getResult() == null) {
+				return;
+			}
+
+			// Si se solicita recordar la decision (solo en caso de permitir la firma)
+			// guardamos la preferencia
+			if (dialog.getResult().booleanValue()) {
+				PreferencesManager.putBoolean(
+						PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN,
+						false);
+				try {
+					PreferencesManager.flush();
+				} catch (final BackingStoreException e) {
+					LOGGER.warning("No se pudo guardar la preferencia del usuario: " + //$NON-NLS-1$
+							PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN);
+				}
+			}
+		}
+
     	// Comprobamos primero si se esta firmando un unico PDF con firma visible,
     	// en cuyo caso calculamos las propiedades para la firma visible
     	if (this.signOperationConfigs.size() == 1 &&
@@ -273,32 +299,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     				else {
     					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
     				}
-    			}
-    		}
-
-    		// Si procede, solicitamos confirmacion para firmar
-    		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN)) {
-    			final ConfirmSignatureDialog dialog = new ConfirmSignatureDialog(
-    					this, this.signOperationConfigs.size());
-    			dialog.setVisible(true);
-
-    			// Si se cancela el dialogo, se interrumpe la operacion
-    			if (dialog.getResult() == null) {
-    				return;
-    			}
-
-    			// Si se solicita recordar la decision (solo en caso de permitir la firma)
-    			// guardamos la preferencia
-    			if (dialog.getResult().booleanValue()) {
-    				PreferencesManager.putBoolean(
-    						PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN,
-    						false);
-    				try {
-						PreferencesManager.flush();
-					} catch (final BackingStoreException e) {
-						LOGGER.warning("No se pudo guardar la preferencia del usuario: " + //$NON-NLS-1$
-								PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN);
-					}
     			}
     		}
 
