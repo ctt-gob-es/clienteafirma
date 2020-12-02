@@ -43,20 +43,17 @@ public class PluginInfoLoader {
 				info.setPermissions(permissions);
 			}
 
+			final String inlineProcessorClassname = parseInlineProcessor(mainObject);
+			info.setInlineProcessorClassname(inlineProcessorClassname);
+
 			final GenericMenuOption menu = parseMenuObject(mainObject);
-			if (menu != null) {
-				info.setMenu(menu);
-			}
+			info.setMenu(menu);
 
 			final PluginButton[] buttons = parseButtonsObject(mainObject);
-			if (buttons != null) {
-				info.setButtons(buttons);
-			}
+			info.setButtons(buttons);
 
 			final PluginCommand[] commands = parseCommandsObject(mainObject);
-			if (commands != null) {
-				info.setCommands(commands);
-			}
+			info.setCommands(commands);
 		}
 
 		return info;
@@ -132,6 +129,18 @@ public class PluginInfoLoader {
 							: o1.getOrder() == o2.getOrder() ? 0 : 1);
 
 		return permissions;
+	}
+
+
+	private static String parseInlineProcessor(final JsonObject mainObject) {
+
+		final JsonString inlineProcessorString = mainObject.getJsonString("inline_processor"); //$NON-NLS-1$
+
+		String inlineProcessor = null;
+		if (inlineProcessorString != null && inlineProcessorString.getString() != null) {
+			inlineProcessor = inlineProcessorString.getString();
+		}
+		return inlineProcessor;
 	}
 
 	private static GenericMenuOption parseMenuObject(final JsonObject mainObject) throws PluginException {

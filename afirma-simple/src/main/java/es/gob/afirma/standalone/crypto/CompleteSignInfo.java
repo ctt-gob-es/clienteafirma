@@ -112,17 +112,22 @@ public final class CompleteSignInfo {
     /** Establece los datos que se firmaron.
      * @param data Datos que se firmaron. */
     public void setData(final byte[] data) {
-    	if (Base64.isBase64(data)) {
-    		try {
-    			final byte[] tmpData = Base64.decode(data, 0, data.length, false);
-    			final String ext = new MimeHelper(tmpData).getExtension();
-				if (ext != null && !ext.isEmpty()) {
-					this.data = tmpData;
-					return;
-				}
-			}
-    		catch (final IOException e) { /* Se ignora */ }
+    	if (data != null) {
+    		if (Base64.isBase64(data)) {
+    			try {
+    				final byte[] tmpData = Base64.decode(data, 0, data.length, false);
+    				final String ext = new MimeHelper(tmpData).getExtension();
+    				if (ext != null && !ext.isEmpty()) {
+    					this.data = tmpData;
+    					return;
+    				}
+    			}
+    			catch (final IOException e) { /* Se ignora */ }
+    		}
+    		this.data = data.clone();
     	}
-        this.data = data.clone();
+    	else {
+    		this.data = null;
+    	}
     }
 }

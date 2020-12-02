@@ -169,8 +169,8 @@ final class CommandLineLauncher {
 				return;
 			}
 
-			// Imprimimos elresultado de la operacion
-			closeApp(STATUS_SUCCESS, pw, response);
+			// Imprimimos el resultado de la operacion
+			printMessage(pw, response);
 		}
 	}
 
@@ -864,19 +864,30 @@ final class CommandLineLauncher {
 		return sb.toString();
 	}
 
-	/** Cierra la aplicaci&oacute;n mostrando un &uacute;ltimo mensaje si se le proporcionan
+	/**
+	 * Cierra la aplicaci&oacute;n mostrando un &uacute;ltimo mensaje si se le proporcionan
 	 * los recursos necesarios.
 	 * @param status Estado de cierre de la aplicaci&oacute;n.
 	 * @param pw Objeto para la impresi&oacute;n por consola.
-	 * @param message Mensaje a mostrar. */
+	 * @param message Mensaje a mostrar.
+	 */
 	private static void closeApp(final int status, final PrintWriter pw, final String message) {
+		printMessage(pw, message);
+		System.exit(status);
+	}
+
+	/**
+	 * Muestra un mensaje por consola si se le proporcionan los recursos necesarios.
+	 * @param pw Objeto para la impresi&oacute;n por consola.
+	 * @param message Mensaje a mostrar.
+	 */
+	private static void printMessage(final PrintWriter pw, final String message) {
 		if (pw != null) {
 			if (message != null) {
 				pw.write(message);
 				pw.flush();
 			}
 		}
-		System.exit(status);
 	}
 
 	public static void main(final String[] args) {

@@ -53,8 +53,9 @@ public class JarVerifier {
 			while (entries.hasMoreElements()) {
 				final JarEntry entry = entries.nextElement();
 
-				// Las entradas dentro del directorio META-INF son las unicas no firmadas
-				if (entry.getName().contains("META-INF")) { //$NON-NLS-1$
+				// Los directorios y las entradas dentro del directorio META-INF son las unicas
+				// entradas que no se firman
+				if (entry.isDirectory() || entry.getName().contains("META-INF")) { //$NON-NLS-1$
 					continue;
 				}
 
@@ -62,11 +63,11 @@ public class JarVerifier {
 				final byte[] buffer = new byte[8096];
 				try (InputStream is = jar.getInputStream(entry)) {
 					while (is.read(buffer, 0, buffer.length) != -1) {
-						// Don't care
+						// No hacemos nada
 					}
 				}
 
-				// Comprobamos que todas las entradas esten firmadas
+				// Comprobamos que la entrada este firmada
 				final CodeSigner[] signers = entry.getCodeSigners();
 				if (signers == null) {
 					throw new JarNoSignedException("Se han encontrado entradas sin firmar: " + entry.getName()); //$NON-NLS-1$

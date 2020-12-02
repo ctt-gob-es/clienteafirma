@@ -10,6 +10,7 @@
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -48,35 +49,46 @@ public final class UrlParametersToSign extends UrlParameters {
 	 * cla <code>PrivateKeyEntry</code> fijada. */
 	private static final String RESET_STICKY_PARAM = "resetsticky"; //$NON-NLS-1$
 
-	/** Tipo de operaci&oacute;n de firma. */
-	public enum Operation {
+	/**
+	 * Par&aacute;metros reconocidos. Se utilizaran para identificar los parametros desconocidos
+	 * introducidos por el JavaScript.
+	 */
+	private static final String[] KNOWN_PARAMETERS = new String[] {
+			FORMAT_PARAM, ALGORITHM_PARAM, ID_PARAM, VER_PARAM, STICKY_PARAM, RESET_STICKY_PARAM,
+			PROPERTIES_PARAM, DATA_PARAM, GZIPPED_DATA_PARAM, RETRIEVE_SERVLET_PARAM,
+			STORAGE_SERVLET_PARAM, KEY_PARAM, FILE_ID_PARAM, KEYSTORE_OLD_PARAM, KEYSTORE_PARAM,
+			ACTIVE_WAITING_PARAM, MINIMUM_CLIENT_VERSION_PARAM
+	};
 
-		/** Operaci&oacute;n de firma. */
-		SIGN,
-
-		/** Operaci&oacute;n de cofirma. */
-		COSIGN,
-
-		/** Operaci&oacute;n de contrafirma. */
-		COUNTERSIGN;
-
-		/** Obtiene el tipo de operaci&oacute;n de firma a partir de su nombre, o <code>null</code>
-		 * si el nombre no corresponde a ninguna operaci&oacute;n conocida.
-		 * @param opName Nombre de la operaci&oacute;n de firma.
-		 * @return Operaci&oacute;n de firma. */
-		public static Operation getOperation(final String opName) {
-			if ("SIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-				return SIGN;
-			}
-			if ("COSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-				return COSIGN;
-			}
-			if ("COUNTERSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-				return COUNTERSIGN;
-			}
-			return null;
-		}
-	}
+//	/** Tipo de operaci&oacute;n de firma. */
+//	public enum Operation {
+//
+//		/** Operaci&oacute;n de firma. */
+//		SIGN,
+//
+//		/** Operaci&oacute;n de cofirma. */
+//		COSIGN,
+//
+//		/** Operaci&oacute;n de contrafirma. */
+//		COUNTERSIGN;
+//
+//		/** Obtiene el tipo de operaci&oacute;n de firma a partir de su nombre, o <code>null</code>
+//		 * si el nombre no corresponde a ninguna operaci&oacute;n conocida.
+//		 * @param opName Nombre de la operaci&oacute;n de firma.
+//		 * @return Operaci&oacute;n de firma. */
+//		public static Operation getOperation(final String opName) {
+//			if ("SIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+//				return SIGN;
+//			}
+//			if ("COSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+//				return COSIGN;
+//			}
+//			if ("COUNTERSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+//				return COUNTERSIGN;
+//			}
+//			return null;
+//		}
+//	}
 
 	/** Algoritmos de firma soportados. */
 	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<>();
@@ -87,7 +99,7 @@ public final class UrlParametersToSign extends UrlParameters {
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512withRSA"); //$NON-NLS-1$
 	}
 
-	private Operation operation;
+	private String operation;
 	private String signFormat;
 	private String signAlgorithm;
 	private String minimumProtocolVersion;
@@ -99,6 +111,9 @@ public final class UrlParametersToSign extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe ignorar
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
+
+	/** Colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los plugins. */
+	private final Map<String, String> anotherParams = new HashMap<>();
 
 	/**
 	 * Construye el conjunto de par&aacute;metros vac&iacute;o.
@@ -117,7 +132,7 @@ public final class UrlParametersToSign extends UrlParameters {
 
 	/** Obtiene el tipo de operaci&oacute;n a realizar (firma, cofirma o contrafirma).
 	 * @return Operaci&oacute;n. */
-	public Operation getOperation() {
+	public String getOperation() {
 		return this.operation;
 	}
 
@@ -133,7 +148,7 @@ public final class UrlParametersToSign extends UrlParameters {
 		return this.signAlgorithm;
 	}
 
-	void setOperation(final Operation operation) {
+	void setOperation(final String operation) {
 		this.operation = operation;
 	}
 
@@ -220,17 +235,8 @@ public final class UrlParametersToSign extends UrlParameters {
 		}
 
 		// Tomamos el tipo de operacion
-		final Operation op = Operation.getOperation(
-			params.get(
-				ProtocolConstants.OPERATION_PARAM
-			)
-		);
-		if (op != null) {
-			setOperation(op);
-		}
-		else {
-			throw new ParameterException("Se ha indicado un codigo de operacion incorrecto"); //$NON-NLS-1$
-		}
+		final String op = params.get(ProtocolConstants.OPERATION_PARAM);
+		setOperation(op);
 
 		// Si hemos recibido el identificador para la descarga de la configuracion,
 		// no encontraremos el resto de parametros
@@ -328,4 +334,38 @@ public final class UrlParametersToSign extends UrlParameters {
 			)
 		);
 	}
+
+	public Map<String, String> getAnotherParams() {
+		return this.anotherParams;
+	}
+
+	/**
+	 * Establece los par&aacute;metros desconocidos que se han encontrado entre los parametros de entrada.
+	 * @param params Par&aacute;metros de entrada.
+	 */
+	public void setAnotherParams(final Map<String, String> params) {
+
+		for (final String key : params.keySet().toArray(new String[0])) {
+			if (!contains(KNOWN_PARAMETERS, key)) {
+				this.anotherParams.put(key,  params.get(key));
+			}
+		}
+	}
+
+	/**
+	 * Busca un elemento dentro de un listado.
+	 * @param elements Elementos entre los que buscar.
+	 * @param targetElement Elemento buscado.
+	 * @return {@code true} si el elemento estaba en el listado, {@code false} en caso contrario.
+	 */
+	private static boolean contains(final String[] elements, final String targetElement) {
+		for (final String element : elements) {
+			if (targetElement.equals(element)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 }

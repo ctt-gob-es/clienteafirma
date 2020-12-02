@@ -19,7 +19,9 @@ public enum Permission {
 	/** Permiso para agregar un menu a la interfaz. */
 	MENU(7),
 	/** Permiso para agregar nuevos comandos a la l&iacute;nea de comandos. */
-	COMMANDS(8);
+	COMMANDS(8),
+	/** Permiso para manipular el proceso de firma cuando se invoca desde una fuente externa. */
+	INLINE_PROCESS(9);
 
 	private int order;
 

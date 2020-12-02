@@ -18,6 +18,8 @@ public class PluginInfo extends MinimalPluginInfo {
 
 	private String configPanel;
 
+	private String inlineProcessorClassname;
+
 	private Permission[] permissions;
 
 	private GenericMenuOption menu;
@@ -47,6 +49,7 @@ public class PluginInfo extends MinimalPluginInfo {
 		this.authors = null;
 		this.contacts = null;
 		this.configPanel = null;
+		this.inlineProcessorClassname = null;
 	}
 
 	/**
@@ -163,6 +166,23 @@ public class PluginInfo extends MinimalPluginInfo {
 	 */
 	public void setPermissions(final Permission[] permissions) {
 		this.permissions = permissions;
+	}
+
+	/**
+	 * Obtiene el nombre de la clase encargada de procesar las peticiones de firma.
+	 * @return Nombre de la clase para el procesado de las peticiones de firma o {@code null}
+	 * si no se estableci&oacute;.
+	 */
+	public String getInlineProcessorClassname() {
+		return this.inlineProcessorClassname;
+	}
+
+	/**
+	 * Establece el nombre de la clase encargada de procesar las peticiones de firma.
+	 * @param inlineProcessorClassname Nombre de la clase para el procesado de las peticiones de firma.
+	 */
+	public void setInlineProcessorClassname(final String inlineProcessorClassname) {
+		this.inlineProcessorClassname = inlineProcessorClassname;
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.plugins;
 
+import java.lang.reflect.Constructor;
 import java.security.cert.Certificate;
 import java.util.Properties;
 
@@ -11,6 +12,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 public abstract class AfirmaPlugin {
 
 	private PluginInfo info = null;
+
+	private SignDataProcessor inlineProcessor = null;
 
 	private ClassLoader classLoader = null;
 
@@ -87,7 +90,7 @@ public abstract class AfirmaPlugin {
 	 * de los datos.
 	 */
 	@SuppressWarnings("static-method")
-	public byte [] preSignProcess(final byte[] data, final String format)
+	public byte[] preSignProcess(final byte[] data, final String format)
 			throws PluginControlledException {
 		return data;
 	}
@@ -103,9 +106,38 @@ public abstract class AfirmaPlugin {
 	 * de la firma.
 	 */
 	@SuppressWarnings("static-method")
-	public byte [] postSignProcess(final byte[] signature, final String format, final Certificate[] certChain)
+	public byte[] postSignProcess(final byte[] signature, final String format, final Certificate[] certChain)
 			throws PluginControlledException {
 		return signature;
+	}
+
+	/**
+	 * Obtiene el procesador para peticiones en linea asociado al plugin.
+	 * @param protocolVersion Versi&oacute;n del protocolo declarado por AutoFirma.
+	 * @return Procesador de peticiones de firma en l&iacute;nea o {@code null} si el
+	 * plugin no lo establece.
+	 * @throws PluginControlledException Cuando se produce un error durante la carga del
+	 * procesador.
+	 */
+	public final SignDataProcessor getInlineProcessor(final int protocolVersion) throws PluginControlledException {
+		if (this.inlineProcessor == null) {
+			final String processorClassName = this.info.getInlineProcessorClassname();
+			if (processorClassName != null) {
+				try {
+					final Class<SignDataProcessor> processorClass =
+							(Class<SignDataProcessor>) Class.forName(processorClassName);
+
+					final Constructor<SignDataProcessor> processorConstructor =
+							processorClass.getConstructor(Integer.TYPE);
+
+					this.inlineProcessor = processorConstructor.newInstance(protocolVersion);
+				}
+				catch (final Exception e) {
+					throw new PluginControlledException("No se ha podido cargar el dialogo de espera", e); //$NON-NLS-1$
+				}
+			}
+		}
+		return this.inlineProcessor;
 	}
 
 	/**

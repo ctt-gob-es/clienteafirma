@@ -39,7 +39,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_CANNOT_ACCESS_KEYSTORE = "SAF_08"; //$NON-NLS-1$
 	static final String ERROR_SIGNATURE_FAILED = "SAF_09"; //$NON-NLS-1$
 	static final String ERROR_NO_CERTIFICATES_SYSTEM = "SAF_10"; //$NON-NLS-1$
-	static final String ERROR_SENDING_SIGNATURE = "SAF_11"; //$NON-NLS-1$
+	static final String ERROR_SENDING_RESULT = "SAF_11"; //$NON-NLS-1$
 	static final String ERROR_ENCRIPTING_DATA = "SAF_12"; //$NON-NLS-1$
 	static final String ERROR_LOCAL_ACCESS_BLOCKED = "SAF_13"; //$NON-NLS-1$
 	static final String ERROR_OBSOLETE_APP = "SAF_14"; //$NON-NLS-1$
@@ -55,7 +55,6 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_RECOVERING_LOG = "SAF_24"; //$NON-NLS-1$
 	static final String ERROR_CANNOT_LOAD_DATA = "SAF_25"; //$NON-NLS-1$
 	static final String ERROR_CONTACT_BATCH_SERVICE = "SAF_26"; //$NON-NLS-1$
-	static final String ERROR_SENDING_RESULT = "SAF_27"; //$NON-NLS-1$
 	static final String ERROR_INVALID_PDF = "SAF_28"; //$NON-NLS-1$
 	static final String ERROR_INVALID_XML = "SAF_29"; //$NON-NLS-1$
 	static final String ERROR_INVALID_DATA = "SAF_30"; //$NON-NLS-1$
@@ -70,6 +69,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_INVALID_SIGNATURE = "SAF_39"; //$NON-NLS-1$
 	static final String ERROR_RECOVER_SERVER_DOCUMENT = "SAF_40"; //$NON-NLS-1$
 	static final String ERROR_MINIMUM_VERSION_NON_SATISTIED = "SAF_41"; //$NON-NLS-1$
+	static final String ERROR_POSTPROCESSING_DATA = "SAF_42"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
@@ -84,7 +84,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_CANNOT_ACCESS_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.8")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGNATURE_FAILED, ProtocolMessages.getString("ProtocolLauncher.9")); //$NON-NLS-1$
 		ERRORS.put(ERROR_NO_CERTIFICATES_SYSTEM, ProtocolMessages.getString("ProtocolLauncher.10")); //$NON-NLS-1$
-		ERRORS.put(ERROR_SENDING_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.11")); //$NON-NLS-1$
+		ERRORS.put(ERROR_SENDING_RESULT, ProtocolMessages.getString("ProtocolLauncher.11")); //$NON-NLS-1$
 		ERRORS.put(ERROR_ENCRIPTING_DATA, ProtocolMessages.getString("ProtocolLauncher.12")); //$NON-NLS-1$
 		ERRORS.put(ERROR_LOCAL_ACCESS_BLOCKED, ProtocolMessages.getString("ProtocolLauncher.13")); //$NON-NLS-1$
 		ERRORS.put(ERROR_OBSOLETE_APP, ProtocolMessages.getString("ProtocolLauncher.14")); //$NON-NLS-1$
@@ -100,7 +100,6 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_RECOVERING_LOG, ProtocolMessages.getString("ProtocolLauncher.34")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_LOAD_DATA, ProtocolMessages.getString("ProtocolLauncher.35")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CONTACT_BATCH_SERVICE, ProtocolMessages.getString("ProtocolLauncher.36")); //$NON-NLS-1$
-		ERRORS.put(ERROR_SENDING_RESULT, ProtocolMessages.getString("ProtocolLauncher.37")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_PDF, ProtocolMessages.getString("ProtocolLauncher.38")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_XML, ProtocolMessages.getString("ProtocolLauncher.39")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_DATA, ProtocolMessages.getString("ProtocolLauncher.40")); //$NON-NLS-1$
@@ -115,6 +114,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_INVALID_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.49")); //$NON-NLS-1$
 		ERRORS.put(ERROR_RECOVER_SERVER_DOCUMENT, ProtocolMessages.getString("ProtocolLauncher.50")); //$NON-NLS-1$
 		ERRORS.put(ERROR_MINIMUM_VERSION_NON_SATISTIED, ProtocolMessages.getString("ProtocolLauncher.53")); //$NON-NLS-1$
+		ERRORS.put(ERROR_POSTPROCESSING_DATA, ProtocolMessages.getString("ProtocolLauncher.54")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {

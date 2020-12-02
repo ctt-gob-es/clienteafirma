@@ -410,16 +410,23 @@ public final class MainMenu extends JMenuBar {
      * @param parentComponent Componente padre sobre el que mostrar el
      */
     static void viewSignature(final Object parentComponent) {
-    	final File[] file = AOUIFactory.getLoadFiles(
-    			SimpleAfirmaMessages.getString("MainMenu.35"), //$NON-NLS-1$
-    			null,
-    			null,
-    			new String[] {"csig", "xsig", "pdf", "sig", "p7s"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-    			SimpleAfirmaMessages.getString("MainMenu.36"), //$NON-NLS-1$
-    			false,
-    			false,
-    			null,
-    			parentComponent);
+    	File[] file;
+    	try {
+    		file = AOUIFactory.getLoadFiles(
+    				SimpleAfirmaMessages.getString("MainMenu.35"), //$NON-NLS-1$
+    				null,
+    				null,
+    				new String[] {"csig", "xsig", "pdf", "sig", "p7s"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    				SimpleAfirmaMessages.getString("MainMenu.36"), //$NON-NLS-1$
+    				false,
+    				false,
+    				null,
+    				parentComponent);
+    	}
+    	catch (final AOCancelledOperationException e) {
+    		// No hacemos nada
+    		return;
+    	}
     	if (file != null && file.length > 0 && file[0] != null && file[0].isFile()) {
     		new VisorFirma(false, null).initialize(false, file[0]);
     	}

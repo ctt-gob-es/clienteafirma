@@ -300,7 +300,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SENDING_SIGNATURE;
+					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT;
 					ProtocolInvocationLauncherErrorManager.showError(errorCode);
 					if (!bySocket){
 						throw new SocketOperationException(errorCode);

@@ -36,10 +36,10 @@ public abstract class UrlParameters {
 	 * pero hay que firmarlos descomprimidos.
 	 * La compresi&oacute;n en GZIP permite reducir el uso de servidor intermedio haciendo que
 	 * quepan m&aacute;s datos en la URL de invocaci&oacute;n. */
-	private static final String GZIPPED_DATA_PARAM = "gzip"; //$NON-NLS-1$
+	protected static final String GZIPPED_DATA_PARAM = "gzip"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con el servlet remoto de recuperaci&oacute;n de datos. */
-	private static final String RETRIEVE_SERVLET_PARAM = "rtservlet"; //$NON-NLS-1$
+	protected static final String RETRIEVE_SERVLET_PARAM = "rtservlet"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con el servlet remoto de guardado de datos. */
 	protected static final String STORAGE_SERVLET_PARAM = "stservlet"; //$NON-NLS-1$
@@ -48,7 +48,7 @@ public abstract class UrlParameters {
 	private static final int CIPHER_KEY_LENGTH = 8;
 
 	/** Par&aacute;metro de entrada con la clave para el cifrado del documento. */
-	private static final String KEY_PARAM = "key"; //$NON-NLS-1$
+	protected static final String KEY_PARAM = "key"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con el identificador del fichero remoto de datos. */
 	protected static final String FILE_ID_PARAM = "fileid"; //$NON-NLS-1$

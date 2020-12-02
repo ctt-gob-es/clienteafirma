@@ -85,19 +85,20 @@
   "type": "object",
 
   "properties": {
-    "info": 		{ "$ref": "#/definitions/info" },
-    "permissions":	{ "$ref": "#/definitions/permissions" },
-    "menu":			{ "$ref": "#/definitions/menu" },
-    "buttons":		{ 
-				    	"type": "array",
-				        "items": { "$ref": "#/definitions/button" },
-				        "default": []
-				    },
-    "commands":		{ 
-				    	"type": "array",
-				        "items": { "$ref": "#/definitions/command" },
-				        "default": []
-				    }
+    "info": 			{ "$ref": "#/definitions/info" },
+    "permissions":		{ "$ref": "#/definitions/permissions" },
+    "inline_processor":	{ "type": "string" },
+    "menu":				{ "$ref": "#/definitions/menu" },
+    "buttons":			{ 
+				    		"type": "array",
+					        "items": { "$ref": "#/definitions/button" },
+					        "default": []
+					    },
+    "commands":			{ 
+					    	"type": "array",
+					        "items": { "$ref": "#/definitions/command" },
+					        "default": []
+					    }
   },
   
   "required": ["info"]

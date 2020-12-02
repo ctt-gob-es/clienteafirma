@@ -284,7 +284,7 @@ public final class ProtocolInvocationLauncher {
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
                     				StandardCharsets.UTF_8.toString());
-                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -357,7 +357,7 @@ public final class ProtocolInvocationLauncher {
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
                     				StandardCharsets.UTF_8.toString());
-                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -430,7 +430,7 @@ public final class ProtocolInvocationLauncher {
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
                     				StandardCharsets.UTF_8.toString());
-                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -513,7 +513,7 @@ public final class ProtocolInvocationLauncher {
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
                     				StandardCharsets.UTF_8.toString());
-                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -586,25 +586,47 @@ public final class ProtocolInvocationLauncher {
 
                 LOGGER.info("Se inicia la operacion de firma. Version de protocolo: " + requestedProtocolVersion); //$NON-NLS-1$
 
+                StringBuilder dataToSend;
                 try {
-                    return ProtocolInvocationLauncherSign.processSign(params, requestedProtocolVersion, bySocket);
+                	dataToSend = ProtocolInvocationLauncherSign.processSign(params, requestedProtocolVersion);
                 }
-                // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
+                // Llegara aqui siempre que tratemos con un error controlado. En caso de estar en
+                // la comunicacion por servidor intermedio, el mensaje de error al servidor
+                // intermedio y despues revolveremos el error. En caso de estar en la comunicacion
+                // por sockets, directamente devolveremos el error.
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
-                    String msg;
-                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()) {
-                    	msg = e.getErrorCode();
-                    } else if (e.getMessage() != null) {
-                    	msg = e.getErrorCode() + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString()); //$NON-NLS-1$
-                    } else {
-                    	msg = URLEncoder.encode(
-                    			ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    			StandardCharsets.UTF_8.toString());
+                    final String errorCode = e.getErrorCode();
+                    if (errorCode != ProtocolInvocationLauncherSign.RESULT_CANCEL) {
+                    	if (e.getMessage() != null) {
+                    		ProtocolInvocationLauncherErrorManager.showErrorDetail(errorCode, e.getMessage());
+                    	} else {
+                    		ProtocolInvocationLauncherErrorManager.showError(errorCode);
+                    	}
                     }
-                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
-                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
+                    if (!bySocket) {
+                        String msg;
+                        if (errorCode == ProtocolInvocationLauncherSign.RESULT_CANCEL) {
+                        	msg = errorCode;
+                        } else if (e.getMessage() != null) {
+                        	msg = errorCode + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString()); //$NON-NLS-1$
+                        } else {
+                        	msg = URLEncoder.encode(
+                        			ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode),
+                        			StandardCharsets.UTF_8.toString());
+                        }
+                        sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
                 }
+
+                // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
+                // espera activa si se encontraba vigente
+                if (!bySocket) {
+                	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
+                }
+
+                return dataToSend.toString();
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
@@ -683,7 +705,7 @@ public final class ProtocolInvocationLauncher {
                     		: URLEncoder.encode(
                     				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
                     				StandardCharsets.UTF_8.toString());
-                    sendErrorToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
             }
@@ -782,12 +804,12 @@ public final class ProtocolInvocationLauncher {
 		}
 	}
 
-	/** Env&iacute;a un mensaje de error al servidor intermedio e interrumpe la espera
-	 * declarada en este servidor.
+	/** Env&iacute;a datos al servidor intermedio e interrumpe la espera declarada en
+	 * este servidor.
      * @param data Cadena de texto.
      * @param serviceUrl URL del servicio de env&iacute;o de datos.
      * @param id Identificador del mensaje en el servidor. */
-	private static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
+	private static void sendDataToServer(final String data, final String serviceUrl, final String id) {
 		synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 			final Thread waitingThread = getActiveWaitingThread();
 			if (waitingThread != null) {
@@ -797,7 +819,9 @@ public final class ProtocolInvocationLauncher {
 				IntermediateServerUtil.sendData(data, serviceUrl, id);
 			}
 			catch (final IOException e) {
-				LOGGER.log(Level.SEVERE, "Error al enviar los datos del error al servidor intermedio: " + e, e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor intermedio: " + e, e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(
+						ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
 			}
 		}
 	}

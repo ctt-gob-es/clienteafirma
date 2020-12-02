@@ -24,12 +24,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
-
 /** Utilidades para en an&aacute;lisis de URL de invocaci&oacute;n por protocolo. */
 public final class ProtocolInvocationUriParserUtil {
 
 	static final String DEFAULT_URL_ENCODING = StandardCharsets.UTF_8.name();
+
+	private static final String DEFAULT_OPERATION = "SIGN"; //$NON-NLS-1$
+
 
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable
@@ -100,11 +101,9 @@ public final class ProtocolInvocationUriParserUtil {
 
 			// Si el elemento principal es OPERATION_PARAM entendemos que es una firma
 			params.put(
-				ProtocolConstants.OPERATION_PARAM,
-				ProtocolConstants.OPERATION_PARAM.equalsIgnoreCase(docElement.getNodeName()) ?
-					Operation.SIGN.toString() :
-						docElement.getNodeName()
-			);
+					ProtocolConstants.OPERATION_PARAM,
+					ProtocolConstants.OPERATION_PARAM.equalsIgnoreCase(docElement.getNodeName())
+						? DEFAULT_OPERATION : docElement.getNodeName());
 
 			elems = docElement.getChildNodes();
 		}
@@ -136,20 +135,21 @@ public final class ProtocolInvocationUriParserUtil {
 
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de firma.
-	 * @param params Par&aacute;metros para el proceso de firma
-	 * @return Par&aacute;metros
+	 * @param params Par&aacute;metros para el proceso de firma.
+	 * @return Par&aacute;metros para la operaci&oacute;n de firma.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSign getParametersToSign(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSign ret = new UrlParametersToSign();
 		ret.setCommonParameters(params);
 		ret.setSignParameters(params);
+		ret.setAnotherParams(params);
 		return ret;
 	}
 
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de firma.
-	 * @param params Par&aacute;metros para el proceso de firma
-	 * @return Par&aacute;metros
+	 * @param params Par&aacute;metros para el proceso de firma.
+	 * @return Par&aacute;metros para la operaci&oacute;n de firma y guardado.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSignAndSave getParametersToSignAndSave(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSignAndSave ret = new UrlParametersToSignAndSave();
@@ -161,7 +161,7 @@ public final class ProtocolInvocationUriParserUtil {
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de selecci&oacute;n de certificado.
 	 * @param params Par&aacute;metros para el proceso de firma
-	 * @return Par&aacute;metros
+	 * @return Par&aacute;metros para la operaci&oacute;n de selecci&oacute;n de certificado.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSelectCert ret = new UrlParametersToSelectCert();

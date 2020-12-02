@@ -44,12 +44,12 @@
 	"commands": [
 		{
 			"name": "createdigest",
-			"description": "Creación de huella digitales con interfaz gráfica",
+			"description": "Creación de huellas digitales con interfaz gráfica",
 			"action": "es.gob.afirma.plugin.hash.command.CreateHashCommand"
 		},
 		{
 			"name": "checkdigest",
-			"description": "Comprobación de huella digitales con interfaz gráfica",
+			"description": "Comprobación de huellas digitales con interfaz gráfica",
 			"action": "es.gob.afirma.plugin.hash.command.CheckHashCommand"
 		}
 	]
