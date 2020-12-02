@@ -918,7 +918,7 @@ final class RestoreConfigFirefox {
 									MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
 											USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH)
 							).getParentFile());
-					LOGGER.info("Se usa el perfil de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
+					LOGGER.info("Fichero de perfiles de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
 				}
 			}
 		}

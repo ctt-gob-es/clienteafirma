@@ -646,6 +646,11 @@ public final class Utils {
     public static void installXmlDSigProvider(final boolean forceApacheProvider) {
 
     	// Correccion al problema insertado en Apache Santuario 2.1.0 (Java 11)
+    	//
+    	// Para que la correccion tenga efecto se requiere Apache Santuario 2.1.2 (a partir de la que
+    	// se implementa la siguiente propiedad) o Java 11.0.5 (que actualiza la version interna de
+    	// Apache santuario a la 2.1.3).
+    	//
     	// Establecemos la propiedad de Apache Santuario necesaria para que no se agreguen saltos
     	// de linea en los Base64 generados, ya que de hacerlo se utiliza "\r\n" y el "\r" aparece como
     	// "&#13;" al final de cada linea en las firmas XML. Las firmas generadas serian validas pero

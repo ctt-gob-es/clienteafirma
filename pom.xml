@@ -51,7 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.7</clienteafirma.version>
-		<jmulticard.version>1.6-SNAPSHOT</jmulticard.version>
+		<jmulticard.version>1.6</jmulticard.version>
 		<afirma.lib.itex.version>1.3</afirma.lib.itex.version>
 		<spongycastle.version>1.56.0.0</spongycastle.version>
 		<afirma.legible.version>1_7_0</afirma.legible.version>
@@ -195,6 +195,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 			</modules>
 			
@@ -302,6 +303,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
@@ -389,6 +391,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->

@@ -436,11 +436,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 */
 	private static void restoreProtocolRegistry(final File installDir, final File workingDir) throws GeneralSecurityException {
 
+		LOGGER.info("Vamos a restaurar el protocolo 'afirma'"); //$NON-NLS-1$
+
 		try {
 			// Crear la key "afirma" si no existe
 			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma")) { //$NON-NLS-1$
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma"); //$NON-NLS-1$
 			}
+
 			// Sobreescribir los valores correctos
 			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma", "", "URL:Afirma Protocol"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma", "URL Protocol", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -459,7 +462,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			// Sobreescribir los valores correctos
 			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", installDir + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		} catch (final Exception e) {
+		} catch (final Exception | Error e) {
 
 			LOGGER.warning("No se pudo actualizar el registro con los permisos del usuario, se solicita elevar privilegios: " + e); //$NON-NLS-1$
 
@@ -471,7 +474,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 		}
 
-		LOGGER.info("Configurado afirma en registro Windows"); //$NON-NLS-1$
+		LOGGER.info("Configurado 'afirma' en registro Windows"); //$NON-NLS-1$
 	}
 
 	/**
