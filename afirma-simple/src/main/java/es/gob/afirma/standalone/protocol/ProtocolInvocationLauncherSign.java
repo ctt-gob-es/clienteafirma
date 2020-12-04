@@ -18,12 +18,14 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
+import javax.swing.JDialog;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -50,8 +52,10 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.InvalidPdfException;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
@@ -80,6 +84,8 @@ import es.gob.afirma.standalone.plugins.SignOperation;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 import es.gob.afirma.standalone.plugins.SignResult;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
+import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 
 final class ProtocolInvocationLauncherSign {
 
@@ -87,22 +93,32 @@ final class ProtocolInvocationLauncherSign {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	static boolean showRubricIsCanceled = false;
+
 	private ProtocolInvocationLauncherSign() {
 		// No instanciable
 	}
 
-	/** Procesa una peticion de firma en invocaci&oacute;n por protocolo y obtiene
-	 * la firma junto con una serie de metadatos en forma de cadena.
+	/**
+	 * Procesa una peticion de firma en invocaci&oacute;n por protocolo y obtiene la
+	 * firma junto con una serie de metadatos en forma de cadena.
+	 *
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
-	 *                 <code>false</code> para usar servidor intermedio.
+	 * @param bySocket        <code>true</code> para usar comunicaci&oacute;n por
+	 *                        <i>socket</i> local, <code>false</code> para usar
+	 *                        servidor intermedio.
 	 * @return Resultado de la operaci&oacute;n o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la
-	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	 *                                            comunicaci&oacute;n por
+	 *                                            <i>socket</i> local.
+	 * @throws VisibleSignatureMandatoryException si el usuario cancela la
+	 *                                            selecci&oacute;n del area de firma
+	 *                                            visible cuando &eacute;sta es
+	 *                                            obligatoria.
+	 */
 	static StringBuilder processSign(final UrlParametersToSign options,
 			final int protocolVersion) throws SocketOperationException {
-
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NULL_URI;
@@ -111,8 +127,7 @@ final class ProtocolInvocationLauncherSign {
 
         // Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
-			LOGGER.severe(
-				String.format(
+			LOGGER.severe(String.format(
 					"Version de protocolo no soportada (%1s). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())
@@ -157,6 +172,11 @@ final class ProtocolInvocationLauncherSign {
 			final SignOperation op = operations.get(i);
 			try {
 				results.add(signOperation(op, options));
+			}
+			catch (final VisibleSignatureMandatoryException e) {
+				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
+				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_VISIBLE_SIGNATURE;
+				throw new SocketOperationException(errorCode, e.getMessage());
 			}
 			catch (final SocketOperationException e) {
 				LOGGER.log(Level.SEVERE, "Se identifico un error en una operacion de firma", e); //$NON-NLS-1$
@@ -212,13 +232,12 @@ final class ProtocolInvocationLauncherSign {
 							+ plugin.getClass().getName() + " para su uso en linea", e); //$NON-NLS-1$
 				}
 			}
-
 		}
 		return new NativeSignDataProcessor(protocolVersion);
 	}
 
 	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSign options)
-			throws SocketOperationException {
+			throws SocketOperationException, VisibleSignatureMandatoryException {
 
 		byte[] data = signOperation.getData();
 		String format = signOperation.getFormat();
@@ -251,25 +270,25 @@ final class ProtocolInvocationLauncherSign {
 		if (data == null) {
 			if (signer != null && signer instanceof OptionalDataInterface) {
 				needRequestData = ((OptionalDataInterface) signer).needData(extraParams);
-			}
-			else {
+			} else {
 				needRequestData = true;
 			}
 		}
 
-		// Nombre del fichero firmado. Tomara valor solo si es ekl usuario quien selecciona
+		// Nombre del fichero firmado. Tomara valor solo si es el usuario quien selecciona
 		// el fichero a firmar
 		String inputFilename = null;
 
 		// Si se tienen que pedir los datos al usuario, se hace
 		if (needRequestData) {
-			final String dialogTitle = Operation.SIGN == cryptoOperation ?
-				ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
-					ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
+			final String dialogTitle = Operation.SIGN == cryptoOperation
+					? ProtocolMessages.getString("ProtocolLauncher.25") //$NON-NLS-1$
+					: ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
 
 			final String fileExts = extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_EXTS);
 
-			final String fileDesc = extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_DESCRIPTION, ProtocolMessages.getString("ProtocolLauncher.32")) +  //$NON-NLS-1$
+			final String fileDesc = options.getExtraParams().getProperty(AfirmaExtraParams.LOAD_FILE_DESCRIPTION,
+					ProtocolMessages.getString("ProtocolLauncher.32")) + //$NON-NLS-1$
 				(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			final File selectedDataFile;
@@ -277,18 +296,12 @@ final class ProtocolInvocationLauncherSign {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 					MacUtils.focusApplication();
 				}
-				selectedDataFile = AOUIFactory.getLoadFiles(
-					dialogTitle,
+				selectedDataFile = AOUIFactory.getLoadFiles(dialogTitle,
 					extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_CURRENT_DIR), // currentDir
 					extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_FILENAME), // fileName
 					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
-					fileDesc,
-					false,
-					false,
-					AutoFirmaUtil.getDefaultDialogsIcon(), null
-				)[0];
-			}
-			catch (final AOCancelledOperationException e) {
+						fileDesc, false, false, AutoFirmaUtil.getDefaultDialogsIcon(), null)[0];
+			} catch (final AOCancelledOperationException e) {
 				LOGGER.info("Carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				throw new SocketOperationException(RESULT_CANCEL);
 			}
@@ -332,8 +345,7 @@ final class ProtocolInvocationLauncherSign {
 			try {
 				data = MessageDigest.getInstance("SHA1").digest(data); //$NON-NLS-1$
 				extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			catch (final Exception e) {
+			} catch (final Exception e) {
 				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
 					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
 			}
@@ -370,8 +382,7 @@ final class ProtocolInvocationLauncherSign {
 					extraParams,
 					data,
 					format);
-		}
-		catch (final IncompatiblePolicyException e1) {
+		} catch (final IncompatiblePolicyException e1) {
 			LOGGER.info("Se ha indicado una politica no compatible: " + e1); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_POLICY;
 			throw new SocketOperationException(errorCode);
@@ -382,10 +393,23 @@ final class ProtocolInvocationLauncherSign {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 
-		if (options.getSticky() && !options.getResetSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
-			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+		// Comprobamos si se necesita que el usuario seleccione el area de firma
+		// visible.
+		try {
+			if (isRubricPositionRequired(format, extraParams)) {
+				showRubricPositionDialog(data, extraParams);
+				checkShowRubricDialogIsCalceled(extraParams);
+			}
+		} catch (final AOCancelledOperationException e) {
+			LOGGER.info("El usuario ha cancelado el proceso de firma."); //$NON-NLS-1$
+			throw new VisibleSignatureMandatoryException(
+					"Es obligatorio mostrar la firma en el documento PDF"); //$NON-NLS-1$
 		}
-		else {
+
+		if (options.getSticky() && !options.getResetSticky()
+				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
+			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+		} else {
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 			final String aoksLib = options.getDefaultKeyStoreLib();
 			final AOKeyStoreManager ksm;
@@ -396,8 +420,7 @@ final class ProtocolInvocationLauncherSign {
 					pwc, // PasswordCallback
 					null // Parent
 				);
-			}
-			catch (final Exception e3) {
+			} catch (final Exception e3) {
 				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
 				throw new SocketOperationException(errorCode);
@@ -409,20 +432,15 @@ final class ProtocolInvocationLauncherSign {
 
 			try {
 				MacUtils.focusApplication();
-				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-					ksm,
-					null,
-					true,
-					true, // showExpiredCertificates
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
 					true, // checkValidity
-					filters,
-					mandatoryCertificate
-				);
+						filters, mandatoryCertificate);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 
 				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
-		    	// que se indico originalmente por haberlo cambiado desde el dialogo de seleccion)
+				// que se indico originalmente por haberlo cambiado desde el dialogo de
+				// seleccion)
 				// y de ahi sacamos la referencia a la clave
 				final CertificateContext context = dialog.getSelectedCertificateContext();
 		    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
@@ -430,12 +448,10 @@ final class ProtocolInvocationLauncherSign {
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
-				}
-				else {
+				} else {
 					ProtocolInvocationLauncher.setStickyKeyEntry(null);
 				}
-			}
-			catch (final AOCancelledOperationException e) {
+			} catch (final AOCancelledOperationException e) {
 				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 				throw new SocketOperationException(RESULT_CANCEL);
 			}
@@ -494,11 +510,9 @@ final class ProtocolInvocationLauncherSign {
 			catch (final AOTriphaseException tex) {
 				throw ProtocolInvocationLauncherUtil.getInternalException(tex);
 			}
-		}
-		catch (final SocketOperationException e) {
+		} catch (final SocketOperationException e) {
 			throw e;
-		}
-		catch (final IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
 			throw new SocketOperationException(errorCode, e.getMessage());
@@ -588,8 +602,7 @@ final class ProtocolInvocationLauncherSign {
 		final byte[] certEncoded;
 		try {
 			certEncoded = pke.getCertificateChain()[0].getEncoded();
-		}
-		catch (final CertificateEncodingException e) {
+		} catch (final CertificateEncodingException e) {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
 			throw new SocketOperationException(errorCode);
@@ -656,19 +669,205 @@ final class ProtocolInvocationLauncherSign {
 		return format;
 	}
 
-	/** Identifica cuando se ha configurado una firma con el formato XAdES y la
-	 * propiedad {@code mode} con el valor {@code explicit}.
-	 * Esta no es una firma correcta pero, por compatibilidad con los tipos de firmas del
-	 * Applet pesado, se ha incluido aqu&iacute;.
+	/**
+	 * Identifica cuando se ha configurado una firma con el formato XAdES y la
+	 * propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma
+	 * correcta pero, por compatibilidad con los tipos de firmas del Applet pesado,
+	 * se ha incluido aqu&iacute;.
+	 *
 	 * @param format Formato declarado para la firma.
 	 * @param config Par&aacute;metros adicionales declarados para la firma.
 	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>,
 	 *         {@code false} en caso contrario.
 	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES
-	 *             expl&iacute;citas. */
+	 *             expl&iacute;citas.
+	 */
 	@Deprecated
 	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
 		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
 			AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(AfirmaExtraParams.MODE));
+	}
+
+	/**
+	 * M&eacute;todo que comprueba si es necesario solicitar al usuario la
+	 * posici&oacute;n de la firma visible. Se mostrar&aacute; el dialogo para
+	 * seleccionar la zona donde colocar la firma siempre y cuando se cumplan las
+	 * siguientes condiciones: 1) El documento a firmar debe ser un PDF. 2) No puede
+	 * ser una firma por lotes. 3) En los par&aacute;metros adicionales debe venir
+	 * la bandera "visibleSignature" con los posibles valores <i>want<i> y
+	 * <i>optional</i>. 4) En los par&aacute;metros adicionales NO pueden venir los
+	 * par&aacute;metros asociados a la posici&oacute;n de la firma ya establecidos,
+	 * estos son: signaturePositionOnPageLowerLeftX,
+	 * signaturePositionOnPageLowerLeftY, signaturePositionOnPageUpperRightX,
+	 * signaturePositionOnPageUpperRightY.
+	 *
+	 * @param format Formato de firma.
+	 * @param extraParams Propiedades de configuraci&oacute;n de firma.
+	 * @return <i>true</i> si se debe mostrar el di&aacute;logo para la selecci&oacute;n de
+	 *         la zona donde hacer la firma visible y <i>false</i> en caso
+	 *         contrario.
+	 */
+	private static boolean isRubricPositionRequired(final String format, final Properties extraParams) {
+
+		// Comprobamos que la firma sea PAdES.
+		final List<String> formatPadesList = Arrays.asList(AOSignConstants.SIGN_FORMAT_PDF,
+				AOSignConstants.SIGN_FORMAT_PDF_TRI, AOSignConstants.SIGN_FORMAT_PADES,
+				AOSignConstants.SIGN_FORMAT_PADES_TRI, AOSignConstants.PADES_SUBFILTER_BES,
+				AOSignConstants.PADES_SUBFILTER_BASIC);
+		if (!formatPadesList.contains(format)) {
+			return false;
+		}
+
+		// Comprobamos que se han incluido los parametros asociados a mostrar la
+		// firma.
+		if (!extraParams.containsKey(PdfExtraParams.VISIBLE_SIGNATURE)) {
+			return false;
+		}
+
+		// Comprobamos que la bandera que indica si se debe solicitar la firma visible
+		// tiene un valor valido.
+		final String visibleSignature = extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE).toString();
+		if (!PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature)
+				&& !PdfExtraParams.VISIBLE_SIGNATURE_VALUE_OPTIONAL.equalsIgnoreCase(visibleSignature)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * M&eacute;todo que muestra el dialogo para seleccionar la posici&oacute;n de
+	 * la firma.
+	 *
+	 * @param options Conjunto de atributos recibidos en la petici&oacute;n.
+	 */
+	private static void showRubricPositionDialog(final byte[] data, final Properties extraParams) {
+
+		final AOPDFSigner signer = new AOPDFSigner();
+		final boolean isSign = signer.isSign(data);
+		final SignPdfDialogListener listener = new SignPdfListener(extraParams);
+		final JDialog dialog = SignPdfDialog.getVisibleSignatureDialog(isSign, data, null, true, isCustomAppearance(extraParams),
+				false, listener);
+		dialog.setVisible(true);
+	}
+
+	/**
+	 * M&eacute;todo que comprueba si el di&aacute;logo ha sido cancelado y act&uacute;a en
+	 * consecuencia.
+	 * @param extraParams Par&aacute;metros de Conjunto de atributos recibidos en la petici&oacute;n.
+	 */
+	private static void checkShowRubricDialogIsCalceled(final Properties extraParams) {
+		if (showRubricIsCanceled) {
+			// Recuperamos el valor del atributo "visibleSignature".
+			final String visibleSignature = extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE) != null
+					? extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE).toString()
+					: null;
+			final boolean want = visibleSignature != null
+					&& PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature)
+						? true : false;
+
+			// Comprobamos si se han indicado la lista de atributos del area de firma
+			// visible.
+			final boolean existsAreaAttributes = extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX)
+					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY)
+					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)
+					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY)
+					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGE);
+
+			if (want && !existsAreaAttributes) {
+				throw new AOCancelledOperationException("Incluir la firma visible en el documento es obligatoria."); //$NON-NLS-1$
+			}
+		}
+	}
+
+	/**
+	 * M&eacute;todo que comprueba si es necesario mostrar el dialogo de
+	 * personalizaci&oacute;n de la firma visible.
+	 *
+	 * @param extraParams Propiedades de configuraci&oacute;n de firma.
+	 * @return <i>true</i> si es necesario mostrar el dialogo y <i>falso</i> en caso
+	 *         contrario.
+	 */
+	private static boolean isCustomAppearance(final Properties extraParams) {
+		// Comprobamos que exista el parametro 'visibleAppearance'.
+		boolean customizable = false;
+		final String visibleAppearance = extraParams.getProperty(PdfExtraParams.VISIBLE_APPEARANCE);
+		if (visibleAppearance != null
+				&& PdfExtraParams.VISIBLE_APPEARANCE_VALUE_CUSTOM.equalsIgnoreCase(visibleAppearance)) {
+			customizable = true;
+		}
+
+		return customizable;
+	}
+
+	static class SignPdfListener implements SignPdfDialogListener {
+
+		Properties extraParams;
+
+		public SignPdfListener(final Properties extraParams) {
+			this.extraParams = extraParams;
+		}
+
+		@Override
+		public void propertiesCreated(final Properties newParams) {
+			// Si el conjunto de propiedades es vacio, significa que se ha cancelado el
+			// proceso.
+			if (newParams.isEmpty()) {
+				ProtocolInvocationLauncherSign.showRubricIsCanceled = true;
+			} else {
+				updateOptions(this.extraParams, newParams);
+			}
+		}
+
+		/**
+		 * M&eacute;todo que actualiza los par&aacute;metros adicionales asociados a la
+		 * posici&oacute;n de la firma visible.
+		 *
+		 * @param extraParams Conjunto de propiedades de configuraci&oacute;n de la firma.
+		 * @param newParams Conjunto de nuevas propiedades que establecer en la firma.
+		 */
+		static void updateOptions(final Properties extraParams, final Properties newParams) {
+			// Atributos asociados al area de firma.
+			extraParams.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX,
+					newParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX));
+			extraParams.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY,
+					newParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY));
+			extraParams.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX,
+					newParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX));
+			extraParams.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY,
+					newParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY));
+			extraParams.setProperty(PdfExtraParams.SIGNATURE_PAGE,
+					newParams.getProperty(PdfExtraParams.SIGNATURE_PAGE));
+
+			// Atributos asociados al aspecto de la firma.
+			if (newParams.getProperty(PdfExtraParams.LAYER2_TEXT) != null) {
+				extraParams.setProperty(PdfExtraParams.LAYER2_TEXT,
+						newParams.getProperty(PdfExtraParams.LAYER2_TEXT));
+			}
+			if (newParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null) {
+				extraParams.setProperty(PdfExtraParams.LAYER2_FONTFAMILY,
+						newParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY));
+			}
+			if (newParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null) {
+				extraParams.setProperty(PdfExtraParams.LAYER2_FONTSIZE,
+						newParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE));
+			}
+			if (newParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION) != null) {
+				extraParams.setProperty(PdfExtraParams.SIGNATURE_ROTATION,
+						newParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
+			}
+			if (newParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null) {
+				extraParams.setProperty(PdfExtraParams.LAYER2_FONTSTYLE,
+						newParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE));
+			}
+			if (newParams.getProperty(PdfExtraParams.LAYER2_FONTCOLOR) != null) {
+				extraParams.setProperty(PdfExtraParams.LAYER2_FONTCOLOR,
+						newParams.getProperty(PdfExtraParams.LAYER2_FONTCOLOR));
+			}
+			if (newParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE) != null) {
+				extraParams.setProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE,
+						newParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
+			}
+		}
 	}
 }

@@ -72,6 +72,13 @@ final class SignPdfUiPanel extends JPanel implements
 	interface SignPdfUiPanelListener {
 		void positionSelected(final Properties extraParams);
 		void positionCancelled();
+		/**
+		 * Pasa al siguiente panel del di&aacute;logo o establece los resultados y lo
+		 * cierra si era el &uacute;ltimo panel.
+		 * @param p Propiedades establecidas en el di&aacute;logo.
+		 * @param im Imagen con la zona seleccionada para usarla en la
+		 * previsualizaci&oacute;n.
+		 */
 		void nextPanel(final Properties p, final BufferedImage im);
 	}
 

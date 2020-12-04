@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
-import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
 /** Pruebas del UI de firma PDF visible.
@@ -26,11 +25,8 @@ public final class UiTester {
 	@SuppressWarnings({ "static-method" })
 	@Test
 	public void testFailedDialog() {
-		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, true, false, new SignPdfDialogListener() {
-			@Override
-			public void propertiesCreated(final Properties extraParams) {
-				// Vacio
-			}
+		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, true, false, false, extraParams -> {
+			// Vacio
 		});
 	}
 
@@ -43,13 +39,9 @@ public final class UiTester {
 		SignPdfDialog.getVisibleSignatureExtraParams(
 				IS_SIGN,
 				testPdf,
-				null,true, false,
-				new SignPdfDialogListener() {
-					@Override
-					public void propertiesCreated(final Properties extraParams) {
-						System.out.println(extraParams);
-					}
-				});
+				null, true, false,
+				false,
+				extraParams -> System.out.println(extraParams));
 		for(;;) {
 			// Bucle infinito
 		}
@@ -82,7 +74,7 @@ public final class UiTester {
 							new SignPdfUiPanelListener() {
 
 								@Override
-								public void nextPanel(Properties p, BufferedImage im) {
+								public void nextPanel(final Properties p, final BufferedImage im) {
 								}
 
 								@Override
