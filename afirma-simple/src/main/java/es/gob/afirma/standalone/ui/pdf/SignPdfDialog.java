@@ -281,28 +281,6 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		else {
 			positionSelected(p);
 		}
-
-//		if (checkSignatureDimensions(p)) {
-//			if (!this.customAppearance) {
-//				positionSelected(p);
-//			} else {
-//				if (this.activePanel instanceof SignPdfUiPanel) {
-//					setPreferredSize(getPreferredDimensionToSignatureDialog());
-//					this.activePanel = new SignPdfUiPanelPreview(this, p, im);
-//					this.scrollPanel.setViewportView(this.activePanel);
-//					pack();
-//					((SignPdfUiPanelPreview) this.activePanel).requestFocusInWindow();
-//				} else if (this.activePanel instanceof SignPdfUiPanelPreview && this.stampVisible) {
-//					setPreferredSize(getPreferredDimensionToStampDialog());
-//					this.activePanel = new SignPdfUiPanelStamp(this.pages, this.pageSizes, this.pdfData, this, p);
-//					this.scrollPanel.setViewportView(this.activePanel);
-//					pack();
-//					((SignPdfUiPanelStamp) this.activePanel).requestFocusInWindow();
-//				} else {
-//					positionSelected(p);
-//				}
-//			}
-//		}
 	}
 
 	private boolean checkSignatureDimensions(final Properties extraParams) {

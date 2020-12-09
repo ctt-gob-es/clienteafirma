@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui.restoreconfig;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -195,7 +196,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		LOGGER.info("Se va a instalar el certificado CA raiz en Google Chrome"); //$NON-NLS-1$
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.9")); //$NON-NLS-1$
-		closeChrome();
+		closeChrome(configPanel);
 		try {
 			RestoreConfigFirefox.installRootCAChromeKeyStore(workingDir, rootCertFile, usersDir);
 		}
@@ -206,12 +207,14 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		LOGGER.info("Se va a instalar el certificado CA raiz en Mozilla Firefox"); //$NON-NLS-1$
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.13")); //$NON-NLS-1$
-		try {
-			closeFirefox();
-		}
-		catch (final AOCancelledOperationException e) {
-			LOGGER.log(Level.INFO, "El usuario cancelo la operacion de restauracion al solicitarsele cerrar Firefox"); //$NON-NLS-1$
-			throw e;
+
+		// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
+		final boolean closed = closeFirefox(configPanel);
+
+		// Si no se ha cerrado el navegador, es muy probable que no se pueda instalar el certificado de confianza,
+		// asi que mostramos un mensaje advirtiendolo
+		if (!closed) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.45")); //$NON-NLS-1$
 		}
 
 		// Desinstalamos previamente los certificados que haya actualmente
@@ -328,34 +331,58 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 	}
 
-	/** Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace. */
-	private static void closeFirefox() {
+	/**
+	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Devuelve {@code true} si se cerr&oacute; el navegador, {@code false} en caso contrario.
+	 */
+	private static boolean closeFirefox(final Component parent) {
 
-		while (isProcessRunningLinux("/usr/lib/firefox/firefox").booleanValue()) { //$NON-NLS-1$
-			final int result = JOptionPane.showConfirmDialog(
-					null,
+		if (isProcessRunningLinux("/usr/lib/firefox/firefox").booleanValue()) { //$NON-NLS-1$
+			JOptionPane.showMessageDialog(
+					parent,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
+		}
+
+		int option = JOptionPane.OK_OPTION;
+		while (option == JOptionPane.OK_OPTION
+				&& isProcessRunningLinux("/usr/lib/firefox/firefox").booleanValue()) { //$NON-NLS-1$
+
+			option = JOptionPane.showConfirmDialog(
+					parent,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.12"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
-
-			if (result != JOptionPane.OK_OPTION) {
-				throw new AOCancelledOperationException("El usuario cancelo el cierre de Mozilla Firefox"); //$NON-NLS-1$
-			}
 		}
+
+		return option == JOptionPane.OK_OPTION;
 	}
 
 	/**
 	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
 	 */
-	private static void closeChrome() {
+	private static void closeChrome(final Component parent) {
 
-		while (isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
+		if (isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
-					null,
+					parent,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
+		}
+
+		int option = JOptionPane.OK_OPTION;
+		while (option == JOptionPane.OK_OPTION
+				&& isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
+			option = JOptionPane.showConfirmDialog(
+					parent,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.11"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION);
 		}
 	}
 

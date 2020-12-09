@@ -9,6 +9,8 @@
 
 package es.gob.afirma.standalone.ui.restoreconfig;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
@@ -65,8 +69,8 @@ final class RestoreConfigFirefox {
 	private static String WINDOWS_MOZILLA_PATH;
 	private static String USERS_WINDOWS_PATH;
 
-	private static final String GET_USER_SCRIPT = "scriptGetUsers";//$NON-NLS-1$
-	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
+//	private static final String GET_USER_SCRIPT = "scriptGetUsers";//$NON-NLS-1$
+//	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
@@ -360,7 +364,7 @@ final class RestoreConfigFirefox {
 	 * @throws IOException Cuando hay errores leyendo o escribiendo datos. */
 	static void generateUninstallScriptMac(final File targetDir, final List<String> usersDirs) throws IOException {
 
-		// XXX: Comprobar que este codigo comentado no sirve para nada y eliminarlo en dicho caso
+		// TODO: Comprobar que este codigo comentado no sirve para nada y eliminarlo en dicho caso
 //		final StringBuilder sb = new StringBuilder(RestoreConfigMacOSX.OSX_GET_USERS_COMMAND);
 //		final File scriptFile = File.createTempFile(GET_USER_SCRIPT, SCRIPT_EXT);
 //
@@ -673,6 +677,12 @@ final class RestoreConfigFirefox {
 		else {
 			LOGGER.info("Se ejecutara el siguiente comando:\n" + sb.toString()); //$NON-NLS-1$
 			final Process process = new ProcessBuilder(command).start();
+
+			// Temporizador para detener el proceso una vez se sobrepase un tiempo determinado. Esto es necesario
+			// porque hay situaciones que bloquean el proceso, como cuando el almacen de claves esta protegido
+			// con contrasena
+			new KillProcessTimer(5000, process).start();
+
 			// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
 			// cualquier salida como un error
 			String line;
@@ -707,7 +717,6 @@ final class RestoreConfigFirefox {
 
 		return false;
 	}
-
 
 	private static void importCARootOnFirefoxKeyStore (final File workingDir,
 													   final File certFile,
@@ -771,6 +780,11 @@ final class RestoreConfigFirefox {
 					};
 
 					final Process process = new ProcessBuilder(certutilCommands).start();
+
+					// Temporizador para detener el proceso una vez se sobrepase un tiempo determinado. Esto es necesario
+					// porque hay situaciones que bloquean el proceso, como cuando el almacen de claves esta protegido
+					// con contrasena
+					new KillProcessTimer(5000, process).start();
 
 					LOGGER.info("Comando certutil ejecutado: " + Arrays.toString(certutilCommands)); //$NON-NLS-1$
 					// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
@@ -1167,4 +1181,34 @@ final class RestoreConfigFirefox {
 		return "user_pref(\"" + MOZ_PREFERENCE_ENTERPRISE_ROOTS //$NON-NLS-1$
 				+ "\", " + enable + ");" + BREAK_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	/**
+	 * Temporizador para la interrupci&oacute;n de un proceso una vez excedido un tiempo determinado.
+	 */
+	private static class KillProcessTimer extends Timer implements ActionListener {
+
+		/** Serial Id. */
+		private static final long serialVersionUID = -2527661514649132415L;
+
+		private final Process process;
+
+		public KillProcessTimer(final int delay, final Process process) {
+			super(delay, null);
+			addActionListener(this);
+			this.process = process;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			if (this.process != null && this.process.isAlive()) {
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"Se interrumpe el proceso por sobrepasar el tiempo maximo configurado..."); //$NON-NLS-1$
+				// Destruimos el proceso
+				this.process.destroy();
+			}
+			// Detenemos el temporizador
+			stop();
+		}
+	}
+
 }

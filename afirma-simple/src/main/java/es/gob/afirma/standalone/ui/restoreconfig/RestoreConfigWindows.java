@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui.restoreconfig;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -171,7 +172,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		// Configuramos el protocolo afirma en Chrome para que no muestre advertencias al llamarlo
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.23")); //$NON-NLS-1$
-		configureChrome();
+		configureChrome(configPanel);
 
 		// Configuramos Firefox para que confie o no en los prestadores dados de alta en el almacen de confianza
 		// del sistema
@@ -243,10 +244,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * Configura el protocolo "afirma" en Chrome para todos los usuarios de
 	 * Windows.
 	 */
-	private static void configureChrome() {
+	private static void configureChrome(final Component parent) {
 
 		// Solicitamos el cierre del navegador Google Chrome
-		closeChrome();
+		closeChrome(parent);
 
 		RestoreRemoveChromeWarning.removeChromeWarningsWindows(null, true);
 
@@ -290,28 +291,58 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 	/**
 	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Devuelve {@code true} si se cerr&oacute; el navegador, {@code false} en caso contrario.
 	 */
-	private static void closeFirefox() {
+	private static boolean closeFirefox(final Component parent) {
 
-		while (isProcessRunningWindows("firefox.exe").booleanValue()) { //$NON-NLS-1$
+		if (isProcessRunningWindows("firefox.exe").booleanValue()) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
-					null,
+					parent,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
+
+		int option = JOptionPane.OK_OPTION;
+		while (option == JOptionPane.OK_OPTION
+				&& isProcessRunningWindows("firefox.exe").booleanValue()) { //$NON-NLS-1$
+
+			option = JOptionPane.showConfirmDialog(
+					parent,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.12"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+		}
+
+		return option == JOptionPane.OK_OPTION;
 	}
 
 	/**
-	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
+	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace
+	 * o acepta el no continuar con este apartado de la instalaci&oacute;n.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
 	 */
-	private static void closeChrome() {
+	private static void closeChrome(final Component parent) {
 
-		while (isProcessRunningWindows("chrome.exe").booleanValue()) { //$NON-NLS-1$
+		if (isProcessRunningWindows("chrome.exe").booleanValue()) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
-					null,
+					parent,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
+		}
+
+		int option = JOptionPane.OK_OPTION;
+		while (option == JOptionPane.OK_OPTION
+				&& isProcessRunningWindows("chrome.exe").booleanValue()) { //$NON-NLS-1$
+
+			option = JOptionPane.showConfirmDialog(
+					parent,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.11"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
 		}
 	}
@@ -398,9 +429,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 			                                         final CertificateFile certFile,
 			                                         final File installDir) {
 		try {
-			// Obligamos a que se cierre Firefox antes de manipular el
-			// certificado en su almacen
-			closeFirefox();
+			// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
+			final boolean closed = closeFirefox(configPanel);
+
+			// Si no se ha cerrado el navegador, es muy probable que no se pueda instalar el certificado de confianza,
+			// asi que mostramos un mensaje advirtiendolo
+			if (!closed) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.45")); //$NON-NLS-1$
+			}
 
 			// Es necesario copiar a disco certutil
 			RestoreConfigFirefox.copyConfigurationFiles(installDir);

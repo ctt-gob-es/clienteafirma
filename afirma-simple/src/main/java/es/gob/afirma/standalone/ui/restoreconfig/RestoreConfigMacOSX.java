@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.ui.restoreconfig;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -150,7 +151,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Iniciamos la restauracion de la confianza de Chrome en el protocolo afirma
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
-		closeChrome();
+		closeChrome(configPanel);
 		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirs);
 
 		if (firefoxSecurityRoots) {
@@ -267,14 +268,26 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/** Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace. */
-	private static void closeChrome() {
-		while (isChromeOpen()) {
+	/**
+	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 */
+	private static void closeChrome(final Component parent) {
+		if (isChromeOpen()) {
 			JOptionPane.showMessageDialog(
-					null,
+					parent,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
+		}
+
+		int option = JOptionPane.OK_OPTION;
+		while (option == JOptionPane.OK_OPTION && isChromeOpen()) {
+			option = JOptionPane.showConfirmDialog(
+					parent,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.11"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION);
 		}
 	}
 
@@ -432,8 +445,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static void installRootCA(final File appDir, final File rootCertFile, final RestoreConfigPanel configPanel)
 			throws IOException, SecurityException, KeyStoreException {
 
-		// Cerramos el almacen de firefox si esta abierto
-		closeFirefox();
+		// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
+		final boolean closed = closeFirefox(configPanel);
+
+		// Si no se ha cerrado el navegador, es muy probable que no se pueda instalar el certificado de confianza,
+		// asi que mostramos un mensaje advirtiendolo
+		if (!closed) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.45")); //$NON-NLS-1$
+		}
 
 		// Desinstalamos de los almacenes cualquier certificado anterior generado para este proposito
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de MacOSX"); //$NON-NLS-1$
@@ -806,16 +825,31 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	/**
 	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Devuelve {@code true} si se cerr&oacute; el navegador, {@code false} en caso contrario.
 	 */
-	private static void closeFirefox() {
+	private static boolean closeFirefox(final Component parent) {
 
-		while (isFirefoxOpen()) {
+		if (isFirefoxOpen()) {
 			JOptionPane.showMessageDialog(
-					null,
+					parent,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
+
+		int option = JOptionPane.OK_OPTION;
+		while (option == JOptionPane.OK_OPTION && isFirefoxOpen()) {
+
+			option = JOptionPane.showConfirmDialog(
+					parent,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.12"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+		}
+
+		return option == JOptionPane.OK_OPTION;
 	}
 
 	/** Detecta si el proceso de Firefox est&aacute; abierto.
