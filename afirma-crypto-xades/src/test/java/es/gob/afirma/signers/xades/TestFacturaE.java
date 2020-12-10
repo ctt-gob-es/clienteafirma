@@ -32,6 +32,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.xml.Utils;
 
 /**
  * Pruebas del m&oacute;dulo XAdES de Afirma para facturas electr&oacute;nicas.
@@ -165,7 +166,7 @@ public final class TestFacturaE {
 
         final Document document;
         try {
-            document = XAdESUtil.getNewDocumentBuilder().parse(sign);
+            document = Utils.getNewDocumentBuilder().parse(sign);
         }
         catch (final Exception e) {
             System.out.println("No es una firma valida: " + e); //$NON-NLS-1$

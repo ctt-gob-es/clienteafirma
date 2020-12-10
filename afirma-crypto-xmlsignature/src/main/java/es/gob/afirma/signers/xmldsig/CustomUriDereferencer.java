@@ -22,7 +22,6 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dom.DOMURIReference;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Attr;
@@ -35,6 +34,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
+import es.gob.afirma.signers.xml.Utils;
 
 /** Dereferenciador a medida de referencias XML DOM. */
 public final class CustomUriDereferencer implements URIDereferencer {
@@ -153,10 +153,8 @@ public final class CustomUriDereferencer implements URIDereferencer {
 				}
 				try {
 					return getStreamData(
-						DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-							new ByteArrayInputStream(externalContent)
-						)
-					);
+							Utils.getNewDocumentBuilder().parse(
+									new ByteArrayInputStream(externalContent)));
 				}
 				catch (final ParserConfigurationException e1) {
 					throw new URIReferenceException(

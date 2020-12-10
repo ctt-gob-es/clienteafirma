@@ -71,7 +71,7 @@ public final class XAdESCoSigner {
 
 		Document signDocument;
 		try {
-			signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+			signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
 		}
 		catch (final Exception e) {
 			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$

@@ -107,7 +107,7 @@ public final class XAdESCounterSigner {
 
 		Document signDocument;
 		try {
-			signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+			signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
 		}
 		catch (final Exception e) {
 			throw new AOException("No se ha podido cargar el documento de firmas", e); //$NON-NLS-1$
@@ -263,7 +263,7 @@ public final class XAdESCounterSigner {
 		// y se vuelve a dejar como raiz el nodo Signature original
 		if (esFirmaSimple) {
 			try {
-				final Document newdoc = XAdESUtil.getNewDocumentBuilder().newDocument();
+				final Document newdoc = Utils.getNewDocumentBuilder().newDocument();
 				newdoc.appendChild(
 						newdoc.adoptNode(
 								doc.getElementsByTagNameNS(

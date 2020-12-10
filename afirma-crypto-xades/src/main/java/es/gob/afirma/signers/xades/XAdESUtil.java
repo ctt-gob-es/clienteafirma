@@ -31,9 +31,6 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -81,26 +78,6 @@ public final class XAdESUtil {
 	    "http://uri.etsi.org/01903/v1.3.2#SignedProperties", //$NON-NLS-1$
 	    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
 	};
-
-	private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
-
-	static {
-		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-		try {
-			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
-
-			// Estas opciones deberian ser innecesarias una vez establecida la propiedad anterior,
-			// pero las establecemos para mayor seguridad
-			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
-			SECURE_BUILDER_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.SEVERE, "No se ha podido establecer la propiedad de seguridad en la factoria XML", e); //$NON-NLS-1$
-		}
-
-		SECURE_BUILDER_FACTORY.setValidating(false);
-		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
-	}
 
 	private XAdESUtil() {
 		// No permitimos la instanciacion
@@ -694,15 +671,6 @@ public final class XAdESUtil {
 		}
 
 		return xades;
-	}
-
-	/**
-	 * Obtiene un objeto para la composici&oacute;n de documentos DOM.
-	 * @return Objeto para la composici&oacute;n de documentos DOM.
-	 * @throws ParserConfigurationException Cuando no se puede obtener el objeto.
-	 */
-	static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
-		return SECURE_BUILDER_FACTORY.newDocumentBuilder();
 	}
 
 	/**

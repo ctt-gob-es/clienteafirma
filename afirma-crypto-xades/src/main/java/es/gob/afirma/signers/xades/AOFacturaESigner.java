@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,6 +31,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.xml.Utils;
 
 /** Manejador de firmas XML XAdES Factura-E.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -243,12 +244,10 @@ public final class AOFacturaESigner implements AOSigner {
             return false;
         }
 
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
         final Document signDocument;
         try {
-        	signDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        	final DocumentBuilder docBuilder = Utils.getNewDocumentBuilder();
+        	signDocument = docBuilder.parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
             return false;
@@ -273,12 +272,10 @@ public final class AOFacturaESigner implements AOSigner {
             return false;
         }
 
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
         Document dataDocument;
         try {
-        	dataDocument = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(data));
+        	final DocumentBuilder docBuilder = Utils.getNewDocumentBuilder();
+        	dataDocument = docBuilder.parse(new ByteArrayInputStream(data));
         }
         catch (final Exception e) {
             return false;

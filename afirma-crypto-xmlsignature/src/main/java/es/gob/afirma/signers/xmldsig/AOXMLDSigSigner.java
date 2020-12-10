@@ -371,10 +371,6 @@ public final class AOXMLDSigSigner implements AOSigner {
         // Propiedades del documento XML original
         final Map<String, String> originalXMLProperties = new Hashtable<>();
 
-        // carga el documento xml
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
         // Elemento de datos
         Element dataElement;
 
@@ -389,7 +385,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT)) {
             try {
                 // Obtenemos el objeto XML y su codificacion
-                final Document docum = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(data));
+                final Document docum = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data));
 
                 // Obtenemos la hoja de estilo del XML
                 if (!ignoreStyleSheets) {
@@ -490,7 +486,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                     LOGGER.info("El documento no es un XML valido. Se convertira a Base64: " + e); //$NON-NLS-1$
 
                     // crea un nuevo nodo xml para contener los datos en base 64
-                    final Document docFile = dbf.newDocumentBuilder().newDocument();
+                    final Document docFile = Utils.getNewDocumentBuilder().newDocument();
                     dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     uri = null;
                     encoding = XMLConstants.BASE64_ENCODING;
@@ -592,7 +588,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             final Document docFile;
             try {
-                docFile = dbf.newDocumentBuilder().newDocument();
+                docFile = Utils.getNewDocumentBuilder().newDocument();
             }
             catch (final Exception e) {
                 throw new AOException("No se ha podido crear el documento XML contenedor: " + e, e); //$NON-NLS-1$
@@ -634,7 +630,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // Crea el nuevo documento de firma
         Document docSignature = null;
         try {
-            docSignature = dbf.newDocumentBuilder().newDocument();
+            docSignature = Utils.getNewDocumentBuilder().newDocument();
             if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)) {
                 docSignature.appendChild(docSignature.adoptNode(dataElement));
             }
@@ -1143,7 +1139,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)) {
             try {
                 if (docSignature.getElementsByTagName(signatureNodeName).getLength() == 1) {
-                    final Document newdoc = dbf.newDocumentBuilder().newDocument();
+                    final Document newdoc = Utils.getNewDocumentBuilder().newDocument();
                     newdoc.appendChild(newdoc.adoptNode(docSignature.getElementsByTagName(signatureNodeName).item(0)));
                     docSignature = newdoc;
                 }
@@ -1224,7 +1220,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // obtiene la raiz del documento de firmas
-            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
             // si es detached
             if (AOXMLDSigSigner.isDetached(rootSig)) {
@@ -1362,7 +1358,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         Document docSig;
         Element rootSig;
         try {
-            docSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            docSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
             rootSig = docSig.getDocumentElement();
 
             // si el documento contiene una firma simple se inserta como raiz el
@@ -1653,9 +1649,9 @@ public final class AOXMLDSigSigner implements AOSigner {
         Element rootSig;
         Element rootData;
         try {
-            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
-            final Document docData = dbf.newDocumentBuilder().newDocument();
+            final Document docData = Utils.getNewDocumentBuilder().newDocument();
             rootData = (Element) docData.adoptNode(rootSig.cloneNode(true));
 
             // Obtiene las firmas y las elimina. Para evitar eliminar firmas de
@@ -1782,7 +1778,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final Map<String, String> originalXMLProperties = new Hashtable<>();
         Element root;
         try {
-            this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            this.doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
 
             // Tomamos la configuracion del XML que contrafirmamos
             if (encoding == null) {
@@ -2213,7 +2209,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         Element root;
         final String completePrefix;
         try {
-            this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            this.doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
             root = this.doc.getDocumentElement();
 
             // Identificamos el prefijo que se utiliza en los nodos de firma
@@ -2311,9 +2307,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         try {
             // Carga el documento a validar
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            final Document signDoc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
             final Element rootNode = signDoc.getDocumentElement();
 
             final String xmlSignatureName = XML_SIGNATURE_PREFIX + ":" + XMLConstants.TAG_SIGNATURE; //$NON-NLS-1$
@@ -2369,7 +2363,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         dbf.setNamespaceAware(true);
 
         // Crea un nuevo documento con la raiz "AFIRMA"
-        final Document docAfirma = dbf.newDocumentBuilder().newDocument();
+        final Document docAfirma = Utils.getNewDocumentBuilder().newDocument();
         final Element rootAfirma = docAfirma.createElement(AFIRMA);
 
         // Inserta el documento pasado por parametro en el nuevo documento
@@ -2399,7 +2393,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         dbf.setNamespaceAware(true);
         Element rootSig = null;
         try {
-            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$

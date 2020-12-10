@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.Transform;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -714,7 +715,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	// Construimos el arbol DOM
         Document doc;
         try {
-            doc = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception ex) {
             throw new AOInvalidFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
@@ -946,7 +947,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	Document signDocument;
     	try {
-    		signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
     	}
     	catch (final Exception e) {
     		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
@@ -1019,7 +1020,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	Document signDocument;
     	try {
-    		signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
     	}
     	catch (final Exception e) {
     		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
@@ -1072,7 +1073,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         // Obtenemos el arbol del documento
         final Document signDoc;
         try {
-            signDoc = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            signDoc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
             LOGGER.warning("Se ha producido un error al obtener la estructura de firmas: " + e); //$NON-NLS-1$
@@ -1212,7 +1213,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
         Document signDocument;
         try {
-            signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        	final DocumentBuilder docBuilder = Utils.getNewDocumentBuilder();
+            signDocument = docBuilder.parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
         	LOGGER.log(Level.INFO, "El documento no es un XML"); //$NON-NLS-1$
@@ -1284,7 +1286,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Crea un nuevo documento con la raiz "AFIRMA"
-        final Document docAfirma = XAdESUtil.getNewDocumentBuilder().newDocument();
+        final Document docAfirma = Utils.getNewDocumentBuilder().newDocument();
         final Element rootAfirma = docAfirma.createElement(XAdESConstants.TAG_PARENT_NODE);
         rootAfirma.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
 
@@ -1305,7 +1307,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         // Cargamos el arbol DOM del documento
         Document signDocument;
         try {
-        	signDocument = XAdESUtil.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        	signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$

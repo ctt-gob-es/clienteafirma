@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
@@ -27,11 +28,13 @@ import org.xml.sax.XMLReader;
 /** Clase con m&eacute;todos para el trabajo con ficheros. */
 public final class AOFileUtils {
 
+	private static final String SHORTENER_ELLIPSE = "..."; //$NON-NLS-1$
+
+    private static SAXParserFactory SAX_FACTORY = null;
+
 	private AOFileUtils() {
 		// No permitimos la instanciacion
 	}
-
-	private static final String SHORTENER_ELLIPSE = "..."; //$NON-NLS-1$
 
 	/** Guarda los datos en un temporal.
 	 * @param data Datos a guardar.
@@ -110,12 +113,12 @@ public final class AOFileUtils {
 	 */
     public static boolean isXML(final byte[] data) {
 
-    	final SAXParserFactory factory = SAXParserFactory.newInstance();
-    	factory.setValidating(false);
-    	factory.setNamespaceAware(true);
+    	if (SAX_FACTORY == null) {
+    		SAX_FACTORY = buildSecureSaxFactory();
+    	}
 
     	try {
-    		final SAXParser parser = factory.newSAXParser();
+    		final SAXParser parser = SAX_FACTORY.newSAXParser();
     		final XMLReader reader = parser.getXMLReader();
     		reader.setErrorHandler(
 				new ErrorHandler() {
@@ -143,4 +146,25 @@ public final class AOFileUtils {
     	}
     	return true;
     }
+
+    /**
+     * Construye un parser SAX seguro que no accede a recursos externos.
+     * @return Factor&iacute;a segura.
+     */
+	private static SAXParserFactory buildSecureSaxFactory() {
+		final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+		try {
+			saxFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+		}
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
+					Level.SEVERE,
+					"No se ha podido establecer una caracteristica de seguridad en la factoria XML: " + e); //$NON-NLS-1$
+		}
+
+		saxFactory.setValidating(false);
+		saxFactory.setNamespaceAware(true);
+
+		return saxFactory;
+	}
 }
