@@ -127,29 +127,90 @@
 
 		function createBatchConfiguration() {
 
-			var config1 = AutoScript.getBase64FromText("FileName=C:/salida/batch/FIRMA1.xml");
-			var config2 = AutoScript.getBase64FromText("FileName=C:/salida/batch/FIRMA2.xml");
+			var config1 = AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA1.xml");
+			var config2 = AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA2.xml");
 
+			var i = 0;
 			return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n" + //$NON-NLS-1$
 			"<signbatch stoponerror=\"false\" algorithm=\"SHA256withRSA\">\r\n" + //$NON-NLS-1$
-			" <singlesign Id=\"7725374e-728d-4a33-9db9-3a4efea4cead\">\r\n" + //$NON-NLS-1$
+			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
 			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
 			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
 			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
 			"  <signsaver>\r\n" + //$NON-NLS-1$
 			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
-			"   <config>" + config1 + "</config>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
 			"  </signsaver>\r\n" + //$NON-NLS-1$
 			" </singlesign>\r\n" + //$NON-NLS-1$
- 			" <singlesign Id=\"93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a\">\r\n" + //$NON-NLS-1$
+ 			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
 			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
 			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
 			"  <extraparams>cG9saWN5SWRlbnRpZmllcj11cm46b2lkOjIuMTYuNzI0LjEuMy4xLjEuMi4xLjkKcG9saWN5UXVhbGlmaWVyPWh0dHBzOi8vc2VkZS4wNjAuZ29iLmVzL3BvbGl0aWNhX2RlX2Zpcm1hX2FuZXhvXzEucGRmCnBvbGljeUlkZW50aWZpZXJIYXNoQWxnb3JpdGhtPWh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExCnBvbGljeUlkZW50aWZpZXJIYXNoPUc3cm91Y2Y2MDArZjAzci9vMGJBT1E2V0FzMD0=</extraparams>\r\n" + //$NON-NLS-1$
 			"  <signsaver>\r\n" + //$NON-NLS-1$
 			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
-			"   <config>" + config2 + "</config>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+ 			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>cG9saWN5SWRlbnRpZmllcj11cm46b2lkOjIuMTYuNzI0LjEuMy4xLjEuMi4xLjkKcG9saWN5UXVhbGlmaWVyPWh0dHBzOi8vc2VkZS4wNjAuZ29iLmVzL3BvbGl0aWNhX2RlX2Zpcm1hX2FuZXhvXzEucGRmCnBvbGljeUlkZW50aWZpZXJIYXNoQWxnb3JpdGhtPWh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExCnBvbGljeUlkZW50aWZpZXJIYXNoPUc3cm91Y2Y2MDArZjAzci9vMGJBT1E2V0FzMD0=</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+ 			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>cG9saWN5SWRlbnRpZmllcj11cm46b2lkOjIuMTYuNzI0LjEuMy4xLjEuMi4xLjkKcG9saWN5UXVhbGlmaWVyPWh0dHBzOi8vc2VkZS4wNjAuZ29iLmVzL3BvbGl0aWNhX2RlX2Zpcm1hX2FuZXhvXzEucGRmCnBvbGljeUlkZW50aWZpZXJIYXNoQWxnb3JpdGhtPWh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExCnBvbGljeUlkZW50aWZpZXJIYXNoPUc3cm91Y2Y2MDArZjAzci9vMGJBT1E2V0FzMD0=</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+ 			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>cG9saWN5SWRlbnRpZmllcj11cm46b2lkOjIuMTYuNzI0LjEuMy4xLjEuMi4xLjkKcG9saWN5UXVhbGlmaWVyPWh0dHBzOi8vc2VkZS4wNjAuZ29iLmVzL3BvbGl0aWNhX2RlX2Zpcm1hX2FuZXhvXzEucGRmCnBvbGljeUlkZW50aWZpZXJIYXNoQWxnb3JpdGhtPWh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExCnBvbGljeUlkZW50aWZpZXJIYXNoPUc3cm91Y2Y2MDArZjAzci9vMGJBT1E2V0FzMD0=</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
 			"  </signsaver>\r\n" + //$NON-NLS-1$
 			" </singlesign>\r\n" + //$NON-NLS-1$
 			"</signbatch>"; //$NON-NLS-1$
@@ -337,13 +398,14 @@
   </head>
 	<body>
 		<script>
-			//AutoScript.setForceWSMode(true);
+			AutoScript.setForceWSMode(true);
 			//AutoScript.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
+			//AutoScript.setMinimumClientVersion("1.8");
 			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",
 					Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
-			
+
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
 		<div>
 		 <input id="data" type="hidden">

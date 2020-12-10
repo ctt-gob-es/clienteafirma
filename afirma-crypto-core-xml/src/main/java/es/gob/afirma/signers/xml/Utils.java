@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -660,26 +661,17 @@ public final class Utils {
     	// - https://issues.apache.org/jira/browse/SANTUARIO-482
     	System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
+    	// Instalamos un proveedor de firma XML que nos garantice que la firma se realice correctamente
     	final Provider provider = Security.getProvider(XMLDSIG);
-
     	if (provider == null || forceApacheProvider) {
-    		Class<?> classProvider = null;
     		try {
-    			classProvider = Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
-    			if (provider == null || !classProvider.isInstance(provider)) {
-    				Security.removeProvider(XMLDSIG);
-    				LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
-    				Security.addProvider((Provider) classProvider.getDeclaredConstructor().newInstance());
-    			}
+    			installProvider("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
+    			Security.removeProvider(XMLDSIG);
     		}
     		catch (final Exception e) {
     			try {
-    				classProvider = Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
-    				if (provider == null || !classProvider.isInstance(provider)) {
-    					Security.removeProvider(XMLDSIG);
-    					LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun: " + e); //$NON-NLS-1$
-    					Security.addProvider((Provider) classProvider.getDeclaredConstructor().newInstance());
-    				}
+        			installProvider("org.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
+        			Security.removeProvider(XMLDSIG);
     			}
     			catch (final Exception e2) {
     				LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig de Sun para firmas XML: " + e2); //$NON-NLS-1$
@@ -687,12 +679,36 @@ public final class Utils {
     		}
     	}
 
-    	final XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-    	if (factory != null) {
-    		LOGGER.info("Se usara el proveedor '" + factory.getProvider().getName() + "': " + factory.getProvider().getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+    	try {
+    		final XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+    		if (factory != null) {
+    			LOGGER.info("Se usara el proveedor '" + factory.getProvider().getName() + "': " + factory.getProvider().getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+    		}
+    		else {
+    			LOGGER.warning("No hay proveedor instalado para XMLDSig"); //$NON-NLS-1$
+    		}
     	}
-    	else {
-    		LOGGER.warning("No hay proveedor instalado para XMLDSig"); //$NON-NLS-1$
+    	catch (final Exception e) {
+    		LOGGER.log(Level.SEVERE, "Error en la verificacion de los proveedores XML", e); //$NON-NLS-1$
     	}
+    }
+
+    private static void installProvider(final String clazz) throws ClassNotFoundException,
+    		InstantiationException, IllegalAccessException, IllegalArgumentException,
+    		InvocationTargetException, NoSuchMethodException, SecurityException {
+
+    	// Comprobamos que no este instalado ya
+    	boolean installed = false;
+    	final Provider[] providers = Security.getProviders();
+		for (int i = 0; !installed && i < providers.length; i++) {
+			installed = clazz.equals(providers[i].getClass().getName());
+		}
+
+		if (!installed) {
+			final Class<?> classProvider = Class.forName(clazz);
+			final Provider provider = (Provider) classProvider.getDeclaredConstructor().newInstance();
+			LOGGER.info("Instalamos el proveedor " + provider.getName() + ": " + provider.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+			Security.addProvider(provider);
+		}
     }
 }
