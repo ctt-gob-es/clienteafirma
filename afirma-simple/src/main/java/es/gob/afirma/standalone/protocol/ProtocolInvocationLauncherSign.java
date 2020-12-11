@@ -100,22 +100,17 @@ final class ProtocolInvocationLauncherSign {
 	}
 
 	/**
-	 * Procesa una peticion de firma en invocaci&oacute;n por protocolo y obtiene la
-	 * firma junto con una serie de metadatos en forma de cadena.
-	 *
+	 * Procesa una peticion de firma en invocaci&oacute;n por protocolo y obtiene
+	 * la firma junto con una serie de metadatos en forma de cadena.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket        <code>true</code> para usar comunicaci&oacute;n por
-	 *                        <i>socket</i> local, <code>false</code> para usar
-	 *                        servidor intermedio.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por
+	 * <i>socket</i> local, <code>false</code> para usar servidor intermedio.
 	 * @return Resultado de la operaci&oacute;n o mensaje de error.
-	 * @throws SocketOperationException Si hay errores en la
-	 *                                            comunicaci&oacute;n por
-	 *                                            <i>socket</i> local.
+	 * @throws SocketOperationException Si hay errores en la comunicaci&oacute;n por
+	 * <i>socket</i> local.
 	 * @throws VisibleSignatureMandatoryException si el usuario cancela la
-	 *                                            selecci&oacute;n del area de firma
-	 *                                            visible cuando &eacute;sta es
-	 *                                            obligatoria.
+	 * selecci&oacute;n del &aacute;rea de firma visible cuando &eacute;sta es obligatoria.
 	 */
 	static StringBuilder processSign(final UrlParametersToSign options,
 			final int protocolVersion) throws SocketOperationException {
@@ -128,11 +123,9 @@ final class ProtocolInvocationLauncherSign {
         // Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format(
-					"Version de protocolo no soportada (%1s). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					"Version de protocolo no soportada (%1d). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
-					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())
-				)
-			);
+					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
 			throw new SocketOperationException(errorCode);
 		}
@@ -246,14 +239,13 @@ final class ProtocolInvocationLauncherSign {
 		final Operation cryptoOperation = signOperation.getCryptoOperation();
 
 		// En caso de que no se haya solicitado una operacion de multifirma con
-		// el formato AUTO configuramos el servidor en base al nombre de formato
+		// el formato AUTO, configuramos el servidor en base al nombre de formato
 		AOSigner signer = null;
 		if (!AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
 			signer = AOSignerFactory.getSigner(format);
 			if (signer == null) {
 				LOGGER.severe("No hay un firmador configurado para el formato: " + format); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_FORMAT;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
 				throw new SocketOperationException(errorCode);
 			}
 		}
@@ -287,7 +279,7 @@ final class ProtocolInvocationLauncherSign {
 
 			final String fileExts = extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_EXTS);
 
-			final String fileDesc = options.getExtraParams().getProperty(AfirmaExtraParams.LOAD_FILE_DESCRIPTION,
+			final String fileDesc = extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_DESCRIPTION,
 					ProtocolMessages.getString("ProtocolLauncher.32")) + //$NON-NLS-1$
 				(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
@@ -296,11 +288,17 @@ final class ProtocolInvocationLauncherSign {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 					MacUtils.focusApplication();
 				}
-				selectedDataFile = AOUIFactory.getLoadFiles(dialogTitle,
+				selectedDataFile = AOUIFactory.getLoadFiles(
+					dialogTitle,
 					extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_CURRENT_DIR), // currentDir
 					extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_FILENAME), // fileName
 					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
-						fileDesc, false, false, AutoFirmaUtil.getDefaultDialogsIcon(), null)[0];
+					fileDesc,
+					false, // Select dir
+					false, // Multiselect
+					AutoFirmaUtil.getDefaultDialogsIcon(),
+					null //Parent
+				)[0];
 			} catch (final AOCancelledOperationException e) {
 				LOGGER.info("Carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				throw new SocketOperationException(RESULT_CANCEL);
@@ -310,8 +308,10 @@ final class ProtocolInvocationLauncherSign {
 			inputFilename = selectedDataFile.getName();
 
 			try {
-				try (final InputStream fis = new FileInputStream(selectedDataFile);
-						final InputStream bis = new BufferedInputStream(fis);) {
+				try (
+					final InputStream fis = new FileInputStream(selectedDataFile);
+					final InputStream bis = new BufferedInputStream(fis);
+				) {
 					data = AOUtil.getDataFromInputStream(bis);
 				}
 				if (data == null) {
@@ -324,7 +324,8 @@ final class ProtocolInvocationLauncherSign {
 			}
 		}
 
-		// En caso de haber programado el formato "AUTO", se define el formato de firma
+		// En no haber fijado aun el firmador significa que se selecciono el formato AUTO y
+		// es necesario identificar cual es el que se deberia usar
 		if (signer == null) {
 			format = identifyFormatFromData(data, cryptoOperation);
 			if (format == null) {
@@ -427,21 +428,24 @@ final class ProtocolInvocationLauncherSign {
 			}
 
 			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
-
 			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
 			try {
 				MacUtils.focusApplication();
-				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
-					true, // checkValidity
-						filters, mandatoryCertificate);
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+						ksm,
+						null,
+						true,
+						true, // showExpiredCertificates
+						true, // checkValidity
+						filters,
+						mandatoryCertificate);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 
 				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
 				// que se indico originalmente por haberlo cambiado desde el dialogo de
 				// seleccion)
-				// y de ahi sacamos la referencia a la clave
 				final CertificateContext context = dialog.getSelectedCertificateContext();
 		    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
 				pke = currentKsm.getKeyEntry(context.getAlias());
@@ -451,7 +455,8 @@ final class ProtocolInvocationLauncherSign {
 				} else {
 					ProtocolInvocationLauncher.setStickyKeyEntry(null);
 				}
-			} catch (final AOCancelledOperationException e) {
+			}
+			catch (final AOCancelledOperationException e) {
 				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 				throw new SocketOperationException(RESULT_CANCEL);
 			}
@@ -578,7 +583,7 @@ final class ProtocolInvocationLauncherSign {
 			throw new SocketOperationException(errorCode);
 		}
 		catch (final InvalidSignatureException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "La firma de entrada no es valida", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
 			throw new SocketOperationException(errorCode);
 		}
@@ -674,7 +679,6 @@ final class ProtocolInvocationLauncherSign {
 	 * propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma
 	 * correcta pero, por compatibilidad con los tipos de firmas del Applet pesado,
 	 * se ha incluido aqu&iacute;.
-	 *
 	 * @param format Formato declarado para la firma.
 	 * @param config Par&aacute;metros adicionales declarados para la firma.
 	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>,
@@ -684,8 +688,10 @@ final class ProtocolInvocationLauncherSign {
 	 */
 	@Deprecated
 	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
-		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
-			AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(AfirmaExtraParams.MODE));
+		return format != null
+				&& format.toLowerCase().startsWith("xades") //$NON-NLS-1$
+				&& config != null
+				&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(AfirmaExtraParams.MODE));
 	}
 
 	/**

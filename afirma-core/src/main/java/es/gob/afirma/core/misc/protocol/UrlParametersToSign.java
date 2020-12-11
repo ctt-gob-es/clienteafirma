@@ -60,36 +60,6 @@ public final class UrlParametersToSign extends UrlParameters {
 			ACTIVE_WAITING_PARAM, MINIMUM_CLIENT_VERSION_PARAM
 	};
 
-//	/** Tipo de operaci&oacute;n de firma. */
-//	public enum Operation {
-//
-//		/** Operaci&oacute;n de firma. */
-//		SIGN,
-//
-//		/** Operaci&oacute;n de cofirma. */
-//		COSIGN,
-//
-//		/** Operaci&oacute;n de contrafirma. */
-//		COUNTERSIGN;
-//
-//		/** Obtiene el tipo de operaci&oacute;n de firma a partir de su nombre, o <code>null</code>
-//		 * si el nombre no corresponde a ninguna operaci&oacute;n conocida.
-//		 * @param opName Nombre de la operaci&oacute;n de firma.
-//		 * @return Operaci&oacute;n de firma. */
-//		public static Operation getOperation(final String opName) {
-//			if ("SIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-//				return SIGN;
-//			}
-//			if ("COSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-//				return COSIGN;
-//			}
-//			if ("COUNTERSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-//				return COUNTERSIGN;
-//			}
-//			return null;
-//		}
-//	}
-
 	/** Algoritmos de firma soportados. */
 	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<>();
 	static {
@@ -366,6 +336,4 @@ public final class UrlParametersToSign extends UrlParameters {
 		}
 		return false;
 	}
-
-
 }

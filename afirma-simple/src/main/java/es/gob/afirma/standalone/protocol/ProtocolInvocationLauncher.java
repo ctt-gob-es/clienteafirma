@@ -534,20 +534,40 @@ public final class ProtocolInvocationLauncher {
 				LOGGER.info("Se inicia la operacion de firma y guardado. Version de protocolo: " //$NON-NLS-1$
 						+ requestedProtocolVersion);
 
+				StringBuilder dataToSend;
                 try {
-                	return  ProtocolInvocationLauncherSignAndSave.process(params, requestedProtocolVersion, bySocket);
+                	dataToSend =  ProtocolInvocationLauncherSignAndSave.processSign(params, requestedProtocolVersion);
                 }
-				// solo entra en la excepcion en el caso de que haya que devolver errores a
-				// traves del servidor intermedio
+                // Llegara aqui siempre que tratemos con un error controlado. En caso de estar en
+                // la comunicacion por servidor intermedio, el mensaje de error al servidor
+                // intermedio y despues revolveremos el error. En caso de estar en la comunicacion
+                // por sockets, directamente devolveremos el error.
                 catch(final SocketOperationException e) {
-                	final String msg = e.getErrorCode() == ProtocolInvocationLauncherSignAndSave.getResultCancel()
-                    		? e.getErrorCode()
-                    		: URLEncoder.encode(
-                    				ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
-                    				StandardCharsets.UTF_8.toString());
-                    sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
-                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
+                    LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
+                    final String errorCode = e.getErrorCode();
+                    if (!bySocket) {
+                        String msg;
+                        if (errorCode == ProtocolInvocationLauncherSignAndSave.RESULT_CANCEL) {
+                        	msg = errorCode;
+                        } else if (e.getMessage() != null) {
+                        	msg = errorCode + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString()); //$NON-NLS-1$
+                        } else {
+                        	msg = URLEncoder.encode(
+                        			ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode),
+                        			StandardCharsets.UTF_8.toString());
+                        }
+                        sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    }
+                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
                 }
+
+                // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
+                // espera activa si se encontraba vigente
+                if (!bySocket) {
+                	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
+                }
+
+                return dataToSend.toString();
 			} catch (final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
