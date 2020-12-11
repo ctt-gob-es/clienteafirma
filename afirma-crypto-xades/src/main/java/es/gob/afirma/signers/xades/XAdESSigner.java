@@ -39,7 +39,7 @@ import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -360,8 +360,13 @@ public final class XAdESSigner {
 		Map<String, String> originalXMLProperties = new Hashtable<>();
 
 		// Factoria XML
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
+		DocumentBuilder docBuilder;
+		try {
+			docBuilder = Utils.getNewDocumentBuilder();
+		}
+		catch (final Exception e) {
+			throw new AOException("No se han podido componer la factoria para la construccion de la firma", e); //$NON-NLS-1$
+		}
 
 		// Elemento de datos
 		Element dataElement;
@@ -382,7 +387,7 @@ public final class XAdESSigner {
 		Element signatureInsertionNode = null;
 
 		// Intentamos carga el documento como XML
-		final Document docum = loadDataAsXml(dbf, data);
+		final Document docum = loadDataAsXml(docBuilder, data);
 
 		// Si los datos son XML
 		if (docum != null) {
@@ -505,7 +510,7 @@ public final class XAdESSigner {
 
 				try {
 					// Crea un nuevo nodo XML para contener los datos en base 64
-					final Document docFile = dbf.newDocumentBuilder().newDocument();
+					final Document docFile = docBuilder.newDocument();
 					dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 
 					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
@@ -592,7 +597,7 @@ public final class XAdESSigner {
 		// Crea el nuevo documento de firma si no lo tenemos ya
 		if (docSignature == null) {
 			try {
-				docSignature = dbf.newDocumentBuilder().newDocument();
+				docSignature = docBuilder.newDocument();
 				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
 					// En este caso, dataElement es siempre el XML original a firmar
 					// (o un nodo de este si asi se especifico)
@@ -1258,7 +1263,7 @@ public final class XAdESSigner {
 			try {
 				if (docSignature.getElementsByTagNameNS(XMLConstants.DSIGNNS,
 						XMLConstants.TAG_SIGNATURE).getLength() == 1) {
-					final Document newdoc = dbf.newDocumentBuilder().newDocument();
+					final Document newdoc = docBuilder.newDocument();
 					newdoc.appendChild(
 						newdoc.adoptNode(
 							docSignature.getElementsByTagNameNS(
@@ -1385,15 +1390,15 @@ public final class XAdESSigner {
 
 	/**
 	 * Intenta cargar el documento como un XML.
-	 * @param dbf Factoria para el procesamiento de XML.
+	 * @param docBuilder Procesador de XML.
 	 * @param data Datos a cargar.
 	 * @return Documento XML o {@code null} si no es tal.
 	 */
-	private static Document loadDataAsXml(final DocumentBuilderFactory dbf, final byte[] data) {
+	private static Document loadDataAsXml(final DocumentBuilder docBuilder, final byte[] data) {
 		Document doc;
 		if (data != null) {
 			try {
-				doc = dbf.newDocumentBuilder().parse(
+				doc = docBuilder.parse(
 						new ByteArrayInputStream(data)
 						);
 			}
