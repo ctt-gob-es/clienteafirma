@@ -703,11 +703,7 @@ public final class Utils {
      * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache. */
     public static void installXmlDSigProvider(final boolean forceApacheProvider) {
 
-    	// Correccion al problema insertado en Apache Santuario 2.1.0 (Java 11)
-    	//
-    	// Para que la correccion tenga efecto se requiere Apache Santuario 2.1.2 (a partir de la que
-    	// se implementa la siguiente propiedad) o Java 11.0.5 (que actualiza la version interna de
-    	// Apache santuario a la 2.1.3).
+    	// Correccion al problema insertado en Apache Santuario 2.1.0 (Java 8u272 y Java 11)
     	//
     	// Establecemos la propiedad de Apache Santuario necesaria para que no se agreguen saltos
     	// de linea en los Base64 generados, ya que de hacerlo se utiliza "\r\n" y el "\r" aparece como
@@ -716,6 +712,18 @@ public final class Utils {
     	// Referencias:
     	// - https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8177334
     	// - https://issues.apache.org/jira/browse/SANTUARIO-482
+    	//
+    	// Esta correccion depende del proveedor de seguridad utilizado, que sera
+    	// el de Apache si se encuentra disponible en el servidor o el por defecto
+    	// si no.
+
+    	// OpenJDK 8.0.272 introduce el uso de Apache Santuario 2.1.1. Con esta version,
+    	// pueden omitirse los saltos de linea con la siguiente propiedad.
+    	System.setProperty("com.sun.org.apache.xml.internal.security.lineFeedOnly", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    	// A partir de Apache Santuario 2.1.2 se implementa la siguiente propiedad, tambien disponible
+    	// con Java 11.0.5 (que actualiza la version interna de Apache santuario a la 2.1.3).
+
     	System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
     	// Instalamos un proveedor de firma XML que nos garantice que la firma se realice correctamente
