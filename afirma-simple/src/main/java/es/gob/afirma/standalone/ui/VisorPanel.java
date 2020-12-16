@@ -269,7 +269,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 			return null;
 		}
 		// Solo se muestra la informacion del certificado si hay una unica firma
-		if (AOTreeModel.getChildCount(tree.getRoot()) != 1) {
+		if (tree == null || AOTreeModel.getChildCount(tree.getRoot()) != 1) {
 			return null;
 		}
 		final AOTreeNode node = (AOTreeNode) AOTreeModel.getChild(tree.getRoot(),0);

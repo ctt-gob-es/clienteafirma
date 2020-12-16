@@ -53,6 +53,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -410,9 +411,21 @@ final class SignDataPanel extends JPanel {
         root.add(dataInfoBranch);
 
         // Arbol de firmantes
-        final TreeModelManager treeManager = new TreeModelManager(signInfo.getSignsTree());
-        final DefaultMutableTreeNode signersBranch = treeManager.getSwingTree();
-        signersBranch.setUserObject(SimpleAfirmaMessages.getString("SignDataPanel.29")); //$NON-NLS-1$
+        DefaultMutableTreeNode signersBranch;
+        final AOTreeModel signersTree = signInfo.getSignsTree();
+        if (signersTree != null) {
+        	final TreeModelManager treeManager = new TreeModelManager(signersTree);
+        	signersBranch = treeManager.getSwingTree();
+        	signersBranch.setUserObject(SimpleAfirmaMessages.getString("SignDataPanel.29")); //$NON-NLS-1$
+        	root.add(signersBranch);
+        }
+        else {
+        	signersBranch = new DefaultMutableTreeNode(
+        			SimpleAfirmaMessages.getString("SignDataPanel.29")); //$NON-NLS-1$
+        	final DefaultMutableTreeNode noSignersNode = new DefaultMutableTreeNode(
+        			SimpleAfirmaMessages.getString("SignDataPanel.32")); //$NON-NLS-1$
+        	signersBranch.add(noSignersNode);
+        }
         root.add(signersBranch);
 
         // Sellos de tiempo de la firma
