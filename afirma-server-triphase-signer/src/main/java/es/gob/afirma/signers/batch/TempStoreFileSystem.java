@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
 
@@ -49,7 +50,7 @@ final class TempStoreFileSystem implements TempStore {
 	@Override
 	public void store(final byte[] dataToSave, final SingleSign ss, final String batchId) throws IOException {
 		store(dataToSave, getFilename(ss, batchId));
-		LOGGER.info("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.fine("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -123,19 +124,16 @@ final class TempStoreFileSystem implements TempStore {
 	}
 
 	private static String getFilename(final SingleSign ss, final String batchId) {
-		byte[] id = ss.getId().getBytes();
-		
-		// Si el ID supera los 20 caracteres, usaremos en su lugar el hash
-		// Esto podria llevar a colisiones si se indican ID superiores a 20
-		// caracteres con un hash que resulta ser el ID de otro documento,
-		// pero esto no deberia ocurrir nunca y, de esta forma, no se
-		// tendra que calcular el hash siempre. Cuando se calcula siempre
-		// el hash, se ha comprobado que el espacio de tiempo que transcurre
-		// entre generar el fichero temporal con la firma y que se recupere
-		// es demasiado corto y a veces no se encuentra ese fichero 
-		if (id.length > 20) {
+		byte[] id = ss.getId().getBytes(StandardCharsets.UTF_8);
+
+		// Se calcula el hash del identificador de fichero para usarlo como nombre
+		// del fichero temporal. De esta forma, nos aseguramos de que el nombre
+		// tenga una longitud predefinida
+		synchronized (MD) {
 			id = MD.digest(id);
+			MD.reset();
 		}
+
 		return Base64.encode(id, true) + "." + batchId; //$NON-NLS-1$
 	}
 }

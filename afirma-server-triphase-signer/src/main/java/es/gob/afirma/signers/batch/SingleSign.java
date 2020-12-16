@@ -277,12 +277,7 @@ public final class SingleSign {
 	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo. */
 	Callable<String> getPreProcessCallable(final X509Certificate[] certChain,
                                                   final SingleSignConstants.SignAlgorithm algorithm) {
-		return new Callable<String>() {
-			@Override
-			public String call() throws IOException, AOException {
-				return doPreProcess(certChain, algorithm);
-			}
-		};
+		return new PreProcessCallable(this, certChain, algorithm);
 	}
 
 	/** Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
@@ -338,35 +333,12 @@ public final class SingleSign {
 			                                                          final TriphaseData td,
 			                                                          final SingleSignConstants.SignAlgorithm algorithm,
 			                                                          final String batchId) {
-		return new Callable<CallableResult>() {
-			@Override
-			public CallableResult call() {
-				try {
-					doPostProcess(certChain, td, algorithm, batchId);
-				}
-				catch(final Exception e) {
-					return new CallableResult(getId(), e);
-				}
-				return new CallableResult(getId());
-			}
-		};
-
+		return new PostProcessCallable(this, certChain, td, algorithm, batchId);
 	}
 
 	Callable<CallableResult> getSaveCallable(final TempStore ts, final String batchId) {
-		return new Callable<CallableResult>() {
-			@Override
-			public CallableResult call() {
-				try {
-					save(ts.retrieve(SingleSign.this, batchId));
-				}
-				catch(final Exception e) {
-					LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + SingleSign.this.getId()); //$NON-NLS-1$
-					return new CallableResult(getId(), e);
-				}
-				return new CallableResult(getId());
-			}
-		};
+
+		return new SaveCallable(this, this.signSaver, ts, batchId);
 	}
 
 	/**
@@ -379,7 +351,7 @@ public final class SingleSign {
 
 	/**
 	 * Recupera los datos que se deben procesar.
-	 * @param stored {@code} true, indica que en caso de tratarse de datos remotos, estos ya
+	 * @param stored {@code true}, indica que en caso de tratarse de datos remotos, estos ya
 	 * estar&aacute;n cargados en un temporal y deben tomarse de este; {@code false} indica
 	 * que se deber&aacute;n cargar los datos desde la fuente y, en caso de ser remotos, se
 	 * crear&aacute; un temporal para ellos.
@@ -525,4 +497,80 @@ public final class SingleSign {
 		}
 	}
 
+
+	static class PreProcessCallable implements Callable<String> {
+		private final SingleSign ss;
+		private final X509Certificate[] certChain;
+		private final SingleSignConstants.SignAlgorithm algorithm;
+
+		public PreProcessCallable(final SingleSign ss, final X509Certificate[] certChain,
+                final SingleSignConstants.SignAlgorithm algorithm) {
+			this.ss = ss;
+			this.certChain = certChain;
+			this.algorithm = algorithm;
+		}
+
+		@Override
+		public String call() throws Exception {
+			return SingleSignPreProcessor.doPreProcess(this.ss, this.certChain, this.algorithm);
+		}
+	}
+
+	static class PostProcessCallable implements Callable<CallableResult> {
+
+		private final SingleSign ss;
+		private final X509Certificate[] certChain;
+		private final TriphaseData td;
+		private final SingleSignConstants.SignAlgorithm algorithm;
+		private final String batchId;
+
+		public PostProcessCallable(final SingleSign ss, final X509Certificate[] certChain,
+                final TriphaseData td, final SingleSignConstants.SignAlgorithm algorithm,
+                final String batchId) {
+			this.ss = ss;
+			this.certChain = certChain;
+			this.td = td;
+			this.algorithm = algorithm;
+			this.batchId = batchId;
+		}
+
+		@Override
+		public CallableResult call() {
+			try {
+				SingleSignPostProcessor.doPostProcess(this.ss, this.certChain, this.td, this.algorithm, this.batchId);
+			}
+			catch(final Exception e) {
+				return new CallableResult(this.ss.getId(), e);
+			}
+			return new CallableResult(this.ss.getId());
+		}
+	}
+
+	static class SaveCallable implements Callable<CallableResult> {
+
+		private final SingleSign ss;
+		private final SignSaver signSaver;
+		private final TempStore ts;
+		private final String batchId;
+
+		public SaveCallable(final SingleSign ss, final SignSaver signSaver, final TempStore ts, final String batchId) {
+			this.ss = ss;
+			this.signSaver = signSaver;
+			this.ts = ts;
+			this.batchId = batchId;
+		}
+
+		@Override
+		public CallableResult call() {
+			try {
+				final byte[] dataToSave = this.ts.retrieve(this.ss, this.batchId);
+				this.signSaver.saveSign(this.ss, dataToSave);
+			}
+			catch(final Exception e) {
+				LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId()); //$NON-NLS-1$
+				return new CallableResult(this.ss.getId(), e);
+			}
+			return new CallableResult(this.ss.getId());
+		}
+	}
 }
