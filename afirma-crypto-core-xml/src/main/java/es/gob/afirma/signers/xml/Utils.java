@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.NoSuchMechanismException;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -68,7 +69,11 @@ public final class Utils {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private static final String XMLDSIG = "XMLDSig"; //$NON-NLS-1$
+
     private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
+
+    private static Provider DEFAULT_PROVIDER;
 
 	static {
 		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
@@ -98,6 +103,14 @@ public final class Utils {
 
 		SECURE_BUILDER_FACTORY.setValidating(false);
 		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
+
+		try {
+			final XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+			DEFAULT_PROVIDER = factory.getProvider();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se encontro un proveedor por defecto para la generacion de firmas XML: " + e); //$NON-NLS-1$
+		}
 	}
 
 
@@ -677,16 +690,14 @@ public final class Utils {
 				"DOM", //$NON-NLS-1$
 				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getDeclaredConstructor().newInstance() //$NON-NLS-1$
 			);
-			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
+			LOGGER.fine("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			LOGGER.info("Se usara la factoria XML por defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
+			LOGGER.fine("Se usara la factoria XML por defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
 			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 		return fac;
     }
-
-    private static final String XMLDSIG = "XMLDSig"; //$NON-NLS-1$
 
     /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
      * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache. */
@@ -712,27 +723,27 @@ public final class Utils {
     	if (provider == null || forceApacheProvider) {
     		try {
     			installProvider("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
-    			Security.removeProvider(XMLDSIG);
+				Security.removeProvider(XMLDSIG);
     		}
     		catch (final Exception e) {
+    			LOGGER.warning("No se ha podido instalar el proveedor XMLDSig de Apache: " + e); //$NON-NLS-1$
     			try {
         			installProvider("org.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
         			Security.removeProvider(XMLDSIG);
     			}
     			catch (final Exception e2) {
-    				LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig de Sun para firmas XML: " + e2); //$NON-NLS-1$
+    				LOGGER.warning("No se ha podido instalar el proveedor XMLDSig de Sun: " + e2); //$NON-NLS-1$
     			}
     		}
     	}
 
     	try {
     		final XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-    		if (factory != null) {
-    			LOGGER.info("Se usara el proveedor '" + factory.getProvider().getName() + "': " + factory.getProvider().getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
-    		}
-    		else {
-    			LOGGER.warning("No hay proveedor instalado para XMLDSig"); //$NON-NLS-1$
-    		}
+    		LOGGER.fine("Se usara el proveedor '" + factory.getProvider().getName() + "': " + factory.getProvider().getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    	catch (final NoSuchMechanismException e) {
+    		LOGGER.warning("No hay proveedor instalado para XMLDSig. Se reinstala el proveedor por defecto: " + e); //$NON-NLS-1$
+    		Security.addProvider(DEFAULT_PROVIDER);
     	}
     	catch (final Exception e) {
     		LOGGER.log(Level.SEVERE, "Error en la verificacion de los proveedores XML", e); //$NON-NLS-1$
@@ -754,7 +765,7 @@ public final class Utils {
 			final Class<?> classProvider = Class.forName(clazz);
 			final Provider provider = (Provider) classProvider.getDeclaredConstructor().newInstance();
 			LOGGER.info("Instalamos el proveedor " + provider.getName() + ": " + provider.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
-			Security.addProvider(provider);
+			Security.insertProviderAt(provider, 0);
 		}
     }
 }

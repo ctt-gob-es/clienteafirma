@@ -506,7 +506,7 @@ public final class XAdESSigner {
 			// Para los formatos de firma internally detached y enveloping se convierte el documento a base64
 			if (AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(format) || AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
 
-				LOGGER.info("El documento se convertira a Base64"); //$NON-NLS-1$
+				LOGGER.fine("El documento se convertira a Base64"); //$NON-NLS-1$
 
 				try {
 					// Crea un nuevo nodo XML para contener los datos en base 64
@@ -543,12 +543,12 @@ public final class XAdESSigner {
 					}
 					else {
 						if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
-							LOGGER.info(
+							LOGGER.warning(
 								"El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion" //$NON-NLS-1$
 							);
 						}
 						else {
-							LOGGER.info(
+							LOGGER.fine(
 								"El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion" //$NON-NLS-1$
 							);
 						}
@@ -1403,7 +1403,7 @@ public final class XAdESSigner {
 						);
 			}
 			catch (final Exception e) {
-				LOGGER.info("Los datos proporcionados no son XML"); //$NON-NLS-1$
+				LOGGER.fine("Los datos proporcionados no son XML"); //$NON-NLS-1$
 				doc = null;
 			}
 		}
