@@ -9,5 +9,6 @@
 	<indexitem text="Ventana de configuraci&oacute;n de plugins" target="MenuPlugins" />
 	<indexitem text="Ventana de configuraci&oacute;n de proxy" target="VentanaConfigurarProxy" />
 	<indexitem text="Ventana de configuraci&oacute;n de firma visible PDF" target="VentanaPdfVisible" />
+	<indexitem text="Uso por l&iacute;nea de comandos" target="LineaComandos" />
 	<indexitem text="Licencia" target="Licencia" />
 </index>

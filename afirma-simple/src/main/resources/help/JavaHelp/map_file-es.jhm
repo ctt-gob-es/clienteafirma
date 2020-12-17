@@ -10,5 +10,6 @@
 	<mapID target="MenuPlugins" url="../Spanish.lproj/pgs/MenuPlugins.html" />
 	<mapID target="VentanaConfigurarProxy" url="../Spanish.lproj/pgs/VentanaConfigurarProxy.html" />
 	<mapID target="VentanaPdfVisible" url="../Spanish.lproj/pgs/VentanaPdfVisible.html" />
+	<mapID target="LineaComandos" url="../Spanish.lproj/pgs/LineaComandos.html" />
 	<mapID target="Licencia" url="../Spanish.lproj/pgs/Licencia.html" />
 </map>

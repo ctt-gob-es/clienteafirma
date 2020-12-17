@@ -43,6 +43,10 @@
 			<param name="Local" value="Spanish.lproj\pgs\VentanaPdfVisible.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Uso por l&iacute;nea de comandos">
+			<param name="Local" value="Spanish.lproj\pgs\LineaComandos.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Licencia de uso y distribuci&oacute;n">
 			<param name="Local" value="Spanish.lproj\pgs\Licencia.html">
 			</OBJECT>

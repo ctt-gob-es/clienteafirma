@@ -15,6 +15,7 @@
 		<tocitem text="Ventana de configuraci&oacute;n de plugins" target="MenuPlugins" />
 		<tocitem text="Ventana de configuraci&oacute;n de proxy" target="VentanaConfigurarProxy" />
 		<tocitem text="Ventana de configuraci&oacute;n de firma visible PDF" target="VentanaPdfVisible" />
+		<tocitem text="Uso por l&iacute;nea de comandos" target="LineaComandos" />
 		<tocitem text="Licencias" target="Licencia" />
 	</tocitem>
 </toc>
