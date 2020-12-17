@@ -159,6 +159,7 @@ public final class PAdESTriPhaseSigner {
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      *                Deben usarse exactamente los mismos valores en la post-firma.
      * @param signTime Momento de la firma. Debe usarse exactamente el mismo valor en la post-firma.
+     * @param secureMode Modo seguro.
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException En caso de errores de entrada / salida
      * @throws AOException En caso de cualquier otro tipo de error
@@ -167,13 +168,14 @@ public final class PAdESTriPhaseSigner {
                                         final byte[] inPDF,
                                         final Certificate[] signerCertificateChain,
                                         final GregorianCalendar signTime,
-                                        final Properties xParams) throws IOException,
+                                        final Properties xParams,
+                                        final boolean secureMode) throws IOException,
                                                                          AOException,
                                                                          InvalidPdfException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final PdfTriPhaseSession ptps = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
+        final PdfTriPhaseSession ptps = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams, secureMode);
 
         // Rango de bytes del PDF que debe firmarse
         final byte[] pdfRangeBytes = AOUtil.getDataFromInputStream(ptps.getSAP().getRangeStream());
@@ -230,6 +232,7 @@ public final class PAdESTriPhaseSigner {
      * @param enhancer Manejador para la generaci&oacute;n de nuevos modos de firma (con
      *                 sello de tiempo, archivo longevo, etc.)
      * @param enhancerConfig Configuraci&oacute;n para generar el nuevo modo de firma.
+     * @param secureMode Modo seguro.
      * @return PDF firmado.
      * @throws AOException en caso de cualquier tipo de error.
      * @throws IOException Cuando ocurre algun error en la conversi&oacute;n o generaci&oacute;n
@@ -241,7 +244,8 @@ public final class PAdESTriPhaseSigner {
                                   final byte[] pkcs1Signature,
                                   final PdfSignResult preSign,
                                   final SignEnhancer enhancer,
-                                  final Properties enhancerConfig) throws AOException,
+                                  final Properties enhancerConfig,
+                                  final boolean secureMode) throws AOException,
                                                                           IOException,
                                                                           NoSuchAlgorithmException {
     	// Obtenemos la firma
@@ -262,7 +266,8 @@ public final class PAdESTriPhaseSigner {
     	return insertSignatureOnPdf(
     		inPdf,
     		signerCertificateChain,
-    		completePdfSSignature
+    		completePdfSSignature,
+    		secureMode
 		);
     }
 
@@ -335,7 +340,8 @@ public final class PAdESTriPhaseSigner {
 
     private static byte[] insertSignatureOnPdf(final byte[] inPdf,
     		                                   final Certificate[] signerCertificateChain,
-    		                                   final PdfSignResult signature) throws AOException, IOException {
+    		                                   final PdfSignResult signature,
+    		                                   final boolean secureMode) throws AOException, IOException {
         final byte[] outc = new byte[CSIZE];
 
         if (signature.getSign().length > CSIZE) {
@@ -350,7 +356,7 @@ public final class PAdESTriPhaseSigner {
 
         final PdfTriPhaseSession pts;
 		try {
-			pts = PdfSessionManager.getSessionData(inPdf, signerCertificateChain, signature.getSignTime(), signature.getExtraParams());
+			pts = PdfSessionManager.getSessionData(inPdf, signerCertificateChain, signature.getSignTime(), signature.getExtraParams(), secureMode);
 		}
 		catch (final InvalidPdfException e) {
 			throw new IOException(e);

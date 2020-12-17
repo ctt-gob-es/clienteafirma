@@ -40,6 +40,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOConfigurableContext;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -648,6 +649,13 @@ final class CommandLineLauncher {
 		}
 		else {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", format)); //$NON-NLS-1$
+		}
+
+		// Si el firmador admite la configuracion de su contexto, rebajamos el modo de seguridad para permitir
+		// que se puedan hacer cosas tales como cargar los recursos del firmador a partir de ficheros en lugar
+		// de deber proveerlos directamente como parmetros
+		if (signer instanceof AOConfigurableContext) {
+			((AOConfigurableContext) signer).setSecureMode(false);
 		}
 
 		// Obtenemos el resultado de la operacion adecuada

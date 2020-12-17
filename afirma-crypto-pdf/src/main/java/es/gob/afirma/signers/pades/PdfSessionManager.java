@@ -68,6 +68,7 @@ public final class PdfSessionManager {
      * @param certChain Cadena de certificados del firmante
      * @param signTime Hora de la firma
      * @param xParams Par&aacute;metros adicionales de la firma
+     * @param secureMode Modo seguro.
      * @return Datos PDF relevantes en cuanto a las firmas electr&oacute;nicas
      * @throws IOException En caso de errores de entrada / salida.
      * @throws InvalidPdfException Si el formato del documento no es v&aacute;lido.
@@ -76,7 +77,8 @@ public final class PdfSessionManager {
     public static PdfTriPhaseSession getSessionData(final byte[] pdfBytes,
                                                     final Certificate[] certChain,
                                                     final Calendar signTime,
-                                                    final Properties xParams) throws IOException,
+                                                    final Properties xParams,
+                                                    final boolean secureMode) throws IOException,
                                                                                          InvalidPdfException,
                                                                                          AOException {
 
@@ -93,7 +95,7 @@ public final class PdfSessionManager {
     	final int signatureRotation = Integer.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION, DEFAULT_SIGNATURE_ROTATION));
 
     	// Imagen de la rubrica
-		final com.aowagie.text.Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
+		final com.aowagie.text.Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE), secureMode);
 
 		// Motivo de la firma
 		final String reason = extraParams.getProperty(PdfExtraParams.SIGN_REASON);
@@ -362,7 +364,7 @@ public final class PdfSessionManager {
                 )
             );
             extraParams.put("userPassword", userPwd); //$NON-NLS-1$
-            return getSessionData(inPDF, certChain, signTime, extraParams);
+            return getSessionData(inPDF, certChain, signTime, extraParams, secureMode);
 		}
 
 		// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco para poner ahi la firma
@@ -397,10 +399,10 @@ public final class PdfSessionManager {
 		PdfUtil.enableLtv(stp);
 
 		// Adjuntos
-		PdfPreProcessor.attachFile(extraParams, stp);
+		PdfPreProcessor.attachFile(extraParams, stp, secureMode);
 
 		// Imagenes
-		PdfPreProcessor.addImage(extraParams, stp, pdfReader);
+		PdfPreProcessor.addImage(extraParams, stp, pdfReader, secureMode);
 
 		// Establecemos el render segun iText antiguo, varia en versiones modernas
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);

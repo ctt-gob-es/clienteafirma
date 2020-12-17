@@ -34,6 +34,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOConfigurableContext;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -63,7 +64,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
  * <p>
  *  La clase necesita espec&iacute;ficamente la versi&oacute;n de iText 2.1.7 modificada para el Cliente &#64;firma.
  * </p> */
-public final class AOPDFSigner implements AOSigner {
+public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
@@ -195,7 +196,8 @@ public final class AOPDFSigner implements AOSigner {
 				data,
 				certificateChain,
 				signTime,
-				extraParams
+				extraParams,
+				this.secureMode
 			);
 		}
         catch (final InvalidPdfException e) {
@@ -229,7 +231,8 @@ public final class AOPDFSigner implements AOSigner {
 				interSign,
 				pre,
 				getSignEnhancer(), // SignEnhancer
-				getSignEnhancerConfig()  // EnhancerConfig (si le llega null usa los ExtraParams)
+				getSignEnhancerConfig(),  // EnhancerConfig (si le llega null usa los ExtraParams)
+				this.secureMode
 			);
 		}
         catch (final NoSuchAlgorithmException e) {
@@ -706,5 +709,17 @@ public final class AOPDFSigner implements AOSigner {
 				LOGGER.warning("Se ignoraran los commitment type indications establecidos por haberse indicado una razon de firma"); //$NON-NLS-1$
 				extraParams.remove(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS);
 		}
+    }
+
+    private boolean secureMode = true;
+
+    @Override
+    public void setSecureMode(final boolean secure) {
+    	this.secureMode = secure;
+    }
+
+    @Override
+    public boolean isSecureMode() {
+    	return this.secureMode;
     }
 }

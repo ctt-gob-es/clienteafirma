@@ -10,6 +10,8 @@
 package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -23,6 +25,7 @@ import com.aowagie.text.pdf.PdfContentByte;
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /** Utilidades para el manejo y modificaci&oacute;n de PDF antes de firmarlo.
@@ -30,6 +33,9 @@ import es.gob.afirma.core.misc.Base64;
 public final class PdfPreProcessor {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+
+    /** Tama&ntilde;o m&aacute;ximo de ruta de un recurso. */
+	private static final int MAX_PATH_SIZE = 500;
 
     private static final int LAST_PAGE = -1;
     private static final int ALL_PAGES = 0;
@@ -49,7 +55,7 @@ public final class PdfPreProcessor {
 		stp.setMoreInfo(moreInfo);
 	}
 
-	static void attachFile(final Properties extraParams, final PdfStamper stp) throws IOException {
+	static void attachFile(final Properties extraParams, final PdfStamper stp, final boolean secureMode) throws IOException {
 		if (extraParams == null) {
 			return;
 		}
@@ -65,14 +71,39 @@ public final class PdfPreProcessor {
 		// Descripcion del adjunto
 		final String attachmentDescription = extraParams.getProperty(PdfExtraParams.ATTACH_DESCRIPTION);
 
+
 		if (b64Attachment != null && attachmentFileName != null) {
-			final byte[] attachment;
-			try {
-				attachment = Base64.decode(b64Attachment);
+
+			byte[] attachment = null;
+
+			// Si no tenemos habilitado el modo seguro, permitiriamos que el recurso se cargue desde una
+			// ruta externa
+			if (!secureMode) {
+				// Permitimos un tamano maximo de ruta para no interpretar como ruta
+				// un base 64 grande
+				if (b64Attachment.length() < MAX_PATH_SIZE) {
+					try {
+						final URI uri = AOUtil.createURI(b64Attachment);
+						try (InputStream is = AOUtil.loadFile(uri)) {
+							attachment = AOUtil.getDataFromInputStream(is);
+						}
+					} catch (final Exception e) {
+						LOGGER.info("El parametro de adjunto no contiene una ruta valida a un recurso: " + e); //$NON-NLS-1$
+						attachment = null;
+					}
+				}
 			}
-			catch(final IOException e) {
-				LOGGER.warning("Se ha indicado un adjunto, pero no estaba en formato Base64, se ignorara : " + e); //$NON-NLS-1$
-				return;
+
+			// Si estaba configurado el modo seguro o el parametro de adjunto no era una ruta,
+			// interpretamos que es un Base 64 con el propio adjunto
+			if (attachment == null) {
+				try {
+					attachment = Base64.decode(b64Attachment);
+				}
+				catch(final IOException e) {
+					LOGGER.warning("Se ha indicado un adjunto, pero no estaba en formato Base64, se ignorara : " + e); //$NON-NLS-1$
+					return;
+				}
 			}
 			stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
 		}
@@ -99,9 +130,38 @@ public final class PdfPreProcessor {
 			                     final int pageNum,
 			                     final String url,
 			                     final PdfStamper stp) throws IOException {
+		Image image;
+		try {
+			image = new Jpeg(jpegImage);
+		}
+		catch (final DocumentException e) {
+			throw new IOException("Error durante la carga de la imagen JPG", e); //$NON-NLS-1$
+		}
+		addImage(image, width, height, left, bottom, pageNum, url, stp);
+	}
+
+	/** Sobreimpone una imagen JPEG en un documento PDF.
+	 * @param image Imagen JPEG
+	 * @param width Ancho de la imagen
+	 * @param height Alto de la imagen
+	 * @param left Distancia de la imagen al borde izquiero de la p&aacute;gina del PDF
+	 * @param bottom Distancia de la imagen al borde inferior de la p&aacute;gina del PDF
+	 * @param pageNum N&uacute;mero de p&aacute;gina del PDF donde insertar la imagen
+	 *                (la numeraci&oacute;n comienza en 1)
+	 * @param url URL a la que enlazar&aacute; la imagen si queremos que esta sea un hiperv&iacute;nculo
+	 *            (puede ser <code>null</code>)
+	 * @param stp Estampador PDF de iText
+	 * @throws IOException En caso de errores de entrada / salida */
+	private static void addImage(final Image image,
+			                     final int width,
+			                     final int height,
+			                     final int left,
+			                     final int bottom,
+			                     final int pageNum,
+			                     final String url,
+			                     final PdfStamper stp) throws IOException {
 		final PdfContentByte content = stp.getOverContent(pageNum);
 		try {
-			final Image image = new Jpeg(jpegImage);
 			if (url != null) {
 				image.setAnnotation(new Annotation(0, 0, 0, 0, url));
 			}
@@ -127,7 +187,7 @@ public final class PdfPreProcessor {
 	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo.
 	 * @param pdfReader Lector PDF, para obtener el n&uacute;mero de p&aacute;ginas del documento.
 	 * @throws IOException Cuando ocurren errores de entrada / salida. */
-	static void addImage(final Properties extraParams, final PdfStamper stp, final PdfReader pdfReader) throws IOException {
+	static void addImage(final Properties extraParams, final PdfStamper stp, final PdfReader pdfReader, final boolean secureMode) throws IOException {
 
 		if (extraParams == null || stp == null) {
 			return;
@@ -137,7 +197,12 @@ public final class PdfPreProcessor {
 		if (imageDataBase64 == null || imageDataBase64.length() < 1) {
 			return;
 		}
-		final byte[] image = Base64.decode(imageDataBase64);
+
+		final Image image = getImage(imageDataBase64, secureMode);
+		if (image == null) {
+			throw new IOException("No se pudo cargar la imagen para agregarla al PDF"); //$NON-NLS-1$
+		}
+
 
 		final Rectangle rect = PdfUtil.getPositionOnPage(extraParams, PdfExtraParams.IMAGE);
 
@@ -188,25 +253,51 @@ public final class PdfPreProcessor {
 		LOGGER.info("Anadida imagen al PDF antes de la firma"); //$NON-NLS-1$
 	}
 
-    static com.aowagie.text.Image getImage(final String imagebase64Encoded) {
-    	if (imagebase64Encoded == null || imagebase64Encoded.isEmpty()) {
+    static com.aowagie.text.Image getImage(final String imageReference, final boolean secureMode)
+    		throws IOException {
+    	if (imageReference == null || imageReference.isEmpty()) {
     		return null;
     	}
-    	final byte[] image;
+
+    	byte[] image = null;
+
+    	// Si no tenemos habilitado el modo seguro, permitiriamos que la imagen se cargue desde una
+    	// ruta externa
+    	if (!secureMode) {
+    		// Permitimos un tamano maximo de ruta para no interpretar como ruta
+    		// un base 64 grande
+    		if (imageReference.length() < MAX_PATH_SIZE) {
+    			try {
+    				final URI uri = AOUtil.createURI(imageReference);
+    				try (InputStream is = AOUtil.loadFile(uri)) {
+    					image = AOUtil.getDataFromInputStream(is);
+    				}
+    			} catch (final Exception e) {
+    				throw new IOException("El parametro de imagen no contiene una ruta valida a un recurso", e); //$NON-NLS-1$
+    			}
+    		}
+    	}
+
+    	// Si estaba configurado el modo seguro o el parametro de imagen no era una ruta,
+    	// interpretamos que es un Base 64 con la propia imagen
+    	if (image == null) {
+
+    		try {
+    			image = Base64.decode(imageReference);
+    		}
+    		catch (final Exception e) {
+    			throw new IOException("Se ha proporcionado una imagen de rubrica que no esta codificada en Base64", e); //$NON-NLS-1$
+    		}
+    	}
+
+    	Image jpgImage;
     	try {
-			image = Base64.decode(imagebase64Encoded);
+			jpgImage = new Jpeg(image);
 		}
     	catch (final Exception e) {
-    		LOGGER.severe("Se ha proporcionado una imagen de rubrica que no esta codificada en Base64: " + e); //$NON-NLS-1$
-			return null;
+    		throw new IOException("Se ha proporcionado una imagen de rubrica que no esta codificada en JPEG", e); //$NON-NLS-1$
 		}
-    	try {
-			return new Jpeg(image);
-		}
-    	catch (final Exception e) {
-    		LOGGER.info("Se ha proporcionado una imagen de rubrica que no esta codificada en JPEG: " + e); //$NON-NLS-1$
-		}
-    	return null;
+    	return jpgImage;
     }
 
 }

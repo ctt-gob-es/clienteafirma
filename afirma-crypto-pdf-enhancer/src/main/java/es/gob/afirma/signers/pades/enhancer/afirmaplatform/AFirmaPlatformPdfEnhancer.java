@@ -168,19 +168,19 @@ final class AFirmaPlatformPdfEnhancer {
 
 		 //Configuracion especifica para los perfiles DSS
 		 //Servicio de Validacion y Actualizacion de Firma
-		 if(servicio.equals("DSSAfirmaVerify")) { //$NON-NLS-1$
+		 if (servicio.equals("DSSAfirmaVerify")) { //$NON-NLS-1$
 				servicioDSS = "verify"; //$NON-NLS-1$
 		 }
 		 //Servicio de Firma Delegada
-     	 else if(servicio.equals("DSSAfirmaSign")) { //$NON-NLS-1$
+     	 else if (servicio.equals("DSSAfirmaSign")) { //$NON-NLS-1$
 				servicioDSS = "sign"; //$NON-NLS-1$
      	 }
 		 //Servicio de Registro de Firmas
-		 else if(servicio.equals("DSSAfirmaArchiveSubmit")) { //$NON-NLS-1$
+		 else if (servicio.equals("DSSAfirmaArchiveSubmit")) { //$NON-NLS-1$
 				servicioDSS = "archiveSubmit"; //$NON-NLS-1$
 		 }
 		 //Servicio de obtencion de firmas
-		 else if(servicio.equals("DSSAfirmaArchiveRetrieval")) { //$NON-NLS-1$
+		 else if (servicio.equals("DSSAfirmaArchiveRetrieval")) { //$NON-NLS-1$
 			    servicioDSS = "archiveRetrieval"; //$NON-NLS-1$
 		 }
 
