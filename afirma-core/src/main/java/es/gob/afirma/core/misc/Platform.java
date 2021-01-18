@@ -19,6 +19,24 @@ public final class Platform {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** Arquitectura del procesador. */
+    public enum MACHINE {
+    	/** x86 32 bits. */
+    	X86,
+    	/** ARM 32 bits. */
+    	ARM32,
+    	/** MIPS 32 bits. */
+    	MIPS32,
+    	/** AMD64 / x86_64 (64 bits). */
+    	AMD64,
+    	/** ARM 64 bits. */
+    	ARM64,
+    	/** MIPS 64 bits. */
+    	MIPS64,
+    	/** Otro */
+    	OTHER
+    }
+
     /** Sistema operativo. */
     public enum OS {
         /** Microsoft Windows. */
@@ -69,6 +87,33 @@ public final class Platform {
     /** Constructor bloqueado. */
     private Platform() {
         // No permitimos la instanciacion
+    }
+
+    /** Obtiene la arquitectura de procesador de la m&aacute;quina actual.
+     * @return Arquitectura de procesador de la m&aacute;quina actual. */
+    public static MACHINE getMachineType() {
+    	final String osArch = System.getProperty("os.arch"); //$NON-NLS-1$
+    	if (osArch == null) {
+    		LOGGER.warning("No se ha podido determinar el la arquitectura del procesador"); //$NON-NLS-1$
+            return MACHINE.OTHER;
+    	}
+    	if (osArch.equals("aarch64") || osArch.startsWith("arm64")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return MACHINE.ARM64;
+    	}
+    	if (osArch.equals("mips64")) { //$NON-NLS-1$
+    		return MACHINE.MIPS64;
+    	}
+    	if (osArch.equals("mips")) { //$NON-NLS-1$
+    		return MACHINE.MIPS32;
+    	}
+    	if (osArch.equals("x86_64")) { //$NON-NLS-1$
+    		return MACHINE.AMD64;
+    	}
+    	if (osArch.equals("x86")) { //$NON-NLS-1$
+    		return MACHINE.X86;
+    	}
+    	LOGGER.warning("No se ha podido determinar el la arquitectura del procesador: " + osArch); //$NON-NLS-1$
+        return MACHINE.OTHER;
     }
 
     private static OS recoverOsName() {
@@ -148,9 +193,9 @@ public final class Platform {
         	}
         	catch(final Exception e) {
         		LOGGER.severe(
-    				"No se ha podido determinar si la JVM es de 32 o 64 bits, se asume que es 32: " + e //$NON-NLS-1$
+    				"No se ha podido determinar si la JVM es de 32 o 64 bits, se asume que es 64: " + e //$NON-NLS-1$
 				);
-        		return "32"; //$NON-NLS-1$
+        		return "64"; //$NON-NLS-1$
         	}
         }
         return javaArch;
@@ -216,7 +261,20 @@ public final class Platform {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return File.separator;
         }
-        return System.getProperty("SystemRoot"); //$NON-NLS-1$
+        String systemRoot = System.getProperty("SystemRoot"); //$NON-NLS-1$
+        if (systemRoot == null) {
+            final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
+            final File winSys32 = new File(defaultSystemRoot + "\\system32"); //$NON-NLS-1$
+            if (winSys32.isDirectory()) {
+                return defaultSystemRoot;
+            }
+        }
+        if (systemRoot == null) {
+            LOGGER
+            .warning("No se ha encontrado el directorio ra&iacute;z del sistema, se devolver&aacute;: " + File.separator); //$NON-NLS-1$
+            return File.separator;
+        }
+        return systemRoot;
     }
 
     /** Devuelve el directorio principal de bibliotecas del sistema.
