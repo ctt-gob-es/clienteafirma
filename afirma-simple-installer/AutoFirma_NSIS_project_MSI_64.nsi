@@ -126,6 +126,7 @@ Section "Programa" sPrograma
 	
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
+	StrCpy $PATH "AutoFirma"
 	
 	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
 	System::Call 'kernel32::GetCurrentProcess()i.r0'
@@ -134,38 +135,35 @@ Section "Programa" sPrograma
 	IntCmp $1 1 +2 0 0
 		Quit
 
-	StrCpy $PATH "AutoFirma"
+	;Se cierra Firefox y Chrome si están abiertos
+	${nsProcess::FindProcess} "firefox.exe" $R2
+	StrCmp $R2 0 0 +1
+	${nsProcess::KillProcess} "firefox.exe" $R0
+	
+	${nsProcess::FindProcess} "chrome.exe" $R3
+	StrCmp $R3 0 0 +1
+	${nsProcess::KillProcess} "chrome.exe" $R0
 
-	;Comprueba que exista ya una version EXE instalada y la desinstala si existe
-	ClearErrors
-	;Leemos el directorio de instalacion de la version actual de la aplicacion, si estuviese instalada
-	ReadRegStr $R0 HKLM SOFTWARE\$PATH "InstallDir"
-	;Leemos el comando de desinstalacion de la aplicacion
-	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	
-	;Si encontramos el comando de desinstalacion, lo ejecutamos en modo silencioso para eliminar la anterior version
-	;anterior de la aplicacion. Antes de hacerlo, cerramos Firefox y Chrome para evitar que el proceso de desinstalacion
-	;se quede bloqueado pidiendo al usuario que los cierre
-	StrCmp $R1 "" +10
-		;Se cierra Firefox y Chrome si estan abiertos
-		${nsProcess::FindProcess} "firefox.exe" $R2
-		StrCmp $R2 0 0 +1
-		${nsProcess::KillProcess} "firefox.exe" $R3
-		${nsProcess::FindProcess} "chrome.exe" $R2
-		StrCmp $R2 0 0 +1
-		${nsProcess::KillProcess} "chrome.exe" $R3
-		;Indicamos el directorio de instalacion anterior para asegurar que se borrar ese
-		ExecWait '"$R1" /S _?=$R0'
-		;Si el anterior directorio de instalacion y el nuevo fuesen distintos, nos aseguramos de borrar el viejo
-		StrCmp $R0 $INSTDIR +2
-			RMDir /r /REBOOTOK '$0'
-			
-	;Si en el directorio de instalacion nuevo ya existiese el directorio interno, lo eliminamos
-	IfFileExists $INSTDIR\$PATH\*.* 0 +2
-		RMDir /r $INSTDIR\$PATH
-		
-	;Iniciamos el proceso de instalacion
-	
+	${nsProcess::Unload}
+
+	Sleep 2000
+
+	;Eliminamos posibles versiones antiguas de 64 bits
+	SetRegView 64
+	Call RemoveOldVersions
+
+	;Eliminamos posibles versiones antiguas de 32 bits
+	SetRegView 32
+	Call RemoveOldVersions
+
+	;Establecemos la vista del registro acorde a la arquitectura del instalador
+	SetRegView 64
+
+	;Eliminamos el directorio de instalacion si existia
+	RMDir /r '$INSTDIR\$PATH'
+
+	;Iniciamos la instalacion
+
 	;El desinstalador del MSI lo dejamos en el directorio principal
 	;Este fichero ya esta incluido en el propio MSI pero cuando se instala el MSI sobre una
 	;instalacion con EXE, al ejecutar el proceso de desinstalacion del EXE se elimina este
@@ -176,20 +174,19 @@ Section "Programa" sPrograma
 	;Los ficheros de la aplicacion los dejamos en un subdirectorio
 	SetOutPath $INSTDIR\$PATH
 
-	;Incluimos la JRE
+	;Copiamos la JRE
 	File /r java64\jre
 	
-	;Incluimos todos los ficheros que componen nuestra aplicacion
+	;Copiamos todos los ficheros que componen nuestra aplicacion
 	File  AutoFirma64\AutoFirma.exe
 	File  AutoFirma64\AutoFirmaConfigurador.exe
 	File  AutoFirma64\AutoFirmaCommandLine.exe
-	
 	File  licencia.txt
 	File  ic_firmar.ico
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
-   SetShellVarContext all
-
+    SetShellVarContext all
+	
 	;Creamos un acceso directo en el escitorio salvo que se haya configurado lo contrario
 	StrCmp $CREATE_ICON "false" +2
 		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
@@ -253,35 +250,24 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
-	
+
+
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
 	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\$PATH\autofirma.pfx"
-	
-	;Se cierra Firefox y Chrome si están abiertos
-	${nsProcess::FindProcess} "firefox.exe" $R2
-	StrCmp $R2 0 0 +1
-	${nsProcess::KillProcess} "firefox.exe" $R0
-	
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "chrome.exe" $R0
 
-	${nsProcess::Unload}
-
-	Sleep 2000
-	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R4 ""
 	StrCmp $FIREFOX_SECURITY_ROOTS "true" 0 +2
 		StrCpy $R4 "-firefox_roots"
-	
+
 	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 /passive'
+
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
-	
+
 	; Importamos el certificado en el sistema
 	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Sleep 2000
@@ -290,7 +276,7 @@ Section "Programa" sPrograma
 	;${If} $0 != success
 	  ;MessageBox MB_OK "Error en la importación: $0"
 	;${EndIf}
-	
+
 	;Se actualiza la variable PATH con la ruta de instalacion
 	Push "$INSTDIR\$PATH"
 	Call AddToPath
@@ -309,13 +295,6 @@ SectionEnd
 !define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
 !define CERT_STORE_ADD_ALWAYS 4
 
-; StrContains
-; This function does a case sensitive searches for an occurrence of a substring in a string. 
-; It returns the substring if it is found. 
-; Otherwise it returns null(""). 
-; Written by kenglish_hi
-; Adapted from StrReplace written by dandaman32
- 
 ;Function AddCertificateToStore
  
 Function AddCertificateToStore
@@ -426,6 +405,47 @@ Function DeleteCertificateOnInstall
   Pop $0
 FunctionEnd 
 
+; Funcion para eliminar versiones anteriores de AutoFirma. Las versiones se
+; buscan a traves del registro, para lo cual afecta si se tiene configurada la
+; vista de 32 o 64 bits
+; Uso:
+;   Call RemoveOldVersions
+Function RemoveOldVersions
+  
+	; Comprueba que no este ya instalada
+	ClearErrors
+
+	;Comprobamos si la aplicacion ya esta registrada
+	ReadRegStr $R0 HKLM SOFTWARE\$PATH "InstallDir"
+	${If} ${Errors}
+		Goto End
+	${EndIf}
+
+	;Buscamos el desinstalador de esa verion y lo ejecutamos
+	;Esto funciona tambien para las versiones MSI, ya que estas
+	;ya se habran desregistrado al iniciarse el proceso de instalacion
+	;de este nuevo MSI
+	StrCpy $R1 ""
+	IfFileExists "$R0\uninstall.exe" 0 +2
+		StrCpy $R1 "uninstall.exe"
+	IfFileExists "$R0\no_ejecutar_x64.exe" 0 +2
+		StrCpy $R1 "no_ejecutar_x64.exe"
+	IfFileExists "$R0\no_ejecutar_x86.exe" 0 +2
+		StrCpy $R1 "no_ejecutar_x86.exe"
+
+	;Ejecutamos el desinstalador si se ha encontrado y lo eliminamos despues
+	StrCmp $R1 "" +3 0
+		ExecWait '"$R0\$R1" /S _?=$R0'
+		RMDir /r $R1
+
+	;Si el directorio de instalacion nuevo es distinto al anterior,
+	;nos aseguramos del borrado eliminandolo
+	StrCmp $INSTDIR $R0 +2 0
+		RMDir /r /REBOOTOK $R0
+
+	End:
+
+FunctionEnd
 
 ;--------------------------------------------------------------------
 ; Path functions

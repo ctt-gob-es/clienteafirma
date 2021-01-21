@@ -1,6 +1,7 @@
 ;Incluimos el Modern UI
   !include "MUI.nsh"
   !include "nsProcess.nsh"
+  !include "Registry.nsh"
   !include "Sections.nsh"
 
 ;Seleccionamos el algoritmo de compresion utilizado para comprimir nuestra aplicacion
@@ -38,7 +39,7 @@ SetCompressor lzma
   ;Pagina final
   !insertmacro MUI_PAGE_FINISH
   
-;Paginas referentes al desinstalador
+  ;Paginas referentes al desinstalador
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
@@ -193,6 +194,7 @@ Section "Programa" sPrograma
 
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
+	StrCpy $PATH "AutoFirma"
 	
 	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
 	System::Call 'kernel32::GetCurrentProcess()i.r0'
@@ -202,48 +204,26 @@ Section "Programa" sPrograma
 		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
 		Quit
 
-	StrCpy $PATH "AutoFirma"
+	;Eliminamos posibles versiones antiguas de 64 bits
+	SetRegView 64
+	Call RemoveOldVersions
 
-	; Comprueba que no este ya instalada
-	ClearErrors
-	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	${If} ${Errors}
-	  ; Comprobamos si esta la version 1.4.2 en ese directorio y la desinstalamos en tal caso; despues instalamos
-	  IfFileExists '$INSTDIR\unistall.exe' 0 +4
-	    MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		StrCpy $R0 "$INSTDIR\unistall.exe"
-	    Goto UninstallOlderVersion
-	  ; Comprobamos si esta la version 1.4.2 en su directorio por defecto y la desinstalamos en tal caso; despues instalamos
-	  IfFileExists '$PROGRAMFILES\AutoFirma\unistall.exe' 0 +5
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		StrCpy $R0 "$PROGRAMFILES\AutoFirma\unistall.exe"
-		ExecWait '"$R0" /S _?=$PROGRAMFILES\AutoFirma'
-		RMDir /r /REBOOTOK '$PROGRAMFILES\AutoFirma'
-	  Goto Install
-	${EndIf}
-	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
-	${VersionCheckNew} $R1 ${VERSION} "$R2"
-	${If} $R2 = 0
-	  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
-	${else}
-	  ${If} $R2 = 2
-	    MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-	    Goto UninstallOlderVersion
-	  ${else}
-	    MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
-	  ${EndIf}
-	${EndIf}
-	Exit:
-	  Quit
+	;Eliminamos posibles versiones antiguas de 32 bits
+	SetRegView 32
+	Call RemoveOldVersions
 
-	UninstallOlderVersion:
-	  ;Ejecuta el desinstalador cuya ruta ha sido obtenida del registro
-	  ExecWait '"$R0" /S _?=$INSTDIR'
+	;Establecemos la vista del registro acorde a la arquitectura del instalador
+	SetRegView 64
 
-	Install:
+	;Eliminamos el directorio de instalacion si existia
+	RMDir /r '$INSTDIR\$PATH'
+	
+	;Iniciamos la instalacion
+
+	;Establecemos el directorio de instalacion
 	SetOutPath $INSTDIR\$PATH
 
-	;Copiamos la JRE en el directorio de instalacion
+	;Copiamos la JRE
 	File /r java64\jre
 	
 	;Copiamos todos los ficheros que componen nuestra aplicacion
@@ -254,7 +234,7 @@ Section "Programa" sPrograma
 	File  ic_firmar.ico
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
-   SetShellVarContext all
+    SetShellVarContext all
    
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
 	
@@ -283,6 +263,7 @@ Section "Programa" sPrograma
 		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
 		CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
 	${Endif}
+
 	;Anade una entrada en la lista de "Program and Features"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "AutoFirma"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "UninstallString" "$INSTDIR\uninstall.exe"
@@ -301,72 +282,72 @@ Section "Programa" sPrograma
 	;Registro
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\AutoFirma.exe sign -gui -i "%1"'
 
 	;Generar huella archivos
  	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "" "Generar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\$PATH\AutoFirma.exe createdigest -i "%1"'
 
 	;Generar huella directorios
 	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "" "Generar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\$PATH\AutoFirma.exe createdigest -i "%1"'
 
 	;Comprobar huella .hash
  	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 
 	;Comprobar huella .hashb64
  	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 	
 	;Comprobar huella .hashfiles
  	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 
 	;Verify
 	; .csig
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
-	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
-	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
-	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
+	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
+	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
+	Delete "$INSTDIR\$PATH\autofirma.pfx"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R0 ""
 	${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
 		StrCpy $R0 "-firefox_roots"
 	${Endif}
-	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" $R0 /passive'
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R0 /passive'
 	
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
 
 	; Importamos el certificado en el sistema
-	Push "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
+	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
@@ -375,7 +356,7 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$INSTDIR\AutoFirma"
+	Push "$INSTDIR\$PATH"
 	Call AddToPath
 
 SectionEnd
@@ -682,38 +663,19 @@ Section "uninstall"
 	${StrContains} $0 $PATH $INSTDIR
 	StrCmp $0 "" PostValidacion
 	DirectorioValido:
-		RMDir /r $INSTDIR 
+		RMDir /r $INSTDIR
 	PostValidacion:
-	;Borrar accesos directorios del menu inicio
+	;Borrar accesos directos del escritorio y menu inicio
 	Delete "$DESKTOP\AutoFirma.lnk"
 	RMDir /r $SMPROGRAMS\$PATH
 	
-	DeleteRegKey HKLM "SOFTWARE\$PATH"
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
+	;Eliminamos las entradas de registro en la vista de 64 bits
+	SetRegView 64
+	Call un.UninstallFromRegistry
 
-	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.sign"
-	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.hashFile"
-	DeleteRegKey HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory"
-	DeleteRegKey HKEY_CLASSES_ROOT ".hash\shell\afirma.hash"
-	DeleteRegKey HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64"
-	DeleteRegKey HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles"
-	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.verify"
-
-	DeleteRegKey HKEY_CLASSES_ROOT ".csig\shell\Verify"
-	DeleteRegKey HKEY_CLASSES_ROOT ".xsig\shell\Verify"
-
-	DeleteRegKey HKEY_CLASSES_ROOT "afirma"
-	
-	;Borramos las claves de registro en las que se almacenan las preferencias de la aplicacion
-	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\ui"
-	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\standalone"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
-
-	;Se elimina la ruta de la variable de entorno Path
-	Push "$INSTDIR\AutoFirma"
-	Call un.RemoveFromPath
+	;Eliminamos las entradas de registro en la vista de 32 bits
+	SetRegView 32
+	Call un.UninstallFromRegistry
 
 SectionEnd
 
@@ -758,9 +720,166 @@ Function un.StrContains
    Exch $STR_RETURN_VAR  
 FunctionEnd
 
+; Funcion para eliminar versiones anteriores de AutoFirma. Las versiones se
+; buscan a traves del registro, para lo cual afecta si se tiene configurada la
+; vista de 32 o 64 bits
+; Uso:
+;   Call RemoveOldVersions
+Function RemoveOldVersions
+  
+	; Comprueba que no este ya instalada
+	ClearErrors
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+
+	${If} ${Errors}
+		Goto CheckAutoFirmaVersion
+	${EndIf}
+	
+	; Se ha encontrado AutoFirma instalado
+	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+	${VersionCheckNew} $R1 ${VERSION} "$R2"
+	${If} $R2 = 0
+	  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
+	${else}
+	  ${If} $R2 = 2
+		StrCpy $R1 $INSTDIR
+		Goto UninstallOlderVersion
+	  ${else}
+		MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
+	  ${EndIf}
+	${EndIf}
+
+	Exit:
+	   Quit
+	
+	; No se encontro AutoFirma instalado por el primer metodo, lo comprobamos de otra forma
+	CheckAutoFirmaVersion:
+		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
+		StrCmp $0 0 0 searchAutoFirmaLoop
+		Goto End
+
+		searchAutoFirmaLoop:
+		${registry::Find} "$0" $1 $2 $3 $4
+
+		; Si hemos terminado la busqueda, salimos del bucle
+		StrCmp $4 '' close
+
+		; Si hemos encontrado el registro, obtenemos la cadena de desinstalacion, preparamos las variables y dejamos de repetir el bucle
+		StrCmp $4 "REG_SZ" 0 searchAutoFirmaLoop
+		StrCmp $3 "AutoFirma" 0 searchAutoFirmaLoop
+		ReadRegStr $R0 HKLM $1 "UninstallString"
+
+		StrCpy $R1 $SYSDIR
+		
+		close:
+		${registry::Close} "$0"
+		${registry::Unload}
+
+		; Si se encontro AutoFirma, se pide desinstalar
+		StrCmp $3 "AutoFirma" 0 End
+		Goto UninstallOlderVersion
+	
+	; No se encontro AutoFirma instalado, asi que se instala
+	Goto End
+
+	UninstallOlderVersion:
+		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+
+		; Almacenamos en $R2 la sentencia de desinstalacion agregando parametros para que sea silenciosa
+		StrCpy $R2 "$R0 /qn"
+	
+		Push $R0
+		Push "msiexec"
+		Call StrStr
+		Pop $0
+
+		; Si no es una instalacion MSI, adaptamos la sentencia de desinstalacion
+		StrCmp $0 "" 0 +5
+		Push $R0
+		Call GetParent
+		Pop $R1	
+		StrCpy $R2 '"$R0" /S _?=$R1'
+		
+		ExecWait $R2
+ 
+	End:
+ 
+FunctionEnd
+
+; Funcion para eliminar de registro las entradas agregadas por la aplicacion
+; Uso:
+;   Call un.UninstallFromRegistry
+Function un.UninstallFromRegistry
+
+	DeleteRegKey HKLM "SOFTWARE\$PATH"
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
+
+	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.sign"
+	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.hashFile"
+	DeleteRegKey HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory"
+	DeleteRegKey HKEY_CLASSES_ROOT ".hash\shell\afirma.hash"
+	DeleteRegKey HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64"
+	DeleteRegKey HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles"
+	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.verify"
+
+	DeleteRegKey HKEY_CLASSES_ROOT ".csig\shell\Verify"
+	DeleteRegKey HKEY_CLASSES_ROOT ".xsig\shell\Verify"
+
+	DeleteRegKey HKEY_CLASSES_ROOT "afirma"
+	
+	;Borramos las claves de registro en las que se almacenan las preferencias de la aplicacion
+	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\ui"
+	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\standalone"
+	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
+	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"
+	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
+
+	;Se elimina la ruta de la variable de entorno Path
+	Push "$INSTDIR\AutoFirma"
+	Call un.RemoveFromPath
+
+FunctionEnd
+
 ;--------------------------------------------------------------------
 ; Path functions
+
+; GetParent
+; input, top of stack  (e.g. C:\Program Files\Foo)
+; output, top of stack (replaces, with e.g. C:\Program Files)
+; modifies no other variables.
 ;
+; Usage:
+;   Push "C:\Program Files\Directory\Whatever"
+;   Call GetParent
+;   Pop $R0
+;   ; at this point $R0 will equal "C:\Program Files\Directory"
+Function GetParent
+ 
+  Exch $R0
+  Push $R1
+  Push $R2
+  Push $R3
+ 
+  StrCpy $R1 0
+  StrLen $R2 $R0
+ 
+  loop:
+    IntOp $R1 $R1 + 1
+    IntCmp $R1 $R2 get 0 get
+    StrCpy $R3 $R0 1 -$R1
+    StrCmp $R3 "\" get
+  Goto loop
+ 
+  get:
+    StrCpy $R0 $R0 -$R1
+ 
+    Pop $R3
+    Pop $R2
+    Pop $R1
+    Exch $R0
+ 
+FunctionEnd
+
 ; Based on example from:
 ; http://nsis.sourceforge.net/Path_Manipulation
 ;
