@@ -13,6 +13,10 @@ import es.gob.afirma.core.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s Capote. */
 public final class ElfParser {
 
+	private ElfParser() {
+		// Vacio
+	}
+
 	/** Obtiene el tipo de m&aacute;quina requerido para ejecutar este ELF.
 	 * @param f Ruta ELF del cual se quiere saber el tipo de m&aacute;quina.
 	 * @return Tipo de m&aacute;quina requerido para ejecutar este ELF.
@@ -134,8 +138,12 @@ public final class ElfParser {
 			);
 			return false;
 		}
-		return "64".equals(Platform.getJavaArch()) && ElfMachineType.AMD64.equals(a) || //$NON-NLS-1$
-			   "32".equals(Platform.getJavaArch()) && ElfMachineType.X86.equals(a); //$NON-NLS-1$
+		return "64".equals(Platform.getJavaArch()) && //$NON-NLS-1$
+					Platform.MACHINE.AMD64.equals(Platform.getMachineType()) &&
+						ElfMachineType.AMD64.equals(a) ||
+			   "32".equals(Platform.getJavaArch()) && //$NON-NLS-1$
+			   		(Platform.MACHINE.X86.equals(Platform.getMachineType()) || Platform.MACHINE.AMD64.equals(Platform.getMachineType())) && // 32 puede estar en maquina de 32 o de 64 bits
+		   				ElfMachineType.X86.equals(a);
 	}
 
 }
