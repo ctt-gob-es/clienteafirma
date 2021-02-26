@@ -9,7 +9,6 @@
 
 package es.gob.afirma.signers.xades;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -36,10 +34,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x509.GeneralName;
-import org.spongycastle.asn1.x509.GeneralNames;
-import org.spongycastle.asn1.x509.IssuerSerial;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -47,7 +41,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
@@ -638,26 +631,28 @@ public final class XAdESUtil {
 		if (signingCertificate != null) {
 			if (xades instanceof XadesWithBaselineAttributes) {
 
-				// El las firmas B-Level el signingCertificateV2 incluira el certificado
-				// de firma y el IssuerSerialV2, a pesar de no seguir la recomendacion
-				// dada en el ETSI EN 319 132-1 V1.1.1, apartado 6.3, anotacion j). Esto
-				// se hace porque algunos validadores conocidos dan avisos cuando falta
-				// el IssuerSerial mientras que no lo hacen si se incluye
-		        final GeneralNames gns = new GeneralNames(new GeneralName(
-		        		X500Name.getInstance(signingCertificate.getIssuerX500Principal().getEncoded())));
-		        final IssuerSerial issuerSerial = new IssuerSerial(gns, signingCertificate.getSerialNumber());
-		        String issuerSerialB64;
-		        try {
-		        	issuerSerialB64 = Base64.encode(issuerSerial.getEncoded());
-		        }
-		        catch (final IOException e) {
-		        	LOGGER.log(Level.WARNING,
-		        			"No se pudo codificar la informacion del IssuerSerial del certificado de firma. Se omitira este campo",  //$NON-NLS-1$
-		        			e);
-		        	issuerSerialB64 = null;
-				}
+				// El las firmas B-Level el signingCertificateV2 incluira solo el
+				// certificado de firma y no el IssuerSerialV2. Esta es la recomendacion
+				// dada en el ETSI EN 319 132-1 V1.1.1, apartado 6.3, anotacion j). Sin
+				// embargo, esto hace que algunos validadores conocidos den avisos,
+				// cuando no lo hacen si se incluye este atributo
+				final SigningCertificateV2Info issuerInfo = null;
 
-				final SigningCertificateV2Info issuerInfo = issuerSerialB64 != null ? new SigningCertificateV2Info(issuerSerialB64) : null;
+//		        final GeneralNames gns = new GeneralNames(new GeneralName(
+//		        		X500Name.getInstance(signingCertificate.getIssuerX500Principal().getEncoded())));
+//		        final IssuerSerial issuerSerial = new IssuerSerial(gns, signingCertificate.getSerialNumber());
+//		        String issuerSerialB64;
+//		        try {
+//		        	issuerSerialB64 = Base64.encode(issuerSerial.getEncoded());
+//		        }
+//		        catch (final IOException e) {
+//		        	LOGGER.log(Level.WARNING,
+//		        			"No se pudo codificar la informacion del IssuerSerial del certificado de firma. Se omitira este campo",  //$NON-NLS-1$
+//		        			e);
+//		        	issuerSerialB64 = null;
+//				}
+//				issuerInfo = issuerSerialB64 != null ? new SigningCertificateV2Info(issuerSerialB64) : null;
+
 				((XadesWithBaselineAttributes) xades).setSigningCertificateV2(
 						signingCertificate,
 						issuerInfo);
