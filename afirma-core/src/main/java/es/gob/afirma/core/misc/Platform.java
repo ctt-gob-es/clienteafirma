@@ -106,7 +106,7 @@ public final class Platform {
     	if (osArch.equals("mips")) { //$NON-NLS-1$
     		return MACHINE.MIPS32;
     	}
-    	if (osArch.equals("x86_64")) { //$NON-NLS-1$
+    	if (osArch.equals("x86_64") || osArch.equals("amd64")) { //$NON-NLS-1$  //$NON-NLS-2$
     		return MACHINE.AMD64;
     	}
     	if (osArch.equals("x86")) { //$NON-NLS-1$
