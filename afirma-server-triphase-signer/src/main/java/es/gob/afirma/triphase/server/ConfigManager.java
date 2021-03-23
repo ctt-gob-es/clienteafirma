@@ -121,7 +121,7 @@ public class ConfigManager {
 		return config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS);
 	}
 
-	static String getAccessControlAllowOrigin() {
+	public static String getAccessControlAllowOrigin() {
 		return config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN, ALL_ORIGINS_ALLOWED);
 	}
 
@@ -131,7 +131,7 @@ public class ConfigManager {
 				);
 	}
 
-	static String getHMacKey() {
+	public static String getHMacKey() {
 		final String verificationKey = config.getProperty(CONFIG_PARAM_VERIFICATION_KEY);
 		return verificationKey != null && verificationKey.length() > 0 ? verificationKey : null;
 	}

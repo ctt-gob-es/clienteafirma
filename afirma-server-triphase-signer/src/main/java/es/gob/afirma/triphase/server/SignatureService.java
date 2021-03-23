@@ -48,6 +48,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
@@ -146,6 +147,9 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 		LOGGER.info("Se usara el siguiente 'DocumentManager' para firma trifasica: " + DOC_MANAGER.getClass().getName()); //$NON-NLS-1$
+
+		// Indicamos si se debe instalar el proveedor de firma XML de Apache
+		Utils.installXmlDSigProvider(ConfigManager.needInstallXmlDsigFactory());
 	}
 
 	@Override
@@ -340,7 +344,7 @@ public final class SignatureService extends HttpServlet {
 			}
 			else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
-						prep = new XAdESTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+						prep = new XAdESTriPhasePreProcessor();
 			}
 			else if (AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_CADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
@@ -348,19 +352,19 @@ public final class SignatureService extends HttpServlet {
 			}
 			else if (AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_XADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
-						prep = new XAdESASiCSTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+						prep = new XAdESASiCSTriPhasePreProcessor();
 			}
 			else if (AOSignConstants.SIGN_FORMAT_FACTURAE.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_FACTURAE_TRI.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1.equalsIgnoreCase(format)) {
-						prep = new FacturaETriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+						prep = new FacturaETriPhasePreProcessor();
 			}
 			else if (AOSignConstants.SIGN_FORMAT_PKCS1.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_PKCS1_TRI.equalsIgnoreCase(format)) {
 						prep = new Pkcs1TriPhasePreProcessor();
 			}
 			else if (AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
-				prep = new AutoTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+				prep = new AutoTriPhasePreProcessor();
 			}
 			else {
 				LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$

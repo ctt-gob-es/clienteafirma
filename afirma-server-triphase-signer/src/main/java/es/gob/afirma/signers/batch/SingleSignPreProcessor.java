@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.batch;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -20,11 +21,14 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
 final class SingleSignPreProcessor {
 
 	private static final String EXTRA_PARAM_CHECK_SIGNATURES = "checkSignatures"; //$NON-NLS-1$
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private SingleSignPreProcessor() {
 		// No instanciable
@@ -63,20 +67,37 @@ final class SingleSignPreProcessor {
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
-		final byte[] docBytes = sSign.getData(false);
+		byte[] docBytes = sSign.getData(false);
 
 		Properties extraParams;
 		try {
 			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), docBytes, sSign.getSignFormat().name());
 		}
 		catch (final IncompatiblePolicyException e) {
-			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
+			LOGGER.log(
 					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
 		}
 
-		// Eliminamos configuraciones que no deseemos que se utilicen extenamente
+		// Eliminamos configuraciones que no deseemos que se utilicen externamente
 		extraParams.remove("profile"); //TODO: Deshacer cuando se permita la generacion de firmas baseline
+
+
+		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
+		// abandone el soporte de XAdES explicitas)
+		if (sSign.getSubOperation() == SignSubOperation.SIGN
+				&& LegacyFunctions.isXadesExplicitConfigurated(sSign.getSignFormat().name(), extraParams)) {
+			LOGGER.warning(
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+			);
+			try {
+				docBytes = MessageDigest.getInstance("SHA1").digest(docBytes); //$NON-NLS-1$
+				extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (final Exception e) {
+				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+			}
+		}
 
 		// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
         final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty(EXTRA_PARAM_CHECK_SIGNATURES));
@@ -131,11 +152,9 @@ final class SingleSignPreProcessor {
 		try {
 			TriPhaseHelper.addVerificationCodes(td, certChain[0]);
 		} catch (final Exception e) {
-			throw new AOException("No se pudo agregar le codigo de verfificacion de firmas", e); //$NON-NLS-1$
+			throw new AOException("No se pudo agregar le codigo de verificacion de firmas", e); //$NON-NLS-1$
 		}
 
 		return td;
 	}
-
-
 }

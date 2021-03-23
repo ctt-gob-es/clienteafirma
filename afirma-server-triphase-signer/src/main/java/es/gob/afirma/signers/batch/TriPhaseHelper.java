@@ -18,6 +18,7 @@ import javax.crypto.spec.SecretKeySpec;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 public class TriPhaseHelper {
 
@@ -56,7 +57,7 @@ public class TriPhaseHelper {
 			throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException,
 			IllegalStateException {
 
-		final String hmacSeed = TriConfigManager.getHMacKey();
+		final String hmacSeed = ConfigManager.getHMacKey();
 		if (hmacSeed == null) {
 			return;
 		}
@@ -95,7 +96,7 @@ public class TriPhaseHelper {
 	static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert)
 			throws SecurityException, IOException {
 
-		final String hmacSeed = TriConfigManager.getHMacKey();
+		final String hmacSeed = ConfigManager.getHMacKey();
 		if (hmacSeed == null) {
 			return;
 		}

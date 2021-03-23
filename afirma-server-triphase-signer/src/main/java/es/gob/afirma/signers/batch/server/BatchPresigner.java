@@ -27,7 +27,7 @@ import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.SignBatch;
 import es.gob.afirma.signers.batch.SignBatchConcurrent;
 import es.gob.afirma.signers.batch.SignBatchSerial;
-import es.gob.afirma.signers.batch.TriConfigManager;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Realiza la primera fase de un proceso de firma por lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -118,7 +118,7 @@ public final class BatchPresigner extends HttpServlet {
 			return;
 		}
 
-		response.setHeader("Access-Control-Allow-Origin", TriConfigManager.getAllowOrigin()); //$NON-NLS-1$
+		response.setHeader("Access-Control-Allow-Origin", ConfigManager.getAccessControlAllowOrigin()); //$NON-NLS-1$
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
 		final PrintWriter writer = response.getWriter();
 		writer.write(pre);

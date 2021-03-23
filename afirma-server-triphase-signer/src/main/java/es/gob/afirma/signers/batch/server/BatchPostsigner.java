@@ -27,7 +27,7 @@ import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.SignBatch;
 import es.gob.afirma.signers.batch.SignBatchConcurrent;
 import es.gob.afirma.signers.batch.SignBatchSerial;
-import es.gob.afirma.signers.batch.TriConfigManager;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Realiza la tercera (y &uacute;ltima) fase de un proceso de firma por lote.
  * Servlet implementation class BatchPostsigner
@@ -145,7 +145,7 @@ public final class BatchPostsigner extends HttpServlet {
 			return;
 		}
 
-		final String allowOrigin = TriConfigManager.getAllowOrigin();
+		final String allowOrigin = ConfigManager.getAccessControlAllowOrigin();
 		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
 		try (

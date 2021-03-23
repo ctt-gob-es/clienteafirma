@@ -84,7 +84,8 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				data,
 				cert,
 				signTime,
-				extraParams
+				extraParams,
+				true
 			);
 		}
 		catch (final InvalidPdfException e) {
@@ -180,7 +181,8 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
 			signResult,
 			AOPDFSigner.getSignEnhancer(), // SignEnhancer
-			AOPDFSigner.getSignEnhancerConfig()  // EnhancerConfig (si le llega null usa los ExtraParams)
+			AOPDFSigner.getSignEnhancerConfig(),  // EnhancerConfig (si le llega null usa los ExtraParams)
+			true
 		);
 
 		LOGGER.info("Postfirma PAdES - Firma - FIN"); //$NON-NLS-1$
