@@ -17,7 +17,6 @@ SetCompressor lzma
   !define MUI_WELCOMEFINISHPAGE_BITMAP "ic_install.bmp"
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP "ic_install.bmp"
   !define VersionCheckNew "!insertmacro MVersionCheck"
-  !define StrContains '!insertmacro "_StrContainsConstructor"'
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
@@ -179,13 +178,6 @@ UninstallText "Desinstalador de AutoFirma."
  Pop "${OutVar}"
 !macroend
 
-!macro _StrContainsConstructor OUT NEEDLE HAYSTACK
-  Push `${HAYSTACK}`
-  Push `${NEEDLE}`
-  Call un.StrContains
-  Pop `${OUT}`
-!macroend
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -200,27 +192,39 @@ Section "Programa" sPrograma
 	System::Call 'kernel32::GetCurrentProcess()i.r0'
 	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
 	pop $3
-	IntCmp $1 1 +3 0 0
+	${If} $1 != 1
 		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
 		Quit
+	${EndIf}
 
-	;Eliminamos posibles versiones antiguas de 64 bits
-	SetRegView 64
-	Call RemoveOldVersions
-
-	;Eliminamos posibles versiones antiguas de 32 bits
-	SetRegView 32
-	Call RemoveOldVersions
-
+	;Comprobamos si ya existe una versión de AutoFirma instalada. Si existe, se devolvera
+	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
+	Call CheckVersionInstalled
+	Pop $R1
+	${If} $R1 != ""
+		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
+		${VersionCheckNew} $R1 ${VERSION} "$R2"
+		${If} $R2 = 0
+		  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
+		  Quit
+		${ElseIf} $R2 <> 2
+		  MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
+		  Quit
+		${EndIf}
+		Call RemoveOldVersions
+	${EndIf}
+	
 	;Establecemos la vista del registro acorde a la arquitectura del instalador
 	SetRegView 64
 
-	;Eliminamos el directorio de instalacion si existia
-	RMDir /r '$INSTDIR\$PATH'
-	
-	;Iniciamos la instalacion
+	;Limpiamos el directorio al que se van a copiar los ficheros y bloqueamos la ejecucion
+	;hasta que este listo
+	IfFileExists $INSTDIR\$PATH 0 +4
+		RMDir /r '$INSTDIR\$PATH'
+		Sleep 3000
+		Goto -3
 
-	;Establecemos el directorio de instalacion
+	;Dejamos los ficheros de la aplicacion en un subdirectorio
 	SetOutPath $INSTDIR\$PATH
 
 	;Copiamos la JRE
@@ -254,13 +258,13 @@ Section "Programa" sPrograma
 
 	;Si se ha configurado, creamos un acceso directo en el escritorio
 	${If} $Shorcut_Integration_Checkbox_State == 1
-		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 	${Endif}
 
 	;Si se ha configurado, creamos el grupo de accesos en el menu inicio
 	${If} $StartMenu_Integration_Checkbox_State == 1
 		CreateDirectory "$SMPROGRAMS\AutoFirma"
-		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 		CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
 	${Endif}
 
@@ -430,7 +434,27 @@ Function AddCertificateToStore
   Exch $0
  
 FunctionEnd
+
+;Identifica la version instalada de AutoFirma.
+;Devuelve la cadena con el numero de version y deja el registro configurado
+;para la arquitectura corresondiente a la version identificada
+Function CheckVersionInstalled
+
+  ;Buscamos en 64 bits			  
+  SetRegView 64
+  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
+
+  ;Si lo hemos encontrado ya, salimos 
+  IfErrors +2
+	Goto End
+
+  ;Buscamos en 32 bits
+  SetRegView 32
+  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
  
+  End:
+	Push $R0 ; output
+FunctionEnd
 
 Function VersionCheck
  Exch $R0 ; second version number
@@ -444,7 +468,7 @@ Function VersionCheck
  
   StrCpy $R1 $R1.
   StrCpy $R0 $R0.
- 
+  
  Next: StrCmp $R0$R1 "" 0 +3
   StrCpy $R0 0
   Goto Done
@@ -654,16 +678,33 @@ Section "uninstall"
 	Call un.DeleteCertificate
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
 
-	RMDir /r $INSTDIR\$PATH
+	;Borramos el subdirectorio con todos los recursos salvo el desinstalador
+	;y bloqueamos la ejecucion hasta que este listo
+	IfFileExists $INSTDIR\$PATH 0 +4
+		RMDir /r '$INSTDIR\$PATH'
+		Sleep 3000
+		Goto -3
+
 	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
-	${StrContains} $0 "Program Files (x86)\" $INSTDIR
+	Push $INSTDIR
+	Push "Program Files (x86)\"
+	Call un.StrContains
+	Pop $0
 	StrCmp $0 "Program Files (x86)\" DirectorioValido
-	${StrContains} $0 "Program Files\" $INSTDIR
+	Push $INSTDIR
+	Push "Program Files\"
+	Call un.StrContains
+	Pop $0
 	StrCmp $0 "Program Files\" DirectorioValido
-	${StrContains} $0 $PATH $INSTDIR
+	Push $INSTDIR
+	Push $PATH
+	Call un.StrContains
+	Pop $0
 	StrCmp $0 "" PostValidacion
+
 	DirectorioValido:
 		RMDir /r $INSTDIR
+
 	PostValidacion:
 	;Borrar accesos directos del escritorio y menu inicio
 	Delete "$DESKTOP\AutoFirma.lnk"
@@ -681,13 +722,12 @@ SectionEnd
 
 
 ; StrContains
+;
 ; This function does a case sensitive searches for an occurrence of a substring in a string. 
 ; It returns the substring if it is found. 
 ; Otherwise it returns null(""). 
 ; Written by kenglish_hi
 ; Adapted from StrReplace written by dandaman32
- 
- 
 Var STR_HAYSTACK
 Var STR_NEEDLE
 Var STR_CONTAINS_VAR_1
@@ -695,8 +735,9 @@ Var STR_CONTAINS_VAR_2
 Var STR_CONTAINS_VAR_3
 Var STR_CONTAINS_VAR_4
 Var STR_RETURN_VAR
- 
-Function un.StrContains
+
+!macro StrContains un
+Function ${un}StrContains
   Exch $STR_NEEDLE
   Exch 1
   Exch $STR_HAYSTACK
@@ -719,6 +760,9 @@ Function un.StrContains
    Pop $STR_NEEDLE ;Prevent "invalid opcode" errors and keep the
    Exch $STR_RETURN_VAR  
 FunctionEnd
+!macroend
+!insertmacro StrContains ""
+!insertmacro StrContains "un."
 
 ; Funcion para eliminar versiones anteriores de AutoFirma. Las versiones se
 ; buscan a traves del registro, para lo cual afecta si se tiene configurada la
@@ -738,19 +782,15 @@ Function RemoveOldVersions
 	; Se ha encontrado AutoFirma instalado
 	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
 	${VersionCheckNew} $R1 ${VERSION} "$R2"
-	${If} $R2 = 0
-	  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
-	${else}
-	  ${If} $R2 = 2
-		StrCpy $R1 $INSTDIR
-		Goto UninstallOlderVersion
-	  ${else}
-		MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
-	  ${EndIf}
+	${If} $R2 = 2
+		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
+		; instalador si no se quiere desinstalar
+		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+			Goto UninstallOlderVersion
 	${EndIf}
 
-	Exit:
-	   Quit
+	; Si no se encuentra o no va a eliminar la version instalada, finalizamos el proceso
+	Goto End
 	
 	; No se encontro AutoFirma instalado por el primer metodo, lo comprobamos de otra forma
 	CheckAutoFirmaVersion:
@@ -768,8 +808,6 @@ Function RemoveOldVersions
 		StrCmp $4 "REG_SZ" 0 searchAutoFirmaLoop
 		StrCmp $3 "AutoFirma" 0 searchAutoFirmaLoop
 		ReadRegStr $R0 HKLM $1 "UninstallString"
-
-		StrCpy $R1 $SYSDIR
 		
 		close:
 		${registry::Close} "$0"
@@ -777,31 +815,77 @@ Function RemoveOldVersions
 
 		; Si se encontro AutoFirma, se pide desinstalar
 		StrCmp $3 "AutoFirma" 0 End
-		Goto UninstallOlderVersion
+		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
+		; instalador si no se quiere desinstalar
+		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+			Goto UninstallOlderVersion
 	
-	; No se encontro AutoFirma instalado, asi que se instala
+	; No se encontro AutoFirma instalado, asi que finalizamos el proceso
 	Goto End
 
-	UninstallOlderVersion:
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+	Exit:
+		Quit
 
+	UninstallOlderVersion:
+		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
+		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
+		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
+		StrCmp $R1 "" +3 0
+			Push "$R1\AutoFirma"
+			Call RemoveFromPath
+
+		; Preparamos una variable para indicar en ella si tras la desinstalacion deberemos borrar el directorio de
+		; instalacion anterior
+		StrCpy $R3 ""
+
+		; Preparamos la sentencia de desinstalacion interpretando primeramente que se instalo mediante MSI.
+		; Almacenamos en $R1 la ruta desde la que ejecutar la desinstalacion (directorio del sistema)
 		; Almacenamos en $R2 la sentencia de desinstalacion agregando parametros para que sea silenciosa
+		StrCpy $R1 $SYSDIR
 		StrCpy $R2 "$R0 /qn"
-	
+		
 		Push $R0
 		Push "msiexec"
 		Call StrStr
 		Pop $0
 
-		; Si no es una instalacion MSI, adaptamos la sentencia de desinstalacion
-		StrCmp $0 "" 0 +5
-		Push $R0
-		Call GetParent
-		Pop $R1	
-		StrCpy $R2 '"$R0" /S _?=$R1'
-		
-		ExecWait $R2
- 
+		; Si no es una instalacion MSI, pisamos las variables por las apropiadas para la desinstalacion convencional
+		StrCmp $0 "" 0 EjecutarDesinstalador
+			Push $R0
+			Call GetParent
+			Pop $R1	
+			StrCpy $R2 '"$R0" /S _?=$R1'
+			; Si el directorio de instalacion es distinto del anterior, establecemos una variable para senalar que
+			; queremos que se elimine ese directorio despues de la desinstalacion, ya que sabemos que quedaran restos
+			; del instalador EXE anterior
+			StrCmp $R1 $INSTDIR EjecutarDesinstalador 0
+				StrCpy $R3 "Uninstall"
+
+		EjecutarDesinstalador:
+			ExecWait $R2
+
+		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
+		; Si no, terminamos el proceso
+		StrCmp $R3 "Uninstall" 0 End
+			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "AutoFirma")
+			Push $R1
+			Push "Program Files (x86)\"
+			Call StrContains
+			Pop $0
+			StrCmp $0 "Program Files (x86)\" EliminarDirectorio
+			Push $R1
+			Push "Program Files\"
+			Call StrContains
+			Pop $0
+			StrCmp $0 "Program Files\" EliminarDirectorio
+			Push $R1
+			Push $PATH
+			Call StrContains
+			Pop $0
+			StrCmp $0 "" End
+			EliminarDirectorio:
+				RMDir /r $R1
+				
 	End:
  
 FunctionEnd
@@ -955,11 +1039,49 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
+
 ; RemoveFromPath - Removes dir from PATH
 ;
 ; Usage:
 ;   Push "dir"
 ;   Call RemoveFromPath
+Function RemoveFromPath
+  Exch $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+  Push $5
+  Push $6
+  ReadRegStr $1 ${Environ} "PATH"
+  StrCpy $5 $1 1 -1
+  StrCmp $5 ";" +2
+    StrCpy $1 "$1;" ; ensure trailing ';'
+  Push $1
+  Push "$0;"
+  Call StrStr
+  Pop $2 ; pos of our dir
+  StrCmp $2 "" done
+  DetailPrint "Eliminamos del PATH: $0"
+  StrLen $3 "$0;"
+  StrLen $4 $2
+  StrCpy $5 $1 -$4 ; $5 is now the part before the path to remove
+  StrCpy $6 $2 "" $3 ; $6 is now the part after the path to remove
+  StrCpy $3 "$5$6"
+  StrCpy $5 $3 1 -1
+  StrCmp $5 ";" 0 +2
+    StrCpy $3 $3 -1 ; remove trailing ';'
+  WriteRegExpandStr ${Environ} "PATH" $3
+  SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+done:
+  Pop $6
+  Pop $5
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
+FunctionEnd
 Function un.RemoveFromPath
   Exch $0
   Push $1
@@ -997,7 +1119,7 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
- 
+
 ; StrStr - find substring in a string
 ;
 ; Usage:

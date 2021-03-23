@@ -57,6 +57,7 @@ SetCompressor lzma
 ; De esta forma pasando la variable LANGUAGE al compilador podremos generar
 ; paquetes en distintos idiomas sin cambiar el script
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -195,8 +196,8 @@ Section "Programa" sPrograma
 	CreateDirectory "$SMPROGRAMS\AutoFirma"
 	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 
-	WriteRegStr HKLM SOFTWARE\$PATH "InstallDir" $INSTDIR
-	WriteRegStr HKLM SOFTWARE\$PATH "Version" "${VERSION}"
+	WriteRegStr HKLM "SOFTWARE\$PATH" "InstallDir" $INSTDIR
+	WriteRegStr HKLM "SOFTWARE\$PATH" "Version" "${VERSION}"
 
 	;Exec "explorer $SMPROGRAMS\$PATH_ACCESO_DIRECTO\"
 	
@@ -282,6 +283,7 @@ Section "Programa" sPrograma
 	Call AddToPath
 
 SectionEnd
+
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
 !define CERT_NAME_ISSUER_FLAG           1
@@ -421,6 +423,11 @@ Function RemoveOldVersions
 		Goto End
 	${EndIf}
 
+	; Usamos la ruta de instalacion de la version anterior para eliminarla del PATH. Si el desinstalador
+	; de la version anterior funcionase bien, esto no seria necesario
+	Push "$R0\AutoFirma"
+	Call RemoveFromPath
+
 	;Buscamos el desinstalador de esa verion y lo ejecutamos
 	;Esto funciona tambien para las versiones MSI, ya que estas
 	;ya se habran desregistrado al iniciarse el proceso de instalacion
@@ -530,7 +537,7 @@ FunctionEnd
 ; Usage:
 ;   Push "dir"
 ;   Call RemoveFromPath
-Function un.RemoveFromPath
+Function RemoveFromPath
   Exch $0
   Push $1
   Push $2
@@ -544,7 +551,7 @@ Function un.RemoveFromPath
     StrCpy $1 "$1;" ; ensure trailing ';'
   Push $1
   Push "$0;"
-  Call un.StrStr
+  Call StrStr
   Pop $2 ; pos of our dir
   StrCmp $2 "" done
   DetailPrint "Eliminamos del PATH: $0"
@@ -567,7 +574,7 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
- 
+
 ; StrStr - find substring in a string
 ;
 ; Usage:
