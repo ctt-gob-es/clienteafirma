@@ -3,6 +3,7 @@ package es.gob.afirma.signers.xades;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 
@@ -15,9 +16,9 @@ import es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestXAdESASiC {
 
-    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
 
     /** Prueba de firma simple XAdES ASiC-S.
      * @throws Exception En culaquier error. */
@@ -34,18 +35,21 @@ public final class TestXAdESASiC {
         final AOSigner signer = new AOXAdESASiCSSigner();
 
         final byte[] result = signer.sign(
-        		"<?xml version=\"1.0\" encoding=\"UTF-8\" ?><NODO>Valor</NODO>".getBytes(), //$NON-NLS-1$
+        		"<?xml version=\"1.0\" encoding=\"UTF-8\" ?><NODO>Valor</NODO>".getBytes(StandardCharsets.UTF_8), //$NON-NLS-1$
         		"SHA512withRSA", //$NON-NLS-1$
         		pke.getPrivateKey(),
         		pke.getCertificateChain(),
         		null
 		);
 
+        final File outputFile = File.createTempFile("ASIC-XAdES-",  ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
         try (
-    		final OutputStream os = new FileOutputStream(File.createTempFile("ASIC-XAdES-",  ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
+    		final OutputStream os = new FileOutputStream(outputFile);
 		) {
         	os.write(result);
         }
+
+        System.out.println("Firma XAdES ASiC-S almacenada en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
     }
 
     /** Prueba de firma simple XAdES ASiC-S.

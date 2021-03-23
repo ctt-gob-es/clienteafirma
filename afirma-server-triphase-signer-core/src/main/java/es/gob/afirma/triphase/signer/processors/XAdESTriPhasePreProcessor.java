@@ -35,7 +35,6 @@ import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
-import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -75,16 +74,13 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Manejador de log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Construye un procesador de firmas trif&aacute;sicas XAdES.
-	 * @param installXmlDSigProvider Indica si se debe instalar expresamente un proveedor de firmas XML. */
-	public XAdESTriPhasePreProcessor(final boolean installXmlDSigProvider) {
-		this(false, installXmlDSigProvider);
+	/** Construye un procesador de firmas trif&aacute;sicas XAdES. */
+	public XAdESTriPhasePreProcessor() {
+		this(false);
 	}
 
-	protected XAdESTriPhasePreProcessor(final boolean factura, final boolean installXmlDSigProvider) {
+	protected XAdESTriPhasePreProcessor(final boolean factura) {
 		this.facturae = factura;
-
-		Utils.installXmlDSigProvider(installXmlDSigProvider);
 	}
 
 	@Override
@@ -235,8 +231,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				Base64.encode(preSignature.getSignedInfos().get(i))
 			);
 
-			//TODO: Borrar. La prefirma se deberia tomar en la postfirma del parametro BASE en lugar
-			// de tener que reenviarla directamente
+			//TODO: Idealmente, la prefirma se deberia tomar en la postfirma del parametro BASE en lugar
+			// de tener que reenviarla directamente. Asi se reduciria la transmision de datos y se evitaria
+			// que el cliente de firma trifasica pudiese enviar una prefirma no valida
 			signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
 
 			// Pasamos como datos de sesion el documento base en donde se realizan las sustituciones,
@@ -433,6 +430,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				"Error insertando los datos a firmar y la cadena de certificados: " + e, e //$NON-NLS-1$
 			);
 		}
+
 		return completeSignature;
 	}
 

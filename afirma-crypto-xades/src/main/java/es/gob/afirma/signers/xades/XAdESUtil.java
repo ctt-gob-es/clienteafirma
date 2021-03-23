@@ -615,7 +615,7 @@ public final class XAdESUtil {
 
 		XAdES xadesProfile = XAdES.EPES;
 		if (profile != null && AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
-			xadesProfile = XAdES.B_LEVEL;
+			xadesProfile = XAdES.B_B_LEVEL;
 		}
 
 		final XAdESBase xades = XAdES.newInstance(

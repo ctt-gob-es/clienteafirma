@@ -97,7 +97,7 @@ public final class Utils {
 				SECURE_BUILDER_FACTORY.setAttribute(securityProperty, ""); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "No se ha podido establecer una propiedad de seguridad en la factoria XML: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se ha podido establecer una propiedad de seguridad '" + securityProperty + "' en la factoria XML"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -690,10 +690,10 @@ public final class Utils {
 				"DOM", //$NON-NLS-1$
 				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getDeclaredConstructor().newInstance() //$NON-NLS-1$
 			);
-			LOGGER.fine("Se usara la factoria XML de Apache"); //$NON-NLS-1$
+			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			LOGGER.fine("Se usara la factoria XML por defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
+			LOGGER.info("Se usara la factoria XML por defecto por no estar disponible la de Apache"); //$NON-NLS-1$
 			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 		return fac;

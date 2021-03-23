@@ -280,6 +280,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				);
 			}
 		}
+
 		return new XmlPreSignResult(xmlResult.getBytes(xmlEncoding), signedInfos, xmlEncoding);
 	}
 

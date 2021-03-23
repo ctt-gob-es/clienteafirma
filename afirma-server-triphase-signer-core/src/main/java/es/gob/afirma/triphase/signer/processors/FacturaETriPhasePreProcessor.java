@@ -13,10 +13,9 @@ package es.gob.afirma.triphase.signer.processors;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class FacturaETriPhasePreProcessor extends XAdESTriPhasePreProcessor {
 
-	/** Construye un procesador de firmas trif&aacute;sicas XAdES FacturaE.
-	 * @param installXmlDSigProvider Indica si se debe instalar expresamente un proveedor de firmas XML. */
-	public FacturaETriPhasePreProcessor(final boolean installXmlDSigProvider) {
-		super(true, installXmlDSigProvider);
+	/** Construye un procesador de firmas trif&aacute;sicas XAdES FacturaE. */
+	public FacturaETriPhasePreProcessor() {
+		super(true);
 	}
 
 }

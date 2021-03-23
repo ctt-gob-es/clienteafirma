@@ -275,10 +275,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
-    static {
-    	Utils.installXmlDSigProvider(true);
-    }
-
     /** Firma datos en formato XAdES.
      * <p>
      * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de estilo XSL asociadas, siguiendo el siguiente criterio:

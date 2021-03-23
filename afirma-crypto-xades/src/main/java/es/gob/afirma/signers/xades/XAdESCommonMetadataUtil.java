@@ -36,11 +36,14 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithExplicitPolicy;
 
 final class XAdESCommonMetadataUtil {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
+
 	private XAdESCommonMetadataUtil() {
 		// No instanciable
 	}
 
-	static void addCommonMetadata(final XAdESBase xades, final Properties extraParams) throws AOException {
+	static void addCommonMetadata(final XAdESBase xades, final Properties extraParams)
+			throws AOException {
 
 		// SignaturePolicyIdentifier
 		if (xades instanceof XadesWithExplicitPolicy) {
@@ -204,11 +207,9 @@ final class XAdESCommonMetadataUtil {
 			return null;
 		}
 
-		final Logger logger = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
-
 		String identifier;
 		try {
-			logger.warning(
+			LOGGER.warning(
 				"Se proporciono directamente un OID como identificador de politica (" + new Oid(id) + "), se tranformara en URN con el prefijo 'urn:oid:'" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			identifier = "urn:oid:" + id; //$NON-NLS-1$
@@ -225,7 +226,7 @@ final class XAdESCommonMetadataUtil {
 					: null, hashAlgo);
 		}
 		catch (final Exception e) {
-			logger.warning(
+			LOGGER.warning(
 				"No se ha podido acceder al identificador ('" + identifier + "') de la politica de firma, no se anadira este campo: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			return null;

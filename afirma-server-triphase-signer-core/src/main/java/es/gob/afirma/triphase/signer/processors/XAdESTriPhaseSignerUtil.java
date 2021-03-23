@@ -71,33 +71,34 @@ final class XAdESTriPhaseSignerUtil {
 			return xmlBase;
 		}
 
+		// Obtenemos el listado de referencias a los elementos a ser reemplazados a partir de la firma original
 		final Document docBase = getDocumentFromBytes(xmlBase);
-		final List<List<String>> elDeliBase = getCommonContentDelimiters(
-			getInmutableReferences(
-				docBase
-			),
-			docBase
-		);
+		final List<String> docBaseReferences =
+				getInmutableReferences(docBase);
 
+		// Obtenemos el listado de referencias a los elementos comunes de la firma recien generada
 		final Document docSource = getDocumentFromBytes(xmlSource);
-		final List<List<String>> elDeliSource = getCommonContentDelimiters(
-			getInmutableReferences(
-				docSource
-			),
-			docSource
-		);
+		final List<String> docSourceReferences =
+				getInmutableReferences(docSource);
 
-		if (elDeliBase.size() != elDeliSource.size()) {
+		// Comprobamos que sean el mismo numero de elementos
+		if (docBaseReferences.size() != docSourceReferences.size()) {
 			throw new IllegalArgumentException(
-				"El documento base no tiene las mismas partes comunes que el documento fuente" //$NON-NLS-1$
-			);
+					"El documento base no tiene las mismas partes comunes que el documento fuente" //$NON-NLS-1$
+					);
 		}
 
-		String base = new String(xmlBase, docBase.getXmlEncoding());
+		// Obtenemos los delimitadores que nos indican cual es el contenido comun que deberemos sacar de la firma
+		// recien generada para completar la firma original
+		final List<List<String>> elDeliSource =
+				getCommonContentDelimiters(docSourceReferences, docSource);
 
+		// Cargamos ambas firmas como cadenas para poder extraer los elementos tal como son
+		String base = new String(xmlBase, docBase.getXmlEncoding());
 		final String source = new String(xmlSource, docSource.getXmlEncoding());
 
-		for (int i=0; i<elDeliBase.size(); i++) {
+		// Realizamos el reemplazo
+		for (int i = 0; i < elDeliSource.size(); i++) {
 			base = base.replace(
 				String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)),
 				source.substring(
@@ -154,7 +155,7 @@ final class XAdESTriPhaseSignerUtil {
 			ret = new String(xml);
 		}
 
-		final List<List<String>> delits = CleanContentDelimiters(
+		final List<List<String>> delits = cleanContentDelimiters(
 			XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
 				XAdESTriPhaseSignerUtil.getInmutableReferences(doc),
 				doc
@@ -194,7 +195,7 @@ final class XAdESTriPhaseSignerUtil {
 	 * @param or Lista original de delimitadores de nodos
 	 * @param orXml XML en su forma de texto.
 	 * @return Lista de delimitadores de nodos con los delimitadores correctos. */
-	private static List<List<String>> CleanContentDelimiters(final List<List<String>> or, final String orXml) {
+	private static List<List<String>> cleanContentDelimiters(final List<List<String>> or, final String orXml) {
 		final List<List<String>> ret = new ArrayList<>(or.size());
 		for (final List<String> del : or) {
 			// Las discordancias siempre estan en la apertura del nodo
@@ -269,7 +270,7 @@ final class XAdESTriPhaseSignerUtil {
 					try {
 						ret.add(
 							getFirstTagPair(
-								removeXmlHeader(
+								cleanNode(
 									new String(
 										Utils.writeXML(node, null, null, null),
 										encoding
@@ -281,7 +282,7 @@ final class XAdESTriPhaseSignerUtil {
 					catch (final UnsupportedEncodingException e) {
 						ret.add(
 							getFirstTagPair(
-								removeXmlHeader(
+									cleanNode(
 									new String(Utils.writeXML(node, null, null, null))
 								)
 							)
@@ -291,7 +292,7 @@ final class XAdESTriPhaseSignerUtil {
 				else {
 					ret.add(
 						getFirstTagPair(
-							removeXmlHeader(
+								cleanNode(
 								new String(Utils.writeXML(node, null, null, null))
 							)
 						)
@@ -324,6 +325,7 @@ final class XAdESTriPhaseSignerUtil {
 		if (signDoc.getNodeName().equals("Signature") || signDoc.getNodeName().endsWith(":Signature")) { //$NON-NLS-1$ //$NON-NLS-2$
 			signatureNodes.add(signDoc);
 		}
+
         // Obtenemos las firmas del documento
         final NodeList nl = signDoc.getElementsByTagNameNS(DS_NAMESPACE_URL, "Signature"); //$NON-NLS-1$
         for(int i = 0; i < nl.getLength(); i++) {
@@ -333,8 +335,7 @@ final class XAdESTriPhaseSignerUtil {
         // Por cada firma buscamos sus referencias
         final List<String> unmutableReferences = new ArrayList<>();
         for(final Node sigs : signatureNodes) {
-        	//final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
-        	final NodeList rf = ((Element) sigs).getElementsByTagName("ds:Reference"); //$NON-NLS-1$
+        	final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
         	for(int j = 0; j < rf.getLength(); j++) {
         		final Node node = rf.item(j);
         		if (!SA_NAMESPACE_URL.equals(((Element) node).getAttribute("Type"))) { //$NON-NLS-1$
@@ -350,17 +351,40 @@ final class XAdESTriPhaseSignerUtil {
 	}
 
 	/** Elimina de la cadena de texto proporcionada la cabecera de XML si empezaba
-	 * por ella.
+	 * por ella y la declaracion de espacios de nombres.
 	 * @param xml Texto XML.
-	 * @return Texto XML sin cabecera. */
-	private static String removeXmlHeader(final String xml) {
+	 * @return Texto XML sin cabecera ni declaracion de espacios de nombre. */
+	private static String cleanNode(final String xml) {
 		if (xml == null) {
 			throw new IllegalArgumentException("La entrada no puede ser nula"); //$NON-NLS-1$
 		}
-		if (!xml.startsWith("<?xml")) { //$NON-NLS-1$
-			return xml;
+		String xmlCleaned = xml;
+		if (xml.startsWith("<?xml")) { //$NON-NLS-1$
+			xmlCleaned = xmlCleaned.substring(xmlCleaned.indexOf("?>") + "?>".length(), xmlCleaned.length()).trim(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		return xml.substring(xml.indexOf("?>") + "?>".length(), xml.length()).trim(); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Buscamos y eliminamos las declaraciones de espacios de nombres
+		int n1 = 0;
+		while ((n1 = xmlCleaned.indexOf(" xmlns", n1)) != -1) { //$NON-NLS-1$
+
+			// Identificamos si la cadena del espacio de nombres se define con comillas dobles o simples
+			int n2;
+			char sepChar = '\0';
+			for (n2 = n1 + " xmlns".length() + 1; sepChar == '\0' && n2 < xmlCleaned.length(); n2++) { //$NON-NLS-1$
+				if (xmlCleaned.charAt(n2) == '\"') {
+					sepChar = '\"';
+				} else if (xmlCleaned.charAt(n2) == '\'') {
+					sepChar = '\'';
+				}
+			}
+
+			// Identificamos donde termina la declaracion del espacio
+			n2 = xmlCleaned.indexOf(sepChar, n2 + 1);
+
+			// Componemos la cadena sin la declaracion del espacio
+			xmlCleaned = xmlCleaned.substring(0, n1) + xmlCleaned.substring(n2 + 1);
+		}
+		return xmlCleaned;
 	}
 
 	/** Construye una lista con la etiqueta XML del nodo por el que empieza el texto XML y la

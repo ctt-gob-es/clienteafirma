@@ -24,10 +24,9 @@ import es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner;
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
 public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProcessor {
 
-	/** Manejador de firma XAdES-ASiC trif&aacute;sico.
-	 * @param installXmlDSigProvider Indica si se debe instalar expresamente un proveedor de firmas XML. */
-	public XAdESASiCSTriPhasePreProcessor(final boolean installXmlDSigProvider) {
-		super(installXmlDSigProvider);
+	/** Manejador de firma XAdES-ASiC trif&aacute;sico. */
+	public XAdESASiCSTriPhasePreProcessor() {
+		super();
 	}
 
 	@Override

@@ -34,7 +34,6 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
-import es.gob.afirma.signers.xml.Utils;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
@@ -52,14 +51,6 @@ public final class AOOOXMLSigner implements AOSigner {
     	if (System.getProperty("java.version").startsWith("1.6")) { //$NON-NLS-1$ //$NON-NLS-2$
     		throw new UnsupportedJreVersionException();
     	}
-
-    	// Proveedor XMLDSig
-    	try {
-    		Utils.installXmlDSigProvider(true);
-    	}
-        catch (final Throwable e) {
-        	LOGGER.log(Level.WARNING, "Error en la instalacion del proveedor XMLdSig: " + e, e); //$NON-NLS-1$
-        }
 
         // Proveedor de transformadas de relacion OOXML.
         try {
