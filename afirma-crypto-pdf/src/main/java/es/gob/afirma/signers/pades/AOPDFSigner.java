@@ -80,7 +80,14 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 	 * </a>. */
 	private static final int PDF_MIN_FILE_SIZE = 70;
 
+	/**
+	 * Modo seguro. Si no esta activado se permiten algunas operaciones, como el uso de rutas a los
+	 * datos en algunos extraParams en lugar de proporcionar estos datos en Base64.
+	 */
+	private boolean secureMode = true;
+
 	private static SignEnhancer enhancer = null;
+
 	private static Properties enhancerConfig;
 	static {
 		enhancerConfig = new Properties();
@@ -710,8 +717,6 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 				extraParams.remove(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS);
 		}
     }
-
-    private boolean secureMode = true;
 
     @Override
     public void setSecureMode(final boolean secure) {

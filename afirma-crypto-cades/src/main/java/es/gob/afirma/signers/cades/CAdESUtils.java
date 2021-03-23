@@ -163,7 +163,13 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  */
 public final class CAdESUtils {
 
-    private CAdESUtils() {
+	/**
+	 * Identificador del id-aa-ets-signerAttrV2. Esta propiedad se utiliza para indicar
+	 * los roles en las firmas baseline ETSI EN 319 122-1.
+	 */
+    private static final String OID_id_aa_ets_signerAttrV2 =  "0.4.0.19122.1.1"; //$NON-NLS-1$
+
+	private CAdESUtils() {
         // No permitimos la instanciacion
     }
 
@@ -440,26 +446,29 @@ public final class CAdESUtils {
         	);
         }
 
-        // ContentHints, que se crea en base al ContentType
-        if (config.getContentTypeOid() != null) {
-        	final ContentHints contentHints;
-        	if (config.getContentDescription() != null) {
-        		contentHints = new ContentHints(
-    				new ASN1ObjectIdentifier(config.getContentTypeOid()),
-    				new DERUTF8String(config.getContentDescription())
-				);
+        // ContentHints, que se crea en base al ContentType.
+        // Este atributo no se creara en las contrafirmas cuando se use un perfil baseline
+        if (!isCountersign || !AOSignConstants.SIGN_PROFILE_BASELINE.equals(config.getProfileSet()) ) {
+        	if (config.getContentTypeOid() != null) {
+        		final ContentHints contentHints;
+        		if (config.getContentDescription() != null) {
+        			contentHints = new ContentHints(
+        					new ASN1ObjectIdentifier(config.getContentTypeOid()),
+        					new DERUTF8String(config.getContentDescription())
+        					);
+        		}
+        		else {
+        			contentHints = new ContentHints(
+        					new ASN1ObjectIdentifier(config.getContentTypeOid())
+        					);
+        		}
+        		contextSpecific.add(
+        				new Attribute(
+        						PKCSObjectIdentifiers.id_aa_contentHint,
+        						new DERSet(contentHints.toASN1Primitive())
+        						)
+        				);
         	}
-        	else {
-        		contentHints = new ContentHints(
-        			new ASN1ObjectIdentifier(config.getContentTypeOid())
-        		);
-        	}
-        	contextSpecific.add(
-    			new Attribute(
-        			PKCSObjectIdentifiers.id_aa_contentHint,
-        			new DERSet(contentHints.toASN1Primitive())
-    			)
-			);
         }
 
         // Atributos adicionales segun seccion 5.11 de RFC 5126
@@ -507,7 +516,7 @@ public final class CAdESUtils {
         //		}
         //		ClaimedAttributes ::= SEQUENCE OF Attribute
         //
-        //  - En el caso de los pergiles baseline, se utilizara signer-attributes-v2 segun el estandar ETSI EN 319 122-1 V1.1.1 (2016-04).
+        //  - En el caso de los perfiles baseline, se utilizara signer-attributes-v2 segun el estandar ETSI EN 319 122-1 V1.1.1 (2016-04).
         //
         //		SignerAttributeV2 ::= SEQUENCE {
         //			claimedAttributes [0] ClaimedAttributes OPTIONAL,
@@ -525,7 +534,7 @@ public final class CAdESUtils {
         			signerAttrOid = PKCSObjectIdentifiers.id_aa_ets_signerAttr;
         		}
         		else if (AOSignConstants.SIGN_PROFILE_BASELINE.equals(config.getProfileSet()) ) {
-        			signerAttrOid = new ASN1ObjectIdentifier("0.4.0.19122.1.1"); // id-aa-ets-signerAttrV2 OID //$NON-NLS-1$
+        			signerAttrOid = new ASN1ObjectIdentifier(OID_id_aa_ets_signerAttrV2);
         		}
         		// Agregamos los roles
         		if (signerAttrOid != null) {

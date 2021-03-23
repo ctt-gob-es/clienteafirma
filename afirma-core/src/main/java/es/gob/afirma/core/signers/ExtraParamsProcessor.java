@@ -10,10 +10,16 @@
 package es.gob.afirma.core.signers;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 
 /** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
  * y recogidas desde Java en formato <code>Properties</code>. */
@@ -26,6 +32,12 @@ public final class ExtraParamsProcessor {
 
 	/** Clave expansible para pol&iacute;ticas de firma. */
 	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
+
+	/**
+	 * Taman&ntilde;o m&aacute;ximo de ruta permitido para cargar un documento local
+	 * cuando se deshabilita el modo seguro.
+	 */
+	private static final int MAX_PATH_SIZE = 255;
 
 	/** Manejador del log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -320,5 +332,45 @@ public final class ExtraParamsProcessor {
 				LOGGER.warning("Error al configurar una firma PAdES igual a las existentes: " + e); //$NON-NLS-1$
 			}
 		}
+	}
+
+	/**
+	 * Carga un binario del Properties de las propiedades de configuraci&oacute;n. Este dato
+	 * debe estar codificado en Base 64 o, si no est&aacute; habilitado el modo seguro,
+	 * podr&iacute;a ser una ruta local desde la que cargar el binario.
+	 * @param extraParams Propiedades de configuraci&oacute;n de las que obtener el binario.
+	 * @param paramName Nombre del par&aacute;metro en el que se encuentra el binario en Base 64
+	 * o desde el que se referencia al mismo.
+	 * @param secureMode Indica si se est&aacute; trabajando en modo seguro ({@code true}) y el
+	 * dato debe estar en las propiedades, o si no estamos en modo seguro ({@code false}) y
+	 * podr&iacute;amos tener una referencia a un fichero local que cargar.
+	 * @return Datos binarios cargados.
+	 * @throws IOException Cuando no se encuentra el dato en la configuraci&oacute;n o cuando
+	 * no se puede cargar.
+	 */
+	public static byte[] loadByteArrayFromExtraParams(final Properties extraParams, final String paramName,
+			final boolean secureMode) throws IOException {
+
+		final String value = extraParams.getProperty(paramName);
+		if (value == null) {
+			throw new IOException("La propiedad '" + paramName + "' no se encuentra en el extraParams"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		byte[] content;
+		if (!secureMode && value.length() > 0 && value.length() < MAX_PATH_SIZE && !Base64.isBase64(value)) {
+			try {
+				final URI uri = AOUtil.createURI(value);
+				try (InputStream is = AOUtil.loadFile(uri)) {
+					content = AOUtil.getDataFromInputStream(is);
+				}
+			} catch (final Exception e) {
+				throw new IOException("El propiedad '" + paramName + "' no contiene una ruta valida a un recurso", e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		else {
+			content = Base64.decode(value);
+		}
+
+		return content;
 	}
 }
