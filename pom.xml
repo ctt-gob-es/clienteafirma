@@ -136,7 +136,7 @@
 			<dependency>
 				<groupId>es.uji.crypto.xades</groupId>
 				<artifactId>jxades</artifactId>
-				<version>0.2.2</version>
+				<version>0.2.3-SNAPSHOT</version>
 			</dependency>
 
 		</dependencies>
