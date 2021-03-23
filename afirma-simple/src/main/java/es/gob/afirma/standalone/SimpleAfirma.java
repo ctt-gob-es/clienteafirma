@@ -58,6 +58,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.plugins.PluginsManager;
@@ -76,7 +77,7 @@ import es.gob.afirma.standalone.updater.Updater;
 
 /**
  * Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
- * 
+ *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class SimpleAfirma implements PropertyChangeListener, WindowListener, SignatureResultViewer {
@@ -174,7 +175,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Devuelve el marco principal de la aplicaci&oacute;n.
-	 * 
+	 *
 	 * @return Marco principal de la aplicaci&oacute;n.
 	 */
     public Frame getMainFrame() {
@@ -192,12 +193,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
     public SimpleAfirma() {
        this.mainMenu = new MainMenu(this.window, this);
+
+		// Indicamos si se debe instalar el proveedor de firma XML de Apache
+		Utils.installXmlDSigProvider(true);
     }
 
 	/**
 	 * Indica si el <code>AOKeyStoreManager</code> ha terminado de inicializarse y
 	 * est&aacute; listo para su uso.
-	 * 
+	 *
 	 * @return <code>true</code> si el <code>AOKeyStoreManager</code> est&aacute;
 	 *         listo para usarse, <code>false</code> en caso contrario
 	 */
@@ -377,7 +381,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Cierra la aplicaci&oacute;n.
-	 * 
+	 *
      * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
 	 *                 indica error y cero indica salida normal.
 	 */
@@ -390,7 +394,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Cierra la aplicaci&oacute;n.
-	 * 
+	 *
      * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
 	 *                 indica error y cero indica salida normal.
 	 */
@@ -400,7 +404,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Obtiene el <code>AOKeyStoreManager</code> en uso en la aplicaci&oacute;n.
-	 * 
+	 *
 	 * @return <code>AOKeyStoreManager</code> en uso en la aplicaci&oacute;n
 	 */
     public synchronized AOKeyStoreManager getAOKeyStoreManager() {
@@ -409,7 +413,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Elimina el panel actual y carga el panel de resultados de firma.
-	 * 
+	 *
 	 * @param signature   Firma sobre el que queremos mostrar un resumen.
 	 * @param signConfig  Configuraci&oacute;n de firma aplicada.
 	 * @param signingCert Certificado usado para la firma.
@@ -493,7 +497,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Obtiene los idiomas disponibles para la aplicaci&oacute;n
-	 * 
+	 *
 	 * @return Locales disponibles para la aplicaci&oacute;n
 	 */
     public static Locale[] getAvailableLocales() {
@@ -502,7 +506,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Establece el idioma de la aplicaci&oacute;n.
-	 * 
+	 *
 	 * @param l Locale a establecer
 	 */
     public static void setDefaultLocale(final Locale l) {
@@ -516,7 +520,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de
      * men&uacute;.
-	 * 
+	 *
 	 * @param e <code>true</code> para habilitar el men&uacute; <i>Archivo</i>,
 	 *          <code>false</code> para deshabilitarlo
 	 */
@@ -568,7 +572,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para
      * permitir su acceso desde la barra de men&uacute;
-	 * 
+	 *
 	 * @param file Fichero a firmar, incluyendo su ruta completa
 	 */
     public void loadFileToSign(final File file) {
@@ -593,7 +597,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * <li>Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con
 	 * entorno gr&aacute;fico, se iniciar&aacute; el modo consola.</li>
      * </ol>
-	 * 
+	 *
 	 * @param args Par&aacute;metros en l&iacute;nea de comandos
 	 */
     public static void main(final String[] args) {
@@ -839,7 +843,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Pregunta al usuario si desea cerrar la aplicaci&oacute;n.
-	 * 
+	 *
 	 * @return <code>true</code> si el usuario responde que s&iacute;,
 	 *         <code>false</code> en caso contrario
 	 */
@@ -883,7 +887,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Configura que el registro de la ejecuci&oacute;n se guarde tambien en
 	 * fichero.
-	 * 
+	 *
 	 * @param logPath Fichero en donde se almacenar&aacute; el registro.
 	 */
     private static void configureFileLogger(final String logPath) {
@@ -920,7 +924,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     /**
      * Devuelve el panel que actualmente muestra la aplicaci&oacute;n.
-	 * 
+	 *
      * @return Panel que muestra la aplicaci&oacute;n.
      */
     public JPanel getCurrentPanel() {
@@ -931,7 +935,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Recupera el identificador del numero de version de la aplicaci&oacute;n.
-	 * 
+	 *
 	 * @return Texto descriptivo de la versi&oacute;n.
 	 */
 	public static String getVersion() {
@@ -970,7 +974,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de
 	 * comandos.
-	 * 
+	 *
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
 	 * @return {@code true} si la llamada se debe procesar como si se hubiese
 	 *         recibido por l&iacute;nea de comandos.
@@ -982,7 +986,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Indica si la JVM est&aacute; configurada para funcionar s&oacute;lo en modo
 	 * consola.
-	 * 
+	 *
 	 * @return {@code true} si la JVM s&oacute;lo admite el modo consola.
 	 */
 	private static boolean isHeadlessMode() {
@@ -992,7 +996,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Establece si las actualizaciones est&aacute;n permitidas o si se desactivaron
 	 * mediante alg&uacute;n mecanismo a nivel de administraci&oacute;n.
-	 * 
+	 *
 	 * @param enable {@code true} si se debe permitir la b&uacute;squeda de
 	 *               actualizaciones, {@code false} en caso contrario.
 	 */
@@ -1003,7 +1007,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/**
 	 * Indica si las actualizaciones est&aacute;n permitidas o si se desactivaron
 	 * mediante alg&uacute;n mecanismo a nivel de administraci&oacute;n.
-	 * 
+	 *
 	 * @return {@code true} si se permite la b&uacute;squeda de actualizaciones,
 	 *         {@code false} en caso contrario.
 	 */
@@ -1013,7 +1017,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/**
 	 * Comprueba que la versi&oacute;n de Java ejecutada sea compatible.
-	 * 
+	 *
 	 * @return {@code true} si la aplicaci&oacute; se est&aacute; ejecutando con una
 	 *         versi&oacute;n de Java compatible, {@code false} en caso contrario.
 	 */
@@ -1037,7 +1041,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * anteriormente que no se volviera a mostrar la advertencia, se
 	 * modificar&aacute; esto para que si se muestre cuando vuelva a ser no
 	 * compatible.
-	 * 
+	 *
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos
 	 *               gr&aacute;ficos.
 	 */

@@ -30,6 +30,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -59,17 +61,27 @@ final class PreferencesPanelCades extends JScrollPane {
 
 	private static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
 
+	private static final AdESPolicy POLICY_CADES_AGE_1_9;
+
+	private static final String POLICY_BUNDLE_NAME = "policy"; //$NON-NLS-1$
+
+	static {
+
+		final ResourceBundle policyBundle = ResourceBundle
+				.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
+
+		POLICY_CADES_AGE_1_9  = new AdESPolicy(
+				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
+				policyBundle.getString("FirmaAGE19.policyIdentifierHash.CAdES"), //$NON-NLS-1$
+				"SHA1", //$NON-NLS-1$
+				policyBundle.getString("FirmaAGE19.policyQualifier") //$NON-NLS-1$
+			);
+	}
+
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
 	 */
 	private boolean blocked = true;
-
-	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
-		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
-		"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
-	);
 
 	private PolicyPanel cadesPolicyDlg;
 
@@ -327,7 +339,7 @@ final class PreferencesPanelCades extends JScrollPane {
         cadesPolicies.add(
     		new PolicyItem(
 				SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-				POLICY_CADES_PADES_AGE_1_9
+				POLICY_CADES_AGE_1_9
 			)
 		);
 
@@ -354,7 +366,7 @@ final class PreferencesPanelCades extends JScrollPane {
         cadesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_CADES_PADES_AGE_1_9
+        		POLICY_CADES_AGE_1_9
     		)
 		);
 
@@ -444,7 +456,7 @@ final class PreferencesPanelCades extends JScrollPane {
 		if (this.cadesPolicyDlg == null) {
 			final List<PolicyItem> cadesPolicies = new ArrayList<>();
 			cadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-					POLICY_CADES_PADES_AGE_1_9));
+					POLICY_CADES_AGE_1_9));
 
 			this.cadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), isBlocked());
 		}

@@ -33,6 +33,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -64,6 +66,23 @@ final class PreferencesPanelPades extends JScrollPane {
 
 	private static final long serialVersionUID = 4299378019540627483L;
 
+	private static final AdESPolicy POLICY_PADES_AGE_1_9;
+
+	private static final String POLICY_BUNDLE_NAME = "policy"; //$NON-NLS-1$
+
+	static {
+
+		final ResourceBundle policyBundle = ResourceBundle
+				.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
+
+		POLICY_PADES_AGE_1_9  = new AdESPolicy(
+				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
+				policyBundle.getString("FirmaAGE19.policyIdentifierHash.PAdES"), //$NON-NLS-1$
+				"SHA1", //$NON-NLS-1$
+				policyBundle.getString("FirmaAGE19.policyQualifier") //$NON-NLS-1$
+			);
+	}
+
 	private PolicyPanel padesPolicyDlg;
 
 	/**
@@ -71,13 +90,6 @@ final class PreferencesPanelPades extends JScrollPane {
 	 * el di&aacute;logo.
 	 */
 	private JLabel currentPolicyValue;
-
-	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
-		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
-		"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
-	);
 
 	/**
 	 * Atributo para gestionar el bloqueo de propiedades.
@@ -449,7 +461,7 @@ final class PreferencesPanelPades extends JScrollPane {
         padesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_CADES_PADES_AGE_1_9
+        		POLICY_PADES_AGE_1_9
     		)
 		);
 //        this.panelPolicies.removeAll();
@@ -502,7 +514,7 @@ final class PreferencesPanelPades extends JScrollPane {
         padesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_CADES_PADES_AGE_1_9
+        		POLICY_PADES_AGE_1_9
     		)
 		);
 
@@ -603,7 +615,7 @@ final class PreferencesPanelPades extends JScrollPane {
 			final List<PolicyItem> padesPolicies = new ArrayList<>();
 			padesPolicies.add(
 				new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-				POLICY_CADES_PADES_AGE_1_9)
+				POLICY_PADES_AGE_1_9)
 			);
 			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(), isBlocked());
 		}
