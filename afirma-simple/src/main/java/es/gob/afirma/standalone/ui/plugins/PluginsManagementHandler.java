@@ -1,5 +1,7 @@
 package es.gob.afirma.standalone.ui.plugins;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -14,8 +16,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -503,6 +508,30 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		JOptionPane.showMessageDialog(this.view, message,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE);
+	}
+
+	private JComponent createScrollableTextPanel() {
+		final JLabel infoError = new JLabel() {
+			@Override public Dimension getPreferredSize() {
+		        return new Dimension(getParent().getSize().width, super.getPreferredSize().height);
+		    }
+		};
+		infoError.setFocusable(false);
+
+		final JPanel textPanel = new JPanel() {
+			@Override public Dimension getPreferredSize() {
+		        return new Dimension(getParent().getSize().width, super.getPreferredSize().height);
+		    }
+		};
+		final GridBagConstraints c2 = new GridBagConstraints();
+		c2.fill = GridBagConstraints.VERTICAL;
+		c2.gridy = 0;
+		textPanel.add(infoError, c2);
+		c2.weighty = 1.0;
+		c2.gridy++;
+		textPanel.add(new JPanel(), c2); // Panel vacio para rellenar la vertical
+
+		return textPanel;
 	}
 
 	/**

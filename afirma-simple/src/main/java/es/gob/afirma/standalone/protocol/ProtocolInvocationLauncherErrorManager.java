@@ -130,10 +130,10 @@ final class ProtocolInvocationLauncherErrorManager {
 				MacUtils.focusApplication();
 			}
 			AOUIFactory.showErrorMessage(
-				null,
 				desc,
 				ProtocolMessages.getString("ProtocolLauncher.29"), //$NON-NLS-1$
-				AOUIFactory.ERROR_MESSAGE
+				AOUIFactory.ERROR_MESSAGE,
+				null
 			);
 		}
 		LOGGER.severe(desc);

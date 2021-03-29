@@ -204,11 +204,11 @@ public final class AOUIFactory {
      * @param message Mensaje de error.
      * @param title Titulo de la ventana de error.
      * @param messageType Tipo de mensaje. */
-    public static void showErrorMessage(final Object parent,
-    		                            final Object message,
+    public static void showErrorMessage(final Object message,
     		                            final String title,
-    		                            final int messageType) {
-    	uiManager.showErrorMessage(parent, message, title, messageType);
+    		                            final int messageType,
+    		                            final Throwable t) {
+    	uiManager.showErrorMessage(message, title, messageType, t);
     }
 
     /** Di&aacute;logo de solicitud de un valor entre una lista de opciones (equivalente a <code>JOptionPane.showInputDialog()</code>).

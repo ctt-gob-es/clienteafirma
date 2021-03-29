@@ -103,8 +103,9 @@ public interface AOUIManager {
      * @param parent Componente padre para la modalidad.
      * @param message Mensaje de error.
      * @param title Titulo de la ventana de error.
-     * @param messageType Tipo de mensaje. */
-    void showErrorMessage(final Object parent, final Object message, final String title, final int messageType);
+     * @param messageType Tipo de mensaje.
+     * @param t Informaci&oacute;n sobre el error */
+    void showErrorMessage(final Object message, final String title, final int messageType, Throwable t);
 
     /** Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
      * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE */

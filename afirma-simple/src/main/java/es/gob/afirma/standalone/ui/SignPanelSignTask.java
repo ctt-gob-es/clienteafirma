@@ -698,10 +698,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
      * @param message Mensaje de error. */
     static void showErrorMessage(final Component parent, final String message) {
 		AOUIFactory.showErrorMessage(
-			parent,
 			message,
 			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			JOptionPane.ERROR_MESSAGE
+			JOptionPane.ERROR_MESSAGE,
+			null
 		);
     }
 
@@ -732,10 +732,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-                this.parent,
                 SimpleAfirmaMessages.getString("SignPanel.113"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.WARNING_MESSAGE
+                JOptionPane.WARNING_MESSAGE,
+                e
             );
 			return data;
 		}
@@ -750,20 +750,20 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     			catch (final PluginControlledException e) {
     				LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
     				AOUIFactory.showErrorMessage(
-    						this.parent,
     						e.getMessage(),
     						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    						JOptionPane.WARNING_MESSAGE
+    						JOptionPane.WARNING_MESSAGE,
+    						e
     						);
     			}
     			catch (Exception | Error e) {
     				LOGGER.log(Level.SEVERE, "Ocurrio un error grave al preprocesar los datos con el plugin " + plugin + //$NON-NLS-1$
     						". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
     				AOUIFactory.showErrorMessage(
-    						this.parent,
     						SimpleAfirmaMessages.getString("SignPanel.111", plugin.toString(), e.getMessage()), //$NON-NLS-1$
     						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    						JOptionPane.ERROR_MESSAGE
+    						JOptionPane.ERROR_MESSAGE,
+    						e
     						);
     			}
     		}
@@ -782,10 +782,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-                this.parent,
                 SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.WARNING_MESSAGE
+                JOptionPane.WARNING_MESSAGE,
+                e
             );
 			return signature;
 		}
@@ -800,20 +800,20 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     			catch (final PluginControlledException e) {
     				LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
     				AOUIFactory.showErrorMessage(
-    						this.parent,
     						e.getMessage(),
     						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    						JOptionPane.WARNING_MESSAGE
+    						JOptionPane.WARNING_MESSAGE,
+    						e
     						);
     			}
     			catch (Exception | Error e) {
     				LOGGER.log(Level.SEVERE, "Ocurrio un error grave al postprocesar la firma con el plugin " + plugin + //$NON-NLS-1$
     						". Se continuara el proceso con el resto de plugins", e); //$NON-NLS-1$
     				AOUIFactory.showErrorMessage(
-    						this.parent,
     						SimpleAfirmaMessages.getString("SignPanel.112", plugin.toString(), e.getMessage()), //$NON-NLS-1$
     						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    						JOptionPane.ERROR_MESSAGE
+    						JOptionPane.ERROR_MESSAGE,
+    						e
     						);
     			}
     		}
@@ -832,10 +832,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se ha podido cargar el listado de plugins instalados", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-                this.parent,
                 SimpleAfirmaMessages.getString("SignPanel.114"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.WARNING_MESSAGE
+                JOptionPane.WARNING_MESSAGE,
+                e
             );
 			return;
 		}
@@ -847,19 +847,19 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     		catch (final PluginControlledException e) {
     			LOGGER.log(Level.WARNING, "El plugin " + plugin + " lanzo una excepcion controlada", e); //$NON-NLS-1$ //$NON-NLS-2$
     			AOUIFactory.showErrorMessage(
-					this.parent,
 					e.getMessage(),
 					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE
+					JOptionPane.WARNING_MESSAGE,
+					e
 				);
     		}
     		catch (Exception | Error e) {
     			LOGGER.log(Level.SEVERE, "Ocurrio un error grave al reiniciar la firma con el plugin " + plugin, e); //$NON-NLS-1$
     			AOUIFactory.showErrorMessage(
-					this.parent,
 					SimpleAfirmaMessages.getString("SignPanel.115", plugin.toString(), e.getMessage()), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					e
 				);
     		}
     	}

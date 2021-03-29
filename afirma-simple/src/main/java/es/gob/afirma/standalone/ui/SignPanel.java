@@ -203,10 +203,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     			!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES)) {
 
     		AOUIFactory.showErrorMessage(
-    				this,
     				SimpleAfirmaMessages.getString("SimpleAfirma.9"), //$NON-NLS-1$,
     				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    				JOptionPane.ERROR_MESSAGE
+    				JOptionPane.ERROR_MESSAGE,
+    				null
     			);
     		return;
     	}

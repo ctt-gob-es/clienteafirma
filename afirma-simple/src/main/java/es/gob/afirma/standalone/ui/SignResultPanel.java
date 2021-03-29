@@ -155,10 +155,10 @@ final class SignResultPanel extends JPanel {
 						"Error abriendo el fichero: " + e //$NON-NLS-1$
 					);
 			    	AOUIFactory.showErrorMessage(
-			            SignResultPanel.this,
 			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
 			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			            JOptionPane.ERROR_MESSAGE
+			            JOptionPane.ERROR_MESSAGE,
+			            e
 			        );
 			    }
 			}

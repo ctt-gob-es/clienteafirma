@@ -174,10 +174,10 @@ final class SignDataPanel extends JPanel {
 						"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
 					);
 			    	AOUIFactory.showErrorMessage(
-			            SignDataPanel.this,
 			            SimpleAfirmaMessages.getString("SignDataPanel.7"), //$NON-NLS-1$
 			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			            JOptionPane.ERROR_MESSAGE
+			            JOptionPane.ERROR_MESSAGE,
+			            e
 			        );
 			    }
 			});
@@ -324,10 +324,10 @@ final class SignDataPanel extends JPanel {
     			"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
 			);
         	AOUIFactory.showErrorMessage(
-                parent,
                 SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE
+                JOptionPane.ERROR_MESSAGE,
+                e
             );
         }
     }

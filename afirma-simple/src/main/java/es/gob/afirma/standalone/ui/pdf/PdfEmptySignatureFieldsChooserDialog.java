@@ -162,10 +162,10 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 				"No ha sido posible cargar la previsualizacion del acrocampo: " + e1//$NON-NLS-1$
 			);
 			AOUIFactory.showErrorMessage(
-                  this,
                   SignPdfUiMessages.getString("SignPdfFieldChooser.2"), //$NON-NLS-1$
                   SignPdfUiMessages.getString("SignPdfFieldChooser.3"), //$NON-NLS-1$
-                  JOptionPane.ERROR_MESSAGE
+                  JOptionPane.ERROR_MESSAGE,
+                  e1
             );
 			setVisible(false);
 			getListener().propertiesCreated(new Properties());
@@ -303,18 +303,18 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 				"Error creando la previsualizacion del PDF: " + cause); //$NON-NLS-1$
 		if (cause instanceof OutOfMemoryError) {
 			AOUIFactory.showErrorMessage(
-				this,
 				SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
 				SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				cause
 			);
 		}
 		else {
 			AOUIFactory.showErrorMessage(
-				this,
 				SignPdfUiMessages.getString("SignPdfDialog.0"), //$NON-NLS-1$
 				SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				cause
 			);
 		}
 		setVisible(false);

@@ -210,10 +210,10 @@ final class PreferencesPanelKeyStores extends JScrollPane {
 					}
 					catch (final Exception e) {
 						AOUIFactory.showErrorMessage(
-							this,
 							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.11"), //$NON-NLS-1$
 							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.10", getDefaultStore().toString()), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							JOptionPane.ERROR_MESSAGE,
+							e
 						);
 						Logger.getLogger("es.gob.afirma").warning("Error al recuperar el almacen por defecto seleccionado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 					}

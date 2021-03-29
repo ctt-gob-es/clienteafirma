@@ -119,10 +119,10 @@ public final class CheckHashFileDialog extends JDialog implements KeyListener {
 				}
 				catch(final OutOfMemoryError ooe) {
 					AOUIFactory.showErrorMessage(
-						parent,
 						Messages.getString("CreateHashDialog.18"), //$NON-NLS-1$
 						Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ooe
 					);
 					LOGGER.log(Level.SEVERE, "Fichero demasiado grande", ooe); //$NON-NLS-1$
 					return;
@@ -132,8 +132,8 @@ public final class CheckHashFileDialog extends JDialog implements KeyListener {
 					AOUIFactory.showErrorMessage(
 						CheckHashFileDialog.this,
 						Messages.getString("CheckHashDialog.6"), //$NON-NLS-1$
-						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ex
 					);
 				}
 				finally {

@@ -57,10 +57,10 @@ public final class SimpleKeyStoreManager {
             }
             catch(final SmartCardLockedException e) {
             	AOUIFactory.showErrorMessage(
-    				parent,
     				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.9"), //$NON-NLS-1$
     				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.10"), //$NON-NLS-1$
-    				JOptionPane.WARNING_MESSAGE
+    				JOptionPane.WARNING_MESSAGE,
+    				e
 				);
             }
             catch (final Exception e) {
@@ -101,10 +101,10 @@ public final class SimpleKeyStoreManager {
 
             		case "es.gob.jmulticard.card.dnie.BurnedDnieCardException": //$NON-NLS-1$
 	            		AOUIFactory.showErrorMessage(
-            				parent,
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.5"), //$NON-NLS-1$
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.6"), //$NON-NLS-1$
-            				JOptionPane.WARNING_MESSAGE
+            				JOptionPane.WARNING_MESSAGE,
+            				e
         				);
 	            		break;
             		default:
@@ -112,10 +112,10 @@ public final class SimpleKeyStoreManager {
             				"No se ha podido inicializar el controlador 100% Java del DNIe: " + e //$NON-NLS-1$
         				);
                 		AOUIFactory.showErrorMessage(
-            				parent,
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.7"), //$NON-NLS-1$
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.8"), //$NON-NLS-1$
-            				JOptionPane.ERROR_MESSAGE
+            				JOptionPane.ERROR_MESSAGE,
+            				e
         				);
             	}
             }

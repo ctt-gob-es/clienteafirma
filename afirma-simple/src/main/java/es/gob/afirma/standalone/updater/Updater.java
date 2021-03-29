@@ -229,10 +229,10 @@ public final class Updater {
 								e
 							);
 							AOUIFactory.showErrorMessage(
-								parent,
 								UpdaterMessages.getString("Updater.3"), //$NON-NLS-1$
 								UpdaterMessages.getString("Updater.4"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								JOptionPane.ERROR_MESSAGE,
+								e
 							);
 						}
 					}

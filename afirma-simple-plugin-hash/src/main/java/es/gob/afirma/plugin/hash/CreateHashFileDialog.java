@@ -80,7 +80,7 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 
 		private final String name;
 
-		private HashFormat(final String n) {
+		HashFormat(final String n) {
 			this.name = n;
 		}
 
@@ -403,10 +403,10 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 		catch (final Exception ioe) {
 			LOGGER.log(Level.SEVERE, "Error generando o guardando la huella digital", ioe); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-				parent,
 				Messages.getString("CreateHashDialog.13"), //$NON-NLS-1$
 				Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				ioe
 			);
 			return;
 		}
@@ -465,10 +465,10 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error durante el guardado del hash", e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-				parent,
 				Messages.getString("CreateHashDialog.27"), //$NON-NLS-1$
 				Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				e
 			);
 		}
 	}

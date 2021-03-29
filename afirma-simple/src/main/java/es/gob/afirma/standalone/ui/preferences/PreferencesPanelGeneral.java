@@ -151,10 +151,10 @@ final class PreferencesPanelGeneral extends JScrollPane {
 							e
 						);
 						AOUIFactory.showErrorMessage(
-							getParent(),
 							SimpleAfirmaMessages.getString("PreferencesPanel.116"), //$NON-NLS-1$
 							SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							JOptionPane.ERROR_MESSAGE,
+							e
 						);
 						return;
 					}
@@ -474,10 +474,10 @@ final class PreferencesPanelGeneral extends JScrollPane {
     		}
     		catch (final ConfigurationException e) {
     			AOUIFactory.showErrorMessage(
-					null,
 					e.getMessage(),
 					SimpleAfirmaMessages.getString("ProxyDialog.2"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					e
 				);
     			changeProxyDlg(container);
     			return;

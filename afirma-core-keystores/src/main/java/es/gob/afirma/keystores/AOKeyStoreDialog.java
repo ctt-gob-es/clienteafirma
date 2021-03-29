@@ -185,10 +185,10 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-				parent,
 				KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
 				KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
-				AOUIFactory.ERROR_MESSAGE
+				AOUIFactory.ERROR_MESSAGE,
+				e
 			);
 			return false;
 		}

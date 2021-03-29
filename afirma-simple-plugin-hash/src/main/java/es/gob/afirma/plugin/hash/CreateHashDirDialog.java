@@ -323,10 +323,10 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
             catch (final Exception ex) {
                 LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
                 AOUIFactory.showErrorMessage(
-            		parent,
             		Messages.getString("CreateHashFiles.3"), //$NON-NLS-1$
             		Messages.getString("CreateHashFiles.19"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
+                    JOptionPane.ERROR_MESSAGE,
+                    ex
                 );
             }
 		}
@@ -336,10 +336,10 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 		catch (final Exception e) {
 			if (e.getCause() instanceof java.lang.OutOfMemoryError) {
 				AOUIFactory.showErrorMessage(
-					parent,
 					Messages.getString("CreateHashFiles.2"), //$NON-NLS-1$
 					Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					e
 				);
 				LOGGER.severe(
 					"Fichero demasiado grande: " + e.getCause() //$NON-NLS-1$
@@ -347,10 +347,10 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 			}
 			else {
 				AOUIFactory.showErrorMessage(
-					parent,
 					Messages.getString("CreateHashDialog.13"), //$NON-NLS-1$
 					Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					e
 				);
 				LOGGER.log(
 					Level.SEVERE, "Error generando o guardando la huella digital", e//$NON-NLS-1$
@@ -391,10 +391,10 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 		}
 		if (!file.canRead()) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("CheckHashFiles.23"), //$NON-NLS-1$
 				Messages.getString("CheckHashFiles.17"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}

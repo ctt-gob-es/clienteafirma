@@ -588,10 +588,10 @@ final class SignPdfUiPanel extends JPanel implements
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas anteriores: " + ex, ex); //$NON-NLS-1$
 						this.currentPage++; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								SignPdfUiPanel.this,
 								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
 								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								JOptionPane.ERROR_MESSAGE,
+								ex
 								);
 					}
 				}
@@ -609,10 +609,10 @@ final class SignPdfUiPanel extends JPanel implements
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas siguientes: " + ex, ex); //$NON-NLS-1$
 						this.currentPage--; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								SignPdfUiPanel.this,
 								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
 								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								JOptionPane.ERROR_MESSAGE,
+								ex
 							);
 					}
 				}

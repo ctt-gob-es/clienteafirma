@@ -230,13 +230,15 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	public void pdfLoadedFailed(final Throwable cause) {
 		LOGGER.severe("Error creando la previsualizacion del PDF: " + cause); //$NON-NLS-1$
 		if (cause instanceof OutOfMemoryError) {
-			AOUIFactory.showErrorMessage(this.parent, SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
 					SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE,
+					cause);
 		} else {
-			AOUIFactory.showErrorMessage(this.parent, SignPdfUiMessages.getString("SignPdfDialog.0"), //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SignPdfUiMessages.getString("SignPdfDialog.0"), //$NON-NLS-1$
 					SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE,
+					cause);
 		}
 		setVisible(false);
 		this.listener.propertiesCreated(new Properties());
@@ -296,7 +298,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		if (limitSizeCondition || limitAreaCondition) {
 			final String msg = "El \u00E1rea seleccionada para mostrar la firma tienen un tama\u00F1o demasiado peque\u00F1o."; //$NON-NLS-1$
 			final String title = "Tama\u00F1o inv\u00E1lido"; //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(this.activePanel, msg, title, AOUIFactory.ERROR_MESSAGE);
+			AOUIFactory.showErrorMessage(msg, title, AOUIFactory.ERROR_MESSAGE, null);
 			res = false;
 		}
 		return res;

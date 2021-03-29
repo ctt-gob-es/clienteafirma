@@ -31,10 +31,10 @@ public final class TestHash {
 		}
 		catch (final Exception e) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("CreateHashDialog.13"), //$NON-NLS-1$
 				Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				e
 			);
 			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
 				Level.SEVERE, "Error generando o guardando la huella digital", e//$NON-NLS-1$
