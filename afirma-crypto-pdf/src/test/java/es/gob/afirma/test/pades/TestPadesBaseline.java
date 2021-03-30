@@ -79,10 +79,10 @@ public class TestPadesBaseline {
 
 		this.commitmentTypeIndicationsParams = new Properties();
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS, "2"); //$NON-NLS-1$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + ".0." + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "1"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + ".0." + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.2.3.4|123.56.23.1"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + ".1." + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "6"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + ".1." + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "123.56.23.2"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "1"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.2.3.4|1.56.23.1"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "6"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.56.23.2"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Tipos erroneos que no deberian declararse
 		this.contentHintParams = new Properties();
@@ -221,7 +221,7 @@ public class TestPadesBaseline {
 
 		final byte[] result = this.signer.sign(
 				this.data, algorithm, this.pke.getPrivateKey(), this.pke.getCertificateChain(),
-				add(this.baselineParams, this.policyParams, this.metadataParams));
+				add(this.baselineParams, this.policyParams, this.metadataParams, this.claimedRolesParams));
 
 		final File saveFile = saveTempFile(result);
 		System.out.println("Prueba " + new TestPadesBaseline() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -247,6 +247,27 @@ public class TestPadesBaseline {
 		checkSign(result, algorithm);
 	}
 
+	/** Firma baseline sin pol&iacute;tica de firma y commitment type indications. Esta
+	 * ser&iacute;a una combinaci&oacute;n no v&aacute;lida para las firmas BES y Baseline EN
+	 * ya que estas requieren que se declare una pol&iacute;tica de firma cuando se incluya
+	 * el atributo CommitmentTypeIndications.
+	 * @throws Exception en cualquier error. */
+	@Test
+	public void testFirmaBaselineSinPoliticaYConCommitmentTypeIndications() throws Exception {
+
+		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
+
+
+		final byte[] result = this.signer.sign(
+				this.data, algorithm, this.pke.getPrivateKey(), this.pke.getCertificateChain(),
+				add(this.baselineParams, this.commitmentTypeIndicationsParams, this.claimedRolesParams));
+
+		final File saveFile = saveTempFile(result);
+		System.out.println("Prueba " + new TestPadesBaseline() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+
+		checkSign(result, algorithm);
+	}
+
 	/** Firma baseline con raz&oacute;n de firma y commitment type indications.
 	 * @throws Exception en cualquier error. */
 	@Test
@@ -257,7 +278,7 @@ public class TestPadesBaseline {
 
 		final byte[] result = this.signer.sign(
 				this.data, algorithm, this.pke.getPrivateKey(), this.pke.getCertificateChain(),
-				add(this.baselineParams, this.metadataParams, this.commitmentTypeIndicationsParams));
+				add(this.baselineParams, this.metadataParams, this.commitmentTypeIndicationsParams, this.claimedRolesParams));
 
 		final File saveFile = saveTempFile(result);
 		System.out.println("Prueba " + new TestPadesBaseline() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -275,7 +296,7 @@ public class TestPadesBaseline {
 
 		final byte[] result = this.signer.sign(
 				this.data, algorithm, this.pke.getPrivateKey(), this.pke.getCertificateChain(),
-				add(this.baselineParams, this.policyParams, this.metadataParams, this.commitmentTypeIndicationsParams));
+				add(this.baselineParams, this.policyParams, this.metadataParams, this.commitmentTypeIndicationsParams, this.claimedRolesParams));
 
 		final File saveFile = saveTempFile(result);
 		System.out.println("Prueba " + new TestPadesBaseline() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$

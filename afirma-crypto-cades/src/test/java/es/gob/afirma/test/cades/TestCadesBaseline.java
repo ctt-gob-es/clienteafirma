@@ -63,6 +63,7 @@ public class TestCadesBaseline {
 
 		final Properties extraParams = new Properties();
 		extraParams.setProperty("profile", "baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final byte[] signature = signer.sign(this.data, "SHA512withRSA", this.pke.getPrivateKey(), this.pke.getCertificateChain(), extraParams); //$NON-NLS-1$
@@ -80,6 +81,7 @@ public class TestCadesBaseline {
 
 		final Properties extraParams = new Properties();
 		extraParams.setProperty("profile", "baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.setProperty("signerClaimedRoles", "Firmante|Revisor"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
@@ -90,6 +92,30 @@ public class TestCadesBaseline {
 			fos.write(signature);
 		}
 
-		System.out.println("Fichero CAdES B-Level implicita: " + outputFile); //$NON-NLS-1$
+		System.out.println("Fichero CAdES B-Level con roles: " + outputFile); //$NON-NLS-1$
+	}
+
+	@Test
+	public void testCadesBLevelWithRolesAndPolicy() throws Exception {
+
+		final Properties extraParams = new Properties();
+		extraParams.setProperty("profile", "baseline"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("signerClaimedRoles", "Firmante|Revisor"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2.1.10"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("policyQualifier", "https://sede.administracion.gob.es/politica_de_firma_anexo_1.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+		//extraParams.setProperty("policyIdentifierHash", "G7roucf600+f03r/o0bAOQ6WAs0="); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.setProperty("policyIdentifierHash", "/U5j6SLFdchtPHw6vlety2qLz/M="); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final byte[] signature = signer.sign(this.data, "SHA512withRSA", this.pke.getPrivateKey(), this.pke.getCertificateChain(), extraParams); //$NON-NLS-1$
+
+		final File outputFile = File.createTempFile("CAdES_BLevel_con_roles_y_politica_", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+		try (final OutputStream fos = new FileOutputStream(outputFile)) {
+			fos.write(signature);
+		}
+
+		System.out.println("Fichero CAdES B-Level con roles y politica: " + outputFile); //$NON-NLS-1$
 	}
 }

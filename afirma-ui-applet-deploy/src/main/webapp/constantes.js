@@ -53,10 +53,10 @@ var showErrors = 'false'; // Valor por defecto
  * Indica si se debe mostrar una advertencia a los usuarios de Mozilla Firefox *
  * en el momento de arrancar el cliente de firma. Ya que en los navegadores	 *
  * Mozilla los certificados de los tokens externos, como las tarjetas		 *
- * inteligentes, sólo se mostrarán si estaban insertados en el momento de abrir*
- * el almacén, será necesario que los usuarios los mantengan insertados en sus *
- * correspondientes lectores desde el inicio de la aplicación. Esta opción	 *
- * permite avisar a los usuarios para que actúen de esta forma. Las distintas	 *
+ * inteligentes, solo se mostraron si estaban insertados en el momento de abrir*
+ * el almacen, sera necesario que los usuarios los mantengan insertados en sus *
+ * correspondientes lectores desde el inicio de la aplicacion. Esta opcion	 *
+ * permite avisar a los usuarios para que actuen de esta forma. Las distintas	 *
  * opciones que se pueden indicar y los comportamientos asociados son los	 *
  * siguientes:											 *
  * 	- true: Mostrar advertencia.								 *

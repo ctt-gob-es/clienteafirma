@@ -30,8 +30,15 @@
 				var extras = JSON.parse(extraData);
 				showLog("Fichero cargado: " + extras.filename);
 			}
+
+			// Mostramos el certificado Base 64
 			//showLog("Certificado:\n" + certificateB64);
+
+			// A modo ilustrativo, mostramos la firma Base 64 en el formulario
 			document.getElementById('result').value = signatureB64;
+			
+			// Agregamos la firma a un campo oculto para enviarla junto al formulario
+			document.getElementById('resultField').value = signatureB64;
 		}
 		
 		function showBatchResultCallback(resultB64, certificateB64) {
@@ -50,9 +57,8 @@
 		}
 
 		function doSign() {
-			try {				
+			try {
 				var data = document.getElementById("data").value;
-
 				AutoScript.sign(
 					(data != undefined && data != null && data != "") ? data : null,
 					document.getElementById("algorithm").value,
@@ -398,7 +404,7 @@
   </head>
 	<body>
 		<script>
-			AutoScript.setForceWSMode(true);
+			//AutoScript.setForceWSMode(true);
 			//AutoScript.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
 			//AutoScript.setMinimumClientVersion("1.8");
 			AutoScript.cargarAppAfirma();
@@ -491,6 +497,7 @@
 		 <br>
 		 <textarea id="result" cols="150" rows="10">
 		 </textarea>
+		 <input type="hidden" id="resultField" value="" />
 		</div>
 		<input type="button" value="Guardar" onclick="saveSignature();">
 		
