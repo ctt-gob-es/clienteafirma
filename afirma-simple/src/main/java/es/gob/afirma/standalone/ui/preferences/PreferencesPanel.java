@@ -205,7 +205,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		}
 		catch(final Exception e) {
 			AOUIFactory.showErrorMessage(
-				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + "</p>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE, e
 			);
@@ -218,7 +218,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		}
 		catch(final Exception e) {
 			AOUIFactory.showErrorMessage(
-				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + "</p>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE, e
 			);
@@ -231,7 +231,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		}
 		catch(final Exception e) {
 			AOUIFactory.showErrorMessage(
-				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.38") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"<p>" + SimpleAfirmaMessages.getString("PreferencesPanel.38") + "</p>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE, e
 			);

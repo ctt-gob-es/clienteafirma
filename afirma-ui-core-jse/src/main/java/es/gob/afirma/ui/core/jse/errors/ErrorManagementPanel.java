@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
@@ -84,6 +85,17 @@ public final class ErrorManagementPanel extends JPanel {
 		}
 
 		this.scrollPane = new JScrollPane(area);
+		this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMinimum());
+
+		//Las barras de scroll se dejan al principio despues de escribir
+		SwingUtilities.invokeLater(new Runnable() {
+            @Override
+			public void run() {
+        		getScrollPane().getVerticalScrollBar().setValue(getScrollPane().getVerticalScrollBar().getMinimum());
+        		getScrollPane().getHorizontalScrollBar().setValue(getScrollPane().getHorizontalScrollBar().getMinimum());
+            }
+        });
+
 		//Por defecto no se mostraran los detalles
 		this.scrollPane.setVisible(false);
 
@@ -125,15 +137,17 @@ public final class ErrorManagementPanel extends JPanel {
 
 		this.errorInfoLabel = new JLabel();
 		this.errorInfoLabel.setFocusable(false);
-		final String newMessage = new String("<html>"+message.toString()+"</html>"); //$NON-NLS-1$ //$NON-NLS-2$
+		final String newMessage = "<html>" + message.toString() + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$
 		this.errorInfoLabel.setText(newMessage.replace("\n", "<br>")); //$NON-NLS-1$ //$NON-NLS-2$
 
+		ImageIcon icon = null;
+
 		if(messageType == 0) {
-			this.errorInfoLabel.setIcon(new ImageIcon(getClass().
-		        getResource("images/error_icon.png"))); //$NON-NLS-1$
+			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("/resources/error_icon.png")); //$NON-NLS-1$
+			this.errorInfoLabel.setIcon(icon);
 		}else if (messageType == 2) {
-			this.errorInfoLabel.setIcon(new ImageIcon(getClass().
-			    getResource("images/warning_icon.png"))); //$NON-NLS-1$
+			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("/resources/error_icon.png")); //$NON-NLS-1$
+			this.errorInfoLabel.setIcon(icon);
 		}
 
 		final JPanel textPanel = new JPanel();
@@ -177,7 +191,7 @@ public final class ErrorManagementPanel extends JPanel {
 	 * del error.
 	 * @return Panel de texto.
 	 */
-	JLabel getErrorInfoLabel() {
+	public JLabel getErrorInfoLabel() {
 		return this.errorInfoLabel;
 	}
 
@@ -185,7 +199,7 @@ public final class ErrorManagementPanel extends JPanel {
 	 * Devuelve el componente del panel de scroll
 	 * @return Panel de scroll.
 	 */
-	JScrollPane getScrollPane() {
+	public JScrollPane getScrollPane() {
 		return this.scrollPane;
 	}
 
@@ -193,7 +207,7 @@ public final class ErrorManagementPanel extends JPanel {
 	 * Devuelve el bot&oacute;n de cierre del di&aacute;logo.
 	 * @return Bot&oacute;n de cierre.
 	 */
-	JButton getCloseButton() {
+	public JButton getCloseButton() {
 		return this.closeButton;
 	}
 
@@ -201,7 +215,7 @@ public final class ErrorManagementPanel extends JPanel {
 	 * Devuelve el bot&oacute;n de abrir o cerrar de los detalles.
 	 * @return Bot&oacute;n de abrir o cerrar los detalles.
 	 */
-	JButton getDetailsButton() {
+	public JButton getDetailsButton() {
 		return this.detailsButton;
 	}
 

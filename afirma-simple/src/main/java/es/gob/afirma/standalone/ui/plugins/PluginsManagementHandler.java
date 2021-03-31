@@ -120,7 +120,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		final AfirmaPlugin plugin = PluginsManager.loadPluginFromFiles(new File[] { pluginFile });
 		if (plugin == null) {
 			LOGGER.warning("El plugin no es valido y no se cargara"); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0")); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), null); //$NON-NLS-1$
 			return;
 		}
 
@@ -168,7 +168,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 		catch (final PluginControlledException e) {
 			LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
-			showError(e.getLocalizedMessage());
+			showError(e.getLocalizedMessage(), e);
 			return;
 		}
 		catch (final PluginInstalledException e) {
@@ -188,13 +188,13 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			}
 			catch (final Exception e2) {
 				LOGGER.log(Level.WARNING, "No se ha podido reemplazar la version preexistente del plugin", e2); //$NON-NLS-1$
-				showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.15")); //$NON-NLS-1$
+				showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.15"), e2); //$NON-NLS-1$
 				return;
 			}
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.2")); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.2"), e); //$NON-NLS-1$
 			return;
 		}
 
@@ -235,7 +235,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Ocurrio un error durante la lectura del fichero de plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.24")); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.24"), e); //$NON-NLS-1$
 			return false;
 		}
 
@@ -357,7 +357,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			removePlugin(plugin);
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Ocurrio un error al desinstalar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.6")); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.6"), e); //$NON-NLS-1$
 			return;
 		}
 
@@ -489,7 +489,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 		catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "Error al cargar el dialogo de configuracion del plugin " + plugin.getInfo().getName(), e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.13")); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.13"), e); //$NON-NLS-1$
 			return;
 		}
 		dialog.init(preferences.recoverConfig());
@@ -504,10 +504,11 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		dialog.setVisible(true);
 	}
 
-	private void showError(final String message) {
-		JOptionPane.showMessageDialog(this.view, message,
+	private void showError(final String message, final Throwable t) {
+		AOUIFactory.showErrorMessage(message,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE);
+				JOptionPane.ERROR_MESSAGE,
+				t);
 	}
 
 	private JComponent createScrollableTextPanel() {
@@ -577,7 +578,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			this.pluginsList = PluginsManager.getInstance().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.severe("No se ha podido cargar la lista de plugins"); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.8")); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.8"), e); //$NON-NLS-1$
 			return;
 		}
 
