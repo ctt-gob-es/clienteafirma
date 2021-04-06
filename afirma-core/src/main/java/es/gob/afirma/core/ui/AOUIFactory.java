@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.JDialog;
+
 import es.gob.afirma.core.misc.Platform;
 
 /** Factor&iacute;a de elementos de interfaz gr&aacute;fica.
@@ -200,16 +202,35 @@ public final class AOUIFactory {
      * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
      * "Cerrar". El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
      * <code>JOptionPane</code>.
-     * @param parent Componente padre para la modalidad.
      * @param message Mensaje de error.
      * @param title Titulo de la ventana de error.
-     * @param messageType Tipo de mensaje. */
+     * @param messageType Tipo de mensaje.
+     * @param t Tipo de mensaje.
+     * */
     public static void showErrorMessage(final Object message,
     		                            final String title,
     		                            final int messageType,
     		                            final Throwable t) {
     	uiManager.showErrorMessage(message, title, messageType, t);
     }
+
+    /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
+     * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
+     * "Cerrar". El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
+     * <code>JOptionPane</code>.
+     * @param dialog Componente padre
+     * @param message Mensaje de error.
+     * @param title Titulo de la ventana de error.
+     * @param messageType Tipo de mensaje.
+     * @param t Tipo de mensaje.
+     * */
+    public static void showErrorMessage(final JDialog dialog,
+    		final Object message,
+            final String title,
+            final int messageType,
+            final Throwable t) {
+    	uiManager.showErrorMessage(dialog, message, title, messageType, t);
+}
 
     /** Di&aacute;logo de solicitud de un valor entre una lista de opciones (equivalente a <code>JOptionPane.showInputDialog()</code>).
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing

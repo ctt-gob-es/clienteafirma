@@ -818,7 +818,12 @@ public class JSEUIManager implements AOUIManager {
 		errorFrame.setBounds(100, 20, 900, 900);
 
 		ErrorManagementDialog.show(errorFrame, true, message, title, messageType, t);
+    }
 
+	@Override
+    public void showErrorMessage(final JDialog dialog, final Object message, final String title, final int messageType, final Throwable t) {
+
+		ErrorManagementDialog.show(dialog, true, message, title, messageType, t);
     }
 
 	/** Di&aacute;logo a medida que permite el control de las extensiones

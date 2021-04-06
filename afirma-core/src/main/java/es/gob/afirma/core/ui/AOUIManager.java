@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.JDialog;
+
 /** Gestor de componentes de interfaz gr&aacute;fico
  * @version 0.4 */
 public interface AOUIManager {
@@ -100,12 +102,22 @@ public interface AOUIManager {
      * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
      * cerrar. El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
      * <code>JOptionPane</code>.
-     * @param parent Componente padre para la modalidad.
      * @param message Mensaje de error.
      * @param title Titulo de la ventana de error.
      * @param messageType Tipo de mensaje.
      * @param t Informaci&oacute;n sobre el error */
     void showErrorMessage(final Object message, final String title, final int messageType, Throwable t);
+
+    /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
+     * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
+     * cerrar. El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
+     * <code>JOptionPane</code>.
+     * @param dialog Componente padre para la modalidad.
+     * @param message Mensaje de error.
+     * @param title Titulo de la ventana de error.
+     * @param messageType Tipo de mensaje.
+     * @param t Informaci&oacute;n sobre el error */
+	void showErrorMessage(JDialog dialog, Object message, String title, int messageType, Throwable t);
 
     /** Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
      * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE */
@@ -196,4 +208,5 @@ public interface AOUIManager {
     		            final String selectedFile,
     		            final List<GenericFileFilter> filters,
     		            final Object parent) throws IOException;
+
 }

@@ -25,6 +25,22 @@ public final class ErrorManagementDialog extends JDialog {
 		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setEnabled(true);
+		setAlwaysOnTop(true);
+	}
+
+	private ErrorManagementDialog(final JDialog parent, final boolean modal, final Object message, final String title, final int messageType, final Throwable t) {
+		super(parent, modal);
+		setTitle(title);
+		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
+		add(errorPanel);
+		final double screenHeight = 231;
+		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
+		setSize(preferedFrameSize);
+		setResizable(false);
+		setLocationRelativeTo(parent);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setEnabled(true);
 	}
 
 	/**
@@ -38,6 +54,19 @@ public final class ErrorManagementDialog extends JDialog {
 	 */
 	public static void show(final Frame parent, final boolean modal, final Object message, final String title, final int messageType, final Throwable t) {
 		new ErrorManagementDialog(parent, modal, message, title, messageType, t).setVisible(true);
+	}
+
+	/**
+	 * Permite mostrar el di&aacute;logo con el error pero pasa un padre como JDialog
+	 * @param dialog donde mostrar el di&aacute;logo
+	 * @param modal indica si es modal o no al constructor
+	 * @param message mensaje de error
+	 * @param title titulo para la ventana de di&aacute;logo
+	 * @param messageType tipo de mensaje (error o advertencia)
+	 * @param t informaci&oacute;n sobre el error
+	 */
+	public static void show(final JDialog dialog, final boolean modal, final Object message, final String title, final int messageType, final Throwable t) {
+		new ErrorManagementDialog(dialog, modal, message, title, messageType, t).setVisible(true);
 	}
 
 }
