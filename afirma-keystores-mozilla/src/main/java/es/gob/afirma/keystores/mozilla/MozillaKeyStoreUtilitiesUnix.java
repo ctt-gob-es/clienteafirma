@@ -11,6 +11,9 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -45,7 +48,8 @@ final class MozillaKeyStoreUtilitiesUnix {
 		if ("64".equals(javaArch)) { //$NON-NLS-1$
 			nssPaths.add("/usr/lib/x86_64-linux-gnu/nss"); //$NON-NLS-1$
 			nssPaths.add("/usr/lib/x86_64-linux-gnu"); //$NON-NLS-1$
-		} else if("32".equals(javaArch)) { //$NON-NLS-1$
+		}
+		else if("32".equals(javaArch)) { //$NON-NLS-1$
 			nssPaths.add("/usr/lib/i386-linux-gnu/nss"); /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
 			nssPaths.add("/usr/lib/i386-linux-gnu"); //$NON-NLS-1$
 		}
@@ -61,18 +65,20 @@ final class MozillaKeyStoreUtilitiesUnix {
 		}
 		nssPaths.add(systemLibDir + "/thunderbird"); //$NON-NLS-1$
 
-		if (new File("/lib" + javaArch).isDirectory()) { //$NON-NLS-1$
+		if (isDirectory("/lib" + javaArch)) { //$NON-NLS-1$
 			nssPaths.add("/lib" + javaArch); //$NON-NLS-1$
-		} else {
+		}
+		else {
 			nssPaths.add("/lib"); //$NON-NLS-1$
 		}
 
 		nssPaths.add("/opt/firefox"); //$NON-NLS-1$
 
 		// Preserve backwards-compatibility on https://github.com/ctt-gob-es/clienteafirma/issues/27#issuecomment-488402089
-		if (new File("/usr/lib" + javaArch).isDirectory()) { //$NON-NLS-1$
+		if (isDirectory("/usr/lib" + javaArch)) { //$NON-NLS-1$
 			nssPaths.add("/usr/lib" + javaArch); //$NON-NLS-1$
-		} else {
+		}
+		else {
 			nssPaths.add("/usr/lib"); //$NON-NLS-1$
 		}
 
@@ -82,10 +88,12 @@ final class MozillaKeyStoreUtilitiesUnix {
 		}
 
 		nssPaths.add("/opt/fedora-ds/clients/lib"); //$NON-NLS-1$
-		nssPaths.add("/opt/google/chrome"); /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura */ //$NON-NLS-1$
+
+		// NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura
+		nssPaths.add("/opt/google/chrome"); //$NON-NLS-1$
 
 		for (int i = nssPaths.size() - 1; i >= 0; i--) {
-			if (!new File(nssPaths.get(i)).isDirectory()) {
+			if (!isDirectory(nssPaths.get(i))) {
 				nssPaths.remove(i);
 			}
 		}
@@ -238,5 +246,27 @@ final class MozillaKeyStoreUtilitiesUnix {
 		public String toString() {
 			return this.text;
 		}
+	}
+
+	/** Determina la existencia de un directorio a partir de su ruta completa.
+	 * Funciona con enlaces simb&oacute;licos.
+	 * @param fullPath Ruta completa del directorio.
+	 * @return <code>true</code> si la ruta apunta a un directorio, <code>false</code>
+	 *         si apunta a otra cosa o a nada. */
+	private static boolean isDirectory(final String fullPath) {
+		if (fullPath == null || fullPath.isEmpty()) {
+			return false;
+		}
+		final Path path;
+		try {
+			path = new File(fullPath).toPath().toRealPath();
+		}
+		catch (final IOException e) {
+			LOGGER.warning(
+				"No se ha podido comprobar la existencia del directorio '" + fullPath + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			return false;
+		}
+		return Files.isDirectory(path);
 	}
 }
