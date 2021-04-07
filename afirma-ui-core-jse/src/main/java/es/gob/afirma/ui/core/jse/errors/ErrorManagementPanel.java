@@ -76,12 +76,15 @@ public final class ErrorManagementPanel extends JPanel {
 
 		final JTextArea area = new JTextArea();
 		area.setEditable(false);
+		
+		boolean withTrace = false;
 
-		if(t != null && t.getStackTrace().length != 0) {
+		if (t != null && t.getStackTrace().length != 0) {
 
 			final StringWriter errors = new StringWriter();
 			t.printStackTrace(new PrintWriter(errors));
 			area.append(errors.toString().replaceAll("\t", "      "));  //$NON-NLS-1$//$NON-NLS-2$
+			withTrace = true;
 		}
 
 		this.scrollPane = new JScrollPane(area);
@@ -100,7 +103,7 @@ public final class ErrorManagementPanel extends JPanel {
 		this.scrollPane.setVisible(false);
 
         // Creamos un panel para los botones de detalles y cerrar
-        this.buttonsPanel = createButtonsPanel();
+        this.buttonsPanel = createButtonsPanel(withTrace);
 
         // Anadimos cada elemento al panel
         final GridBagConstraints c = new GridBagConstraints();
@@ -159,17 +162,21 @@ public final class ErrorManagementPanel extends JPanel {
 
 	/** Construye el objeto gr&aacute;fico que representa el panel
 	 * donde se ubican los botones de detalles y cerrar
+	 * @param withTrace indica si viene con informaci&oacute;n sobre el error
 	 * @return Panel donde se ubican los botones de detalles y cerrar*/
-	private JPanel createButtonsPanel() {
+	private JPanel createButtonsPanel(final boolean withTrace) {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
-		this.detailsButton = new JButton(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
-		this.detailsButton.getAccessibleContext().setAccessibleDescription(
+		if(withTrace) {
+			
+			this.detailsButton = new JButton(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
+			this.detailsButton.getAccessibleContext().setAccessibleDescription(
 				JSEUIMessages.getString("JSEUIManager.90")  //$NON-NLS-1$
-		);
-		panel.add(this.detailsButton);
+			);
+			panel.add(this.detailsButton);
+		}
 
 		this.closeButton = new JButton(JSEUIMessages.getString("JSEUIManager.1")); //$NON-NLS-1$
 		this.closeButton.getAccessibleContext().setAccessibleDescription(

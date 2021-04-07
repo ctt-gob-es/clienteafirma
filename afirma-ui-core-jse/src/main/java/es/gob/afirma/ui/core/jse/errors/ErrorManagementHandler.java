@@ -27,13 +27,15 @@ public class ErrorManagementHandler {
 	 */
 	void registerComponents() {
 
-		// Boton para abrir o cerrar detalles del error
+		// Boton para abrir o cerrar detalles del error, en caso de que existan detalles
+		if(this.view.getDetailsButton() != null) {
 		this.view.getDetailsButton().addActionListener( new ActionListener(){
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 				resizeScrollpane();
 			}
 		});
+		}
 
 		//Boton de cierre del dialogo
 		this.view.getCloseButton().addActionListener( new ActionListener(){
