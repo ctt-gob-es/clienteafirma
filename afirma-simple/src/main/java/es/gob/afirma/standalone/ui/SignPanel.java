@@ -120,6 +120,12 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	private List<SignOperationConfig> signOperationConfigs;
 
+	/**
+	 * Valor bandera usado para determinar si esta corriendo una tarea en segunda plano y hay que mostrar un
+	 * di&aacute;logo de espera.
+	 */
+    private boolean taskIsRunning = false;
+
     /** Construye el panel de firma, en el que se selecciona y se firma un fichero.
      * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
      * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
@@ -315,6 +321,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
     	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
+    	this.taskIsRunning = true;
+
     	new SignPanelSignTask(
         		this,
         		signConfigs,
@@ -324,12 +332,19 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         		this,
         		this.saf
     		).execute();
-        	this.signWaitDialog.setVisible(true);
+
+    	// Cuidamos de no mostrar el dialogo cuando la tarea ya haya terminado
+   		if (this.taskIsRunning) {
+   			this.signWaitDialog.setVisible(true);
+   		}
     }
 
     @Override
     public void finishTask() {
-    	this.signWaitDialog.dispose();
+
+    	// Marcamos la tarea como termiada para evitar mostrar el dialogo espera despues de su fin
+		this.taskIsRunning = false;
+   		this.signWaitDialog.dispose();
     	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
