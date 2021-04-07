@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.core.jse.errors;
 
-import java.awt.Dimension;
 import java.awt.Frame;
 
 import javax.swing.JDialog;
@@ -19,14 +18,12 @@ public final class ErrorManagementDialog extends JDialog {
 		setTitle(title);
 		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
 		add(errorPanel);
-		final double screenHeight = 231;
-		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
-		setSize(preferedFrameSize);
 		setResizable(false);
-		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setEnabled(true);
 		setAlwaysOnTop(true);
+
+		resize();
 	}
 
 	private ErrorManagementDialog(final JDialog parent, final boolean modal, final Object message, final String title, final int messageType, final Throwable t) {
@@ -34,13 +31,12 @@ public final class ErrorManagementDialog extends JDialog {
 		setTitle(title);
 		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
 		add(errorPanel);
-		final double screenHeight = 231;
-		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
-		setSize(preferedFrameSize);
 		setResizable(false);
-		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setEnabled(true);
+		setAlwaysOnTop(true);
+
+		resize();
 	}
 
 	/**
@@ -69,4 +65,11 @@ public final class ErrorManagementDialog extends JDialog {
 		new ErrorManagementDialog(dialog, modal, message, title, messageType, t).setVisible(true);
 	}
 
+	/**
+	 * Redimensiona el dialogo para ajustarse a su contenido y lo reposiciona en pantalla.
+	 */
+	public void resize() {
+		pack();
+		setLocationRelativeTo(getParent());
+	}
 }

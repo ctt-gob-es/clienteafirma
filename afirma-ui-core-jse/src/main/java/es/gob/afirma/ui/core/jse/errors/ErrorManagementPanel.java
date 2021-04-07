@@ -9,10 +9,12 @@
 
 package es.gob.afirma.ui.core.jse.errors;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,6 +22,7 @@ import java.io.StringWriter;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -36,9 +39,13 @@ public final class ErrorManagementPanel extends JPanel {
 	/** Serial Id. */
 	private static final long serialVersionUID = 8384222173067817402L;
 
+	private static final int DETAILS_PREFERRED_WIDTH = 700;
+
+	private static final int DETAILS_PREFERRED_HEIGHT = 200;
+
 	private final Window window;
 
-	private JLabel errorInfoLabel;
+	private JPanel errorInfoPanel;
 	private JPanel buttonsPanel;
 
 	private JButton closeButton;
@@ -51,13 +58,13 @@ public final class ErrorManagementPanel extends JPanel {
 	private boolean expandedDetails;
 
 	/** Constructor con la ventana padre.
-	 * @param w Ventana sobre la que mostrar la clase.
+	 * @param w Di&aacute;logo sobre el que mostrar el panel.
 	 * @param t Informaci&oacute;n sobre el error
 	 * @param message Mensaje sobre el error
 	 */
-	ErrorManagementPanel(final Window w, final Throwable t, final Object message, final int messageType) {
+	ErrorManagementPanel(final ErrorManagementDialog w, final Throwable t, final Object message, final int messageType) {
 		this.window = w;
-		this.eventsHandler = new ErrorManagementHandler(this);
+		this.eventsHandler = new ErrorManagementHandler(this, w);
 		createUI(t, message, messageType);
 		this.eventsHandler.registerComponents();
 	}
@@ -72,15 +79,14 @@ public final class ErrorManagementPanel extends JPanel {
 
 		setLayout(new GridBagLayout());
 
-		createInfoTextPanel(t, message, messageType);
+		this.errorInfoPanel = createInfoTextPanel(t, message, messageType);
 
 		final JTextArea area = new JTextArea();
 		area.setEditable(false);
-		
+
 		boolean withTrace = false;
 
 		if (t != null && t.getStackTrace().length != 0) {
-
 			final StringWriter errors = new StringWriter();
 			t.printStackTrace(new PrintWriter(errors));
 			area.append(errors.toString().replaceAll("\t", "      "));  //$NON-NLS-1$//$NON-NLS-2$
@@ -89,6 +95,11 @@ public final class ErrorManagementPanel extends JPanel {
 
 		this.scrollPane = new JScrollPane(area);
 		this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMinimum());
+		final double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		final Dimension preferedFrameSize = new Dimension(
+				DETAILS_PREFERRED_WIDTH,
+				(int) Math.min(DETAILS_PREFERRED_HEIGHT, screenHeight * 0.7));
+		this.scrollPane.setPreferredSize(preferedFrameSize);
 
 		//Las barras de scroll se dejan al principio despues de escribir
 		SwingUtilities.invokeLater(new Runnable() {
@@ -112,19 +123,16 @@ public final class ErrorManagementPanel extends JPanel {
 		c.weightx = 1.0;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.insets = new Insets(11, 11,  11,  11);
-		add(this.errorInfoLabel, c);
+		c.insets = new Insets(15, 5, 11, 15);
+		add(this.errorInfoPanel, c);
 
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridy = 1;
+		c.gridy++;
 		c.ipady = 140;
+		c.insets = new Insets(0, 15,  11,  15);
 		add(this.scrollPane, c);
 
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weighty = 0;
-        c.gridx = 0;
-        c.gridy = 2;
-		c.ipady = 11;
+        c.gridy++;
+		c.ipady = 0;
         add(this.buttonsPanel, c);
 	}
 
@@ -136,28 +144,28 @@ public final class ErrorManagementPanel extends JPanel {
 	 * @param messageType Tipo de mensaje (error o warning)
 	 * @return Componente para la visualizaci&oacute;n del texto.
 	 */
-	private JPanel createInfoTextPanel(final Throwable t, final Object message, final int messageType) {
-
-		this.errorInfoLabel = new JLabel();
-		this.errorInfoLabel.setFocusable(false);
-		final String newMessage = "<html>" + message.toString() + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$
-		this.errorInfoLabel.setText(newMessage.replace("\n", "<br>")); //$NON-NLS-1$ //$NON-NLS-2$
+	private static JPanel createInfoTextPanel(final Throwable t, final Object message, final int messageType) {
 
 		ImageIcon icon = null;
-
-		if(messageType == 0) {
-			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("/resources/error_icon.png")); //$NON-NLS-1$
-			this.errorInfoLabel.setIcon(icon);
-		}else if (messageType == 2) {
-			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("/resources/error_icon.png")); //$NON-NLS-1$
-			this.errorInfoLabel.setIcon(icon);
+		final JLabel errorIconLabel = new JLabel();
+		if (messageType == JOptionPane.ERROR_MESSAGE) {
+			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("error_icon.png")); //$NON-NLS-1$
+			errorIconLabel.setIcon(icon);
+		} else if (messageType == JOptionPane.WARNING_MESSAGE) {
+			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("warning_icon.png")); //$NON-NLS-1$
+			errorIconLabel.setIcon(icon);
 		}
 
-		final JPanel textPanel = new JPanel();
+		final String newMessage = "<html>" + message.toString().replace("\n", "<br>") + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final JLabel errorInfoLabel = new JLabel();
+		errorInfoLabel.setText(newMessage);
 
-		textPanel.add(this.errorInfoLabel);
 
-		return textPanel;
+		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 11, 0));
+		panel.add(errorIconLabel);
+		panel.add(errorInfoLabel);
+
+		return panel;
 	}
 
 	/** Construye el objeto gr&aacute;fico que representa el panel
@@ -170,7 +178,7 @@ public final class ErrorManagementPanel extends JPanel {
 		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
 		if(withTrace) {
-			
+
 			this.detailsButton = new JButton(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
 			this.detailsButton.getAccessibleContext().setAccessibleDescription(
 				JSEUIMessages.getString("JSEUIManager.90")  //$NON-NLS-1$
@@ -198,8 +206,8 @@ public final class ErrorManagementPanel extends JPanel {
 	 * del error.
 	 * @return Panel de texto.
 	 */
-	public JLabel getErrorInfoLabel() {
-		return this.errorInfoLabel;
+	public JPanel getErrorInfoPanel() {
+		return this.errorInfoPanel;
 	}
 
 	/**

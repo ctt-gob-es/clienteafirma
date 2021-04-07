@@ -296,8 +296,8 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		final boolean limitSizeCondition = dimensionX < LOWER_LIMIT_X || dimensionY < LOWER_LIMIT_Y;
 		final boolean limitAreaCondition = dimensionX * dimensionY < AREA_LIMIT;
 		if (limitSizeCondition || limitAreaCondition) {
-			final String msg = "El \u00E1rea seleccionada para mostrar la firma tienen un tama\u00F1o demasiado peque\u00F1o."; //$NON-NLS-1$
-			final String title = "Tama\u00F1o inv\u00E1lido"; //$NON-NLS-1$
+			final String msg = SignPdfUiMessages.getString("SignPdfDialog.6"); //$NON-NLS-1$
+			final String title = SignPdfUiMessages.getString("SignPdfDialog.7"); //$NON-NLS-1$
 			transferFocus();
 			AOUIFactory.showErrorMessage(this, msg, title, AOUIFactory.ERROR_MESSAGE, null);
 			res = false;

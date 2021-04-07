@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.core.jse.errors;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,14 +11,16 @@ import es.gob.afirma.ui.core.jse.JSEUIMessages;
 public class ErrorManagementHandler {
 
 	private final ErrorManagementPanel view;
+	private final ErrorManagementDialog dialog;
 
 	/**
 	 * Construye el objeto para la gesti&oacute;n de los eventos del di&aacute;logo de
 	 * errores.
 	 * @param view Panel sobre en el que encuentra el error a mostrar.
 	 */
-	public ErrorManagementHandler(final ErrorManagementPanel view) {
+	public ErrorManagementHandler(final ErrorManagementPanel view, final ErrorManagementDialog dialog) {
 		this.view = view;
+		this.dialog = dialog;
 	}
 
 	/**
@@ -28,17 +29,17 @@ public class ErrorManagementHandler {
 	void registerComponents() {
 
 		// Boton para abrir o cerrar detalles del error, en caso de que existan detalles
-		if(this.view.getDetailsButton() != null) {
-		this.view.getDetailsButton().addActionListener( new ActionListener(){
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				resizeScrollpane();
-			}
-		});
+		if (this.view.getDetailsButton() != null) {
+			this.view.getDetailsButton().addActionListener( new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent arg0) {
+					resizeScrollpane();
+				}
+			});
 		}
 
 		//Boton de cierre del dialogo
-		this.view.getCloseButton().addActionListener( new ActionListener(){
+		this.view.getCloseButton().addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 				getView().getWindow().dispose();
@@ -51,21 +52,17 @@ public class ErrorManagementHandler {
 	 */
 	void resizeScrollpane() {
 
-		boolean visible = false;
-		int screenHeight = 465;
-
-		if(this.view.isExpandedDetails()) {
+		if (this.view.isExpandedDetails()) {
 			this.view.setExpandedDetails(false);
-			screenHeight = 231;
+			this.view.getScrollPane().setVisible(false);
 			this.view.getDetailsButton().setText(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
-		}else {
+		} else {
 			this.view.setExpandedDetails(true);
-			visible = true;
+			this.view.getScrollPane().setVisible(true);
 			this.view.getDetailsButton().setText(JSEUIMessages.getString("JSEUIManager.91")); //$NON-NLS-1$
 		}
 
-		this.view.getWindow().setSize(new Dimension(600, (int) Math.min(550, screenHeight * 0.8)));
-		this.view.getScrollPane().setVisible(visible);
+		this.dialog.resize();
 	}
 
 	/**
