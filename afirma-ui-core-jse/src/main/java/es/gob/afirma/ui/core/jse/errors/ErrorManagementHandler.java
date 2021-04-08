@@ -1,5 +1,8 @@
 package es.gob.afirma.ui.core.jse.errors;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -37,6 +40,16 @@ public class ErrorManagementHandler {
 				}
 			});
 		}
+		
+		// Boton para copiar el error del textarea, en caso de que exista excepcion
+		if (this.view.getCopyErrorButton() != null) {
+			this.view.getCopyErrorButton().addActionListener( new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent arg0) {
+					copyToClipboard();
+				}
+			});
+		}
 
 		//Boton de cierre del dialogo
 		this.view.getCloseButton().addActionListener( new ActionListener() {
@@ -48,7 +61,8 @@ public class ErrorManagementHandler {
 	}
 
 	/**
-	 * Redimensiona el panel si se pulsa en el bot&oacute;n de detalles
+	 * Redimensiona el panel si se pulsa en el bot&oacute;n de detalles 
+	 * y da visibilidad al bot&oacute;n de copiar error
 	 */
 	void resizeScrollpane() {
 
@@ -56,13 +70,25 @@ public class ErrorManagementHandler {
 			this.view.setExpandedDetails(false);
 			this.view.getScrollPane().setVisible(false);
 			this.view.getDetailsButton().setText(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
+			this.view.getCopyErrorButton().setVisible(false);
 		} else {
 			this.view.setExpandedDetails(true);
 			this.view.getScrollPane().setVisible(true);
 			this.view.getDetailsButton().setText(JSEUIMessages.getString("JSEUIManager.91")); //$NON-NLS-1$
+			this.view.getCopyErrorButton().setVisible(true);
 		}
 
 		this.dialog.resize();
+	}
+	
+	/**
+	 * Copia los detalles del error al portapapeles
+	 */
+	void copyToClipboard() {
+
+		StringSelection stringSelection = new StringSelection(this.view.getErrorTextArea().getText());
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, null);
 	}
 
 	/**

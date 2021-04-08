@@ -50,8 +50,10 @@ public final class ErrorManagementPanel extends JPanel {
 
 	private JButton closeButton;
 	private JButton detailsButton;
+	private JButton copyErrorButton;
 
 	private JScrollPane scrollPane;
+	private JTextArea errorTextArea;
 
 	final ErrorManagementHandler eventsHandler;
 
@@ -81,19 +83,19 @@ public final class ErrorManagementPanel extends JPanel {
 
 		this.errorInfoPanel = createInfoTextPanel(t, message, messageType);
 
-		final JTextArea area = new JTextArea();
-		area.setEditable(false);
+		this.errorTextArea = new JTextArea();
+		this.errorTextArea.setEditable(false);
 
 		boolean withTrace = false;
 
 		if (t != null && t.getStackTrace().length != 0) {
 			final StringWriter errors = new StringWriter();
 			t.printStackTrace(new PrintWriter(errors));
-			area.append(errors.toString().replaceAll("\t", "      "));  //$NON-NLS-1$//$NON-NLS-2$
+			this.errorTextArea.append(errors.toString().replaceAll("\t", "      "));  //$NON-NLS-1$//$NON-NLS-2$
 			withTrace = true;
 		}
 
-		this.scrollPane = new JScrollPane(area);
+		this.scrollPane = new JScrollPane(this.errorTextArea);
 		this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMinimum());
 		final double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(
@@ -178,6 +180,13 @@ public final class ErrorManagementPanel extends JPanel {
 		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
 		if(withTrace) {
+			
+			this.copyErrorButton = new JButton(JSEUIMessages.getString("JSEUIManager.92")); //$NON-NLS-1$
+			this.copyErrorButton.getAccessibleContext().setAccessibleDescription(
+				JSEUIMessages.getString("JSEUIManager.92")  //$NON-NLS-1$
+			);
+			this.copyErrorButton.setVisible(false);
+			panel.add(this.copyErrorButton);
 
 			this.detailsButton = new JButton(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
 			this.detailsButton.getAccessibleContext().setAccessibleDescription(
@@ -248,6 +257,38 @@ public final class ErrorManagementPanel extends JPanel {
 	 */
 	public void setExpandedDetails(final boolean expandedDetails) {
 		this.expandedDetails = expandedDetails;
+	}
+	
+	/**
+	 * Devuelve el bot&oacute; de copiar el error del textarea
+	 * @return Bot&oacute; de copiar el error del textarea
+	 */
+	public JButton getCopyErrorButton() {
+		return this.copyErrorButton;
+	}
+
+	/**
+	 * Da valor al bot&oacute; de copiar el error del textarea
+	 * @param copyErrorButton Bot&oacute; de copiar el error del textarea
+	 */
+	public void setCopyErrorButton(JButton copyErrorButton) {
+		this.copyErrorButton = copyErrorButton;
+	}
+	
+	/**
+	 * Devuelve el textarea con la informaci&oacute; sobre el error
+	 * @return Textarea con la informaci&oacute; sobre el error
+	 */
+	public JTextArea getErrorTextArea() {
+		return this.errorTextArea;
+	}
+
+	/**
+	 * Da valor al textarea con la informaci&oacute; sobre el error
+	 * @param copyErrorButton Textarea con la informaci&oacute; sobre el error
+	 */
+	public void setErrorTextArea(JTextArea errorTextArea) {
+		this.errorTextArea = errorTextArea;
 	}
 
 }
