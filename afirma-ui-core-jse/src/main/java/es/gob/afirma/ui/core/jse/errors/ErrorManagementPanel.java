@@ -180,7 +180,7 @@ public final class ErrorManagementPanel extends JPanel {
 		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
 		if(withTrace) {
-			
+
 			this.copyErrorButton = new JButton(JSEUIMessages.getString("JSEUIManager.92")); //$NON-NLS-1$
 			this.copyErrorButton.getAccessibleContext().setAccessibleDescription(
 				JSEUIMessages.getString("JSEUIManager.92")  //$NON-NLS-1$
@@ -258,7 +258,7 @@ public final class ErrorManagementPanel extends JPanel {
 	public void setExpandedDetails(final boolean expandedDetails) {
 		this.expandedDetails = expandedDetails;
 	}
-	
+
 	/**
 	 * Devuelve el bot&oacute; de copiar el error del textarea
 	 * @return Bot&oacute; de copiar el error del textarea
@@ -268,27 +268,10 @@ public final class ErrorManagementPanel extends JPanel {
 	}
 
 	/**
-	 * Da valor al bot&oacute; de copiar el error del textarea
-	 * @param copyErrorButton Bot&oacute; de copiar el error del textarea
-	 */
-	public void setCopyErrorButton(JButton copyErrorButton) {
-		this.copyErrorButton = copyErrorButton;
-	}
-	
-	/**
 	 * Devuelve el textarea con la informaci&oacute; sobre el error
 	 * @return Textarea con la informaci&oacute; sobre el error
 	 */
 	public JTextArea getErrorTextArea() {
 		return this.errorTextArea;
 	}
-
-	/**
-	 * Da valor al textarea con la informaci&oacute; sobre el error
-	 * @param copyErrorButton Textarea con la informaci&oacute; sobre el error
-	 */
-	public void setErrorTextArea(JTextArea errorTextArea) {
-		this.errorTextArea = errorTextArea;
-	}
-
 }
