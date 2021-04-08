@@ -678,11 +678,10 @@ final class PreferencesPanelPades extends JScrollPane {
 
 			} catch (final Exception e) {
 
-				AOUIFactory.showErrorMessage(null,
-						"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + ":<br>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								+ e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$
+				AOUIFactory.showErrorMessage(
+						"<p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + "</p>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE);
+						JOptionPane.ERROR_MESSAGE, e);
 				changePadesPolicyDlg(container);
 
 			}

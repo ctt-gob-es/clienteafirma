@@ -196,10 +196,10 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 				}
 				catch (final OutOfMemoryError ooe) {
 					AOUIFactory.showErrorMessage(
-						parent,
 						Messages.getString("CreateHashFiles.2"), //$NON-NLS-1$
 						Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ooe
 					);
 					LOGGER.log(Level.SEVERE, "Fichero demasiado grande", ooe); //$NON-NLS-1$
 				}
@@ -209,28 +209,28 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 				catch (final DocumentException ex) {
 					LOGGER.log(Level.WARNING, "El documento seleccionado no es un documento de hashes soportado"); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
-						CheckHashDirDialog.this,
 						Messages.getString("CheckHashDialog.17"), //$NON-NLS-1$
 						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ex
 					);
 				}
 				catch (final CorruptedDocumentException ex) {
 					LOGGER.log(Level.WARNING, "El documento seleccionado es un documento de hashes corrupto o manipulado", ex); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
-						CheckHashDirDialog.this,
 						Messages.getString("CheckHashDialog.18"), //$NON-NLS-1$
 						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ex
 					);
 				}
 				catch (final Exception ex) {
 					LOGGER.log(Level.SEVERE, "No ha sido posible comprobar las huellas digitales", ex); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
-						CheckHashDirDialog.this,
 						Messages.getString("CheckHashDialog.6"), //$NON-NLS-1$
 						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ex
 					);
 				}
 			}

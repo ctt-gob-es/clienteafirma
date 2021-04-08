@@ -9,13 +9,13 @@
 
 package es.gob.afirma.standalone.configurator;
 
-import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 final class ConsoleManager {
 
@@ -53,13 +53,13 @@ final class ConsoleManager {
 		return new GraphicConfiguratorConsole(cl);
 	}
 
-	static void showErrorMessage(final Component parent, final String errorText) {
+	static void showErrorMessage(final String errorText, final Throwable t) {
 		if (!headless) {
-			JOptionPane.showMessageDialog(
-				parent,
+			AOUIFactory.showErrorMessage(
 				errorText,
 				Messages.getString("AutoFirmaConfigurator.2"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				t
 			);
 		}
 		else if (con != null) {

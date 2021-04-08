@@ -89,10 +89,10 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         								"Error abriendo el fichero: " + e //$NON-NLS-1$
         								);
         						AOUIFactory.showErrorMessage(
-        								SignPanelFilePanel.this,
         								SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
         								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-        								JOptionPane.ERROR_MESSAGE
+        								JOptionPane.ERROR_MESSAGE,
+        								null
         								);
         						return;
         					}

@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 /** Clase para la obtenci&oacute;n de los recursos textuales del UI del n&uacute;cleo del
  * cliente Afirma. */
-final class JSEUIMessages {
+public final class JSEUIMessages {
 
     private static final String BUNDLE_NAME = "uimessages"; //$NON-NLS-1$
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
@@ -26,7 +26,7 @@ final class JSEUIMessages {
     /** Recupera el texto identificado con la clave proporcionada.
      * @param key Clave del texto.
      * @return Recurso textual. */
-    static String getString(final String key) {
+    public static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }

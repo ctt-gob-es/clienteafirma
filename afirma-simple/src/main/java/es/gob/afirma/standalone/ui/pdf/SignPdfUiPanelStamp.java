@@ -663,10 +663,10 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas anteriores: " + ex, ex); //$NON-NLS-1$
 						this.currentPage++; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-							SignPdfUiPanelStamp.this,
 							SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
 							SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							JOptionPane.ERROR_MESSAGE,
+							ex
 						);
 					}
 				}
@@ -685,10 +685,10 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas siguientes: " + ex, ex); //$NON-NLS-1$
 						this.currentPage--; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-							SignPdfUiPanelStamp.this,
 							SignPdfUiMessages.getString("SignPdfUiStamp.15"), //$NON-NLS-1$
 							SignPdfUiMessages.getString("SignPdfUiStamp.12"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							JOptionPane.ERROR_MESSAGE,
+							ex
 						);
 					}
 				}

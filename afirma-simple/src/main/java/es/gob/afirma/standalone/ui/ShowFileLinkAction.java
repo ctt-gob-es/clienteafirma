@@ -85,10 +85,10 @@ final class ShowFileLinkAction {
         catch(final Exception e) {
         	LOGGER.warning("Error intentado abrir el fichero: " + e); //$NON-NLS-1$
         	AOUIFactory.showErrorMessage(
-                null,
                 SimpleAfirmaMessages.getString("ShowFileLinkAction.2", info.getExtension()),  //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE
+                JOptionPane.ERROR_MESSAGE,
+                e
             );
         }
     }
@@ -112,10 +112,10 @@ final class ShowFileLinkAction {
         catch (final IOException e) {
 			LOGGER.severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-				null,
 				SimpleAfirmaMessages.getString("ShowFileLinkAction.3"), //$NON-NLS-1$
 				SimpleAfirmaMessages.getString("ShowFileLinkAction.4"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				e
 			);
 		}
         catch (final AOCancelledOperationException e) {

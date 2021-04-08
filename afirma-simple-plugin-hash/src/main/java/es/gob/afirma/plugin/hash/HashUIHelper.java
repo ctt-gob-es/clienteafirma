@@ -49,28 +49,28 @@ public final class HashUIHelper {
 	public static void checkHashUI(final File dataFile, final File defaultHashFile) {
 		if (dataFile == null) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("HashHelper.4"), //$NON-NLS-1$
 				Messages.getString("HashHelper.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}
 		if (!dataFile.exists()) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("HashHelper.5"), //$NON-NLS-1$
 				Messages.getString("HashHelper.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}
 		if (!dataFile.canRead()) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("HashHelper.3"), //$NON-NLS-1$
 				Messages.getString("HashHelper.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}
@@ -154,10 +154,10 @@ public final class HashUIHelper {
 			}
 			catch (final OutOfMemoryError ooe) {
 				AOUIFactory.showErrorMessage(
-						null,
 						Messages.getString("CreateHashFiles.2"), //$NON-NLS-1$
 						Messages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ooe
 						);
 				LOGGER.log(
 						Level.SEVERE,
@@ -177,10 +177,10 @@ public final class HashUIHelper {
 								hashFile.getAbsolutePath(), ex
 						);
 				AOUIFactory.showErrorMessage(
-						null,
 						Messages.getString("CheckHashDialog.6"), //$NON-NLS-1$
 						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						ex
 						);
 				return;
 			}
@@ -192,10 +192,10 @@ public final class HashUIHelper {
 			}
 			catch (final Exception e) {
 				AOUIFactory.showErrorMessage(
-						null,
 						Messages.getString("CheckHashDialog.20"), //$NON-NLS-1$
 						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						e
 						);
 				return;
 			}
@@ -210,10 +210,10 @@ public final class HashUIHelper {
 			catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "Error guardado el informe de comprobacion de hashes", e); //$NON-NLS-1$
 				AOUIFactory.showErrorMessage(
-						null,
 						Messages.getString("CheckHashDialog.19"), //$NON-NLS-1$
 						Messages.getString("CheckHashDialog.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						e
 						);
 				return;
 			}
@@ -263,10 +263,10 @@ public final class HashUIHelper {
 					e
 				);
 				AOUIFactory.showErrorMessage(
-					null,
 					Messages.getString("HashHelper.8"), //$NON-NLS-1$
 					Messages.getString("HashHelper.1"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					e
 				);
 				return;
 			}
@@ -286,28 +286,28 @@ public final class HashUIHelper {
 	public static void createHashUI(final File inputFile, final File outputFile, final String hashAlgorithm, final String hashFormat, final boolean recursive) {
 		if (inputFile == null) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("HashHelper.0"), //$NON-NLS-1$
 				Messages.getString("HashHelper.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}
 		if (!inputFile.exists()) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("HashHelper.2"), //$NON-NLS-1$
 				Messages.getString("HashHelper.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}
 		if (!inputFile.canRead()) {
 			AOUIFactory.showErrorMessage(
-				null,
 				Messages.getString("HashHelper.3"), //$NON-NLS-1$
 				Messages.getString("HashHelper.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				null
 			);
 			return;
 		}

@@ -218,9 +218,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             }
 		} else {
         	LOGGER.info("No se ha podido inicializar el almacen por defecto"); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(this.container, SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE, null);
         }
     }
 
@@ -293,9 +293,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		} catch (final Exception e) {
 			LOGGER.severe("No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
             );
-			AOUIFactory.showErrorMessage(this.container, SimpleAfirmaMessages.getString("SimpleAfirma.42"), //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.42"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE, e);
 		} finally {
             this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -580,9 +580,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             try {
                 ((SignPanel) this.currentPanel).loadFiles(new File[] { file } );
 			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(this.currentPanel, SimpleAfirmaMessages.getString("SimpleAfirma.0"), //$NON-NLS-1$
+				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.0"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE);
+						JOptionPane.ERROR_MESSAGE, e);
             }
         }
     }
@@ -766,9 +766,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     					PluginsManager.getInstance().getPluginsLoadedList();
 					} catch (final Exception e) {
     					LOGGER.severe("No se han podido cargar los plugins en la aplicacion"); //$NON-NLS-1$
-						AOUIFactory.showErrorMessage(null, "No se han podido cargar los plugins en la aplicacion.", //$NON-NLS-1$
+						AOUIFactory.showErrorMessage("No se han podido cargar los plugins en la aplicacion.", //$NON-NLS-1$
         						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-								JOptionPane.WARNING_MESSAGE);
+								JOptionPane.WARNING_MESSAGE, e);
     				}
 
     				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
@@ -776,9 +776,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
    					checkJavaVersion(saf.getMainFrame());
 				} else {
-					AOUIFactory.showErrorMessage(null, SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE);
+							JOptionPane.WARNING_MESSAGE, null);
     			}
     		}
 		} catch (final HeadlessException he) {

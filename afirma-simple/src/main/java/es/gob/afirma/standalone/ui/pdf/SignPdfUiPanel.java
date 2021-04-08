@@ -504,7 +504,8 @@ final class SignPdfUiPanel extends JPanel implements
 		final int lyl = Math.max(0, Integer.parseInt(p.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY)));
 		final int y = Math.max(0, newHeight - uyr);
 
-		final BufferedImage imSign = im.getSubimage(lxl, y, uxr - lxl, uyr - lyl);
+		// Obtenemos la subimagen, garantizando de que al menos tenga altura y anchura positivas
+		final BufferedImage imSign = im.getSubimage(lxl, y, Math.max(uxr - lxl, 1), Math.max(uyr - lyl, 1));
 
 		return imSign;
 	}
@@ -588,10 +589,10 @@ final class SignPdfUiPanel extends JPanel implements
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas anteriores: " + ex, ex); //$NON-NLS-1$
 						this.currentPage++; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								SignPdfUiPanel.this,
 								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
 								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								JOptionPane.ERROR_MESSAGE,
+								ex
 								);
 					}
 				}
@@ -609,10 +610,10 @@ final class SignPdfUiPanel extends JPanel implements
 						LOGGER.log(Level.SEVERE, "Error durante la carga de las miniaturas siguientes: " + ex, ex); //$NON-NLS-1$
 						this.currentPage--; // Deshacemos el cambio de pagina
 						AOUIFactory.showErrorMessage(
-								SignPdfUiPanel.this,
 								SignPdfUiMessages.getString("SignPdfDialog.5"), //$NON-NLS-1$
 								SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								JOptionPane.ERROR_MESSAGE,
+								ex
 							);
 					}
 				}

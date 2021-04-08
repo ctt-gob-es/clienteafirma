@@ -185,8 +185,8 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			}
 			catch (final Exception | Error e) {
 				ConsoleManager.showErrorMessage(
-						configurator.getParentComponent(),
-						Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
+						Messages.getString("AutoFirmaConfigurator.0"), //$NON-NLS-1$
+						e
 						);
 				configurator.closeApplication(-1);
 			}
@@ -196,7 +196,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	}
 
 	/** Operaciones admitidas. */
-	private static enum Operation {
+	private enum Operation {
 		INSTALLATION,
 		UNINSTALLATION
 	}

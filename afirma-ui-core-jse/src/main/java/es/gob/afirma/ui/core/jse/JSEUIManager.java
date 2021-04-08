@@ -35,6 +35,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,6 +52,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
+import es.gob.afirma.ui.core.jse.errors.ErrorManagementDialog;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
@@ -754,10 +756,10 @@ public class JSEUIManager implements AOUIManager {
 	                    catch (final Exception ex) {
 	                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
 	                        showErrorMessage(
-	                    		parentComponent,
 	                            JSEUIMessages.getString("JSEUIManager.88"), //$NON-NLS-1$
 	                            JSEUIMessages.getString("JSEUIManager.89"), //$NON-NLS-1$
-	                            JOptionPane.ERROR_MESSAGE
+	                            JOptionPane.ERROR_MESSAGE,
+	                            ex
 	                        );
 	                        // Volvemos a intentar guardar
 	                        tryAgain = true;
@@ -810,18 +812,18 @@ public class JSEUIManager implements AOUIManager {
     }
 
 	@Override
-    public void showErrorMessage(final Object parent, final Object message, final String title, final int messageType) {
-        final String buttonTxt = JSEUIMessages.getString("JSEUIManager.1"); //$NON-NLS-1$
-        JOptionPane.showOptionDialog(
-            parent instanceof Component ? (Component) parent : null,
-            message,
-            title,
-            JOptionPane.OK_OPTION,
-            messageType,
-            null,
-            new String[] { buttonTxt },
-            buttonTxt
-        );
+    public void showErrorMessage(final Object message, final String title, final int messageType, final Throwable t) {
+
+		final JFrame errorFrame = new JFrame("Error"); //$NON-NLS-1$
+		errorFrame.setBounds(100, 20, 900, 900);
+
+		ErrorManagementDialog.show(errorFrame, true, message, title, messageType, t);
+    }
+
+	@Override
+    public void showErrorMessage(final JDialog dialog, final Object message, final String title, final int messageType, final Throwable t) {
+
+		ErrorManagementDialog.show(dialog, true, message, title, messageType, t);
     }
 
 	/** Di&aacute;logo a medida que permite el control de las extensiones

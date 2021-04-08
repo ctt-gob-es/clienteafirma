@@ -347,10 +347,10 @@ public final class MainMenu extends JMenuBar {
 					catch (final Exception ex) {
 						LOGGER.log(Level.SEVERE, "Se ha producido un error inesperado durante la ejecucion de la accion del plugin", ex); //$NON-NLS-1$
 						AOUIFactory.showErrorMessage(
-								parent,
 								SimpleAfirmaMessages.getString("SimpleAfirma.52"), //$NON-NLS-1$
 								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								JOptionPane.ERROR_MESSAGE,
+								ex
 								);
 					}
 				});

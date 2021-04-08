@@ -137,20 +137,20 @@ final class PreferencesPlistHandler {
 				e
 			);
 			AOUIFactory.showErrorMessage(
-				parent,
 				SimpleAfirmaMessages.getString("PreferencesPlistHandler.0"), //$NON-NLS-1$
 				SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				e
 			);
 			return;
 		}
 
 		if (!DataAnalizerUtil.isXML(configData)) {
 			AOUIFactory.showErrorMessage(
-					parent,
 					SimpleAfirmaMessages.getString("PreferencesPlistHandler.9"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					null
 				);
 			return;
 		}
@@ -176,10 +176,10 @@ final class PreferencesPlistHandler {
 							"El fichero de configuracion no esta firmado" //$NON-NLS-1$
 						);
 						AOUIFactory.showErrorMessage(
-							parent,
 							SimpleAfirmaMessages.getString("PreferencesPlistHandler.3"), //$NON-NLS-1$
 							SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							JOptionPane.ERROR_MESSAGE,
+							null
 						);
 						return;
 					}
@@ -189,10 +189,10 @@ final class PreferencesPlistHandler {
 						"El fichero de configuracion contiene una firma invalida: " + sv.getError() //$NON-NLS-1$
 					);
 					AOUIFactory.showErrorMessage(
-						parent,
 						SimpleAfirmaMessages.getString("PreferencesPlistHandler.4"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						null
 					);
 					return;
 			}
@@ -209,10 +209,10 @@ final class PreferencesPlistHandler {
 						"El firmante de las preferencias no esta autorizado: " + AOUtil.getCN(signerCert) //$NON-NLS-1$
 					);
 					AOUIFactory.showErrorMessage(
-						parent,
 						SimpleAfirmaMessages.getString("PreferencesPlistHandler.6", AOUtil.getCN(signerCert)), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
+						JOptionPane.ERROR_MESSAGE,
+						null
 					);
 				}
 			}
@@ -221,10 +221,10 @@ final class PreferencesPlistHandler {
 					"No se ha podido extraer la informacion de la firma del fichero de configuracion: " + e //$NON-NLS-1$
 				);
 				AOUIFactory.showErrorMessage(
-					parent,
 					SimpleAfirmaMessages.getString("PreferencesPlistHandler.7"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					JOptionPane.ERROR_MESSAGE,
+					e
 				);
 				return;
 			}
@@ -251,10 +251,10 @@ final class PreferencesPlistHandler {
 				e
 			);
 			AOUIFactory.showErrorMessage(
-				parent,
 				SimpleAfirmaMessages.getString("PreferencesPlistHandler.8"), //$NON-NLS-1$
 				SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
+				JOptionPane.ERROR_MESSAGE,
+				e
 			);
 		}
 

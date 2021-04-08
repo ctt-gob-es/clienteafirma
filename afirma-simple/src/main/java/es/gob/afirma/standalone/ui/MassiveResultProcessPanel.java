@@ -128,10 +128,10 @@ final class MassiveResultProcessPanel extends JPanel {
         					"Error abriendo el directorio con las firmas generadas: " + e //$NON-NLS-1$
         					);
         			AOUIFactory.showErrorMessage(
-        					this,
         					SimpleAfirmaMessages.getString("MassiveResultProcessPanel.8"), //$NON-NLS-1$
         					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-        					JOptionPane.ERROR_MESSAGE
+        					JOptionPane.ERROR_MESSAGE,
+        					null
         					);
         		}
         	}
@@ -332,10 +332,10 @@ final class MassiveResultProcessPanel extends JPanel {
     			"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
 			);
         	AOUIFactory.showErrorMessage(
-                parent,
                 SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE
+                JOptionPane.ERROR_MESSAGE,
+                e
             );
         }
     }

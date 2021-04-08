@@ -344,10 +344,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                         }
                         if (fileList.size() > 1) {
                         	AOUIFactory.showErrorMessage(
-                        		SignPdfUiPanelPreview.this,
                                 SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
                                 SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-                                JOptionPane.WARNING_MESSAGE
+                                JOptionPane.WARNING_MESSAGE,
+                                null
                             );
                         }
                         File file = null;
@@ -357,10 +357,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                         	filename.startsWith("ftp://") //$NON-NLS-1$
                         ) {
                         	AOUIFactory.showErrorMessage(
-                        		SignPdfUiPanelPreview.this,
                                 SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
                                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
+                                JOptionPane.ERROR_MESSAGE,
+                                null
                             );
                             dtde.dropComplete(false);
                             return;
@@ -756,10 +756,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		    			"No ha podido abrirse el navegador de sistema: " + e //$NON-NLS-1$
 	    			);
 			    	AOUIFactory.showErrorMessage(
-						SignPdfUiPanelPreview.this,
 			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
 			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			            JOptionPane.ERROR_MESSAGE
+			            JOptionPane.ERROR_MESSAGE,
+			            e
 			        );
 			    }
 			}
@@ -1109,10 +1109,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
         }
         if (errorMessage != null) {
         	AOUIFactory.showErrorMessage(
-        		SignPdfUiPanelPreview.this,
                 errorMessage,
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE
+                JOptionPane.ERROR_MESSAGE,
+                null
             );
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             return;
@@ -1618,7 +1618,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		private int degrees;
 		private String text;
 
-		private RotationAngles(final int degrees, final String text) {
+		RotationAngles(final int degrees, final String text) {
 			this.degrees = degrees;
 			this.text = text;
 		}
