@@ -19,6 +19,7 @@ public final class UIPasswordCallback extends PasswordCallback {
 
     private static final long serialVersionUID = 1719174318602363633L;
 
+    /** Texto del di&aacute;logo para solicitar la contrase&ntilde;a. */
     private String childPrompt = null;
 
     /** Componente padre sobre el que se mostrar&aacute; el di&aacute;logo para

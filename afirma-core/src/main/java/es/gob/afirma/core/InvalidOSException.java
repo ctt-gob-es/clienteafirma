@@ -14,6 +14,7 @@ package es.gob.afirma.core;
 public final class InvalidOSException extends RuntimeException {
 	private static final long serialVersionUID = -6174267665607129065L;
 
+	/** Sistema operativo actual. */
 	private final String os;
 
 	/** Crea una nueva instancia de la excepci&oacute;n.

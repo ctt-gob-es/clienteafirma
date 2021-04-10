@@ -21,7 +21,8 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 
-/** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
+/** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n de la operaci&oacute;n
+ * de firma y guardado de resultados. */
 public final class UrlParametersToSignAndSave extends UrlParameters {
 
 	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
@@ -88,7 +89,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
 
-	/** Colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los plugins. */
+	/** Colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los <i>plugins</i>). */
 	private final Map<String, String> anotherParams = new HashMap<>();
 
 	/**
@@ -174,6 +175,10 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		return this.resetSticky;
 	}
 
+	/** Establece los par&aacute;metros de la operaci&oacute;n de firma y guardado de resultados.
+	 * @param params Par&aacute;metros de la operaci&oacute;n de firma y guardado de resultados.
+	 * @throws ParameterException Si se proporciona un par&aacute;metro inv&aacute;lido o incorrecto.
+	 */
 	public void setSignAndSaveParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
@@ -328,6 +333,10 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	}
 
 
+	/**
+	 * Obtiene la colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los <i>plugins</i>).
+	 * @return Colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los <i>plugins</i>).
+	 */
 	public Map<String, String> getAnotherParams() {
 		return this.anotherParams;
 	}

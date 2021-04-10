@@ -66,9 +66,9 @@ public class JSEUIManager implements AOUIManager {
 
     /** Objecto general de preferencias donde se guarda la configuraci&oacute;n de la
 	 * aplicaci&oacute;n. */
-	private static final Preferences preferences;
+	private static final Preferences PREFERENCES;
 	static {
-		preferences = Preferences.userNodeForPackage(JSEUIManager.class);
+		PREFERENCES = Preferences.userNodeForPackage(JSEUIManager.class);
 	}
 
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
@@ -77,7 +77,7 @@ public class JSEUIManager implements AOUIManager {
 	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static String get(final String key, final String def) {
-		return preferences.get(key, def);
+		return PREFERENCES.get(key, def);
 	}
 
 	/** Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
@@ -86,7 +86,7 @@ public class JSEUIManager implements AOUIManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void put(final String key, final String value) {
-		preferences.put(key, value);
+		PREFERENCES.put(key, value);
 	}
 
 	/** Guarda el directorio actual. */
@@ -413,6 +413,7 @@ public class JSEUIManager implements AOUIManager {
             this.acceptedChars = acceptedchars;
         }
 
+        /** Indica si se debe reproducir o no un pitido cuando el usuario introduce un caracter no v&aacute;lido. */
         private boolean beep = false;
 
         /** {@inheritDoc} */
@@ -748,7 +749,7 @@ public class JSEUIManager implements AOUIManager {
 	                // el guardado se haga externamente.
 	                if (data != null) {
 		                try (
-	                		final OutputStream fos = new FileOutputStream(file);
+	                		final OutputStream fos = new FileOutputStream(file)
 	            		) {
 	                        fos.write(data);
 	                        fos.flush();

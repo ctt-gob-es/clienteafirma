@@ -19,7 +19,9 @@ public final class FirstEmptyThenPinUiPasswordCallback extends PasswordCallback 
 
 	private static final long serialVersionUID = -6862690043430780707L;
 
-    private final boolean isFirstTime = true;
+    private static final boolean isFirstTime = true;
+
+    /** Di&aacute;logo a utilizar cuando se usa interfaz gr&aacute;fico. */
     private final UIPasswordCallback uiPasswordCallback;
 
     /** Crea una <i>CallBack</i> para solicitar al usuario una contrase&ntilde;a
@@ -51,7 +53,7 @@ public final class FirstEmptyThenPinUiPasswordCallback extends PasswordCallback 
 
     @Override
     public char[] getPassword() {
-    	if (this.isFirstTime) {
+    	if (isFirstTime) {
     		return new char[0];
     	}
         return this.uiPasswordCallback.getPassword();

@@ -20,6 +20,7 @@ public class ErrorManagementHandler {
 	 * Construye el objeto para la gesti&oacute;n de los eventos del di&aacute;logo de
 	 * errores.
 	 * @param view Panel sobre en el que encuentra el error a mostrar.
+	 * @param dialog Di&aacute;logo de errores.
 	 */
 	public ErrorManagementHandler(final ErrorManagementPanel view, final ErrorManagementDialog dialog) {
 		this.view = view;
@@ -40,7 +41,7 @@ public class ErrorManagementHandler {
 				}
 			});
 		}
-		
+
 		// Boton para copiar el error del textarea, en caso de que exista excepcion
 		if (this.view.getCopyErrorButton() != null) {
 			this.view.getCopyErrorButton().addActionListener( new ActionListener() {
@@ -61,8 +62,8 @@ public class ErrorManagementHandler {
 	}
 
 	/**
-	 * Redimensiona el panel si se pulsa en el bot&oacute;n de detalles 
-	 * y da visibilidad al bot&oacute;n de copiar error
+	 * Redimensiona el panel si se pulsa en el bot&oacute;n de detalles.
+	 * y da visibilidad al bot&oacute;n de copiar error.
 	 */
 	void resizeScrollpane() {
 
@@ -80,20 +81,20 @@ public class ErrorManagementHandler {
 
 		this.dialog.resize();
 	}
-	
+
 	/**
 	 * Copia los detalles del error al portapapeles
 	 */
 	void copyToClipboard() {
 
-		StringSelection stringSelection = new StringSelection(this.view.getErrorTextArea().getText());
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		final StringSelection stringSelection = new StringSelection(this.view.getErrorTextArea().getText());
+		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clipboard.setContents(stringSelection, null);
 	}
 
 	/**
-	 * Devuelve el componente padre donde se encuentran todos los componentes hijos
-	 * @return Devuelve el componente padre
+	 * Devuelve el componente padre donde se encuentran todos los componentes hijos.
+	 * @return Devuelve el componente padre.
 	 */
 	public ErrorManagementPanel getView() {
 		return this.view;

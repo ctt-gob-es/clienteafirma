@@ -11,6 +11,7 @@ package es.gob.afirma.ui.core.jse;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /** Clase para la obtenci&oacute;n de los recursos textuales del UI del n&uacute;cleo del
  * cliente Afirma. */
@@ -18,6 +19,8 @@ public final class JSEUIMessages {
 
     private static final String BUNDLE_NAME = "uimessages"; //$NON-NLS-1$
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private JSEUIMessages() {
         // No permitimos la instanciacion
@@ -31,22 +34,22 @@ public final class JSEUIMessages {
             return RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
+        	LOGGER.severe("No se ha encontrado el texto para la clave '" + key + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return '!' + key + '!';
         }
     }
 
     /** Recupera el texto identificado con la clave proporcionada y sustituye la
      * subcadenas "%0" por el texto proporcionado.
-     * @param key
-     *        Clave del texto.
-     * @param text
-     *        Texto que se desea insertar.
+     * @param key Clave del texto.
+     * @param text Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
     static String getString(final String key, final String text) {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
+        	LOGGER.severe("No se ha encontrado el texto para la clave '" + key + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return '!' + key + '!';
         }
     }
@@ -66,6 +69,7 @@ public final class JSEUIMessages {
             text = RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
+        	LOGGER.severe("No se ha encontrado el texto para la clave '" + key + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return '!' + key + '!';
         }
 

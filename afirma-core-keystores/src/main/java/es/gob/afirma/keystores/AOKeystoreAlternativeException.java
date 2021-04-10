@@ -16,6 +16,7 @@ public final class AOKeystoreAlternativeException extends Exception {
 
     private static final long serialVersionUID = -1536411480952188376L;
 
+    /** Almac&eacute;n alternativo. */
     private final AOKeyStore alternativeKs;
 
     /** Crea la excepci&oacute;n con un mensaje determinado y un almac&eacute;n

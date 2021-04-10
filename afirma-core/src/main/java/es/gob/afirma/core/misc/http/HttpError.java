@@ -17,8 +17,13 @@ public final class HttpError extends IOException {
 
 	private static final long serialVersionUID = 8997766820804553378L;
 
+	/** C&oacute;digo del error. */
 	private final int responseCode;
+
+	/** Descripci&oacute;n del error. */
 	private final String responseDescription;
+
+	/** Flujo de octetos del error (del contenido del error). */
 	private final byte[] errorStreamBytes;
 
 	/** Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
