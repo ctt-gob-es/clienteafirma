@@ -27,7 +27,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String P11_CONFIG_VALID_CHARS = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
+	private static final String P11_CONFIG_VALID_CHARS;
 
 	// Bibliotecas Windows de Firefox
 
@@ -38,7 +38,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 	private static final String MSVCP100_DLL = "msvcp100.dll"; //$NON-NLS-1$
 	private static final String MSVCR120_DLL = "msvcr120.dll"; //$NON-NLS-1$
 	private static final String MSVCP120_DLL = "msvcp120.dll"; //$NON-NLS-1$
-	private static final String MSVCR140_DLL = "VCRUNTIME140.DLL"; //$NON-NLS-1$
+	private static final String MSVCR140_DLL = "vcruntime140.dll"; //$NON-NLS-1$
 	private static final String MSVCP140_DLL = "msvcp140.dll"; //$NON-NLS-1$
 	private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
 	private static final String PLDS4_DLL = "plds4.dll"; //$NON-NLS-1$
@@ -68,6 +68,11 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// No permitimos la instanciacion
 	}
 
+	static {
+		// El caracter tilde solo es invalido para Java 7 y versiones anteriores
+		final String validChars = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
+		P11_CONFIG_VALID_CHARS = isJava8orNewer() ? validChars.concat("~") : validChars; //$NON-NLS-1$
+	}
 	/** Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
 	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
 	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
@@ -85,7 +90,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 				"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			).start();
 			try (
-				final InputStream is = p.getInputStream();
+				final InputStream is = p.getInputStream()
 			) {
 				return new String(AOUtil.getDataFromInputStream(is)).trim();
 			}
@@ -97,7 +102,11 @@ final class MozillaKeyStoreUtilitiesWindows {
 	}
 
 	static String cleanMozillaUserProfileDirectoryWindows(final String dir) {
-		return getShort(dir).replace('\\', '/');
+		final String sh = getShort(dir);
+		if (sh == null) {
+			return dir;
+		}
+		return sh.replace('\\', '/');
 	}
 
 	static String getSystemNSSLibDirWindows() throws IOException {
@@ -135,14 +144,21 @@ final class MozillaKeyStoreUtilitiesWindows {
 				// Copiamos las DLL necesarias a un temporal y devolvemos el temporal
 				final File tmp;
 				// Intentamos usar antes el temporal del sistema, para evitar el del usuario, que puede tener caracteres especiales
-				final File tmpDir = new File(new File(Platform.getSystemLibDir()).getParent(), "Temp"); //$NON-NLS-1$
+				final File tmpDir = new File(
+					new File(
+						Platform.getSystemLibDir()
+					).getParent(),
+					"Temp" //$NON-NLS-1$
+				);
 				if (tmpDir.isDirectory() && tmpDir.canWrite() && tmpDir.canRead()) {
 					tmp = File.createTempFile("nss", null, tmpDir); //$NON-NLS-1$
 				}
 				else {
 					tmp = File.createTempFile("nss", null); //$NON-NLS-1$
 				}
-				tmp.delete();
+				if(!tmp.delete()) {
+					LOGGER.warning("No se ha podido eliminar el fichero '" + tmp.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 				if (!tmp.mkdir()) {
 					throw new AOException(
 						"No se ha podido crear el directorio temporal para las bibliotecas NSS" //$NON-NLS-1$
@@ -168,7 +184,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		if (dir != null) {
 			final File nssP11 = new File(dir, SOFTOKN3_DLL);
-			if (!nssP11.exists()) {
+			if (!nssP11.isFile()) {
 				throw new FileNotFoundException(
 					"No se ha encontrado un NSS en Windows para el directorio " + dir //$NON-NLS-1$
 				);
@@ -179,22 +195,19 @@ final class MozillaKeyStoreUtilitiesWindows {
 				);
 			}
 			try (
-				final InputStream fis = new FileInputStream(nssP11);
+				final InputStream fis = new FileInputStream(nssP11)
 			) {
 				final PeMachineType peArch = new MsPortableExecutable(
 					AOUtil.getDataFromInputStream(fis)
 				).getPeMachineType();
 				final String javaArch = Platform.getJavaArch();
-				if (peArch.equals(PeMachineType.INTEL_386) && "32".equals(javaArch) || //$NON-NLS-1$
-					peArch.equals(PeMachineType.X64) && "64".equals(javaArch)) { //$NON-NLS-1$
-						LOGGER.info("Arquitectura del NSS encontrado: " + peArch); //$NON-NLS-1$
-				}
-				else {
+				if ((!peArch.equals(PeMachineType.INTEL_386) || !"32".equals(javaArch)) && (!peArch.equals(PeMachineType.X64) || !"64".equals(javaArch))) { //$NON-NLS-1$ //$NON-NLS-2$
 					LOGGER.info(
 						"Se usara un NSS local por ser este Java de " + javaArch + " bits y el NSS de sistema para la arquitectura " +  peArch //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					return BundledNssHelper.getBundledNssDirectory();
 				}
+				LOGGER.info("Arquitectura del NSS encontrado: " + peArch); //$NON-NLS-1$
 			}
 			catch(final PEParserException e) {
 				LOGGER.warning(
@@ -256,7 +269,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// Y por ultimo con el directorio por defecto de Windows 7 y Windows 8
 		final String probablyPath = "C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final File f = new File(probablyPath);
-		if (f.exists() && f.isDirectory()) {
+		if (f.isDirectory()) {
 			appData = probablyPath;
 			LOGGER.info(
 				"Se ha comprobado la situacion del directorio 'AppData' de Windows manualmente" //$NON-NLS-1$
@@ -288,5 +301,32 @@ final class MozillaKeyStoreUtilitiesWindows {
 				}
 			}
 		}
+	}
+
+	/** Indica si el JRE actual es Java 8 o superior.
+     * @return <code>true</code> si el JRE actual es Java 8 o superior,
+     *         <code>false</code> si es Java 7 o inferior. */
+	private static boolean isJava8orNewer() {
+		final String ver = System.getProperty("java.version");  //$NON-NLS-1$
+		if (ver == null || ver.isEmpty()) {
+			LOGGER.warning("No se ha podido determinar la version de Java"); //$NON-NLS-1$
+			return false;
+		}
+		try {
+			//  Puede que estemos en Java 8 o menor, con el antiguo esquema de versionado
+			if(ver.substring(0,2).equals("1.")) { //$NON-NLS-1$
+				return Integer.parseInt(ver.substring(2, 3)) > 7;
+			}
+			// En el nuevo esquema de versionado de Java se sigue el patron [1-9][0-9]*((\.0)*\.[1-9][0-9]*)*,
+			// en el que tenemos $MAJOR.$MINOR.$SECURITY (http://openjdk.java.net/jeps/223)
+			final String newVer = ver.substring(0, ver.indexOf(".")); //$NON-NLS-1$+
+			if (AOUtil.isOnlyNumber(newVer)) {
+				return Integer.parseInt(newVer) > 7;
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se ha podido determinar la version de Java (" + ver + "):" + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return false;
 	}
 }
