@@ -158,7 +158,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	this.entryPasswordCallBack = pwc;
     }
 
-    /** Ontiene el <code>PasswordCallBack</code> para las entradas del almac&eacute;n.
+    /** Obtiene el <code>PasswordCallBack</code> para las entradas del almac&eacute;n.
      * @return <code>PasswordCallBack</code> para las entradas del almac&eacute;n. */
     protected PasswordCallback getEntryPasswordCallBack() {
     	return this.entryPasswordCallBack;
