@@ -88,16 +88,23 @@ Var PATH
 Var CREATE_ICON
 ;Parametro que indica si se debe activar el uso del almacen del sistema en Firefox
 Var FIREFOX_SECURITY_ROOTS
+;Parametro que indica la ruta del certificado a pasar por el administrador
+Var CERTIFICATE_PATH
+;Parametro que indica la ruta del almacen de claves a pasar por el administrador
+Var KEYSTORE_PATH
+
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
 InstallDir "$PROGRAMFILES64\AutoFirma"
+
 
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
 InstallDirRegKey HKLM SOFTWARE\AutoFirmacon@firma "Install_Dir"
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
 DirText "Elija un directorio donde instalar la aplicación:"
+
 
 ;Indicamos que cuando la instalacion se complete no se cierre el instalador automaticamente
 AutoCloseWindow false
@@ -111,12 +118,43 @@ SetDatablockOptimize on
 SetCompress auto
 
 Function .onInit
-  ${GetParameters} $R0
-    ClearErrors
-  ;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
-  ;Este delimitador se agrega en el .wxs del instalador MSI
-  ${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
-  ${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS  
+
+	${GetParameters} $R0
+		ClearErrors
+	;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
+	;Este delimitador se agrega en el .wxs del instalador MSI
+	${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
+	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS  
+	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH  
+	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH 
+	
+	; Comprobamos que los archivos pasados por el administrador existen, 
+	; en caso contrario abortamos la instalacion. Tambien comprobamos que
+	; no solo se informe de un parametro, si no de los dos, o de ninguno
+	
+	${If} $KEYSTORE_PATH != "false" 
+	
+		${If} $CERTIFICATE_PATH == "false" 
+			Abort
+		${EndIf}
+
+	${EndIf}
+	
+	${If} $CERTIFICATE_PATH != "false" 
+	
+		${If} $KEYSTORE_PATH == "false" 
+			Abort
+		${EndIf}
+			
+		IfFileExists "$CERTIFICATE_PATH" 0 file_not_found
+			IfFileExists "$KEYSTORE_PATH" 0 file_not_found
+		goto file_check_end
+		file_not_found:
+			Abort
+		file_check_end:
+	
+	${EndIf}
+	
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -124,6 +162,19 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Section "Programa" sPrograma
+
+	; Comprobamos que los archivos pasados por el administrador existen, 
+	; en caso contrario abortamos la instalacion
+	${If} $CERTIFICATE_PATH != "false"
+			
+		IfFileExists "$CERTIFICATE_PATH" 0 file_not_found
+			IfFileExists "$KEYSTORE_PATH" 0 file_not_found
+		goto file_check_end
+		file_not_found:
+			Quit
+		file_check_end:
+ 
+    ${EndIf}
 	
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
@@ -135,7 +186,7 @@ Section "Programa" sPrograma
 	pop $3
 	IntCmp $1 1 +2 0 0
 		Quit
-
+	
 	;Se cierra Firefox y Chrome si están abiertos
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +1
@@ -200,7 +251,6 @@ Section "Programa" sPrograma
 	WriteRegStr HKLM "SOFTWARE\$PATH" "Version" "${VERSION}"
 
 	;Exec "explorer $SMPROGRAMS\$PATH_ACCESO_DIRECTO\"
-	
 	;Registro
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
@@ -251,26 +301,56 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
-
+	
+	${If} $CERTIFICATE_PATH != "false"
+	
+		Push "$CERTIFICATE_PATH"
+		Push "\"
+		Call GetAfterChar
+		Pop $R0
+	
+		; Eliminamos los certificados generados anteriormente con el nombre que indica el administrador
+		IfFileExists "$INSTDIR\$PATH\$R0" 0 +1
+			Delete "$INSTDIR\$PATH\$R0"
+		IfFileExists "$INSTDIR\$PATH\$R0" 0 +1
+			Delete "$INSTDIR\$PATH\$R0"
+ 
+    ${EndIf}
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
-	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+		Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
-	Delete "$INSTDIR\$PATH\autofirma.pfx"
+		Delete "$INSTDIR\$PATH\autofirma.pfx"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R4 ""
 	StrCmp $FIREFOX_SECURITY_ROOTS "true" 0 +2
 		StrCpy $R4 "-firefox_roots"
-
-	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 /passive'
+	
+	; Comprobamos si el administrador le ha pasado el parametro con el certificado
+	StrCpy $R5 ""
+	StrCmp $CERTIFICATE_PATH "false" +2
+		StrCpy $R5 "-certificate_path=$CERTIFICATE_PATH"
+	
+	; Comprobamos si el administrador le ha pasado el parametro con el almacen
+	StrCpy $R6 ""
+	StrCmp $KEYSTORE_PATH "false" +2
+		StrCpy $R6 "-keystore_path=$KEYSTORE_PATH"
+	
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 $R5 $R6 /passive'
 
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
-
+	
 	; Importamos el certificado en el sistema
-	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	StrCmp $CERTIFICATE_PATH "false" 0 custom_cert
+		Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	goto end
+	custom_cert:
+		Push "$INSTDIR\$PATH\$R0"
+	end:
+	
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
@@ -573,6 +653,31 @@ done:
   Pop $2
   Pop $1
   Pop $0
+FunctionEnd
+
+Function GetAfterChar
+ Exch $0 ; chop char
+  Exch
+  Exch $1 ; input string
+  Push $2
+  Push $3
+  StrCpy $2 0
+  loop:
+    IntOp $2 $2 - 1
+    StrCpy $3 $1 1 $2
+    StrCmp $3 "" 0 +3
+      StrCpy $0 ""
+      Goto exit2
+    StrCmp $3 $0 exit1
+    Goto loop
+  exit1:
+    IntOp $2 $2 + 1
+    StrCpy $0 $1 "" $2
+  exit2:
+    Pop $3
+    Pop $2
+    Pop $1
+    Exch $0 ; output
 FunctionEnd
 
 ; StrStr - find substring in a string
