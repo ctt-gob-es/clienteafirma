@@ -40,6 +40,9 @@ import es.gob.jmulticard.card.AuthenticationModeLockedException;
 public class AOKeyStoreManager implements KeyStoreManager {
 
 	private Object parentComponent = null;
+
+	/** Obtiene el componente padre para la modalidad de los elementos gr&aacute;ficos.
+	 * @return Componente padre para la modalidad de los elementos gr&aacute;ficos. */
 	protected Object getParentComponent() {
 		return this.parentComponent;
 	}
@@ -49,25 +52,35 @@ public class AOKeyStoreManager implements KeyStoreManager {
 		this.parentComponent = p;
 	}
 
+	/** <code>Logger</code> de la clase y sus hijas. */
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private final Set<String> deactivatedCertificatesThumbprints = new HashSet<>();
 
     private String[] cachedAliases = null;
+
+    /** Borra la lista de alias precargados. */
     protected void resetCachedAliases() {
     	this.cachedAliases = null;
     }
 
+    /** Obtiene la lista de alias precargados.
+     * @return Lista de alias precargados. */
     protected String[] getCachedAliases() {
     	return this.cachedAliases;
     }
 
+    /** Establece la lista de alias precargados.
+     * @param ca Lista de alias precargados. */
     protected void setCachedAliases(final String[] ca) {
     	this.cachedAliases = ca.clone();
     }
 
     private boolean preferred = false;
 
+    /** Indica si este gestor de almacenes es el preferente.
+     * @return <code>true</code> si este gestor de almacenes es el preferente,
+     *         <code>false</code> en caso contrario. */
     protected boolean isPreferred() {
     	return this.preferred;
     }
@@ -81,6 +94,10 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     /** Almacenes de claves. */
     private KeyStore ks;
+
+
+    /** Establece el almac&eacute;n de claves principal.
+     * @param k Almac&eacute;n de claves principal. */
     protected void setKeyStore(final KeyStore k) {
     	this.ks = k;
     }
@@ -105,10 +122,15 @@ public class AOKeyStoreManager implements KeyStoreManager {
 		}
     }
 
+    /** Indica si este gestor de almacenes no tiene ning&uacute;n almac&eacute;n a gestionar.
+     * @return <code>true</code> si este gestor de almacenes no tiene ning&uacute;n almac&eacute;n a gestionar,
+     *         <code>false</code> en caso contrario. */
     protected boolean lacksKeyStores() {
     	return this.ks == null;
     }
 
+    /** Establece el tipo del almac&eacute;n principal de este gestor.
+     * @param type Tipo del almac&eacute;n principal de este gestor. */
     protected final void setKeyStoreType(final AOKeyStore type) {
     	this.ksType = type;
     }
@@ -136,6 +158,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	this.entryPasswordCallBack = pwc;
     }
 
+    /** Ontiene el <code>PasswordCallBack</code> para las entradas del almac&eacute;n.
+     * @return <code>PasswordCallBack</code> para las entradas del almac&eacute;n. */
     protected PasswordCallback getEntryPasswordCallBack() {
     	return this.entryPasswordCallBack;
     }
@@ -377,11 +401,9 @@ public class AOKeyStoreManager implements KeyStoreManager {
     public String toString() {
         final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves "); //$NON-NLS-1$
         ret.append(this.ksType);
-        if (this.ksType != null) {
-            if (this.ksType.getName() != null) {
-                ret.append(" con nombre "); //$NON-NLS-1$
-                ret.append(this.ksType.getName());
-            }
+        if (this.ksType != null && this.ksType.getName() != null) {
+            ret.append(" con nombre "); //$NON-NLS-1$
+            ret.append(this.ksType.getName());
         }
         return ret.toString();
     }
@@ -391,6 +413,9 @@ public class AOKeyStoreManager implements KeyStoreManager {
 		return getKeyStore().isKeyEntry(alias);
 	}
 
+	/** Limpia la lista de alias deshabilitados.
+	 * @param currentAliases Lista actual de alias, sin los deshabilitados.
+	 * @return Lista de alias con todas las entradas habilitadas. */
 	protected String[] cleanDeactivatedAliases(final String[] currentAliases) {
 
 		if (this.deactivatedCertificatesThumbprints.isEmpty()) {

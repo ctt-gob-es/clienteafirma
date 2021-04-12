@@ -77,6 +77,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final String KEYSTORE_TYPE = "javax.net.ssl.keyStoreType"; //$NON-NLS-1$
 	private static final String KEYSTORE_DEFAULT_TYPE = "JKS"; //$NON-NLS-1$
 	private static final String SSL_CONTEXT = "SSL";//$NON-NLS-1$
+	private static final String ACCEPT = "Accept"; //$NON-NLS-1$
 
 	private static KeyStore sslKeyStore = null;
 	private static PasswordCallback sslKeyStorePasswordCallback = null;
@@ -87,6 +88,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		CookieHandler.setDefault(cookieManager);
 	}
 
+	/** Constructor. */
 	protected UrlHttpManagerImpl() {
 		// Vacio y "protected"
 	}
@@ -153,7 +155,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
 		}
 		if (accept != null) {
-			headers.setProperty("Accept", accept); //$NON-NLS-1$
+			headers.setProperty(ACCEPT, accept);
 		}
 		return readUrl(urlToRead, timeout, method, headers);
 	}
@@ -247,9 +249,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		if (authString != null && !headers.containsKey("Authorization")) { //$NON-NLS-1$
 			conn.addRequestProperty("Authorization", "Basic " + authString); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (!headers.containsKey("Accept")) { //$NON-NLS-1$
+		if (!headers.containsKey(ACCEPT)) {
 			conn.addRequestProperty(
-				"Accept", //$NON-NLS-1$
+				ACCEPT,
 				"*/*" //$NON-NLS-1$
 			);
 		}
@@ -277,7 +279,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			);
 			conn.setDoOutput(true);
 			try (
-				final OutputStream os = conn.getOutputStream();
+				final OutputStream os = conn.getOutputStream()
 			) {
 				os.write(urlParameters.getBytes(StandardCharsets.UTF_8));
 			}
@@ -302,7 +304,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final byte[] data;
 		try (
-			final InputStream is = conn.getInputStream();
+			final InputStream is = conn.getInputStream()
 		) {
 			data = AOUtil.getDataFromInputStream(is);
 		}
@@ -415,7 +417,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE
 			);
 			try (
-				final InputStream fis = new FileInputStream(f);
+				final InputStream fis = new FileInputStream(f)
 			) {
 				kstore.load(
 					fis,

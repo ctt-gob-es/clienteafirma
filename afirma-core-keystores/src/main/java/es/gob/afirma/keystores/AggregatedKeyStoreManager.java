@@ -38,6 +38,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		setKeyStoreType(mainKsm.getType());
 	}
 
+	/** Constructor. */
 	protected AggregatedKeyStoreManager() {
 		// Vacio
 	}

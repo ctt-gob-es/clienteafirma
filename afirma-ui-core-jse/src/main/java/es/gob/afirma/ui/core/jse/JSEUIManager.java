@@ -59,6 +59,7 @@ import es.gob.afirma.ui.core.jse.errors.ErrorManagementDialog;
  * @version 0.4 */
 public class JSEUIManager implements AOUIManager {
 
+	/** <code>Logger</code> de la clase y sus hijas. */
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final int ASCII_LOWER_INDEX = 32;
@@ -143,7 +144,7 @@ public class JSEUIManager implements AOUIManager {
         constraints.gridy = 1;
         panel.add(pwd, constraints);
 
-        final Icon icon = imageIcon instanceof javax.swing.Icon ? (javax.swing.Icon) imageIcon : null;
+        final Icon icon = imageIcon instanceof Icon ? (Icon) imageIcon : null;
 
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, icon) {
             private static final long serialVersionUID = -3012522768561175760L;
@@ -440,6 +441,7 @@ public class JSEUIManager implements AOUIManager {
 
         private static final long serialVersionUID = 1979726487852842735L;
 
+        /** Indica si se debe reproducir o no un pitido cuando el usuario introduce un caracter no v&aacute;lido. */
         private boolean beep = false;
 
         /** Crea un nuevo filtro para campo de entrada de texto.
