@@ -2979,7 +2979,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Carga de multiples ficheros de datos. Se realiza mediante la invocacion de una app nativa. 
 			 */
-			function getMultiFileNameContentBase64  (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+			function getMultiFileNameContentBase64  (title, extensions, description, filePath, successCallback, errorCallback) {
 				var errorType = "java.lang.UnsupportedOperationException";
 				var errorMessage = "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio";
 				if (!errorCallback) {
