@@ -228,8 +228,16 @@ class SignBatchXmlHandler extends DefaultHandler {
 			this.currentSign.setExtraParams(extraParams);
 			break;
 		case ELEMENT_CLASS:
+			// Comprobamos que la clase indicada implemente nuestra interfaz para
+			// asegurarnos de que no se ejecuta su contexto estatico si no es necesario.
+			// Si la clase implementa
 			try {
-				this.currentSignSaver = (SignSaver) Class.forName(new String(this.acumulateContent.toCharArray()).trim()).newInstance();
+				final String className = new String(this.acumulateContent.toCharArray()).trim();
+				final Class<?> signSaverClass = Class.forName(className, false, ClassLoader.getSystemClassLoader());
+				if (!SignSaver.class.isAssignableFrom(signSaverClass)) {
+					throw new IllegalArgumentException("La clase indicada no implementa la interfaz " + SignSaver.class.getName()); //$NON-NLS-1$
+				}
+				this.currentSignSaver = (SignSaver) signSaverClass.newInstance();
 			} catch (final Exception e) {
 				throw new SAXException("No se pudo cargar la clase de guardado para la firma " + this.currentSign.getId(), e); //$NON-NLS-1$
 			}

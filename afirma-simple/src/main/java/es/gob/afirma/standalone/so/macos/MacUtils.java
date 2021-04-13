@@ -87,42 +87,48 @@ public class MacUtils {
 		}
 	}
 
-
     /** Ejecuta un fichero de scripts.
-	 * @param scriptFile Fichero de <i>script</i>.
-	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
-	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-	 * @return El objeto que da como resultado el <i>script</i>.
-	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>.
-     * @throws InterruptedException Cuando el proceso se ve interrumpido (posiblemente por el usuario). */
-	public static Object executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
+	 * @param scriptFile Ruta del fichero de <i>script</i>.
+	 * @param administratorMode {@code true} el <i>script</i> se ejecuta con permisos de adminsitrador,
+	 * {@code false} en caso contrario.
+	 * @param delete {@code true} borra el fichero despu&eacute;s de haberse ejecutado, {@code false} no hace nada.
+	 * @return La cadena que da como resultado el <i>script</i>.
+	 * @throws IOException Cuando ocurre un error en la ejecuci&oacute;n del <i>script</i>.
+     * @throws InterruptedException  Cuando se interrumpe la ejecuci&oacute;n del script (posiblemente por el usuario). */
+	public static String executeScriptFile(final File scriptFile, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
 		final ShellScript script = new ShellScript(scriptFile, delete);
-
 		try {
-			Object o;
+			String result;
 			if (administratorMode) {
 				LOGGER.info("Se ejecuta con permisos de administrador el script: " + scriptFile); //$NON-NLS-1$
-				o = script.runAsAdministrator();
+				result = script.runAsAdministrator();
 			}
 			else {
 				LOGGER.info("Se ejecuta el script: " + scriptFile); //$NON-NLS-1$
-				o = script.run();
+				result = script.run();
 			}
-			return o;
+			return result;
 		}
 		catch (final IOException e) {
 			throw new IOException("Error en la ejecucion del script", e); //$NON-NLS-1$
 		}
 	}
 
-	/** Mata el proceso de AutoFirma cuando estamos en macOS. En el resto de sistemas
-	 * no hace nada.
-	 * @param processIdText Texto que permite identificar el proceso. */
-	public static void closeMacService(final String processIdText) {
+	/** Mata el proceso intermedio de AutoFirma cuando estamos en macOS. El proceso intermedio
+	 * no es la aplicaci&oacute;n Java, sino el ejecutable que traslada los par&aacute;metros
+	 * proporcionados por el navegador Web a la aplicaci&oacute;n Java.
+	 * @param sessionIdText Texto contenido en la llamada al proceso y que permite identificarlo. */
+	public static void closeMacService(final String sessionIdText) {
+
+		if (sessionIdText == null) {
+			LOGGER.warning("No se ha proporcionado el id del proceso que hay que cerrar"); //$NON-NLS-1$
+			return;
+		}
+
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
 		final ShellScript script = new ShellScript(
-				"kill -9 $(ps -ef | grep " + processIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
+				"kill -9 $(ps -ef | grep " + sessionIdText + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
 				);
 		try {
 			script.run();

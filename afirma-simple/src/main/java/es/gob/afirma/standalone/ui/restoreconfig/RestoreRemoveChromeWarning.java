@@ -117,19 +117,15 @@ final public class RestoreRemoveChromeWarning {
 
 				// Se escriben los comandos de reconfiguracion
 				final StringBuilder reconfigScript = new StringBuilder();
-				// Comandos de desinstalacion
-				final ArrayList<String[]> uninstallCommands = getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(userDir);
-				final Iterator<String[]> list2 = uninstallCommands.iterator();
 
-				while(list2.hasNext()) {
-					ConfiguratorUtil.printScript(list2.next(), reconfigScript);
+				// Comandos de desinstalacion
+				for (final String[] cmds : getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(userDir)) {
+					ConfiguratorUtil.printScript(cmds, reconfigScript);
 				}
 
 				// Comandos de instalacion
-				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(userDir);
-				final Iterator<String[]> list = installCommands.iterator();
-				while(list.hasNext()) {
-					ConfiguratorUtil.printScript(list.next(), reconfigScript);
+				for (final String[] cmds : getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(userDir)) {
+					ConfiguratorUtil.printScript(cmds, reconfigScript);
 				}
 
 				// Se almacenan los script de reconfiguracion en un fichero

@@ -578,10 +578,13 @@ final class RestoreConfigFirefox {
 			sb.append(' ');
 		}
 
+		// macOS
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, sb, true);
 			return false;
 		}
+
+		// Linux
 		else if (Platform.OS.LINUX.equals(Platform.getOS())) {
 			// Ejecutamos el comando certutil en Linux
 			final StringBuilder uninstall = new StringBuilder();
@@ -649,8 +652,9 @@ final class RestoreConfigFirefox {
 						"Error en la ejecucion del script para la desinstalacion del certificado del almacen de confianza: " + e); //$NON-NLS-1$
 				return true;
 			}
-			try {
 
+			// Despues, instalamos el certificado de confianza
+			try {
 				error = execCommand(new String[] {path});
 			}
 			catch (final Exception e) {
@@ -668,44 +672,19 @@ final class RestoreConfigFirefox {
 			}
 
 			return error;
-
-		}
-		else {
-			LOGGER.info("Se ejecutara el siguiente comando:\n" + sb.toString()); //$NON-NLS-1$
-			final Process process = new ProcessBuilder(command).start();
-			// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
-			// cualquier salida como un error
-			String line;
-			try (
-					final InputStream resIs = process.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					LOGGER.severe(line);
-					return true;
-				}
-			}
-
-			try (
-					final InputStream errIs = process.getErrorStream();
-					final BufferedReader errReader = new BoundedBufferedReader(
-							new InputStreamReader(errIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = errReader.readLine()) != null) {
-					LOGGER.severe(line);
-					return true;
-				}
-			}
 		}
 
-		return false;
+		// Windows
+		LOGGER.info("Se ejecutara el siguiente comando:\n" + sb.toString()); //$NON-NLS-1$
+		try {
+			error = execCommand(command);
+		}
+		catch (final Exception e) {
+			LOGGER.severe(
+					"Excepcion en la ejecucion del script para la instalacion del certificado en el almacen de confianza: " + e); //$NON-NLS-1$
+			return true;
+		}
+		return error;
 	}
 
 
@@ -770,38 +749,20 @@ final class RestoreConfigFirefox {
 							"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					};
 
-					final Process process = new ProcessBuilder(certutilCommands).start();
-
-					LOGGER.info("Comando certutil ejecutado: " + Arrays.toString(certutilCommands)); //$NON-NLS-1$
-					// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
-					// cualquier salida como un error
-					String line;
-					try (
-							final InputStream resIs = process.getInputStream();
-							final BufferedReader resReader = new BoundedBufferedReader(
-									new InputStreamReader(resIs),
-									256, // Maximo 256 lineas de salida
-									1024 // Maximo 1024 caracteres por linea
-									);
-							) {
-						while ((line = resReader.readLine()) != null) {
-							error = true;
-							LOGGER.severe("Error devuelto por certutilen el flujo de salida: " + line); //$NON-NLS-1$
-						}
+					boolean detectedError;
+					try {
+						detectedError = execCommand(certutilCommands);
+					}
+					catch (final Exception e) {
+						LOGGER.severe(
+								"Excepcion en la ejecucion del script para el borrado del certificado en el almacen de confianza de alguno de los perfiles de Firefox: " + e); //$NON-NLS-1$
+						detectedError = true;
 					}
 
-					try (
-							final InputStream errIs = process.getErrorStream();
-							final BufferedReader errReader = new BoundedBufferedReader(
-									new InputStreamReader(errIs),
-									256, // Maximo 256 lineas de salida
-									1024 // Maximo 1024 caracteres por linea
-									);
-							) {
-						while ((line = errReader.readLine()) != null) {
-							error = true;
-							LOGGER.severe("Error devuelto por certutilen el flujo de error: " + line); //$NON-NLS-1$
-						}
+					// Si detectamos algun error al ejecutar el comando en alguno de los perfiles,
+					// marcamos como que hubo algun error
+					if (detectedError) {
+						error = true;
 					}
 				}
 			}
@@ -995,13 +956,13 @@ final class RestoreConfigFirefox {
 
 	/** Ejecuta un comando de consola.
 	 * @param command Nombre del comando y sus argumentos
-	 * @return {@code true} si la ejecuci&oacute;n devolvioacute; alg&uacute;n error {@code false} en caso contrario.
+	 * @return {@code true} si la ejecuci&oacute;n devolvi&oacute; alg&uacute;n error, {@code false} en caso contrario.
 	 * @throws IOException Si hay problemas ejecutando el comando. */
 	private static boolean execCommand(final String[] command) throws IOException {
 
 		LOGGER.info("Se ejecutara el siguiente comando:\n" + Arrays.toString(command)); //$NON-NLS-1$
 		final Process process = new ProcessBuilder(command).start();
-		// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
+		// Cuando certUtil se ejecuta correctamente no hay salida de ningun tipo, asi que se interpreta
 		// cualquier salida como un error
 		final StringBuffer buffer = new StringBuffer();
 		try (
@@ -1017,8 +978,8 @@ final class RestoreConfigFirefox {
 				buffer.append(line).append("\n"); //$NON-NLS-1$
 			}
 			if (buffer.length() > 0) {
-				LOGGER.info("Salida estandar:\n" + buffer.toString()); //$NON-NLS-1$
-				return false;
+				LOGGER.warning("Error devuelto por certutil en el flujo de salida: " + buffer.toString()); //$NON-NLS-1$
+				return true;
 			}
 		}
 
@@ -1036,8 +997,8 @@ final class RestoreConfigFirefox {
 				buffer.append(line).append("\n"); //$NON-NLS-1$
 			}
 			if (buffer.length() > 0) {
-				LOGGER.info("Salida de error:\n" + buffer.toString()); //$NON-NLS-1$
-				return false;
+				LOGGER.warning("Error devuelto por certutil en el flujo de error: " + buffer.toString()); //$NON-NLS-1$
+				return true;
 			}
 		}
 

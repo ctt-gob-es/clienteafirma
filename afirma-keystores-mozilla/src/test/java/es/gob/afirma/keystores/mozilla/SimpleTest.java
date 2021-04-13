@@ -129,8 +129,8 @@ public final class SimpleTest {
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$
 			loadNSS(
-				KeyStoreUtilities.getShort("c:\\program files (x86)\\mozilla firefox"), //$NON-NLS-1$
-				KeyStoreUtilities.getShort("C:\\Users\\tgarciameras\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\9xk45g11.default").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				KeyStoreUtilities.getWindowsShortName("c:\\program files (x86)\\mozilla firefox"), //$NON-NLS-1$
+				KeyStoreUtilities.getWindowsShortName("C:\\Users\\tgarciameras\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\9xk45g11.default").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			)
 		);
     	keyStore.load(null, new char[0]);

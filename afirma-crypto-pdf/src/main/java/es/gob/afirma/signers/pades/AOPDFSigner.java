@@ -476,7 +476,10 @@ public final class AOPDFSigner implements AOSigner {
     			}
 
     			// Obtenemos el algoritmo de firma
-    			ssi.setSignAlgorithm(pkcs7.getDigestAlgorithm());
+    			final String digestAlgorithm = pkcs7.getDigestAlgorithm();
+    			if (digestAlgorithm != null) {
+    				ssi.setSignAlgorithm(digestAlgorithm);
+    			}
 
     			root.add(new AOTreeNode(ssi));
     		}
