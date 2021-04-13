@@ -244,16 +244,9 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			return this.keystorePath;
 		}
 
-		public void setKeystorePath(final String keystorePath) {
-			this.keystorePath = keystorePath;
-		}
-
 		public String getCertificatePath() {
 			return this.certificatePath;
 		}
 
-		public void setCertificatePath(final String keystorePath) {
-			this.certificatePath = keystorePath;
-		}
 	}
 }

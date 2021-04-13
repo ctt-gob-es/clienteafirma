@@ -424,15 +424,15 @@ final class ConfiguratorWindows implements Configurator {
 
 		try {
 
-		in = new FileInputStream(fileOrigin);
-		out = new FileOutputStream(fileDestination);
+			in = new FileInputStream(fileOrigin);
+			out = new FileOutputStream(fileDestination);
 
-		final byte[] buf = new byte[1024];
-		int len;
+			final byte[] buf = new byte[1024];
+			int len;
 
-		while ((len = in.read(buf)) > 0) {
-		  out.write(buf, 0, len);
-		}
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
 		
 		} catch (final IOException ioe) {
 			LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
@@ -457,7 +457,7 @@ final class ConfiguratorWindows implements Configurator {
 		//Si es un almacen, lo renombramos a autofirma.pfx
 		if (isKeystore) {			
 			try {
-				File newFile = new File(fileDestination.getParent(), "autofirma.pfx"); //$NON-NLS-1$
+				File newFile = new File(fileDestination.getParent(), "autofirma.pfx");  //$NON-NLS-1$
 				Files.move(fileDestination.toPath(), newFile.toPath());
 			} catch (IOException e) {
 				LOGGER.warning("Error al renombrar fichero"); //$NON-NLS-1$
