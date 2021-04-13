@@ -14,6 +14,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -27,7 +30,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String P11_CONFIG_VALID_CHARS;
+	private static final String P11_CONFIG_VALID_CHARS = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
 
 	// Bibliotecas Windows de Firefox
 
@@ -68,11 +71,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// No permitimos la instanciacion
 	}
 
-	static {
-		// El caracter tilde solo es invalido para Java 7 y versiones anteriores
-		final String validChars = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
-		P11_CONFIG_VALID_CHARS = isJava8orNewer() ? validChars.concat("~") : validChars; //$NON-NLS-1$
-	}
 	/** Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
 	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
 	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
@@ -83,6 +81,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 		}
 		final File dir = new File(originalPath);
 		if (!dir.exists()) {
+			LOGGER.warning("El fichero o directorio '" + dir + "' a pasar a nombre corto no existe"); //$NON-NLS-1$ //$NON-NLS-2$
 			return originalPath;
 		}
 		try {
@@ -167,17 +166,40 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 				// Copiamos la biblioteca de acceso y luego sus dependencias. Las dependencias las
 				// recuperamos indicando cadena vacia para que nos las devuelva sin path
-				copyFile(new String[] { SOFTOKN3_DLL }, dir, tmp.getCanonicalPath());
-				copyFile(getSoftkn3DependenciesWindows(""), dir, tmp.getCanonicalPath()); //$NON-NLS-1$
+			    Files.copy(
+			    	Paths.get(SOFTOKN3_DLL),// fichero de entrada
+			    	Paths.get(tmp.getCanonicalPath()), // fichero de salida con ruta absoluta
+			        StandardCopyOption.REPLACE_EXISTING
+			    );
 
-				dir = tmp.getCanonicalPath();
+			    for (final String dependency : getSoftkn3DependenciesWindows("")) { //$NON-NLS-1$
+				    Files.copy(
+				    	Paths.get(dependency),// fichero de entrada
+				    	Paths.get(tmp.getCanonicalPath()), // fichero de salida con ruta absoluta
+				        StandardCopyOption.REPLACE_EXISTING
+				    );
+				}
+
+				if(new File(tmp, SOFTOKN3_DLL).isFile()) {
+					dir = tmp.getCanonicalPath();
+				}
+
+				else {
+					LOGGER.warning(
+						"No se ha podido duplicar NSS encontrado en '" + dir + "' a un directorio temporal" //$NON-NLS-1$ //$NON-NLS-2$
+						+ "se intentara utilizar el NSS de la aplicacion '" + BundledNssHelper.getBundledNssDirectory() //$NON-NLS-1$
+					);
+					return BundledNssHelper.getBundledNssDirectory();
+				}
 
 			}
 			catch (final Exception e) {
 				LOGGER.warning(
 					"No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por " + //$NON-NLS-1$
-						"el error 6581254 de Java es posible que no pueda cargarse: " + e //$NON-NLS-1$
+						"el error 6581254 de Java es posible que no pueda cargarse. Se intentara utilziar el NSS de la" //$NON-NLS-1$
+						+ " aplicacion '" + BundledNssHelper.getBundledNssDirectory() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
 				);
+				return BundledNssHelper.getBundledNssDirectory();
 			}
 
 		}
@@ -280,53 +302,5 @@ final class MozillaKeyStoreUtilitiesWindows {
 		appData = null;
 		throw new IllegalStateException("No se ha podido determinar la situacion del directorio 'AppData' de Windows"); //$NON-NLS-1$
 
-	}
-
-	/** Copia ficheros de un directorio a otro, ignorando los ficheros que no existan.
-	 * @param fileNames Nombres de los ficheros a copiar.
-	 * @param sourceDir Directorio de origen, no debe tener la barra al final.
-	 * @param destDir Directorio de destino, debe tener la barra al final. */
-	private static void copyFile(final String[] fileNames, final String sourceDir, final String destDir) {
-		if (fileNames !=null) {
-			File tmpFile;
-			for(final String f : fileNames) {
-				tmpFile = new File(sourceDir, f);
-				if (tmpFile.exists()) {
-					try {
-						AOUtil.copyFile(tmpFile, new File(destDir, f));
-					}
-					catch (final IOException e) {
-						LOGGER.warning("No se ha podido copiar '" + f + "' a '" + destDir + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					}
-				}
-			}
-		}
-	}
-
-	/** Indica si el JRE actual es Java 8 o superior.
-     * @return <code>true</code> si el JRE actual es Java 8 o superior,
-     *         <code>false</code> si es Java 7 o inferior. */
-	private static boolean isJava8orNewer() {
-		final String ver = System.getProperty("java.version");  //$NON-NLS-1$
-		if (ver == null || ver.isEmpty()) {
-			LOGGER.warning("No se ha podido determinar la version de Java"); //$NON-NLS-1$
-			return false;
-		}
-		try {
-			//  Puede que estemos en Java 8 o menor, con el antiguo esquema de versionado
-			if(ver.substring(0,2).equals("1.")) { //$NON-NLS-1$
-				return Integer.parseInt(ver.substring(2, 3)) > 7;
-			}
-			// En el nuevo esquema de versionado de Java se sigue el patron [1-9][0-9]*((\.0)*\.[1-9][0-9]*)*,
-			// en el que tenemos $MAJOR.$MINOR.$SECURITY (http://openjdk.java.net/jeps/223)
-			final String newVer = ver.substring(0, ver.indexOf(".")); //$NON-NLS-1$+
-			if (AOUtil.isOnlyNumber(newVer)) {
-				return Integer.parseInt(newVer) > 7;
-			}
-		}
-		catch(final Exception e) {
-			LOGGER.warning("No se ha podido determinar la version de Java (" + ver + "):" + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return false;
 	}
 }

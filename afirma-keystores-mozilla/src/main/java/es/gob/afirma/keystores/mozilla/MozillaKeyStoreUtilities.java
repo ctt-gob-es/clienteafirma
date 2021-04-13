@@ -188,7 +188,7 @@ public final class MozillaKeyStoreUtilities {
 					new InputStreamReader(fis),
 					512, // Maximo 512 lineas
 					4096 // Maximo 4KB por linea
-				);
+				)
 			) {
 				String line;
 				while ((line = br.readLine()) != null && dir == null) {
@@ -200,8 +200,8 @@ public final class MozillaKeyStoreUtilities {
 		}
 		if (dir == null) {
 			throw new FileNotFoundException(
-					"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
-					);
+				"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
+			);
 		}
 		return dir;
 	}
@@ -401,7 +401,7 @@ public final class MozillaKeyStoreUtilities {
 	 * @param nssDirectory Directorio en donde se encuentran las bibliotecas de NSS. */
 	public static void loadNSSDependencies(final String nssDirectory) {
 
-		final String dependList[];
+		final String[] dependList;
 
 		// Comprobamos despues el caso especifico de NSS partido entre /usr/lib y
 		// /lib, que se da en versiones de Fedora muy antiguas y solo en 32 bits
@@ -410,20 +410,21 @@ public final class MozillaKeyStoreUtilities {
                 && new File("/usr/lib/" + SOFTOKN3_SO).exists() //$NON-NLS-1$
                 && new File(LIB_NSPR4_SO).exists()) {
 			dependList = new String[] {
-					"/lib/libmozglue.so", //$NON-NLS-1$
-					"/usr/lib/libmozglue.so", //$NON-NLS-1$
-					LIB_NSPR4_SO,
-					"/lib/libplds4.so", //$NON-NLS-1$
-					"/usr/lib/libplds4.so", //$NON-NLS-1$
-					"/lib/libplc4.so", //$NON-NLS-1$
-					"/usr/lib/libplc4.so", //$NON-NLS-1$
-					"/lib/libnssutil3.so", //$NON-NLS-1$
-					"/usr/lib/libnssutil3.so", //$NON-NLS-1$
-					"/lib/libsqlite3.so", //$NON-NLS-1$
-					"/usr/lib/libsqlite3.so", //$NON-NLS-1$
-					"/lib/libmozsqlite3.so", //$NON-NLS-1$
-					"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
+				"/lib/libmozglue.so", //$NON-NLS-1$
+				"/usr/lib/libmozglue.so", //$NON-NLS-1$
+				LIB_NSPR4_SO,
+				"/lib/libplds4.so", //$NON-NLS-1$
+				"/usr/lib/libplds4.so", //$NON-NLS-1$
+				"/lib/libplc4.so", //$NON-NLS-1$
+				"/usr/lib/libplc4.so", //$NON-NLS-1$
+				"/lib/libnssutil3.so", //$NON-NLS-1$
+				"/usr/lib/libnssutil3.so", //$NON-NLS-1$
+				"/lib/libsqlite3.so", //$NON-NLS-1$
+				"/usr/lib/libsqlite3.so", //$NON-NLS-1$
+				"/lib/libmozsqlite3.so", //$NON-NLS-1$
+				"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
 			};
+			LOGGER.info("Detectada configuración de NSS mixta entre '/usr/lib' y '/lib'"); //$NON-NLS-1$
 		}
 		else {
 			final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator); //$NON-NLS-1$
@@ -571,7 +572,7 @@ public final class MozillaKeyStoreUtilities {
 		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
 		final File f = File.createTempFile("pkcs11_nss_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
 		try (
-			final OutputStream fos = new FileOutputStream(f);
+			final OutputStream fos = new FileOutputStream(f)
 		) {
 			fos.write(p11NSSConfigFileContents.getBytes());
 		}
@@ -608,7 +609,7 @@ public final class MozillaKeyStoreUtilities {
 				// Realizamos un ultimo intento configurando NSS para que utilice la base de
 				// datos Berkeley en lugar de SQLite
 				try (
-					final OutputStream fos = new FileOutputStream(f);
+					final OutputStream fos = new FileOutputStream(f)
 				) {
 					fos.write(p11NSSConfigFileContents.replace("sql:/", "").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -622,7 +623,9 @@ public final class MozillaKeyStoreUtilities {
 				}
 			}
 		}
-		f.delete();
+		if(!f.delete()) {
+			LOGGER.warning("No se ha podido eliminar el fichero '" + f.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		return ret;
 	}
 
