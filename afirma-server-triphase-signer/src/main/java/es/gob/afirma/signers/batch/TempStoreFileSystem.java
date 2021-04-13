@@ -17,16 +17,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 
 final class TempStoreFileSystem implements TempStore {
 
 	/** N&uacute;mero de recuperaciones de fichero que realizaremos antes de iniciar un
 	 * proceso de limpieza de temporales caducados. */
-	private static final int RETRIEVES_BEFORE_CLEANING = 100;
+	private static final int RETRIEVES_BEFORE_CLEANING = 1000;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 	private static final MessageDigest MD;
@@ -48,7 +50,7 @@ final class TempStoreFileSystem implements TempStore {
 	@Override
 	public void store(final byte[] dataToSave, final SingleSign ss, final String batchId) throws IOException {
 		store(dataToSave, getFilename(ss, batchId));
-		LOGGER.info("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.fine("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -90,7 +92,7 @@ final class TempStoreFileSystem implements TempStore {
 			}
 		}
 
-		final byte[] ret;
+		byte[] ret;
 		try (
 			final InputStream fis = new FileInputStream(
 				new File(
@@ -101,8 +103,6 @@ final class TempStoreFileSystem implements TempStore {
 			final InputStream bis = new BufferedInputStream(fis);
 		) {
 			ret = AOUtil.getDataFromInputStream(bis);
-			bis.close();
-			fis.close();
 		}
 		return ret;
 	}
@@ -124,6 +124,16 @@ final class TempStoreFileSystem implements TempStore {
 	}
 
 	private static String getFilename(final SingleSign ss, final String batchId) {
-		return AOUtil.hexify(MD.digest(ss.getId().getBytes()), false) + "." + batchId; //$NON-NLS-1$
+		byte[] id = ss.getId().getBytes(StandardCharsets.UTF_8);
+
+		// Se calcula el hash del identificador de fichero para usarlo como nombre
+		// del fichero temporal. De esta forma, nos aseguramos de que el nombre
+		// tenga una longitud predefinida
+		synchronized (MD) {
+			id = MD.digest(id);
+			MD.reset();
+		}
+
+		return Base64.encode(id, true) + "." + batchId; //$NON-NLS-1$
 	}
 }

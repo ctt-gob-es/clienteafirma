@@ -233,7 +233,7 @@ class SignBatchXmlHandler extends DefaultHandler {
 			// Si la clase implementa
 			try {
 				final String className = new String(this.acumulateContent.toCharArray()).trim();
-				final Class<?> signSaverClass = Class.forName(className, false, ClassLoader.getSystemClassLoader());
+				final Class<?> signSaverClass = Class.forName(className, false, getClass().getClassLoader());
 				if (!SignSaver.class.isAssignableFrom(signSaverClass)) {
 					throw new IllegalArgumentException("La clase indicada no implementa la interfaz " + SignSaver.class.getName()); //$NON-NLS-1$
 				}

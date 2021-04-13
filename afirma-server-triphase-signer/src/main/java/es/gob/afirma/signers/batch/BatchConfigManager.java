@@ -84,9 +84,10 @@ public class BatchConfigManager {
 	}
 
 	/**
-	 * Indica si esta habilitado el modo de ejecuci&oacute;n concurrente.
-	 * @return {@code true} si las firmas se ejecutar&aacute;n de forma concurrente,
-	 * {@code false} en caso contrario.
+	 * Obtiene el n&uacute;mero m&aacute;ximo de firmas que se pueden procesar de forma
+	 * concurrente.
+	 * @return N&uacute;mero m&aacute;ximo de firmas que se pueden procesar de forma
+	 * concurrente.
 	 */
 	public static int getMaxCurrentSigns() {
 		if (CONCURRENT_SIGNS == null) {

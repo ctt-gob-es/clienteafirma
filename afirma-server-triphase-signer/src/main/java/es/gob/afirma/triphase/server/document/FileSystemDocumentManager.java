@@ -116,6 +116,11 @@ public final class FileSystemDocumentManager implements DocumentManager {
 		else if (format != null && format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
 			newId += ".xsig"; //$NON-NLS-1$
 		}
+		else if (format != null
+				&& (format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.toLowerCase())
+						|| format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.toLowerCase()))) {
+			newId += ".asics"; //$NON-NLS-1$
+		}
 		else if (lastDotPos < initialId.length() - 1) {
 			newId += initialId.substring(lastDotPos);
 		}

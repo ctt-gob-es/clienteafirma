@@ -207,6 +207,4 @@ public abstract class SignBatch {
 			ts.delete(ss, getId());
 		}
 	}
-
-
 }

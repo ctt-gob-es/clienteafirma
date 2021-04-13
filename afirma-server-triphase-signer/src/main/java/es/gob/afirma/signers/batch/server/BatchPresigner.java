@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +27,7 @@ import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.SignBatch;
 import es.gob.afirma.signers.batch.SignBatchConcurrent;
 import es.gob.afirma.signers.batch.SignBatchSerial;
-import es.gob.afirma.signers.batch.TriConfigManager;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Realiza la primera fase de un proceso de firma por lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -52,7 +53,10 @@ public final class BatchPresigner extends HttpServlet {
 	protected void service(final HttpServletRequest request,
 			               final HttpServletResponse response) throws ServletException,
 			                                                          IOException {
-		final String xml = request.getParameter(BATCH_XML_PARAM);
+
+		final Map<String, String> parametes = RequestParameters.extractParameters(request);
+
+		final String xml = parametes.get(BATCH_XML_PARAM);
 		if (xml == null) {
 			LOGGER.severe("No se ha recibido una definicion de lote en el parametro " + BATCH_XML_PARAM); //$NON-NLS-1$
 			response.sendError(
@@ -78,7 +82,7 @@ public final class BatchPresigner extends HttpServlet {
 			return;
 		}
 
-		final String certListUrlSafeBase64 = request.getParameter(BATCH_CRT_PARAM);
+		final String certListUrlSafeBase64 = parametes.get(BATCH_CRT_PARAM);
 		if (certListUrlSafeBase64 == null) {
 			LOGGER.severe("No se ha recibido la cadena de certificados del firmante en el parametro " + BATCH_CRT_PARAM); //$NON-NLS-1$
 			response.sendError(
@@ -114,7 +118,7 @@ public final class BatchPresigner extends HttpServlet {
 			return;
 		}
 
-		response.setHeader("Access-Control-Allow-Origin", TriConfigManager.getAllowOrigin()); //$NON-NLS-1$
+		response.setHeader("Access-Control-Allow-Origin", ConfigManager.getAccessControlAllowOrigin()); //$NON-NLS-1$
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
 		final PrintWriter writer = response.getWriter();
 		writer.write(pre);

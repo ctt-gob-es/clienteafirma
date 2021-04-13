@@ -74,7 +74,7 @@ public final class SignSaverFile implements SignSaver {
 				// Cerramos explicitamente
 				fos.close();
 			}
-			LOGGER.info("Guardada finalmente la firma '" + sign.getId() + "' en: " + this.filename); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.fine("Guardada finalmente la firma '" + sign.getId() + "' en: " + this.filename); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			LOGGER.info(

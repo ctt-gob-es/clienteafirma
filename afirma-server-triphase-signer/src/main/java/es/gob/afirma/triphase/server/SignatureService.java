@@ -48,6 +48,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
@@ -146,6 +147,9 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 		LOGGER.info("Se usara el siguiente 'DocumentManager' para firma trifasica: " + DOC_MANAGER.getClass().getName()); //$NON-NLS-1$
+
+		// Indicamos si se debe instalar el proveedor de firma XML de Apache
+		Utils.installXmlDSigProvider(ConfigManager.needInstallXmlDsigFactory());
 	}
 
 	@Override

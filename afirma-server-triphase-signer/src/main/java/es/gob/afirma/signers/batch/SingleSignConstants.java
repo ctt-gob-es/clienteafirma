@@ -11,6 +11,7 @@ package es.gob.afirma.signers.batch;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
@@ -185,11 +186,11 @@ public final class SingleSignConstants {
 			case CADES_ASIC:
 				return new CAdESASiCSTriPhasePreProcessor();
 			case XADES:
-				return new XAdESTriPhasePreProcessor(TriConfigManager.needInstallXmlDSig());
+				return new XAdESTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			case XADES_ASIC:
-				return new XAdESASiCSTriPhasePreProcessor(TriConfigManager.needInstallXmlDSig());
+				return new XAdESASiCSTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			case FACTURAE:
-				return new FacturaETriPhasePreProcessor(TriConfigManager.needInstallXmlDSig());
+				return new FacturaETriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
 			case PKCS1:
 				return new Pkcs1TriPhasePreProcessor();
 			default:
