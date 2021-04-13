@@ -18,7 +18,7 @@
 		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
         <afirma.keytool.alias>codesign</afirma.keytool.alias>
         <afirma.keytool.password>afirma</afirma.keytool.password>
-        <afirma.core.version>1.7-SNAPSHOT</afirma.core.version>
+        <afirma.core.version>1.7</afirma.core.version>
 	</properties>
 	
 	<dependencies>
