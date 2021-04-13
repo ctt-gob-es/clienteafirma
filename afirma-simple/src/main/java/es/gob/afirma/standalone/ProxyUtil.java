@@ -200,6 +200,7 @@ public final class ProxyUtil {
 			System.setProperty("http.nonProxyHosts", excludedUrls); //$NON-NLS-1$
 			System.setProperty("https.nonProxyHosts", excludedUrls); //$NON-NLS-1$
 			System.setProperty("ftp.nonProxyHosts", excludedUrls); //$NON-NLS-1$
+			System.setProperty("socksNonProxyHosts", excludedUrls); //$NON-NLS-1$
 		}
 
 		// Se configura si es necesario el usuario y contrasena del proxy

@@ -29,7 +29,7 @@ public class ProxyPanelHandler {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final String URL_CHECK_CONNECTION = "http://www.google.com"; //$NON-NLS-1$
+	static final String URL_CHECK_CONNECTION = "https://www.google.com"; //$NON-NLS-1$
 
 	private final ProxyPanel view;
 
