@@ -36,6 +36,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -64,12 +66,22 @@ final class PreferencesPanelXades extends JScrollPane {
 
 	private static final String SIGN_FORMAT_XADES = "XAdES"; //$NON-NLS-1$
 
-	private static final AdESPolicy POLICY_XADES_AGE_1_9 = new AdESPolicy(
-		"urn:oid:2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
-		"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
-	);
+	private static final AdESPolicy POLICY_XADES_AGE_1_9;
+
+	private static final String POLICY_BUNDLE_NAME = "policy"; //$NON-NLS-1$
+
+	static {
+
+		final ResourceBundle policyBundle = ResourceBundle
+				.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
+
+		POLICY_XADES_AGE_1_9  = new AdESPolicy(
+				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
+				policyBundle.getString("FirmaAGE19.policyIdentifierHash.XAdES"), //$NON-NLS-1$
+				"SHA1", //$NON-NLS-1$
+				policyBundle.getString("FirmaAGE19.policyQualifier") //$NON-NLS-1$
+			);
+	}
 
 	private final JTextField xadesSignatureProductionCity = new JTextField();
 	private final JTextField xadesSignatureProductionProvince = new JTextField();
