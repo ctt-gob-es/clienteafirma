@@ -1,6 +1,7 @@
 ;Incluimos el Modern UI
   !include "MUI.nsh"
   !include "nsProcess.nsh"
+  !include "Registry.nsh"
   !include "Sections.nsh"
 
 ;Seleccionamos el algoritmo de compresion utilizado para comprimir nuestra aplicacion
@@ -16,7 +17,6 @@ SetCompressor lzma
   !define MUI_WELCOMEFINISHPAGE_BITMAP "ic_install.bmp"
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP "ic_install.bmp"
   !define VersionCheckNew "!insertmacro MVersionCheck"
-  !define StrContains '!insertmacro "_StrContainsConstructor"'
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
@@ -38,7 +38,7 @@ SetCompressor lzma
   ;Pagina final
   !insertmacro MUI_PAGE_FINISH
   
-;Paginas referentes al desinstalador
+  ;Paginas referentes al desinstalador
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
@@ -178,13 +178,6 @@ UninstallText "Desinstalador de AutoFirma."
  Pop "${OutVar}"
 !macroend
 
-!macro _StrContainsConstructor OUT NEEDLE HAYSTACK
-  Push `${HAYSTACK}`
-  Push `${NEEDLE}`
-  Call un.StrContains
-  Pop `${OUT}`
-!macroend
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -193,57 +186,48 @@ Section "Programa" sPrograma
 
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
+	StrCpy $PATH "AutoFirma"
 	
 	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
 	System::Call 'kernel32::GetCurrentProcess()i.r0'
 	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
 	pop $3
-	IntCmp $1 1 +3 0 0
+	${If} $1 != 1
 		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
 		Quit
-
-	StrCpy $PATH "AutoFirma"
-
-	; Comprueba que no este ya instalada
-	ClearErrors
-	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	${If} ${Errors}
-	  ; Comprobamos si esta la version 1.4.2 en ese directorio y la desinstalamos en tal caso; despues instalamos
-	  IfFileExists '$INSTDIR\unistall.exe' 0 +4
-	    MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		StrCpy $R0 "$INSTDIR\unistall.exe"
-	    Goto UninstallOlderVersion
-	  ; Comprobamos si esta la version 1.4.2 en su directorio por defecto y la desinstalamos en tal caso; despues instalamos
-	  IfFileExists '$PROGRAMFILES\AutoFirma\unistall.exe' 0 +5
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-		StrCpy $R0 "$PROGRAMFILES\AutoFirma\unistall.exe"
-		ExecWait '"$R0" /S _?=$PROGRAMFILES\AutoFirma'
-		RMDir /r /REBOOTOK '$PROGRAMFILES\AutoFirma'
-	  Goto Install
 	${EndIf}
-	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
-	${VersionCheckNew} $R1 ${VERSION} "$R2"
-	${If} $R2 = 0
-	  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
-	${else}
-	  ${If} $R2 = 2
-	    MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
-	    Goto UninstallOlderVersion
-	  ${else}
-	    MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
-	  ${EndIf}
+
+	;Comprobamos si ya existe una versión de AutoFirma instalada. Si existe, se devolvera
+	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
+	Call CheckVersionInstalled
+	Pop $R1
+	${If} $R1 != ""
+		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
+		${VersionCheckNew} $R1 ${VERSION} "$R2"
+		${If} $R2 = 0
+		  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
+		  Quit
+		${ElseIf} $R2 <> 2
+		  MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
+		  Quit
+		${EndIf}
+		Call RemoveOldVersions
 	${EndIf}
-	Exit:
-	  Quit
+	
+	;Establecemos la vista del registro acorde a la arquitectura del instalador
+	SetRegView 64
 
-	UninstallOlderVersion:
-	  ;Ejecuta el desinstalador cuya ruta ha sido obtenida del registro
-	  ExecWait '"$R0" /S _?=$INSTDIR'
+	;Limpiamos el directorio al que se van a copiar los ficheros y bloqueamos la ejecucion
+	;hasta que este listo
+	IfFileExists $INSTDIR\$PATH 0 +4
+		RMDir /r '$INSTDIR\$PATH'
+		Sleep 3000
+		Goto -3
 
-	Install:
+	;Dejamos los ficheros de la aplicacion en un subdirectorio
 	SetOutPath $INSTDIR\$PATH
 
-	;Copiamos la JRE en el directorio de instalacion
+	;Copiamos la JRE
 	File /r java64\jre
 	
 	;Copiamos todos los ficheros que componen nuestra aplicacion
@@ -254,7 +238,7 @@ Section "Programa" sPrograma
 	File  ic_firmar.ico
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
-   SetShellVarContext all
+    SetShellVarContext all
    
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
 	
@@ -274,15 +258,16 @@ Section "Programa" sPrograma
 
 	;Si se ha configurado, creamos un acceso directo en el escritorio
 	${If} $Shorcut_Integration_Checkbox_State == 1
-		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 	${Endif}
 
 	;Si se ha configurado, creamos el grupo de accesos en el menu inicio
 	${If} $StartMenu_Integration_Checkbox_State == 1
 		CreateDirectory "$SMPROGRAMS\AutoFirma"
-		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
+		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
 		CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
 	${Endif}
+
 	;Anade una entrada en la lista de "Program and Features"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "AutoFirma"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "UninstallString" "$INSTDIR\uninstall.exe"
@@ -301,72 +286,72 @@ Section "Programa" sPrograma
 	;Registro
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\AutoFirma.exe sign -gui -i "%1"'
 
 	;Generar huella archivos
  	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "" "Generar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\$PATH\AutoFirma.exe createdigest -i "%1"'
 
 	;Generar huella directorios
 	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "" "Generar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\$PATH\AutoFirma.exe createdigest -i "%1"'
 
 	;Comprobar huella .hash
  	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 
 	;Comprobar huella .hashb64
  	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 	
 	;Comprobar huella .hashfiles
  	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "" "Comprobar huella digital con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\$PATH\AutoFirma.exe checkdigest -i "%1"'
 
 	;Verify
 	; .csig
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
-	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
-	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
-	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
+	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
+	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
+	Delete "$INSTDIR\$PATH\autofirma.pfx"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R0 ""
 	${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
 		StrCpy $R0 "-firefox_roots"
 	${Endif}
-	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" $R0 /passive'
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R0 /passive'
 	
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
 
 	; Importamos el certificado en el sistema
-	Push "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
+	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
@@ -375,7 +360,7 @@ Section "Programa" sPrograma
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$INSTDIR\AutoFirma"
+	Push "$INSTDIR\$PATH"
 	Call AddToPath
 
 SectionEnd
@@ -449,7 +434,27 @@ Function AddCertificateToStore
   Exch $0
  
 FunctionEnd
+
+;Identifica la version instalada de AutoFirma.
+;Devuelve la cadena con el numero de version y deja el registro configurado
+;para la arquitectura corresondiente a la version identificada
+Function CheckVersionInstalled
+
+  ;Buscamos en 64 bits			  
+  SetRegView 64
+  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
+
+  ;Si lo hemos encontrado ya, salimos 
+  IfErrors +2
+	Goto End
+
+  ;Buscamos en 32 bits
+  SetRegView 32
+  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
  
+  End:
+	Push $R0 ; output
+FunctionEnd
 
 Function VersionCheck
  Exch $R0 ; second version number
@@ -463,7 +468,7 @@ Function VersionCheck
  
   StrCpy $R1 $R1.
   StrCpy $R0 $R0.
- 
+  
  Next: StrCmp $R0$R1 "" 0 +3
   StrCpy $R0 0
   Goto Done
@@ -673,21 +678,223 @@ Section "uninstall"
 	Call un.DeleteCertificate
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
 
-	RMDir /r $INSTDIR\$PATH
+	;Borramos el subdirectorio con todos los recursos salvo el desinstalador
+	;y bloqueamos la ejecucion hasta que este listo
+	IfFileExists $INSTDIR\$PATH 0 +4
+		RMDir /r '$INSTDIR\$PATH'
+		Sleep 3000
+		Goto -3
+
 	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
-	${StrContains} $0 "Program Files (x86)\" $INSTDIR
+	Push $INSTDIR
+	Push "Program Files (x86)\"
+	Call un.StrContains
+	Pop $0
 	StrCmp $0 "Program Files (x86)\" DirectorioValido
-	${StrContains} $0 "Program Files\" $INSTDIR
+	Push $INSTDIR
+	Push "Program Files\"
+	Call un.StrContains
+	Pop $0
 	StrCmp $0 "Program Files\" DirectorioValido
-	${StrContains} $0 $PATH $INSTDIR
+	Push $INSTDIR
+	Push $PATH
+	Call un.StrContains
+	Pop $0
 	StrCmp $0 "" PostValidacion
+
 	DirectorioValido:
-		RMDir /r $INSTDIR 
+		RMDir /r $INSTDIR
+
 	PostValidacion:
-	;Borrar accesos directorios del menu inicio
+	;Borrar accesos directos del escritorio y menu inicio
 	Delete "$DESKTOP\AutoFirma.lnk"
 	RMDir /r $SMPROGRAMS\$PATH
 	
+	;Eliminamos las entradas de registro en la vista de 64 bits
+	SetRegView 64
+	Call un.UninstallFromRegistry
+
+	;Eliminamos las entradas de registro en la vista de 32 bits
+	SetRegView 32
+	Call un.UninstallFromRegistry
+
+SectionEnd
+
+
+; StrContains
+;
+; This function does a case sensitive searches for an occurrence of a substring in a string. 
+; It returns the substring if it is found. 
+; Otherwise it returns null(""). 
+; Written by kenglish_hi
+; Adapted from StrReplace written by dandaman32
+Var STR_HAYSTACK
+Var STR_NEEDLE
+Var STR_CONTAINS_VAR_1
+Var STR_CONTAINS_VAR_2
+Var STR_CONTAINS_VAR_3
+Var STR_CONTAINS_VAR_4
+Var STR_RETURN_VAR
+
+!macro StrContains un
+Function ${un}StrContains
+  Exch $STR_NEEDLE
+  Exch 1
+  Exch $STR_HAYSTACK
+  ; Uncomment to debug
+  ;MessageBox MB_OK 'STR_NEEDLE = $STR_NEEDLE STR_HAYSTACK = $STR_HAYSTACK '
+    StrCpy $STR_RETURN_VAR ""
+    StrCpy $STR_CONTAINS_VAR_1 -1
+    StrLen $STR_CONTAINS_VAR_2 $STR_NEEDLE
+    StrLen $STR_CONTAINS_VAR_4 $STR_HAYSTACK
+    loop:
+      IntOp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_1 + 1
+      StrCpy $STR_CONTAINS_VAR_3 $STR_HAYSTACK $STR_CONTAINS_VAR_2 $STR_CONTAINS_VAR_1
+      StrCmp $STR_CONTAINS_VAR_3 $STR_NEEDLE found
+      StrCmp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_4 done
+      Goto loop
+    found:
+      StrCpy $STR_RETURN_VAR $STR_NEEDLE
+      Goto done
+    done:
+   Pop $STR_NEEDLE ;Prevent "invalid opcode" errors and keep the
+   Exch $STR_RETURN_VAR  
+FunctionEnd
+!macroend
+!insertmacro StrContains ""
+!insertmacro StrContains "un."
+
+; Funcion para eliminar versiones anteriores de AutoFirma. Las versiones se
+; buscan a traves del registro, para lo cual afecta si se tiene configurada la
+; vista de 32 o 64 bits
+; Uso:
+;   Call RemoveOldVersions
+Function RemoveOldVersions
+  
+	; Comprueba que no este ya instalada
+	ClearErrors
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+
+	${If} ${Errors}
+		Goto CheckAutoFirmaVersion
+	${EndIf}
+	
+	; Se ha encontrado AutoFirma instalado
+	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+	${VersionCheckNew} $R1 ${VERSION} "$R2"
+	${If} $R2 = 2
+		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
+		; instalador si no se quiere desinstalar
+		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+			Goto UninstallOlderVersion
+	${EndIf}
+
+	; Si no se encuentra o no va a eliminar la version instalada, finalizamos el proceso
+	Goto End
+	
+	; No se encontro AutoFirma instalado por el primer metodo, lo comprobamos de otra forma
+	CheckAutoFirmaVersion:
+		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
+		StrCmp $0 0 0 searchAutoFirmaLoop
+		Goto End
+
+		searchAutoFirmaLoop:
+		${registry::Find} "$0" $1 $2 $3 $4
+
+		; Si hemos terminado la busqueda, salimos del bucle
+		StrCmp $4 '' close
+
+		; Si hemos encontrado el registro, obtenemos la cadena de desinstalacion, preparamos las variables y dejamos de repetir el bucle
+		StrCmp $4 "REG_SZ" 0 searchAutoFirmaLoop
+		StrCmp $3 "AutoFirma" 0 searchAutoFirmaLoop
+		ReadRegStr $R0 HKLM $1 "UninstallString"
+		
+		close:
+		${registry::Close} "$0"
+		${registry::Unload}
+
+		; Si se encontro AutoFirma, se pide desinstalar
+		StrCmp $3 "AutoFirma" 0 End
+		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
+		; instalador si no se quiere desinstalar
+		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+			Goto UninstallOlderVersion
+	
+	; No se encontro AutoFirma instalado, asi que finalizamos el proceso
+	Goto End
+
+	Exit:
+		Quit
+
+	UninstallOlderVersion:
+		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
+		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
+		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
+		StrCmp $R1 "" +3 0
+			Push "$R1\AutoFirma"
+			Call RemoveFromPath
+
+		; Preparamos una variable para indicar en ella si tras la desinstalacion deberemos borrar el directorio de
+		; instalacion anterior
+		StrCpy $R3 ""
+
+		; Preparamos la sentencia de desinstalacion interpretando primeramente que se instalo mediante MSI.
+		; Almacenamos en $R1 la ruta desde la que ejecutar la desinstalacion (directorio del sistema)
+		; Almacenamos en $R2 la sentencia de desinstalacion agregando parametros para que sea silenciosa
+		StrCpy $R1 $SYSDIR
+		StrCpy $R2 "$R0 /qn"
+		
+		Push $R0
+		Push "msiexec"
+		Call StrStr
+		Pop $0
+
+		; Si no es una instalacion MSI, pisamos las variables por las apropiadas para la desinstalacion convencional
+		StrCmp $0 "" 0 EjecutarDesinstalador
+			Push $R0
+			Call GetParent
+			Pop $R1	
+			StrCpy $R2 '"$R0" /S _?=$R1'
+			; Si el directorio de instalacion es distinto del anterior, establecemos una variable para senalar que
+			; queremos que se elimine ese directorio despues de la desinstalacion, ya que sabemos que quedaran restos
+			; del instalador EXE anterior
+			StrCmp $R1 $INSTDIR EjecutarDesinstalador 0
+				StrCpy $R3 "Uninstall"
+
+		EjecutarDesinstalador:
+			ExecWait $R2
+
+		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
+		; Si no, terminamos el proceso
+		StrCmp $R3 "Uninstall" 0 End
+			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "AutoFirma")
+			Push $R1
+			Push "Program Files (x86)\"
+			Call StrContains
+			Pop $0
+			StrCmp $0 "Program Files (x86)\" EliminarDirectorio
+			Push $R1
+			Push "Program Files\"
+			Call StrContains
+			Pop $0
+			StrCmp $0 "Program Files\" EliminarDirectorio
+			Push $R1
+			Push $PATH
+			Call StrContains
+			Pop $0
+			StrCmp $0 "" End
+			EliminarDirectorio:
+				RMDir /r $R1
+				
+	End:
+ 
+FunctionEnd
+
+; Funcion para eliminar de registro las entradas agregadas por la aplicacion
+; Uso:
+;   Call un.UninstallFromRegistry
+Function un.UninstallFromRegistry
+
 	DeleteRegKey HKLM "SOFTWARE\$PATH"
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
 
@@ -715,52 +922,48 @@ Section "uninstall"
 	Push "$INSTDIR\AutoFirma"
 	Call un.RemoveFromPath
 
-SectionEnd
-
-
-; StrContains
-; This function does a case sensitive searches for an occurrence of a substring in a string. 
-; It returns the substring if it is found. 
-; Otherwise it returns null(""). 
-; Written by kenglish_hi
-; Adapted from StrReplace written by dandaman32
- 
- 
-Var STR_HAYSTACK
-Var STR_NEEDLE
-Var STR_CONTAINS_VAR_1
-Var STR_CONTAINS_VAR_2
-Var STR_CONTAINS_VAR_3
-Var STR_CONTAINS_VAR_4
-Var STR_RETURN_VAR
- 
-Function un.StrContains
-  Exch $STR_NEEDLE
-  Exch 1
-  Exch $STR_HAYSTACK
-  ; Uncomment to debug
-  ;MessageBox MB_OK 'STR_NEEDLE = $STR_NEEDLE STR_HAYSTACK = $STR_HAYSTACK '
-    StrCpy $STR_RETURN_VAR ""
-    StrCpy $STR_CONTAINS_VAR_1 -1
-    StrLen $STR_CONTAINS_VAR_2 $STR_NEEDLE
-    StrLen $STR_CONTAINS_VAR_4 $STR_HAYSTACK
-    loop:
-      IntOp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_1 + 1
-      StrCpy $STR_CONTAINS_VAR_3 $STR_HAYSTACK $STR_CONTAINS_VAR_2 $STR_CONTAINS_VAR_1
-      StrCmp $STR_CONTAINS_VAR_3 $STR_NEEDLE found
-      StrCmp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_4 done
-      Goto loop
-    found:
-      StrCpy $STR_RETURN_VAR $STR_NEEDLE
-      Goto done
-    done:
-   Pop $STR_NEEDLE ;Prevent "invalid opcode" errors and keep the
-   Exch $STR_RETURN_VAR  
 FunctionEnd
 
 ;--------------------------------------------------------------------
 ; Path functions
+
+; GetParent
+; input, top of stack  (e.g. C:\Program Files\Foo)
+; output, top of stack (replaces, with e.g. C:\Program Files)
+; modifies no other variables.
 ;
+; Usage:
+;   Push "C:\Program Files\Directory\Whatever"
+;   Call GetParent
+;   Pop $R0
+;   ; at this point $R0 will equal "C:\Program Files\Directory"
+Function GetParent
+ 
+  Exch $R0
+  Push $R1
+  Push $R2
+  Push $R3
+ 
+  StrCpy $R1 0
+  StrLen $R2 $R0
+ 
+  loop:
+    IntOp $R1 $R1 + 1
+    IntCmp $R1 $R2 get 0 get
+    StrCpy $R3 $R0 1 -$R1
+    StrCmp $R3 "\" get
+  Goto loop
+ 
+  get:
+    StrCpy $R0 $R0 -$R1
+ 
+    Pop $R3
+    Pop $R2
+    Pop $R1
+    Exch $R0
+ 
+FunctionEnd
+
 ; Based on example from:
 ; http://nsis.sourceforge.net/Path_Manipulation
 ;
@@ -836,11 +1039,49 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
+
 ; RemoveFromPath - Removes dir from PATH
 ;
 ; Usage:
 ;   Push "dir"
 ;   Call RemoveFromPath
+Function RemoveFromPath
+  Exch $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+  Push $5
+  Push $6
+  ReadRegStr $1 ${Environ} "PATH"
+  StrCpy $5 $1 1 -1
+  StrCmp $5 ";" +2
+    StrCpy $1 "$1;" ; ensure trailing ';'
+  Push $1
+  Push "$0;"
+  Call StrStr
+  Pop $2 ; pos of our dir
+  StrCmp $2 "" done
+  DetailPrint "Eliminamos del PATH: $0"
+  StrLen $3 "$0;"
+  StrLen $4 $2
+  StrCpy $5 $1 -$4 ; $5 is now the part before the path to remove
+  StrCpy $6 $2 "" $3 ; $6 is now the part after the path to remove
+  StrCpy $3 "$5$6"
+  StrCpy $5 $3 1 -1
+  StrCmp $5 ";" 0 +2
+    StrCpy $3 $3 -1 ; remove trailing ';'
+  WriteRegExpandStr ${Environ} "PATH" $3
+  SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+done:
+  Pop $6
+  Pop $5
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
+FunctionEnd
 Function un.RemoveFromPath
   Exch $0
   Push $1
@@ -878,7 +1119,7 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
- 
+
 ; StrStr - find substring in a string
 ;
 ; Usage:
