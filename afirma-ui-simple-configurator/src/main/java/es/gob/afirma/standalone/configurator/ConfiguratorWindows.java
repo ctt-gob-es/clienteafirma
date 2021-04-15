@@ -13,14 +13,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -75,9 +74,9 @@ final class ConfiguratorWindows implements Configurator {
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
 			if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
-				
+
 				window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
-				
+
 				final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
 					ConfiguratorUtil.CERT_ALIAS,
 					KS_PASSWORD
@@ -87,7 +86,15 @@ final class ConfiguratorWindows implements Configurator {
 
 				//Generacion del certificado pfx
 				if (!this.keyStorePath.isEmpty()){
-					writeFiles(this.keyStorePath, appDir.getAbsolutePath(), true);
+					try {
+						Files.copy(
+								new File(this.keyStorePath).toPath(),
+								new File (appDir.getAbsolutePath(), KS_FILENAME).toPath(),
+								StandardCopyOption.REPLACE_EXISTING);
+					}
+					catch (final Exception e) {
+						window.print(Messages.getString("ConfiguratorWindows.23") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				} else {
 					ConfiguratorUtil.installFile(
 						certPack.getPkcs12(),
@@ -97,7 +104,16 @@ final class ConfiguratorWindows implements Configurator {
 
 				//Generacion del certificado raiz .cer
 				if (!this.certificatePath.isEmpty()) {
-					writeFiles(this.certificatePath, appDir.getAbsolutePath(), false);
+					try {
+						final File certFile = new File(this.certificatePath);
+						Files.copy(
+								certFile.toPath(),
+								new File (appDir.getAbsolutePath(), certFile.getName()).toPath(),
+								StandardCopyOption.REPLACE_EXISTING);
+					}
+					catch (final Exception e) {
+						window.print(Messages.getString("ConfiguratorWindows.24") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				} else {
 					ConfiguratorUtil.installFile(
 						certPack.getCaCertificate().getEncoded(),
@@ -113,11 +129,11 @@ final class ConfiguratorWindows implements Configurator {
 				}
 
 				if (this.jnlpInstance) {
+					// En los despliegues JNLP no se instala nunca el certificado proporcionado por el administrador
 					JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
 					window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
 					importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
 				}
-
 
 				if (this.firefoxSecurityRoots) {
 					window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
@@ -406,63 +422,5 @@ final class ConfiguratorWindows implements Configurator {
 	private static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
 		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Permite escribir el .cer y .pfx en caso de que se pasen por par&aacute;metros
-	 * @param origin archivo de origen
-	 * @param destination directorio de destino
-	 * @param isKeystore si es true, significa que es un almac&aecute;n, si es false es un certificado 
-	 */
-	private static void writeFiles(final String origin, final String destination, final boolean isKeystore) {
-
-		final File fileOrigin = new File(origin);
-		final File fileDestination = new File(destination + "\\" + fileOrigin.getName()); //$NON-NLS-1$
-
-		InputStream in = null;
-		OutputStream out = null;
-
-		try {
-
-			in = new FileInputStream(fileOrigin);
-			out = new FileOutputStream(fileDestination);
-
-			final byte[] buf = new byte[1024];
-			int len;
-
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-		
-		} catch (final IOException ioe) {
-			LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (final IOException e) {
-					LOGGER.warning("Error al cerrar input en escritura de fichero"); //$NON-NLS-1$
-				}
-			}
-
-			if (out != null) {
-				try {
-					out.close();
-				} catch (final IOException e) {
-					LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
-				}
-			}
-		}
-
-		//Si es un almacen, lo renombramos a autofirma.pfx
-		if (isKeystore) {			
-			try {
-				File newFile = new File(fileDestination.getParent(), "autofirma.pfx");  //$NON-NLS-1$
-				Files.move(fileDestination.toPath(), newFile.toPath());
-			} catch (IOException e) {
-				LOGGER.warning("Error al renombrar fichero"); //$NON-NLS-1$
-			}
-		}
-		
 	}
 }

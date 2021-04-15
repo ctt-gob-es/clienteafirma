@@ -125,31 +125,24 @@ Function .onInit
 	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH  
 	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH 
 	
-	; Comprobamos que los archivos pasados por el administrador existen, 
-	; en caso contrario abortamos la instalacion. Tambien comprobamos que
-	; no solo se informe de un parametro, si no de los dos, o de ninguno
-	
+	; Comprobamos que no solo se informe de un parametro, sino de
+	; los dos o de ninguno
 	${If} $KEYSTORE_PATH != "false" 
-	
-		${If} $CERTIFICATE_PATH == "false" 
-			Abort
-		${EndIf}
+	${AndIf} $CERTIFICATE_PATH == "false" 
+		Abort
+	${EndIf}
 
+	${If} $CERTIFICATE_PATH != "false" 
+	${AndIf} $KEYSTORE_PATH == "false" 
+		Abort
 	${EndIf}
 	
+	; En caso de haber indicado los archivos, comprobamos que existan
 	${If} $CERTIFICATE_PATH != "false" 
-	
-		${If} $KEYSTORE_PATH == "false" 
+	${AndIf} $KEYSTORE_PATH != "false" 
+		IfFileExists "$CERTIFICATE_PATH" 0 +2
+		IfFileExists "$KEYSTORE_PATH" +2 0
 			Abort
-		${EndIf}
-			
-		IfFileExists "$CERTIFICATE_PATH" 0 file_not_found
-			IfFileExists "$KEYSTORE_PATH" 0 file_not_found
-		goto file_check_end
-		file_not_found:
-			Abort
-		file_check_end:
-	
 	${EndIf}
 	
 FunctionEnd
@@ -160,18 +153,13 @@ FunctionEnd
 
 Section "Programa" sPrograma
 
-	; Comprobamos que los archivos pasados por el administrador existen, 
-	; en caso contrario abortamos la instalacion
-	${If} $CERTIFICATE_PATH != "false"
-			
-		IfFileExists "$CERTIFICATE_PATH" 0 file_not_found
-			IfFileExists "$KEYSTORE_PATH" 0 file_not_found
-		goto file_check_end
-		file_not_found:
+	; En caso de haber recibido los archivos, comprobamos que existan
+	${If} $CERTIFICATE_PATH != "false" 
+	${AndIf} $KEYSTORE_PATH != "false" 
+		IfFileExists "$CERTIFICATE_PATH" 0 +2
+		IfFileExists "$KEYSTORE_PATH" +2 0
 			Quit
-		file_check_end:
- 
-    ${EndIf}
+	${EndIf}
 	
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
@@ -298,25 +286,25 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
 	
 	${If} $CERTIFICATE_PATH != "false"
-	
+		; Obtenemos el nombre del certificado
 		Push "$CERTIFICATE_PATH"
 		Push "\"
 		Call GetAfterChar
 		Pop $R0
 	
 		; Eliminamos los certificados generados anteriormente con el nombre que indica el administrador
-		IfFileExists "$INSTDIR\$PATH\$R0" 0 +1
+		IfFileExists "$INSTDIR\$PATH\$R0" 0 +2
 			Delete "$INSTDIR\$PATH\$R0"
-		IfFileExists "$INSTDIR\$PATH\$R0" 0 +1
+		IfFileExists "$INSTDIR\$PATH\$R0" 0 +2
 			Delete "$INSTDIR\$PATH\$R0"
  
     ${EndIf}
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
-	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
-	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
-	Delete "$INSTDIR\$PATH\autofirma.pfx"
+	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
+		Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
+		Delete "$INSTDIR\$PATH\autofirma.pfx"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R4 ""
@@ -326,12 +314,12 @@ Section "Programa" sPrograma
 	; Comprobamos si el administrador le ha pasado el parametro con el certificado
 	StrCpy $R5 ""
 	StrCmp $CERTIFICATE_PATH "false" +2
-		StrCpy $R5 "-certificate_path=$CERTIFICATE_PATH"
+		StrCpy $R5 "-certificate_path '$CERTIFICATE_PATH'"
 	
 	; Comprobamos si el administrador le ha pasado el parametro con el almacen
 	StrCpy $R6 ""
 	StrCmp $KEYSTORE_PATH "false" +2
-		StrCpy $R6 "-keystore_path=$KEYSTORE_PATH"
+		StrCpy $R6 "-keystore_path '$KEYSTORE_PATH'"
 	
 	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 $R5 $R6 /passive'
 
@@ -339,12 +327,10 @@ Section "Programa" sPrograma
 	Call DeleteCertificateOnInstall
 	
 	; Importamos el certificado en el sistema
-	StrCmp $CERTIFICATE_PATH "false" 0 cer_not_false
-		Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
-	goto end
-	cer_not_false:
-		Push "$INSTDIR\$PATH\$R0"
-	end:
+	StrCpy $R7 "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	StrCmp $CERTIFICATE_PATH "false" +2
+		StrCpy $R7 "$INSTDIR\$PATH\$R0"
+	Push $R7
 	
 	Sleep 2000
 	Call AddCertificateToStore
@@ -650,6 +636,14 @@ done:
   Pop $0
 FunctionEnd
 
+; StrStr - get the last part of a string after a specified character.
+; Useful to get file extensions, last file name or last directory part.
+;
+; Usage:
+;	Push "C:\program files\geoffrey\files"
+;	Push "\"
+;	Call GetAfterChar
+;	Pop $R0
 Function GetAfterChar
  Exch $0 ; chop char
   Exch

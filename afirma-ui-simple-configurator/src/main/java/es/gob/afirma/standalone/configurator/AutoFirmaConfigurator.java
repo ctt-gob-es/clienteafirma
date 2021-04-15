@@ -49,10 +49,10 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
 
 	/** Indica la ruta del certificado pasado por el administrador. */
-	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path="; //$NON-NLS-1$
+	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path"; //$NON-NLS-1$
 
 	/** Indica la ruta del certificado pasado por el administrador. */
-	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path="; //$NON-NLS-1$
+	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path"; //$NON-NLS-1$
 
 	private Configurator configurator;
 
@@ -251,7 +251,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 		public ConfigArgs(final String[] args) {
 			if (args != null) {
-				for (final String arg : args) {
+				for (int i = 0; i < args.length; i++) {
+					final String arg = args[i];
 					if (PARAMETER_INSTALL.equalsIgnoreCase(arg)) {
 						this.op = Operation.INSTALLATION;
 					} else if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
@@ -264,10 +265,14 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 						this.jnlpInstance = true;
 					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
 						this.firefoxSecurityRoots = true;
-					} else if (arg.length() > 18 && PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg.substring(0, 18))) {
-						this.certificatePath = arg.substring(18);
-					} else if (arg.length() > 15 && PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg.substring(0, 15))) {
-						this.keystorePath = arg.substring(15);
+					} else if (PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg)) {
+						if (i < args.length - 1) {
+							this.certificatePath = args[++i];
+						}
+					} else if (PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg)) {
+						if (i < args.length - 1) {
+							this.keystorePath = args[++i];
+						}
 					}
 				}
 			}
