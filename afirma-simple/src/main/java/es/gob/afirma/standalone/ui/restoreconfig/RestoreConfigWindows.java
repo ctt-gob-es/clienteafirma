@@ -243,6 +243,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	/**
 	 * Configura el protocolo "afirma" en Chrome para todos los usuarios de
 	 * Windows.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
 	 */
 	private static void configureChrome(final Component parent) {
 

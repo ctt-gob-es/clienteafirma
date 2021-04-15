@@ -1124,10 +1124,12 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return AccessController.doPrivileged(new SelectSignerAction(format));
 	}
 
-	/** Recupera un manejador de firma compatible con el formato indicado. Si este es {@code AUTO}, se
+	/**
+	 * Recupera un manejador de firma compatible con el formato indicado. Si este es {@code AUTO}, se
 	 * calcular&aacute; en base a los datos proporcionados. Si no se encuentra uno compatible, se
 	 * devuelve {@code null}.
 	 * @param format Nombre de un formato de firma.
+	 * @param data Datos que se desean firmar.
 	 * @return Manejador de firma.
 	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
 	 */
@@ -1135,7 +1137,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return AccessController.doPrivileged(new SelectSignerAction(format, data));
 	}
 
-	/** Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
+	/**
+	 * Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
 	 * compatible, se devuelve {@code null}.
 	 * @param signature Firma electr&oacute;nica.
 	 * @return Manejador de firma.

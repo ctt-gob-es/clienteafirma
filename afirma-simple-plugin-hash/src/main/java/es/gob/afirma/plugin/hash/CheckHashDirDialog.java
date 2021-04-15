@@ -393,7 +393,8 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 		return Arrays.equals(newHash, expectedFileHash);
 	}
 
-	/** Analiza el fichero para identificar si se trata de alguno de los formatos soportados
+	/**
+	 * Analiza el fichero para identificar si se trata de alguno de los formatos soportados
 	 * de documentos de hashes y comprueba que los hashes de los ficheros del directorio
 	 * indicado se correspondan con los del documento.
 	 * @param dir Directorio seleccionado.
@@ -402,7 +403,7 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 	 * @throws IOException Error al abrir o cerrar el fichero seleccionado.
 	 * @throws DocumentException Cuando se proporcione un documento de hashes no soportado.
 	 * @throws CorruptedDocumentException Cuando se ha identificado que el documento est&aacute; corrupto.
-	 * @throws NoSuchAlgorithmException Error al construir la implementacion de un algoritmo. */
+	 */
 	public static void checkHash(final Path dir, final File hashDocumentPath, final HashReport report)
 			throws IOException, DocumentException, CorruptedDocumentException {
 
@@ -509,9 +510,6 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 	 *	&lt;/xs:schema&gt;
 	 * </pre>
 	 * @param mapReport Mapa con la informacion para generar el report el XML.
-	 * @param alg Algoritmo con el que fue generado el XML.
-	 * @param recursive Si se ha elegido que el recorrido por el directorio sea
-	 *        recursivo o no.
 	 * @return Informe de coincidencias de huellas en XML.
 	 * @throws ParserConfigurationException Si no se puede obtener en analizador XML.
 	 * @throws TransformerException Si hay errores escribiendo el XML. */
@@ -655,7 +653,7 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 
 	/**
 	 * Recupera la extensi&oacute;n del fichero.
-	 * @param path Ruta o nombre del fichero.
+	 * @param file Fichero.
 	 * @return Extensi&oacute;n del fichero sin punto o {@code null} si no ten&iacute;a.
 	 */
 	private static String getExtension(final File file) {

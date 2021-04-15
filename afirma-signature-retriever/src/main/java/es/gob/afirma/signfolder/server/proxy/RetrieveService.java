@@ -146,9 +146,10 @@ public final class RetrieveService extends HttpServlet {
 		}
 	}
 
-	/** Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
+	/**
+	 * Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
 	 * de vida configurado.
-	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
+	 */
 	private static void removeExpiredFiles() {
 
 		if (RetrieveConfig.DEBUG) {

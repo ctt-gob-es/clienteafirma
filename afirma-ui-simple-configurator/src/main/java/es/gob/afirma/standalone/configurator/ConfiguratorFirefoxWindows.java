@@ -146,9 +146,12 @@ final class ConfiguratorFirefoxWindows {
 		//removeCertUtilFromDisk(appDir);
 	}
 
-	/** Desinstala un certificado de los almacenes de autoridades de confianza
+	/**
+	 * Desinstala un certificado de los almacenes de autoridades de confianza
 	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n. */
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 */
 	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console) {
 
 		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
@@ -199,9 +202,12 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	/** Instala un certificado de CA en el almac&eacute;n de un perfil de Mozilla.
+	/**
+	 * Instala un certificado de CA en el almac&eacute;n de un perfil de Mozilla.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @param profilesDir Directorio del perfil de Mozilla. */
+	 * @param profilesDir Directorio del perfil de Mozilla.
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 */
 	private static void importCACertOnMozillaKeyStore (final File appDir,
 			                                           final File profilesDir,
 			                                           final Console console) {
@@ -239,10 +245,12 @@ final class ConfiguratorFirefoxWindows {
 	}
 
 
-	/** Ejecuta la utilidad CertUtil para la instalaci&oacute;n del certificado ra&iacute;z de
+	/**
+	 * Ejecuta la utilidad CertUtil para la instalaci&oacute;n del certificado ra&iacute;z de
 	 * confianza SSL en un perfil de Mozilla.
 	 * @param appDir Directorio en el que se encuentra el certificado a importar.
 	 * @param profileDir Directorio de perfil de Mozilla.
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
 	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore. */
 	private static void executeCertUtilToImport(final File appDir,
@@ -287,12 +295,15 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	/** Ejecuta la aplicacion Mozilla CertUtil para eliminar el certificado de confianza ra&iacute;z
+	/**
+	 * Ejecuta la aplicacion Mozilla CertUtil para eliminar el certificado de confianza ra&iacute;z
 	 * SSL de Firefox.
 	 * @param appDir Directorio padre en el que se encuentra el directorio de certUtil.
 	 * @param profileDir Directorio de perfil de Mozilla.
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
 	 * @throws IOException Cuando no se encuentra o puede leer alguno de los ficheros necesarios.
-	 * @throws GeneralSecurityException Cuando no se puede ejecutar. */
+	 * @throws GeneralSecurityException Cuando no se puede ejecutar.
+	 */
 	private static void uninstallCACertFromMozillaKeyStore(final File appDir, final File profileDir, final Console console) throws IOException, GeneralSecurityException {
 
 		final File certutilFile = new File(appDir, CERTUTIL_DIR + File.separator + CERTUTIL_EXE);
@@ -319,9 +330,13 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	/** Ejecuta Mozilla CertUtil como comando del sistema.
+	/**
+	 * Ejecuta Mozilla CertUtil como comando del sistema.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param command Comando a ejecutar, con el nombre de comando y sus par&aacute;metros separados en un array.
-	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n.
+	 */
 	private static void execCertUtilCommandLine(final File appDir, final String[] command, final Console console)
 			throws IOException {
 
@@ -386,10 +401,14 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	/** Solicita al usuario la contrase&ntilde;a maestra del almac&eacute;n y
+	/**
+	 * Solicita al usuario la contrase&ntilde;a maestra del almac&eacute;n y
 	 * ejecuta Mozilla CertUtil para importar un certificado.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param command Comando a ejecutar, con el nombre de comando y sus par&aacute;metros separados en un array.
-	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n.
+	 */
 	private static void execCertUtilCommandLineWithPassword(final File appDir, final String[] command, final Console console)
 			throws IOException {
 
@@ -631,7 +650,6 @@ final class ConfiguratorFirefoxWindows {
 	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
 	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
 	 * {@code false} en de que s&oacute;lo se desee confiar en el almac&eacute;n del navegador.
-	 * @param profileDirs Listado de directorios de perfil de Firefox.
 	 * @param window Consola en la que se mostrar&aacute;n los mensajes de progreso.
 	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
 	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado perfiles de Firefox.

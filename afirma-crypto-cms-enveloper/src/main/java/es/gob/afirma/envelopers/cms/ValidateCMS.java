@@ -219,9 +219,11 @@ final class ValidateCMS {
         return isValid;
     }
 
-    /** Verifica si una firma es de tipo </i>Enveloped Data</i>.
+    /**
+     * Verifica si una firma es de tipo <i>Enveloped Data</i>.
      * @param data Datos CMS.
-     * @return Si es de este tipo. */
+     * @return Si es de este tipo.
+     */
 	static boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try (

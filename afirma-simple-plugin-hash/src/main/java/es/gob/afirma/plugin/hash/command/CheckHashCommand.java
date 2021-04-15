@@ -60,12 +60,14 @@ public class CheckHashCommand extends PluginCommandAction {
 		return response;
 	}
 
-	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales a trav&eacute;s de consola.
+	/**
+	 * Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales a trav&eacute;s de consola.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @return {@code true} si la operaci&oacute;n termino correctamente, {@code false} en caso contrario.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
-	 * @throws IOException
-	 * @throws AOException */
+	 * @throws IllegalArgumentException Cuando falta algun par&aacute;metro necesario.
+	 * @throws IOException Cuando No se pueden leer los datos de entrada.
+	 * @throws AOException Cuando falla el c&aacute;lculo del hash.
+	 */
 	private static boolean checkHashByCommandLine(final HashParameters params)
 			throws IllegalArgumentException, IOException, AOException {
 
@@ -138,7 +140,7 @@ public class CheckHashCommand extends PluginCommandAction {
 	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales mostrando los di&aacute;logos
 	 * que fuesen necesarios.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	 * @throws IllegalArgumentException Cuando falta algun par&aacute;metro necesario. */
 	private static void checkHashByGui(final HashParameters params)
 			throws IllegalArgumentException {
 

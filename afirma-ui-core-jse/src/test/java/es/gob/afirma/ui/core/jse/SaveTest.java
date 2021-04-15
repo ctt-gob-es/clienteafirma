@@ -14,9 +14,10 @@ import es.gob.afirma.core.ui.GenericFileFilter;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SaveTest {
 
-	/** Main para pruebas.
-	 * @param args No se usa.
-	 * @throws IOException En cualquier error. */
+	/**
+	 * Prueba de di&aacute;logo de guardado.
+	 * @throws IOException En cualquier error.
+	 */
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore

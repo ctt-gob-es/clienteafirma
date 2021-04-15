@@ -105,13 +105,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 	 * la firma junto con una serie de metadatos en forma de cadena.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por
-	 * <i>socket</i> local, <code>false</code> para usar servidor intermedio.
 	 * @return Resultado de la operaci&oacute;n o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la comunicaci&oacute;n por
 	 * <i>socket</i> local.
-	 * @throws VisibleSignatureMandatoryException si el usuario cancela la
-	 * selecci&oacute;n del &aacute;rea de firma visible cuando &eacute;sta es obligatoria.
 	 */
 	static StringBuilder processSign(final UrlParametersToSignAndSave options,
 			final int protocolVersion) throws SocketOperationException {
@@ -732,7 +728,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 	 * seleccionar la zona donde colocar la firma siempre y cuando se cumplan las
 	 * siguientes condiciones: 1) El documento a firmar debe ser un PDF. 2) No puede
 	 * ser una firma por lotes. 3) En los par&aacute;metros adicionales debe venir
-	 * la bandera "visibleSignature" con los posibles valores <i>want<i> y
+	 * la bandera "visibleSignature" con los posibles valores <i>want</i> y
 	 * <i>optional</i>. 4) En los par&aacute;metros adicionales NO pueden venir los
 	 * par&aacute;metros asociados a la posici&oacute;n de la firma ya establecidos,
 	 * estos son: signaturePositionOnPageLowerLeftX,
@@ -776,8 +772,8 @@ final class ProtocolInvocationLauncherSignAndSave {
 	/**
 	 * M&eacute;todo que muestra el dialogo para seleccionar la posici&oacute;n de
 	 * la firma.
-	 *
-	 * @param options Conjunto de atributos recibidos en la petici&oacute;n.
+	 * @param data Documento que se desea firmar.
+	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
 	 */
 	private static void showRubricPositionDialog(final byte[] data, final Properties extraParams) {
 
@@ -792,7 +788,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 	/**
 	 * M&eacute;todo que comprueba si el di&aacute;logo ha sido cancelado y act&uacute;a en
 	 * consecuencia.
-	 * @param extraParams Par&aacute;metros de Conjunto de atributos recibidos en la petici&oacute;n.
+	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
 	 */
 	private static void checkShowRubricDialogIsCalceled(final Properties extraParams) {
 		if (showRubricIsCanceled) {

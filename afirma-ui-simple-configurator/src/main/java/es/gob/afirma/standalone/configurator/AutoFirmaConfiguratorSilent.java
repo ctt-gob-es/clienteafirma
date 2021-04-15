@@ -80,7 +80,10 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 	}
 
-	/** Configurador de AutoFirma. */
+	/**
+	 * Configurador de AutoFirma.
+	 * @param config Par&aacute;metros de configuraci&oacute;n para la instalaci&oacute;n de AutoFirma.
+	 */
 	public AutoFirmaConfiguratorSilent(final ConfigArgs config) {
 
 		this.config = config;

@@ -59,10 +59,12 @@ public final class ErrorManagementPanel extends JPanel {
 
 	private boolean expandedDetails;
 
-	/** Constructor con la ventana padre.
+	/**
+	 * Constructor con la ventana padre.
 	 * @param w Di&aacute;logo sobre el que mostrar el panel.
-	 * @param t Informaci&oacute;n sobre el error
-	 * @param message Mensaje sobre el error
+	 * @param t Informaci&oacute;n sobre el error.
+	 * @param message Mensaje sobre el error.
+	 * @param messageType Tipo de mensaje (precauci&oacute;n o error).
 	 */
 	ErrorManagementPanel(final ErrorManagementDialog w, final Throwable t, final Object message, final int messageType) {
 		this.window = w;
@@ -72,10 +74,10 @@ public final class ErrorManagementPanel extends JPanel {
 	}
 
 	/**
-	 * Dibuja la ventana con la informaci&oacute;n sobre el error
-	 * @param t Datos sobre el error
-	 * @param message Mensaje del error
-	 * @param messageType Tipo de mensaje (error o warning)
+	 * Dibuja la ventana con la informaci&oacute;n sobre el error.
+	 * @param t Datos sobre el error.
+	 * @param message Mensaje del error.
+	 * @param messageType Tipo de mensaje (precauci&oacute;n o error).
 	 */
 	private void createUI(final Throwable t, final Object message, final int messageType) {
 

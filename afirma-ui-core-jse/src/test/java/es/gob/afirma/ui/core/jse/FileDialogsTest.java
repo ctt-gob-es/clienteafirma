@@ -15,9 +15,10 @@ import es.gob.afirma.core.ui.GenericFileFilter;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class FileDialogsTest {
 
-	/** Prueba de selecci&oacute;n simple y m&uacute;ltiples de fichero.
-	 * @param args Argumentos.
-	 * @throws IOException Cuando ocurre un error al leer los datos. */
+	/**
+	 * Prueba de selecci&oacute;n simple y m&uacute;ltiples de fichero.
+	 * @throws IOException Cuando ocurre un error al leer los datos.
+	 */
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore

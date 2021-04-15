@@ -144,8 +144,11 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 		return this.copyToClipBoardCheckBox.isSelected();
 	}
 
-	/** Inicia el proceso de creaci&oacute;n de huella digital.
-	 * @param parent Componente padre para la modalidad. */
+	/**
+	 * Inicia el proceso de creaci&oacute;n de huella digital.
+	 * @param parent Componente padre para la modalidad.
+	 * @param config Configuraci&oacute;n para la creaci&oacute;n de hash.
+	 */
 	public static void startHashCreation(final Window parent, final Properties config) {
 		final CreateHashFileDialog chd = new CreateHashFileDialog(parent, config);
 		chd.setSize(600, 350);
@@ -154,8 +157,11 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 		chd.setVisible(true);
 	}
 
-	/** Crea un di&aacute;logo para la creaci&oacute;n de huellas digitales.
-	 * @param parent Componente padre para la modalidad. */
+	/**
+	 * Crea un di&aacute;logo para la creaci&oacute;n de huellas digitales.
+	 * @param parent Componente padre para la modalidad.
+	 * @param config Configuraci&oacute;n para la creaci&oacute;n de hash.
+	 */
 	private CreateHashFileDialog(final Window parent, final Properties config) {
 		super(parent);
 
