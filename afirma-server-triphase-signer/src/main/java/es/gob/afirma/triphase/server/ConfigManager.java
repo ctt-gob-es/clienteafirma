@@ -20,7 +20,6 @@ public class ConfigManager {
 
 	private static final String CONFIG_PARAM_DOCUMENT_MANAGER_CLASS = "document.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
-	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_VERIFICATION_KEY = "verification.key"; //$NON-NLS-1$
 
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
@@ -123,12 +122,6 @@ public class ConfigManager {
 
 	public static String getAccessControlAllowOrigin() {
 		return config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN, ALL_ORIGINS_ALLOWED);
-	}
-
-	static boolean needInstallXmlDsigFactory() {
-		return Boolean.parseBoolean(
-				config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString())
-				);
 	}
 
 	public static String getHMacKey() {

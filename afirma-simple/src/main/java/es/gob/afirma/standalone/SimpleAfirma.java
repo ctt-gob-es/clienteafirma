@@ -58,7 +58,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.plugins.PluginsManager;
@@ -195,7 +195,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
        this.mainMenu = new MainMenu(this.window, this);
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
-		Utils.installXmlDSigProvider(true);
+       XmlDSigProviderHelper.configureXmlDSigProvider();
     }
 
 	/**

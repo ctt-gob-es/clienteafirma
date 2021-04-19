@@ -25,6 +25,7 @@ import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas XML XAdES ASiC-S.
  * Todas las firmas XAdES ASiC-S se generan de forma <i>externally detached</i> con MANIFEST para evitar problemas de resoluci&oacute;n en
@@ -38,6 +39,12 @@ import es.gob.afirma.signers.xades.XAdESExtraParams;
 public final class AOXAdESASiCSSigner implements AOSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+    // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+    // de los Base 64
+    static {
+    	XmlDSigProviderHelper.configureXmlDSigProvider();
+    }
 
 	@Override
 	public byte[] sign(final byte[] data,

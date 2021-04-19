@@ -41,6 +41,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas XML XAdES
  * <p>Soporta XAdES-BES, XAdES-EPES y Baseline B-LEVEL.</p>
@@ -274,6 +275,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
+
+    // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+    // de los Base 64
+    static {
+    	XmlDSigProviderHelper.configureXmlDSigProvider();
+    }
 
     /** Firma datos en formato XAdES.
      * <p>

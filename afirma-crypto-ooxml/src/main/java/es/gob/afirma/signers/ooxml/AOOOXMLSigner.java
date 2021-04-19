@@ -34,6 +34,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
@@ -45,6 +46,12 @@ public final class AOOOXMLSigner implements AOSigner {
     private static final String EXTENSION_PPTX = ".pptx"; //$NON-NLS-1$
     private static final String EXTENSION_PPSX = ".ppsx"; //$NON-NLS-1$
     private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
+
+    // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+    // de los Base 64
+    static {
+    	XmlDSigProviderHelper.configureXmlDSigProvider();
+    }
 
     /** Consutruye un firmador OOXML, comprobando que se cuente con un JRE adecuado. */
     public AOOOXMLSigner() {
