@@ -77,6 +77,18 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 				}
 			}
+			else if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+				// En Windows se ejecutara en modo administrador y el directorio de usuario apuntara al del administrador,
+				// asi que componemos el directorio de usuario real
+				final String drive = System.getenv("HOMEDRIVE"); //$NON-NLS-1$
+				final String path = System.getenv("HOMEPATH"); //$NON-NLS-1$
+				if (drive != null && path != null && new File(drive + path).isDirectory()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, new File(drive + path, LogManager.SUBDIR).getAbsolutePath());
+				}
+				else {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
+				}
+			}
 			else {
 				LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
 			}
