@@ -1,9 +1,10 @@
-package test.es.gob.afirma.signfolder.server.proxy;
+package es.gob.afirma.signfolder.server.proxy;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -42,27 +43,27 @@ public final class TestStorageService {
 			System.out.println("Error 411 lanzado en el POST sin datos"); //$NON-NLS-1$
 		}
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-20")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP&v=FAKE_V", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=put&v=PEDO", //$NON-NLS-1$
+			SERVICE_URL + "?op=put&v=FAKE_V", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-05")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=put&v=PEDO&id=PIS.txt", //$NON-NLS-1$
+			SERVICE_URL + "?op=put&v=FAKE_V&id=ID.txt", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=put&v=PEDO&id=CACA.txt&dat=CULO", //$NON-NLS-1$
+			SERVICE_URL + "?op=put&v=FAKE_V&id=ID2.txt&dat=" + Base64.encode("DATOS".getBytes(), true), //$NON-NLS-1$ //$NON-NLS-2$
 			UrlHttpMethod.POST
 		);
 		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$
@@ -75,7 +76,7 @@ public final class TestStorageService {
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-00")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertTrue(
@@ -83,22 +84,22 @@ public final class TestStorageService {
 			new String(res).startsWith("ERR-20") //$NON-NLS-1$
 		);
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP&v=FAKE_V", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=put&v=PEDO", //$NON-NLS-1$
+			SERVICE_URL + "?op=put&v=FAKE_V", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-05")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=put&v=PEDO&id=PIS.txt", //$NON-NLS-1$
+			SERVICE_URL + "?op=put&v=FAKE_V&id=ID3.txt", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=put&v=PEDO&id=CACA.txt&dat=CULO", //$NON-NLS-1$
+			SERVICE_URL + "?op=put&v=FAKE_V&id=ID4.txt&dat=" + Base64.encode("DATOS2".getBytes(), true), //$NON-NLS-1$ //$NON-NLS-2$
 			UrlHttpMethod.GET
 		);
 		Assert.assertEquals("OK", new String(res)); //$NON-NLS-1$

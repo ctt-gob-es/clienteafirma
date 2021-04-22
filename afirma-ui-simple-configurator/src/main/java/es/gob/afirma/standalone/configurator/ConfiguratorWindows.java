@@ -76,7 +76,7 @@ final class ConfiguratorWindows implements Configurator {
 
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
-			if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
+			if (!checkSSLKeyStoreGenerated(appDir)) {
 
 				// Generacion del certificado pfx
 				if (!this.keyStorePath.isEmpty() && !this.certificatePath.isEmpty()){
@@ -189,52 +189,11 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
-	 * En caso del despliegue JNLP, primero consulta en el directorio por
-	 * defecto de instalaci&oacute;n de AutoFirma en el sistema, y despu&eacute;s
-	 * el directorio indicado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
-	 * @param jnlpDeployment Indica si la funci&oacute;n se ejecuta desde un aplicativo desplegado mediante JNLP.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
-	private static boolean checkSSLKeyStoreGenerated(final File appDir,
-			                                         final boolean jnlpDeployment) {
-
-		/*
-		// En caso de tratarse de un despliegue JNLP, probamos primeramente
-		// a buscar el almacen en el directorio de instalacion por defecto
-		// de AutoFirma para evitar tener que volver a generarlo
-		if (jnlpDeployment) {
-			final File[] defaultDirs = getDefaultInstallationDirs();
-			for (final File defaultDir : defaultDirs) {
-				if (new File(defaultDir, KS_FILENAME).exists()) {
-					return true;
-				}
-			}
-		}
-		*/
+	private static boolean checkSSLKeyStoreGenerated(final File appDir) {
 		return new File(appDir, KS_FILENAME).exists();
 	}
-
-//	/**
-//	 * Devuelve el listado de directorios en el que com&uacute;nmente se instala
-//	 * AutoFirma en este sistema operativo.
-//	 * @return Listado de directorios.
-//	 */
-//	private static File[] getDefaultInstallationDirs() {
-//
-//		final List<File> dirs = new ArrayList<>();
-//		final String subPath = "AutoFirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
-//		final String basePath = System.getenv("PROGRAMFILES"); //$NON-NLS-1$
-//		if (basePath != null) {
-//			dirs.add(new File(basePath, subPath));
-//			if (basePath.endsWith(" (x86)")) { //$NON-NLS-1$
-//				dirs.add(new File(basePath.substring(0,  basePath.lastIndexOf(" (x86)")), subPath)); //$NON-NLS-1$
-//			}
-//			else {
-//				dirs.add(new File(basePath + " (x86)", subPath)); //$NON-NLS-1$
-//			}
-//		}
-//		return dirs.toArray(new File[dirs.size()]);
-//	}
 
 	@Override
 	public void uninstall(final Console console) {

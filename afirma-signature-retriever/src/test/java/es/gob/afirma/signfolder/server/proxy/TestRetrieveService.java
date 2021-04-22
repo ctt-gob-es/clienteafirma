@@ -1,4 +1,4 @@
-package test.es.gob.afirma.signfolder.server.proxy;
+package es.gob.afirma.signfolder.server.proxy;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -29,25 +29,25 @@ public final class TestRetrieveService {
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-00")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-20")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP&v=FAKE_V", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=get&v=PEDO&id=PIS", //$NON-NLS-1$
+			SERVICE_URL + "?op=get&v=FAKE_V&id=ID", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-06")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=get&v=PEDO&id=CACA.txt", //$NON-NLS-1$
+			SERVICE_URL + "?op=get&v=FAKE_V&id=ID.txt", //$NON-NLS-1$
 			UrlHttpMethod.GET
 		);
-		Assert.assertEquals("CULO", new String(res).trim()); //$NON-NLS-1$
+		Assert.assertEquals("DATA", new String(res).trim()); //$NON-NLS-1$
 
 		// Ahora todo de nuevo pero con POST
 		try {
@@ -65,17 +65,17 @@ public final class TestRetrieveService {
 			System.out.println("Error 411 lanzado en el POST sin datos"); //$NON-NLS-1$
 		}
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-20")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=KAKA&v=PEDO", //$NON-NLS-1$
+			SERVICE_URL + "?op=FAKE_OP&v=FAKE_V", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-01")); //$NON-NLS-1$
 		res = mgr.readUrl(
-			SERVICE_URL + "?op=get&v=PEDO&id=PIS", //$NON-NLS-1$
+			SERVICE_URL + "?op=get&v=PEDO&id=ID2", //$NON-NLS-1$
 			UrlHttpMethod.POST
 		);
 		Assert.assertTrue(new String(res).startsWith("ERR-06")); //$NON-NLS-1$
