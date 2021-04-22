@@ -67,17 +67,23 @@ public final class TestCertUtil {
 		System.out.println();
 		System.out.println(AOUtil.hexify(cp.getPkcs12(), true));
 
-		try (
-			final OutputStream fos = new FileOutputStream(File.createTempFile("SSLCERT_", ".cer")) //$NON-NLS-1$ //$NON-NLS-2$
-		) {
+		final File sslCertFile = File.createTempFile("SSLCERT_", ".cer"); //$NON-NLS-1$ //$NON-NLS-2$
+		try (final OutputStream fos = new FileOutputStream(sslCertFile)) {
 			fos.write(cp.getSslCertificate().getEncoded());
 		}
+		System.out.println("Certificado SSL: " + sslCertFile.getAbsolutePath()); //$NON-NLS-1$
 
-		try (
-			final OutputStream fos = new FileOutputStream(File.createTempFile("CACERT_", ".cer")) //$NON-NLS-1$ //$NON-NLS-2$
-		) {
+		final File sslP12File = File.createTempFile("SSLPKCS12_", ".p12"); //$NON-NLS-1$ //$NON-NLS-2$
+		try (final OutputStream fos = new FileOutputStream(sslP12File)) {
+				fos.write(cp.getPkcs12());
+		}
+		System.out.println("PKCS#12 SSL: " + sslP12File.getAbsolutePath()); //$NON-NLS-1$
+
+		final File sslCaCertFile = File.createTempFile("CACERT_", ".cer"); //$NON-NLS-1$ //$NON-NLS-2$
+		try (final OutputStream fos = new FileOutputStream(sslCaCertFile)) {
 			fos.write(cp.getCaCertificate().getEncoded());
 		}
+		System.out.println("Certificado CA: " + sslCaCertFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 }

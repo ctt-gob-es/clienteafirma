@@ -26,6 +26,8 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +45,7 @@ final class ConfiguratorWindows implements Configurator {
 
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
-	private static final String FILE_AUTOFIRMA_ROOT_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String CA_CERT_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
@@ -75,33 +77,63 @@ final class ConfiguratorWindows implements Configurator {
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
 			if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
-				
-				window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
-				
-				final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
-					ConfiguratorUtil.CERT_ALIAS,
-					KS_PASSWORD
-				);
 
-				window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
+				// Generacion del certificado pfx
+				if (!this.keyStorePath.isEmpty() && !this.certificatePath.isEmpty()){
 
-				//Generacion del certificado pfx
-				if (!this.keyStorePath.isEmpty()){
-					writeFiles(this.keyStorePath, appDir.getAbsolutePath(), true);
+					window.print(Messages.getString("ConfiguratorWindows.25")); //$NON-NLS-1$
+
+					// Copiamos al directorio el almacen con la clave SSL
+					try {
+						copyFile(
+								new File(this.keyStorePath),
+								new File (appDir.getAbsolutePath(), KS_FILENAME));
+					}
+					catch (final Exception e) {
+						window.print(Messages.getString("ConfiguratorWindows.23") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+
+					// Copiamos al directorio el certificado de CA
+					try {
+						final File certFile = new File(this.certificatePath);
+						copyFile(
+								certFile,
+								new File (appDir.getAbsolutePath(), CA_CERT_FILENAME));
+					}
+					catch (final Exception e) {
+						window.print(Messages.getString("ConfiguratorWindows.24") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				} else {
+
+					window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
+
+					// Generamos un certificado de CA y un certificado SSL a partir de el
+					final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
+						ConfiguratorUtil.CERT_ALIAS,
+						KS_PASSWORD
+					);
+
+					window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
+
+					// Guardamos el PKCS#12 con la clave SSL generada
 					ConfiguratorUtil.installFile(
 						certPack.getPkcs12(),
 						new File(appDir, KS_FILENAME)
 					);
-				}
 
-				//Generacion del certificado raiz .cer
-				if (!this.certificatePath.isEmpty()) {
-					writeFiles(this.certificatePath, appDir.getAbsolutePath(), false);
-				} else {
+					// Guardamos el certificado de CA generado
 					ConfiguratorUtil.installFile(
-						certPack.getCaCertificate().getEncoded(),
-						new File(appDir, FILE_AUTOFIRMA_ROOT_CERTIFICATE));
+							certPack.getCaCertificate().getEncoded(),
+							new File(appDir, CA_CERT_FILENAME));
+
+					// En los despliegues JNLP nunca se proporcionan certificados. Ademas, en estos casos, el
+					// instalador no lo habra instalado en el almacen de Windows, asi que lo tendremos que
+					// hacer ahora
+					if (this.jnlpInstance) {
+						JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
+						window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
+						importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
+					}
 				}
 
 				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
@@ -111,13 +143,6 @@ final class ConfiguratorWindows implements Configurator {
 				catch(final MozillaProfileNotFoundException e) {
 					window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-
-				if (this.jnlpInstance) {
-					JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
-					window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
-					importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
-				}
-
 
 				if (this.firefoxSecurityRoots) {
 					window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
@@ -215,7 +240,7 @@ final class ConfiguratorWindows implements Configurator {
 	public void uninstall(final Console console) {
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Windows"); //$NON-NLS-1$
-		uninstallRootCAWindowsKeyStore(CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
+		uninstallRootCAWindowsKeyStore();
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(
@@ -384,18 +409,62 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	/**
-	 * Desinstala un certificado del almacen de confianza de Windows sin
-	 * necesidad de tener permisos de administrador.
-	 * @param principal Principal del certificado a eliminar.
+	 * Desinstala el certificado de confianza del almac&eacute;n de confianza de Windows sin
+	 * necesidad de tener permisos de administrador. Si se encuentra el certificado en el directorio
+	 * de instalaci&oacute;n se eliminara el certificado cuyo alias sea igual al CN de ese
+	 * certificado. Si no, se eliminara el certificado con el alias por defecto.
 	 */
-	private static void uninstallRootCAWindowsKeyStore(final String principal) {
+	private static void uninstallRootCAWindowsKeyStore() {
+
+		KeyStore windowsKs;
 		try {
-			final KeyStore ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
-			ks.load(null,  null);
-			ks.deleteEntry(principal);
+			windowsKs = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
+			windowsKs.load(null,  null);
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Windows: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo acceder al almacen de confianza de Windows: " + e); //$NON-NLS-1$
+			return;
+		}
+
+		String certAlias;
+		final File caCertFile = new File(getApplicationDirectory(false), CA_CERT_FILENAME);
+		if (caCertFile.isFile() && caCertFile.canRead()) {
+			try (InputStream certInputStream = new FileInputStream(caCertFile)) {
+				final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
+				final X509Certificate caCert = (X509Certificate) certFactory.generateCertificate(certInputStream);
+				certAlias = windowsKs.getCertificateAlias(caCert);
+
+				if (certAlias != null) {
+					LOGGER.info("Se ha encontrado el certificado con el alias: " + certAlias); //$NON-NLS-1$
+				}
+				else {
+					certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;
+					LOGGER.info("No se encontro el certificado de CA del directorio de instalacion en el almacen"); //$NON-NLS-1$
+				}
+
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING,
+						"No se pudo cargar el certificado de CA para identificar cual eliminar del almacen de confianza. Se eliminara en base al alias por defecto: " //$NON-NLS-1$
+								+ CertUtil.ROOT_CERTIFICATE_PRINCIPAL, e);
+				certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;
+			}
+		}
+		else {
+			certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;
+		}
+
+		// Si el certificado esta en el almacen, se elimina
+		try {
+			if (windowsKs.containsAlias(certAlias)) {
+				windowsKs.deleteEntry(certAlias);
+			}
+			else {
+				LOGGER.info("El certificado de CA parece ya haber sido eliminado del almacen"); //$NON-NLS-1$
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de confianza de Windows: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -409,60 +478,20 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	/**
-	 * Permite escribir el .cer y .pfx en caso de que se pasen por par&aacute;metros
-	 * @param origin archivo de origen
-	 * @param destination directorio de destino
-	 * @param isKeystore si es true, significa que es un almac&aecute;n, si es false es un certificado 
+	 * Copia un fichero sobreescribiendo si es necesario.
+	 * @param sourceFile Fichero de origen.
+	 * @param targetFile Fichero destino.
 	 */
-	private static void writeFiles(final String origin, final String destination, final boolean isKeystore) {
-
-		final File fileOrigin = new File(origin);
-		final File fileDestination = new File(destination + "\\" + fileOrigin.getName()); //$NON-NLS-1$
-
-		InputStream in = null;
-		OutputStream out = null;
-
-		try {
-
-			in = new FileInputStream(fileOrigin);
-			out = new FileOutputStream(fileDestination);
-
-			final byte[] buf = new byte[1024];
+	private static void copyFile(final File sourceFile, final File targetFile) {
+		try (InputStream in = new FileInputStream(sourceFile);
+				OutputStream out = new FileOutputStream(targetFile);) {
 			int len;
-
+			final byte[] buf = new byte[1024];
 			while ((len = in.read(buf)) > 0) {
 				out.write(buf, 0, len);
 			}
-		
-		} catch (final IOException ioe) {
-			LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (final IOException e) {
-					LOGGER.warning("Error al cerrar input en escritura de fichero"); //$NON-NLS-1$
-				}
-			}
-
-			if (out != null) {
-				try {
-					out.close();
-				} catch (final IOException e) {
-					LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
-				}
-			}
+		} catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "Error al copiar el fichero", e); //$NON-NLS-1$
 		}
-
-		//Si es un almacen, lo renombramos a autofirma.pfx
-		if (isKeystore) {			
-			try {
-				File newFile = new File(fileDestination.getParent(), "autofirma.pfx");  //$NON-NLS-1$
-				Files.move(fileDestination.toPath(), newFile.toPath());
-			} catch (IOException e) {
-				LOGGER.warning("Error al renombrar fichero"); //$NON-NLS-1$
-			}
-		}
-		
 	}
 }
