@@ -46,9 +46,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Base64;
 import java.util.HashMap;
@@ -69,6 +67,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -119,6 +118,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private static final String SPACE_SEPARATOR = " "; //$NON-NLS-1$
 	private static final String SPLIT_REGEXP= "\\s+"; //$NON-NLS-1$
 	static final String IMAGE_EXT[] = {"jpg", "jpeg", "png", "gif"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+	private JDialog dialogParent;
 
 	private float scale = 1;
 	private BufferedImage image;
@@ -240,7 +241,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	JTextArea getTextArea() {
 		return this.signatureText;
 	}
-	
+
 	private JPanel previewPanel;
 	JPanel getPreviewPanel() {
 		return this.previewPanel;
@@ -266,7 +267,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		createUI();
 
 		loadProperties();
-		
+
 	}
 
 	void createUI() {
@@ -353,11 +354,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                         }
                         if (fileList.size() > 1) {
                         	AOUIFactory.showErrorMessage(
-                                SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
-                                SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-                                JOptionPane.WARNING_MESSAGE,
-                                null
-                            );
+                        			SignPdfUiPanelPreview.this.getDialogParent(),
+                        			SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
+                        			SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+                        			JOptionPane.WARNING_MESSAGE,
+                        			null);
                         }
                         File file = null;
                         final String filename = fileList.get(0).toString();
@@ -366,11 +367,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
                         	filename.startsWith("ftp://") //$NON-NLS-1$
                         ) {
                         	AOUIFactory.showErrorMessage(
-                                SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
-                                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE,
-                                null
-                            );
+                        			SignPdfUiPanelPreview.this.getDialogParent(),
+                        			SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
+                        			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                        			JOptionPane.ERROR_MESSAGE,
+                        			null);
                             dtde.dropComplete(false);
                             return;
                         }
@@ -453,9 +454,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		panel.add(this.viewLabel);
 		panel.add(createPreviewHintLabel());
-		
-		previewPanel = panel;
-		
+
+		this.previewPanel = panel;
+
 		return panel;
 
 	}
@@ -764,11 +765,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		    			"No ha podido abrirse el navegador de sistema: " + e //$NON-NLS-1$
 	    			);
 			    	AOUIFactory.showErrorMessage(
-			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			            JOptionPane.ERROR_MESSAGE,
-			            e
-			        );
+			    			SignPdfUiPanelPreview.this.getDialogParent(),
+			    			SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+			    			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			    			JOptionPane.ERROR_MESSAGE,
+			    			e);
 			    }
 			}
 		);
@@ -815,32 +816,31 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					getProp().put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey());
 					getProp().put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees()));
 				}
-				
-				if (getSignImage() != null ) {
-					
-					//Obtenemos la imagen directamente de la ruta, para no perder calidad al reescalarla mas tarde
-					File signImageFile = new File(this.signatureImagePath.getText());
-					BufferedImage signImageFromPath = null;
-					
+
+				if (!this.signatureImagePath.getText().isEmpty()) {
+
+					// Obtenemos la imagen directamente de la ruta para no perder calidad al reescalarla mas tarde
+					BufferedImage signImageFromPath;
+					final File signImageFile = new File(this.signatureImagePath.getText());
 					try {
-						
-						InputStream in = new FileInputStream(signImageFile);
-						signImageFromPath = ImageIO.read(in);
-						
-					} catch (IOException e1) {
-						LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen desde la ruta proporcionada", e1); //$NON-NLS-1$
+						signImageFromPath = ImageIO.read(signImageFile);
+					} catch (final IOException ex) {
+						LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen de rubrica desde la ruta proporcionada", ex); //$NON-NLS-1$
+						signImageFromPath = null;
 					}
-					
-					getProp().put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(signImageFromPath));
+
+					if (signImageFromPath != null) {
+						getProp().put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(signImageFromPath));
+					}
 				}
-				
-				if(this.saveConfig.isSelected()) {
+
+				if (this.saveConfig.isSelected()) {
 					saveProperties(getProp());
 				}
-				getListener().nextPanel(getProp(),null);
+				getListener().nextPanel(getProp(), null);
 			}
 		);
-		
+
 		this.okButton.addKeyListener(this);
 		panel.add(this.okButton);
 
@@ -876,7 +876,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	void selectSignatureImage() {
 		String defaultPath = null;
 		String defaultFilename = null;
-		
+
 		try {
 			defaultPath = SignPdfUiPanelPreview.this.signatureImagePath.getText();
 			if (defaultPath != null && !defaultPath.isEmpty()) {
@@ -904,7 +904,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			)[0].getAbsolutePath();
 			loadSignImage(imPath);
 			showPreview();
-			
+
 			if (checkTransparency()) {
 	        	AOUIFactory.showMessageDialog(
 	        			this,
@@ -922,14 +922,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			LOGGER.severe(
 				"No ha sido posible cargar la imagen: " + e //$NON-NLS-1$
 			);
-			AOUIFactory.showMessageDialog(
-				SignPdfUiPanelPreview.this,
-				SignPdfUiMessages.getString("SignPdfUiPreview.24"),  //$NON-NLS-1$
-				SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-			);
+			AOUIFactory.showErrorMessage(
+					this.dialogParent,
+					SignPdfUiMessages.getString("SignPdfUiPreview.24"),  //$NON-NLS-1$
+					SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					e);
 		}
-    	
 	}
 
 	/** Recupera las propiedades de la firma. */
@@ -993,7 +992,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		}
 
 		showPreview();
-		
+
 	}
 
 	/** Restaura las propiedades por defecto de la firma. */
@@ -1075,7 +1074,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 				LOGGER.log(Level.SEVERE, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
 			}
 		}
-		
+
 		showPreview();
 
 	}
@@ -1149,11 +1148,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
         }
         if (errorMessage != null) {
         	AOUIFactory.showErrorMessage(
-                errorMessage,
-                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE,
-                null
-            );
+        			this.dialogParent,
+        			errorMessage,
+        			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+        			JOptionPane.ERROR_MESSAGE,
+        			null);
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             return;
         }
@@ -1227,17 +1226,22 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.image = bi;
 	}
 
-	void loadSignImage(final String path) throws IOException {
+	void loadSignImage(final String path) throws IOException, IllegalArgumentException {
 
 		// Cargamos la imagen
 		final BufferedImage bi = ImageIO.read(new File(path));
+
+		if (bi == null) {
+			throw new IllegalArgumentException("La ruta proporcionada no se corresponde con la de un fichero de imagen soportada");  //$NON-NLS-1$
+		}
 
 		final BufferedImage newImage = new BufferedImage(
 		    this.image.getWidth(), this.image.getHeight(), this.image.getType()
 		);
 
 		final Graphics2D g = newImage.createGraphics();
-		g.drawImage(bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);		g.dispose();
+		g.drawImage(bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
+		g.dispose();
 		this.signImage = newImage;
 
 		// Mostramos la ruta en el campo de carga
@@ -1274,20 +1278,17 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	}
 
 	void showPreview() {
-		
-		BufferedImage bi = null; 
-		Graphics2D g = null;
-	    
-	    bi = new BufferedImage(
+
+		final BufferedImage bi = new BufferedImage(
 	    		this.image.getWidth(),
 	    		this.image.getHeight(),
 	    		this.image.getType()
 	    		);
-	    
-	    g = bi.createGraphics();
+
+		final Graphics2D g = bi.createGraphics();
 	 	g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.drawImage(this.image, 0, 0, null);
-	    
+
 	    g.setColor(this.colorCombobox.getSelectedItem().getColor());
 	    final int scaledSize = Math.max(1,Math.round(getViewFont().getSize() / this.scale) - 3);
 	    g.setFont(getViewFont().deriveFont(getStyle(), scaledSize));
@@ -1295,20 +1296,20 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    final RotationAngles rotationGrades = (RotationAngles) this.rotateSignature.getSelectedItem();
 
 	    if (this.signImage != null) {
-	    	rotateImgWithText(g, this.signImage, this.signImage.getWidth(), this.signImage.getHeight(), 
+	    	rotateImgWithText(g, this.signImage, this.signImage.getWidth(), this.signImage.getHeight(),
 	    			 		getTextArea().getText(), rotationGrades, true);
 	    }
 	    else {
-	    	rotateImgWithText(g, this.image, this.image.getWidth(), this.image.getHeight(), 
+	    	rotateImgWithText(g, this.image, this.image.getWidth(), this.image.getHeight(),
 	    			 		getTextArea().getText(), rotationGrades, false);
 	    }
 
 	    g.dispose();
 
-	    getViewLabel().setIcon(new ImageIcon(bi));   
+	    getViewLabel().setIcon(new ImageIcon(bi));
 	}
 
-	private void rotateImgWithText(final Graphics2D g, BufferedImage image, final int imageWidth, final int imageHeight, 
+	private void rotateImgWithText(final Graphics2D g, final BufferedImage loadedImage, final int imageWidth, final int imageHeight,
 			final String text, final RotationAngles rotation, final boolean isSignImage) {
 
 		final AffineTransform originalTransform = g.getTransform();
@@ -1320,8 +1321,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		int lineWidth;
 		int posX;
-		int posY;		
-		BufferedImage res = image;
+		int posY;
+		BufferedImage res = loadedImage;
 
 		// Realizamos la rotacion correspondiente y calculamos las referencias
 		// para el posicionamiento del texto. La imagen solo se rotara en caso de que sea
@@ -1333,7 +1334,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			posY = 0;
 			g.rotate(-Math.PI/2);
 			if (isSignImage) {
-				res = resizeSignImage(image);
+				res = resizeSignImage(loadedImage);
 				g.drawImage(res, posX - MARGIN, posY, null);
 			}
 			break;
@@ -1352,7 +1353,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			posY = -imageWidth;
 			g.rotate(Math.PI/2);
 			if (isSignImage) {
-				res = resizeSignImage(image);
+				res = resizeSignImage(loadedImage);
 				g.drawImage(res, 0, posY, null);
 			}
 			break;
@@ -1413,56 +1414,55 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    g.dispose();
 		this.image = newBi;
 	}
-	
+
 	/**
 	 * M&eacute;todo que permite escalar la imagen al tamaño necesario para que se
 	 * adapte al panel con la vista previa de la firma visible
 	 * @param bi Imagen a escalar
 	 * @return Imagen con el nuevo tama&ntilde;o
 	 */
-	private BufferedImage resizeSignImage(BufferedImage bi) {
-		
-		int newWidth = this.signImage.getWidth();; 
-		int newHeight = this.signImage.getHeight(); 
-		
-		Image tmp = bi.getScaledInstance(newHeight, newWidth, Image.SCALE_SMOOTH);
-		BufferedImage dimg = new BufferedImage(newHeight, newWidth, BufferedImage.SCALE_SMOOTH);
+	private BufferedImage resizeSignImage(final BufferedImage bi) {
 
-		Graphics2D g2d = dimg.createGraphics();
+		final int newWidth = this.signImage.getWidth();
+		final int newHeight = this.signImage.getHeight();
+
+		final Image tmp = bi.getScaledInstance(newHeight, newWidth, Image.SCALE_SMOOTH);
+		final BufferedImage dimg = new BufferedImage(newHeight, newWidth, Image.SCALE_SMOOTH);
+
+		final Graphics2D g2d = dimg.createGraphics();
 	    g2d.drawImage(tmp, 0, 0, null);
 	    g2d.dispose();
 
 		return dimg;
 	}
-	
+
 	/**
 	 * Comprueba si la imag&eacute;n tiene alg&uacute;n canal alfa o alg&eacute;n
 	 * p&iacute; transparente
 	 * @return devuelve true en caso de que detecte transparencias
 	 */
 	public boolean checkTransparency(){
-		
+
 		boolean hasTransparency = false;
-		
-		if (!signatureImagePath.getText().isEmpty()) {
-		
-			File input = new File(signatureImagePath.getText());
+
+		if (!this.signatureImagePath.getText().isEmpty()) {
+
+			final File input = new File(this.signatureImagePath.getText());
 			BufferedImage image = null;
-		
 			try {
 				image = ImageIO.read(input);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.warning("Error al leer la imagen de firma visible"); //$NON-NLS-1$
 			}
-		
+
 			if (image != null) {
 				if (containsAlphaChannel(image) || containsTransparency(image)){
 					hasTransparency = true;
 				}
 			}
-		
+
 		}
-		
+
 		return hasTransparency;
 	}
 
@@ -1471,7 +1471,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	 * @param image imagen a comprobar
 	 * @return devuelve true en caso de que disponga de un canal alfa
 	 */
-    private static boolean containsAlphaChannel(BufferedImage image){
+    private static boolean containsAlphaChannel(final BufferedImage image){
         return image.getColorModel().hasAlpha();
     }
 
@@ -1480,7 +1480,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
      * @param image imagen a comprobar
      * @return devuelve true si detecta alg&uacute;n p&iacute;xel transparente
      */
-    private static boolean containsTransparency(BufferedImage image){
+    private static boolean containsTransparency(final BufferedImage image){
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if (isTransparent(image, j, i)){
@@ -1498,9 +1498,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
      * @param y posici&oacute;n y
      * @return devuelve true si el p&iacute;xel es transparente
      */
-    public static boolean isTransparent(BufferedImage image, int x, int y ) {
-        int pixel = image.getRGB(x,y);
-        return (pixel>>24) == 0x00;
+    public static boolean isTransparent(final BufferedImage image, final int x, final int y ) {
+        final int pixel = image.getRGB(x,y);
+        return pixel>>24 == 0x00;
     }
 
 	int getStyleIndex() {
@@ -1803,5 +1803,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			}
 			return null;
 		}
+	}
+
+	public void setDialogParent(final JDialog dialogParent) {
+		this.dialogParent = dialogParent;
+	}
+
+	JDialog getDialogParent() {
+		return this.dialogParent;
 	}
 }

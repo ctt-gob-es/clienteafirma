@@ -260,7 +260,8 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 				if (this.customAppearance) {
 					setPreferredSize(getPreferredDimensionToSignatureDialog());
 					this.activePanel = new SignPdfUiPanelPreview(this, p, im);
-					
+					((SignPdfUiPanelPreview) this.activePanel).setDialogParent(this);
+
 					// Comprobamos la imagen precargada, en caso de que exista, para avisar si
 					// contiene transparencias
 					if (((SignPdfUiPanelPreview) this.activePanel).checkTransparency()) {
@@ -272,7 +273,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 			                    null
 			                );
 					}
-					
+
 					this.scrollPanel.setViewportView(this.activePanel);
 					pack();
 					((SignPdfUiPanelPreview) this.activePanel).requestFocusInWindow();
