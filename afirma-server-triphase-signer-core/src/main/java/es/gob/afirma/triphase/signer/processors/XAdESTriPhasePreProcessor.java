@@ -35,7 +35,6 @@ import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
-import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -75,16 +74,13 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Manejador de log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Construye un procesador de firmas trif&aacute;sicas XAdES.
-	 * @param installXmlDSigProvider Indica si se debe instalar expresamente un proveedor de firmas XML. */
-	public XAdESTriPhasePreProcessor(final boolean installXmlDSigProvider) {
-		this(false, installXmlDSigProvider);
+	/** Construye un procesador de firmas trif&aacute;sicas XAdES. */
+	public XAdESTriPhasePreProcessor() {
+		this(false);
 	}
 
-	protected XAdESTriPhasePreProcessor(final boolean factura, final boolean installXmlDSigProvider) {
+	protected XAdESTriPhasePreProcessor(final boolean factura) {
 		this.facturae = factura;
-
-		Utils.installXmlDSigProvider(installXmlDSigProvider);
 	}
 
 	@Override

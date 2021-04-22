@@ -19,8 +19,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -42,6 +40,9 @@ import javax.xml.crypto.dsig.spec.XPathFilter2ParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType;
 import javax.xml.crypto.dsig.spec.XPathType.Filter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
 import org.w3c.dom.Document;
@@ -64,9 +65,53 @@ public final class Utils {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
+
+
+	static {
+		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+		try {
+			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "No se ha podido establecer una caracteristica de seguridad en la factoria XML: " + e); //$NON-NLS-1$
+		}
+
+		// Los siguientes atributos deberia establececerlos automaticamente la implementacion de
+		// la biblioteca al habilitar la caracteristica anterior. Por si acaso, los establecemos
+		// expresamente
+		final String[] securityProperties = new String[] {
+				javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD,
+				javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA,
+				javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET
+		};
+		for (final String securityProperty : securityProperties) {
+			try {
+				SECURE_BUILDER_FACTORY.setAttribute(securityProperty, ""); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se ha podido establecer una propiedad de seguridad '" + securityProperty + "' en la factoria XML"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+
+		SECURE_BUILDER_FACTORY.setValidating(false);
+		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
+	}
+
+
     private Utils() {
         // No permitimos la instanciacion
     }
+
+
+	/**
+	 * Obtiene un objeto para la composici&oacute;n de documentos DOM.
+	 * @return Objeto para la composici&oacute;n de documentos DOM.
+	 * @throws ParserConfigurationException Cuando no se puede obtener el objeto.
+	 */
+	public static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
+		return SECURE_BUILDER_FACTORY.newDocumentBuilder();
+	}
 
     /** A&ntilde;ade la cabecera de hoja de estilo a un XML dado.
      * @param xml XML origen.
@@ -350,6 +395,7 @@ public final class Utils {
      * principales de firma.
      * @param format Formato de firma.
      * @param mode Modo de firma (s&oacute;lo usado en XMLdSig).
+     * @param useManifest Indica si la firma usa MANIFEST o no.
      * @param uri URI del objeto a firmar.
      * @param externallyDetachedHashAlgorithm Algoritmo de huella digital en el caso de estar esta
      *                                        pre-calculada
@@ -621,72 +667,6 @@ public final class Utils {
     /** Recupera la factor&iacute;a de firmas XML preferente.
      * @return Factor&iacute;a de firmas XML */
     public static XMLSignatureFactory getDOMFactory() {
-		final XMLSignatureFactory fac;
-		try {
-			// Primero comprobamos si hay una version nueva de XMLSec accesible, en cuyo caso, podria
-			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria.
-			fac =  XMLSignatureFactory.getInstance(
-				"DOM", //$NON-NLS-1$
-				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getDeclaredConstructor().newInstance() //$NON-NLS-1$
-			);
-			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			LOGGER.info("Se usara la factoria XML por defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
-			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-		}
-		return fac;
-    }
-
-    private static final String XMLDSIG = "XMLDSig"; //$NON-NLS-1$
-
-    /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
-     * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache. */
-    public static void installXmlDSigProvider(final boolean forceApacheProvider) {
-
-    	// Correccion al problema insertado en Apache Santuario 2.1.0 (Java 11)
-    	// Establecemos la propiedad de Apache Santuario necesaria para que no se agreguen saltos
-    	// de linea en los Base64 generados, ya que de hacerlo se utiliza "\r\n" y el "\r" aparece como
-    	// "&#13;" al final de cada linea en las firmas XML. Las firmas generadas serian validas pero
-    	// darian problemas al promocionarlas a formatos longevos.
-    	// Referencias:
-    	// - https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8177334
-    	// - https://issues.apache.org/jira/browse/SANTUARIO-482
-    	System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-
-    	final Provider provider = Security.getProvider(XMLDSIG);
-
-    	if (provider == null || forceApacheProvider) {
-    		Class<?> classProvider = null;
-    		try {
-    			classProvider = Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
-    			if (provider == null || !classProvider.isInstance(provider)) {
-    				Security.removeProvider(XMLDSIG);
-    				LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
-    				Security.addProvider((Provider) classProvider.getDeclaredConstructor().newInstance());
-    			}
-    		}
-    		catch (final Exception e) {
-    			try {
-    				classProvider = Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
-    				if (provider == null || !classProvider.isInstance(provider)) {
-    					Security.removeProvider(XMLDSIG);
-    					LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun: " + e); //$NON-NLS-1$
-    					Security.addProvider((Provider) classProvider.getDeclaredConstructor().newInstance());
-    				}
-    			}
-    			catch (final Exception e2) {
-    				LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig de Sun para firmas XML: " + e2); //$NON-NLS-1$
-    			}
-    		}
-    	}
-
-    	final XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-    	if (factory != null) {
-    		LOGGER.info("Se usara el proveedor '" + factory.getProvider().getName() + "': " + factory.getProvider().getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
-    	}
-    	else {
-    		LOGGER.warning("No hay proveedor instalado para XMLDSig"); //$NON-NLS-1$
-    	}
+		return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
     }
 }

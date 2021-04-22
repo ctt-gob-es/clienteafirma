@@ -26,14 +26,6 @@ import es.gob.afirma.signers.xades.AOFacturaESigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 
-	private final boolean installXmlDSig;
-
-	/** Crea un procesador de firmas trif&aacute;sicas de formato autom&aacute;tico.
-	 * @param installXmlDSigProvider Indica si se debe instalar expresamente un proveedor de firmas XML. */
-	public AutoTriPhasePreProcessor(final boolean installXmlDSigProvider) {
-		this.installXmlDSig = installXmlDSigProvider;
-	}
-
 	@Override
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
@@ -168,7 +160,7 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 		if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) ||
 				 AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
-					return new XAdESTriPhasePreProcessor(this.installXmlDSig);
+					return new XAdESTriPhasePreProcessor();
 		}
 		if (AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.equalsIgnoreCase(format) ||
 				 AOSignConstants.SIGN_FORMAT_CADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
@@ -176,12 +168,12 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 		if (AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.equalsIgnoreCase(format) ||
 				 AOSignConstants.SIGN_FORMAT_XADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
-					return new XAdESASiCSTriPhasePreProcessor(this.installXmlDSig);
+					return new XAdESASiCSTriPhasePreProcessor();
 		}
 		if (AOSignConstants.SIGN_FORMAT_FACTURAE.equalsIgnoreCase(format) ||
 				 AOSignConstants.SIGN_FORMAT_FACTURAE_TRI.equalsIgnoreCase(format) ||
 				 AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1.equalsIgnoreCase(format)) {
-					return new FacturaETriPhasePreProcessor(this.installXmlDSig);
+					return new FacturaETriPhasePreProcessor();
 		}
 		throw new IllegalArgumentException("Formato de firma no soportado: " + format); //$NON-NLS-1$
 	}

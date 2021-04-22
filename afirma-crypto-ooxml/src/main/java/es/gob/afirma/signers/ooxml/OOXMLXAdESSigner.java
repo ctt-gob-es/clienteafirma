@@ -18,7 +18,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +41,7 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.signers.xades.XAdESUtil;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlace;
@@ -168,22 +168,7 @@ final class OOXMLXAdESSigner {
 		final String signatureId = "xmldsig-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 
 		// Creamos la factoria de firma XML
-	    XMLSignatureFactory fac;
-		try {
-			// Primero comprobamos si hay una version nueva de XMLSec accesible, en cuyo caso, podria
-			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria.
-			fac =  XMLSignatureFactory.getInstance(
-				"DOM", //$NON-NLS-1$
-				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getConstructor().newInstance() //$NON-NLS-1$
-			);
-			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			LOGGER.info(
-				"No se ha podido usar la factoria XML DOM Apache 'org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI', se usara la por defecto del sistema: " + e //$NON-NLS-1$
-			);
-			fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-		}
+		final XMLSignatureFactory fac = Utils.getDOMFactory();
 
 	    // Huella digital para las referencias
 	    final DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA512, null);

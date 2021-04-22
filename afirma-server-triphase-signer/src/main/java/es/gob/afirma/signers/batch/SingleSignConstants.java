@@ -186,11 +186,11 @@ public final class SingleSignConstants {
 			case CADES_ASIC:
 				return new CAdESASiCSTriPhasePreProcessor();
 			case XADES:
-				return new XAdESTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+				return new XAdESTriPhasePreProcessor();
 			case XADES_ASIC:
-				return new XAdESASiCSTriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+				return new XAdESASiCSTriPhasePreProcessor();
 			case FACTURAE:
-				return new FacturaETriPhasePreProcessor(ConfigManager.needInstallXmlDsigFactory());
+				return new FacturaETriPhasePreProcessor();
 			case PKCS1:
 				return new Pkcs1TriPhasePreProcessor();
 			default:

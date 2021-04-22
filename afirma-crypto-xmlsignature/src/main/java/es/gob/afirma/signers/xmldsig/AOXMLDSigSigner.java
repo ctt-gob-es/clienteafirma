@@ -76,6 +76,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
@@ -119,9 +120,12 @@ public final class AOXMLDSigSigner implements AOSigner {
     private String algo;
     private Document doc;
 
+    // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+    // de los Base 64
     static {
-    	Utils.installXmlDSigProvider(true);
+    	XmlDSigProviderHelper.configureXmlDSigProvider();
     }
+
 
     /** Firma datos en formato XMLDSig 1.0 (XML Digital Signature).
      * <p>

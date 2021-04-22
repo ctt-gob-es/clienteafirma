@@ -43,7 +43,6 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	}
 
     /** Devuelve el tipo de almac&eacute;n de claves para un alias determinado.
-     * @param alias Alias de la entrada para la cual se desea conocer su tipo de almac&eacute;n.
      * @return Tipo de almac&eacute;n de claves para el alias indicado. */
     @Override
 	public AOKeyStore getType() {

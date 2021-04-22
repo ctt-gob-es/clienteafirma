@@ -51,9 +51,9 @@ import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.xml.Utils;
 
 /** Resuelve referencias dentro del Zip de un documento OOXML. */
 public final class OOXMLURIDereferencer implements URIDereferencer {
@@ -66,7 +66,7 @@ public final class OOXMLURIDereferencer implements URIDereferencer {
         if (null == ooxml) {
             throw new IllegalArgumentException("El OOXML es nulo"); //$NON-NLS-1$
         }
-        this.baseUriDereferencer = XMLSignatureFactory.getInstance().getURIDereferencer();
+        this.baseUriDereferencer = Utils.getDOMFactory().getURIDereferencer();
         this.ooxml = ooxml.clone();
     }
 

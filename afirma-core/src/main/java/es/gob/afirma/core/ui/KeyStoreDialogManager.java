@@ -80,7 +80,7 @@ public interface KeyStoreDialogManager {
 	String show() throws AOException;
 
 	/** Recupera el alias del certificado seleccionado;. Este m&eacute;todo no deber&iacute;a
-	 * usarse cuando se permite la carga de almacenes externos. En su lugar, se debe utilizar {@link getCertificateContext()}
+	 * usarse cuando se permite la carga de almacenes externos. En su lugar, se debe utilizar {@link #getSelectedCertificateContext()}
 	 * @return Alias de certificado. */
 	String getSelectedAlias();
 

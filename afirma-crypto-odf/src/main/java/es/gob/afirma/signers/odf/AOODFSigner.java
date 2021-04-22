@@ -80,6 +80,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import nu.xom.canonical.Canonicalizer;
 
 /** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
@@ -114,14 +115,16 @@ public final class AOODFSigner implements AOSigner {
     private static final String ENTRY_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
     static {
+
+        // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+        // de los Base 64
+        XmlDSigProviderHelper.configureXmlDSigProvider();
+
+        // Listado de formatos OpenDocument soportados
         SUPPORTED_FORMATS = new HashSet<>();
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.text"); //$NON-NLS-1$
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.spreadsheet"); //$NON-NLS-1$
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.presentation"); //$NON-NLS-1$
-    }
-
-    static {
-        Utils.installXmlDSigProvider(true);
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
