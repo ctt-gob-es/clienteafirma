@@ -36,6 +36,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
 	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
 
+	/** Indica la ruta del certificado pasado por el administrador. */
+	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path="; //$NON-NLS-1$
+
+	/** Indica la ruta del certificado pasado por el administrador. */
+	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path="; //$NON-NLS-1$
+
 	private Configurator configurator;
 
 	private final ConfigArgs config;
@@ -89,7 +95,8 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		this.config = config;
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots());
+			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots()
+								, this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(false);
@@ -209,6 +216,8 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 		private Operation op = Operation.INSTALLATION;
 		private boolean firefoxSecurityRoots = false;
+		private String certificatePath = ""; //$NON-NLS-1$
+		private String keystorePath = ""; //$NON-NLS-1$
 
 		public ConfigArgs(final String[] args) {
 			if (args != null) {
@@ -217,6 +226,10 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 						this.op = Operation.UNINSTALLATION;
 					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
 						this.firefoxSecurityRoots = true;
+					} else if (arg.length() > 17 && PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg.substring(0, 18))) {
+						this.certificatePath = arg.substring(18);
+					} else if (arg.length() > 14 && PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg.substring(0, 15))) {
+						this.keystorePath = arg.substring(15);
 					}
 				}
 			}
@@ -229,5 +242,14 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		public boolean isFirefoxSecurityRoots() {
 			return this.firefoxSecurityRoots;
 		}
+
+		public String getKeystorePath() {
+			return this.keystorePath;
+		}
+
+		public String getCertificatePath() {
+			return this.certificatePath;
+		}
+
 	}
 }

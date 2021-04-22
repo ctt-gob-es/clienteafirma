@@ -17,11 +17,13 @@
 
 		<Property Id="CREATE_ICON" Value="true" Admin="yes" />
 		<Property Id="FIREFOX_SECURITY_ROOTS" Value="false" Admin="yes" />
+		<Property Id="CERTIFICATE_PATH" Value="false" Admin="yes" />
+		<Property Id="KEYSTORE_PATH" Value="false" Admin="yes" />
 		
 		<!-- Ejecucion del instalador -->
 		<CustomAction Id='QtExecInstall'
 					  FileKey='$(var.ProjectName)Generator.exe'
-					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON]'
+					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON] /CERTIFICATE_PATH=[CERTIFICATE_PATH] /KEYSTORE_PATH=[KEYSTORE_PATH]'
                       Execute="deferred"
                       Return="check"
 					  Impersonate="no" />
@@ -73,9 +75,9 @@
 	
 			<!--  Ejecuta el $(var.ProjectName)Generator.exe al instalar -->
 		    <Custom Action="QtExecInstall" Before="InstallFinalize">
-				NOT Installed AND NOT REMOVE
+				NOT REMOVE
 			</Custom>
-
+			
 			<!-- Ejecuta el no_ejecutar_$(var.Platform).exe al desinstalar -->
 			<Custom Action="QtExecUninstall" After='InstallFiles'>
 				(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")

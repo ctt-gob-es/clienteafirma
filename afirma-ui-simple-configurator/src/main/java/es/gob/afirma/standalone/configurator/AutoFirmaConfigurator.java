@@ -48,6 +48,12 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
 	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
 
+	/** Indica la ruta del certificado pasado por el administrador. */
+	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path="; //$NON-NLS-1$
+
+	/** Indica la ruta del certificado pasado por el administrador. */
+	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path="; //$NON-NLS-1$
+
 	private Configurator configurator;
 
 	private final ConfigArgs config;
@@ -113,7 +119,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(jnlpDeployment, this.config.isFirefoxSecurityRoots());
+			this.configurator = new ConfiguratorWindows(jnlpDeployment, this.config.isFirefoxSecurityRoots()
+								, this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
@@ -226,7 +233,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 
 	/** Operaciones admitidas. */
-	private static enum Operation {
+	private enum Operation {
 		INSTALLATION,
 		UNINSTALLATION
 	}
@@ -239,6 +246,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		private boolean headless = false;
 		private boolean jnlpInstance = false;
 		private boolean firefoxSecurityRoots = false;
+		private String certificatePath = ""; //$NON-NLS-1$
+		private String keystorePath = ""; //$NON-NLS-1$
 
 		public ConfigArgs(final String[] args) {
 			if (args != null) {
@@ -255,6 +264,10 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 						this.jnlpInstance = true;
 					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
 						this.firefoxSecurityRoots = true;
+					} else if (arg.length() > 18 && PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg.substring(0, 18))) {
+						this.certificatePath = arg.substring(18);
+					} else if (arg.length() > 15 && PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg.substring(0, 15))) {
+						this.keystorePath = arg.substring(15);
 					}
 				}
 			}
@@ -279,5 +292,14 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		public boolean isFirefoxSecurityRoots() {
 			return this.firefoxSecurityRoots;
 		}
+
+		public String getCertificatePath() {
+			return this.certificatePath;
+		}
+
+		public String getKeystorePath() {
+			return this.keystorePath;
+		}
+
 	}
 }

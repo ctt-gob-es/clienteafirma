@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -53,10 +55,14 @@ final class ConfiguratorWindows implements Configurator {
 
 	private final boolean jnlpInstance;
 	private final boolean firefoxSecurityRoots;
+	private final String certificatePath;
+	private final String keyStorePath;
 
-	public ConfiguratorWindows(final boolean jnlpInstance, final boolean firefoxSecurityRoots) {
+	public ConfiguratorWindows(final boolean jnlpInstance, final boolean firefoxSecurityRoots, final String certificatePath, final String keyStorePath) {
 		this.jnlpInstance = jnlpInstance;
 		this.firefoxSecurityRoots = firefoxSecurityRoots;
+		this.certificatePath = certificatePath;
+		this.keyStorePath = keyStorePath;
 	}
 
 	@Override
@@ -68,53 +74,64 @@ final class ConfiguratorWindows implements Configurator {
 
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
-		if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
-			window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
-			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
-				ConfiguratorUtil.CERT_ALIAS,
-				KS_PASSWORD
-			);
+			if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
+				
+				window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
+				
+				final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
+					ConfiguratorUtil.CERT_ALIAS,
+					KS_PASSWORD
+				);
 
-			window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
+				window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
 
-			//Generacion del certificado pfx
-			ConfiguratorUtil.installFile(
-				certPack.getPkcs12(),
-				new File(appDir, KS_FILENAME)
-			);
+				//Generacion del certificado pfx
+				if (!this.keyStorePath.isEmpty()){
+					writeFiles(this.keyStorePath, appDir.getAbsolutePath(), true);
+				} else {
+					ConfiguratorUtil.installFile(
+						certPack.getPkcs12(),
+						new File(appDir, KS_FILENAME)
+					);
+				}
 
-			//Generacion del certificado raiz .cer
-			ConfiguratorUtil.installFile(
-					certPack.getCaCertificate().getEncoded(),
-					new File(appDir, FILE_AUTOFIRMA_ROOT_CERTIFICATE));
+				//Generacion del certificado raiz .cer
+				if (!this.certificatePath.isEmpty()) {
+					writeFiles(this.certificatePath, appDir.getAbsolutePath(), false);
+				} else {
+					ConfiguratorUtil.installFile(
+						certPack.getCaCertificate().getEncoded(),
+						new File(appDir, FILE_AUTOFIRMA_ROOT_CERTIFICATE));
+				}
 
-			window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
-			try {
-				ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
-			}
-			catch(final MozillaProfileNotFoundException e) {
-				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			if (this.jnlpInstance) {
-				JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
-				window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
-				importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
-			}
-
-
-			if (this.firefoxSecurityRoots) {
-				window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
+				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 				try {
-					ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
-				} catch (final MozillaProfileNotFoundException e) {
-					window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
+				}
+				catch(final MozillaProfileNotFoundException e) {
+					window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				if (this.jnlpInstance) {
+					JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
+					window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
+					importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
+				}
+
+
+				if (this.firefoxSecurityRoots) {
+					window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
+					try {
+						ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
+					} catch (final MozillaProfileNotFoundException e) {
+						window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
-		}
-		else {
-			window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
-		}
+			else {
+				window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
+			}
+
 
 		// Si no se ha cargado mediante JNLP, registramos el protocolo para Google Chrome
 		if (!this.jnlpInstance) {
@@ -389,5 +406,63 @@ final class ConfiguratorWindows implements Configurator {
 	private static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
 		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Permite escribir el .cer y .pfx en caso de que se pasen por par&aacute;metros
+	 * @param origin archivo de origen
+	 * @param destination directorio de destino
+	 * @param isKeystore si es true, significa que es un almac&aecute;n, si es false es un certificado 
+	 */
+	private static void writeFiles(final String origin, final String destination, final boolean isKeystore) {
+
+		final File fileOrigin = new File(origin);
+		final File fileDestination = new File(destination + "\\" + fileOrigin.getName()); //$NON-NLS-1$
+
+		InputStream in = null;
+		OutputStream out = null;
+
+		try {
+
+			in = new FileInputStream(fileOrigin);
+			out = new FileOutputStream(fileDestination);
+
+			final byte[] buf = new byte[1024];
+			int len;
+
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+		
+		} catch (final IOException ioe) {
+			LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (final IOException e) {
+					LOGGER.warning("Error al cerrar input en escritura de fichero"); //$NON-NLS-1$
+				}
+			}
+
+			if (out != null) {
+				try {
+					out.close();
+				} catch (final IOException e) {
+					LOGGER.warning("Error al cerrar output en escritura de fichero"); //$NON-NLS-1$
+				}
+			}
+		}
+
+		//Si es un almacen, lo renombramos a autofirma.pfx
+		if (isKeystore) {			
+			try {
+				File newFile = new File(fileDestination.getParent(), "autofirma.pfx");  //$NON-NLS-1$
+				Files.move(fileDestination.toPath(), newFile.toPath());
+			} catch (IOException e) {
+				LOGGER.warning("Error al renombrar fichero"); //$NON-NLS-1$
+			}
+		}
+		
 	}
 }
