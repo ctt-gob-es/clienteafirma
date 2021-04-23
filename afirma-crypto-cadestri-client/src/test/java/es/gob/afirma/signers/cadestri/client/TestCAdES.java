@@ -206,6 +206,7 @@ public final class TestCAdES {
 	 * @param alias Alias del certificado.
 	 * @param password Contrase&ntilde;a.
 	 * @return Clave privada del certificado.
+	 * @throws Exception Cuando ocurre cualquier error.
 	 */
 	private static PrivateKeyEntry loadKeyEntry(final String pkcs12File, final String alias, final String password) throws Exception {
 		final PrivateKeyEntry pke;
@@ -221,7 +222,16 @@ public final class TestCAdES {
 		return signer.sign(data, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params);
 	}
 
-	/** Cofirma sin necesidad de los datos originales. */
+	/**
+	 * Cofirma sin necesidad de los datos originales.
+	 * @param signer Firmador.
+	 * @param sign Firma
+	 * @param algorithm Algoritmo de firma.
+	 * @param pke Referencia a la clave privada de firma.
+	 * @param params Configuraci&oacute;n de firma.
+	 * @return Cofirma generada.
+	 * @throws Exception Cuando ocurre un error.
+	 */
 	private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
 		return signer.cosign(sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params);
 	}

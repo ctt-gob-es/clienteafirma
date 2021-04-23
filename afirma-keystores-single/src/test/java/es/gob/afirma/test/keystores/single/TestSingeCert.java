@@ -21,8 +21,10 @@ public class TestSingeCert {
        "www_google_com.crt" //$NON-NLS-1$
     };
 
-    /** Pruebas de apertura de certificados sueltos.
-     * @throws Exception */
+    /**
+     * Pruebas de apertura de certificados sueltos.
+     * @throws Exception Cuando falla la carga del almacen o el acceso a su contenido.
+     */
     @SuppressWarnings("static-method")
 	@Test
     public void testSingleKeyStore() throws Exception {

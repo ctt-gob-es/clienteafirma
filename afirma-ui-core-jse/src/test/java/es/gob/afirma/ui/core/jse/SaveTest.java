@@ -15,7 +15,6 @@ import es.gob.afirma.core.ui.GenericFileFilter;
 public final class SaveTest {
 
 	/** Main para pruebas.
-	 * @param args No se usa.
 	 * @throws IOException En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test

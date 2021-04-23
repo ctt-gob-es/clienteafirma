@@ -201,11 +201,14 @@ public final class TestOOXML {
 
     }
 
-    /** Carga la clave privada un certificado de un almac&eacute;n en disco.
+    /**
+     * Carga la clave privada un certificado de un almac&eacute;n en disco.
      * @param pkcs12File Fichero P12/PFX.
      * @param alias Alias del certificado.
      * @param password Contrase&ntilde;a.
-     * @return Clave privada del certificado. */
+     * @return Clave privada del certificado.
+     * @throws Exception Cuando ocurre un error durante la carga.
+     */
     private static PrivateKeyEntry loadKeyEntry(final String pkcs12File, final String alias, final String password) throws Exception {
         final PrivateKeyEntry pke;
 
@@ -226,7 +229,16 @@ public final class TestOOXML {
 		);
     }
 
-    /** Cofirma sin necesidad de los datos originales. */
+    /**
+     * Cofirma sin necesidad de los datos originales.
+     * @param signer Firmador.
+     * @param sign Firma.
+     * @param algorithm Algoritmo de firma.
+     * @param pke Referencia a la clave para firmar.
+     * @param params Configuraci&oacute;n de la firma.
+     * @return Cofirma.
+     * @throws Exception Cuando falla la cofirma.
+     */
     private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
         return signer.cosign(
     		sign,

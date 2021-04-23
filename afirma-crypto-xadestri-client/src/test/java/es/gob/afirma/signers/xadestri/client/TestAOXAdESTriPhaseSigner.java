@@ -89,8 +89,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.setProperty(UrlHttpManagerImpl.JAVA_PARAM_DISABLE_SSL_CHECKS, Boolean.TRUE.toString());
 	}
 
-	/** Prueba de firma XAdES-ASiC-S.
-	 * @throws Exception */
+	/**
+	 * Prueba de firma XAdES-ASiC-S.
+	 * @throws Exception Cuando falla la generacion de la firma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore // Necesita un servidor trifasico
@@ -158,8 +160,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de cofirma XAdES Detached de fichero grande.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma XAdES Detached de fichero grande.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -199,8 +203,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la cofirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirma XAdES Detached.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirma XAdES Detached.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -234,8 +240,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirma de una cofirma XAdES Detached.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirma de una cofirma XAdES Detached.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -269,8 +277,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de cofirma de contrafirma XAdES Detached.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma de contrafirma XAdES Detached.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -311,8 +321,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la cofirma de contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirmar una contrafirma XAdES Detached.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirmar una contrafirma XAdES Detached.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -346,8 +358,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma de la contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de firma XAdES Enveloping.
-	 * @throws Exception */
+	/**
+	 * Prueba de firma XAdES Enveloping.
+	 * @throws Exception Cuando falla la generacion de la firma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -385,8 +399,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de cofirma XAdES Enveloping.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma XAdES Enveloping.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -427,8 +443,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la cofirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirma XAdES Enveloping.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirma XAdES Enveloping.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -462,8 +480,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirma de una cofirma XAdES Enveloping.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirma de una cofirma XAdES Enveloping.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -556,8 +576,10 @@ public class TestAOXAdESTriPhaseSigner {
 //	}
 
 
-	/** Prueba de cofirma de contrafirma XAdES Enveloping.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma de contrafirma XAdES Enveloping.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -598,8 +620,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la cofirma de contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirmar una contrafirma XAdES Enveloping.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirmar una contrafirma XAdES Enveloping.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -633,8 +657,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma de la contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de firma XAdES Enveloped.
-	 * @throws Exception */
+	/**
+	 * Prueba de firma XAdES Enveloped.
+	 * @throws Exception Cuando falla la generacion de la firma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -672,8 +698,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la firma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de cofirma XAdES Enveloped.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma XAdES Enveloped.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -714,8 +742,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la cofirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirma XAdES Enveloped.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirma XAdES Enveloped.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -749,8 +779,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirma de cofirma XAdES Enveloped.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirma de cofirma XAdES Enveloped.
+	 * @throws Exception Cuando falla la generacion de la firma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -784,8 +816,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de cofirma de contrafirma XAdES Enveloped.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma de contrafirma XAdES Enveloped.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -826,8 +860,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la cofirma de contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de contrafirmar una contrafirma XAdES Enveloped.
-	 * @throws Exception */
+	/**
+	 * Prueba de contrafirmar una contrafirma XAdES Enveloped.
+	 * @throws Exception Cuando falla la generacion de la contrafirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -861,8 +897,10 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la contrafirma de la contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de firma XAdES.
-	 * @throws Exception */
+	/**
+	 * Prueba de firma XAdES.
+	 * @throws Exception Cuando falla la generacion de la firma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore // Necesita un servidor trifasico
@@ -891,8 +929,10 @@ public class TestAOXAdESTriPhaseSigner {
 		}
 	}
 
-	/** Prueba de cofirma con MANIFEST.
-	 * @throws Exception */
+	/**
+	 * Prueba de cofirma con MANIFEST.
+	 * @throws Exception Cuando falla la generacion de la cofirma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore // Necesita un servidor trifasico

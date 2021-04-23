@@ -10,7 +10,8 @@
 /**
  *	M&oacute;dulo de generaci&oacute;n de firmas digitales XAdES.
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de XAdES:</p>
- *  <table border="1" cellpadding="5" summary="Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de XAdES">
+ *  <table border="1">
+ *  <caption>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de XAdES</caption>
  *   <tr>
  *    <td>XAdES-BES</td>
  *    <td>XAdES-EPES</td>

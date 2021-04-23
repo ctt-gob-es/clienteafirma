@@ -248,11 +248,15 @@ final class CommandLineLauncher {
 		Logger.getLogger(handlerName).setLevel(Level.SEVERE);
 	}
 
-	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
+	/**
+	 * Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @return Un mensaje con el resultado de la operacion si se ha indicado el guardado del hash en fichero,
+	 * o el propio hash codificado en base 64 si no.
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
 	 * @throws IOException Cuando ocurre algun error en la lectura o guardado de ficheros.
-	 * @throws AOException Cuando ocurre algun error al procesar la petici&oacute;n. */
+	 * @throws AOException Cuando ocurre algun error al procesar la petici&oacute;n.
+	 */
 	private static String createHashByCommandLine(final CommandLineParameters params)
 			throws CommandLineException, IOException, AOException {
 
@@ -356,12 +360,14 @@ final class CommandLineLauncher {
 				params.isRecursive());
 	}
 
-	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales a trav&eacute;s de consola.
+	/**
+	 * Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales a trav&eacute;s de consola.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @return {@code true} si la operaci&oacute;n termino correctamente, {@code false} en caso contrario.
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
-	 * @throws IOException
-	 * @throws AOException */
+	 * @throws IOException Cuando no se pueden leer los datos de entrada o guardar el resultado.
+	 * @throws AOException Cuando no se puede generar el hash.
+	 */
 	private static boolean checkHashByCommandLine(final CommandLineParameters params)
 			throws CommandLineException, IOException, AOException {
 

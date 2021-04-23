@@ -624,7 +624,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	/**
 	 * guarda en las preferencias del usuario la &uacute;ltima vista de certificados seleccionada.
-	 * @param view Vista de certificados.
 	 */
 	void savePreferredCertificateView() {
 		try {

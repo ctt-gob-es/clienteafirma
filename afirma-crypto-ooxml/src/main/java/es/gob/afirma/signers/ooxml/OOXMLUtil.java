@@ -149,10 +149,13 @@ final class OOXMLUtil {
         return relations.toArray(new byte[0][]);
     }
 
-    /** Recupera la entrada con la relaci&oacute;n de firmas del documento.
+    /**
+     * Recupera la entrada con la relaci&oacute;n de firmas del documento.
      * @param ooxmlData Datos OOXML.
+     * @param entries Listado de entradas del ZIP.
      * @return Entrada con la relaci&oacute;n de firmas.
-     * @throws IOException Cuando ocurre un error durante la lectura. */
+     * @throws IOException Cuando ocurre un error durante la lectura.
+     */
     private static byte[] getSignaturesRels(final byte[] ooxmlData, final List<ZipEntry> entries) throws IOException {
 
    		byte[] relsData;
@@ -197,7 +200,7 @@ final class OOXMLUtil {
 
 	/**
 	 * Recupera el listado de entradas del ZIP en memoria.
-	 * @param zis Flujo de datos del fichero comprimido.
+	 * @param zipData Contenido del archivo comprimido.
 	 * @return Listado de entradas del ZIP.
 	 * @throws IOException Cuando ocurre un error durante la lectura del fichero.
 	 */
@@ -231,10 +234,10 @@ final class OOXMLUtil {
 	}
 
 	/**
-	 * Comprueba si entre un listado de entradas de un ZIP se encuentra una en concreto.
-	 * @param entryList Listado de entradas.
+	 * Lee una entrada de un documento OOXML.
+	 * @param ooxmlData Contenido del documento OOXML.
 	 * @param entryName Nombre de la entrada buscada.
-	 * @return {@code true} si se encuentra la entrada, {@code false} en caso contrario.
+	 * @return Contenido de la entrada.
 	 * @throws IOException Cuando ocurre un error en la lectura.
 	 */
 	static byte[] readEntry(final byte[] ooxmlData, final String entryName) throws IOException {

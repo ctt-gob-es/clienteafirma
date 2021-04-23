@@ -10,7 +10,8 @@
 /**
  *	M&oacute;dulo de generaci&oacute;n de firmas digitales CAdES.
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de CAdES:</p>
- *  <table border="1" cellpadding="5" summary="Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de CAdES">
+ *  <table border="1">
+ *   <caption>Tabla de compatibilidad</caption>
  *   <tr>
  *    <td>CAdES-BES</td>
  *    <td>CAdES-EPES</td>

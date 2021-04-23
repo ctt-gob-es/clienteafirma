@@ -1128,6 +1128,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * calcular&aacute; en base a los datos proporcionados. Si no se encuentra uno compatible, se
 	 * devuelve {@code null}.
 	 * @param format Nombre de un formato de firma.
+	 * @param data Datos.
 	 * @return Manejador de firma.
 	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
 	 */

@@ -9,7 +9,8 @@
 
 /** M&oacute;dulo de generaci&oacute;n de firmas digitales PAdES.
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de PAdES:</p>
- *  <table border="1" cellpadding="5" summary="Tabla de compatibilidad respecto a variantes de PAdES">
+ *  <table border="1">
+ *  <caption>Tabla de compatibilidad respecto a variantes de PAdES</caption>
  *   <tr>
  *    <td>PAdES-BES</td>
  *    <td>PAdES-EPES</td>

@@ -455,8 +455,8 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 	 * de los hashes del directorio. Se configura por defecto (el primero de la
 	 * lista) el filtro correspondiente al formato del fichero de salida
 	 * indicado.
-	 * @param defaultFormat Formato de hash
-	 * @return
+	 * @param extension Extensi&oacute;n preferente de fichero.
+	 * @return Listado de fitros de fichero.
 	 */
 	private static List<GenericFileFilter> buildFilterList(final String extension) {
 

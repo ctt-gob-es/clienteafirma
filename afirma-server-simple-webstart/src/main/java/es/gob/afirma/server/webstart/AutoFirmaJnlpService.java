@@ -81,6 +81,8 @@ public class AutoFirmaJnlpService extends HttpServlet {
 	/**
 	 * Carga la plantilla del JNLP en la que sobreescribir el codebase del JAR WebStart
 	 * y el argumento a proporcionarle.
+	 * @param complete {@code true} para cargar la plantilla para la carga completa de AutoFirma,
+	 * {@code false} para la plantilla base.
 	 * @return Plantilla JNLP.
 	 * @throws IOException Cuando ocurre un error en la lectura.
 	 */

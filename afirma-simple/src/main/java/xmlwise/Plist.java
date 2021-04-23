@@ -101,7 +101,7 @@ public final class Plist
 	 *
 	 * @param o the object to convert, must be Integer, Double, String, Date, Boolean, byte[],
 	 * Map or List.
-	 * @return an <tt>XmlElement</tt> containing the serialized version of the object.
+	 * @return an <i>XmlElement</i> containing the serialized version of the object.
 	 */
 	XmlElement objectToXml(final Object o)
 	{
@@ -140,7 +140,7 @@ public final class Plist
 	 * Convert a list to its plist representation.
 	 *
 	 * @param list the list to convert.
-	 * @return an <tt>XmlElement</tt> representing the list.
+	 * @return an <i>XmlElement</i> representing the list.
 	 */
 	private XmlElement toXmlArray(final List<Object> list) {
 		final XmlElement array = new XmlElement("array"); //$NON-NLS-1$
@@ -154,7 +154,7 @@ public final class Plist
 	 * Convert a map to its plist representation.
 	 *
 	 * @param map the map to convert, assumed to have string keys.
-	 * @return an <tt>XmlElement</tt> representing the map.
+	 * @return an <i>XmlElement</i> representing the map.
 	 */
 	private XmlElement toXmlDict(final Map<String, Object> map) {
 		final XmlElement dict = new XmlElement("dict"); //$NON-NLS-1$

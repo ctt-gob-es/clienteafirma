@@ -21,8 +21,9 @@ public class XmlDSigProviderHelper {
 
     private static boolean configured = false;
 
-    /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
-     * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache. */
+    /**
+     * Configura el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
+     */
     public static void configureXmlDSigProvider() {
 
     	// Omitimos la configuracion si ya se realizo previamente

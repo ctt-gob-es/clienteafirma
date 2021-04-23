@@ -152,7 +152,7 @@ public class DigestManager {
 	 * @param is InputStream a los datos sobre los que calcular el hash
 	 * @param size Tama&ntilde;o del trozo parcial sobre el que se va calculando el hash
 	 * @return hash de los datos
-	 * @throws IOException
+	 * @throws IOException Cuando falla el c&aacute;lculo del hash.
 	 */
 	public byte[ ] computeHashOptimized(final InputStream is, final int size) throws IOException {
 		final byte[ ] buff = new byte[size];

@@ -178,7 +178,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/**
 	 * Escribe en el script de ejecuci&oacute;n el comando para el cambio de propiedad
 	 * de un fichero/directorio a un usuario.
-	 * @param appDir Directorio/fichero del que se desea cambiar la propiedad.
+	 * @param file Directorio/fichero del que se desea cambiar la propiedad.
 	 * @param username Nombre del usuario al que se le desea asignar la propiedad.
 	 */
 	private static void changeDirectoryProperty(final File file, final String username) {
