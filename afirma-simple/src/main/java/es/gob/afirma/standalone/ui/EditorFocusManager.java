@@ -48,7 +48,7 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
     private final Style linkUnfocusedStyle;
     private final Style linkFocusedStyle;
 
-    private final AbstractList<AccessibleHyperlink> hyperLinks;
+    private AbstractList<AccessibleHyperlink> hyperLinks;
 
     private int selectedLink = 0;
 
@@ -85,7 +85,7 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
         Color selecctionBackgroundColor;
         Color foregroundColor;
         try {
-        	backgroundColor = UIManager.getColor("TREE.background"); //$NON-NLS-1$
+        	backgroundColor = new Color(0,0,0,0);
         	selecctionBackgroundColor = UIManager.getColor("TREE.selectionBackground"); //$NON-NLS-1$
         	foregroundColor = UIManager.getColor("TREE.selectionForeground"); //$NON-NLS-1$
         }
@@ -109,12 +109,7 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
     		foregroundColor != null ? foregroundColor : Color.WHITE
 		);
 
-        final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();
-        this.hyperLinks = new Vector<>(accessibleHypertext.getLinkCount());
-        for (int i=0; i<accessibleHypertext.getLinkCount(); i++) {
-            this.hyperLinks.add(accessibleHypertext.getLink(i));
-        }
-
+        refreshHyperlinks();
     }
 
     @Override
@@ -178,9 +173,13 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
                 break;
             case KeyEvent.VK_SPACE:
             case KeyEvent.VK_ENTER:
+            	
+            	refreshHyperlinks();
+            	
                 if (this.hlAction != null) {
                     this.hlAction.openHyperLink(new HyperlinkEvent(this, HyperlinkEvent.EventType.ACTIVATED, (URL) this.hyperLinks.get(this.selectedLink).getAccessibleActionObject(0)), this.selectedLink);
                 }
+                
                 break;
             default:
             	break;
@@ -189,7 +188,7 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
 
     @Override
     public void focusGained(final FocusEvent e) {
-        if (this.hyperLinks.size() > 0) {
+    	if (this.hyperLinks.size() > 0) {
             final int startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
             ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
                  startIndex,
@@ -261,5 +260,16 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
     @Override public void componentHidden(final ComponentEvent e) { /* No implementado */ }
 
     @Override public void componentShown(final ComponentEvent e) { /* No implementado */ }
+    
+    /**
+     * M&eacute;todo para actualizar la validez de los hiperv&iacute;nculos
+     */
+    private void refreshHyperlinks() {
+        final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();
+        this.hyperLinks = new Vector<>(accessibleHypertext.getLinkCount());
+        for (int i=0; i<accessibleHypertext.getLinkCount(); i++) {
+            this.hyperLinks.add(accessibleHypertext.getLink(i));
+        }
+    }
 
 }

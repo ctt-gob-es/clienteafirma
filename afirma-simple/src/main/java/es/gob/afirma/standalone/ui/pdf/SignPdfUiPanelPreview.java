@@ -85,6 +85,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -748,8 +749,17 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	 * @return Panel de botones. */
 	private Component createPreviewHintLabel() {
 
+
 		final JEditorPane helpLabel = new JEditorPane();
+		
+		Color bgColor = helpLabel.getBackground();
+		UIDefaults defaults = new UIDefaults();
+		defaults.put("EditorPane[Enabled].backgroundPainter", bgColor); //$NON-NLS-1$
+		helpLabel.putClientProperty("Nimbus.Overrides", defaults); //$NON-NLS-1$
+		helpLabel.putClientProperty("Nimbus.Overrides.InheritDefaults", true); //$NON-NLS-1$
+		helpLabel.setBackground(bgColor);
 		helpLabel.setContentType("text/html"); //$NON-NLS-1$
+
 		helpLabel.setText(SignPdfUiMessages.getString("SignPdfUiPreview.4")); //$NON-NLS-1$
 
         final EditorFocusManager editorFocusManager = new EditorFocusManager (
@@ -777,8 +787,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
         helpLabel.addHyperlinkListener(editorFocusManager);
         helpLabel.addFocusListener(editorFocusManager);
         helpLabel.addKeyListener(editorFocusManager);
-        helpLabel.setEditable(false);
-        helpLabel.setBackground(new Color(0,0,0,0));
+        helpLabel.setEditable(false);       
 
         return helpLabel;
 	}
