@@ -19,6 +19,7 @@ public class ConfigManager {
 	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
 
 	private static final String CONFIG_PARAM_DOCUMENT_MANAGER_CLASS = "document.manager"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_DOCUMENT_CACHE_MANAGER_CLASS = "document.cache.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_VERIFICATION_KEY = "verification.key"; //$NON-NLS-1$
 
@@ -63,7 +64,8 @@ public class ConfigManager {
 
 		if (!config.containsKey(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS)) {
 			throw new IllegalArgumentException(
-				"No se ha indicado el document manager (" + CONFIG_PARAM_DOCUMENT_MANAGER_CLASS + ") en el fichero de propiedades" //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha indicado el document manager o (" + CONFIG_PARAM_DOCUMENT_MANAGER_CLASS  //$NON-NLS-1$
+				+ ") en el fichero de propiedades"  //$NON-NLS-1$
 			);
 		}
 
@@ -118,6 +120,10 @@ public class ConfigManager {
 
 	static String getDocManagerClassName() {
 		return config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS);
+	}
+
+	static String getDocCacheManagerClassName() {
+		return config.getProperty(CONFIG_PARAM_DOCUMENT_CACHE_MANAGER_CLASS);
 	}
 
 	public static String getAccessControlAllowOrigin() {
