@@ -21,7 +21,6 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dom.DOMURIReference;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -35,6 +34,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
+import es.gob.afirma.signers.xml.Utils;
 
 /** Dereferenciador a medida de referencias XML DOM. */
 public final class CustomUriDereferencer implements URIDereferencer {
@@ -54,7 +54,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
 	/** Crea un dereferenciador a medida que act&uacute;a solo cuando falla el dereferenciador por defecto. */
 	public CustomUriDereferencer() {
-		this.defaultUriDereferencer = XMLSignatureFactory.getInstance("DOM").getURIDereferencer(); //$NON-NLS-1$
+		this.defaultUriDereferencer = Utils.getDOMFactory().getURIDereferencer();
 	}
 
 	private static Class<?> getNodesetDataClass() throws ClassNotFoundException {
