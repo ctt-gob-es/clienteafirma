@@ -49,7 +49,7 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
-import es.gob.afirma.triphase.server.document.DocumentCacheManager;
+import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
@@ -68,8 +68,8 @@ public final class SignatureService extends HttpServlet {
 
 	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static DocumentManager DOC_MANAGER;
-	private static DocumentCacheManager DOC_CACHE_MANAGER;
+	private static DocumentManager docManager;
+	private static DocumentCacheManager docCacheManager;
 
 	private static final String URL_DEFAULT_CHARSET = "utf-8"; //$NON-NLS-1$
 
@@ -91,6 +91,7 @@ public final class SignatureService extends HttpServlet {
 	private static final String PARAM_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	private static final String PARAM_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
 	private static final String PARAM_NAME_CERT = "cert"; //$NON-NLS-1$
+	private static final String PARAM_NAME_CACHE_ID = "CACHE_ID"; //$NON-NLS-1$
 
 	/** Separador que debe usarse para incluir varios certificados dentro del mismo par&aacute;metro. */
 	private static final String PARAM_NAME_CERT_SEPARATOR = ","; //$NON-NLS-1$
@@ -121,11 +122,8 @@ public final class SignatureService extends HttpServlet {
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-	/** Propiedad que contiene el cacheId en caso de que se use cach */
-	private static final String PROP_CACHE_ID = "CACHE_ID"; //$NON-NLS-1$
-
 	/** Propiedad que indica si la cach&eacute; est&aacute activada o no*/
-	private static boolean IS_CACHE_ENABLED = false;
+	private static boolean cacheEnabled = false;
 
 	static {
 
@@ -144,11 +142,11 @@ public final class SignatureService extends HttpServlet {
 
 		try {
 			final Constructor<?> docManagerConstructor = docManagerClass.getConstructor(Properties.class);
-			DOC_MANAGER = (DocumentManager) docManagerConstructor.newInstance(ConfigManager.getConfig());
+			docManager = (DocumentManager) docManagerConstructor.newInstance(ConfigManager.getConfig());
 		}
 		catch (final Exception e) {
 			try {
-				DOC_MANAGER = (DocumentManager) docManagerClass.getConstructor().newInstance();
+				docManager = (DocumentManager) docManagerClass.getConstructor().newInstance();
 			}
 			catch (final Exception e2) {
 				throw new RuntimeException(
@@ -157,9 +155,11 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 
-		IS_CACHE_ENABLED = Boolean.parseBoolean(ConfigManager.getConfig().getProperty("isCacheEnabled")); //$NON-NLS-1$
+		LOGGER.info("Se usara el siguiente 'DocumentManager' para firma trifasica: " + docManager.getClass().getName()); //$NON-NLS-1$
 
-		if (IS_CACHE_ENABLED) {
+		cacheEnabled = Boolean.parseBoolean(ConfigManager.isCacheEnabled());
+
+		if (cacheEnabled) {
 
 			final Class<?> docCacheManagerClass;
 			String docCacheManagerClassName;
@@ -177,11 +177,11 @@ public final class SignatureService extends HttpServlet {
 
 			try {
 				final Constructor<?> docCacheManagerConstructor = docCacheManagerClass.getConstructor(Properties.class);
-				DOC_CACHE_MANAGER = (DocumentCacheManager) docCacheManagerConstructor.newInstance(ConfigManager.getConfig());
+				docCacheManager = (DocumentCacheManager) docCacheManagerConstructor.newInstance(ConfigManager.getConfig());
 			}
 			catch (final Exception e) {
 				try {
-					DOC_CACHE_MANAGER = (DocumentCacheManager) docCacheManagerClass.getConstructor().newInstance();
+					docCacheManager = (DocumentCacheManager) docCacheManagerClass.getConstructor().newInstance();
 				}
 				catch (final Exception e2) {
 					throw new RuntimeException(
@@ -190,10 +190,8 @@ public final class SignatureService extends HttpServlet {
 				}
 			}
 
-			LOGGER.info("Se usara el siguiente 'DocumentCacheManager' para firma trifasica: " + DOC_CACHE_MANAGER.getClass().getName()); //$NON-NLS-1$
+			LOGGER.info("Se usara el siguiente 'DocumentCacheManager' para firma trifasica: " + docCacheManager.getClass().getName()); //$NON-NLS-1$
 		}
-
-		LOGGER.info("Se usara el siguiente 'DocumentManager' para firma trifasica: " + DOC_MANAGER.getClass().getName()); //$NON-NLS-1$
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
 		XmlDSigProviderHelper.configureXmlDSigProvider();
@@ -353,19 +351,19 @@ public final class SignatureService extends HttpServlet {
 
 			byte[] docBytes = null;
 
-			if (IS_CACHE_ENABLED && sessionData != null) {
+			if (cacheEnabled && sessionData != null) {
 				LOGGER.info("Recuperamos el documento de cache"); //$NON-NLS-1$
 				final TriphaseData tr = TriphaseData.parser(sessionData);
 				final TriSign preSign = tr.getTriSigns().get(0);
-				final String cacheId = preSign.getProperty(PROP_CACHE_ID);
-				docBytes = DOC_CACHE_MANAGER.getDocumentFromCache(cacheId, extraParams);
+				final String cacheId = preSign.getProperty(PARAM_NAME_CACHE_ID);
+				docBytes = docCacheManager.getDocumentFromCache(cacheId);
 			}
 
 			final String docId = parameters.get(PARAM_NAME_DOCID);
 			if (docId != null && docBytes == null) {
 				try {
 					LOGGER.info("Recuperamos el documento mediante el DocumentManager"); //$NON-NLS-1$
-					docBytes = DOC_MANAGER.getDocument(docId, signerCertChain, extraParams);
+					docBytes = docManager.getDocument(docId, signerCertChain, extraParams);
 					LOGGER.info(
 							"Recuperado documento de " + docBytes.length + " octetos"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -486,9 +484,10 @@ public final class SignatureService extends HttpServlet {
 					return;
 				}
 
-				if (IS_CACHE_ENABLED) {
-					final String cacheId = DOC_CACHE_MANAGER.storeDocumentToCache(preRes.getTriSigns().get(0).getId(), sessionData, extraParams);
-					preRes.getTriSigns().get(0).addProperty(PROP_CACHE_ID, cacheId);
+				// Si la propiedad para habilitar el sistema de cache esta habilitada
+				// se procedera a la escritura del fichero en cache
+				if (cacheEnabled) {
+					addCacheId(preRes, docBytes);
 				}
 
 				// Si se ha definido una clave HMAC para la comprobacion de integridad de
@@ -616,8 +615,7 @@ public final class SignatureService extends HttpServlet {
 				LOGGER.info("Almacenamos la firma mediante el DocumentManager"); //$NON-NLS-1$
 				final String newDocId;
 				try {
-					newDocId = DOC_MANAGER.storeDocument(docId, signerCertChain, signedDoc, extraParams);
-					LOGGER.info("Almacenamos la firma en cache"); //$NON-NLS-1$
+					newDocId = docManager.storeDocument(docId, signerCertChain, signedDoc, extraParams);
 				}
 				catch(final Throwable e) {
 					LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
@@ -683,6 +681,21 @@ public final class SignatureService extends HttpServlet {
 		}
 	}
 
+	/**
+	 * A&ntilde;ade el fichero en cach&eacute; para m&aacute;s tarde leerlo
+	 * @param triphaseData datos de la prefirma
+	 * @param docBytes datos a almacenar en la cach&eacute;
+	 * @throws IOException error en la lectura / escritura del fichero
+	 */
+	private static void addCacheId(final TriphaseData triphaseData, final byte [] docBytes) throws IOException {
+		try {
+			final String cacheId = docCacheManager.storeDocumentToCache(docBytes);
+			triphaseData.getTriSigns().get(0).addProperty(PARAM_NAME_CACHE_ID, cacheId);
+		} catch (final IOException e) {
+			LOGGER.warning("Error en la escritura del fichero en cache"); //$NON-NLS-1$
+			throw e;
+		}
+	}
 
 	/**
 	 * Comprueba que la prefirma y el certificado estuviesen asociados a un mismo proceso de

@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.triphase.server.document;
+package es.gob.afirma.triphase.server.cache;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 
 /** Implementaci&oacute;n de acceso a gestor documental mediante cache&eacute;
  */
@@ -106,7 +105,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	}
 
 	@Override
-	public byte[] getDocumentFromCache(final String idCacheFile, final Properties prop) throws IOException {
+	public byte[] getDocumentFromCache(final String idCacheFile) throws IOException {
 
 		LOGGER.info("Recuperamos el documento con identificador: " + idCacheFile); //$NON-NLS-1$
 
@@ -131,9 +130,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	}
 
 	@Override
-	public String storeDocumentToCache(final String id,
-			final byte[] data,
-			final Properties prop) throws IOException {
+	public String storeDocumentToCache(final byte[] data) throws IOException {
 
 		String newId = ""; //$NON-NLS-1$
 		File file = null;
@@ -150,15 +147,13 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 			}
 		}
 
-		final byte[] dataToCache = Base64.decode(id);
-
 		// Guardamos el archivo en el directorio indicado en el archivo de configuracion
 		try (final OutputStream os = new FileOutputStream(file)) {
 
-			os.write(dataToCache);
+			os.write(data);
 
 		} catch (final IOException e) {
-			LOGGER.warning("Error en la lectura del fichero '" + tmpDir + newId + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("Error en la escritura del fichero '" + tmpDir + newId + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw e;
 		}
 
