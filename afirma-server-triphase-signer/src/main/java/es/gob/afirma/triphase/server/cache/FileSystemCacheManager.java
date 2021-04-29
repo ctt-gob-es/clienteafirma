@@ -21,7 +21,8 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 
-/** Implementaci&oacute;n de acceso a gestor documental mediante cache&eacute;
+/**
+ * Implementaci&oacute;n de cache&eacute; en disco.
  */
 public final class FileSystemCacheManager implements DocumentCacheManager {
 

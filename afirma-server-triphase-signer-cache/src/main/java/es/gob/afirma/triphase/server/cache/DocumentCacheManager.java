@@ -11,29 +11,31 @@ package es.gob.afirma.triphase.server.cache;
 
 import java.io.IOException;
 
-/** Interfaz para la recuperaci&oacute;n de documentos desde un servidor o repositorio documental mediante cach&eacute.
- * <u>ES OBLIGATORIO</u>, que las clases que implementen esta interfaz dispongan de un constructor que reciba
- * &uacute;nicamente un objeto Properties (<code>java.util.Properties</code>). */
+/**
+ * Interfaz para la gesti&oacute;n de cach&eacute; del servicio de firma trif&aacute;sica.
+ */
 public interface DocumentCacheManager {
 
-	/** Obtiene un documento de cach&eacute en base a su identificador.
-	 * Si no es posible recuperar el fichero se debe lanzar una excepci&oacute;n. El mensaje se recibir&aacute;
-	 * como parte del mensaje de error en el cliente de firma.
-	 * @param id Identificador del documento
-	 * @return devuelve un array con los datos del archivo cacheado
-	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n. */
+	/**
+	 * Obtiene un documento de cach&eacute en base a su identificador.
+	 * @param id Identificador del documento.
+	 * @return Array con los datos del archivo cacheado o {@code null} si no se encontr&oacute;.
+	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n.
+	 */
 	byte[] getDocumentFromCache(String id) throws IOException;
 
-	/** Almacena un documento firmado en cach&eacute.
-	 * Si no es posible almacenar el fichero se debe lanzar una excepci&oacute;n. El mensaje se recibir&aacute;
-	 * como parte del mensaje de error en el cliente de firma.
-	 * @param data Datos firmados.
-	 * @return Identificador del nuevo documento codificado en base 64.
-	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado. */
+	/**
+	 * Almacena un documento en cach&eacute.
+	 * @param data Datos a guardar.
+	 * @return Identificador con el que referenciar al documento guardado.
+	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado.
+	 */
 	String storeDocumentToCache(byte[] data) throws IOException;
 
-	/** Permite la limpieza de cach&eacute.
-	 * @throws IOException Cuando ocurre alg&uacute;n problema en el borrado de archivos */
+	/**
+	 * Permite la limpieza de cach&eacute.
+	 * @throws IOException Cuando ocurre alg&uacute;n problema en el borrado de archivos.
+	 */
 	void cleanCache() throws IOException;
 
 }

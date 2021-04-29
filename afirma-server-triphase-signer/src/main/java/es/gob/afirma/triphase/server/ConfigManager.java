@@ -22,7 +22,7 @@ public class ConfigManager {
 	private static final String CONFIG_PARAM_DOCUMENT_CACHE_MANAGER_CLASS = "document.cache.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_VERIFICATION_KEY = "verification.key"; //$NON-NLS-1$
-	/** Propiedad que contiene el cacheId en caso de que se use cach&oacute; */
+	/** Propiedad que indica si se deber habilitar o no la cach&eacute; */
 	private static final String CONFIG_PARAM_CACHE_ENABLED = "cacheEnabled"; //$NON-NLS-1$
 
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
