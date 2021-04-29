@@ -20,6 +20,12 @@
 			<artifactId>afirma-core</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-server-triphase-signer-cache</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
