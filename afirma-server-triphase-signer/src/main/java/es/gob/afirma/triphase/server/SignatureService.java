@@ -91,7 +91,6 @@ public final class SignatureService extends HttpServlet {
 	private static final String PARAM_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	private static final String PARAM_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
 	private static final String PARAM_NAME_CERT = "cert"; //$NON-NLS-1$
-	private static final String PARAM_NAME_CACHE_ID = "CACHE_ID"; //$NON-NLS-1$
 
 	/** Separador que debe usarse para incluir varios certificados dentro del mismo par&aacute;metro. */
 	private static final String PARAM_NAME_CERT_SEPARATOR = ","; //$NON-NLS-1$
@@ -115,14 +114,19 @@ public final class SignatureService extends HttpServlet {
 	/** Propiedad de la informacion trifasica en la que se almacenan las prefirmas. */
 	private static final String TRIPHASE_PROP_PKCS1 = "PK1"; //$NON-NLS-1$
 
-	/** Propiedad de la informacion trifasica en la que se almacenan los c&oacute;digos
-	 * de verificaci&oacute;n de integridad. */
+	/**
+	 * Propiedad de la informacion trifasica en la que se almacenan los c&oacute;digos
+	 * de verificaci&oacute;n de integridad.
+	 */
 	private static final String TRIPHASE_PROP_HMAC = "HMAC"; //$NON-NLS-1$
+
+	/** Propiedad dedicada a almacenar el identificador del archivo a escribir o leer de cach&eacute;. */
+	private static final String TRIPHASE_PROP_CACHE_ID = "CACHE_ID"; //$NON-NLS-1$
 
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-	/** Propiedad que indica si la cach&eacute; est&aacute activada o no*/
+	/** Propiedad que indica si la cach&eacute; est&aacute activada o no. */
 	private static boolean cacheEnabled = false;
 
 	static {
@@ -355,7 +359,7 @@ public final class SignatureService extends HttpServlet {
 				LOGGER.info("Recuperamos el documento de cache"); //$NON-NLS-1$
 				final TriphaseData tr = TriphaseData.parser(sessionData);
 				final TriSign preSign = tr.getTriSigns().get(0);
-				final String cacheId = preSign.getProperty(PARAM_NAME_CACHE_ID);
+				final String cacheId = preSign.getProperty(TRIPHASE_PROP_CACHE_ID);
 				docBytes = docCacheManager.getDocumentFromCache(cacheId);
 			}
 
@@ -687,13 +691,12 @@ public final class SignatureService extends HttpServlet {
 	 * @param docBytes datos a almacenar en la cach&eacute;
 	 * @throws IOException error en la lectura / escritura del fichero
 	 */
-	private static void addCacheId(final TriphaseData triphaseData, final byte [] docBytes) throws IOException {
+	private static void addCacheId(final TriphaseData triphaseData, final byte [] docBytes) {
 		try {
 			final String cacheId = docCacheManager.storeDocumentToCache(docBytes);
-			triphaseData.getTriSigns().get(0).addProperty(PARAM_NAME_CACHE_ID, cacheId);
+			triphaseData.getTriSigns().get(0).addProperty(TRIPHASE_PROP_CACHE_ID, cacheId);
 		} catch (final IOException e) {
 			LOGGER.warning("Error en la escritura del fichero en cache"); //$NON-NLS-1$
-			throw e;
 		}
 	}
 

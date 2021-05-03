@@ -30,10 +30,14 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	private static final String EXP_TIME = "expTime"; //$NON-NLS-1$
 	private static final String MAX_USE_TO_CLEANING = "maxUseToCleaning"; //$NON-NLS-1$
 
-	static String tmpDir = ""; //$NON-NLS-1$
+	File tmpDir;
+	final File defaultTmpDir = new File(System.getProperty("java.io.tmpdir") //$NON-NLS-1$
+			+ File.separator + "triphaseSignTemp");  //$NON-NLS-1$
 
-	final long expTime;
-	final int maxUseToCleaning;
+	long expTime;
+	final long defaultExpTime = 60000;
+	int maxUseToCleaning;
+	final int defaultMaxUseToClean = 100;
 
 	private static int uses = 0;
 
@@ -43,56 +47,55 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	 * @param config Configuraci&oacute;n del gestor (directorios, etc.) */
 	public FileSystemCacheManager(final Properties config) {
 
-		tmpDir = config.getProperty(TMP_DIR);
-
-		final File directory = new File(tmpDir);
+		final String tmpDirProp = config.getProperty(TMP_DIR);
+		File dirToUse = this.defaultTmpDir;
 
 		//En caso de que el directorio configurado no exista, se crea una carpeta en el sistema
-		if (!directory.isDirectory()) {
+		if (tmpDirProp != null && !tmpDirProp.isEmpty()) {
+			final File directory = new File(tmpDirProp);
 
-			final File newDirectory = new File(System.getProperty("user.dir") //$NON-NLS-1$
-					+ File.separator + "temp");  //$NON-NLS-1$
-
-			tmpDir = newDirectory.getAbsolutePath();
-
-			if (!newDirectory.isDirectory()) {
-				newDirectory.mkdir();
+			if (directory.isDirectory()) {
+				dirToUse = directory;
 			}
 		}
 
-		this.expTime = Long.parseLong(config.getProperty(EXP_TIME));
-		this.maxUseToCleaning = Integer.parseInt(config.getProperty(MAX_USE_TO_CLEANING));
+		this.tmpDir = dirToUse;
+
+		//Comprobamos que la propiedad expTime venga correctamente informada
+		final String expTimeProp = config.getProperty(EXP_TIME);
+		long expTimeToUse = this.defaultExpTime;
+
+		if (expTimeProp != null && !expTimeProp.isEmpty()) {
+			try {
+				expTimeToUse = Long.parseLong(expTimeProp);
+			} catch (final NumberFormatException nfe) {
+				LOGGER.warning("Error leyendo la propiedad expTime, se usara el valor por defecto: "  //$NON-NLS-1$
+						+ this.defaultExpTime);
+			}
+		}
+
+		this.expTime = expTimeToUse;
+
+		//Comprobamos que la propiedad maxUseToCleaning venga correctamente informada
+		final String maxUseToCleanProp = config.getProperty(MAX_USE_TO_CLEANING);
+		int maxCleanToUse = this.defaultMaxUseToClean;
+
+		if (maxUseToCleanProp != null && !maxUseToCleanProp.isEmpty()) {
+			try {
+				maxCleanToUse = Integer.parseInt(maxUseToCleanProp);
+			} catch (final NumberFormatException nfe) {
+				LOGGER.warning("Error leyendo la propiedad maxUseToCleaning, se usara el valor por defecto: "  //$NON-NLS-1$
+						+ this.defaultMaxUseToClean);
+			}
+		}
+
+		this.maxUseToCleaning = maxCleanToUse;
 	}
+
 
 	@Override
-	public void cleanCache() throws IOException {
-		new ExpiredDocumentsCleanerThread(this.expTime).start();
-	}
-
-	/**
-	 * M&eacute;todo que borra todos los archivos que hayan expirado en cach&eacute;
-	 * @param expirationTime tiempo de expiraci&oacute;n a comprobar para el archivo
-	 */
-	public static void deleteExpiredDocuments(final long expirationTime) {
-		final File directory = new File(tmpDir);
-
-		if (tmpDir != null && directory.isDirectory()) {
-			for (final File file : directory.listFiles()) {
-				try {
-					if (file.isFile() && isExpired(file, expirationTime)) {
-						file.delete();
-					}
-				}
-				catch(final Exception e) {
-					// Suponemos que el fichero ha sido eliminado por otro hilo
-					LOGGER.warning(
-							"No se ha podido eliminar el fichero '" + file.getAbsolutePath() //$NON-NLS-1$s
-							+ "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$
-							);
-				}
-			}
-		}
-
+	public void cleanCache() {
+		new ExpiredDocumentsCleanerThread(this.expTime, this.tmpDir).start();
 	}
 
 	/**
@@ -101,18 +104,18 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	 * @param expirationTimeLimit tiempo de exipraci&oacute;n
 	 * @return devuelve true si ha expirado y false en caso contrario
 	 */
-	private static boolean isExpired(final File file, final long expirationTimeLimit) {
+	static boolean isExpired(final File file, final long expirationTimeLimit) {
 		return System.currentTimeMillis() - file.lastModified() > expirationTimeLimit;
 	}
 
 	@Override
-	public byte[] getDocumentFromCache(final String idCacheFile) throws IOException {
+	public byte[] getDocumentFromCache(final String idCacheFile) {
 
 		LOGGER.info("Recuperamos el documento con identificador: " + idCacheFile); //$NON-NLS-1$
 
 		byte[] data = null;
 
-		final File inFile = new File(tmpDir, idCacheFile);
+		final File inFile = new File(this.tmpDir, idCacheFile);
 
 		//Recuperamos el archivo del directorio de cache
 		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, this.expTime)) {
@@ -123,17 +126,16 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 			data = AOUtil.getDataFromInputStream(fis);
 		}
 		catch (final IOException e) {
-			LOGGER.warning("Error en la lectura del fichero '" + inFile.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			throw e;
+			LOGGER.warning("Error en la lectura del fichero '" + inFile.getAbsolutePath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
 		}
 
 		return data;
 	}
 
 	@Override
-	public String storeDocumentToCache(final byte[] data) throws IOException {
+	public String storeDocumentToCache(final byte[] data){
 
-		String newId = ""; //$NON-NLS-1$
+		String newId = null;
 		File file = null;
 		boolean fileExist = true;
 
@@ -141,7 +143,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 		while (fileExist) {
 
 			newId = generateNewId() + ".tmp"; //$NON-NLS-1$
-			file = new File(tmpDir, newId);
+			file = new File(this.tmpDir, newId);
 
 			if (!file.exists()) {
 				fileExist = false;
@@ -154,8 +156,8 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 			os.write(data);
 
 		} catch (final IOException e) {
-			LOGGER.warning("Error en la escritura del fichero '" + tmpDir + newId + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			throw e;
+			LOGGER.warning("Error en la escritura del fichero '" + this.tmpDir + newId + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return newId;
 		}
 
 		// Si el numero de usos iguala o supera a la variable, se limpian los archivos expirados
@@ -191,18 +193,45 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	private static final class ExpiredDocumentsCleanerThread extends Thread {
 
 		private final long timeout;
+		private final File temporaryDir;
 
 		/**
 		 * Construye el hilo para la eliminaci&oacute;n de documentos temporales caducados.
 		 * @param tempTimeout Tiempo de caducidad en milisegundos de los ficheros temporales.
 		 */
-		public ExpiredDocumentsCleanerThread (final long tempTimeout) {
+		public ExpiredDocumentsCleanerThread (final long tempTimeout, final File tempDir) {
 			this.timeout = tempTimeout;
+			this.temporaryDir = tempDir;
 		}
 
 		@Override
 		public void run() {
 			deleteExpiredDocuments(this.timeout);
+		}
+
+		/**
+		 * M&eacute;todo que borra todos los archivos que hayan expirado en cach&eacute;
+		 * @param expirationTime tiempo de expiraci&oacute;n a comprobar para el archivo
+		 */
+		public void deleteExpiredDocuments(final long expirationTime) {
+
+			if (this.temporaryDir != null) {
+				for (final File file : this.temporaryDir.listFiles()) {
+					try {
+						if (file.isFile() && isExpired(file, expirationTime)) {
+							file.delete();
+						}
+					}
+					catch(final Exception e) {
+						// Suponemos que el fichero ha sido eliminado por otro hilo
+						LOGGER.warning(
+								"No se ha podido eliminar el fichero '" + file.getAbsolutePath() //$NON-NLS-1$s
+								+ "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$
+								);
+					}
+				}
+			}
+
 		}
 	}
 }
