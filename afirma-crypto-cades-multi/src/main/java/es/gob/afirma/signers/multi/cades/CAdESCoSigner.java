@@ -11,6 +11,7 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -144,7 +145,7 @@ final class CAdESCoSigner {
 
 		// 3. CONTENTINFO
 		// si se introduce el contenido o no
-		ContentInfo encInfo = null;
+		ContentInfo encInfo;
 
 		// Si se proporcionaron los datos, los uso para identificar el contenido
 		if (config.getContentData() != null) {
@@ -167,7 +168,12 @@ final class CAdESCoSigner {
 			if (config.getDataDigest() == null) {
 				final DEROctetString contentData = (DEROctetString) encInfo.getContent();
 				if (contentData != null) {
-					final byte[] data = AOUtil.getDataFromInputStream(contentData.getOctetStream());
+					final byte[] data;
+					try (
+						final InputStream is = contentData.getOctetStream()
+					) {
+						data = AOUtil.getDataFromInputStream(is);
+					}
 					config.setDataDigest(MessageDigest.getInstance(config.getDigestAlgorithm()).digest(data));
 				}
 			}
@@ -230,16 +236,14 @@ final class CAdESCoSigner {
 		// === PREFIRMA ===
 
 		final ASN1Set signedAttr;
-		if (config.getDataDigest() != null || config.getContentData() != null) {
-			final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(
-					certChain[0],
-					config,
-					false);
-			signedAttr = SigUtils.getAttributeSet(new AttributeTable(signedAttributes));
-		}
-		else {
+		if ((config.getDataDigest() == null) && (config.getContentData() == null)) {
 			throw new ContainsNoDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
 		}
+		final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(
+				certChain[0],
+				config,
+				false);
+		signedAttr = SigUtils.getAttributeSet(new AttributeTable(signedAttributes));
 
 		// === FIRMA ===
 
