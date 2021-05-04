@@ -76,7 +76,7 @@ public final class SignBatchConcurrent extends SignBatch {
 		final StringBuilder sb = new StringBuilder("<xml>\n <firmas>"); //$NON-NLS-1$
 
 		for (final Future<String> f : results) {
-			String tmp;
+			final String tmp;
 			try {
 				tmp = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
@@ -300,7 +300,11 @@ public final class SignBatchConcurrent extends SignBatch {
 		    if (!executorService.awaitTermination(200, TimeUnit.MILLISECONDS)) {
 		        executorService.shutdownNow();
 		    }
-		} catch (final InterruptedException ex) {
+		}
+		catch (final InterruptedException ex) {
+			LOGGER.warning(
+				"Error intentando hacer una parada controlada del firmador concurrente de lotes de firma: " + ex //$NON-NLS-1$
+			);
 		    executorService.shutdownNow();
 		}
 	}

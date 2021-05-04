@@ -61,7 +61,9 @@ public abstract class SignBatch {
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/** Lista de firmas a procesar. */
 	protected final List<SingleSign> signs;
+
 	protected final SingleSignConstants.SignAlgorithm algorithm;
 
 	private String id;
@@ -82,6 +84,7 @@ public abstract class SignBatch {
 		return this.algorithm;
 	}
 
+	/** Indica si se debe parar al encontrar un error o por el contrario se debe continuar con el proceso. */
 	protected boolean stopOnError = false;
 
 	/** Ejecuta el preproceso de firma por lote.
@@ -189,6 +192,8 @@ public abstract class SignBatch {
 		this.stopOnError = soe;
 	}
 
+	/** Obtiene el <i>log</i> con el resultado del proceso del lote.
+	 * @return <i>Log</i> en formato XML con el resultado del proceso del lote. */
 	protected String getResultLog() {
 		// Iniciamos el log de retorno
 		final StringBuilder ret = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<signs>\n"); //$NON-NLS-1$
@@ -201,6 +206,7 @@ public abstract class SignBatch {
 		return ret.toString();
 	}
 
+	/** Borra todos los ficheros temporales usados en el proceso del lote. */
 	protected void deleteAllTemps() {
 		final TempStore ts = TempStoreFactory.getTempStore();
 		for (final SingleSign ss : this.signs) {

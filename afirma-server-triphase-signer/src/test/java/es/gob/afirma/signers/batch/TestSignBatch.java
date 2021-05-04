@@ -1,5 +1,7 @@
 package es.gob.afirma.signers.batch;
 
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -88,7 +90,11 @@ public final class TestSignBatch {
 
 	private static SignBatch createSampleBatch(final boolean concurrent) throws InstantiationException,
 	                                                                            IllegalAccessException,
-	                                                                            ClassNotFoundException {
+	                                                                            ClassNotFoundException,
+	                                                                            IllegalArgumentException,
+	                                                                            InvocationTargetException,
+	                                                                            NoSuchMethodException,
+	                                                                            SecurityException {
 
 		final String tempDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 
@@ -98,7 +104,7 @@ public final class TestSignBatch {
 		//************ CREACION DE LOTE ********************************************************
 		final Properties ssvp1 = new Properties();
 		ssvp1.put("FileName", tempDir + "\\FIRMA1.xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final SignSaver ssv1 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
+		final SignSaver ssv1 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").getDeclaredConstructor().newInstance(); //$NON-NLS-1$
 		ssv1.init(ssvp1);
 
 		final SingleSign ss1 = new SingleSign(
@@ -112,7 +118,7 @@ public final class TestSignBatch {
 
 		final Properties ssvp2 = new Properties();
 		ssvp2.put("FileName", tempDir + "\\FIRMA2.xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final SignSaver ssv2 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
+		final SignSaver ssv2 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").getDeclaredConstructor().newInstance(); //$NON-NLS-1$
 		ssv2.init(ssvp2);
 
 		final SingleSign ss2 = new SingleSign(
@@ -126,7 +132,7 @@ public final class TestSignBatch {
 
 		final Properties ssvp3 = new Properties();
 		ssvp3.put("FileName", tempDir + "\\FIRMA3.xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final SignSaver ssv3 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
+		final SignSaver ssv3 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").getDeclaredConstructor().newInstance(); //$NON-NLS-1$
 		ssv3.init(ssvp3);
 
 		final SingleSign ss3 = new SingleSign(
@@ -140,7 +146,7 @@ public final class TestSignBatch {
 
 		final Properties ssvp4 = new Properties();
 		ssvp4.put("FileName", tempDir + "\\FIRMA4.xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final SignSaver ssv4 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
+		final SignSaver ssv4 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").getDeclaredConstructor().newInstance(); //$NON-NLS-1$
 		ssv4.init(ssvp4);
 
 		final Properties extraParams4 = new Properties();
@@ -185,7 +191,9 @@ public final class TestSignBatch {
 		//********** OBTENCION DE CLAVE ********************************************************
 		final PrivateKeyEntry pke;
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		//********** FIN OBTENCION DE CLAVE ****************************************************
 		//**************************************************************************************
@@ -250,7 +258,9 @@ public final class TestSignBatch {
 		final PrivateKeyEntry pke;
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final SignBatch batch = createSampleBatch(true);
@@ -304,7 +314,9 @@ public final class TestSignBatch {
 		final PrivateKeyEntry pke;
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final SignBatch batch = new SignBatchSerial(SAMPLE_BATCH_XML_ERROR.getBytes());

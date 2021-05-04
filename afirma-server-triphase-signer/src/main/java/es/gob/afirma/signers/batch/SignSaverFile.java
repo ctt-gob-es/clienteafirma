@@ -62,17 +62,21 @@ public final class SignSaverFile implements SignSaver {
 	@Override
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
 		if (!DISABLED) {
+			final File f = new File(this.filename);
+			if (!f.getParentFile().isDirectory()) {
+				throw new IOException(
+					"El directorio de guardado de la firma no existe: " + f.getParent() //$NON-NLS-1$
+				);
+			}
 			try (
 				final OutputStream fos = new FileOutputStream(this.filename);
-			) {
 				final BufferedOutputStream bos = new BufferedOutputStream(
 					fos,
 					dataToSave.length
-				);
+				)
+			) {
 				bos.write(dataToSave);
 				bos.flush();
-				// Cerramos explicitamente
-				fos.close();
 			}
 			LOGGER.fine("Guardada finalmente la firma '" + sign.getId() + "' en: " + this.filename); //$NON-NLS-1$ //$NON-NLS-2$
 		}

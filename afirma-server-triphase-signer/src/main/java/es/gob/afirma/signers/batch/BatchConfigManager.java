@@ -35,15 +35,15 @@ public class BatchConfigManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final Properties config;
+	private static final Properties CONFIG = new Properties();
 
 	private static Boolean CONCURRENT_MODE = null;
 
 	private static Integer CONCURRENT_SIGNS = null;
 
-	private static String[] ALLOWED_SOURCES = null;
+	private static String[] allowedSources = null;
 
-	private static File TEMD_DIR = null;
+	private static File tempDir = null;
 
 	static {
 
@@ -65,9 +65,8 @@ public class BatchConfigManager {
 			throw new RuntimeException("No se ha encontrado el fichero de configuracion del servicio"); //$NON-NLS-1$
 		}
 
-		config = new Properties();
 		for (final String k : configProperties.keySet().toArray(new String[0])) {
-			config.setProperty(k, mapSystemProperties(configProperties.getProperty(k)));
+			CONFIG.setProperty(k, mapSystemProperties(configProperties.getProperty(k)));
 		}
 	}
 
@@ -78,7 +77,7 @@ public class BatchConfigManager {
 	 */
 	public static boolean isConcurrentMode() {
 		if (CONCURRENT_MODE == null) {
-			CONCURRENT_MODE = Boolean.valueOf(config.getProperty("concurrentmode")); //$NON-NLS-1$
+			CONCURRENT_MODE = Boolean.valueOf(CONFIG.getProperty("concurrentmode")); //$NON-NLS-1$
 		}
 		return CONCURRENT_MODE.booleanValue();
 	}
@@ -93,12 +92,16 @@ public class BatchConfigManager {
 		if (CONCURRENT_SIGNS == null) {
 			int n = 0;
 			try {
-				n = Integer.parseInt(config.getProperty("maxcurrentsigns", Integer.toString(MAX_CONCURRENT_SIGNS))); //$NON-NLS-1$
+				n = Integer.parseInt(CONFIG.getProperty("maxcurrentsigns", Integer.toString(MAX_CONCURRENT_SIGNS))); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
+				LOGGER.warning(
+					"El valor configurado como numero maximo de firmas concurrentes no es valido (" + //$NON-NLS-1$
+						CONFIG.getProperty("maxcurrentsigns") + "), se usara el valor por defecto (" + MAX_CONCURRENT_SIGNS + "): " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				);
 				n = MAX_CONCURRENT_SIGNS;
 			}
-			CONCURRENT_SIGNS = new Integer(n > 0 && n <= MAX_CONCURRENT_SIGNS ? n : MAX_CONCURRENT_SIGNS);
+			CONCURRENT_SIGNS = Integer.valueOf(n > 0 && n <= MAX_CONCURRENT_SIGNS ? n : MAX_CONCURRENT_SIGNS);
 		}
 		return CONCURRENT_SIGNS.intValue();
 	}
@@ -111,16 +114,16 @@ public class BatchConfigManager {
 	 * @throws IllegalStateException Cuando no se ha indicado ninguna fuente.
 	 */
 	public static String[] getAllowedSources() {
-		if (ALLOWED_SOURCES == null) {
-			final String sources = config.getProperty("allowedsources"); //$NON-NLS-1$
+		if (allowedSources == null) {
+			final String sources = CONFIG.getProperty("allowedsources"); //$NON-NLS-1$
 			if (sources == null || sources.isEmpty()) {
 				throw new IllegalStateException(
-						"No se ha definido ningun permiso para la carga de datos" //$NON-NLS-1$
-						);
+					"No se ha definido ningun permiso para la carga de datos" //$NON-NLS-1$
+				);
 			}
-			ALLOWED_SOURCES = sources.split(";"); //$NON-NLS-1$
+			allowedSources = sources.split(";"); //$NON-NLS-1$
 		}
-		return ALLOWED_SOURCES;
+		return allowedSources;
 	}
 
 	/**
@@ -129,9 +132,9 @@ public class BatchConfigManager {
 	 * ninguno o no era v&aacute;lido.
 	 */
 	public static File getTempDir() {
-		if (TEMD_DIR == null) {
+		if (tempDir == null) {
 			final String defaultDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
-			final File f = new File(config.getProperty("tmpdir", defaultDir)); //$NON-NLS-1$
+			final File f = new File(CONFIG.getProperty("tmpdir", defaultDir)); //$NON-NLS-1$
 
 			if (f.isDirectory() && f.canRead() && f.canWrite()) {
 				return f;
@@ -139,9 +142,9 @@ public class BatchConfigManager {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 					"El directorio temporal configurado (" + f.getAbsolutePath() + ") no es valido, se usaran el por defecto: " + defaultDir //$NON-NLS-1$ //$NON-NLS-2$
 					);
-			TEMD_DIR = new File(defaultDir);
+			tempDir = new File(defaultDir);
 		}
-		return TEMD_DIR;
+		return tempDir;
 	}
 
 	/** Intenta cargar un fichero propiedades del directorio proporcionado o, en caso de
