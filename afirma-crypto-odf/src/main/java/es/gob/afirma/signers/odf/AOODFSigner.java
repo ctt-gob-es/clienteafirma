@@ -128,10 +128,10 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
-     * @param data Documento ODF a firmar
-     * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
-     * @param key Clave privada a usar para firmar
-     * @param certChain Cadena de certificados del firmante
+     * @param data Documento ODF a firmar.
+     * @param algorithm Algoritmo de firma.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -149,12 +149,6 @@ public final class AOODFSigner implements AOSigner {
                        final PrivateKey key,
                        final java.security.cert.Certificate[] certChain,
                        final Properties xParams) throws AOException {
-
-    	if (!AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)) {
-    		LOGGER.warning(
-				"Se ha indicado '" + algorithm + "' como algoritmo de firma, pero se usara 'SHA1withRSA' por necesidades del formato ODF" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-    	}
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -310,7 +304,7 @@ public final class AOODFSigner implements AOSigner {
                     			final InputStream zis = zf.getInputStream(zf.getEntry(fullPath))
                 			) {
 		                        reference = fac.newReference(
-	                        		fullPath.replaceAll(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
+	                        		fullPath.replace(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
 	                        		dm,
 	                        		transformList,
 	                        		null,
@@ -334,7 +328,7 @@ public final class AOODFSigner implements AOSigner {
                 				final InputStream zis = zf.getInputStream(zf.getEntry(fullPath))
                 			) {
 		                        reference = fac.newReference(
-	                        		fullPath.replaceAll(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
+	                        		fullPath.replace(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
 	                        		dm,
 	                        		null,
 	                        		null,
