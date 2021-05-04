@@ -36,25 +36,25 @@ public final class TestBatchSigner {
 			"  <datasource>http://www.google.com</datasource>\r\n" + //$NON-NLS-1$
 			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
-			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <extraparams>U2lnbmF0dXJlSWQ9NzcyNTM3NGUtNzI4ZC00YTMzLTlkYjktM2E0ZWZlYTRjZWFk</extraparams> <!-- SignatureId=7725374e-728d-4a33-9db9-3a4efea4cead -->\r\n" + //$NON-NLS-1$
 			"  <signsaver>\r\n" + //$NON-NLS-1$
 			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
-			"   <config>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpGaWxlTmFtZT1DXDpcXFVzZXJzXFx0b21hc1xcQXBwRGF0YVxcTG9jYWxcXFRlbXBcXEZJUk1BMS54bWwNCg==</config>\r\n" + //$NON-NLS-1$
+			"   <config>RmlsZU5hbWU9QzovVXNlcnMvdG9tYXMuY2Fwb3RlL0FwcERhdGEvTG9jYWwvVGVtcC9GSVJNQTEueG1s</config> <!-- FileName=C:/Users/tomas.capote/AppData/Local/Temp/FIRMA1.xml -->\r\n" + //$NON-NLS-1$
 			"  </signsaver>\r\n" + //$NON-NLS-1$
 			" </singlesign>\r\n" + //$NON-NLS-1$
 			" <singlesign Id=\"93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a\">\r\n" + //$NON-NLS-1$
 			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
 			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
-			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD05M2QxNTMxYy1jZDMyLTRjOGUtOGNjOC0xZjFjZmU2NmY2NGENCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <extraparams>U2lnbmF0dXJlSWQ9OTNkMTUzMWMtY2QzMi00YzhlLThjYzgtMWYxY2ZlNjZmNjRh</extraparams> <!-- SignatureId=93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a -->\r\n" + //$NON-NLS-1$
 			"  <signsaver>\r\n" + //$NON-NLS-1$
 			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
-			"   <config>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpGaWxlTmFtZT1DXDpcXFVzZXJzXFx0b21hc1xcQXBwRGF0YVxcTG9jYWxcXFRlbXBcXEZJUk1BMi54bWwNCg==</config>\r\n" + //$NON-NLS-1$
+			"   <config>RmlsZU5hbWU9QzovVXNlcnMvdG9tYXMuY2Fwb3RlL0FwcERhdGEvTG9jYWwvVGVtcC9GSVJNQTIueG1s</config> <!-- FileName=C:/Users/tomas.capote/AppData/Local/Temp/FIRMA2.xml -->\r\n" + //$NON-NLS-1$
 			"  </signsaver>\r\n" + //$NON-NLS-1$
 			" </singlesign>\r\n" + //$NON-NLS-1$
 			"</signbatch>"; //$NON-NLS-1$
 
-	/** Prueba simple del cliente de firma por lote.
+	/** Prueba simple del cliente de firma por lotes.
 	 * @param args No se usa.
 	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
