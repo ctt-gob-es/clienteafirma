@@ -9,6 +9,7 @@
 
 package test.es.gob.afirma.signers.batch.server;
 
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
@@ -60,9 +61,18 @@ public final class TestBatchSigner {
 
 		final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+		System.out.println("Se procesa el siguiente XML:\n\n" + SAMPLE_BATCH_XML + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		final PrivateKeyEntry pke;
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try(
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+			ks.load(
+				is,
+				CERT_PASS.toCharArray()
+			);
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final String res = BatchSigner.sign(
