@@ -344,8 +344,10 @@ final class PdfVisibleAreasUtils {
 	        internalBuffer.write(actualBuffer.toByteArray());
 	        final Font f = appearance.getLayer2Font();
             // Traduccion de la fuente a una fuente PDF
-            final BaseFont bf = f.getCalculatedBaseFont(false);
-	        t.setFontAndSize(bf, f.getSize());
+	        if (f != null) {
+	        	final BaseFont bf = f.getCalculatedBaseFont(false);
+	        	t.setFontAndSize(bf, f.getSize());
+	        }
 
 	        n2Layer.reset();
 	        final Image textImg = Image.getInstance(t);
