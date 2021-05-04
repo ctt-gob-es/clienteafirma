@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>afirma-server-triphase-signer-cache</artifactId>
+	<packaging>jar</packaging>
+
+	<name>afirma-server-triphase-signer-cache</name>
+	<description>Modulo con la interfaz para la generacion de sistemas de cache para la firma trifasica</description>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.8-SNAPSHOT</version>
+	</parent>
+
+</project>

@@ -192,6 +192,7 @@
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
@@ -300,6 +301,7 @@
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
@@ -388,6 +390,7 @@
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
