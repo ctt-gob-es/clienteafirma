@@ -26,70 +26,57 @@ import es.gob.afirma.core.misc.AOUtil;
  */
 public final class FileSystemCacheManager implements DocumentCacheManager {
 
-	private static final String TMP_DIR = "tmpDir"; //$NON-NLS-1$
-	private static final String EXP_TIME = "expTime"; //$NON-NLS-1$
-	private static final String MAX_USE_TO_CLEANING = "maxUseToCleaning"; //$NON-NLS-1$
+	private static final String PROP_TMP_DIR = "tmpDir"; //$NON-NLS-1$
+	private static final String PROP_EXP_TIME = "expTime"; //$NON-NLS-1$
+	private static final String PROP_MAX_USE_TO_CLEANING = "maxUseToCleaning"; //$NON-NLS-1$
 
-	File tmpDir;
-	final File defaultTmpDir = new File(System.getProperty("java.io.tmpdir") //$NON-NLS-1$
-			+ File.separator + "triphaseSignTemp");  //$NON-NLS-1$
+	private static final File DEFAULT_TMP_DIR = new File(System.getProperty("java.io.tmpdir"), "triphaseSignTemp");  //$NON-NLS-1$ //$NON-NLS-2$
+	private static final long DEFAULT_EXP_TIME = 60000;
+	private static final int DEFAULT_MAX_USE_TO_CLEAN = 100;
 
-	long expTime;
-	final long defaultExpTime = 60000;
-	int maxUseToCleaning;
-	final int defaultMaxUseToClean = 100;
+	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static int uses = 0;
 
-	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private File tmpDir;
+	private long expTime;
+	private int maxUseToCleaning;
 
 	/** Construye la clase de acceso a gestor documental usando sistema de ficheros.
 	 * @param config Configuraci&oacute;n del gestor (directorios, etc.) */
 	public FileSystemCacheManager(final Properties config) {
 
-		final String tmpDirProp = config.getProperty(TMP_DIR);
-		File dirToUse = this.defaultTmpDir;
-
-		//En caso de que el directorio configurado no exista, se crea una carpeta en el sistema
-		if (tmpDirProp != null && !tmpDirProp.isEmpty()) {
-			final File directory = new File(tmpDirProp);
-
-			if (directory.isDirectory()) {
-				dirToUse = directory;
+		// Establecemos el directorio configurado o el por defecto si no existe
+		final String tmpDirProp = config.getProperty(PROP_TMP_DIR, ""); //$NON-NLS-1$
+		if (!tmpDirProp.isEmpty() && new File(tmpDirProp).isDirectory()) {
+			this.tmpDir = new File(tmpDirProp);
+		}
+		else {
+			this.tmpDir = DEFAULT_TMP_DIR;
+			if (!this.tmpDir.exists()) {
+				this.tmpDir.mkdirs();
 			}
 		}
 
-		this.tmpDir = dirToUse;
-
-		//Comprobamos que la propiedad expTime venga correctamente informada
-		final String expTimeProp = config.getProperty(EXP_TIME);
-		long expTimeToUse = this.defaultExpTime;
-
-		if (expTimeProp != null && !expTimeProp.isEmpty()) {
-			try {
-				expTimeToUse = Long.parseLong(expTimeProp);
-			} catch (final NumberFormatException nfe) {
-				LOGGER.warning("Error leyendo la propiedad expTime, se usara el valor por defecto: "  //$NON-NLS-1$
-						+ this.defaultExpTime);
-			}
+		// Establecemos el tiempo de caducidad
+		try {
+			this.expTime = Long.parseLong(config.getProperty(PROP_EXP_TIME));
+		}
+		catch (final Exception e) {
+			LOGGER.warning("Error leyendo la propiedad " + PROP_EXP_TIME  //$NON-NLS-1$
+					+ ", se usara el valor por defecto: " + DEFAULT_EXP_TIME);  //$NON-NLS-1$
+			this.expTime = DEFAULT_EXP_TIME;
 		}
 
-		this.expTime = expTimeToUse;
-
-		//Comprobamos que la propiedad maxUseToCleaning venga correctamente informada
-		final String maxUseToCleanProp = config.getProperty(MAX_USE_TO_CLEANING);
-		int maxCleanToUse = this.defaultMaxUseToClean;
-
-		if (maxUseToCleanProp != null && !maxUseToCleanProp.isEmpty()) {
-			try {
-				maxCleanToUse = Integer.parseInt(maxUseToCleanProp);
-			} catch (final NumberFormatException nfe) {
-				LOGGER.warning("Error leyendo la propiedad maxUseToCleaning, se usara el valor por defecto: "  //$NON-NLS-1$
-						+ this.defaultMaxUseToClean);
-			}
+		// Establecemos el numero de accesos que permitimos entre accesos a la cache
+		try {
+			this.maxUseToCleaning = Integer.parseInt(config.getProperty(PROP_MAX_USE_TO_CLEANING));
 		}
-
-		this.maxUseToCleaning = maxCleanToUse;
+		catch (final Exception e) {
+			LOGGER.warning("Error leyendo la propiedad " + PROP_MAX_USE_TO_CLEANING //$NON-NLS-1$
+					+ ", se usara el valor por defecto: " + DEFAULT_MAX_USE_TO_CLEAN);  //$NON-NLS-1$
+			this.maxUseToCleaning = DEFAULT_MAX_USE_TO_CLEAN;
+		}
 	}
 
 
@@ -109,9 +96,9 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	}
 
 	@Override
-	public byte[] getDocumentFromCache(final String idCacheFile) {
+	public byte[] getDocumentFromCache(final String idCacheFile) throws IOException {
 
-		LOGGER.info("Recuperamos el documento con identificador: " + idCacheFile); //$NON-NLS-1$
+		LOGGER.fine("Recuperamos de la cache el documento con identificador: " + idCacheFile); //$NON-NLS-1$
 
 		byte[] data = null;
 
@@ -126,38 +113,28 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 			data = AOUtil.getDataFromInputStream(fis);
 		}
 		catch (final IOException e) {
-			LOGGER.warning("Error en la lectura del fichero '" + inFile.getAbsolutePath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+			throw new IOException("Error al leer de cache el fichero: " + inFile.getAbsolutePath(), e); //$NON-NLS-1$
 		}
 
 		return data;
 	}
 
 	@Override
-	public String storeDocumentToCache(final byte[] data){
+	public String storeDocumentToCache(final byte[] data) throws IOException {
 
-		String newId = null;
-		File file = null;
-		boolean fileExist = true;
-
-		// Comprobamos que el archivo a guardar no estara duplicado
-		while (fileExist) {
-
+		// Obtenemos un nombre de temporal que no exista ya
+		String newId;
+		File file;
+		do {
 			newId = generateNewId() + ".tmp"; //$NON-NLS-1$
 			file = new File(this.tmpDir, newId);
-
-			if (!file.exists()) {
-				fileExist = false;
-			}
-		}
+		} while (!file.exists());
 
 		// Guardamos el archivo en el directorio indicado en el archivo de configuracion
 		try (final OutputStream os = new FileOutputStream(file)) {
-
 			os.write(data);
-
 		} catch (final IOException e) {
-			LOGGER.warning("Error en la escritura del fichero '" + this.tmpDir + newId + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			return newId;
+			throw new IOException("Error al escribir en cache el fichero: " + file.getAbsolutePath(), e); //$NON-NLS-1$
 		}
 
 		// Si el numero de usos iguala o supera a la variable, se limpian los archivos expirados

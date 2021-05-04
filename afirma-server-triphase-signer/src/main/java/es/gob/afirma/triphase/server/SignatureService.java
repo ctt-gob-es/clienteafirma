@@ -360,7 +360,13 @@ public final class SignatureService extends HttpServlet {
 				final TriphaseData tr = TriphaseData.parser(sessionData);
 				final TriSign preSign = tr.getTriSigns().get(0);
 				final String cacheId = preSign.getProperty(TRIPHASE_PROP_CACHE_ID);
-				docBytes = docCacheManager.getDocumentFromCache(cacheId);
+				try {
+					docBytes = docCacheManager.getDocumentFromCache(cacheId);
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se pudo obtener un documento de la cache", e); //$NON-NLS-1$
+					docBytes = null;
+				}
 			}
 
 			final String docId = parameters.get(PARAM_NAME_DOCID);
@@ -491,7 +497,7 @@ public final class SignatureService extends HttpServlet {
 				// Si la propiedad para habilitar el sistema de cache esta habilitada
 				// se procedera a la escritura del fichero en cache
 				if (cacheEnabled) {
-					addCacheId(preRes, docBytes);
+					saveToCache(preRes, docBytes);
 				}
 
 				// Si se ha definido una clave HMAC para la comprobacion de integridad de
@@ -689,14 +695,13 @@ public final class SignatureService extends HttpServlet {
 	 * A&ntilde;ade el fichero en cach&eacute; para m&aacute;s tarde leerlo
 	 * @param triphaseData datos de la prefirma
 	 * @param docBytes datos a almacenar en la cach&eacute;
-	 * @throws IOException error en la lectura / escritura del fichero
 	 */
-	private static void addCacheId(final TriphaseData triphaseData, final byte [] docBytes) {
+	private static void saveToCache(final TriphaseData triphaseData, final byte [] docBytes) {
 		try {
 			final String cacheId = docCacheManager.storeDocumentToCache(docBytes);
 			triphaseData.getTriSigns().get(0).addProperty(TRIPHASE_PROP_CACHE_ID, cacheId);
 		} catch (final IOException e) {
-			LOGGER.warning("Error en la escritura del fichero en cache"); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error en la escritura del fichero en cache", e); //$NON-NLS-1$
 		}
 	}
 
