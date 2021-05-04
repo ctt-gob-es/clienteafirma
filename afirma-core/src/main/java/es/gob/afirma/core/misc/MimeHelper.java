@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
@@ -75,22 +76,22 @@ public final class MimeHelper {
 
         try {
             final Method getMagicMatchMethod = Class.forName("net.sf.jmimemagic.Magic") //$NON-NLS-1$
-                .getMethod("getMagicMatch", new Class[] { byte[].class }); //$NON-NLS-1$
+                .getMethod("getMagicMatch", byte[].class); //$NON-NLS-1$
             final Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
 
             final Class<?> magicMatchClass = Class.forName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
             String mt = (String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
-            if (mt != null && UNKNOWN_JMIMEMAGIC_VALUE.equals(mt)) {
+            if (UNKNOWN_JMIMEMAGIC_VALUE.equals(mt)) {
             	mt = null;
             }
             this.mimeInfo.setMimeType(mt);
             String ext = (String)magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
-            if (ext != null && UNKNOWN_JMIMEMAGIC_VALUE.equals(ext)) {
+            if (UNKNOWN_JMIMEMAGIC_VALUE.equals(ext)) {
             	ext = null;
             }
             this.mimeInfo.setExtension(ext);
             String desc = (String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
-            if (desc != null && UNKNOWN_JMIMEMAGIC_VALUE.equals(desc)) {
+            if (UNKNOWN_JMIMEMAGIC_VALUE.equals(desc)) {
             	desc = null;
             }
             this.mimeInfo.setDescription(desc);
@@ -105,7 +106,7 @@ public final class MimeHelper {
                     LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
                 }
                 else {
-                    LOGGER.warning("Error durante el analisis de la cabecera de los datos: " + e); //$NON-NLS-1$
+                    LOGGER.log(Level.WARNING, "Error durante el analisis de la cabecera de los datos: " + e, e); //$NON-NLS-1$
                 }
             }
             catch (final Exception e2) {
