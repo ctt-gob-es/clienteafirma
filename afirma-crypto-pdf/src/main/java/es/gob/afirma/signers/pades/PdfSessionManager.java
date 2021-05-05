@@ -438,17 +438,9 @@ public final class PdfSessionManager {
 
 		// Rubrica de la firma
 		if (rubric != null) {
-			if (signatureRotation != 0) {
-				LOGGER.warning(
-					"Se ha indicado rotar la firma y ademas insertar una imagen, pero las firmas rotadas" //$NON-NLS-1$
-						+ " actualmente no aceptan imagenes. No se usara la imagen proporcionada" //$NON-NLS-1$
-				);
-			}
-			else {
-				sap.setImage(rubric);
-				sap.setLayer2Text(""); //$NON-NLS-1$
-				sap.setLayer4Text(""); //$NON-NLS-1$
-			}
+			sap.setImage(rubric);
+			sap.setLayer2Text(""); //$NON-NLS-1$
+			sap.setLayer4Text(""); //$NON-NLS-1$
 		}
 
 		// **************************
