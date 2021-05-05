@@ -141,7 +141,7 @@ final class ProtocolInvocationLauncherLoad {
 		} catch (final Exception e) {
 			LOGGER.severe("Error en la lectura de los datos a cargar: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_LOAD_DATA;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}

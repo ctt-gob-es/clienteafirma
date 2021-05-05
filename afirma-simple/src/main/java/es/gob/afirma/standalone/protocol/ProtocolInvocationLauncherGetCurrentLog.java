@@ -72,7 +72,7 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 		} catch (final IOException e) {
 			LOGGER.severe("Error al obtener el registro de log acumulado hasta la ejecucion actual: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_LOG;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}

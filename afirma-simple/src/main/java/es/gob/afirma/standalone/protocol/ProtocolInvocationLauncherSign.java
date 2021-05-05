@@ -12,8 +12,10 @@ package es.gob.afirma.standalone.protocol;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
@@ -154,6 +156,14 @@ final class ProtocolInvocationLauncherSign {
 				ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion(),
 				operation);
 		processor.setCipherKey(options.getDesKey());
+
+
+		try (OutputStream out = new FileOutputStream("C:\\Users\\carlos.gamuci\\Desktop\\salida\\pdf.pdf")) {
+			out.write(operation.getData());
+		}
+		catch (final Exception e) {
+			LOGGER.severe("ERROR: " + e);
+		}
 
 		final List<SignOperation> operations = processor.preProcess(operation);
 		final List<SignResult> results = new ArrayList<>(operations.size());

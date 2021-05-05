@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Base64;
@@ -127,7 +126,7 @@ final class ProtocolInvocationLauncherBatch {
 			catch (final Exception e3) {
 				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-    			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+    			ProtocolInvocationLauncherErrorManager.showError(errorCode, e3);
     			if (!bySocket){
     				throw new SocketOperationException(errorCode);
     			}
@@ -173,7 +172,7 @@ final class ProtocolInvocationLauncherBatch {
 			catch(final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE;
-    			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+    			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
     			if (!bySocket){
     				throw new SocketOperationException(errorCode);
     			}
@@ -182,7 +181,7 @@ final class ProtocolInvocationLauncherBatch {
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-    			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+    			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
     			if (!bySocket){
     				throw new SocketOperationException(errorCode);
     			}
@@ -210,29 +209,16 @@ final class ProtocolInvocationLauncherBatch {
 						e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
 			}
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 		}
-		catch (final AOException e) {
-			LOGGER.log(
-					Level.SEVERE,
-					"Error en el proceso del lote de firmas: " + e, //$NON-NLS-1$
-					e
-				);
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode, e.getMessage());
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
-		}
-		catch(final Exception e) {
+		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error en el proceso del lote de firmas", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}
@@ -249,7 +235,7 @@ final class ProtocolInvocationLauncherBatch {
 			} catch (final CertificateEncodingException e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido codificar el certificado de firma para su devolucion", e); //$NON-NLS-1$
 					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-					ProtocolInvocationLauncherErrorManager.showError(errorCode);
+					ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 					if (!bySocket){
 						throw new SocketOperationException(errorCode);
 					}
@@ -269,7 +255,7 @@ final class ProtocolInvocationLauncherBatch {
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 				if (!bySocket){
 					throw new SocketOperationException(errorCode);
 				}
@@ -301,7 +287,7 @@ final class ProtocolInvocationLauncherBatch {
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
 					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT;
-					ProtocolInvocationLauncherErrorManager.showError(errorCode);
+					ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 					if (!bySocket){
 						throw new SocketOperationException(errorCode);
 					}

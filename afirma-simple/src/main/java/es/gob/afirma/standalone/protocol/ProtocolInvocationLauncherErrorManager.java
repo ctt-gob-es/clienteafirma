@@ -120,10 +120,14 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	static void showError(final String code) {
-		showError(code, ERRORS.get(code));
+		showError(code, null);
 	}
 
-	static void showError(final String code, final String message) {
+	static void showError(final String code, final Throwable t) {
+		showError(code, ERRORS.get(code), t);
+	}
+
+	static void showError(final String code, final String message, final Throwable t) {
 		final String desc = ProtocolMessages.getString("ProtocolLauncher.28") + "\n(" + code + ": " + message + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (!HEADLESS) {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -133,7 +137,7 @@ final class ProtocolInvocationLauncherErrorManager {
 				desc,
 				ProtocolMessages.getString("ProtocolLauncher.29"), //$NON-NLS-1$
 				AOUIFactory.ERROR_MESSAGE,
-				null
+				t
 			);
 		}
 		LOGGER.severe(desc);
@@ -144,7 +148,15 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	static void showErrorDetail(final String code, final String message, final String detail) {
-		showError(code, message + "\n" + detail); //$NON-NLS-1$
+		showError(code, message + "\n" + detail, null); //$NON-NLS-1$
+	}
+
+	static void showErrorDetail(final String code, final Throwable t) {
+		showError(code, t);
+	}
+
+	static void showErrorDetail(final String code, final String message, final Throwable t) {
+		showError(code, message, t);
 	}
 
 	static String getErrorMessage(final String code) {

@@ -100,7 +100,7 @@ final class ProtocolInvocationLauncherSave {
 		catch (final Exception e) {
 			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_SAVE_DATA;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}
@@ -120,7 +120,7 @@ final class ProtocolInvocationLauncherSave {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
+					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, e);
 					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
 				}
 			}

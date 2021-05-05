@@ -221,14 +221,14 @@ public final class ProtocolInvocationLauncher {
 			} catch (final UnsupportedProtocolException e) {
              	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
              	final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
-             	ProtocolInvocationLauncherErrorManager.showError(errorCode);
+             	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
              	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 			} catch (final GeneralSecurityException | IOException e) {
               	LOGGER.log(Level.SEVERE, "Ocurrio un error durante la carga del almacen de claves", e); //$NON-NLS-1$
 				final String errorCode = e instanceof IOException
 						? ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_SSL_KEYSTORE
 						: ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_SSL_KEYSTORE;
-              	ProtocolInvocationLauncherErrorManager.showError(errorCode);
+              	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
               	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
               }
 
@@ -247,7 +247,7 @@ public final class ProtocolInvocationLauncher {
 				final String errorCode = e.isNewVersionNeeded()
 						? ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE
 						: ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
-            	ProtocolInvocationLauncherErrorManager.showError(errorCode);
+            	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
             	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
             }
 
@@ -275,13 +275,13 @@ public final class ProtocolInvocationLauncher {
 					} catch (final InvalidEncryptedDataLengthException e) {
                         LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
 					} catch (final DecryptionException e) {
                         LOGGER.severe("Error al descifrar los datos obtenidos: " + e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
@@ -313,12 +313,12 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -345,13 +345,13 @@ public final class ProtocolInvocationLauncher {
 					} catch (final InvalidEncryptedDataLengthException e) {
                     	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
 					} catch (final DecryptionException e) {
                         LOGGER.severe("Error al descifrar: " + e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
@@ -386,12 +386,12 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -421,13 +421,13 @@ public final class ProtocolInvocationLauncher {
 					} catch (final InvalidEncryptedDataLengthException e) {
                     	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
 					} catch (final DecryptionException e) {
                         LOGGER.severe("Error al descifrar: " + e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
@@ -461,24 +461,24 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
 			} catch (final ParameterException e) {
-            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado: " + e, e); //$NON-NLS-1$
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado", e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
-            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado: " + e, e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado", e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -509,15 +509,15 @@ public final class ProtocolInvocationLauncher {
                     try {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
 					} catch (final InvalidEncryptedDataLengthException e) {
-                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor", e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
 					} catch (final DecryptionException e) {
                         LOGGER.severe("Error al descifrar: " + e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
@@ -571,24 +571,24 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
 			} catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -618,15 +618,15 @@ public final class ProtocolInvocationLauncher {
                     try {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
 					} catch (final InvalidEncryptedDataLengthException | IOException e) {
-                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor", e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
 					} catch (final DecryptionException e) {
-                        LOGGER.log(Level.SEVERE, "Error al descifrar" + e, e); //$NON-NLS-1$
+                        LOGGER.log(Level.SEVERE, "Error al descifrar", e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
@@ -679,24 +679,24 @@ public final class ProtocolInvocationLauncher {
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
 			} catch (final ParameterException e) {
-            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma: " + e, e); //$NON-NLS-1$
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma", e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
-            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma: " + e, e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma", e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -723,15 +723,15 @@ public final class ProtocolInvocationLauncher {
                     try {
                         xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
 					} catch (final InvalidEncryptedDataLengthException | IOException e) {
-                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
+                    	LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor", e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_RECOVERING_DATA);
 					} catch (final DecryptionException e) {
-                        LOGGER.severe("Error al descifrar" + e); //$NON-NLS-1$
+                        LOGGER.log(Level.SEVERE, "Error al descifrar", e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
-								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
+								.showError(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA, e);
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
@@ -764,24 +764,24 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
 			} catch (final ParameterException e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -814,24 +814,24 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
 			} catch (final ParameterException e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e.getMessage());
+						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
 			} catch (final Exception e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
             }
@@ -881,7 +881,7 @@ public final class ProtocolInvocationLauncher {
 			} catch (final IOException e) {
 				LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor intermedio: " + e, e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(
-						ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
+						ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, e);
 			}
 		}
 	}

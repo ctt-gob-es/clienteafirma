@@ -131,7 +131,7 @@ final class ProtocolInvocationLauncherSelectCert {
 			} catch (final Exception e3) {
 				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e3);
 				if (!bySocket){
 					throw new SocketOperationException(errorCode);
 				}
@@ -177,7 +177,7 @@ final class ProtocolInvocationLauncherSelectCert {
 			catch (final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 				if (!bySocket){
 					throw new SocketOperationException(errorCode);
 				}
@@ -186,7 +186,7 @@ final class ProtocolInvocationLauncherSelectCert {
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 				if (!bySocket){
 					throw new SocketOperationException(errorCode);
 				}
@@ -203,7 +203,7 @@ final class ProtocolInvocationLauncherSelectCert {
 		} catch (final CertificateEncodingException e) {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}
@@ -218,7 +218,7 @@ final class ProtocolInvocationLauncherSelectCert {
 			} catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 				if (!bySocket){
 					throw new SocketOperationException(errorCode);
 				}
@@ -244,7 +244,7 @@ final class ProtocolInvocationLauncherSelectCert {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
+					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, e);
 					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
 				}
 			}
