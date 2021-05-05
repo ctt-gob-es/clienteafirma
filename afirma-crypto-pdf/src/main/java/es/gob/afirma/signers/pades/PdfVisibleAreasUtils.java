@@ -302,6 +302,7 @@ final class PdfVisibleAreasUtils {
 	 * @param fieldName Nombre del campo de firma a usar (si se especifica <code>null</code> se
 	 *                  crea uno nuevo.
 	 * @param degrees Grados de rotaci&oacute;n del campo de firma.
+	 * @param rubric imagen a estampar
 	 * @throws DocumentException Si hay problemas tratando el PDF.
 	 * @throws IOException En cualquier otro error. */
     static void setVisibleSignatureRotated(final PdfStamper stamper,
@@ -309,7 +310,8 @@ final class PdfVisibleAreasUtils {
     		                               final Rectangle pageRect,
     		                               final int page,
     		                               final String fieldName,
-    		                               final int degrees) throws DocumentException,
+    		                               final int degrees, 
+    		                               final Image rubric) throws DocumentException,
                                                                      IOException {
         final float width = pageRect.getWidth();
         final float height = pageRect.getHeight();
@@ -351,9 +353,26 @@ final class PdfVisibleAreasUtils {
 
 	        n2Layer.reset();
 	        final Image textImg = Image.getInstance(t);
+	        //Imagen con el texto encima de la rubrica
 	        textImg.setInterpolation(true);
 	        textImg.setRotationDegrees(degrees);
 	        textImg.setAbsolutePosition(0, 0);
+	        
+	        if(rubric != null) {
+	        	//Imagen con la firma rubrica
+	        	rubric.setInterpolation(true);
+	        	rubric.setRotationDegrees(degrees);
+	        	rubric.setAbsolutePosition(0, 0);
+	        
+	        	//Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
+	        	if (degrees == 90 || degrees == 270) {
+	        		rubric.scaleAbsolute(height, width);
+	        	} else {
+	        		rubric.scaleAbsolute(width, height);
+	        	}
+	        
+	        	n2Layer.addImage(rubric);
+	        }
 	        n2Layer.addImage(textImg);
 	        n2Layer.setWidth(width);
 	        n2Layer.setHeight(height);
@@ -523,4 +542,5 @@ final class PdfVisibleAreasUtils {
     	}
     	return digitsCount;
     }
+    
 }
