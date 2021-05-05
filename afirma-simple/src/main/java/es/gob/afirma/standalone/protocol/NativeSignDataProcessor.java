@@ -106,7 +106,7 @@ public class NativeSignDataProcessor extends SignDataProcessor {
 
 	/**
 	 * Construye una cadena de texto con un objeto JSON de datos extra que enviar en la respuesta.
-	 * @param filename Nombre de fichero.
+	 * @param extraData Conjunto de propiedades que imprimir en el JSON.
 	 * @return Cadena con el JSON de datos extra.
 	 */
 	private static byte[] buildExtraDataResult(final Properties extraData) {

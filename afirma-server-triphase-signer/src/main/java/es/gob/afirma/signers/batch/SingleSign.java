@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -184,13 +185,14 @@ public final class SingleSign {
 					return;
 				}
 			}
-			else {
-				if (dataSource.equals(allowed)) {
-					return;
-				}
+			else if (dataSource.equals(allowed)) {
+				return;
 			}
 		}
-		throw new SecurityException("Origen de datos no valido"); //$NON-NLS-1$
+		throw new SecurityException(
+			"Origen de datos no valido (" + dataSource + "), los origenes validos son: " + //$NON-NLS-1$ //$NON-NLS-2$
+				Arrays.asList(BatchConfigManager.getAllowedSources())
+		);
 	}
 
 	@Override

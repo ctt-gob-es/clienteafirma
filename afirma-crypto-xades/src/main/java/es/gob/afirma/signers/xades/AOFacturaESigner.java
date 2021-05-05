@@ -32,6 +32,7 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas XML XAdES Factura-E.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -55,6 +56,12 @@ public final class AOFacturaESigner implements AOSigner {
 
     private static final Set<String> ALLOWED_PARAMS = new HashSet<>(5);
     static {
+
+    	// Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+	    // de los Base 64
+    	XmlDSigProviderHelper.configureXmlDSigProvider();
+
+	    // Establecemos el listado de parametros de configuracion permitidos
         ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_CITY);
         ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_PROVINCE);
         ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE);

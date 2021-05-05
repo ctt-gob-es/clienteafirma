@@ -73,8 +73,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 * @param parentFrame      Marco padre para la modalidad.
 	 * @param spdl             Clase a la que notificar la obtencion de propiedades
 	 *                         de la firma visible.
-	 * @param signatureVisible Indica si se va a insertar una firma
-	 * @param stampVisible     Indica si se va a insertar una marca
+	 * @param signatureVisible Indica si se va a insertar una firma.
+	 * @param customAppearance Indica si se va a establecer una apariencia distinta a la por defecto.
+	 * @param stampVisible     Indica si se va a insertar una marca.
 	 */
 	private SignPdfDialog(final Frame parentFrame, final SignPdfDialogListener spdl, final boolean signatureVisible,
 			final boolean customAppearance, final boolean stampVisible) {
@@ -118,8 +119,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 *                         <code>false</code> en caso contrario.
 	 * @param pdf              PDF al que aplicar la firma visible.
 	 * @param parentFrame      Marco padre para la modalidad.
-	 * @param signatureVisible Indica si se va a insertar una firma
-	 * @param stampVisible     Indica si se va a insertar una marca
+	 * @param signatureVisible Indica si se va a insertar una firma.
+	 * @param customAppearance Indica si se va a establecer una apariencia distinta a la por defecto.
+	 * @param stampVisible     Indica si se va a insertar una marca.
 	 * @param spdl             Clase a la que notificar la obtencion de propiedades
 	 *                         de la firma visible.
 	 */
@@ -157,10 +159,10 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 * @param parentFrame      Marco padre para la modalidad.
 	 * @param signatureVisible Indica si se va a insertar una firma
 	 * @param stampVisible     Indica si se va a insertar una marca
-	 * @param customAppearance Indica si el
+	 * @param customAppearance Indica si se va a establecer una apariencia distinta a la por defecto.
 	 * @param spdl             Clase a la que notificar la obtencion de propiedades
 	 *                         de la firma visible.
-	 * @return the Dialog generated.
+	 * @return El di&aacute;logo generado.
 	 */
 	public static JDialog getVisibleSignatureDialog(final boolean isSign, final byte[] pdf, final Frame parentFrame,
 			final boolean signatureVisible, final boolean customAppearance, final boolean stampVisible,

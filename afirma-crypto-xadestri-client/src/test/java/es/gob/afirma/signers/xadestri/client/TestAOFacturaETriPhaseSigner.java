@@ -38,8 +38,10 @@ public class TestAOFacturaETriPhaseSigner {
 	//private static final String SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 	private static final String SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
-	/** Prueba de firma FacturaE trif&aacute;sica.
-	 * @throws Exception */
+	/**
+	 * Prueba de firma FacturaE trif&aacute;sica.
+	 * @throws Exception Cuando falla la firma.
+	 */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore // Necesita un servidor trifasico

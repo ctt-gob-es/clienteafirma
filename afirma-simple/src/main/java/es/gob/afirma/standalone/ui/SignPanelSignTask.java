@@ -693,9 +693,11 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	}
 
 
-	/** Muestra un di&aacute;logo con un mensaje de error.
-	 * @param parent Componente padre.
-     * @param message Mensaje de error. */
+	/**
+	 * Muestra un di&aacute;logo con un mensaje de error.
+	 * @param message Mensaje de error.
+	 * @param t Causa del error.
+	 */
     static void showErrorMessage(final String message, final Throwable t) {
 		AOUIFactory.showErrorMessage(
 			message,

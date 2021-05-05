@@ -47,9 +47,11 @@ public final class TestCadesTriphase {
 	private PrivateKeyEntry pke;
 	private PrivateKeyEntry pke2;
 
-	/** Prueba de firma CAdES trif&aacute;sica.
-	 * @throws AOException
-	 * @throws IOException */
+	/**
+	 * Prueba de firma CAdES trif&aacute;sica.
+	 * @throws AOException Cuando falla la firma.
+	 * @throws IOException Cuando ocurre un error al cargar o guardar datos.
+	 */
 	@Test
 	@Ignore // Necesita el servidor
 	public void testTriPhaseSignCAdESASiCS() throws AOException, IOException {

@@ -62,10 +62,12 @@ public class CreateHashCommand extends PluginCommandAction {
 		return response;
 	}
 
-	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales mostrando los di&aacute;logos
+	/**
+	 * Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales mostrando los di&aacute;logos
 	 * que fuesen necesarios.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	 * @throws IllegalArgumentException Cuando falta algun par&aacute;metro necesario.
+	 */
 	private static void createHashByGui(final HashParameters params)
 			throws IllegalArgumentException {
 
@@ -79,7 +81,9 @@ public class CreateHashCommand extends PluginCommandAction {
 
 	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
+	 * @return Si se ha indicado el fichero de salida, se devuelve la cadena texto con le mensaje del resultado;
+	 * si no, se devuelve el hash con la codificaci&oacute;n que se haya indicado.
+	 * @throws IllegalArgumentException Cuando falta algun par&aacute;metro necesario.
 	 * @throws IOException Cuando ocurre algun error en la lectura o guardado de ficheros.
 	 * @throws AOException Cuando ocurre algun error al procesar la petici&oacute;n. */
 	private static String createHashByCommandLine(final HashParameters params)

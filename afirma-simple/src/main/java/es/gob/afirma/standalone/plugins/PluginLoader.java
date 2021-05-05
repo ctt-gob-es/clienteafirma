@@ -121,8 +121,8 @@ public class PluginLoader {
 
 	/**
 	 * M&eacute;todo encargado de asociar una lista de actions a un determinado classLoader.
+	 * @param plugin Plugin.
 	 * @param info Informaci&oacute;n asociada al plugin.
-	 * @param classLoader ClassLoader usado para cargar el plugin.
 	 */
 	private static void registryPluginReferences(final AfirmaPlugin plugin, final PluginInfo info) {
 		final List<String> actions = new ArrayList<>();
@@ -135,7 +135,7 @@ public class PluginLoader {
 	}
 
 	/**
-	 * M&eaacute;todo encargado de recuperar la lista de actions del plugin dado.
+	 * M&eacute;todo encargado de recuperar la lista de actions del plugin dado.
 	 * @param info Informaci%oaacute;n del plugin.
 	 * @param actionsList Lista donde almacenar los actions encontrados.
 	 */
@@ -161,7 +161,7 @@ public class PluginLoader {
 	}
 
 	/**
-	 * M&eaacute;todo encargado de recuperar la lista de acciones de los menus de un plugin dado.
+	 * M&eacute;todo encargado de recuperar la lista de acciones de los menus de un plugin dado.
 	 * @param menu Menu a recorrer para extraer los actions.
 	 * @param actionsList lista donde almacenar los actions encontrados.
 	 */

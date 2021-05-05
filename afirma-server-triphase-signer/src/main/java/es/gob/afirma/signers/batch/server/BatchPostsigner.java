@@ -27,6 +27,7 @@ import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.SignBatch;
 import es.gob.afirma.signers.batch.SignBatchConcurrent;
 import es.gob.afirma.signers.batch.SignBatchSerial;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Realiza la tercera (y &uacute;ltima) fase de un proceso de firma por lote.
@@ -43,6 +44,11 @@ public final class BatchPostsigner extends HttpServlet {
 	private static final String BATCH_TRI_PARAM = "tridata"; //$NON-NLS-1$
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+
+	static {
+		// Indicamos si se debe instalar el proveedor de firma XML de Apache
+		XmlDSigProviderHelper.configureXmlDSigProvider();
+	}
 
 	/** Realiza la tercera y &uacute;ltima fase de un proceso de firma por lote.
 	 * Debe recibir la definici&oacute;n XML (<a href="../doc-files/batch-scheme.html">descripci&oacute;n

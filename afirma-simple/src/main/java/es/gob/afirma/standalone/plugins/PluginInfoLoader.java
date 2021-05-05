@@ -96,9 +96,9 @@ public class PluginInfoLoader {
 	}
 
 	/**
-	 * Carga y ordena los
-	 * @param mainObject
-	 * @return
+	 * Carga y ordena los permisos de un plugin.
+	 * @param mainObject JSON con la informaci&oacute;n del plugin.
+	 * @return Listado de permisos.
 	 */
 	private static Permission[] parsePermissionsObject(final JsonObject mainObject) {
 

@@ -116,6 +116,7 @@ class ProfilesIni {
 	/**
 	 * Lee el bloque de propiedades correspondiente a un perfil de Firefox.
 	 * @param in Lector de entrada del profiles.ini.
+	 * @param baseDir Directorio base del que se lee el perfil.
 	 * @return Informaci&oacute;n del perfil de Firefox.
 	 * @throws IOException Cuando se produce alg&uacute;n error en la lectura.
 	 */

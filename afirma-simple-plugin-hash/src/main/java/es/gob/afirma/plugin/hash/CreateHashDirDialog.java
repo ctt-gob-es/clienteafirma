@@ -83,8 +83,11 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 
 	private final Properties config;
 
-	/** Inicia el proceso de creaci&oacute;n de huella digital de directorios.
-	 * @param parent Componente padre para la modalidad. */
+	/**
+	 * Inicia el proceso de creaci&oacute;n de huella digital de directorios.
+	 * @param parent Componente padre para la modalidad.
+	 * @param config Configuraci&oacute;n para la creaci&oacute;n de hash.
+	 */
 	public static void startHashCreation(final Window parent, final Properties config) {
 		final JDialog dialog = new CreateHashDirDialog(parent, config);
 		dialog.setSize(600, 250);
@@ -93,9 +96,12 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 		dialog.setVisible(true);
 	}
 
-	/** Crea un di&aacute;logo para la creaci&oacute;n de huellas digitales de
+	/**
+	 * Crea un di&aacute;logo para la creaci&oacute;n de huellas digitales de
 	 * directorios.
-	 * @param parent Componente padre para la modalidad. */
+	 * @param parent Componente padre para la modalidad.
+	 * @param config Configuraci&oacute;n para la creaci&oacute;n de hash.
+	 */
 	private CreateHashDirDialog(final Window parent, final Properties config) {
 		super(parent);
 
@@ -106,9 +112,11 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 		createUI(parent);
 	}
 
-	/** Crea todos los elementos necesarios para generar una huella digital de
+	/**
+	 * Crea todos los elementos necesarios para generar una huella digital de
 	 * directorios.
-	 * @param parent Componente padre para la modalidad. */
+	 * @param parent Componente padre para la modalidad.
+	 */
 	void createUI(final Window parent) {
 
 		final Container c = getContentPane();
@@ -480,8 +488,8 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 	 * de los hashes del directorio. Se configura por defecto (el primero de la
 	 * lista) el filtro correspondiente al formato del fichero de salida
 	 * indicado.
-	 * @param defaultFormat Formato de hash
-	 * @return
+	 * @param extension Extensi&oacute;n del fichero.
+	 * @return Listado de filtros de fichero.
 	 */
 	private static List<GenericFileFilter> buildFilterList(final String extension) {
 

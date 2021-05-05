@@ -1,5 +1,6 @@
 package test.es.gob.afirma.signers.batch.server;
 
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
@@ -25,24 +26,35 @@ public final class TestBatchSignerWithCounterSign {
 
 		final PrivateKeyEntry pke;
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try(
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+			ks.load(
+				is,
+				CERT_PASS.toCharArray()
+			);
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-		final String res = BatchSigner.sign(
-			Base64.encode(
-				AOUtil.getDataFromInputStream(
-					TestBatchSignerWithCounterSign.class.getResourceAsStream(
-						"/batch-with-countersign.xml" //$NON-NLS-1$
-					)
+		final String res;
+		try (
+			final InputStream is = TestBatchSignerWithCounterSign.class.getResourceAsStream(
+				"/batch-with-countersign.xml" //$NON-NLS-1$
+			)
+		) {
+			res = BatchSigner.sign(
+				Base64.encode(
+					AOUtil.getDataFromInputStream(
+						is
+					),
+					true
 				),
-				true
-			),
-			"http://localhost:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
-			"http://localhost:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
-			pke.getCertificateChain(),
-			pke.getPrivateKey()
-		);
-
+				"http://localhost:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
+				"http://localhost:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
+				pke.getCertificateChain(),
+				pke.getPrivateKey()
+			);
+		}
 		LOGGER.info(res);
 	}
 

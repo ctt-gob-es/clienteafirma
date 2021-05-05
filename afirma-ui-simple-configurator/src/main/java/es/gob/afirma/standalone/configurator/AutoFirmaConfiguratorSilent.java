@@ -36,6 +36,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
 	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
 
+	/** Indica la ruta del certificado pasado por el administrador. */
+	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path"; //$NON-NLS-1$
+
+	/** Indica la ruta del certificado pasado por el administrador. */
+	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path"; //$NON-NLS-1$
+
 	private Configurator configurator;
 
 	private final ConfigArgs config;
@@ -71,6 +77,18 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 				}
 			}
+			else if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+				// En Windows se ejecutara en modo administrador y el directorio de usuario apuntara al del administrador,
+				// asi que componemos el directorio de usuario real
+				final String drive = System.getenv("HOMEDRIVE"); //$NON-NLS-1$
+				final String path = System.getenv("HOMEPATH"); //$NON-NLS-1$
+				if (drive != null && path != null && new File(drive + path).isDirectory()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, new File(drive + path, LogManager.SUBDIR).getAbsolutePath());
+				}
+				else {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
+				}
+			}
 			else {
 				LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
 			}
@@ -80,13 +98,17 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 	}
 
-	/** Configurador de AutoFirma. */
+	/**
+	 * Configurador de AutoFirma.
+	 * @param config Par&aacute;metros de configuraci&oacute;n para la instalaci&oacute;n de AutoFirma.
+	 */
 	public AutoFirmaConfiguratorSilent(final ConfigArgs config) {
 
 		this.config = config;
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots());
+			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots()
+								, this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(false);
@@ -206,14 +228,25 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 		private Operation op = Operation.INSTALLATION;
 		private boolean firefoxSecurityRoots = false;
+		private String certificatePath = ""; //$NON-NLS-1$
+		private String keystorePath = ""; //$NON-NLS-1$
 
 		public ConfigArgs(final String[] args) {
 			if (args != null) {
-				for (final String arg : args) {
+				for (int i = 0; i < args.length; i++) {
+					final String arg = args[i];
 					if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
 						this.op = Operation.UNINSTALLATION;
 					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
 						this.firefoxSecurityRoots = true;
+					} else if (PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg)) {
+						if (i < args.length - 1) {
+							this.certificatePath = args[++i];
+						}
+					} else if (PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg)) {
+						if (i < args.length - 1) {
+							this.keystorePath = args[++i];
+						}
 					}
 				}
 			}
@@ -226,5 +259,14 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		public boolean isFirefoxSecurityRoots() {
 			return this.firefoxSecurityRoots;
 		}
+
+		public String getKeystorePath() {
+			return this.keystorePath;
+		}
+
+		public String getCertificatePath() {
+			return this.certificatePath;
+		}
+
 	}
 }

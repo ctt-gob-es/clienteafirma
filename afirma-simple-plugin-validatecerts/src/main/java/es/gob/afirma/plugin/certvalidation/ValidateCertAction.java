@@ -34,7 +34,7 @@ public class ValidateCertAction extends SignatureProcessAction {
 	JDialog waitDialog = null;
 
 	@Override
-	public void processSignatures(OutputData[] outputs, X509Certificate signingCert, Window parent) {
+	public void processSignatures(final OutputData[] outputs, final X509Certificate signingCert, final Window parent) {
 		if (signingCert == null) {
 			JOptionPane.showMessageDialog(
 					parent,
@@ -51,7 +51,7 @@ public class ValidateCertAction extends SignatureProcessAction {
 		showWaitDialog(parent, validationWorker);
 	}
 
-	private void showWaitDialog(Window parent, SwingWorker<?, ?> worker) {
+	private void showWaitDialog(final Window parent, final SwingWorker<?, ?> worker) {
 
 		this.waitDialog.setLayout(new GridBagLayout());
 
@@ -83,7 +83,7 @@ public class ValidateCertAction extends SignatureProcessAction {
 		this.waitDialog.dispose();
 	}
 
-	private SwingWorker<ValidationResult, Void> executeCertValidation(X509Certificate cert, Window parent) {
+	private SwingWorker<ValidationResult, Void> executeCertValidation(final X509Certificate cert, final Window parent) {
 		final SwingWorker<ValidationResult, Void> validationWorker = new SwingWorker<ValidationResult, Void>(){
 			@Override
 			protected ValidationResult doInBackground() throws Exception {
@@ -135,18 +135,20 @@ public class ValidateCertAction extends SignatureProcessAction {
 			protected void done() {
 				hideWaitDialog();
 
-				ValidationResult vr;
+				final ValidationResult vr;
 				try {
 					vr = get();
-				} catch (final CancellationException e) {
-					LOGGER.log(Level.INFO, "Tarea cancelada por el usuario"); //$NON-NLS-1$
+				}
+				catch (final CancellationException e) {
+					LOGGER.log(Level.INFO, "Tarea cancelada por el usuario: " + e); //$NON-NLS-1$
 					return;
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Tarea interrumpida", e); //$NON-NLS-1$
 					return;
 				}
 
-				String validationMessage;
+				final String validationMessage;
 				int validationMessageType = JOptionPane.ERROR_MESSAGE;
 				switch(vr) {
 				case VALID:
@@ -178,11 +180,11 @@ public class ValidateCertAction extends SignatureProcessAction {
 					validationMessage = Messages.getString("ValidateCertAction.8");  //$NON-NLS-1$
 				}
 				JOptionPane.showMessageDialog(
-						parent,
-						validationMessage,
-						Messages.getString("ValidateCertAction.9"),  //$NON-NLS-1$
-						validationMessageType
-						);
+					parent,
+					validationMessage,
+					Messages.getString("ValidateCertAction.9"),  //$NON-NLS-1$
+					validationMessageType
+				);
 			}
 		};
 

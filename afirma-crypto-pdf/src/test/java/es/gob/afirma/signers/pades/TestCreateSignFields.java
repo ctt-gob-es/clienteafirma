@@ -9,10 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Properties;
 
@@ -53,11 +49,7 @@ public class TestCreateSignFields {
 
     /**
      * Carga las claves para firmar.
-     * @throws IOException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyStoreException
-     * @throws UnrecoverableEntryException
+     * @throws Exception Cuando falla la carga de la clave.
      */
     @Before
     public void loadKeyStore() throws Exception {

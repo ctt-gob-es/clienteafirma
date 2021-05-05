@@ -58,7 +58,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.plugins.PluginsManager;
@@ -195,7 +195,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
        this.mainMenu = new MainMenu(this.window, this);
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
-		Utils.installXmlDSigProvider(true);
+       XmlDSigProviderHelper.configureXmlDSigProvider();
     }
 
 	/**
@@ -667,6 +667,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         			LOGGER.warning("No ha sido posible establecer el icono del Dock de OS X: " + e); //$NON-NLS-1$
 				}
         	}
+
+        	// Aplicamos un parche para el error JDK-8255877 de Java:
+       	 	// https://bugs.openjdk.java.net/browse/JDK-8255877
+        	final String osName = System.getProperty("os.name"); //$NON-NLS-1$
+    		if (osName != null && osName.startsWith("Mac OS X")) { //$NON-NLS-1$
+    			final String pcscDir = "/System/Library/Frameworks/PCSC.framework/Versions/Current"; //$NON-NLS-1$
+    			if (new File(pcscDir).isDirectory()) {
+    				System.setProperty(
+    					"sun.security.smartcardio.library", //$NON-NLS-1$
+    					"/System/Library/Frameworks/PCSC.framework/Versions/Current/PCSC" //$NON-NLS-1$
+    				);
+    			}
+    		}
         }
 
     	// Comprobamos actualizaciones si estan habilitadas

@@ -80,6 +80,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import nu.xom.canonical.Canonicalizer;
 
 /** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
@@ -114,6 +115,12 @@ public final class AOODFSigner implements AOSigner {
     private static final String ENTRY_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
     static {
+
+        // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
+        // de los Base 64
+        XmlDSigProviderHelper.configureXmlDSigProvider();
+
+        // Listado de formatos OpenDocument soportados
         SUPPORTED_FORMATS = new HashSet<>();
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.text"); //$NON-NLS-1$
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.spreadsheet"); //$NON-NLS-1$
@@ -121,10 +128,10 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
-     * @param data Documento ODF a firmar
-     * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
-     * @param key Clave privada a usar para firmar
-     * @param certChain Cadena de certificados del firmante
+     * @param data Documento ODF a firmar.
+     * @param algorithm Algoritmo de firma.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -142,12 +149,6 @@ public final class AOODFSigner implements AOSigner {
                        final PrivateKey key,
                        final java.security.cert.Certificate[] certChain,
                        final Properties xParams) throws AOException {
-
-    	if (!AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)) {
-    		LOGGER.warning(
-				"Se ha indicado '" + algorithm + "' como algoritmo de firma, pero se usara 'SHA1withRSA' por necesidades del formato ODF" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-    	}
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -303,7 +304,7 @@ public final class AOODFSigner implements AOSigner {
                     			final InputStream zis = zf.getInputStream(zf.getEntry(fullPath))
                 			) {
 		                        reference = fac.newReference(
-	                        		fullPath.replaceAll(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
+	                        		fullPath.replace(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
 	                        		dm,
 	                        		transformList,
 	                        		null,
@@ -327,7 +328,7 @@ public final class AOODFSigner implements AOSigner {
                 				final InputStream zis = zf.getInputStream(zf.getEntry(fullPath))
                 			) {
 		                        reference = fac.newReference(
-	                        		fullPath.replaceAll(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
+	                        		fullPath.replace(" ", "%20"), //$NON-NLS-1$ //$NON-NLS-2$
 	                        		dm,
 	                        		null,
 	                        		null,

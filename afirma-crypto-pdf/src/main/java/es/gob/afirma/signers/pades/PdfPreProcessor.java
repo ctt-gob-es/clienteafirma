@@ -181,12 +181,17 @@ public final class PdfPreProcessor {
 		}
 	}
 
-	/** Sobreimpone una imagen en un documento PDF.
+	/**
+	 * Sobreimpone una imagen en un documento PDF.
 	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros
 	 *                    adicionales</a>.
 	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo.
 	 * @param pdfReader Lector PDF, para obtener el n&uacute;mero de p&aacute;ginas del documento.
-	 * @throws IOException Cuando ocurren errores de entrada / salida. */
+	 * @param secureMode Con {@code true} se habilita el modo seguro, con {@code false} se deshabilita. Al deshabilitar el
+	 * modo seguro se permite la carga de imagenes a partir de una ruta local indicada a trav&eacute;s del par&aacute;metro
+	 * {@code extraParams}.
+	 * @throws IOException Cuando ocurren errores de entrada / salida.
+	 */
 	static void addImage(final Properties extraParams, final PdfStamper stp, final PdfReader pdfReader, final boolean secureMode) throws IOException {
 
 		if (extraParams == null || stp == null) {

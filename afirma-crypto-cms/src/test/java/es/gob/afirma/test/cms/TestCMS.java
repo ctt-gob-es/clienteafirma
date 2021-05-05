@@ -232,6 +232,7 @@ public final class TestCMS {
      * @param alias Alias del certificado.
      * @param password Contrase&ntilde;a.
      * @return Clave privada del certificado.
+     * @throws Exception Cuando ocurre un error al cargar la entrada.
      */
     private static PrivateKeyEntry loadKeyEntry(final String pkcs12File, final String alias, final String password) throws Exception {
         final PrivateKeyEntry pke;
@@ -253,7 +254,16 @@ public final class TestCMS {
 		);
     }
 
-    /** Cofirma sin necesidad de los datos originales. */
+    /**
+     * Cofirma sin necesidad de los datos originales.
+     * @param signer Firmador.
+     * @param sign Firma que debe cofirmarse.
+     * @param algorithm Algoritmo de firma.
+     * @param pke Entrada de clave privada con la que firmar.
+     * @param params Par&aacute;metros extra de configuraci&oacute;n de la firma.
+     * @return Cofirma.
+     * @throws Exception Cuando falla la cofirma.
+     */
     private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
         return signer.cosign(
     		sign,
@@ -276,8 +286,16 @@ public final class TestCMS {
 		);
     }
 
-    /** Hace las comprobaciones b&aacute;sicas de una firma.
-     * @throws IOException */
+    /**
+     * Hace las comprobaciones b&aacute;sicas de una firma.
+     * @param signer Firmador.
+     * @param sign Firma que comprobar.
+     * @param pke Clave privada con la que se firm&oacute;n.
+     * @param signsAlias Nombre del firmante.
+     * @param prueba Texto identificador de la prueba.
+     * @throws AOException Cuando falla la comprobaci&oacute;n.
+     * @throws IOException Cuando falla la carga de la firma.
+     */
     private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws AOException, IOException {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));

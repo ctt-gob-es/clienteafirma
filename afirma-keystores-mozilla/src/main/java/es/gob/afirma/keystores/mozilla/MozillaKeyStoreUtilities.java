@@ -424,7 +424,7 @@ public final class MozillaKeyStoreUtilities {
 				"/lib/libmozsqlite3.so", //$NON-NLS-1$
 				"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
 			};
-			LOGGER.info("Detectada configuración de NSS mixta entre '/usr/lib' y '/lib'"); //$NON-NLS-1$
+			LOGGER.info("Detectada configuracion de NSS mixta entre '/usr/lib' y '/lib'"); //$NON-NLS-1$
 		}
 		else {
 			final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator); //$NON-NLS-1$

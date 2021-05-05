@@ -188,9 +188,10 @@ public final class StorageService extends HttpServlet {
 		out.print(SUCCESS);
 	}
 
-	/** Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
+	/**
+	 * Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
 	 * de vida configurado.
-	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
+	 */
 	private static void removeExpiredFiles() {
 		if (StorageConfig.getTempDir() != null && StorageConfig.getTempDir().isDirectory()) {
 			if (StorageConfig.DEBUG) {

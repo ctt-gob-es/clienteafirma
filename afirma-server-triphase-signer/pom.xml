@@ -11,13 +11,19 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.7</version>
+		<version>1.8-SNAPSHOT</version>
 	</parent>
 	
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-server-triphase-signer-cache</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
 
@@ -31,6 +37,12 @@
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-server-triphase-signer-document</artifactId>
 			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>2.2.1</version>
 		</dependency>
 
 		<dependency>

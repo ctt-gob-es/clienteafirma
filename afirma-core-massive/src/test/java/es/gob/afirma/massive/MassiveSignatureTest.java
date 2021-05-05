@@ -26,10 +26,10 @@ public class MassiveSignatureTest {
 	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 
 	/**
-	 * Formatos de los cuales ejecutarse el test.
+	 * Formatos a usarse en las pruebas.
 	 * Campo 1: Identificador del formato
-	 * Campo 2: Nombre para la generacion del nombre de fichero
-	 * Campo 3: Extension de firma
+	 * Campo 2: Nombre para la generaci&oacute;n del nombre de fichero
+	 * Campo 3: Extensi&oacute;n de firma
 	 * Campo 4: Soporta contrafirma
 	 */
 	private static final String[][]	FORMATS = {
@@ -128,18 +128,23 @@ public class MassiveSignatureTest {
 	}
 
 	/**
-	 * Genera todo tipo de firmas y multifirmas masivas haciendo u
+	 * Genera todo tipo de firmas y multifirmas masivas.
 	 * @throws Exception Cuando se produce cualquier error durante la ejecuci&oacute;n.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public void pruebaTodasLasCombinacionesDeFirmaProgramatica()
-			throws Exception {
+	public void pruebaTodasLasCombinacionesDeFirmaProgramatica() throws Exception {
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader
-				.getSystemResourceAsStream(MassiveSignatureTest.CERT_PATH),
-				MassiveSignatureTest.CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(MassiveSignatureTest.CERT_PATH)
+		) {
+			ks.load(
+				is,
+				MassiveSignatureTest.CERT_PASS.toCharArray()
+			);
+		}
+
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
 				MassiveSignatureTest.CERT_ALIAS,
 				new KeyStore.PasswordProtection(MassiveSignatureTest.CERT_PASS
@@ -191,7 +196,7 @@ public class MassiveSignatureTest {
 	}
 
 	/**
-	 * Configura un formato de firma al inicio y lo cambia a lo largo de la ejecucion para firmas en otros formatos.
+	 * Configura un formato de firma al inicio y lo cambia a lo largo de la ejecuci&oacute;n para firmas en otros formatos.
 	 * @throws Exception Cuando se produce cualquier error durante la ejecuci&oacute;n.
 	 */
 	@SuppressWarnings("static-method")
@@ -199,8 +204,14 @@ public class MassiveSignatureTest {
 	public void pruebaCambioDeFormatoEnCaliente() throws Exception {
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(MassiveSignatureTest.CERT_PATH),
-				MassiveSignatureTest.CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(MassiveSignatureTest.CERT_PATH)
+		) {
+			ks.load(
+				is,
+				MassiveSignatureTest.CERT_PASS.toCharArray()
+			);
+		}
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
 				MassiveSignatureTest.CERT_ALIAS,
 				new KeyStore.PasswordProtection(MassiveSignatureTest.CERT_PASS.toCharArray()));
@@ -213,7 +224,7 @@ public class MassiveSignatureTest {
 		config.setMode(AOSignConstants.SIGN_MODE_IMPLICIT);
 		config.setOriginalFormat(true);
 
-		byte[] result = null;
+		byte[] result;
 
 		final MassiveSignatureHelper massive = new MassiveSignatureHelper(config);
 		result = massive.signFile(fullpath);

@@ -662,6 +662,8 @@ public final class TestXAdES {
 	@Test
     public void testSignature() throws Exception {
 
+    	System.out.println("Prueba con JAVA: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
 //        TestSignVerifier verifier = null;
 //        try {
 //            verifier = new TestSignVerifier();
@@ -669,7 +671,6 @@ public final class TestXAdES {
 //        catch (Exception e) {
 //            System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
 //        }
-
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;

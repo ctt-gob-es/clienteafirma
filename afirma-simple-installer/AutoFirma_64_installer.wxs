@@ -13,19 +13,21 @@
 		<Package Id="*" Compressed="yes" Description="$(var.ProjectName)" InstallerVersion="200" Languages="1033" Manufacturer="$(var.ManufacturerName)" Platform="$(var.Platform)" />
        
 	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
-	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
+	    <MajorUpgrade AllowDowngrades="yes" />
 
-		<Property Id="CREATE_ICON" Value="true" Admin="yes" />
-		<Property Id="FIREFOX_SECURITY_ROOTS" Value="false" Admin="yes" />
+		<Property Id="CREATE_ICON" Value="true" Secure="yes" Admin="yes" />
+		<Property Id="FIREFOX_SECURITY_ROOTS" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="CERTIFICATE_PATH" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="KEYSTORE_PATH" Value="false" Secure="yes" Admin="yes" />
 
 		<!-- Ejecucion del instalador -->
 		<CustomAction Id='QtExecInstall'
 					  FileKey='$(var.ProjectName)Generator.exe'
-					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON]'
+					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON] /CERTIFICATE_PATH=[CERTIFICATE_PATH] /KEYSTORE_PATH=[KEYSTORE_PATH]'
                       Execute="deferred"
                       Return="check"
 					  Impersonate="no" />
-
+					  
 		<!-- Ejecucion del desinstalador -->
 		<CustomAction Id='QtExecUninstall'
 					  FileKey='no_ejecutar_$(var.Platform).exe'
@@ -70,12 +72,12 @@
         <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
 		<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
 		<InstallExecuteSequence>
-
+		
 			<!--  Ejecuta el $(var.ProjectName)Generator.exe al instalar -->
-		    <Custom Action="QtExecInstall" Before="InstallFinalize">
-				NOT Installed AND NOT REMOVE
+		    <Custom Action="QtExecInstall" Before="InstallFinalize" >
+				NOT REMOVE
 			</Custom>
-
+					
 			<!-- Ejecuta el no_ejecutar_$(var.Platform).exe al desinstalar -->
 			<Custom Action="QtExecUninstall" After='InstallFiles'>
 				(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")

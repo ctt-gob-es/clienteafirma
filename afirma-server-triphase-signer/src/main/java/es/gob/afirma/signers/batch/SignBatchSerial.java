@@ -52,7 +52,7 @@ public final class SignBatchSerial extends SignBatch {
 				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
 				continue;
 			}
-			String tmp;
+			final String tmp;
 			try {
 				tmp = ss.doPreProcess(certChain, this.algorithm);
 			}
@@ -113,11 +113,11 @@ public final class SignBatchSerial extends SignBatch {
 
 			try {
 				ss.doPostProcess(
-						certChain,
-						td,
-						this.algorithm,
-						getId()
-						);
+					certChain,
+					td,
+					this.algorithm,
+					getId()
+				);
 			}
 			catch (final Exception e) {
 
@@ -127,15 +127,15 @@ public final class SignBatchSerial extends SignBatch {
 
 				if (this.stopOnError) {
 					LOGGER.log(
-							Level.SEVERE,
-							"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
-							e
-							);
+						Level.SEVERE,
+						"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
+						e
+					);
 					ignoreRemaining = true;
 				}
 				LOGGER.severe(
-						"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
-						);
+					"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				continue;
 			}
 
@@ -161,11 +161,16 @@ public final class SignBatchSerial extends SignBatch {
 			}
 
 			try {
-				ss.save(ts.retrieve(ss, getId()));
+				ss.save(
+					ts.retrieve(
+						ss,
+						getId()
+					)
+				);
 				ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
 			}
 			catch (final IOException e) {
-				LOGGER.log(Level.WARNING, "Error en el guardado de la firma", e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error en el guardado de la firma", e); //$NON-NLS-1$
 				error = true;
 				ss.setProcessResult(
 					new ProcessResult(

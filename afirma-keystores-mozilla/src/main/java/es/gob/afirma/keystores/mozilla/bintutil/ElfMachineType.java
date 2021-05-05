@@ -7,7 +7,7 @@ public enum ElfMachineType {
 	/** No especificado. */
 	UNSPECIFIED("No especificado"), //$NON-NLS-1$
 
-	/** AT&T WE 32100. */
+	/** AT&amp;T WE 32100. */
 	BELLMAC_32("AT&T WE 32100"), //$NON-NLS-1$
 
 	/** SPARC. */

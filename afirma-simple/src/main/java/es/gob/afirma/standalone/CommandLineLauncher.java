@@ -236,7 +236,6 @@ final class CommandLineLauncher {
 
 	/**
 	 * Busca el comando entre aquellos soportados por los plugins instalados.
-	 * @param command Comando proporcionado a la aplicaci&oacute;n.
 	 * @return Informaci&oacute;n del comando soportado.
 	 * @throws PluginException Cuando falla la carga de la informaci&oacute;n del plugin.
 	 */

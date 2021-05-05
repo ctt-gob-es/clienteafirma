@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -24,6 +26,8 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +45,7 @@ final class ConfiguratorWindows implements Configurator {
 
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
-	private static final String FILE_AUTOFIRMA_ROOT_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String CA_CERT_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
@@ -53,10 +57,14 @@ final class ConfiguratorWindows implements Configurator {
 
 	private final boolean jnlpInstance;
 	private final boolean firefoxSecurityRoots;
+	private final String certificatePath;
+	private final String keyStorePath;
 
-	public ConfiguratorWindows(final boolean jnlpInstance, final boolean firefoxSecurityRoots) {
+	public ConfiguratorWindows(final boolean jnlpInstance, final boolean firefoxSecurityRoots, final String certificatePath, final String keyStorePath) {
 		this.jnlpInstance = jnlpInstance;
 		this.firefoxSecurityRoots = firefoxSecurityRoots;
+		this.certificatePath = certificatePath;
+		this.keyStorePath = keyStorePath;
 	}
 
 	@Override
@@ -68,53 +76,87 @@ final class ConfiguratorWindows implements Configurator {
 
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
-		if (!checkSSLKeyStoreGenerated(appDir, this.jnlpInstance)) {
-			window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
-			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
-				ConfiguratorUtil.CERT_ALIAS,
-				KS_PASSWORD
-			);
+			if (!checkSSLKeyStoreGenerated(appDir)) {
 
-			window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
+				// Generacion del certificado pfx
+				if (!this.keyStorePath.isEmpty() && !this.certificatePath.isEmpty()){
 
-			//Generacion del certificado pfx
-			ConfiguratorUtil.installFile(
-				certPack.getPkcs12(),
-				new File(appDir, KS_FILENAME)
-			);
+					window.print(Messages.getString("ConfiguratorWindows.25")); //$NON-NLS-1$
 
-			//Generacion del certificado raiz .cer
-			ConfiguratorUtil.installFile(
-					certPack.getCaCertificate().getEncoded(),
-					new File(appDir, FILE_AUTOFIRMA_ROOT_CERTIFICATE));
+					// Copiamos al directorio el almacen con la clave SSL
+					try {
+						copyFile(
+								new File(this.keyStorePath),
+								new File (appDir.getAbsolutePath(), KS_FILENAME));
+					}
+					catch (final Exception e) {
+						window.print(Messages.getString("ConfiguratorWindows.23") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 
-			window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
-			try {
-				ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
-			}
-			catch(final MozillaProfileNotFoundException e) {
-				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+					// Copiamos al directorio el certificado de CA
+					try {
+						final File certFile = new File(this.certificatePath);
+						copyFile(
+								certFile,
+								new File (appDir.getAbsolutePath(), CA_CERT_FILENAME));
+					}
+					catch (final Exception e) {
+						window.print(Messages.getString("ConfiguratorWindows.24") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				} else {
 
-			if (this.jnlpInstance) {
-				JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
-				window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
-				importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
-			}
+					window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
 
+					// Generamos un certificado de CA y un certificado SSL a partir de el
+					final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
+						ConfiguratorUtil.CERT_ALIAS,
+						KS_PASSWORD
+					);
 
-			if (this.firefoxSecurityRoots) {
-				window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
+					window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
+
+					// Guardamos el PKCS#12 con la clave SSL generada
+					ConfiguratorUtil.installFile(
+						certPack.getPkcs12(),
+						new File(appDir, KS_FILENAME)
+					);
+
+					// Guardamos el certificado de CA generado
+					ConfiguratorUtil.installFile(
+							certPack.getCaCertificate().getEncoded(),
+							new File(appDir, CA_CERT_FILENAME));
+
+					// En los despliegues JNLP nunca se proporcionan certificados. Ademas, en estos casos, el
+					// instalador no lo habra instalado en el almacen de Windows, asi que lo tendremos que
+					// hacer ahora
+					if (this.jnlpInstance) {
+						JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
+						window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
+						importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
+					}
+				}
+
+				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 				try {
-					ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
-				} catch (final MozillaProfileNotFoundException e) {
-					window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
+				}
+				catch(final MozillaProfileNotFoundException e) {
+					window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				if (this.firefoxSecurityRoots) {
+					window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
+					try {
+						ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
+					} catch (final MozillaProfileNotFoundException e) {
+						window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
-		}
-		else {
-			window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
-		}
+			else {
+				window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
+			}
+
 
 		// Si no se ha cargado mediante JNLP, registramos el protocolo para Google Chrome
 		if (!this.jnlpInstance) {
@@ -147,58 +189,17 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
-	 * En caso del despliegue JNLP, primero consulta en el directorio por
-	 * defecto de instalaci&oacute;n de AutoFirma en el sistema, y despu&eacute;s
-	 * el directorio indicado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
-	 * @param jnlpDeployment Indica si la funci&oacute;n se ejecuta desde un aplicativo desplegado mediante JNLP.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
-	private static boolean checkSSLKeyStoreGenerated(final File appDir,
-			                                         final boolean jnlpDeployment) {
-
-		/*
-		// En caso de tratarse de un despliegue JNLP, probamos primeramente
-		// a buscar el almacen en el directorio de instalacion por defecto
-		// de AutoFirma para evitar tener que volver a generarlo
-		if (jnlpDeployment) {
-			final File[] defaultDirs = getDefaultInstallationDirs();
-			for (final File defaultDir : defaultDirs) {
-				if (new File(defaultDir, KS_FILENAME).exists()) {
-					return true;
-				}
-			}
-		}
-		*/
+	private static boolean checkSSLKeyStoreGenerated(final File appDir) {
 		return new File(appDir, KS_FILENAME).exists();
 	}
-
-//	/**
-//	 * Devuelve el listado de directorios en el que com&uacute;nmente se instala
-//	 * AutoFirma en este sistema operativo.
-//	 * @return Listado de directorios.
-//	 */
-//	private static File[] getDefaultInstallationDirs() {
-//
-//		final List<File> dirs = new ArrayList<>();
-//		final String subPath = "AutoFirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
-//		final String basePath = System.getenv("PROGRAMFILES"); //$NON-NLS-1$
-//		if (basePath != null) {
-//			dirs.add(new File(basePath, subPath));
-//			if (basePath.endsWith(" (x86)")) { //$NON-NLS-1$
-//				dirs.add(new File(basePath.substring(0,  basePath.lastIndexOf(" (x86)")), subPath)); //$NON-NLS-1$
-//			}
-//			else {
-//				dirs.add(new File(basePath + " (x86)", subPath)); //$NON-NLS-1$
-//			}
-//		}
-//		return dirs.toArray(new File[dirs.size()]);
-//	}
 
 	@Override
 	public void uninstall(final Console console) {
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Windows"); //$NON-NLS-1$
-		uninstallRootCAWindowsKeyStore(CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
+		uninstallRootCAWindowsKeyStore();
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(
@@ -367,18 +368,62 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	/**
-	 * Desinstala un certificado del almacen de confianza de Windows sin
-	 * necesidad de tener permisos de administrador.
-	 * @param principal Principal del certificado a eliminar.
+	 * Desinstala el certificado de confianza del almac&eacute;n de confianza de Windows sin
+	 * necesidad de tener permisos de administrador. Si se encuentra el certificado en el directorio
+	 * de instalaci&oacute;n se eliminara el certificado cuyo alias sea igual al CN de ese
+	 * certificado. Si no, se eliminara el certificado con el alias por defecto.
 	 */
-	private static void uninstallRootCAWindowsKeyStore(final String principal) {
+	private static void uninstallRootCAWindowsKeyStore() {
+
+		KeyStore windowsKs;
 		try {
-			final KeyStore ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
-			ks.load(null,  null);
-			ks.deleteEntry(principal);
+			windowsKs = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
+			windowsKs.load(null,  null);
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Windows: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo acceder al almacen de confianza de Windows: " + e); //$NON-NLS-1$
+			return;
+		}
+
+		String certAlias;
+		final File caCertFile = new File(getApplicationDirectory(false), CA_CERT_FILENAME);
+		if (caCertFile.isFile() && caCertFile.canRead()) {
+			try (InputStream certInputStream = new FileInputStream(caCertFile)) {
+				final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
+				final X509Certificate caCert = (X509Certificate) certFactory.generateCertificate(certInputStream);
+				certAlias = windowsKs.getCertificateAlias(caCert);
+
+				if (certAlias != null) {
+					LOGGER.info("Se ha encontrado el certificado con el alias: " + certAlias); //$NON-NLS-1$
+				}
+				else {
+					certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;
+					LOGGER.info("No se encontro el certificado de CA del directorio de instalacion en el almacen"); //$NON-NLS-1$
+				}
+
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING,
+						"No se pudo cargar el certificado de CA para identificar cual eliminar del almacen de confianza. Se eliminara en base al alias por defecto: " //$NON-NLS-1$
+								+ CertUtil.ROOT_CERTIFICATE_PRINCIPAL, e);
+				certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;
+			}
+		}
+		else {
+			certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;
+		}
+
+		// Si el certificado esta en el almacen, se elimina
+		try {
+			if (windowsKs.containsAlias(certAlias)) {
+				windowsKs.deleteEntry(certAlias);
+			}
+			else {
+				LOGGER.info("El certificado de CA parece ya haber sido eliminado del almacen"); //$NON-NLS-1$
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de confianza de Windows: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -389,5 +434,23 @@ final class ConfiguratorWindows implements Configurator {
 	private static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
 		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Copia un fichero sobreescribiendo si es necesario.
+	 * @param sourceFile Fichero de origen.
+	 * @param targetFile Fichero destino.
+	 */
+	private static void copyFile(final File sourceFile, final File targetFile) {
+		try (InputStream in = new FileInputStream(sourceFile);
+				OutputStream out = new FileOutputStream(targetFile);) {
+			int len;
+			final byte[] buf = new byte[1024];
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+		} catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "Error al copiar el fichero", e); //$NON-NLS-1$
+		}
 	}
 }

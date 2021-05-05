@@ -178,7 +178,7 @@ final class HashParameters {
 	/**
 	 * Recupera el formato de salida de huella digital cuando la entrada es un directorio.
 	 * @return Formato del documento con las huellas digitales del directorio.
-	 * @throws CommandLineException Cuando el formato de salida indicado no era v&aacute;lido.
+	 * @throws IllegalArgumentException Cuando el formato de salida indicado no era v&aacute;lido.
 	 */
 	String getHashDirectoryFormat() throws IllegalArgumentException {
 		String formatResult;
@@ -198,7 +198,7 @@ final class HashParameters {
 	/**
 	 * Recupera el formato de salida de huella digital cuando la entrada es un fichero.
 	 * @return Formato del documento con la huella digital del fichero.
-	 * @throws CommandLineException Cuando el formato de salida indicado no era v&aacute;lido.
+	 * @throws IllegalArgumentException Cuando el formato de salida indicado no era v&aacute;lido.
 	 */
 	String getHashFileFormat() throws IllegalArgumentException {
 		String formatResult;

@@ -271,7 +271,7 @@ Section "Programa" sPrograma
 	;Anade una entrada en la lista de "Program and Features"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "AutoFirma"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "UninstallString" "$INSTDIR\uninstall.exe"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayIcon" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayIcon" "$INSTDIR\$PATH\AutoFirma.exe"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoModify" "1"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoRepair" "1"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "EstimatedSize" "100000"
@@ -351,8 +351,8 @@ Section "Programa" sPrograma
 	Call DeleteCertificateOnInstall
 
 	; Importamos el certificado en el sistema
-	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Sleep 2000
+	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Call AddCertificateToStore
 	Pop $0
 	;${If} $0 != success
@@ -386,47 +386,29 @@ Function AddCertificateToStore
   Push $1
   Push $R0
  
-
   System::Call "crypt32::CryptQueryObject(i ${CERT_QUERY_OBJECT_FILE}, w r0, \
     i ${CERT_QUERY_CONTENT_FLAG_ALL}, i ${CERT_QUERY_FORMAT_FLAG_ALL}, \
     i 0, i 0, i 0, i 0, i 0, i 0, *i .r0) i .R0"
- 
   ${If} $R0 <> 0
- 
     System::Call "crypt32::CertOpenStore(i ${CERT_STORE_PROV_SYSTEM}, i 0, i 0, \
       i ${CERT_STORE_OPEN_EXISTING_FLAG}|${CERT_SYSTEM_STORE_LOCAL_MACHINE}, \
       w 'ROOT') i .r1"
- 
     ${If} $1 <> 0
- 
       System::Call "crypt32::CertAddCertificateContextToStore(i r1, i r0, \
         i ${CERT_STORE_ADD_ALWAYS}, i 0) i .R0"
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
- 
       ${If} $R0 = 0
- 
         StrCpy $0 "Unable to add certificate to certificate store"
- 
       ${Else}
- 
         StrCpy $0 "success"
- 
       ${EndIf}
- 
       System::Call "crypt32::CertCloseStore(i r1, i 0)"
- 
     ${Else}
- 
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
- 
       StrCpy $0 "No fue posible abrir el almacén de certificados"
- 
     ${EndIf}
- 
   ${Else}
- 
     StrCpy $0 "No fue posible abrir el fichero de certificados"
- 
   ${EndIf}
  
   Pop $R0
@@ -578,6 +560,7 @@ Function DeleteCertificateOnInstall
 FunctionEnd 
 
 Function un.DeleteCertificate
+  Exch $R0
   ; Save registers
   Push $0
   Push $1
@@ -585,43 +568,79 @@ Function un.DeleteCertificate
   Push $3
   Push $4
   Push $5
+  Push $6
+  Push $7
+  Push $8
+  Push $9
+
+  ; Abrimos el certificado que queremos eliminar del almacen
+  System::Call "crypt32::CryptQueryObject(i ${CERT_QUERY_OBJECT_FILE}, w R0, \
+    i ${CERT_QUERY_CONTENT_FLAG_ALL}, i ${CERT_QUERY_FORMAT_FLAG_ALL}, \
+    i 0, i 0, i 0, i 0, i 0, i 0, *i .R0) i .r9"
+ 
+  ; Si hemos podido cargar el certificado, buscaremos su nombre y emisor.
+  ; Si no, se usara el nombre y emisor por defecto ("AutoFirma ROOT")
+  ${If} $9 <> 0
+	  ; Leemos el nombre del certificado
+	  System::Call "crypt32::CertGetNameString(i R0, \\
+		   i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, \\
+		   i 0, i 0, \\
+		   t .r7, i ${NSIS_MAX_STRLEN}) i.r6"
+
+	   ; Leemos el emisor del certificado
+	   System::Call "crypt32::CertGetNameString(i R0, \\
+		  i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, \\
+		  i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
+		  t .r8, i ${NSIS_MAX_STRLEN}) i.r6"
+  ${Else}
+    ; Usamos el nombre y emisor por defecto ("AutoFirma ROOT")
+	StrCpy $7 "AutoFirma ROOT"
+	StrCpy $8 "AutoFirma ROOT"
+  ${EndIf}
+
   ; Abre el almacen de CA del sistema
-	    System::Call "crypt32::CertOpenStore(i ${CERT_STORE_PROV_SYSTEM}, i 0, i 0, \
-      i ${CERT_STORE_OPEN_EXISTING_FLAG}|${CERT_SYSTEM_STORE_LOCAL_MACHINE}, \
-      w 'ROOT') i .r1"
+  System::Call "crypt32::CertOpenStore(i ${CERT_STORE_PROV_SYSTEM}, i 0, i 0, \
+	  i ${CERT_STORE_OPEN_EXISTING_FLAG}|${CERT_SYSTEM_STORE_LOCAL_MACHINE}, \
+	  w 'ROOT') i .r1"
   ${If} $1 != 0
-     StrCpy $2 0
-     ; Itera sobre el almacen de certificados CA
-     ${Do}
-         System::Call "crypt32::CertEnumCertificatesInStore(i r1, i r2) i.r2"
-         ${If} $2 != 0
-            ; Obtiene el nombre del certificado
-            System::Call "crypt32::CertGetNameString(i r2, \\
-               i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, i 0, i 0, \\
-               t .r4, i ${NSIS_MAX_STRLEN}) i.r3"
-            ${If} $3 != 0
-               ; Obtiene el emisor del certificado
-               System::Call "crypt32::CertGetNameString(i r2, \\
-                  i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, \\
-                  i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
-                  t .r4, i ${NSIS_MAX_STRLEN}) i.r3"
-               ${If} $3 != 0
-				  ;Si el emisor es el AutoFirma ROOT
-                  ${If} $4 == "AutoFirma ROOT"
-                    System::Call "crypt32::CertDuplicateCertificateContext(i r2) i.r5"
-				    System::Call "crypt32::CertDeleteCertificateFromStore(i r5)"
+	 StrCpy $2 0
+	 ; Itera sobre el almacen de certificados CA
+	 ${Do}
+		 System::Call "crypt32::CertEnumCertificatesInStore(i r1, i r2) i.r2"
+		 ${If} $2 != 0
+			; Obtiene el nombre del certificado
+			System::Call "crypt32::CertGetNameString(i r2, \\
+			   i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, i 0, i 0, \\
+			   t .r3, i ${NSIS_MAX_STRLEN}) i.r6"
+			${If} $6 != 0
+			   ; Obtiene el emisor del certificado
+			   System::Call "crypt32::CertGetNameString(i r2, \\
+				  i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, \\
+				  i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
+				  t .r4, i ${NSIS_MAX_STRLEN}) i.r6"
+			   ${If} $6 != 0
+				  ; Si el subject y el issuer coinciden con los del certificado que
+				  ; buscamos, se elimina
+				  ${If} $3 == $7
+				  ${AndIf} $4 == $8
+					System::Call "crypt32::CertDuplicateCertificateContext(i r2) i.r5"
+					System::Call "crypt32::CertDeleteCertificateFromStore(i r5)"
 				  ${EndIf}
-               ${EndIf}
-               
-            ${EndIf} 
-         ${Else}
-            ${ExitDo}
-         ${EndIf}
-     ${Loop}
-     System::Call "crypt32::CertCloseStore(i r1, i 0)"
+			   ${EndIf}
+			   
+			${EndIf} 
+		 ${Else}
+			${ExitDo}
+		 ${EndIf}
+	 ${Loop}
+	 System::Call "crypt32::CertCloseStore(i r1, i 0)"
   ${EndIf}
   
   ; Restore registers
+  Pop $9
+  Pop $8
+  Pop $7
+  Pop $6
   Pop $5
   Pop $4
   Pop $3
@@ -629,6 +648,7 @@ Function un.DeleteCertificate
   Pop $1
   Pop $0
 FunctionEnd 
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Configuracion de la desinstalacion ;
@@ -641,32 +661,33 @@ Section "uninstall"
 	; ==== Desinstalador EXE - INICIO ====
    
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
-	loopFirefox:
-	${nsProcess::FindProcess} "firefox.exe" $R2
-	StrCmp $R2 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
+;	loopFirefox:
+;	${nsProcess::FindProcess} "firefox.exe" $R2
+;	StrCmp $R2 0 0 +2
+;		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 
-	loopChrome:
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
+;	loopChrome:
+;	${nsProcess::FindProcess} "chrome.exe" $R3
+;	StrCmp $R3 0 0 +2
+;		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
 	
 	; ==== Desinstalador EXE - FIN ====
 	
 	; ==== Desinstalador MSI - INICIO ====
    
-	;Se fuerza el cierre de Firefox y Chrome si estan abiertos
-;	loopFirefox:
-;	${nsProcess::FindProcess} "firefox.exe" $R2
-;	StrCmp $R2 0 0 +4
-;	${nsProcess::KillProcess} "firefox.exe" $R0
-;	Goto loopFirefox
+	; Se fuerza el cierre de Firefox y Chrome si estan abiertos. Los saltos cuentan
+	; un paso mas (+4 en lugar de +3) porque si no se queda en un bucle infinito
+	loopFirefox:
+		${nsProcess::FindProcess} "firefox.exe" $R2
+		StrCmp $R2 0 0 +4
+			${nsProcess::KillProcess} "firefox.exe" $R0
+			Goto loopFirefox
 
-;	loopChrome:
-;	${nsProcess::FindProcess} "chrome.exe" $R3
-;	StrCmp $R3 0 0 +4
-;	${nsProcess::KillProcess} "chrome.exe" $R0
-;	Goto loopChrome
+	loopChrome:
+		${nsProcess::FindProcess} "chrome.exe" $R3
+		StrCmp $R3 0 0 +4
+			${nsProcess::KillProcess} "chrome.exe" $R0
+			Goto loopChrome
 	
 	; ==== Desinstalador MSI - FIN ====
 
@@ -674,9 +695,13 @@ Section "uninstall"
 	
 	Sleep 2000
 
-	;Eliminamos los certificados del sistema
+	; Eliminamos del almacen el certificado de CA que tenemos en el
+	; directorio de instalacion. Si no esta ese, se eliminara el por defecto
+	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	Call un.DeleteCertificate
-	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
+	
+	; Ejecutamos el proceso de desinstalacion del Configurador java
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" -uninstall /passive'
 
 	;Borramos el subdirectorio con todos los recursos salvo el desinstalador
 	;y bloqueamos la ejecucion hasta que este listo
@@ -919,7 +944,7 @@ Function un.UninstallFromRegistry
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	Push "$INSTDIR\AutoFirma"
+	Push "$INSTDIR\$PATH"
 	Call un.RemoveFromPath
 
 FunctionEnd

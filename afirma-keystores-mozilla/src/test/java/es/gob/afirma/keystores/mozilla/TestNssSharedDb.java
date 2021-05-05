@@ -99,7 +99,7 @@ public final class TestNssSharedDb {
 	public void testRawPkcs11txtTest2() throws Exception {
 		final byte[] pkcs11Txt;
 		try (
-			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11-test2.txt") //$NON-NLS-1$
 		) {
 			pkcs11Txt = AOUtil.getDataFromInputStream(is);
 		}
@@ -127,7 +127,7 @@ public final class TestNssSharedDb {
 	public void testRawPkcs11txtTest3() throws Exception {
 		final byte[] pkcs11Txt;
 		try (
-			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+			final InputStream is = TestNssSharedDb.class.getResourceAsStream("/pkcs11-test3.txt") //$NON-NLS-1$
 		) {
 			pkcs11Txt = AOUtil.getDataFromInputStream(is);
 		}

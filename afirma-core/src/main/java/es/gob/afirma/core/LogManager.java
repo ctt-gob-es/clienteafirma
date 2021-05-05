@@ -52,8 +52,9 @@ public final class LogManager {
 		OTHER
 	}
 
+	public static final String SUBDIR = ".afirma"; //$NON-NLS-1$
 	private static final String LOG_FILE_NAME = "%a.afirma.log.xml"; //$NON-NLS-1$
-	private static final String LOG_FILE_PATH = "%h/.afirma"; //$NON-NLS-1$
+	private static final String LOG_FILE_PATH = "%h/" + SUBDIR; //$NON-NLS-1$
 
 	private static final int LOG_MAX_SIZE = 1024 * 1024 * 2;
 

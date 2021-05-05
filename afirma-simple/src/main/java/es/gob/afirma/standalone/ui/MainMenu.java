@@ -483,6 +483,7 @@ public final class MainMenu extends JMenuBar {
 	 * fichero JSON de un plugin.
 	 * @param actionClass Clase donde se define la acci&oacute;n a realizar.
 	 * @param parent Componente padre sobre el que mostrar di&aacute;logos del plugin.
+	 * @throws PluginException Cuando no se puede cargar la acci&oacute;n.
 	 */
 	public static void doMenuAction(final String actionClass, final Frame parent)
 			throws PluginException{
