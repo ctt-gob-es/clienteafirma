@@ -245,32 +245,34 @@ public abstract class JSONSignBatch {
 
 	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) {
 		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<JSONSingleSign>();
-		final JSONArray jArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
+		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
 
-		if (jArray != null) {
-			for (int i=0;i<jArray.length();i++){
+		if (singleSignsArray != null) {
+			for (int i=0;i<singleSignsArray.length();i++){
 
-				final JSONSingleSign singleSign = new JSONSingleSign(jArray.getJSONObject(i).getString(JSON_ELEMENT_ID));
+				final JSONSingleSign singleSign = new JSONSingleSign(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_ID));
 
-				singleSign.setReference(jArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
+				singleSign.setReference(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
 
-				singleSign.setFormat(jArray.getJSONObject(i).has(JSON_ELEMENT_FORMAT)
+				singleSign.setFormat(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_FORMAT)
 						? JSONSingleSignConstants.SignFormat.getFormat(
-								jsonObject.getString(JSON_ELEMENT_FORMAT)
+								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_FORMAT)
 								)
 								: this.format);
 
-				singleSign.setSubOperation(jArray.getJSONObject(i).has(JSON_ELEMENT_SUBOPERATION)
+				singleSign.setSubOperation(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_SUBOPERATION)
 						? JSONSingleSignConstants.SignSubOperation.getSubOperation(
-								jsonObject.getString(JSON_ELEMENT_SUBOPERATION)
+								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_SUBOPERATION)
 								)
 								: this.subOperation);
 
 				singleSign.setDocumentManager(this.documentManager);
 
 				try {
-					singleSign.setExtraParams(jArray.getJSONObject(i).has(JSON_ELEMENT_EXTRAPARAMS)
-							? AOUtil.base642Properties(JSON_ELEMENT_EXTRAPARAMS) : null);
+					singleSign.setExtraParams(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_EXTRAPARAMS)
+							? AOUtil.base642Properties (
+									singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_EXTRAPARAMS)
+									) : null);
 				} catch (final Exception e) {
 					throw new JSONException(
 							"El objeto JSON no está correctamente formado"); //$NON-NLS-1$
