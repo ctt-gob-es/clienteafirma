@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -39,6 +41,7 @@ import es.gob.afirma.core.signers.TriphaseDataSigner;
 public final class BatchSigner {
 
 	private static final String BATCH_XML_PARAM = "xml"; //$NON-NLS-1$
+	private static final String BATCH_JSON_PARAM = "json"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
 	private static final String BATCH_TRI_PARAM = "tridata"; //$NON-NLS-1$
 
@@ -189,11 +192,87 @@ public final class BatchSigner {
 	 * @throws IOException Si hay problemas de red o en el tratamiento de datos.
 	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
 	 * @throws AOException Si hay errores en las firmas cliente. */
+
+	public static String sign(final String batchB64,
+			final String batchPresignerUrl,
+			final String batchPostSignerUrl,
+			final Certificate[] certificates,
+			final PrivateKey pk) throws CertificateEncodingException,
+										IOException,
+										AOException {
+
+		if (batchB64 == null || batchB64.isEmpty()) {
+			throw new IllegalArgumentException("El lote de firma no puede ser nulo ni vacio"); //$NON-NLS-1$
+		}
+		if (batchPresignerUrl == null || batchPresignerUrl.isEmpty()) {
+			throw new IllegalArgumentException(
+					"La URL de preproceso de lotes no puede se nula ni vacia" //$NON-NLS-1$
+					);
+		}
+		if (batchPostSignerUrl == null || batchPostSignerUrl.isEmpty()) {
+			throw new IllegalArgumentException(
+					"La URL de postproceso de lotes no puede ser nula ni vacia" //$NON-NLS-1$
+					);
+		}
+		if (certificates == null || certificates.length < 1) {
+			throw new IllegalArgumentException(
+					"La cadena de certificados del firmante no puede ser nula ni vacia" //$NON-NLS-1$
+					);
+		}
+
+		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+
+		byte[] ret;
+		try {
+			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
+					batchPresignerUrl + "?" + //$NON-NLS-1$
+							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
+							UrlHttpMethod.POST
+					);
+		}
+		catch (final HttpError e) {
+			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
+			throw e;
+		}
+
+		final TriphaseData td1 = TriphaseData.parser(ret);
+
+		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
+		final TriphaseData td2 = TriphaseDataSigner.doSign(
+				new AOPkcs1Signer(),
+				getAlgorithmForXML(batchB64),
+				pk,
+				certificates,
+				td1,
+				null // Sin ExtraParams para el PKCS#1 en lotes
+				);
+
+		// Llamamos al servidor de nuevo para el postproceso
+		try {
+			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
+					batchPostSignerUrl + "?" + //$NON-NLS-1$
+							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
+							BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(DEFAULT_CHARSET), true),
+							UrlHttpMethod.POST
+					);
+		}
+		catch (final HttpError e) {
+			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e.getResponseDescription()); //$NON-NLS-1$
+			throw e;
+		}
+
+		return new String(ret, DEFAULT_CHARSET);
+	}
+
+
 	public static String sign(final String batchB64,
 			                  final String batchPresignerUrl,
 			                  final String batchPostSignerUrl,
 			                  final Certificate[] certificates,
-			                  final PrivateKey pk) throws CertificateEncodingException,
+			                  final PrivateKey pk,
+			                  final boolean jsonBatch) throws CertificateEncodingException,
 			                                              IOException,
 			                                              AOException {
 		if (batchB64 == null || batchB64.isEmpty()) {
@@ -216,12 +295,20 @@ public final class BatchSigner {
 		}
 
 		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
-
+		final String algorithm;
 		byte[] ret;
+		String batchType;
+		if (jsonBatch) {
+			batchType = BATCH_JSON_PARAM;
+			algorithm = getAlgorithmForJSON(batchB64);
+		} else {
+			batchType = BATCH_XML_PARAM;
+			algorithm = getAlgorithmForXML(batchB64);
+		}
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 				batchPresignerUrl + "?" + //$NON-NLS-1$
-					BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+					batchType + EQU + batchUrlSafe + AMP +
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 				UrlHttpMethod.POST
 			);
@@ -231,12 +318,12 @@ public final class BatchSigner {
 			throw e;
 		}
 
-		final TriphaseData td1 = TriphaseData.parser(ret);
+		final TriphaseData td1 = TriphaseData.parserFromJSON(ret);
 
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
 			new AOPkcs1Signer(),
-			getAlgorithm(batchB64),
+			algorithm,
 			pk,
 			certificates,
 			td1,
@@ -247,9 +334,9 @@ public final class BatchSigner {
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 				batchPostSignerUrl + "?" + //$NON-NLS-1$
-					BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+					batchType + EQU + batchUrlSafe + AMP +
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-					BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(DEFAULT_CHARSET), true),
+					BATCH_TRI_PARAM + EQU + Base64.encode(td2.toStringJSONFormat().getBytes(DEFAULT_CHARSET), true),
 				UrlHttpMethod.POST
 			);
 		}
@@ -273,7 +360,13 @@ public final class BatchSigner {
 		return ret.substring(0, ret.length()-1);
 	}
 
-	private static String getAlgorithm(final String batch) throws IOException {
+	/**
+	 * Obtiene el algoritmo para la petici&oacute;n de formato XML
+	 * @param batch datos de la petici&oacute;n
+	 * @return algoritmo a usar
+	 * @throws IOException error en caso de que no se lea correctamente la petici&oacute;n
+	 */
+	private static String getAlgorithmForXML(final String batch) throws IOException {
 		final byte[] xml =  Base64.decode(batch.replace("-", "+").replace("_", "/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		final Document doc;
 		try (
@@ -307,6 +400,34 @@ public final class BatchSigner {
 			"El nodo 'signbatch' debe contener al manos el atributo de algoritmo" //$NON-NLS-1$
 		);
 
+	}
+
+	/**
+	 * Obtiene el algoritmo para la petici&oacute;n de formato JSON
+	 * @param batch datos de la petici&oacute;n
+	 * @return algoritmo a usar
+	 * @throws IOException error en caso de que no se lea correctamente la petici&oacute;n
+	 */
+	private static String getAlgorithmForJSON(final String batch) throws IOException  {
+
+		JSONObject jsonObject = null;
+		final String convertedJson = new String(Base64.decode(batch), DEFAULT_CHARSET);
+		try {
+			jsonObject = new JSONObject(convertedJson);
+		}catch (final JSONException jsonEx){
+			LOGGER.severe("Error al parsear JSON"); //$NON-NLS-1$
+			throw new JSONException(
+					"El JSON de definicion de lote de firmas no esta formado correctamente" //$NON-NLS-1$
+				);
+		}
+
+		if (jsonObject.has("algorithm")){ //$NON-NLS-1$
+			return jsonObject.getString("algorithm"); //$NON-NLS-1$
+		}
+
+		throw new IllegalArgumentException(
+				"El nodo 'signbatch' debe contener al manos el atributo de algoritmo" //$NON-NLS-1$
+			);
 	}
 
 }

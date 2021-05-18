@@ -191,13 +191,24 @@ final class ProtocolInvocationLauncherBatch {
 
 		String batchResult;
 		try {
-			batchResult = BatchSigner.sign(
-				Base64.encode(options.getData(), true),
-				options.getBatchPresignerUrl(),
-				options.getBatchPostSignerUrl(),
-				pke.getCertificateChain(),
-				pke.getPrivateKey()
-			);
+			if (options.isJsonBatch()) {
+				batchResult = BatchSigner.sign(
+						Base64.encode(options.getData(), true),
+						options.getBatchPresignerUrl(),
+						options.getBatchPostSignerUrl(),
+						pke.getCertificateChain(),
+						pke.getPrivateKey(),
+						options.isJsonBatch()
+						);
+			} else {
+				batchResult = BatchSigner.sign(
+						Base64.encode(options.getData(), true),
+						options.getBatchPresignerUrl(),
+						options.getBatchPostSignerUrl(),
+						pke.getCertificateChain(),
+						pke.getPrivateKey()
+						);
+			}
 		}
 		catch(final HttpError e) {
 			if (e.getResponseCode() / 100 == 4) {

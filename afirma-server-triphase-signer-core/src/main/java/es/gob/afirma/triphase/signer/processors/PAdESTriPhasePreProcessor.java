@@ -129,7 +129,19 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                      AOException,
 			                                                      IOException {
 
-		return preProcessPostSign(docBytes, algorithm, cert, extraParams, TriphaseData.parser(session));
+		return preProcessPostSign(docBytes, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
+	}
+
+	@Override
+	public byte[] preProcessJSONPostSign(final byte[] docBytes,
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final byte[] session) throws NoSuchAlgorithmException,
+			                                                      AOException,
+			                                                      IOException {
+
+		return preProcessPostSign(docBytes, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
 	}
 
 	@Override
@@ -230,6 +242,17 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                        AOException,
 			                                                        IOException {
 		return preProcessPostSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessJSONPostCoSign(final byte[] data,
+			                           final String signatureAlgorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final byte[] session) throws NoSuchAlgorithmException,
+			                                                        AOException,
+			                                                        IOException {
+		return preProcessPostSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
 	}
 
 	@Override

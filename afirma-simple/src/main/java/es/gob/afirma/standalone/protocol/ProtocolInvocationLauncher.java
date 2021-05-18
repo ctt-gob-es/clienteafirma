@@ -145,7 +145,7 @@ public final class ProtocolInvocationLauncher {
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 	    	try {
 				final Method aboutMethod = ProtocolInvocationLauncher.class.getDeclaredMethod("showAbout", //$NON-NLS-1$
-						new Class[] { EventObject.class });
+						EventObject.class);
 	    		OSXHandler.setAboutHandler(null, aboutMethod);
 			} catch (final Exception e) {
 	    		LOGGER.warning("No ha sido posible establecer el menu 'Acerca de...' de OS X: " + e); //$NON-NLS-1$
@@ -268,7 +268,7 @@ public final class ProtocolInvocationLauncher {
 				// Si se indica un identificador de fichero, es que el XML de definicion de lote
 				// se tiene que
                 // descargar desde el servidor intermedio
-                if (params.getFileId() != null) {
+                if (params.getFileId() != null && !params.isJsonBatch()) {
                     final byte[] xmlBatchDefinition;
                     try {
                         xmlBatchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);

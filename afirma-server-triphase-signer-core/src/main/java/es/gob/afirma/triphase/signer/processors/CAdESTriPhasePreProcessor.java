@@ -124,6 +124,22 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
+	public byte[] preProcessJSONPostSign(final byte[] data,
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final byte[] session) throws NoSuchAlgorithmException,
+			                                                                AOException,
+			                                                                IOException {
+
+		if (session == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
+
+		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
+	}
+
+	@Override
 	public byte[] preProcessPostSign(final byte[] data,
 			                         final String signatureAlgorithm,
 			                         final X509Certificate[] cert,
@@ -275,6 +291,20 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		return preProcessPostCoSign(sign, algorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessJSONPostCoSign(final byte[] sign,
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
+
+		if (session == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
+
+		return preProcessPostCoSign(sign, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
 	}
 
 	@Override

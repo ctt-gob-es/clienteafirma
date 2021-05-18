@@ -102,6 +102,9 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		// Version minima del Cliente que se requiere
 		var minimumClientVersion;
+		
+		// Peticion JSON
+		var jsonRequest = null;
         
         /**
          * Indica si el navegador soporta WebSockets.
@@ -397,6 +400,37 @@ var AutoScript = ( function ( window, undefined ) {
 			resetStickySignatory = false;
 		}
 		
+		var signBatch = function (concurrentTimeout, stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
+			jsonRequest.concurrentTimeout = concurrentTimeout;
+			jsonRequest.stopOnError = stopOnError;
+			clienteFirma.signBatch(JSON.stringify(jsonRequest), batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback);
+			jsonRequest = null;
+			resetStickySignatory = false;
+		}
+		
+		var createBatch = function (algorithm, format, subOperation, extraParams) { 
+			var batchConfig = new Object();
+			batchConfig.algorithm = algorithm; 
+			batchConfig.format = format;
+			batchConfig.subOperation = subOperation;
+			batchConfig.extraParams = extraParams;
+			batchConfig.singleSigns = new Array(); 
+			
+			jsonRequest = batchConfig;
+		}
+		
+		var addDocumentToBatch = function (id, datasource, format, subOperation, extraParams) {
+			
+			var singleSign = new Object();
+			singleSign.id = id;
+			singleSign.datasource = datasource;
+			singleSign.format = format;
+			singleSign.subOperation = subOperation;
+			singleSign.extraParams = extraParams;
+			
+			jsonRequest.singleSigns.push(singleSign);
+		}
+		
 		var getBase64FromText = function (plainText) {
 			return plainText != null ? Base64.encode(plainText) : null;
 		}
@@ -587,7 +621,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			// En cualquier otro caso, usaremos servidor intermedio
 			else {
-				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
+				clienteFirma = new appafirmajswebservice(clientAddress, window, undefined);
 				if (!!storageServletAddress || !!retrieverServletAddress) {
 					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
 				}
@@ -1007,6 +1041,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				data.needcert = createKeyValuePair ("needcert", true);
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
+				if (jsonRequest != null){
+					data.jsonBatch = createKeyValuePair ("jsonBatch", true);	
+				}
 				
 				return data;
 			}
@@ -1499,6 +1536,8 @@ var AutoScript = ( function ( window, undefined ) {
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
+				addDocumentToBatch : addDocumentToBatch,
+				createBatch : createBatch,
 				signBatch : signBatch,
 				selectCertificate : selectCertificate,
 				saveDataToFile : saveDataToFile,
@@ -2608,6 +2647,8 @@ var AutoScript = ( function ( window, undefined ) {
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
+				addDocumentToBatch : addDocumentToBatch,
+				createBatch : createBatch,
 				signBatch : signBatch,
 				selectCertificate : selectCertificate,
 				saveDataToFile : saveDataToFile,
@@ -3691,6 +3732,38 @@ var AutoScript = ( function ( window, undefined ) {
 				return base64UrlSave.replace(/\-/g, "+").replace(/\_/g, "/")
 			}
 			
+			/**
+			 * Rellena los singleSigns para configurar el JSON
+			 */
+			function fillSingleSigns(singleSigns) {	
+				
+				var configuration = ", \"singleSigns\" : [";
+					
+				for (var i = 0 ; i < singleSigns.length ; i++) {
+					configuration += "\"Id\" : \"" + singleSigns[i].id+ "\"";
+					configuration += ", \"datasource\" : \"" + singleSigns[i].dataSource + "\"";
+					
+					if (singleSigns[i].format) {
+						configuration += ", \"format\" : \"" + singleSigns[i].format + "\"";
+					}		
+					if (singleSigns[i].subOperation) {
+						configuration += ", \"subOperation\" : \"" + singleSigns[i].subOperation + "\"";
+					}					
+					if (singleSigns[i].extraParams) {
+						configuration += ", \"extraParams\" : \"" + singleSigns[i].extraParams + "\"";
+					}
+					if (singleSigns[i].signsaver) {
+						configuration += ", \"signsaver\" : [";
+						configuration += ", \"class\" : \"" + singleSigns[i].signsaver.class.value+ "\"";
+						configuration += ", \"config\" : \"" + singleSigns[i].signsaver.config.value + "\" ] ";
+					}
+				}
+				
+				configuration += "]";
+				
+				return configuration;
+			}
+			
 			/* Metodos que publicamos del objeto AppAfirmaJSWebService */
 			return {
 				echo : echo,
@@ -3698,6 +3771,8 @@ var AutoScript = ( function ( window, undefined ) {
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
+				addDocumentToBatch : addDocumentToBatch,
+				createBatch : createBatch,
 				signBatch : signBatch,
 				selectCertificate : selectCertificate,
 				saveDataToFile : saveDataToFile,
@@ -3756,6 +3831,8 @@ var AutoScript = ( function ( window, undefined ) {
 			cosign : cosign,
 			counterSign : counterSign,
 			countersign : counterSign,
+			addDocumentToBatch : addDocumentToBatch,
+			createBatch : createBatch,
 			signBatch : signBatch,
 			selectCertificate : selectCertificate,
 			signAndSaveToFile : signAndSaveToFile,

@@ -43,6 +43,9 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
 	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
+	private static final String PARAM_JSON_BATCH = "jsonBatch"; //$NON-NLS-1$
+
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
 
@@ -59,6 +62,17 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe devolver
 	 * el certificado utilizado para firmar o no. */
 	private boolean certNeeded;
+
+	/** Indica si la peticion de firma por lotes es con JSON o XML */
+	private boolean jsonBatch;
+
+	public boolean isJsonBatch() {
+		return this.jsonBatch;
+	}
+
+	public void setJsonBatch(final boolean jsonBatch) {
+		this.jsonBatch = jsonBatch;
+	}
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
 	 * @return URL del servicio de preprocesado de lotes de firma. */
@@ -244,6 +258,11 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 		else {
 			setCertNeeded(false);
+		}
+
+		// Valor del parametro needCert
+		if (params.containsKey(PARAM_JSON_BATCH)) {
+			setJsonBatch(Boolean.parseBoolean(params.get(PARAM_JSON_BATCH)));
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
