@@ -772,6 +772,11 @@ public final class PdfExtraParams {
 	static final String INCLUDE_QUESTION_MARK = "includeQuestionMark";//$NON-NLS-1$
 
 	/**
+	 * Indica el tama&ntilde;o que se desea reservar para la firma en el PDF.
+	 */
+	static final String SIGN_RESERVED_SIZE = "signReservedSize";//$NON-NLS-1$
+
+	/**
 	 * Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya
 	 * que es est&aacute;tico.
 	 */

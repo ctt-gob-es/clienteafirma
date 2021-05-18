@@ -542,8 +542,7 @@ public final class PdfSessionManager {
 		}
 
 		// Reservamos el espacio necesario en el PDF para insertar la firma
-		final HashMap<PdfName, Integer> exc = new HashMap<>();
-		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
+		final HashMap<PdfName, Integer> exc = reserveSignSizes(extraParams);
 
 		try {
 			sap.preClose(exc, signTime);
@@ -570,5 +569,31 @@ public final class PdfSessionManager {
     		buf.append('\n').append("Lugar de firma: ").append(PdfVisibleAreasUtils.LAYERTEXT_TAG_LOCATION); //$NON-NLS-1$
     	}
     	return buf.toString();
+    }
+
+    /**
+     * Calcula el espacio que se debe reservar espacio dentro del PDF para almacenar firmas.
+     * @param extraParams Conjunto de par&aacute;metros donde se informan el valor de las
+     * propiedades de reserva de espacio.
+     * @return Mapa con las propiedades de reserva de exclusiones de firma.
+     */
+    private static HashMap<PdfName, Integer> reserveSignSizes(final Properties extraParams) {
+
+    	int sizeParamInt = CSIZE;
+    	final String reservedSizeParam = extraParams.getProperty(PdfExtraParams.SIGN_RESERVED_SIZE);
+    	if (reservedSizeParam != null && !reservedSizeParam.isEmpty()) {
+    		try {
+    			sizeParamInt = Integer.parseInt(reservedSizeParam);
+    		} catch (final NumberFormatException e) {
+    			LOGGER.warning(
+    					"El valor de la propiedad " + PdfExtraParams.SIGN_RESERVED_SIZE //$NON-NLS-1$
+    					+ " no es valido, se le asignara el valor por defecto (" + CSIZE + "):" + e); //$NON-NLS-1$ //$NON-NLS-2$
+    		}
+    	}
+
+		final HashMap<PdfName, Integer> exc = new HashMap<>();
+		exc.put(PdfName.CONTENTS, Integer.valueOf(sizeParamInt * 2 + 2));
+
+		return exc;
     }
 }
