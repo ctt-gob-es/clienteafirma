@@ -71,6 +71,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_MINIMUM_VERSION_NON_SATISTIED = "SAF_41"; //$NON-NLS-1$
 	static final String ERROR_POSTPROCESSING_DATA = "SAF_42"; //$NON-NLS-1$
 	static final String ERROR_VISIBLE_SIGNATURE = "SAF_43"; //$NON-NLS-1$
+	static final String ERROR_SIGN_WITHOUT_DATA = "SAF_44"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
@@ -117,6 +118,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_MINIMUM_VERSION_NON_SATISTIED, ProtocolMessages.getString("ProtocolLauncher.53")); //$NON-NLS-1$
 		ERRORS.put(ERROR_POSTPROCESSING_DATA, ProtocolMessages.getString("ProtocolLauncher.54")); //$NON-NLS-1$
 		ERRORS.put(ERROR_VISIBLE_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.55")); //$NON-NLS-1$
+		ERRORS.put(ERROR_SIGN_WITHOUT_DATA, ProtocolMessages.getString("ProtocolLauncher.56")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {

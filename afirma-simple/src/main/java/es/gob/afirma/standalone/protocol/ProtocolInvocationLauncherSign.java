@@ -61,6 +61,7 @@ import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
+import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.InvalidXMLException;
@@ -556,6 +557,11 @@ final class ProtocolInvocationLauncherSign {
 		catch (final EFacturaAlreadySignedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED;
+			throw new SocketOperationException(errorCode);
+		}
+		catch (final ContainsNoDataException e) {
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGN_WITHOUT_DATA;
 			throw new SocketOperationException(errorCode);
 		}
 		catch (final AOInvalidFormatException e) {
