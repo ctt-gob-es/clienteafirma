@@ -106,21 +106,21 @@ final class JSONSingleSignPostProcessor {
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {
 			case SIGN:
-				signedDoc = prep.preProcessJSONPostSign(
+				signedDoc = prep.preProcessPostSign(
 					docBytes,
 					algorithm.toString(),
 					certChain,
 					extraParams,
-					td.toStringJSONFormat().getBytes()
+					td
 				);
 				break;
 			case COSIGN:
-				signedDoc = prep.preProcessJSONPostCoSign(
+				signedDoc = prep.preProcessPostCoSign(
 					docBytes,
 					algorithm.toString(),
 					certChain,
 					extraParams,
-					td.toStringJSONFormat().getBytes()
+					td
 				);
 				break;
 			case COUNTERSIGN:

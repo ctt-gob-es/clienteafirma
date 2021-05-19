@@ -17,17 +17,18 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
 
-final class JSONBatchServerUtil {
+public final class JSONBatchServerUtil {
 
 	private JSONBatchServerUtil() {
 		// No instanciable
 	}
 
 	static TriphaseData getTriphaseData(final byte[] triphaseDataAsUrlSafeBase64) throws IOException {
-		return TriphaseData.parserFromJSON(
+		return AOUtil.parseFromJSON(
 			Base64.decode(triphaseDataAsUrlSafeBase64, 0, triphaseDataAsUrlSafeBase64.length, true)
 		);
 	}

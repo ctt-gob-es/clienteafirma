@@ -282,18 +282,6 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessJSONPostSign(final byte[] data,
-			                         final String algorithm,
-			                         final X509Certificate[] cert,
-			                         final Properties extraParams,
-			                         final byte[] session) throws NoSuchAlgorithmException,
-			                                                      AOException,
-			                                                      IOException {
-
-		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
-	}
-
-	@Override
 	public byte[] preProcessPostSign(final byte[] data,
 			                         final String algorithm,
 			                         final X509Certificate[] cert,
@@ -324,18 +312,6 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                        IOException {
 
 		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, TriphaseData.parser(session));
-	}
-
-	@Override
-	public byte[] preProcessJSONPostCoSign(final byte[] data,
-			                           final String algorithm,
-			                           final X509Certificate[] cert,
-			                           final Properties extraParams,
-			                           final byte[] session) throws NoSuchAlgorithmException,
-			                                                        AOException,
-			                                                        IOException {
-
-		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, TriphaseData.parserFromJSON(session));
 	}
 
 	@Override

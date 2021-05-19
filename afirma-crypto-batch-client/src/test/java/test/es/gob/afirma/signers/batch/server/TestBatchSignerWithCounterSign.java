@@ -42,7 +42,7 @@ public final class TestBatchSignerWithCounterSign {
 				"/batch-with-countersign.xml" //$NON-NLS-1$
 			)
 		) {
-			res = BatchSigner.sign(
+			res = BatchSigner.signXML(
 				Base64.encode(
 					AOUtil.getDataFromInputStream(
 						is

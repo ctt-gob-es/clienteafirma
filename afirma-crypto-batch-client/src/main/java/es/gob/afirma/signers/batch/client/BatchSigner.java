@@ -28,6 +28,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -193,7 +194,7 @@ public final class BatchSigner {
 	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
 	 * @throws AOException Si hay errores en las firmas cliente. */
 
-	public static String sign(final String batchB64,
+	public static String signXML(final String batchB64,
 			final String batchPresignerUrl,
 			final String batchPostSignerUrl,
 			final Certificate[] certificates,
@@ -266,13 +267,32 @@ public final class BatchSigner {
 		return new String(ret, DEFAULT_CHARSET);
 	}
 
-
-	public static String sign(final String batchB64,
+	/**
+	 * Procesa un lote de firmas.
+	 * Los lotes deben proporcionase definidos en un fichero JSON con el esquema indicado
+	 * en el siguiente enlace: <a href="https://htmlpreview.github.io/?https://github.com/ctt-gob-es
+	 * /clienteafirma/blob/master/afirma-server-triphase-signer/src/main/java/es/gob/afirma/signers
+	 * /batchV2/doc-files/batch-scheme.html">descripci&oacute;n
+	 * del formato</a>, donde tambi&eacute;nn se adjunta un ejemplo de petici&oacute;nn.
+	 * @param batchB64 JSON de definici&oacute;n del lote de firmas.
+	 * @param batchPresignerUrl URL del servicio remoto de preproceso de lotes de firma.
+	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
+	 * @param certificates Cadena de certificados del firmante.
+	 * @param pk Clave privada para realizar las firmas cliente.
+	 * @return Registro del resultado general del proceso por lote, en un JSON con el esquema indicado
+	 * en el siguiente enlace: <a href="https://htmlpreview.github.io/?https://github.com/ctt-gob-es
+	 * /clienteafirma/blob/master/afirma-server-triphase-signer/src/main/java/es/gob/afirma/signers
+	 * /batchV2/doc-files/resultlog-scheme.html">descripci&oacute;n
+	 * de la respuesta</a>
+	 * @throws IOException Si hay problemas de red o en el tratamiento de datos.
+	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
+	 * @throws AOException Si hay errores en las firmas cliente.
+	 * */
+	public static String signJSON(final String batchB64,
 			                  final String batchPresignerUrl,
 			                  final String batchPostSignerUrl,
 			                  final Certificate[] certificates,
-			                  final PrivateKey pk,
-			                  final boolean jsonBatch) throws CertificateEncodingException,
+			                  final PrivateKey pk) throws CertificateEncodingException,
 			                                              IOException,
 			                                              AOException {
 		if (batchB64 == null || batchB64.isEmpty()) {
@@ -295,20 +315,12 @@ public final class BatchSigner {
 		}
 
 		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
-		final String algorithm;
 		byte[] ret;
-		String batchType;
-		if (jsonBatch) {
-			batchType = BATCH_JSON_PARAM;
-			algorithm = getAlgorithmForJSON(batchB64);
-		} else {
-			batchType = BATCH_XML_PARAM;
-			algorithm = getAlgorithmForXML(batchB64);
-		}
+
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 				batchPresignerUrl + "?" + //$NON-NLS-1$
-					batchType + EQU + batchUrlSafe + AMP +
+					BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 				UrlHttpMethod.POST
 			);
@@ -318,12 +330,12 @@ public final class BatchSigner {
 			throw e;
 		}
 
-		final TriphaseData td1 = TriphaseData.parserFromJSON(ret);
+		final TriphaseData td1 = AOUtil.parseFromJSON(ret);
 
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
 			new AOPkcs1Signer(),
-			algorithm,
+			getAlgorithmForJSON(batchB64),
 			pk,
 			certificates,
 			td1,
@@ -334,9 +346,10 @@ public final class BatchSigner {
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 				batchPostSignerUrl + "?" + //$NON-NLS-1$
-					batchType + EQU + batchUrlSafe + AMP +
+					BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-					BATCH_TRI_PARAM + EQU + Base64.encode(td2.toStringJSONFormat().getBytes(DEFAULT_CHARSET), true),
+					BATCH_TRI_PARAM + EQU +
+					Base64.encode(AOUtil.triphaseDataToJsonString(td2).getBytes(DEFAULT_CHARSET), true),
 				UrlHttpMethod.POST
 			);
 		}

@@ -108,8 +108,11 @@ public abstract class JSONSignBatch {
 		this.id = jsonObject.has(JSON_ELEMENT_ID) ?
 				jsonObject.getString(JSON_ELEMENT_ID) : UUID.randomUUID().toString();
 
-		this.concurrentTimeout = jsonObject.getLong(JSON_ELEMENT_CONCURRENTTIMEOUT);
-		this.stopOnError = jsonObject.getBoolean(JSON_ELEMENT_STOPONERROR);
+		this.concurrentTimeout = jsonObject.has(JSON_ELEMENT_CONCURRENTTIMEOUT) ?
+				jsonObject.getLong(JSON_ELEMENT_CONCURRENTTIMEOUT) : 30;
+
+		this.stopOnError = jsonObject.has(JSON_ELEMENT_STOPONERROR) ?
+				jsonObject.getBoolean(JSON_ELEMENT_STOPONERROR) : false;
 
 		if (jsonObject.has(JSON_ELEMENT_ALGORITHM)) {
 			this.algorithm = JSONSingleSignConstants.SignAlgorithm.getAlgorithm(

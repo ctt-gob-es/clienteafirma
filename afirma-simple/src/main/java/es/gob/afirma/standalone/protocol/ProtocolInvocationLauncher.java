@@ -265,13 +265,13 @@ public final class ProtocolInvocationLauncher {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
-				// Si se indica un identificador de fichero, es que el XML de definicion de lote
+				// Si se indica un identificador de fichero, es que el JSON o XML de definicion de lote
 				// se tiene que
                 // descargar desde el servidor intermedio
-                if (params.getFileId() != null && !params.isJsonBatch()) {
-                    final byte[] xmlBatchDefinition;
+                if (params.getFileId() != null) {
+                    final byte[] batchDefinition;
                     try {
-                        xmlBatchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+                    	batchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
 					} catch (final InvalidEncryptedDataLengthException e) {
                         LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
@@ -286,7 +286,11 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersForBatch(xmlBatchDefinition);
+                    if (params.isJsonBatch()) {
+                    	params = ProtocolInvocationUriParser.getParametersForJsonBatch(batchDefinition);
+                    } else {
+                    	params = ProtocolInvocationUriParser.getParametersForXmlBatch(batchDefinition);
+                    }
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,

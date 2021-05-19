@@ -383,7 +383,7 @@ final class CommandLineLauncher {
 			else {
 				xml = new String(inputXml).replace("+", "-").replace("/", "_"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
-			final String res = BatchSigner.sign(
+			final String res = BatchSigner.signXML(
 				xml,
 				preUrl.toString(),
 				postUrl.toString(),
@@ -889,11 +889,9 @@ final class CommandLineLauncher {
 	 * @param message Mensaje a mostrar.
 	 */
 	private static void printMessage(final PrintWriter pw, final String message) {
-		if (pw != null) {
-			if (message != null) {
-				pw.write(message);
-				pw.flush();
-			}
+		if ((pw != null) && (message != null)) {
+			pw.write(message);
+			pw.flush();
 		}
 	}
 

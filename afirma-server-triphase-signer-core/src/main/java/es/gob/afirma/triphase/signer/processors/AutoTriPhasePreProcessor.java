@@ -121,20 +121,6 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessJSONPostSign(final byte[] data,
-			                         final String signatureAlgorithm,
-			                         final X509Certificate[] cert,
-			                         final Properties extraParams,
-			                         final byte[] session) throws NoSuchAlgorithmException,
-			                                                      IOException,
-			                                                      AOException {
-		if (session == null) {
-			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
-		}
-		return preProcessPostSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
-	}
-
-	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign,
 			                                final String signatureAlgorithm,
 			                                final X509Certificate[] cert,
@@ -161,15 +147,6 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
 		return preProcessPostCoSign(data, signatureAlgorithm, cert, extraParams, TriphaseData.parser(session));
-	}
-
-	@Override
-	public byte[] preProcessJSONPostCoSign(final byte[] data, final String algorithm, final X509Certificate[] cert,
-			final Properties extraParams, final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
-		if (session == null) {
-			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
-		}
-		return preProcessPostCoSign(data, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
 	}
 
 	private static TriPhasePreProcessor getPreProcessor(final String format) {

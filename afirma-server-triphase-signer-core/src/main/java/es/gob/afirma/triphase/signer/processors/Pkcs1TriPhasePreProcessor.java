@@ -83,21 +83,6 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessJSONPostSign(final byte[] data,
-			                         final String algorithm,
-			                         final X509Certificate[] cert,
-			                         final Properties extraParams,
-			                         final byte[] session) throws NoSuchAlgorithmException,
-			                                                                AOException,
-			                                                                IOException {
-		if (session == null) {
-			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
-		}
-
-		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parserFromJSON(session));
-	}
-
-	@Override
 	public byte[] preProcessPostSign(final byte[] data,
 			                         final String algorithm,
 			                         final X509Certificate[] cert,
@@ -138,16 +123,6 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] sign,
-			                           final String algorithm,
-			                           final X509Certificate[] cert,
-			                           final Properties extraParams,
-			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
-
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
-	}
-
-	@Override
-	public byte[] preProcessJSONPostCoSign(final byte[] sign,
 			                           final String algorithm,
 			                           final X509Certificate[] cert,
 			                           final Properties extraParams,

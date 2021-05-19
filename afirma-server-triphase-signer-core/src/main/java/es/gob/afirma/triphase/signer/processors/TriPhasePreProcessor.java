@@ -47,19 +47,6 @@ public interface TriPhasePreProcessor {
 	byte[] preProcessPostSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, byte[] session)
 			throws NoSuchAlgorithmException, IOException, AOException;
 
-	/** Postfirma en formato JSON
-	 * @param data Datos a firmar.
-	 * @param algorithm Algoritmo de firma.
-	 * @param cert Cadena de certificados del firmante.
-	 * @param extraParams Par&aacute;meros adicionales de la firma.
-	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
-	 * @return Firma completa.
-	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
-	 * @throws IOException Si hay errores en el tratamiento de los datos.
-	 * @throws AOException En cualquier otro tipo de error. */
-	byte[] preProcessJSONPostSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, byte[] session)
-			throws NoSuchAlgorithmException, IOException, AOException;
-
 	/** Postfirma.
 	 * @param data Datos a firmar.
 	 * @param algorithm Algoritmo de firma.
@@ -84,18 +71,6 @@ public interface TriPhasePreProcessor {
 	 * @throws AOException En cualquier otro tipo de error. */
 	TriphaseData preProcessPreCoSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, boolean checkSignatures)
 			throws IOException, AOException;
-
-	/** Postcofirma para peticiones JSON.
-	 * @param data Datos a cofirmar.
-	 * @param algorithm Algoritmo de firma.
-	 * @param cert Cadena de certificados del firmante.
-	 * @param extraParams Par&aacute;meros adicionales de la firma.
-	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
-	 * @return Cofirma completa.
-	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
-	 * @throws IOException Si hay errores en el tratamiento de los datos.
-	 * @throws AOException En cualquier otro tipo de error. */
-	byte[] preProcessJSONPostCoSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, byte[] session) throws NoSuchAlgorithmException, AOException, IOException;
 
 	/** Postcofirma.
 	 * @param data Datos a cofirmar.

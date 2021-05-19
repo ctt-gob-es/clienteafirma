@@ -112,8 +112,17 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForBatch(final byte[] xml) throws ParameterException {
+	public static UrlParametersForBatch getParametersForXmlBatch(final byte[] xml) throws ParameterException {
 		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un JSON todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes definidos en JSON.
+	 * @param json JSON de entrada
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersForJsonBatch(final byte[] json) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseJson(json));
 	}
 
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una

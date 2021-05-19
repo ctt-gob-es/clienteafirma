@@ -23,8 +23,6 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -249,43 +247,6 @@ public final class TriphaseData {
 		return parser(doc.getDocumentElement());
 	}
 
-	public static TriphaseData parserFromJSON(final byte[] json) {
-
-		final JSONObject jsonObject = new JSONObject(new String(json));
-		JSONArray signsArray = null;
-		if (jsonObject.has("signs")) { //$NON-NLS-1$
-			signsArray = jsonObject.getJSONArray("signs"); //$NON-NLS-1$
-		}
-
-		String format = null;
-		if (jsonObject.has("format")) { //$NON-NLS-1$
-			format = jsonObject.getString("format"); //$NON-NLS-1$
-		}
-
-		final List<TriSign> triSigns = new ArrayList<>();
-
-		if (signsArray != null) {
-			for (int i = 0 ; i < signsArray.length() ; i++) {
-				final JSONObject sign = signsArray.getJSONObject(i);
-				final JSONArray signInfo = sign.getJSONArray("signinfo"); //$NON-NLS-1$
-
-				final String id = signInfo.getJSONObject(0).getString("Id"); //$NON-NLS-1$
-				final JSONArray params = signInfo.getJSONObject(0).getJSONArray("params"); //$NON-NLS-1$
-
-				triSigns.add(new TriSign(parseParamsJSON(params),id));
-			}
-		} else {
-			final JSONArray signInfoArray = jsonObject.getJSONArray("signinfo"); //$NON-NLS-1$
-			for (int i = 0 ; i < signInfoArray.length() ; i++) {
-				final String id = signInfoArray.getJSONObject(i).getString("Id"); //$NON-NLS-1$
-				final JSONArray params = signInfoArray.getJSONObject(i).getJSONArray("params"); //$NON-NLS-1$
-				triSigns.add(new TriSign(parseParamsJSON(params),id));
-			}
-
-		}
-		return new TriphaseData(triSigns,format);
-	}
-
 	/** Obtiene una sesi&oacute;n de firma trif&aacute;sica a partir del nodo
 	 * XML que lo describe.
 	 * Un ejemplo de XML podr&iacute;a ser el siguiente:
@@ -331,22 +292,6 @@ public final class TriphaseData {
 		final List<TriSign> signsNodes = parseSignsNode(rootSignsNode);
 
 		return new TriphaseData(signsNodes, format);
-	}
-
-	private static Map<String, String> parseParamsJSON(final JSONArray params){
-
-		final Map<String, String> paramsResult = new ConcurrentHashMap<>();
-
-		for (int i = 0; i < params.length() ; i++) {
-			final JSONObject param = params.getJSONObject(i);
-			final Map<String, Object> paramToMap = param.toMap();
-			for (final String key : paramToMap.keySet()) {
-			    final String value = (String) paramToMap.get(key);
-			    paramsResult.put(key, value);
-			}
-		}
-
-		return paramsResult;
 	}
 
 	/** Analiza el nodo con el listado de firmas.
@@ -464,48 +409,4 @@ public final class TriphaseData {
 		return builder.toString();
 	}
 
-	/** Genera un JSON con la descripci&oacute;n del mensaje trif&aacute;sico.
-	 * @return JSON con la descripci&oacute;n. */
-	public String toStringJSONFormat() {
-
-		final StringBuilder builder = new StringBuilder();
-		builder.append("{\n"); //$NON-NLS-1$
-		if (this.format != null) {
-			builder.append(" \"format\":\""); //$NON-NLS-1$
-			builder.append(this.format);
-			builder.append("\","); //$NON-NLS-1$
-		}
-		builder.append("\n\"signinfo\":["); //$NON-NLS-1$
-		final Iterator<TriSign> firmasIt = this.signs.iterator();
-		while (firmasIt.hasNext()) {
-			final TriSign signConfig = firmasIt.next();
-			builder.append("{\n"); //$NON-NLS-1$
-
-			if (signConfig.getId() != null) {
-				builder.append(" \"Id\":\""); //$NON-NLS-1$
-				builder.append(signConfig.getId());
-				builder.append("\""); //$NON-NLS-1$
-			}
-
-			builder.append(",\n\"params\":\n[{\n"); //$NON-NLS-1$
-			final Iterator<String> firmaIt = signConfig.getDict().keySet().iterator();
-			while (firmaIt.hasNext()) {
-				final String p = firmaIt.next();
-				builder.append("\n\"") //$NON-NLS-1$
-					.append(p)
-						.append("\":\"") //$NON-NLS-1$
-							.append(signConfig.getProperty(p))
-								.append("\"\n"); //$NON-NLS-1$
-				if(firmaIt.hasNext()) {
-					builder.append(","); //$NON-NLS-1$
-				}
-			}
-			builder.append("  }]\n"); //$NON-NLS-1$
-			if(firmasIt.hasNext()) {
-				builder.append("},\n"); //$NON-NLS-1$
-			}
-		}
-		builder.append(" }\n]\n}"); //$NON-NLS-1$
-		return builder.toString();
-	}
 }

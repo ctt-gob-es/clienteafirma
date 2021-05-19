@@ -32,7 +32,7 @@ public final class JSONSingleSign {
 
 	private static final String JSON_ATTRIBUTE_ID = "Id"; //$NON-NLS-1$
 
-	private static final String JSON_ELEMENT_DATASOURCE = "datasource"; //$NON-NLS-1$
+	private static final String JSON_ELEMENT_DATAREFERENCE = "datareference"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_FORMAT = "format"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_SUBOPERATION = "suboperation"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
@@ -167,7 +167,7 @@ public final class JSONSingleSign {
 		sb.append(":\""); //$NON-NLS-1$
 		sb.append(getId());
 		sb.append("\" , \n\""); //$NON-NLS-1$
-		sb.append(JSON_ELEMENT_DATASOURCE);
+		sb.append(JSON_ELEMENT_DATAREFERENCE);
 		sb.append("\":\""); //$NON-NLS-1$
 		sb.append(this.reference);
 		sb.append("\",\n"); //$NON-NLS-1$
@@ -227,17 +227,30 @@ public final class JSONSingleSign {
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param td Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
 	 *           Debe serializarse como un XML con esta forma (ejemplo):
-	 *           <pre>
-	 *            &lt;xml&gt;
-	 *             &lt;firmas&gt;
-	 *              &lt;firma Id="53820fb4-336a-47ee-b7ba-f32f58e5cfd6"&gt;
-	 *               &lt;param n="PRE"&gt;MYICXDAYBgk[...]GvykA=&lt;/param&gt;
-	 *               &lt;param n="PK1"&gt;dC2dIILB9HV[...]xT1bY=&lt;/param&gt;
-	 *               &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
-	 *              &lt;/firma&gt;
-	 *             &lt;/firmas&gt;
-	 *            &lt;/xml&gt;
-	 *           </pre>
+	 *<pre>
+	 * {
+	 * "format":"PAdES",
+	 * "signs":
+	 * [{
+	 *	"signinfo":[{
+ 	 *		"Id":"7725374e-728d-4a33-9db9-3a4efea4cead",
+	 *		"params":
+	 *			[{
+	 *			"PRE":"PGGYzMC1iOTub3JnL1RSLzIwMDEvUkVDLXh",
+	 *			"ENCODING":"UTF-8",
+	 *			"NEED_PRE":"true",
+	 *			"BASE":"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGl"}]}]},
+	 *{
+	 *	"signinfo":[{
+ 	 *		"Id":"93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a",
+	 *		"params":
+	 *			[{
+	 *			"PRE":"MYIBAzAYBgkqhkiG9w0BCQMxCwYJKoZIhv",
+	 *			"NEED_PRE":"true",
+	 *			"TIME":"1621423575727",
+	 *			"PID":"Wzw5MjBjODdmYmE4ZTEyZTM0YjU2OWUzOW"}]}]}]
+	 * }
+	 * </pre>
 	 * @param algorithm Algoritmo de firma.
 	 * @param batchId Identificador del lote de firma.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.

@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -128,6 +130,48 @@ public final class ProtocolInvocationUriParserUtil {
 			catch (final UnsupportedEncodingException e) {
 				Logger.getLogger("es.gob.afirma").warning("Codificacion no soportada para la URL (" + DEFAULT_URL_ENCODING + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				params.put(keyNode.getNodeValue(), valueNode.getNodeValue());
+			}
+		}
+		return params;
+	}
+
+	/** Analiza un JSON de entrada para obtener la lista de par&aacute;metros asociados
+	 * @param json JSON con el listado de par&aacute;metros.
+	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor
+	 * @throws ParameterException Cuando el JSON de entrada no es v&acute;lido. */
+	public static Map<String, String> parseJson(final byte[] json) throws ParameterException {
+
+		final Map<String, String> params = new HashMap<>();
+		final JSONArray elems;
+
+		try {
+			final JSONObject jsonDoc = new JSONObject(new String(json));
+
+			// Si el elemento principal es OPERATION_PARAM entendemos que es una firma
+			params.put(
+					ProtocolConstants.OPERATION_PARAM,
+					jsonDoc.has(ProtocolConstants.OPERATION_PARAM)
+						? DEFAULT_OPERATION : jsonDoc.getString(jsonDoc.keys().next()));
+
+			elems = jsonDoc.getJSONArray("params"); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new ParameterException("Error grave durante el analisis del JSON: " + e, e); //$NON-NLS-1$
+		}
+
+		for (int i = 0; i < elems.length(); i++) {
+			final JSONObject element = elems.getJSONObject(i);
+			if (!element.has("k") || !element.has("v")) { //$NON-NLS-1$ //$NON-NLS-2$
+				throw new ParameterException("El JSON no tiene la forma esperada"); //$NON-NLS-1$
+			}
+			final String key = element.getString("k"); //$NON-NLS-1$
+			final String value = element.getString("v"); //$NON-NLS-1$
+			try {
+				params.put(key, URLDecoder.decode(value, DEFAULT_URL_ENCODING));
+			}
+			catch (final UnsupportedEncodingException e) {
+				Logger.getLogger("es.gob.afirma").warning("Codificacion no soportada para la URL (" + DEFAULT_URL_ENCODING + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				params.put(key, value);
 			}
 		}
 		return params;

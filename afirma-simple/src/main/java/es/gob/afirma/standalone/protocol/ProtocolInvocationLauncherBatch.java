@@ -192,16 +192,15 @@ final class ProtocolInvocationLauncherBatch {
 		String batchResult;
 		try {
 			if (options.isJsonBatch()) {
-				batchResult = BatchSigner.sign(
+				batchResult = BatchSigner.signJSON(
 						Base64.encode(options.getData(), true),
 						options.getBatchPresignerUrl(),
 						options.getBatchPostSignerUrl(),
 						pke.getCertificateChain(),
-						pke.getPrivateKey(),
-						options.isJsonBatch()
+						pke.getPrivateKey()
 						);
 			} else {
-				batchResult = BatchSigner.sign(
+				batchResult = BatchSigner.signXML(
 						Base64.encode(options.getData(), true),
 						options.getBatchPresignerUrl(),
 						options.getBatchPostSignerUrl(),

@@ -49,7 +49,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 
 	/**
 	 * Realiza la primera fase de un proceso de firma por lote.
-	 * Debe recibir la definici&oacute;n del lote en un XML (<a href="../doc-files/batch-scheme.html">descripci&oacute;n
+	 * Debe recibir la definici&oacute;n del lote en un JSON (<a href="../doc-files/batch-scheme.html">descripci&oacute;n
 	 * del formato</a>) convertido completamente
 	 * en Base64 y la cadena de certificados del firmante, convertidos a Base64 (puede ser
 	 * <i>URL Safe</i>) y separados por punto y coma (<code>;</code>).
