@@ -8,7 +8,7 @@ public abstract class DocumentManagerBase implements DocumentManager{
 	/** Deshace un guardado previo (para los modos transaccionales).
 	 * @param sign Identificador de la firma a deshacer. */
 	public void rollback() {
-		//NADA
+		//Implementar en clase que herede si es necesario
 	}
 
 	/** Configura c&oacute;mo ha de guardarse la firma electr&oacute;nica.
@@ -16,7 +16,7 @@ public abstract class DocumentManagerBase implements DocumentManager{
 	 * objeto de propiedades.
 	 * @param config Propiedades de configuraci&oacute;n. */
 	public void init(final Properties config) {
-
+		//Implementar en clase que herede si es necesario
 	}
 
 }
