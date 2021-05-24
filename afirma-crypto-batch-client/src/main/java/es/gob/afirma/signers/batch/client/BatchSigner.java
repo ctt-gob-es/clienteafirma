@@ -28,7 +28,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -330,7 +329,7 @@ public final class BatchSigner {
 			throw e;
 		}
 
-		final TriphaseData td1 = AOUtil.parseFromJSON(ret);
+		final TriphaseData td1 = TriphaseDataParser.parseFromJSON(ret);
 
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
@@ -349,7 +348,7 @@ public final class BatchSigner {
 					BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
 					BATCH_TRI_PARAM + EQU +
-					Base64.encode(AOUtil.triphaseDataToJsonString(td2).getBytes(DEFAULT_CHARSET), true),
+					Base64.encode(TriphaseDataParser.triphaseDataToJsonString(td2).getBytes(DEFAULT_CHARSET), true),
 				UrlHttpMethod.POST
 			);
 		}

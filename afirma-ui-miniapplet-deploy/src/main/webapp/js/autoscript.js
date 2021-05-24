@@ -407,6 +407,7 @@ var AutoScript = ( function ( window, undefined ) {
 			batchConfig.format = format;
 			batchConfig.suboperation = suboperation;
 			batchConfig.extraparams = extraparams;
+
 			batchConfig.singlesigns = new Array(); 
 			
 			jsonRequest = batchConfig;
@@ -415,7 +416,9 @@ var AutoScript = ( function ( window, undefined ) {
 		var addDocumentToBatch = function (id, datareference, format, suboperation, extraparams) {
 			
 			var singleSign = new Object();
-			singleSign.id = id;
+			if (id != null) { 
+				singleSign.id = id; 
+			}
 			singleSign.datareference = datareference;
 			if (format != null) { 
 				singleSign.format = format; 
@@ -431,11 +434,11 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var signBatchProcess = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback, concurrentTimeout) {
 			jsonRequest.stoponerror = stopOnError;
-			if (concurrentTimeout != null) {
+			if (concurrentTimeout != null && concurrentTimeout != "" ) {
 				jsonRequest.concurrenttimeout = concurrentTimeout;
 			}
 			var jsonToBase64 = Base64.encode(JSON.stringify(jsonRequest));
-			clienteFirma.signBatch(jsonToBase64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback);
+			clienteFirma.signBatchProcess(jsonToBase64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback);
 			jsonRequest = null;
 			resetStickySignatory = false;
 		}
@@ -906,25 +909,19 @@ var AutoScript = ( function ( window, undefined ) {
 				setCallbacks(successCallbackFunction, errorCallbackFunction);
 				currentOperation = OPERATION_BATCH;
 				var requestData = createBatchRequest(batchPreSignerUrl, batchPostSignerUrl,
-						extraParams, normalizeBase64Data(batchB64));
+						extraParams, normalizeBase64Data(batchB64), false);
 				execAppIntent(buildUrl(requestData));
 			};
 			
 			/**
 			 * Inicia el proceso de firma por lotes con JSON
 			 */
-			var signBatchProcess = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallbackFunction, errorCallbackFunction, concurrentTimeout) {
-				jsonRequest.stoponerror = stopOnError;
-				if (concurrentTimeout != null) {
-					jsonRequest.concurrenttimeout = concurrentTimeout;
-				}
-				var jsonToBase64 = Base64.encode(JSON.stringify(jsonRequest));
+			var signBatchProcess = function (jsonRequest, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallbackFunction, errorCallbackFunction) {
 				setCallbacks(successCallbackFunction, errorCallbackFunction);
 				currentOperation = OPERATION_BATCH;
 				var requestData = createBatchRequest(batchPreSignerUrl, batchPostSignerUrl,
-						extraParams, normalizeBase64Data(jsonToBase64));
+						extraParams, normalizeBase64Data(jsonRequest), true);
 				execAppIntent(buildUrl(requestData));
-				jsonRequest = null;
 			};
 
 			/**
@@ -1054,7 +1051,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
-			function createBatchRequest(batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64) {
+			function createBatchRequest(batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64, isJson) {
 				var data = new Object();
 				data.op = createKeyValuePair("op","batch");
 				data.batchpresignerurl = createKeyValuePair("batchpresignerurl", batchPreSignerUrl);
@@ -1067,7 +1064,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				data.needcert = createKeyValuePair ("needcert", true);
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
-				if (jsonRequest != null){
+				if (isJson){
 					data.jsonBatch = createKeyValuePair ("jsonBatch", true);	
 				}
 				
@@ -1771,23 +1768,18 @@ var AutoScript = ( function ( window, undefined ) {
 			function signBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
 				errorCallback = errorCallbackFunction;
-				signBatchByService(batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams);
+				signBatchByService(batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, false);
 			}
 			
 			/**
 			 * Inicia el proceso de firma por lotes con JSON.
 			 */	
-			function signBatchProcess (stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, concurrentTimeout) {
-				jsonRequest.stoponerror = stopOnError;
-				if (concurrentTimeout != null) {
-					jsonRequest.concurrenttimeout = concurrentTimeout;
-				}
+			function signBatchProcess (jsonRequest, batchPreSignerUrl, batchPostSignerUrl, params) {
 				var jsonToBase64 = Base64.encode(JSON.stringify(jsonRequest));
-				signBatchByService(jsonToBase64, batchPreSignerUrl, batchPostSignerUrl, params);
-				jsonRequest = null;
+				signBatchByService(jsonToBase64, batchPreSignerUrl, batchPostSignerUrl, params, true);
 			}
 			
-			function signBatchByService (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams) {
+			function signBatchByService (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, isJson) {
 				
 				if (batchB64 == undefined || batchB64 == "") {
 					batchB64 = null;
@@ -1797,14 +1789,14 @@ var AutoScript = ( function ( window, undefined ) {
 					batchB64 = batchB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
 				
-				var data = generateDataToBatch(defaultKeyStore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64);
+				var data = generateDataToBatch(defaultKeyStore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64, isJson);
 				execAppIntent(buildUrl(data));
 			}
 			
 			/**
 			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
-			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64) {
+			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64, isJson) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op","batch");
 				data.keystore = generateDataKeyValue("keystore", keystore != null ? keystore : null);
@@ -1819,7 +1811,7 @@ var AutoScript = ( function ( window, undefined ) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
 				
-				if (jsonRequest != null){
+				if (isJson){
 					data.jsonBatch = createKeyValuePair ("jsonBatch", true);	
 				}
 
@@ -3020,7 +3012,7 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
 				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
 
 				var url = buildUrl(opId, params);
@@ -3043,25 +3035,17 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Ejecuta una operacion de firma de lote JSON.
 			 */
-			function signBatchProcess (stopOnError, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallback, errorCallback, concurrentTimeout) {
+			function signBatchProcess (jsonRequest, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallback, errorCallback) {
 				
 				currentOperation = OPERATION_BATCH;
 				
-				jsonRequest.stoponerror = stopOnError;
-				if (concurrentTimeout != null) {
-					jsonRequest.concurrenttimeout = concurrentTimeout;
-				}
-				
-				var jsonToBase64 = Base64.encode(JSON.stringify(jsonRequest));
-				
-				if (jsonToBase64 == undefined || jsonToBase64 == "") {
-					jsonToBase64 = null;
+				if (jsonRequest == undefined || jsonRequest == "") {
+					throwException("java.lang.IllegalArgumentException", "No se ha indicado una peticion JSON");
+					return;
 				}
 
-				if (jsonToBase64 != null && !isValidUrl(jsonToBase64)) {
-					jsonToBase64 = jsonToBase64.replace(/\+/g, "-").replace(/\//g, "_");
-					jsonToBase64 = jsonToBase64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
-				}
+				jsonRequest = jsonRequest.replace(/\+/g, "-").replace(/\//g, "_");
+				jsonRequest = jsonRequest.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 
 				// Si hay un certificado prefijado, lo agregamos a los parametros extra
 				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
@@ -3090,9 +3074,10 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } // Espera activa
-				if (jsonRequest != null) {								params[i++] = {key:"jsonBatch", value:true}; 
-																		params[i++] = {key:"dat", value:jsonToBase64}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
+				
+				params[i++] = {key:"jsonBatch", value:"true"}; 
+				params[i++] = {key:"dat", value:jsonRequest}; 
 
 				var url = buildUrl(opId, params);
 
@@ -3109,8 +3094,6 @@ var AutoScript = ( function ( window, undefined ) {
 				else {
 					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
 				}
-				
-				jsonRequest = null;
 			}
 			
 			/**

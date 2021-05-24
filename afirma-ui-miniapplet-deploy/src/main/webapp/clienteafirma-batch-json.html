@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html>
+<!-- Ejemplo basico de lanzador de la aplicacion -->
+<head>
+<title>Ejemplo de firma por lotes con JSON del MiniApplet @firma</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<script type="text/javascript" src="js/autoscript.js"></script>
+<script type="text/javascript" src="js/constantes.js"></script>
+<script type="text/javascript">
+
+		var singleSigns = new Array();
+	
+		function showResultCallback(signatureB64, certificateB64) {
+			showLog("Firma OK");
+			document.getElementById('result').value = signatureB64;
+		}
+
+		function showLogCallback(errorType, errorMessage) {
+			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+		}
+
+		function doSignBatch() {
+			try {
+				
+				createBatchConfiguration();
+				
+				for (var i = 0 ; i< singleSigns.length ; i++){
+					var id = singleSigns[i].id;
+					var dataReference = singleSigns[i].datareference;
+					var format = singleSigns[i].format;
+					var suboperation = singleSigns[i].suboperation;
+					var extraparams = singleSigns[i].extraparams;
+					
+					AutoScript.addDocumentToBatch(id, dataReference, format, suboperation, extraparams);
+				}
+				
+				AutoScript.signBatchProcess(
+				document.getElementById("stopOnError").checked, 
+				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPresigner", 
+				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPostsigner", 
+				document.getElementById("filters").value, 
+				showResultCallback, 
+				showLogCallback, 
+				document.getElementById("concurrentTimeOut").value);
+
+			} catch(e) {
+				try {
+					showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
+				} catch(ex) {
+					showLog("Error: " + e);
+				}
+			}
+		}
+
+		function addSingleSign() {
+			singleSigns[singleSigns.length] = buildSingleSign(generateUUID());
+			document.getElementById("signButton").disabled = "";
+		}
+		
+		function generateUUID(){
+		    var d = new Date().getTime();
+		    if(window.performance && typeof window.performance.now === "function"){
+		        d += performance.now();; //use high-precision timer if available
+		    }
+		    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = (d + Math.random()*16)%16 | 0;
+		        d = Math.floor(d/16);
+		        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+		    });
+		    return uuid;
+		}
+		
+		function buildSingleSign(id) {
+			
+			var datareference = document.getElementById("datareferenceValue").value;
+			if (document.getElementById("datareference").value == "text") {
+				datareference = AutoScript.getBase64FromText(datasource);
+			}
+			
+			var format = document.getElementById("format").value;
+			var suboperation = document.getElementById("suboperation").value;
+			var extraParams = AutoScript.getBase64FromText(document.getElementById("params").value);
+			
+			var singleSign = new Object();
+			
+			singleSign.id = id;
+			singleSign.datareference = datareference;
+			if (format != "confGeneralFormat"){
+				singleSign.format = format;
+			}
+			if (suboperation != "confGeneralSuboperation"){
+				singleSign.suboperation = suboperation;
+			}
+			singleSign.extraParams = extraParams;
+			
+			return singleSign;
+		}
+		
+		function createBatchConfiguration() {
+			
+			var algorithm = document.getElementById("algorithm").value;
+			var format = document.getElementById("generalFormat").value;
+			var subOperation = document.getElementById("generalSuboperation").value;
+			var extraParams = document.getElementById("filters").value
+			
+			AutoScript.createBatch(generateUUID(), algorithm, format, subOperation, extraParams);
+		}
+
+		function showAppletLog() {
+			try {
+				showLog(AutoScript.getCurrentLog());
+			} catch(e) {
+				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
+			}
+		}
+
+		function cleanDataField(dataField, textDiv) {
+			textDiv.innerHTML = "";
+			dataField.value = null;
+		}
+		
+		function addExtraParam(newParamId, listParamsId) {
+			var paramsList = document.getElementById(listParamsId);
+			paramsList.value = paramsList.value + document.getElementById(newParamId).value + "\n";
+			document.getElementById(newParamId).value = "";
+		}
+		
+		function cleanExtraParams(newParamId, listParamsId) {
+			document.getElementById(listParamsId).value = "";
+			document.getElementById(newParamId).value = "";
+		}
+		
+		function showLog(newLog) {
+			document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+		}
+
+	</script>
+</head>
+<body>
+	<script type="text/javascript">
+			AutoScript.cargarAppAfirma();
+			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+		</script>
+
+	<fieldset>
+		<legend>Configuraci&oacute;n general</legend>
+
+		<div>
+			<label for="generalSuboperation">Operaci&oacute;n</label> 
+			<select id="generalSuboperation">
+				<option value="sign">Firma</option>
+				<option value="cosign">Cofirma</option>
+				<option value="countersign">Contrafirma</option>
+			</select>
+		</div>
+		<div>
+			<label for="generalFormat">Formato</label> 
+			<select id="generalFormat">
+				<option value="CAdES">CAdES</option>
+				<option value="PAdES">PAdES</option>
+				<option value="XAdES">XAdES</option>
+				<option value="FacturaE">FacturaE</option>
+			</select>
+		</div>
+		
+		<div>
+			<label for="algorithm">Algoritmo</label> <select id="algorithm">
+				<option value="SHA256withRSA">SHA1 con RSA</option>
+				<option value="SHA512withRSA">SHA512 con RSA</option>
+			</select>
+		</div>
+
+		<div>
+			<input type="checkbox" id="stopOnError" />Parar en caso de error
+		</div>
+		<div>
+			<label for="concurrentTimeOut">Tiempo m&aacute;ximo por fase
+				en los procesos concurrentes:</label>&nbsp;<input type="text"
+				id="concurrentTimeOut" /> Segundos
+		</div>
+
+		<div>
+			<label for="filter">Filtros</label> <input id="filter" type="text"><input
+				type="button" value="Agregar"
+				onclick="addExtraParam('filter', 'filters');">&nbsp; <input
+				type="button" value="Limpiar"
+				onclick="cleanExtraParams('filter', 'filters');">&nbsp; <span>(Insertar
+				las propiedades de una en una)</span> <br>
+			<textarea id="filters" cols="50" rows="5" readonly></textarea>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>Configuraci&oacute;n de firmas particulares</legend>
+		<fieldset>
+			<legend>Fuente de datos</legend>
+			<select id="datareference">
+				<option value="text" selected>Texto plano</option>
+				<option value="base64">Base64</option>
+				<option value="url">URL</option>
+			</select> <br> <input type="text" name="datareferenceValue"
+				id="datareferenceValue" style="width: 600px;" />
+		</fieldset>
+		<div>
+			<label for="format">Formato</label> <select id="format">
+				<option value="CAdES" selected>CAdES</option>
+				<option value="PAdES">PAdES</option>
+				<option value="XAdES">XAdES</option>
+				<option value="FacturaE">FacturaE</option>
+				<option value="confGeneralFormat">Formato Conf. General</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="suboperation">Operaci&oacute;n</label> <select
+				id="suboperation">
+				<option value="sign">Firma</option>
+				<option value="cosign">Cofirma</option>
+				<option value="countersign">Contrafirma</option>
+				<option value="confGeneralSuboperation">Operaci&oacute;n Conf. General</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="newParam">ExtraParams</label> <input id="newParam"
+				type="text"><input type="button" value="Agregar"
+				onclick="addExtraParam('newParam', 'params');">&nbsp; <input
+				type="button" value="Limpiar"
+				onclick="cleanExtraParams('newParam', 'params');">&nbsp; <span>(Insertar
+				las propiedades de una en una)</span> <br>
+			<textarea id="params" cols="50" rows="5" readonly></textarea>
+		</div>
+		<div style="font-weight: bold;">NOTA: Los aqu&iacute;
+			presentados son manejadores de pruebas y no deben usarse tal cual en
+			los entornos de producción</div>
+		<input type="button" value="Agregar firma" onclick="addSingleSign();">
+	</fieldset>
+
+	<br />
+
+	<input type="button" id="signButton" value="Firmar"
+		onclick="doSignBatch();" disabled="disabled">&nbsp;
+	<br />
+	<br />
+
+	<div>
+		<span>Consola</span> <br>
+		<textarea id="console" cols="150" rows="10">
+		 </textarea>
+	</div>
+
+	<div>
+		<span>Resultado</span> <br>
+		<textarea id="result" cols="150" rows="10">
+		 </textarea>
+	</div>
+</body>
+</html>

@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
@@ -48,7 +47,7 @@ final class JSONSingleSignPreProcessor {
 			                   final DocumentManager docManager) throws IOException,
 			                                                                             AOException {
 		final TriphaseData td = getPreSign(sSign, certChain, algorithm, docManager);
-		return AOUtil.triphaseDataToJsonString(td);
+		return TriphaseDataParser.triphaseDataToJsonString(td);
 	}
 
 	private static TriphaseData getPreSign(final JSONSingleSign sSign,

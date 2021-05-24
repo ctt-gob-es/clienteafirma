@@ -41,6 +41,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
+import es.gob.afirma.signers.batch.client.TriphaseDataParser;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
@@ -287,7 +288,7 @@ public final class ProtocolInvocationLauncher {
                     }
 
                     if (params.isJsonBatch()) {
-                    	params = ProtocolInvocationUriParser.getParametersForJsonBatch(batchDefinition);
+                    	params = TriphaseDataParser.getParametersForJsonBatch(batchDefinition);
                     } else {
                     	params = ProtocolInvocationUriParser.getParametersForXmlBatch(batchDefinition);
                     }

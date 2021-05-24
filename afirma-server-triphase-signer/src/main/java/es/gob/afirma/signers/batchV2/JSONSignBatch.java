@@ -38,6 +38,8 @@ public abstract class JSONSignBatch {
 	private static final String JSON_ELEMENT_STOPONERROR = "stoponerror"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
+	private static final long DEFAULT_CONCURRENTTIMEOUT = 30;
+
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Lista de firmas a procesar. */
@@ -109,7 +111,7 @@ public abstract class JSONSignBatch {
 				jsonObject.getString(JSON_ELEMENT_ID) : UUID.randomUUID().toString();
 
 		this.concurrentTimeout = jsonObject.has(JSON_ELEMENT_CONCURRENTTIMEOUT) ?
-				jsonObject.getLong(JSON_ELEMENT_CONCURRENTTIMEOUT) : 30;
+				jsonObject.getLong(JSON_ELEMENT_CONCURRENTTIMEOUT) : DEFAULT_CONCURRENTTIMEOUT;
 
 		this.stopOnError = jsonObject.has(JSON_ELEMENT_STOPONERROR) ?
 				jsonObject.getBoolean(JSON_ELEMENT_STOPONERROR) : false;

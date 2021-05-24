@@ -1,5 +1,6 @@
 package es.gob.afirma.test.simple;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
@@ -42,7 +43,7 @@ public class TestProtocolInvocationJSON {
 	/** Prueba de firma por lotes. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore // Necesita UI
+	@Ignore // Necesita UI
 	public void testWithoutData() {
 		SimpleAfirma.main(new String[] { LINE });
 	}
