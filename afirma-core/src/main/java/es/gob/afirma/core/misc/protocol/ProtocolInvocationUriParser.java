@@ -107,13 +107,13 @@ public final class ProtocolInvocationUriParser {
 		return ProtocolInvocationUriParserUtil.getParametersForBatch(parserUri(uri));
 	}
 
-	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma por lotes definidos en XML.
-	 * @param xml XML de entrada
+	/** Comprueba que est&eacute;n disponibles  todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes.
+	 * @param paramsMap mapa con par&aacute;metros de entrada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForXmlBatch(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
+	public static UrlParametersForBatch getParametersForBatch(final Map<String, String> paramsMap) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersForBatch(paramsMap);
 	}
 
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una

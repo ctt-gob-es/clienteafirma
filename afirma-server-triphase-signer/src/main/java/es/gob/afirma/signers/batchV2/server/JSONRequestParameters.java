@@ -6,7 +6,7 @@
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
-package es.gob.afirma.signers.batchV2.serverV2;
+package es.gob.afirma.signers.batchV2.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;

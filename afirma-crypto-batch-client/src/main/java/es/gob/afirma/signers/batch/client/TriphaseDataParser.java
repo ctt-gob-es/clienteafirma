@@ -18,9 +18,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import es.gob.afirma.core.misc.protocol.ParameterException;
-import es.gob.afirma.core.misc.protocol.ProtocolConstants;
-import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParserUtil;
-import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 
@@ -146,38 +143,17 @@ public class TriphaseDataParser {
 		return builder.toString();
 	}
 
-	/** Comprueba que est&eacute;n disponibles en un JSON todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma por lotes definidos en JSON.
-	 * @param json JSON de entrada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForJsonBatch(final byte[] json) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(parseParamsListJson(json));
-	}
-
 	/** Analiza un JSON de entrada para obtener la lista de par&aacute;metros asociados
 	 * @param json JSON con el listado de par&aacute;metros.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor
 	 * @throws ParameterException Cuando el JSON de entrada no es v&acute;lido. */
-	private static Map<String, String> parseParamsListJson(final byte[] json) throws ParameterException {
+	public static Map<String, String> parseParamsListJson(final byte[] json) throws ParameterException {
 
 		final Map<String, String> params = new HashMap<>();
 		final JSONArray elems;
 
-		try {
-			final JSONObject jsonDoc = new JSONObject(new JSONTokener(new ByteArrayInputStream(json)));
-
-			// Si el elemento principal es OPERATION_PARAM entendemos que es una firma
-			params.put(
-					ProtocolConstants.OPERATION_PARAM,
-					jsonDoc.has(ProtocolConstants.OPERATION_PARAM)
-						? DEFAULT_OPERATION : jsonDoc.getString(jsonDoc.keys().next()));
-
-			elems = jsonDoc.getJSONArray("params"); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			throw new ParameterException("Error grave durante el analisis del JSON: " + e, e); //$NON-NLS-1$
-		}
+		final JSONObject jsonDoc = new JSONObject(new JSONTokener(new ByteArrayInputStream(json)));
+		elems = jsonDoc.getJSONArray("params"); //$NON-NLS-1$
 
 		for (int i = 0; i < elems.length(); i++) {
 			final JSONObject element = elems.getJSONObject(i);

@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2.serverV2;
+package es.gob.afirma.signers.batchV2.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

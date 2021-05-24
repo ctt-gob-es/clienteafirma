@@ -8,4 +8,4 @@
  */
 
 /** Servicios Web REST JEE para la firma por lotes. */
-package es.gob.afirma.signers.batchV2.serverV2;
+package es.gob.afirma.signers.batchV2.server;

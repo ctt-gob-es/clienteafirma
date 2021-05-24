@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -56,7 +55,7 @@ public final class JSONSingleSign {
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */
 	JSONSingleSign(final String id) {
-		this.id = id != null ? id : UUID.randomUUID().toString();
+		this.id = id;
 		this.extraParams = new Properties();
 		// El identificador de la firma debe transmitirse al firmador trifasico a traves
 		// de los extraParams para que este lo utilice y asi podamos luego asociar la
@@ -99,7 +98,7 @@ public final class JSONSingleSign {
 		this.reference = dataSrc;
 		this.format = fmt;
 
-		this.id = id != null ? id : UUID.randomUUID().toString();
+		this.id = id;
 
 		// El identificador de la firma debe transmitirse al firmador trifasico a traves
 		// de los extraParams para que este lo utilice y asi podamos luego asociar la

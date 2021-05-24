@@ -34,7 +34,7 @@
 					AutoScript.addDocumentToBatch(id, dataReference, format, suboperation, extraparams);
 				}
 				
-				AutoScript.signBatchProcess(
+				AutoScript.signBatchJSON(
 				document.getElementById("stopOnError").checked, 
 				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPresigner", 
 				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPostsigner", 

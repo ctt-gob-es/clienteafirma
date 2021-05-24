@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2.serverV2;
+package es.gob.afirma.signers.batchV2.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -22,18 +23,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batchV2.JSONBatchConfigManager;
 import es.gob.afirma.signers.batchV2.JSONSignBatch;
 import es.gob.afirma.signers.batchV2.JSONSignBatchConcurrent;
 import es.gob.afirma.signers.batchV2.JSONSignBatchSerial;
+import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.ConfigManager;
 
-/**
- * Realiza la tercera (y &uacute;ltima) fase de un proceso de firma por lote.
- * Servlet implementation class BatchPostsigner
- */
-public final class JSONBatchPostsigner extends HttpServlet {
+/** Realiza la primera fase de un proceso de firma por lote. */
+public final class JSONBatchPresigner extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,19 +39,21 @@ public final class JSONBatchPostsigner extends HttpServlet {
 
 	private static final String BATCH_JSON_PARAM = "json"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
-	private static final String BATCH_TRI_PARAM = "tridata"; //$NON-NLS-1$
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
+	static {
+		// Indicamos si se debe instalar el proveedor de firma XML de Apache
+		XmlDSigProviderHelper.configureXmlDSigProvider();
+	}
+
 	/**
-	 * Realiza la tercera y &uacute;ltima fase de un proceso de firma por lote.
-	 * Debe recibir la definici&oacute;n JSON (<a href="../doc-files/batch-scheme.html">descripci&oacute;n
-	 * del formato</a>) del lote (exactamente la misma enviada para la primera fase)
-	 * en un JSON pero convertido a Base64 (puede ser en formato <i>URL Safe</i>) y la cadena de
-	 * certificados del firmante (exactamente la misma que la enviada en la primera fase),
-	 * convertidos a Base64 (puede ser <i>URL Safe</i>) y separados por punto y coma (<code>;</code>).<br>
-	 * Devuelve un JSON de resumen de resultado (<a href="../doc-files/resultlog-scheme.html">descripci&oacute;n
-	 * del formato</a>)
+	 * Realiza la primera fase de un proceso de firma por lote.
+	 * Debe recibir la definici&oacute;n del lote en un JSON (<a href="../doc-files/batch-scheme.html">descripci&oacute;n
+	 * del formato</a>) convertido completamente
+	 * en Base64 y la cadena de certificados del firmante, convertidos a Base64 (puede ser
+	 * <i>URL Safe</i>) y separados por punto y coma (<code>;</code>).
+	 * Devuelve un JSON de sesi&oacute;n trif&aacute;sica.
 	 * @see HttpServlet#service(HttpServletRequest request, HttpServletResponse response)
 	 * */
 	@Override
@@ -61,9 +61,9 @@ public final class JSONBatchPostsigner extends HttpServlet {
 			               final HttpServletResponse response) throws ServletException,
 			                                                          IOException {
 
-		final Map<String, String> parametes = JSONRequestParameters.extractParameters(request);
+		final Map<String, String> parameters = JSONRequestParameters.extractParameters(request);
 
-		final String json = parametes.get(BATCH_JSON_PARAM);
+		final String json = parameters.get(BATCH_JSON_PARAM);
 		if (json == null) {
 			LOGGER.severe("No se ha recibido una definicion de lote en el parametro " + BATCH_JSON_PARAM); //$NON-NLS-1$
 			response.sendError(
@@ -89,7 +89,7 @@ public final class JSONBatchPostsigner extends HttpServlet {
 			return;
 		}
 
-		final String certListUrlSafeBase64 = parametes.get(BATCH_CRT_PARAM);
+		final String certListUrlSafeBase64 = parameters.get(BATCH_CRT_PARAM);
 		if (certListUrlSafeBase64 == null) {
 			LOGGER.severe("No se ha recibido la cadena de certificados del firmante en el parametro " + BATCH_CRT_PARAM); //$NON-NLS-1$
 			response.sendError(
@@ -112,51 +112,24 @@ public final class JSONBatchPostsigner extends HttpServlet {
 			return;
 		}
 
-		final String triphaseDataAsUrlSafeBase64 = parametes.get(BATCH_TRI_PARAM);
-		if (triphaseDataAsUrlSafeBase64 == null) {
-			LOGGER.severe("No se ha recibido el resultado de las firmas cliente en el parametro " + BATCH_TRI_PARAM); //$NON-NLS-1$
-			response.sendError(
-				HttpServletResponse.SC_BAD_REQUEST,
-				"No se ha recibido el resultado de las firmas cliente en el parametro " + BATCH_TRI_PARAM //$NON-NLS-1$
-			);
-			return;
-		}
-
-		final TriphaseData td;
+		final String pre;
 		try {
-			td = JSONBatchServerUtil.getTriphaseData(triphaseDataAsUrlSafeBase64.getBytes(DEFAULT_CHARSET));
+			pre = batch.doPreBatch(certs);
 		}
 		catch(final Exception e) {
-			LOGGER.severe("El JSON de firmas cliente es invalido: " + e); //$NON-NLS-1$
-			response.sendError(
-				HttpServletResponse.SC_BAD_REQUEST,
-				"El JSON de firmas cliente es invalido: " + e //$NON-NLS-1$
-			);
-			return;
-		}
-
-		final String ret;
-		try {
-			ret = batch.doPostBatch(certs, td);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error en el postproceso del lote: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote: " + e, e); //$NON-NLS-1$
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-				"Error en el postproceso del lote: " + e //$NON-NLS-1$
+				"Error en el preproceso del lote: " + e //$NON-NLS-1$
 			);
 			return;
 		}
 
-		final String allowOrigin = ConfigManager.getAccessControlAllowOrigin();
-		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
+		response.setHeader("Access-Control-Allow-Origin", ConfigManager.getAccessControlAllowOrigin()); //$NON-NLS-1$
 		response.setContentType("application/json;charset=UTF-8"); //$NON-NLS-1$
-		try (
-			final PrintWriter writer = response.getWriter();
-		) {
-			writer.write(ret);
+		try (PrintWriter writer = response.getWriter()) {
+			writer.write(pre);
 			writer.flush();
 		}
 	}
-
 }

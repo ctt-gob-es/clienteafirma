@@ -31,7 +31,7 @@
 	<servlet>
 		<description>Realiza la primera fase de un proceso de firma por lote con JSON v1.0</description>
 		<servlet-name>JSONBatchPresigner</servlet-name>
-		<servlet-class>es.gob.afirma.signers.batchV2.serverV2.JSONBatchPresigner</servlet-class>
+		<servlet-class>es.gob.afirma.signers.batchV2.server.JSONBatchPresigner</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -53,7 +53,7 @@
 	<servlet>
 		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote con JSON v1.0</description>
 		<servlet-name>JSONBatchPostsigner</servlet-name>
-		<servlet-class>es.gob.afirma.signers.batchV2.serverV2.JSONBatchPostsigner</servlet-class>
+		<servlet-class>es.gob.afirma.signers.batchV2.server.JSONBatchPostsigner</servlet-class>
 	</servlet>
 
 	<servlet-mapping>

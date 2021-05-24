@@ -287,10 +287,14 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
+                    final Map <String, String> paramsMap;
+
                     if (params.isJsonBatch()) {
-                    	params = TriphaseDataParser.getParametersForJsonBatch(batchDefinition);
+                    	 paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
+                    	 params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
                     } else {
-                    	params = ProtocolInvocationUriParser.getParametersForXmlBatch(batchDefinition);
+                    	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
+                    	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
                     }
                 }
 
