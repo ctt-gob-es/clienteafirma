@@ -452,6 +452,9 @@ final class CommandLineLauncher {
 			String selectedAlias;
 			if (params.isCertGui()) {
 				final Properties extraParams = buildProperties(params.getExtraParams());
+				if (params.getFilter() != null && !params.getFilter().isEmpty()) {
+					extraParams.put("filters", params.getFilter()); //$NON-NLS-1$
+				}
 				final CertFilterManager filterManager = new CertFilterManager(extraParams);
 				final List<CertificateFilter> filters = filterManager.getFilters();
 
@@ -889,7 +892,7 @@ final class CommandLineLauncher {
 	 * @param message Mensaje a mostrar.
 	 */
 	private static void printMessage(final PrintWriter pw, final String message) {
-		if ((pw != null) && (message != null)) {
+		if (pw != null && message != null) {
 			pw.write(message);
 			pw.flush();
 		}
