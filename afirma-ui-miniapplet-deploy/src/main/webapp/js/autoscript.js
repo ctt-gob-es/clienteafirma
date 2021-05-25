@@ -395,7 +395,7 @@ var AutoScript = ( function ( window, undefined ) {
 			resetStickySignatory = false;
 		}
 
-		var signBatch = function (batchB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
+		var signBatchXML = function (batchB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
 			clienteFirma.signBatchXML(batchB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback);
 			resetStickySignatory = false;
 		}
@@ -3935,8 +3935,8 @@ var AutoScript = ( function ( window, undefined ) {
 			countersign : counterSign,
 			createBatch : createBatch,
 			addDocumentToBatch : addDocumentToBatch,
-			signBatchJSON : signBatchJSON,
-			signBatch : signBatch,
+			signBatchProcess : signBatchJSON,
+			signBatch : signBatchXML,
 			selectCertificate : selectCertificate,
 			signAndSaveToFile : signAndSaveToFile,
 			getCurrentLog : getCurrentLog,

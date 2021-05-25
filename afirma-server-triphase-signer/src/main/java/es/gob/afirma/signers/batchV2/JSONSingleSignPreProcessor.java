@@ -37,6 +37,7 @@ final class JSONSingleSignPreProcessor {
 	 * @param sSign Firma sobre la que hay que hacer el preproceso.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param algorithm Algoritmo de firma.
+	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @return Nodo <code>firma</code> del JSON de datos trif&aacute;sicos (sin ninguna etiqueta
 	 *         antes ni despu&eacute;s).
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.

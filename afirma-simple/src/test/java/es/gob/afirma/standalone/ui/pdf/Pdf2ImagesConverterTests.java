@@ -50,6 +50,7 @@ public final class Pdf2ImagesConverterTests {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testPdfLoad() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 		System.out.println("Inicio de la carga"); //$NON-NLS-1$

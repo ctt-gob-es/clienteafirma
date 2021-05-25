@@ -126,7 +126,7 @@ public final class SignatureService extends HttpServlet {
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-	/** Propiedad que indica si la cach&eacute; est&aacute activada o no. */
+	/** Propiedad que indica si la cach&eacute; est&aacute; activada o no. */
 	private static boolean cacheEnabled = false;
 
 	static {

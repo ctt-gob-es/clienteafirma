@@ -59,6 +59,7 @@ final class JSONSingleSignPostProcessor {
 	 *           </pre>
 	 * @param algorithm Algoritmo de firma.
 	 * @param batchId Identificador del lote de firma.
+	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */

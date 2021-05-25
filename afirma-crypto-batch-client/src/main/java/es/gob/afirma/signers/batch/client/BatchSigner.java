@@ -268,21 +268,16 @@ public final class BatchSigner {
 
 	/**
 	 * Procesa un lote de firmas.
-	 * Los lotes deben proporcionase definidos en un fichero JSON con el esquema indicado
-	 * en el siguiente enlace: <a href="https://htmlpreview.github.io/?https://github.com/ctt-gob-es
-	 * /clienteafirma/blob/master/afirma-server-triphase-signer/src/main/java/es/gob/afirma/signers
-	 * /batchV2/doc-files/batch-scheme.html">descripci&oacute;n
-	 * del formato</a>, donde tambi&eacute;nn se adjunta un ejemplo de petici&oacute;nn.
+	 * Los lotes deben proporcionase definidos en un fichero JSON con un determinado esquema.
+	 * Puede ver dicho esquema y un ejemplo de petici&oacute;n
+	 * <a href="doc-files/batch-scheme.html">aqu&iacute;</a>.
 	 * @param batchB64 JSON de definici&oacute;n del lote de firmas.
 	 * @param batchPresignerUrl URL del servicio remoto de preproceso de lotes de firma.
 	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
 	 * @param certificates Cadena de certificados del firmante.
 	 * @param pk Clave privada para realizar las firmas cliente.
-	 * @return Registro del resultado general del proceso por lote, en un JSON con el esquema indicado
-	 * en el siguiente enlace: <a href="https://htmlpreview.github.io/?https://github.com/ctt-gob-es
-	 * /clienteafirma/blob/master/afirma-server-triphase-signer/src/main/java/es/gob/afirma/signers
-	 * /batchV2/doc-files/resultlog-scheme.html">descripci&oacute;n
-	 * de la respuesta</a>
+	 * @return Cadena JSON con el resultado de la firma del lote. La estructura presentar&aacute;
+	 * la estructura indicada <a href="doc-files/resultlog-scheme.html">aqu&iacute;</a>.
 	 * @throws IOException Si hay problemas de red o en el tratamiento de datos.
 	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
 	 * @throws AOException Si hay errores en las firmas cliente.

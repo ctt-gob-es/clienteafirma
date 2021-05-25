@@ -24,7 +24,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 
 	/**
 	 * Crea un lote de firmas que se ejecuta secuencialmente.
-	 * @param xml XML de definici&oacute;n de lote.
+	 * @param json JSON de definici&oacute;n de lote.
 	 * @throws IOException Si hay problemas en la creaci&oacute;n del lote.
 	 * */
 	public JSONSignBatchSerial(final byte[] json) throws IOException {

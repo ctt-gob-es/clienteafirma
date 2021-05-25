@@ -175,6 +175,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 		/**
 		 * Construye el hilo para la eliminaci&oacute;n de documentos temporales caducados.
 		 * @param tempTimeout Tiempo de caducidad en milisegundos de los ficheros temporales.
+		 * @param tempDir Directorio en el que se encuentran los temporales.
 		 */
 		public ExpiredDocumentsCleanerThread (final long tempTimeout, final File tempDir) {
 			this.timeout = tempTimeout;
