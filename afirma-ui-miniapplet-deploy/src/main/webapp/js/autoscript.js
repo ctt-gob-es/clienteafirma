@@ -783,6 +783,20 @@ var AutoScript = ( function ( window, undefined ) {
 
 					return random;
 				}
+				
+				/** Comprueba si los datos son de tipo JSON */
+				function checkJSONData(data){
+					
+					try {
+						var dataDecoded = Base64.decode(data);
+						JSON.parse(dataDecoded);
+						//Si se parsea correctamente quiere decir que es un JSON.
+						return true;
+					} catch(e) {
+						//Si no se parsea bien quiere decir que es un XML.
+						return false;
+					}	
+				}
 
 				/** Genera numeros aleatorios con una distribucion homogenea. */
 				var seed;
@@ -797,7 +811,8 @@ var AutoScript = ( function ( window, undefined ) {
 				/* Metodos que publicamos del objeto */
 				return {
 					/** Genera un nuevo identificador de sesion aleatorio. */
-					generateNewIdSession : generateNewIdSession				
+					generateNewIdSession : generateNewIdSession,
+					checkJSONData : checkJSONData
 				};
 		})(window, undefined);
 
@@ -1462,6 +1477,11 @@ var AutoScript = ( function ( window, undefined ) {
 						result = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
 						certificate = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 					}
+					
+					if (AfirmaUtils.checkJSONData(result)) {
+						result = Base64.decode(result);
+					}
+					
 					successCallback(result, certificate);
 				}
 				else {
@@ -2359,6 +2379,9 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				// Termina bien y no devuelve ningun resultado o es una operacion guardado
 				if (data == "OK") {
+					if (AfirmaUtils.checkJSONData(data)) {
+						data = Base64.decode(data);
+					}
 					successCallback(data, null);
 					return;
 				}
@@ -2469,6 +2492,7 @@ var AutoScript = ( function ( window, undefined ) {
 					certificate = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
 					signature = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
+				
 				successCallback(signature, certificate);
 			}
 			
@@ -2509,6 +2533,11 @@ var AutoScript = ( function ( window, undefined ) {
 					result = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
 					certificate = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
+				
+				if (AfirmaUtils.checkJSONData(result)) {
+					result = Base64.decode(result);
+				}
+				
 				successCallback(result, certificate);
 			}
 			
@@ -3572,6 +3601,10 @@ var AutoScript = ( function ( window, undefined ) {
 							stickyCertificate = null;
 						}
 					}
+					
+					if (AfirmaUtils.checkJSONData(result)) {
+						result = Base64.decode(result);
+					}
 
 					successCallback(result, certificate);
 					return false;
@@ -3932,7 +3965,6 @@ var AutoScript = ( function ( window, undefined ) {
 			coSign : coSign,
 			cosign : cosign,
 			counterSign : counterSign,
-			countersign : counterSign,
 			createBatch : createBatch,
 			addDocumentToBatch : addDocumentToBatch,
 			signBatchProcess : signBatchJSON,
