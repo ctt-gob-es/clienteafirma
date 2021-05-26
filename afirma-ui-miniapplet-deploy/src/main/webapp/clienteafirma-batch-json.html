@@ -44,11 +44,7 @@
 				document.getElementById("concurrentTimeOut").value);
 
 			} catch(e) {
-				try {
-					showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
-				} catch(ex) {
-					showLog("Error: " + e);
-				}
+				showLog(e);
 			}
 		}
 

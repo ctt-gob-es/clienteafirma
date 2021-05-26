@@ -415,12 +415,17 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var addDocumentToBatch = function (id, datareference, format, suboperation, extraparams) {
 			
-			var singleSign = new Object();
 			if (id == null || datareference == null) { 
-				throwException("java.lang.IllegalArgumentException", 
-								"No se ha indicado el id o datareference de la firma");
-				return;
+				throw new Error("No se ha indicado el id o datareference de la firma");
+			} else if (jsonRequest == null){
+				throw new Error("No hay ningun lote creado. Es necesario crear uno antes de agregar firmas");
 			}
+			
+			//Se comprueba de que no existan IDs repetidos dentro del lote.
+			AfirmaUtils.checkExistingId(jsonRequest.singlesigns, id);
+			
+			var singleSign = new Object();
+			
 			singleSign.id = id;
 			singleSign.datareference = datareference;
 			if (format != null) { 
@@ -437,9 +442,8 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback, concurrentTimeout) {
 			
-			if (jsonRequest == undefined || jsonRequest == "") {
-				throwException("java.lang.IllegalArgumentException", "No se ha indicado una peticion JSON");
-				return;
+			if (jsonRequest == undefined || jsonRequest == null) {
+				throw new Error("No hay ningun lote creado. Es necesario crear uno antes de firmar.");
 			}
 			
 			jsonRequest.stoponerror = stopOnError;
@@ -797,6 +801,16 @@ var AutoScript = ( function ( window, undefined ) {
 						return false;
 					}	
 				}
+				
+				/** Comprueba que no haya identificadores repetidos */
+				function checkExistingId(singleSigns, newId){
+					
+					for (var i = 0 ; i < singleSigns.length ; i++) {
+						if (singleSigns[i].id == newId){
+							throw new Error("El id de la firma a agregar = \"" + singleSigns[i].id + "\" ya existe en el lote");
+						}
+					}
+				}
 
 				/** Genera numeros aleatorios con una distribucion homogenea. */
 				var seed;
@@ -812,7 +826,8 @@ var AutoScript = ( function ( window, undefined ) {
 				return {
 					/** Genera un nuevo identificador de sesion aleatorio. */
 					generateNewIdSession : generateNewIdSession,
-					checkJSONData : checkJSONData
+					checkJSONData : checkJSONData,
+					checkExistingId : checkExistingId
 				};
 		})(window, undefined);
 
