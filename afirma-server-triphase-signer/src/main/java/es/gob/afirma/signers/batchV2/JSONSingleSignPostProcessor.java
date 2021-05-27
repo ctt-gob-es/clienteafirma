@@ -23,6 +23,7 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
@@ -149,10 +150,12 @@ final class JSONSingleSignPostProcessor {
 		}
 
 		// Se almacenara el documento con la configuracion indicada en el DocumentManager
-		if(JSONBatchConfigManager.isConcurrentMode()) {
+		if(BatchConfigManager.isConcurrentMode()) {
 			JSONTempStoreFactory.getTempStore().store(signedDoc, sSign, batchId);
 		} else {
-			docManager.storeDocument(sSign.getId(), certChain, signedDoc, extraParams);
+			final Properties singleSignProps = new Properties();
+			singleSignProps.put("format", sSign.getSignFormat().toString()); //$NON-NLS-1$
+			docManager.storeDocument(sSign.getReference(), certChain, signedDoc, singleSignProps);
 		}
 
 	}

@@ -24,7 +24,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Implementaci&oacute;n de acceso a gestor documental usando simplemente el sistema de ficheros.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class FileSystemDocumentManager implements DocumentManager {
+public class FileSystemDocumentManager implements BatchDocumentManager {
 
 	private static final String IN_DIR_PARAM = "indir"; //$NON-NLS-1$
 	private static final String OUT_DIR_PARAM = "outdir"; //$NON-NLS-1$
@@ -32,23 +32,11 @@ public final class FileSystemDocumentManager implements DocumentManager {
 
 	private static final String FORMAT_PROPERTY = "format"; //$NON-NLS-1$
 
-	final String inDir;
-	final String outDir;
-	final boolean overwrite;
+	String inDir;
+	String outDir;
+	boolean overwrite;
 
 	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-	/** Construye la clase de acceso a gestor documental usando sistema de ficheros.
-	 * @param config Configuraci&oacute;n del gestor (directorios, etc.) */
-	public FileSystemDocumentManager(final Properties config) {
-
-		this.inDir = config.getProperty(IN_DIR_PARAM);
-		this.outDir = config.getProperty(OUT_DIR_PARAM);
-		this.overwrite = Boolean.parseBoolean(config.getProperty(OVERWRITE_PARAM));
-
-		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
-		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$
-	}
 
 	@Override
 	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties prop) throws IOException {
@@ -110,7 +98,7 @@ public final class FileSystemDocumentManager implements DocumentManager {
 		}
 
 		final String format = prop.getProperty(FORMAT_PROPERTY);
-		if (format != null && AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
+		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
 			newId += ".csig";  //$NON-NLS-1$
 		}
 		else if (format != null && format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
@@ -163,6 +151,33 @@ public final class FileSystemDocumentManager implements DocumentManager {
 	        f = f.getParentFile();
 	    }
 	    return false;
+	}
+
+	@Override
+	public void init(final Properties config) {
+		this.inDir = config.getProperty(IN_DIR_PARAM);
+		this.outDir = config.getProperty(OUT_DIR_PARAM);
+		this.overwrite = Boolean.parseBoolean(config.getProperty(OVERWRITE_PARAM));
+
+		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
+		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$
+	}
+
+
+	@Override
+	public void rollback(final String singleSignRef) {
+
+		File file = null;
+
+		try {
+			file = new File(this.outDir, new String(Base64.decode(singleSignRef)));
+		} catch (final IOException e) {
+			LOGGER.severe("Error al decodificar la referencia a datos:" + singleSignRef); //$NON-NLS-1$
+		}
+
+		if (file != null && file.exists()) {
+			file.delete();
+		}
 	}
 
 }

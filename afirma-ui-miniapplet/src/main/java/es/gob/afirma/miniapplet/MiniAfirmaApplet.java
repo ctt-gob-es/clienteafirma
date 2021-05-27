@@ -1416,7 +1416,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 							new PrivilegedExceptionAction<byte[]>() {
 								@Override
 								public byte[] run() throws Exception {
-									return BatchSigner.sign(
+									return BatchSigner.signXML(
 											batchB64,
 											batchPreSignerUrl,
 											batchPostSignerUrl,

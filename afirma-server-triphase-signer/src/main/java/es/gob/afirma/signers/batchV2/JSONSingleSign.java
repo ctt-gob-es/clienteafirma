@@ -326,10 +326,6 @@ public final class JSONSingleSign {
 		return this.processResult;
 	}
 
-	public String getDataSource() {
-		return this.reference;
-	}
-
 	public void setDocumentManager(final DocumentManager documentManager) {
 		this.documentManager = documentManager;
 	}
@@ -487,7 +483,9 @@ public final class JSONSingleSign {
 		public CallableResult call() {
 			try {
 				final byte[] dataToSave = this.ts.retrieve(this.ss, this.batchId);
-				this.documentManager.storeDocument(this.ss.getId(), null, dataToSave, null);
+				final Properties singleSignProps = new Properties();
+				singleSignProps.put("format", this.ss.getSignFormat().toString()); //$NON-NLS-1$
+				this.documentManager.storeDocument(this.ss.getReference(), null, dataToSave, singleSignProps);
 			}
 			catch(final Exception e) {
 				LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId()); //$NON-NLS-1$

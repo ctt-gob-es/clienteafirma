@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.gob.afirma.signers.batchV2.JSONBatchConfigManager;
+import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batchV2.JSONSignBatch;
 import es.gob.afirma.signers.batchV2.JSONSignBatchConcurrent;
 import es.gob.afirma.signers.batchV2.JSONSignBatchSerial;
@@ -76,7 +76,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 		final JSONSignBatch batch;
 		try {
 			final byte[] batchConfig = JSONBatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
-			batch = JSONBatchConfigManager.isConcurrentMode() ?
+			batch = BatchConfigManager.isConcurrentMode() ?
 					new JSONSignBatchConcurrent(batchConfig) :
 						new JSONSignBatchSerial(batchConfig);
 		}

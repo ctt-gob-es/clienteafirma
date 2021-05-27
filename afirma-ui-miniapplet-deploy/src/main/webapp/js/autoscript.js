@@ -462,6 +462,10 @@ var AutoScript = ( function ( window, undefined ) {
 			resetStickySignatory = false;
 		}
 		
+		var printJSONRequest = function () {
+			return JSON.stringify(jsonRequest, null, 2);
+		}
+		
 		var getBase64FromText = function (plainText) {
 			return plainText != null ? Base64.encode(plainText) : null;
 		}
@@ -3983,6 +3987,7 @@ var AutoScript = ( function ( window, undefined ) {
 			createBatch : createBatch,
 			addDocumentToBatch : addDocumentToBatch,
 			signBatchProcess : signBatchJSON,
+			printJSONRequest : printJSONRequest,
 			signBatch : signBatchXML,
 			selectCertificate : selectCertificate,
 			signAndSaveToFile : signAndSaveToFile,

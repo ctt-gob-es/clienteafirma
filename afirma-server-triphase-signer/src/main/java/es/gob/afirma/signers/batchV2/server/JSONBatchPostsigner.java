@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.signers.batchV2.JSONBatchConfigManager;
+import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batchV2.JSONSignBatch;
 import es.gob.afirma.signers.batchV2.JSONSignBatchConcurrent;
 import es.gob.afirma.signers.batchV2.JSONSignBatchSerial;
@@ -61,9 +61,9 @@ public final class JSONBatchPostsigner extends HttpServlet {
 			               final HttpServletResponse response) throws ServletException,
 			                                                          IOException {
 
-		final Map<String, String> parametes = JSONRequestParameters.extractParameters(request);
+		final Map<String, String> parameters = JSONRequestParameters.extractParameters(request);
 
-		final String json = parametes.get(BATCH_JSON_PARAM);
+		final String json = parameters.get(BATCH_JSON_PARAM);
 		if (json == null) {
 			LOGGER.severe("No se ha recibido una definicion de lote en el parametro " + BATCH_JSON_PARAM); //$NON-NLS-1$
 			response.sendError(
@@ -76,7 +76,7 @@ public final class JSONBatchPostsigner extends HttpServlet {
 		final JSONSignBatch batch;
 		try {
 			final byte[] batchConfig = JSONBatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
-			batch = JSONBatchConfigManager.isConcurrentMode() ?
+			batch = BatchConfigManager.isConcurrentMode() ?
 					new JSONSignBatchConcurrent(batchConfig) :
 						new JSONSignBatchSerial(batchConfig);
 		}
@@ -89,7 +89,7 @@ public final class JSONBatchPostsigner extends HttpServlet {
 			return;
 		}
 
-		final String certListUrlSafeBase64 = parametes.get(BATCH_CRT_PARAM);
+		final String certListUrlSafeBase64 = parameters.get(BATCH_CRT_PARAM);
 		if (certListUrlSafeBase64 == null) {
 			LOGGER.severe("No se ha recibido la cadena de certificados del firmante en el parametro " + BATCH_CRT_PARAM); //$NON-NLS-1$
 			response.sendError(
@@ -112,7 +112,7 @@ public final class JSONBatchPostsigner extends HttpServlet {
 			return;
 		}
 
-		final String triphaseDataAsUrlSafeBase64 = parametes.get(BATCH_TRI_PARAM);
+		final String triphaseDataAsUrlSafeBase64 = parameters.get(BATCH_TRI_PARAM);
 		if (triphaseDataAsUrlSafeBase64 == null) {
 			LOGGER.severe("No se ha recibido el resultado de las firmas cliente en el parametro " + BATCH_TRI_PARAM); //$NON-NLS-1$
 			response.sendError(

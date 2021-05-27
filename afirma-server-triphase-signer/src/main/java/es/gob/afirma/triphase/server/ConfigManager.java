@@ -120,7 +120,7 @@ public class ConfigManager {
 		return configProperties;
 	}
 
-	static String getDocManagerClassName() {
+	public static String getDocManagerClassName() {
 		return config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS);
 	}
 
@@ -141,7 +141,7 @@ public class ConfigManager {
 		return verificationKey != null && verificationKey.length() > 0 ? verificationKey : null;
 	}
 
-	static Properties getConfig() {
+	public static Properties getConfig() {
 		return (Properties) config.clone();
 	}
 

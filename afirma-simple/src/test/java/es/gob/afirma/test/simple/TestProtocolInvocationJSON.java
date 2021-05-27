@@ -19,14 +19,14 @@ public class TestProtocolInvocationJSON {
 			"\"singlesigns\": [ " + //$NON-NLS-1$
 				"{" + //$NON-NLS-1$
 					"\"id\":\"7725374e-728d-4a33-9db9-3a4efea4cead\"," + //$NON-NLS-1$
-					"\"datareference\":\"QzovcHJ1ZWJhcy90ZXN0X2ZpY2hlcm8zLnhtbA==\"," + //$NON-NLS-1$
+					"\"datareference\":\"cHJ1ZWJhMS54bWw=\"," + //$NON-NLS-1$
 					"\"format\":\"XAdES\"," + //$NON-NLS-1$
 					"\"suboperation\":\"sign\"," + //$NON-NLS-1$
 					"\"extraparams\":\"Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==\"" + //$NON-NLS-1$
 				"}," + //$NON-NLS-1$
 				"{" + //$NON-NLS-1$
 					"\"id\":\"93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a\"," + //$NON-NLS-1$
-					"\"datareference\":\"QzovcHJ1ZWJhcy90ZXN0X2ZpY2hlcm8yLnBkZg==\"," + //$NON-NLS-1$
+					"\"datareference\":\"dGVzdF9maWNoZXJvMS5wZGY=\"," + //$NON-NLS-1$
 					"\"extraparams\":\"Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD05M2QxNTMxYy1jZDMyLTRjOGUtOGNjOC0xZjFjZmU2NmY2NGENCg==\"" + //$NON-NLS-1$
 				"}" + //$NON-NLS-1$
 			"]" + //$NON-NLS-1$

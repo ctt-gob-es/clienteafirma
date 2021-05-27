@@ -18,6 +18,7 @@ import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult;
 import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult.Result;
 import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignAlgorithm;
+import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta secuencialmente. */
 public final class JSONSignBatchSerial extends JSONSignBatch {
@@ -152,18 +153,19 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 			ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
 		}
 
-		// En este punto las firmas estan en almacenamiento temporal
-
-		// Si hubo errores y se indico parar en caso de error, no hacemos los guardados de datos,
-		// borramos los temporales y enviamos el log
+		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer
+		// los que se subiesen antes del error si se indico parar en error
 		if (error && this.stopOnError) {
 			for (final JSONSingleSign ss : this.signs) {
 				if (ss.getProcessResult().wasSaved()) {
+
+					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
+						((BatchDocumentManager) this.documentManager).rollback(ss.getReference());
+					}
+
 					ss.setProcessResult(ProcessResult.PROCESS_RESULT_ROLLBACKED);
 				}
 			}
-			deleteAllTemps();
-			return getResultLog();
 		}
 
 		deleteAllTemps();

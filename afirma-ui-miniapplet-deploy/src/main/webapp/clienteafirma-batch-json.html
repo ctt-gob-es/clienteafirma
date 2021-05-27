@@ -34,6 +34,8 @@
 					AutoScript.addDocumentToBatch(id, dataReference, format, suboperation, extraparams);
 				}
 				
+				document.getElementById("console").value =  "Peticion :\n" + AutoScript.printJSONRequest();
+				
 				AutoScript.signBatchProcess(
 				document.getElementById("stopOnError").checked, 
 				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPresigner", 
@@ -50,6 +52,7 @@
 
 		function addSingleSign() {
 			singleSigns[singleSigns.length] = buildSingleSign(generateUUID());
+			printSingleSign(singleSigns[singleSigns.length-1]);
 			document.getElementById("signButton").disabled = "";
 		}
 		
@@ -148,7 +151,32 @@
 				document.getElementById("params").disabled = true;
 			}
 		}
-
+		
+		function printSingleSign(singleSign) {
+			document.getElementById('console').value += "\n{";
+			document.getElementById('console').value += "\nid :" + singleSign.id + ",";
+			document.getElementById('console').value += "\ndatareference :" + singleSign.datareference + ",";
+			
+			if (document.getElementById("useSingleConf").checked == true){
+				
+				var format = document.getElementById("format").value;
+				var suboperation = document.getElementById("suboperation").value;
+				var extraParams = AutoScript.getBase64FromText(document.getElementById("params").value);
+				
+				document.getElementById('console').value += "\nformat :" + singleSign.format + ",";
+				document.getElementById('console').value += "\nsuboperation :" + singleSign.suboperation + "";
+				
+				if (extraParams != "") {
+					document.getElementById('console').value += ",\nextraParams :" + singleSign.extraParams;
+				}
+			}
+			document.getElementById('console').value += "\n}\n";
+		}
+		
+		function codeToB64() {
+				document.getElementById("datareferenceValue").value = 
+					AutoScript.getBase64FromText(document.getElementById("datareferenceValue").value);
+		}
 	</script>
 </head>
 <body>
@@ -177,8 +205,8 @@
 		
 		<div>
 			<label for="algorithm">Algoritmo</label> <select id="algorithm">
-				<option value="SHA256withRSA">SHA1 con RSA</option>
 				<option value="SHA512withRSA">SHA512 con RSA</option>
+				<option value="SHA256withRSA">SHA1 con RSA</option>
 			</select>
 		</div><br>
 
@@ -218,15 +246,15 @@
 		<fieldset>
 			<legend>Referencia a  datos (Utilizada en DocumentManager)</legend>
 			<div style="font-weight: bold;">La referencia a los datos indicada
-			en este apartado debe de codificarse en base 64</div><br>
-			<input type="checkbox" id="codeInB64" name="codeInB64"/> 
-			<label for="suboperation">Codificar a base 64</label><br>
+			en este apartado debe de codificarse en base 64</div>
 			<br> 
 			<input type="text" name="datareferenceValue"
 				id="datareferenceValue" style="width: 600px;" />
+			<button id="codeInB64" type="button" onclick="codeToB64()">Codificar a base 64</button>
 		</fieldset><br>
-		<input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" checked/> 
-		<label for="suboperation">Aplicar configuraci&oacute;n individual</label><br>
+		<fieldset>
+		<legend><input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" checked/> 
+		<label for="suboperation">Aplicar configuraci&oacute;n individual</label><br></legend>
 		<br>
 		<div>
 			<label for="format">Formato</label> <select id="format">
@@ -255,9 +283,7 @@
 				las propiedades de una en una)</span> <br>
 			<textarea id="params" cols="50" rows="5" readonly></textarea>
 		</div>
-		<div style="font-weight: bold;">NOTA: Los aqu&iacute;
-			presentados son manejadores de pruebas y no deben usarse tal cual en
-			los entornos de producción</div>
+		</fieldset>
 		<input type="button" value="Agregar firma" onclick="addSingleSign();">
 	</fieldset>
 

@@ -12,6 +12,8 @@ package es.gob.afirma.signers.batchV2;
 import java.io.File;
 import java.util.Date;
 
+import es.gob.afirma.signers.batch.BatchConfigManager;
+
 /**
  * Clase para la limpieza del directorio de temporales de las operaciones de lotes.
  * Estable un periodo de caducidad y todos los ficheros del directorio que existan
@@ -39,7 +41,7 @@ public class JSONTempStoreFileSystemCleaner implements Runnable {
 		runningCleaning = true;
 
 		final long limitTime = new Date().getTime() - EXPIRED_PERIOD;
-		for (final File file : JSONBatchConfigManager.getTempDir().listFiles()) {
+		for (final File file : BatchConfigManager.getTempDir().listFiles()) {
 			if (file.isFile() && file.lastModified() < limitTime) {
 				file.delete();
 			}

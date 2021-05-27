@@ -2,21 +2,17 @@ package es.gob.afirma.triphase.server.document;
 
 import java.util.Properties;
 
-
-public abstract class DocumentManagerBase implements DocumentManager{
+/** Interfaz para el uso de m&eacutetodos especificos en la firma de lotes */
+public interface BatchDocumentManager extends DocumentManager {
 
 	/** Deshace un guardado previo (para los modos transaccionales).
 	 * @param sign Identificador de la firma a deshacer. */
-	public void rollback() {
-		//Implementar en clase que herede si es necesario
-	}
+	void rollback(final String singleSignId);
 
 	/** Configura c&oacute;mo ha de guardarse la firma electr&oacute;nica.
 	 * cada implementaci&oacute;n requerir&aacute; unas propiedades distintas dentro del
 	 * objeto de propiedades.
 	 * @param config Propiedades de configuraci&oacute;n. */
-	public void init(final Properties config) {
-		//Implementar en clase que herede si es necesario
-	}
+	void init(final Properties config);
 
 }

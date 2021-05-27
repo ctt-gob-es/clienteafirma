@@ -22,10 +22,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batchV2.JSONSingleSign.CallableResult;
 import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult;
 import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult.Result;
 import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignAlgorithm;
+import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta en paralelo. */
 public final class JSONSignBatchConcurrent extends JSONSignBatch {
@@ -56,7 +58,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 	@Override
 	public String doPreBatch(final X509Certificate[] certChain) throws JSONBatchException {
 
-		final ExecutorService executorService = Executors.newFixedThreadPool(JSONBatchConfigManager.getMaxCurrentSigns());
+		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<String>> callables = new ArrayList<>(this.signs.size());
 
 		for (final JSONSingleSign ss : this.signs) {
@@ -121,7 +123,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			);
 		}
 
-		final ExecutorService executorService = Executors.newFixedThreadPool(JSONBatchConfigManager.getMaxCurrentSigns());
+		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<CallableResult>> callables = new ArrayList<>(this.signs.size());
 
 		for (final JSONSingleSign ss : this.signs) {
@@ -279,6 +281,11 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		if (error && this.stopOnError) {
 			for (final JSONSingleSign ss : this.signs) {
 				if (ss.getProcessResult().wasSaved()) {
+
+					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
+						((BatchDocumentManager) this.documentManager).rollback(ss.getReference());
+					}
+
 					ss.setProcessResult(ProcessResult.PROCESS_RESULT_ROLLBACKED);
 				}
 			}

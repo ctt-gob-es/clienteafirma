@@ -10,9 +10,11 @@
 package es.gob.afirma.signers.batchV2;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -22,8 +24,9 @@ import org.json.JSONObject;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.triphase.server.ConfigManager;
+import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
-import es.gob.afirma.triphase.server.document.DocumentManagerBase;
 
 /** Lote de firmas electr&oacute;nicas */
 public abstract class JSONSignBatch {
@@ -147,18 +150,27 @@ public abstract class JSONSignBatch {
 		}
 
 		try {
-			final String className = JSONBatchConfigManager.getSaverFile();
+			final String className = ConfigManager.getDocManagerClassName();
 			final Class<?> docManagerClass = Class.forName(className, false, getClass().getClassLoader());
 
-			if (DocumentManagerBase.class.isAssignableFrom(docManagerClass)) {
-				this.documentManager = (DocumentManagerBase) docManagerClass.newInstance();
-				((DocumentManagerBase) this.documentManager).init(JSONBatchConfigManager.getConfig());
+			if (BatchDocumentManager.class.isAssignableFrom(docManagerClass)) {
+				this.documentManager = (BatchDocumentManager) docManagerClass.newInstance();
+				((BatchDocumentManager) this.documentManager).init(ConfigManager.getConfig());
 			} else {
-				this.documentManager = (DocumentManager) docManagerClass.newInstance();
+				try {
+
+				final Constructor<?> constructor = docManagerClass.getConstructor(Properties.class);
+				this.documentManager = (DocumentManager) constructor.newInstance(ConfigManager.getConfig());
+
+				} catch (final Exception e) {
+					LOGGER.severe("El DocumentManager utilizado no dispone de un constructor con Properties, "+ //$NON-NLS-1$
+									"se utilizara un constructor vacio para instanciarlo"); //$NON-NLS-1$
+					this.documentManager = (DocumentManager) docManagerClass.newInstance();
+				}
 			}
 
 		} catch (final Exception e) {
-			throw new IllegalArgumentException("Error al instanciar la clase utilizada para el signSaver"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Error al instanciar la clase utilizada para el documentManager"); //$NON-NLS-1$
 		}
 
 		this.signs = fillSingleSigns(jsonObject);

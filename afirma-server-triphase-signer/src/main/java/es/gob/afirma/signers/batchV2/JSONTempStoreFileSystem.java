@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.signers.batch.BatchConfigManager;
 
 final class JSONTempStoreFileSystem implements JSONTempStore {
 
@@ -58,7 +59,7 @@ final class JSONTempStoreFileSystem implements JSONTempStore {
 		try (
 			final OutputStream fos = new FileOutputStream(
 				new File(
-					JSONBatchConfigManager.getTempDir(),
+					BatchConfigManager.getTempDir(),
 					filename
 				)
 			);
@@ -96,7 +97,7 @@ final class JSONTempStoreFileSystem implements JSONTempStore {
 		try (
 			final InputStream fis = new FileInputStream(
 				new File(
-					JSONBatchConfigManager.getTempDir(),
+					BatchConfigManager.getTempDir(),
 					filename
 				)
 			);
@@ -115,7 +116,7 @@ final class JSONTempStoreFileSystem implements JSONTempStore {
 	@Override
 	public void delete(final String filename) {
 		final File f = new File(
-				JSONBatchConfigManager.getTempDir(),
+				BatchConfigManager.getTempDir(),
 				filename
 				);
 		if (f.exists()) {
