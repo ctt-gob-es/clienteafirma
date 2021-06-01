@@ -318,8 +318,7 @@ public final class BatchSigner {
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 				UrlHttpMethod.POST
 			);
-		}
-		catch (final HttpError e) {
+		}catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
 			throw e;
 		}

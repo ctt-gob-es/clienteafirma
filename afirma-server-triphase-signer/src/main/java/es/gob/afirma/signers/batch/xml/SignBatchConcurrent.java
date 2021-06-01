@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.xml;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -23,46 +23,45 @@ import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchConfigManager;
-import es.gob.afirma.signers.batchV2.JSONSingleSign.CallableResult;
-import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult;
-import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult.Result;
-import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignAlgorithm;
-import es.gob.afirma.triphase.server.document.BatchDocumentManager;
+import es.gob.afirma.signers.batch.BatchException;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.TempStore;
+import es.gob.afirma.signers.batch.TempStoreFactory;
+import es.gob.afirma.signers.batch.xml.SingleSign.CallableResult;
+import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult;
+import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult.Result;
 
-/** Lote de firmas electr&oacute;nicas que se ejecuta en paralelo. */
-public final class JSONSignBatchConcurrent extends JSONSignBatch {
+/** Lote de firmas electr&oacute;nicas que se ejecuta en paralelo.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class SignBatchConcurrent extends SignBatch {
 
-	/**
-	 * Crea un lote de firmas que se ejecuta de forma concurrente por cada una de sus firmas.
-	 * @param json JSON de definici&oacute;n de lote.
-	 * @throws IOException Si hay problemas en la creaci&oacute;n del lote.
-	 */
-	public JSONSignBatchConcurrent(final byte[] json) throws IOException {
-		super(json);
+	/** Crea un lote de firmas que se ejecuta de forma concurrente por cada una de sus firmas.
+	 * @param xml XML de definici&oacute;n de lote.
+	 * @throws IOException Si hay problemas en la creaci&oacute;n del lote. */
+	public SignBatchConcurrent(final byte[] xml) throws IOException {
+		super(xml);
 	}
 
-	/**
-	 * Crea un lote de firmas para ejecuci&oacute;n paralela.
+	/** Crea un lote de firmas para ejecuci&oacute;n paralela.
 	 * @param signs Firmas del lote.
 	 * @param algo ALgoritmo de firma para todo el lote.
 	 * @param soe <code>true</code> si se debe parar el proceso al encontrar un error,
 	 *            <code>false</code> si se deben intentar las firmas restantes del lote aun
-	 *            cuando una previa ha resultado en error.
-	 *            */
-	public JSONSignBatchConcurrent(final List<JSONSingleSign> signs,
+	 *            cuando una previa ha resultado en error. */
+	public SignBatchConcurrent(final List<SingleSign> signs,
 			                   final SignAlgorithm algo,
 			                   final boolean soe) {
 		super(signs, algo, soe);
 	}
 
 	@Override
-	public String doPreBatch(final X509Certificate[] certChain) throws JSONBatchException {
+	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
 		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<String>> callables = new ArrayList<>(this.signs.size());
 
-		for (final JSONSingleSign ss : this.signs) {
-			final Callable<String> callable = ss.getPreProcessCallable(certChain, this.algorithm, this.documentManager);
+		for (final SingleSign ss : this.signs) {
+			final Callable<String> callable = ss.getPreProcessCallable(certChain, this.algorithm);
 			callables.add(callable);
 		}
 
@@ -72,25 +71,23 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		}
 		catch (final InterruptedException e) {
 			stopExecution(executorService);
-			throw new JSONBatchException(
+			throw new BatchException(
 				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
 			);
 		}
 
-		final StringBuilder sb = new StringBuilder("{\n"); //$NON-NLS-1$
-		sb.append("\"format\":\"" + this.format + "\",\n");  //$NON-NLS-1$//$NON-NLS-2$
-		sb.append("\"signs\": ["); //$NON-NLS-1$
+		final StringBuilder sb = new StringBuilder("<xml>\n <firmas>"); //$NON-NLS-1$
 
-		for (int i = 0 ; i < results.size() ; i++) {
+		for (final Future<String> f : results) {
 			final String tmp;
 			try {
-				tmp = results.get(i).get(this.concurrentTimeout, TimeUnit.SECONDS);
+				tmp = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch (final Exception e) {
 				if (this.stopOnError) {
 					stopExecution(executorService);
-					throw new JSONBatchException(
+					throw new BatchException(
 						"Error en una de las firmas del lote, se parara el proceso: " + e, e //$NON-NLS-1$
 					);
 				}
@@ -101,12 +98,9 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 				continue;
 			}
 			sb.append(tmp);
-			if (results.size() -1 != i) {
-				sb.append(","); //$NON-NLS-1$
-			}
 		}
 
-		sb.append("]\n}"); //$NON-NLS-1$
+		sb.append("</firmas>\n</xml>"); //$NON-NLS-1$
 
 		executorService.shutdown();
 
@@ -115,7 +109,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 
 	@Override
 	public String doPostBatch(final X509Certificate[] certChain,
-                              final TriphaseData td) throws JSONBatchException {
+                              final TriphaseData td) throws BatchException {
 
 		if (td == null) {
 			throw new IllegalArgumentException(
@@ -126,9 +120,9 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<CallableResult>> callables = new ArrayList<>(this.signs.size());
 
-		for (final JSONSingleSign ss : this.signs) {
+		for (final SingleSign ss : this.signs) {
 			final Callable<CallableResult> callable = ss.getPostProcessCallable(
-				certChain, td, this.algorithm, getId(), this.documentManager
+				certChain, td, this.algorithm, getId()
 			);
 			callables.add(callable);
 		}
@@ -139,7 +133,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		}
 		catch (final InterruptedException e) {
 			stopExecution(executorService);
-			throw new JSONBatchException(
+			throw new BatchException(
 				"Error en el postproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
 			);
@@ -216,10 +210,10 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 
 		// En otro caso procedemos a la subida de datos
 
-		final JSONTempStore ts = JSONTempStoreFactory.getTempStore();
+		final TempStore ts = TempStoreFactory.getTempStore();
 
 		final Collection<Callable<CallableResult>> saveCallables = new ArrayList<>(this.signs.size());
-		for (final JSONSingleSign ss : this.signs) {
+		for (final SingleSign ss : this.signs) {
 			final Callable<CallableResult> callable = ss.getSaveCallable(
 				ts, getId()
 			);
@@ -232,7 +226,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		}
 		catch (final InterruptedException e) {
 			stopExecution(executorService);
-			throw new JSONBatchException(
+			throw new BatchException(
 				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
 			);
@@ -279,13 +273,9 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer
 		// los que se subiesen antes del error si se indico parar en error
 		if (error && this.stopOnError) {
-			for (final JSONSingleSign ss : this.signs) {
+			for (final SingleSign ss : this.signs) {
 				if (ss.getProcessResult().wasSaved()) {
-
-					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
-						((BatchDocumentManager) this.documentManager).rollback(ss.getReference());
-					}
-
+					ss.rollbackSave();
 					ss.setProcessResult(ProcessResult.PROCESS_RESULT_ROLLBACKED);
 				}
 			}
@@ -294,9 +284,9 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		return getResultLog();
 	}
 
-	private JSONSingleSign getSingleSignById(final String singleSignId) {
-		for (final JSONSingleSign ss: this.signs) {
-			if (ss.getId().equals(singleSignId)) {
+	private SingleSign getSingleSignById(final String id) {
+		for (final SingleSign ss: this.signs) {
+			if (ss.getId().equals(id)) {
 				return ss;
 			}
 		}

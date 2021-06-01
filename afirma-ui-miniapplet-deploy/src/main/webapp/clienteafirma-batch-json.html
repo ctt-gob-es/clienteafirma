@@ -7,182 +7,214 @@
 <script type="text/javascript" src="js/autoscript.js"></script>
 <script type="text/javascript" src="js/constantes.js"></script>
 <script type="text/javascript">
+		
+	//Esperar a que la página termine de cargarse
+	document.addEventListener('DOMContentLoaded', function() {
+		// Adjunte el detector de eventos `change` al checkbox
+		desactivateSingleConf();
+	}, false);
 
-		var singleSigns = new Array();
+	function showResultCallback(signatureB64, certificateB64) {
+		showLog("Firma OK");
+		document.getElementById('result').value = signatureB64;
+	}
+
+	function showLogCallback(errorType, errorMessage) {
+		showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+	}
+
+	function doSignBatch() {
+		try {
+			
+			document.getElementById("console").value = "Peticion :\n{\n"
+				+ "  \"stoponerror\":" + "\"" + document.getElementById("stopOnError").checked + "\","
+				+ AutoScript.printJSONRequest().substring(1);
+
+			AutoScript
+					.signBatchProcess(
+							document.getElementById("stopOnError").checked,
+							Constants.URL_BASE_SERVICES
+									+ "/afirma-server-triphase-signer/presign",
+							Constants.URL_BASE_SERVICES
+									+ "/afirma-server-triphase-signer/postsign",
+							document.getElementById("filters").value,
+							showResultCallback, showLogCallback);
+			
+			desactivateSingleConf();
+			
+			document.getElementById("signButton").disabled = true;
+			document.getElementById("singleSignID").value = "";
+			document.getElementById("filters").value = "";
+
+		} catch (e) {
+			showLog(e);
+		}
+	}
+
+	function addSingleSign() {
+		buildAndAddSingleSign();
+		document.getElementById("signButton").disabled = "";
+		document.getElementById("datareferenceValue").value= "";
+	}
+
+	function generateUUID() {
+		var d = new Date().getTime();
+		if (window.performance && typeof window.performance.now === "function") {
+			d += performance.now();
+			; //use high-precision timer if available
+		}
+		var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+				function(c) {
+					var r = (d + Math.random() * 16) % 16 | 0;
+					d = Math.floor(d / 16);
+					return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+				});
+		return uuid;
+	}
+
+	function buildAndAddSingleSign() {
+
+		var singleSignID = document.getElementById("singleSignID").value;
+		var datareference = document.getElementById("datareferenceValue").value;
+		var format = null;
+		var suboperation = null;
+		var extraParams = null;
+
+		if (document.getElementById("useSingleConf").checked == true) {
+			format = document.getElementById("format").value;
+			suboperation = document.getElementById("suboperation").value;
+			if(document.getElementById("params").value != ""){
+				extraParams = AutoScript.getBase64FromText(document
+						.getElementById("params").value);
+			}
+		}
+		
+		AutoScript.addDocumentToBatch(singleSignID, datareference, format,
+				suboperation, extraParams);
+		
+		printSingleSign(singleSignID, datareference, format,
+				suboperation, extraParams);
+	}
+
+	function createBatchConfiguration() {
+
+		var algorithm = document.getElementById("algorithm").value;
+		var format = document.getElementById("generalFormat").value;
+		var subOperation = document.getElementById("generalSuboperation").value;
+		var extraParams = AutoScript.getBase64FromText(document
+				.getElementById("filters").value);
+
+		AutoScript.createBatch(generateUUID(), algorithm, format, subOperation,
+				extraParams);
+	}
+
+	function showAppletLog() {
+		try {
+			showLog(AutoScript.getCurrentLog());
+		} catch (e) {
+			showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
+					+ AutoScript.getErrorMessage());
+		}
+	}
+
+	function cleanDataField(dataField, textDiv) {
+		textDiv.innerHTML = "";
+		dataField.value = null;
+	}
+
+	function addExtraParam(newParamId, listParamsId) {
+		var paramsList = document.getElementById(listParamsId);
+		paramsList.value = paramsList.value
+				+ document.getElementById(newParamId).value + "\n";
+		document.getElementById(newParamId).value = "";
+	}
+
+	function cleanExtraParams(newParamId, listParamsId) {
+		document.getElementById(listParamsId).value = "";
+		document.getElementById(newParamId).value = "";
+	}
+
+	function showLog(newLog) {
+		document.getElementById('console').value = document
+				.getElementById('console').value
+				+ "\n" + newLog;
+	}
+
+	function useSingleConfClick() {
+		if (document.getElementById("useSingleConf").checked == true) {
+			document.getElementById("format").disabled = false;
+			document.getElementById("suboperation").disabled = false;
+			document.getElementById("newParam").disabled = false;
+			document.getElementById("addParam").disabled = false;
+			document.getElementById("cleanExtraParams").disabled = false;
+			document.getElementById("params").disabled = false;
+		} else {
+			document.getElementById("format").disabled = true;
+			document.getElementById("suboperation").disabled = true;
+			document.getElementById("newParam").disabled = true;
+			document.getElementById("addParam").disabled = true;
+			document.getElementById("cleanExtraParams").disabled = true;
+			document.getElementById("params").disabled = true;
+		}
+	}
+
+	function printSingleSign(id, datareference, format, suboperation, extraParams) {
+		document.getElementById('console').value += "\n{";
+		document.getElementById('console').value += "\nid :" + id + ",";
+		document.getElementById('console').value += "\ndatareference :" + datareference;
+
+		if (document.getElementById("useSingleConf").checked == true) {
+
+			document.getElementById('console').value += ",\nformat :" + format + ",";
+			document.getElementById('console').value += "\nsuboperation :" + suboperation + "";
+
+			if (extraParams != null && extraParams != "") {
+				document.getElementById('console').value += ",\nextraParams :"
+						+ extraParams;
+			}
+		}
+		document.getElementById('console').value += "\n}\n";
+	}
+
+	function codeToB64() {
+		document.getElementById("datareferenceValue").value = AutoScript
+				.getBase64FromText(document
+						.getElementById("datareferenceValue").value);
+	}
 	
-		function showResultCallback(signatureB64, certificateB64) {
-			showLog("Firma OK");
-			document.getElementById('result').value = signatureB64;
+	function desactivateSingleConf() {
+		var elements = document.getElementsByClassName("singleSignConf");
+		document.getElementById("useSingleConf").checked = false;
+		document.getElementById("params").value = "";
+		for (var i = 0 ; i < elements.length ; i++) {
+			elements[i].disabled = true;
 		}
-
-		function showLogCallback(errorType, errorMessage) {
-			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
-		}
-
-		function doSignBatch() {
-			try {
-				
-				createBatchConfiguration();
-				
-				for (var i = 0 ; i< singleSigns.length ; i++){
-					var id = singleSigns[i].id;
-					var dataReference = singleSigns[i].datareference;
-					var format = singleSigns[i].format;
-					var suboperation = singleSigns[i].suboperation;
-					var extraparams = singleSigns[i].extraparams;
-					
-					AutoScript.addDocumentToBatch(id, dataReference, format, suboperation, extraparams);
-				}
-				
-				document.getElementById("console").value =  "Peticion :\n" + AutoScript.printJSONRequest();
-				
-				AutoScript.signBatchProcess(
-				document.getElementById("stopOnError").checked, 
-				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPresigner", 
-				Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/JSONBatchPostsigner", 
-				document.getElementById("filters").value, 
-				showResultCallback, 
-				showLogCallback, 
-				document.getElementById("concurrentTimeOut").value);
-
-			} catch(e) {
-				showLog(e);
-			}
-		}
-
-		function addSingleSign() {
-			singleSigns[singleSigns.length] = buildSingleSign(generateUUID());
-			printSingleSign(singleSigns[singleSigns.length-1]);
-			document.getElementById("signButton").disabled = "";
-		}
+	}
+	
+	function createBatchConf() {
+		createBatchConfiguration();
 		
-		function generateUUID(){
-		    var d = new Date().getTime();
-		    if(window.performance && typeof window.performance.now === "function"){
-		        d += performance.now();; //use high-precision timer if available
-		    }
-		    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-		        var r = (d + Math.random()*16)%16 | 0;
-		        d = Math.floor(d/16);
-		        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-		    });
-		    return uuid;
-		}
-		
-		function buildSingleSign(id) {
-			
-			var datareference = document.getElementById("datareferenceValue").value;
-			
-			if(document.getElementById("codeInB64").checked == true) {
-				datareference = AutoScript.getBase64FromText(datareference);
-			}
-			
-			var singleSign = new Object();
-			
-			singleSign.id = id;
-			singleSign.datareference = datareference;
-			
-			if (document.getElementById("useSingleConf").checked == true){
-				
-				var format = document.getElementById("format").value;
-				var suboperation = document.getElementById("suboperation").value;
-				var extraParams = AutoScript.getBase64FromText(document.getElementById("params").value);
-				
-				singleSign.format = format;
-				singleSign.suboperation = suboperation;
-				singleSign.extraParams = extraParams;
-			}
-			
-			return singleSign;
-		}
-		
-		function createBatchConfiguration() {
-			
-			var algorithm = document.getElementById("algorithm").value;
-			var format = document.getElementById("generalFormat").value;
-			var subOperation = document.getElementById("generalSuboperation").value;
-			var extraParams = document.getElementById("filters").value
-			
-			AutoScript.createBatch(generateUUID(), algorithm, format, subOperation, extraParams);
-		}
-
-		function showAppletLog() {
-			try {
-				showLog(AutoScript.getCurrentLog());
-			} catch(e) {
-				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: " + AutoScript.getErrorMessage());
-			}
-		}
-
-		function cleanDataField(dataField, textDiv) {
-			textDiv.innerHTML = "";
-			dataField.value = null;
-		}
-		
-		function addExtraParam(newParamId, listParamsId) {
-			var paramsList = document.getElementById(listParamsId);
-			paramsList.value = paramsList.value + document.getElementById(newParamId).value + "\n";
-			document.getElementById(newParamId).value = "";
-		}
-		
-		function cleanExtraParams(newParamId, listParamsId) {
-			document.getElementById(listParamsId).value = "";
-			document.getElementById(newParamId).value = "";
-		}
-		
-		function showLog(newLog) {
-			document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
-		}
-		
-		function useSingleConfClick() {
-			if(document.getElementById("useSingleConf").checked == true) {
-				document.getElementById("format").disabled = false;
-				document.getElementById("suboperation").disabled = false;
-				document.getElementById("newParam").disabled = false;
-				document.getElementById("addParam").disabled = false;
-				document.getElementById("cleanExtraParams").disabled = false;
-				document.getElementById("params").disabled = false;
-			} else{
-				document.getElementById("format").disabled = true; 
-				document.getElementById("suboperation").disabled = true;
-				document.getElementById("newParam").disabled = true;
-				document.getElementById("addParam").disabled = true;
-				document.getElementById("cleanExtraParams").disabled = true;
-				document.getElementById("params").disabled = true;
-			}
-		}
-		
-		function printSingleSign(singleSign) {
-			document.getElementById('console').value += "\n{";
-			document.getElementById('console').value += "\nid :" + singleSign.id + ",";
-			document.getElementById('console').value += "\ndatareference :" + singleSign.datareference + ",";
-			
-			if (document.getElementById("useSingleConf").checked == true){
-				
-				var format = document.getElementById("format").value;
-				var suboperation = document.getElementById("suboperation").value;
-				var extraParams = AutoScript.getBase64FromText(document.getElementById("params").value);
-				
-				document.getElementById('console').value += "\nformat :" + singleSign.format + ",";
-				document.getElementById('console').value += "\nsuboperation :" + singleSign.suboperation + "";
-				
-				if (extraParams != "") {
-					document.getElementById('console').value += ",\nextraParams :" + singleSign.extraParams;
-				}
-			}
-			document.getElementById('console').value += "\n}\n";
-		}
-		
-		function codeToB64() {
-				document.getElementById("datareferenceValue").value = 
-					AutoScript.getBase64FromText(document.getElementById("datareferenceValue").value);
-		}
-	</script>
+		document.getElementById("singleSignID").disabled = false;
+		document.getElementById("generateId").disabled = false; 
+		document.getElementById("datareferenceValue").disabled = false;
+		document.getElementById("codeInB64").disabled = false;
+		document.getElementById("useSingleConf").disabled = false;
+		document.getElementById("addSign").disabled = false;
+	}
+	
+	function generateSingleSignId() {
+		var id = generateUUID();
+		document.getElementById("singleSignID").value = id;
+	}
+</script>
 </head>
 <body>
 	<script type="text/javascript">
 			AutoScript.cargarAppAfirma();
-			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.setServlets(Constants.URL_BASE_SERVICES 
+					+ "/afirma-signature-storage/StorageService", 
+					Constants.URL_BASE_SERVICES 
+					+ "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 	<fieldset>
@@ -191,13 +223,6 @@
 		<div>
 			<input type="checkbox" id="stopOnError" />Parar en caso de error
 		</div>
-		<br>
-		<div>
-			<label for="concurrentTimeOut">Tiempo m&aacute;ximo por fase
-				en los procesos concurrentes:</label>&nbsp;<input type="text"
-				id="concurrentTimeOut" /> Segundos
-		</div>
-
 	</fieldset>
 	<br>
 	<fieldset>
@@ -206,7 +231,7 @@
 		<div>
 			<label for="algorithm">Algoritmo</label> <select id="algorithm">
 				<option value="SHA512withRSA">SHA512 con RSA</option>
-				<option value="SHA256withRSA">SHA1 con RSA</option>
+				<option value="SHA256withRSA">SHA256 con RSA</option>
 			</select>
 		</div><br>
 
@@ -230,7 +255,7 @@
 		</div><br>
 		
 		<div>
-			<label for="filter">Filtros</label> <input id="filter" type="text"><input
+			<label for="filter">ExtraParams y Filtros</label> <input id="filter" type="text"><input
 				type="button" value="Agregar"
 				onclick="addExtraParam('filter', 'filters');">&nbsp; <input
 				type="button" value="Limpiar"
@@ -238,26 +263,33 @@
 				las propiedades de una en una)</span> <br>
 			<textarea id="filters" cols="50" rows="5" readonly></textarea>
 		</div>
-
+		<input type="button" value="Crear nuevo lote" onclick="createBatchConf();" >
 	</fieldset>
 	<br>
 	<fieldset>
+		<label for="singleSignID">ID :</label>
+		<input id="singleSignID" type="text" class="singleSignConf" size="33"/> 
+		<button id="generateId" type="button" onclick="generateSingleSignId()" class="singleSignConf">
+		Generar ID aleatorio
+		</button>
 		<legend>Configuraci&oacute;n de firmas particulares</legend>
 		<fieldset>
 			<legend>Referencia a  datos (Utilizada en DocumentManager)</legend>
-			<div style="font-weight: bold;">La referencia a los datos indicada
-			en este apartado debe de codificarse en base 64</div>
+			<div style="font-weight: bold;">La referencia a los datos deben codificarse en base 64. 
+			El tratamiento de estos datos depender&aacute; del DocumentManager utilizado.</div>
 			<br> 
 			<input type="text" name="datareferenceValue"
-				id="datareferenceValue" style="width: 600px;" />
-			<button id="codeInB64" type="button" onclick="codeToB64()">Codificar a base 64</button>
+				id="datareferenceValue" style="width: 600px;" class="singleSignConf"/>
+			<button id="codeInB64" type="button" onclick="codeToB64()" class="singleSignConf">Codificar a base 64</button>
 		</fieldset><br>
+		
 		<fieldset>
-		<legend><input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" checked/> 
+		<legend><input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" class="singleSignConf"/> 
 		<label for="suboperation">Aplicar configuraci&oacute;n individual</label><br></legend>
 		<br>
 		<div>
-			<label for="format">Formato</label> <select id="format">
+			<label for="format" >Formato</label> 
+			<select id="format" class="singleSignConf">
 				<option value="CAdES" selected>CAdES</option>
 				<option value="PAdES">PAdES</option>
 				<option value="XAdES">XAdES</option>
@@ -266,8 +298,8 @@
 		</div><br>
 
 		<div>
-			<label for="suboperation">Operaci&oacute;n</label> <select
-				id="suboperation">
+			<label for="suboperation">Operaci&oacute;n</label> 
+			<select id="suboperation" class="singleSignConf">
 				<option value="sign">Firma</option>
 				<option value="cosign">Cofirma</option>
 				<option value="countersign">Contrafirma</option>
@@ -275,16 +307,18 @@
 		</div><br>
 
 		<div>
-			<label for="newParam">ExtraParams</label> <input id="newParam"
-				type="text"><input type="button" value="Agregar" id="addParam"
-				onclick="addExtraParam('newParam', 'params');">&nbsp; <input
-				type="button" value="Limpiar" id="cleanExtraParams"
-				onclick="cleanExtraParams('newParam', 'params');">&nbsp; <span>(Insertar
-				las propiedades de una en una)</span> <br>
-			<textarea id="params" cols="50" rows="5" readonly></textarea>
+			<label for="newParam">ExtraParams</label> 
+			<input id="newParam" type="text" class="singleSignConf">
+			<input type="button" value="Agregar" id="addParam" 
+			onclick="addExtraParam('newParam', 'params');" class="singleSignConf">&nbsp; 
+			<input type="button" value="Limpiar" id="cleanExtraParams" 
+			onclick="cleanExtraParams('newParam', 'params');" class="singleSignConf">&nbsp; 
+			<span>(Insertar las propiedades de una en una)</span> <br>
+			<textarea id="params" cols="50" rows="5" class="singleSignConf" readonly></textarea>
 		</div>
 		</fieldset>
-		<input type="button" value="Agregar firma" onclick="addSingleSign();">
+		<input type="button" value="Agregar firma" id="addSign" 
+		onclick="addSingleSign();" class="singleSignConf">
 	</fieldset>
 
 	<br />

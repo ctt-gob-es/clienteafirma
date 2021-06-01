@@ -440,17 +440,13 @@ var AutoScript = ( function ( window, undefined ) {
 			jsonRequest.singlesigns.push(singleSign);
 		}
 		
-		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback, concurrentTimeout) {
+		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
 			
 			if (jsonRequest == undefined || jsonRequest == null) {
 				throw new Error("No hay ningun lote creado. Es necesario crear uno antes de firmar.");
 			}
 			
 			jsonRequest.stoponerror = stopOnError;
-			
-			if (concurrentTimeout != null && concurrentTimeout != "" ) {
-				jsonRequest.concurrenttimeout = concurrentTimeout;
-			}
 			
 			var jsonRequestB64 = Base64.encode(JSON.stringify(jsonRequest));
 			jsonRequestB64 = jsonRequestB64.replace(/\+/g, "-").replace(/\//g, "_");

@@ -26,9 +26,9 @@ import es.gob.afirma.core.misc.AOUtil;
  */
 public final class FileSystemCacheManager implements DocumentCacheManager {
 
-	private static final String PROP_TMP_DIR = "tmpDir"; //$NON-NLS-1$
-	private static final String PROP_EXP_TIME = "expTime"; //$NON-NLS-1$
-	private static final String PROP_MAX_USE_TO_CLEANING = "maxUseToCleaning"; //$NON-NLS-1$
+	private static final String PROP_TMP_DIR = "cache.tmpDir"; //$NON-NLS-1$
+	private static final String PROP_EXP_TIME = "cache.expTime"; //$NON-NLS-1$
+	private static final String PROP_MAX_USE_TO_CLEANING = "cache.maxUseToCleaning"; //$NON-NLS-1$
 
 	private static final File DEFAULT_TMP_DIR = new File(System.getProperty("java.io.tmpdir"), "triphaseSignTemp");  //$NON-NLS-1$ //$NON-NLS-2$
 	private static final long DEFAULT_EXP_TIME = 60000;
@@ -128,7 +128,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 		do {
 			newId = generateNewId() + ".tmp"; //$NON-NLS-1$
 			file = new File(this.tmpDir, newId);
-		} while (!file.exists());
+		} while (file.exists());
 
 		// Guardamos el archivo en el directorio indicado en el archivo de configuracion
 		try (final OutputStream os = new FileOutputStream(file)) {

@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -24,7 +24,13 @@ import org.json.JSONObject;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.batch.BatchConfigManager;
+import es.gob.afirma.signers.batch.BatchException;
+import es.gob.afirma.signers.batch.SingleSignConstants;
+import es.gob.afirma.signers.batch.TempStore;
+import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.triphase.server.ConfigManager;
+import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 
@@ -33,7 +39,6 @@ public abstract class JSONSignBatch {
 
 	private static final String JSON_ELEMENT_ID = "id"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_DATAREFERENCE = "datareference"; //$NON-NLS-1$
-	private static final String JSON_ELEMENT_CONCURRENTTIMEOUT = "concurrenttimeout"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_FORMAT = "format"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_ALGORITHM = "algorithm"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_SINGLESIGNS = "singlesigns"; //$NON-NLS-1$
@@ -41,26 +46,26 @@ public abstract class JSONSignBatch {
 	private static final String JSON_ELEMENT_STOPONERROR = "stoponerror"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
-	private static final long DEFAULT_CONCURRENTTIMEOUT = 30;
-
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Lista de firmas a procesar. */
 	protected final List<JSONSingleSign> signs;
 
-	protected JSONSingleSignConstants.SignAlgorithm algorithm = null;
+	protected SingleSignConstants.SignAlgorithm algorithm = null;
 
 	protected String id;
 
 	protected String extraParams;
 
-	protected long concurrentTimeout = Long.MAX_VALUE;
+	protected long concurrentTimeout = 30;
 
-	protected JSONSingleSignConstants.SignSubOperation subOperation = null;
+	protected SingleSignConstants.SignSubOperation subOperation = null;
 
-	protected JSONSingleSignConstants.SignFormat format = null;
+	protected SingleSignConstants.SignFormat format = null;
 
 	protected DocumentManager documentManager = null;
+
+	protected DocumentCacheManager docCacheManager = null;
 
 	/** Indica si se debe parar al encontrar un error o por el contrario se debe continuar con el proceso. */
 	protected boolean stopOnError = false;
@@ -69,9 +74,9 @@ public abstract class JSONSignBatch {
 	 * Ejecuta el preproceso de firma por lote.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @return Datos trif&aacute;sicos de pre-firma del lote.
-	 * @throws JSONBatchException Si hay errores irrecuperables en el proceso.
+	 * @throws BatchException
 	 */
-	public abstract String doPreBatch(final X509Certificate[] certChain) throws JSONBatchException;
+	public abstract String doPreBatch(final X509Certificate[] certChain) throws BatchException;
 
 	/**
 	 * Ejecuta el postproceso de firma por lote.
@@ -80,10 +85,10 @@ public abstract class JSONSignBatch {
 	 *           Debe contener los datos de todas y cada una de las firmas del lote.
 	 * @return Registro del resultado general del proceso por lote, en un JSON (<a href="../doc-files/resultlog-scheme.html">descripci&oacute;n
 	 *         del formato</a>).
-	 * @throws JSONBatchException Si hay errores irrecuperables en el postproceso.
+	 * @throws BatchException Si hay errores irrecuperables en el postproceso.
 	 */
 	public abstract String doPostBatch(final X509Certificate[] certChain,
-                                       final TriphaseData td) throws JSONBatchException;
+                                       final TriphaseData td) throws BatchException;
 
 	/**
 	 * Crea un lote de firmas a partir de su definici&oacute;n JSON.
@@ -113,14 +118,13 @@ public abstract class JSONSignBatch {
 		this.id = jsonObject.has(JSON_ELEMENT_ID) ?
 				jsonObject.getString(JSON_ELEMENT_ID) : UUID.randomUUID().toString();
 
-		this.concurrentTimeout = jsonObject.has(JSON_ELEMENT_CONCURRENTTIMEOUT) ?
-				jsonObject.getLong(JSON_ELEMENT_CONCURRENTTIMEOUT) : DEFAULT_CONCURRENTTIMEOUT;
+		this.concurrentTimeout = BatchConfigManager.getConcurrentTimeout();
 
 		this.stopOnError = jsonObject.has(JSON_ELEMENT_STOPONERROR) ?
 				jsonObject.getBoolean(JSON_ELEMENT_STOPONERROR) : false;
 
 		if (jsonObject.has(JSON_ELEMENT_ALGORITHM)) {
-			this.algorithm = JSONSingleSignConstants.SignAlgorithm.getAlgorithm(
+			this.algorithm = SingleSignConstants.SignAlgorithm.getAlgorithm(
 								jsonObject.getString(JSON_ELEMENT_ALGORITHM)
 								);
 		} else {
@@ -128,7 +132,7 @@ public abstract class JSONSignBatch {
 		}
 
 		if (jsonObject.has(JSON_ELEMENT_FORMAT)) {
-			this.format = JSONSingleSignConstants.SignFormat.getFormat(
+			this.format = SingleSignConstants.SignFormat.getFormat(
 							jsonObject.getString(JSON_ELEMENT_FORMAT)
 							);
 		} else {
@@ -136,7 +140,7 @@ public abstract class JSONSignBatch {
 		}
 
 		if (jsonObject.has(JSON_ELEMENT_SUBOPERATION)) {
-			this.subOperation = JSONSingleSignConstants.SignSubOperation.getSubOperation(
+			this.subOperation = SingleSignConstants.SignSubOperation.getSubOperation(
 									jsonObject.getString(JSON_ELEMENT_SUBOPERATION)
 								);
 		} else {
@@ -173,11 +177,45 @@ public abstract class JSONSignBatch {
 			throw new IllegalArgumentException("Error al instanciar la clase utilizada para el documentManager"); //$NON-NLS-1$
 		}
 
+		if (Boolean.parseBoolean(ConfigManager.isCacheEnabled())) {
+
+			final Class<?> docCacheManagerClass;
+			String docCacheManagerClassName;
+			docCacheManagerClassName = ConfigManager.getDocCacheManagerClassName();
+
+			try {
+				docCacheManagerClass = Class.forName(docCacheManagerClassName);
+			}
+			catch (final ClassNotFoundException e) {
+				throw new RuntimeException(
+						"La clase DocumentCacheManager indicada no existe ("  //$NON-NLS-1$
+						+ docCacheManagerClassName +  "): " + e, e //$NON-NLS-1$
+						);
+			}
+
+			try {
+				final Constructor<?> docCacheManagerConstructor = docCacheManagerClass.getConstructor(Properties.class);
+				this.docCacheManager = (DocumentCacheManager) docCacheManagerConstructor.newInstance(ConfigManager.getConfig());
+			}
+			catch (final Exception e) {
+				try {
+					this.docCacheManager = (DocumentCacheManager) docCacheManagerClass.getConstructor().newInstance();
+				}
+				catch (final Exception e2) {
+					throw new RuntimeException(
+							"No se ha podido inicializar el DocumentCacheManager. Debe tener un constructor vacio o que reciba un Properties: " + e2, e //$NON-NLS-1$
+							);
+				}
+			}
+
+			LOGGER.info("Se usara el siguiente 'DocumentCacheManager' para firma trifasica: " + this.docCacheManager.getClass().getName()); //$NON-NLS-1$
+		}
+
 		this.signs = fillSingleSigns(jsonObject);
 	}
 
 	protected JSONSignBatch(final List<JSONSingleSign> signatures,
-			            final JSONSingleSignConstants.SignAlgorithm algo,
+			            final SingleSignConstants.SignAlgorithm algo,
 			            final boolean soe) {
 
 		if (signatures == null) {
@@ -242,7 +280,7 @@ public abstract class JSONSignBatch {
 		// Iniciamos el log de retorno
 		final StringBuilder ret = new StringBuilder("{ \n \"signs\":[\n"); //$NON-NLS-1$
 		for (int i = 0; i < this.signs.size() ; i++) {
-			ret.append(this.signs.get(i).getProcessResult().toString());
+			ret.append(this.signs.get(i).getJSONProcessResult().toString());
 			if(this.signs.size()-1 != i) {
 				ret.append(","); //$NON-NLS-1$
 			}
@@ -254,7 +292,7 @@ public abstract class JSONSignBatch {
 
 	/** Borra todos los ficheros temporales usados en el proceso del lote. */
 	protected void deleteAllTemps() {
-		final JSONTempStore ts = JSONTempStoreFactory.getTempStore();
+		final TempStore ts = TempStoreFactory.getTempStore();
 		for (final JSONSingleSign ss : this.signs) {
 			ts.delete(ss, getId());
 		}
@@ -265,20 +303,20 @@ public abstract class JSONSignBatch {
 		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
 
 		if (singleSignsArray != null) {
-			for (int i=0;i<singleSignsArray.length();i++){
+			for (int i=0 ; i<singleSignsArray.length() ; i++){
 
 				final JSONSingleSign singleSign = new JSONSingleSign(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_ID));
 
 				singleSign.setReference(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
 
 				singleSign.setFormat(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_FORMAT)
-						? JSONSingleSignConstants.SignFormat.getFormat(
+						? SingleSignConstants.SignFormat.getFormat(
 								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_FORMAT)
 								)
 								: this.format);
 
 				singleSign.setSubOperation(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_SUBOPERATION)
-						? JSONSingleSignConstants.SignSubOperation.getSubOperation(
+						? SingleSignConstants.SignSubOperation.getSubOperation(
 								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_SUBOPERATION)
 								)
 								: this.subOperation);
@@ -286,10 +324,13 @@ public abstract class JSONSignBatch {
 				singleSign.setDocumentManager(this.documentManager);
 
 				try {
-					singleSign.setExtraParams(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_EXTRAPARAMS)
-							? AOUtil.base642Properties (
-									singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_EXTRAPARAMS)
-									) : null);
+					if (singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_EXTRAPARAMS)) {
+						singleSign.setExtraParams(
+								AOUtil.base642Properties(
+										singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_EXTRAPARAMS)));
+					}else {
+						singleSign.setExtraParams(AOUtil.base642Properties(this.extraParams));
+					}
 				} catch (final Exception e) {
 					throw new JSONException(
 							"El objeto JSON no está correctamente formado"); //$NON-NLS-1$
@@ -324,7 +365,7 @@ public abstract class JSONSignBatch {
 	 * Obtiene el algoritmo de firma.
 	 * @return Algoritmo de firma.
 	 * */
-	public JSONSingleSignConstants.SignAlgorithm getSignAlgorithm() {
+	public SingleSignConstants.SignAlgorithm getSignAlgorithm() {
 		return this.algorithm;
 	}
 

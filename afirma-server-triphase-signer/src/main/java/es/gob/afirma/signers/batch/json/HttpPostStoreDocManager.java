@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -18,7 +18,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST. */
-public abstract class HttpPostGetDocManager implements BatchDocumentManager {
+public abstract class HttpPostStoreDocManager implements BatchDocumentManager {
 
 	@Override
 	public void init(final Properties config) {
@@ -26,15 +26,12 @@ public abstract class HttpPostGetDocManager implements BatchDocumentManager {
 	}
 
 	@Override
-	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties config) throws IOException{
-		return Base64.decode(
-				// Por si acaso deshacemos un posible URL Safe
-				id.replace("-", "+").replace("_", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			);
-	}
+	public abstract byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties config) throws IOException;
 
 	@Override
-	public abstract String storeDocument(final String id, final X509Certificate[] certChain, final byte[] data, final Properties config) throws IOException;
+	public String storeDocument(final String id, final X509Certificate[] certChain, final byte[] data, final Properties config) throws IOException {
+		return Base64.encode(data, true);
+	}
 
 	@Override
 	public void rollback(final String singleSignId) {

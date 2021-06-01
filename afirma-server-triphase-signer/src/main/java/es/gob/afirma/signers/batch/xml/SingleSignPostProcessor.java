@@ -7,9 +7,10 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.xml;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -23,15 +24,18 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
-import es.gob.afirma.signers.batch.BatchConfigManager;
-import es.gob.afirma.triphase.server.document.DocumentManager;
+import es.gob.afirma.signers.batch.LegacyFunctions;
+import es.gob.afirma.signers.batch.SingleSignConstants;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
+import es.gob.afirma.signers.batch.TempStoreFactory;
+import es.gob.afirma.signers.batch.TriPhaseHelper;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
-final class JSONSingleSignPostProcessor {
+final class SingleSignPostProcessor {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private JSONSingleSignPostProcessor() {
+	private SingleSignPostProcessor() {
 		// No instanciable
 	}
 
@@ -41,35 +45,26 @@ final class JSONSingleSignPostProcessor {
 	 * @param tdata Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
 	 *           Debe serializarse como un XML con esta forma (ejemplo):
 	 *           <pre>
-	 *{
- 	 *	"signs":[
-	 *		{	"id":"CADES-001",
-  	 *			"result":"DONE_AND_SAVED",
- 	 *			"description":""
-	 *		},
-	 *		{	"id":"XADES-002",
- 	 *			"result":"DONE_AND_SAVED",
- 	 *			"description":""
-	 *		},
-	 *		{	"id":"PADES-003",
- 	 *			"result":"DONE_AND_SAVED",
- 	 *			"description":""
-	 *		}
-	 *	]
-	 *}
+	 *            &lt;xml&gt;
+	 *             &lt;firmas&gt;
+	 *              &lt;firma Id="53820fb4-336a-47ee-b7ba-f32f58e5cfd6"&gt;
+	 *               &lt;param n="PRE"&gt;MYICXDAYBgk[...]GvykA=&lt;/param&gt;
+	 *               &lt;param n="PK1"&gt;dC2dIILB9HV[...]xT1bY=&lt;/param&gt;
+	 *               &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
+	 *              &lt;/firma&gt;
+	 *             &lt;/firmas&gt;
+	 *            &lt;/xml&gt;
 	 *           </pre>
 	 * @param algorithm Algoritmo de firma.
 	 * @param batchId Identificador del lote de firma.
-	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
-	static void doPostProcess(final JSONSingleSign sSign,
+	static void doPostProcess(final SingleSign sSign,
 			                  final X509Certificate[] certChain,
 			                  final TriphaseData tdata,
-			                  final JSONSingleSignConstants.SignAlgorithm algorithm,
-			                  final String batchId,
-			                  final DocumentManager docManager) throws IOException,
+			                  final SingleSignConstants.SignAlgorithm algorithm,
+			                  final String batchId) throws IOException,
 			                                                                            AOException,
 			                                                                            NoSuchAlgorithmException {
 		if (certChain == null || certChain.length < 1) {
@@ -81,16 +76,16 @@ final class JSONSingleSignPostProcessor {
 		final TriphaseData td = cleanTriphaseData(tdata, sSign.getId());
 
 		try {
-			JSONTriPhaseHelper.checkSignaturesIntegrity(td, certChain[0]);
+			TriPhaseHelper.checkSignaturesIntegrity(td, certChain[0]);
 		}
 		catch (final Exception e) {
 			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
 		}
 
 		// Instanciamos el preprocesador adecuado
-		final TriPhasePreProcessor prep = JSONSingleSignConstants.getTriPhasePreProcessor(sSign);
+		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
-		final byte[] docBytes = docManager.getDocument(sSign.getReference(), certChain, null);
+		byte[] docBytes = sSign.getData(true);
 
 		Properties extraParams;
 		try {
@@ -102,8 +97,25 @@ final class JSONSingleSignPostProcessor {
 			extraParams = sSign.getExtraParams();
 		}
 
+
 		//TODO: Deshacer cuando se permita la generacion de firmas baseline
-		extraParams.remove("profile"); //$NON-NLS-1$
+		extraParams.remove("profile");
+
+		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
+		// abandone el soporte de XAdES explicitas)
+		if (sSign.getSubOperation() == SignSubOperation.SIGN
+				&& LegacyFunctions.isXadesExplicitConfigurated(sSign.getSignFormat().name(), extraParams)) {
+			LOGGER.warning(
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+			);
+			try {
+				docBytes = MessageDigest.getInstance("SHA1").digest(docBytes); //$NON-NLS-1$
+				extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (final Exception e) {
+				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+			}
+		}
 
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {
@@ -113,7 +125,7 @@ final class JSONSingleSignPostProcessor {
 					algorithm.toString(),
 					certChain,
 					extraParams,
-					td
+					td.toString().getBytes()
 				);
 				break;
 			case COSIGN:
@@ -122,7 +134,7 @@ final class JSONSingleSignPostProcessor {
 					algorithm.toString(),
 					certChain,
 					extraParams,
-					td
+					td.toString().getBytes()
 				);
 				break;
 			case COUNTERSIGN:
@@ -149,15 +161,8 @@ final class JSONSingleSignPostProcessor {
 				);
 		}
 
-		// Se almacenara el documento con la configuracion indicada en el DocumentManager
-		if(BatchConfigManager.isConcurrentMode()) {
-			JSONTempStoreFactory.getTempStore().store(signedDoc, sSign, batchId);
-		} else {
-			final Properties singleSignProps = new Properties();
-			singleSignProps.put("format", sSign.getSignFormat().toString()); //$NON-NLS-1$
-			docManager.storeDocument(sSign.getReference(), certChain, signedDoc, singleSignProps);
-		}
-
+		// Guardamos el resultado en almacenamiento temporal
+		TempStoreFactory.getTempStore().store(signedDoc, sSign, batchId);
 	}
 
 	/** Elimina los datos de sesi&oacute;n que no est&eacute;n relacionados con la firma actual.

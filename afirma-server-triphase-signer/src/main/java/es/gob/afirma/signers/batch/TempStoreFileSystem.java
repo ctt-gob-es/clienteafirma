@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.signers.batch.xml.SingleSign;
 
 final class TempStoreFileSystem implements TempStore {
 

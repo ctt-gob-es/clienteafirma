@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -19,13 +19,17 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult.Result;
-import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignFormat;
-import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignSubOperation;
+import es.gob.afirma.signers.batch.SingleSignConstants;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
+import es.gob.afirma.signers.batch.TempStore;
+import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult.Result;
+import es.gob.afirma.signers.batch.xml.SingleSign;
+import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote. */
-public final class JSONSingleSign {
+public final class JSONSingleSign extends SingleSign{
 
 	private static final String PROP_ID = "SignatureId"; //$NON-NLS-1$
 
@@ -50,17 +54,12 @@ public final class JSONSingleSign {
 
 	private DocumentManager documentManager;
 
-	private ProcessResult processResult = new ProcessResult(Result.NOT_STARTED, null);
+	private JSONProcessResult processResult = new JSONProcessResult(Result.NOT_STARTED, null);
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */
 	JSONSingleSign(final String id) {
 		this.id = id;
-		this.extraParams = new Properties();
-		// El identificador de la firma debe transmitirse al firmador trifasico a traves
-		// de los extraParams para que este lo utilice y asi podamos luego asociar la
-		// firma con los datos a los que corresponden
-		this.extraParams.put(PROP_ID, getId());
 	}
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
@@ -100,12 +99,6 @@ public final class JSONSingleSign {
 
 		this.id = id;
 
-		// El identificador de la firma debe transmitirse al firmador trifasico a traves
-		// de los extraParams para que este lo utilice y asi podamos luego asociar la
-		// firma con los datos a los que corresponden
-		this.extraParams = xParams != null ? xParams : new Properties();
-		this.extraParams.put(PROP_ID, getId());
-
 		this.subOperation = subOp;
 		this.documentManager = ss;
 	}
@@ -118,6 +111,7 @@ public final class JSONSingleSign {
 	 * Recupera los par&aacute;metros de configuraci&oacute;n del formato de firma.
 	 * @return Configuraci&oacute;n del formato de firma.
 	 */
+	@Override
 	public Properties getExtraParams() {
 		return this.extraParams;
 	}
@@ -126,15 +120,18 @@ public final class JSONSingleSign {
 	 * Recupera el formato de firma.
 	 * @return Formato de firma.
 	 */
+	@Override
 	public SignFormat getSignFormat() {
 		return this.format;
 	}
 
-	SignSubOperation getSubOperation() {
+	@Override
+	protected SignSubOperation getSubOperation() {
 		return this.subOperation;
 	}
 
-	void setExtraParams(final Properties extraParams) {
+	@Override
+	protected void setExtraParams(final Properties extraParams) {
 		// El identificador de la firma debe transmitirse al firmador trifasico a traves
 		// de los extraParams para que este lo utilice y asi podamos luego asociar la
 		// firma con los datos a los que corresponden
@@ -150,11 +147,13 @@ public final class JSONSingleSign {
 		this.reference = reference;
 	}
 
-	void setFormat(final SignFormat format) {
+	@Override
+	protected void setFormat(final SignFormat format) {
 		this.format = format;
 	}
 
-	void setSubOperation(final SignSubOperation subOperation) {
+	@Override
+	protected void setSubOperation(final SignSubOperation subOperation) {
 		this.subOperation = subOperation;
 	}
 
@@ -207,10 +206,11 @@ public final class JSONSingleSign {
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
 	String doPreProcess(final X509Certificate[] certChain,
-			            final JSONSingleSignConstants.SignAlgorithm algorithm,
-			            final DocumentManager docManager) throws IOException,
+			            final SingleSignConstants.SignAlgorithm algorithm,
+			            final DocumentManager docManager,
+			            final DocumentCacheManager docCacheManager) throws IOException,
 			                                                                      AOException {
-		return JSONSingleSignPreProcessor.doPreProcess(this, certChain, algorithm, docManager);
+		return JSONSingleSignPreProcessor.doPreProcess(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
 	/** Obtiene la tarea de preproceso de firma para ser ejecutada en paralelo.
@@ -219,9 +219,10 @@ public final class JSONSingleSign {
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo. */
 	Callable<String> getPreProcessCallable(final X509Certificate[] certChain,
-                                                  final JSONSingleSignConstants.SignAlgorithm algorithm,
-                                                  final DocumentManager docManager) {
-		return new PreProcessCallable(this, certChain, algorithm, docManager);
+                                                  final SingleSignConstants.SignAlgorithm algorithm,
+                                                  final DocumentManager docManager,
+                                                  final DocumentCacheManager docCacheManager) {
+		return new PreProcessCallable(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
 	/** Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
@@ -260,13 +261,14 @@ public final class JSONSingleSign {
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
 	void doPostProcess(final X509Certificate[] certChain,
 			                  final TriphaseData td,
-			                  final JSONSingleSignConstants.SignAlgorithm algorithm,
+			                  final SingleSignConstants.SignAlgorithm algorithm,
 			                  final String batchId,
-			                  final DocumentManager docManager) throws IOException,
+			                  final DocumentManager docManager,
+			                  final DocumentCacheManager docCacheManager) throws IOException,
 			                                               AOException,
 			                                               NoSuchAlgorithmException {
 		JSONSingleSignPostProcessor.doPostProcess(
-			this, certChain, td, algorithm, batchId, docManager
+			this, certChain, td, algorithm, batchId, docManager, docCacheManager
 		);
 	}
 
@@ -298,30 +300,32 @@ public final class JSONSingleSign {
 	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo. */
 	Callable<CallableResult> getPostProcessCallable(final X509Certificate[] certChain,
 			                                                          final TriphaseData td,
-			                                                          final JSONSingleSignConstants.SignAlgorithm algorithm,
+			                                                          final SingleSignConstants.SignAlgorithm algorithm,
 			                                                          final String batchId,
-			                                                          final DocumentManager docManager) {
-		return new PostProcessCallable(this, certChain, td, algorithm, batchId, docManager);
+			                                                          final DocumentManager docManager,
+			                                                          final DocumentCacheManager docCacheManager) {
+		return new PostProcessCallable(this, certChain, td, algorithm, batchId, docManager, docCacheManager);
 	}
 
-	Callable<CallableResult> getSaveCallable(final JSONTempStore ts, final String batchId) {
+	Callable<CallableResult> getSaveCallableJSON(final TempStore ts, final String batchId) {
 
-		return new SaveCallable(this, this.documentManager, ts, batchId);
+		return new JSONSaveCallable(this, this.documentManager, ts, batchId);
 	}
 
 	/**
 	 * Recupera el identificador asignado en el lote a la firma.
 	 * @return Identificador.
 	 */
+	@Override
 	public String getId() {
 		return this.id;
 	}
 
-	void setProcessResult(final ProcessResult pResult) {
+	void setProcessResult(final JSONProcessResult pResult) {
 		this.processResult = pResult;
 	}
 
-	ProcessResult getProcessResult() {
+	public JSONProcessResult getJSONProcessResult() {
 		this.processResult.setId(getId());
 		return this.processResult;
 	}
@@ -358,7 +362,7 @@ public final class JSONSingleSign {
 		}
 	}
 
-	static final class ProcessResult {
+	public static final class JSONProcessResult {
 
 		enum Result {
 			NOT_STARTED,
@@ -380,12 +384,12 @@ public final class JSONSingleSign {
 			return Result.DONE_AND_SAVED.equals(this.result);
 		}
 
-		static final ProcessResult PROCESS_RESULT_OK_UNSAVED = new ProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null);
-		static final ProcessResult PROCESS_RESULT_SKIPPED    = new ProcessResult(Result.SKIPPED,                null);
-		static final ProcessResult PROCESS_RESULT_DONE_SAVED = new ProcessResult(Result.DONE_AND_SAVED,         null);
-		static final ProcessResult PROCESS_RESULT_ROLLBACKED = new ProcessResult(Result.SAVE_ROLLBACKED,        null);
+		static final JSONProcessResult PROCESS_RESULT_OK_UNSAVED = new JSONProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null);
+		static final JSONProcessResult PROCESS_RESULT_SKIPPED    = new JSONProcessResult(Result.SKIPPED,                null);
+		static final JSONProcessResult PROCESS_RESULT_DONE_SAVED = new JSONProcessResult(Result.DONE_AND_SAVED,         null);
+		static final JSONProcessResult PROCESS_RESULT_ROLLBACKED = new JSONProcessResult(Result.SAVE_ROLLBACKED,        null);
 
-		ProcessResult(final Result r, final String d) {
+		JSONProcessResult(final Result r, final String d) {
 			if (r == null) {
 				throw new IllegalArgumentException(
 					"El resultado no puede ser nulo" //$NON-NLS-1$
@@ -413,22 +417,26 @@ public final class JSONSingleSign {
 	static class PreProcessCallable implements Callable<String> {
 		private final JSONSingleSign ss;
 		private final X509Certificate[] certChain;
-		private final JSONSingleSignConstants.SignAlgorithm algorithm;
+		private final SingleSignConstants.SignAlgorithm algorithm;
 		private final DocumentManager documentManager;
+		private final DocumentCacheManager docCacheManager;
 
 		public PreProcessCallable(final JSONSingleSign ss, final X509Certificate[] certChain,
-                final JSONSingleSignConstants.SignAlgorithm algorithm,
-                final DocumentManager docManager) {
+                final SingleSignConstants.SignAlgorithm algorithm,
+                final DocumentManager docManager,
+                final DocumentCacheManager docCacheManager) {
 			this.ss = ss;
 			this.certChain = certChain;
 			this.algorithm = algorithm;
 			this.documentManager = docManager;
+			this.docCacheManager = docCacheManager;
 		}
 
 		@Override
 		public String call() throws Exception {
 			return JSONSingleSignPreProcessor.doPreProcess(this.ss, this.certChain,
-														this.algorithm, this.documentManager);
+														this.algorithm, this.documentManager,
+														this.docCacheManager);
 		}
 	}
 
@@ -437,26 +445,30 @@ public final class JSONSingleSign {
 		private final JSONSingleSign ss;
 		private final X509Certificate[] certChain;
 		private final TriphaseData td;
-		private final JSONSingleSignConstants.SignAlgorithm algorithm;
+		private final SingleSignConstants.SignAlgorithm algorithm;
 		private final String batchId;
 		private final DocumentManager documentManager;
+		private final DocumentCacheManager docCacheManager;
 
 		public PostProcessCallable(final JSONSingleSign ss, final X509Certificate[] certChain,
-                final TriphaseData td, final JSONSingleSignConstants.SignAlgorithm algorithm,
-                final String batchId, final DocumentManager docManager) {
+                final TriphaseData td, final SingleSignConstants.SignAlgorithm algorithm,
+                final String batchId, final DocumentManager docManager,
+                final DocumentCacheManager docCacheManager) {
 			this.ss = ss;
 			this.certChain = certChain;
 			this.td = td;
 			this.algorithm = algorithm;
 			this.batchId = batchId;
 			this.documentManager = docManager;
+			this.docCacheManager = docCacheManager;
 		}
 
 		@Override
 		public CallableResult call() {
 			try {
 				JSONSingleSignPostProcessor.doPostProcess(this.ss, this.certChain, this.td,
-														this.algorithm, this.batchId, this.documentManager);
+														this.algorithm, this.batchId, this.documentManager,
+														this.docCacheManager);
 			}
 			catch(final Exception e) {
 				return new CallableResult(this.ss.getId(), e);
@@ -465,14 +477,14 @@ public final class JSONSingleSign {
 		}
 	}
 
-	static class SaveCallable implements Callable<CallableResult> {
+	static class JSONSaveCallable implements Callable<CallableResult> {
 
 		private final JSONSingleSign ss;
 		private final DocumentManager documentManager;
-		private final JSONTempStore ts;
+		private final TempStore ts;
 		private final String batchId;
 
-		public SaveCallable(final JSONSingleSign ss, final DocumentManager documentManager, final JSONTempStore ts, final String batchId) {
+		public JSONSaveCallable(final JSONSingleSign ss, final DocumentManager documentManager, final TempStore ts, final String batchId) {
 			this.ss = ss;
 			this.documentManager = documentManager;
 			this.ts = ts;

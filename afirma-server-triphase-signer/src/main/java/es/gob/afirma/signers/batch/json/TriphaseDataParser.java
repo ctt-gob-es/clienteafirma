@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.json;
 
 
 import java.io.ByteArrayInputStream;

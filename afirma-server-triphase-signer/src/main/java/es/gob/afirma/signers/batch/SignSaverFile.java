@@ -17,6 +17,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.signers.batch.xml.SingleSign;
+
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST.
  * <b>Esta clase es &uacute;nicamente un ejemplo de implementaci&oacute;n del interfaz <code>SignSaver</code>
  * para depuraci&oacute;n, <u>nunca</u> debe usarse en entornos reales</b> (no hay comprobaciones de

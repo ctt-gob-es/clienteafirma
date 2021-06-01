@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchConfigManager;
-import es.gob.afirma.signers.batch.SignBatch;
-import es.gob.afirma.signers.batch.SignBatchConcurrent;
-import es.gob.afirma.signers.batch.SignBatchSerial;
+import es.gob.afirma.signers.batch.xml.SignBatch;
+import es.gob.afirma.signers.batch.xml.SignBatchConcurrent;
+import es.gob.afirma.signers.batch.xml.SignBatchSerial;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.ConfigManager;
 

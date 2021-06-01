@@ -8,7 +8,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * Clases con metodos que se mantienen por compatibilidad hacia atr&aacute;s y pueden ser eliminados
  * en futuras versiones del servicio.
  */
-class LegacyFunctions {
+public class LegacyFunctions {
 
 	private static final String XADES_FORMAT_PREFIX = "xades"; //$NON-NLS-1$
 
@@ -27,7 +27,7 @@ class LegacyFunctions {
 	 *             expl&iacute;citas.
 	 */
 	@Deprecated
-	static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
+	public static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
 		return format != null
 				&& format.toLowerCase().startsWith(XADES_FORMAT_PREFIX)
 				&& config != null

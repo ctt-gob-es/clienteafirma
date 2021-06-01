@@ -124,7 +124,7 @@ public class ConfigManager {
 		return config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS);
 	}
 
-	static String getDocCacheManagerClassName() {
+	public static String getDocCacheManagerClassName() {
 		return config.getProperty(CONFIG_PARAM_DOCUMENT_CACHE_MANAGER_CLASS);
 	}
 
@@ -132,7 +132,7 @@ public class ConfigManager {
 		return config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN, ALL_ORIGINS_ALLOWED);
 	}
 
-	static String isCacheEnabled() {
+	public static String isCacheEnabled() {
 		return config.getProperty(CONFIG_PARAM_CACHE_ENABLED);
 	}
 

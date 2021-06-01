@@ -19,7 +19,7 @@ import java.util.List;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.signers.batchV2.TriphaseDataParser;
+import es.gob.afirma.signers.batch.json.TriphaseDataParser;
 
 public final class JSONBatchServerUtil {
 

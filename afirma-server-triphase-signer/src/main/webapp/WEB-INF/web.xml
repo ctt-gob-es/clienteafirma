@@ -36,7 +36,7 @@
 
 	<servlet-mapping>
 		<servlet-name>JSONBatchPresigner</servlet-name>
-		<url-pattern>/JSONBatchPresigner</url-pattern>
+		<url-pattern>/presign</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
@@ -58,7 +58,7 @@
 
 	<servlet-mapping>
 		<servlet-name>JSONBatchPostsigner</servlet-name>
-		<url-pattern>/JSONBatchPostsigner</url-pattern>
+		<url-pattern>/postsign</url-pattern>
 	</servlet-mapping>
 
 </web-app>

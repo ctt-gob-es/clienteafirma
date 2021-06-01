@@ -33,6 +33,8 @@ public class BatchConfigManager {
 
 	private static final int MAX_CONCURRENT_SIGNS = 10;
 
+	private static long CONCURRENT_TIMEOUT = 30;
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final Properties CONFIG = new Properties();
@@ -80,6 +82,18 @@ public class BatchConfigManager {
 			CONCURRENT_MODE = Boolean.valueOf(CONFIG.getProperty("concurrentmode")); //$NON-NLS-1$
 		}
 		return CONCURRENT_MODE.booleanValue();
+	}
+
+	/**
+	 * Devuelve el n&uacute;mero de segundos que deber&aacute;
+	 * durar como m&aacute;ximo cada fase de una operaci&oacute;n de firma.
+	 * @return tiempo m&aacute;ximo de cada fase
+	 */
+	public static long getConcurrentTimeout() {
+		if(CONFIG.getProperty("concurrenttimeout") != null) { //$NON-NLS-1$
+			CONCURRENT_TIMEOUT = Long.parseLong(CONFIG.getProperty("concurrenttimeout")); //$NON-NLS-1$
+		}
+		return CONCURRENT_TIMEOUT;
 	}
 
 	/**

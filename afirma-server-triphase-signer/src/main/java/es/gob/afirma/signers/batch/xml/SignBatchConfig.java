@@ -1,19 +1,17 @@
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.xml;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
-import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignFormat;
-import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignSubOperation;
 
-/** Configuraci&oacute;n para la firma de un lote.*/
-class JSONSignBatchConfig {
+/**
+ * Configuraci&oacute;n para la firma de un lote.
+ */
+class SignBatchConfig {
 
-	/**
-	 * Tiempo de espera que, por defecto, se aplicar&aacute;a a las distintas
-	 * operaciones de firma concurrente de datos.
-	 * */
+	/** Tiempo de espera que, por defecto, se aplicar&aacute;a a las distintas
+	 * operaciones de firma concurrente de datos. */
 	private static final long DEFAULT_TIMEOUT = 30;
 
 	private String id;
@@ -24,20 +22,16 @@ class JSONSignBatchConfig {
 
 	private long concurrentTimeout;
 
-	private final SignFormat format;
+	private final List<SingleSign> signs;
 
-	private final SignSubOperation subOperation;
-
-	private final List<JSONSingleSign> signs;
-
-	/** * Construye un lote vac&iacute;o. */
-	public JSONSignBatchConfig() {
+	/**
+	 * Construye un lote vac&iacute;o.
+	 */
+	public SignBatchConfig() {
 		this.id = null;
 		this.stopOnError = true;
 		this.concurrentTimeout = DEFAULT_TIMEOUT;
 		this.signs = new ArrayList<>();
-		this.format = null;
-		this.subOperation = null;
 	}
 
 	/**
@@ -78,7 +72,7 @@ class JSONSignBatchConfig {
 	 * Establece el identificador del lote.
 	 * @param id Identificador del lote.
 	 */
-	public void setId(final String id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -87,7 +81,7 @@ class JSONSignBatchConfig {
 	 * @param stopOnError {@code true} si se debe detener la ejecuci&oacute;n,
 	 * {@code false} en caso contrario.
 	 */
-	public void setStopOnError(final boolean stopOnError) {
+	public void setStopOnError(boolean stopOnError) {
 		this.stopOnError = stopOnError;
 	}
 
@@ -95,7 +89,7 @@ class JSONSignBatchConfig {
 	 * Establece el algoritmo de firma para los documentos del lote.
 	 * @param algorithm Algoritmo de firma.
 	 */
-	public void setAlgorithm(final SignAlgorithm algorithm) {
+	public void setAlgorithm(SignAlgorithm algorithm) {
 		this.algorithm = algorithm;
 	}
 
@@ -104,31 +98,15 @@ class JSONSignBatchConfig {
 	 * @param concurrentTimeout Tiempo m&aacute;ximo de espera o 0 si se
 	 * espera indefinidamente.
 	 */
-	public void setConcurrentTimeout(final long concurrentTimeout) {
+	public void setConcurrentTimeout(long concurrentTimeout) {
 		this.concurrentTimeout = concurrentTimeout;
-	}
-
-	/**
-	 * Obtiene el formato configurado
-	 * @return Formato configurado en la operaci&oacute;n batch
-	 * */
-	public SignFormat getFormat() {
-		return this.format;
-	}
-
-	/**
-	 * Obtiene la operacion configurada
-	 * @return Operaci&oacute;n configurada en la ejecuci&oacute;n batch
-	 * */
-	public SignSubOperation getSubOperation() {
-		return this.subOperation;
 	}
 
 	/**
 	 * Agrega un nuevo documento al lote.
 	 * @param sign Informaci&oacute;n necesaria para la firma del documento.
 	 */
-	public void addSingleSign(final JSONSingleSign sign) {
+	public void addSingleSign(SingleSign sign) {
 		this.signs.add(sign);
 	}
 
@@ -136,8 +114,7 @@ class JSONSignBatchConfig {
 	 * Obtiene el listado de configuraciones de los documentos a firmar.
 	 * @return Listado de configuraciones de los documentos a firmar.
 	 */
-	public List<JSONSingleSign> getSingleSigns() {
+	public List<SingleSign> getSingleSigns() {
 		return this.signs;
 	}
-
 }

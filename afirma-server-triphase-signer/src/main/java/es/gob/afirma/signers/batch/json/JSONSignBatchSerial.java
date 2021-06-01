@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
+package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult;
-import es.gob.afirma.signers.batchV2.JSONSingleSign.ProcessResult.Result;
-import es.gob.afirma.signers.batchV2.JSONSingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.BatchException;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult;
+import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult.Result;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta secuencialmente. */
@@ -47,7 +48,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 	}
 
 	@Override
-	public String doPreBatch(final X509Certificate[] certChain) throws JSONBatchException {
+	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
 		boolean ignoreRemaining = false;
 		final StringBuilder sb = new StringBuilder("{\n"); //$NON-NLS-1$
@@ -56,15 +57,15 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 		for (int i = 0 ; i < this.signs.size() ; i++) {
 			final JSONSingleSign ss = this.signs.get(i);
 			if (ignoreRemaining) {
-				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
+				ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_SKIPPED);
 				continue;
 			}
 			final String tmp;
 			try {
-				tmp = ss.doPreProcess(certChain, this.algorithm, this.documentManager);
+				tmp = ss.doPreProcess(certChain, this.algorithm, this.documentManager, this.docCacheManager);
 			}
 			catch(final Exception e) {
-				ss.setProcessResult(new ProcessResult(Result.ERROR_PRE, e.toString()));
+				ss.setProcessResult(new JSONProcessResult(Result.ERROR_PRE, e.toString()));
 				if (this.stopOnError) {
 					ignoreRemaining = true;
 					LOGGER.log(Level.WARNING,
@@ -103,7 +104,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 
 			// Si se ha detectado un error y no deben procesarse el resto de firmas, se marcan como tal
 			if (ignoreRemaining) {
-				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
+				ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_SKIPPED);
 				continue;
 			}
 
@@ -117,7 +118,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				else {
 					LOGGER.warning("Se detecto un error previo en la firma, se continua con el resto de elementos"); //$NON-NLS-1$
 				}
-				ss.setProcessResult(new ProcessResult(Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
+				ss.setProcessResult(new JSONProcessResult(Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
 				continue;
 			}
 
@@ -127,14 +128,15 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 					td,
 					this.algorithm,
 					getId(),
-					this.documentManager
+					this.documentManager,
+					this.docCacheManager
 				);
 			}
 			catch (final Exception e) {
 
 				error = true;
 
-				ss.setProcessResult(new ProcessResult(Result.ERROR_POST, e.toString()));
+				ss.setProcessResult(new JSONProcessResult(Result.ERROR_POST, e.toString()));
 
 				if (this.stopOnError) {
 					LOGGER.log(
@@ -150,20 +152,20 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				continue;
 			}
 
-			ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
+			ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_DONE_SAVED);
 		}
 
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer
 		// los que se subiesen antes del error si se indico parar en error
 		if (error && this.stopOnError) {
 			for (final JSONSingleSign ss : this.signs) {
-				if (ss.getProcessResult().wasSaved()) {
+				if (ss.getJSONProcessResult().wasSaved()) {
 
 					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
 						((BatchDocumentManager) this.documentManager).rollback(ss.getReference());
 					}
 
-					ss.setProcessResult(ProcessResult.PROCESS_RESULT_ROLLBACKED);
+					ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_ROLLBACKED);
 				}
 			}
 		}

@@ -7,15 +7,5 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2;
-
-/** Error en el proceso de firma por lotes.*/
-public final class JSONBatchException extends Exception {
-
-	private static final long serialVersionUID = 1L;
-
-	JSONBatchException(final String msg, final Throwable e) {
-		super(msg, e);
-	}
-
-}
+/** Firmas por lotes trif&aacute;sicos de autorizaci&oacute;n &uacute;nica. */
+package es.gob.afirma.signers.batch.json;

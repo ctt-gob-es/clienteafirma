@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.signers.batch.BatchConfigManager;
-import es.gob.afirma.signers.batchV2.JSONSignBatch;
-import es.gob.afirma.signers.batchV2.JSONSignBatchConcurrent;
-import es.gob.afirma.signers.batchV2.JSONSignBatchSerial;
+import es.gob.afirma.signers.batch.json.JSONSignBatch;
+import es.gob.afirma.signers.batch.json.JSONSignBatchConcurrent;
+import es.gob.afirma.signers.batch.json.JSONSignBatchSerial;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.ConfigManager;
 
