@@ -115,8 +115,7 @@ public abstract class JSONSignBatch {
 				);
 		}
 
-		this.id = jsonObject.has(JSON_ELEMENT_ID) ?
-				jsonObject.getString(JSON_ELEMENT_ID) : UUID.randomUUID().toString();
+		this.id = UUID.randomUUID().toString();
 
 		this.concurrentTimeout = BatchConfigManager.getConcurrentTimeout();
 
@@ -214,26 +213,6 @@ public abstract class JSONSignBatch {
 		this.signs = fillSingleSigns(jsonObject);
 	}
 
-	protected JSONSignBatch(final List<JSONSingleSign> signatures,
-			            final SingleSignConstants.SignAlgorithm algo,
-			            final boolean soe) {
-
-		if (signatures == null) {
-			throw new IllegalArgumentException(
-				"La lista de firmas del lote no puede ser nula" //$NON-NLS-1$
-			);
-		}
-		if (algo == null) {
-			throw new IllegalArgumentException(
-				"El algoritmo de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-		this.signs = signatures;
-		this.stopOnError = soe;
-		this.algorithm = null;
-		this.id = UUID.randomUUID().toString();
-	}
-
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder(
@@ -244,8 +223,6 @@ public abstract class JSONSignBatch {
 		sb.append(this.format);
 		sb.append("\",\n\"algorithm\":\""); //$NON-NLS-1$
 		sb.append(this.algorithm);
-		sb.append("\",\n\"concurrenttimeout\":"); //$NON-NLS-1$
-		sb.append(this.concurrentTimeout);
 		sb.append(",\n\"Id\":\""); //$NON-NLS-1$
 		sb.append(this.id);
 		sb.append("\",\n"); //$NON-NLS-1$

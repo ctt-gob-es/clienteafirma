@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.batchV2.server;
+package es.gob.afirma.signers.batch.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -61,7 +61,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 			               final HttpServletResponse response) throws ServletException,
 			                                                          IOException {
 
-		final Map<String, String> parameters = JSONRequestParameters.extractParameters(request);
+		final Map<String, String> parameters = RequestParameters.extractParameters(request);
 
 		final String json = parameters.get(BATCH_JSON_PARAM);
 		if (json == null) {
@@ -75,7 +75,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 
 		final JSONSignBatch batch;
 		try {
-			final byte[] batchConfig = JSONBatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
+			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
 			batch = BatchConfigManager.isConcurrentMode() ?
 					new JSONSignBatchConcurrent(batchConfig) :
 						new JSONSignBatchSerial(batchConfig);
@@ -101,7 +101,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 
 		final X509Certificate[] certs;
 		try {
-			certs = JSONBatchServerUtil.getCertificates(certListUrlSafeBase64);
+			certs = BatchServerUtil.getCertificates(certListUrlSafeBase64);
 		}
 		catch (final Exception e) {
 			LOGGER.severe("La cadena de certificados del firmante es invalida: " + e); //$NON-NLS-1$

@@ -400,9 +400,8 @@ var AutoScript = ( function ( window, undefined ) {
 			resetStickySignatory = false;
 		}
 		
-		var createBatch = function (id, algorithm, format, suboperation, extraparams) { 
+		var createBatch = function (algorithm, format, suboperation, extraparams) { 
 			var batchConfig = new Object();
-			batchConfig.id = id; 
 			batchConfig.algorithm = algorithm; 
 			batchConfig.format = format;
 			batchConfig.suboperation = suboperation;

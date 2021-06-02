@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.BatchException;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.json.JSONSingleSign.CallableResult;
@@ -42,20 +41,6 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 	 */
 	public JSONSignBatchConcurrent(final byte[] json) throws IOException {
 		super(json);
-	}
-
-	/**
-	 * Crea un lote de firmas para ejecuci&oacute;n paralela.
-	 * @param signs Firmas del lote.
-	 * @param algo ALgoritmo de firma para todo el lote.
-	 * @param soe <code>true</code> si se debe parar el proceso al encontrar un error,
-	 *            <code>false</code> si se deben intentar las firmas restantes del lote aun
-	 *            cuando una previa ha resultado en error.
-	 *            */
-	public JSONSignBatchConcurrent(final List<JSONSingleSign> signs,
-			                   final SignAlgorithm algo,
-			                   final boolean soe) {
-		super(signs, algo, soe);
 	}
 
 	@Override

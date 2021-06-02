@@ -53,8 +53,12 @@
 
 	function addSingleSign() {
 		buildAndAddSingleSign();
-		document.getElementById("signButton").disabled = "";
+		document.getElementById("singleSignID").value= "";
 		document.getElementById("datareferenceValue").value= "";
+		document.getElementById("params").value= "";
+		document.getElementById("signButton").disabled = "";
+		document.getElementById('format').getElementsByTagName('option')[0].selected = true;
+		document.getElementById('suboperation').getElementsByTagName('option')[0].selected = true;
 	}
 
 	function generateUUID() {
@@ -89,11 +93,16 @@
 			}
 		}
 		
-		AutoScript.addDocumentToBatch(singleSignID, datareference, format,
-				suboperation, extraParams);
+		try {
+			AutoScript.addDocumentToBatch(singleSignID, datareference, format,
+					suboperation, extraParams);
+			
+			printSingleSign(singleSignID, datareference, format,
+					suboperation, extraParams);
+		} catch (e) {
+			showLog(e);
+		}
 		
-		printSingleSign(singleSignID, datareference, format,
-				suboperation, extraParams);
 	}
 
 	function createBatchConfiguration() {
@@ -104,7 +113,7 @@
 		var extraParams = AutoScript.getBase64FromText(document
 				.getElementById("filters").value);
 
-		AutoScript.createBatch(generateUUID(), algorithm, format, subOperation,
+		AutoScript.createBatch(algorithm, format, subOperation,
 				extraParams);
 	}
 
@@ -135,9 +144,7 @@
 	}
 
 	function showLog(newLog) {
-		document.getElementById('console').value = document
-				.getElementById('console').value
-				+ "\n" + newLog;
+		document.getElementById('console').value +=  "\n" + newLog;
 	}
 
 	function useSingleConfClick() {
@@ -217,15 +224,15 @@
 					+ "/afirma-signature-retriever/RetrieveService");
 		</script>
 
-	<fieldset>
+	<fieldset style="margin-bottom:30px;">
 		<legend>Configuraci&oacute;n de la operaci&oacute;n</legend>
 
 		<div>
 			<input type="checkbox" id="stopOnError" />Parar en caso de error
 		</div>
 	</fieldset>
-	<br>
-	<fieldset>
+
+	<fieldset style="margin-bottom:30px;">
 		<legend>Configuraci&oacute;n general para firmas</legend>
 		
 		<div>
@@ -265,24 +272,22 @@
 		</div>
 		<input type="button" value="Crear nuevo lote" onclick="createBatchConf();" >
 	</fieldset>
-	<br>
+
 	<fieldset>
+	<legend>Configuraci&oacute;n de firmas particulares</legend><br>
+	<div style="margin-bottom:30px;">
 		<label for="singleSignID">ID :</label>
 		<input id="singleSignID" type="text" class="singleSignConf" size="33"/> 
 		<button id="generateId" type="button" onclick="generateSingleSignId()" class="singleSignConf">
 		Generar ID aleatorio
 		</button>
-		<legend>Configuraci&oacute;n de firmas particulares</legend>
-		<fieldset>
-			<legend>Referencia a  datos (Utilizada en DocumentManager)</legend>
-			<div style="font-weight: bold;">La referencia a los datos deben codificarse en base 64. 
-			El tratamiento de estos datos depender&aacute; del DocumentManager utilizado.</div>
-			<br> 
-			<input type="text" name="datareferenceValue"
+		<br><br>
+		<label>Referencia a los datos en Base 64 (Depende del DocumentManager configurado en servidor)</label> 
+		<br> 
+		<input type="text" name="datareferenceValue"
 				id="datareferenceValue" style="width: 600px;" class="singleSignConf"/>
-			<button id="codeInB64" type="button" onclick="codeToB64()" class="singleSignConf">Codificar a base 64</button>
-		</fieldset><br>
-		
+		<button id="codeInB64" type="button" onclick="codeToB64()" class="singleSignConf">Codificar a base 64</button>
+	</div>
 		<fieldset>
 		<legend><input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" class="singleSignConf"/> 
 		<label for="suboperation">Aplicar configuraci&oacute;n individual</label><br></legend>
