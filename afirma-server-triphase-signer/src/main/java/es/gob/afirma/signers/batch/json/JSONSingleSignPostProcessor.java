@@ -23,7 +23,6 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
-import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.TriPhaseHelper;
@@ -69,6 +68,7 @@ final class JSONSingleSignPostProcessor {
 	 * @param algorithm Algoritmo de firma.
 	 * @param batchId Identificador del lote de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
+	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
@@ -117,7 +117,7 @@ final class JSONSingleSignPostProcessor {
 		}
 
 		if (docBytes == null) {
-			docBytes = docManager.getDocument(sSign.getReference(), certChain, null);
+			docBytes = docManager.getDocument(sSign.getReference(), certChain, sSign.getExtraParams());
 		}
 
 		Properties extraParams;
@@ -178,10 +178,10 @@ final class JSONSingleSignPostProcessor {
 		}
 
 		// Se almacenara el documento con la configuracion indicada en el DocumentManager
-		if(BatchConfigManager.isConcurrentMode()) {
+		if(ConfigManager.isConcurrentModeEnable()) {
 			TempStoreFactory.getTempStore().store(signedDoc, sSign, batchId);
 		} else {
-			final Properties singleSignProps = new Properties();
+			final Properties singleSignProps = sSign.getExtraParams();
 			singleSignProps.put("format", sSign.getSignFormat().toString()); //$NON-NLS-1$
 			docManager.storeDocument(sSign.getReference(), certChain, signedDoc, singleSignProps);
 		}

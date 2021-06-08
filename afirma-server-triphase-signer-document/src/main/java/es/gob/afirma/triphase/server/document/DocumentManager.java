@@ -22,7 +22,7 @@ public interface DocumentManager {
 	/** Obtiene un documento en base a su identificador.
 	 * Si no es posible recuperar el fichero se debe lanzar una excepci&oacute;n. El mensaje se recibir&aacute;
 	 * como parte del mensaje de error en el cliente de firma.
-	 * @param id Identificador del documento
+	 * @param id Identificador del documento.
 	 * @param certChain Cadena de certificados que se usar&aacute; para realizar la firma
 	 * @param config Par&aacute;metros para la configuraci&oacute;n de la recuperaci&oacute;n del documento.
 	 * @return Documento (en binario)

@@ -24,7 +24,6 @@ import org.json.JSONObject;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.TempStore;
@@ -57,8 +56,6 @@ public abstract class JSONSignBatch {
 
 	protected String extraParams;
 
-	protected long concurrentTimeout = 30;
-
 	protected SingleSignConstants.SignSubOperation subOperation = null;
 
 	protected SingleSignConstants.SignFormat format = null;
@@ -74,7 +71,7 @@ public abstract class JSONSignBatch {
 	 * Ejecuta el preproceso de firma por lote.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @return Datos trif&aacute;sicos de pre-firma del lote.
-	 * @throws BatchException
+	 * @throws BatchException Cuando hay errores irrecuperables en el preproceso.
 	 */
 	public abstract String doPreBatch(final X509Certificate[] certChain) throws BatchException;
 
@@ -85,7 +82,7 @@ public abstract class JSONSignBatch {
 	 *           Debe contener los datos de todas y cada una de las firmas del lote.
 	 * @return Registro del resultado general del proceso por lote, en un JSON (<a href="../doc-files/resultlog-scheme.html">descripci&oacute;n
 	 *         del formato</a>).
-	 * @throws BatchException Si hay errores irrecuperables en el postproceso.
+	 * @throws BatchException Cuando hay errores irrecuperables en el postproceso.
 	 */
 	public abstract String doPostBatch(final X509Certificate[] certChain,
                                        final TriphaseData td) throws BatchException;
@@ -108,16 +105,14 @@ public abstract class JSONSignBatch {
 		final String convertedJson = new String(json);
 		try {
 			jsonObject = new JSONObject(convertedJson);
-		}catch (final JSONException jsonEx){
-			LOGGER.severe("Error al parsear JSON"); //$NON-NLS-1$
+		}catch (final JSONException e){
+			LOGGER.severe("Error al parsear JSON: " + e); //$NON-NLS-1$
 			throw new JSONException(
-					"El JSON de definicion de lote de firmas no esta formado correctamente" //$NON-NLS-1$
+					"El JSON de definicion de lote de firmas no esta formado correctamente", e //$NON-NLS-1$
 				);
 		}
 
 		this.id = UUID.randomUUID().toString();
-
-		this.concurrentTimeout = BatchConfigManager.getConcurrentTimeout();
 
 		this.stopOnError = jsonObject.has(JSON_ELEMENT_STOPONERROR) ?
 				jsonObject.getBoolean(JSON_ELEMENT_STOPONERROR) : false;
@@ -173,7 +168,7 @@ public abstract class JSONSignBatch {
 			}
 
 		} catch (final Exception e) {
-			throw new IllegalArgumentException("Error al instanciar la clase utilizada para el documentManager"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Error al instanciar la clase utilizada para el documentManager", e); //$NON-NLS-1$
 		}
 
 		if (Boolean.parseBoolean(ConfigManager.isCacheEnabled())) {
@@ -188,7 +183,7 @@ public abstract class JSONSignBatch {
 			catch (final ClassNotFoundException e) {
 				throw new RuntimeException(
 						"La clase DocumentCacheManager indicada no existe ("  //$NON-NLS-1$
-						+ docCacheManagerClassName +  "): " + e, e //$NON-NLS-1$
+						+ docCacheManagerClassName +  ")", e //$NON-NLS-1$
 						);
 			}
 
@@ -255,15 +250,14 @@ public abstract class JSONSignBatch {
 	 * */
 	protected String getResultLog() {
 		// Iniciamos el log de retorno
-		final StringBuilder ret = new StringBuilder("{ \n \"signs\":[\n"); //$NON-NLS-1$
+		final StringBuilder ret = new StringBuilder("{\"signs\":["); //$NON-NLS-1$
 		for (int i = 0; i < this.signs.size() ; i++) {
 			ret.append(this.signs.get(i).getJSONProcessResult().toString());
-			if(this.signs.size()-1 != i) {
+			if (this.signs.size() - 1 != i) {
 				ret.append(","); //$NON-NLS-1$
 			}
-			ret.append("\n"); //$NON-NLS-1$
 		}
-		ret.append("\n]\n}"); //$NON-NLS-1$
+		ret.append("]}"); //$NON-NLS-1$
 		return ret.toString();
 	}
 
@@ -276,7 +270,7 @@ public abstract class JSONSignBatch {
 	}
 
 	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) {
-		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<JSONSingleSign>();
+		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<>();
 		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
 
 		if (singleSignsArray != null) {

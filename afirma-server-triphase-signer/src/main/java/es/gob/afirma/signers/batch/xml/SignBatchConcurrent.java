@@ -72,7 +72,7 @@ public final class SignBatchConcurrent extends SignBatch {
 		catch (final InterruptedException e) {
 			stopExecution(executorService);
 			throw new BatchException(
-				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
+				"Error en el preproceso en paralelo del lote de firma", //$NON-NLS-1$
 				e
 			);
 		}
@@ -88,11 +88,11 @@ public final class SignBatchConcurrent extends SignBatch {
 				if (this.stopOnError) {
 					stopExecution(executorService);
 					throw new BatchException(
-						"Error en una de las firmas del lote, se parara el proceso: " + e, e //$NON-NLS-1$
+						"Error en una de las firmas del lote, se parara el proceso", e //$NON-NLS-1$
 					);
 				}
 				LOGGER.log(Level.WARNING,
-					"Error en una de las firmas del lote, se continua con el siguiente elemento: " + e, //$NON-NLS-1$
+					"Error en una de las firmas del lote, se continua con el siguiente elemento", //$NON-NLS-1$
 					e
 				);
 				continue;

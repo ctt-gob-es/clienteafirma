@@ -231,7 +231,6 @@ class SignBatchXmlHandler extends DefaultHandler {
 		case ELEMENT_CLASS:
 			// Comprobamos que la clase indicada implemente nuestra interfaz para
 			// asegurarnos de que no se ejecuta su contexto estatico si no es necesario.
-			// Si la clase implementa
 			try {
 				final String className = new String(this.acumulateContent.toCharArray()).trim();
 				final Class<?> signSaverClass = Class.forName(className, false, getClass().getClassLoader());

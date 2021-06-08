@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,17 +23,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.json.JSONSingleSign.CallableResult;
 import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult;
 import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult.Result;
+import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta en paralelo. */
 public final class JSONSignBatchConcurrent extends JSONSignBatch {
+
+
+	private final long concurrentTimeout;
+	private final int concurrentMaxSigns;
 
 	/**
 	 * Crea un lote de firmas que se ejecuta de forma concurrente por cada una de sus firmas.
@@ -41,12 +46,15 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 	 */
 	public JSONSignBatchConcurrent(final byte[] json) throws IOException {
 		super(json);
+
+		this.concurrentTimeout = ConfigManager.getConcurrentTimeout();
+		this.concurrentMaxSigns = ConfigManager.getConcurrentMaxSigns();
 	}
 
 	@Override
 	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
-		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
+		final ExecutorService executorService = Executors.newFixedThreadPool(this.concurrentMaxSigns);
 		final Collection<Callable<String>> callables = new ArrayList<>(this.signs.size());
 
 		for (final JSONSingleSign ss : this.signs) {
@@ -67,8 +75,8 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			);
 		}
 
-		final StringBuilder sb = new StringBuilder("{\n"); //$NON-NLS-1$
-		sb.append("\"format\":\"" + this.format + "\",\n");  //$NON-NLS-1$//$NON-NLS-2$
+		final StringBuilder sb = new StringBuilder("{"); //$NON-NLS-1$
+		sb.append("\"format\":\"" + this.format + "\",");  //$NON-NLS-1$//$NON-NLS-2$
 		sb.append("\"signs\": ["); //$NON-NLS-1$
 
 		for (int i = 0 ; i < results.size() ; i++) {
@@ -80,7 +88,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 				if (this.stopOnError) {
 					stopExecution(executorService);
 					throw new BatchException(
-						"Error en una de las firmas del lote, se parara el proceso: " + e, e //$NON-NLS-1$
+						"Error en una de las firmas del lote, se parara el proceso", e //$NON-NLS-1$
 					);
 				}
 				LOGGER.log(Level.WARNING,
@@ -95,7 +103,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			}
 		}
 
-		sb.append("]\n}"); //$NON-NLS-1$
+		sb.append("]}"); //$NON-NLS-1$
 
 		executorService.shutdown();
 
@@ -112,7 +120,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			);
 		}
 
-		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
+		final ExecutorService executorService = Executors.newFixedThreadPool(this.concurrentMaxSigns);
 		final Collection<Callable<CallableResult>> callables = new ArrayList<>(this.signs.size());
 
 		for (final JSONSingleSign ss : this.signs) {
@@ -210,7 +218,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		final Collection<Callable<CallableResult>> saveCallables = new ArrayList<>(this.signs.size());
 		for (final JSONSingleSign ss : this.signs) {
 			final Callable<CallableResult> callable = ss.getSaveCallableJSON(
-				ts, getId()
+				ts, certChain, getId()
 			);
 			saveCallables.add(callable);
 		}
@@ -272,7 +280,15 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 				if (ss.getJSONProcessResult().wasSaved()) {
 
 					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
-						((BatchDocumentManager) this.documentManager).rollback(ss.getReference());
+						final Properties singleSignProps = new Properties();
+						singleSignProps.put("format", ss.getSignFormat().toString()); //$NON-NLS-1$
+						try {
+							((BatchDocumentManager) this.documentManager).rollback(ss.getReference(), certChain, singleSignProps);
+						} catch (final IOException e) {
+							LOGGER.severe(
+									"No se pudo deshacer el guardado de una firma (" + ss.getId() + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
+									);
+						}
 					}
 
 					ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_ROLLBACKED);

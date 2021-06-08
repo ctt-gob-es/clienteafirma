@@ -55,6 +55,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_RECOVERING_LOG = "SAF_24"; //$NON-NLS-1$
 	static final String ERROR_CANNOT_LOAD_DATA = "SAF_25"; //$NON-NLS-1$
 	static final String ERROR_CONTACT_BATCH_SERVICE = "SAF_26"; //$NON-NLS-1$
+	static final String ERROR_BATCH_SIGNATURE = "SAF_27"; //$NON-NLS-1$
 	static final String ERROR_INVALID_PDF = "SAF_28"; //$NON-NLS-1$
 	static final String ERROR_INVALID_XML = "SAF_29"; //$NON-NLS-1$
 	static final String ERROR_INVALID_DATA = "SAF_30"; //$NON-NLS-1$
@@ -101,6 +102,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_RECOVERING_LOG, ProtocolMessages.getString("ProtocolLauncher.34")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_LOAD_DATA, ProtocolMessages.getString("ProtocolLauncher.35")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CONTACT_BATCH_SERVICE, ProtocolMessages.getString("ProtocolLauncher.36")); //$NON-NLS-1$
+		ERRORS.put(ERROR_BATCH_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.37")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_PDF, ProtocolMessages.getString("ProtocolLauncher.38")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_XML, ProtocolMessages.getString("ProtocolLauncher.39")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_DATA, ProtocolMessages.getString("ProtocolLauncher.40")); //$NON-NLS-1$

@@ -26,11 +26,11 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class FileSystemDocumentManager implements BatchDocumentManager {
 
-	private static final String IN_DIR_PARAM = "indir"; //$NON-NLS-1$
-	private static final String OUT_DIR_PARAM = "outdir"; //$NON-NLS-1$
-	private static final String OVERWRITE_PARAM = "overwrite"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_IN_DIR = "docmanager.filesystem.indir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OUT_DIR = "docmanager.filesystem.outdir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OVERWRITE = "docmanager.filesystem.overwrite"; //$NON-NLS-1$
 
-	private static final String FORMAT_PROPERTY = "format"; //$NON-NLS-1$
+	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
 	String inDir;
 	String outDir;
@@ -39,11 +39,11 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
-	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties prop) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException {
 
-		LOGGER.info("Recuperamos el documento con identificador: " + id); //$NON-NLS-1$
+		LOGGER.info("Recuperamos el documento con referencia: " + dataRef); //$NON-NLS-1$
 
-		final File file = new File(this.inDir, new String(Base64.decode(id)));
+		final File file = new File(this.inDir, new String(Base64.decode(dataRef)));
 
 		if( !isParent(new File(this.inDir), file ) ) {
 		    throw new IOException(
@@ -85,38 +85,14 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	}
 
 	@Override
-	public String storeDocument(final String id,
+	public String storeDocument(final String dataRef,
 			                    final X509Certificate[] certChain,
 			                    final byte[] data,
 			                    final Properties prop) throws IOException {
 
-		final String initialId = id != null ? new String(Base64.decode(id)) : "signature"; //$NON-NLS-1$
-		String newId = initialId;
-		final int lastDotPos = initialId.lastIndexOf('.');
-		if (lastDotPos != -1) {
-			newId = initialId.substring(0,  lastDotPos);
-		}
+		final File file = buildOutputFilename(dataRef, prop);
 
-		final String format = prop.getProperty(FORMAT_PROPERTY);
-		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
-			newId += ".csig";  //$NON-NLS-1$
-		}
-		else if (format != null && format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
-			newId += ".xsig"; //$NON-NLS-1$
-		}
-		else if (format != null
-				&& (format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.toLowerCase())
-						|| format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.toLowerCase()))) {
-			newId += ".asics"; //$NON-NLS-1$
-		}
-		else if (lastDotPos < initialId.length() - 1) {
-			newId += initialId.substring(lastDotPos);
-		}
-
-		final File file = new File(this.outDir, newId);
-		if (file.exists() && !this.overwrite) {
-			throw new IOException("Se ha obtenido un nombre de documento existente en el sistema de ficheros."); //$NON-NLS-1$
-		}
+		LOGGER.info("Escribiendo el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
 
 		try (
 			final FileOutputStream fos = new FileOutputStream(file);
@@ -129,8 +105,7 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 			throw e;
 		}
 
-		LOGGER.info("Escribiendo el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
-		return Base64.encode(newId.getBytes());
+		return Base64.encode(file.getName().getBytes());
 	}
 
 	private static boolean isParent(final File p, final File file) {
@@ -155,9 +130,9 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 
 	@Override
 	public void init(final Properties config) {
-		this.inDir = config.getProperty(IN_DIR_PARAM);
-		this.outDir = config.getProperty(OUT_DIR_PARAM);
-		this.overwrite = Boolean.parseBoolean(config.getProperty(OVERWRITE_PARAM));
+		this.inDir = config.getProperty(CONFIG_PARAM_IN_DIR);
+		this.outDir = config.getProperty(CONFIG_PARAM_OUT_DIR);
+		this.overwrite = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_OVERWRITE));
 
 		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
 		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$
@@ -165,19 +140,53 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 
 
 	@Override
-	public void rollback(final String singleSignRef) {
+	public void rollback(final String id,
+            final X509Certificate[] certChain,
+            final Properties prop) throws IOException {
 
-		File file = null;
+		final File file = buildOutputFilename(id, prop);
 
-		try {
-			file = new File(this.outDir, new String(Base64.decode(singleSignRef)));
-		} catch (final IOException e) {
-			LOGGER.severe("Error al decodificar la referencia a datos:" + singleSignRef); //$NON-NLS-1$
+		LOGGER.info("Borrando el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/**
+	 * Compone el nombre y la ruta del fichero donde debe encontrarse la firma de un documento dato.
+	 * @param id Identificador del documento.
+	 * @param prop Configuraci&oacute;n de firma.
+	 * @return Fichero de salida.
+	 * @throws IOException Cuando falla la composici&oacute;n del fichero.
+	 */
+	private File buildOutputFilename(final String id, final Properties prop) throws IOException {
+
+		final String initialId = id != null ? new String(Base64.decode(id)) : "signature"; //$NON-NLS-1$
+		String newId = initialId;
+		final int lastDotPos = initialId.lastIndexOf('.');
+		if (lastDotPos != -1) {
+			newId = initialId.substring(0,  lastDotPos);
 		}
 
-		if (file != null && file.exists()) {
-			file.delete();
+		final String format = prop.getProperty(PROPERTY_FORMAT);
+		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
+			newId += ".csig";  //$NON-NLS-1$
 		}
+		else if (format != null && format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
+			newId += ".xsig"; //$NON-NLS-1$
+		}
+		else if (format != null
+				&& (format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.toLowerCase())
+						|| format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.toLowerCase()))) {
+			newId += ".asics"; //$NON-NLS-1$
+		}
+		else if (lastDotPos < initialId.length() - 1) {
+			newId += initialId.substring(lastDotPos);
+		}
+
+		final File file = new File(this.outDir, newId);
+		if (file.exists() && !this.overwrite) {
+			throw new IOException("Se ha obtenido un nombre de documento existente en el sistema de ficheros."); //$NON-NLS-1$
+		}
+
+		return file;
 	}
 
 }

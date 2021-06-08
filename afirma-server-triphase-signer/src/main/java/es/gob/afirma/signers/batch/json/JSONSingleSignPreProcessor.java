@@ -45,6 +45,7 @@ final class JSONSingleSignPreProcessor {
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param algorithm Algoritmo de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
+	 * @param docCacheManager Gestor para el guardado de datos en cach&eacute;.
 	 * @return Nodo <code>firma</code> del JSON de datos trif&aacute;sicos (sin ninguna etiqueta
 	 *         antes ni despu&eacute;s).
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
@@ -74,7 +75,7 @@ final class JSONSingleSignPreProcessor {
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
-		final byte[] docBytes = docManager.getDocument(sSign.getReference(), certChain, null);
+		final byte[] docBytes = docManager.getDocument(sSign.getReference(), certChain, sSign.getExtraParams());
 
 		Properties extraParams;
 		try {
@@ -154,6 +155,7 @@ final class JSONSingleSignPreProcessor {
 
 	/**
 	 * A&ntilde;ade el fichero en cach&eacute; para m&aacute;s tarde leerlo
+	 * @param docCacheManager Gestor para el guardado de datos en cach&eacute;.
 	 * @param triphaseData datos de la prefirma
 	 * @param docBytes datos a almacenar en la cach&eacute;
 	 */

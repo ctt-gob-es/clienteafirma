@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.json.JSONSignBatch;
 import es.gob.afirma.signers.batch.json.JSONSignBatchConcurrent;
 import es.gob.afirma.signers.batch.json.JSONSignBatchSerial;
@@ -76,7 +75,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 		final JSONSignBatch batch;
 		try {
 			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
-			batch = BatchConfigManager.isConcurrentMode() ?
+			batch = ConfigManager.isConcurrentModeEnable() ?
 					new JSONSignBatchConcurrent(batchConfig) :
 						new JSONSignBatchSerial(batchConfig);
 		}
@@ -117,7 +116,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 			pre = batch.doPreBatch(certs);
 		}
 		catch(final Exception e) {
-			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote", e); //$NON-NLS-1$
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Error en el preproceso del lote: " + e //$NON-NLS-1$

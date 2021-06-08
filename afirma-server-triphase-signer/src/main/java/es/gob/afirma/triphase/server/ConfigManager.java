@@ -25,6 +25,18 @@ public class ConfigManager {
 	/** Propiedad que indica si se deber habilitar o no la cach&eacute; */
 	private static final String CONFIG_PARAM_CACHE_ENABLED = "cacheEnabled"; //$NON-NLS-1$
 
+	private static final String CONFIG_PARAM_TEMP_DIR = "tmpdir"; //$NON-NLS-1$
+
+	private static final String CONFIG_PARAM_CONCURRENT_MODE_ENABLE = "concurrent.enable"; //$NON-NLS-1$
+
+	private static final String CONFIG_PARAM_CONCURRENT_TIMEOUT = "concurrent.timeout"; //$NON-NLS-1$
+
+	private static final String CONFIG_PARAM_CONCURRENT_MAX_SIGNS = "concurrent.maxsigns"; //$NON-NLS-1$
+
+	private static final long DEFAULT_CONCURRENT_TIMEOUT = 30;
+
+	private static final int DEFAULT_CONCURRENT_MAXSIGNS = 10;
+
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
 	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
 
@@ -174,5 +186,34 @@ public class ConfigManager {
 			}
 		}
 		return mappedText;
+	}
+
+	public static File getTempDir() {
+		if (config.getProperty(CONFIG_PARAM_TEMP_DIR) == null) {
+			return null;
+		}
+		return new File(config.getProperty(CONFIG_PARAM_TEMP_DIR));
+	}
+
+	public static boolean isConcurrentModeEnable() {
+		return Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_CONCURRENT_MODE_ENABLE));
+	}
+
+	public static long getConcurrentTimeout() {
+		try {
+			return Long.parseLong(config.getProperty(CONFIG_PARAM_CONCURRENT_TIMEOUT));
+		}
+		catch (final Exception e) {
+			return DEFAULT_CONCURRENT_TIMEOUT;
+		}
+	}
+
+	public static int getConcurrentMaxSigns() {
+		try {
+			return Integer.parseInt(config.getProperty(CONFIG_PARAM_CONCURRENT_MAX_SIGNS));
+		}
+		catch (final Exception e) {
+			return DEFAULT_CONCURRENT_MAXSIGNS;
+		}
 	}
 }

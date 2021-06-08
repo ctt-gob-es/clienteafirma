@@ -116,7 +116,7 @@ public final class BatchPresigner extends HttpServlet {
 			pre = batch.doPreBatch(certs);
 		}
 		catch(final Exception e) {
-			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote", e); //$NON-NLS-1$
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Error en el preproceso del lote: " + e //$NON-NLS-1$

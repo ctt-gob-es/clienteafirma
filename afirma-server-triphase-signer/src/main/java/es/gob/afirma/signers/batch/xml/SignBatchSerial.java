@@ -136,9 +136,11 @@ public final class SignBatchSerial extends SignBatch {
 					);
 					ignoreRemaining = true;
 				}
-				LOGGER.severe(
-					"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				else {
+					LOGGER.severe(
+							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
+							);
+				}
 				continue;
 			}
 

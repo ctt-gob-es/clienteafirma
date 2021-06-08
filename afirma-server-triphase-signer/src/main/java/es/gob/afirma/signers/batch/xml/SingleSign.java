@@ -71,7 +71,7 @@ public class SingleSign {
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */
-	SingleSign(final String id) {
+	public SingleSign(final String id) {
 		this.id =  id;
 		this.extraParams = new Properties();
 		// El identificador de la firma debe transmitirse al firmador trifasico a traves

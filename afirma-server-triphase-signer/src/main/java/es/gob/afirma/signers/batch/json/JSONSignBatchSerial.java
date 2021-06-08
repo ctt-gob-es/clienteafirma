@@ -11,6 +11,7 @@ package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.util.Properties;
 import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
@@ -35,8 +36,8 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
 		boolean ignoreRemaining = false;
-		final StringBuilder sb = new StringBuilder("{\n"); //$NON-NLS-1$
-		sb.append("\"format\":\"" + this.format + "\",\n");  //$NON-NLS-1$//$NON-NLS-2$
+		final StringBuilder sb = new StringBuilder("{"); //$NON-NLS-1$
+		sb.append("\"format\":\"" + this.format + "\",");  //$NON-NLS-1$//$NON-NLS-2$
 		sb.append("\"signs\": ["); //$NON-NLS-1$
 		for (int i = 0 ; i < this.signs.size() ; i++) {
 			final JSONSingleSign ss = this.signs.get(i);
@@ -68,7 +69,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				sb.append(","); //$NON-NLS-1$
 			}
 		}
-		sb.append("]\n}"); //$NON-NLS-1$
+		sb.append("]}"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -124,15 +125,17 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 
 				if (this.stopOnError) {
 					LOGGER.log(
-						Level.SEVERE,
-						"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
-						e
-					);
+							Level.SEVERE,
+							"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
+							e
+							);
 					ignoreRemaining = true;
 				}
-				LOGGER.severe(
-					"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				else {
+					LOGGER.severe(
+							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
+							);
+				}
 				continue;
 			}
 
@@ -146,7 +149,15 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				if (ss.getJSONProcessResult().wasSaved()) {
 
 					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
-						((BatchDocumentManager) this.documentManager).rollback(ss.getReference());
+						final Properties singleSignProps = new Properties();
+						singleSignProps.put("format", ss.getSignFormat().toString()); //$NON-NLS-1$
+						try {
+							((BatchDocumentManager) this.documentManager).rollback(ss.getReference(), certChain, singleSignProps);
+						} catch (final IOException e) {
+							LOGGER.severe(
+									"No se pudo deshacer el guardado de una firma (" + ss.getId() + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
+								);
+						}
 					}
 
 					ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_ROLLBACKED);

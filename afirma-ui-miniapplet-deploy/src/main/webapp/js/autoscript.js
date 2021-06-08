@@ -405,7 +405,7 @@ var AutoScript = ( function ( window, undefined ) {
 			batchConfig.algorithm = algorithm; 
 			batchConfig.format = format;
 			batchConfig.suboperation = suboperation;
-			batchConfig.extraparams = extraparams;
+			batchConfig.extraparams = Base64.encode(extraparams);
 
 			batchConfig.singlesigns = new Array(); 
 			
@@ -427,19 +427,19 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			singleSign.id = id;
 			singleSign.datareference = datareference;
-			if (format != null) { 
+			if (format) { 
 				singleSign.format = format; 
 			}
-			if (suboperation != null) { 
+			if (suboperation) { 
 				singleSign.suboperation = suboperation; 
 			}
-			if (extraparams != null) { 
-				singleSign.extraparams = extraparams; 
+			if (extraparams) { 
+				singleSign.extraparams = Base64.encode(extraparams); 
 			}
 			jsonRequest.singlesigns.push(singleSign);
 		}
 		
-		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
+		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback) {
 			
 			if (jsonRequest == undefined || jsonRequest == null) {
 				throw new Error("No hay ningun lote creado. Es necesario crear uno antes de firmar.");
@@ -447,20 +447,13 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			jsonRequest.stoponerror = stopOnError;
 			
-			var jsonRequestB64 = Base64.encode(JSON.stringify(jsonRequest));
-			jsonRequestB64 = jsonRequestB64.replace(/\+/g, "-").replace(/\//g, "_");
-			//Eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
-			jsonRequestB64 = jsonRequestB64.replace(/\n/g, "").replace(/\r/g, ""); 
+			var jsonRequestB64 = Base64.encode(JSON.stringify(jsonRequest), true);
 			
-			clienteFirma.signBatchJSON(jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback);
+			clienteFirma.signBatchJSON(jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback);
 			jsonRequest = null;
 			resetStickySignatory = false;
 		}
-		
-		var printJSONRequest = function () {
-			return JSON.stringify(jsonRequest, null, 2);
-		}
-		
+				
 		var getBase64FromText = function (plainText) {
 			return plainText != null ? Base64.encode(plainText) : null;
 		}
@@ -638,6 +631,9 @@ var AutoScript = ( function ( window, undefined ) {
 			// usamos servidor intermedio
 			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
 				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
+				if (!!storageServletAddress || !!retrieverServletAddress) {
+					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
+				}
 			}
 			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
 			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
@@ -787,18 +783,13 @@ var AutoScript = ( function ( window, undefined ) {
 					return random;
 				}
 				
-				/** Comprueba si los datos son de tipo JSON */
-				function checkJSONData(data){
-					
-					try {
-						var dataDecoded = Base64.decode(data);
-						JSON.parse(dataDecoded);
-						//Si se parsea correctamente quiere decir que es un JSON.
-						return true;
-					} catch(e) {
-						//Si no se parsea bien quiere decir que es un XML.
-						return false;
-					}	
+				/**
+				 * Decodifica y parsea los datos como JSON. Si no eran un JSON,
+				 * devuelve una excepcion.
+				 */
+				function parseJSONData(dataB64) {
+					var dataDecoded = Base64.decode(dataB64);
+					return JSON.parse(dataDecoded);
 				}
 				
 				/** Comprueba que no haya identificadores repetidos */
@@ -825,7 +816,7 @@ var AutoScript = ( function ( window, undefined ) {
 				return {
 					/** Genera un nuevo identificador de sesion aleatorio. */
 					generateNewIdSession : generateNewIdSession,
-					checkJSONData : checkJSONData,
+					parseJSONData : parseJSONData,
 					checkExistingId : checkExistingId
 				};
 		})(window, undefined);
@@ -960,11 +951,11 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Inicia el proceso de firma por lotes con JSON
 			 */
-			var signBatchJSON = function (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallbackFunction, errorCallbackFunction) {
+			var signBatchJSON = function (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallbackFunction, errorCallbackFunction) {
 				setCallbacks(successCallbackFunction, errorCallbackFunction);
 				currentOperation = OPERATION_BATCH;
 				var requestData = createBatchRequest(batchPreSignerUrl, batchPostSignerUrl,
-						extraParams, jsonRequestB64, true);
+						certFilters, jsonRequestB64, true);
 				execAppIntent(buildUrl(requestData));
 			};
 
@@ -1095,12 +1086,12 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
-			function createBatchRequest(batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64, isJson) {
+			function createBatchRequest(batchPreSignerUrl, batchPostSignerUrl, certFilters, batchB64, isJson) {
 				var data = new Object();
 				data.op = createKeyValuePair("op","batch");
 				data.batchpresignerurl = createKeyValuePair("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = createKeyValuePair("batchpostsignerurl", batchPostSignerUrl);
-				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
+				data.properties = createKeyValuePair ("properties", certFilters != null ? Base64.encode(certFilters, true) : null, true);
 				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
 				if (resetStickySignatory) {
@@ -1492,9 +1483,10 @@ var AutoScript = ( function ( window, undefined ) {
 						certificate = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 					}
 					
-					if (AfirmaUtils.checkJSONData(result)) {
-						result = Base64.decode(result);
+					try {
+						result = AfirmaUtils.parseJSONData(result);
 					}
+					catch (e) {}
 					
 					successCallback(result, certificate);
 				}
@@ -1821,11 +1813,13 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Inicia el proceso de firma por lotes con JSON.
 			 */	
-			function signBatchJSON (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, params) {
-				signBatchByService(jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, params, true);
+			function signBatchJSON (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signBatchByService(jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, true);
 			}
 			
-			function signBatchByService (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, isJson) {
+			function signBatchByService (batchB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, isJson) {
 				
 				if (batchB64 == undefined || batchB64 == "") {
 					batchB64 = null;
@@ -1835,21 +1829,21 @@ var AutoScript = ( function ( window, undefined ) {
 					batchB64 = batchB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
 				
-				var data = generateDataToBatch(defaultKeyStore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64, isJson);
+				var data = generateDataToBatch(defaultKeyStore, batchPreSignerUrl, batchPostSignerUrl, certFilters, batchB64, isJson);
 				execAppIntent(buildUrl(data));
 			}
 			
 			/**
 			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
-			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64, isJson) {
+			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, certFilters, batchB64, isJson) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op","batch");
 				data.keystore = generateDataKeyValue("keystore", keystore != null ? keystore : null);
 				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
 				data.batchpresignerurl = generateDataKeyValue("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
-				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.properties = generateDataKeyValue ("properties", certFilters != null ? Base64.encode(certFilters) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
 				data.needcert = generateDataKeyValue ("needcert",  "true");
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
@@ -1857,8 +1851,8 @@ var AutoScript = ( function ( window, undefined ) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
 				
-				if (isJson){
-					data.jsonBatch = createKeyValuePair ("jsonBatch", true);	
+				if (isJson) {
+					data.jsonBatch = generateDataKeyValue ("jsonBatch", true);	
 				}
 
 				return data;
@@ -2393,13 +2387,15 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				// Termina bien y no devuelve ningun resultado o es una operacion guardado
 				if (data == "OK") {
-					if (AfirmaUtils.checkJSONData(data)) {
-						data = Base64.decode(data);
+					try {
+						data = AfirmaUtils.parseJSONData(data);
 					}
+					catch (e) {}
+
 					successCallback(data, null);
 					return;
 				}
-				
+
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
 					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
@@ -2489,7 +2485,7 @@ var AutoScript = ( function ( window, undefined ) {
 										
 					}
 					
-					successCallback(fileNameArray,dataB64Array);
+					successCallback(fileNameArray, dataB64Array);
 					
 					return;
 				}
@@ -2548,9 +2544,10 @@ var AutoScript = ( function ( window, undefined ) {
 					certificate = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
 				
-				if (AfirmaUtils.checkJSONData(result)) {
-					result = Base64.decode(result);
+				try {
+					result = AfirmaUtils.parseJSONData(result);
 				}
+				catch (e) {}
 				
 				successCallback(result, certificate);
 			}
@@ -3088,13 +3085,13 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Ejecuta una operacion de firma de lote JSON.
 			 */
-			function signBatchJSON (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallback, errorCallback) {
+			function signBatchJSON (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback) {
 				
 				currentOperation = OPERATION_BATCH;
 
-				// Si hay un certificado prefijado, lo agregamos a los parametros extra
+				// Si hay un certificado prefijado, lo agregamos a los filtros de certificado
 				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
-					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
+					certFilters = addSignatoryCertificateToExtraParams(stickyCertificate, certFilters);
 				}
 				
 				var idSession = generateNewIdSession();
@@ -3117,7 +3114,7 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPreSignerUrl != undefined) {				params[i++] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
 				if (batchPostSignerUrl != null &&
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
-				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
 				
@@ -3616,9 +3613,10 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 					}
 					
-					if (AfirmaUtils.checkJSONData(result)) {
-						result = Base64.decode(result);
+					try {
+						result = AfirmaUtils.parseJSONData(result);
 					}
+					catch (e) {}
 
 					successCallback(result, certificate);
 					return false;
@@ -3982,7 +3980,6 @@ var AutoScript = ( function ( window, undefined ) {
 			createBatch : createBatch,
 			addDocumentToBatch : addDocumentToBatch,
 			signBatchProcess : signBatchJSON,
-			printJSONRequest : printJSONRequest,
 			signBatch : signBatchXML,
 			selectCertificate : selectCertificate,
 			signAndSaveToFile : signAndSaveToFile,
