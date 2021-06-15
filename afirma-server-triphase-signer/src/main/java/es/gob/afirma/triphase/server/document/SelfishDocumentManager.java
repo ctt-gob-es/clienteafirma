@@ -15,7 +15,7 @@ import java.util.Properties;
 
 import es.gob.afirma.core.misc.Base64;
 
-/** Simulador de gestor documental, el identificador de documento es el propio documento en Base64.
+/** Simulador de gestor documental, la referencia al documento es el propio documento en Base 64.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SelfishDocumentManager implements DocumentManager {
 
@@ -26,15 +26,15 @@ public final class SelfishDocumentManager implements DocumentManager {
 	}
 
 	@Override
-	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties config) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties config) throws IOException {
 		return Base64.decode(
 			// Por si acaso deshacemos un posible URL Safe
-			id.replace("-", "+").replace("_", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			dataRef.replace("-", "+").replace("_", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
 	}
 
 	@Override
-	public String storeDocument(final String id, final X509Certificate[] certChain, final byte[] data, final Properties config) throws IOException {
+	public String storeDocument(final String dataRef, final X509Certificate[] certChain, final byte[] data, final Properties config) throws IOException {
 		return Base64.encode(data, true);
 	}
 

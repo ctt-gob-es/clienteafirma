@@ -74,7 +74,7 @@ public final class Utils {
 			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.SEVERE, "No se ha podido establecer una caracteristica de seguridad en la factoria XML: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se ha podido establecer el procesado seguro en la factoria XML: " + e); //$NON-NLS-1$
 		}
 
 		// Los siguientes atributos deberia establececerlos automaticamente la implementacion de
@@ -90,7 +90,9 @@ public final class Utils {
 				SECURE_BUILDER_FACTORY.setAttribute(securityProperty, ""); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "No se ha podido establecer una propiedad de seguridad '" + securityProperty + "' en la factoria XML"); //$NON-NLS-1$ //$NON-NLS-2$
+				// Podemos las trazas en debug ya que estas propiedades son adicionales
+				// a la activacion de el procesado seguro
+				LOGGER.log(Level.FINE, "No se ha podido establecer una propiedad de seguridad '" + securityProperty + "' en la factoria XML"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 

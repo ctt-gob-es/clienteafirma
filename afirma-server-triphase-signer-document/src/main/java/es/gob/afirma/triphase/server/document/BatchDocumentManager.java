@@ -9,7 +9,7 @@ public interface BatchDocumentManager extends DocumentManager {
 
 	/**
 	 * Deshace un guardado previo (para los modos transaccionales).
-	 * @param dataRef Identificador de la firma a deshacer.
+	 * @param dataRef Referencia al documento firmado.
 	 * @param certChain Cadena de certificaci&oacute;n usada para el guardado de los datos.
 	 * @param prop Configuraci&oacute;n de firma aplicada.
 	 * @throws IOException Cuando falla el deshacer el guardado de la firma.
