@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -979,6 +980,11 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 			throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
 		}
 
+		//Se comprueba si las firmas que ya contiene el documento tienen una version valida
+		if (!checkSignVersion(signDocument)) {
+			throw new AOFormatFileException("El documento a cofirmar contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
+		}
+
 		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
     }
 
@@ -1388,5 +1394,44 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	newExtraParams.remove(XAdESExtraParams.INTERNAL_VALIDATE_PKCS1);
 
     	return newExtraParams;
+    }
+
+    /**
+     * Comprueba si el documento a cofirmar, contiene firmas de una versi&oacute;n distinta
+     * a la 1.3.2.
+     * @param signDocument Documento que contiene las firmas y datos.
+     * @return Devuelve true en caso de que la versi&oacute;n sea correcta o false en caso
+     * de que se encuentre alguna firma con una versi&oacute;n no soportada.
+     */
+    private static boolean checkSignVersion(final Document signDocument) {
+
+        try {
+            final Element rootNode = signDocument.getDocumentElement();
+            final List<Node> signNodes = new ArrayList<>();
+
+            // Comprobamos si el nodo raiz es una firma
+            if (rootNode.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
+                signNodes.add(rootNode);
+            }
+
+            // Identificamos las firmas internas del XML
+            final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
+            for (int i = 0; i < signatures.getLength(); i++) {
+            	// Omitimos las firmas extraidas de sellos de tiempo
+            	final Node parentNode = signatures.item(i).getParentNode();
+            	if (parentNode == null || !TIMESTAMP_TAG.equals(parentNode.getLocalName())) {
+            		signNodes.add(signatures.item(i));
+            	}
+            }
+
+            if (!XAdESUtil.checkSignVersion(signNodes)) {
+                return false;
+            }
+        }
+        catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "Error al analizar si el XML era una firma XAdES", e); //$NON-NLS-1$
+            return false;
+        }
+        return true;
     }
 }

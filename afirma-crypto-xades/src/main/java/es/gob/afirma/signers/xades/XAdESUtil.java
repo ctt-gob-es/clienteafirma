@@ -65,6 +65,12 @@ public final class XAdESUtil {
 	    "http://uri.etsi.org/01903/v1.4.1#" //$NON-NLS-1$
 	};
 
+	private static final String[] UNSUPPORTED_COSIGN_XADES_NAMESPACE_URIS = new String[] {
+		    "http://uri.etsi.org/01903/v1.1.1#", //$NON-NLS-1$
+		    "http://uri.etsi.org/01903/v1.2.2#", //$NON-NLS-1$
+		    "http://uri.etsi.org/01903/v1.4.1#" //$NON-NLS-1$
+		};
+
 	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
 		"http://uri.etsi.org/01903#SignedProperties", //$NON-NLS-1$
 	    "http://uri.etsi.org/01903/v1.2.2#SignedProperties", //$NON-NLS-1$
@@ -86,6 +92,23 @@ public final class XAdESUtil {
         		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength(); //$NON-NLS-1$
         	}
             if (lenCount == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES compatibles
+     * con la cofirma a realizar
+     * @param signNodes Listado de nodos de firma.
+     * @return {@code true} cuando todos los nodos sean firmas compatibles para este formato. */
+    static boolean checkSignVersion(final List<Node> signNodes) {
+        for (final Node signNode : signNodes) {
+        	int lenCount = 0;
+        	for (final String xadesNamespace : UNSUPPORTED_COSIGN_XADES_NAMESPACE_URIS) {
+        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength(); //$NON-NLS-1$
+        	}
+            if (lenCount > 0) {
                 return false;
             }
         }
@@ -614,7 +637,7 @@ public final class XAdESUtil {
 			final X509Certificate signingCertificate) throws AOException {
 
 		XAdES xadesProfile = XAdES.EPES;
-		if (profile != null && AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
 			xadesProfile = XAdES.B_LEVEL;
 		}
 
