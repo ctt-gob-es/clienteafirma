@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
+import es.gob.afirma.signers.batch.xml.SingleSign;
 
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

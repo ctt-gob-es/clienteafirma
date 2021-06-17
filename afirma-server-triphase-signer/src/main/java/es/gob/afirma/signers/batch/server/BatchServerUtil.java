@@ -19,6 +19,7 @@ import java.util.List;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.batch.json.TriphaseDataParser;
 
 final class BatchServerUtil {
 
@@ -32,17 +33,23 @@ final class BatchServerUtil {
 		);
 	}
 
-	static byte[] getSignBatchConfig(final byte[] xmlAsUrlSafeBase64) throws IOException {
-		if (xmlAsUrlSafeBase64 == null) {
+	static byte[] getSignBatchConfig(final byte[] batchAsUrlSafeBase64) throws IOException {
+		if (batchAsUrlSafeBase64 == null) {
 			throw new IllegalArgumentException(
 				"La definicion de lote no puede ser nula" //$NON-NLS-1$
 			);
 		}
-		final byte[] xml = Base64.isBase64(xmlAsUrlSafeBase64) ?
-			Base64.decode(xmlAsUrlSafeBase64, 0, xmlAsUrlSafeBase64.length, true) :
-				xmlAsUrlSafeBase64;
+		final byte[] batch = Base64.isBase64(batchAsUrlSafeBase64) ?
+			Base64.decode(batchAsUrlSafeBase64, 0, batchAsUrlSafeBase64.length, true) :
+				batchAsUrlSafeBase64;
 
-		return xml;
+		return batch;
+	}
+
+	static TriphaseData getTriphaseDataFromJSON(final byte[] triphaseDataAsUrlSafeBase64) throws IOException {
+		return TriphaseDataParser.parseFromJSON(
+			Base64.decode(triphaseDataAsUrlSafeBase64, 0, triphaseDataAsUrlSafeBase64.length, true)
+		);
 	}
 
 	static X509Certificate[] getCertificates(final String certListUrlSafeBase64) throws CertificateException,

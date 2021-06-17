@@ -75,7 +75,7 @@ public final class TestBatchSigner {
 		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-		final String res = BatchSigner.sign(
+		final String res = BatchSigner.signXML(
 			Base64.encode(SAMPLE_BATCH_XML.getBytes(), true),
 			"http://localhost:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
 			"http://localhost:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$

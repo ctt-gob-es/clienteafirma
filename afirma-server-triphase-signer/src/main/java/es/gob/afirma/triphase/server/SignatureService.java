@@ -126,7 +126,7 @@ public final class SignatureService extends HttpServlet {
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-	/** Propiedad que indica si la cach&eacute; est&aacute activada o no. */
+	/** Propiedad que indica si la cach&eacute; est&aacute; activada o no. */
 	private static boolean cacheEnabled = false;
 
 	static {
@@ -357,10 +357,10 @@ public final class SignatureService extends HttpServlet {
 
 			if (cacheEnabled && sessionData != null) {
 				LOGGER.info("Recuperamos el documento de cache"); //$NON-NLS-1$
-				final TriphaseData tr = TriphaseData.parser(sessionData);
-				final TriSign preSign = tr.getTriSigns().get(0);
-				final String cacheId = preSign.getProperty(TRIPHASE_PROP_CACHE_ID);
 				try {
+					final TriphaseData tr = TriphaseData.parser(sessionData);
+					final TriSign preSign = tr.getTriSigns().get(0);
+					final String cacheId = preSign.getProperty(TRIPHASE_PROP_CACHE_ID);
 					docBytes = docCacheManager.getDocumentFromCache(cacheId);
 				}
 				catch (final Exception e) {
@@ -391,7 +391,10 @@ public final class SignatureService extends HttpServlet {
 				LOGGER.warning("No se ha indicado algoritmo de firma. Se utilizara " + AOSignConstants.DEFAULT_SIGN_ALGO); //$NON-NLS-1$
 				algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
 			} else if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
-	    		throw new IllegalArgumentException("Las firmas electronicas no permiten huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+				LOGGER.severe("Las firmas electronicas no permiten huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+				out.print(ErrorManager.getErrorMessage(20));
+				out.flush();
+				return;
 	    	}
 
 			// Instanciamos el preprocesador adecuado
@@ -635,10 +638,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				LOGGER.info("Documento almacenado"); //$NON-NLS-1$
 
-				out.println(
-					new StringBuilder(newDocId.length() + SUCCESS.length()).
-					append(SUCCESS).append(newDocId).toString()
-				);
+				out.println(SUCCESS + newDocId);
 				out.flush();
 
 				LOGGER.info("== FIN POSTFIRMA"); //$NON-NLS-1$
@@ -648,7 +648,7 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
         catch (final Exception e) {
-        	LOGGER.severe("No se pudo contestar a la peticion: " + e); //$NON-NLS-1$
+        	LOGGER.log(Level.SEVERE, "No se pudo contestar a la peticion", e); //$NON-NLS-1$
         	try {
 				response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR, "No se pude contestar a la peticion: " + e); //$NON-NLS-1$
 			}

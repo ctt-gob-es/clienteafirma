@@ -25,6 +25,12 @@ public class TempStoreFileSystemCleaner implements Runnable {
 
 	private static boolean runningCleaning = false;
 
+	private final File tempDir;
+
+	public TempStoreFileSystemCleaner(final File tempDir) {
+		this.tempDir = tempDir;
+	}
+
 	/**
 	 * Indica si el proceso se est&aacute; ejecutando actualmente.
 	 * @return {@code true} si el proceso de limpieza se est&aacute; ejecutando,
@@ -40,7 +46,7 @@ public class TempStoreFileSystemCleaner implements Runnable {
 		runningCleaning = true;
 
 		final long limitTime = new Date().getTime() - EXPIRED_PERIOD;
-		for (final File file : BatchConfigManager.getTempDir().listFiles()) {
+		for (final File file : this.tempDir.listFiles()) {
 			if (file.isFile() && file.lastModified() < limitTime) {
 				file.delete();
 			}

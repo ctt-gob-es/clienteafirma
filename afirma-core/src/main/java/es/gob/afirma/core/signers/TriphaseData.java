@@ -408,4 +408,5 @@ public final class TriphaseData {
 		builder.append("</xml>"); //$NON-NLS-1$
 		return builder.toString();
 	}
+
 }

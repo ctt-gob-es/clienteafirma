@@ -17,6 +17,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.signers.batch.xml.SingleSign;
+
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST.
  * <b>Esta clase es &uacute;nicamente un ejemplo de implementaci&oacute;n del interfaz <code>SignSaver</code>
  * para depuraci&oacute;n, <u>nunca</u> debe usarse en entornos reales</b> (no hay comprobaciones de
@@ -29,7 +31,7 @@ public final class SignSaverFile implements SignSaver {
 	/** El guardado real est&aacute; deshabilitado por defecto, habilitar para usar esta clase
 	 * para depuraci&oacute;n. No debe usarse para entornos reales, ya que no hay comprobaciones de
 	 * qu&eacute; ficheros pueden sobrescribirse. */
-	private static final boolean DISABLED = false;
+	private static final boolean DISABLED = true;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 

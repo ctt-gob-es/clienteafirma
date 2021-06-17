@@ -72,9 +72,9 @@ public class RequestParameters extends HashMap<String, String> {
 
 	private static void extractParametersFromUrl(final HttpServletRequest request, final RequestParameters params) {
 
-		final Enumeration<String> names = request.getParameterNames();
+		final Enumeration<?> names = request.getParameterNames();
 		while (names.hasMoreElements()) {
-			final String name = names.nextElement();
+			final String name = (String) names.nextElement();
 			params.put(name, request.getParameter(name));
 		}
 	}

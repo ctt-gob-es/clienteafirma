@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html>
+ <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>
+   Esquema del JSON de definici&oacute;n de lotes de firmas
+  </title>
+ </head>
+ <body>
+  El esquema JSON de definici&oacute;n de lotes de firmas es el siguiente:
+  <pre>
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "algorithm": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "suboperation": {
+      "type": "string"
+    },
+    "concurrenttimeout": {
+      "type": "integer"
+    },
+    "stoponerror": {
+      "type": "boolean"
+    },
+    "extraparams": {
+      "type": "string"
+    },
+    "singlesigns": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "datareference": {
+              "type": "string"
+            },
+            "format": {
+              "type": "string"
+            },
+            "suboperation": {
+              "type": "string"
+            },
+            "extraparams": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "datareference",
+            "format",
+            "suboperation",
+            "extraparams"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "datareference": {
+              "type": "string"
+            },
+            "suboperation": {
+              "type": "string"
+            },
+            "extraparams": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "datareference",
+            "suboperation",
+            "extraparams"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "algorithm",
+    "format",
+    "suboperation",
+    "concurrenttimeout",
+    "stoponerror",
+    "extraparams",
+    "singlesigns"
+  ]
+}
+ </pre>
+ Un ejemplo de definici&oacute;n JSON de lote de firmas podr&iacute;a ser
+ este (ejemplo con dos firmas en el lote):
+ <pre>
+{
+   "algorithm":"SHA256withRSA",
+   "format":"PAdES",
+   "suboperation":"sign",
+   "concurrenttimeout":30,
+   "stoponerror":false,
+   "extraparams":"Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==",
+   "singlesigns":[
+      {
+         "id":"7725374e-728d-4a33-9db9-3a4efea4cead",
+         "datareference":"QzovcHJ1ZWJhcy90ZXN0X2ZpY2hlcm8xLnBkZg==",
+         "format":"XAdES",
+         "suboperation":"sign",
+         "extraparams":"Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg=="
+      },
+      {
+         "id":"93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a",
+         "datareference":"QzovcHJ1ZWJhcy90ZXN0X2ZpY2hlcm8yLnBkZg==",
+         "suboperation":"sign",
+         "extraparams":"Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD05M2QxNTMxYy1jZDMyLTRjOGUtOGNjOC0xZjFjZmU2NmY2NGENCg=="
+      }
+   ]
+}
+ </pre>
+ En este se distinguen los siguientes elementos:
+ <p><b><u>Cabecera de definici&oacute;n de lote</u></b></p>
+ <p>
+  En el ejemplo, es la l&iacute;nea <code>"stoponerror":"false"</code>, 
+  que contiene dos atributos configurables por el integrador:
+ </p>
+ <dl>
+  <dt><code>stoponerror</code></dt>
+  <dd>
+   <p>
+    Cuando se establece a <code>false</code> se indica que el proceso debe continuar incluso
+    si alguna de las firmas del lote no puede completarse, y cuando se establece a <code>true</code>
+    el proceso se para en el momento en el que se produce el primer error.
+   </p>
+  </dd>
+  <dt><code>algorithm</code></dt>
+  <dd>
+   <p>
+    Algoritmo de firma a usar en todo el lote.<br>
+    Se admiten los siguientes algoritmos:
+   </p>
+   <ol>
+    <li><code>SHA1withRSA</code> (no se recomienda por obsoleto)</li>
+    <li><code>SHA256withRSA</code></li>
+    <li><code>SHA384withRSA</code></li>
+    <li><code>SHA512withRSA</code></li>
+   </ol>
+  </dd>
+ </dl> 
+ <p><b><u>Definici&oacute;n de cada firma dentro del lote</u></b></p>
+ <p>
+  Dentro del elemento de definici&oacute;n de lote debemos incluir uno o varios elementos de tipo
+  <code>singlesign</code>, que es obligatorio cuenten en origen con un identificados &uacute;nico 
+  (en el ejemplo se observa la primera cabecera de definici&oacute;n de firma 
+  <code>"id":"7725374e-728d-4a33-9db9-3a4efea4cead"</code>, que indica que es una 
+  firma dentro del lote identificada por la cadena <code>7725374e-728d-4a33-9db9-3a4efea4cead</code>.
+ </p>
+ <p><u>Configuraci&oacute;n de cada firma dentro del lote</u></p>
+  Cada una de las firmas dentro del lote puede ser configurada individualmente con los siguientes par&aacute;metros:
+  <dl>
+   <dt>
+    Origen de los datos a firmar
+   </dt>
+    <dd>
+     <p>
+      El origen de los datos debe indicarse dentro del elemento <code>datasource</code> del JSON, por ejemplo: 
+      <code>"datareference":""http://google.com"</code>
+     </p>
+     El origen de los datos a firmar puede indicarse:
+     <ol>
+      <li>
+       Con una URL (se admite HTTP y HTTPS). En este caso el servidor (nunca el cliente) descargar&aacute; 
+       directamente los datos a firmar.
+      </li>
+      <li>
+       Indicando directamente los datos a firmar codificados en Base64. 
+       En este caso el servidor descodificar&aacute; el Base64 para obtener los datos a firmar.</li>
+     </ol>
+    </dd>
+   <dt>
+    Formato de firma
+   </dt>
+    <dd>
+     <p>
+      El formato de firma a utilizar debe indicarse dentro del elemento <code>format</code> del JSON, por ejemplo 
+      <code>"format":"XAdES"</code>.
+     </p>
+     Se admiten los siguientes formatos:
+     <ol>
+      <li><code>XAdES</code></li>
+      <li><code>CAdES</code></li>
+      <li><code>PAdES</code> (v&aacute;lido &uacute;nicamente para documentos PDF)</li>
+     </ol>
+    </dd>
+   <dt>
+    Operaci&oacute;n de firma
+   </dt>
+    <dd>
+     <p>
+      La operaci&oacute;n concreta de firma a realizar debe indicarse dentro del elemento <code>suboperation</code> 
+      del JSON, por ejemplo <code>"suboperation":"sign"</code>.
+     </p>
+     Se admiten las siguientes operaciones:
+     <ol>
+      <li><code>sign</code> (firma)</li>
+      <li><code>cosign</code> (cofirma)</li>
+     </ol>
+    </dd>
+   <dt>
+    Par&aacute;metros adicionales para la firma
+   </dt>
+   	<dd>
+   	 <p>
+   	  Los par&aacute;metros adicionales para el formato y la operaci&oacute;n concreta de firma (tal y como se describe
+   	  en la documentaci&oacute;n del MiniApplet) deben indicarse dentro del elemento <code>extraparams</code> del JSON, 
+   	  por ejemplo <code>"extraparams":"bW9kZT1pbXBsaWNpdA0Kc2lnbmF0dXJlUHJvZHVjdGlvbkNpdHk9TWFkcmlk"</code>.
+   	 <p>
+   	 <p>
+      Estos par&aacute;metros adicionales deben indicarse codificando su representaci&oacute;n textual como Base64.<br> 
+      As&iacute;, las siguientes propiedades (indicando cada par&aacute;metro en una l&iacute;nea de texto con el formato
+      nombre_parámetro=valor):
+     </p>
+     <p><code>
+      mode=implicit<br>
+      signatureProductionCity=Madrid
+     </code></p>
+     Quedar&iacute;an codificadas en Base64 como:
+     <p><code>
+     bW9kZT1pbXBsaWNpdA0Kc2lnbmF0dXJlUHJvZHVjdGlvbkNpdHk9TWFkcmlk
+     </code></p>
+   	 Si no se desea establecer par&aacute;metros adicionales debe dejarse el nodo vac&iacute;o.<br>&nbsp;
+   	</dd>
+  </dl>
+ <p>
+ </p>
+ </body>
+</html>

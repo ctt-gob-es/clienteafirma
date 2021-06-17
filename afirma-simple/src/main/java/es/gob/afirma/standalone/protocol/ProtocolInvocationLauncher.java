@@ -41,6 +41,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
+import es.gob.afirma.signers.batch.client.TriphaseDataParser;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
@@ -145,7 +146,7 @@ public final class ProtocolInvocationLauncher {
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 	    	try {
 				final Method aboutMethod = ProtocolInvocationLauncher.class.getDeclaredMethod("showAbout", //$NON-NLS-1$
-						new Class[] { EventObject.class });
+						EventObject.class);
 	    		OSXHandler.setAboutHandler(null, aboutMethod);
 			} catch (final Exception e) {
 	    		LOGGER.warning("No ha sido posible establecer el menu 'Acerca de...' de OS X: " + e); //$NON-NLS-1$
@@ -265,13 +266,13 @@ public final class ProtocolInvocationLauncher {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
                 }
 
-				// Si se indica un identificador de fichero, es que el XML de definicion de lote
+				// Si se indica un identificador de fichero, es que el JSON o XML de definicion de lote
 				// se tiene que
                 // descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
-                    final byte[] xmlBatchDefinition;
+                    final byte[] batchDefinition;
                     try {
-                        xmlBatchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+                    	batchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
 					} catch (final InvalidEncryptedDataLengthException e) {
                         LOGGER.log(Level.SEVERE, "No se pueden recuperar los datos del servidor: " + e, e); //$NON-NLS-1$
 						ProtocolInvocationLauncherErrorManager
@@ -286,7 +287,15 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersForBatch(xmlBatchDefinition);
+                    final Map <String, String> paramsMap;
+
+                    if (params.isJsonBatch()) {
+                    	 paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
+                    	 params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    } else {
+                    	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
+                    	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    }
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -651,21 +660,20 @@ public final class ProtocolInvocationLauncher {
                 // por sockets, directamente devolveremos el error.
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
+                    String msg;
                     final String errorCode = e.getErrorCode();
-                    if (!bySocket) {
-                        String msg;
-                        if (errorCode == ProtocolInvocationLauncherSign.RESULT_CANCEL) {
-                        	msg = errorCode;
-                        } else if (e.getMessage() != null) {
-                        	msg = errorCode + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString()); //$NON-NLS-1$
-                        } else {
-                        	msg = URLEncoder.encode(
-                        			ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode),
-                        			StandardCharsets.UTF_8.toString());
-                        }
-                        sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    if (ProtocolInvocationLauncherSign.RESULT_CANCEL.equals(errorCode)) {
+                    	msg = errorCode;
+                    } else if (e.getMessage() != null) {
+                    	msg = errorCode + ": " + e.getMessage(); //$NON-NLS-1$
+                    } else {
+                    	msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
                     }
-                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+                    if (!bySocket) {
+                    	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
+                    	sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    }
+                    return msg;
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la

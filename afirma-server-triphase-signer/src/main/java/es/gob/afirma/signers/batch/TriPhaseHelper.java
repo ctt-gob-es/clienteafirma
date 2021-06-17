@@ -53,7 +53,7 @@ public class TriPhaseHelper {
 	 * @throws CertificateEncodingException Cuando no se puede codificar el certificado.
 	 * @throws IllegalStateException Nunca se deber&iacute;a dar.
 	 */
-	static void addVerificationCodes(final TriphaseData triphaseData, final X509Certificate cert)
+	public static void addVerificationCodes(final TriphaseData triphaseData, final X509Certificate cert)
 			throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException,
 			IllegalStateException {
 
@@ -93,7 +93,7 @@ public class TriPhaseHelper {
 	// prefirma (par&aacute;metro PRE) para completar la firma, sino el parametro BASE. Habr&iacute;a
 	// que extraer la prefirma del BASE en lugar de coger la que se pasa como par&aacute;metro (que
 	// ya podr&iacute;a dejar de pasarse).
-	static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert)
+	public static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert)
 			throws SecurityException, IOException {
 
 		final String hmacSeed = ConfigManager.getHMacKey();

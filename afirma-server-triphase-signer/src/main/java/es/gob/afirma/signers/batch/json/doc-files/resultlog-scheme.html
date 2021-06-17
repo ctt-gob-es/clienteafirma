@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html>
+ <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>
+   Esquema del JSON de resumen de resultado de la ejecuci&oacute;n de un lote de firmas
+  </title>
+ </head>
+ <body>
+  <p>
+   Cuando se termina de procesar un lote de firma, el cliente recibe como respuesta un JSON que describe 
+   como ha resultado el proceso.<br>
+   Este JSON es acorde al siguiente esquema:
+  </p>
+  <pre>
+  {
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "signs": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "result",
+            "description"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "signs"
+  ]
+}
+  </pre>
+  <p>
+   Un ejemplo de JSON devuelto podr&iacute;a ser el siguiente:
+  </p>
+  <pre>
+	{
+ 		"signs":[
+			{	"id":"CADES-001",
+ 				"result":"DONE_AND_SAVED",
+ 				"description":""
+			},
+			{	"id":"XADES-002",
+ 				"result":"DONE_AND_SAVED",
+ 				"description":""
+			},
+			{	"id":"PADES-003",
+ 				"result":"DONE_AND_SAVED",
+ 				"description":""
+			}
+		]
+	}
+  </pre>
+  <p>
+   En &eacute;l distinguimos un nodo <code>signs</code> por cada una de las firmas del lote, 
+   con su correspondiente identificador.<br>
+   Este puede tener tres atributos:
+  </p>
+  <dl>
+   <dt><code>id</code></dt>
+    <dd>Identificador de la firma.</dd>
+   <dt><code>result</code></dt>
+    <dd>Resultado del proceso.</dd>
+   <dt><code>description</code> (opcional)</dt>
+    <dd>Descripción del resultado del proceso.</dd>
+  </dl>
+ </body>
+</html>

@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import javax.swing.JFrame;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -34,6 +35,7 @@ public final class UiTester {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings({ "static-method" })
 	@Test
+	@Ignore // Requiere interfaz grafica
 	public void testDialog() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 		SignPdfDialog.getVisibleSignatureExtraParams(
@@ -51,6 +53,7 @@ public final class UiTester {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Requiere interfaz grafica
 	public void testMainPanel() throws Exception {
 
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));

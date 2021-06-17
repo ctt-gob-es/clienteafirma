@@ -12,6 +12,8 @@ package es.gob.afirma.signers.batch;
 import java.io.IOException;
 import java.util.Properties;
 
+import es.gob.afirma.signers.batch.xml.SingleSign;
+
 /** Interfaz para el guardado, almacenaje o env&iacute;o de firmas una vez realizadas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public interface SignSaver {

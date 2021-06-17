@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.signers.batch.BatchConfigManager;
-import es.gob.afirma.signers.batch.SignBatch;
-import es.gob.afirma.signers.batch.SignBatchConcurrent;
-import es.gob.afirma.signers.batch.SignBatchSerial;
+import es.gob.afirma.signers.batch.xml.SignBatch;
+import es.gob.afirma.signers.batch.xml.SignBatchConcurrent;
+import es.gob.afirma.signers.batch.xml.SignBatchSerial;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.ConfigManager;
 
@@ -116,7 +116,7 @@ public final class BatchPresigner extends HttpServlet {
 			pre = batch.doPreBatch(certs);
 		}
 		catch(final Exception e) {
-			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote", e); //$NON-NLS-1$
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Error en el preproceso del lote: " + e //$NON-NLS-1$

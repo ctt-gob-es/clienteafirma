@@ -24,38 +24,29 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Implementaci&oacute;n de acceso a gestor documental usando simplemente el sistema de ficheros.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class FileSystemDocumentManager implements DocumentManager {
+public class FileSystemDocumentManager implements BatchDocumentManager {
 
-	private static final String IN_DIR_PARAM = "indir"; //$NON-NLS-1$
-	private static final String OUT_DIR_PARAM = "outdir"; //$NON-NLS-1$
-	private static final String OVERWRITE_PARAM = "overwrite"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_IN_DIR = "docmanager.filesystem.indir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_IN_DIR_LEGACY = "indir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OUT_DIR = "docmanager.filesystem.outdir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OUT_DIR_LEGACY = "outdir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OVERWRITE = "docmanager.filesystem.overwrite"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OVERWRITE_LEGACY = "overwrite"; //$NON-NLS-1$
 
-	private static final String FORMAT_PROPERTY = "format"; //$NON-NLS-1$
+	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
-	final String inDir;
-	final String outDir;
-	final boolean overwrite;
+	String inDir;
+	String outDir;
+	boolean overwrite;
 
 	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Construye la clase de acceso a gestor documental usando sistema de ficheros.
-	 * @param config Configuraci&oacute;n del gestor (directorios, etc.) */
-	public FileSystemDocumentManager(final Properties config) {
-
-		this.inDir = config.getProperty(IN_DIR_PARAM);
-		this.outDir = config.getProperty(OUT_DIR_PARAM);
-		this.overwrite = Boolean.parseBoolean(config.getProperty(OVERWRITE_PARAM));
-
-		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
-		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$
-	}
-
 	@Override
-	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties prop) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException {
 
-		LOGGER.info("Recuperamos el documento con identificador: " + id); //$NON-NLS-1$
+		LOGGER.info("Recuperamos el documento con referencia: " + dataRef); //$NON-NLS-1$
 
-		final File file = new File(this.inDir, new String(Base64.decode(id)));
+		final File file = new File(this.inDir, new String(Base64.decode(dataRef)));
 
 		if( !isParent(new File(this.inDir), file ) ) {
 		    throw new IOException(
@@ -97,10 +88,86 @@ public final class FileSystemDocumentManager implements DocumentManager {
 	}
 
 	@Override
-	public String storeDocument(final String id,
+	public String storeDocument(final String dataRef,
 			                    final X509Certificate[] certChain,
 			                    final byte[] data,
 			                    final Properties prop) throws IOException {
+
+		final File file = buildOutputFilename(dataRef, prop);
+
+		LOGGER.info("Escribiendo el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
+
+		try (
+			final FileOutputStream fos = new FileOutputStream(file);
+		) {
+			fos.write(data);
+			fos.close();
+		}
+		catch (final IOException e) {
+			LOGGER.severe("Error al almacenar los datos en el fichero '" + file.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			throw e;
+		}
+
+		return Base64.encode(file.getName().getBytes());
+	}
+
+	/**
+	 * Comprueba que un fichero realmente sea descendiente de un directorio padre
+	 * para evitar ataques de tipo Path Transversal.
+	 * @param p Directorio dentro del cual debe encontrarse el fichero.
+	 * @param f Fichero que se desea comprobar.
+	 * @return {@code true} si el fichero estaba dentro del directorio o uno de sus
+	 * subdirectorios, {@code false} en caso contrario.
+	 */
+	private static boolean isParent(final File p, final File f) {
+	    File file;
+	    final File parent;
+	    try {
+	        parent = p.getCanonicalFile();
+	        file = f.getCanonicalFile();
+	    }
+	    catch( final IOException e) {
+	        return false;
+	    }
+
+	    while( file != null ) {
+	        if(parent.equals(file)) {
+	            return true;
+	        }
+	        file = file.getParentFile();
+	    }
+	    return false;
+	}
+
+	@Override
+	public void init(final Properties config) {
+		this.inDir = config.getProperty(CONFIG_PARAM_IN_DIR, config.getProperty(CONFIG_PARAM_IN_DIR_LEGACY));
+		this.outDir = config.getProperty(CONFIG_PARAM_OUT_DIR, config.getProperty(CONFIG_PARAM_OUT_DIR_LEGACY));
+		this.overwrite = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_OVERWRITE, config.getProperty(CONFIG_PARAM_OVERWRITE_LEGACY)));
+
+		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
+		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$
+	}
+
+
+	@Override
+	public void rollback(final String id,
+            final X509Certificate[] certChain,
+            final Properties prop) throws IOException {
+
+		final File file = buildOutputFilename(id, prop);
+
+		LOGGER.info("Borrando el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/**
+	 * Compone el nombre y la ruta del fichero donde debe encontrarse la firma de un documento dato.
+	 * @param id Identificador del documento.
+	 * @param prop Configuraci&oacute;n de firma.
+	 * @return Fichero de salida.
+	 * @throws IOException Cuando falla la composici&oacute;n del fichero.
+	 */
+	private File buildOutputFilename(final String id, final Properties prop) throws IOException {
 
 		final String initialId = id != null ? new String(Base64.decode(id)) : "signature"; //$NON-NLS-1$
 		String newId = initialId;
@@ -109,8 +176,8 @@ public final class FileSystemDocumentManager implements DocumentManager {
 			newId = initialId.substring(0,  lastDotPos);
 		}
 
-		final String format = prop.getProperty(FORMAT_PROPERTY);
-		if (format != null && AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
+		final String format = prop.getProperty(PROPERTY_FORMAT);
+		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
 			newId += ".csig";  //$NON-NLS-1$
 		}
 		else if (format != null && format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
@@ -130,39 +197,7 @@ public final class FileSystemDocumentManager implements DocumentManager {
 			throw new IOException("Se ha obtenido un nombre de documento existente en el sistema de ficheros."); //$NON-NLS-1$
 		}
 
-		try (
-			final FileOutputStream fos = new FileOutputStream(file);
-		) {
-			fos.write(data);
-			fos.close();
-		}
-		catch (final IOException e) {
-			LOGGER.severe("Error al almacenar los datos en el fichero '" + file.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			throw e;
-		}
-
-		LOGGER.info("Escribiendo el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
-		return Base64.encode(newId.getBytes());
-	}
-
-	private static boolean isParent(final File p, final File file) {
-	    File f;
-	    final File parent;
-	    try {
-	        parent = p.getCanonicalFile();
-	        f = file.getCanonicalFile();
-	    }
-	    catch( final IOException e) {
-	        return false;
-	    }
-
-	    while( f != null ) {
-	        if(parent.equals(f)) {
-	            return true;
-	        }
-	        f = f.getParentFile();
-	    }
-	    return false;
+		return file;
 	}
 
 }

@@ -20,6 +20,10 @@ import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
+import es.gob.afirma.signers.batch.xml.SignBatch;
+import es.gob.afirma.signers.batch.xml.SignBatchConcurrent;
+import es.gob.afirma.signers.batch.xml.SignBatchSerial;
+import es.gob.afirma.signers.batch.xml.SingleSign;
 
 /** Pruebas de firma por lotes.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

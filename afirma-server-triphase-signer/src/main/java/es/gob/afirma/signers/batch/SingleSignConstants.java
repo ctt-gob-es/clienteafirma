@@ -11,6 +11,7 @@ package es.gob.afirma.signers.batch;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
@@ -38,7 +39,7 @@ public final class SingleSignConstants {
 
 		private final String name;
 
-		private SignSubOperation(final String n) {
+		SignSubOperation(final String n) {
 			this.name = n;
 		}
 
@@ -92,7 +93,7 @@ public final class SingleSignConstants {
 
 		private final String name;
 
-		private SignFormat(final String n) {
+		SignFormat(final String n) {
 			this.name = n;
 		}
 
@@ -142,7 +143,7 @@ public final class SingleSignConstants {
 
 		private final String name;
 
-		private SignAlgorithm(final String n) {
+		SignAlgorithm(final String n) {
 			this.name = n;
 		}
 
@@ -173,7 +174,7 @@ public final class SingleSignConstants {
 		}
 	}
 
-	static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOInvalidFormatException {
+	public static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOInvalidFormatException {
 		if (sSign == null) {
 			throw new IllegalArgumentException("La firma no puede ser nula"); //$NON-NLS-1$
 		}

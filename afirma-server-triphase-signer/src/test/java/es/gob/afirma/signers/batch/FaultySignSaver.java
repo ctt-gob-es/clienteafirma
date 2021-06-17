@@ -3,6 +3,8 @@ package es.gob.afirma.signers.batch;
 import java.io.IOException;
 import java.util.Properties;
 
+import es.gob.afirma.signers.batch.xml.SingleSign;
+
 /** Guardador que siempre da error al guardar.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class FaultySignSaver implements SignSaver {

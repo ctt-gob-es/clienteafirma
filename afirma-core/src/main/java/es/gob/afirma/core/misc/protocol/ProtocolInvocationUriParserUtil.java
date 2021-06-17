@@ -31,7 +31,6 @@ public final class ProtocolInvocationUriParserUtil {
 
 	private static final String DEFAULT_OPERATION = "SIGN"; //$NON-NLS-1$
 
-
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable
 	}

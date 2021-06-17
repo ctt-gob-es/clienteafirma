@@ -524,5 +524,6 @@ public final class AOUtil {
 		}
 	    return value.matches("^[0-9]+$"); //$NON-NLS-1$
 	}
+
 }
 

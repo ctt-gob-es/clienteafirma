@@ -191,25 +191,39 @@ final class ProtocolInvocationLauncherBatch {
 
 		String batchResult;
 		try {
-			batchResult = BatchSigner.sign(
-				Base64.encode(options.getData(), true),
-				options.getBatchPresignerUrl(),
-				options.getBatchPostSignerUrl(),
-				pke.getCertificateChain(),
-				pke.getPrivateKey()
-			);
+			if (options.isJsonBatch()) {
+				batchResult = BatchSigner.signJSON(
+						Base64.encode(options.getData(), true),
+						options.getBatchPresignerUrl(),
+						options.getBatchPostSignerUrl(),
+						pke.getCertificateChain(),
+						pke.getPrivateKey()
+						);
+			} else {
+				batchResult = BatchSigner.signXML(
+						Base64.encode(options.getData(), true),
+						options.getBatchPresignerUrl(),
+						options.getBatchPostSignerUrl(),
+						pke.getCertificateChain(),
+						pke.getPrivateKey()
+						);
+			}
 		}
 		catch(final HttpError e) {
+			String errorCode;
 			if (e.getResponseCode() / 100 == 4) {
+				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
 				LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
 					e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
 			else {
+				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
 				LOGGER.severe("Error en el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
 						e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(errorCode);
 			}
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}

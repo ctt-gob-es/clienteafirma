@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -24,9 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchConfigManager;
-import es.gob.afirma.signers.batch.SignBatch;
-import es.gob.afirma.signers.batch.SignBatchConcurrent;
-import es.gob.afirma.signers.batch.SignBatchSerial;
+import es.gob.afirma.signers.batch.xml.SignBatch;
+import es.gob.afirma.signers.batch.xml.SignBatchConcurrent;
+import es.gob.afirma.signers.batch.xml.SignBatchSerial;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.ConfigManager;
 
@@ -143,7 +144,7 @@ public final class BatchPostsigner extends HttpServlet {
 			ret = batch.doPostBatch(certs, td);
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error en el postproceso del lote: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en el postproceso del lote", e); //$NON-NLS-1$
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Error en el postproceso del lote: " + e //$NON-NLS-1$
