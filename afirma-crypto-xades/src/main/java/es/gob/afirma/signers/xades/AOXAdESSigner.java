@@ -980,9 +980,10 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 			throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
 		}
 
-		//Se comprueba si las firmas que ya contiene el documento tienen una version valida
-		if (!checkSignVersion(signDocument)) {
-			throw new AOFormatFileException("Error al analizar si el XML era una firma XAdES"); //$NON-NLS-1$
+		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
+		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline
+		if (checkCompatibility(signDocument)) {
+			extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
 		}
 
 		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
@@ -1036,6 +1037,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	}
 
     	final Properties newExtraParams = getExtraParams(extraParams);
+
+		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
+		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline
+		if (checkCompatibility(signDocument)) {
+			newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+		}
 
     	return countersign(signDocument, algorithm, targetType, targets, key, certChain, newExtraParams);
     }
@@ -1400,11 +1407,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * Comprueba si el documento a cofirmar, contiene firmas de una versi&oacute;n distinta
      * a la 1.3.2.
      * @param signDocument Documento que contiene las firmas y datos.
-     * @return Devuelve true en caso de que la versi&oacute;n sea correcta o false en caso
-     * de que se encuentre alguna firma con una versi&oacute;n no soportada.
+     * @return Devuelve true en caso de que se trate de una firma de tipo Baseline,
+     * y false en caso contrario.
      * @throws AOFormatFileException
      */
-    public static boolean checkSignVersion(final Document signDocument) throws AOFormatFileException {
+    public static boolean checkCompatibility(final Document signDocument) throws AOFormatFileException {
+
+    	boolean isBaselineSign = false;
 
         try {
             final Element rootNode = signDocument.getDocumentElement();
@@ -1425,15 +1434,17 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             	}
             }
 
-            XAdESUtil.checkSignVersion(signNodes);
+            if(XAdESUtil.checkCompatibility(signNodes)) {
+            	isBaselineSign = true;
+            }
         }
         catch (final AOFormatFileException aoffe) {
         	throw aoffe;
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al analizar si el XML era una firma XAdES", e); //$NON-NLS-1$
-            return false;
+            throw e;
         }
-        return true;
+        return isBaselineSign;
     }
 }

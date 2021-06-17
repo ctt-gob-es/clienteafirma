@@ -320,8 +320,12 @@ public final class XAdESSigner {
 		final String profile = extraParams.getProperty(
 		        XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
 
-		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
-		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
+		// El KeyInfo se firmara salvo que la firma sea Baseline o que se indique
+        // expresamente que no se haga
+        final boolean keepKeyInfoUnsigned =
+                AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)
+                || Boolean.parseBoolean(extraParams.getProperty(
+                        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
 
 		// ********** FIN LECTURA PARAMETROS ADICIONALES *************************************************
 		// ***********************************************************************************************

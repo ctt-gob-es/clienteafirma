@@ -60,6 +60,7 @@ import org.w3c.dom.Document;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -70,6 +71,7 @@ import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
@@ -466,6 +468,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	 }
 
 	 private static void configureDataSigner(final SignOperationConfig config, final byte[] data) throws IOException {
+
+		 boolean isBaselineSign = false;
+
 		 // Comprobamos si es un fichero PDF
 		 if (DataAnalizerUtil.isPDF(data)) {
 			 config.setFileType(FileType.PDF);
@@ -493,7 +498,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		    	  try {
 		    		  final DocumentBuilder docBuilder = Utils.getNewDocumentBuilder();
 		    		  signDocument = docBuilder.parse(new ByteArrayInputStream(data));
-		    		  AOXAdESSigner.checkSignVersion(signDocument);
+
+		    		  if(AOXAdESSigner.checkCompatibility(signDocument)) {
+		    			  isBaselineSign = true;
+		    		  }
 		    	  }
 		    	  catch (final Exception e) {
 		    		  AOUIFactory.showErrorMessage(
@@ -571,6 +579,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 		 config.setSignatureFormatName(getSignatureName(config.getSigner()));
 		 config.setExtraParams(ExtraParamsHelper.loadExtraParamsForSigner(config.getSigner()));
+
+		 if(isBaselineSign) {
+			config.getExtraParams().put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+		 }
 	 }
 
 	 private static String buildErrorText(final SIGN_DETAIL_TYPE result, final VALIDITY_ERROR error) {

@@ -79,6 +79,8 @@ public final class XAdESUtil {
 
 	private static final String QUALIFYING_PROPERTIES_ELEMENT = "QualifyingProperties"; //$NON-NLS-1$
 
+	private static final String SIGNING_CERT_V2_ELEMENT = "SigningCertificateV2"; //$NON-NLS-1$
+
 	private XAdESUtil() {
 		// No permitimos la instanciacion
 	}
@@ -92,7 +94,7 @@ public final class XAdESUtil {
         for (final Node signNode : signNodes) {
         	int lenCount = 0;
         	for (final String xadesNamespace : SUPPORTED_XADES_NAMESPACE_URIS) {
-        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength(); //$NON-NLS-1$
+        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, QUALIFYING_PROPERTIES_ELEMENT).getLength();
         	}
             if (lenCount == 0) {
                 return false;
@@ -104,16 +106,19 @@ public final class XAdESUtil {
     /**
      * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES compatibles
      * con la cofirma a realizar. Si el metodo finaliza sin lanzar ninguna excepci&oacute;n, las firmas
-     * del documento son correctas
+     * del documento son correctas. Tambi&eacute;n se comprobara si es una firma de tipo baseline
      * @param signNodes Listado de nodos de firma.
-     * @return {@code true} cuando todos los nodos sean firmas compatibles para este formato.
-     * @throws AOFormatFileException se lanza en caso de que las firmas no tengan las versiones
-     * correctas
+     * @return {@code true} En caso de que sea una firma baseline, false en caso contrario.
+     * @throws AOFormatFileException Se lanza en caso de que las firmas no tengan las versiones
+     * correctas.
      */
-    static void checkSignVersion(final List<Node> signNodes) throws AOFormatFileException {
+    static boolean checkCompatibility(final List<Node> signNodes) throws AOFormatFileException {
+
+    	boolean isBaselineSign = false;
+
         for (final Node signNode : signNodes) {
 
-        	final NodeList namespaceList = ((Element) signNode).getElementsByTagNameNS("*", "QualifyingProperties"); //$NON-NLS-1$ //$NON-NLS-2$
+        	final NodeList namespaceList = ((Element) signNode).getElementsByTagNameNS("*", QUALIFYING_PROPERTIES_ELEMENT); //$NON-NLS-1$
 
         	for (int i = 0 ; i < namespaceList.getLength() ; i++) {
         		final String namespaceUri = namespaceList.item(i).getNamespaceURI();
@@ -133,8 +138,16 @@ public final class XAdESUtil {
             	if(!NAMESPACE_V_1_3_2.equals(namespaceUri)) {
             		throw new AOFormatFileException("El documento a cofirmar contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
             	}
+
+            	final NodeList signCertV2List = ((Element) namespaceList.item(i)).getElementsByTagNameNS("*", SIGNING_CERT_V2_ELEMENT); //$NON-NLS-1$
+
+            	if(signCertV2List.getLength() > 0) {
+            		isBaselineSign = true;
+            	}
         	}
         }
+
+        return isBaselineSign;
     }
 
     /**
