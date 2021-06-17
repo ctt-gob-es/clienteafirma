@@ -16,8 +16,7 @@ import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
-import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult;
-import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult.Result;
+import es.gob.afirma.signers.batch.xml.ProcessResult;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta secuencialmente. */
@@ -42,7 +41,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 		for (int i = 0 ; i < this.signs.size() ; i++) {
 			final JSONSingleSign ss = this.signs.get(i);
 			if (ignoreRemaining) {
-				ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_SKIPPED);
+				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
 				continue;
 			}
 			final String tmp;
@@ -50,7 +49,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				tmp = ss.doPreProcess(certChain, this.algorithm, this.documentManager, this.docCacheManager);
 			}
 			catch(final Exception e) {
-				ss.setProcessResult(new JSONProcessResult(Result.ERROR_PRE, e.toString()));
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, e.toString()));
 				if (this.stopOnError) {
 					ignoreRemaining = true;
 					LOGGER.log(Level.WARNING,
@@ -89,7 +88,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 
 			// Si se ha detectado un error y no deben procesarse el resto de firmas, se marcan como tal
 			if (ignoreRemaining) {
-				ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_SKIPPED);
+				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
 				continue;
 			}
 
@@ -103,7 +102,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				else {
 					LOGGER.warning("Se detecto un error previo en la firma, se continua con el resto de elementos"); //$NON-NLS-1$
 				}
-				ss.setProcessResult(new JSONProcessResult(Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
 				continue;
 			}
 
@@ -121,7 +120,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 
 				error = true;
 
-				ss.setProcessResult(new JSONProcessResult(Result.ERROR_POST, e.toString()));
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_POST, e.toString()));
 
 				if (this.stopOnError) {
 					LOGGER.log(
@@ -139,20 +138,20 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				continue;
 			}
 
-			ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_DONE_SAVED);
+			ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
 		}
 
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer
 		// los que se subiesen antes del error si se indico parar en error
 		if (error && this.stopOnError) {
 			for (final JSONSingleSign ss : this.signs) {
-				if (ss.getJSONProcessResult().wasSaved()) {
+				if (ss.getProcessResult().wasSaved()) {
 
 					if (BatchDocumentManager.class.isAssignableFrom(this.documentManager.getClass())) {
 						final Properties singleSignProps = new Properties();
 						singleSignProps.put("format", ss.getSignFormat().toString()); //$NON-NLS-1$
 						try {
-							((BatchDocumentManager) this.documentManager).rollback(ss.getReference(), certChain, singleSignProps);
+							((BatchDocumentManager) this.documentManager).rollback(ss.getDataRef(), certChain, singleSignProps);
 						} catch (final IOException e) {
 							LOGGER.severe(
 									"No se pudo deshacer el guardado de una firma (" + ss.getId() + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
@@ -160,7 +159,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 						}
 					}
 
-					ss.setProcessResult(JSONProcessResult.PROCESS_RESULT_ROLLBACKED);
+					ss.setProcessResult(ProcessResult.PROCESS_RESULT_ROLLBACKED);
 				}
 			}
 		}

@@ -203,11 +203,17 @@ public abstract class SignBatch {
 		final StringBuilder ret = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<signs>\n"); //$NON-NLS-1$
 		for (final SingleSign ss : this.signs) {
 			ret.append(" "); //$NON-NLS-1$
-			ret.append(ss.getProcessResult().toString());
+			ret.append(printProcessResult(ss.getProcessResult()));
 			ret.append("\n"); //$NON-NLS-1$
 		}
 		ret.append("</signs>"); //$NON-NLS-1$
 		return ret.toString();
+	}
+
+	private static String printProcessResult(final ProcessResult result) {
+		return "<signresult id=\"" + result.getId() //$NON-NLS-1$
+			+ "\" result=\"" + result.getResult() //$NON-NLS-1$
+			+ "\" description=\"" + result.getDescription() + "\"/>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** Borra todos los ficheros temporales usados en el proceso del lote. */

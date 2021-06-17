@@ -9,6 +9,7 @@
 
 package es.gob.afirma.triphase.server.document;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
@@ -33,6 +34,8 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 	private static final String CONFIG_PARAM_DOCMANEGER_ALLOWSOURCES = "docmanager.legacybatch.allowedsources"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_SEPARATOR = ";"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_WILD_CARD = "*"; //$NON-NLS-1$
+
+	private static final String REPONSE_OK = Base64.encode("OK".getBytes()); //$NON-NLS-1$
 
 	private static final String PROP_SIGNSAVER = "signSaver"; //$NON-NLS-1$
 
@@ -94,7 +97,16 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 				}
 				if (allowed.endsWith(ALLOWSOURCES_WILD_CARD)) {
 					if (dataRef.startsWith(allowed.replace(ALLOWSOURCES_WILD_CARD, ""))) { //$NON-NLS-1$
-						return;
+						// Si no es de tipo file:/, lo damos por bueno
+						if (!allowed.startsWith(FILE_SCHEME)) {
+							return;
+						}
+						// Si es de tipo file:/, nos aseguramos de anular vulnerabilidades de tipo Path Transversal
+						final String path = dataRef.substring(FILE_SCHEME.length());
+						final String dataRefCleaned = FILE_SCHEME + new File(path).getCanonicalPath().replace('\\', '/');
+						if (dataRefCleaned.startsWith(allowed.replace(ALLOWSOURCES_WILD_CARD, ""))) { //$NON-NLS-1$
+							return;
+						}
 					}
 				}
 				else if (dataRef.equals(allowed)) {
@@ -130,7 +142,7 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 		// Guardamos
 		signSaver.saveSign(ss, data);
 
-		return null;
+		return REPONSE_OK;
 	}
 
 	@Override

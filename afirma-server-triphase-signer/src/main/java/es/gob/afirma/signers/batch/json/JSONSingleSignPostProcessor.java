@@ -117,7 +117,7 @@ final class JSONSingleSignPostProcessor {
 		}
 
 		if (docBytes == null) {
-			docBytes = docManager.getDocument(sSign.getReference(), certChain, sSign.getExtraParams());
+			docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
 		}
 
 		Properties extraParams;
@@ -183,7 +183,7 @@ final class JSONSingleSignPostProcessor {
 		} else {
 			final Properties singleSignProps = sSign.getExtraParams();
 			singleSignProps.put("format", sSign.getSignFormat().toString()); //$NON-NLS-1$
-			docManager.storeDocument(sSign.getReference(), certChain, signedDoc, singleSignProps);
+			docManager.storeDocument(sSign.getDataRef(), certChain, signedDoc, singleSignProps);
 		}
 
 	}

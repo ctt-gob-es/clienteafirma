@@ -28,6 +28,7 @@ import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
+import es.gob.afirma.signers.batch.xml.ProcessResult;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
@@ -252,13 +253,27 @@ public abstract class JSONSignBatch {
 		// Iniciamos el log de retorno
 		final StringBuilder ret = new StringBuilder("{\"signs\":["); //$NON-NLS-1$
 		for (int i = 0; i < this.signs.size() ; i++) {
-			ret.append(this.signs.get(i).getJSONProcessResult().toString());
+			ret.append(printProcessResult(this.signs.get(i).getProcessResult()));
 			if (this.signs.size() - 1 != i) {
 				ret.append(","); //$NON-NLS-1$
 			}
 		}
 		ret.append("]}"); //$NON-NLS-1$
 		return ret.toString();
+	}
+
+	public static String printProcessResult(final ProcessResult result) {
+		String jsonText = "{\"id\":\"" + scapeText(result.getId()) + "\", \"result\":\"" + result.getResult() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (result.getDescription() != null) {
+			jsonText += ", \"description\":\"" + scapeText(result.getDescription()) + "\"";	 //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		jsonText += "}"; //$NON-NLS-1$
+		return jsonText;
+	}
+
+	private static String scapeText(final String text) {
+		return text == null ? null :
+			text.replace("\\", "\\\\").replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/** Borra todos los ficheros temporales usados en el proceso del lote. */
@@ -278,7 +293,7 @@ public abstract class JSONSignBatch {
 
 				final JSONSingleSign singleSign = new JSONSingleSign(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_ID));
 
-				singleSign.setReference(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
+				singleSign.setDataRef(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
 
 				singleSign.setFormat(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_FORMAT)
 						? SingleSignConstants.SignFormat.getFormat(

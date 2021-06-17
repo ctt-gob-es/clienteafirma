@@ -19,8 +19,6 @@ import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
-import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult;
-import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult.Result;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta secuencialmente.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -60,7 +58,7 @@ public final class SignBatchSerial extends SignBatch {
 				tmp = ss.doPreProcess(certChain, this.algorithm);
 			}
 			catch(final Exception e) {
-				ss.setProcessResult(new ProcessResult(Result.ERROR_PRE, e.toString()));
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, e.toString()));
 				if (this.stopOnError) {
 					ignoreRemaining = true;
 					LOGGER.log(Level.WARNING,
@@ -110,7 +108,7 @@ public final class SignBatchSerial extends SignBatch {
 				else {
 					LOGGER.warning("Se detecto un error previo en la firma, se continua con el resto de elementos"); //$NON-NLS-1$
 				}
-				ss.setProcessResult(new ProcessResult(Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
 				continue;
 			}
 
@@ -126,7 +124,7 @@ public final class SignBatchSerial extends SignBatch {
 
 				error = true;
 
-				ss.setProcessResult(new ProcessResult(Result.ERROR_POST, e.toString()));
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_POST, e.toString()));
 
 				if (this.stopOnError) {
 					LOGGER.log(
@@ -161,7 +159,7 @@ public final class SignBatchSerial extends SignBatch {
 		error = false;
 		for (final SingleSign ss : this.signs) {
 			if (ss.getProcessResult() != null &&
-					ss.getProcessResult().getResult() != Result.DONE_BUT_NOT_SAVED_YET) {
+					ss.getProcessResult().getResult() != ProcessResult.Result.DONE_BUT_NOT_SAVED_YET) {
 				continue;
 			}
 

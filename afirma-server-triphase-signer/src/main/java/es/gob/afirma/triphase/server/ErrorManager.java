@@ -35,6 +35,7 @@ final class ErrorManager {
 		errorMessages.put(Integer.valueOf(17), "Error al comprobar el codigo de verificacion de las firmas"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(18), "Error de integridad en la firma"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(19), "El formato de los datos de operacion suministrados es erroneo"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(20), "Algoritmo de firma no soportado"); //$NON-NLS-1$
 	}
 
 	static String getErrorMessage(final int errNo) {

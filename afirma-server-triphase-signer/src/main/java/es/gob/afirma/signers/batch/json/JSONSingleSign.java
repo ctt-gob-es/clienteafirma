@@ -23,15 +23,12 @@ import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
-import es.gob.afirma.signers.batch.json.JSONSingleSign.JSONProcessResult.Result;
 import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote. */
 public final class JSONSingleSign extends SingleSign {
-
-	private static final String PROP_ID = "SignatureId"; //$NON-NLS-1$
 
 	private static final String JSON_ATTRIBUTE_ID = "Id"; //$NON-NLS-1$
 
@@ -42,19 +39,7 @@ public final class JSONSingleSign extends SingleSign {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private Properties extraParams;
-
-	private String reference;
-
-	private SignFormat format;
-
-	private final String id;
-
-	private SignSubOperation subOperation;
-
 	private DocumentManager documentManager;
-
-	private JSONProcessResult processResult = new JSONProcessResult(Result.NOT_STARTED, null);
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */
@@ -94,63 +79,13 @@ public final class JSONSingleSign extends SingleSign {
 			);
 		}
 
-		this.reference = dataSrc;
+		this.dataRef = dataSrc;
 		this.format = fmt;
 
 		this.id = id;
 
 		this.subOperation = subOp;
 		this.documentManager = ss;
-	}
-
-	/**
-	 * Recupera los par&aacute;metros de configuraci&oacute;n del formato de firma.
-	 * @return Configuraci&oacute;n del formato de firma.
-	 */
-	@Override
-	public Properties getExtraParams() {
-		return this.extraParams;
-	}
-
-	/**
-	 * Recupera el formato de firma.
-	 * @return Formato de firma.
-	 */
-	@Override
-	public SignFormat getSignFormat() {
-		return this.format;
-	}
-
-	@Override
-	protected SignSubOperation getSubOperation() {
-		return this.subOperation;
-	}
-
-	@Override
-	protected void setExtraParams(final Properties extraParams) {
-		// El identificador de la firma debe transmitirse al firmador trifasico a traves
-		// de los extraParams para que este lo utilice y asi podamos luego asociar la
-		// firma con los datos a los que corresponden
-		this.extraParams = extraParams != null ? extraParams : new Properties();
-		this.extraParams.put(PROP_ID, getId());
-	}
-
-	public String getReference() {
-		return this.reference;
-	}
-
-	void setReference(final String reference) {
-		this.reference = reference;
-	}
-
-	@Override
-	protected void setFormat(final SignFormat format) {
-		this.format = format;
-	}
-
-	@Override
-	protected void setSubOperation(final SignSubOperation subOperation) {
-		this.subOperation = subOperation;
 	}
 
 	@Override
@@ -163,7 +98,7 @@ public final class JSONSingleSign extends SingleSign {
 		sb.append("\" , \n\""); //$NON-NLS-1$
 		sb.append(JSON_ELEMENT_DATAREFERENCE);
 		sb.append("\":\""); //$NON-NLS-1$
-		sb.append(this.reference);
+		sb.append(this.dataRef);
 		sb.append("\",\n"); //$NON-NLS-1$
 		sb.append("\""); //$NON-NLS-1$
 		sb.append(JSON_ELEMENT_FORMAT);
@@ -312,24 +247,6 @@ public final class JSONSingleSign extends SingleSign {
 		return new JSONSaveCallable(this, this.documentManager, ts, certChain, batchId);
 	}
 
-	/**
-	 * Recupera el identificador asignado en el lote a la firma.
-	 * @return Identificador.
-	 */
-	@Override
-	public String getId() {
-		return this.id;
-	}
-
-	void setProcessResult(final JSONProcessResult pResult) {
-		this.processResult = pResult;
-	}
-
-	public JSONProcessResult getJSONProcessResult() {
-		this.processResult.setId(getId());
-		return this.processResult;
-	}
-
 	public void setDocumentManager(final DocumentManager documentManager) {
 		this.documentManager = documentManager;
 	}
@@ -362,68 +279,6 @@ public final class JSONSingleSign extends SingleSign {
 		}
 	}
 
-	public static final class JSONProcessResult {
-
-		enum Result {
-			NOT_STARTED,
-			DONE_AND_SAVED,
-			DONE_BUT_NOT_SAVED_YET,
-			DONE_BUT_SAVED_SKIPPED,
-			DONE_BUT_ERROR_SAVING,
-			ERROR_PRE,
-			ERROR_POST,
-			SKIPPED,
-			SAVE_ROLLBACKED;
-		}
-
-		private final Result result;
-		private final String description;
-		private String signId;
-
-		boolean wasSaved() {
-			return Result.DONE_AND_SAVED.equals(this.result);
-		}
-
-		static final JSONProcessResult PROCESS_RESULT_OK_UNSAVED = new JSONProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null);
-		static final JSONProcessResult PROCESS_RESULT_SKIPPED    = new JSONProcessResult(Result.SKIPPED,                null);
-		static final JSONProcessResult PROCESS_RESULT_DONE_SAVED = new JSONProcessResult(Result.DONE_AND_SAVED,         null);
-		static final JSONProcessResult PROCESS_RESULT_ROLLBACKED = new JSONProcessResult(Result.SAVE_ROLLBACKED,        null);
-
-		JSONProcessResult(final Result r, final String d) {
-			if (r == null) {
-				throw new IllegalArgumentException(
-					"El resultado no puede ser nulo" //$NON-NLS-1$
-				);
-			}
-			this.result = r;
-			this.description = d;
-		}
-
-		@Override
-		public String toString() {
-			String jsonText = "{\"id\":\"" + scapeText(this.signId) + "\", \"result\":\"" + this.result + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (this.description != null) {
-				jsonText += ", \"description\":\"" + scapeText(this.description) + "\"";	 //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			jsonText += "}"; //$NON-NLS-1$
-			return jsonText;
-		}
-
-		private static String scapeText(final String text) {
-			return text == null ? null :
-				text.replace("\\", "\\\\").replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		}
-
-		void setId(final String id) {
-			this.signId = id;
-		}
-
-		public Result getResult() {
-			return this.result;
-		}
-	}
-
-
 	static class PreProcessCallable implements Callable<String> {
 		private final JSONSingleSign ss;
 		private final X509Certificate[] certChain;
@@ -445,8 +300,8 @@ public final class JSONSingleSign extends SingleSign {
 		@Override
 		public String call() throws Exception {
 			return JSONSingleSignPreProcessor.doPreProcess(this.ss, this.certChain,
-														this.algorithm, this.documentManager,
-														this.docCacheManager);
+					this.algorithm, this.documentManager,
+					this.docCacheManager);
 		}
 	}
 
@@ -509,7 +364,7 @@ public final class JSONSingleSign extends SingleSign {
 				final byte[] dataToSave = this.ts.retrieve(this.ss, this.batchId);
 				final Properties singleSignProps = this.ss.getExtraParams();
 				singleSignProps.put("format", this.ss.getSignFormat().toString()); //$NON-NLS-1$
-				this.documentManager.storeDocument(this.ss.getReference(), this.certChain, dataToSave, singleSignProps);
+				this.documentManager.storeDocument(this.ss.getDataRef(), this.certChain, dataToSave, singleSignProps);
 			}
 			catch(final Exception e) {
 				LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId()); //$NON-NLS-1$

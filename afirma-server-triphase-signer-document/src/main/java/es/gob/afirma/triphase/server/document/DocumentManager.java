@@ -24,10 +24,10 @@ public interface DocumentManager {
 	 * como parte del mensaje de error en el cliente de firma.
 	 * @param dataRef Referencia al documento.
 	 * @param certChain Cadena de certificados que se usar&aacute; para realizar la firma
-	 * @param config Par&aacute;metros para la configuraci&oacute;n de la recuperaci&oacute;n del documento.
+	 * @param prop Par&aacute;metros para la configuraci&oacute;n de la recuperaci&oacute;n del documento.
 	 * @return Documento (en binario)
 	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n. */
-	byte[] getDocument(String dataRef, X509Certificate[] certChain, Properties config) throws IOException;
+	byte[] getDocument(String dataRef, X509Certificate[] certChain, Properties prop) throws IOException;
 
 	/** Almacena un documento firmado.
 	 * Si no es posible almacenar el fichero se debe lanzar una excepci&oacute;n. El mensaje se recibir&aacute;
@@ -35,8 +35,8 @@ public interface DocumentManager {
 	 * @param dataRef Referencia al documento firmado.
 	 * @param certChain Cadena de certificados de firma.
 	 * @param data Datos firmados.
-	 * @param config Par&aacute;metros para la configuraci&oacute;n del guardado del documento.
+	 * @param prop Par&aacute;metros para la configuraci&oacute;n del guardado del documento.
 	 * @return Identificador del nuevo documento codificado en base 64.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado. */
-	String storeDocument(String dataRef, final X509Certificate[] certChain, byte[] data, Properties config) throws IOException;
+	String storeDocument(String dataRef, final X509Certificate[] certChain, byte[] data, Properties prop) throws IOException;
 }

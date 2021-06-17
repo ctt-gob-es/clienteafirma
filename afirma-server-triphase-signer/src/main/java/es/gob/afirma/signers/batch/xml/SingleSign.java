@@ -31,7 +31,6 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
-import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult.Result;
 
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -55,19 +54,19 @@ public class SingleSign {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private Properties extraParams;
+	protected Properties extraParams;
 
-	private String dataSource;
+	protected String dataRef;
 
-	private SignFormat format;
+	protected SignFormat format;
 
-	private String id;
+	protected String id;
 
-	private SignSubOperation subOperation;
+	protected SignSubOperation subOperation;
 
 	private SignSaver signSaver;
 
-	private ProcessResult processResult = new ProcessResult(Result.NOT_STARTED, null);
+	private ProcessResult processResult = new ProcessResult(ProcessResult.Result.NOT_STARTED, null);
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */
@@ -112,7 +111,7 @@ public class SingleSign {
 			);
 		}
 
-		this.dataSource = dataSrc;
+		this.dataRef = dataSrc;
 		this.format = fmt;
 
 		this.id = id != null ? id : UUID.randomUUID().toString();
@@ -151,11 +150,15 @@ public class SingleSign {
 		return this.format;
 	}
 
-	protected SignSubOperation getSubOperation() {
+	public SignSubOperation getSubOperation() {
 		return this.subOperation;
 	}
 
-	protected void setExtraParams(final Properties extraParams) {
+	public String getDataRef() {
+		return this.dataRef;
+	}
+
+	public void setExtraParams(final Properties extraParams) {
 		// El identificador de la firma debe transmitirse al firmador trifasico a traves
 		// de los extraParams para que este lo utilice y asi podamos luego asociar la
 		// firma con los datos a los que corresponden
@@ -163,15 +166,15 @@ public class SingleSign {
 		this.extraParams.put(PROP_ID, getId());
 	}
 
-	void setDataSource(final String dataSource) {
-		this.dataSource = dataSource;
+	public void setDataRef(final String dataRef) {
+		this.dataRef = dataRef;
 	}
 
-	protected void setFormat(final SignFormat format) {
+	public void setFormat(final SignFormat format) {
 		this.format = format;
 	}
 
-	protected void setSubOperation(final SignSubOperation subOperation) {
+	public void setSubOperation(final SignSubOperation subOperation) {
 		this.subOperation = subOperation;
 	}
 
@@ -213,7 +216,7 @@ public class SingleSign {
 		sb.append("\">\n  <"); //$NON-NLS-1$
 		sb.append(XML_ELEMENT_DATASOURCE);
 		sb.append(">"); //$NON-NLS-1$
-		sb.append(this.dataSource);
+		sb.append(this.dataRef);
 		sb.append("</"); //$NON-NLS-1$
 		sb.append(XML_ELEMENT_DATASOURCE);
 		sb.append(">\n  <"); //$NON-NLS-1$
@@ -373,9 +376,9 @@ public class SingleSign {
 		// Si se nos solicita un fichero remoto, calculamos cual seria el fichero
 		// temporal que le corresponderia
 		String tempResource = null;
-		if (this.dataSource.startsWith(HTTP_SCHEME) || this.dataSource.startsWith(HTTPS_SCHEME) || this.dataSource.startsWith(FTP_SCHEME)) {
+		if (this.dataRef.startsWith(HTTP_SCHEME) || this.dataRef.startsWith(HTTPS_SCHEME) || this.dataRef.startsWith(FTP_SCHEME)) {
 			try {
-				tempResource = getTempFileName(this.dataSource, this.id);
+				tempResource = getTempFileName(this.dataRef, this.id);
 			}
 			catch (final Exception e) {
 				LOGGER.warning("No se puede calcular el nombre de un temporal para un recurso remoto: " + e); //$NON-NLS-1$
@@ -399,8 +402,8 @@ public class SingleSign {
 
 		// Si no, lo descargamos de la fuente original
 		if (data == null) {
-			checkDataSource(this.dataSource);
-			data = DataDownloader.downloadData(this.dataSource);
+			checkDataSource(this.dataRef);
+			data = DataDownloader.downloadData(this.dataRef);
 		}
 
 		// Finalmente, si se habia indicado que no habia recurso temporal
@@ -416,11 +419,11 @@ public class SingleSign {
 		return Base64.encode(MessageDigest.getInstance("SHA-1").digest((source + signId).getBytes()), true); //$NON-NLS-1$
 	}
 
-	void setProcessResult(final ProcessResult pResult) {
+	public void setProcessResult(final ProcessResult pResult) {
 		this.processResult = pResult;
 	}
 
-	protected ProcessResult getProcessResult() {
+	public ProcessResult getProcessResult() {
 		this.processResult.setId(getId());
 		return this.processResult;
 	}
@@ -456,58 +459,6 @@ public class SingleSign {
 			return this.signId;
 		}
 	}
-
-	static final class ProcessResult {
-
-		enum Result {
-			NOT_STARTED,
-			DONE_AND_SAVED,
-			DONE_BUT_NOT_SAVED_YET,
-			DONE_BUT_SAVED_SKIPPED,
-			DONE_BUT_ERROR_SAVING,
-			ERROR_PRE,
-			ERROR_POST,
-			SKIPPED,
-			SAVE_ROLLBACKED;
-		}
-
-		private final Result result;
-		private final String description;
-		private String signId;
-
-		boolean wasSaved() {
-			return Result.DONE_AND_SAVED.equals(this.result);
-		}
-
-		static final ProcessResult PROCESS_RESULT_OK_UNSAVED = new ProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null);
-		static final ProcessResult PROCESS_RESULT_SKIPPED    = new ProcessResult(Result.SKIPPED,                null);
-		static final ProcessResult PROCESS_RESULT_DONE_SAVED = new ProcessResult(Result.DONE_AND_SAVED,         null);
-		static final ProcessResult PROCESS_RESULT_ROLLBACKED = new ProcessResult(Result.SAVE_ROLLBACKED,        null);
-
-		ProcessResult(final Result r, final String d) {
-			if (r == null) {
-				throw new IllegalArgumentException(
-					"El resultado no puede ser nulo" //$NON-NLS-1$
-				);
-			}
-			this.result = r;
-			this.description = d != null ? d : ""; //$NON-NLS-1$
-		}
-
-		@Override
-		public String toString() {
-			return "<signresult id=\"" + this.signId + "\" result=\"" + this.result + "\" description=\"" + this.description + "\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		}
-
-		void setId(final String id) {
-			this.signId = id;
-		}
-
-		public Result getResult() {
-			return this.result;
-		}
-	}
-
 
 	static class PreProcessCallable implements Callable<String> {
 		private final SingleSign ss;

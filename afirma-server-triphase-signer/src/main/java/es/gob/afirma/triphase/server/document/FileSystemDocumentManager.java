@@ -27,8 +27,11 @@ import es.gob.afirma.core.signers.AOSignConstants;
 public class FileSystemDocumentManager implements BatchDocumentManager {
 
 	private static final String CONFIG_PARAM_IN_DIR = "docmanager.filesystem.indir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_IN_DIR_LEGACY = "indir"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_OUT_DIR = "docmanager.filesystem.outdir"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OUT_DIR_LEGACY = "outdir"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_OVERWRITE = "docmanager.filesystem.overwrite"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_OVERWRITE_LEGACY = "overwrite"; //$NON-NLS-1$
 
 	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
@@ -108,31 +111,39 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 		return Base64.encode(file.getName().getBytes());
 	}
 
-	private static boolean isParent(final File p, final File file) {
-	    File f;
+	/**
+	 * Comprueba que un fichero realmente sea descendiente de un directorio padre
+	 * para evitar ataques de tipo Path Transversal.
+	 * @param p Directorio dentro del cual debe encontrarse el fichero.
+	 * @param f Fichero que se desea comprobar.
+	 * @return {@code true} si el fichero estaba dentro del directorio o uno de sus
+	 * subdirectorios, {@code false} en caso contrario.
+	 */
+	private static boolean isParent(final File p, final File f) {
+	    File file;
 	    final File parent;
 	    try {
 	        parent = p.getCanonicalFile();
-	        f = file.getCanonicalFile();
+	        file = f.getCanonicalFile();
 	    }
 	    catch( final IOException e) {
 	        return false;
 	    }
 
-	    while( f != null ) {
-	        if(parent.equals(f)) {
+	    while( file != null ) {
+	        if(parent.equals(file)) {
 	            return true;
 	        }
-	        f = f.getParentFile();
+	        file = file.getParentFile();
 	    }
 	    return false;
 	}
 
 	@Override
 	public void init(final Properties config) {
-		this.inDir = config.getProperty(CONFIG_PARAM_IN_DIR);
-		this.outDir = config.getProperty(CONFIG_PARAM_OUT_DIR);
-		this.overwrite = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_OVERWRITE));
+		this.inDir = config.getProperty(CONFIG_PARAM_IN_DIR, config.getProperty(CONFIG_PARAM_IN_DIR_LEGACY));
+		this.outDir = config.getProperty(CONFIG_PARAM_OUT_DIR, config.getProperty(CONFIG_PARAM_OUT_DIR_LEGACY));
+		this.overwrite = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_OVERWRITE, config.getProperty(CONFIG_PARAM_OVERWRITE_LEGACY)));
 
 		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
 		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$

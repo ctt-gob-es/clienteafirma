@@ -209,7 +209,7 @@ class SignBatchXmlHandler extends DefaultHandler {
 			}
 			break;
 		case ELEMENT_DATASOURCE:
-			this.currentSign.setDataSource(new String(this.acumulateContent.toCharArray()).trim());
+			this.currentSign.setDataRef(new String(this.acumulateContent.toCharArray()).trim());
 			break;
 		case ELEMENT_FORMAT:
 			this.currentSign.setFormat(SignFormat.getFormat(new String(this.acumulateContent.toCharArray()).trim()));

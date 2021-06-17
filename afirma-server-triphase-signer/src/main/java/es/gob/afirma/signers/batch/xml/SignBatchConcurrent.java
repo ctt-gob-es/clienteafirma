@@ -28,8 +28,6 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.xml.SingleSign.CallableResult;
-import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult;
-import es.gob.afirma.signers.batch.xml.SingleSign.ProcessResult.Result;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta en paralelo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -120,7 +118,26 @@ public final class SignBatchConcurrent extends SignBatch {
 		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<CallableResult>> callables = new ArrayList<>(this.signs.size());
 
+
+		boolean ignoreRemaining = false;
+		boolean error = false;
+
 		for (final SingleSign ss : this.signs) {
+
+			// Si no se encuentran firmas con ese identificador, es que fallaron en la prefirma
+			if (td.getTriSigns(ss.getId()) == null) {
+				error = true;
+				if (this.stopOnError) {
+					LOGGER.warning("Se detecto un error previo en la firma, se ignoraran el resto de elementos"); //$NON-NLS-1$
+					ignoreRemaining = true;
+				}
+				else {
+					LOGGER.warning("Se detecto un error previo en la firma, se continua con el resto de elementos"); //$NON-NLS-1$
+				}
+				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
+				continue;
+			}
+
 			final Callable<CallableResult> callable = ss.getPostProcessCallable(
 				certChain, td, this.algorithm, getId()
 			);
@@ -138,9 +155,6 @@ public final class SignBatchConcurrent extends SignBatch {
 				e
 			);
 		}
-
-		boolean ignoreRemaining = false;
-		boolean error = false;
 
 		for (final Future<CallableResult> f : results) {
 
@@ -167,7 +181,7 @@ public final class SignBatchConcurrent extends SignBatch {
 					error = true;
 
 					getSingleSignById(signatureResult.getSignatureId()).setProcessResult(
-						new ProcessResult(Result.ERROR_POST, signatureResult.getError().toString())
+						new ProcessResult(ProcessResult.Result.ERROR_POST, signatureResult.getError().toString())
 					);
 
 					if (this.stopOnError) {
@@ -214,6 +228,13 @@ public final class SignBatchConcurrent extends SignBatch {
 
 		final Collection<Callable<CallableResult>> saveCallables = new ArrayList<>(this.signs.size());
 		for (final SingleSign ss : this.signs) {
+
+			// Si no se encuentra la firma, es que fallo en una operacion anterior
+			// y no debe intentar guardarse
+			if (td.getTriSigns(ss.getId()) == null) {
+				continue;
+			}
+
 			final Callable<CallableResult> callable = ss.getSaveCallable(
 				ts, getId()
 			);
