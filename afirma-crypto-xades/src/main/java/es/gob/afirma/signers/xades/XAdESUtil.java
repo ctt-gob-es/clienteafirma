@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
@@ -62,24 +63,18 @@ public final class XAdESUtil {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
 	private static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
-		"http://uri.etsi.org/01903#", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.2.2#", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.3.2#", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.4.1#" //$NON-NLS-1$
+		XAdESConstants.DEFAULT_NAMESPACE_NO_VERSION,
+	    XAdESConstants.NAMESPACE_XADES_1_2_2,
+	    XAdESConstants.NAMESPACE_XADES_1_3_2,
+	    XAdESConstants.NAMESPACE_XADES_1_4_1
 	};
 
 	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
-		"http://uri.etsi.org/01903#SignedProperties", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.2.2#SignedProperties", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.3.2#SignedProperties", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
+		XAdESConstants.DEFAULT_NAMESPACE_NO_VERSION_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_1_2_2_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_1_3_2_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_1_4_1_SIGNED_PROPERTIES
 	};
-
-	private static final String NAMESPACE_V_1_3_2 = "http://uri.etsi.org/01903/v1.3.2#"; //$NON-NLS-1$
-
-	private static final String QUALIFYING_PROPERTIES_ELEMENT = "QualifyingProperties"; //$NON-NLS-1$
-
-	private static final String SIGNING_CERT_V2_ELEMENT = "SigningCertificateV2"; //$NON-NLS-1$
 
 	private XAdESUtil() {
 		// No permitimos la instanciacion
@@ -94,7 +89,7 @@ public final class XAdESUtil {
         for (final Node signNode : signNodes) {
         	int lenCount = 0;
         	for (final String xadesNamespace : SUPPORTED_XADES_NAMESPACE_URIS) {
-        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, QUALIFYING_PROPERTIES_ELEMENT).getLength();
+        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, XAdESConstants.TAG_QUALIFYING_PROPERTIES).getLength();
         	}
             if (lenCount == 0) {
                 return false;
@@ -106,22 +101,22 @@ public final class XAdESUtil {
     /**
      * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES compatibles
      * con la cofirma a realizar. Si el metodo finaliza sin lanzar ninguna excepci&oacute;n, las firmas
-     * del documento son correctas. Tambi&eacute;n se comprobara si es una firma de tipo baseline
+     * del documento son correctas. Tambi&eacute;n se comprobara si es una firma de tipo Baseline EN
      * @param signNodes Listado de nodos de firma.
-     * @return {@code true} En caso de que sea una firma baseline, false en caso contrario.
+     * @return {@code true} En caso de que sea una firma Baseline EN, false en caso contrario.
      * @throws AOFormatFileException Se lanza en caso de que las firmas no tengan las versiones
      * correctas.
      */
-    static boolean checkCompatibility(final List<Node> signNodes) throws AOFormatFileException {
+    static boolean checkCompatibility(final List<Node> signNodes) throws AOInvalidFormatException {
 
     	boolean isBaselineSign = false;
 
         for (final Node signNode : signNodes) {
 
-        	final NodeList namespaceList = ((Element) signNode).getElementsByTagNameNS("*", QUALIFYING_PROPERTIES_ELEMENT); //$NON-NLS-1$
+        	final NodeList qualifyingPropsList = ((Element) signNode).getElementsByTagNameNS("*", XAdESConstants.TAG_QUALIFYING_PROPERTIES); //$NON-NLS-1$
 
-        	for (int i = 0 ; i < namespaceList.getLength() ; i++) {
-        		final String namespaceUri = namespaceList.item(i).getNamespaceURI();
+        	for (int i = 0 ; i < qualifyingPropsList.getLength() ; i++) {
+        		final String namespaceUri = qualifyingPropsList.item(i).getNamespaceURI();
 
         		boolean existingNamespace = false;
 
@@ -132,16 +127,16 @@ public final class XAdESUtil {
         		}
 
             	if(!existingNamespace) {
-            		throw new AOFormatFileException("Una de las firmas encontradas en el documento contiene una version inexistente"); //$NON-NLS-1$
+            		throw new AOInvalidFormatException("Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
             	}
 
-            	if(!NAMESPACE_V_1_3_2.equals(namespaceUri)) {
-            		throw new AOFormatFileException("El documento a cofirmar contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
+            	if(!XAdESConstants.NAMESPACE_XADES_1_3_2.equals(namespaceUri)) {
+            		throw new AOInvalidFormatException("El documento contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
             	}
 
-            	final NodeList signCertV2List = ((Element) namespaceList.item(i)).getElementsByTagNameNS("*", SIGNING_CERT_V2_ELEMENT); //$NON-NLS-1$
+            	final String name = ((Element) qualifyingPropsList.item(i)).getChildNodes().item(0).getChildNodes().item(0).getChildNodes().item(1).getLocalName();
 
-            	if(signCertV2List.getLength() > 0) {
+            	if(XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(name)) {
             		isBaselineSign = true;
             	}
         	}

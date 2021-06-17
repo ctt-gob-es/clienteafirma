@@ -30,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -981,7 +980,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 		}
 
 		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
-		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline
+		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline EN
 		if (checkCompatibility(signDocument)) {
 			extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
 		}
@@ -1039,7 +1038,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	final Properties newExtraParams = getExtraParams(extraParams);
 
 		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
-		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline
+		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline EN
 		if (checkCompatibility(signDocument)) {
 			newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
 		}
@@ -1407,11 +1406,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * Comprueba si el documento a cofirmar, contiene firmas de una versi&oacute;n distinta
      * a la 1.3.2.
      * @param signDocument Documento que contiene las firmas y datos.
-     * @return Devuelve true en caso de que se trate de una firma de tipo Baseline,
+     * @return Devuelve true en caso de que se trate de una firma de tipo Baseline EN,
      * y false en caso contrario.
-     * @throws AOFormatFileException
+     * @throws AOInvalidFormatException Devuelve esta excepcion en caso de que la version de la firma
+     * no sea correcta
      */
-    public static boolean checkCompatibility(final Document signDocument) throws AOFormatFileException {
+    public static boolean checkCompatibility(final Document signDocument) throws AOInvalidFormatException {
 
     	boolean isBaselineSign = false;
 
@@ -1438,8 +1438,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             	isBaselineSign = true;
             }
         }
-        catch (final AOFormatFileException aoffe) {
-        	throw aoffe;
+        catch (final AOInvalidFormatException aoife) {
+        	throw aoife;
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al analizar si el XML era una firma XAdES", e); //$NON-NLS-1$
