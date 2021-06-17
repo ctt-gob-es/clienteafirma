@@ -28,6 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -52,6 +53,9 @@ import javax.swing.JSeparator;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -66,6 +70,7 @@ import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -479,9 +484,29 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 config.setSigner(AOSignerFactory.getSigner(
 					 PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE))
 					 );
-			 // No se pueden agregar firmas a una factura electronica ya firmada
-			 if (config.getSigner() instanceof AOFacturaESigner &&
-					 config.getSigner().isSign(data)) {
+
+			// Se comprueba que si la FacturaE se esta tratando como XAdES y ya esta firmada,
+			// tenga una version de firma XAdES valida
+		    if (config.getSigner() instanceof AOXAdESSigner &&
+		        		config.getSigner().isSign(data)) {
+		    	  Document signDocument;
+		    	  try {
+		    		  final DocumentBuilder docBuilder = Utils.getNewDocumentBuilder();
+		    		  signDocument = docBuilder.parse(new ByteArrayInputStream(data));
+		    		  AOXAdESSigner.checkSignVersion(signDocument);
+		    	  }
+		    	  catch (final Exception e) {
+		    		  AOUIFactory.showErrorMessage(
+		    				e.getMessage(),
+		      				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+		      				JOptionPane.ERROR_MESSAGE,
+		      				null
+		      			);
+		    		  throw new IOException("Error al cofirmar XML:"+e.getMessage()); //$NON-NLS-1$
+		    	  }
+		    // No se pueden agregar firmas a una factura electronica ya firmada
+			} else if (config.getSigner() instanceof AOFacturaESigner &&
+		    		  config.getSigner().isSign(data)) {
 				 throw new IOException("No se puede firmar con formato FacturaE la factura ya firmada"); //$NON-NLS-1$
 			 }
 		 }

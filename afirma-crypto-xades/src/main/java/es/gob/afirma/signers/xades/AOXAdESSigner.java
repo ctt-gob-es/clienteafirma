@@ -982,7 +982,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
 		//Se comprueba si las firmas que ya contiene el documento tienen una version valida
 		if (!checkSignVersion(signDocument)) {
-			throw new AOFormatFileException("El documento a cofirmar contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
+			throw new AOFormatFileException("Error al analizar si el XML era una firma XAdES"); //$NON-NLS-1$
 		}
 
 		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
@@ -1402,8 +1402,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param signDocument Documento que contiene las firmas y datos.
      * @return Devuelve true en caso de que la versi&oacute;n sea correcta o false en caso
      * de que se encuentre alguna firma con una versi&oacute;n no soportada.
+     * @throws AOFormatFileException
      */
-    private static boolean checkSignVersion(final Document signDocument) {
+    public static boolean checkSignVersion(final Document signDocument) throws AOFormatFileException {
 
         try {
             final Element rootNode = signDocument.getDocumentElement();
@@ -1424,9 +1425,10 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             	}
             }
 
-            if (!XAdESUtil.checkSignVersion(signNodes)) {
-                return false;
-            }
+            XAdESUtil.checkSignVersion(signNodes);
+        }
+        catch (final AOFormatFileException aoffe) {
+        	throw aoffe;
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al analizar si el XML era una firma XAdES", e); //$NON-NLS-1$
