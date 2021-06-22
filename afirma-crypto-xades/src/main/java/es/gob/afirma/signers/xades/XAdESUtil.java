@@ -811,6 +811,8 @@ public final class XAdESUtil {
      */
     public static void checkSignProfile(final Properties newExtraParams, final boolean isBaselineSign) {
 
+    	boolean checkedProfile = false;
+
     	if(Boolean.TRUE.equals(newExtraParams.get(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE))) {
     		final String profile = (String) newExtraParams.get(XAdESExtraParams.PROFILE);
 
@@ -822,14 +824,21 @@ public final class XAdESUtil {
 						XAdESMessages.getString("AOXAdESSigner.1"), //$NON-NLS-1$
 						AOUIFactory.YES_NO_OPTION,
 						AOUIFactory.WARNING_MESSAGE);
-			 if(option == 0) {
-				 if(isBaselineSign) {
-					 newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
-				 } else {
-					 newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
-				 }
-			 }
-		 }
+
+				checkedProfile = true;
+
+    			if(option == 0) {
+    				if(isBaselineSign) {
+    					newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+    				} else {
+    					newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
+    				}
+    			}
+    		}
+    	}
+
+    	if(!checkedProfile && isBaselineSign) {
+    		newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
     	}
     }
 }
