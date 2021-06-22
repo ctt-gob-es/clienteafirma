@@ -44,6 +44,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
@@ -800,5 +801,35 @@ public final class XAdESUtil {
     	}
 
     	return dataReferences;
+    }
+
+    /**
+     * Comprueba el perfil que tiene la firma y lo compara con el que viene en los extraParams.
+     * Permite al usuario decidir si decide mantener el mismo perfil que tiene la firma o no.
+     * @param newExtraParams Par&aacute;metros de configuraci&oacute;n.
+     * @param isBaselineSign Indica si es una firma Baseline EN o no.
+     */
+    public static void checkSignProfile(final Properties newExtraParams, final boolean isBaselineSign) {
+
+    	if(Boolean.TRUE.equals(newExtraParams.get(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE))) {
+    		final String profile = (String) newExtraParams.get(XAdESExtraParams.PROFILE);
+
+    		if(profile != null && (isBaselineSign && AOSignConstants.SIGN_PROFILE_ADVANCED.equals(profile)
+				 || !isBaselineSign && AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile))){
+    			final int option = AOUIFactory.showConfirmDialog(
+						null,
+						XAdESMessages.getString("AOXAdESSigner.0"), //$NON-NLS-1$
+						XAdESMessages.getString("AOXAdESSigner.1"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE);
+			 if(option == 0) {
+				 if(isBaselineSign) {
+					 newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+				 } else {
+					 newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
+				 }
+			 }
+		 }
+    	}
     }
 }

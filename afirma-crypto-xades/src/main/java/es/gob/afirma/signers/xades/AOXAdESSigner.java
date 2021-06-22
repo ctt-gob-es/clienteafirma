@@ -981,9 +981,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
 		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
 		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline EN
-		if (checkCompatibility(signDocument)) {
-			extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
-		}
+		final boolean isBaselineSign = checkCompatibility(signDocument);
+
+		XAdESUtil.checkSignProfile(extraParams, isBaselineSign);
 
 		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
     }
@@ -1039,9 +1039,9 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
 		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
 		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline EN
-		if (checkCompatibility(signDocument)) {
-			newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
-		}
+    	final boolean isBaselineSign = checkCompatibility(signDocument);
+
+		XAdESUtil.checkSignProfile(newExtraParams, isBaselineSign);
 
     	return countersign(signDocument, algorithm, targetType, targets, key, certChain, newExtraParams);
     }

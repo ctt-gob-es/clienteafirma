@@ -72,6 +72,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
+import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
@@ -470,6 +471,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	 private static void configureDataSigner(final SignOperationConfig config, final byte[] data) throws IOException {
 
 		 boolean isBaselineSign = false;
+		 boolean checkProfile = false;
 
 		 // Comprobamos si es un fichero PDF
 		 if (DataAnalizerUtil.isPDF(data)) {
@@ -502,6 +504,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		    		  if(AOXAdESSigner.checkCompatibility(signDocument)) {
 		    			  isBaselineSign = true;
 		    		  }
+
+		    		  checkProfile = true;
 		    	  }
 		    	  catch (final Exception e) {
 		    		  AOUIFactory.showErrorMessage(
@@ -579,9 +583,14 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 		 config.setSignatureFormatName(getSignatureName(config.getSigner()));
 		 config.setExtraParams(ExtraParamsHelper.loadExtraParamsForSigner(config.getSigner()));
+		 config.getExtraParams().put(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE, Boolean.TRUE);
 
-		 if(isBaselineSign) {
-			config.getExtraParams().put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+		 if (isBaselineSign) {
+			 config.getExtraParams().put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+		 }
+
+		 if (checkProfile) {
+			 XAdESUtil.checkSignProfile(config.getExtraParams(), isBaselineSign);
 		 }
 	 }
 
