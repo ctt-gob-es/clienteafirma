@@ -64,14 +64,14 @@ public final class XAdESUtil {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
 	private static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
-		XAdESConstants.DEFAULT_NAMESPACE_NO_VERSION,
+		XAdESConstants.NAMESPACE_NO_VERSION,
 	    XAdESConstants.NAMESPACE_XADES_1_2_2,
 	    XAdESConstants.NAMESPACE_XADES_1_3_2,
 	    XAdESConstants.NAMESPACE_XADES_1_4_1
 	};
 
 	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
-		XAdESConstants.DEFAULT_NAMESPACE_NO_VERSION_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_NO_VERSION_SIGNED_PROPERTIES,
 		XAdESConstants.NAMESPACE_XADES_1_2_2_SIGNED_PROPERTIES,
 		XAdESConstants.NAMESPACE_XADES_1_3_2_SIGNED_PROPERTIES,
 		XAdESConstants.NAMESPACE_XADES_1_4_1_SIGNED_PROPERTIES

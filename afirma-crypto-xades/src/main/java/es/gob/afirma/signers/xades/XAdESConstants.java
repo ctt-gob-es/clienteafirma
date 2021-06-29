@@ -41,10 +41,10 @@ public class XAdESConstants {
     static final String DEFAULT_NAMESPACE_XADES = NAMESPACE_XADES_1_3_2;
 
     /** URI para definir la versi&oacute;n de XAdES. */
-    static final String DEFAULT_NAMESPACE_NO_VERSION = "http://uri.etsi.org/01903#"; //$NON-NLS-1$
+    static final String NAMESPACE_NO_VERSION = "http://uri.etsi.org/01903#"; //$NON-NLS-1$
 
     /** URI para definir la versi&oacute;n de XAdES. */
-    static final String DEFAULT_NAMESPACE_NO_VERSION_SIGNED_PROPERTIES = DEFAULT_NAMESPACE_NO_VERSION + TAG_SIGNED_PROPERTIES;
+    static final String NAMESPACE_NO_VERSION_SIGNED_PROPERTIES = NAMESPACE_NO_VERSION + TAG_SIGNED_PROPERTIES;
 
     /** URI con referencia a SignedProperties que define el espacio de nombres de XAdES v1.2.2. */
     static final String NAMESPACE_XADES_1_2_2_SIGNED_PROPERTIES = NAMESPACE_XADES_1_2_2 + TAG_SIGNED_PROPERTIES;
@@ -56,7 +56,7 @@ public class XAdESConstants {
     static final String NAMESPACE_XADES_1_4_1_SIGNED_PROPERTIES = NAMESPACE_XADES_1_4_1 + TAG_SIGNED_PROPERTIES;
 
     /** URI que define el tipo de propiedades firmadas de XAdES. */
-    static final String REFERENCE_TYPE_SIGNED_PROPERTIES = DEFAULT_NAMESPACE_NO_VERSION + TAG_SIGNED_PROPERTIES;
+    static final String REFERENCE_TYPE_SIGNED_PROPERTIES = NAMESPACE_NO_VERSION + TAG_SIGNED_PROPERTIES;
 
     /** URI que define una referencia de tipo MANIFEST. */
     static final String REFERENCE_TYPE_MANIFEST = "http://www.w3.org/2000/09/xmldsig#Manifest"; //$NON-NLS-1$
