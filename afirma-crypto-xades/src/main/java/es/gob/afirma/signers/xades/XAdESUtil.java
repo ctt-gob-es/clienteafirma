@@ -110,7 +110,7 @@ public final class XAdESUtil {
      */
     static boolean checkCompatibility(final List<Node> signNodes) throws AOInvalidFormatException {
 
-    	boolean isBaselineSign = false;
+    	boolean isBaselineENSign = false;
 
         for (final Node signNode : signNodes) {
 
@@ -135,15 +135,21 @@ public final class XAdESUtil {
             		throw new AOInvalidFormatException("El documento contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
             	}
 
-            	final String name = ((Element) qualifyingPropsList.item(i)).getChildNodes().item(0).getChildNodes().item(0).getChildNodes().item(1).getLocalName();
+            	try {
+                	final Node signingCertificateNode = ((Element) qualifyingPropsList.item(i)).getChildNodes().item(0).getChildNodes().item(0).getChildNodes().item(1);
+                	final String localName = signingCertificateNode.getLocalName();
+                	final String signingCertNamespaceUri = signingCertificateNode.getNamespaceURI();
 
-            	if(XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(name)) {
-            		isBaselineSign = true;
+                	if(XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(localName) && namespaceUri.equals(signingCertNamespaceUri)) {
+                		isBaselineENSign = true;
+                	}
+            	}catch(final Exception e) {
+            		throw new AOInvalidFormatException("Error al intentar analizar el nodo SigningCertificateV2"); //$NON-NLS-1$
             	}
         	}
         }
 
-        return isBaselineSign;
+        return isBaselineENSign;
     }
 
     /**
@@ -807,17 +813,15 @@ public final class XAdESUtil {
      * Comprueba el perfil que tiene la firma y lo compara con el que viene en los extraParams.
      * Permite al usuario decidir si decide mantener el mismo perfil que tiene la firma o no.
      * @param newExtraParams Par&aacute;metros de configuraci&oacute;n.
-     * @param isBaselineSign Indica si es una firma Baseline EN o no.
+     * @param isBaselineENSign Indica si es una firma Baseline EN o no.
      */
-    public static void checkSignProfile(final Properties newExtraParams, final boolean isBaselineSign) {
-
-    	boolean checkedProfile = false;
+    public static void checkSignProfile(final Properties newExtraParams, final boolean isBaselineENSign) {
 
     	if(Boolean.TRUE.equals(newExtraParams.get(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE))) {
-    		final String profile = (String) newExtraParams.get(XAdESExtraParams.PROFILE);
+    		final String profile = newExtraParams.getProperty(XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
 
-    		if(profile != null && (isBaselineSign && AOSignConstants.SIGN_PROFILE_ADVANCED.equals(profile)
-				 || !isBaselineSign && AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile))){
+    		if(isBaselineENSign && AOSignConstants.SIGN_PROFILE_ADVANCED.equals(profile)
+				 || !isBaselineENSign && AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile)){
     			final int option = AOUIFactory.showConfirmDialog(
 						null,
 						XAdESMessages.getString("AOXAdESSigner.0"), //$NON-NLS-1$
@@ -825,10 +829,8 @@ public final class XAdESUtil {
 						AOUIFactory.YES_NO_OPTION,
 						AOUIFactory.WARNING_MESSAGE);
 
-				checkedProfile = true;
-
     			if(option == 0) {
-    				if(isBaselineSign) {
+    				if(isBaselineENSign) {
     					newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
     				} else {
     					newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
@@ -837,7 +839,7 @@ public final class XAdESUtil {
     		}
     	}
 
-    	if(!checkedProfile && isBaselineSign) {
+    	if(isBaselineENSign) {
     		newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
     	}
     }

@@ -419,9 +419,10 @@ public final class XAdESExtraParams {
     public static final String INTERNAL_VALIDATE_PKCS1 = "validatePkcs1"; //$NON-NLS-1$
 
     /**
-     * Par&aacute;metro para indicar si se esta realizando la llamada desde la interfaz gr&aacute;fica.
+     * Par&aacute;metro que permite solicitar confirmacion para cofirmar con un perfil distinto al que usa la
+     * operaci&oacute;n de firma.
      */
-    public static final String CONFIRM_DIFFERENT_PROFILE = "confirmDifferentProfile "; //$NON-NLS-1$
+    public static final String CONFIRM_DIFFERENT_PROFILE = "confirmDifferentProfile"; //$NON-NLS-1$
 
     /**
      * Constructor vac&iacute;o privado para que no se pueda instanciar la clase
