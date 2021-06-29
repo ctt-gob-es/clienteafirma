@@ -64,7 +64,6 @@ import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signvalidation.SignValider;
@@ -481,17 +480,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 config.setSigner(AOSignerFactory.getSigner(
 					 PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE))
 					 );
-
-			 if ((config.getSigner() instanceof AOFacturaESigner || config.getSigner() instanceof AOXAdESSigner) &&
-		    		  config.getSigner().isSign(data)) {
-				 AOUIFactory.showErrorMessage(
-						 SimpleAfirmaMessages.getString("SignPanel.150"), //$NON-NLS-1$,
-						 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						 JOptionPane.ERROR_MESSAGE,
-						 null
-		    			);
-		    	throw new IOException(SimpleAfirmaMessages.getString("SignPanel.150")); //$NON-NLS-1$
-			 }
 		 }
 		 // Comprobamos si es un OOXML
 		 else if (DataAnalizerUtil.isOOXML(data)) {

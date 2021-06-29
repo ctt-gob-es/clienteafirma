@@ -64,14 +64,14 @@ public final class XAdESUtil {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
 	private static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
-		XAdESConstants.NAMESPACE_NO_VERSION,
+		XAdESConstants.NAMESPACE_XADES_NO_VERSION,
 	    XAdESConstants.NAMESPACE_XADES_1_2_2,
 	    XAdESConstants.NAMESPACE_XADES_1_3_2,
 	    XAdESConstants.NAMESPACE_XADES_1_4_1
 	};
 
 	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
-		XAdESConstants.NAMESPACE_NO_VERSION_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_NO_VERSION_SIGNED_PROPERTIES,
 		XAdESConstants.NAMESPACE_XADES_1_2_2_SIGNED_PROPERTIES,
 		XAdESConstants.NAMESPACE_XADES_1_3_2_SIGNED_PROPERTIES,
 		XAdESConstants.NAMESPACE_XADES_1_4_1_SIGNED_PROPERTIES
@@ -105,8 +105,8 @@ public final class XAdESUtil {
      * del documento son correctas. Tambi&eacute;n se comprobara si es una firma de tipo Baseline EN
      * @param signNodes Listado de nodos de firma.
      * @return {@code true} En caso de que sea una firma Baseline EN, false en caso contrario.
-     * @throws AOFormatFileException Se lanza en caso de que las firmas no tengan las versiones
-     * correctas.
+     * @throws AOFormatFileException Se lanza en caso de que no se pueda identificar la versi&oacute;n
+     * de la firma o que esta use una versi&oacute;n de XAdES no v&aacute;lida o no compatible.
      */
     static boolean checkCompatibility(final List<Node> signNodes) throws AOInvalidFormatException {
 
@@ -122,16 +122,16 @@ public final class XAdESUtil {
         		boolean existingNamespace = false;
 
         		for (final String xadesNameSpace : SUPPORTED_XADES_NAMESPACE_URIS) {
-        			if(xadesNameSpace.equals(namespaceUri)) {
+        			if (xadesNameSpace.equals(namespaceUri)) {
         				existingNamespace = true;
         			}
         		}
 
-            	if(!existingNamespace) {
+            	if (!existingNamespace) {
             		throw new AOInvalidFormatException("Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
             	}
 
-            	if(!XAdESConstants.NAMESPACE_XADES_1_3_2.equals(namespaceUri)) {
+            	if (!XAdESConstants.NAMESPACE_XADES_1_3_2.equals(namespaceUri)) {
             		throw new AOInvalidFormatException("El documento contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
             	}
 
@@ -143,7 +143,7 @@ public final class XAdESUtil {
                 	if(XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(localName) && namespaceUri.equals(signingCertNamespaceUri)) {
                 		isBaselineENSign = true;
                 	}
-            	}catch(final Exception e) {
+            	} catch(final Exception e) {
             		throw new AOInvalidFormatException("Error al intentar analizar el nodo SigningCertificateV2"); //$NON-NLS-1$
             	}
         	}
@@ -810,18 +810,17 @@ public final class XAdESUtil {
     }
 
     /**
-     * Comprueba el perfil que tiene la firma y lo compara con el que viene en los extraParams.
-     * Permite al usuario decidir si decide mantener el mismo perfil que tiene la firma o no.
-     * @param newExtraParams Par&aacute;metros de configuraci&oacute;n.
-     * @param isBaselineENSign Indica si es una firma Baseline EN o no.
+     * Comprueba que el perfil de una firma sea compatible con el perfil con el que se va a multifirmar.
+     * En caso de no serlo y haberse solicitado, se le consultar&aacute; si desea continuar o no.
+     * @param extraParams Par&aacute;metros de configuraci&oacute;n de la multifirma.
+     * @param signatureIsBaselineEN Indica si la firma que se va a multificar es una firma Baseline EN o no.
      */
-    public static void checkSignProfile(final Properties newExtraParams, final boolean isBaselineENSign) {
+    public static void checkSignProfile(final Properties extraParams, final boolean signatureIsBaselineEN) {
 
-    	if(Boolean.TRUE.equals(newExtraParams.get(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE))) {
-    		final String profile = newExtraParams.getProperty(XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
-
-    		if(isBaselineENSign && AOSignConstants.SIGN_PROFILE_ADVANCED.equals(profile)
-				 || !isBaselineENSign && AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile)){
+    	if (Boolean.TRUE.equals(extraParams.get(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE))) {
+    		final String profile = extraParams.getProperty(XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
+    		final boolean baselineENRequested = AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile);
+    		if (signatureIsBaselineEN != baselineENRequested){
     			final int option = AOUIFactory.showConfirmDialog(
 						null,
 						XAdESMessages.getString("AOXAdESSigner.0"), //$NON-NLS-1$
@@ -829,18 +828,21 @@ public final class XAdESUtil {
 						AOUIFactory.YES_NO_OPTION,
 						AOUIFactory.WARNING_MESSAGE);
 
-    			if(option == 0) {
-    				if(isBaselineENSign) {
-    					newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+    			if (option == 0) {
+    				if (signatureIsBaselineEN) {
+    					extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
     				} else {
-    					newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
+    					extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
     				}
     			}
     		}
     	}
-
-    	if(isBaselineENSign) {
-    		newExtraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+    	else {
+			if (signatureIsBaselineEN) {
+				extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+			} else {
+				extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
+			}
     	}
     }
 }

@@ -1442,7 +1442,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         	throw aoife;
         }
         catch (final Exception e) {
-        	LOGGER.log(Level.WARNING, "Error al analizar si el XML era una firma XAdES", e); //$NON-NLS-1$
+        	LOGGER.log(Level.WARNING, "Error al analizar la firma XAdES que se debia multifirmar", e); //$NON-NLS-1$
             throw e;
         }
         return isBaselineSign;
