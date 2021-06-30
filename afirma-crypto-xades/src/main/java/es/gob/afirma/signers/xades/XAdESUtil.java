@@ -41,7 +41,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
@@ -52,44 +55,101 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBaselineAttributes;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBasicAttributes;
 
-/** Utilidades varias para firmas XAdES.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+/**
+ * Utilidades varias para firmas XAdES.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
+ */
 public final class XAdESUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
 	private static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
-		"http://uri.etsi.org/01903#", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.2.2#", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.3.2#", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.4.1#" //$NON-NLS-1$
+		XAdESConstants.NAMESPACE_XADES_NO_VERSION,
+	    XAdESConstants.NAMESPACE_XADES_1_2_2,
+	    XAdESConstants.NAMESPACE_XADES_1_3_2,
+	    XAdESConstants.NAMESPACE_XADES_1_4_1
 	};
 
 	private static final String[] SIGNED_PROPERTIES_TYPES = new String[] {
-		"http://uri.etsi.org/01903#SignedProperties", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.2.2#SignedProperties", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.3.2#SignedProperties", //$NON-NLS-1$
-	    "http://uri.etsi.org/01903/v1.4.1#SignedProperties" //$NON-NLS-1$
+		XAdESConstants.NAMESPACE_XADES_NO_VERSION_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_1_2_2_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_1_3_2_SIGNED_PROPERTIES,
+		XAdESConstants.NAMESPACE_XADES_1_4_1_SIGNED_PROPERTIES
 	};
 
 	private XAdESUtil() {
 		// No permitimos la instanciacion
 	}
 
-    /** Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES.
+    /**
+     * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES.
      * @param signNodes Listado de nodos de firma.
-     * @return {@code true} cuando todos los nodos sean firmas en este formato. */
+     * @return {@code true} cuando todos los nodos sean firmas en este formato.
+     */
     static boolean checkSignNodes(final List<Node> signNodes) {
         for (final Node signNode : signNodes) {
         	int lenCount = 0;
         	for (final String xadesNamespace : SUPPORTED_XADES_NAMESPACE_URIS) {
-        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength(); //$NON-NLS-1$
+        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, XAdESConstants.TAG_QUALIFYING_PROPERTIES).getLength();
         	}
             if (lenCount == 0) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES compatibles
+     * con la cofirma a realizar. Si el metodo finaliza sin lanzar ninguna excepci&oacute;n, las firmas
+     * del documento son correctas. Tambi&eacute;n se comprobara si es una firma de tipo Baseline EN
+     * @param signNodes Listado de nodos de firma.
+     * @return {@code true} En caso de que sea una firma Baseline EN, false en caso contrario.
+     * @throws AOFormatFileException Se lanza en caso de que no se pueda identificar la versi&oacute;n
+     * de la firma o que esta use una versi&oacute;n de XAdES no v&aacute;lida o no compatible.
+     */
+    static boolean checkCompatibility(final List<Node> signNodes) throws AOInvalidFormatException {
+
+    	boolean isBaselineENSign = false;
+
+        for (final Node signNode : signNodes) {
+
+        	final NodeList qualifyingPropsList = ((Element) signNode).getElementsByTagNameNS("*", XAdESConstants.TAG_QUALIFYING_PROPERTIES); //$NON-NLS-1$
+
+        	for (int i = 0 ; i < qualifyingPropsList.getLength() ; i++) {
+        		final String namespaceUri = qualifyingPropsList.item(i).getNamespaceURI();
+
+        		boolean existingNamespace = false;
+
+        		for (final String xadesNameSpace : SUPPORTED_XADES_NAMESPACE_URIS) {
+        			if (xadesNameSpace.equals(namespaceUri)) {
+        				existingNamespace = true;
+        			}
+        		}
+
+            	if (!existingNamespace) {
+            		throw new AOInvalidFormatException("Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
+            	}
+
+            	if (!XAdESConstants.NAMESPACE_XADES_1_3_2.equals(namespaceUri)) {
+            		throw new AOInvalidFormatException("El documento contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
+            	}
+
+            	try {
+                	final Node signingCertificateNode = ((Element) qualifyingPropsList.item(i)).getChildNodes().item(0).getChildNodes().item(0).getChildNodes().item(1);
+                	final String localName = signingCertificateNode.getLocalName();
+                	final String signingCertNamespaceUri = signingCertificateNode.getNamespaceURI();
+
+                	if(XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(localName) && namespaceUri.equals(signingCertNamespaceUri)) {
+                		isBaselineENSign = true;
+                	}
+            	} catch(final Exception e) {
+            		throw new AOInvalidFormatException("Error al intentar analizar el nodo SigningCertificateV2"); //$NON-NLS-1$
+            	}
+        	}
+        }
+
+        return isBaselineENSign;
     }
 
     /**
@@ -614,7 +674,7 @@ public final class XAdESUtil {
 			final X509Certificate signingCertificate) throws AOException {
 
 		XAdES xadesProfile = XAdES.EPES;
-		if (profile != null && AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
+		if (AOSignConstants.SIGN_PROFILE_BASELINE.equalsIgnoreCase(profile)) {
 			xadesProfile = XAdES.B_LEVEL;
 		}
 
@@ -747,5 +807,42 @@ public final class XAdESUtil {
     	}
 
     	return dataReferences;
+    }
+
+    /**
+     * Comprueba que el perfil de una firma sea compatible con el perfil con el que se va a multifirmar.
+     * En caso de no serlo y haberse solicitado, se le consultar&aacute; si desea continuar o no.
+     * @param extraParams Par&aacute;metros de configuraci&oacute;n de la multifirma.
+     * @param signatureIsBaselineEN Indica si la firma que se va a multificar es una firma Baseline EN o no.
+     */
+    public static void checkSignProfile(final Properties extraParams, final boolean signatureIsBaselineEN) {
+
+    	if (Boolean.TRUE.equals(extraParams.get(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE))) {
+    		final String profile = extraParams.getProperty(XAdESExtraParams.PROFILE, AOSignConstants.DEFAULT_SIGN_PROFILE);
+    		final boolean baselineENRequested = AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile);
+    		if (signatureIsBaselineEN != baselineENRequested){
+    			final int option = AOUIFactory.showConfirmDialog(
+						null,
+						XAdESMessages.getString("AOXAdESSigner.0"), //$NON-NLS-1$
+						XAdESMessages.getString("AOXAdESSigner.1"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE);
+
+    			if (option == 0) {
+    				if (signatureIsBaselineEN) {
+    					extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+    				} else {
+    					extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
+    				}
+    			}
+    		}
+    	}
+    	else {
+			if (signatureIsBaselineEN) {
+				extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+			} else {
+				extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
+			}
+    	}
     }
 }

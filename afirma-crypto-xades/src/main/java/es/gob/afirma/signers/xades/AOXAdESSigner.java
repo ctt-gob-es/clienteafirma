@@ -979,6 +979,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 			throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
 		}
 
+		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
+		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline EN
+		final boolean isBaselineENSign = checkCompatibility(signDocument);
+
+		XAdESUtil.checkSignProfile(extraParams, isBaselineENSign);
+
 		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
     }
 
@@ -1030,6 +1036,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	}
 
     	final Properties newExtraParams = getExtraParams(extraParams);
+
+		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
+		// Tambien devolvera true en caso de que se trate de una firma de tipo Baseline EN
+    	final boolean isBaselineENSign = checkCompatibility(signDocument);
+
+		XAdESUtil.checkSignProfile(newExtraParams, isBaselineENSign);
 
     	return countersign(signDocument, algorithm, targetType, targets, key, certChain, newExtraParams);
     }
@@ -1388,5 +1400,51 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	newExtraParams.remove(XAdESExtraParams.INTERNAL_VALIDATE_PKCS1);
 
     	return newExtraParams;
+    }
+
+    /**
+     * Comprueba si el documento a cofirmar, contiene firmas de una versi&oacute;n distinta
+     * a la 1.3.2.
+     * @param signDocument Documento que contiene las firmas y datos.
+     * @return Devuelve true en caso de que se trate de una firma de tipo Baseline EN,
+     * y false en caso contrario.
+     * @throws AOInvalidFormatException Devuelve esta excepcion en caso de que la version de la firma
+     * no sea correcta
+     */
+    public static boolean checkCompatibility(final Document signDocument) throws AOInvalidFormatException {
+
+    	boolean isBaselineSign = false;
+
+        try {
+            final Element rootNode = signDocument.getDocumentElement();
+            final List<Node> signNodes = new ArrayList<>();
+
+            // Comprobamos si el nodo raiz es una firma
+            if (rootNode.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
+                signNodes.add(rootNode);
+            }
+
+            // Identificamos las firmas internas del XML
+            final NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
+            for (int i = 0; i < signatures.getLength(); i++) {
+            	// Omitimos las firmas extraidas de sellos de tiempo
+            	final Node parentNode = signatures.item(i).getParentNode();
+            	if (parentNode == null || !TIMESTAMP_TAG.equals(parentNode.getLocalName())) {
+            		signNodes.add(signatures.item(i));
+            	}
+            }
+
+            if(XAdESUtil.checkCompatibility(signNodes)) {
+            	isBaselineSign = true;
+            }
+        }
+        catch (final AOInvalidFormatException aoife) {
+        	throw aoife;
+        }
+        catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "Error al analizar la firma XAdES que se debia multifirmar", e); //$NON-NLS-1$
+            throw e;
+        }
+        return isBaselineSign;
     }
 }

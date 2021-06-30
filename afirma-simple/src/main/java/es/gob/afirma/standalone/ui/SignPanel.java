@@ -64,8 +64,8 @@ import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -461,6 +461,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	 }
 
 	 private static void configureDataSigner(final SignOperationConfig config, final byte[] data) throws IOException {
+
 		 // Comprobamos si es un fichero PDF
 		 if (DataAnalizerUtil.isPDF(data)) {
 			 config.setFileType(FileType.PDF);
@@ -479,11 +480,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 config.setSigner(AOSignerFactory.getSigner(
 					 PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE))
 					 );
-			 // No se pueden agregar firmas a una factura electronica ya firmada
-			 if (config.getSigner() instanceof AOFacturaESigner &&
-					 config.getSigner().isSign(data)) {
-				 throw new IOException("No se puede firmar con formato FacturaE la factura ya firmada"); //$NON-NLS-1$
-			 }
 		 }
 		 // Comprobamos si es un OOXML
 		 else if (DataAnalizerUtil.isOOXML(data)) {
@@ -546,6 +542,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 		 config.setSignatureFormatName(getSignatureName(config.getSigner()));
 		 config.setExtraParams(ExtraParamsHelper.loadExtraParamsForSigner(config.getSigner()));
+		 config.getExtraParams().put(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE, Boolean.TRUE);
 	 }
 
 	 private static String buildErrorText(final SIGN_DETAIL_TYPE result, final VALIDITY_ERROR error) {
