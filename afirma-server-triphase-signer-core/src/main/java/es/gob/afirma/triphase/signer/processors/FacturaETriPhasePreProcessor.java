@@ -9,6 +9,14 @@
 
 package es.gob.afirma.triphase.signer.processors;
 
+import java.io.IOException;
+import java.security.cert.X509Certificate;
+import java.util.Properties;
+
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.TriphaseData;
+
 /** Procesador de firmas trif&aacute;sicas XAdES FacturaE.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class FacturaETriPhasePreProcessor extends XAdESTriPhasePreProcessor {
@@ -16,6 +24,26 @@ public final class FacturaETriPhasePreProcessor extends XAdESTriPhasePreProcesso
 	/** Construye un procesador de firmas trif&aacute;sicas XAdES FacturaE. */
 	public FacturaETriPhasePreProcessor() {
 		super(true);
+	}
+
+	@Override
+	public TriphaseData preProcessPreCoSign(final byte[] data,
+			                          final String algorithm,
+			                          final X509Certificate[] cert,
+			                          final Properties extraParams,
+			                          final boolean checkSignatures) throws IOException, AOException {
+		throw new UnsupportedOperationException("No se permiten multifirmas para formatos de tipo FacturaE"); //$NON-NLS-1$
+	}
+
+	@Override
+	public TriphaseData preProcessPreCounterSign(final byte[] sign,
+			                               final String algorithm,
+			                               final X509Certificate[] cert,
+			                               final Properties extraParams,
+			                               final CounterSignTarget targets,
+				                           final boolean checkSignatures) throws IOException,
+			                                                                       AOException {
+		throw new UnsupportedOperationException("No se permiten multifirmas para formatos de tipo FacturaE"); //$NON-NLS-1$
 	}
 
 }
