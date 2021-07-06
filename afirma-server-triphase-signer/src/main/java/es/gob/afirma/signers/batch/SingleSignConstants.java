@@ -9,17 +9,7 @@
 
 package es.gob.afirma.signers.batch;
 
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.batch.xml.SingleSign;
-import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.Pkcs1TriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
-import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
 /** Constantes para la definici&oacute;n de una firma independiente.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -173,29 +163,4 @@ public final class SingleSignConstants {
 			);
 		}
 	}
-
-	public static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOInvalidFormatException {
-		if (sSign == null) {
-			throw new IllegalArgumentException("La firma no puede ser nula"); //$NON-NLS-1$
-		}
-		switch(sSign.getSignFormat()) {
-			case PADES:
-				return new PAdESTriPhasePreProcessor();
-			case CADES:
-				return new CAdESTriPhasePreProcessor();
-			case CADES_ASIC:
-				return new CAdESASiCSTriPhasePreProcessor();
-			case XADES:
-				return new XAdESTriPhasePreProcessor();
-			case XADES_ASIC:
-				return new XAdESASiCSTriPhasePreProcessor();
-			case FACTURAE:
-				return new FacturaETriPhasePreProcessor();
-			case PKCS1:
-				return new Pkcs1TriPhasePreProcessor();
-			default:
-				throw new AOInvalidFormatException("Formato de firma no soportado: " + sSign.getSignFormat()); //$NON-NLS-1$
-		}
-	}
-
 }

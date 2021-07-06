@@ -87,7 +87,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                          final Properties extraParams,
 			                          final boolean checkSignatures) throws IOException,
 			                                                               AOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                           final byte[] triphaseDataBytes) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                               final CounterSignTarget targets,
 				                           final boolean checkSignatures) throws IOException,
 			                                                                       AOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			                                                                        AOException,
 			                                                                        IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			                                                                        AOException,
 			                                                                        IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 }

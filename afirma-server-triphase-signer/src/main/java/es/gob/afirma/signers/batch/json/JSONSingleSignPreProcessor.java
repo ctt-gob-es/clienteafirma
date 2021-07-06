@@ -73,7 +73,7 @@ final class JSONSingleSignPreProcessor {
 		}
 
 		// Instanciamos el preprocesador adecuado
-		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
+		final TriPhasePreProcessor prep = TriPhaseHelper.getTriPhasePreProcessor(sSign);
 
 		final byte[] docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
 

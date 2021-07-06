@@ -15,10 +15,20 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.triphase.server.ConfigManager;
+import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.Pkcs1TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
 public class TriPhaseHelper {
 
@@ -163,4 +173,30 @@ public class TriPhaseHelper {
     		throw new SecurityException("El PKCS#1 de la firma no se ha generado con el certificado indicado", e); //$NON-NLS-1$
     	}
     }
+
+
+	public static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOInvalidFormatException {
+		if (sSign == null) {
+			throw new IllegalArgumentException("La firma no puede ser nula"); //$NON-NLS-1$
+		}
+		switch(sSign.getSignFormat()) {
+			case PADES:
+				return new PAdESTriPhasePreProcessor();
+			case CADES:
+				return new CAdESTriPhasePreProcessor();
+			case CADES_ASIC:
+				return new CAdESASiCSTriPhasePreProcessor();
+			case XADES:
+				return new XAdESTriPhasePreProcessor();
+			case XADES_ASIC:
+				return new XAdESASiCSTriPhasePreProcessor();
+			case FACTURAE:
+				return new FacturaETriPhasePreProcessor();
+			case PKCS1:
+				return new Pkcs1TriPhasePreProcessor();
+			default:
+				throw new AOInvalidFormatException("Formato de firma no soportado: " + sSign.getSignFormat()); //$NON-NLS-1$
+		}
+	}
+
 }

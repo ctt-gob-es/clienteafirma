@@ -76,7 +76,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                          final X509Certificate[] cert,
 			                          final Properties xParams,
 		                               final boolean checkSignatures) throws IOException, AOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas CAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                           final X509Certificate[] cert,
 			                           final Properties xParams,
 			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas CAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                           final X509Certificate[] cert,
 			                           final Properties xParams,
 			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException, AOException, IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas CAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                               final Properties extraParams,
 			                               final CounterSignTarget targets,
 			                               final boolean checkSignatures) throws IOException, AOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas CAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
 			                                                                           AOException,
 			                                                                           IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas CAdES-ASiCS"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -128,6 +128,6 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
 			                                                                           AOException,
 			                                                                           IOException {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas CAdES-ASiCS"); //$NON-NLS-1$
 	}
 }

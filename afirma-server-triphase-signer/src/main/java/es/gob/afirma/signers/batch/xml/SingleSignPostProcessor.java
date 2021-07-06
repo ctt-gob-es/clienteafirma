@@ -82,7 +82,7 @@ final class SingleSignPostProcessor {
 		}
 
 		// Instanciamos el preprocesador adecuado
-		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
+		final TriPhasePreProcessor prep = TriPhaseHelper.getTriPhasePreProcessor(sSign);
 
 		byte[] docBytes = sSign.getData(true);
 
