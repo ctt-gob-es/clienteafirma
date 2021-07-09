@@ -1403,11 +1403,11 @@ public final class XAdESSigner {
 		if (data != null) {
 			try {
 				doc = docBuilder.parse(
-						new ByteArrayInputStream(data)
-						);
+					new ByteArrayInputStream(data)
+				);
 			}
 			catch (final Exception e) {
-				LOGGER.fine("Los datos proporcionados no son XML"); //$NON-NLS-1$
+				LOGGER.fine("Los datos proporcionados no son XML: " + e); //$NON-NLS-1$
 				doc = null;
 			}
 		}
