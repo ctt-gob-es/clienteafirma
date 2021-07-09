@@ -3,8 +3,10 @@ package es.gob.afirma.standalone.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,10 +192,12 @@ public class PluginLoader {
 
 		PluginInfo info;
 		try (InputStream is = plugin.getClass().getResourceAsStream(infoResource)) {
-				if (is == null) {
-					throw new IOException(String.format("No se encontro el fichero %1s en el plugin", infoResource)); //$NON-NLS-1$
-				}
-				info = PluginInfoLoader.parseInfo(is);
+			if (is == null) {
+				throw new IOException(String.format("No se encontro el fichero %1s en el plugin", infoResource)); //$NON-NLS-1$
+			}
+			try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+				info = PluginInfoLoader.parseInfo(reader);
+			}
 		} catch (final IOException e) {
 			throw new IOException("Error en la lectura del fichero " + CONFIG_FILE, e); //$NON-NLS-1$
 

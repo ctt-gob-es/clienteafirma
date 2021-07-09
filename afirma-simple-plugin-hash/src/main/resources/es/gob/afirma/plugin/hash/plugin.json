@@ -5,9 +5,9 @@
 		"version_code": 1,
 		"version": "1.0",
 		"authors": [
-			"Gobierno de España"
+			"Gobierno de EspaÃ±a"
 		],
-		"description": "Plugin para el cálculo y la comprobación de hashes.<br><br>El componente permite generar ficheros de hashes con el hash de un fichero o de todos los ficheros de un directorio. También permite comprobar que un fichero de hashes es válido seleccionando el fichero o directorio a partir del cuál se generó.<br><br>El plugin permite realizar las nuevas operaciones tanto desde interfaces gráficos como desde línea de comandos."
+		"description": "Plugin para el cÃ¡lculo y la comprobaciÃ³n de hashes.<br><br>El componente permite generar ficheros de hashes con el hash de un fichero o de todos los ficheros de un directorio. TambiÃ©n permite comprobar que un fichero de hashes es vÃ¡lido seleccionando el fichero o directorio a partir del cuÃ¡l se generÃ³.<br><br>El plugin permite realizar las nuevas operaciones tanto desde interfaces grÃ¡ficos como desde lÃ­nea de comandos."
 	},
 	"permissions": ["RESET", "MENU", "COMMANDS"],
 	"menu": {
@@ -44,12 +44,12 @@
 	"commands": [
 		{
 			"name": "createdigest",
-			"description": "Creación de huellas digitales con interfaz gráfica",
+			"description": "Creaciï¿½n de huellas digitales con interfaz grï¿½fica",
 			"action": "es.gob.afirma.plugin.hash.command.CreateHashCommand"
 		},
 		{
 			"name": "checkdigest",
-			"description": "Comprobación de huellas digitales con interfaz gráfica",
+			"description": "Comprobaciï¿½n de huellas digitales con interfaz grï¿½fica",
 			"action": "es.gob.afirma.plugin.hash.command.CheckHashCommand"
 		}
 	]

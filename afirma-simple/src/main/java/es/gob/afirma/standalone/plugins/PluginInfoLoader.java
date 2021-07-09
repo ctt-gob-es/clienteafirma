@@ -1,6 +1,6 @@
 package es.gob.afirma.standalone.plugins;
 
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -23,16 +23,16 @@ public class PluginInfoLoader {
 
 	/**
 	 * Obtiene la informaci&oacute;n de un plugin.
-	 * @param is Flujo de entrada de datos.
+	 * @param reader Lector para la obtenci&oacute;n de la informaci&oacute;n del plugin.
 	 * @return Informaci&oacute;n del plugin.
 	 * @throws PluginException Cuando no se puede leer la informaci&oacute;n del plugin
 	 * o la informaci&oacute;n encontrada est&aacute; mal formada.
 	 */
-	static PluginInfo parseInfo(final InputStream is) throws PluginException {
+	static PluginInfo parseInfo(final InputStreamReader reader) throws PluginException {
 
 		PluginInfo info;
-		try (final JsonReader reader = Json.createReader(is)) {
-			final JsonObject mainObject = reader.readObject();
+		try (final JsonReader jsonReader = Json.createReader(reader)) {
+			final JsonObject mainObject = jsonReader.readObject();
 
 			// Parseamos la informacion del plugin
 
