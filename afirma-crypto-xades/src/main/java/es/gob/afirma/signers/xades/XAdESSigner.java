@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -238,6 +239,11 @@ public final class XAdESSigner {
 
 		String nodeToSign = extraParams.getProperty(
 		        XAdESExtraParams.NODE_TOSIGN);
+
+		final boolean avoidEnveloped = nodeToSign == null ?
+			false :
+				Boolean.parseBoolean(extraParams.getProperty(
+					XAdESExtraParams.AVOID_ENVELOPED_TRANSFORM_WHEN_SIGNING_NODE, Boolean.FALSE.toString()));
 
 		String format = extraParams.getProperty(
 		        XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
@@ -1013,16 +1019,17 @@ public final class XAdESSigner {
 		// Crea una referencia indicando que se trata de una firma enveloped
 		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
 			try {
-
-				// Transformacion enveloped.
-				// La enveloped siempre la primera, para que no se quede sin
-				// nodos Signature por haber ejecutado antes otra transformacion
-				transformList.add(
-					fac.newTransform(
-						Transform.ENVELOPED,
-						(TransformParameterSpec) null
-					)
-				);
+				if (!avoidEnveloped) {
+					// Transformacion enveloped.
+					// La enveloped siempre la primera, para que no se quede sin
+					// nodos Signature por haber ejecutado antes otra transformacion
+					transformList.add(
+						fac.newTransform(
+							Transform.ENVELOPED,
+							(TransformParameterSpec) null
+						)
+					);
+				}
 
 				// Establecemos que es lo que se firma
 				// 1.- Si se especifico un nodo, se firma ese nodo
@@ -1550,24 +1557,25 @@ public final class XAdESSigner {
 			final DigestMethod digestMethod,
 			final String referenceId) throws AOException {
 
-		Reference ref;
+		final Reference ref;
 
 		// Si es una referencia de tipo file:// obtenemos el fichero y
 		// creamos una referencia solo con el message digest
 		if (uri.substring(0, FILE_PROTOCOL_PREFIX.length()).equalsIgnoreCase(FILE_PROTOCOL_PREFIX)) {
-			try {
+			try (
+				final InputStream lfis = AOUtil.loadFile(AOUtil.createURI(uri))
+			) {
 				ref = fac.newReference(
 					uri,
 					digestMethod,
 					null,
 					null, // Las referencias externas no tienen tipo
 					referenceId,
-					MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm()))
-						.digest(
-								AOUtil.getDataFromInputStream(
-										AOUtil.loadFile(AOUtil.createURI(uri))
-										)
-								)
+					MessageDigest.getInstance(
+						AOSignConstants.getDigestAlgorithmName(
+							digestMethod.getAlgorithm()
+						)
+					).digest(AOUtil.getDataFromInputStream(lfis))
 				);
 			}
 			catch (final Exception e) {
