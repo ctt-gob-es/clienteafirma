@@ -18,7 +18,7 @@ public final class XAdESExtraParams {
 	/** Si se indica <code>true</code>, <u>no</u> se firma una referencia al nodo <code>KeyInfo</code>, si no
 	 * se establece valor o se establece a otro valor distinto de <code>true</code>, se firma el nodo incluyendo
 	 * una referencia a &eacute;l. */
-	static final String KEEP_KEYINFO_UNSIGNED = "keepKeyInfoUnsigned"; //$NON-NLS-1$
+	public static final String KEEP_KEYINFO_UNSIGNED = "keepKeyInfoUnsigned"; //$NON-NLS-1$
 
     /** URI en la que se encuentra el documento a firmar, necesario en el caso
      * del formato <i>XAdES Externally Detached</i>
@@ -40,14 +40,14 @@ public final class XAdESExtraParams {
      * que elimina todas las firmas del documento para dejar &uacute;nicamente
      * el contenido. Por defecto, se encuentra a <code>false</code>.
      * &Uacute;nicamente aplica a firmas <i>enveloped</i>. */
-    static final String AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED = "avoidXpathExtraTransformsOnEnveloped";//$NON-NLS-1$
+    public static final String AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED = "avoidXpathExtraTransformsOnEnveloped";//$NON-NLS-1$
 
     /** Indica, mediante un <code>true</code> o <code>false</code>, que debe
      * incluirse en la firma &uacute;nicamente el certificado utilizado para
      * firmar y no su cadena de certificaci&oacute;n completa. Por defecto, se
      * incluir&aacute; toda la cadena de certificaci&oacute;n. <br>
      * Propiedad compartida con CAdES y PAdES. */
-    static final String INCLUDE_ONLY_SIGNNING_CERTIFICATE = "includeOnlySignningCertificate";//$NON-NLS-1$
+    public static final String INCLUDE_ONLY_SIGNNING_CERTIFICATE = "includeOnlySignningCertificate";//$NON-NLS-1$
 
     /** Indica, mediante <code>true</code> o <code>false</code> (por defecto), si
      * debe usarse un <a
@@ -59,20 +59,23 @@ public final class XAdESExtraParams {
     public static final String USE_MANIFEST = "useManifest";//$NON-NLS-1$
 
     /** Indica, mediante una expresi&oacute;n XPath (v1), el nodo bajo el cual
-     * debe insertarse el nodo de firma en el caso de una firma
-     * <i>Enveloped</i>.<br>
+     * debe insertarse el nodo de firma en el caso de una firma <i>Enveloped</i>.<br>
      * Si la expresi&oacute;n devuelve m&aacute;s de un nodo, se usa solo el
      * primero. Si la expresi&oacute;n no devuelve nodos o est&aacute; mal
      * construida se lanzar&aacute; una excepci&oacute;n.<br>
      * Este par&aacute;metro solo tiene efecto en firmas <i>Enveloped</i>. */
-    static final String INSERT_ENVELOPED_SIGNATURE_ON_NODE_BY_XPATH = "insertEnvelopedSignatureOnNodeByXPath";//$NON-NLS-1$
+    public static final String INSERT_ENVELOPED_SIGNATURE_ON_NODE_BY_XPATH = "insertEnvelopedSignatureOnNodeByXPath";//$NON-NLS-1$
 
-    /** Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
-     * XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
-     * que elimina todas las firmas del documento para dejar &uacute;nicamente
-     * el contenido. Por defecto, se encuentra a <code>false</code>.
-     * No aplica a contrafirmas. */
-    static final String NODE_TOSIGN = "nodeToSign";//$NON-NLS-1$
+    /** Indica el nodo del XML que debe firmarse. Cuando no se indica este par&aacute;metro,
+     * se firma el documento entero.
+     * El nodo se determina por su identificador. */
+    public static final String NODE_TOSIGN = "nodeToSign";//$NON-NLS-1$
+
+    /** No incluye la transformaci&oacute;n <code>Enveloped</code> cuando se ha indicado adem&aacute;s
+     * <i>nodeToSign</i>.
+     * Solo aplica a firmas Enveloped, y el usuario debe asegurarse de que la firma se inserte
+     * en un lugar o nodo del XML que no interfiera con el contenido firmado. */
+    public static final String AVOID_ENVELOPED_TRANSFORM_WHEN_SIGNING_NODE = "avoidEnvelopedTransformWhenSigningNode"; //$NON-NLS-1$
 
     /** Formato de firma. Se aceptan los siguientes valores:<br>
      * <ul>
@@ -111,17 +114,17 @@ public final class XAdESExtraParams {
      *  <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
      * </ul>
      */
-    static final String REFERENCES_DIGEST_METHOD = "referencesDigestMethod";//$NON-NLS-1$
+	public static final String REFERENCES_DIGEST_METHOD = "referencesDigestMethod";//$NON-NLS-1$
 
     /** Algoritmo de canonicalizaci&oacute;n. */
-    static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";//$NON-NLS-1$
+	public static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";//$NON-NLS-1$
 
     /** URL de definici&oacute;n del espacio de nombres de XAdES (y por
      * extensi&oacute;n, versi&oacute;n de XAdES). Si se establece este
      * par&aacute;metro es posible que se necesite establecer tambi&eacute;n el
      * par&aacute;metro <code>signedPropertiesTypeUrl</code> para evitar
      * incoherencias en la versi&oacute;n de XAdES. */
-    static final String XADES_NAMESPACE = "xadesNamespace";//$NON-NLS-1$
+	public static final String XADES_NAMESPACE = "xadesNamespace";//$NON-NLS-1$
 
     /**
      * URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed
@@ -133,7 +136,7 @@ public final class XAdESExtraParams {
      * href="http://uri.etsi.org/01903#SignedProperties"
      * >http://uri.etsi.org/01903#SignedProperties</a>.
      */
-    static final String SIGNED_PROPERTIES_TYPE_URL = "signedPropertiesTypeUrl";//$NON-NLS-1$
+	public static final String SIGNED_PROPERTIES_TYPE_URL = "signedPropertiesTypeUrl";//$NON-NLS-1$
 
     /**
      * Ignora las hojas de estilo externas de los XML (no las firma) si se
@@ -141,7 +144,7 @@ public final class XAdESExtraParams {
      * act&uacute;a normalmente (s&iacute; las firma). (s&iacute; las firma).
      * <br> No aplica a contrafirmas.
      */
-    static final String IGNORE_STYLE_SHEETS = "ignoreStyleSheets";//$NON-NLS-1$
+	public static final String IGNORE_STYLE_SHEETS = "ignoreStyleSheets";//$NON-NLS-1$
 
     /**
      * No declara transformaciones Base64 incluso si son necesarias si se
@@ -150,18 +153,18 @@ public final class XAdESExtraParams {
      * declara). <br>
      * No aplica a contrafirmas)
      */
-    static final String AVOID_BASE64_TRANSFORMS = "avoidBase64Transforms";//$NON-NLS-1$
+	public static final String AVOID_BASE64_TRANSFORMS = "avoidBase64Transforms";//$NON-NLS-1$
 
     /** Evita cualquier interacci&oacute;n con el usuario si se establece a
      * <code>true</code>, si se establece a <code>false</code> act&uacute;a
      * normalmente (puede mostrar di&aacute;logos, por ejemplo, para la
      * dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas
      * relativas). &Uacute;til para los procesos desatendidos y por lotes. */
-    static final String HEADLESS = "headless";//$NON-NLS-1$
+	public static final String HEADLESS = "headless";//$NON-NLS-1$
 
     /** Indica, mediante true (por defecto) o false, si debe incluirse el nodo
      * KeyValue dentro de KeyInfo de XAdES. */
-    static final String ADD_KEY_INFO_KEY_VALUE = "addKeyInfoKeyValue";//$NON-NLS-1$
+	public static final String ADD_KEY_INFO_KEY_VALUE = "addKeyInfoKeyValue";//$NON-NLS-1$
 
     /** Indica, mediante true o false (por defecto), si debe incluirse el nodo
      * KeyName dentro de KeyInfo de XAdES. */
@@ -184,23 +187,23 @@ public final class XAdESExtraParams {
      *   siendo conveniente adem&aacute;s hacer uso de un <i>Manifest</i>.
      *  </li>
      * </ul> */
-    static final String PRECALCULATED_HASH_ALGORITHM = "precalculatedHashAlgorithm";//$NON-NLS-1$
+    public static final String PRECALCULATED_HASH_ALGORITHM = "precalculatedHashAlgorithm";//$NON-NLS-1$
 
     /** Indica, mediante un <code>true</code> o <code>false</code>, si se deben
      * realizar las necesarias restricciones de comportamiento para la firma de
      * facturas electr&oacute;nicas (FACTURAe). Estas restricciones son, no
      * introducir la transformaci&oacute;n de canonicalizaci&oacute;n de la
      * firma, ni la transformaci&oacute;n XPATH en las firmas <i>Enveloped</i>. */
-    static final String FACTURAE_SIGN = "facturaeSign";//$NON-NLS-1$
+    public static final String FACTURAE_SIGN = "facturaeSign";//$NON-NLS-1$
 
     /** MIME-Type de los datos a firmar.
      * Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede ser inexacto. */
-    static final String CONTENT_MIME_TYPE = "mimeType";//$NON-NLS-1$
+    public static final String CONTENT_MIME_TYPE = "mimeType";//$NON-NLS-1$
 
     /**
      * OID que identifica el tipo de datos a firmar. <br> No aplica a contrafirmas.
      */
-    static final String CONTENT_TYPE_OID = "contentTypeOid";//$NON-NLS-1$
+    public static final String CONTENT_TYPE_OID = "contentTypeOid";//$NON-NLS-1$
 
     /** Codificaci&oacute;n de los datos a firmar.<br>No aplica a contrafirmas.
      * Por restricc&oacute;n de esquema de XMLDsig debe ser una URI:
@@ -215,11 +218,11 @@ public final class XAdESExtraParams {
      *      &lt;attribute name="Encoding" type="anyURI" use="optional"/&gt;
      *    &lt;/complexType&gt;
      * </pre> */
-    static final String CONTENT_ENCODING = "encoding";//$NON-NLS-1$
+    public static final String CONTENT_ENCODING = "encoding";//$NON-NLS-1$
 
     /** Prefijo del par&aacute;metro con el MIME-Type de los datos de una referencia concreta de
      * las que se firman. */
-    static final String CONTENT_MIME_TYPE_PREFIX = "mimeType";//$NON-NLS-1$
+    public static final String CONTENT_MIME_TYPE_PREFIX = "mimeType";//$NON-NLS-1$
 
     /**
      * Prefijo del par&aacute;metro con el OID que identifica el tipo de datos a firmar para una
@@ -229,18 +232,18 @@ public final class XAdESExtraParams {
 
     /** Prefijo del par&aacute;metro con la codificaci&oacute;n de los datos a firmar para una
      * referencia concreta de las firmadas. No aplica a contrafirmas. */
-    static final String CONTENT_ENCODING_PREFIX = "encoding";//$NON-NLS-1$
+    public static final String CONTENT_ENCODING_PREFIX = "encoding";//$NON-NLS-1$
 
     /** Codificaci&oacute;n del XML de salida.
      * Si no se indica este valor se intenta auto-detectar a partir del XML de entrada (si los datos a firmar son un XML). */
-    static final String OUTPUT_XML_ENCODING = "outputXmlEncoding"; //$NON-NLS-1$
+    public static final String OUTPUT_XML_ENCODING = "outputXmlEncoding"; //$NON-NLS-1$
 
     /**
      * Identificador de la pol&iacute;tica de firma (normalmente una URL hacia
      * la pol&iacute;tica en formato XML procesable o una URN de tipo OID).
      * <br> Propiedad compartida con CAdES y PAdES.
      */
-    static final String POLICY_IDENTIFIER = "policyIdentifier";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER = "policyIdentifier";//$NON-NLS-1$
 
     /**
      * Huella digital del documento de pol&iacute;tica de firma (normalmente del
@@ -249,68 +252,68 @@ public final class XAdESExtraParams {
      * accesible universalmente. <br>
      * Propiedad compartida con CAdES y PAdES.
      */
-    static final String POLICY_IDENTIFIER_HASH = "policyIdentifierHash";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH = "policyIdentifierHash";//$NON-NLS-1$
 
     /**
      * Algoritmo usado para el c&uacute;lculo de la huella digital indicada en
      * el par&uacute;metro policyIdentifierHash. <br>
      * Propiedad compartida con CAdES y PAdES.
      */
-    static final String POLICY_IDENTIFIER_HASH_ALGORITHM = "policyIdentifierHashAlgorithm";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH_ALGORITHM = "policyIdentifierHashAlgorithm";//$NON-NLS-1$
 
     /**
      * Descripci&oacute;n textual de la pol&iacute;tica
      */
-    static final String POLICY_DESCRIPTION = "policyDescription";//$NON-NLS-1$
+    public static final String POLICY_DESCRIPTION = "policyDescription";//$NON-NLS-1$
 
     /**
      * URL hacia el documento (legible por personas, normalmente en formato PDF)
      * descriptivo de la pol&iacute;tica de firma. <br>
      * Propiedad compartida con CAdES y PAdES.
      */
-    static final String POLICY_QUALIFIER = "policyQualifier";//$NON-NLS-1$
+    public static final String POLICY_QUALIFIER = "policyQualifier";//$NON-NLS-1$
 
     /**
      * Lista de cargos atribuidos al firmante separados por el car&uacute;cter
      * '|'. Los cargos de la lista no pueden contener el car&uacute;cter '|' (ya
      * que este se usa como separador).
      */
-    static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
+    public static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
 
     /**
      * Ciudad en la que se realiza la firma. <br>
      * Propiedad compartida con CAdES y PAdES.
      */
-    static final String SIGNATURE_PRODUCTION_CITY = "signatureProductionCity";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_CITY = "signatureProductionCity";//$NON-NLS-1$
 
     /**
      * Calle de la direcci&oacute;n en la que se realiza la firma.
      */
-    static final String SIGNATURE_PRODUCCTION_STREET_ADDRESS = "signatureProductionStreetAddress";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCCTION_STREET_ADDRESS = "signatureProductionStreetAddress";//$NON-NLS-1$
 
     /**
      * Provincia en la que se realiza la firma.
      */
-    static final String SIGNATURE_PRODUCTION_PROVINCE = "signatureProductionProvince";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_PROVINCE = "signatureProductionProvince";//$NON-NLS-1$
 
     /**
      * C&oacute;digo postal en el que se realiza la firma. <br>
      * Propiedad compartida con CAdES y PAdES.
      */
-    static final String SIGNATURE_PRODUCTION_POSTAL_CODE = "signatureProductionPostalCode";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_POSTAL_CODE = "signatureProductionPostalCode";//$NON-NLS-1$
 
     /**
      * Pa&iacute;s en el que se realiza la firma. <br>
      * Propiedad compartida con CAdES y PAdES.
      */
-    static final String SIGNATURE_PRODUCTION_COUNTRY = "signatureProductionCountry";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_COUNTRY = "signatureProductionCountry";//$NON-NLS-1$
 
     /**
      * N&uacute;mero de CommitmentTypeIndications a a&ntilde;adir a la firma
      * XAdES. En los par&uacute;metros siguientes, los CommitmentTypeIndications
      * se numeran a partir de 0 (cero).
      */
-    static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
 
     /**
      * Prefijo de las claves con las que se indican las propiedades de los <i>Commitment
@@ -324,7 +327,7 @@ public final class XAdESExtraParams {
      *  <li>commitmentTypeIndication<i>n</i>DocumentationReferences</li>
      * </ul>
      */
-    static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication"; //$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication"; //$NON-NLS-1$
 
     /**
      * Tipo de <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
@@ -340,12 +343,12 @@ public final class XAdESExtraParams {
      * <br>
      * Propiedad compartida con CAdES.
      */
-    static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
 
     /**
      * Descripci&oacute;n textual del CommitmentTypeIndication n&uacute;mero n (atributo opcional).
      */
-    static final String COMMITMENT_TYPE_INDICATION_DESCRIPTION = "Description";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_DESCRIPTION = "Description";//$NON-NLS-1$
 
     /**
      * Lista de URL separadas por el car&aacute;cter '<i>|</i>' que se aportan como referencias
@@ -354,7 +357,7 @@ public final class XAdESExtraParams {
      * Las URL de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya
      * que este se usa como separador)
      */
-    static final String COMMITMENT_TYPE_INDICATION_DOCUMENTATION_REFERENCE = "DocumentationReferences"; //$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_DOCUMENTATION_REFERENCE = "DocumentationReferences"; //$NON-NLS-1$
 
     /**
      * Lista de indicadores textuales separados por el car&aacute;cter '|' que se aportan como calificadores
@@ -363,7 +366,7 @@ public final class XAdESExtraParams {
      * <br>
      * Propiedad compartida con CAdES.
      */
-    static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers"; //$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers"; //$NON-NLS-1$
 
     // Definicion de las URI para los Commitment Type Identifiers:
     // http://uri.etsi.org/01903/v1.2.2/ts_101903v010202p.pdf
@@ -410,7 +413,6 @@ public final class XAdESExtraParams {
      * Nombre del prefijo en el namespace en el nodo ra&iacute;z de la firma.
      */
     public static final String ROOT_XML_NODE_NAMESPACE_PREFIX = "RootXmlNodeNamespacePrefix"; //$NON-NLS-1$
-
 
     /**
      * Par&aacute;metro interno (no se puede usar desde el exterior) para desactivar la validaci&oacute;n del
