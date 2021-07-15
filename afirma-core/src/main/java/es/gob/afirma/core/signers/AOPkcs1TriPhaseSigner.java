@@ -31,6 +31,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
  * datos a firmar se obtengan desde el servidor trifasico en lugar del cliente. */
 public class AOPkcs1TriPhaseSigner implements AOSigner {
 
+	/** <i>Logger</i> para la clase y sus derivadas. */
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
@@ -78,11 +79,13 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 
 	private final String signFormat;
 
+	/** Construye un manejador de firmas trif&aacute;sicas para un determinado formato.
+	 * @param format Formato de firma. */
 	protected AOPkcs1TriPhaseSigner(final String format) {
 		this.signFormat = format;
 	}
 
-	/** Construye un manejador de firmas XAdES trif&aacute;sicas. */
+	/** Construye un manejador de firmas trif&aacute;sicas para firmas PKCS#1. */
 	public AOPkcs1TriPhaseSigner() {
 		this(AOSignConstants.SIGN_FORMAT_PKCS1);
 	}

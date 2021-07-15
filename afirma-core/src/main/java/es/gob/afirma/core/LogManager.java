@@ -52,7 +52,9 @@ public final class LogManager {
 		OTHER
 	}
 
+	/** Subdirectorio por defecto donde se guarda el <i>log</i>. */
 	public static final String SUBDIR = ".afirma"; //$NON-NLS-1$
+
 	private static final String LOG_FILE_NAME = "%a.afirma.log.xml"; //$NON-NLS-1$
 	private static final String LOG_FILE_PATH = "%h/" + SUBDIR; //$NON-NLS-1$
 
