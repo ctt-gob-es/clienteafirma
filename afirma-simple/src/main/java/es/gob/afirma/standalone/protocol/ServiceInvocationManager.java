@@ -183,9 +183,9 @@ public final class ServiceInvocationManager {
 
 		final String[] portsText = ps.split(","); //$NON-NLS-1$
 		final int[] ports = new int[portsText.length];
-		for (int i=0; i<portsText.length; i++) {
+		for (int i = 0; i < portsText.length; i++) {
 			try {
-				ports[i] = Integer.parseInt(portsText[i]);
+				ports[i] = Math.abs(Integer.parseInt(portsText[i]));
 			}
 			catch(final Exception e) {
 				throw new IllegalArgumentException(
@@ -193,9 +193,23 @@ public final class ServiceInvocationManager {
 				, e);
 			}
 		}
-		final String idSession = urlParams.get(IDSESSION);
-		if(idSession != null ){
+
+		String idSession = urlParams.get(IDSESSION);
+		if (idSession != null && !idSession.isEmpty()){
 		    LOGGER.info("Se ha recibido un idSesion para la transaccion: " + idSession); //$NON-NLS-1$
+		    // El ID de sesion solo puede estar conformado por numeros. Usar otra cadena nos expondria
+		    // a una injeccion de codigo en los AppleScripts que se ejecuten con el
+		    boolean valid = true;
+		    for (final char c : idSession.toCharArray()) {
+		    	if (!Character.isDigit(c)) {
+		    		valid = false;
+		    		break;
+		    	}
+		    }
+		    if (!valid) {
+		    	LOGGER.info("No se ha proporcionado un id de sesion valido"); //$NON-NLS-1$
+		    	idSession = null;
+		    }
 		}
 		else {
             LOGGER.info("No se utilizara idSesion durante la transaccion"); //$NON-NLS-1$

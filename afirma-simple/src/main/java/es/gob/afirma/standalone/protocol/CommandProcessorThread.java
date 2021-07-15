@@ -13,7 +13,10 @@ import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Base64;
 
-
+/**
+ * Hilo para la recepci&oacute;n de peticiones de operaciones de AutoFirma
+ * a trav&eacute;s de un socket.
+ */
 class CommandProcessorThread extends Thread {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

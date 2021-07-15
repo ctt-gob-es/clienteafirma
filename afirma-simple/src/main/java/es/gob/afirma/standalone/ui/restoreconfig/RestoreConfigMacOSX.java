@@ -291,39 +291,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/** Detecta si el proceso de Firefox est&aacute; abierto.
-	 * @return <code>true</code> si el proceso de Firefox est&aacute; abierto,
-	 *         <code>false</code> en caso contrario. */
-	private static boolean isChromeOpen() {
-
-		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa de Firefox
-		try {
-			final ProcessBuilder psProcessBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
-			final Process ps = psProcessBuilder.start();
-
-			String line;
-			try (
-					final InputStream resIs = ps.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					if (line.contains("Google Chrome.app")) { //$NON-NLS-1$
-						return true;
-					}
-				}
-			}
-		}
-		catch (final IOException e) {
-			LOGGER.warning("No se pudo completar la deteccion del proceso de Firefox. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
-		}
-
-		return false;
-	}
-
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
 	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL,
@@ -391,23 +358,23 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 				userDirs = null;
 			}
 			else {
-				userDirs = new ArrayList<>();
-				try (
-						final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
-						final BufferedReader resReader = new BoundedBufferedReader(
-								new InputStreamReader(resIs),
-								2048, // Maximo 2048 lineas de salida (256 perfiles)
-								2048 // Maximo 2048 caracteres por linea
-								);
-						) {
-					String line;
-					while ((line = resReader.readLine()) != null) {
-						if (line.startsWith(USER_DIR_LINE_PREFIX)){
-							userDirs.add(line.substring(USER_DIR_LINE_PREFIX.length()));
-						}
+			userDirs = new ArrayList<>();
+			try (
+					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
+					final BufferedReader resReader = new BoundedBufferedReader(
+							new InputStreamReader(resIs),
+							2048, // Maximo 2048 lineas de salida (256 perfiles)
+							2048 // Maximo 2048 caracteres por linea
+							);
+					) {
+				String line;
+				while ((line = resReader.readLine()) != null) {
+					if (line.startsWith(USER_DIR_LINE_PREFIX)){
+						userDirs.add(line.substring(USER_DIR_LINE_PREFIX.length()));
 					}
 				}
 			}
+		}
 		}
 		catch (final IOException | InterruptedException e) {
 			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
@@ -503,8 +470,9 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
-			addExexPermissionsToFile(new File(mac_script_path));
-			executeScript(mac_script_path, true, true);
+			final File scriptFile = new File(mac_script_path);
+			addExexPermissionsToFile(scriptFile);
+			MacUtils.executeScriptFile(scriptFile, true, true);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
@@ -852,38 +820,57 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		return option == JOptionPane.OK_OPTION;
 	}
 
-	/** Detecta si el proceso de Firefox est&aacute; abierto.
-	 * @return <code>true</code> si el proceso de Firefox est&aacute; abierto,
+	/** Detecta si Firefox est&aacute; abierto.
+	 * @return <code>true</code> si Firefox est&aacute; abierto,
 	 *         <code>false</code> en caso contrario. */
 	private static boolean isFirefoxOpen() {
 
-		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa de Firefox
+		// Comprobamos si esta abierto el proceos de Firefox
 		try {
-			final ProcessBuilder psProcessBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
-			final Process ps = psProcessBuilder.start();
+			return checkProcess("Firefox.app"); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
+		}
+		return false;
+	}
 
+	/** Detecta si Chrome est&aacute; abierto.
+	 * @return <code>true</code> si Chrome est&aacute; abierto,
+	 *         <code>false</code> en caso contrario. */
+	private static boolean isChromeOpen() {
+
+		// Comprobamos si esta abierto el proceos de Chrome
+		try {
+			return checkProcess("Google Chrome.app"); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
+		}
+		return false;
+	}
+
+	private static boolean checkProcess(final String processName) throws IOException {
+
+		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa del proceso
+		final ProcessBuilder pBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
+		final Process ps = pBuilder.start();
+
+		try (
+				final InputStream resIs = ps.getInputStream();
+				final BufferedReader resReader = new BoundedBufferedReader(
+						new InputStreamReader(resIs),
+						256, // Maximo 256 lineas de salida
+						1024 // Maximo 1024 caracteres por linea
+						);
+				) {
 			String line;
-			try (
-					final InputStream resIs = ps.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					if (line.contains("Firefox.app") //$NON-NLS-1$
-							|| line.contains("FirefoxNightly.app") //$NON-NLS-1$
-							|| line.contains("FirefoxDeveloperEdition.app")) { //$NON-NLS-1$
-						return true;
-					}
+			while ((line = resReader.readLine()) != null) {
+				if (line.contains(processName)) {
+					return true;
 				}
 			}
 		}
-		catch (final IOException e) {
-			LOGGER.warning("No se pudo completar la deteccion del proceso de Firefox. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
-		}
-
 		return false;
 	}
 

@@ -412,7 +412,7 @@ public class TestPAdES {
         }
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-        final AOSigner signer = new AOPDFSigner();
+        final AOPDFSigner signer = new AOPDFSigner();
 
         String prueba;
 

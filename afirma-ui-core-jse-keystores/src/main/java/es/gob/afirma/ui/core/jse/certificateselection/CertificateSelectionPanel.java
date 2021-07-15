@@ -212,7 +212,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				openButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
 				openButton.setBackground(Color.WHITE);
 				this.add(openButton, c);
-			}
+						}
 
 
 			// Boton para el cambio de vista de certificados
@@ -508,6 +508,12 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.addMouseListener(listener);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public void valueChanged(final ListSelectionEvent e) {
+		this.selectedIndex = this.certList.getSelectedIndex();
+	}
+
 	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
 	private static final class CertListCellRendered implements ListCellRenderer<CertificateLine> {
 
@@ -538,12 +544,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public void valueChanged(final ListSelectionEvent e) {
-		this.selectedIndex = this.certList.getSelectedIndex();
-	}
-
 	/** Manejador de eventos de raton para la lista de certificados. */
 	private final class CertLinkMouseListener extends MouseAdapter {
 
@@ -558,7 +558,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		public void mouseClicked(final MouseEvent me) {
 			final JList<?> tmpList = (JList<?>) me.getSource();
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
-			if (tmpLine != null &&
+			if (tmpLine != null && tmpLine.getCertificateLinkBounds() != null &&
 				me.getClickCount() == 1 &&
 						me.getY() < CERT_LIST_ELEMENT_HEIGHT * tmpList.getModel().getSize() &&
 					tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
@@ -607,7 +607,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final String certView = pref.get(PREFERENCE_CERT_VIEW, null);
 			if (certView != null) {
 				view = CertificateLineView.valueOf(certView);
-			}
+}
 		}
 		catch (final Exception e) {
 			view = null;
