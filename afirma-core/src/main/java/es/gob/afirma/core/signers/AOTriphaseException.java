@@ -38,14 +38,24 @@ public class AOTriphaseException extends AOException {
 		super(msg, cause);
 	}
 
+	/** Establece la excepci&oacute;n generada en el servidor cuando este ha sido la causa del problema.
+	 * @param serverExceptionClassname Nombre de la clase de la excepci&oacute;n generada en el servidor. */
 	public void setServerExceptionClassname(final String serverExceptionClassname) {
 		this.serverExceptionClassname = serverExceptionClassname;
 	}
 
+	/** Obtiene la excepci&oacute;n generada en el servidor cuando este ha sido la causa del problema.
+	 * @return Nombre de la clase de la excepci&oacute;n generada en el servidor o <code>null</code>
+	 *         si el error no est&aacute; relacionado con problemas en el servidor. */
 	public String getServerExceptionClassname() {
 		return this.serverExceptionClassname;
 	}
 
+	/** Obtiene la excepci&oacute;n que se&ntilde;ala un error durante un proceso de firma trif&aacute;fica
+	 * a partir del mensaje recibido del servidor.
+	 * @param msg Mensaje recibido del servidor.
+	 * @return Excepci&oacute;n que se&ntilde;ala un error durante un proceso de firma trif&aacute;fica
+	 *         a partir del mensaje recibido del servidor. */
 	public static AOTriphaseException parseException(final String msg) {
 		AOTriphaseException e;
 		final int sepPos = msg.indexOf(":"); //$NON-NLS-1$
