@@ -336,7 +336,8 @@ final class ProtocolInvocationLauncherSign {
 
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
 		// abandone el soporte de XAdES explicitas)
-		if (cryptoOperation == Operation.SIGN && isXadesExplicitConfigurated(format, extraParams)) {
+		if (cryptoOperation == Operation.SIGN && isXadesExplicitConfigurated(format, extraParams)
+				&& !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_TRI)) {
 			LOGGER.warning(
 				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
 			);
