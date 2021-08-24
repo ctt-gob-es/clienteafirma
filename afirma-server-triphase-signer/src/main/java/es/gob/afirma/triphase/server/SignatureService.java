@@ -13,12 +13,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
@@ -156,6 +158,12 @@ public final class SignatureService extends HttpServlet {
 				throw new RuntimeException(
 						"No se ha podido inicializar el DocumentManager. Debe tener un constructor vacio o que reciba un Properties: " + e2, e //$NON-NLS-1$
 						);
+			}
+			try {
+				final Method initMethod = docManagerClass.getMethod("init", Properties.class); //$NON-NLS-1$
+				initMethod.invoke(docManager, ConfigManager.getConfig());
+			} catch (final Exception e2) {
+				LOGGER.warning("El DocumentManager no permitir recibir configuracion ni en un contructor ni en un metodo init, asi que no se configurara"); //$NON-NLS-1$
 			}
 		}
 
@@ -303,7 +311,6 @@ public final class SignatureService extends HttpServlet {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Se han indicado una politica de firma y un formato incompatibles: "  + e); //$NON-NLS-1$
-
 			}
 
 			// Obtenemos los parametros adicionales para la firma
@@ -378,10 +385,27 @@ public final class SignatureService extends HttpServlet {
 							"Recuperado documento de " + docBytes.length + " octetos"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (final Throwable e) {
-					LOGGER.warning("Error al recuperar el documento: " + e); //$NON-NLS-1$
+					LOGGER.log(Level.WARNING, "Error al recuperar el documento", e); //$NON-NLS-1$
 					out.print(ErrorManager.getErrorMessage(14) + ": " + new AOTriphaseException(e.toString(), e)); //$NON-NLS-1$
 					out.flush();
 					return;
+				}
+
+				// XXX: Si se pide una firma XAdES explicita, se firmara el hash de los datos en
+				// lugar de los propios datos. Hacemos el cambio nada mas recuperarlos. Si se ha
+				// activado la cache, lo que se cachee sera el hash. Esto se deberia eliminar
+				// cuando se abandone el soporte de XAdES explicitas.
+				if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation) && isXadesExplicitConfigurated(format, extraParams)) {
+					LOGGER.warning(
+						"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+					);
+					try {
+						docBytes = MessageDigest.getInstance("SHA1").digest(docBytes); //$NON-NLS-1$
+						extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+					} catch (final Exception e) {
+						LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+							+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+					}
 				}
 			}
 
@@ -675,6 +699,16 @@ public final class SignatureService extends HttpServlet {
 			throws NoSuchAlgorithmException, InvalidKeyException, CertificateEncodingException,
 			IllegalStateException {
 
+		// TODO: Integrar la generacion de HMAC con salto
+//		SecureRandom srandom = new SecureRandom();
+//		byte[] salt = new byte[8];
+//		srandom.nextBytes(salt);
+//
+//		char[] password = ...;
+//		SecretKeyFactory factory = SecretKeyFactory.getInstance(algo);
+//		KeySpec spec = new PBEKeySpec(password, salt, 10000, 128);
+//		SecretKey key = factory.generateSecret(spec);
+
 		final SecretKeySpec key = new SecretKeySpec(ConfigManager.getHMacKey().getBytes(CHARSET), HMAC_ALGORITHM);
 		for (final TriSign triSign : triphaseData.getTriSigns()) {
 
@@ -731,6 +765,8 @@ public final class SignatureService extends HttpServlet {
 			if (verificationHMac == null) {
 				throw new InvalidVerificationCodeException("Alguna de las firmas no contenida el codigo de verificacion"); //$NON-NLS-1$
 			}
+
+			//TODO: Integrar la validacion de HMAC con salto
 
 			final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
 
@@ -790,5 +826,25 @@ public final class SignatureService extends HttpServlet {
 		public InvalidVerificationCodeException(final String msg, final Throwable cause) {
 			super(msg, cause);
 		}
+	}
+
+	/**
+	 * Identifica cuando se ha configurado una firma con el formato XAdES y la
+	 * propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma
+	 * correcta pero, por compatibilidad con los tipos de firmas del Applet pesado,
+	 * se ha incluido aqu&iacute;.
+	 * @param format Formato declarado para la firma.
+	 * @param config Par&aacute;metros adicionales declarados para la firma.
+	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>,
+	 *         {@code false} en caso contrario.
+	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES
+	 *             expl&iacute;citas.
+	 */
+	@Deprecated
+	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
+		return format != null
+				&& format.toLowerCase().startsWith("xades") //$NON-NLS-1$
+				&& config != null
+				&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")); //$NON-NLS-1$
 	}
 }

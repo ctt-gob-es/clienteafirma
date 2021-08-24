@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -24,8 +25,10 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyExcepti
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.batch.SingleSignConstants;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.TriPhaseHelper;
+import es.gob.afirma.signers.batch.xml.LegacyFunctions;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -132,6 +135,22 @@ final class JSONSingleSignPostProcessor {
 
 		//TODO: Deshacer cuando se permita la generacion de firmas baseline
 		extraParams.remove("profile"); //$NON-NLS-1$
+
+		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
+		// abandone el soporte de XAdES explicitas)
+		if (sSign.getSubOperation() == SignSubOperation.SIGN
+				&& LegacyFunctions.isXadesExplicitConfigurated(sSign.getSignFormat().name(), extraParams)) {
+			LOGGER.warning(
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+			);
+			try {
+				docBytes = MessageDigest.getInstance("SHA1").digest(docBytes); //$NON-NLS-1$
+				extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (final Exception e) {
+				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+			}
+		}
 
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {

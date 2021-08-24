@@ -106,7 +106,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 
 		//Recuperamos el archivo del directorio de cache
 		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, this.expTime)) {
-			return data;
+			return null;
 		}
 
 		try (final InputStream fis = new FileInputStream(inFile)) {
@@ -114,6 +114,15 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 		}
 		catch (final IOException e) {
 			throw new IOException("Error al leer de cache el fichero: " + inFile.getAbsolutePath(), e); //$NON-NLS-1$
+		}
+
+		try {
+			if (!inFile.delete()) {
+				LOGGER.warning(String.format("El fichero %1s no se elimino la de cache", idCacheFile)); //$NON-NLS-1$
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.warning(String.format("El fichero %1s no se pudido eliminar la de cache: %2s", idCacheFile, e)); //$NON-NLS-1$
 		}
 
 		return data;

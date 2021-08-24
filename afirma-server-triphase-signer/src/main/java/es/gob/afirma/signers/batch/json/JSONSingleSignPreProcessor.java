@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -21,7 +22,9 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.SingleSignConstants;
+import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TriPhaseHelper;
+import es.gob.afirma.signers.batch.xml.LegacyFunctions;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -75,7 +78,7 @@ final class JSONSingleSignPreProcessor {
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = TriPhaseHelper.getTriPhasePreProcessor(sSign);
 
-		final byte[] docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
+		byte[] docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
 
 		Properties extraParams;
 		try {
@@ -89,6 +92,22 @@ final class JSONSingleSignPreProcessor {
 
 		// Eliminamos configuraciones que no deseemos que se utilicen externamente
 		extraParams.remove("profile"); //TODO: Deshacer cuando se permita la generacion de firmas baseline //$NON-NLS-1$
+
+		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
+		// abandone el soporte de XAdES explicitas)
+		if (sSign.getSubOperation() == SignSubOperation.SIGN
+				&& LegacyFunctions.isXadesExplicitConfigurated(sSign.getSignFormat().name(), extraParams)) {
+			LOGGER.warning(
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+			);
+			try {
+				docBytes = MessageDigest.getInstance("SHA1").digest(docBytes); //$NON-NLS-1$
+				extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+			} catch (final Exception e) {
+				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+			}
+		}
 
 		// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
         final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty(EXTRA_PARAM_CHECK_SIGNATURES));
