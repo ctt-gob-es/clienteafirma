@@ -19,6 +19,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.AlgorithmMethod;
@@ -50,8 +51,6 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 public final class ValidateXMLSignature implements SignValider {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-	private static final SignValidity KO = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
 
     /** Valida una firma XML y las fechas de validez de los certificados.
      * @param sign Firma a validar
@@ -85,67 +84,69 @@ public final class ValidateXMLSignature implements SignValider {
         }
 
         try {
+        	for (int i = 0; i < nl.getLength(); i++) {
+        		final DOMValidateContext valContext = new DOMValidateContext(
+        				new KeyValueKeySelector(),
+        				nl.item(i)
+        				);
 
-        	final DOMValidateContext valContext = new DOMValidateContext(
-    			new KeyValueKeySelector(),
-    			nl.item(0)
-			);
-        	final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-            if (!signature.validate(valContext)) {
-            	LOGGER.info("La firma es invalida"); //$NON-NLS-1$
-            	return KO;
-            }
-            if (!signature.getSignatureValue().validate(valContext)) {
-            	LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
-            	return KO;
-            }
+        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+        		if (!signature.validate(valContext)) {
+        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+        			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        		}
+        		if (!signature.getSignatureValue().validate(valContext)) {
+        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+        			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        		}
 
-            if (checkCertificates) {
-				final XMLSignatureFactory certs = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-				final XMLSignature signature2 = certs.unmarshalXMLSignature(valContext);
-				final KeyInfo keyInfo = signature2.getKeyInfo();
-				X509Certificate certImpl = null;
-				final Iterator<?> iter = keyInfo.getContent().iterator();
-				while (iter.hasNext()) {
-					final XMLStructure kiType = (XMLStructure) iter.next();
-					//Validamos la fecha de expiracion y emision de los certificados
-					if (kiType instanceof X509Data) {
-						final X509Data xData = (X509Data) kiType;
-						final List<?> x509DataContent = xData.getContent();
-						for (int i1 = 0; i1 < x509DataContent.size(); i1++) {
-							if (x509DataContent.get(i1) instanceof X509Certificate) {
-								certImpl = (X509Certificate) x509DataContent.get(i1);
-								try {
-									certImpl.checkValidity();
-								}
-								catch (final CertificateExpiredException expiredEx) {
-									return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, expiredEx);
-								}
-								catch (final CertificateNotYetValidException notYetValidEx) {
-									return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, notYetValidEx);
-								}
-							}
-						}
-					}
-				}
-			}
+        		if (checkCertificates) {
+        			final XMLSignatureFactory certs = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+        			final XMLSignature signature2 = certs.unmarshalXMLSignature(valContext);
+        			final KeyInfo keyInfo = signature2.getKeyInfo();
+        			X509Certificate certImpl = null;
+        			final Iterator<?> iter = keyInfo.getContent().iterator();
+        			while (iter.hasNext()) {
+        				final XMLStructure kiType = (XMLStructure) iter.next();
+        				//Validamos la fecha de expiracion y emision de los certificados
+        				if (kiType instanceof X509Data) {
+        					final X509Data xData = (X509Data) kiType;
+        					final List<?> x509DataContent = xData.getContent();
+        					for (int i1 = 0; i1 < x509DataContent.size(); i1++) {
+        						if (x509DataContent.get(i1) instanceof X509Certificate) {
+        							certImpl = (X509Certificate) x509DataContent.get(i1);
+        							try {
+        								certImpl.checkValidity();
+        							}
+        							catch (final CertificateExpiredException expiredEx) {
+        								return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, expiredEx);
+        							}
+        							catch (final CertificateNotYetValidException notYetValidEx) {
+        								return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, notYetValidEx);
+        							}
+        						}
+        					}
+        				}
+        			}
+        		}
 
-			// Ahora miramos las referencias una a una
-			final Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
-			for (int j=0; i.hasNext(); j++) {
-				final Reference iNext = (Reference) i.next();
-				if (!iNext.validate(valContext)) {
-					LOGGER.info("La referencia " + j + " de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
-					return KO;
-				}
-			}
+        		// Ahora miramos las referencias una a una
+        		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
+        		while (it.hasNext()) {
+        			final Reference iNext = (Reference) it.next();
+        			if (!iNext.validate(valContext)) {
+        				LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+        				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        			}
+        		}
+        	}
+        }
+        catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
+        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null, e);
+        }
 
-			return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
-		}
-		catch (final Exception e) {
-			LOGGER.warning("No se ha podido validar la firma: " + e); //$NON-NLS-1$
-			return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
-		}
+        return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
 	}
 
     static final class KeyValueKeySelector extends KeySelector {
