@@ -405,13 +405,18 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		}
 
 		// Comprobamos que no se trate de un error
-		if (preSignResult.length > 8) {
-			final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
-			if (headMsg.startsWith(ERROR_PREFIX)) {
-				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
-				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg);
-			}
+		if (preSignResult.length <= 8) {
+			final String msg = new String(preSignResult, StandardCharsets.UTF_8);
+			LOGGER.warning("No se han obtenido datos de la prefirma: " + msg); //$NON-NLS-1$
+			throw new AOException("No se han obtenido datos de la prefirma"); //$NON-NLS-1$
+		}
+
+		// Comprobamos que la cabecera no se corresponda con un error
+		final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
+		if (headMsg.startsWith(ERROR_PREFIX)) {
+			final String msg = new String(preSignResult, StandardCharsets.UTF_8);
+			LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
+			throw buildInternalException(msg);
 		}
 
 		// ----------

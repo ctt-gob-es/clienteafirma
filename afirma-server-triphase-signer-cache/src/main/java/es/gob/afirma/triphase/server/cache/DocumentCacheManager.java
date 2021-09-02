@@ -17,7 +17,7 @@ import java.io.IOException;
 public interface DocumentCacheManager {
 
 	/**
-	 * Obtiene un documento de cach&eacute en base a su identificador.
+	 * Obtiene un documento de cach&eacute en base a su identificador y lo elimina.
 	 * @param id Identificador del documento.
 	 * @return Array con los datos del archivo cacheado o {@code null} si no se encontr&oacute;.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n.

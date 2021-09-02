@@ -224,6 +224,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		for (int i = 0; i < preSignature.getSignedInfos().size(); i++) {
 
+			// Datos necesarios para la ejecucion del restos de pasos de la firma trifasica
 			final Map<String, String> signConfig = new HashMap<>();
 
 			signConfig.put(
@@ -239,6 +240,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			// Pasamos como datos de sesion el documento base en donde se realizan las sustituciones,
 			// pero solo lo haremos en la primera prefirma ya que todos serian iguales
 			if (i == 0) {
+
 				signConfig.put(
 					PROPERTY_NAME_SCHEMA_BASE,
 					Base64.encode(
@@ -390,6 +392,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				throw new IllegalArgumentException("La propiedades adicionales no contienen la firma PKCS#1"); //$NON-NLS-1$
 			}
 
+			// Hacemos la sustitucion del PKCS#1 en la firma
 			xmlBase = xmlBase.replace(
 				XAdESTriPhaseSignerServerSide.REPLACEMENT_STRING.replace(
 					XAdESTriPhaseSignerServerSide.REPLACEMENT_CODE, Integer.toString(i)
@@ -398,8 +401,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 
-		// El XML resultante carece de las secciones de datos y KeyInfo, por lo que hay
-		// que recrearlas y volverlas a introducir
+		// El XML resultante carece de las secciones de datos, KeyInfo y
+		// signedProperties, por lo que hay que recrearlas y volverlas a
+		// introducir
 
 		final XmlPreSignResult preSignature;
 		try {

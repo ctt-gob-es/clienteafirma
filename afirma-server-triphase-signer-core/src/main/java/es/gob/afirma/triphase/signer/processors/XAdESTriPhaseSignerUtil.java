@@ -13,7 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -30,6 +29,7 @@ import org.xml.sax.SAXException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
+import es.gob.afirma.triphase.signer.xades.NodeDelimiter;
 
 final class XAdESTriPhaseSignerUtil {
 
@@ -38,7 +38,7 @@ final class XAdESTriPhaseSignerUtil {
 	}
 
 	private static final String DS_NAMESPACE_URL = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
-	private static final String SA_NAMESPACE_URL = "http://uri.etsi.org/01903#SignedProperties"; //$NON-NLS-1$
+	private static final String SIGNED_PROPERTIES_TYPE_SUFIX = "#SignedProperties"; //$NON-NLS-1$
 
 	private static final String USE_MANIFEST = "useManifest"; //$NON-NLS-1$
 
@@ -90,7 +90,7 @@ final class XAdESTriPhaseSignerUtil {
 
 		// Obtenemos los delimitadores que nos indican cual es el contenido comun que deberemos sacar de la firma
 		// recien generada para completar la firma original
-		final List<List<String>> elDeliSource =
+		final List<NodeDelimiter> elDeliSource =
 				getCommonContentDelimiters(docSourceReferences, docSource);
 
 		// Cargamos ambas firmas como cadenas para poder extraer los elementos tal como son
@@ -101,11 +101,9 @@ final class XAdESTriPhaseSignerUtil {
 		for (int i = 0; i < elDeliSource.size(); i++) {
 			base = base.replace(
 				String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)),
-				source.substring(
-					source.indexOf(elDeliSource.get(i).get(0)) + elDeliSource.get(i).get(0).length(),
-					source.indexOf(elDeliSource.get(i).get(1), source.indexOf(elDeliSource.get(i).get(0)) + elDeliSource.get(i).get(0).length())
-				)
+				getContent(source, elDeliSource.get(i))
 			);
+
 		}
 		return base.getBytes(docBase.getXmlEncoding());
 	}
@@ -155,7 +153,7 @@ final class XAdESTriPhaseSignerUtil {
 			ret = new String(xml);
 		}
 
-		final List<List<String>> delits = cleanContentDelimiters(
+		final List<NodeDelimiter> delits = cleanContentDelimiters(
 			XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
 				XAdESTriPhaseSignerUtil.getInmutableReferences(doc),
 				doc
@@ -163,15 +161,12 @@ final class XAdESTriPhaseSignerUtil {
 			ret
 		);
 
+		// Reemplazamos todo el contenido que haya entre los delimitadores por
+		// una cadena de reemplazo que podamos identificar posteriormente
 		for (int i = 0; i < delits.size(); i++) {
-			final List<String> delPair = delits.get(i);
 			ret = ret.replace(
-				ret.substring(
-					ret.indexOf(delPair.get(0)) + delPair.get(0).length(),
-					ret.indexOf(delPair.get(1), ret.indexOf(delPair.get(0)) + delPair.get(0).length())
-				),
-				String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i))
-			);
+					getContent(ret, delits.get(i)),
+					String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)));
 		}
 
 		if (doc.getXmlEncoding() != null) {
@@ -195,11 +190,11 @@ final class XAdESTriPhaseSignerUtil {
 	 * @param or Lista original de delimitadores de nodos
 	 * @param orXml XML en su forma de texto.
 	 * @return Lista de delimitadores de nodos con los delimitadores correctos. */
-	private static List<List<String>> cleanContentDelimiters(final List<List<String>> or, final String orXml) {
-		final List<List<String>> ret = new ArrayList<>(or.size());
-		for (final List<String> del : or) {
+	private static List<NodeDelimiter> cleanContentDelimiters(final List<NodeDelimiter> or, final String orXml) {
+		final List<NodeDelimiter> ret = new ArrayList<>(or.size());
+		for (final NodeDelimiter del : or) {
 			// Las discordancias siempre estan en la apertura del nodo
-			final String orDel = del.get(0);
+			final String orDel = del.getOpenTag();
 			if (orXml.contains(orDel)) {
 				ret.add(del);
 			}
@@ -241,7 +236,8 @@ final class XAdESTriPhaseSignerUtil {
 				}
 
 				if (retDel != null) {
-					ret.add(Arrays.asList(new String[] { retDel, del.get(1) }));
+					del.setOpenTag(retDel);
+					ret.add(del);
 				}
 				else {
 					LOGGER.warning(
@@ -259,48 +255,88 @@ final class XAdESTriPhaseSignerUtil {
 	 * @param uris Listado de referencias.
 	 * @param doc Documento de firma XML al que pertenecen las referencias.
 	 * @return Listado de nodos. */
-	private static List<List<String>> getCommonContentDelimiters(final List<String> uris,
+	private static List<NodeDelimiter> getCommonContentDelimiters(final List<String> uris,
 			                                                     final Document doc) {
 		final String encoding = doc.getInputEncoding();
-		final List<List<String>> ret = new ArrayList<>();
+		final List<NodeDelimiter> ret = new ArrayList<>();
 		for (final String uriValue : uris) {
 			final Node node = CustomUriDereferencer.getNodeByInternalUriReference(uriValue, doc);
 			if (node != null) {
-				if (encoding != null) {
-					try {
-						ret.add(
-							getFirstTagPair(
-								cleanNode(
-									new String(
-										Utils.writeXML(node, null, null, null),
-										encoding
-									)
-								)
-							)
-						);
-					}
-					catch (final UnsupportedEncodingException e) {
-						ret.add(
-							getFirstTagPair(
-									cleanNode(
-									new String(Utils.writeXML(node, null, null, null))
-								)
-							)
-						);
-					}
-				}
-				else {
-					ret.add(
-						getFirstTagPair(
-								cleanNode(
-								new String(Utils.writeXML(node, null, null, null))
-							)
-						)
-					);
-				}
+				final String nodeContent = getNodeAsText(node, encoding);
+				ret.add(getDelimiterTags(nodeContent));
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * Convierte un nodo a texto.
+	 * @param node Nodo que se desea obtener como texto.
+	 * @param encoding Codificaci&oacute;n del texto (deber&iacute;a coincidir
+	 * con la del XML al que pertenece el nodo).
+	 * @return Nodo en forma de texto.
+	 */
+	private static String getNodeAsText(final Node node, final String encoding) {
+
+		String content;
+		final byte[] nodeContent = Utils.writeXML(node, null, null, null);
+		if (encoding != null) {
+			try {
+				content = new String(nodeContent, encoding);
+			} catch (final UnsupportedEncodingException e) {
+				content = new String(nodeContent);
+			}
+		}
+		else {
+			content = new String(nodeContent);
+		}
+
+		return content;
+	}
+
+	/**
+	 * Convierte un nodo a texto.
+	 * @param node Nodo que se desea obtener como texto.
+	 * @param encoding Codificaci&oacute;n del texto (deber&iacute;a coincidir
+	 * con la del XML al que pertenece el nodo).
+	 * @return Nodo en forma de texto.
+	 */
+	private static String getContent(final String text, final NodeDelimiter delimiter) {
+
+		final String openTag = delimiter.getOpenTag();
+		final String closeTag = delimiter.getCloseTag();
+
+		final int openTagIdx = text.indexOf(openTag);
+
+		return text.substring(
+				openTagIdx + openTag.length(),
+				text.indexOf(closeTag, openTagIdx + openTag.length()));
+	}
+
+	/**
+	 * Obtiene las etiquetas que de inicio y cierre del fragmento de XML proporcionado.
+	 * @param nodeContent Fragmento de XML.
+	 * @return Etiquetas de apertura y cierre del XML.
+	 */
+	private static NodeDelimiter getDelimiterTags(final String nodeContent) {
+		return getFirstTagPair(cleanNode(nodeContent));
+	}
+
+	/** Construye una lista con la etiqueta XML del nodo por el que empieza el texto XML y la
+	 * etiqueta del nodo XML con la que termina.
+	 * @param xml Texto XML.
+	 * @return Delimitador con la primera y &uacute;ltima etiqueta del XML. */
+	private static NodeDelimiter getFirstTagPair(final String xml) {
+		if (xml == null) {
+			throw new IllegalArgumentException("La entrada no puede ser nula"); //$NON-NLS-1$
+		}
+		if (!xml.contains("<") || !xml.contains(">")) { //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IllegalArgumentException("La entrada no tiene ninguna etiqueta XML"); //$NON-NLS-1$return xml;
+		}
+
+		final String openTag = xml.substring(0, xml.indexOf(">") + 1).trim(); //$NON-NLS-1$
+		final String closeTag = xml.substring(xml.lastIndexOf("<")).trim(); //$NON-NLS-1$
+		return new NodeDelimiter(openTag, closeTag);
 	}
 
 	private static Document getDocumentFromBytes(final byte[] data) throws SAXException,
@@ -338,7 +374,8 @@ final class XAdESTriPhaseSignerUtil {
         	final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
         	for(int j = 0; j < rf.getLength(); j++) {
         		final Node node = rf.item(j);
-        		if (!SA_NAMESPACE_URL.equals(((Element) node).getAttribute("Type"))) { //$NON-NLS-1$
+        		final String type = ((Element) node).getAttribute("Type"); //$NON-NLS-1$
+        		if (type == null || !type.endsWith(SIGNED_PROPERTIES_TYPE_SUFIX)) {
         			final String uri = ((Element) node).getAttribute("URI"); //$NON-NLS-1$
         			if (uri != null) {
         				unmutableReferences.add(uri);
@@ -385,22 +422,5 @@ final class XAdESTriPhaseSignerUtil {
 			xmlCleaned = xmlCleaned.substring(0, n1) + xmlCleaned.substring(n2 + 1);
 		}
 		return xmlCleaned;
-	}
-
-	/** Construye una lista con la etiqueta XML del nodo por el que empieza el texto XML y la
-	 * etiqueta del nodo XML con la que termina.
-	 * @param xml Texto XML.
-	 * @return Listado de 2 elementos: la primera y &uacute;ltima etiqueta del XML. */
-	private static List<String> getFirstTagPair(final String xml) {
-		if (xml == null) {
-			throw new IllegalArgumentException("La entrada no puede ser nula"); //$NON-NLS-1$
-		}
-		if (!xml.contains("<") || !xml.contains(">")) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new IllegalArgumentException("La entrada no tiene ninguna etiqueta XML"); //$NON-NLS-1$return xml;
-		}
-		final List<String> ret = new ArrayList<>(2);
-		ret.add(xml.substring(0, xml.indexOf(">") + 1).trim()); //$NON-NLS-1$
-		ret.add(xml.substring(xml.lastIndexOf("<")).trim()); //$NON-NLS-1$
-		return ret;
 	}
 }
