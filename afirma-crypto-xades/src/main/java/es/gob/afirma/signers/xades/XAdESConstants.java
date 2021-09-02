@@ -7,7 +7,7 @@ import javax.xml.crypto.dsig.DigestMethod;
  */
 public class XAdESConstants {
 
-	static final String TAG_SIGNED_PROPERTIES = "SignedProperties"; //$NON-NLS-1$
+	public static final String TAG_SIGNED_PROPERTIES = "SignedProperties"; //$NON-NLS-1$
 
 	static final String TAG_QUALIFYING_PROPERTIES = "QualifyingProperties"; //$NON-NLS-1$
 

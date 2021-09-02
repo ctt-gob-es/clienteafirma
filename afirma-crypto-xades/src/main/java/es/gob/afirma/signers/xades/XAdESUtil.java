@@ -15,11 +15,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -100,9 +102,10 @@ public final class XAdESUtil {
     }
 
     /**
-     * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES compatibles
-     * con la cofirma a realizar. Si el metodo finaliza sin lanzar ninguna excepci&oacute;n, las firmas
-     * del documento son correctas. Tambi&eacute;n se comprobara si es una firma de tipo Baseline EN
+     * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES soportadas. Se
+     * considerar&aacute; que no est&aacute;n soportadas si no hay mezcla de versiones de firmas
+     * XAdES y si la versi&oacute;n declarada est&aacute; soportada. Tambi&eacute;n se comprobara
+     * si es una firma de tipo Baseline EN para indicarlo mediante el valor de retorno.
      * @param signNodes Listado de nodos de firma.
      * @return {@code true} En caso de que sea una firma Baseline EN, false en caso contrario.
      * @throws AOFormatFileException Se lanza en caso de que no se pueda identificar la versi&oacute;n
@@ -111,6 +114,10 @@ public final class XAdESUtil {
     static boolean checkCompatibility(final List<Node> signNodes) throws AOInvalidFormatException {
 
     	boolean isBaselineENSign = false;
+
+    	// Conjunto con los distintos espacios de nombre XAdES que se han encontrado
+    	// a lo largo del listado de nodos de firma
+    	final Set<String> xadesNamepaceUris = new HashSet<>();
 
         for (final Node signNode : signNodes) {
 
@@ -124,6 +131,7 @@ public final class XAdESUtil {
         		for (final String xadesNameSpace : SUPPORTED_XADES_NAMESPACE_URIS) {
         			if (xadesNameSpace.equals(namespaceUri)) {
         				existingNamespace = true;
+        				xadesNamepaceUris.add(namespaceUri);
         			}
         		}
 
@@ -131,21 +139,22 @@ public final class XAdESUtil {
             		throw new AOInvalidFormatException("Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
             	}
 
-            	if (!XAdESConstants.NAMESPACE_XADES_1_3_2.equals(namespaceUri)) {
-            		throw new AOInvalidFormatException("El documento contiene firmas con versiones distintas a la 1.3.2"); //$NON-NLS-1$
-            	}
-
             	try {
                 	final Node signingCertificateNode = ((Element) qualifyingPropsList.item(i)).getChildNodes().item(0).getChildNodes().item(0).getChildNodes().item(1);
                 	final String localName = signingCertificateNode.getLocalName();
                 	final String signingCertNamespaceUri = signingCertificateNode.getNamespaceURI();
 
-                	if(XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(localName) && namespaceUri.equals(signingCertNamespaceUri)) {
+                	if (XAdESConstants.TAG_SIGNING_CERTIFICATE_V2.equals(localName) && namespaceUri.equals(signingCertNamespaceUri)) {
                 		isBaselineENSign = true;
                 	}
             	} catch(final Exception e) {
             		throw new AOInvalidFormatException("Error al intentar analizar el nodo SigningCertificateV2"); //$NON-NLS-1$
             	}
+        	}
+
+
+        	if (xadesNamepaceUris.size() > 1) {
+        		throw new AOInvalidFormatException("El documento contiene firmas con distintas versiones de XAdES"); //$NON-NLS-1$
         	}
         }
 

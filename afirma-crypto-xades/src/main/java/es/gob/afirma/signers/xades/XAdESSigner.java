@@ -384,8 +384,8 @@ public final class XAdESSigner {
 		// Documento final de firma
 		Document docSignature = null;
 
-		final String contentId = AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME + "-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-		final String styleId = AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME + "-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+		final String contentId = AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME + "-" + generateUUID(); //$NON-NLS-1$
+		final String styleId = AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME + "-" + generateUUID(); //$NON-NLS-1$
 		boolean isBase64 = false;
 		boolean wasEncodedToBase64 = false;
 		boolean avoidDetachedContentInclusion = false;
@@ -638,8 +638,8 @@ public final class XAdESSigner {
 			);
 		}
 
-		final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-		final String referenceStyleId = "StyleReference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+		final String referenceId = "Reference-" + generateUUID(); //$NON-NLS-1$
+		final String referenceStyleId = "StyleReference-" + generateUUID(); //$NON-NLS-1$
 
 		final List<Transform> transformList = new ArrayList<>();
 
@@ -723,7 +723,7 @@ public final class XAdESSigner {
 					)
 				);
 
-				final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+				final String objectId = "Object-" + generateUUID(); //$NON-NLS-1$
 				envelopingObject = fac.newXMLObject(
 						structures,
 						objectId,
@@ -748,7 +748,7 @@ public final class XAdESSigner {
 				// ************** Hojas de estilo ***********************************
 				// ******************************************************************
 				if (xmlStyle.getStyleElement() != null) {
-					final String objectStyleId = "StyleObject-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+					final String objectStyleId = "StyleObject-" + generateUUID(); //$NON-NLS-1$
 					envelopingStyleObject = fac.newXMLObject(
 						Collections.singletonList(
 							new DOMStructure(xmlStyle.getStyleElement())
@@ -1247,7 +1247,7 @@ public final class XAdESSigner {
 				pk,
 				algoUri,
 				referenceList,
-				"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
+				"Signature-" + generateUUID(), //$NON-NLS-1$
 				addKeyInfoKeyValue,
 				addKeyInfoKeyName,
 				addKeyInfoX509IssuerSerial,
@@ -1525,7 +1525,7 @@ public final class XAdESSigner {
 						extraParams.getProperty(XAdESExtraParams.URI_PREFIX + i),
 						md);
 
-				refData.setId("Reference-" + UUID.randomUUID().toString()); //$NON-NLS-1$
+				refData.setId("Reference-" + generateUUID()); //$NON-NLS-1$
 				refData.setMimeType(extraParams.getProperty(XAdESExtraParams.CONTENT_MIME_TYPE_PREFIX + i));
 				refData.setOid(extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID_PREFIX + i));
 				refData.setEncoding(extraParams.getProperty(XAdESExtraParams.CONTENT_ENCODING_PREFIX + i));
@@ -1624,5 +1624,13 @@ public final class XAdESSigner {
 			}
 		}
 		return ref;
+	}
+
+	/**
+	 * Genera un identificador aleatorio.
+	 * @return Identificador aleatorio.
+	 */
+	private static String generateUUID() {
+		return UUID.randomUUID().toString();
 	}
 }
