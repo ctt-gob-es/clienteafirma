@@ -85,6 +85,7 @@ import es.gob.afirma.standalone.plugins.SignOperation;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 import es.gob.afirma.standalone.plugins.SignResult;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 
@@ -257,11 +258,23 @@ final class ProtocolInvocationLauncherSign {
 		// Comprobamos si es necesario pedir datos de entrada al usuario
 		boolean needRequestData = false;
 		if (data == null) {
-			if (signer != null && signer instanceof OptionalDataInterface) {
+			if (signer instanceof OptionalDataInterface) {
 				needRequestData = ((OptionalDataInterface) signer).needData(extraParams);
 			} else {
 				needRequestData = true;
 			}
+		}
+
+		// Si el usuario lo pide (estableciendo una variable de entorno), mostramos los datos que va a firmar
+		try {
+			if (!needRequestData && Boolean.getBoolean("AFIRMA_SHOW_DATA_TO_SIGN")) { //$NON-NLS-1$
+				final DataDebugDialog ddd = new DataDebugDialog(data);
+				data = ddd.getData();
+				ddd.dispose();
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se pueden mostrar los datos a firmar: " + e); //$NON-NLS-1$
 		}
 
 		// Nombre del fichero firmado. Tomara valor solo si es el usuario quien selecciona
@@ -307,7 +320,7 @@ final class ProtocolInvocationLauncherSign {
 			try {
 				try (
 					final InputStream fis = new FileInputStream(selectedDataFile);
-					final InputStream bis = new BufferedInputStream(fis);
+					final InputStream bis = new BufferedInputStream(fis)
 				) {
 					data = AOUtil.getDataFromInputStream(bis);
 				}
@@ -337,7 +350,7 @@ final class ProtocolInvocationLauncherSign {
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
 		// abandone el soporte de XAdES explicitas)
 		if (cryptoOperation == Operation.SIGN && isXadesExplicitConfigurated(format, extraParams)
-				&& !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_TRI)) {
+				&& !AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
 			LOGGER.warning(
 				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
 			);
@@ -366,7 +379,7 @@ final class ProtocolInvocationLauncherSign {
 				// deben comprobar la validadez de las firmas previas para las operaciones de
 				// firma (PAdES, OOXML, etc.).
 				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
-						!(cryptoOperation == Operation.SIGN && validity.getError() == VALIDITY_ERROR.NO_SIGN)) {
+						(cryptoOperation != Operation.SIGN || validity.getError() != VALIDITY_ERROR.NO_SIGN)) {
 					LOGGER.severe("La firma indicada no es valida"); //$NON-NLS-1$
 					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
 					throw new SocketOperationException(errorCode);
@@ -402,7 +415,7 @@ final class ProtocolInvocationLauncherSign {
 		} catch (final AOCancelledOperationException e) {
 			LOGGER.info("El usuario ha cancelado el proceso de firma."); //$NON-NLS-1$
 			throw new VisibleSignatureMandatoryException(
-					"Es obligatorio mostrar la firma en el documento PDF"); //$NON-NLS-1$
+					"Es obligatorio mostrar la firma en el documento PDF", e); //$NON-NLS-1$
 		}
 
 		if (options.getSticky() && !options.getResetSticky()
@@ -560,11 +573,6 @@ final class ProtocolInvocationLauncherSign {
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
 			throw new SocketOperationException(errorCode);
 		}
-		catch (final BadPdfPasswordException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
-			throw new SocketOperationException(errorCode);
-		}
 		catch (final PdfHasUnregisteredSignaturesException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN;
@@ -575,7 +583,7 @@ final class ProtocolInvocationLauncherSign {
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED;
 			throw new SocketOperationException(errorCode);
 		}
-		catch (final PdfIsPasswordProtectedException e) {
+		catch (final BadPdfPasswordException | PdfIsPasswordProtectedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
 			throw new SocketOperationException(errorCode);
@@ -723,13 +731,9 @@ final class ProtocolInvocationLauncherSign {
 				AOSignConstants.SIGN_FORMAT_PDF_TRI, AOSignConstants.SIGN_FORMAT_PADES,
 				AOSignConstants.SIGN_FORMAT_PADES_TRI, AOSignConstants.PADES_SUBFILTER_BES,
 				AOSignConstants.PADES_SUBFILTER_BASIC);
-		if (!formatPadesList.contains(format)) {
-			return false;
-		}
-
 		// Comprobamos que se han incluido los parametros asociados a mostrar la
 		// firma.
-		if (!extraParams.containsKey(PdfExtraParams.VISIBLE_SIGNATURE)) {
+		if (!formatPadesList.contains(format) || !extraParams.containsKey(PdfExtraParams.VISIBLE_SIGNATURE)) {
 			return false;
 		}
 
@@ -771,9 +775,7 @@ final class ProtocolInvocationLauncherSign {
 			final String visibleSignature = extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE) != null
 					? extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE).toString()
 					: null;
-			final boolean want = visibleSignature != null
-					&& PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature)
-						? true : false;
+			final boolean want = PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature);
 
 			// Comprobamos si se han indicado la lista de atributos del area de firma
 			// visible.
@@ -801,8 +803,7 @@ final class ProtocolInvocationLauncherSign {
 		// Comprobamos que exista el parametro 'visibleAppearance'.
 		boolean customizable = false;
 		final String visibleAppearance = extraParams.getProperty(PdfExtraParams.VISIBLE_APPEARANCE);
-		if (visibleAppearance != null
-				&& PdfExtraParams.VISIBLE_APPEARANCE_VALUE_CUSTOM.equalsIgnoreCase(visibleAppearance)) {
+		if (PdfExtraParams.VISIBLE_APPEARANCE_VALUE_CUSTOM.equalsIgnoreCase(visibleAppearance)) {
 			customizable = true;
 		}
 
