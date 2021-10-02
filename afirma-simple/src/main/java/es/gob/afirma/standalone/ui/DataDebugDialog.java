@@ -36,16 +36,9 @@ public final class DataDebugDialog extends JDialog {
 
 	private byte[] data;
 
-	static boolean toLoad = true;
-
-	/** Construye un di&aacute;logo para la muestra de datos a firmar o datos a entregar como firma.
-	 * @param dataToSign Datos a firmar o datos a entregar como firma.
-	 * @param load <code>true</code> si se trata de datos a firmar, <code>false> si se trata de
-	 *             datos a entregar como firma. */
-	public DataDebugDialog(final byte[] dataToSign, final boolean load) {
-
-		toLoad = load;
-
+	/** Construye un di&aacute;logo para la muestra de datos a firmar.
+	 * @param dataToSign Datos a firmar. */
+	public DataDebugDialog(final byte[] dataToSign) {
 		if (dataToSign == null || dataToSign.length < 1) {
 			throw new IllegalArgumentException(
 				"Los datos a firmar no pueden ser nulos ni vacios" //$NON-NLS-1$
@@ -74,11 +67,11 @@ public final class DataDebugDialog extends JDialog {
 				public void keyPressed(final KeyEvent e) {
 		            if (e.getKeyCode() == KeyEvent.VK_R && e.isControlDown()) {
 		                final File newDataFile = AOUIFactory.getLoadFiles(
-	                		toLoad ? SimpleAfirmaMessages.getString("DataDebugDialog.7") : SimpleAfirmaMessages.getString("DataDebugDialog.10"), //$NON-NLS-1$ //$NON-NLS-2$
+	                		SimpleAfirmaMessages.getString("DataDebugDialog.7"), //$NON-NLS-1$
 	                		null,
 	                		null,
 	                		null,
-	                		toLoad ? SimpleAfirmaMessages.getString("DataDebugDialog.6") : SimpleAfirmaMessages.getString("DataDebugDialog.11"), //$NON-NLS-1$ //$NON-NLS-2$
+	                		SimpleAfirmaMessages.getString("DataDebugDialog.6"), //$NON-NLS-1$
 	                		false,
 	                		false,
 	                		null,
@@ -125,21 +118,18 @@ public final class DataDebugDialog extends JDialog {
 
 		final MimeHelper mh = new MimeHelper(dataToSign);
 
-		if (toLoad) {
-			String desc;
-			try {
-				desc = mh.getDescription();
-			}
-			catch (final IOException e1) {
-				LOGGER.warning(
-					"No se ha podido determinar el tipo de los datos a firmar, se usara binario: " + e1 //$NON-NLS-1$
-				);
-				desc = SimpleAfirmaMessages.getString("DataDebugDialog.0"); //$NON-NLS-1$
-			}
-			display.append(SimpleAfirmaMessages.getString("DataDebugDialog.1",  desc) + '\n'); //$NON-NLS-1$
-			display.append(SimpleAfirmaMessages.getString("DataDebugDialog.2", Integer.toString(dataToSign.length)) + '\n'); //$NON-NLS-1$
-			display.append(SimpleAfirmaMessages.getString("DataDebugDialog.3") + '\n'); //$NON-NLS-1$
+		String desc;
+		try {
+			desc = mh.getDescription();
 		}
+		catch (final IOException e1) {
+			LOGGER.warning(
+				"No se ha podido determinar el tipo de los datos a firmar, se usara binario: " + e1 //$NON-NLS-1$
+			);
+			desc = SimpleAfirmaMessages.getString("DataDebugDialog.0"); //$NON-NLS-1$
+		}
+		display.append(SimpleAfirmaMessages.getString("DataDebugDialog.1",  desc) + '\n'); //$NON-NLS-1$
+		display.append(SimpleAfirmaMessages.getString("DataDebugDialog.2", Integer.toString(dataToSign.length)) + '\n'); //$NON-NLS-1$
 		String mime;
 		try {
 			mime = mh.getMimeType();
@@ -150,6 +140,7 @@ public final class DataDebugDialog extends JDialog {
 			);
 			mime = "application/octet-stream"; //$NON-NLS-1$
 		}
+		display.append(SimpleAfirmaMessages.getString("DataDebugDialog.3") + '\n'); //$NON-NLS-1$
 		if (mime.contains("text") || mime.contains("xml")) { //$NON-NLS-1$ //$NON-NLS-2$
 			display.append(new String(dataToSign));
 		}
@@ -162,8 +153,8 @@ public final class DataDebugDialog extends JDialog {
 		}
 	}
 
-	/** Obtiene los datos.
-	 * @return Datos. */
+	/** Obtiene los datos a firmar.
+	 * @return Datos a firmar. */
 	public byte[] getData() {
 		return this.data;
 	}

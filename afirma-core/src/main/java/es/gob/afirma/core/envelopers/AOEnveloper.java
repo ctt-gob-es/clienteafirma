@@ -23,7 +23,7 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 /** Funcionalidades de sobres digitales. */
 public interface AOEnveloper {
 
-    /** Construye distintas estructuras PKCS#7.
+    /** Contruye distintas estructuras PKCS#7.
      * @param data
      *        Datos que se van a envolver.
      * @param digestAlgorithm

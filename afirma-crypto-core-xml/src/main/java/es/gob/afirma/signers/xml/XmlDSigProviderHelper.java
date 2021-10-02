@@ -100,7 +100,7 @@ public class XmlDSigProviderHelper {
      * @throws IllegalAccessException Cuando no se tiene acceso a la clase.
      * @throws IllegalArgumentException Cuando no existe un constructor vac&iacute;o en la clase.
      * @throws InvocationTargetException Si el constructor por defecto es abstracto.
-     * @throws NoSuchMethodException Si no se encuentra un constructor por defecto.
+     * @throws NoSuchMethodException Si no se encuentra un contructor por defecto.
      * @throws SecurityException No se tiene acceso al constructor por defecto.
      */
     private static void installProvider(final String clazz) throws ClassNotFoundException,
