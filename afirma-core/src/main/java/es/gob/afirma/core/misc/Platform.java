@@ -106,7 +106,7 @@ public final class Platform {
     	if (osArch.equals("mips")) { //$NON-NLS-1$
     		return MACHINE.MIPS32;
     	}
-    	if (osArch.equals("x86_64")) { //$NON-NLS-1$
+    	if (osArch.equals("x86_64") || osArch.startsWith("amd64")) { //$NON-NLS-1$ //$NON-NLS-2$
     		return MACHINE.AMD64;
     	}
     	if (osArch.equals("x86")) { //$NON-NLS-1$
@@ -257,11 +257,11 @@ public final class Platform {
 
     /** Obtiene el directorio principal del sistema operativo del sistema.
      * @return Directorio principal del sistema operativo */
-    private static String getSystemRoot() {
+    public static String getSystemRoot() {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return File.separator;
         }
-        String systemRoot = System.getProperty("SystemRoot"); //$NON-NLS-1$
+        final String systemRoot = System.getProperty("SystemRoot"); //$NON-NLS-1$
         if (systemRoot == null) {
             final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
             final File winSys32 = new File(defaultSystemRoot + "\\system32"); //$NON-NLS-1$
