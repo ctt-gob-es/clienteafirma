@@ -243,24 +243,6 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jarsigner-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>${afirma.keytool.keystore}</keystore>
-					<alias>${afirma.keytool.alias}</alias>
-					<storepass>${afirma.keytool.password}</storepass>
-					<verify>true</verify>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 	</profile>

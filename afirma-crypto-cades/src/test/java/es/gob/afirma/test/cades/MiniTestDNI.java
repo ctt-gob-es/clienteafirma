@@ -45,9 +45,9 @@ public final class MiniTestDNI {
 	@Test
     public void testCAdESDNIe() throws Exception {
 
-        final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+        final Constructor<?> sunPKCS11Constructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
 
-		final Provider p = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
+		final Provider p = (Provider) sunPKCS11Constructor.newInstance(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
 
         Security.addProvider(p);
         final KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$

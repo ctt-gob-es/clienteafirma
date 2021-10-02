@@ -15,20 +15,20 @@ public class AOException extends Exception {
 
     private static final long serialVersionUID = -662191654860389176L;
 
-    /** Contruye una excepci&oacute;n gen&eacute;rica con mensaje.
+    /** Construye una excepci&oacute;n gen&eacute;rica con mensaje.
      * @param msg Mensaje de la excepci&oacute;n */
     public AOException(final String msg) {
         super(msg);
     }
 
-    /** Contruye una excepci&oacute;n gen&eacute;rica con mensaje y define su causa.
+    /** Construye una excepci&oacute;n gen&eacute;rica con mensaje y define su causa.
      * @param msg Descripci&oacute;n del error.
      * @param cause Causa del error. */
     public AOException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 
-    /** Contruye una excepci&oacute;n gen&eacute;rica definiendo su causa.
+    /** Construye una excepci&oacute;n gen&eacute;rica definiendo su causa.
      * @param cause Causa del error. */
     public AOException(final Throwable cause) {
         super(cause);
