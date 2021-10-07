@@ -87,6 +87,7 @@ import es.gob.afirma.standalone.plugins.SignOperation;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 import es.gob.afirma.standalone.plugins.SignResult;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 
@@ -167,7 +168,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			catch (final VisibleSignatureMandatoryException e) {
 				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_VISIBLE_SIGNATURE;
-				throw new SocketOperationException(errorCode, e.getMessage());
+				throw new SocketOperationException(errorCode, e);
 			}
 			catch (final SocketOperationException e) {
 				LOGGER.log(Level.SEVERE, "Se identifico un error en una operacion de firma", e); //$NON-NLS-1$
@@ -258,11 +259,23 @@ final class ProtocolInvocationLauncherSignAndSave {
 		// Comprobamos si es necesario pedir datos de entrada al usuario
 		boolean needRequestData = false;
 		if (data == null) {
-			if (signer != null && signer instanceof OptionalDataInterface) {
+			if (signer instanceof OptionalDataInterface) {
 				needRequestData = ((OptionalDataInterface) signer).needData(extraParams);
 			} else {
 				needRequestData = true;
 			}
+		}
+
+		// Si el usuario lo pide (estableciendo una variable de entorno), mostramos los datos que va a firmar
+		try {
+			if (!needRequestData && Boolean.getBoolean("AFIRMA_SHOW_DATA_TO_SIGN")) { //$NON-NLS-1$
+				final DataDebugDialog ddd = new DataDebugDialog(data);
+				data = ddd.getData();
+				ddd.dispose();
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se pueden mostrar los datos a firmar: " + e); //$NON-NLS-1$
 		}
 
 		// Nombre del fichero firmado. Tomara valor solo si es el usuario quien selecciona
@@ -519,12 +532,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 		} catch (final IllegalArgumentException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-			throw new SocketOperationException(errorCode, e.getMessage());
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final AOTriphaseException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT;
-			throw new SocketOperationException(errorCode, e.getMessage());
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final InvalidPdfException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
@@ -598,7 +611,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		catch (final AOException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode, e.getMessage());
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
