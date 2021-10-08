@@ -161,30 +161,34 @@ public class CAdESParameters {
 			dataConfig.setSigningTime(new Date());
 		}
 
-		// Determinamos el tipo de contenido, ya sea
-		// que obtengamos esta informacion del exterior o que se analicen los datos.
-		String contentTypeOid = config.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
-		String contentTypeDescription = config.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION);
-		if (data != null && (contentTypeOid == null || contentTypeDescription == null)) {
-			try {
-				final MimeHelper mimeHelper = new MimeHelper(data);
-				if (contentTypeOid == null) {
-					contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+		// El atributo content-hint se incluira siempre salvo que desde el exterior se indique que no se haga
+		if (!config.containsKey(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE) ||
+				!Boolean.FALSE.toString().equalsIgnoreCase(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE)) {
+			// Determinamos el tipo de contenido, ya sea
+			// que obtengamos esta informacion del exterior o que se analicen los datos.
+			String contentTypeOid = config.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
+			String contentTypeDescription = config.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION);
+			if (data != null && (contentTypeOid == null || contentTypeDescription == null)) {
+				try {
+					final MimeHelper mimeHelper = new MimeHelper(data);
+					if (contentTypeOid == null) {
+						contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+					}
+					if (contentTypeDescription == null) {
+						contentTypeDescription = mimeHelper.getDescription();
+					}
 				}
-				if (contentTypeDescription == null) {
-					contentTypeDescription = mimeHelper.getDescription();
+				catch (final Exception e) {
+					LOGGER.warning(
+							"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e //$NON-NLS-1$
+							);
 				}
 			}
-			catch (final Exception e) {
-				LOGGER.warning(
-						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e //$NON-NLS-1$
-						);
-			}
+			dataConfig.setContentTypeOid(contentTypeOid != null ?
+					contentTypeOid : MimeHelper.DEFAULT_CONTENT_OID_DATA);
+			dataConfig.setContentDescription(contentTypeDescription != null ?
+					contentTypeDescription : MimeHelper.DEFAULT_CONTENT_DESCRIPTION);
 		}
-		dataConfig.setContentTypeOid(contentTypeOid != null ?
-				contentTypeOid : MimeHelper.DEFAULT_CONTENT_OID_DATA);
-		dataConfig.setContentDescription(contentTypeDescription != null ?
-				contentTypeDescription : MimeHelper.DEFAULT_CONTENT_DESCRIPTION);
 
 		// Metadatos con la localizacion de firma
 		dataConfig.setMetadata(CAdESSignerMetadataHelper.getCAdESSignerMetadata(config));

@@ -449,6 +449,7 @@ public final class CAdESUtils {
         // ContentHints, que se crea en base al ContentType.
         // Este atributo no se creara en las contrafirmas cuando se use un perfil baseline
         if (!isCountersign || !AOSignConstants.SIGN_PROFILE_BASELINE.equals(config.getProfileSet()) ) {
+        	// Tampoco se incluira si se ha definio externamente que no se haga (el contentTypeOid sera nulo)
         	if (config.getContentTypeOid() != null) {
         		final ContentHints contentHints;
         		if (config.getContentDescription() != null) {
