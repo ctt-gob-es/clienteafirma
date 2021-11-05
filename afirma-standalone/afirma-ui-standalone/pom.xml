@@ -18,7 +18,7 @@
 		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
         <afirma.keytool.alias>codesign</afirma.keytool.alias>
         <afirma.keytool.password>afirma</afirma.keytool.password>
-        <afirma.core.version>1.7</afirma.core.version>
+        <afirma.core.version>1.7.1</afirma.core.version>
 	</properties>
 	
 	<dependencies>
@@ -176,7 +176,7 @@
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard-jse</artifactId>
-			<version>1.5</version>
+			<version>1.7</version>
 		</dependency>
 		
 		<dependency>

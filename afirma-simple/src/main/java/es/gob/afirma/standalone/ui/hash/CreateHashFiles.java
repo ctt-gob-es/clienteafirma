@@ -180,7 +180,7 @@ public final class CreateHashFiles extends JDialog implements KeyListener {
 						new File(getFileTextField().getText()),
 						null,
 						getSelectedHashAlgorithm(),
-						null,
+						HashDocumentFactory.FORMAT_XML,
 						isRecursive()
 						);
 			}
