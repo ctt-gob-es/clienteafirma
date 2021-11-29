@@ -13,7 +13,7 @@
 			AutoScript.saveDataToFile(
 					document.getElementById('result').value,
 					"Guardar firma electr\u00F3nica",
-					null,
+					"prueba.csig",
 					null,
 					null,
 					showSaveOkCallback,
@@ -56,7 +56,7 @@
 			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
 		}
 
-		function doSign() {
+		function doSign() {			
 			try {
 				var data = document.getElementById("data").value;
 				AutoScript.sign(
@@ -75,7 +75,7 @@
 				}
 			}
 		}
-
+		
 		function downloadAndSign() {
 			try {
 
@@ -404,7 +404,7 @@
   </head>
 	<body>
 		<script>
-			//AutoScript.setForceWSMode(true);
+			AutoScript.setForceWSMode(false);
 			//AutoScript.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
 			//AutoScript.setMinimumClientVersion("1.8");
 			AutoScript.cargarAppAfirma();

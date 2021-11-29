@@ -213,7 +213,7 @@ public abstract class SignBatch {
 	private static String printProcessResult(final ProcessResult result) {
 		return "<signresult id=\"" + result.getId() //$NON-NLS-1$
 			+ "\" result=\"" + result.getResult() //$NON-NLS-1$
-			+ "\" description=\"" + result.getDescription() + "\"/>"; //$NON-NLS-1$ //$NON-NLS-2$
+			+ "\" description=\"" + (result.getDescription() != null ? result.getDescription() : "") + "\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/** Borra todos los ficheros temporales usados en el proceso del lote. */

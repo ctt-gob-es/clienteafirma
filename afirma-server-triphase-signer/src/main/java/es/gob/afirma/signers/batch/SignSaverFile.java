@@ -31,7 +31,7 @@ public final class SignSaverFile implements SignSaver {
 	/** El guardado real est&aacute; deshabilitado por defecto, habilitar para usar esta clase
 	 * para depuraci&oacute;n. No debe usarse para entornos reales, ya que no hay comprobaciones de
 	 * qu&eacute; ficheros pueden sobrescribirse. */
-	private static final boolean DISABLED = true;
+	private static final boolean DISABLED = false;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -63,9 +63,21 @@ public final class SignSaverFile implements SignSaver {
 
 	@Override
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
+
 		if (!DISABLED) {
+			if (this.filename == null) {
+				final Properties customExtraParams = sign.getExtraParams();
+				final String file = customExtraParams.getProperty(PROP_FILENAME);
+				if (file == null) {
+					throw new IllegalArgumentException(
+						"Es obligarorio que la configuracion incluya un valor para la propiedad " + PROP_FILENAME //$NON-NLS-1$
+					);
+				}
+				this.filename = file;
+			}
+
 			final File f = new File(this.filename);
-			if (!f.getParentFile().isDirectory()) {
+			if (f.getParentFile() == null || !f.getParentFile().isDirectory()) {
 				throw new IOException(
 					"El directorio de guardado de la firma no existe: " + f.getParent() //$NON-NLS-1$
 				);
@@ -97,12 +109,10 @@ public final class SignSaverFile implements SignSaver {
 			);
 		}
 		final String file = config.getProperty(PROP_FILENAME);
-		if (file == null) {
-			throw new IllegalArgumentException(
-				"Es obligarorio que la configuracion incluya un valor para la propiedad " + PROP_FILENAME //$NON-NLS-1$
-			);
+		if (file != null) {
+			this.filename = file;
 		}
-		this.filename = file;
+
 	}
 
 	@Override

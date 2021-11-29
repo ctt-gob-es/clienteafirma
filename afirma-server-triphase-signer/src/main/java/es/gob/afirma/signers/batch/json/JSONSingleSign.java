@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -367,7 +368,7 @@ public final class JSONSingleSign extends SingleSign {
 				this.documentManager.storeDocument(this.ss.getDataRef(), this.certChain, dataToSave, singleSignProps);
 			}
 			catch(final Exception e) {
-				LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId()); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId(), e); //$NON-NLS-1$
 				return new CallableResult(this.ss.getId(), e);
 			}
 			return new CallableResult(this.ss.getId());

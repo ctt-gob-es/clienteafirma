@@ -376,13 +376,10 @@ public final class AOUtil {
         copyFile(file, tempLibrary);
 
         // Pedimos borrar los temporales cuando se cierre la JVM
-        if (tempLibrary != null) {
-            tempLibrary.deleteOnExit();
-        }
+        tempLibrary.deleteOnExit();
 
-        LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
-        System.load(tempLibrary != null ? tempLibrary.getAbsolutePath() : path);
-
+        LOGGER.info("Cargamos " + tempLibrary.getAbsolutePath()); //$NON-NLS-1$
+        System.load(tempLibrary.getAbsolutePath());
     }
 
     /** Copia un fichero.

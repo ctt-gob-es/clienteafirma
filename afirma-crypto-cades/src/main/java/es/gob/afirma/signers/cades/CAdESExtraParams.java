@@ -62,7 +62,7 @@ public final class CAdESExtraParams {
     /**
      *  <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *  <code>false</code> para no incluirlo.<br><br>
-     *  Esta propiedad sólo debería utilizarse para generar firmas PAdES para aptas para ser
+     *  Esta propiedad s&Oacute;lo deber&iacute;a utilizarse para generar firmas PAdES para aptas para ser
      *  incluidas como para de una firma PAdES.
      */
     public static final String INCLUDE_SIGNING_TIME_ATTRIBUTE = "includeSigningTimeAttribute"; //$NON-NLS-1$
@@ -73,7 +73,7 @@ public final class CAdESExtraParams {
      *  incluir&aacute; el atributo, ya sea con los valores calculados autom&aacute;ticamente a
      *  partir de los datos o con los valores establecidos en las propiedades
      *  {@code #CONTENT_TYPE_OID} y {@code #CONTENT_DESCRIPTION}.<br><br>
-     *  Esta propiedad sólo debería utilizarse para generar firmas PAdES para aptas para ser
+     *  Esta propiedad s&oacute;lo deber&iacute;a utilizarse para generar firmas PAdES para aptas para ser
      *  incluidas como para de una firma PAdES.
      */
     public static final String INCLUDE_CONTENT_HINT_ATTRIBUTE = "includeContentHintAttribute"; //$NON-NLS-1$

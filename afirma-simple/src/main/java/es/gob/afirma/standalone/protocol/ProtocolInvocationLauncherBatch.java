@@ -221,7 +221,7 @@ final class ProtocolInvocationLauncherBatch {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
 				LOGGER.severe("Error en el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
 						e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
 
 			if (!bySocket){

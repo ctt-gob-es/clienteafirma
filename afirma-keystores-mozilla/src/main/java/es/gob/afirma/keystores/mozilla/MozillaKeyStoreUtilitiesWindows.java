@@ -15,11 +15,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.KeyStoreUtilities;
@@ -118,32 +118,25 @@ final class MozillaKeyStoreUtilitiesWindows {
 					"Temp" //$NON-NLS-1$
 				);
 				if (tmpDir.isDirectory() && tmpDir.canWrite() && tmpDir.canRead()) {
-					tmp = File.createTempFile("nss", null, tmpDir); //$NON-NLS-1$
+					final Path tempDirPath = Paths.get(tmpDir.getCanonicalPath());
+					tmp = Files.createTempDirectory(tempDirPath, "nss").toFile(); //$NON-NLS-1$
 				}
 				else {
-					tmp = File.createTempFile("nss", null); //$NON-NLS-1$
-				}
-				if(!tmp.delete()) {
-					LOGGER.warning("No se ha podido eliminar el fichero '" + tmp.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				if (!tmp.mkdir()) {
-					throw new AOException(
-						"No se ha podido crear el directorio temporal para las bibliotecas NSS" //$NON-NLS-1$
-					);
+					tmp = Files.createTempDirectory("nss").toFile(); //$NON-NLS-1$
 				}
 
 				// Copiamos la biblioteca de acceso y luego sus dependencias. Las dependencias las
 				// recuperamos indicando cadena vacia para que nos las devuelva sin path
 			    Files.copy(
-			    	Paths.get(SOFTOKN3_DLL),// fichero de entrada
-			    	Paths.get(tmp.getCanonicalPath()), // fichero de salida con ruta absoluta
+			    	Paths.get(SOFTOKN3_DLL), // fichero de entrada
+			    	Paths.get(tmp.getCanonicalPath()), // directorio de salida con ruta absoluta
 			        StandardCopyOption.REPLACE_EXISTING
 			    );
 
 			    for (final String dependency : getSoftkn3DependenciesWindows("")) { //$NON-NLS-1$
 				    Files.copy(
 				    	Paths.get(dependency),// fichero de entrada
-				    	Paths.get(tmp.getCanonicalPath()), // fichero de salida con ruta absoluta
+				    	Paths.get(tmp.getCanonicalPath()), // directorio de salida con ruta absoluta
 				        StandardCopyOption.REPLACE_EXISTING
 				    );
 				}
