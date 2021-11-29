@@ -19,7 +19,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.7.0"
+!define VERSION "1.8.0"
 
 ;--------------------------------
 ;Macros para el tratamiento de los parametros de entrada del instalador
@@ -124,9 +124,9 @@ Function .onInit
 	;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
 	;Este delimitador se agrega en el .wxs del instalador MSI
 	${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
-	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS  
-	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH  
-	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH 
+	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS
+	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH
+	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
 	
 	; Comprobamos que no solo se informe de un parametro, sino de
 	; los dos o de ninguno
@@ -147,7 +147,7 @@ Function .onInit
 		IfFileExists "$KEYSTORE_PATH" +2 0
 			Abort
 	${EndIf}
-	
+
 FunctionEnd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -163,7 +163,7 @@ Section "Programa" sPrograma
 		IfFileExists "$KEYSTORE_PATH" +2 0
 			Quit
 	${EndIf}
-	
+
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
 	StrCpy $PATH "AutoFirma"
@@ -299,17 +299,17 @@ Section "Programa" sPrograma
 	StrCpy $R4 ""
 	StrCmp $FIREFOX_SECURITY_ROOTS "true" 0 +2
 		StrCpy $R4 "-firefox_roots"
-	
+
 	; Comprobamos si el administrador le ha pasado el parametro con el certificado
 	StrCpy $R5 ""
 	StrCmp $CERTIFICATE_PATH "false" +2
 		StrCpy $R5 '-certificate_path "$CERTIFICATE_PATH"'
-	
+
 	; Comprobamos si el administrador le ha pasado el parametro con el almacen
 	StrCpy $R6 ""
 	StrCmp $KEYSTORE_PATH "false" +2
 		StrCpy $R6 '-keystore_path "$KEYSTORE_PATH"'
-	
+
 	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 $R5 $R6 /passive'
 
 	; Eliminamos los certificados de versiones previas del sistema

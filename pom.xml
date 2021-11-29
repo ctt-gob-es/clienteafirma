@@ -51,7 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.8-SNAPSHOT</clienteafirma.version>
-		<jmulticard.version>1.6</jmulticard.version>
+		<jmulticard.version>1.7</jmulticard.version>
 		<afirma.lib.itex.version>1.3</afirma.lib.itex.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
@@ -142,7 +142,7 @@
 			<dependency>
 				<groupId>es.uji.crypto.xades</groupId>
 				<artifactId>jxades</artifactId>
-				<version>0.2.2</version>
+				<version>0.2.3-SNAPSHOT</version>
 			</dependency>
 
 		</dependencies>
@@ -272,6 +272,73 @@
 			</build>
 			
 		</profile>
+		
+		<!-- ===== Construccion para informe sonar ===== -->
+		<profile>
+			<id>sonar</id>
+			
+			<modules>
+				<module>afirma-core</module>
+				<module>afirma-core-keystores</module>
+				<module>afirma-crypto-batch-client</module>
+				<module>afirma-crypto-cadestri-client</module>
+				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cades</module>
+				<module>afirma-crypto-cades-multi</module>
+				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-core-xml</module>
+				<module>afirma-crypto-odf</module>
+				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-validation</module>
+				<module>afirma-crypto-xades</module>
+				<module>afirma-crypto-xadestri-client</module>
+				<module>afirma-crypto-xmlsignature</module>
+				<module>afirma-crypto-ooxml</module>
+				<module>afirma-keystores-filters</module>
+				<module>afirma-keystores-mozilla</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				<module>afirma-crypto-pdf</module>
+				<module>afirma-core-massive</module>
+				<module>afirma-server-triphase-signer-cache</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
+				
+				<!-- Aplicaciones -->
+				<module>afirma-simple</module>
+				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Servicios -->
+				<module>afirma-server-triphase-signer</module>
+				<module>afirma-signature-retriever</module>
+				<module>afirma-signature-storage</module>
+			</modules>
+			
+      		<build>
+       			<plugins>
+	
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
+							<fork>true</fork>
+<!--
+							<compilerArgs>
+								<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
+							</compilerArgs>
+-->
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+	    </profile>
 		
 		<!-- ===== Construccion para despliegue en el repositorio de artefactos del MINHAP ===== -->
 		<profile>
