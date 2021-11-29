@@ -134,7 +134,8 @@ final class CertUtil {
 			sslCertificateAlias,
 			storePassword,
 			DEFAULT_LOCALHOST_IP,
-			new String[] { DEFAULT_LOCALHOST_HOSTNAME },
+			DEFAULT_LOCALHOST_IP,
+			new String[] { DEFAULT_LOCALHOST_IP, DEFAULT_LOCALHOST_HOSTNAME },
 			ROOT_CERTIFICATE_PRINCIPAL
 		);
 	}
@@ -143,6 +144,7 @@ final class CertUtil {
 	 * para la comunicaci&oacute;n.
 	 * @param sslCertificateAlias Alias con el que identificar el certificado SSL.
 	 * @param storePassword Contrase&ntilde;a del almac&eacute;n de claves a generar.
+	 * @param commonName Nombre com&uacute;n que se usar&aacute; en el certificado.
 	 * @param ipAddress Direcci&oacute;n IP del <i>host</i>.
 	 * @param hostNames Listado de nombres de dominio SSL.
 	 * @param rootName Principal X&#46;500 de la CA a crear (por ejemplo <i>CN=Nombre</i>).
@@ -152,7 +154,8 @@ final class CertUtil {
 	 * @throws IOException El cualquier otro tipo de problema. */
 	static CertPack getCertPackForHostSsl(final String sslCertificateAlias,
 			                              final String storePassword,
-			                              final String ipAddress,
+			                              final String commonName,
+										  final String ipAddress,
 			                              final String[] hostNames,
 			                              final String rootName) throws NoSuchAlgorithmException,
 	                                                                    CertificateException,
@@ -161,7 +164,15 @@ final class CertUtil {
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
 			rootName
 		);
+
+		final String cn = commonName != null
+				? commonName
+				: hostNames != null && hostNames.length > 0 && hostNames[0] != null
+					? hostNames[0]
+					: ipAddress;
+
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
+			cn,
 			ipAddress,
 			hostNames,
 			caCertificatePrivateKeyEntry
@@ -270,7 +281,8 @@ final class CertUtil {
 		);
 	}
 
-	private static PrivateKeyEntry generateSslCertificate(final String ipAddress,
+	private static PrivateKeyEntry generateSslCertificate(final String commonName,
+														  final String ipAddress,
 			                                              final String[] hostNames,
 			                                              final PrivateKeyEntry issuerKeyEntry) {
 		// Generamos las claves...
@@ -287,9 +299,6 @@ final class CertUtil {
 			final X500Name issuerDN = new JcaX509CertificateHolder(
 				(X509Certificate) issuerKeyEntry.getCertificate()
 			).getSubject();
-
-			final String commonName = hostNames != null && hostNames.length > 0 && hostNames[0] != null ?
-					hostNames[0] : ipAddress;
 
 			final X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
 				issuerDN,
