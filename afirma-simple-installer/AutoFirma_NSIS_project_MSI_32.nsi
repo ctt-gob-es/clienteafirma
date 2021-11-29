@@ -19,7 +19,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.7.1"
+!define VERSION "1.7.2"
 
 ;--------------------------------
 ;Macros para el tratamiento de los parametros de entrada del instalador
