@@ -1,5 +1,8 @@
 package es.gob.afirma.ui.core.jse;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -21,6 +24,8 @@ public class CertificateSelectionDialogTest {
     private static final String CERT_PATH = "multi_almacen.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Prueba de di&aacute;logo de selecci&oacute;n de certificados.
 	 * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
@@ -41,12 +46,12 @@ public class CertificateSelectionDialogTest {
 			alias = dialog.show();
 		}
 		catch (final Exception e) {
-			System.err.println("Error: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error al cargar un certificado a traves del dialogo de seleccion", e); //$NON-NLS-1$
 			e.printStackTrace();
 			return;
 		}
 
-		System.out.println("Certificado:\n" + ksm.getCertificate(alias)); //$NON-NLS-1$
+		LOGGER.info("Certificado:\n" + ksm.getCertificate(alias)); //$NON-NLS-1$
 	}
 
 }

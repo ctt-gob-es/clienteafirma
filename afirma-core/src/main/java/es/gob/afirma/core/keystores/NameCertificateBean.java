@@ -52,7 +52,7 @@ public class NameCertificateBean {
 	/** Devuelve la cadena de certificaci&oacute;n del certificado.
 	 * @return Cadena de certificaci&oacute;n. */
 	public X509Certificate[] getCertificateChain() {
-		return this.certificateChain;
+		return this.certificateChain == null ? null : this.certificateChain.clone();
 	}
 
 	@Override

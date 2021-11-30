@@ -62,7 +62,6 @@ import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -83,6 +82,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import es.gob.afirma.signers.xml.Utils;
 
 /** Implementaci&oacute;n JSR105 de la transformaci&oacute;n RelationshipTransform.
  * <a href="http://openiso.org/Ecma/376/Part2/12.2.4#26">http://openiso.org/Ecma/376/Part2/12.2.4#26</a>
@@ -292,7 +293,10 @@ public final class RelationshipTransformService extends TransformService {
         final Source source = new DOMSource(dom);
         final StringWriter stringWriter = new StringWriter();
         final Result result = new StreamResult(stringWriter);
-        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        final TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
+        final Transformer transformer = factory.newTransformer();
         /*
          * We have to omit the ?xml declaration if we want to embed the
          * document.
@@ -306,8 +310,10 @@ public final class RelationshipTransformService extends TransformService {
         final Source source = new DOMSource(node);
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final Result result = new StreamResult(outputStream);
-        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        final Transformer transformer = transformerFactory.newTransformer();
+        final TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
+        final Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
         transformer.transform(source, result);
         return new OctetStreamData(new ByteArrayInputStream(outputStream.toByteArray()));
@@ -315,9 +321,7 @@ public final class RelationshipTransformService extends TransformService {
 
     private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final InputSource inputSource = new InputSource(documentInputStream);
-        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        return documentBuilderFactory.newDocumentBuilder().parse(inputSource);
+        return Utils.getNewDocumentBuilder().parse(inputSource);
     }
 
     /** {@inheritDoc} */

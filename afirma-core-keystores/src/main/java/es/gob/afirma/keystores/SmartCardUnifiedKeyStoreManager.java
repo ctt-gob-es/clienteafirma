@@ -54,7 +54,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			               final boolean forceReset) {
 
 		this.passwordCallback = pssCallBack;
-		this.configParams = params;
+		this.configParams = params != null ? params.clone() : null;
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 		boolean excludePreferredKeyStores = false;

@@ -16,12 +16,11 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 
@@ -76,11 +75,9 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
         if (is == null || is.length == 0) {
             return false;
         }
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
 
         try {
-            final Document doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(is));
+            final Document doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(is));
             final Element rootNode = doc.getDocumentElement();
             final String rootNodePrefix = rootNode.getPrefix();
 

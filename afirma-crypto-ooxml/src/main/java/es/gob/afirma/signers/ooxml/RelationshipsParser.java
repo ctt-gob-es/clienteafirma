@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -23,6 +22,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import es.gob.afirma.signers.xml.Utils;
 
 /** Parser de ficheros XML Relationships. Este tipo de fichero se encuentra
  * comunmente dentro de los ficheros OOXML de Microsoft Office con el nombre ".rels". */
@@ -59,7 +60,7 @@ final class RelationshipsParser {
                                                                                               IOException,
                                                                                               ParserConfigurationException {
 
-        final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlRelationships);
+        final Document doc = Utils.getNewDocumentBuilder().parse(xmlRelationships);
 
         // Obtenemos la raiz
         final Element root = doc.getDocumentElement();

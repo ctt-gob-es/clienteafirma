@@ -20,7 +20,7 @@ public final class NativeDataCipher implements DataCipher {
 	private final byte[] cipherKey;
 
 	public NativeDataCipher(final byte[] key) {
-		this.cipherKey = key;
+		this.cipherKey = key != null ? key.clone() : null;
 	}
 
 	@Override

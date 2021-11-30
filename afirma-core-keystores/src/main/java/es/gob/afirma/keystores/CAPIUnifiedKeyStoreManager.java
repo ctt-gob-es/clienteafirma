@@ -46,7 +46,7 @@ public class CAPIUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			               final boolean forceReset) {
 
 		this.passwordCallback = pssCallBack;
-		this.configParams = params;
+		this.configParams = params != null ? params.clone() : null;
 
 		// Vaciamos el listado de almacenes agregados
 		removeAll();

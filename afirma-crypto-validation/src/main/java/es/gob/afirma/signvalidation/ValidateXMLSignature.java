@@ -35,7 +35,6 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -67,11 +66,9 @@ public final class ValidateXMLSignature implements SignValider {
     @Override
 	public SignValidity validate(final byte[] sign, final boolean checkCertificates) {
 
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
         final Document doc;
         try {
-            doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
         	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);

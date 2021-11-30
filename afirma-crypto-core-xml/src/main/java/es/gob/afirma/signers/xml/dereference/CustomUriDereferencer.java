@@ -21,7 +21,6 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dom.DOMURIReference;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Attr;
@@ -109,7 +108,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 				}
 				try {
 					return getStreamData(
-						DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+						Utils.getNewDocumentBuilder().parse(
 							new ByteArrayInputStream(externalContent)
 						)
 					);

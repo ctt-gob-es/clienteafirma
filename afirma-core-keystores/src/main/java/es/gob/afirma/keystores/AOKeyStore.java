@@ -209,18 +209,6 @@ public enum AOKeyStore {
         return this.providerName;
     }
 
-    /** Establece el nombre del proveedor de seguridad que da acceso al almac&eacute;n de
-     * claves y certificados.
-     * @param provName Nombre del proveedor. */
-    public void setProviderName(final String provName) {
-    	if (provName == null || provName.isEmpty()) {
-    		throw new IllegalArgumentException(
-				"El nombre del proveedor no puede ser nulo ni vac&iacute;o" //$NON-NLS-1$
-			);
-    	}
-        this.providerName = provName;
-    }
-
     /** Obtiene el n&uacute;mero interno del n del almac&eacute;n de claves.
      * @return N&uacute;mero interno del almac&eacute;n de claves. */
     public int getOrdinal() {
@@ -231,17 +219,6 @@ public enum AOKeyStore {
      * @return Nombre del almac&eacute;n de claves. */
     public String getName() {
         return this.name;
-    }
-
-    /** Establece el nombre del almac&eacute;n de claves.
-     * @param n Nombre del almac&eacute;n de claves. */
-    public void setName(final String n) {
-    	if (n == null || n.isEmpty()) {
-    		throw new IllegalArgumentException(
-				"El nombre del almacen no puede ser nulo ni vac&iacute;o" //$NON-NLS-1$
-			);
-    	}
-        this.name = n;
     }
 
     /** Recupera el repositorio con el nombre indicado. Si no existe un <code>KeyStore</code> con
@@ -277,13 +254,6 @@ public enum AOKeyStore {
 		return this.certificatePasswordCallback;
 	}
 
-	/** Establece el <i>PasswordCallback</i> necesario para usar una clave del almac&eacute;n despu&eacute;s
-	 * de haberlo abierto.
-	 * @param certPwc <i>PasswordCallback</i> necesario para usar una cave del almac&eacute;n. */
-	public void setCertificatePasswordCallback(final PasswordCallback certPwc) {
-		this.certificatePasswordCallback = certPwc;
-	}
-
 	/** Obtiene el <i>PasswordCallback</i> necesario para abrir el almac&eacute;n.
 	 * @param parent Componente padre para la modalidad.
 	 * @return <i>PasswordCallback</i> necesario para abrir el almac&eacute;n. */
@@ -301,11 +271,5 @@ public enum AOKeyStore {
 			((UIPasswordCallback)this.storePasswordCallback).setPrompt(prompt);
 		}
 		return this.storePasswordCallback;
-	}
-
-	/** Establece el <i>PasswordCallback</i> necesario para abrir el almac&eacute;n.
-	 * @param storePwc <i>PasswordCallback</i> necesario para abrir el almac&eacute;n. */
-	public void setStorePasswordCallback(final PasswordCallback storePwc) {
-		this.storePasswordCallback = storePwc;
 	}
 }

@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.so.macos.UnixUtils;
 
 /**
  * Clase de gesti&oacute;n de plugins.
@@ -33,9 +34,6 @@ public class PluginsManager {
 	private static final String RELATIONS_SEPARATOR = ":"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-	/** Extensi&oacute;n de fichero asociada a los plugins de la aplicaci&oacute;n. */
-	public static final String[] PLUGIN_EXTENSIONS = new String[] { "jar", "zip" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private List<AfirmaPlugin> pluginsLoadedList = null;
 
@@ -358,7 +356,7 @@ public class PluginsManager {
 		// Creamos el fichero con el script, le damos permisos y lo ejecutamos
 		try {
 			MacUtils.writeScriptFile(scriptText, scriptFile, false);
-			MacUtils.addAllPermissionsToFile(scriptFile);
+			UnixUtils.addAllPermissionsToFile(scriptFile);
 			MacUtils.executeScriptFile(scriptFile, true, true);
 		} catch (final Exception e) {
 			LOGGER.warning("Error al ejecutar el Script para la importacion del plugin"); //$NON-NLS-1$

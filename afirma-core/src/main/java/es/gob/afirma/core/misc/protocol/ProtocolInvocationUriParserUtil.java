@@ -24,12 +24,16 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
+
 /** Utilidades para en an&aacute;lisis de URL de invocaci&oacute;n por protocolo. */
 public final class ProtocolInvocationUriParserUtil {
 
 	static final String DEFAULT_URL_ENCODING = StandardCharsets.UTF_8.name();
 
 	private static final String DEFAULT_OPERATION = "SIGN"; //$NON-NLS-1$
+
+	private static DocumentBuilderFactory SECURE_BUILDER_FACTORY = null;
 
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable
@@ -95,7 +99,7 @@ public final class ProtocolInvocationUriParserUtil {
 		final NodeList elems;
 
 		try {
-			final Element docElement = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+			final Element docElement = SecureXmlBuilder.getSecureDocumentBuilder()
 					.parse(new ByteArrayInputStream(xml)).getDocumentElement();
 
 			// Si el elemento principal es OPERATION_PARAM entendemos que es una firma

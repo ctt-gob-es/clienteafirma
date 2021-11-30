@@ -24,7 +24,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -47,6 +46,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.xml.Utils;
 
 final class OOXMLZipHelper {
 
@@ -261,10 +261,8 @@ final class OOXMLZipHelper {
     private static void addOriginSigsRels(final String signatureZipEntryName, final ZipOutputStream zipOutputStream) throws ParserConfigurationException,
                                                                                                              IOException,
                                                                                                              TransformerException {
-        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
 
-        final Document originSignRelsDocument = documentBuilderFactory.newDocumentBuilder().newDocument();
+    	final Document originSignRelsDocument = Utils.getNewDocumentBuilder().newDocument();
 
         final Element relationshipsElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationships"); //$NON-NLS-1$
         relationshipsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
@@ -285,12 +283,11 @@ final class OOXMLZipHelper {
 	static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException,
     																							SAXException,
     																							IOException {
-    	final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    	dbf.setNamespaceAware(true);
+
     	try (
 			final InputStream is = new NoCloseInputStream(documentInputStream);
 		) {
-    		return dbf.newDocumentBuilder().parse(new InputSource(is));
+    		return Utils.getNewDocumentBuilder().parse(new InputSource(is));
     	}
     }
 
@@ -301,7 +298,10 @@ final class OOXMLZipHelper {
 			final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
 		) {
     		final Result result = new StreamResult(outputStream);
-	    	final Transformer xformer = TransformerFactory.newInstance().newTransformer();
+    		final TransformerFactory factory = TransformerFactory.newInstance();
+    		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+	        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
+	        final Transformer xformer = factory.newTransformer();
 	    	if (omitXmlDeclaration) {
 	    		xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
 	    	}

@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -305,7 +303,7 @@ public final class OfficeAnalizer {
 
         final Document doc;
         try {
-            doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(contentTypeIs);
+            doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(contentTypeIs);
         }
         catch (final Exception e) {
         	LOGGER.warning("No se ha podido analizar el XML de ContentTypes de OOXML: " + e); //$NON-NLS-1$

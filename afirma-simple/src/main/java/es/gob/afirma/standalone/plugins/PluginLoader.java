@@ -25,7 +25,7 @@ public class PluginLoader {
 
 	private static final String CONFIG_FILE = "/plugin.json"; //$NON-NLS-1$
 
-	public static Map<String, AfirmaPlugin> classLoaderForPlugin = new HashMap<>();
+	public static final Map<String, AfirmaPlugin> classLoaderForPlugin = new HashMap<>();
 
 	/**
 	 * Carga la colecci&oacute;n de JARs de un plugin y devuelve un objeto
@@ -40,85 +40,81 @@ public class PluginLoader {
 	 */
 	static AfirmaPlugin loadPlugin(final File[] jars) throws IOException, PluginException {
 
+		AfirmaPlugin loadedPlugin;
+
 		// Cargamos los JAR
 		final List<URL> urls = new ArrayList<>();
 		for (final File jar : jars) {
 			urls.add(jar.toURI().toURL());
 		}
-		final URLClassLoader classLoader = new URLClassLoader(
+		try (final URLClassLoader classLoader = new URLClassLoader(
 				urls.toArray(new URL[urls.size()]),
-				PluginLoader.class.getClassLoader());
+				PluginLoader.class.getClassLoader())) {
 
-		// Cargamos las clases de plugin
-		final List<AfirmaPlugin> plugins = new ArrayList<>();
-		final ServiceLoader<AfirmaPlugin> loader;
-		try {
-			loader = ServiceLoader.load(AfirmaPlugin.class, classLoader);
-			for (final AfirmaPlugin plugin : loader) {
-				plugins.add(plugin);
-			}
-		}
-		catch (final Error e) {
-			classLoader.close();
-			throw new PluginException("Se han contrado plugins mal definidos en el fichero importado"); //$NON-NLS-1$
-		}
-
-		if (plugins.size() == 0) {
-			classLoader.close();
-			throw new PluginException("No se encontro ningun plugin en los archivos"); //$NON-NLS-1$
-		}
-
-		if (plugins.size() > 1) {
-			classLoader.close();
-			throw new PluginException("No se permite la carga simulatea de varios plugins"); //$NON-NLS-1$
-		}
-
-		final AfirmaPlugin plugin = plugins.get(0);
-		plugin.setClassLoader(classLoader);
-
-		final PluginInfo info = loadPluginConfiguration(plugin);
-
-		registryPluginReferences(plugin, info);
-
-		// TODO: Puesto que ya almacenamos el classLoader de cada clase del plugin, ya
-		// no es necesario configurar las acciones de los botones de los plugins. Habria
-		// que ver donde se usa cada accion y cargar las clases involucradas a partir de
-		// su classLoader, igual que se hace con los menus.
-		if (info.getButtons() != null) {
-			for (final PluginButton button : info.getButtons()) {
-
-				if (button.getActionClassName() == null) {
-					classLoader.close();
-					throw new PluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
-				}
-				if (button.getWindow() == null) {
-					classLoader.close();
-					throw new PluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
-				}
-				final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
-				if (window == null) {
-					classLoader.close();
-					throw new PluginException(String.format("El plugin '%1s' definio un boton en una ventana desconocida: %2s", //$NON-NLS-1$
-							info.getName(), button.getWindow()));
-				}
-				try {
-					final PluginAction action = (PluginAction)
-							loadAction(button.getActionClassName(), PluginAction.class, classLoader);
-					action.setPlugin(plugin);
-					button.setAction(action);
-				}
-				catch (final Exception e) {
-					classLoader.close();
-					throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
-							info.getName(), button.getActionClassName()), e);
+			// Cargamos las clases de plugin
+			final List<AfirmaPlugin> plugins = new ArrayList<>();
+			final ServiceLoader<AfirmaPlugin> loader;
+			try {
+				loader = ServiceLoader.load(AfirmaPlugin.class, classLoader);
+				for (final AfirmaPlugin plugin : loader) {
+					plugins.add(plugin);
 				}
 			}
+			catch (final Error e) {
+				throw new PluginException("Se han contrado plugins mal definidos en el fichero importado"); //$NON-NLS-1$
+			}
+
+			if (plugins.size() == 0) {
+				throw new PluginException("No se encontro ningun plugin en los archivos"); //$NON-NLS-1$
+			}
+
+			if (plugins.size() > 1) {
+				throw new PluginException("No se permite la carga simulatea de varios plugins"); //$NON-NLS-1$
+			}
+
+			loadedPlugin = plugins.get(0);
+			loadedPlugin.setClassLoader(classLoader);
+
+			final PluginInfo info = loadPluginConfiguration(loadedPlugin);
+
+			registryPluginReferences(loadedPlugin, info);
+
+			// TODO: Puesto que ya almacenamos el classLoader de cada clase del plugin, ya
+			// no es necesario configurar las acciones de los botones de los plugins. Habria
+			// que ver donde se usa cada accion y cargar las clases involucradas a partir de
+			// su classLoader, igual que se hace con los menus.
+			if (info.getButtons() != null) {
+				for (final PluginButton button : info.getButtons()) {
+
+					if (button.getActionClassName() == null) {
+						throw new PluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
+					}
+					if (button.getWindow() == null) {
+						throw new PluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
+					}
+					final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
+					if (window == null) {
+						throw new PluginException(String.format("El plugin '%1s' definio un boton en una ventana desconocida: %2s", //$NON-NLS-1$
+								info.getName(), button.getWindow()));
+					}
+					try {
+						final PluginAction action = (PluginAction)
+								loadAction(button.getActionClassName(), PluginAction.class, classLoader);
+						action.setPlugin(loadedPlugin);
+						button.setAction(action);
+					}
+					catch (final Exception e) {
+						throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
+								info.getName(), button.getActionClassName()), e);
+					}
+				}
+			}
+
+			// Configuramos la informacion obtenida del plugin, en el propio plugin
+			loadedPlugin.setInfo(info);
 		}
 
-		// Configuramos la informacion obtenida del plugin, en el propio plugin
-		plugin.setInfo(info);
-
-		return plugin;
+		return loadedPlugin;
 	}
 
 	/**

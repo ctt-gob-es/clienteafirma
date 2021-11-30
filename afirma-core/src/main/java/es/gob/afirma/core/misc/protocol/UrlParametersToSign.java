@@ -298,11 +298,11 @@ public final class UrlParametersToSign extends UrlParameters {
 	public void expandExtraParams() throws IncompatiblePolicyException {
 		setExtraParams(
 				ExtraParamsProcessor.expandProperties(
-				getExtraParams(),
-				getData(),
-				getSignatureFormat()
-			)
-		);
+						getExtraParams(),
+						this.data,
+						getSignatureFormat()
+						)
+				);
 	}
 
 	public Map<String, String> getAnotherParams() {

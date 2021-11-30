@@ -19,9 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -30,15 +27,12 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -53,12 +47,14 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.so.macos.ShellScript;
+import es.gob.afirma.standalone.so.macos.UnixUtils;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
@@ -139,7 +135,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Ejecutamos el script de inmediato porque necesitamos estos permisos para seguir. Despues se ejecutara
 		// de nuevo con el resto de comandos
-		addExexPermissionsToFile(new File(mac_script_path));
+		UnixUtils.addAllPermissionsToFile(new File(mac_script_path));
 		try {
 			executeScript(mac_script_path, true, false);
 		} catch (final Exception e) {
@@ -205,7 +201,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		final File sslRootCertFile;
 		if (!checkSSLKeyStoreGenerated(appDir)) {
 			// Damos permisos al script
-			addExexPermissionsToAllFilesOnDirectory(appDir);
+			UnixUtils.addExexPermissionsToAllFilesOnDirectory(appDir);
 
 			try {
 				configureSSL(appDir, configPanel);
@@ -224,7 +220,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 		else if (!checkSSLRootCertificateGenerated(appDir)) {
 			// Damos permisos al script
-			addExexPermissionsToAllFilesOnDirectory(appDir);
+			UnixUtils.addExexPermissionsToAllFilesOnDirectory(appDir);
 
 			sslRootCertFile = new File(appDir, SSL_CA_CER_FILENAME);
 			try {
@@ -397,7 +393,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		catch (final IOException e) {
 			LOGGER.log(Level.WARNING, "Ha ocurrido un error al generar el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
 		}
-		MacUtils.addAllPermissionsToFile(scriptFile);
+		UnixUtils.addAllPermissionsToFile(scriptFile);
 		return scriptFile;
 	}
 
@@ -471,7 +467,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
 			final File scriptFile = new File(mac_script_path);
-			addExexPermissionsToFile(scriptFile);
+			UnixUtils.addAllPermissionsToFile(scriptFile);
 			MacUtils.executeScriptFile(scriptFile, true, true);
 		}
 		catch (final Exception e) {
@@ -577,47 +573,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	}
 
 	/**
-	 * Da permisos de ejecuci&oacute;n a todos los ficheros de un directorio dado.
-	 * @param dir Directorio al que dar permiso.
-	 */
-	public static void addExexPermissionsToAllFilesOnDirectory(final File dir) {
-
-		for (final File fileEntry : dir.listFiles()) {
-			addExexPermissionsToFile(fileEntry);
-		}
-	}
-
-	/**
-	 * Cambia los permisos de un fichero para permitir su ejecuci&oacute;n
-	 * @param f Fichero sobre el cual se cambian los permisos
-	 */
-	static void addExexPermissionsToFile(final File f) {
-		final Set<PosixFilePermission> perms = new HashSet<>();
-		perms.add(PosixFilePermission.OWNER_EXECUTE);
-		perms.add(PosixFilePermission.GROUP_EXECUTE);
-		perms.add(PosixFilePermission.OTHERS_EXECUTE);
-		perms.add(PosixFilePermission.OWNER_READ);
-		perms.add(PosixFilePermission.GROUP_READ);
-		perms.add(PosixFilePermission.OTHERS_READ);
-		perms.add(PosixFilePermission.OWNER_WRITE);
-		perms.add(PosixFilePermission.GROUP_WRITE);
-		perms.add(PosixFilePermission.OTHERS_WRITE);
-
-		try {
-			Files.setPosixFilePermissions(
-				Paths.get(f.getAbsolutePath()),
-				perms
-			);
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-	}
-
-
-	/**
 	 * Agrega al script de ejecuci&oacute;n los comandos para la desinstalaci&oacute;n
 	 * del certificado generado del llavero OS X y elimina los links simb&oacute;licos.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
@@ -657,11 +612,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		try (final InputStream in = new FileInputStream(new File(appDir, TRUST_SETTINGS_FILE));) {
 
-			final DocumentBuilderFactory docFactory =
-			DocumentBuilderFactory.newInstance();
-			final DocumentBuilder docBuilder =
-			docFactory.newDocumentBuilder();
-			final Document doc = docBuilder.parse(in);
+			final Document doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(in);
 			final Node dict = doc.getElementsByTagName("dict").item(1); //$NON-NLS-1$
 			final NodeList list = dict.getChildNodes();
 
@@ -698,6 +649,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		    }
 
 			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
 			final Transformer transformer = transformerFactory.newTransformer();
 			final DOMSource domSource = new DOMSource(doc);
 			final StreamResult streamResult = new StreamResult(
@@ -774,7 +727,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Generamos script para borrar el almacen certificados firefox
 		RestoreConfigFirefox.generateUninstallScriptMac(workingDir, userDirs);
 		// Le damos permisos para poder ejecutarlo
-		addExexPermissionsToAllFilesOnDirectory(workingDir);
+		UnixUtils.addExexPermissionsToAllFilesOnDirectory(workingDir);
 	}
 
 	/** Escribe un <i>script</i> en un fichero dado.

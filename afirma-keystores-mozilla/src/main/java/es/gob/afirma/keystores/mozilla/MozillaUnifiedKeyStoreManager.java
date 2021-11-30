@@ -62,19 +62,19 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
 
 		this.passwordCallback = pssCallBack;
-		this.configParams = params;
+		this.configParams = params != null ? params.clone() : params;
 
 		// Vaciamos el listado de almacenes agregados ya que esta llamada puede realizarse como
 		// parte de una operacion de refresco del almacen
 		removeAll();
 
-		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
+		final Object parentComponent = this.configParams != null && this.configParams.length > 0 ? this.configParams[0] : null;
 
 		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
 			try {
-				ksm.init(type, store, pssCallBack, params, forceReset);
+				ksm.init(type, store, pssCallBack, this.configParams, forceReset);
 			}
 			catch(final Exception e) {
 				LOGGER.severe(

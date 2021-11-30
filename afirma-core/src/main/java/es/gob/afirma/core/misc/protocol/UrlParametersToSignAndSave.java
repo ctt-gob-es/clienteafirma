@@ -325,11 +325,11 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	public void expandExtraParams() throws IncompatiblePolicyException {
 		setExtraParams(
 				ExtraParamsProcessor.expandProperties(
-				getExtraParams(),
-				getData(),
-				getSignatureFormat()
-			)
-		);
+						getExtraParams(),
+						this.data,
+						getSignatureFormat()
+						)
+				);
 	}
 
 

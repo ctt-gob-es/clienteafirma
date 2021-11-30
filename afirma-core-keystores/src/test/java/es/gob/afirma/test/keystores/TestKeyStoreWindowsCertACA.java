@@ -64,7 +64,7 @@ public class TestKeyStoreWindowsCertACA {
 			);
         }
         catch (final Exception e) {
-        	e.printStackTrace();
+        	Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se pudo cargar la clave de firma", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         Assert.assertNotNull("No se pudo extraer la clave del almacen", pke); //$NON-NLS-1$
     }

@@ -86,13 +86,9 @@ public final class TestPkcs11 {
 				null
 			)).getPrivateKey()
 		);
-		try {
-			s.update("Hola".getBytes()); //$NON-NLS-1$
-		}
-		catch(final Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+
+		s.update("Hola".getBytes()); //$NON-NLS-1$
+
 		System.out.println("Firma: " + new String(s.sign())); //$NON-NLS-1$
 
 	}

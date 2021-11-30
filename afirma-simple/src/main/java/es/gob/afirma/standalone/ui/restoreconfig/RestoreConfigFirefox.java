@@ -21,9 +21,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
@@ -42,6 +39,7 @@ import javax.swing.Timer;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
+import es.gob.afirma.standalone.so.macos.UnixUtils;
 
 
 /**Contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -429,35 +427,6 @@ final class RestoreConfigFirefox {
 		RestoreConfigFirefox.deleteConfigDir(targetDir);
 	}
 
-	/**
-	 * Cambia los permisos de un fichero para poder ejecutarlo en Linux
-	 * @param f Fichero sobre se cambian los permisos
-	 */
-	static void addExexPermissionsToFile(final File f) {
-		final Set<PosixFilePermission> perms = new HashSet<>();
-		perms.add(PosixFilePermission.OWNER_EXECUTE);
-		perms.add(PosixFilePermission.GROUP_EXECUTE);
-		perms.add(PosixFilePermission.OTHERS_EXECUTE);
-		perms.add(PosixFilePermission.OWNER_READ);
-		perms.add(PosixFilePermission.GROUP_READ);
-		perms.add(PosixFilePermission.OTHERS_READ);
-		perms.add(PosixFilePermission.OWNER_WRITE);
-		perms.add(PosixFilePermission.GROUP_WRITE);
-		perms.add(PosixFilePermission.OTHERS_WRITE);
-		try {
-			Files.setPosixFilePermissions(
-				Paths.get(f.getAbsolutePath()),
-				perms
-			);
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-	}
-
-
 	private static String escapePath(final String path) {
 		if (path == null) {
 			throw new IllegalArgumentException(
@@ -494,7 +463,7 @@ final class RestoreConfigFirefox {
 			}
 
 			if (!certutilFile.canExecute() && Platform.OS.MACOSX.equals(Platform.getOS())) {
-				RestoreConfigMacOSX.addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
+				UnixUtils.addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
 			}
 
 			if (!certutilFile.canExecute()) {
@@ -648,8 +617,8 @@ final class RestoreConfigFirefox {
 				return true;
 			}
 
-			addExexPermissionsToFile(uninstallScript);
-			addExexPermissionsToFile(installScript);
+			UnixUtils.addAllPermissionsToFile(uninstallScript);
+			UnixUtils.addAllPermissionsToFile(installScript);
 
 			// Primero desinstalamos las posibles versiones previas del certificado
 			try {
@@ -799,7 +768,7 @@ final class RestoreConfigFirefox {
 		if (!certutil.exists()) {
 			uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, workingDir);
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				RestoreConfigMacOSX.addExexPermissionsToAllFilesOnDirectory(certutil);
+				UnixUtils.addExexPermissionsToAllFilesOnDirectory(certutil);
 			}
 		}
 	}

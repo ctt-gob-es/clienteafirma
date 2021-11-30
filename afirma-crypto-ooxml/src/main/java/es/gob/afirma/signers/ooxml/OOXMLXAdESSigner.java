@@ -31,7 +31,6 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -104,9 +103,7 @@ final class OOXMLXAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		final Document docSignature = dbf.newDocumentBuilder().newDocument();
+		final Document docSignature = Utils.getNewDocumentBuilder().newDocument();
 
 		// Instancia XADES_EPES
 		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
@@ -254,7 +251,7 @@ final class OOXMLXAdESSigner {
         writeXMLwithXALAN(writer, node, xmlEncoding);
 
         try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+        	Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
         catch (final Exception e) {
             LOGGER.severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e); //$NON-NLS-1$

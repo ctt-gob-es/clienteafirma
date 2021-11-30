@@ -6,6 +6,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ServerSocketFactory;
 import javax.net.SocketFactory;
@@ -18,6 +20,8 @@ public final class TestFirewall {
 
 	private static final int PORT = 6629;
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Main para pruebas.
 	 * @param args No se usa.
 	 * @throws Exception En cualquier error no controlado. */
@@ -28,10 +32,7 @@ public final class TestFirewall {
 					createSocket(PORT);
 				}
 				catch (final IOException e) {
-					System.out.println(
-						"Error creando el servicio servidor en el puerto " + PORT //$NON-NLS-1$
-					);
-					e.printStackTrace();
+					LOGGER.log(Level.SEVERE, "Error creando el servicio servidor en el puerto " + PORT, e); //$NON-NLS-1$
 				}
 
 			}
@@ -46,12 +47,12 @@ public final class TestFirewall {
 				);
 			}
 			catch(final SocketTimeoutException | java.net.ConnectException ste) {
-				System.out.println("No se ha podido conectar: " + ste); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se ha podido conectar", ste); //$NON-NLS-1$
 				System.exit(-2);
 			}
 			try ( final InputStream is = s.getInputStream(); ) {
 				final byte[] d = getDataFromInputStream(is);
-				System.out.println(new String(d));
+				LOGGER.log(Level.INFO, new String(d));
 			}
 		}
 

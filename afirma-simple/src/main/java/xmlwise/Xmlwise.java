@@ -4,10 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
+
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /**
  * Xmlwise convenience methods for loading xml documents and render them into
@@ -45,9 +44,7 @@ public class Xmlwise
 	{
 		try
 		{
-			final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-			final DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-			return builder.parse(file);
+			return SecureXmlBuilder.getSecureDocumentBuilder().parse(file);
 		}
 		catch (final IOException e)
 		{
@@ -71,9 +68,7 @@ public class Xmlwise
 	{
 		try
 		{
-			final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-			final DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-			return builder.parse(new ByteArrayInputStream(xml.getBytes()));
+			return SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
 		}
 		catch (final Exception e)
 		{

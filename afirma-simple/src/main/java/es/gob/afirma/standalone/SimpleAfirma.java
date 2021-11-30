@@ -840,7 +840,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
                         try {
                             fileLock.release();
                             randomAccessFile.close();
-                            file.delete();
+                            if (!file.delete()) {
+                            	LOGGER.warning("No se ha podido eliminar el bloqueo de instancia"); //$NON-NLS-1$
+                            }
 						} catch (final Exception e) {
                             LOGGER.warning("No se ha podido eliminar el bloqueo de instancia: " + e); //$NON-NLS-1$
                         }

@@ -57,7 +57,7 @@ public final class HttpError extends IOException {
 		);
 		this.responseCode = resCode;
 		this.responseDescription = resDescription;
-		this.errorStreamBytes = errorStreamContent;
+		this.errorStreamBytes = errorStreamContent != null ? errorStreamContent.clone() : null;
 	}
 
 	/** Obtiene el contenido del flujo de error HTTP.

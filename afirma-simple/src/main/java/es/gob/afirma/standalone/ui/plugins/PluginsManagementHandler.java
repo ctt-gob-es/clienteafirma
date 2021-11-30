@@ -50,6 +50,10 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+
+	/** Extensi&oacute;n de fichero asociada a los plugins de la aplicaci&oacute;n. */
+	private static final String[] PLUGIN_EXTENSIONS = new String[] { "jar", "zip" }; //$NON-NLS-1$ //$NON-NLS-2$
+
 	private final PluginsManagementPanel view;
 
 	private List<AfirmaPlugin> pluginsList;
@@ -258,7 +262,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.3"), //$NON-NLS-1$
 				null,
 				null,
-				PluginsManager.PLUGIN_EXTENSIONS,
+				PLUGIN_EXTENSIONS,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.4"), //$NON-NLS-1$
 				false,
 				false,

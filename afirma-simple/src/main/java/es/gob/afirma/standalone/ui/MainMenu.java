@@ -319,7 +319,7 @@ public final class MainMenu extends JMenuBar {
         		OSXHandler.setAboutHandler(this, aboutMethod);
         	}
         	catch (final Exception e) {
-        		e.printStackTrace();
+        		LOGGER.log(Level.WARNING, "Error al abrir la ayuda", e); //$NON-NLS-1$
 			}
 
         	try {
@@ -327,7 +327,7 @@ public final class MainMenu extends JMenuBar {
         		OSXHandler.setQuitHandler(this, exitApplicationMethod);
         	}
         	catch (final Exception e) {
-        		e.printStackTrace();
+        		LOGGER.log(Level.WARNING, "Error al cerrar la aplicacion", e); //$NON-NLS-1$
 			}
         }
     }
