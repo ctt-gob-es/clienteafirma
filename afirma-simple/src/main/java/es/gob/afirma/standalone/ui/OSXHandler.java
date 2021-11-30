@@ -202,7 +202,7 @@ public class OSXHandler implements InvocationHandler {
         } catch (NoSuchMethodException | SecurityException | InstantiationException |
                  IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
-            LOGGER.log(Level.SEVERE, "Mac OS X Adapter could not talk to EAWT", e); //$NON-NLS-1$
+            LOGGER.log(Level.SEVERE, "Mac OS X Adapter could not talk to EAWT", ex); //$NON-NLS-1$
         }
     }
 
