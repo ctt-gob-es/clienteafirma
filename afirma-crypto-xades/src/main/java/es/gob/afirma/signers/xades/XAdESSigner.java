@@ -196,11 +196,11 @@ public final class XAdESSigner {
      *              <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *              <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      *            </ul>
-     * @param certChain Cadena de certificados del firmante
-     * @param pk Clave privada del firmante
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @return Firma en formato XAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @param certChain Cadena de certificados del firmante.
+     * @param pk Clave privada del firmante.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @return Firma en formato XAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
 	public static byte[] sign(final byte[] data,
 			                  final String signAlgorithm,
 			                  final PrivateKey pk,
@@ -362,7 +362,7 @@ public final class XAdESSigner {
 
 		// Un externally detached con URL permite los datos nulos o vacios
 		if ((data == null || data.length == 0)
-				&& !format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+				&& !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(format)) {
 			throw new AOException("No se han podido leer los datos a firmar"); //$NON-NLS-1$
 		}
 
@@ -444,7 +444,7 @@ public final class XAdESSigner {
 			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(docum, outputXmlEncoding);
 
 			// Creamos un elemento raiz nuevo unicamente si es necesario
-			if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
+			if (AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(format)) {
 				// Si se esta firmando un nodo con un ID concreto, ese nodo es ya el elemento de datos,
 				// por lo que no es necesario crear un elemento nuevo, a menos que sea justo el raiz,
 				// en cuyo caso no podemos usarlo directamente por la imposibilidad de poner la firma
@@ -608,7 +608,7 @@ public final class XAdESSigner {
 		if (docSignature == null) {
 			try {
 				docSignature = docBuilder.newDocument();
-				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
+				if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
 					// En este caso, dataElement es siempre el XML original a firmar
 					// (o un nodo de este si asi se especifico)
 					docSignature.appendChild(docSignature.adoptNode(dataElement));
@@ -706,7 +706,7 @@ public final class XAdESSigner {
 		XMLObject envelopingObject = null;
 		XMLObject envelopingStyleObject = null;
 
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
+		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
 			try {
 				// crea el nuevo elemento Object que contiene el documento a firmar
 				final List<XMLStructure> structures = new ArrayList<>(1);
@@ -813,7 +813,7 @@ public final class XAdESSigner {
 
 		// crea una referencia al documento mediante la URI hacia el
 		// identificador del nodo CONTENT o el de datos si ya tenia Id
-		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
+		else if (AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(format)) {
 			try {
 				if (dataElement != null) {
 					// Inserta en el nuevo documento de firma el documento a firmar
@@ -902,7 +902,7 @@ public final class XAdESSigner {
 		// directas a los datos y referencias a traves de un manifest. Las referencias se crean a
 		// partir de URIs externas y, si se usa manifest o los datos no son derreferenciables, los
 		// Message Digest precalculados
-		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+		else if (AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(format)) {
 
 			// Los datos proporcionados son el message digest
 			final String digestAlgorithm = externalReferencesHashAlgorithm != null ?
@@ -929,27 +929,30 @@ public final class XAdESSigner {
 				final boolean dataIsMessageDigest = externalReferencesHashAlgorithm != null;
 				if (!dataIsMessageDigest) {
 					LOGGER.warning("No se ha proporcionado la huella asociada a la referencia del parametro '" + XAdESExtraParams.URI  //$NON-NLS-1$
-							+ "'. Compruebe proporcionar la huella como datos y el parametro '"  //$NON-NLS-1$
+						+ "'. Compruebe proporcionar la huella como datos y el parametro '"  //$NON-NLS-1$
 							+ XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM + "' con algoritmo de hash"); //$NON-NLS-1$
 					throw new AOException("No se ha proporcionado la huella asociada a la referencia"); //$NON-NLS-1$
 				}
 
 				try {
 					refDataList = loadManifestReferencesData(
-							data,
-							referenceId,
-							extraParams);
+						data,
+						referenceId,
+						extraParams
+					);
 				}
 				catch (final NoSuchAlgorithmException e) {
 					throw new AOException(
-							"No se ha podido calcular la huella de los datos proporcionados", //$NON-NLS-1$
-							e);
+						"No se ha podido calcular la huella de los datos proporcionados", //$NON-NLS-1$
+						e
+					);
 				}
 				catch (final Exception e) {
 					LOGGER.severe("No se han indicado los parametros necesarios ('uri1', 'uri2'... y 'md1', 'md2'...) para construir las referencias a los datos"); //$NON-NLS-1$
 					throw new AOException(
-							"No se han indicado los parametros necesarios para construir las referencias a los datos", //$NON-NLS-1$
-							e);
+						"No se han indicado los parametros necesarios para construir las referencias a los datos", //$NON-NLS-1$
+						e
+					);
 				}
 
 
@@ -957,18 +960,19 @@ public final class XAdESSigner {
 				for (final ExternalReferenceData refData : refDataList) {
 					try {
 						referenceList.add(fac.newReference(
-								refData.getUri(),
-								dm,
-								null,
-								null, // A las referencias externas no se les pone tipo
-								refData.getId(),
-								refData.getMessageDigest()));
+							refData.getUri(),
+							dm,
+							null,
+							null, // A las referencias externas no se les pone tipo
+							refData.getId(),
+							refData.getMessageDigest())
+						);
 					}
 					catch (final Exception e) {
 						throw new AOException(
-								"Error al generar la firma Manifest al no poder crear una de las referencias externas", //$NON-NLS-1$
-								e
-								);
+							"Error al generar la firma Manifest al no poder crear una de las referencias externas", //$NON-NLS-1$
+							e
+						);
 					}
 				}
 			}
@@ -1017,7 +1021,7 @@ public final class XAdESSigner {
 		}
 
 		// Crea una referencia indicando que se trata de una firma enveloped
-		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
+		else if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
 			try {
 				if (!avoidEnveloped) {
 					// Transformacion enveloped.
@@ -1145,11 +1149,13 @@ public final class XAdESSigner {
 		if (refDataList != null) {
 			for (final ExternalReferenceData refData : refDataList) {
 				objectFormats.add(
-						createDataObjectFormat(
-								refData.getId(),
-								refData.getMimeType(),
-								refData.getOid(),
-								refData.getEncoding()));
+					createDataObjectFormat(
+						refData.getId(),
+						refData.getMimeType(),
+						refData.getOid(),
+						refData.getEncoding()
+					)
+				);
 			}
 
 		}
@@ -1177,7 +1183,7 @@ public final class XAdESSigner {
 
 		// en el caso de formato enveloping se inserta el elemento Object con el
 		// documento a firmar
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
+		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
 			xmlSignature.addXMLObject(envelopingObject);
 			if (envelopingStyleObject != null) {
 				xmlSignature.addXMLObject(envelopingStyleObject);
@@ -1187,7 +1193,7 @@ public final class XAdESSigner {
 		// *******************************************************
 		// *********** Hojas de estilo en Enveloped **************
 		// *******************************************************
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && xmlStyle.getStyleElement() != null) {
+		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format) && xmlStyle.getStyleElement() != null) {
 
 			// Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
 			// referenciarla
@@ -1270,7 +1276,7 @@ public final class XAdESSigner {
 
 		// Si se esta realizando una firma enveloping simple no tiene sentido el nodo raiz,
 		// asi que sacamos el nodo de firma a un documento aparte
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
+		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
 			try {
 				if (docSignature.getElementsByTagNameNS(XMLConstants.DSIGNNS,
 						XMLConstants.TAG_SIGNATURE).getLength() == 1) {
@@ -1298,10 +1304,10 @@ public final class XAdESSigner {
 		return Utils.writeXML(
 			docSignature.getDocumentElement(),
 			originalXMLProperties,
-			format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) ?
+			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format) ?
 				xmlStyle.getStyleHref() :
 					null,
-			format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) ?
+			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format) ?
 				xmlStyle.getStyleType() :
 					null
 		);
@@ -1314,8 +1320,8 @@ public final class XAdESSigner {
 	 * opciones de configuraci&oacute;n no recomendadas.
 	 * @param algorithm Algoritmo de firma.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n.
-	 * @throws IllegalArgumentException Cuando se proporciona una configuracion de firma no v&aacute;lida e
-	 * incorregible.
+	 * @throws IllegalArgumentException Cuando se proporciona una configuraci&oacute;n de firma
+	 *                                  no v&aacute;lida e incorregible.
 	 */
 	private static void checkParams(final String algorithm, final Properties extraParams) {
 
@@ -1388,15 +1394,13 @@ public final class XAdESSigner {
 					new ArrayList<String>(0));
 		}
 
-		final DataObjectFormat objectFormat = new DataObjectFormatImpl(
+		return new DataObjectFormatImpl(
 			null,
 			objectIdentifier,
 			mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE,
 			encoding,
 			"#" + referenceId //$NON-NLS-1$
 		);
-
-		return objectFormat;
 	}
 
 	/**
@@ -1452,8 +1456,10 @@ public final class XAdESSigner {
 				ref = new ExternalReferenceData(uri, data);
 			}
 			else {
-				ref = new ExternalReferenceData(uri,
-						MessageDigest.getInstance(mdAlgorithm).digest(data));
+				ref = new ExternalReferenceData(
+					uri,
+					MessageDigest.getInstance(mdAlgorithm).digest(data)
+				);
 			}
 		}
 		// Si no se tiene ni la huella ni los datos, no tenemos huella
@@ -1466,17 +1472,17 @@ public final class XAdESSigner {
 
 	/**
 	 * Carga el listado de referencias a los datos que se van a firmar. De cada referencia
-	 * se intenta cargar la huella digital asociada, calculandola a partir de los datos
+	 * se intenta cargar la huella digital asociada, calcul&aacute;ndola a partir de los datos
 	 * proporcionados si es posible. Durante este proceso no se accede a URI externas para
 	 * calcular las huellas. Eso s&oacute;lo se har&aacute;a cuando no se use manifest.
 	 * @param digest La huella de los datos referenciados o {@code null} desde los extraParams
-	 * se pueden obtener m&uacute;ltiples referncias con la
+	 *               se pueden obtener m&uacute;ltiples referncias con la
 	 * @param referenceId Indica si el dato anterior es la huella o los datos.
 	 * @param extraParams Configuraci&oacute;n de firma.
 	 * @return Listado de referencias externas.
 	 * @throws AOException Cuando se encuentra un defecto en los par&aacute;metros proporcionados.
 	 * @throws NoSuchAlgorithmException Cuando el algoritmo de huella indicado no es v&aacute;lido
-	 * e intenta usarse para calcular la huella de los datos.
+	 *                                  e intenta usarse para calcular la huella de los datos.
 	 */
 	private static List<ExternalReferenceData> loadManifestReferencesData(
 			final byte[] digest,
@@ -1490,7 +1496,9 @@ public final class XAdESSigner {
 		// o su huella a trav&eacute;s del par&aacute;metro {@code data}.
 		if (extraParams.containsKey(XAdESExtraParams.URI)) {
 			if (digest == null) {
-				throw new AOException("No se ha proporcionado en el parametro de datos la huella correspondiente a los datos referenciados por la URI"); //$NON-NLS-1$
+				throw new AOException(
+					"No se ha proporcionado en el parametro de datos la huella correspondiente a los datos referenciados por la URI" //$NON-NLS-1$
+				);
 			}
 			final String uri = extraParams.getProperty(XAdESExtraParams.URI);
 			final String mimeType = extraParams.getProperty(XAdESExtraParams.CONTENT_MIME_TYPE);
@@ -1509,21 +1517,24 @@ public final class XAdESSigner {
 			while (extraParams.containsKey(XAdESExtraParams.URI_PREFIX + i)) {
 				if (!extraParams.containsKey(XAdESExtraParams.MD_PREFIX + i)) {
 					throw new AOException(
-							String.format("No se ha indicado la huella de la referencia %d del manifest", new Integer(i))); //$NON-NLS-1$
+						String.format("No se ha indicado la huella de la referencia %d del manifest", Integer.valueOf(i)) //$NON-NLS-1$
+					);
 				}
-				byte[] md;
+				final byte[] md;
 				try {
 					md = Base64.decode(extraParams.getProperty(XAdESExtraParams.MD_PREFIX + i));
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.WARNING, "Se ha indicado un base 64 no valido como huella de la referencia " + i, e); //$NON-NLS-1$
 					throw new AOException(
-							String.format("Se ha indicado un base 64 no valido como huella de la referencia %d del manifest", new Integer(i)), //$NON-NLS-1$
-							e);
+						String.format("Se ha indicado un base 64 no valido como huella de la referencia %d del manifest", Integer.valueOf(i)), //$NON-NLS-1$
+						e
+					);
 				}
 				final ExternalReferenceData refData = new ExternalReferenceData(
-						extraParams.getProperty(XAdESExtraParams.URI_PREFIX + i),
-						md);
+					extraParams.getProperty(XAdESExtraParams.URI_PREFIX + i),
+					md
+				);
 
 				refData.setId("Reference-" + generateUUID()); //$NON-NLS-1$
 				refData.setMimeType(extraParams.getProperty(XAdESExtraParams.CONTENT_MIME_TYPE_PREFIX + i));
@@ -1543,7 +1554,7 @@ public final class XAdESSigner {
 	}
 
 	/**
-	 * Crea una referencia a datos externos a partir de
+	 * Crea una referencia a datos externos.
 	 * @param uri URI a los datos externos.
 	 * @param fac Factor&iacute;a de firmas XML.
 	 * @param digestMethod Identificador del algoritmo de huella digital.
@@ -1561,7 +1572,7 @@ public final class XAdESSigner {
 
 		// Si es una referencia de tipo file:// obtenemos el fichero y
 		// creamos una referencia solo con el message digest
-		if (uri.substring(0, FILE_PROTOCOL_PREFIX.length()).equalsIgnoreCase(FILE_PROTOCOL_PREFIX)) {
+		if (FILE_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, FILE_PROTOCOL_PREFIX.length()))) {
 			try (
 				final InputStream lfis = AOUtil.loadFile(AOUtil.createURI(uri))
 			) {
@@ -1586,8 +1597,8 @@ public final class XAdESSigner {
 		}
 
 		// Dereferenciamos las URL de tipo HTTP/HTTPS
-		else if (uri.substring(0, HTTP_PROTOCOL_PREFIX.length()).equalsIgnoreCase(HTTP_PROTOCOL_PREFIX) ||
-				uri.substring(0, HTTPS_PROTOCOL_PREFIX.length()).equalsIgnoreCase(HTTPS_PROTOCOL_PREFIX)) {
+		else if (HTTP_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, HTTP_PROTOCOL_PREFIX.length())) ||
+				HTTPS_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, HTTPS_PROTOCOL_PREFIX.length()))) {
 			try {
 
 				final UrlHttpManager httpManager = UrlHttpManagerFactory.getInstalledManager();
