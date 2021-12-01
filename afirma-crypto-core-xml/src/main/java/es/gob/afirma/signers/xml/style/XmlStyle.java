@@ -18,14 +18,13 @@ import java.net.URI;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.xml.Utils;
 
 /** Elemento de estilo XML (XSL) a firmar.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -247,7 +246,7 @@ public final class XmlStyle {
 
         try {
             if (xml != null) {
-                return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xml));
+                return Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(xml));
             }
             throw new CannotDereferenceException("No se ha dereferenciado la hoja de estilo"); //$NON-NLS-1$
         }

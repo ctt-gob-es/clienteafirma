@@ -35,6 +35,7 @@ import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.pades.PdfPreProcessor;
 
 /** Pruebas de operaciones sobre XMP.
@@ -118,7 +119,7 @@ public final class TestMetadata {
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-		final DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilder db = SecureXmlBuilder.getSecureDocumentBuilder();
 		final Document doc = db.parse(new ByteArrayInputStream(xmpBytes));
 		NodeList nl = doc.getElementsByTagName("xmpMM:History"); //$NON-NLS-1$
 		if (nl.getLength() != 1) {

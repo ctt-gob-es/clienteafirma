@@ -1224,11 +1224,11 @@ var AutoScript = ( function ( window, undefined ) {
 					console.log("Se cierra el socket");
 				};
 
-				ws.onmessage = function(evt) {
+				webSocket.onmessage = function(evt) {
 					console.log("Procesado por defecto del mensaje");
 				}
 				
-				ws.onerror = function(evt) {
+				webSocket.onerror = function(evt) {
 					console.log("Procesado por defecto del error");
 				}
 				

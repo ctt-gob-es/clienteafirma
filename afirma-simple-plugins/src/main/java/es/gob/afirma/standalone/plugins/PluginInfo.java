@@ -107,7 +107,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @return Listado de autores.
 	 */
 	public String[] getAuthors() {
-		return this.authors;
+		return this.authors != null ? this.authors.clone() : null;
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @param authors Listado de autores.
 	 */
 	public void setAuthors(final String[] authors) {
-		this.authors = authors;
+		this.authors = authors != null ? authors.clone() : null;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @return Listado contactos.
 	 */
 	public String[] getContacts() {
-		return this.contacts;
+		return this.contacts != null ? this.contacts.clone() : null;
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @param contacts Listado contactos.
 	 */
 	public void setContacts(final String[] contacts) {
-		this.contacts = contacts;
+		this.contacts = contacts != null ? contacts.clone() : null;
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @return Listado de permisos.
 	 */
 	public Permission[] getPermissions() {
-		return this.permissions;
+		return this.permissions != null ? this.permissions.clone() : null;
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @param permissions Listado de permisos.
 	 */
 	public void setPermissions(final Permission[] permissions) {
-		this.permissions = permissions;
+		this.permissions = permissions != null ? permissions.clone() : null;
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @return Botones para el acceso a las funciones del plugin.
 	 */
 	public PluginButton[] getButtons() {
-		return this.buttons;
+		return this.buttons != null ? this.buttons.clone() : null;
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @param buttons Botones para el acceso a las funciones del plugin.
 	 */
 	public void setButtons(final PluginButton[] buttons) {
-		this.buttons = buttons;
+		this.buttons = buttons != null ? buttons.clone() : null;
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @return Comandos declarados por el plugin.
 	 */
 	public PluginCommand[] getCommands() {
-		return this.commands;
+		return this.commands != null ? this.commands.clone() : null;
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class PluginInfo extends MinimalPluginInfo {
 	 * @param commands Comandos declarados por el plugin.
 	 */
 	public void setCommands(final PluginCommand[] commands) {
-		this.commands = commands;
+		this.commands = commands != null ? commands.clone() : null;
 	}
 
 	@Override

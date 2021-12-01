@@ -104,13 +104,11 @@ public class OSXHandler implements InvocationHandler {
             final Object osxAdapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { quitHandlerClass }, adapter);
             addHandlerMethod.invoke(macOSXApplication, new Object[] { osxAdapterProxy });
         } catch (final ClassNotFoundException cnfe) {
-            LOGGER.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled ({0})", cnfe.getMessage()); //$NON-NLS-1$
-            cnfe.printStackTrace();
+            LOGGER.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled", cnfe); //$NON-NLS-1$
         } catch (NoSuchMethodException | SecurityException | InstantiationException |
                  IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
-            LOGGER.severe("Mac OS X Adapter could not talk to EAWT:"); //$NON-NLS-1$
-            LOGGER.severe(ex.toString());
+            LOGGER.log(Level.SEVERE, "Mac OS X Adapter could not talk to EAWT", ex); //$NON-NLS-1$
         }
     }
 
@@ -153,13 +151,11 @@ public class OSXHandler implements InvocationHandler {
             final Object osxAdapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { aboutHandlerClass }, adapter);
             addHandlerMethod.invoke(macOSXApplication, new Object[] { osxAdapterProxy });
         } catch (final ClassNotFoundException cnfe) {
-            LOGGER.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled ({0})", cnfe.getMessage()); //$NON-NLS-1$
-            cnfe.printStackTrace();
+            LOGGER.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled", cnfe); //$NON-NLS-1$
         } catch (NoSuchMethodException | SecurityException | InstantiationException |
                  IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
-            LOGGER.severe("Mac OS X Adapter could not talk to EAWT:"); //$NON-NLS-1$
-            LOGGER.severe(ex.toString());
+            LOGGER.log(Level.SEVERE, "Mac OS X Adapter could not talk to EAWT", ex); //$NON-NLS-1$
         }
     }
 
@@ -202,13 +198,11 @@ public class OSXHandler implements InvocationHandler {
             final Object osxAdapterProxy = Proxy.newProxyInstance(OSXHandler.class.getClassLoader(), new Class<?>[] { prefsHandlerClass }, adapter);
             addHandlerMethod.invoke(macOSXApplication, new Object[] { osxAdapterProxy });
         } catch (final ClassNotFoundException cnfe) {
-            LOGGER.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled ({0})", cnfe.getMessage()); //$NON-NLS-1$
-            cnfe.printStackTrace();
+            LOGGER.log(Level.SEVERE, "This version of Mac OS X does not support the Apple EAWT. ApplicationEvent handling has been disabled", cnfe); //$NON-NLS-1$
         } catch (NoSuchMethodException | SecurityException | InstantiationException |
                  IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
-            LOGGER.severe("Mac OS X Adapter could not talk to EAWT:"); //$NON-NLS-1$
-            LOGGER.severe(ex.toString());
+            LOGGER.log(Level.SEVERE, "Mac OS X Adapter could not talk to EAWT", ex); //$NON-NLS-1$
         }
     }
 

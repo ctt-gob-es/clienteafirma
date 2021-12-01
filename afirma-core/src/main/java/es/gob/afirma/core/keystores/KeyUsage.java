@@ -33,6 +33,21 @@ public final class KeyUsage {
 	private final Boolean[] usage;
 
 	/** Uso para firma electr&oacute;nica. */
+	private static final KeyUsage EMPTY_USAGES = new KeyUsage(
+		new Boolean[] {
+            null, // digitalSignature
+            null, // nonRepudiation
+            null, // keyEncipherment
+            null, // dataEncipherment
+            null, // keyAgreement
+            null, // keyCertSign
+            null, // cRLSign
+            null, // encipherOnly
+            null  // decipherOnly
+		}
+	);
+
+	/** Uso para firma electr&oacute;nica. */
 	public static final KeyUsage SIGN = new KeyUsage(
 		new Boolean[] {
             null, // digitalSignature
@@ -79,16 +94,24 @@ public final class KeyUsage {
 
 	@Override
 	public boolean equals(final Object e) {
-		if (!(e instanceof KeyUsage)) {
+		if (e == null || !(e instanceof KeyUsage)) {
 			return false;
 		}
 		final KeyUsage ku = (KeyUsage) e;
-		final Boolean[] other = ku.getUsage();
-		final Boolean[] me = getUsage();
+		Boolean[] other = ku.getUsage();
+		if (other == null) {
+			other = EMPTY_USAGES.getUsage();
+		}
+		Boolean[] me = getUsage();
+		if (me == null) {
+			me = EMPTY_USAGES.getUsage();
+		}
+
+		// Comprobamos que ambos sean iguales
 		if (other.length != me.length) {
 			return false;
 		}
-		for (int i=0;i<me.length;i++) {
+		for (int i = 0; i < me.length; i++) {
 			if (other[i] != me[i]) {
 				return false;
 			}
@@ -106,7 +129,7 @@ public final class KeyUsage {
 		}
 		final Boolean[] other = ku.getUsage();
 		final Boolean[] me = getUsage();
-		if (other.length != me.length) {
+		if (other == null || me == null || other.length != me.length) {
 			return false;
 		}
 		for (int i=0;i<me.length;i++) {

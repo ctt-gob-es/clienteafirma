@@ -22,8 +22,8 @@ class SocketOperationException extends Exception {
 		setErrorCode(code);
 	}
 
-	SocketOperationException(final String code, final String msg) {
-		super(msg);
+	SocketOperationException(final String code, final Throwable cause) {
+		super(cause != null ? cause.getMessage(): null, cause);
 		setErrorCode(code);
 	}
 

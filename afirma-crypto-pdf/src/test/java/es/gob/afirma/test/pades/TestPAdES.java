@@ -662,4 +662,41 @@ public class TestPAdES {
 
     	Assert.assertTrue("El formato no se ha identificado correctamente", signer instanceof AOPDFSigner); //$NON-NLS-1$
     }
+
+    /** Prueba de la verificaci&oacute;n de la versi&oacute;n de iText.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testReservedSignatureSize() throws Exception {
+
+    	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final byte[] testPdf;
+        try (
+    		final InputStream isPdf = ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(isPdf);
+        }
+    	final AOSigner signer = new AOPDFSigner();
+
+    	final byte[] defaultSignature = signer.sign(testPdf, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), null);
+
+    	final Properties reservedSpaceConfig = new Properties();
+    	reservedSpaceConfig.setProperty("signReservedSize", "40000"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    	final byte[] signatureWithReservedSpace = signer.sign(testPdf, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), reservedSpaceConfig);
+
+    	System.out.println("Tamano estandar: " + defaultSignature.length);
+    	System.out.println("Con tamano reservado: " + signatureWithReservedSpace.length);
+
+    	Assert.assertTrue(
+    			"El tamano de la firma con espacio reservado deveria ser considerablemente mayor a la por defecto", //$NON-NLS-1$
+    			signatureWithReservedSpace.length > defaultSignature.length + 10000);
+    }
 }

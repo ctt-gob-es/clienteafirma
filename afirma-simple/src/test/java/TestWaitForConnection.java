@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ServerSocketFactory;
 
@@ -15,24 +17,22 @@ public final class TestWaitForConnection {
 
 	private static final int PORT = 6629;
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Main para pruebas.
 	 * @param args No se usa. */
 	public static void main(final String[] args) {
 		new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-					try {
-						createSocket(PORT);
-					}
-					catch (final IOException e) {
-						System.out.println(
-							"Error creando el servicio servidor en el puerto " + PORT //$NON-NLS-1$
-						);
-						e.printStackTrace();
-					}
-
+			() -> {
+				try {
+					createSocket(PORT);
 				}
+				catch (final IOException e) {
+					LOGGER.log(Level.SEVERE,
+							"Error creando el servicio servidor en el puerto " + PORT, //$NON-NLS-1$
+							e);
+				}
+
 			}
 		).start();
 //		Thread.sleep(3000);

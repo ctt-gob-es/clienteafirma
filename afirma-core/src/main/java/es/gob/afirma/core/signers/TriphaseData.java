@@ -21,13 +21,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /** Mensaje con la informaci&oacute;n requerida para la ejecuci&oacute;n de una
  * operaci&oacute;n trif&aacute;sica. */
@@ -237,7 +237,7 @@ public final class TriphaseData {
 
 		Document doc;
 		try (final InputStream is = new ByteArrayInputStream(xml);) {
-			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+			doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero XML: " + e + "\n" + new String(xml)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -19,8 +19,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -29,6 +27,7 @@ import org.w3c.dom.Node;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -378,7 +377,7 @@ public final class BatchSigner {
 		try (
 			final InputStream is = new ByteArrayInputStream(xml);
 		) {
-			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+			doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
 			LOGGER.severe(

@@ -35,8 +35,6 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -48,6 +46,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.signers.ooxml.relprovider.RelationshipTransformParameterSpec;
 import es.gob.afirma.signers.ooxml.relprovider.RelationshipTransformService;
+import es.gob.afirma.signers.xml.Utils;
 
 final class OOXMLPackageObjectHelper {
 
@@ -167,10 +166,8 @@ final class OOXMLPackageObjectHelper {
 			final InputStream noCloseInputStream = new NoCloseInputStream(documentInputStream);
 		) {
 	        final InputSource inputSource = new InputSource(noCloseInputStream);
-	        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-	        documentBuilderFactory.setNamespaceAware(true);
-	        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-	        return documentBuilder.parse(inputSource);
+
+	        return Utils.getNewDocumentBuilder().parse(inputSource);
 		}
     }
 

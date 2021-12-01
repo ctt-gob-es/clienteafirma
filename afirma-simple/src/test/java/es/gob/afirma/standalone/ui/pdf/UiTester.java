@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
@@ -21,6 +23,8 @@ public final class UiTester {
 	//private final static String TEST_FILE = "sec1-v2.pdf"; //$NON-NLS-1$
 	private final static String TEST_FILE = "PDF_MULTISIZE.pdf"; //$NON-NLS-1$
 	private final static boolean IS_SIGN = false;
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Prueba de di&aacute;logo fallido. */
 	@SuppressWarnings({ "static-method" })
@@ -67,7 +71,7 @@ public final class UiTester {
 			new PdfLoaderListener() {
 				@Override
 				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
-					System.out.println("Cargado"); //$NON-NLS-1$
+					LOGGER.info("Cargado"); //$NON-NLS-1$
 					frame.add(
 						new SignPdfUiPanel(
 							isSign,
@@ -89,7 +93,7 @@ public final class UiTester {
 
 								@Override
 								public void positionCancelled() {
-									System.out.println("Seleccion cancelada"); //$NON-NLS-1$
+									LOGGER.info("Seleccion cancelada"); //$NON-NLS-1$
 									frame.dispose();
 									System.exit(0);
 								}
@@ -103,7 +107,7 @@ public final class UiTester {
 				}
 				@Override
 				public void pdfLoadedFailed(final Throwable cause) {
-					cause.printStackTrace();
+					LOGGER.log(Level.SEVERE, "Error en la carga del PDF", cause); //$NON-NLS-1$
 				}
 			}
 		);

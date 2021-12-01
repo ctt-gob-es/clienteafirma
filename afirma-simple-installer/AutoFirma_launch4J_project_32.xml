@@ -33,12 +33,12 @@
     <timeoutErr>false</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>1.7.0.0</fileVersion>
-    <txtFileVersion>1.7.0</txtFileVersion>
+    <fileVersion>1.8.0.0</fileVersion>
+    <txtFileVersion>1.8.0</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.7.0.0</productVersion>
-    <txtProductVersion>1.7.0</txtProductVersion>
+    <productVersion>1.8.0.0</productVersion>
+    <txtProductVersion>1.8.0</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>

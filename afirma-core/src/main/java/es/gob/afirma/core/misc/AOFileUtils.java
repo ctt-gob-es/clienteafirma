@@ -14,11 +14,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -30,7 +28,8 @@ public final class AOFileUtils {
 
 	private static final String SHORTENER_ELLIPSE = "..."; //$NON-NLS-1$
 
-    private static SAXParserFactory SAX_FACTORY = null;
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 
 	private AOFileUtils() {
 		// No permitimos la instanciacion
@@ -113,12 +112,8 @@ public final class AOFileUtils {
 	 */
     public static boolean isXML(final byte[] data) {
 
-    	if (SAX_FACTORY == null) {
-    		SAX_FACTORY = buildSecureSaxFactory();
-    	}
-
     	try {
-    		final SAXParser parser = SAX_FACTORY.newSAXParser();
+    		final SAXParser parser = SecureXmlBuilder.getSecureSAXParser();
     		final XMLReader reader = parser.getXMLReader();
     		reader.setErrorHandler(
 				new ErrorHandler() {
@@ -135,7 +130,7 @@ public final class AOFileUtils {
 						log(e);
 					}
 					private void log(final Exception e) {
-						Logger.getLogger("es.gob.afirma").fine("El documento no es un XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+						LOGGER.fine("El documento no es un XML: " + e); //$NON-NLS-1$
 					}
 				}
 			);
@@ -146,25 +141,4 @@ public final class AOFileUtils {
     	}
     	return true;
     }
-
-    /**
-     * Construye un parser SAX seguro que no accede a recursos externos.
-     * @return Factor&iacute;a segura.
-     */
-	private static SAXParserFactory buildSecureSaxFactory() {
-		final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-		try {
-			saxFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
-		}
-		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
-					Level.SEVERE,
-					"No se ha podido establecer una caracteristica de seguridad en la factoria XML: " + e); //$NON-NLS-1$
-		}
-
-		saxFactory.setValidating(false);
-		saxFactory.setNamespaceAware(true);
-
-		return saxFactory;
-	}
 }

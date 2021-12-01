@@ -34,7 +34,7 @@ public class ProcessResult {
 					);
 		}
 		this.result = r;
-		this.description = d != null ? d : ""; //$NON-NLS-1$
+		this.description = d;
 	}
 
 	public String getId() {

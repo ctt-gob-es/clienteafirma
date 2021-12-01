@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -26,6 +28,8 @@ public final class Pdf2ImagesConverterTests {
 
 	private final static String TEST_FILE = "sec1-v2.pdf"; //$NON-NLS-1$
 	private final static boolean IS_SIGN = false;
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** prueba de conversi&oacute;n de PDF a conjunto de im&aacute;genes.
 	 * @throws Exception En cualquier error. */
@@ -53,7 +57,7 @@ public final class Pdf2ImagesConverterTests {
 	@Ignore
 	public void testPdfLoad() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
-		System.out.println("Inicio de la carga"); //$NON-NLS-1$
+		LOGGER.info("Inicio de la carga"); //$NON-NLS-1$
 		final long time = System.currentTimeMillis();
 		PdfLoader.loadPdf(
 			IS_SIGN,
@@ -61,14 +65,14 @@ public final class Pdf2ImagesConverterTests {
 			new PdfLoaderListener() {
 				@Override
 				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
-					System.out.println(
+					LOGGER.info(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					System.exit(-1);
 				}
 				@Override
 				public void pdfLoadedFailed(final Throwable cause) {
-					cause.printStackTrace();
+					LOGGER.log(Level.SEVERE, "Error en la carga del PDF", cause); //$NON-NLS-1$
 				}
 			}
 		);
@@ -84,7 +88,7 @@ public final class Pdf2ImagesConverterTests {
 	public void testPdfLoadUi() throws Exception {
 
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
-		System.out.println("Inicio de la carga"); //$NON-NLS-1$
+		LOGGER.info("Inicio de la carga"); //$NON-NLS-1$
 		final long time = System.currentTimeMillis();
 
 		final JFrame frame = new JFrame("Cargando documento PDF"); //$NON-NLS-1$
@@ -98,13 +102,13 @@ public final class Pdf2ImagesConverterTests {
 			new PdfLoaderListener() {
 				@Override
 				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
-					System.out.println(
+					LOGGER.info(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 				@Override
 				public void pdfLoadedFailed(final Throwable cause) {
-					cause.printStackTrace();
+					LOGGER.log(Level.SEVERE, "Error en la carga del PDF", cause); //$NON-NLS-1$
 				}
 			}
 		);

@@ -167,7 +167,7 @@ final class ProtocolInvocationLauncherSign {
 			catch (final VisibleSignatureMandatoryException e) {
 				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_VISIBLE_SIGNATURE;
-				throw new SocketOperationException(errorCode, e.getMessage());
+				throw new SocketOperationException(errorCode, e);
 			}
 			catch (final SocketOperationException e) {
 				LOGGER.log(Level.SEVERE, "Se identifico un error en una operacion de firma", e); //$NON-NLS-1$
@@ -186,7 +186,7 @@ final class ProtocolInvocationLauncherSign {
 		catch (final EncryptingException e) {
 			LOGGER.log(Level.SEVERE, "Error en el cifrado de los datos a enviar", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error en el postprocesador de los datos a enviar", e); //$NON-NLS-1$
@@ -330,7 +330,7 @@ final class ProtocolInvocationLauncherSign {
 			} catch (final Exception e) {
 				LOGGER.severe("Error en la lectura de los datos a firmar: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_READ_DATA;
-				throw new SocketOperationException(errorCode);
+				throw new SocketOperationException(errorCode, e);
 			}
 		}
 
@@ -531,72 +531,72 @@ final class ProtocolInvocationLauncherSign {
 		} catch (final IllegalArgumentException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-			throw new SocketOperationException(errorCode, e.getMessage());
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final AOTriphaseException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT;
-			throw new SocketOperationException(errorCode, e.getMessage());
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final InvalidPdfException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_PDF;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final InvalidXMLException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_XML;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final AOFormatFileException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final InvalidEFacturaDataException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_FACTURAE;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final EFacturaAlreadySignedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final ContainsNoDataException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGN_WITHOUT_DATA;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final AOInvalidFormatException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final PdfHasUnregisteredSignaturesException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final PdfIsCertifiedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final BadPdfPasswordException | PdfIsPasswordProtectedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final UnsupportedOperationException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final InvalidSignatureException e) {
 			LOGGER.log(Level.SEVERE, "La firma de entrada no es valida", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final AOCancelledOperationException e) {
 			LOGGER.log(Level.SEVERE, "Operacion cancelada por el usuario", e); //$NON-NLS-1$
@@ -605,12 +605,12 @@ final class ProtocolInvocationLauncherSign {
 		catch (final AOException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode, e.getMessage());
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un separador
@@ -621,7 +621,7 @@ final class ProtocolInvocationLauncherSign {
 		} catch (final CertificateEncodingException e) {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 
 		final SignResult result = new SignResult();

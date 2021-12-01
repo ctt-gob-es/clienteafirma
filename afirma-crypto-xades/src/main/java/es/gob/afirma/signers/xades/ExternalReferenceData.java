@@ -24,7 +24,7 @@ public class ExternalReferenceData {
 	 */
 	public ExternalReferenceData(final String uri, final byte[] md) {
 		this.uri = uri;
-		this.messageDigest = md;
+		this.messageDigest = md != null ? md.clone() : null;
 
 	}
 
@@ -41,7 +41,7 @@ public class ExternalReferenceData {
 	 * @return Huella digital/hash.
 	 */
 	public byte[] getMessageDigest() {
-		return this.messageDigest;
+		return this.messageDigest != null ? this.messageDigest.clone() : null;
 	}
 
 	/**

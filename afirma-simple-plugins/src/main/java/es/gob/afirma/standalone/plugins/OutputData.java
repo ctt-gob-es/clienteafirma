@@ -30,7 +30,7 @@ public class OutputData {
 	 * @param success {@code true} si finaliz&oacute; correctamente, {@code false}
 	 * en caso contrario.
 	 */
-	public void setSuccess(boolean success) {
+	public void setSuccess(final boolean success) {
 		this.success = success;
 	}
 
@@ -47,7 +47,7 @@ public class OutputData {
 	 * Establece el fichero de datos generado.
 	 * @param dataFile Fichero de datos.
 	 */
-	public void setDataFile(File dataFile) {
+	public void setDataFile(final File dataFile) {
 		this.dataFile = dataFile;
 	}
 
@@ -63,7 +63,7 @@ public class OutputData {
 	 * Establece el nombre del formato de firma utilizado.
 	 * @param signatureFormat Formato de firma.
 	 */
-	public void setSignatureFormat(String signatureFormat) {
+	public void setSignatureFormat(final String signatureFormat) {
 		this.signatureFormat = signatureFormat;
 	}
 
@@ -72,14 +72,14 @@ public class OutputData {
 	 * @return Certificados de firma.
 	 */
 	public X509Certificate[] getCerts() {
-		return this.certs;
+		return this.certs != null ? this.certs.clone() : null;
 	}
 
 	/**
 	 * Establece un listado con los certificados encontrados dentro de la firma.
 	 * @param certs Certificados de firma.
 	 */
-	public void setCerts(X509Certificate[] certs) {
-		this.certs = certs;
+	public void setCerts(final X509Certificate[] certs) {
+		this.certs = certs != null ? certs.clone() : null;
 	}
 }

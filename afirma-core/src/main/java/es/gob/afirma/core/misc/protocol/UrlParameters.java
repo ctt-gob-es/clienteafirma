@@ -70,7 +70,7 @@ public abstract class UrlParameters {
 	/** Codificaci&oacute;n por defecto. */
 	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
-	private byte[] data = null;
+	protected byte[] data = null;
 	private String fileId = null;
 	private byte[] desKey = null;
 	private URL retrieveServletUrl = null;
@@ -160,7 +160,7 @@ public abstract class UrlParameters {
 	/** Obtiene los datos.
 	 * @return Datos. */
 	public byte[] getData() {
-		return this.data;
+		return  this.data != null ? Arrays.copyOf(this.data, this.data.length) : null;
 	}
 
 	/** Obtiene el identificador de los datos en el servidor intermedio.
@@ -172,7 +172,7 @@ public abstract class UrlParameters {
 	/** Obtiene la clave DES de cifrado de los datos a subir al servidor intermedio.
 	 * @return Clave DES de cifrado de los datos a subir al servidor intermedio */
 	public byte[] getDesKey() {
-		return this.desKey;
+		return this.desKey != null ? Arrays.copyOf(this.desKey, this.desKey.length) : null;
 	}
 
 	/** Obtiene la URL de subida al servidor intermedio.

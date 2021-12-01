@@ -86,7 +86,7 @@ public class ProxyConfig {
 	 * @return Contrase&ntilde;a de acceso al proxy.
 	 */
 	public char[] getPassword() {
-		return this.password;
+		return this.password != null ? this.password.clone() : null;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class ProxyConfig {
 	 * @param password Contrase&ntilde;a de acceso al proxy.
 	 */
 	public void setPassword(final char[] password) {
-		this.password = password;
+		this.password = password != null ? password.clone() : null;
 	}
 
 	/**

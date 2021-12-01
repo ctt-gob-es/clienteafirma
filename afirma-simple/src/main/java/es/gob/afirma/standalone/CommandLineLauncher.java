@@ -161,7 +161,6 @@ final class CommandLineLauncher {
 				return;
 			}
 			catch (final Exception e) {
-				e.printStackTrace();
 				String msg = CommandLineMessages.getString("CommandLineLauncher.50", e.getMessage()); //$NON-NLS-1$
 				if (needXmlResponse) {
 					msg = buildXmlResponse(false, msg, null);

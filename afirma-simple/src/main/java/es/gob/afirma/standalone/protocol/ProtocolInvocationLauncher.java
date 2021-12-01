@@ -553,21 +553,20 @@ public final class ProtocolInvocationLauncher {
                 // por sockets, directamente devolveremos el error.
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
+                    String msg;
                     final String errorCode = e.getErrorCode();
+                    if (ProtocolInvocationLauncherSignAndSave.RESULT_CANCEL.equals(errorCode)) {
+                    	msg = errorCode;
+                    } else if (e.getMessage() != null) {
+                    	msg = errorCode + ": " + e.getMessage(); //$NON-NLS-1$
+                    } else {
+                    	msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+                    }
                     if (!bySocket) {
-                        String msg;
-                        if (errorCode == ProtocolInvocationLauncherSignAndSave.RESULT_CANCEL) {
-                        	msg = errorCode;
-                        } else if (e.getMessage() != null) {
-                        	msg = errorCode + ": " + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString()); //$NON-NLS-1$
-                        } else {
-                        	msg = URLEncoder.encode(
-                        			ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode),
-                        			StandardCharsets.UTF_8.toString());
-                        }
+                    	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                         sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     }
-                    return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+                    return msg;
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la

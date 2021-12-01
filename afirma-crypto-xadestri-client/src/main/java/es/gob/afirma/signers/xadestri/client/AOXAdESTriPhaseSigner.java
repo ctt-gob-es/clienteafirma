@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,6 +29,7 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -242,14 +241,10 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
         }
 
         try {
-            // Carga el documento a validar
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-
             // JXades no captura un nodo de firma si se pasa este como raiz del arbol de firmas, asi
             // que nos vemos obligados a crear un nodo padre, del que colgara todo el arbol de firmas,
             // para que lo detecte correctamente
-            final Element rootNode = dbf.newDocumentBuilder().parse(
+            final Element rootNode = SecureXmlBuilder.getSecureDocumentBuilder().parse(
         		new ByteArrayInputStream(sign)
     		).getDocumentElement();
 
