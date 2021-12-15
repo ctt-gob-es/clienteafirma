@@ -232,6 +232,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		signConstraint.gridy++;
 
+		this.avoidAskForClose.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.avoidAskForClose.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.44") //$NON-NLS-1$
 		);
@@ -242,6 +245,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		signConstraint.gridy++;
 
+		this.hideDniStartScreen.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
 		);
@@ -255,6 +261,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// Solo mostramos el check de buscar actualizaciones si esta habilitado
 		// su uso
 		if (SimpleAfirma.isUpdatesEnabled()) {
+			this.checkForUpdates.getAccessibleContext().setAccessibleName(
+					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+			);
 			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
 			);
@@ -265,6 +274,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			signConstraint.gridy++;
 		}
 
+		this.sendAnalytics.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.sendAnalytics.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.90") //$NON-NLS-1$
 		);
@@ -278,6 +290,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.LINUX) {
+			this.enableJMulticard.getAccessibleContext().setAccessibleName(
+					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+			);
 			this.enableJMulticard.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.166")); //$NON-NLS-1$
 			this.enableJMulticard.setMnemonic('j');
@@ -303,6 +318,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		final JLabel signatureAlgorithmsLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.18")); //$NON-NLS-1$
 
+		this.signatureAlgorithms.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.183") //$NON-NLS-1$
+		);
 		this.signatureAlgorithms.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.46") //$NON-NLS-1$
 		);
@@ -352,6 +370,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		c.gridy++;
 
+		this.confirmToSign.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.confirmToSign.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.180")); //$NON-NLS-1$
 		this.confirmToSign.setMnemonic('N');
@@ -361,6 +382,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		c.gridy++;
 
+		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
 		this.showExpiredCerts.setMnemonic('M');
@@ -370,6 +394,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		c.gridy++;
 
+		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.178")); //$NON-NLS-1$
 		this.allowSignInvalidSignatures.addItemListener(modificationListener);
@@ -378,6 +405,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		c.gridy++;
 
+		this.massiveOverwrite.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 		this.massiveOverwrite.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 		this.massiveOverwrite.setMnemonic('S');
@@ -400,6 +430,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.secureConnections.addKeyListener(keyListener);
 		this.secureConnections.setToolTipText(
 			SimpleAfirmaMessages.getString("PreferencesPanel.174") //$NON-NLS-1$
+		);
+		this.secureConnections.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);
 		this.secureConnections.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.174") //$NON-NLS-1$

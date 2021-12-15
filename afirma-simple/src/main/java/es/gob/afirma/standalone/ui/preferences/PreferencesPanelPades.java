@@ -134,6 +134,9 @@ final class PreferencesPanelPades extends JScrollPane {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
 
+		this.padesBasicFormat.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.183") //$NON-NLS-1$
+		);
 		this.padesBasicFormat.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.70") //$NON-NLS-1$
 		);
@@ -149,11 +152,29 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.padesBasicFormat.addKeyListener(keyListener);
 		this.padesBasicFormat.setEnabled(!isBlocked());
 
+		this.visiblePdfSignature.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.visiblePdfSignature.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.79") //$NON-NLS-1$
+		);
 		this.visiblePdfSignature.setMnemonic('i');
 		this.visiblePdfSignature.addItemListener(modificationListener);
 		this.visiblePdfSignature.addKeyListener(keyListener);
+		this.obfuscateCertificateInfo.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.obfuscateCertificateInfo.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.175") //$NON-NLS-1$
+		);
 		this.obfuscateCertificateInfo.addItemListener(modificationListener);
 		this.obfuscateCertificateInfo.addKeyListener(keyListener);
+		this.visiblePdfStamp.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.visiblePdfStamp.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.172") //$NON-NLS-1$
+		);
 		this.visiblePdfStamp.addItemListener(modificationListener);
     	this.visiblePdfStamp.addKeyListener(keyListener);
 
@@ -219,6 +240,7 @@ final class PreferencesPanelPades extends JScrollPane {
 
 	    c.gridy++;
 
+	    this.padesSignReason.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.181")); //$NON-NLS-1$
 	    this.padesSignReason.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.63")); //$NON-NLS-1$
 	    this.padesSignReason.addKeyListener(modificationListener);
 	    this.padesSignReason.addKeyListener(keyListener);
@@ -232,6 +254,7 @@ final class PreferencesPanelPades extends JScrollPane {
 
 	    c.gridy++;
 
+	    this.padesSignProductionCity.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.181")); //$NON-NLS-1$
 	    this.padesSignProductionCity.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.64")); //$NON-NLS-1$
 	    this.padesSignProductionCity.addKeyListener(modificationListener);
 	    this.padesSignProductionCity.addKeyListener(keyListener);
@@ -245,6 +268,7 @@ final class PreferencesPanelPades extends JScrollPane {
 
 	    c.gridy++;
 
+	    this.padesSignerContact.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.181")); //$NON-NLS-1$
 	    this.padesSignerContact.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.65")); //$NON-NLS-1$
 	    this.padesSignerContact.addKeyListener(modificationListener);
 	    this.padesSignerContact.addKeyListener(keyListener);

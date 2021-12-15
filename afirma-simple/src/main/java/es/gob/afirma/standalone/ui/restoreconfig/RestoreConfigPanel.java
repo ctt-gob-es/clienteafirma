@@ -111,6 +111,8 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 
         this.firefoxIntegrationCb = new JCheckBox(SimpleAfirmaMessages.getString("RestoreConfigPanel.7")); //$NON-NLS-1$
         this.firefoxIntegrationCb.setToolTipText(SimpleAfirmaMessages.getString("RestoreConfigPanel.8")); //$NON-NLS-1$
+        this.firefoxIntegrationCb.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("RestoreConfigPanel.9")); //$NON-NLS-1$
+        this.firefoxIntegrationCb.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("RestoreConfigPanel.8")); //$NON-NLS-1$
 
         // La opcion de configurar Firefox para que use el almacen de confianza del sistema solo estara disponible
         // en sistemas Windows y macOS.

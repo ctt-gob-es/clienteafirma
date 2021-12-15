@@ -4,12 +4,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.font.TextAttribute;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -40,7 +43,6 @@ public class SignatureConfigInfoPanel extends JPanel {
     private JCheckBox pdfStamp = null;
 
 	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor) {
-		super();
 		createUI(signConfig, bgColor);
 	}
 
@@ -139,8 +141,16 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	private static JLabel createAttributesHiperlink(final String text, final SignOperationConfig signConfig) {
 
-		final JLabel hlLabel = new JLabel("<html>&nbsp;- <font color=\"blue\"><u>" + text + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+		final JLabel hlLabel = new JLabel(" - " + text); //$NON-NLS-1$
+
 		hlLabel.setFocusable(true);
+		hlLabel.setForeground(Color.blue);
+    	final Font font = hlLabel.getFont();
+    	final Map attributes = font.getAttributes();
+    	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+    	hlLabel.setFont(font.deriveFont(attributes));
+
+    	hlLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + text);  //$NON-NLS-1$//$NON-NLS-2$
 
 		final SignatureAttributesListener linkListener = new SignatureAttributesListener(signConfig);
 		hlLabel.addMouseListener(linkListener);

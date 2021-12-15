@@ -145,6 +145,9 @@ final class PreferencesPanelCades extends JScrollPane {
 				SimpleAfirmaMessages.getString("PreferencesPanel.69") //$NON-NLS-1$
 			)
 		);
+	    this.signatureMode.getAccessibleContext().setAccessibleName(
+			SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
 	    this.signatureMode.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.45") //$NON-NLS-1$
 		);
@@ -178,14 +181,32 @@ final class PreferencesPanelCades extends JScrollPane {
         group.add(this.optionCounterSignLeafs);
         group.add(this.optionCounterSignTree);
 
+	    this.optionCoSign.getAccessibleContext().setAccessibleName(
+			SimpleAfirmaMessages.getString("PreferencesPanel.184") //$NON-NLS-1$
+		);
+	    this.optionCoSign.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.168") //$NON-NLS-1$
+		);
         this.optionCoSign.setEnabled(!isBlocked());
     	this.optionCoSign.addItemListener(modificationListener);
     	this.optionCoSign.addKeyListener(keyListener);
 
+	    this.optionCounterSignLeafs.getAccessibleContext().setAccessibleName(
+			SimpleAfirmaMessages.getString("PreferencesPanel.184") //$NON-NLS-1$
+		);
+	    this.optionCounterSignLeafs.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.169") //$NON-NLS-1$
+		);
         this.optionCounterSignLeafs.setEnabled(!isBlocked());
         this.optionCounterSignLeafs.addItemListener(modificationListener);
         this.optionCounterSignLeafs.addKeyListener(keyListener);
 
+	    this.optionCounterSignTree.getAccessibleContext().setAccessibleName(
+			SimpleAfirmaMessages.getString("PreferencesPanel.184") //$NON-NLS-1$
+		);
+	    this.optionCounterSignTree.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.170") //$NON-NLS-1$
+		);
         this.optionCounterSignTree.setEnabled(!isBlocked());
         this.optionCounterSignTree.addItemListener(modificationListener);
         this.optionCounterSignTree.addKeyListener(keyListener);

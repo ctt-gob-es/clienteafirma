@@ -146,6 +146,9 @@ final class PreferencesPanelFacturaE extends JScrollPane {
         facturaeSignatureProductionCityLabel.setLabelFor(this.facturaeSignatureProductionCity);
         c.gridy++;
         metadata.add(facturaeSignatureProductionCityLabel, c);
+        this.facturaeSignatureProductionCity.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
         this.facturaeSignatureProductionCity.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.66") //$NON-NLS-1$
 		);
@@ -160,6 +163,9 @@ final class PreferencesPanelFacturaE extends JScrollPane {
         facturaeSignatureProductionProvinceLabel.setLabelFor(this.facturaeSignatureProductionProvince);
         c.gridy++;
         metadata.add(facturaeSignatureProductionProvinceLabel, c);
+        this.facturaeSignatureProductionProvince.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
         this.facturaeSignatureProductionProvince.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.68") //$NON-NLS-1$
 		);
@@ -174,6 +180,12 @@ final class PreferencesPanelFacturaE extends JScrollPane {
         facturaeSignatureProductionPostalCodeLabel.setLabelFor(this.facturaeSignatureProductionPostalCode);
         c.gridy++;
         metadata.add(facturaeSignatureProductionPostalCodeLabel, c);
+        this.facturaeSignatureProductionPostalCode.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
+        this.facturaeSignatureProductionPostalCode.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.102") //$NON-NLS-1$
+		);
         this.facturaeSignatureProductionPostalCode.addKeyListener(modificationListener);
         this.facturaeSignatureProductionPostalCode.addKeyListener(keyListener);
         c.gridy++;
@@ -185,6 +197,9 @@ final class PreferencesPanelFacturaE extends JScrollPane {
         facturaeSignatureProductionCountryLabel.setLabelFor(this.facturaeSignatureProductionCountry);
         c.gridy++;
         metadata.add(facturaeSignatureProductionCountryLabel, c);
+        this.facturaeSignatureProductionCountry.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
         this.facturaeSignatureProductionCountry.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.67") //$NON-NLS-1$
 		);
@@ -200,6 +215,9 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 
         final JPanel signOptionsInnerPanel = new JPanel(new GridBagLayout());
 
+        this.facturaeRol.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.183") //$NON-NLS-1$
+		);
         this.facturaeRol.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.53") //$NON-NLS-1$
 		);
