@@ -14,7 +14,7 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var AutoScript = ( function ( window, undefined ) {
 
-		var VERSION = "1.7.0";
+		var VERSION = "1.8.0";
 		var VERSION_CODE = 2;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
@@ -1303,11 +1303,17 @@ var AutoScript = ( function ( window, undefined ) {
 					return;
 				}
 				
-				try {
-					ws.send("echo=-idsession=" + idSession + "@EOF");
+				if (ws.readyState === 1) {
+					try {
+						ws.send("echo=-idsession=" + idSession + "@EOF");
+					}
+					catch (ex) {
+						console.log("Error en echo: " + ex);
+						setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ws, idSession, retries - 1);
+					}
 				}
-				catch (ex) {
-					console.log("Error en echo: " + ex);
+				else {
+					console.log("El socket aun no esta preparado");
 					setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ws, idSession, retries - 1);
 				}
 			}
