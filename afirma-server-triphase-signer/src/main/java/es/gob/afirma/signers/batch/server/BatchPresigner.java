@@ -124,7 +124,8 @@ public final class BatchPresigner extends HttpServlet {
 			return;
 		}
 
-		response.setHeader("Access-Control-Allow-Origin", ConfigManager.getAccessControlAllowOrigin()); //$NON-NLS-1$
+		final String allowOrigin = ConfigManager.getAccessControlAllowOrigin();
+		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
 		final PrintWriter writer = response.getWriter();
 		writer.write(pre);
