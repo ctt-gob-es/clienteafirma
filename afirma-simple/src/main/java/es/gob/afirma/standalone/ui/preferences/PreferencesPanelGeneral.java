@@ -219,7 +219,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		final GridBagConstraints panelConstraint = new GridBagConstraints();
 		panelConstraint.fill = GridBagConstraints.HORIZONTAL;
-		panelConstraint.weightx = 1.0;
+		panelConstraint.weightx = 0.5;
 		panelConstraint.gridx = 0;
 		panel.add(importConfigFromFileButton, panelConstraint);
 		panelConstraint.gridx++;
