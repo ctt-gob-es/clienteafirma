@@ -65,18 +65,18 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                 e.getCause() instanceof BadPaddingException ||
                 e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
-                	throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
+                	throw new IOException("La contrasena del almacen PKCS#12 / PFX no es valida", e); //$NON-NLS-1$
             }
-            throw e;
+            throw new IOException("El almacen PKCS#12 / PFX no es valido o no pudo cargarse", e); //$NON-NLS-1$
         }
         catch (final CertificateException e) {
             throw new AOKeyStoreManagerException(
-        		"No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado: " + e, e //$NON-NLS-1$
+        		"No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado", e //$NON-NLS-1$
     		);
         }
         catch (final NoSuchAlgorithmException e) {
             throw new AOKeyStoreManagerException(
-        		"No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado: " + e, e //$NON-NLS-1$
+        		"No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado", e //$NON-NLS-1$
     		);
 		}
         try {
@@ -151,7 +151,7 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 			setKeyStore(init(fis, this.cachePasswordCallback));
 		}
 		catch (final AOKeyStoreManagerException e) {
-			throw new IOException("Error al recargar el almacen PKCS#12: " + e, e); //$NON-NLS-1$
+			throw new IOException("Error al recargar el almacen PKCS#12", e); //$NON-NLS-1$
 		}
 	}
 }
