@@ -21,6 +21,15 @@ SetCompressor lzma
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
 !define VERSION "1.7.2"
+!define FILE_VERSION "1.7.2.0"
+
+VIProductVersion "${FILE_VERSION}"
+VIFileVersion "${FILE_VERSION}"
+VIAddVersionKey "ProductName" "AutoFirma"
+VIAddVersionKey "ProductVersion" "${VERSION}"
+VIAddVersionKey "FileVersion" "${VERSION}"
+VIAddVersionKey "LegalCopyright" "(C) Gobierno de España"
+VIAddVersionKey "FileDescription" "AutoFirma (64 bits)"
 
 ;--------------------------------
 ;Paginas del instalador
