@@ -1,5 +1,6 @@
 package es.gob.afirma.plugin.certvalidation;
 
+import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -19,9 +20,14 @@ public final class TestCertValidation {
 	@Test
 	@Ignore
 	public void testFnmt() throws Exception {
-		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-			TestCertValidation.class.getResourceAsStream("/cert_test_fnmt.cer") //$NON-NLS-1$
-		);
+		final X509Certificate cert;
+		try (
+			final InputStream is = TestCertValidation.class.getResourceAsStream("/cert_test_fnmt.cer") //$NON-NLS-1$
+		) {
+			cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+				is
+			);
+		}
 		final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
 			cert
 		).validateCertificate();
@@ -34,9 +40,14 @@ public final class TestCertValidation {
 	@Test
 	@Ignore
 	public void testGen() throws Exception {
-		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-			TestCertValidation.class.getResourceAsStream("/CERT_ATOS_TEST.cer") //$NON-NLS-1$
-		);
+		final X509Certificate cert;
+		try (
+			final InputStream is = TestCertValidation.class.getResourceAsStream("/CERT_ATOS_TEST.cer") //$NON-NLS-1$
+		) {
+			cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+				is
+			);
+		}
 		final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
 			cert
 		).validateCertificate();

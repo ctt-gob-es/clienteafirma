@@ -11,6 +11,7 @@ package es.gob.afirma.plugin.certvalidation.validation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.PublicKey;
@@ -107,7 +108,7 @@ final class CrlHelper {
 			// Descargamos
 			final byte[] crlBytes;
 			try {
-				crlBytes = downloadCRL(crlDP);
+				crlBytes = downloadCrl(crlDP);
 			}
 			catch (final Exception e1) {
 				LOGGER.severe(
@@ -153,29 +154,33 @@ final class CrlHelper {
 		return ValidationResult.UNKNOWN;
 	}
 
-	private static byte[] downloadCRL(final String crlURL) throws CRLException,
+	private static byte[] downloadCrl(final String crlURL) throws CRLException,
 	                                                              IOException,
 	                                                              NamingException,
 	                                                              URISyntaxException {
 	 	if (crlURL.startsWith("http://") || crlURL.startsWith("https://") || crlURL.startsWith("ftp://")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	 		return downloadCRLFromWeb(crlURL);
 	 	}
-	 	else if (crlURL.startsWith("ldap://")) { //$NON-NLS-1$
-	 		return downloadCRLFromLDAP(crlURL);
+		if (crlURL.startsWith("ldap://")) { //$NON-NLS-1$
+	 		return downloadCrlFromLdap(crlURL);
 	 	}
-	 	else if (crlURL.startsWith("file:/")) { //$NON-NLS-1$
-	 		return downloadCRLFromFile(crlURL);
+		if (crlURL.startsWith("file:/")) { //$NON-NLS-1$
+	 		return downloadCrlFromFile(crlURL);
 	 	}
 	 	throw new CRLException(
 			"No se soporta el protocolo del punto de distribucion de CRL: " + crlURL //$NON-NLS-1$
 		);
 	}
 
-	private static byte[] downloadCRLFromFile(final String ldapURL) throws IOException, URISyntaxException {
-		return AOUtil.getDataFromInputStream(AOUtil.loadFile(new URI(ldapURL)));
+	private static byte[] downloadCrlFromFile(final String ldapURL) throws IOException, URISyntaxException {
+		try (
+			final InputStream is = AOUtil.loadFile(new URI(ldapURL))
+		) {
+			return AOUtil.getDataFromInputStream(is);
+		}
 	}
 
-	private static byte[] downloadCRLFromLDAP(final String ldapURL) throws NamingException {
+	private static byte[] downloadCrlFromLdap(final String ldapURL) throws NamingException {
 	 	final Hashtable<String , String> env = new Hashtable<>();
 	 	env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory"); //$NON-NLS-1$
 	 	env.put(Context.PROVIDER_URL, ldapURL);
@@ -199,13 +204,13 @@ final class CrlHelper {
 		}
 
 		try (
-			final ASN1InputStream oAsnInStream = new ASN1InputStream(new ByteArrayInputStream(crldpExt));
+			final ASN1InputStream oAsnInStream = new ASN1InputStream(new ByteArrayInputStream(crldpExt))
 		) {
 			final ASN1Primitive derObjCrlDP = oAsnInStream.readObject();
 			final byte[] crldpExtOctets = ((DEROctetString) derObjCrlDP).getOctets();
 			final ASN1Primitive derObj2;
 			try (
-				final ASN1InputStream oAsnInStream2 = new ASN1InputStream(new ByteArrayInputStream(crldpExtOctets));
+				final ASN1InputStream oAsnInStream2 = new ASN1InputStream(new ByteArrayInputStream(crldpExtOctets))
 			) {
 				derObj2 = oAsnInStream2.readObject();
 				final CRLDistPoint distPoint = CRLDistPoint.getInstance(derObj2);

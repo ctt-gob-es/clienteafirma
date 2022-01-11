@@ -9,6 +9,7 @@
 
 package es.gob.afirma.plugin.certvalidation.validation;
 
+import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -51,8 +52,10 @@ public final class CertificateVerifierFactory {
 		}
 		if (p == null) {
 			p = new Properties();
-			try {
-				p.load(CertificateVerifierFactory.class.getResourceAsStream(FACTORY_CONFIGURATION));
+			try (
+				final InputStream is = CertificateVerifierFactory.class.getResourceAsStream(FACTORY_CONFIGURATION)
+			) {
+				p.load(is);
 			}
 			catch (final Exception e) {
 				p = null;

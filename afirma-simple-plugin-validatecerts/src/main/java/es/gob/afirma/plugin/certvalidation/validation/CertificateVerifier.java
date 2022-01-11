@@ -9,6 +9,8 @@
 
 package es.gob.afirma.plugin.certvalidation.validation;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -21,12 +23,14 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 
-/** Validador gen&eacute;rico de certificados X.509. Como clase base comprueba &uacute;nicamente el
+/** Validador gen&eacute;rico de certificados X&#46;509.
+ * Como clase base comprueba &uacute;nicamente el
  * periodo de validez contra el reloj del sistema y la firma por parte de la CA.
  * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public abstract class CertificateVerifier implements CertificateVerificable {
 
+	/** <code>Logger</code> para uso en esta clase y sus derivadas. */
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private X509Certificate certificate = null;
@@ -37,10 +41,14 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 		this.certificate = c;
 	}
 
+	/** Obtiene el certificado cargado para validar.
+	 * @return Certificado cargado para validar. */
 	protected X509Certificate getCertificate() {
 		return this.certificate;
 	}
 
+	/** Obtiene las propiedades de cnfiguraci&oacute;n para la validaci&oacute;n.
+	 * @return Propiedades de cnfiguraci&oacute;n para la validaci&oacute;n. */
 	protected Properties getValidationProperties() {
 		return this.conf;
 	}
@@ -53,8 +61,10 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 			);
 			return;
 		}
-		try {
-			this.conf.load(CertificateVerifier.class.getResourceAsStream(confFile));
+		try (
+			final InputStream is = CertificateVerifier.class.getResourceAsStream(confFile)
+		) {
+			this.conf.load(is);
 		}
 		catch (final Exception e) {
 			throw new IllegalArgumentException(
@@ -64,16 +74,16 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 
 		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
 		if (issuerCertFile != null) {
-			try {
+			try (
+				final InputStream is = CertificateVerifier.class.getResourceAsStream(issuerCertFile)
+			) {
 				setIssuerCert(
 					(X509Certificate) CertificateFactory.getInstance(
 						"X.509" //$NON-NLS-1$
-					).generateCertificate(
-						CertificateVerifier.class.getResourceAsStream(issuerCertFile)
-					)
+					).generateCertificate(is)
 				);
 			}
-			catch (final CertificateException e) {
+			catch (final CertificateException | IOException e) {
 				throw new IllegalArgumentException(
 					"No se ha podido cargar el certificado raiz del emisor (" + issuerCertFile + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 				);
@@ -87,11 +97,14 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 	public void setIssuerCert(final X509Certificate cert) {
 		this.issuerCert = cert;
 	}
+
+	/** Obtiene el certificado del emisor del certificado a validar.
+	 * @return Certificado del emisor del certificado a validar. */
 	protected X509Certificate getIssuerCert() {
 		return this.issuerCert;
 	}
 
-	/** Valida el certificado X.509v3 que se ha proporcionado en el constructor.
+	/** Valida el certificado X&#46;509v3 que se ha proporcionado en el constructor.
 	 * @return Resultado de la validaci&oacute;n */
 	@Override
 	public ValidationResult validateCertificate() {
@@ -123,18 +136,12 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 		try {
 			cert.verify(this.issuerCert.getPublicKey());
 		}
-		catch (final InvalidKeyException e) {
-			throw new CertificateException(e);
-		}
-		catch (final NoSuchAlgorithmException e) {
-			throw new CertificateException(e);
-		}
-		catch (final NoSuchProviderException e) {
+		catch (final InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new CertificateException(e);
 		}
 	}
 
-	/** Valida un certificado X.509v3.
+	/** Valida un certificado X&#46;509v3.
 	 * @param cert Certificado a validar
 	 * @return Resultado de la validaci&oacute;n */
 	@Override
@@ -165,6 +172,9 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 				verifyIssuer(cert);
 			}
 			catch(final SignatureException e) {
+				LOGGER.info(
+					"Encontrada CA no soportada durante la validacion del certificado: " + e //$NON-NLS-1$
+				);
 				return ValidationResult.CA_NOT_SUPPORTED;
 			}
 			catch(final Exception e) {

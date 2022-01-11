@@ -11,6 +11,7 @@ package es.gob.afirma.plugin.certvalidation.validation;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 final class CertValidationMessages {
 
@@ -27,6 +28,9 @@ final class CertValidationMessages {
 			return RESOURCE_BUNDLE.getString(key);
 		}
 		catch (final MissingResourceException e) {
+			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				"No se ha encontrado el texto para la clave '" + key + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return '!' + key + '!';
 		}
 	}
