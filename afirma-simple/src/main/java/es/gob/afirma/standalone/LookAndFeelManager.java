@@ -39,7 +39,7 @@ public final class LookAndFeelManager {
     public static final boolean HIGH_CONTRAST;
 
     /** Tama&ntilde;o m&aacute;ximo de las fuentes por defecto antes de considerarse grandes. */
-    private static final int LARGE_FONT_LIMIT = 12;
+    private static final int LARGE_FONT_LIMIT = 13;
 
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     private static final boolean LARGE_FONT;

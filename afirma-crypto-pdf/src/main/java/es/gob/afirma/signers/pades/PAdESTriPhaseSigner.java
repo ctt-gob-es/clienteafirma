@@ -137,8 +137,6 @@ public final class PAdESTriPhaseSigner {
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -1;
 
-    private static final int CSIZE = 27000;
-
     private PAdESTriPhaseSigner() {
     	// No permitimos la instanciacion
     }
@@ -342,11 +340,13 @@ public final class PAdESTriPhaseSigner {
     		                                   final Certificate[] signerCertificateChain,
     		                                   final PdfSignResult signature,
     		                                   final boolean secureMode) throws AOException, IOException {
-        final byte[] outc = new byte[CSIZE];
 
-        if (signature.getSign().length > CSIZE) {
+    	final int reservedSize = PdfSessionManager.getReservedSignatureSized(signature.getExtraParams());
+        final byte[] outc = new byte[reservedSize];
+
+        if (signature.getSign().length > reservedSize) {
         	throw new AOException(
-    			"El tamano de la firma (" + signature.getSign().length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			"El tamano de la firma (" + signature.getSign().length + ") supera el maximo permitido para un PDF (" + reservedSize + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
         }
 

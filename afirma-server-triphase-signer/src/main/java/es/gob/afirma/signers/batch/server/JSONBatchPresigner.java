@@ -124,7 +124,8 @@ public final class JSONBatchPresigner extends HttpServlet {
 			return;
 		}
 
-		response.setHeader("Access-Control-Allow-Origin", ConfigManager.getAccessControlAllowOrigin()); //$NON-NLS-1$
+		final String allowOrigin = ConfigManager.getAccessControlAllowOrigin();
+		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("application/json;charset=UTF-8"); //$NON-NLS-1$
 		try (PrintWriter writer = response.getWriter()) {
 			writer.write(pre);

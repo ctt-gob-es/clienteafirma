@@ -155,8 +155,7 @@ public final class PdfTimestamper {
 	        		sap.setCryptoDictionary(pdfSignature);
 
 	        		// Reservamos el espacio necesario en el PDF para insertar la firma
-	        		final HashMap<PdfName, Integer> exc = new HashMap<>();
-	        		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
+	        		final HashMap<PdfName, Integer> exc = PdfSessionManager.reserveSignSizes(extraParams);
 
 	        		try {
 						sap.preClose(exc, signTime);

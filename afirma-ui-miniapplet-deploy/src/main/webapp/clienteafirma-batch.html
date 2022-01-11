@@ -11,7 +11,7 @@
 	
 		function showResultCallback(signatureB64, certificateB64) {
 			showLog("Firma OK");
-			document.getElementById('result').value = signatureB64;
+			document.getElementById('result').value = AutoScript.getTextFromBase64(signatureB64) + "\n\n" + certificateB64;
 		}
 
 		function showLogCallback(errorType, errorMessage) {

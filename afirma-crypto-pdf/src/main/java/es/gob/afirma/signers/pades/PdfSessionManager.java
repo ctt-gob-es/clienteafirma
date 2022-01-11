@@ -577,8 +577,23 @@ public final class PdfSessionManager {
      * propiedades de reserva de espacio.
      * @return Mapa con las propiedades de reserva de exclusiones de firma.
      */
-    private static HashMap<PdfName, Integer> reserveSignSizes(final Properties extraParams) {
+    public static HashMap<PdfName, Integer> reserveSignSizes(final Properties extraParams) {
 
+    	final int sizeParamInt = getReservedSignatureSized(extraParams);
+
+		final HashMap<PdfName, Integer> exc = new HashMap<>();
+		exc.put(PdfName.CONTENTS, Integer.valueOf(sizeParamInt * 2 + 2));
+
+		return exc;
+    }
+
+    /**
+     * Recupera el tama&ntilde;o que se ha configurado reservar para la firma o el por defecto si
+     * no se indic&oacute;.
+     * @param extraParams Configuraci&oacute;n de la operaci&oacute;n de firma.
+     * @return Tama&ntilde;o que se reservar&aacute; para la firma.
+     */
+    public static int getReservedSignatureSized(final Properties extraParams) {
     	int sizeParamInt = CSIZE;
     	final String reservedSizeParam = extraParams.getProperty(PdfExtraParams.SIGN_RESERVED_SIZE);
     	if (reservedSizeParam != null && !reservedSizeParam.isEmpty()) {
@@ -590,10 +605,6 @@ public final class PdfSessionManager {
     					+ " no es valido, se le asignara el valor por defecto (" + CSIZE + "):" + e); //$NON-NLS-1$ //$NON-NLS-2$
     		}
     	}
-
-		final HashMap<PdfName, Integer> exc = new HashMap<>();
-		exc.put(PdfName.CONTENTS, Integer.valueOf(sizeParamInt * 2 + 2));
-
-		return exc;
+    	return sizeParamInt;
     }
 }
