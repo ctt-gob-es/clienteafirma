@@ -17,11 +17,15 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -43,6 +47,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -86,6 +91,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private CertificateLineView certLineView;
 
+    private static boolean highContrast;
+
 	CertificateSelectionPanel(final NameCertificateBean[] el,
 			                  final CertificateSelectionDialog selectionDialog,
 			                  final String dialogHeadline,
@@ -116,7 +123,27 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		setLayout(new GridBagLayout());
 
-		setBackground(Color.WHITE);
+		Color windowColor = Color.BLACK;
+		setBackground(windowColor);
+
+        // Establecemos la configuracion de color
+        final Object highContrastProp = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
+        if (highContrastProp instanceof Boolean) {
+        	CertificateSelectionPanel.highContrast = ((Boolean) highContrastProp).booleanValue();
+        }
+
+        if (!CertificateSelectionPanel.highContrast) {
+        	try {
+        		windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
+    	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
+    	    			Color.WHITE;
+        	}
+        	catch (final Throwable e) {
+        		windowColor = Color.WHITE;
+    		}
+            setBackground(windowColor);
+        }
+
 		setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
 		final GridBagConstraints c = new GridBagConstraints();
@@ -142,14 +169,23 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		if (showControlButons) {
 
+			URL refreshImgResource;
+
+			if (!CertificateSelectionPanel.highContrast) {
+				refreshImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"); //$NON-NLS-1$
+			} else {
+				refreshImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_white_18dp.png"); //$NON-NLS-1$
+			}
+
 			// Boton de refresco del almacen
 			final JButton refresh = new JButton(
 				new ImageIcon(
-					CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+					refreshImgResource,
 					CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 				)
 			);
 			refresh.setBorder(BorderFactory.createEmptyBorder());
+			refresh.setRolloverEnabled(false);
 			refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			refresh.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
@@ -163,7 +199,28 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 					}
 				}
 			);
-			refresh.setBackground(Color.WHITE);
+			refresh.addFocusListener(
+					new FocusListener() {
+						  @Override
+						  public void focusGained(final FocusEvent e) {
+							  if (isHighContrast()) {
+								 refresh.setIcon(new ImageIcon(
+										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								));
+							 }
+						  }
+						  @Override
+						  public void focusLost(final FocusEvent e) {
+							  if (isHighContrast()) {
+								 refresh.setIcon(new ImageIcon(
+										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_white_18dp.png"), //$NON-NLS-1$
+										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								));
+							 }
+						  }
+					}
+			);
 			this.add(refresh, c);
 
 			c.gridx++;
@@ -197,20 +254,50 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 					keystoresMenu.add(menuItemOpenDnieKs);
 				}
 
+				URL openInBrowserImgResource;
+
+				if (!CertificateSelectionPanel.highContrast) {
+					openInBrowserImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"); //$NON-NLS-1$
+				} else {
+					openInBrowserImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_white_18dp.png"); //$NON-NLS-1$
+				}
+
 				final JDropDownButton openButton = new JDropDownButton(
 					new ImageIcon(
-						CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+						openInBrowserImgResource,
 						CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 					)
 				);
 				openButton.setComponentPopupMenu(keystoresMenu);
+				openButton.setRolloverEnabled(false);
 				openButton.setBorder(BorderFactory.createEmptyBorder());
 				openButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				openButton.getAccessibleContext().setAccessibleDescription(
 					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 				);
 				openButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
-				openButton.setBackground(Color.WHITE);
+				openButton.addFocusListener(
+						new FocusListener() {
+							  @Override
+							  public void focusGained(final FocusEvent e) {
+								  if (isHighContrast()) {
+									  openButton.setIcon(new ImageIcon(
+											 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+											 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+									));
+								 }
+							  }
+							  @Override
+							  public void focusLost(final FocusEvent e) {
+								  if (isHighContrast()) {
+									  openButton.setIcon(new ImageIcon(
+											 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_white_18dp.png"), //$NON-NLS-1$
+											 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+									));
+								 }
+							  }
+						}
+				);
 				this.add(openButton, c);
 						}
 
@@ -239,35 +326,72 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			certViewsGroup.add(menuItemPseudonymView);
 			popupMenu.add(menuItemPseudonymView);
 
+			URL viewArrowImgResource;
+
+			if (!CertificateSelectionPanel.highContrast) {
+				viewArrowImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_black.png"); //$NON-NLS-1$
+			} else {
+				viewArrowImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_white.png"); //$NON-NLS-1$
+			}
+
 			final JDropDownButton dropDownButton = new JDropDownButton(
 					new ImageIcon(
-						CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow.png"), //$NON-NLS-1$
+						viewArrowImgResource,
 						CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
 					)
 				);
 			dropDownButton.setComponentPopupMenu(popupMenu);
+			dropDownButton.setRolloverEnabled(false);
 			dropDownButton.setBorder(BorderFactory.createEmptyBorder());
 			dropDownButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			dropDownButton.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
 			);
 			dropDownButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.4")); //$NON-NLS-1$
-
-			dropDownButton.setBackground(Color.WHITE);
+			dropDownButton.addFocusListener(
+					new FocusListener() {
+						  @Override
+						  public void focusGained(final FocusEvent e) {
+							  if (isHighContrast()) {
+								  dropDownButton.setIcon(new ImageIcon(
+										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_black.png"), //$NON-NLS-1$
+										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								));
+							 }
+						  }
+						  @Override
+						  public void focusLost(final FocusEvent e) {
+							  if (isHighContrast()) {
+								  dropDownButton.setIcon(new ImageIcon(
+										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_white.png"), //$NON-NLS-1$
+										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								));
+							 }
+						  }
+					}
+			);
 			this.add(dropDownButton, c);
-
 
 			// Boton de ayuda
 			c.insets = new Insets(13, 0, 8, 15);
 			c.gridx++;
 
+			URL helpImgResource;
+
+			if (!CertificateSelectionPanel.highContrast) {
+				helpImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"); //$NON-NLS-1$
+			} else {
+				helpImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"); //$NON-NLS-1$
+			}
+
 			final JButton help = new JButton(
 				new ImageIcon(
-					CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+					helpImgResource,
 					CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
 				)
 			);
 			help.setBorder(BorderFactory.createEmptyBorder());
+			help.setRolloverEnabled(false);
 			help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			help.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
@@ -281,7 +405,28 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 					}
 				}
 			);
-			help.setBackground(Color.WHITE);
+			help.addFocusListener(
+					new FocusListener() {
+						  @Override
+						  public void focusGained(final FocusEvent e) {
+							  if (isHighContrast()) {
+								 help.setIcon(new ImageIcon(
+										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								));
+							 }
+						  }
+						  @Override
+						  public void focusLost(final FocusEvent e) {
+							  if (isHighContrast()) {
+								 help.setIcon(new ImageIcon(
+										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"), //$NON-NLS-1$
+										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								));
+							 }
+						  }
+					}
+			);
 			this.add(help, c);
 		}
 
@@ -309,9 +454,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certListPanel.setLayout(new GridBagLayout());
 		this.certListPanel.setBorder(null);
 
-
 		this.certList = new JList<>();
-		this.certList.setCellRenderer(new CertListCellRendered());
+		this.certList.setCellRenderer(new CertListCellRendered(windowColor, CertificateSelectionPanel.highContrast));
 
 		updateCertListInfo(this.certificateBeans);
 
@@ -371,7 +515,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		for (final NameCertificateBean nameCert : certBeans) {
 			CertificateLine certLine;
 		    try {
-		    	certLine = certLineFactory.buildCertificateLine(nameCert.getName(), nameCert.getCertificate());
+		    	certLine = certLineFactory.buildCertificateLine(nameCert.getName(), nameCert.getCertificate(), isHighContrast());
 		    }
 		    catch(final Exception e) {
 		        continue;
@@ -501,6 +645,14 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		return this.certificateBeans;
 	}
 
+	/**
+	 * Indica si se est&aacute; usando el modo de alto contraste.
+	 * @return Devuelve true si est&aacute; activado el alto contraste.
+	 */
+	public static boolean isHighContrast() {
+		return highContrast;
+	}
+
 	/** Agrega un gestor de eventos de rat&oacute;n a la lista de certificados para poder
 	 * gestionar a trav&eacute;s de &eacute;l eventos especiales sobre la lista.
 	 * @param listener Manejador de eventos de rat&oacute;n. */
@@ -517,8 +669,12 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
 	private static final class CertListCellRendered implements ListCellRenderer<CertificateLine> {
 
-		CertListCellRendered() {
-			/* Limitamos la visibilidad del constructor */
+		private final Color bgColor;
+		private final boolean highContrast;
+
+		CertListCellRendered(final Color bgColor, final boolean highContrast) {
+			this.bgColor = bgColor;
+			this.highContrast = highContrast;
 		}
 
 		/** {@inheritDoc} */
@@ -529,13 +685,47 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final CertificateLine line = value;
 			if (isSelected) {
 				line.setBackground(Color.decode("0xD9EAFF")); //$NON-NLS-1$
+				if (isHighContrast()) {
+					if (line instanceof DefaultCertificateLine) {
+						((DefaultCertificateLine)line).getAlias().setForeground(Color.BLACK);
+						((DefaultCertificateLine)line).getIssuer().setForeground(Color.BLACK);
+						((DefaultCertificateLine)line).getDates().setForeground(Color.BLACK);
+						((DefaultCertificateLine)line).getPropertiesLink().setForeground(Color.BLACK);
+					} else if (line instanceof PseudonymCertificateLine) {
+						((PseudonymCertificateLine)line).getPositionLabel().setForeground(Color.BLACK);
+						((PseudonymCertificateLine)line).getOrganizationLabel().setForeground(Color.BLACK);
+						((PseudonymCertificateLine)line).getDates().setForeground(Color.BLACK);
+						((PseudonymCertificateLine)line).getPropertiesLink().setForeground(Color.BLACK);
+					} else if (line instanceof RepresentativeCertificateLine) {
+						((RepresentativeCertificateLine)line).getOrganizationLabel().setForeground(Color.BLACK);
+						((RepresentativeCertificateLine)line).getAgentLabel().setForeground(Color.BLACK);
+						((RepresentativeCertificateLine)line).getDates().setForeground(Color.BLACK);
+						((RepresentativeCertificateLine)line).getPropertiesLink().setForeground(Color.BLACK);
+					}
+				}
 				line.setBorder(BorderFactory.createCompoundBorder(
 						BorderFactory.createLineBorder(Color.WHITE, 1),
 						BorderFactory.createLineBorder(Color.decode("0x84ACDD"), 1))); //$NON-NLS-1$
-
-			}
-			else {
-				line.setBackground(Color.WHITE);
+			} else {
+				line.setBackground(this.bgColor);
+				if (isHighContrast()) {
+					if (line instanceof DefaultCertificateLine) {
+						((DefaultCertificateLine)line).getAlias().setForeground(Color.WHITE);
+						((DefaultCertificateLine)line).getIssuer().setForeground(Color.WHITE);
+						((DefaultCertificateLine)line).getDates().setForeground(Color.WHITE);
+						((DefaultCertificateLine)line).getPropertiesLink().setForeground(Color.WHITE);
+					} else if (line instanceof PseudonymCertificateLine) {
+						((PseudonymCertificateLine)line).getPositionLabel().setForeground(Color.WHITE);
+						((PseudonymCertificateLine)line).getOrganizationLabel().setForeground(Color.WHITE);
+						((PseudonymCertificateLine)line).getDates().setForeground(Color.WHITE);
+						((PseudonymCertificateLine)line).getPropertiesLink().setForeground(Color.WHITE);
+					} else if (line instanceof RepresentativeCertificateLine) {
+						((RepresentativeCertificateLine)line).getOrganizationLabel().setForeground(Color.WHITE);
+						((RepresentativeCertificateLine)line).getAgentLabel().setForeground(Color.WHITE);
+						((RepresentativeCertificateLine)line).getDates().setForeground(Color.WHITE);
+						((RepresentativeCertificateLine)line).getPropertiesLink().setForeground(Color.WHITE);
+					}
+				}
 				line.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 4));
 			}
 
@@ -607,7 +797,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final String certView = pref.get(PREFERENCE_CERT_VIEW, null);
 			if (certView != null) {
 				view = CertificateLineView.valueOf(certView);
-}
+			}
 		}
 		catch (final Exception e) {
 			view = null;
@@ -663,7 +853,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 	}
 
-	private class ChangeKeyStoreActionListener implements ActionListener {
+	private static class ChangeKeyStoreActionListener implements ActionListener {
 
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;

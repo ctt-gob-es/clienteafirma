@@ -21,11 +21,14 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
@@ -33,6 +36,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.FileHandler;
@@ -40,7 +44,10 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -540,34 +547,84 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-    /** Muestra la ayuda de la aplicaci&oacute;n. */
-    public static void showHelp() {
-        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final File helpFile = new File(APPLICATION_HOME + "\\AutoFirmaV2.chm"); //$NON-NLS-1$
-            final File helpVersionFile = new File(APPLICATION_HOME + "\\help.version"); //$NON-NLS-1$
-            // Si el fichero no existe lo creamos
-            if (!helpFile.exists() || HelpResourceManager.isDifferentHelpFile(helpVersionFile)) {
-	            try {
-	            	HelpResourceManager.createWindowsHelpResources(helpFile, helpVersionFile);
-				} catch (final Exception e) {
-	                LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
-	            }
-            }
-            // Cargamos el fichero
-            try {
-				Desktop.getDesktop().open(helpFile);
-			} catch (final IOException e) {
-				LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
-				JavaHelp.showHelp();
+	/** Muestra la ayuda de la aplicaci&oacute;n. */
+	public static void showHelp() {
+		final File helpFile = new File(APPLICATION_HOME + "\\AutoFirmaV3.zip"); //$NON-NLS-1$
+		final File helpVersionFile = new File(APPLICATION_HOME + "\\help.version"); //$NON-NLS-1$
+		// Si el fichero no existe lo creamos
+		if (!helpFile.exists() || HelpResourceManager.isDifferentHelpFile(helpVersionFile)) {
+			try {
+				HelpResourceManager.createWindowsHelpResources(helpFile, helpVersionFile);
+			} catch (final Exception e) {
+				LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
 			}
-            return;
-		} else if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			// Ultimo recurso, si no es Windows, es Apple OS X pero no disponemos de Apple
-			// Help, o es otro
-            // sistema operativo (Linux, Solaris), cargamos JavaHelp
-            JavaHelp.showHelp();
-        }
-    }
+		}
+
+		// Se abre el recurso para descomprimir el zip
+		try (ZipFile zipFile = new ZipFile(helpFile)) {
+
+			ZipEntry zipentry = null;
+
+			final Enumeration<?> e = zipFile.entries();
+
+			// Se recorren todas las entradas dentro del zip
+			while (e.hasMoreElements()) {
+				zipentry = (ZipEntry) e.nextElement();
+				if (zipentry.isDirectory()) {
+					final File file = new File(APPLICATION_HOME + "\\" + zipentry.getName()); //$NON-NLS-1$
+					file.mkdir(); // Crear carpeta
+				} else {
+					InputStream input = null;
+					FileOutputStream fout = null;
+					try {
+						input = zipFile.getInputStream(zipentry);
+						final File f = new File(APPLICATION_HOME + "\\" + zipentry.getName()); //$NON-NLS-1$
+						String extension = ""; //$NON-NLS-1$
+						final int i = zipentry.getName().lastIndexOf('.');
+						if (i > 0) {
+							extension = zipentry.getName().substring(i+1);
+						}
+						if ("png".equals(extension)) { //$NON-NLS-1$
+							final BufferedImage bufferedImage = ImageIO.read(input); //fileContent is your InputStream
+							ImageIO.write(bufferedImage, "png", f); //$NON-NLS-1$
+						} else {
+							fout = new FileOutputStream(f);
+							final byte[] bytes = new byte[input.available()];
+							while (input.read(bytes) != -1) {
+								fout.write(bytes);
+							}
+						}
+
+					} catch (final Exception e1) {
+						LOGGER.warning("La ayuda en HTML no se ha podido cargar correctamente " + e1); //$NON-NLS-1$
+					} finally {
+						try {
+							if (input != null) {
+								input.close();
+							}
+							if (fout != null) {
+								fout.close();
+							}
+						} catch (final Exception e2) {
+							LOGGER.warning("La ayuda en HTML no se ha podido cargar correctamente " + e2); //$NON-NLS-1$
+						}
+					}
+				}
+			}
+		} catch (final Exception e) {
+			LOGGER.warning("La ayuda en HTML no se ha podido cargar correctamente " + e); //$NON-NLS-1$
+		}
+
+		// Cargamos el fichero
+		try {
+			final File indexHelpFile = new File(APPLICATION_HOME + "\\help\\Spanish.lproj\\index.html"); //$NON-NLS-1$
+			Desktop.getDesktop().open(indexHelpFile);
+		} catch (final IOException ioe) {
+			LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + ioe); //$NON-NLS-1$
+			JavaHelp.showHelp();
+		}
+	}
+
 
 	/**
 	 * Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para

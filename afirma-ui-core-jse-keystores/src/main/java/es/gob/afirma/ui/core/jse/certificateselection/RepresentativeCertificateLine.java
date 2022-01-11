@@ -6,9 +6,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.font.TextAttribute;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -26,15 +28,22 @@ class RepresentativeCertificateLine extends CertificateLine {
 	private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
 	private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
 
+	private JLabel organizationLabel = null;
+
+	private JLabel agentLabel = null;
+
+	private JLabel dates = null;
+
 	private JLabel propertiesLink = null;
 
 	/**
 	 * Construye el panel con la informaci&oacute;n
 	 * @param friendlyName Nombre legible con el que identificar el certificado.
 	 * @param certificate Certificado del que se desea mostrar la informaci&oacute;n.
+	 * @param highContrast Indica si el modo de alto contraste est&aacute; activo en el SO.
 	 */
-	RepresentativeCertificateLine(final String friendlyName, final X509Certificate certificate) {
-		super(friendlyName, certificate);
+	RepresentativeCertificateLine(final String friendlyName, final X509Certificate certificate, final boolean highContrast) {
+		super(friendlyName, certificate, highContrast);
 		createUI();
 	}
 
@@ -65,46 +74,72 @@ class RepresentativeCertificateLine extends CertificateLine {
 		final PrincipalStructure subjectPrincipal = new PrincipalStructure(getCertificate().getSubjectX500Principal());
 
 		final String organization = subjectPrincipal.getRDNvalue(PrincipalStructure.O);
-		final JLabel organizationLabel = new JLabel();
+		this.organizationLabel = new JLabel();
 		if (organization != null) {
-			organizationLabel.setText(organization);
+			this.organizationLabel.setText(organization);
 		}
 		else {
-			organizationLabel.setText(getFriendlyName());
+			this.organizationLabel.setText(getFriendlyName().getText());
 		}
-		organizationLabel.setFont(SUBJECT_FONT);
-		add(organizationLabel, c);
+		this.organizationLabel.setFont(SUBJECT_FONT);
+		if (isHighContrast()) {
+			this.organizationLabel.setForeground(Color.WHITE);
+		} else {
+			this.organizationLabel.setForeground(Color.BLACK);
+		}
+		add(this.organizationLabel, c);
 
 		c.gridy++;
 		c.insets = new Insets(0, 0, 0, 5);
 
 		final String subjectCN = AOUtil.getCN(getCertificate());
-		final JLabel agentLabel = new JLabel(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.28", subjectCN)); //$NON-NLS-1$
-		agentLabel.setFont(DETAILS_FONT);
-		add(agentLabel, c);
+		this.agentLabel = new JLabel(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.28", subjectCN)); //$NON-NLS-1$
+		this.agentLabel.setFont(DETAILS_FONT);
+		if (isHighContrast()) {
+			this.agentLabel.setForeground(Color.WHITE);
+		} else {
+			this.agentLabel.setForeground(Color.BLACK);
+		}
+		add(this.agentLabel, c);
 
 		c.gridy++;
 
-		final JLabel dates = new JLabel(
+		this.dates = new JLabel(
 			CertificateSelectionDialogMessages.getString(
 					"CertificateSelectionPanel.3", //$NON-NLS-1$
 					formatDate(getCertificate().getNotBefore()),
 					formatDate(getCertificate().getNotAfter()))
 		);
-		dates.setFont(DETAILS_FONT);
-		add(dates, c);
+		this.dates.setFont(DETAILS_FONT);
+		if (isHighContrast()) {
+			this.dates.setForeground(Color.WHITE);
+		} else {
+			this.dates.setForeground(Color.BLACK);
+		}
+		add(this.dates, c);
 
 		c.gridy++;
 
 		this.propertiesLink = new JLabel(
-	        "<html><u>" + //$NON-NLS-1$
-    		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
-	        "</u></html>" //$NON-NLS-1$
-        );
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5")
+				);
+		if (isHighContrast()) {
+				this.propertiesLink.setForeground(Color.WHITE);
+		} else {
+				this.propertiesLink.setForeground(Color.BLACK);
+		}
+		Font font = this.propertiesLink.getFont();
+		Map attributes = font.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		this.propertiesLink.setFont(font.deriveFont(attributes));
+
 		// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
 		// inicia su importacion
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			this.propertiesLink.setFont(DETAILS_FONT);
+			font = DETAILS_FONT;
+			attributes = font.getAttributes();
+			attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+			this.propertiesLink.setFont(font.deriveFont(attributes));
 			add(this.propertiesLink, c);
 		}
 
@@ -112,7 +147,7 @@ class RepresentativeCertificateLine extends CertificateLine {
 				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.31") : //$NON-NLS-1$
 					CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.30"); //$NON-NLS-1$
 		final String toolTipText = CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.32", //$NON-NLS-1$
-				new String[] { organizationLabel.getText(), subjectCN, validityText });
+				this.organizationLabel.getText(), subjectCN, validityText);
 		setToolTipText(toolTipText);
 	}
 
@@ -129,4 +164,21 @@ class RepresentativeCertificateLine extends CertificateLine {
 	Rectangle getCertificateLinkBounds() {
 		return this.propertiesLink.getBounds();
 	}
+
+	public JLabel getOrganizationLabel() {
+		return this.organizationLabel;
+	}
+
+	public JLabel getAgentLabel() {
+		return this.agentLabel;
+	}
+
+	public JLabel getDates() {
+		return this.dates;
+	}
+
+	public JLabel getPropertiesLink() {
+		return this.propertiesLink;
+	}
+
 }

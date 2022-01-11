@@ -42,7 +42,7 @@ public final class HelpResourceManager {
 
 	static void createWindowsHelpResources(final File helpFile, final File helpVersionFile) throws IOException {
 		extractResource(
-			"help/WinHelp/AutoFirmaV2.chm", //$NON-NLS-1$
+			"help/AutoFirmaV3.zip", //$NON-NLS-1$
 			helpFile
 		);
 
@@ -104,7 +104,7 @@ public final class HelpResourceManager {
 	 * @return {@code true} si el fichero de version indicado no se corresponde con el
 	 * de la versi&oacute;n actual. {@code false} en caso contrario.
 	 */
-	public static boolean isDifferentHelpFile(File helpVersionFile) {
+	public static boolean isDifferentHelpFile(final File helpVersionFile) {
 		if (!helpVersionFile.exists()) {
 			return true;
 		}

@@ -110,7 +110,7 @@ final class MassiveResultProcessPanel extends JPanel {
 
 
         // Boton de apertura del fichero firmado
-        JButton openDirButton = null;
+        JButton openDirButton;
         openDirButton = new JButton(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.4")); //$NON-NLS-1$
         openDirButton.setPreferredSize(new Dimension(150, 24));
         openDirButton.setMnemonic('b');
@@ -162,7 +162,6 @@ final class MassiveResultProcessPanel extends JPanel {
 	            setFocusable(false);
 	            this.certDescription.setEditable(false);
 	            this.certDescription.setOpaque(false);
-	            this.certDescription.setText(certInfo.getDescriptionText());
 	            this.certDescription.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.12")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
