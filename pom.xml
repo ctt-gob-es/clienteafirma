@@ -52,7 +52,7 @@
 	<properties>
 		<clienteafirma.version>1.8-SNAPSHOT</clienteafirma.version>
 		<jmulticard.version>1.7</jmulticard.version>
-		<afirma.lib.itex.version>1.3</afirma.lib.itex.version>
+		<afirma.lib.itex.version>1.4</afirma.lib.itex.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
@@ -106,7 +106,7 @@
 			<dependency>
 				<groupId>es.gob.afirma.lib</groupId>
 				<artifactId>afirma-lib-jmimemagic</artifactId>
-				<version>0.0.6</version>
+				<version>0.0.7</version>
 			</dependency>
 			
 			<dependency>

@@ -295,7 +295,7 @@ public final class PdfSessionManager {
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
-		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader) && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
+		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader) && !Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
 			throw new PdfHasUnregisteredSignaturesException();
 		}
 

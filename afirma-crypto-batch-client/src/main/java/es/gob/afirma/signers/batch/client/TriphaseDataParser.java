@@ -28,8 +28,6 @@ import es.gob.afirma.core.signers.TriphaseData.TriSign;
  */
 public class TriphaseDataParser {
 
-	private static final String DEFAULT_OPERATION = "SIGN"; //$NON-NLS-1$
-
 	static final String DEFAULT_URL_ENCODING = StandardCharsets.UTF_8.name();
 
 	/**
