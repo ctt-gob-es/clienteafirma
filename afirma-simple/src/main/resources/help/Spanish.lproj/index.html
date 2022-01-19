@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title>AutoFirma</title>
+  <meta name="AppleTitle" content="Ayuda de AutoFirma">
+  <meta name="AppleIcon" content="AutoFirmaHelpIcon.png">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+ </head>
+ <style>
+ 
+	body {
+		overflow-y: hidden;
+	}
+ 
+	.sidebar {
+		height: 100%; 
+		width: 20%; 
+		position: fixed; 
+		z-index: 1;
+		top: 0;
+		left: 0;
+		background-color: #111; 
+		padding-top: 60px; 
+	}
+	
+	.sidebar ul {
+		margin:0;
+		padding:0;
+	}
+	
+	.sidebar li {
+		border: 2px solid white; 
+		list-style: none;
+		padding: 7px;
+		margin: 10px;
+		background-color: #96181c; 
+		text-decoration: none; 
+		font-family: 'Helvetica', sans-serif; 
+		border-radius: 15px; 
+	}
+	
+	.sidebar a {
+		text-decoration: none;
+		color: white;
+	}
+	
+	.content {
+		margin-left: 20%;
+		width:75%;
+	}
+</style>
+
+<script>
+    function loadMain() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="AutoFirma.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadWaitScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/PantallaEspera.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadSignScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/PantallaFirma.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadDetailScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/PantallaDetalle.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadConfigurationMenuScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/MenuPreferencias.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadPluginsScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/MenuPlugins.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadProxyConfScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/VentanaConfigurarProxy.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadVisiblePDFScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/VentanaPdfVisible.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadCommandLineScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/LineaComandos.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+	function loadLicenseScreen() {
+		document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="pgs/Licencia.html" width="107%" height="920px" style="align:right;"></object>';
+	}
+</script>
+ <body>
+ <div id='sidebar' class='sidebar'>
+ <ul>
+	 <li><a href="javascript:loadMain();">AutoFirma</a></li>
+	 <li><a href="javascript:loadWaitScreen();">Esperando a la insercion del DNIe...</a></li>
+	 <li><a href="javascript:loadSignScreen();">Firma electronica de documentos</a></li>
+	 <li><a href="javascript:loadDetailScreen();">Detalle de las firmas una vez completadas</a></li>
+	 <li><a href="javascript:loadConfigurationMenuScreen();">Menu de configuracion</a></li>
+	 <li><a href="javascript:loadPluginsScreen();">Panel de gestion de plugins</a></li>
+	 <li><a href="javascript:loadProxyConfScreen();">Ventana de configuracion de proxy</a></li>
+	 <li><a href="javascript:loadVisiblePDFScreen();">Ventana de configuracion de elementos visibles en PDF</a></li>
+	 <li><a href="javascript:loadCommandLineScreen();">Uso por linea de comandos</a></li>
+	 <li><a href="javascript:loadLicenseScreen();">Licencia de uso y distribucion</a></li>
+ </ul>
+ </div>
+ <div id='dynamicContent' class='content'>
+	<object type="text/html" data="AutoFirma.html" width="100%" height="800px"></object>
+ </div>
+</html>

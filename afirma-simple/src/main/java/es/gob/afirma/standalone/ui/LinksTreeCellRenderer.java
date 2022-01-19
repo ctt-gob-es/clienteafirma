@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -41,10 +42,22 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
 
         	if (focus) {
         		linkLbl.setText(getText());
-        		linkLbl.setForeground(Color.white);
+        		linkLbl.setOpaque(true);
+        		if (!LookAndFeelManager.HIGH_CONTRAST) {
+        			linkLbl.setForeground(Color.WHITE);
+            		linkLbl.setBackground(Color.decode("#39698a")); //$NON-NLS-1$
+        		} else {
+        			linkLbl.setForeground(Color.YELLOW);
+            		linkLbl.setBackground(Color.BLUE);
+        		}
         	} else {
         		linkLbl.setText(getText());
-        		linkLbl.setForeground(Color.blue);
+        		if (!LookAndFeelManager.HIGH_CONTRAST) {
+        			linkLbl.setForeground(Color.BLUE);
+        		} else {
+        			linkLbl.setForeground(Color.YELLOW);
+        		}
+        		linkLbl.setOpaque(false);
         	}
 
         	final Font font = linkLbl.getFont();

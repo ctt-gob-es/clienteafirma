@@ -126,26 +126,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		Color windowColor = Color.BLACK;
 		setBackground(windowColor);
 
-        // Establecemos la configuracion de color
-        final Object highContrastProp = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
-        if (highContrastProp instanceof Boolean) {
-        	CertificateSelectionPanel.highContrast = ((Boolean) highContrastProp).booleanValue();
-        }
-
-        if (!CertificateSelectionPanel.highContrast) {
-        	try {
-        		windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
-    	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
-    	    			Color.WHITE;
-        	}
-        	catch (final Throwable e) {
-        		windowColor = Color.WHITE;
-    		}
-            setBackground(windowColor);
-        }
-
-		setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(13, 15, 8, 15);
@@ -160,7 +140,30 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 					CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
 		);
 		mainMessage.setFont(TITLE_FONT);
-		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
+
+        // Establecemos la configuracion de color
+        final Object highContrastProp = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
+        if (highContrastProp instanceof Boolean) {
+        	CertificateSelectionPanel.highContrast = ((Boolean) highContrastProp).booleanValue();
+        }
+
+        if (!CertificateSelectionPanel.highContrast) {
+        	try {
+        		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
+        		windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
+    	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
+    	    			Color.WHITE;
+        	}
+        	catch (final Throwable e) {
+        		windowColor = Color.WHITE;
+    		}
+            setBackground(windowColor);
+        } else {
+    		mainMessage.setForeground(Color.WHITE);
+        }
+
+		setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+
 		this.add(mainMessage, c);
 
 		c.insets = new Insets(13, 0, 8, 5);
@@ -690,17 +693,17 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 						((DefaultCertificateLine)line).getAlias().setForeground(Color.BLACK);
 						((DefaultCertificateLine)line).getIssuer().setForeground(Color.BLACK);
 						((DefaultCertificateLine)line).getDates().setForeground(Color.BLACK);
-						((DefaultCertificateLine)line).getPropertiesLink().setForeground(Color.BLACK);
+						((DefaultCertificateLine)line).getPropertiesLink().setForeground(Color.BLUE);
 					} else if (line instanceof PseudonymCertificateLine) {
 						((PseudonymCertificateLine)line).getPositionLabel().setForeground(Color.BLACK);
 						((PseudonymCertificateLine)line).getOrganizationLabel().setForeground(Color.BLACK);
 						((PseudonymCertificateLine)line).getDates().setForeground(Color.BLACK);
-						((PseudonymCertificateLine)line).getPropertiesLink().setForeground(Color.BLACK);
+						((PseudonymCertificateLine)line).getPropertiesLink().setForeground(Color.BLUE);
 					} else if (line instanceof RepresentativeCertificateLine) {
 						((RepresentativeCertificateLine)line).getOrganizationLabel().setForeground(Color.BLACK);
 						((RepresentativeCertificateLine)line).getAgentLabel().setForeground(Color.BLACK);
 						((RepresentativeCertificateLine)line).getDates().setForeground(Color.BLACK);
-						((RepresentativeCertificateLine)line).getPropertiesLink().setForeground(Color.BLACK);
+						((RepresentativeCertificateLine)line).getPropertiesLink().setForeground(Color.BLUE);
 					}
 				}
 				line.setBorder(BorderFactory.createCompoundBorder(
@@ -713,17 +716,17 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 						((DefaultCertificateLine)line).getAlias().setForeground(Color.WHITE);
 						((DefaultCertificateLine)line).getIssuer().setForeground(Color.WHITE);
 						((DefaultCertificateLine)line).getDates().setForeground(Color.WHITE);
-						((DefaultCertificateLine)line).getPropertiesLink().setForeground(Color.WHITE);
+						((DefaultCertificateLine)line).getPropertiesLink().setForeground(Color.YELLOW);
 					} else if (line instanceof PseudonymCertificateLine) {
 						((PseudonymCertificateLine)line).getPositionLabel().setForeground(Color.WHITE);
 						((PseudonymCertificateLine)line).getOrganizationLabel().setForeground(Color.WHITE);
 						((PseudonymCertificateLine)line).getDates().setForeground(Color.WHITE);
-						((PseudonymCertificateLine)line).getPropertiesLink().setForeground(Color.WHITE);
+						((PseudonymCertificateLine)line).getPropertiesLink().setForeground(Color.YELLOW);
 					} else if (line instanceof RepresentativeCertificateLine) {
 						((RepresentativeCertificateLine)line).getOrganizationLabel().setForeground(Color.WHITE);
 						((RepresentativeCertificateLine)line).getAgentLabel().setForeground(Color.WHITE);
 						((RepresentativeCertificateLine)line).getDates().setForeground(Color.WHITE);
-						((RepresentativeCertificateLine)line).getPropertiesLink().setForeground(Color.WHITE);
+						((RepresentativeCertificateLine)line).getPropertiesLink().setForeground(Color.YELLOW);
 					}
 				}
 				line.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 4));

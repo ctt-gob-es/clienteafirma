@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
@@ -56,7 +57,11 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     	final Map attributes = font.getAttributes();
     	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
     	this.label.setFont(font.deriveFont(attributes));
-    	this.label.setForeground(Color.blue);
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	this.label.setForeground(Color.BLUE);
+    	} else {
+        	this.label.setForeground(Color.YELLOW);
+    	}
     	this.label.setCursor(new Cursor(Cursor.HAND_CURSOR));
     	this.label.setOpaque(true);
 
@@ -71,7 +76,11 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     @Override
     public void focusGained(final FocusEvent e) {
     	this.label.setOpaque(true);
-    	this.label.setForeground(Color.white);
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	this.label.setForeground(Color.WHITE);
+    	} else {
+        	this.label.setForeground(Color.YELLOW);
+    	}
     	this.label.setBackground(Color.blue);
     	this.label.repaint();
     }
@@ -79,7 +88,11 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     @Override
     public void focusLost(final FocusEvent e) {
     	this.label.setOpaque(false);
-    	this.label.setForeground(Color.blue);
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	this.label.setForeground(Color.BLUE);
+    	} else {
+        	this.label.setForeground(Color.YELLOW);
+    	}
     	this.label.repaint();
     }
 

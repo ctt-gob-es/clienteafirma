@@ -146,7 +146,7 @@ class PseudonymCertificateLine extends CertificateLine {
 				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5")
 				);
 		if (isHighContrast()) {
-				this.propertiesLink.setForeground(Color.WHITE);
+				this.propertiesLink.setForeground(Color.YELLOW);
 		} else {
 				this.propertiesLink.setForeground(Color.BLACK);
 		}

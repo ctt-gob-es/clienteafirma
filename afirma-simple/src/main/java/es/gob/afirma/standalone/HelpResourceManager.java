@@ -9,10 +9,14 @@
 
 package es.gob.afirma.standalone;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
@@ -38,12 +42,17 @@ public final class HelpResourceManager {
     	if (!apDir.exists()) {
     		apDir.mkdirs();
     	}
+
+    	final File helpDir = new File(SimpleAfirma.APPLICATION_HOME + "\\help"); //$NON-NLS-1$
+    	if (!helpDir.exists()) {
+    		helpDir.mkdirs();
+    	}
     }
 
-	static void createWindowsHelpResources(final File helpFile, final File helpVersionFile) throws IOException {
+	static void createWindowsHelpResources(final File filesList, final File helpVersionFile) throws IOException {
 		extractResource(
-			"help/AutoFirmaV3.zip", //$NON-NLS-1$
-			helpFile
+			"help/fileslist.txt", //$NON-NLS-1$
+			filesList
 		);
 
 		// Creamos un fichero que marca la version del fichero de ayuda utilizando la version de la aplicacion
@@ -77,23 +86,38 @@ public final class HelpResourceManager {
 
 	}
 
-	private static void extractResource(final String source, final File destination) throws IOException {
+	private static void extractResource(final String filesList, final File destination) throws IOException {
 
 		// Creamos el directorio de la aplicacion
 		createApplicationDataDir();
 
-		// Copiamos el recurso desde el JAR hasta el destino especificado
-    	final byte[] helpDocument = AOUtil.getDataFromInputStream(
-			ClassLoader.getSystemResourceAsStream(source)
-		);
-    	if (helpDocument == null || helpDocument.length == 0) {
-    		throw new IOException(
-				"No se ha encontrado la biblioteca JNI de carga de la ayuda de OS X (JavaHelpHook.jnilib)" //$NON-NLS-1$
-			);
-    	}
+		// Copiamos el recurso con la ruta de todos los archivos desde el JAR hasta el destino especificado
+    	final byte[] bytes = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filesList));
 
-        try (final FileOutputStream fos = new FileOutputStream(destination); ) {
-        	fos.write(helpDocument);
+        try (final FileOutputStream fos = new FileOutputStream(destination)) {
+        	fos.write(bytes);
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(destination))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+               final URL url = ClassLoader.getSystemResource("help"+ File.separator + line); //$NON-NLS-1$
+               final String rscFileDecoded = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
+               final File resourceFile = new File(rscFileDecoded);
+               if (resourceFile.exists()) {
+            	   final File newFile = new File(SimpleAfirma.APPLICATION_HOME + "\\help\\" + line);
+            	   if (resourceFile.isDirectory()) {
+            		   newFile.mkdir();
+            	   } else {
+            	    	final byte[] fileData = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("help\\" + line)); //$NON-NLS-1$
+            	        try (final FileOutputStream fos = new FileOutputStream(newFile)) {
+            	        	fos.write(fileData);
+            	        }
+            	   }
+               } else {
+            	   LOGGER.warning("El archivo " + line + " no existe en los recursos");  //$NON-NLS-1$//$NON-NLS-2$
+               }
+            }
         }
 	}
 

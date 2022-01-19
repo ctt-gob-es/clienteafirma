@@ -183,7 +183,7 @@ final class SignResultPanel extends JPanel {
         c.weighty = 0.0;
         c.weightx = 3.0;
         c.gridy = 2;
-        c.insets = new Insets(0, 6, 0, 470);
+        c.insets = new Insets(0, 6, 0, 460);
         this.add(this.linkLabel, c);
 
     }
