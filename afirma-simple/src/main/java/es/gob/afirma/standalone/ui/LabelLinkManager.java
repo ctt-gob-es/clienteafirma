@@ -11,7 +11,6 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -20,16 +19,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
-import java.net.URI;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.LookAndFeelManager;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
  * Gestor de foco y rat&oacute;n en JLabel con enlaces.
@@ -40,17 +34,13 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
 
     private final JLabel label;
 
-    private final boolean isValideURL;
-
-    private final X509Certificate cert;
+    private LabelLinkListener labelLinkListener;
 
     /**
      * Crea un nuevo gestor de foco y rat&oacute;n.
      * @param label Etiqueta a la que agregar el gestor.
-     * @param isValideURL Indica si redirigir a la URL de VALIDe o a la informaci&oacute;n de un certificado
-     * @param cert Informacion sobre el certificado a redirigir, en caso de se quiera redirigir a VALIDe ser&aacute; null.
      */
-    public LabelLinkManager (final JLabel label, final boolean isValideURL, final X509Certificate cert) {
+    public LabelLinkManager(final JLabel label) {
 
     	this.label = label;
     	final Font font = this.label.getFont();
@@ -65,12 +55,14 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     	this.label.setCursor(new Cursor(Cursor.HAND_CURSOR));
     	this.label.setOpaque(true);
 
-        this.isValideURL = isValideURL;
-        this.cert = cert;
         this.label.setFocusable(true);
         this.label.addMouseListener(this);
         this.label.addFocusListener(this);
         this.label.addKeyListener(this);
+    }
+
+    public void addLabelLinkListener(final LabelLinkListener linkListener) {
+    	this.labelLinkListener = linkListener;
     }
 
     @Override
@@ -109,7 +101,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
 
 		this.label.requestFocus();
 		focusGained(null);
-		openLink();
+		this.labelLinkListener.openLink();
 	}
 
 	@Override
@@ -118,33 +110,12 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_SPACE:
 			case KeyEvent.VK_ENTER:
-
-				openLink();
+				this.labelLinkListener.openLink();
 					break;
 
 	            default:
 	            	break;
 	        }
-	    }
-
-	/**
-	 * Abre el enlace seg&uacute;n el tipo indicado en la variable isValideURL.
-	 */
-	private void openLink() {
-		if (this.isValideURL) {
-	    	try {
-				Desktop.getDesktop().browse(new URI(SimpleAfirmaMessages.getString("SignResultPanel.33"))); //$NON-NLS-1$
-			} catch (final Exception ex) {
-		    	AOUIFactory.showErrorMessage(
-		            SimpleAfirmaMessages.getString("SignResultPanel.0") + SimpleAfirmaMessages.getString("SignResultPanel.33"), //$NON-NLS-1$ //$NON-NLS-2$
-		            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-		            JOptionPane.ERROR_MESSAGE,
-		            ex
-		        );
-			}
-		} else {
-			SignDataPanel.openCertificate(this.cert);
-		}
 	}
 
 }

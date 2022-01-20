@@ -216,11 +216,15 @@ final class SignDataPanel extends JPanel {
 	            this.issuerCertLabel.setText("<html><b>" + certInfo.getIssuerName() + "</b></html>"); //$NON-NLS-1$ //$NON-NLS-2$
 
             	// Este gestor se encargara de controlar los eventos de foco y raton
-                final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel, false, cert);
+                final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel);
+                labelLinkManager.addLabelLinkListener(new CertInfoLabelLinkImpl(cert));
             }
 
             certDescPanel = new JPanel();
-            certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            // Se agrega un borde y un padding al panel con la informacion del certificado
+            certDescPanel.setBorder(BorderFactory.createCompoundBorder
+            		(BorderFactory.createLineBorder(Color.GRAY),
+            		BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             certDescPanel.setLayout(new GridBagLayout());
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
