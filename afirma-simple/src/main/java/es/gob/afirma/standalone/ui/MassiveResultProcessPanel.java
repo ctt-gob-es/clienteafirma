@@ -179,7 +179,7 @@ final class MassiveResultProcessPanel extends JPanel {
 
             	// Este gestor se encargara de controlar los eventos de foco y raton
                 final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel);
-                labelLinkManager.addLabelLinkListener(new CertInfoLabelLinkImpl(cert));
+                labelLinkManager.setLabelLinkListener(new CertInfoLabelLinkImpl(cert));
             }
             certDescPanel = new JPanel();
             // Se agrega un borde y un padding al panel con la informacion del certificado

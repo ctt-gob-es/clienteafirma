@@ -77,7 +77,7 @@ final class SignResultPanel extends JPanel {
 
             	// Este gestor se encargara de controlar los eventos de foco y raton
                 LabelLinkManager labelLinkManager = new LabelLinkManager(this.linkLabel);
-                labelLinkManager.addLabelLinkListener(new URLLabelLinkImpl(
+                labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
                 		SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
                 ));
 
@@ -105,7 +105,7 @@ final class SignResultPanel extends JPanel {
 
                 	// Este gestor se encargara de controlar los eventos de foco y raton
                     labelLinkManager = new LabelLinkManager(this.linkLabel);
-                    labelLinkManager.addLabelLinkListener(new URLLabelLinkImpl(
+                    labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
 							SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
 					));
 
@@ -149,7 +149,7 @@ final class SignResultPanel extends JPanel {
 
                 	// Este gestor se encargara de controlar los eventos de foco y raton
                     labelLinkManager = new LabelLinkManager(this.linkLabel);
-                    labelLinkManager.addLabelLinkListener(new URLLabelLinkImpl(
+                    labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
 							SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
 					));
 

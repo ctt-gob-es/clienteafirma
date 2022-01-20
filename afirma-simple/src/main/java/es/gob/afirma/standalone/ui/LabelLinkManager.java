@@ -16,6 +16,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
@@ -52,6 +53,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     	} else {
         	this.label.setForeground(Color.YELLOW);
     	}
+    	this.label.setBackground(null);
     	this.label.setCursor(new Cursor(Cursor.HAND_CURSOR));
     	this.label.setOpaque(true);
 
@@ -61,7 +63,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
         this.label.addKeyListener(this);
     }
 
-    public void addLabelLinkListener(final LabelLinkListener linkListener) {
+    public void setLabelLinkListener(final LabelLinkListener linkListener) {
     	this.labelLinkListener = linkListener;
     }
 
@@ -85,6 +87,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     	} else {
         	this.label.setForeground(Color.YELLOW);
     	}
+    	this.label.setBackground(null);
     	this.label.repaint();
     }
 
@@ -101,21 +104,26 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
 
 		this.label.requestFocus();
 		focusGained(null);
-		this.labelLinkListener.openLink();
+		if (this.labelLinkListener != null) {
+			this.labelLinkListener.openLink();
+		}
 	}
 
 	@Override
 	public void keyPressed(final KeyEvent e) {
-
 		switch (e.getKeyCode()) {
-			case KeyEvent.VK_SPACE:
-			case KeyEvent.VK_ENTER:
+		case KeyEvent.VK_SPACE:
+		case KeyEvent.VK_ENTER:
+			if (this.labelLinkListener != null) {
 				this.labelLinkListener.openLink();
-					break;
-
-	            default:
-	            	break;
-	        }
+			}
+			break;
+		default:
+			for (final KeyListener l : this.label.getKeyListeners()) {
+				l.keyPressed(e);
+			}
+			break;
+		}
 	}
 
 }

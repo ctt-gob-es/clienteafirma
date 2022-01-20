@@ -217,7 +217,7 @@ final class SignDataPanel extends JPanel {
 
             	// Este gestor se encargara de controlar los eventos de foco y raton
                 final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel);
-                labelLinkManager.addLabelLinkListener(new CertInfoLabelLinkImpl(cert));
+                labelLinkManager.setLabelLinkListener(new CertInfoLabelLinkImpl(cert));
             }
 
             certDescPanel = new JPanel();
