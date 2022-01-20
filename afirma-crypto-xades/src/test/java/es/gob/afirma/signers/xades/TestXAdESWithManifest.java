@@ -1,6 +1,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.File;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -13,7 +14,8 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 
-/** Pruebas de firmas XAdES con MANIFEST. */
+/** Pruebas de firmas XAdES con MANIFEST.
+ * @author Tom&aacute;s Garc&iacuute;a-Mer&aacute;s. */
 public final class TestXAdESWithManifest {
 
     private static final String CERT_PATH = "CATCERT CIUTADANIA PF CPIXSA-2.p12"; //$NON-NLS-1$
@@ -28,13 +30,24 @@ public final class TestXAdESWithManifest {
 	@Test
     public void testXadesExternallyDetachedUseManifest() throws Exception {
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+	        ks.load(is, CERT_PASS.toCharArray());
+		}
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+    		CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
 
         // Los datos son la huella de los datos
-        final byte[] data = MessageDigest.getInstance("SHA-512").digest( //$NON-NLS-1$
-    		AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("ANF_con cadena_certificacion.jks")) //$NON-NLS-1$
-		);
+        final byte[] data;
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream("ANF_con cadena_certificacion.jks") //$NON-NLS-1$
+		) {
+	        data = MessageDigest.getInstance("SHA-512").digest( //$NON-NLS-1$
+	    		AOUtil.getDataFromInputStream(is)
+			);
+        }
         System.out.println("Huella de los datos: " + Base64.encode(data)); //$NON-NLS-1$
 
         final AOXAdESSigner signer = new AOXAdESSigner();
@@ -49,7 +62,7 @@ public final class TestXAdESWithManifest {
 
         final File f = File.createTempFile("xadesExternallyDetachedManifest-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
         try (
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)
 		) {
         	fos.write(signature);
         	fos.flush();
@@ -69,11 +82,21 @@ public final class TestXAdESWithManifest {
 		System.out.println("Firma XAdES enveloping con Manifest de datos binarios"); //$NON-NLS-1$
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+	        ks.load(is, CERT_PASS.toCharArray());
+		}
 
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-
-        final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("ANF_con cadena_certificacion.jks")); //$NON-NLS-1$
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+    		CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
+        final byte[] data;
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream("ANF_con cadena_certificacion.jks") //$NON-NLS-1$
+		) {
+        	data = AOUtil.getDataFromInputStream(is);
+        }
 
         final AOXAdESSigner signer = new AOXAdESSigner();
 
@@ -105,11 +128,22 @@ public final class TestXAdESWithManifest {
 		System.out.println("Firma XAdES Enveloping con Manifest de XML"); //$NON-NLS-1$
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+	        ks.load(is, CERT_PASS.toCharArray());
+		}
 
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+    		CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
 
-        final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xml_with_ids.xml")); //$NON-NLS-1$
+        final byte[] data;
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream("xml_with_ids.xml") //$NON-NLS-1$
+		) {
+        	data = AOUtil.getDataFromInputStream(is);
+        }
 
         final AOXAdESSigner signer = new AOXAdESSigner();
 
@@ -122,7 +156,7 @@ public final class TestXAdESWithManifest {
 
         final File f = File.createTempFile("xadesEnveloping-useManifestXML-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
         try (
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)
 		) {
         	fos.write(signature);
         	fos.flush();
@@ -141,11 +175,20 @@ public final class TestXAdESWithManifest {
 		System.out.println("Firma XAdES Enveloped con Manifest"); //$NON-NLS-1$
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+	        ks.load(is, CERT_PASS.toCharArray());
+		}
 
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-        final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xml_with_ids.xml")); //$NON-NLS-1$
+        final byte[] data;
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream("xml_with_ids.xml") //$NON-NLS-1$
+		) {
+        	data = AOUtil.getDataFromInputStream(is);
+        }
 
         final AOXAdESSigner signer = new AOXAdESSigner();
 
@@ -159,7 +202,7 @@ public final class TestXAdESWithManifest {
 
         final File f = File.createTempFile("xadesEnveloped-useManifestXML-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
         try (
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)
 		) {
         	fos.write(signature);
         	fos.flush();

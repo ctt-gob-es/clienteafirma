@@ -125,7 +125,11 @@ final class OcspHelper {
 			throw new IllegalArgumentException("Debe indicarse un alias de certificado contenido en el almacen PKCS#12"); //$NON-NLS-1$
 		}
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(OcspHelper.class.getResourceAsStream(pfxFile), pfxPassword.toCharArray());
+		try (
+			final InputStream is = OcspHelper.class.getResourceAsStream(pfxFile)
+		) {
+			ks.load(is, pfxPassword.toCharArray());
+		}
 
 		if (!ks.containsAlias(alias)) {
 			throw new IllegalArgumentException(
@@ -156,7 +160,7 @@ final class OcspHelper {
 		conn.setRequestProperty("Accept", "application/ocsp-response");  //$NON-NLS-1$//$NON-NLS-2$
 		try (
 			final OutputStream out = conn.getOutputStream();
-			final DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out));
+			final DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out))
 		) {
 			dataOut.write(ocspRequest);
 		}
@@ -164,7 +168,7 @@ final class OcspHelper {
 			throw new IOException("El servidor OCSP ha devuelto un codigo de error " + conn.getResponseCode()); //$NON-NLS-1$
 		}
 		try (
-			final InputStream in = (InputStream) conn.getContent();
+			final InputStream in = (InputStream) conn.getContent()
 		) {
 			return AOUtil.getDataFromInputStream(in);
 		}
@@ -301,7 +305,7 @@ final class OcspHelper {
 		) {
         	final DEROctetString aiaDEROctetString = (DEROctetString) asn1In.readObject();
         	try (
-    			final ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets());
+    			final ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets())
 			) {
         		final ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1InOctets.readObject();
         		final AuthorityInformationAccess authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);

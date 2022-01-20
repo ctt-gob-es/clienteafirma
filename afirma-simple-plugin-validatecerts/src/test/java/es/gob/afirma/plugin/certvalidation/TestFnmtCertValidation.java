@@ -1,6 +1,6 @@
 package es.gob.afirma.plugin.certvalidation;
 
-
+import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
@@ -19,7 +19,7 @@ import es.gob.afirma.plugin.certvalidation.validation.ValidationResult;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestFnmtCertValidation {
 
-	private static final String[] ACTIVOS = new String[] {
+	private static final String[] ACTIVOS = {
 		//"certificadoActivoACUsuarios-Pruebas.cer", //$NON-NLS-1$
 		"ejemploADM_SLD_ACTIVO.cer", //$NON-NLS-1$
 		"ejemploESPJ_ACTIVO.cer", //$NON-NLS-1$
@@ -30,7 +30,7 @@ public final class TestFnmtCertValidation {
 		"TARJETA_ACTIVO_EIDAS_ACAP.cer" //$NON-NLS-1$
 	};
 
-	private static final String[] REVOCADOS = new String[] {
+	private static final String[] REVOCADOS = {
 		//"certificadoRevocadoACUsuarios-Pruebas.cer", //$NON-NLS-1$
 		"ejemploADM_SLD_REVOCADO.cer", //$NON-NLS-1$
 		"ejemploESPJ_REVOCADO.cer", //$NON-NLS-1$
@@ -49,9 +49,12 @@ public final class TestFnmtCertValidation {
 	public void testRevoked() throws Exception {
 		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 		for (final String c : REVOCADOS) {
-			final X509Certificate cert = (X509Certificate) cf.generateCertificate(
-				TestCertValidation.class.getResourceAsStream("/fnmt/" + c) //$NON-NLS-1$
-			);
+			final X509Certificate cert;
+			try (
+				final InputStream is = TestFnmtCertValidation.class.getResourceAsStream("/fnmt/" + c) //$NON-NLS-1$
+			) {
+				cert = (X509Certificate) cf.generateCertificate(is);
+			}
 			System.out.println("Probando certificado emitido por '" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "': " + c); //$NON-NLS-1$ //$NON-NLS-2$
 			final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
 				cert
@@ -83,9 +86,12 @@ public final class TestFnmtCertValidation {
 	public void testValid() throws Exception {
 		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 		for (final String c : ACTIVOS) {
-			final X509Certificate cert = (X509Certificate) cf.generateCertificate(
-				TestCertValidation.class.getResourceAsStream("/fnmt/" + c) //$NON-NLS-1$
-			);
+			final X509Certificate cert;
+			try (
+				final InputStream is = TestFnmtCertValidation.class.getResourceAsStream("/fnmt/" + c) //$NON-NLS-1$
+			) {
+				cert = (X509Certificate) cf.generateCertificate(is);
+			}
 			System.out.println("Probando certificado emitido por '" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "': " + c); //$NON-NLS-1$ //$NON-NLS-2$
 			final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
 				cert
