@@ -72,7 +72,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
         titlePanel.setFileNameColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.43")); //$NON-NLS-1$
         titlePanel.setSignatureFormatColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.44")); //$NON-NLS-1$
         titlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.45")); //$NON-NLS-1$
-        titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, Color.black));
+        titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, LookAndFeelManager.HIGH_CONTRAST ? Color.white : Color.black));
 
         final JList<SignOperationConfig> fileList =
         		new JList<>(operations.toArray(new SignOperationConfig[operations.size()]));
@@ -177,14 +177,11 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
     		this.sizeLabel = new JLabel();
     		this.sizeLabel.setPreferredSize(new Dimension(60, 14));
 
-    		// Establecemos la configuracion de color
-    		Color bgColor = Color.WHITE;
     		// Configuramos los colores
     		if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-    			bgColor = LookAndFeelManager.WINDOW_COLOR;
+    			final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
+    			setBackground(bgColor);
     		}
-
-    		setBackground(bgColor);
 
     		setLayout(new GridBagLayout());
 
@@ -261,14 +258,11 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 			this.focusedBorder = BorderFactory.createDashedBorder(Color.GRAY);
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
-			// Establecemos la configuracion de color
-            Color bgColor = Color.WHITE;
             // Configuramos los colores
             if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-            	bgColor = LookAndFeelManager.WINDOW_COLOR;
+            	final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
+            	setBackground(bgColor);
             }
-
-            setBackground(bgColor);
 
 			setLayout(new GridBagLayout());
 
@@ -307,12 +301,16 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
 			if (value.getInvalidSignatureText() == null) {
 				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
-				this.fileNameLabel.setForeground(Color.BLACK);
+				if (!LookAndFeelManager.HIGH_CONTRAST) {
+					this.fileNameLabel.setForeground(Color.BLACK);
+				}
 			}
 			else {
 				this.fileNameLabel.setText(
 						(value.getDataFile().getAbsolutePath() + " " + SimpleAfirmaMessages.getString("SignPanel.147")).substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
-				this.fileNameLabel.setForeground(Color.RED);
+				if (!LookAndFeelManager.HIGH_CONTRAST) {
+					this.fileNameLabel.setForeground(Color.RED);
+				}
 			}
 
 			this.formatNameLabel.setText(value.getSignatureFormatName());

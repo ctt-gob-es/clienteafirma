@@ -16,8 +16,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -37,7 +35,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -66,7 +63,10 @@ final class MassiveResultProcessPanel extends JPanel {
 	private final JLabel certDescText = new JLabel();
     private final JLabel dirPathText = new JLabel();
     private final JLabel certIcon = new JLabel();
-    private final JEditorPane certDescription = new JEditorPane();
+    private final JLabel holderDescCertLabel = new JLabel();
+    private final JLabel holderCertLabel = new JLabel();
+    private final JLabel issuerDescCertLabel = new JLabel();
+    private final JLabel issuerCertLabel = new JLabel();
     private final JButton validateCertButton = null;
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -103,7 +103,7 @@ final class MassiveResultProcessPanel extends JPanel {
         this.dirPathText.setLabelFor(outDirPath);
 
         final JPanel dirPathPanel = new JPanel();
-        dirPathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        dirPathPanel.setBorder(BorderFactory.createLineBorder(LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY));
         dirPathPanel.setLayout(new BoxLayout(dirPathPanel, BoxLayout.X_AXIS));
         dirPathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         dirPathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -117,25 +117,22 @@ final class MassiveResultProcessPanel extends JPanel {
         openDirButton.setToolTipText(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.5")); //$NON-NLS-1$
         openDirButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.6")); //$NON-NLS-1$
         openDirButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.7")); //$NON-NLS-1$
-        openDirButton.addActionListener(new ActionListener() {
-        	@Override
-        	public void actionPerformed(final ActionEvent ae) {
-        		try {
-        			Desktop.getDesktop().open(outDir);
-        		}
-        		catch (final Exception e) {
-        			LOGGER.warning(
-        					"Error abriendo el directorio con las firmas generadas: " + e //$NON-NLS-1$
-        					);
-        			AOUIFactory.showErrorMessage(
-        					SimpleAfirmaMessages.getString("MassiveResultProcessPanel.8"), //$NON-NLS-1$
-        					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-        					JOptionPane.ERROR_MESSAGE,
-        					null
-        					);
-        		}
-        	}
-        });
+        openDirButton.addActionListener(ae -> {
+			try {
+				Desktop.getDesktop().open(outDir);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+						"Error abriendo el directorio con las firmas generadas: " + e //$NON-NLS-1$
+						);
+				AOUIFactory.showErrorMessage(
+						SimpleAfirmaMessages.getString("MassiveResultProcessPanel.8"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						null
+						);
+			}
+		});
 
 
         dirPathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
@@ -156,30 +153,62 @@ final class MassiveResultProcessPanel extends JPanel {
 	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
 	            this.certIcon.setFocusable(false);
 
+//	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
+//	            // el tipo de contenido antes que el contenido
+//	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
+//	            setFocusable(false);
+//	            this.certDescription.setEditable(false);
+//	            this.certDescription.setOpaque(false);
+//	            this.certDescription.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.12")); //$NON-NLS-1$
+//	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
+//	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
+//
+//	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, (he, linkIndex) -> openCertificate(cert, MassiveResultProcessPanel.this));
+//                this.certDescription.addFocusListener(editorFocusManager);
+//                this.certDescription.addKeyListener(editorFocusManager);
+//	            this.certDescription.addHyperlinkListener(editorFocusManager);
+
 	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
 	            // el tipo de contenido antes que el contenido
-	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-	            setFocusable(false);
-	            this.certDescription.setEditable(false);
-	            this.certDescription.setOpaque(false);
-	            this.certDescription.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.12")); //$NON-NLS-1$
-	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
-	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
+	            this.holderDescCertLabel.setText(SimpleAfirmaMessages.getString("CertificateInfo.1")); //$NON-NLS-1$
+	            this.holderCertLabel.setText(certInfo.getHolderName());
+	            this.holderCertLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") + //$NON-NLS-1$
+	            															SimpleAfirmaMessages.getString("CertificateInfo.1")); //$NON-NLS-1$
+	            this.issuerDescCertLabel.setText(SimpleAfirmaMessages.getString("CertificateInfo.2")); //$NON-NLS-1$
+	            this.issuerCertLabel.setText("<html><b>" + certInfo.getIssuerName() + "</b></html>"); //$NON-NLS-1$ //$NON-NLS-2$
 
-	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, (he, linkIndex) -> openCertificate(cert, MassiveResultProcessPanel.this));
-                this.certDescription.addFocusListener(editorFocusManager);
-                this.certDescription.addKeyListener(editorFocusManager);
-	            this.certDescription.addHyperlinkListener(editorFocusManager);
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel, false, cert);
             }
             certDescPanel = new JPanel();
             certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            certDescPanel.setLayout(new BoxLayout(certDescPanel, BoxLayout.X_AXIS));
-            certDescPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-            certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-            certDescPanel.add(this.certIcon);
-            certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-            certDescPanel.add(this.certDescription);
-            certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+            certDescPanel.setLayout(new GridBagLayout());
+            final GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 0.0;
+            c.weighty = 0.0;
+            c.gridheight = 2;
+            c.insets = new Insets(0, 0, 0, 10);
+            certDescPanel.add(this.certIcon, c);
+            c.weightx = 0.0;
+            c.weighty = 0.0;
+            c.gridx = 1;
+            c.gridheight = 1;
+            certDescPanel.add(this.holderDescCertLabel, c);
+            c.weightx = 5.0;
+            c.gridx = 2;
+            c.insets = new Insets(0, 0, 0, 0);
+            certDescPanel.add(this.holderCertLabel, c);
+            c.weightx = 0.0;
+            c.weighty = 1.0;
+            c.gridx = 1;
+            c.gridy = 1;
+            c.insets = new Insets(0, 0, 0, 0);
+            certDescPanel.add(this.issuerDescCertLabel, c);
+            c.weightx = 5.0;
+            c.gridx = 2;
+            certDescPanel.add(this.issuerCertLabel, c);
+
             if (this.validateCertButton != null) {
                 certDescPanel.add(this.validateCertButton);
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -189,7 +218,7 @@ final class MassiveResultProcessPanel extends JPanel {
             }
 
             this.certDescText.setText(SimpleAfirmaMessages.getString("SignDataPanel.21")); //$NON-NLS-1$
-            this.certDescText.setLabelFor(this.certDescription);
+            this.certDescText.setLabelFor(this.holderCertLabel);
         }
 
         // Barra de titulo del listado de resultados
@@ -197,7 +226,7 @@ final class MassiveResultProcessPanel extends JPanel {
 		resultTitlePanel.setFileNameColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.9")); //$NON-NLS-1$
 		resultTitlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.10")); //$NON-NLS-1$
 		resultTitlePanel.setResultColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.11")); //$NON-NLS-1$
-		resultTitlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, Color.GRAY));
+		resultTitlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY));
 
         final JScrollPane resultListPanel = new JScrollPane(
     		getSignResultList(signConfigList, this)
@@ -215,7 +244,7 @@ final class MassiveResultProcessPanel extends JPanel {
 
         // Creamos un panel que contenga el titulo del listado y el propio listado
         final JPanel resultPanel = new JPanel(new GridBagLayout());
-        resultPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        resultPanel.setBorder(BorderFactory.createLineBorder(LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY));
 
         final GridBagConstraints resultConstraints = new GridBagConstraints();
         resultConstraints.fill = GridBagConstraints.BOTH;
@@ -361,14 +390,11 @@ final class MassiveResultProcessPanel extends JPanel {
 			this.resultLabel = new JLabel();
 			this.resultLabel.setPreferredSize(new Dimension(52, 14));
 
-			// Establecemos la configuracion de color
-			Color bgColor = Color.WHITE;
 			// Configuramos los colores
 			if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-				bgColor = LookAndFeelManager.WINDOW_COLOR;
+				final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
+				setBackground(bgColor);
 			}
-
-			setBackground(bgColor);
 
 			setLayout(new GridBagLayout());
 
@@ -447,17 +473,14 @@ final class MassiveResultProcessPanel extends JPanel {
 
 			this.formatter = NumberFormat.getNumberInstance();
 
-			this.focusedBorder = BorderFactory.createDashedBorder(Color.GRAY);
+			this.focusedBorder = BorderFactory.createDashedBorder(LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY);
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
-			// Establecemos la configuracion de color
-			Color bgColor = Color.WHITE;
 			// Configuramos los colores
 			if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-				bgColor = LookAndFeelManager.WINDOW_COLOR;
+				final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
+				setBackground(bgColor);
 			}
-
-			setBackground(bgColor);
 
 			setLayout(new GridBagLayout());
 

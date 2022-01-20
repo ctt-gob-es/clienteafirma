@@ -35,7 +35,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -81,7 +80,6 @@ final class SignDataPanel extends JPanel {
     private final JLabel holderCertLabel = new JLabel();
     private final JLabel issuerDescCertLabel = new JLabel();
     private final JLabel issuerCertLabel = new JLabel();
-    private final JEditorPane certDescription = new JEditorPane();
     private final JButton validateCertButton = null;
 
     private CompleteSignInfo currentSignInfo = null;
@@ -259,7 +257,7 @@ final class SignDataPanel extends JPanel {
             }
 
             this.certDescText.setText(SimpleAfirmaMessages.getString("SignDataPanel.21")); //$NON-NLS-1$
-            this.certDescText.setLabelFor(this.certDescription);
+            this.certDescText.setLabelFor(this.holderCertLabel);
         }
 
         // Panel el detalle de la firma

@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.AgePolicy;
@@ -144,7 +145,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 		final JLabel hlLabel = new JLabel(" - " + text); //$NON-NLS-1$
 
 		hlLabel.setFocusable(true);
-		hlLabel.setForeground(Color.blue);
+		hlLabel.setForeground(LookAndFeelManager.HIGH_CONTRAST ? Color.yellow : Color.blue);
     	final Font font = hlLabel.getFont();
     	final Map attributes = font.getAttributes();
     	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
