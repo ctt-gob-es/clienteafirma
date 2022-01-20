@@ -540,34 +540,35 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-    /** Muestra la ayuda de la aplicaci&oacute;n. */
-    public static void showHelp() {
-        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final File helpFile = new File(APPLICATION_HOME + "\\AutoFirmaV2.chm"); //$NON-NLS-1$
-            final File helpVersionFile = new File(APPLICATION_HOME + "\\help.version"); //$NON-NLS-1$
-            // Si el fichero no existe lo creamos
-            if (!helpFile.exists() || HelpResourceManager.isDifferentHelpFile(helpVersionFile)) {
-	            try {
-	            	HelpResourceManager.createWindowsHelpResources(helpFile, helpVersionFile);
+	/** Muestra la ayuda de la aplicaci&oacute;n. */
+	public static void showHelp() {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			final File filesList = new File(APPLICATION_HOME + "\\help\\fileslist.txt"); //$NON-NLS-1$
+			final File helpVersionFile = new File(APPLICATION_HOME + "\\help.version"); //$NON-NLS-1$
+			// Si el fichero no existe lo creamos
+			if (!filesList.exists() || HelpResourceManager.isDifferentHelpFile(helpVersionFile)) {
+				try {
+					HelpResourceManager.createWindowsHelpResources(filesList, helpVersionFile);
 				} catch (final Exception e) {
-	                LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
-	            }
-            }
-            // Cargamos el fichero
-            try {
-				Desktop.getDesktop().open(helpFile);
-			} catch (final IOException e) {
-				LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
+					LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
+				}
+			}
+
+			// Cargamos el fichero
+			try {
+				final File indexHelpFile = new File(APPLICATION_HOME + "\\help\\Spanish.lproj\\index.html"); //$NON-NLS-1$
+				Desktop.getDesktop().open(indexHelpFile);
+			} catch (final IOException ioe) {
+				LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + ioe); //$NON-NLS-1$
 				JavaHelp.showHelp();
 			}
-            return;
 		} else if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 			// Ultimo recurso, si no es Windows, es Apple OS X pero no disponemos de Apple
 			// Help, o es otro
-            // sistema operativo (Linux, Solaris), cargamos JavaHelp
-            JavaHelp.showHelp();
-        }
-    }
+	        // sistema operativo (Linux, Solaris), cargamos JavaHelp
+	        JavaHelp.showHelp();
+		}
+	}
 
 	/**
 	 * Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para

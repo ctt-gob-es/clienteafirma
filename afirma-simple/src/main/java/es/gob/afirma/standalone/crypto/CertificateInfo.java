@@ -15,7 +15,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
@@ -27,44 +26,34 @@ public final class CertificateInfo {
 
     private final String iconTooltip;
 
-    /** Texto descriptivo del certificado. */
-    private String descriptionText;
+    /** Nombre com&uacute;n del propietario del certificado. */
+    private String holderName;
+
+    /** Nombre com&uacute;n del emisor. */
+    private String issuerName;
 
     /** Construye el objeto con la informaci&oacute;n del certificado.
      * @param cert Certificado al cual se refierre la informaci&oacute;n
-     * @param description Texto descriptivo del certificado.
+     * @param holderName Texto con el titular del certificado.
      * @param i Icono para el certificado
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
     CertificateInfo(final X509Certificate cert,
-    		        final String description,
+    		        final String holderName,
     		        final Icon i,
     		        final String iTooltip) {
 
-		final boolean isMac = Platform.OS.MACOSX.equals(Platform.getOS());
-    	if (description == null || description.isEmpty()) {
+    	if (holderName == null || holderName.isEmpty()) {
         	if (cert == null) {
-        		this.descriptionText = SimpleAfirmaMessages.getString("CertificateInfo.0"); //$NON-NLS-1$
+        		this.holderName = null;
+        		this.issuerName = null;
         	}
         	else {
-        		this.descriptionText =
-    				"<html>" + //$NON-NLS-1$
-					(isMac ? "<br>" : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					SimpleAfirmaMessages.getString("CertificateInfo.1") + //$NON-NLS-1$
-					": " + //$NON-NLS-1$
-					(isMac ? "<b>" : "<a href=\"#\">") + //$NON-NLS-1$ //$NON-NLS-2$
-					AOUtil.getCN(cert) +
-					(isMac ? "</b>" : "</a>") +  //$NON-NLS-1$//$NON-NLS-2$
-					". " + //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("CertificateInfo.2") + //$NON-NLS-1$
-					": " + //$NON-NLS-1$
-					"<b>" + //$NON-NLS-1$
-					AOUtil.getCN(cert.getIssuerX500Principal().toString()) +
-					"</b>" + //$NON-NLS-1$
-					"</html>"; //$NON-NLS-1$
+        		this.holderName = AOUtil.getCN(cert);
+        		this.issuerName = AOUtil.getCN(cert.getIssuerX500Principal().toString());
         	}
         }
         else {
-            this.descriptionText = "<html>" + (isMac ? "<br>" : "") + "<a href=\"#\">" + description + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        	this.holderName = holderName;
         }
 
         if (i == null) {
@@ -95,9 +84,20 @@ public final class CertificateInfo {
     	return this.iconTooltip;
     }
 
-    /** Obtiene un texto descriptivo del certificado.
-     * @return Descripci&oacute;n del certificado. */
-    public String getDescriptionText() {
-        return this.descriptionText;
-    }
+    /**
+     * Obtiene el nombre del titular del certificado.
+     * @return Texto con el titular del certificado.
+     */
+	public String getHolderName() {
+		return this.holderName;
+	}
+
+	/**
+	 * Obtiene el nombre del emisor del certificado.
+	 * @return Texto con el nombre del emisor del certificado.
+	 */
+	public String getIssuerName() {
+		return this.issuerName;
+	}
+
 }

@@ -6,9 +6,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.font.TextAttribute;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -27,15 +29,22 @@ class PseudonymCertificateLine extends CertificateLine {
 	private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
 	private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
 
+	private JLabel positionLabel = null;
+
+	private JLabel organizationLabel = null;
+
+	private JLabel dates = null;
+
 	private JLabel propertiesLink = null;
 
 	/**
 	 * Construye el panel con la informaci&oacute;n
 	 * @param friendlyName Nombre legible con el que identificar el certificado.
 	 * @param certificate Certificado del que se desea mostrar la informaci&oacute;n.
+	 * @param highContrast Indica si el modo de alto contraste est&aacute; activo en el SO.
 	 */
-	PseudonymCertificateLine(final String friendlyName, final X509Certificate certificate) {
-		super(friendlyName, certificate);
+	PseudonymCertificateLine(final String friendlyName, final X509Certificate certificate, final boolean highContrast) {
+		super(friendlyName, certificate, highContrast);
 		createUI();
 	}
 
@@ -67,18 +76,23 @@ class PseudonymCertificateLine extends CertificateLine {
 		final String title = subjectPrincipal.getRDNvalue(PrincipalStructure.TITLE);
 		final String pseudonym = subjectPrincipal.getRDNvalue(PrincipalStructure.PSEUDONYM);
 
-		final JLabel positionLabel = new JLabel();
+		this.positionLabel = new JLabel();
 		if (title != null && pseudonym != null) {
-			positionLabel.setText(title + " (" + pseudonym + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			this.positionLabel.setText(title + " (" + pseudonym + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (title != null) {
-			positionLabel.setText(title);
+			this.positionLabel.setText(title);
 		}
 		else {
-			positionLabel.setText(getFriendlyName());
+			this.positionLabel.setText(getFriendlyName().getText());
 		}
-		positionLabel.setFont(SUBJECT_FONT);
-		add(positionLabel, c);
+		this.positionLabel.setFont(SUBJECT_FONT);
+		if (isHighContrast()) {
+			this.positionLabel.setForeground(Color.WHITE);
+		} else {
+			this.positionLabel.setForeground(Color.BLACK);
+		}
+		add(this.positionLabel, c);
 
 		c.gridy++;
 		c.insets = new Insets(0, 0, 0, 5);
@@ -89,44 +103,65 @@ class PseudonymCertificateLine extends CertificateLine {
 			organization = subjectPrincipal.getRDNvalue(PrincipalStructure.O);
 		}
 
-		final JLabel organizationLabel = new JLabel();
+		this.organizationLabel = new JLabel();
 		if (organization != null) {
-			organizationLabel.setText(
+			this.organizationLabel.setText(
 					CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.33", //$NON-NLS-1$
 							organization,
 							keyUsages));
 		}
 		else {
-			organizationLabel.setText(
+			this.organizationLabel.setText(
 					CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2", //$NON-NLS-1$
 							AOUtil.getCN(getCertificate().getIssuerX500Principal().toString()),
 							keyUsages));
 		}
-		organizationLabel.setFont(DETAILS_FONT);
-		add(organizationLabel, c);
+		this.organizationLabel.setFont(DETAILS_FONT);
+		if (isHighContrast()) {
+			this.organizationLabel.setForeground(Color.WHITE);
+		} else {
+			this.organizationLabel.setForeground(Color.BLACK);
+		}
+		add(this.organizationLabel, c);
 
 		c.gridy++;
 
-		final JLabel dates = new JLabel(
+		this.dates = new JLabel(
 			CertificateSelectionDialogMessages.getString(
 					"CertificateSelectionPanel.3", //$NON-NLS-1$
 					formatDate(getCertificate().getNotBefore()),
 					formatDate(getCertificate().getNotAfter()))
 		);
-		dates.setFont(DETAILS_FONT);
-		add(dates, c);
+		this.dates.setFont(DETAILS_FONT);
+		if (isHighContrast()) {
+			this.dates.setForeground(Color.WHITE);
+		} else {
+			this.dates.setForeground(Color.BLACK);
+		}
+		add(this.dates, c);
 
 		c.gridy++;
 
 		this.propertiesLink = new JLabel(
-	        "<html><u>" + //$NON-NLS-1$
-    		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
-	        "</u></html>" //$NON-NLS-1$
-        );
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5")
+				);
+		if (isHighContrast()) {
+				this.propertiesLink.setForeground(Color.YELLOW);
+		} else {
+				this.propertiesLink.setForeground(Color.BLACK);
+		}
+		Font font = this.propertiesLink.getFont();
+		Map attributes = font.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		this.propertiesLink.setFont(font.deriveFont(attributes));
+
 		// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
 		// inicia su importacion
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			this.propertiesLink.setFont(DETAILS_FONT);
+			font = DETAILS_FONT;
+			attributes = font.getAttributes();
+			attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+			this.propertiesLink.setFont(font.deriveFont(attributes));
 			add(this.propertiesLink, c);
 		}
 
@@ -160,4 +195,21 @@ class PseudonymCertificateLine extends CertificateLine {
 	Rectangle getCertificateLinkBounds() {
 		return this.propertiesLink.getBounds();
 	}
+
+	public JLabel getPositionLabel() {
+		return this.positionLabel;
+	}
+
+	public JLabel getOrganizationLabel() {
+		return this.organizationLabel;
+	}
+
+	public JLabel getDates() {
+		return this.dates;
+	}
+
+	public JLabel getPropertiesLink() {
+		return this.propertiesLink;
+	}
+
 }

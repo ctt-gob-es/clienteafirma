@@ -163,6 +163,7 @@ final class PreferencesPanelXades extends JScrollPane {
 
         final JPanel signOptionsInnerPanel = new JPanel(new GridBagLayout());
 
+        this.xadesSignFormat.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.183")); //$NON-NLS-1$
         this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(modificationListener);
         this.xadesSignFormat.addKeyListener(keyListener);
@@ -206,14 +207,20 @@ final class PreferencesPanelXades extends JScrollPane {
         group.add(this.optionCounterSignLeafs);
         group.add(this.optionCounterSignTree);
 
+        this.optionCoSign.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.184")); //$NON-NLS-1$
+        this.optionCoSign.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.168")); //$NON-NLS-1$
         this.optionCoSign.setEnabled(!isBlocked());
     	this.optionCoSign.addItemListener(modificationListener);
     	this.optionCoSign.addKeyListener(keyListener);
 
+        this.optionCounterSignLeafs.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.184")); //$NON-NLS-1$
+        this.optionCounterSignLeafs.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.169")); //$NON-NLS-1$
         this.optionCounterSignLeafs.setEnabled(!isBlocked());
         this.optionCounterSignLeafs.addItemListener(modificationListener);
         this.optionCounterSignLeafs.addKeyListener(keyListener);
 
+        this.optionCounterSignTree.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.184")); //$NON-NLS-1$
+        this.optionCounterSignTree.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.170")); //$NON-NLS-1$
         this.optionCounterSignTree.setEnabled(!isBlocked());
         this.optionCounterSignTree.addItemListener(modificationListener);
         this.optionCounterSignTree.addKeyListener(keyListener);
@@ -249,6 +256,9 @@ final class PreferencesPanelXades extends JScrollPane {
         xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
         c.gridy++;
         metadata.add(xadesSignatureProductionCityLabel, c);
+        this.xadesSignatureProductionCity.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
         this.xadesSignatureProductionCity.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.66") //$NON-NLS-1$
 		);
@@ -263,6 +273,12 @@ final class PreferencesPanelXades extends JScrollPane {
         xadesSignatureProductionProvinceLabel.setLabelFor(this.xadesSignatureProductionProvince);
         c.gridy++;
         metadata.add(xadesSignatureProductionProvinceLabel, c);
+        this.xadesSignatureProductionProvince.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
+        this.xadesSignatureProductionProvince.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.14") //$NON-NLS-1$
+		);
         this.xadesSignatureProductionProvince.addKeyListener(modificationListener);
         this.xadesSignatureProductionProvince.addKeyListener(keyListener);
         c.gridy++;
@@ -274,6 +290,12 @@ final class PreferencesPanelXades extends JScrollPane {
         xadesSignatureProductionPostalCodeLabel.setLabelFor(this.xadesSignatureProductionPostalCode);
         c.gridy++;
         metadata.add(xadesSignatureProductionPostalCodeLabel, c);
+        this.xadesSignatureProductionPostalCode.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
+        this.xadesSignatureProductionPostalCode.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.102") //$NON-NLS-1$
+		);
         this.xadesSignatureProductionPostalCode.addKeyListener(modificationListener);
         this.xadesSignatureProductionPostalCode.addKeyListener(keyListener);
         c.gridy++;
@@ -283,6 +305,12 @@ final class PreferencesPanelXades extends JScrollPane {
         xadesSignatureProductionCountryLabel.setLabelFor(this.xadesSignatureProductionCountry);
         c.gridy++;
         metadata.add(xadesSignatureProductionCountryLabel, c);
+        this.xadesSignatureProductionCountry.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
+        this.xadesSignatureProductionCountry.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.12") //$NON-NLS-1$
+		);
         this.xadesSignatureProductionCountry.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.67")); //$NON-NLS-1$
         this.xadesSignatureProductionCountry.addKeyListener(modificationListener);
         this.xadesSignatureProductionCountry.addKeyListener(keyListener);
@@ -293,6 +321,12 @@ final class PreferencesPanelXades extends JScrollPane {
         xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
         c.gridy++;
         metadata.add(xadesSignerCertifiedRoleLabel, c);
+        this.xadesSignerClaimedRole.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.181") //$NON-NLS-1$
+		);
+        this.xadesSignerClaimedRole.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanelXades.0") //$NON-NLS-1$
+		);
         this.xadesSignerClaimedRole.addKeyListener(modificationListener);
         this.xadesSignerClaimedRole.addKeyListener(keyListener);
         c.gridy++;

@@ -10,7 +10,6 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -20,13 +19,10 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -37,8 +33,9 @@ final class SignResultPanel extends JPanel {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private final JEditorPane descTextLabel = new JEditorPane();
+    private final JLabel descTextLabel = new JLabel();
     private final JLabel resultTextLabel = new JLabel();
+    private final JLabel linkLabel = new JLabel();
 
     SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener));
@@ -48,7 +45,7 @@ final class SignResultPanel extends JPanel {
 
         // Para que se detecten apropiadamente los hipervinculos hay que establecer
         // el tipo de contenido antes que el contenido
-        this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
+        //this.editorLinkTextLabel.setContentType("text/plain"); //$NON-NLS-1$
 
         String iconFilename;
         switch (validity.getValidity()) {
@@ -75,6 +72,22 @@ final class SignResultPanel extends JPanel {
             case GENERATED:
                 this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.2")); //$NON-NLS-1$
                 this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.3")); //$NON-NLS-1$
+
+                this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                LabelLinkManager labelLinkManager = new LabelLinkManager(this.linkLabel);
+                labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
+                		SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
+                ));
+
+                if (extKeyListener != null) {
+                	this.linkLabel.addKeyListener(extKeyListener);
+                }
+
+                this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
             case OK:
@@ -87,6 +100,21 @@ final class SignResultPanel extends JPanel {
             		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.27")); //$NON-NLS-1$
             		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.28")); //$NON-NLS-1$
             		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.29"); //$NON-NLS-1$
+
+                    this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+
+                	// Este gestor se encargara de controlar los eventos de foco y raton
+                    labelLinkManager = new LabelLinkManager(this.linkLabel);
+                    labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
+							SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
+					));
+
+                    if (extKeyListener != null) {
+                    	this.linkLabel.addKeyListener(extKeyListener);
+                    }
+
+                    this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                    		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
             	}
                 break;
             case KO:
@@ -117,6 +145,20 @@ final class SignResultPanel extends JPanel {
                 	this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.30")); //$NON-NLS-1$
                     errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.31"); //$NON-NLS-1$
                 	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+
+                	// Este gestor se encargara de controlar los eventos de foco y raton
+                    labelLinkManager = new LabelLinkManager(this.linkLabel);
+                    labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
+							SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
+					));
+
+                    if (extKeyListener != null) {
+                    	this.linkLabel.addKeyListener(extKeyListener);
+                    }
+
+                    this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                    		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
                     resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.32"); //$NON-NLS-1$
                 }
                 break;
@@ -142,38 +184,6 @@ final class SignResultPanel extends JPanel {
 
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
-        final EditorFocusManager editorFocusManager = new EditorFocusManager(
-    		this.descTextLabel,
-    		(he, linkIndex) -> {
-			    try {
-			        if (he.getURL() != null) {
-			            Desktop.getDesktop().browse(he.getURL().toURI());
-			        }
-			    }
-			    catch (final Exception e) {
-			    	LOGGER.warning(
-						"Error abriendo el fichero: " + e //$NON-NLS-1$
-					);
-			    	AOUIFactory.showErrorMessage(
-			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			            JOptionPane.ERROR_MESSAGE,
-			            e
-			        );
-			    }
-			}
-		);
-
-        this.descTextLabel.addFocusListener(editorFocusManager);
-        this.descTextLabel.addHyperlinkListener(editorFocusManager);
-        this.descTextLabel.addKeyListener(editorFocusManager);
-        if (extKeyListener != null) {
-        	this.descTextLabel.addKeyListener(extKeyListener);
-        }
-
-        this.descTextLabel.setEditable(false);
-        this.descTextLabel.setOpaque(false);
-
         this.resultTextLabel.setFont(getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
@@ -189,7 +199,7 @@ final class SignResultPanel extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.weighty = 1.0;
-        c.gridheight = 2;
+        c.gridheight = 3;
         c.insets = new Insets(11, 11, 0, 5);
        	this.add(resultOperationIcon, c);
         c.weightx = 1.0;
@@ -200,8 +210,13 @@ final class SignResultPanel extends JPanel {
         this.add(this.resultTextLabel, c);
         c.weighty = 1.0;
         c.gridy = 1;
-        c.insets = new Insets(0, 6, 5, 11);
+        c.insets = new Insets(0, 6, 0, 11);
         this.add(this.descTextLabel, c);
+        c.weighty = 0.0;
+        c.weightx = 3.0;
+        c.gridy = 2;
+        c.insets = new Insets(0, 6, 0, 460);
+        this.add(this.linkLabel, c);
 
     }
 }

@@ -191,6 +191,9 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			add(this.policiesCombo, c);
 		}
 
+		this.policiesCombo.getAccessibleContext().setAccessibleName(
+			SimpleAfirmaMessages.getString("PreferencesPanel.183") //$NON-NLS-1$
+		);
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
 		);

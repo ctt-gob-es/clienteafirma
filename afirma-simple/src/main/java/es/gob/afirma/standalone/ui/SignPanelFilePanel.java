@@ -57,7 +57,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         setAlignmentY(Component.TOP_ALIGNMENT);
 
         // Establecemos la configuracion de color
-        Color bgColor = Color.WHITE;
+        Color bgColor = Color.BLACK;
         // Configuramos los colores
         if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
         	bgColor = LookAndFeelManager.WINDOW_COLOR;
@@ -203,6 +203,11 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         c.gridy++;
         c.insets = new Insets(4, 11, 0, 0);
         detailPanel.add(this.configInfoPanel, c);
+
+        // Establecemos la configuracion de color
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	detailPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
 
         return detailPanel;
 	}

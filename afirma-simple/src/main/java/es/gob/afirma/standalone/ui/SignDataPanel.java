@@ -35,7 +35,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -77,7 +76,10 @@ final class SignDataPanel extends JPanel {
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
     private final JLabel certIcon = new JLabel();
-    private final JEditorPane certDescription = new JEditorPane();
+    private final JLabel holderDescCertLabel = new JLabel();
+    private final JLabel holderCertLabel = new JLabel();
+    private final JLabel issuerDescCertLabel = new JLabel();
+    private final JLabel issuerCertLabel = new JLabel();
     private final JButton validateCertButton = null;
 
     private CompleteSignInfo currentSignInfo = null;
@@ -206,32 +208,50 @@ final class SignDataPanel extends JPanel {
 
 	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
 	            // el tipo de contenido antes que el contenido
-	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-	            setFocusable(false);
-	            this.certDescription.setEditable(false);
-	            this.certDescription.setOpaque(false);
-	            this.certDescription.setText(certInfo.getDescriptionText());
-	            this.certDescription.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.12")); //$NON-NLS-1$
-	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
-	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
+	            this.holderDescCertLabel.setText(SimpleAfirmaMessages.getString("CertificateInfo.1")); //$NON-NLS-1$
+	            this.holderCertLabel.setText(certInfo.getHolderName());
+	            this.holderCertLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") + //$NON-NLS-1$
+	            															SimpleAfirmaMessages.getString("CertificateInfo.1")); //$NON-NLS-1$
+	            this.issuerDescCertLabel.setText(SimpleAfirmaMessages.getString("CertificateInfo.2")); //$NON-NLS-1$
+	            this.issuerCertLabel.setText("<html><b>" + certInfo.getIssuerName() + "</b></html>"); //$NON-NLS-1$ //$NON-NLS-2$
 
-	            final EditorFocusManager editorFocusManager = new EditorFocusManager (
-	            	this.certDescription,
-	            	(he, linkIndex) -> openCertificate(cert, SignDataPanel.this)
-	            );
-                this.certDescription.addFocusListener(editorFocusManager);
-                this.certDescription.addKeyListener(editorFocusManager);
-	            this.certDescription.addHyperlinkListener(editorFocusManager);
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel);
+                labelLinkManager.setLabelLinkListener(new CertInfoLabelLinkImpl(cert));
             }
+
             certDescPanel = new JPanel();
-            certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            certDescPanel.setLayout(new BoxLayout(certDescPanel, BoxLayout.X_AXIS));
-            certDescPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-            certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-            certDescPanel.add(this.certIcon);
-            certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-            certDescPanel.add(this.certDescription);
-            certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+            // Se agrega un borde y un padding al panel con la informacion del certificado
+            certDescPanel.setBorder(BorderFactory.createCompoundBorder
+            		(BorderFactory.createLineBorder(Color.GRAY),
+            		BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            certDescPanel.setLayout(new GridBagLayout());
+            final GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 0.0;
+            c.weighty = 0.0;
+            c.gridheight = 2;
+            c.insets = new Insets(0, 0, 0, 10);
+            certDescPanel.add(this.certIcon, c);
+            c.weightx = 0.0;
+            c.weighty = 0.0;
+            c.gridx = 1;
+            c.gridheight = 1;
+            certDescPanel.add(this.holderDescCertLabel, c);
+            c.weightx = 5.0;
+            c.gridx = 2;
+            c.insets = new Insets(0, 0, 0, 0);
+            certDescPanel.add(this.holderCertLabel, c);
+            c.weightx = 0.0;
+            c.weighty = 1.0;
+            c.gridx = 1;
+            c.gridy = 1;
+            c.insets = new Insets(0, 0, 0, 0);
+            certDescPanel.add(this.issuerDescCertLabel, c);
+            c.weightx = 5.0;
+            c.gridx = 2;
+            certDescPanel.add(this.issuerCertLabel, c);
+
             if (this.validateCertButton != null) {
                 certDescPanel.add(this.validateCertButton);
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -241,7 +261,7 @@ final class SignDataPanel extends JPanel {
             }
 
             this.certDescText.setText(SimpleAfirmaMessages.getString("SignDataPanel.21")); //$NON-NLS-1$
-            this.certDescText.setLabelFor(this.certDescription);
+            this.certDescText.setLabelFor(this.holderCertLabel);
         }
 
         // Panel el detalle de la firma
@@ -308,7 +328,7 @@ final class SignDataPanel extends JPanel {
         this.add(detailPanel, c);
     }
 
-	static void openCertificate(final X509Certificate cert, final Component parent) {
+	public static void openCertificate(final X509Certificate cert) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();
@@ -456,7 +476,7 @@ final class SignDataPanel extends JPanel {
 
         final TreeFocusManager treeFocusManager = new TreeFocusManager(tree, nodeInfo -> {
 		    if (nodeInfo instanceof AOSimpleSignInfo) {
-		        openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0], parent);
+		        openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0]);
 		    }
 		    else if (nodeInfo instanceof ShowFileLinkAction) {
 		        ((ShowFileLinkAction) nodeInfo).action();

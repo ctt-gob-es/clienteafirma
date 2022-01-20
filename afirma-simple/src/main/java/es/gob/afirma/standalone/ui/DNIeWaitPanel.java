@@ -15,8 +15,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeListener;
@@ -28,8 +26,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -79,12 +75,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         // Boton para cargar DNIe
         final JButton dniButton = new JButton(SimpleAfirmaMessages.getString("DNIeWaitPanel.4")); //$NON-NLS-1$
         dniButton.addActionListener(
-    		new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REQUESTED, false, true);
-				}
-			}
+    		e -> DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REQUESTED, false, true)
 		);
         dniButton.setMnemonic('C');
         dniButton.getAccessibleContext().setAccessibleDescription(
@@ -100,12 +91,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         // Boton para saltar de pantalla
         final JButton noDNIButton = new JButton(SimpleAfirmaMessages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
         noDNIButton.addActionListener(
-    		new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REJECTED, false, true);
-				}
-			}
+    		e -> DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REJECTED, false, true)
 		);
         noDNIButton.setMnemonic('u');
         noDNIButton.getAccessibleContext().setAccessibleDescription(
@@ -151,10 +137,12 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
         	bgColor = LookAndFeelManager.WINDOW_COLOR;
         }
-        setBackground(bgColor);
-        dniePanel.setBackground(bgColor);
-        textPanel.setBackground(bgColor);
-        textPanelExtra.setBackground(bgColor);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	setBackground(bgColor);
+        	dniePanel.setBackground(bgColor);
+        	textPanel.setBackground(bgColor);
+        	textPanelExtra.setBackground(bgColor);
+        }
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -185,17 +173,14 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
     		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN)
 		);
         hideDniWaitScreen.addChangeListener(
-    		new ChangeListener() {
-				@Override
-				public void stateChanged(final ChangeEvent e) {
-					PreferencesManager.putBoolean(
-						PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN,
-						hideDniWaitScreen.isSelected()
-					);
-				}
-			}
+    		e -> PreferencesManager.putBoolean(
+				PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN,
+				hideDniWaitScreen.isSelected()
+			)
     	);
-        hideDniWaitScreen.setBackground(Color.WHITE);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	hideDniWaitScreen.setBackground(Color.WHITE);
+        }
         this.add(hideDniWaitScreen, c);
     }
 

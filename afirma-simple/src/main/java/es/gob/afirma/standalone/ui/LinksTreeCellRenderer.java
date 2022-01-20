@@ -9,11 +9,20 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.font.TextAttribute;
+import java.util.Map;
 
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+
+import es.gob.afirma.core.signers.AOSimpleSignInfo;
+import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
 
@@ -22,15 +31,43 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean focus) {
-        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, focus);
-        if (value instanceof DefaultMutableTreeNode && (!(((DefaultMutableTreeNode) value).getUserObject() instanceof String))) {
-            if (focus) {
-                setText("<html><font color=\"white\"><u>" + getText() + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            else {
-                setText("<html><font color=\"blue\"><u>" + getText() + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
+
+    	final Component ret = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, focus);
+
+        if (((DefaultMutableTreeNode) value).getUserObject() instanceof ShowFileLinkAction
+        		|| ((DefaultMutableTreeNode) value).getUserObject() instanceof AOSimpleSignInfo) {
+
+        	final JLabel linkLbl = new JLabel();
+        	linkLbl.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + getText());  //$NON-NLS-1$//$NON-NLS-2$
+
+        	if (focus) {
+        		linkLbl.setText(getText());
+        		linkLbl.setOpaque(true);
+        		if (!LookAndFeelManager.HIGH_CONTRAST) {
+        			linkLbl.setForeground(Color.WHITE);
+            		linkLbl.setBackground(Color.decode("#39698a")); //$NON-NLS-1$
+        		} else {
+        			linkLbl.setForeground(Color.YELLOW);
+            		linkLbl.setBackground(Color.BLUE);
+        		}
+        	} else {
+        		linkLbl.setText(getText());
+        		if (!LookAndFeelManager.HIGH_CONTRAST) {
+        			linkLbl.setForeground(Color.BLUE);
+        		} else {
+        			linkLbl.setForeground(Color.YELLOW);
+        		}
+        		linkLbl.setOpaque(false);
+        	}
+
+        	final Font font = linkLbl.getFont();
+        	final Map attributes = font.getAttributes();
+        	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        	linkLbl.setFont(font.deriveFont(attributes));
+
+        	return linkLbl;
         }
-        return this;
+
+        return ret;
     }
 }
