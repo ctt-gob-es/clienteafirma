@@ -296,6 +296,10 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			}
 		}
 
+		// Cerramos el servicio de ejecución concurrente
+		executorService.shutdown();
+
+		// Borramos temporales
 		deleteAllTemps();
 
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer

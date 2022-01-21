@@ -289,6 +289,10 @@ public final class SignBatchConcurrent extends SignBatch {
 			}
 		}
 
+		// Cerramos el servicio de ejecución concurrente
+		executorService.shutdown();
+
+		// Borramos temporales
 		deleteAllTemps();
 
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer
