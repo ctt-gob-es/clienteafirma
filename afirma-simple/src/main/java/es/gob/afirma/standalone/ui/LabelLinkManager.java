@@ -16,7 +16,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
@@ -119,9 +118,6 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
 			}
 			break;
 		default:
-			for (final KeyListener l : this.label.getKeyListeners()) {
-				l.keyPressed(e);
-			}
 			break;
 		}
 	}
