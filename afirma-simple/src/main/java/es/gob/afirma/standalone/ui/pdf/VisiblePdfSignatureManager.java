@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
@@ -32,26 +32,40 @@ public final class VisiblePdfSignatureManager {
 	 * @param parent Componente padre.
 	 * @throws IOException Cuando se produce un error al procesar el PDF.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n. */
-	public static void getVisibleSignatureParams(final SignOperationConfig signConfig,
+	public static void getVisibleSignatureParams(final List<SignOperationConfig> signConfigs,
 												 final SignatureExecutor signExecutor,
 												 final boolean signatureVisible,
 												 final boolean stampVisible,
 												 final Frame parent) throws IOException,
 	                                                                        AOCancelledOperationException {
-		final byte[] data = loadData(signConfig.getDataFile());
+		SignOperationConfig pdfSignConf = null;
+
+		// Obtenemos y actuamos sobre el primer PDF que se encuentre en las configuraciones
+		for (final SignOperationConfig signConfig : signConfigs) {
+			if (signConfig.getSigner() instanceof AOPDFSigner) {
+				pdfSignConf = signConfig;
+			}
+		}
+
+		byte[] data = null;
+
+		if (pdfSignConf != null) {
+			data = loadData(pdfSignConf.getDataFile());
+		}
+
 		final List<SignatureField> emptySignatureFields = PdfUtil.getPdfEmptySignatureFields(data);
 
 		// Si hay campos de firma vacios, usaremos uno de entre ellos
 		if (!emptySignatureFields.isEmpty()) {
-			selectEmptySignatureField(data, signConfig, emptySignatureFields, signExecutor, signatureVisible, stampVisible, parent);
+			selectEmptySignatureField(data, signConfigs, emptySignatureFields, signExecutor, signatureVisible, stampVisible, parent);
 		}
 		// Si no los hay, pero se ha pedido agregar una firma visible o una imagen al PDF, permitiremos configurarlos
 		else if (signatureVisible || stampVisible) {
-			showVisibleSignatureDialog(data, signConfig, signExecutor, signatureVisible, stampVisible, parent);
+			showVisibleSignatureDialog(data, signConfigs, signExecutor, signatureVisible, stampVisible, parent);
 		}
 		// Si no, procedemos inmediatamente con la firma
 		else {
-			signExecutor.initSignTask(Collections.singletonList(signConfig));
+			signExecutor.initSignTask(signConfigs);
 		}
 	}
 
@@ -67,7 +81,7 @@ public final class VisiblePdfSignatureManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws IOException Cuando se produce un error durante la firma. */
 	private static void selectEmptySignatureField(final byte[] data,
-			                                      final SignOperationConfig signConfig,
+			                                      final List<SignOperationConfig> signConfigs,
 			                                      final List<SignatureField> emptySignatureFields,
 			                                      final SignatureExecutor executor,
 												  final boolean signatureVisible,
@@ -83,45 +97,54 @@ public final class VisiblePdfSignatureManager {
 		if (field == null) {
 			// Si se debe agregar una firma visible o una marca en el PDF, se muestra el dialogo para ello
 			if (signatureVisible || stampVisible) {
-				showVisibleSignatureDialog(data, signConfig, executor, signatureVisible, stampVisible, parent);
+				showVisibleSignatureDialog(data, signConfigs, executor, signatureVisible, stampVisible, parent);
 			}
 			// Si no es una firma visible, se firma directamente
 			else {
-				executor.initSignTask(Collections.singletonList(signConfig));
+				executor.initSignTask(signConfigs);
 			}
 		}
 		// Si se selecciono el campo de firma que se debe usar, se firmar ese campo
 		else {
-			signConfig.addExtraParam(PdfExtraParams.SIGNATURE_FIELD, field.getName());
+			for (final SignOperationConfig signConfig : signConfigs) {
+				signConfig.addExtraParam(PdfExtraParams.SIGNATURE_FIELD, field.getName());
+			}
 
 			// Si se ha pedido una marca visible, se muestra el dialogo correspondiente.
 			// En este caso, nunca se permitira seleccionar el area de firma, ya que se
 			// usara la del campo seleccionado.
 			if (stampVisible) {
-				showVisibleSignatureDialog(data, signConfig, executor, false, stampVisible, parent);
+				showVisibleSignatureDialog(data, signConfigs, executor, false, stampVisible, parent);
 			}
 			// Si no, se firma directamente
 			else {
-				executor.initSignTask(Collections.singletonList(signConfig));
+				executor.initSignTask(signConfigs);
 			}
 		}
 	}
 
     private static void showVisibleSignatureDialog(final byte[] data,
-    		                                    final SignOperationConfig signConfig,
+    		                                    final List<SignOperationConfig> signConfigs,
     		                                    final SignatureExecutor executor,
     		                                    final boolean signatureVisible,
     		                                    final boolean stampVisible,
     		                                    final Frame parent) throws IOException {
     	try {
+    		boolean isMassiveSign = false;
+
+    		if (signConfigs.size() > 1) {
+    			isMassiveSign = true;
+    		}
+
     		SignPdfDialog.getVisibleSignatureExtraParams(
-				signConfig.getSigner().isSign(data),
+    			signConfigs.get(0).getSigner().isSign(data),
+    			isMassiveSign,
 				data,
 				parent,
 				signatureVisible,
 				true,
 				stampVisible,
-				new SignPdfListener(signConfig, executor)
+				new SignPdfListener(signConfigs, executor)
 			);
     	}
     	catch (final Exception e) {
@@ -140,30 +163,34 @@ public final class VisiblePdfSignatureManager {
 		}
 	}
 
-	/** Procesa la firma de un PDF una vez se han obtenido
+	/** Procesa la firma de uno o varios PDF una vez se han obtenido
 	 * los par&aacute;metros de firma visible. */
 	public static final class SignPdfListener implements SignPdfDialogListener {
 
-		private final SignOperationConfig signConfig;
+		private final List<SignOperationConfig> signConfigs;
 		private final SignatureExecutor executor;
 
-		/** Construye un objeto para ejecutar la firma de un PDF una vez se
+		/** Construye un objeto para ejecutar la firma de uno o varios PDF una vez se
 		 * han obtenido sus par&aacute;metros para la firma visible.
-		 * @param signConfig Operaci&oacute;n de firma a ejecutar.
-		 * @param executor Objeto para la ejecuci&oacute;n de la firma. */
-		public SignPdfListener(final SignOperationConfig signConfig, final SignatureExecutor executor) {
-			this.signConfig = signConfig;
+		 * @param signConfig Operaci&oacute;nes de firma a ejecutar.
+		 * @param executor Objeto para la ejecuci&oacute;n de la/s firma/s. */
+		public SignPdfListener(final List<SignOperationConfig> signConfigs, final SignatureExecutor executor) {
+			this.signConfigs = signConfigs;
 			this.executor = executor;
 		}
 
 		@Override
 		public void propertiesCreated(final Properties extraParams) {
-			// Agregamos las propiedades de la firma visible al resto de propiedades
-			// de la primera firma
+			// Agregamos las propiedades de la firma visible al resto de archivos PDF
 			if (extraParams != null && !extraParams.isEmpty()) {
-				this.signConfig.addExtraParams(extraParams);
+				for (final SignOperationConfig signConfig : this.signConfigs) {
+					if (signConfig.getSigner() instanceof AOPDFSigner) {
+						signConfig.addExtraParams(extraParams);
+					}
+				}
 			}
-			this.executor.initSignTask(Collections.singletonList(this.signConfig));
+
+			this.executor.initSignTask(this.signConfigs);
 		}
 
 	}

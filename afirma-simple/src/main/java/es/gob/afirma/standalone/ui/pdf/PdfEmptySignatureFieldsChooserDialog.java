@@ -207,6 +207,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		{
 			PdfLoader.loadPdf(
 				this.isSign,
+				false,
 				this.pdf,
 				this
 			);
@@ -286,7 +287,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	@Override
-	public void pdfLoaded(final boolean signed, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] document) {
+	public void pdfLoaded(final boolean signed, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] document) {
 		getContentPane().remove(this.activePanel);
 		this.activePanel = new SignPdfUiPanelStamp(
 			pages,

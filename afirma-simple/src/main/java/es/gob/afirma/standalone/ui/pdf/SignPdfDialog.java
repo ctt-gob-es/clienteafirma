@@ -60,6 +60,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	}
 
 	private boolean isPdfSign;
+	private boolean isMassiveSign;
 	private byte[] pdfData;
 	private final boolean customAppearance;
 
@@ -125,7 +126,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 * @param spdl             Clase a la que notificar la obtencion de propiedades
 	 *                         de la firma visible.
 	 */
-	public static void getVisibleSignatureExtraParams(final boolean isSign, final byte[] pdf, final Frame parentFrame,
+	public static void getVisibleSignatureExtraParams(final boolean isSign, final boolean isMassiveSign, final byte[] pdf, final Frame parentFrame,
 			final boolean signatureVisible, final boolean customAppearance, final boolean stampVisible,
 			final SignPdfDialogListener spdl) {
 		if (pdf == null || pdf.length < 3) {
@@ -145,7 +146,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 				cp.y - (int) dialog.getPreferredSize().getHeight() / 2);
 		dialog.setResizable(false);
 
-		PdfLoader.loadPdf(isSign, pdf, (PdfLoaderListener) dialog);
+		PdfLoader.loadPdf(isSign, isMassiveSign, pdf, (PdfLoaderListener) dialog);
 	}
 
 	/**
@@ -154,6 +155,8 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 *
 	 * @param isSign           <code>true</code> si el PDF de entrada ya contiene
 	 *                         firmas electr&oacute;nicas previas,
+	 *                         <code>false</code> en caso contrario.
+	 * @param isMassiveSign    <code>true</code> si es una operaci&oacute;n de firma masiva,
 	 *                         <code>false</code> en caso contrario.
 	 * @param pdf              PDF al que aplicar la firma visible.
 	 * @param parentFrame      Marco padre para la modalidad.
@@ -164,7 +167,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 *                         de la firma visible.
 	 * @return El di&aacute;logo generado.
 	 */
-	public static JDialog getVisibleSignatureDialog(final boolean isSign, final byte[] pdf, final Frame parentFrame,
+	public static JDialog getVisibleSignatureDialog(final boolean isSign, final boolean isMassiveSign, final byte[] pdf, final Frame parentFrame,
 			final boolean signatureVisible, final boolean customAppearance, final boolean stampVisible,
 			final SignPdfDialogListener spdl) {
 		if (pdf == null || pdf.length < 3) {
@@ -184,7 +187,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 				cp.y - (int) dialog.getPreferredSize().getHeight() / 2);
 		dialog.setResizable(false);
 
-		PdfLoader.loadPdf(isSign, pdf, (PdfLoaderListener) dialog);
+		PdfLoader.loadPdf(isSign, isMassiveSign, pdf, (PdfLoaderListener) dialog);
 		return dialog;
 	}
 
@@ -192,17 +195,18 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private List<Dimension> pageSizes;
 
 	@Override
-	public void pdfLoaded(final boolean isSign, final List<BufferedImage> listPages,
+	public void pdfLoaded(final boolean isSign, final boolean isMassive ,final List<BufferedImage> listPages,
 			final List<Dimension> listPageSizes, final byte[] pdf) {
 
 		this.isPdfSign = isSign;
+		this.isMassiveSign = isMassive;
 		this.pages = listPages;
 		this.pageSizes = listPageSizes;
 		this.pdfData = pdf;
 
 		if (this.signatureVisible) {
 			setPreferredSize(getPreferredDimensionToSignatureDialog());
-			this.activePanel = new SignPdfUiPanel(this.isPdfSign, this.pages, this.pageSizes, this.pdfData, this);
+			this.activePanel = new SignPdfUiPanel(this.isPdfSign, this.isMassiveSign, this.pages, this.pageSizes, this.pdfData, this);
 			this.scrollPanel.setViewportView(this.activePanel);
 		} else if (this.stampVisible) {
 			setPreferredSize(getPreferredDimensionToStampDialog());

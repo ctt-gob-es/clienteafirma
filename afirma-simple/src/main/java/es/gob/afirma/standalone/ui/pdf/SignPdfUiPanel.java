@@ -103,6 +103,7 @@ final class SignPdfUiPanel extends JPanel implements
 	private  List<BufferedImage> pdfPages;
 
 	private final boolean isSignPdf;
+	private final boolean isMassiveSign;
 	private BufferedImage appendPage;
 	private final List<Dimension> pdfPageSizes;
 	private PageLabel pageLabel;
@@ -122,6 +123,7 @@ final class SignPdfUiPanel extends JPanel implements
 	private int pressButton = 0;
 
 	SignPdfUiPanel(final boolean isSign,
+				   final boolean isMassiveSign,
 				   final List<BufferedImage> pages,
 				   final List<Dimension> pageSizes,
 				   final byte[] pdf,
@@ -146,6 +148,7 @@ final class SignPdfUiPanel extends JPanel implements
 		this.pdfPageSizes = pageSizes;
 		this.listener = spul;
 		this.isSignPdf = isSign;
+		this.isMassiveSign = isMassiveSign;
 
 		this.pdfDocument = new PdfDocument();
 		this.pdfDocument.setBytesPdf(pdf);
@@ -342,10 +345,17 @@ final class SignPdfUiPanel extends JPanel implements
 	 * Crea la etiqueta que explica la selecci&oacute;n del &aacute;rea de firma.
 	 * @return Etiqueta.
 	 */
-	private static JLabel createMessageLabel() {
-		final JLabel messageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.14")); //$NON-NLS-1$
-		messageLabel.getAccessibleContext().setAccessibleDescription(
-				SignPdfUiMessages.getString("SignPdfUiPanel.15")); //$NON-NLS-1$
+	private JLabel createMessageLabel() {
+		JLabel messageLabel = new JLabel();
+		if (!this.isMassiveSign) {
+			messageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.14")); //$NON-NLS-1$
+			messageLabel.getAccessibleContext().setAccessibleDescription(
+					SignPdfUiMessages.getString("SignPdfUiPanel.15")); //$NON-NLS-1$
+		} else {
+			messageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPanel.20")); //$NON-NLS-1$
+			messageLabel.getAccessibleContext().setAccessibleDescription(
+					SignPdfUiMessages.getString("SignPdfUiPanel.21")); //$NON-NLS-1$
+		}
 
 		return messageLabel;
 	}

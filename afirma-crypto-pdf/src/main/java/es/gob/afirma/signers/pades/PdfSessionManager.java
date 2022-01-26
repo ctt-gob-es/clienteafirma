@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import com.aowagie.text.DocumentException;
 import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
+import com.aowagie.text.exceptions.InvalidPageNumberException;
 import com.aowagie.text.pdf.PdfDate;
 import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfObject;
@@ -468,7 +469,12 @@ public final class PdfSessionManager {
 		// Firma visible
 		if (signaturePositionOnPage != null && signatureField == null) {
 			if (signatureRotation == 0) {
-				sap.setVisibleSignature(signaturePositionOnPage, page, null);
+				try {
+					sap.setVisibleSignature(signaturePositionOnPage, page, null);
+				}
+				catch (final InvalidPageNumberException ipne) {
+					LOGGER.severe("Numero de pagina incorrecto. La firma visible no se insertara: " + ipne); //$NON-NLS-1$
+				}
 			}
 			else {
 				try {
@@ -481,6 +487,9 @@ public final class PdfSessionManager {
 						signatureRotation,
 						rubric
 					);
+				}
+				catch (final InvalidPageNumberException ipne) {
+					LOGGER.severe("Numero de pagina incorrecto. La firma visible no se insertara: " + ipne); //$NON-NLS-1$
 				}
 				catch (final DocumentException e) {
 					throw new IOException(

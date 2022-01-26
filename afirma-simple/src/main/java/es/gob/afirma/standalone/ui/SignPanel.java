@@ -250,10 +250,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			}
 		}
 
+		if (this.signOperationConfigs.size() > 1) {
+			checkConfPreferences(this.signOperationConfigs);
+		}
+
     	// Comprobamos primero si se esta firmando un unico PDF con firma visible,
     	// en cuyo caso calculamos las propiedades para la firma visible
-    	if (this.signOperationConfigs.size() == 1 &&
-    			this.signOperationConfigs.get(0).getSigner() instanceof AOPDFSigner) {
+    	if (checkSignPDFOperationSign(this.signOperationConfigs)) {
 
     		this.signWaitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
 
@@ -264,9 +267,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     			visibleStamp = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp();
     		}
 
+    		if (this.signOperationConfigs.size() > 1 && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE)) {
+    			visibleSignature = true;
+    		}
+
     		try {
     			VisiblePdfSignatureManager.getVisibleSignatureParams(
-    					this.signOperationConfigs.get(0),
+    					this.signOperationConfigs,
     					this,
     					visibleSignature,
     					visibleStamp,
@@ -281,33 +288,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			}
     	}
     	else {
-    		// Comprobamos si hay casos de multifirma, y aplicamos
-    		// la configuracion seleccionada en las preferencias
-    		for (final SignOperationConfig signConfig : this.signOperationConfigs) {
-    			if(signConfig.getFileType() == FileType.SIGN_CADES) {
-    				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)) {
-    					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
-    				}
-    				else if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS)) {
-    					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
-    				}
-    				else {
-    					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
-    				}
-    			}
-    			else if(signConfig.getFileType() == FileType.SIGN_XADES) {
-    				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN)) {
-    					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
-    				}
-    				else if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS)) {
-    					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
-    				}
-    				else {
-    					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
-    				}
-    			}
-    		}
-
     		initSignTask(this.signOperationConfigs);
     	}
     }
@@ -688,6 +668,51 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		    }
 		});
     }
+
+	/**
+	 * Comprueba si en las configuraciones de firma se encuentra alguna de tipo PDF.
+	 * @param signConfigs Lista con las configuraciones de las firmas a realizar.
+	 * @return Devuelve true en caso de que se encuentre algun
+	 */
+	private boolean checkSignPDFOperationSign(final List<SignOperationConfig> signConfigs) {
+		for (final SignOperationConfig signConfig : signConfigs) {
+			if (signConfig.getSigner() instanceof AOPDFSigner) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Comprueba si hay casos de multifirma, y se aplica la configuracion seleccionada en las preferencias.
+	 * @param signConfigs Lista con las configuraciones de las firmas a realizar.
+	 */
+	private void checkConfPreferences(final List<SignOperationConfig> signConfigs) {
+		for (final SignOperationConfig signConfig : signConfigs) {
+			if(signConfig.getFileType() == FileType.SIGN_CADES) {
+				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)) {
+					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
+				}
+				else if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS)) {
+					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
+				}
+				else {
+					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
+				}
+			}
+			else if(signConfig.getFileType() == FileType.SIGN_XADES) {
+				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN)) {
+					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
+				}
+				else if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS)) {
+					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
+				}
+				else {
+					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
+				}
+			}
+		}
+	}
 
 	private final class UpperPanel extends JPanel {
 

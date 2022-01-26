@@ -158,11 +158,15 @@ final class ProtocolInvocationLauncherSign {
 		processor.setCipherKey(options.getDesKey());
 
 		final List<SignOperation> operations = processor.preProcess(operation);
+		boolean isMassiveSign = false;
+		if (operations.size() > 1) {
+			isMassiveSign = true;
+		}
 		final List<SignResult> results = new ArrayList<>(operations.size());
 		for (int i = 0; i < operations.size(); i++) {
 			final SignOperation op = operations.get(i);
 			try {
-				results.add(signOperation(op, options));
+				results.add(signOperation(op, options, isMassiveSign));
 			}
 			catch (final VisibleSignatureMandatoryException e) {
 				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
@@ -227,7 +231,7 @@ final class ProtocolInvocationLauncherSign {
 		return new NativeSignDataProcessor(protocolVersion);
 	}
 
-	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSign options)
+	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSign options, final boolean isMassiveSign)
 			throws SocketOperationException, VisibleSignatureMandatoryException {
 
 		byte[] data = signOperation.getData();
@@ -409,7 +413,7 @@ final class ProtocolInvocationLauncherSign {
 		// visible.
 		try {
 			if (isRubricPositionRequired(format, extraParams)) {
-				showRubricPositionDialog(data, extraParams);
+				showRubricPositionDialog(data, extraParams, isMassiveSign);
 				checkShowRubricDialogIsCalceled(extraParams);
 			}
 		} catch (final AOCancelledOperationException e) {
@@ -753,13 +757,14 @@ final class ProtocolInvocationLauncherSign {
 	 * la firma.
 	 * @param data Documento de firma PDF
 	 * @param extraParams Condiguraci&oacute;n de firma.
+	 * @param isMassiveSign Si tiene valor {@code true} indica que es una firma masiva y {@code false} en caso contrario.
 	 */
-	private static void showRubricPositionDialog(final byte[] data, final Properties extraParams) {
+	private static void showRubricPositionDialog(final byte[] data, final Properties extraParams, final boolean isMassiveSign) {
 
 		final AOPDFSigner signer = new AOPDFSigner();
 		final boolean isSign = signer.isSign(data);
 		final SignPdfDialogListener listener = new SignPdfListener(extraParams);
-		final JDialog dialog = SignPdfDialog.getVisibleSignatureDialog(isSign, data, null, true, isCustomAppearance(extraParams),
+		final JDialog dialog = SignPdfDialog.getVisibleSignatureDialog(isSign, isMassiveSign, data, null, true, isCustomAppearance(extraParams),
 				false, listener);
 		dialog.setVisible(true);
 	}

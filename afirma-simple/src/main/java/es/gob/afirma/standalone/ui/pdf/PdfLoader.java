@@ -25,15 +25,16 @@ final class PdfLoader {
 	}
 
 	interface PdfLoaderListener extends EventListener {
-		void pdfLoaded(boolean isSing, List<BufferedImage> pages, List<Dimension> pageSizes, byte[] pdf);
+		void pdfLoaded(boolean isSing, final boolean isMassiveSign, List<BufferedImage> pages, List<Dimension> pageSizes, byte[] pdf);
 		void pdfLoadedFailed(Throwable cause);
 	}
 
-	static void loadPdf(final boolean isSign, final byte[] inPdf, final PdfLoaderListener pll) {
+	static void loadPdf(final boolean isSign, final boolean isMassiveSign, final byte[] inPdf, final PdfLoaderListener pll) {
 		new Thread(() ->  {
 				try {
 					pll.pdfLoaded(
 						isSign,
+						isMassiveSign,
 						Pdf2ImagesConverter.pdf2ImagesUsefulSections(inPdf, 0),
 						getPageSizes(inPdf),
 						inPdf

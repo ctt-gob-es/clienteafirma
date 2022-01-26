@@ -23,6 +23,7 @@ public final class UiTester {
 	//private final static String TEST_FILE = "sec1-v2.pdf"; //$NON-NLS-1$
 	private final static String TEST_FILE = "PDF_MULTISIZE.pdf"; //$NON-NLS-1$
 	private final static boolean IS_SIGN = false;
+	private final static boolean IS_MASSIVE_SIGN = false;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -30,7 +31,7 @@ public final class UiTester {
 	@SuppressWarnings({ "static-method" })
 	@Test
 	public void testFailedDialog() {
-		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, true, false, false, extraParams -> {
+		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, IS_MASSIVE_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, true, false, false, extraParams -> {
 			// Vacio
 		});
 	}
@@ -44,6 +45,7 @@ public final class UiTester {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 		SignPdfDialog.getVisibleSignatureExtraParams(
 				IS_SIGN,
+				IS_MASSIVE_SIGN,
 				testPdf,
 				null, true, false,
 				false,
@@ -67,14 +69,16 @@ public final class UiTester {
 
 		PdfLoader.loadPdf(
 			IS_SIGN,
+			IS_MASSIVE_SIGN,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
+				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
 					LOGGER.info("Cargado"); //$NON-NLS-1$
 					frame.add(
 						new SignPdfUiPanel(
 							isSign,
+							isMassiveSign,
 							pages,
 							pageSizes,
 							pdf,
