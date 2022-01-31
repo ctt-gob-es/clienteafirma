@@ -38,12 +38,13 @@ public final class VisiblePdfSignatureManager {
 												 final boolean stampVisible,
 												 final Frame parent) throws IOException,
 	                                                                        AOCancelledOperationException {
-		SignOperationConfig pdfSignConf = null;
 
 		// Obtenemos y actuamos sobre el primer PDF que se encuentre en las configuraciones
+		SignOperationConfig pdfSignConf = null;
 		for (final SignOperationConfig signConfig : signConfigs) {
 			if (signConfig.getSigner() instanceof AOPDFSigner) {
 				pdfSignConf = signConfig;
+				break;
 			}
 		}
 
@@ -130,15 +131,9 @@ public final class VisiblePdfSignatureManager {
     		                                    final boolean stampVisible,
     		                                    final Frame parent) throws IOException {
     	try {
-    		boolean isMassiveSign = false;
-
-    		if (signConfigs.size() > 1) {
-    			isMassiveSign = true;
-    		}
-
     		SignPdfDialog.getVisibleSignatureExtraParams(
     			signConfigs.get(0).getSigner().isSign(data),
-    			isMassiveSign,
+    			signConfigs.size() > 1,
 				data,
 				parent,
 				signatureVisible,

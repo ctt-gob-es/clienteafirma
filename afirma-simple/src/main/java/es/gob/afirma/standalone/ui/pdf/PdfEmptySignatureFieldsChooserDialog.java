@@ -71,14 +71,12 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	 * @param parent Componente padre para la modalidad.
 	 * @param field Campos de firma seleccionado.
 	 * @param signPdfDialogListener Clase a la que hay que notificar la selecci&oacute;n de propiedades de firma visible PDF.
-	 * @param signatureVisible Indica si se va a insertar una firma visible
 	 * @param stampVisible Indica si se va a insertar una marca visible */
 	public static void startPdfEmptySignatureFieldsChooserDialog(final byte[] pdf,
 																 final boolean isSign,
 																 final Frame parent,
 																 final SignatureField field,
 																 final SignPdfDialogListener signPdfDialogListener,
-																 final boolean signatureVisible,
 																 final boolean stampVisible) {
 
 		final PdfEmptySignatureFieldsChooserDialog tsd = new PdfEmptySignatureFieldsChooserDialog(
@@ -87,7 +85,6 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 			parent,
 			field,
 			signPdfDialogListener,
-			signatureVisible,
 			stampVisible
 		);
 		tsd.setSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
@@ -100,7 +97,6 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 												 final Frame parentFrame,
 												 final SignatureField fld,
 												 final SignPdfDialogListener spul,
-												 final boolean signatureVisible,
 												 final boolean stampVisible) {
 		super(parentFrame);
 		this.listener = spul;

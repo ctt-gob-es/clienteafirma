@@ -25,7 +25,7 @@ final class PdfLoader {
 	}
 
 	interface PdfLoaderListener extends EventListener {
-		void pdfLoaded(boolean isSing, final boolean isMassiveSign, List<BufferedImage> pages, List<Dimension> pageSizes, byte[] pdf);
+		void pdfLoaded(boolean isSign, final boolean isMassiveSign, List<BufferedImage> pages, List<Dimension> pageSizes, byte[] pdf);
 		void pdfLoadedFailed(Throwable cause);
 	}
 

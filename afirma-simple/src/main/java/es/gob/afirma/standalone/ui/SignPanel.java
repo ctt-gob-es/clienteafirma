@@ -250,25 +250,28 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			}
 		}
 
-		if (this.signOperationConfigs.size() > 1) {
-			checkConfPreferences(this.signOperationConfigs);
-		}
+		// Establecemos la configuracion para las multifirmas que pueda haber
+		setMultisignOpFromPreferences(this.signOperationConfigs);
 
-    	// Comprobamos primero si se esta firmando un unico PDF con firma visible,
-    	// en cuyo caso calculamos las propiedades para la firma visible
+    	// Comprobamos si se va a realizar alguna firma de PDF y establecemos si deben ser
+		// firmas visibles o no
     	if (checkSignPDFOperationSign(this.signOperationConfigs)) {
 
     		this.signWaitDialog.setMessage(SimpleAfirmaMessages.getString("SignPanelSignTask.0")); //$NON-NLS-1$
 
-    		boolean visibleSignature = false;
-    		boolean visibleStamp = false;
+    		boolean visibleSignature;
+    		boolean visibleStamp;
+
+    		// Si se muestra el panel de configuracion de la firma PDF (caso de las firmas
+    		// simples), se tomara la configuracion del panel
     		if (this.lowerPanel.getFilePanel() instanceof SignPanelFilePanel) {
     			visibleSignature = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature();
     			visibleStamp = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp();
     		}
-
-    		if (this.signOperationConfigs.size() > 1 && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE)) {
-    			visibleSignature = true;
+    		// Si no, se tomara de las preferencias
+    		else {
+    			visibleSignature = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE);
+    			visibleStamp = false;
     		}
 
     		try {
@@ -672,9 +675,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	/**
 	 * Comprueba si en las configuraciones de firma se encuentra alguna de tipo PDF.
 	 * @param signConfigs Lista con las configuraciones de las firmas a realizar.
-	 * @return Devuelve true en caso de que se encuentre algun
+	 * @return Devuelve {@code true} en caso de que alguna de las configuraciones sea de firma PDF,
+	 * {@code false} en caso contrario.
 	 */
-	private boolean checkSignPDFOperationSign(final List<SignOperationConfig> signConfigs) {
+	private static boolean checkSignPDFOperationSign(final List<SignOperationConfig> signConfigs) {
 		for (final SignOperationConfig signConfig : signConfigs) {
 			if (signConfig.getSigner() instanceof AOPDFSigner) {
 				return true;
@@ -684,34 +688,54 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	}
 
 	/**
-	 * Comprueba si hay casos de multifirma, y se aplica la configuracion seleccionada en las preferencias.
+	 * Comprueba si hay casos de multifirma y les aplica la configuraci&oacute;n seleccionada en las preferencias.
 	 * @param signConfigs Lista con las configuraciones de las firmas a realizar.
 	 */
-	private void checkConfPreferences(final List<SignOperationConfig> signConfigs) {
+	private static void setMultisignOpFromPreferences(final List<SignOperationConfig> signConfigs) {
+
+		// Establecemos la configuracion para cada tipo de firma
+		CryptoOperation cadesCryptoOp = null;
+		CryptoOperation xadesCryptoOp = null;
 		for (final SignOperationConfig signConfig : signConfigs) {
-			if(signConfig.getFileType() == FileType.SIGN_CADES) {
-				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)) {
-					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
+			if (signConfig.getFileType() == FileType.SIGN_CADES) {
+				if (cadesCryptoOp == null) {
+					cadesCryptoOp = getCadesCryptoOperation();
 				}
-				else if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS)) {
-					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
-				}
-				else {
-					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
-				}
+				signConfig.setCryptoOperation(cadesCryptoOp);
 			}
-			else if(signConfig.getFileType() == FileType.SIGN_XADES) {
-				if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN)) {
-					signConfig.setCryptoOperation(CryptoOperation.COSIGN);
+			else if (signConfig.getFileType() == FileType.SIGN_XADES) {
+				if (xadesCryptoOp == null) {
+					xadesCryptoOp = getXadesCryptoOperation();
 				}
-				else if(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS)) {
-					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
-				}
-				else {
-					signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_TREE);
-				}
+				signConfig.setCryptoOperation(xadesCryptoOp);
 			}
 		}
+	}
+
+	/**
+	 * Obtiene la operaci&oacute;n de multifirma que se debe realizar sobre las firmas CAdES.
+	 * @return Operaci&oacute;n criptogr&aacute;fica (cofirma, contrafirma de hoja o contrafirma
+	 * de todo el &aacute;rbol).
+	 */
+	private static CryptoOperation getCadesCryptoOperation() {
+		return PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)
+				? CryptoOperation.COSIGN
+				: PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS)
+					? CryptoOperation.COUNTERSIGN_LEAFS
+					: CryptoOperation.COUNTERSIGN_TREE;
+	}
+
+	/**
+	 * Obtiene la operaci&oacute;n de multifirma que se debe realizar sobre las firmas XAdES.
+	 * @return Operaci&oacute;n criptogr&aacute;fica (cofirma, contrafirma de hoja o contrafirma
+	 * de todo el &aacute;rbol).
+	 */
+	private static CryptoOperation getXadesCryptoOperation() {
+		return PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN)
+				? CryptoOperation.COSIGN
+				: PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS)
+					? CryptoOperation.COUNTERSIGN_LEAFS
+					: CryptoOperation.COUNTERSIGN_TREE;
 	}
 
 	private final class UpperPanel extends JPanel {

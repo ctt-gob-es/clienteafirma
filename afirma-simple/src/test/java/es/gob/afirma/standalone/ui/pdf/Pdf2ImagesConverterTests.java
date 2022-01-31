@@ -28,6 +28,7 @@ public final class Pdf2ImagesConverterTests {
 
 	private final static String TEST_FILE = "sec1-v2.pdf"; //$NON-NLS-1$
 	private final static boolean IS_SIGN = false;
+	private final static boolean IS_MASSIVE_SIGN = false;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -61,10 +62,11 @@ public final class Pdf2ImagesConverterTests {
 		final long time = System.currentTimeMillis();
 		PdfLoader.loadPdf(
 			IS_SIGN,
+			IS_MASSIVE_SIGN,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
+				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
 					LOGGER.info(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
@@ -98,10 +100,11 @@ public final class Pdf2ImagesConverterTests {
 
 		PdfLoader.loadPdf(
 			IS_SIGN,
+			IS_MASSIVE_SIGN,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
+				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
 					LOGGER.info(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);

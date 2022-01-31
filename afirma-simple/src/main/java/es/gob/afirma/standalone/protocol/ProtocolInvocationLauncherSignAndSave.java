@@ -159,10 +159,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		processor.setCipherKey(options.getDesKey());
 
 		final List<SignOperation> operations = processor.preProcess(operation);
-		boolean isMassiveSign = false;
-		if (operations.size() > 1) {
-			isMassiveSign = true;
-		}
+		final boolean isMassiveSign = operations.size() > 1;
 		final List<SignResult> results = new ArrayList<>(operations.size());
 		for (int i = 0; i < operations.size(); i++) {
 			final SignOperation op = operations.get(i);

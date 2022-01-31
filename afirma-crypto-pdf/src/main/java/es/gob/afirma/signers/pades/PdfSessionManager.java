@@ -472,8 +472,8 @@ public final class PdfSessionManager {
 				try {
 					sap.setVisibleSignature(signaturePositionOnPage, page, null);
 				}
-				catch (final InvalidPageNumberException ipne) {
-					LOGGER.severe("Numero de pagina incorrecto. La firma visible no se insertara: " + ipne); //$NON-NLS-1$
+				catch (final InvalidPageNumberException e) {
+					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
 				}
 			}
 			else {
@@ -488,8 +488,8 @@ public final class PdfSessionManager {
 						rubric
 					);
 				}
-				catch (final InvalidPageNumberException ipne) {
-					LOGGER.severe("Numero de pagina incorrecto. La firma visible no se insertara: " + ipne); //$NON-NLS-1$
+				catch (final InvalidPageNumberException e) {
+					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
 				}
 				catch (final DocumentException e) {
 					throw new IOException(
