@@ -496,7 +496,7 @@ class CommandProcessorThread extends Thread {
 			sb.append("HTTP/1.1 200 OK\n"); //$NON-NLS-1$
 		}
 		else  {
-			sb.append("HTTP/1.1 500 Internal Server Error"); //$NON-NLS-1$
+			sb.append("HTTP/1.1 500 Internal Server Error\n"); //$NON-NLS-1$
 		}
 		sb.append("Connection: close\n"); //$NON-NLS-1$
 		sb.append("Pragma: no-cache\n"); //$NON-NLS-1$
