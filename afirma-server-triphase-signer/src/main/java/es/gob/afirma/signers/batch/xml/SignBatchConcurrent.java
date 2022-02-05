@@ -289,7 +289,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			}
 		}
 
-		// Cerramos el servicio de ejecución concurrente
+		// Cerramos el servicio de ejecucion concurrente
 		executorService.shutdown();
 
 		// Borramos temporales
