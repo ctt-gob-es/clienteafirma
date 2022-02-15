@@ -785,7 +785,7 @@ final class ProtocolInvocationLauncherSign {
 					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY)
 					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)
 					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY)
-					&& extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGE);
+					&& (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGE) || extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGES));
 
 			if (want && !existsAreaAttributes) {
 				throw new AOCancelledOperationException("Incluir la firma visible en el documento es obligatoria."); //$NON-NLS-1$

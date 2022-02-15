@@ -41,7 +41,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private static final long serialVersionUID = -7987676963743094243L;
 
 	private static final int PREFERRED_WIDTH = 500;
-	private static final int PREFERRED_HEIGHT = 680;
+	private static final int PREFERRED_HEIGHT = 800;
 
 	private static final double LOWER_LIMIT_X = 30.0;
 	private static final double LOWER_LIMIT_Y = 45.0;
@@ -99,7 +99,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 		this.scrollPanel = new JScrollPane();
 		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		add(this.scrollPanel);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {

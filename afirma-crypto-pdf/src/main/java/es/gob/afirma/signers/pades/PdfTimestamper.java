@@ -158,7 +158,7 @@ public final class PdfTimestamper {
 	        		final HashMap<PdfName, Integer> exc = PdfSessionManager.reserveSignSizes(extraParams);
 
 	        		try {
-						sap.preClose(exc, signTime);
+						sap.preClose(exc, signTime, null);
 					}
 	        		catch (final DocumentException e) {
 						throw new AOException("Error en el procesado del PDF: " + e, e); //$NON-NLS-1$

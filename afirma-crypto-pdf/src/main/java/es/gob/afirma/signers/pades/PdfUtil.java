@@ -465,7 +465,7 @@ public final class PdfUtil {
 	    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
 			extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null && //$NON-NLS-1$
 			extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null //$NON-NLS-1$
-		) {
+	    	) {
 	        try {
 	            return new com.aowagie.text.Rectangle(
 	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX").trim()), //$NON-NLS-1$
@@ -481,5 +481,52 @@ public final class PdfUtil {
 	        }
 	    	}
 	    	return null;
+    }
+
+    /**
+     * Metodo que controla si se ha introducido algun rango en el parametro con las paginas donde estampar la firma
+     * visible para introducirlo en un array correctamente.
+     * @param pagesStr Paginas o rango de paginas a tratar.
+     * @param totalPages Numero total de paginas del documento.
+     * @return Devuelve una lista donde se indican las paginas una a una.
+     */
+    public static List<Integer> checkPagesRange(final String[] pagesStr, final int totalPages) {
+    	final ArrayList<Integer> result = new ArrayList<>();
+    	for (final String page : pagesStr) {
+    		//Se comprueba si estamos tratando un rango, si es asi se extraeran las paginas
+    		if (page.length() > 2) {
+    			// Se comprueba si el primero es un numero negativo.
+    			// Si el primero es negativo, el segundo debe serlo tambien ya que las ultimas paginas se
+    			// indican de menor a mayor, por lo que lo restamos al numero total de paginas.
+    			// Por ejemplo, -2 es la penultima pagina y -1 la ultima.
+    			int firstNumber;
+    			int limitNumber;
+    			if ("-".equals(page.substring(0, 1))) { //$NON-NLS-1$
+    				firstNumber = Integer.parseInt(page.substring(0, 2)) + totalPages + 1;
+    				limitNumber = Integer.parseInt(page.substring(3)) + totalPages + 1;
+    			}
+    			// Si el numero no es negativo, se obtiene el rango directamente
+    			else {
+    				firstNumber = Integer.parseInt(page.substring(0, 1));
+    				limitNumber = Integer.parseInt(page.substring(2));
+    				if (limitNumber < 0) {
+    					limitNumber = limitNumber + totalPages + 1;
+    				}
+    			}
+    			// Se agregan las paginas comprendidas entre el primer y ultimo numero
+				for ( ; firstNumber <= limitNumber ; firstNumber++) {
+					result.add(firstNumber);
+				}
+    		}
+    		//Si no es un rango, se obtiene el numero directamente
+    		else {
+    			int number = Integer.parseInt(page);
+    			if (number < 0) {
+    				number = number + totalPages + 1;
+    			}
+    			result.add(number);
+    		}
+    	}
+    	return result;
     }
 }
