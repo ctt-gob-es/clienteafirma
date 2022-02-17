@@ -12,12 +12,11 @@ package es.gob.afirma.standalone.configurator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -25,35 +24,23 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.MessageDigest;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.keystores.mozilla.apple.ShellScript;
@@ -71,24 +58,20 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static final String CERT_CN = "localhost"; //"127.0.0.1"; //$NON-NLS-1$
 	private static final String CERT_CN_ROOT = "'AutoFirma ROOT'"; //$NON-NLS-1$
 	private static final String MACOSX_CERTIFICATE = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
-	private static final String KEYCHAIN_PATH = "/Library/Keychains/System.keychain"; //$NON-NLS-1$
-	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
-	private static final String OSX_SEC_KS_CERT_COMMAND = "security add-trusted-cert -d -r trustAsRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	private static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private final static String USER_DIR_LINE_PREFIX = "dir: "; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
 	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	private static final String MAC_SCRIPT_NAME = "installCerScript"; //$NON-NLS-1$
 	private static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
-	private static final String TRUST_SETTINGS_COMMAND = "security trust-settings-import -d "; //$NON-NLS-1$
-	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
-	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
+
+	private static final byte[] DUMMY = "dummy".getBytes(); //$NON-NLS-1$
 
 	private static final String MAC_CHROME_V56_OR_LOWER_PREFS_PATH = "/Library/Application Support/Google/Chrome/Local State"; //$NON-NLS-1$
 	private static final String MAC_CHROME_V57_OR_HIGHER_PREFS_PATH = "/Library/Application Support/Google/Chrome/Default/Preferences"; //$NON-NLS-1$
 
 	static String mac_script_path;
-	private static File sslCerFile;
+	//private static File sslCerFile;
 
     /** Directorios de los usuarios del sistema. */
     private static String[] userDirs = null;
@@ -217,15 +200,20 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		console.print(Messages.getString("ConfiguratorMacOSX.11")); //$NON-NLS-1$
 
-		// Copiamos los certificados CA y SSL a disco
-        ConfiguratorUtil.installFile(
-        		certPack.getCaCertificate().getEncoded(),
-        		new File(appDir, MACOSX_CERTIFICATE));
+		// Copiamos a disco los certificados CA y SSL y el almacen SSL
+		final File caCertFile = new File(appDir, MACOSX_CERTIFICATE);
+		ConfiguratorUtil.installFile(
+				certPack.getCaCertificate().getEncoded(),
+				caCertFile);
 
 		ConfiguratorUtil.installFile(
-			certPack.getPkcs12(),
-			new File(appDir, KS_FILENAME)
-		);
+				certPack.getPkcs12(),
+				new File(appDir, KS_FILENAME));
+
+		final File sslCertFile = new File(appDir, SSL_CER_FILENAME);
+		ConfiguratorUtil.installFile(
+				certPack.getSslCertificate().getEncoded(),
+				sslCertFile);
 
 		// Cerramos las instancias de firefox que esten abiertas
 		closeFirefox();
@@ -238,14 +226,17 @@ final class ConfiguratorMacOSX implements Configurator {
 		final JLabel msgLabel = new JLabel("<html>" + Messages.getString("ConfiguratorMacOSX.20") + "</html>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		JOptionPane.showMessageDialog(console.getParentComponent(), msgLabel);
 		console.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
+
 		try {
-			createScriptToImportCARootOnMacOSXKeyStore(appDir);
-			final File scriptFile = new File(mac_script_path);
-			ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
-			executeScriptFile(scriptFile, true, true);
+			installTrustedCertsInAppleKeyChain(caCertFile, sslCertFile, console);
 		}
-		catch (final Exception e1) {
-			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e1, e1); //$NON-NLS-1$
+		catch (final Exception e) {
+			console.print(Messages.getString("ConfiguratorMacOSX.34")); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+					Messages.getString("ConfiguratorMacOSX.25"), //$NON-NLS-1$
+					Messages.getString("ConfiguratorMacOSX.26"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					e);
 		}
 
 		// Se instalan los certificados en el almacen de Firefox
@@ -259,7 +250,6 @@ final class ConfiguratorMacOSX implements Configurator {
 
 			ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
 			executeScriptFile(scriptFile, true, true);
-
 		}
 		catch (final MozillaProfileNotFoundException e) {
 			LOGGER.severe("Perfil de Mozilla no encontrado: " + e); //$NON-NLS-1$
@@ -271,81 +261,125 @@ final class ConfiguratorMacOSX implements Configurator {
 		catch (final Exception e1) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el almacen de Firefox: " + e1, e1); //$NON-NLS-1$
 		}
-		finally {
-			if (sslCerFile != null) {
-				LOGGER.info("Elimino .cer del certificado SSL: " + sslCerFile.delete()); //$NON-NLS-1$
-			}
-		}
 	}
 
-	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de Apple en
-	 * el <i>script</i> de instalaci&oacute;n.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
-	 * @throws IOException Cuando hay un error en la creaci&oacute;n del fichero. */
-	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException,
-	                                                                                 IOException {
 
-		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
-		final File certFile = new File(appDir, MACOSX_CERTIFICATE);
-		final String cmd = OSX_SEC_COMMAND.replace(
-			"%KEYCHAIN%", //$NON-NLS-1$
-			KEYCHAIN_PATH
-			).replace(
-				"%CERT%", //$NON-NLS-1$
-				certFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-		LOGGER.info("Comando de instalacion del certificado de CA en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
-		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(cmd), mac_script_path, true);
+	private static void installTrustedCertsInAppleKeyChain(final File caCertFile,
+			final File sslCertFile, final Console console) throws IOException, InterruptedException, KeyChainException {
 
 
-		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
-		final File pfx = new File(appDir, KS_FILENAME);
-		final KeyStore ks;
-		try (final InputStream is = new FileInputStream(pfx)) {
-			ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-			ks.load(is, KS_PASSWORD.toCharArray());
+		byte[] data = null;
+		boolean passwordError = false;
+		boolean certInstalled = false;
+		do {
+
+			// La contrasena solo hace falta si no estamos ya en modo administrador, asi que la primera vez probaremos con una generica
+			if (data == null) {
+				data = DUMMY;
+			}
+			else {
+				// Solicitamos la contrasena para la instalacion de los certificados
+				final String text = passwordError
+						? Messages.getString("ConfiguratorMacOSX.28") //$NON-NLS-1$
+						: Messages.getString("ConfiguratorMacOSX.27"); //$NON-NLS-1$
+
+				try {
+					// Se pone en una linea para evitar que la contrasena se exponda en claro en memoria
+					data = new String(AOUIFactory.getPassword(text, console.getParentComponent())).getBytes(StandardCharsets.UTF_8);
+				}
+				catch (final AOCancelledOperationException e) {
+					LOGGER.info("Se cancelo el dialogo de entrada de contrasena: " + e); //$NON-NLS-1$
+					final int option = AOUIFactory.showConfirmDialog(console.getParentComponent(),
+							Messages.getString("ConfiguratorMacOSX.29"), //$NON-NLS-1$
+							Messages.getString("ConfiguratorMacOSX.30"), //$NON-NLS-1$
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (option == JOptionPane.YES_OPTION) {
+						console.print(Messages.getString("ConfiguratorMacOSX.31")); //$NON-NLS-1$
+						return;
+					}
+					continue;
+				}
+			}
+
+			// Restablecemos el valor
+			passwordError = false;
+
+			// Insertamos el certificado raiz
+			try {
+				installTrustedCertInAppleKeyChain(caCertFile, data, true);
+			}
+			catch (final SecurityException e) {
+				// La contrasena invalida, pero si era el intento de prueba, no lo tendremos en cuenta
+				if (!Arrays.equals(DUMMY, data)) {
+					passwordError = true;
+				}
+				continue;
+			}
+			console.print(Messages.getString("ConfiguratorMacOSX.32")); //$NON-NLS-1$
+			installTrustedCertInAppleKeyChain(sslCertFile, data, false);
+			console.print(Messages.getString("ConfiguratorMacOSX.33")); //$NON-NLS-1$
+
+			certInstalled = true;
+
+		} while(certInstalled);
+	}
+
+	/**
+	 * Instala un certificado en el almacen de certificados de confianza del llavero de macOS.
+	 * @param sslCertFile Fichero del certificado SSL.
+	 * @param phrase Contrase&ntilde;a del llavero/administrador.
+	 * @param isRootCa Indica si el certificado debe instalarse como CA.
+	 * @throws IOException Cuando ocurre un error al leer el fichero
+	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
+	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
+	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 */
+	private static void installTrustedCertInAppleKeyChain(final File sslCertFile, final byte[] phrase, final boolean isRootCa)
+			throws IOException, InterruptedException, KeyChainException, SecurityException {
+
+		final List<String> params = new ArrayList<>();
+		params.add("sudo"); //$NON-NLS-1$
+		params.add("-S"); //$NON-NLS-1$
+		params.add("security"); //$NON-NLS-1$
+		params.add("-i"); //$NON-NLS-1$
+		params.add("add-trusted-cert"); //$NON-NLS-1$
+		params.add("-d"); //$NON-NLS-1$
+		params.add("-r"); //$NON-NLS-1$
+		params.add(isRootCa ? "trustRoot" : "trustAsRoot"); //$NON-NLS-1$ //$NON-NLS-2$
+		params.add("-k"); //$NON-NLS-1$
+		params.add("/Library/Keychains/System.keychain"); //$NON-NLS-1$
+		params.add(sslCertFile.getAbsolutePath());
+
+		final ProcessBuilder builder = new ProcessBuilder(params);
+		final Process process = builder.start();
+
+		// Se proporciona la contrasena de administrador
+		try (OutputStream os = process.getOutputStream()) {
+			os.write(phrase);
+			os.flush();
 		}
-		final X509Certificate certPfx = (X509Certificate) ks.getCertificate(ConfiguratorUtil.CERT_ALIAS);
-		final byte[] buf = certPfx.getEncoded();
 
-		sslCerFile = new File(appDir, SSL_CER_FILENAME);
-		try (
-			final FileOutputStream os = new FileOutputStream(sslCerFile);
-		) {
-			os.write(buf);
+		final int exitValue = process.waitFor();
+		if (exitValue != 0) {
+			byte[] errorOutput = null;
+			try (final InputStream errorStream = process.getErrorStream()) {
+				errorOutput = AOUtil.getDataFromInputStream(errorStream);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se pudo leer la salida de error " //$NON-NLS-1$
+						+ "del proceso de instalacion del certificado en el llavero", e); //$NON-NLS-1$
+			}
+			if (errorOutput != null) {
+				final String errorMsg = new String(errorOutput);
+				LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
+				if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+					throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+				}
+				throw new KeyChainException("Error al instalar el certificado " + sslCertFile //$NON-NLS-1$
+						+ " en el llavero de macOS"); //$NON-NLS-1$
+			}
 		}
-
-		final String cmdKs = OSX_SEC_KS_CERT_COMMAND.replace(
-			"%KEYCHAIN%", //$NON-NLS-1$
-			KEYCHAIN_PATH
-		).replace(
-			"%CERT%", //$NON-NLS-1$
-			sslCerFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-		LOGGER.info("Comando de instalacion del certificado SSL en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
-		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(cmdKs), mac_script_path, true);
-
-		// Creamos el fichero de perfil y el script necesario para que se confie automaticamente en los nuevos certificados
-		final X509Certificate root;
-		try (final InputStream is = new FileInputStream(certFile)) {
-			root = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is); //$NON-NLS-1$
-		}
-
-		final String snRoot = AOUtil.hexify(root.getSerialNumber().toByteArray(), false);
-		final String sha1Root = AOUtil.hexify(MessageDigest.getInstance("SHA1").digest(root.getEncoded()), false); //$NON-NLS-1$
-		final String snCer = AOUtil.hexify(certPfx.getSerialNumber().toByteArray(), false);
-		final String sha1Cer =  AOUtil.hexify(MessageDigest.getInstance("SHA1").digest(certPfx.getEncoded()), false); //$NON-NLS-1$
-
-		editTrustFile(appDir, sha1Root, sha1Cer, snRoot, snCer);
-
-		final String trustCmd = TRUST_SETTINGS_COMMAND
-			+ appDir.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-			+ TRUST_SETTINGS_FILE
-		;
-		LOGGER.info("Comando de instalacion de ajustes de confianza: " + trustCmd); //$NON-NLS-1$
-		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(trustCmd), mac_script_path, true);
-
 	}
 
 	@Override
@@ -380,7 +414,7 @@ final class ConfiguratorMacOSX implements Configurator {
 									Files.delete(file);
 								}
 								catch (final Exception e) {
-									LOGGER.warning("No se pudo eliminar el fichero: " + file); //$NON-NLS-1$
+									LOGGER.warning("No se pudo eliminar el fichero '" + file + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								return FileVisitResult.CONTINUE;
 							}
@@ -389,7 +423,7 @@ final class ConfiguratorMacOSX implements Configurator {
 								try {
 									Files.delete(dir);
 								} catch (final IOException e) {
-									LOGGER.warning("No se pudo eliminar el directorio: " + dir); //$NON-NLS-1$
+									LOGGER.warning("No se pudo eliminar el directorio '" + dir + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								return FileVisitResult.CONTINUE;
 							}
@@ -442,83 +476,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		ConfiguratorMacUtils.writeScriptFile(sb, mac_script_path, true);
 	}
 
-	private static void editTrustFile(final File appDir, final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
-
-		// Copia a disco la plantilla que rellenaremos para usarla como fichero de perfil
-		// que instalar para configurar la confianza en los certificados SSL. Si existiese
-		// una version anterior, la eliminariamos previamente
-		try {
-			deleteTrustTemplate(appDir);
-			exportResource(OSX_RESOURCES, TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
-		} catch (final Exception e) {
-			LOGGER.log(Level.SEVERE, "No ha sido posible exportar la plantilla de confianza para la instalacion de los certificados SSL. Quizas no se confie en los certificados.", e); //$NON-NLS-1$
-		}
-
-		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
-		final String sha1CerOrig = "%SSL_SHA1%"; //$NON-NLS-1$
-		final String snRootOrig = "%CA_SERIALNUMBER%"; //$NON-NLS-1$
-		final String snCerOrig = "%SSL_SERIALNUMBER%"; //$NON-NLS-1$
-
-		try(final InputStream in = new FileInputStream(
-				appDir.getAbsolutePath()
-			+ TRUST_SETTINGS_FILE
-		);
-				) {
-
-			final DocumentBuilderFactory docFactory =
-			DocumentBuilderFactory.newInstance();
-			final DocumentBuilder docBuilder =
-			docFactory.newDocumentBuilder();
-			final Document doc = docBuilder.parse(in);
-			final Node dict = doc.getElementsByTagName("dict").item(1); //$NON-NLS-1$
-			final NodeList list = dict.getChildNodes();
-
-			for (int i = 0; i < list.getLength(); i++) {
-		         final Node node = list.item(i);
-		         if (node.getNodeType() == Node.ELEMENT_NODE) {
-		        	 final Element element = (Element) node;
-		        	 if (element.getNodeName().equals("key")) { //$NON-NLS-1$
-		        		 if (element.getTextContent().equals(sha1RootOrig)) {
-		        			 element.setTextContent(sha1Root);
-		        		 }
-		        		 else if (element.getTextContent().equals(sha1CerOrig)) {
-		        			 element.setTextContent(sha1Cer);
-		        		 }
-		        	 }
-		        	 else if (element.getNodeName().equals("dict")) { //$NON-NLS-1$
-		        		 final NodeList certList = element.getChildNodes();
-		        		 for (int j = 0; j < certList.getLength(); j++) {
-		        			 final Node n = certList.item(j);
-		        			 if (n.getNodeType() == Node.ELEMENT_NODE) {
-		        				 final Element el = (Element) n;
-		        				 if (el.getNodeName().equals("data")) { //$NON-NLS-1$
-		        					 if (AOUtil.hexify(Base64.decode(el.getTextContent()), false).equals(snRootOrig)) {
-		        						 el.setTextContent(Base64.encode(hexStringToByteArray(snRoot)));
-		        					 }
-		        					 else if (AOUtil.hexify(Base64.decode(el.getTextContent()), false).equals(snCerOrig)) {
-		        						 el.setTextContent(Base64.encode(hexStringToByteArray(snCer)));
-		        					 }
-			   		        	}
-		        			}
-		        		 }
-		        	 }
-		         }
-		    }
-
-			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			final Transformer transformer = transformerFactory.newTransformer();
-			final DOMSource domSource = new DOMSource(doc);
-			final StreamResult streamResult = new StreamResult(
-				new File(appDir, TRUST_SETTINGS_FILE)
-			);
-			transformer.transform(domSource, streamResult);
-
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error analizando el PList: " + e); //$NON-NLS-1$
-		}
-	}
-
 	private static File getResourcesDirectory() throws IOException {
 
 		// Devuelve un directorio en el que copiar y generar los recursos
@@ -529,16 +486,6 @@ final class ConfiguratorMacOSX implements Configurator {
 			throw new IOException("No se ha podido generar el directorio de recursos de la aplicacion: " + appDir.getAbsolutePath()); //$NON-NLS-1$
 		}
 		return appDir;
-	}
-
-	private static byte[] hexStringToByteArray(final String s) {
-	    final int len = s.length();
-	    final byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-	                             + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
 	}
 
 	/** Ejecuta un fichero de scripts.
@@ -616,66 +563,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		return false;
 	}
 
-	/** Comprueba si ya existe una plantilla de confianzas instalada en el
-	 * directorio de la aplicaci&oacute;n.
-	 * @param appDir Directorio de la aplicaci&oacute;n.
-	 * @return {@code true} si ya existe una plantilla de confianza, {@code false} en caso contrario. */
-	private static boolean checkTrustsTemplateInstalled(final File appDir) {
-		return new File(appDir, TRUST_SETTINGS_FILE).exists();
-	}
-
-	/** Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
-	 * como paso previo a volver a generarlos
-	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
-	 * @throws IOException En cualquier error. */
-	private static void deleteTrustTemplate(final File appDir) throws IOException {
-
-		if (checkTrustsTemplateInstalled(appDir)) {
-
-			final File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
-
-			if (!sslKey.delete()) {
-				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE); //$NON-NLS-1$
-			}
-
-		}
-
-	}
-
-	/** Copia un recurso desde dentro del JAR hacia una ruta externa.
-     * @param pathToResource Carpeta del recurso dentro del JAR.
-     * @param resourceName Nombre del recurso a copiar.
-     * @param destinationPath Ruta externa destino.
-     * @return Ruta completa del recurso copiado.
-     * @throws IOException En cualquier error. */
-    private static String exportResource(final String pathToResource,
-    		                             final String resourceName,
-    		                             final String destinationPath) throws IOException {
-
-    	final File outFile = new File(destinationPath + resourceName);
-        try (
-    		final InputStream stream = ConfiguratorMacOSX.class.getResourceAsStream(pathToResource + resourceName);
-		) {
-
-            if (stream == null) {
-                throw new IOException("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar."); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            int readBytes;
-            final byte[] buffer = new byte[4096];
-            final boolean jnlpDeploy = AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment();
-            try (OutputStream resStreamOut = jnlpDeploy ?
-            		AutoFirmaConfiguratiorJNLPUtils.selectFileToWrite(outFile) :
-            			new FileOutputStream(outFile);) {
-            	while ((readBytes = stream.read(buffer)) > 0) {
-            		resStreamOut.write(buffer, 0, readBytes);
-            	}
-            }
-        }
-
-        return outFile.getAbsolutePath();
-    }
-
     /** Devuelve un listado con todos los directorios de usuario del sistema.
 	 * @return Listado de directorios. */
 	private static String[] getSystemUsersHomes() {
@@ -741,7 +628,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
-		final String[] endIfStatement = new String[] {
+		final String[] endIfStatement = {
 				"fi", //$NON-NLS-1$
 		};
 
@@ -761,7 +648,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 			final String[] ifContainsString2 = getIfNotCointainsStringCommand(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
 			// Comando para agregar la confianza del esquema 'afirma' en caso de tener Chrome v56 o inferior recien instalado
-			final String[] commandInstallChrome56OrLower4 = new String[] {
+			final String[] commandInstallChrome56OrLower4 = {
 					"sed -i ''", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 					"'s/last_active_profiles\\([^,]*\\),/" //$NON-NLS-1$
 					+ "last_active_profiles\\1,\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}},/'", //$NON-NLS-1$
@@ -811,15 +698,12 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return <i>Scripts</i> para confirmar si existen protocolos definidos en el fichero.*/
 	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
-		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
-		// por el contrario, ya estaba
-		final String[] ifStatement = new String[] {
+		return new String[] {
 				"if ! ", //$NON-NLS-1$
 				"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				"; then", //$NON-NLS-1$
 		};
-		return ifStatement;
 	}
 
 	/** Genera los <i>scripts</i> para reemplazar el fichero original por el temporal con
@@ -829,14 +713,11 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @return <i>Scripts</i> para reemplazar el fichero original por el temporal con
 	 *         el que se estaba trabajando. */
 	private static String[] copyConfigurationFile(final String userDir, final String browserPath) {
-		// Comando para sobreescribir el fichero de configuracion
-		final String[] commandCopy = new String[] {
+		return new String[] {
 				"\\cp", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 		};
-
-		return commandCopy;
 	}
 
 	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
@@ -845,15 +726,13 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>. */
 	private static String[] deleteProtocolInPreferencesFile1(final String userDir, final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed", //$NON-NLS-1$
 				"'s/\\\"afirma\\\":false,//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				">", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
@@ -863,13 +742,11 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static String[] deleteProtocolInPreferencesFile2(final String userDir,
 			                                                 final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed -i ''", //$NON-NLS-1$
 				"'s/\\\"afirma\\\":false//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los <i>scripts</i> para eliminar las advertencias cuando se invoque al
@@ -879,14 +756,12 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @return <i>Scripts</i> para eliminar el protocolo <code>afirma</code>.*/
 	private static String[] addProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed -i ''", //$NON-NLS-1$
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/" //$NON-NLS-1$
 				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los <i>scripts</i> para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
@@ -895,14 +770,12 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @return <i>Scripts</i> para eliminar la coma en caso de que sea el unico protocolo definido en el fichero. */
 	private static String[] correctProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
-		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
-		final String[] commandInstall2 = new String[] {
+		return new String[] {
 				"sed -i ''", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,}/" //$NON-NLS-1$
 				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}/g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall2;
 	}
 
 

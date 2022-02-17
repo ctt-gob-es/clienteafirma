@@ -11,6 +11,8 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +48,39 @@ public final class MozillaKeyStoreUtilitiesOsX {
 
 		final String nssBinDir = binDir.endsWith("/") ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
+		
+		
+		
+//		System.out.println("java.library.path: " + System.getProperty("java.library.path"));
+//		
+//		String libraryPath = System.getProperty("java.library.path");
+//		if (!libraryPath.contains(binDir)) {
+//			libraryPath += File.pathSeparator + binDir;
+//			System.setProperty("java.library.path", libraryPath);
+//		}
+//		
+//		System.out.println("=========");
+//		Properties p = System.getProperties();
+//		for (String k : p.keySet().toArray(new String[0])) {
+//			System.out.println(k + ": " + p.getProperty(k));
+//		}
+//		System.out.println("=========");
+//		
+//		System.out.println("=========");
+//		Map<String, String> m = System.getenv();
+//		for (String k : m.keySet().toArray(new String[0])) {
+//			System.out.println(k + ": " + m.get(k));
+//		}
+//		System.out.println("=========");
+//		
+//		
+//		System.setProperty("sun.boot.library.path", nssBinDir);
+//		
+//		System.setProperty("java.home", nssBinDir);
+//		
+//		
+//		System.out.println("java.library.path: " + System.getProperty("java.library.path"));
+		
 		// Intentamos la carga, para ver si es necesaria la reconfiguracion
 		try {
 			System.load(nssBinDir + "libmozglue.dylib"); //$NON-NLS-1$
@@ -63,8 +98,6 @@ public final class MozillaKeyStoreUtilitiesOsX {
 				"No se puede realizar una carga directa de NSS, se crearan enlaces simbolicos: " + e //$NON-NLS-1$
 			);
 		}
-
-
 
 		// Si sigue sin funcionar, tendremos que crear enlaces simbolicos de las dependencias en un
 		// directorio desde el que se traten de cargar

@@ -98,10 +98,7 @@ public interface AOUIManager {
      * @param icon Icono para el di&aacute;logo */
     void showMessageDialog(Object parentComponent, Object message, String title, int messageType, Object icon);
 
-    /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
-     * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
-     * cerrar. El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
-     * <code>JOptionPane</code>.
+    /** Muestra un di&aacute;logo de error de forma modal.
      * @param message Mensaje de error.
      * @param title Titulo de la ventana de error.
      * @param messageType Tipo de mensaje.

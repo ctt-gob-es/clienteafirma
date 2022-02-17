@@ -576,13 +576,15 @@ public final class MozillaKeyStoreUtilities {
 		) {
 			fos.write(p11NSSConfigFileContents.getBytes());
 		}
+		
+		System.out.println("Temporal de configuracion: " + f.getAbsolutePath());
 
 		Provider ret;
 		try {
 			final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
 			ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 		}
-		catch (final Exception e) {
+		catch (final Exception | Error e) {
 
 			// No se ha podido cargar el proveedor sin precargar las dependencias
 			// Cargamos las dependencias necesarias para la correcta carga
@@ -695,7 +697,7 @@ public final class MozillaKeyStoreUtilities {
 	                                                           SecurityException,
 	                                                           ClassNotFoundException {
 
-		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+		String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		LOGGER.info("Directorio de bibliotecas NSS: " + nssDirectory); //$NON-NLS-1$
 
 		String profileDir = useSharedNss ?
@@ -713,13 +715,17 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.warning("No se pudo comprobar si el almacen de claves debia cargase como base de datos: " + e); //$NON-NLS-1$
 		}
 
+		//nssDirectory = "/Users/carlosgamuci/Documents/nss";
+		//nssDirectory = "/Users/carlosgamuci/Library/Application Support/AutoFirma/nss";
+		nssDirectory = "/Library/Application Support/AutoFirma/nss";
+		
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
 			profileDir,
 			nssDirectory
 		);
 
 		// Mostramos la configuracion de NSS, sustituyendo la ruta del usuario del
-		// registro para evitar mostrar datos personales
+		// registro para evitar mostrar datos personales en el log
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final Provider p = AOUtil.isJava9orNewer() ?

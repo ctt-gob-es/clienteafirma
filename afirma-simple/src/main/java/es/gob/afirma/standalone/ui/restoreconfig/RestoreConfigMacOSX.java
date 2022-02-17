@@ -19,35 +19,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.MessageDigest;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.xml.XMLConstants;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
-import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -73,18 +62,15 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
 	private static final String CERT_CN_ROOT = "'AutoFirma ROOT'"; //$NON-NLS-1$
 	static final String GET_USER_SCRIPT = "/getUsers.sh";//$NON-NLS-1$
-	private static final String KEYCHAIN_PATH = "/Library/Keychains/System.keychain"; //$NON-NLS-1$
-	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
-	private static final String OSX_SEC_KS_CERT_COMMAND = "security add-trusted-cert -d -r trustAsRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	static final String OSX_GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private final static String USER_DIR_LINE_PREFIX = "dir: "; //$NON-NLS-1$
 	static final String MAC_SCRIPT_NAME = "/installCerScript"; //$NON-NLS-1$
 	static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
 	static final String EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
 	static final String EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
-	private static final String TRUST_SETTINGS_COMMAND = "security trust-settings-import -d "; //$NON-NLS-1$
-	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
-	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
+
+
+	private static final byte[] DUMMY = "dummy".getBytes(); //$NON-NLS-1$
 
 	private static final String CHANGE_OWN_COMMAND = "chown %USERNAME% \"%DIR%\""; //$NON-NLS-1$
 
@@ -199,6 +185,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static void restoreSslCertificates(final File appDir, final RestoreConfigPanel configPanel) {
 
 		final File sslRootCertFile;
+		final File sslCertFile;
 		if (!checkSSLKeyStoreGenerated(appDir)) {
 			// Damos permisos al script
 			UnixUtils.addExexPermissionsToAllFilesOnDirectory(appDir);
@@ -217,12 +204,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 				return;
 			}
 			sslRootCertFile = new File(appDir, SSL_CA_CER_FILENAME);
+			sslCertFile = new File(appDir, SSL_CER_FILENAME);
 		}
 		else if (!checkSSLRootCertificateGenerated(appDir)) {
 			// Damos permisos al script
 			UnixUtils.addExexPermissionsToAllFilesOnDirectory(appDir);
 
 			sslRootCertFile = new File(appDir, SSL_CA_CER_FILENAME);
+			sslCertFile = new File(appDir, SSL_CER_FILENAME);
 			try {
 				final Certificate[] sslCertChain;
 				try (FileInputStream fis = new FileInputStream(new File(appDir, KS_FILENAME))) {
@@ -231,10 +220,16 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 					sslCertChain = ks.getCertificateChain(ks.aliases().nextElement());
 				}
 
-				// Generacion del certificado raiz .cer
+				// Guardamos el certificado raiz
 				RestoreConfigUtil.installFile(
 					sslCertChain[sslCertChain.length - 1].getEncoded(),
 					sslRootCertFile
+				);
+
+				// Guardamos el certificado ssl
+				RestoreConfigUtil.installFile(
+					sslCertChain[0].getEncoded(),
+					sslCertFile
 				);
 			}
 			catch (final Exception e) {
@@ -244,13 +239,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			}
 		}
 		else {
-			LOGGER.info("Los certificados SSL existen y no se crearan ni instalaran" ); //$NON-NLS-1$
+			LOGGER.info("Los certificados SSL existen. Se procede a la instalacion." ); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
 			sslRootCertFile = new File(appDir, SSL_CA_CER_FILENAME);
+			sslCertFile = new File(appDir, SSL_CER_FILENAME);
 		}
 
 		try {
-			installRootCA(appDir, sslRootCertFile, configPanel);
+			installRootCA(appDir, sslRootCertFile, sslCertFile, configPanel);
 		}
 		catch (final SecurityException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.10")); //$NON-NLS-1$
@@ -302,14 +298,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		return new File(appDir, SSL_CA_CER_FILENAME).exists();
 	}
 
-	/** Comprueba si ya existe una plantilla de confianzas instalada en el
-	 * directorio de la aplicaci&oacute;n.
-	 * @param appDir Directorio de la aplicaci&oacute;n.
-	 * @return {@code true} si ya existe una plantilla de confianza, {@code false} en caso contrario. */
-	private static boolean checkTrutsTemplateInstalled(final File appDir) {
-		return new File(appDir, TRUST_SETTINGS_FILE).exists();
-	}
-
 	/**
 	 * Genera y copia a disco los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
 	 * @param workingDir Directorio en el que almacenar los certificados de la aplicaci&oacute;n.
@@ -338,6 +326,11 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			certPack.getPkcs12(),
 			new File(workingDir, KS_FILENAME)
 		);
+
+		RestoreConfigUtil.installFile(
+				certPack.getSslCertificate().getEncoded(),
+				new File(workingDir, SSL_CER_FILENAME)
+			);
 	}
 
     /** Devuelve un listado con todos los directorios de usuario del sistema.
@@ -400,12 +393,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/** Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple.
 	 * @param appDir Directorio de aplicaci&oacute;n.
 	 * @param rootCertFile Certificado ra&iacute;z a instalar.
+	 * @param sslCertFile Certificado SSL a instalar.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso.
 	 * @throws SecurityException Cuando no se tengan permisos para realizar la instalaci&oacute;n.
 	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n.
 	 */
-	private static void installRootCA(final File appDir, final File rootCertFile, final RestoreConfigPanel configPanel)
+	private static void installRootCA(final File appDir, final File rootCertFile, final File sslCertFile, final RestoreConfigPanel configPanel)
 			throws IOException, SecurityException, KeyStoreException {
 
 		// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
@@ -465,14 +459,16 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Se instalan los certificados en el almacen de Apple
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
 		try {
-			createScriptToImportCARootOnMacOSXKeyStore(appDir);
-			final File scriptFile = new File(mac_script_path);
-			UnixUtils.addAllPermissionsToFile(scriptFile);
-			MacUtils.executeScriptFile(scriptFile, true, true);
+			installTrustedCertsInAppleKeyChain(rootCertFile, sslCertFile, configPanel);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.27", rootCertFile.getAbsolutePath(), sslCertFile.getAbsolutePath()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.28"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					e);
 		}
 		finally {
 			if (sslCerFile != null) {
@@ -481,72 +477,122 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de Apple en el
-	 * <i>script</i> de instalaci&oacute;n.
-	 * @param appDir Directorio de la aplicaci&oacute;n, donde est&aacute; el certificado.
-	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException, IOException {
+	private static void installTrustedCertsInAppleKeyChain(final File caCertFile,
+			final File sslCertFile, final RestoreConfigPanel console) throws IOException, InterruptedException, KeyChainException {
 
-		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
-		final File certFile = new File(appDir, SSL_CA_CER_FILENAME);
-		final String cmd = OSX_SEC_COMMAND.replace(
-			"%KEYCHAIN%", //$NON-NLS-1$
-			KEYCHAIN_PATH
-			).replace(
-				"%CERT%", //$NON-NLS-1$
-				certFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-		LOGGER.info("Comando de instalacion del certificado de CA en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
-		writeScriptFile(mac_script_path, new StringBuilder(cmd), true);
 
-		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
-		final File pfx = new File(appDir, KS_FILENAME);
-		final KeyStore ks;
-		try (final InputStream is = new FileInputStream(pfx)) {
-			ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-			ks.load(is, KS_PASSWORD.toCharArray());
+		byte[] data = null;
+		boolean passwordError = false;
+		boolean certInstalled = false;
+		do {
+
+			// La contrasena solo hace falta si no estamos ya en modo administrador, asi que la primera vez probaremos con una generica
+			if (data == null) {
+				data = DUMMY;
+			}
+			else {
+				// Solicitamos la contrasena para la instalacion de los certificados
+				final String text = passwordError
+						? SimpleAfirmaMessages.getString("RestoreConfigMacOSX.30") //$NON-NLS-1$
+						: SimpleAfirmaMessages.getString("RestoreConfigMacOSX.29"); //$NON-NLS-1$
+
+				try {
+					// Se pone en una linea para evitar que la contrasena se exponda en claro en memoria
+					data = new String(AOUIFactory.getPassword(text, console)).getBytes(StandardCharsets.UTF_8);
+				}
+				catch (final AOCancelledOperationException e) {
+					LOGGER.info("Se cancelo el dialogo de entrada de contrasena: " + e); //$NON-NLS-1$
+					final int option = AOUIFactory.showConfirmDialog(console,
+							SimpleAfirmaMessages.getString("RestoreConfigMacOSX.31"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("RestoreConfigMacOSX.32"), //$NON-NLS-1$
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (option == JOptionPane.YES_OPTION) {
+						console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.33")); //$NON-NLS-1$
+						return;
+					}
+					continue;
+				}
+			}
+
+			// Restablecemos el valor
+			passwordError = false;
+
+			// Insertamos el certificado raiz
+			try {
+				installTrustedCertInAppleKeyChain(caCertFile, data, true);
+			}
+			catch (final SecurityException e) {
+				// La contrasena invalida, pero si era el intento de prueba, no lo tendremos en cuenta
+				if (!Arrays.equals(DUMMY, data)) {
+					passwordError = true;
+				}
+				continue;
+			}
+			console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.25")); //$NON-NLS-1$
+			installTrustedCertInAppleKeyChain(sslCertFile, data, false);
+			console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.26")); //$NON-NLS-1$
+
+			certInstalled = true;
+
+		} while(!certInstalled);
+	}
+
+	/**
+	 * Instala un certificado en el almacen de certificados de confianza del llavero de macOS.
+	 * @param sslCertFile Fichero del certificado SSL.
+	 * @param phrase Contrase&ntilde;a del llavero/administrador.
+	 * @param isRootCa Indica si el certificado debe instalarse como CA.
+	 * @throws IOException Cuando ocurre un error al leer el fichero
+	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
+	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
+	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 */
+	private static void installTrustedCertInAppleKeyChain(final File sslCertFile, final byte[] phrase, final boolean isRootCa)
+			throws IOException, InterruptedException, KeyChainException, SecurityException {
+
+		final List<String> params = new ArrayList<>();
+		params.add("sudo"); //$NON-NLS-1$
+		params.add("-S"); //$NON-NLS-1$
+		params.add("security"); //$NON-NLS-1$
+		params.add("-i"); //$NON-NLS-1$
+		params.add("add-trusted-cert"); //$NON-NLS-1$
+		params.add("-d"); //$NON-NLS-1$
+		params.add("-r"); //$NON-NLS-1$
+		params.add(isRootCa ? "trustRoot" : "trustAsRoot"); //$NON-NLS-1$ //$NON-NLS-2$
+		params.add("-k"); //$NON-NLS-1$
+		params.add("/Library/Keychains/System.keychain"); //$NON-NLS-1$
+		params.add(sslCertFile.getAbsolutePath());
+
+		final ProcessBuilder builder = new ProcessBuilder(params);
+		final Process process = builder.start();
+
+		// Se proporciona la contrasena de administrador
+		try (OutputStream os = process.getOutputStream()) {
+			os.write(phrase);
+			os.flush();
 		}
-		final X509Certificate certPfx = (X509Certificate) ks.getCertificate(RestoreConfigUtil.CERT_ALIAS);
-		final byte[] buf = certPfx.getEncoded();
 
-		sslCerFile = new File(appDir, SSL_CER_FILENAME);
-		try (
-			final FileOutputStream os = new FileOutputStream(sslCerFile);
-		) {
-			os.write(buf);
+		final int exitValue = process.waitFor();
+		if (exitValue != 0) {
+			byte[] errorOutput = null;
+			try (final InputStream errorStream = process.getErrorStream()) {
+				errorOutput = AOUtil.getDataFromInputStream(errorStream);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se pudo leer la salida de error " //$NON-NLS-1$
+						+ "del proceso de instalacion del certificado en el llavero", e); //$NON-NLS-1$
+			}
+			if (errorOutput != null) {
+				final String errorMsg = new String(errorOutput);
+				LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
+				if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+					throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+				}
+				throw new KeyChainException("Error al instalar el certificado " + sslCertFile //$NON-NLS-1$
+						+ " en el llavero de macOS"); //$NON-NLS-1$
+			}
 		}
-
-		final String cmdKs = OSX_SEC_KS_CERT_COMMAND.replace(
-			"%KEYCHAIN%", //$NON-NLS-1$
-			KEYCHAIN_PATH
-			).replace(
-				"%CERT%", //$NON-NLS-1$
-				sslCerFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-		LOGGER.info("Comando de instalacion del certificado SSL en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
-		writeScriptFile(mac_script_path, new StringBuilder(cmdKs), true);
-
-		// Creamos el fichero de perfil y el script necesario para que se confie automaticamente en los nuevos certificados
-		final X509Certificate root;
-		try (final InputStream is = new FileInputStream(certFile)) {
-			root = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is); //$NON-NLS-1$
-		}
-
-		final String snRoot = AOUtil.hexify(root.getSerialNumber().toByteArray(), false);
-		final String sha1Root = AOUtil.hexify(MessageDigest.getInstance("SHA1").digest(root.getEncoded()), false); //$NON-NLS-1$
-		final String snCer = AOUtil.hexify(certPfx.getSerialNumber().toByteArray(), false);
-		final String sha1Cer =  AOUtil.hexify(MessageDigest.getInstance("SHA1").digest(certPfx.getEncoded()), false); //$NON-NLS-1$
-
-		editTrustFile(appDir, sha1Root, sha1Cer, snRoot, snCer);
-
-		final String trustCmd = TRUST_SETTINGS_COMMAND
-			+ appDir.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-			+ TRUST_SETTINGS_FILE
-		;
-		LOGGER.info("Comando de instalacion de ajustes de confianza: " + trustCmd); //$NON-NLS-1$
-		writeScriptFile(mac_script_path, new StringBuilder(trustCmd), true);
-
 	}
 
 	/** Ejecuta un script en OS X.
@@ -592,88 +638,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		writeScriptFile(mac_script_path, sb, true);
 	}
 
-	private static void editTrustFile(final File appDir, final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
-
-		try {
-			deleteTrustTemplate(appDir);
-		} catch (final Exception e) {
-			LOGGER.warning("No ha podido eliminarse la anterior plantilla de configuracion de confianza: " + e); //$NON-NLS-1$
-		}
-		try {
-			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
-		} catch (final Exception e) {
-			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza: " + e); //$NON-NLS-1$
-		}
-
-		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
-		final String sha1CerOrig = "%SSL_SHA1%"; //$NON-NLS-1$
-		final String snRootOrig = "%CA_SERIALNUMBER%"; //$NON-NLS-1$
-		final String snCerOrig = "%SSL_SERIALNUMBER%"; //$NON-NLS-1$
-
-		try (final InputStream in = new FileInputStream(new File(appDir, TRUST_SETTINGS_FILE));) {
-
-			final Document doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(in);
-			final Node dict = doc.getElementsByTagName("dict").item(1); //$NON-NLS-1$
-			final NodeList list = dict.getChildNodes();
-
-			for (int i = 0; i < list.getLength(); i++) {
-		         final Node node = list.item(i);
-		         if (node.getNodeType() == Node.ELEMENT_NODE) {
-		        	 final Element element = (Element) node;
-		        	 if (element.getNodeName().equals("key")) { //$NON-NLS-1$
-		        		 if (element.getTextContent().equals(sha1RootOrig)) {
-		        			 element.setTextContent(sha1Root);
-		        		 }
-		        		 else if (element.getTextContent().equals(sha1CerOrig)) {
-		        			 element.setTextContent(sha1Cer);
-		        		 }
-		        	 }
-		        	 else if (element.getNodeName().equals("dict")) { //$NON-NLS-1$
-		        		 final NodeList certList = element.getChildNodes();
-		        		 for (int j = 0; j < certList.getLength(); j++) {
-		        			 final Node n = certList.item(j);
-		        			 if (n.getNodeType() == Node.ELEMENT_NODE) {
-		        				 final Element el = (Element) n;
-		        				 if (el.getNodeName().equals("data")) { //$NON-NLS-1$
-		        					 if (AOUtil.hexify(Base64.decode(el.getTextContent()), false).equals(snRootOrig)) {
-		        						 el.setTextContent(Base64.encode(hexStringToByteArray(snRoot)));
-		        					 }
-		        					 else if (AOUtil.hexify(Base64.decode(el.getTextContent()), false).equals(snCerOrig)) {
-		        						 el.setTextContent(Base64.encode(hexStringToByteArray(snCer)));
-		        					 }
-			   		        	}
-		        			}
-		        		 }
-		        	 }
-		         }
-		    }
-
-			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
-			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
-			final Transformer transformer = transformerFactory.newTransformer();
-			final DOMSource domSource = new DOMSource(doc);
-			final StreamResult streamResult = new StreamResult(
-				new File(appDir, TRUST_SETTINGS_FILE)
-			);
-			transformer.transform(domSource, streamResult);
-
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error analizando el PList: " + e); //$NON-NLS-1$
-		}
-	}
-
-	private static byte[] hexStringToByteArray(final String s) {
-	    final int len = s.length();
-	    final byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-	                             + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
-	}
-
 	/**
 	 * Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
@@ -696,24 +660,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			}
 
 		}
-	}
-
-	/** Elimina los ficheros de certificado ra&iacute;z y almac&eacute;n SSL del disco
-	 * como paso previo a volver a generarlos.
-	 * @param appDir Ruta del directorio de la aplicaci&oacute;n.
-	 * @throws IOException Si hay problemas borrando los ficheros. */
-	private static void deleteTrustTemplate(final File appDir) throws IOException {
-
-		if (checkTrutsTemplateInstalled(appDir)) {
-
-			final File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
-
-			if (!sslKey.delete()) {
-				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE); //$NON-NLS-1$
-			}
-
-		}
-
 	}
 
 	/**
