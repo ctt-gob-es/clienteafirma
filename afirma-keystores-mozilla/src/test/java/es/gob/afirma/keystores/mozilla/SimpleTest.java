@@ -37,7 +37,7 @@ public final class SimpleTest {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
     @Test
-    //@Ignore // Necesita NSS
+    @Ignore // Necesita NSS
     public void testKeyStoreManagerCreation() throws Exception {
 
     	System.setProperty(
@@ -81,7 +81,7 @@ public final class SimpleTest {
     	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
     	sig.initSign(
 			ksm.getKeyEntry(
-				aliases[1]
+				aliases[0]
 			).getPrivateKey()
 		);
     	sig.update("Hola".getBytes()); //$NON-NLS-1$

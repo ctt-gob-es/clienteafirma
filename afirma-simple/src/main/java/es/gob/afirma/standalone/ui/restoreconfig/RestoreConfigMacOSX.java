@@ -239,10 +239,31 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			}
 		}
 		else {
-			LOGGER.info("Los certificados SSL existen. Se procede a la instalacion." ); //$NON-NLS-1$
+			LOGGER.info("El almacen y el certificado raiz existen." ); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
 			sslRootCertFile = new File(appDir, SSL_CA_CER_FILENAME);
 			sslCertFile = new File(appDir, SSL_CER_FILENAME);
+
+			// El certificado SSL (.cer) siempre se guarda a disco a partir del almacen
+			try {
+				final Certificate[] sslCertChain;
+				try (FileInputStream fis = new FileInputStream(new File(appDir, KS_FILENAME))) {
+					final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+					ks.load(fis, KS_PASSWORD.toCharArray());
+					sslCertChain = ks.getCertificateChain(ks.aliases().nextElement());
+				}
+
+				// Guardamos el certificado SSL
+				RestoreConfigUtil.installFile(
+					sslCertChain[0].getEncoded(),
+					sslCertFile
+				);
+			}
+			catch (final Exception e) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.4")); //$NON-NLS-1$
+				LOGGER.severe("Error al copiar el certificado SSL a disco: " + e); //$NON-NLS-1$
+				return;
+			}
 		}
 
 		try {
@@ -283,17 +304,21 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
+	/**
+	 * Comprueba si ya existe un almac&eacute;n de certificados generado.
 	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL,
-	 *         {@code false} en caso contrario. */
+	 *         {@code false} en caso contrario.
+	 */
 	private static boolean checkSSLKeyStoreGenerated(final File appConfigDir) {
 		return new File(appConfigDir, KS_FILENAME).exists();
 	}
 
-	/** Comprueba si ya existe un certificado ra&iacute;z generado.
+	/**
+	 * Comprueba si ya existe un certificado ra&iacute;z generado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
-	 * @return {@code true} si ya existe un certificado ra&iacute;z .cer, {@code false} en caso contrario. */
+	 * @return {@code true} si ya existe un certificado ra&iacute;z .cer, {@code false} en caso contrario.
+	 */
 	private static boolean checkSSLRootCertificateGenerated(final File appDir) {
 		return new File(appDir, SSL_CA_CER_FILENAME).exists();
 	}
@@ -411,7 +436,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.45")); //$NON-NLS-1$
 		}
 
-		// Desinstalamos de los almacenes cualquier certificado anterior generado para este proposito
+		// Desinstalamos del llavero los certificados anteriores
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de MacOSX"); //$NON-NLS-1$
 		try {
 			uninstallRootCAMacOSXKeyStore();
@@ -420,9 +445,25 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en el llavero de macOS: " + e, e); //$NON-NLS-1$
 		}
 
+		// Se instalan los certificados en el llavero del sistema operativo
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
+		try {
+			installTrustedCertsInAppleKeyChain(rootCertFile, sslCertFile, configPanel);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.27", rootCertFile.getAbsolutePath(), sslCertFile.getAbsolutePath()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.28"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					e);
+		}
+
 		// Copiamos en disco certUtil para la configuracion de los certificados en el almacen de Firefox
 		RestoreConfigFirefox.copyConfigurationFiles(appDir);
 
+		// Desinstalamos del almacen de Firefox el certificado anterior
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		try {
 			uninstallRootCAFirefoxKeyStore(appDir);
@@ -432,7 +473,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 
 
-		// Se instalan los certificados en el almacen de Mozilla
+		// Se instala el certificado raiz en el almacen de Firefox
 		try {
 
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.13")); //$NON-NLS-1$
@@ -456,25 +497,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.19")); //$NON-NLS-1$
 		}
 
-		// Se instalan los certificados en el almacen de Apple
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
-		try {
-			installTrustedCertsInAppleKeyChain(rootCertFile, sslCertFile, configPanel);
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.20")); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
-					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.27", rootCertFile.getAbsolutePath(), sslCertFile.getAbsolutePath()), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.28"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE,
-					e);
-		}
-		finally {
-			if (sslCerFile != null) {
-				LOGGER.info("Elimino .cer del certificado SSL: " + sslCerFile.delete()); //$NON-NLS-1$
-			}
-		}
+
 	}
 
 	private static void installTrustedCertsInAppleKeyChain(final File caCertFile,
