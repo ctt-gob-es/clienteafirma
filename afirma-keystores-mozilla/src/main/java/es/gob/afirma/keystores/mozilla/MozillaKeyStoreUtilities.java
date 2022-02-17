@@ -65,7 +65,7 @@ public final class MozillaKeyStoreUtilities {
 	public static final String ENABLE_NSS_WRITE = "es.gob.afirma.keystores.mozilla.EnableNssWrite"; //$NON-NLS-1$
 
 	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
-	private static final String[] DNI_P11_NAMES = new String[] {
+	private static final String[] DNI_P11_NAMES = {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
 		"libpkcs11-dnie.so", //$NON-NLS-1$
 		"usrpkcs11.dll", //$NON-NLS-1$
@@ -97,7 +97,7 @@ public final class MozillaKeyStoreUtilities {
 		private String lib;
 		private Platform.OS os;
 		private boolean forcedLoad;
-		private KnownModule(final String description, final String lib, final Platform.OS os, final boolean forcedLoad) {
+		KnownModule(final String description, final String lib, final Platform.OS os, final boolean forcedLoad) {
 			this.description = description;
 			this.lib = lib;
 			this.forcedLoad = forcedLoad;
@@ -138,10 +138,10 @@ public final class MozillaKeyStoreUtilities {
 	public static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
 		final String softoknLib;
-		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			softoknLib = SOFTOKN3_DLL;
 		}
-		else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			softoknLib = "libsoftokn3.dylib"; //$NON-NLS-1$
 		}
 		else {
@@ -247,11 +247,11 @@ public final class MozillaKeyStoreUtilities {
 			nssLibDir = MozillaKeyStoreUtilitiesWindows.getSystemNSSLibDirWindows();
 		}
 
-		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
+		else if (Platform.OS.LINUX.equals(Platform.getOS()) || Platform.OS.SOLARIS.equals(Platform.getOS())) {
 			nssLibDir = MozillaKeyStoreUtilitiesUnix.getNSSLibDirUnix();
 		}
 
-		else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			nssLibDir = MozillaKeyStoreUtilitiesOsX.getSystemNSSLibDirMacOsX();
 		}
 
@@ -366,9 +366,7 @@ public final class MozillaKeyStoreUtilities {
 		// Creamos una copia de modsByDesc para evitar problemas de concurrencia
 		// (nunca soltara excepciones por usar ConcurrentHashMap, pero no significa
 		// que los problemas no ocurran si no se toman medidas).
-		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<>(modsByDesc.size());
-		modsByDescCopy.putAll(modsByDesc);
-
+		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<>(modsByDesc);
 		// Incluimos si aplica los modulos conocidos (aquellos de los que sin estar configurados sabemos
 		// el nombre) y los agregamos. No lo hacemos cuando se trate de una biblioteca preferida y se haya
 		// indicado que se excluyan
@@ -460,17 +458,17 @@ public final class MozillaKeyStoreUtilities {
 			return new String[0];
 		}
 
-		if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			// En Mac OS X no funciona la precarga de bibliotecas
 			return new String[0];
 		}
 
 		final String nssPath = !path.endsWith(File.separator) ? path + File.separator : path;
 
-		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesWindows.getSoftkn3DependenciesWindows(nssPath);
 		}
-		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
+		if (Platform.OS.LINUX.equals(Platform.getOS()) || Platform.OS.SOLARIS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesUnix.getSoftkn3DependenciesUnix(nssPath);
 		}
 
@@ -521,7 +519,7 @@ public final class MozillaKeyStoreUtilities {
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesWindows.getWindowsAppDataDir() + "\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 		}
-		if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			return Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"; //$NON-NLS-1$
 		}
 		// Linux / UNIX
@@ -576,8 +574,6 @@ public final class MozillaKeyStoreUtilities {
 		) {
 			fos.write(p11NSSConfigFileContents.getBytes());
 		}
-		
-		System.out.println("Temporal de configuracion: " + f.getAbsolutePath());
 
 		Provider ret;
 		try {
@@ -697,7 +693,8 @@ public final class MozillaKeyStoreUtilities {
 	                                                           SecurityException,
 	                                                           ClassNotFoundException {
 
-		String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+
 		LOGGER.info("Directorio de bibliotecas NSS: " + nssDirectory); //$NON-NLS-1$
 
 		String profileDir = useSharedNss ?
@@ -715,10 +712,6 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.warning("No se pudo comprobar si el almacen de claves debia cargase como base de datos: " + e); //$NON-NLS-1$
 		}
 
-		//nssDirectory = "/Users/carlosgamuci/Documents/nss";
-		//nssDirectory = "/Users/carlosgamuci/Library/Application Support/AutoFirma/nss";
-		nssDirectory = "/Library/Application Support/AutoFirma/nss";
-		
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
 			profileDir,
 			nssDirectory
@@ -728,9 +721,9 @@ public final class MozillaKeyStoreUtilities {
 		// registro para evitar mostrar datos personales en el log
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final Provider p = AOUtil.isJava9orNewer() ?
-			loadNssJava9(nssDirectory, p11NSSConfigFile) :
-				loadNssJava8(nssDirectory, p11NSSConfigFile);
+		final Provider p = AOUtil.isJava9orNewer()
+				? loadNssJava9(nssDirectory, p11NSSConfigFile)
+				: loadNssJava8(nssDirectory, p11NSSConfigFile);
 
 		Security.addProvider(p);
 

@@ -11,8 +11,6 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,41 +44,8 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			return;
 		}
 
-		final String nssBinDir = binDir.endsWith("/") ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+		final String nssBinDir = binDir.endsWith(File.separator) ? binDir : binDir + File.separator;
 
-		
-		
-		
-//		System.out.println("java.library.path: " + System.getProperty("java.library.path"));
-//		
-//		String libraryPath = System.getProperty("java.library.path");
-//		if (!libraryPath.contains(binDir)) {
-//			libraryPath += File.pathSeparator + binDir;
-//			System.setProperty("java.library.path", libraryPath);
-//		}
-//		
-//		System.out.println("=========");
-//		Properties p = System.getProperties();
-//		for (String k : p.keySet().toArray(new String[0])) {
-//			System.out.println(k + ": " + p.getProperty(k));
-//		}
-//		System.out.println("=========");
-//		
-//		System.out.println("=========");
-//		Map<String, String> m = System.getenv();
-//		for (String k : m.keySet().toArray(new String[0])) {
-//			System.out.println(k + ": " + m.get(k));
-//		}
-//		System.out.println("=========");
-//		
-//		
-//		System.setProperty("sun.boot.library.path", nssBinDir);
-//		
-//		System.setProperty("java.home", nssBinDir);
-//		
-//		
-//		System.out.println("java.library.path: " + System.getProperty("java.library.path"));
-		
 		// Intentamos la carga, para ver si es necesaria la reconfiguracion
 		try {
 			System.load(nssBinDir + "libmozglue.dylib"); //$NON-NLS-1$
@@ -101,7 +66,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 
 		// Si sigue sin funcionar, tendremos que crear enlaces simbolicos de las dependencias en un
 		// directorio desde el que se traten de cargar
-		final String[] libs = new String[] {
+		final String[] libs = {
 				"libmozglue.dylib", // Firefox 11 y superiores //$NON-NLS-1$
 				"libmozutils.dylib", // Firefox 9 y 10 //$NON-NLS-1$
 				"libnspr4.dylib", //$NON-NLS-1$
@@ -155,7 +120,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 
 	static String getSystemNSSLibDirMacOsX() throws FileNotFoundException {
 
-		final String[] paths = new String[] {
+		final String[] paths = {
 			"/Applications/Firefox.app/Contents/MacOS", //$NON-NLS-1$
 			"/lib", //$NON-NLS-1$
 			"/usr/lib", //$NON-NLS-1$
@@ -166,7 +131,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		String nssLibDir = null;
 
 		for (final String path : paths) {
-			if (new File(path + "/libsoftokn3.dylib").exists()) { //$NON-NLS-1$
+			if (new File(path, "libsoftokn3.dylib").exists()) { //$NON-NLS-1$
 				nssLibDir = path;
 				break;
 			}
