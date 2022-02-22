@@ -47,6 +47,8 @@ public final class PdfUtil {
 
 	private static final String FILTER_ADOBE_PKCS7_DETACHED = "/adbe.pkcs7.detached"; //$NON-NLS-1$
 
+	private static final String RANGE_INDICATOR = "-"; //$NON-NLS-1$
+
 	private static final Set<String> SUPPORTED_SUBFILTERS;
 	static {
 		SUPPORTED_SUBFILTERS = new HashSet<>();
@@ -188,8 +190,7 @@ public final class PdfUtil {
 			// y "no establecido"
 			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
 			if ("true".equalsIgnoreCase(allow)) { //$NON-NLS-1$
-				// Se permite, no se hace nada
-				return;
+
 			}
 			else if ("false".equalsIgnoreCase(allow)) { //$NON-NLS-1$
 				// No se permite, se lanza excepcion
@@ -484,49 +485,80 @@ public final class PdfUtil {
     }
 
     /**
-     * Metodo que controla si se ha introducido algun rango en el parametro con las paginas donde estampar la firma
+     * Metodo que controla si se ha introducido alg&uacute;n rango en el par&aacute;metro con las p&aacute;ginas donde estampar la firma
      * visible para introducirlo en un array correctamente.
-     * @param pagesStr Paginas o rango de paginas a tratar.
-     * @param totalPages Numero total de paginas del documento.
-     * @return Devuelve una lista donde se indican las paginas una a una.
+     * @param pageStr P&aacute;gina o rango de p&aacute;ginas a tratar.
+     * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
+     * @param pagesList Lista de enteros donde se indican las p&aacute;ginas una a una.
      */
-    public static List<Integer> checkPagesRange(final String[] pagesStr, final int totalPages) {
-    	final ArrayList<Integer> result = new ArrayList<>();
-    	for (final String page : pagesStr) {
+    public static void checkPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) {
     		//Se comprueba si estamos tratando un rango, si es asi se extraeran las paginas
-    		if (page.length() > 2) {
+    		if (pageStr.length() > 2) {
     			// Se comprueba si el primero es un numero negativo.
     			// Si el primero es negativo, el segundo debe serlo tambien ya que las ultimas paginas se
     			// indican de menor a mayor, por lo que lo restamos al numero total de paginas.
     			// Por ejemplo, -2 es la penultima pagina y -1 la ultima.
     			int firstNumber;
     			int limitNumber;
-    			if ("-".equals(page.substring(0, 1))) { //$NON-NLS-1$
-    				firstNumber = Integer.parseInt(page.substring(0, 2)) + totalPages + 1;
-    				limitNumber = Integer.parseInt(page.substring(3)) + totalPages + 1;
+    			String limitNumberStr;
+    			if (RANGE_INDICATOR.equals(pageStr.substring(0, 1))) {
+    				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1))) + totalPages + 1;
+    				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1)) + RANGE_INDICATOR, "");  //$NON-NLS-1$
+    				limitNumber = Integer.parseInt(limitNumberStr) + totalPages + 1;
     			}
     			// Si el numero no es negativo, se obtiene el rango directamente
     			else {
-    				firstNumber = Integer.parseInt(page.substring(0, 1));
-    				limitNumber = Integer.parseInt(page.substring(2));
+    				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)));
+    				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)) + RANGE_INDICATOR, ""); //$NON-NLS-1$
+    				limitNumber = Integer.parseInt(limitNumberStr);
     				if (limitNumber < 0) {
     					limitNumber = limitNumber + totalPages + 1;
     				}
     			}
     			// Se agregan las paginas comprendidas entre el primer y ultimo numero
 				for ( ; firstNumber <= limitNumber ; firstNumber++) {
-					result.add(firstNumber);
+					if (firstNumber <= totalPages && !pagesList.contains(firstNumber)) {
+						pagesList.add(firstNumber);
+	    			}
 				}
     		}
-    		//Si no es un rango, se obtiene el numero directamente
+    		// Si no es un rango, se obtiene el numero directamente
     		else {
-    			int number = Integer.parseInt(page);
+    			int number = Integer.parseInt(pageStr);
     			if (number < 0) {
     				number = number + totalPages + 1;
     			}
-    			result.add(number);
+    			// Si el numero que se indica supera las paginas que tiene el documento, no se agregara.
+    			if (number <= totalPages && !pagesList.contains(number)) {
+    				pagesList.add(number);
+    			}
+    		}
+    }
+
+    /**
+     * Comprueba que la posici&oacute;n indicada donde estampar la firma visible corresponda a alguna de las p&aacute;ginas a estampar
+     * del documento. En caso contrario, se lanzara una InvalidSignaturePositionException.
+     * @param pdfReader Lector de PDF donde se encuentran las p&aacute;ginas del documento a firmar.
+     * @param pagesList Lista con las p&aacute;ginas donde estampar la firma visible.
+     * @param extraParams Par&aacute;metros extra con informaci&aacute;n sobre la posici&oacute;n.
+     */
+    public static void checkCorrectPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Properties extraParams) {
+    	for (final int page : pagesList) {
+    		if (pdfReader.getPageSize(page).getBottom() - 15 <
+					Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
+				&& pdfReader.getPageSize(page).getLeft() - 15 <
+					Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX))
+    			&& pdfReader.getPageSize(page).getTop() - 15 >
+    				Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY))
+    			&& pdfReader.getPageSize(page).getRight() - 15 >
+					Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)))
+    		{
+    				return;
     		}
     	}
-    	return result;
+
+    	throw new InvalidSignaturePositionException(
+    			"La posicion proporcionada no se encuentra en el rango de ninguna de las paginas a estampar del documento" //$NON-NLS-1$
+    	);
     }
 }

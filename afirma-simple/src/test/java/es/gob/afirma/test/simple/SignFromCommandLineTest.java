@@ -73,7 +73,7 @@ public final class SignFromCommandLineTest {
 							"signaturePositionOnPageLowerLeftY=100\\n" + //$NON-NLS-1$
 							"signaturePositionOnPageUpperRightX=200\\n" + //$NON-NLS-1$
 							"signaturePositionOnPageUpperRightY=200\\n" + //$NON-NLS-1$
-							"signaturePages=all" //$NON-NLS-1$
+							"signaturePages=2-4,6" //$NON-NLS-1$
 				}
 
 			);

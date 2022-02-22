@@ -29,6 +29,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -535,21 +536,28 @@ final class SignPdfUiPanel extends JPanel implements
 	}
 
 	BufferedImage getFragmentImage(final Properties p) {
-		final int pageNumber;
-		final BufferedImage page;
+		int pageNumber = 0;
+		BufferedImage page = null;
 		final String [] pagesStr = p.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(","); //$NON-NLS-1$
-		if ("append".equals(pagesStr[pagesStr.length-1])) { //$NON-NLS-1$
-			pageNumber = 0;
-			page = this.appendPage;
-		}
-		else if ("all".equals(pagesStr[0])) { //$NON-NLS-1$
-			pageNumber = 0;
-			page = this.pdfPages.get(0);
-		}
-		else {
-			final List<Integer> pagesList = PdfUtil.checkPagesRange(pagesStr, this.pdfPages.size());
-			pageNumber = pagesList.get(0) - 1;
-			page = this.pdfPages.get(pageNumber);
+
+		if (pagesStr.length > 0) {
+			for (final String pageStr : pagesStr) {
+				if ("append".equals(pageStr)) { //$NON-NLS-1$
+					pageNumber = 0;
+					page = this.appendPage;
+				}
+				else if ("all".equals(pageStr)) { //$NON-NLS-1$
+					pageNumber = 0;
+					page = this.pdfPages.get(0);
+				}
+				else {
+					final List<Integer> pagesList = new ArrayList<Integer>();
+					PdfUtil.checkPagesRange(pageStr, this.pdfPages.size(), pagesList);
+					pageNumber = pagesList.get(0) - 1;
+					page = this.pdfPages.get(pageNumber);
+					break;
+				}
+			}
 		}
 
 		final int newWidth = (int) this.pdfPageSizes.get(pageNumber).getWidth();

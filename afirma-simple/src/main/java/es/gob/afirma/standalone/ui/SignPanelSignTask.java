@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -30,6 +31,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+
+import com.aowagie.text.exceptions.InvalidPageNumberException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -48,6 +51,8 @@ import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.InvalidSignaturePositionException;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -80,6 +85,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	private final SignatureExecutor signExecutor;
 	private final SignatureResultViewer resultViewer;
 
+	private final static List<String> invalidPageNumberFilesList = new ArrayList<String>();
+
 
 	SignPanelSignTask(final Component parent,
 					  final List<SignOperationConfig> signConfigs,
@@ -88,7 +95,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			          final CommonWaitDialog signWaitDialog,
 			          final SignatureExecutor signExecutor,
 			          final SignatureResultViewer resultViewer) {
-        super();
         this.parent = parent;
         this.signConfigs = signConfigs;
         this.ksm = ksm;
@@ -235,10 +241,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
                 signResult = signData(
             		dataToSign,
             		currentSigner,
-            		signConfig.getCryptoOperation(),
+            		signConfig,
             		signatureAlgorithm,
             		pke,
-            		signConfig.getExtraParams(),
             		onlyOneFile,
             		this.parent
         		);
@@ -363,6 +368,23 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         }
         else {
         	this.signExecutor.finishTask();
+
+        	if (!invalidPageNumberFilesList.isEmpty()) {
+        		String invalidPageNumberFiles = ""; //$NON-NLS-1$
+        		for (final String fileName : invalidPageNumberFilesList) {
+        			invalidPageNumberFiles += fileName + "\n"; //$NON-NLS-1$
+        		}
+
+    			AOUIFactory.showMessageDialog(
+    					this,
+    					SimpleAfirmaMessages.getString("SignResultPanel.34") + "\n" + invalidPageNumberFiles, //$NON-NLS-1$ //$NON-NLS-2$
+    	                SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+    	                JOptionPane.WARNING_MESSAGE
+    	        );
+
+    			invalidPageNumberFilesList.clear();
+        	}
+
         	this.resultViewer.showResultsInfo(
     			this.signConfigs,
     			outDir,
@@ -376,10 +398,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
      * Ejecuta una operaci&oacute;n de firma.
      * @param data Datos a firmar.
      * @param signer Manejador de firma con el que realizar la operaci&oacute;n.
-     * @param cop Typo de operaci&oacute;n.
+     * @param signConfig Configuraci&oacute;n de la firma.
      * @param algorithm Algoritmo de firma.
      * @param pke Referencia al certificado y clave de firma.
-     * @param extraParams Configuraci&oacute;n de firma.
      * @param onlyOneFile {@code true} si s&oacute;lo se carga un fichero en el panel,
      * {@code false} si se carga m&aacute;s de uno.
      * @param parent Componente padre.
@@ -390,14 +411,15 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
      */
     private static byte[] signData(final byte[] data,
     						       final AOSigner signer,
-    						       final CryptoOperation cop,
+    						       final SignOperationConfig signConfig,
     						       final String algorithm,
     						       final PrivateKeyEntry pke,
-    						       final Properties extraParams,
     						       final boolean onlyOneFile,
     						       final Component parent) throws AOException,
                                                                   IOException,
                                                                   SingleSignatureException {
+    	final CryptoOperation cop = signConfig.getCryptoOperation();
+    	final Properties extraParams = signConfig.getExtraParams();
     	byte[] signResult;
     	try {
     		switch (cop) {
@@ -458,7 +480,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	final Properties newExtraParams = (Properties) extraParams.clone();
         	ExtraParamsHelper.addParamToCertifiedPdf(newExtraParams);
-        	signResult = signData(data, signer, cop, algorithm, pke, newExtraParams, onlyOneFile, parent);
+        	signConfig.setExtraParams(newExtraParams);
+        	signResult = signData(data, signer, signConfig, algorithm, pke, onlyOneFile, parent);
         }
         catch(final PdfHasUnregisteredSignaturesException e) {
         	LOGGER.warning("PDF con firmas no registradas: " + e); //$NON-NLS-1$
@@ -473,7 +496,34 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	final Properties newExtraParams = (Properties) extraParams.clone();
         	ExtraParamsHelper.addParamToUnregisteredPdf(newExtraParams);
-        	signResult = signData(data, signer, cop, algorithm, pke, newExtraParams, onlyOneFile, parent);
+        	signConfig.setExtraParams(newExtraParams);
+        	signResult = signData(data, signer, signConfig, algorithm, pke, onlyOneFile, parent);
+        }
+    	catch(final InvalidPageNumberException e) {
+        	LOGGER.warning("El documento no dispone de las paginas donde estampar la firma visible: " + e); //$NON-NLS-1$
+        	final Properties newExtraParams = (Properties) extraParams.clone();
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_PAGE);
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_PAGES);
+        	signConfig.setExtraParams(newExtraParams);
+        	if (!invalidPageNumberFilesList.contains(signConfig.getDataFile().getName())) {
+            	invalidPageNumberFilesList.add(signConfig.getDataFile().getName());
+        	}
+        	signResult = signData(data, signer, signConfig, algorithm, pke, onlyOneFile, parent);
+        }
+    	catch(final InvalidSignaturePositionException e) {
+        	LOGGER.warning("No es posible estampar la firma visible ya que la posicion indicada se encuentra fuera de rango " + e); //$NON-NLS-1$
+        	final Properties newExtraParams = (Properties) extraParams.clone();
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_PAGE);
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_PAGES);
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX);
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY);
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX);
+        	newExtraParams.remove(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY);
+        	signConfig.setExtraParams(newExtraParams);
+        	if (!invalidPageNumberFilesList.contains(signConfig.getDataFile().getName())) {
+            	invalidPageNumberFilesList.add(signConfig.getDataFile().getName());
+        	}
+        	signResult = signData(data, signer, signConfig, algorithm, pke, onlyOneFile, parent);
         }
 
     	return signResult;
@@ -680,10 +730,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			}
 		}
 
-		if (!defaultOutFile.getParentFile().isDirectory()) {
-			if (!defaultOutFile.getParentFile().mkdirs()) {
-				throw new IOException("No se pudo crear el directorio de salida de la firma"); //$NON-NLS-1$
-			}
+		if (!defaultOutFile.getParentFile().isDirectory() && !defaultOutFile.getParentFile().mkdirs()) {
+			throw new IOException("No se pudo crear el directorio de salida de la firma"); //$NON-NLS-1$
 		}
 
 		try (FileOutputStream fos = new FileOutputStream(outFile)) {
