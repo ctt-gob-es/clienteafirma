@@ -257,7 +257,7 @@ import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
  * </dl> */
 public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
-    static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
@@ -772,9 +772,22 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             // Si es enveloped
             else if (isSignatureElementEnveloped(signatureElement, dataReferenceList)) {
 
-            	removeEnvelopedSignatures(docElement);
+            	// Obtenemos el nodo referenciado (si no se indica, sera todo el documento)
+            	final Element referencedElement = getElementReferenced(docElement, dataReferenceList.get(0));
 
-                elementRes = docElement;
+            	// Eliminamos las firmas dentro del nodo referenciado
+            	removeEnvelopedSignatures(referencedElement);
+
+            	// Comprobamos si el nodo referenciado no es exactamente el nodo raiz (se trata de
+            	// una firma enveloped sobre un nodo concreto) y, ademas, es un nodo que contiene
+            	// un texto, recuperamos su contenido en lugar del propio nodo
+            	if (referencedElement != docElement && referencedElement.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+            		return isBase64TransformationDeclared(docElement, dataReferenceList.get(0)) ?
+            				Base64.decode(referencedElement.getTextContent()) :
+            					referencedElement.getTextContent().getBytes();
+            	}
+
+	            elementRes = referencedElement;
             }
 
             // Si es internally detached
@@ -829,6 +842,33 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         return Utils.writeXML(elementRes, null, null, null);
     }
 
+    /**
+     * Devuelve el elemento referenciado dentro de un documento. Si la referencia
+     * est&aacute; vac&iacute;a, se considerar&aacute; que se referencia todo el documento
+     * y se devolver&aacute; el par&aacute;metro {@code document}.
+     * @param document Documento dentro del que buscar la referencia.
+     * @param dataReference Nodo de referencia a un elemento del documento.
+     * @return Elemento referenciado o null si no es una referencia v&aacute;lida
+     * o es una referencia externa.
+     */
+    private static Element getElementReferenced(final Element document, final Element dataReference) {
+
+    	// Si la referencia es vacia o no esta declarada, el elemento referenciado es el documento
+    	final String reference = dataReference.getAttribute("URI"); //$NON-NLS-1$
+    	if (reference.isEmpty()) {
+    		return document;
+    	}
+
+    	// Si no es una referencia interna, se devuelve nulo
+    	if (!reference.startsWith("#")) { //$NON-NLS-1$
+    		return null;
+    	}
+
+    	// Tomamos de la referencia el ID del nodo y lo buscamos
+    	final String nodeId = reference.substring(1);
+    	return XAdESUtil.findElementById(nodeId, document, false);
+    }
+
     private static void removeEnvelopedSignatures(final Element rootSig) {
         // obtiene las firmas y las elimina
     	final NodeList mainChildNodes = rootSig.getChildNodes();
@@ -870,6 +910,26 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 				}
 			}
 		}
+		return false;
+    }
+
+	/** Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n de tipo Base64.
+     * @param rootSig Nodo raiz de la firma.
+     * @param reference Referencia a los datos.
+     * @return {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
+     *         en caso contrario. */
+    private static boolean isBase64TransformationDeclared(final Element rootSig, final Element reference) {
+    	if (reference == null) {
+    		return false;
+    	}
+
+    	final NodeList transforms = reference.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
+    	for (int i = 0; i < transforms.getLength(); i++) {
+    		if (((Element) transforms.item(i)).hasAttribute("Algorithm") && //$NON-NLS-1$
+    				XMLConstants.BASE64_ENCODING.equals(((Element) transforms.item(i)).getAttribute("Algorithm"))) { //$NON-NLS-1$
+    			return true;
+    		}
+    	}
 		return false;
     }
 
