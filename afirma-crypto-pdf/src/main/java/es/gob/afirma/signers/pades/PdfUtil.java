@@ -561,23 +561,25 @@ public final class PdfUtil {
      * @param extraParams Par&aacute;metros extra con informaci&aacute;n sobre la posici&oacute;n.
      */
     public static void checkCorrectPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Properties extraParams) {
-    	for (final int page : pagesList) {
-    		if (pdfReader.getPageSize(page).getBottom() - 15 <
-					Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
-				&& pdfReader.getPageSize(page).getLeft() - 15 <
-					Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX))
-    			&& pdfReader.getPageSize(page).getTop() - 15 >
-    				Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY))
-    			&& pdfReader.getPageSize(page).getRight() - 15 >
-					Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)))
-    		{
-    				return;
-    		}
-    	}
+    	if (!pagesList.isEmpty()) {
+	    	for (final int page : pagesList) {
+	    		if (pdfReader.getPageSize(page).getBottom() - 15 <
+						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
+					&& pdfReader.getPageSize(page).getLeft() - 15 <
+						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX))
+	    			&& pdfReader.getPageSize(page).getTop() - 15 >
+	    				Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY))
+	    			&& pdfReader.getPageSize(page).getRight() - 15 >
+						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)))
+	    		{
+	    				return;
+	    		}
+	    	}
 
-    	throw new InvalidSignaturePositionException(
-    			"La posicion proporcionada no se encuentra en el rango de ninguna de las paginas a estampar del documento" //$NON-NLS-1$
-    	);
+	    	throw new InvalidSignaturePositionException(
+	    			"La posicion proporcionada no se encuentra en el rango de ninguna de las paginas a estampar del documento" //$NON-NLS-1$
+	    	);
+    	}
     }
 
     /**

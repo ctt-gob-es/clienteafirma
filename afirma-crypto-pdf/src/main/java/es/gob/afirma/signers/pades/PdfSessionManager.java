@@ -171,10 +171,6 @@ public final class PdfSessionManager {
 					}
 				}
 			}
-
-			// Comprobamos que la posicion indicada para la firma visible
-			// se pueda estampar al menos en una de las paginas del documento
-			PdfUtil.checkCorrectPositionSignature(pdfReader, pages, extraParams);
 		}
 
 		// Nombre del subfiltro de firma en el diccionario PDF
@@ -419,6 +415,10 @@ public final class PdfSessionManager {
 			pages.remove(Integer.valueOf(NEW_PAGE));
 			pages.add(totalPages + 1);
 		}
+
+		// Comprobamos que la posicion indicada para la firma visible
+		// se pueda estampar al menos en una de las paginas del documento
+		PdfUtil.checkCorrectPositionSignature(pdfReader, pages, extraParams);
 
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
 
