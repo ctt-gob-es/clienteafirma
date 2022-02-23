@@ -51,10 +51,13 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
+import com.aowagie.text.exceptions.InvalidPageNumberException;
+
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 
 final class SignPdfUiPanel extends JPanel implements
@@ -494,6 +497,16 @@ final class SignPdfUiPanel extends JPanel implements
 					p.put(PdfExtraParams.SIGNATURE_PAGES, "all"); //$NON-NLS-1$
 				}
 				else if (this.selectPagesRadioBtn.isSelected()) {
+					final boolean correctFormat = PdfUtil.checkPagesRangeInputFormat(this.selectionPagesRange.getText());
+					if (!correctFormat) {
+			    		AOUIFactory.showMessageDialog(
+			    				this,
+			    				SignPdfUiMessages.getString("SignPdfUiPanel.26"), //$NON-NLS-1$,
+			    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			    				JOptionPane.ERROR_MESSAGE
+			    			);
+			    		return;
+					}
 					p.put(PdfExtraParams.SIGNATURE_PAGES, this.selectionPagesRange.getText());
 				}
 				else {
@@ -506,7 +519,10 @@ final class SignPdfUiPanel extends JPanel implements
 					p.put(PdfExtraParams.SIGNATURE_PAGES, pages);
 				}
 				p.putAll(getExtraParamsForLocation());
-				getListener().nextPanel(p, getFragmentImage(p));
+				final BufferedImage previewImage = getFragmentImage(p);
+				if (previewImage != null) {
+					getListener().nextPanel(p, previewImage);
+				}
 			}
 		);
 		this.okButton.addKeyListener(this);
@@ -536,37 +552,59 @@ final class SignPdfUiPanel extends JPanel implements
 	}
 
 	BufferedImage getFragmentImage(final Properties p) {
-		int pageNumber = 0;
+		int pageNumber = 1;
 		BufferedImage page = null;
 		final String [] pagesStr = p.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(","); //$NON-NLS-1$
 
 		if (pagesStr.length > 0) {
 			for (final String pageStr : pagesStr) {
 				if ("append".equals(pageStr)) { //$NON-NLS-1$
-					pageNumber = 0;
 					page = this.appendPage;
 				}
 				else if ("all".equals(pageStr)) { //$NON-NLS-1$
-					pageNumber = 0;
 					page = this.pdfPages.get(0);
 				}
 				else {
 					final List<Integer> pagesList = new ArrayList<Integer>();
-					PdfUtil.checkPagesRange(pageStr, this.pdfPages.size(), pagesList);
-					pageNumber = pagesList.get(0) - 1;
-					page = this.pdfPages.get(pageNumber);
+					try {
+						PdfUtil.checkPagesRange(pageStr, this.pdfPages.size(), pagesList);
+					} catch (final InvalidPageNumberException e) {
+			    		AOUIFactory.showMessageDialog(
+			    				this,
+			    				SignPdfUiMessages.getString("SignPdfUiPanel.26"), //$NON-NLS-1$,
+			    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			    				JOptionPane.ERROR_MESSAGE
+			    		);
+			    		return null;
+					}
+					pageNumber = pagesList.get(0);
+					page = this.pdfPages.get(pageNumber -1);
+					if (page == null) {
+						try {
+							preLoadNecessaryPage(pageNumber);
+							page = this.pdfPages.get(pageNumber -1);
+						} catch (final IOException e) {
+				    		AOUIFactory.showMessageDialog(
+				    				this,
+				    				SignPdfUiMessages.getString("SignPdfUiPanel.26"), //$NON-NLS-1$,
+				    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+				    				JOptionPane.ERROR_MESSAGE
+				    		);
+				    		return null;
+						}
+					}
 					break;
 				}
 			}
 		}
 
-		final int newWidth = (int) this.pdfPageSizes.get(pageNumber).getWidth();
-		final int newHeight = (int) this.pdfPageSizes.get(pageNumber).getHeight();
+		final int newWidth = (int) this.pdfPageSizes.get(pageNumber -1).getWidth();
+		final int newHeight = (int) this.pdfPageSizes.get(pageNumber -1).getHeight();
 
 		final BufferedImage im = new BufferedImage (
 			newWidth,
 			newHeight,
-			this.pdfPages.get(pageNumber).getType()
+			this.pdfPages.get(pageNumber -1).getType()
 		);
 
 		final Graphics2D graphics2D = im.createGraphics();
@@ -854,10 +892,14 @@ final class SignPdfUiPanel extends JPanel implements
 			return;
 		}
 
+		preLoadNecessaryPage(necessaryPage);
+	}
+
+	private void preLoadNecessaryPage(final int necessaryPage) throws IOException {
 		// Si no tenemos la pagina que necesitamos, la cargamos
 		if (this.pdfPages.get(necessaryPage) == null) {
 			try {
-				this.pdfDocument.loadNewPages(this.pdfPages, getCurrentPage() - 1);
+				this.pdfDocument.loadNewPages(this.pdfPages, necessaryPage - 1);
 			}
 			catch (final OutOfMemoryError | Exception e) {
 				throw new IOException("No se ha podido cargar la previsualizacion de la pagina", e); //$NON-NLS-1$
