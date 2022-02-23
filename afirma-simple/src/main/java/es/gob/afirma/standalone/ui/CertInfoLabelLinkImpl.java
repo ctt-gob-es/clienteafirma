@@ -21,6 +21,7 @@ public final class CertInfoLabelLinkImpl implements LabelLinkListener{
 
     /**
      * Crea un nuevo gestor para certificados.
+     * @param cert Certificado que se debe abrir al pulsar sobre la URL.
      */
     public CertInfoLabelLinkImpl (final X509Certificate cert) {
     	this.cert = cert;

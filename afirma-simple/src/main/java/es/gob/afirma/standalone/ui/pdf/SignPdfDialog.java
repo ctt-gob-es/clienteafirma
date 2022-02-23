@@ -115,9 +115,11 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 * Obtiene los par&aacute;metros adicionales de una firma visible PDF mediante
 	 * un di&aacute;logo gr&aacute;fico.
 	 *
-	 * @param isSign           <code>true</code> si el PDF de entrada ya contiene
+	 * @param isSign           {@code true} si el PDF de entrada ya contiene
 	 *                         firmas electr&oacute;nicas previas,
-	 *                         <code>false</code> en caso contrario.
+	 *                         {@code false} en caso contrario.
+	 * @param isMassiveSign    {@code true} si los datos se van a utilizar para una
+	 * 						   operaci&oacute;n masiva, {@code false} en caso contrario.
 	 * @param pdf              PDF al que aplicar la firma visible.
 	 * @param parentFrame      Marco padre para la modalidad.
 	 * @param signatureVisible Indica si se va a insertar una firma.
@@ -222,14 +224,12 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 	private static Dimension getPreferredDimensionToSignatureDialog() {
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
-		final Dimension dim = new Dimension(PREFERRED_WIDTH, (int) Math.min(PREFERRED_HEIGHT, screenHeight * 0.9));
-		return dim;
+		return new Dimension(PREFERRED_WIDTH, (int) Math.min(PREFERRED_HEIGHT, screenHeight * 0.9));
 	}
 
 	private static Dimension getPreferredDimensionToStampDialog() {
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
-		final Dimension dim = new Dimension(PREFERRED_WIDTH, (int) Math.min(PREFERRED_HEIGHT + 60, screenHeight * 0.9));
-		return dim;
+		return new Dimension(PREFERRED_WIDTH, (int) Math.min(PREFERRED_HEIGHT + 60, screenHeight * 0.9));
 	}
 
 	@Override

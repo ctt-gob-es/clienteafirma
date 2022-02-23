@@ -12,6 +12,7 @@ package es.gob.afirma.standalone.ui.restoreconfig;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
  * Clase que contiene la l&oacute;gica para iniciar el proceso de restauraci&oacute;n decidiendo
@@ -55,7 +56,14 @@ public class RestoreConfigManager {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
 			return;
 		}
+
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreAutoFirma.13")); //$NON-NLS-1$
+		LOGGER.info("Inicio de la restauracion de la instalacion" ); //$NON-NLS-1$
+
 		this.configurator.restore(configPanel);
+
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreAutoFirma.14")); //$NON-NLS-1$
+		LOGGER.info("Fin de la restauracion de la instalacion" ); //$NON-NLS-1$
 	}
 
 }
