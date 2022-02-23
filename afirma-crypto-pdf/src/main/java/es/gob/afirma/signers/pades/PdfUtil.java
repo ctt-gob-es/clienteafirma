@@ -590,20 +590,33 @@ public final class PdfUtil {
 	    	final String[] rangesArray = rangeInput.split(","); //$NON-NLS-1$
 	    	final String rangeChars = "0123456789-,"; //$NON-NLS-1$
 	    	for (final String range : rangesArray) {
+
+	    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
+	    		if (RANGE_INDICATOR.equals(String.valueOf(range.charAt(range.length() -1)))) {
+	    			return false;
+	    		}
+	    		// Comprobamos que el rango no termine con un guion
+	    		else if (range.length() >= 2
+	    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(0)))
+	    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(1))) )
+	    		{
+	    			return false;
+	    		}
+	    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
+	    		else if (range.length() == 1 && RANGE_INDICATOR.equals(range)) {
+	    			return false;
+	    		}
+
 		    	for (int i = 0; i < range.length(); i++) {
 		    		// Comprobamos que sea un caracter correcto
 		    		if (!rangeChars.contains(String.valueOf(range.charAt(i)))) {
 		    			return false;
 		            }
-		    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
-		    		else if (range.length() == 1 && RANGE_INDICATOR.equals(range)) {
-		    			return false;
-		    		}
 		    		// Comprobamos que no se hayan intro tres guiones seguidos
 		    		else if (i+2 < range.length()
 		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i)))
-		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i+1)))
-		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i+2)))) {
+		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i +1)))
+		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i +2)))) {
 		    			return false;
 		    		}
 		    	}
