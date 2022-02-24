@@ -222,6 +222,9 @@ final class RestoreConfigFirefoxMacOS {
 		// Si nos han pedido desinstalar el certificado actual, introducimos un script para eliminarlo
 		if (uninstall) {
 			final String command = getRemoveCertCommand(certUtilFile, profileDir);
+
+			System.out.println(command);
+
 			RestoreConfigMacOSX.writeScriptFile(command, true);
 		}
 
@@ -257,12 +260,17 @@ final class RestoreConfigFirefoxMacOS {
 		final String profilePath = escapePath(profileDir.getAbsolutePath());
 		final String alias = RestoreConfigUtil.CERT_ALIAS;
 
+		// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
+		// de un almacen de certificados compartido SQL
+		final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
+		final String profileRef = (sqlDb ? "sql:" : "") + profilePath; //$NON-NLS-1$ //$NON-NLS-2$
+
 		return String.format(
 				"max=$(%1$s -L -d %2$s | grep AutoFirma | wc -l);" //$NON-NLS-1$
 				+ "for ((i=0; i<$max; i++));" //$NON-NLS-1$
-				+ "do %1$s -D -d sql:%2$s -n \"%3$s\";" //$NON-NLS-1$
+				+ "do %1$s -D -d %2$s -n \"%3$s\";" //$NON-NLS-1$
 				+ "done", //$NON-NLS-1$
-				certUtilPath, profilePath, alias);
+				certUtilPath, profileRef, alias);
 	}
 
 

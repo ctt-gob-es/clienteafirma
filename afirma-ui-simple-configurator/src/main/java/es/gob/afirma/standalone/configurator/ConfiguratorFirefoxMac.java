@@ -30,7 +30,7 @@ import es.gob.afirma.core.misc.BoundedBufferedReader;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
- * @author carlos.gamuci Carlos Gamuci Mill&aacute;n. */
+ * @author Carlos Gamuci Mill&aacute;n. */
 final class ConfiguratorFirefoxMac {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -61,17 +61,42 @@ final class ConfiguratorFirefoxMac {
 	 * @param appDir Directorio de instalaci&oacute;n.
 	 * @param userDirs Directorios de los usuarios del sistema.
 	 * @param scriptFile Fichero al que agregar al final el script de desinstalaci&oacute;n.
+	 * @param console Consola sobre la que mostrar los mensajes al usuario.
 	 * @throws MozillaProfileNotFoundException No se ha encontrado el directorio de perfiles de Mozilla.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
 	 */
-	static void createScriptToInstallOnMozillaKeyStore(final File appDir, final String[] userDirs, final File scriptFile)
+	static void installOnMozillaKeyStore(final File appDir, final String[] userDirs, final File scriptFile, final Console console)
 			throws MozillaProfileNotFoundException, IOException {
 
-		// Obtenemos los directorios de usuario de Mozilla
+		// Preparamos CertUtil para realizar la operacion
+		File certutilFile;
+		try {
+			certutilFile = prepareCertUtil(appDir, scriptFile);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo preparar CertUtil para la instalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion: " + e); //$NON-NLS-1$
+			return;
+		}
+
+		// Obtenemos los directorios de los perfiles de Mozilla
 		final File[] profileDirs = getMozillaUsersProfiles(userDirs);
 
-		// Generamos el script para instalar el certificado en el almacen de Mozilla
-		generateInstallScriptWithCheck(appDir, profileDirs, scriptFile);
+		// Por cada uno de los perfiles, generamos los comandos de instalación del certificado
+		// y los ejecutamos
+		for (final File profileDir : profileDirs) {
+
+			console.print(Messages.getString("ConfiguratorMacOSX.35", profileDir.getName())); //$NON-NLS-1$
+
+			generateInstallScriptWithCheck(appDir, profileDir, certutilFile, scriptFile);
+
+			try {
+				ConfiguratorMacOSX.executeScriptFile(scriptFile, true, false);
+			}
+			catch (final Exception e) {
+				console.print(Messages.getString("ConfiguratorMacOSX.36", profileDir.getName())); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se pudo instalar el certificado en el siguiente perfil de Mozilla: " + profileDir.getName(), e); //$NON-NLS-1$
+			}
+		}
 	}
 
 	/**
@@ -82,14 +107,36 @@ final class ConfiguratorFirefoxMac {
 	 * @throws MozillaProfileNotFoundException No se ha encontrado el directorio de perfiles de Mozilla.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del script.
 	 */
-	static void createScriptToUnistallFromMozillaKeyStore(final File appDir, final String[] userDirs, final File scriptFile)
+	static void uninstallFromMozillaKeyStore(final File appDir, final String[] userDirs, final File scriptFile)
 			throws MozillaProfileNotFoundException, IOException {
 
-		// Obtenemos los directorios de usuario de Mozilla
+		// Preparamos CertUtil para realizar la operacion
+		File certutilFile;
+		try {
+			certutilFile = prepareCertUtil(appDir, scriptFile);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo preparar CertUtil para la desinstalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion: " + e); //$NON-NLS-1$
+			return;
+		}
+
+		// Obtenemos los directorios de los perfiles de Mozilla
 		final File[] profileDirs = getMozillaUsersProfiles(userDirs);
 
-		// Generamos el script para eliminar el certificado del almacen de Mozilla
-		generateUninstallScript(appDir, profileDirs, scriptFile);
+		// Por cada uno de los perfiles, generamos los comandos de instalación del certificado
+		// y los ejecutamos
+		for (final File profileDir : profileDirs) {
+
+			// Generamos el script para eliminar el certificado del almacen de Mozilla
+			generateUninstallScript(appDir, profileDir, certutilFile, scriptFile);
+
+			try {
+				ConfiguratorMacOSX.executeScriptFile(scriptFile, true, false);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se pudo desinstalar el certificado en el siguiente perfil de Mozilla: " + profileDir.getName(), e); //$NON-NLS-1$
+			}
+		}
 	}
 
 	/**
@@ -97,16 +144,18 @@ final class ConfiguratorFirefoxMac {
 	 * permite al usuario reintentarlo.
 	 * @param appDir Directorio de instalaci&oacute;n.
 	 * @param profileDirs Directorios de perfil de Mozilla.
+	 * @param certUtilFile Fichero del ejecutable certUtil.
 	 * @param scriptFile Fichero al que agregar el script.
 	 */
 	private static void generateInstallScriptWithCheck (final File appDir,
-			                                           final File[] profileDirs,
+			                                           final File profileDir,
+			                                           final File certUtilFile,
 			                                           final File scriptFile) {
 		boolean installed = false;
 		boolean cancelled = false;
 		do {
 			try {
-				generateInstallScript(appDir, profileDirs, scriptFile);
+				generateInstallScript(appDir, profileDir, certUtilFile, scriptFile);
 				installed = true;
 			}
 			catch (final Exception e) {
@@ -133,89 +182,99 @@ final class ConfiguratorFirefoxMac {
 	/** Ejecuta la utilidad Mozilla CertUtil para la instalaci&oacute;n del certificado
 	 * ra&iacute;z de confianza en Firefox.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @param profileDirs Listado de directorios de perfiles de usuario de Mozilla Firefox.
+	 * @param profileDir Listado de directorio de perfil de usuario de Mozilla Firefox.
+	 * @param certUtilFile Fichero del ejecutable certUtil.
 	 * @param scriptFile Fichero al que agregar al final el script de desinstalaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en la escritura de los ficheros.
 	 */
 	private static void generateInstallScript(final File appDir,
-			                                    final File[] profileDirs,
+			                                    final File profileDir,
+		                                        final File certUtilFile,
 			                                    final File scriptFile) throws IOException {
 
-		File certutilFile;
-		try {
-			certutilFile = prepareCertUtil(appDir, scriptFile);
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Se omite la configuracion del certificado SSL en Mozilla Firefox: " + e); //$NON-NLS-1$
+		if (!profileDir.isDirectory()) {
 			return;
 		}
 
-		for (final File profileDir : profileDirs) {
-			if (!profileDir.isDirectory()) {
-				continue;
-			}
+		// Configuramos el script para exportar el PATH para que
+		// certUtil encuentre sus dependencias
+		final StringBuilder exportPathScript = new StringBuilder();
+		exportPathScript.append(COMMAND_EXPORT_PATH);
+		exportPathScript.append(certUtilFile.getParentFile().getAbsolutePath());
+		ConfiguratorMacUtils.writeScriptFile(exportPathScript, scriptFile, false);
 
-			// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
-			// de un almacen de certificados compartido SQL
-			final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
+		// Configuramos el script para exportar el LD_LIBRARY_PATH
+		// para que certUtil encuentre sus dependencias
+		final StringBuilder exportLibraryLdScript = new StringBuilder();
+		exportLibraryLdScript.append(COMMAND_EXPORT_LIBRARY_LD);
+		exportLibraryLdScript.append(certUtilFile.getParentFile().getAbsolutePath());
+		ConfiguratorMacUtils.writeScriptFile(exportLibraryLdScript, scriptFile, true);
 
-			final StringBuilder installScript = new StringBuilder()
-					.append(escapePath(certutilFile.getAbsolutePath()))
-					.append(" -A -d ") //$NON-NLS-1$
-					.append(escapePath((sqlDb ? "sql:" : "") + profileDir.getAbsolutePath())) //$NON-NLS-1$ //$NON-NLS-2$
-					.append(" -i ") //$NON-NLS-1$
-					.append(escapePath(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()))
-					.append(" -n ") //$NON-NLS-1$
-					.append("\"").append(ConfiguratorUtil.CERT_ALIAS).append("\"") //$NON-NLS-1$ //$NON-NLS-2$
-					.append(" -t  \"C,,\""); //$NON-NLS-1$
+		// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
+		// de un almacen de certificados compartido SQL
+		final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
 
-			ConfiguratorMacUtils.writeScriptFile(installScript, scriptFile.getAbsolutePath(), true);
-		}
+		final StringBuilder installScript = new StringBuilder()
+				.append(escapePath(certUtilFile.getAbsolutePath()))
+				.append(" -A -d ") //$NON-NLS-1$
+				.append(escapePath((sqlDb ? "sql:" : "") + profileDir.getAbsolutePath())) //$NON-NLS-1$ //$NON-NLS-2$
+				.append(" -i ") //$NON-NLS-1$
+				.append(escapePath(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()))
+				.append(" -n ") //$NON-NLS-1$
+				.append("\"").append(ConfiguratorUtil.CERT_ALIAS).append("\"") //$NON-NLS-1$ //$NON-NLS-2$
+				.append(" -t  \"C,,\""); //$NON-NLS-1$
+
+		ConfiguratorMacUtils.writeScriptFile(installScript, scriptFile, true);
 	}
 
 	/**
 	 * Genera el script de desinstalaci&oacute;n de los certificados de la aplicaci&oacute;n.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @param profileDirs Directorios de perfil de Mozilla.
+	 * @param profileDir Listado de directorio de perfil de usuario de Mozilla Firefox.
+	 * @param certUtilFile Fichero del ejecutable certUtil.
 	 * @param scriptFile Fichero al final del cual donde se almacenar&aacute; el script de desinstalaci&oacute;n.
 	 * @throws IOException Cuando se produce un error al generar el script.
 	 */
 	private static void generateUninstallScript(final File appDir,
-												final File[] profileDirs,
-												final File scriptFile) throws IOException {
+			final File profileDir,
+            final File certUtilFile,
+			final File scriptFile) throws IOException {
 
-		File certutilFile;
-		try {
-			certutilFile = prepareCertUtil(appDir, scriptFile);
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Se omite la configuracion del certificado SSL en Mozilla Firefox: " + e); //$NON-NLS-1$
+		if (!profileDir.isDirectory()) {
 			return;
 		}
 
-		for (final File profileDir : profileDirs) {
-			if (!profileDir.isDirectory()) {
-				continue;
-			}
+		// Configuramos el script para exportar el PATH para que
+		// certUtil encuentre sus dependencias
+		final StringBuilder exportPathScript = new StringBuilder();
+		exportPathScript.append(COMMAND_EXPORT_PATH);
+		exportPathScript.append(certUtilFile.getParentFile().getAbsolutePath());
+		ConfiguratorMacUtils.writeScriptFile(exportPathScript, scriptFile, false);
 
-			// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
-			// de un almacen de certificados compartido SQL
-			final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
-			final String profileRef = (sqlDb ? "sql:" : "") + profileDir.getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
+		// Configuramos el script para exportar el LD_LIBRARY_PATH
+		// para que certUtil encuentre sus dependencias
+		final StringBuilder exportLibraryLdScript = new StringBuilder();
+		exportLibraryLdScript.append(COMMAND_EXPORT_LIBRARY_LD);
+		exportLibraryLdScript.append(certUtilFile.getParentFile().getAbsolutePath());
+		ConfiguratorMacUtils.writeScriptFile(exportLibraryLdScript, scriptFile, true);
 
-			final StringBuilder uninstallScript = new StringBuilder()
-					.append("max=$(") //$NON-NLS-1$
-					.append(escapePath(certutilFile.getAbsolutePath()))
-					.append(" -L -d ") //$NON-NLS-1$
-					.append(escapePath(profileRef))
-					.append(" | grep AutoFirma | wc -l);for ((i=0; i<$max; i++));do ") //$NON-NLS-1$
-					.append(escapePath(certutilFile.getAbsolutePath()))
-					.append(" -D -d ") //$NON-NLS-1$
-					.append(escapePath(profileRef))
-					.append(" -n \"SocketAutoFirma\";done"); //$NON-NLS-1$
+		// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
+		// de un almacen de certificados compartido SQL
+		final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
+		final String profileRef = (sqlDb ? "sql:" : "") + profileDir.getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
 
-			ConfiguratorMacUtils.writeScriptFile(uninstallScript, scriptFile.getAbsolutePath(), true);
-		}
+		final StringBuilder uninstallScript = new StringBuilder()
+				.append("max=$(") //$NON-NLS-1$
+				.append(escapePath(certUtilFile.getAbsolutePath()))
+				.append(" -L -d ") //$NON-NLS-1$
+				.append(escapePath(profileRef))
+				.append(" | grep AutoFirma | wc -l);for ((i=0; i<$max; i++));do ") //$NON-NLS-1$
+				.append(escapePath(certUtilFile.getAbsolutePath()))
+				.append(" -D -d ") //$NON-NLS-1$
+				.append(escapePath(profileRef))
+				.append(" -n \"SocketAutoFirma\";done"); //$NON-NLS-1$
+
+		ConfiguratorMacUtils.writeScriptFile(uninstallScript, scriptFile, true);
 	}
 
 	/** Obtiene una referencia a una instancia de CertUtil v&aacute;lida para su ejecuci&oacute;n.
@@ -241,20 +300,6 @@ final class ConfiguratorFirefoxMac {
 		if (!certutilFile.canExecute()) {
 			throw new IOException("El ejecutable CertUtil no tiene permisos de ejecucion"); //$NON-NLS-1$
 		}
-
-		// Configuramos el script para exportar el PATH para que
-		// certUtil encuentre sus dependencias
-		final StringBuilder exportPathScript = new StringBuilder();
-		exportPathScript.append(COMMAND_EXPORT_PATH);
-		exportPathScript.append(certutilFile.getParentFile().getAbsolutePath());
-		ConfiguratorMacUtils.writeScriptFile(exportPathScript, scriptFile.getAbsolutePath(), true);
-
-		// Configuramos el script para exportar el LD_LIBRARY_PATH
-		// para que certUtil encuentre sus dependencias
-		final StringBuilder exportLibraryLdScript = new StringBuilder();
-		exportLibraryLdScript.append(COMMAND_EXPORT_LIBRARY_LD);
-		exportLibraryLdScript.append(certutilFile.getParentFile().getAbsolutePath());
-		ConfiguratorMacUtils.writeScriptFile(exportLibraryLdScript, scriptFile.getAbsolutePath(), true);
 
 		return certutilFile;
 	}

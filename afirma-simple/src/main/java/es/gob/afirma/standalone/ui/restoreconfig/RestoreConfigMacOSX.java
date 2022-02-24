@@ -40,6 +40,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.so.macos.ShellScript;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
+import es.gob.jmulticard.ui.passwordcallback.Messages;
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -54,7 +55,9 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
-	private static final String CERT_CN_ROOT = "'AutoFirma ROOT'"; //$NON-NLS-1$
+	private static final String CERT_CN_ROOT = "AutoFirma ROOT"; //$NON-NLS-1$
+
+	private static final String FIND_CERT_HASH_PREFIX = "hash:";  //$NON-NLS-1$
 
 	private static final String MAC_SCRIPT_NAME = "/installCerScript"; //$NON-NLS-1$
 	private static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
@@ -68,12 +71,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	private static final String CHANGE_OWN_COMMAND = "chown %USERNAME% \"%DIR%\""; //$NON-NLS-1$
 
-//	private static final String GET_USER_SCRIPT = "/getUsers.sh";//$NON-NLS-1$
-//	private static final String OSX_GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
-//	private final static String USER_DIR_LINE_PREFIX = "dir: "; //$NON-NLS-1$
-//	private static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
-//	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
-//	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 
 	static String mac_script_path;
 
@@ -349,19 +346,17 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 *                    imprimiendo los mensajes con el estado de la operaci&oacute;n. */
 	private static void restoreSslCertificatesInKeyChain(final File appDir, final CertFilesInfo certFiles, final RestoreConfigPanel configPanel) {
 
+		// Obtenemos del usuario y probamos la contrasena del Llavero
+		final byte[] keyChainPhrase = getKeyChainPhrase(configPanel);
+
 		// Desinstalamos del llavero los certificados anteriores
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del Llavero del sistema"); //$NON-NLS-1$
-		try {
-			uninstallSslCertFromKeyChain();
-		}
-		catch (final IOException e) {
-			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en el llavero de macOS: " + e, e); //$NON-NLS-1$
-		}
+		uninstallRootCAMacOSXKeyStore(keyChainPhrase);
 
 		// Se instalan los certificados en el llavero del sistema operativo
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
 		try {
-			installTrustedCertsInAppleKeyChain(certFiles.getSslRootFile(), certFiles.getSslCertFile(), configPanel);
+			installTrustedCertsInAppleKeyChain(certFiles.getSslRootFile(), certFiles.getSslCertFile(), keyChainPhrase, configPanel);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo", e); //$NON-NLS-1$
@@ -374,6 +369,128 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 					SimpleAfirmaMessages.getString("RestoreConfigMacOSX.28"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE,
 					e);
+		}
+	}
+
+	/**
+	 * Obtiene la contrase&ntilde;a del llavero y lo desbloquea para comprobarla.
+	 * @param console Consola en la que mostrar los mensajes al usuario.
+	 * @return Contrase&ntilde;a del llavero.
+	 */
+	private static byte[] getKeyChainPhrase(final RestoreConfigPanel console) {
+
+		byte[] phrase = null;
+		boolean passwordError = false;
+		boolean keyChainUnlocked = false;
+		do {
+
+			// La contrasena solo hace falta si no estamos ya en modo administrador, asi que la primera vez probaremos con una generica
+			if (phrase == null) {
+				phrase = DUMMY;
+			}
+			else {
+				// Solicitamos la contrasena para la instalacion de los certificados
+				final String text = passwordError
+						? SimpleAfirmaMessages.getString("RestoreConfigMacOSX.30") //$NON-NLS-1$
+						: SimpleAfirmaMessages.getString("RestoreConfigMacOSX.29"); //$NON-NLS-1$
+
+				try {
+					// Se pone en una linea para evitar que la contrasena se exponda en claro en memoria
+					phrase = new String(AOUIFactory.getPassword(text, console)).getBytes(StandardCharsets.UTF_8);
+				}
+				catch (final AOCancelledOperationException e) {
+					LOGGER.info("Se cancelo el dialogo de entrada de contrasena: " + e); //$NON-NLS-1$
+					final int option = AOUIFactory.showConfirmDialog(console,
+							SimpleAfirmaMessages.getString("RestoreConfigMacOSX.31"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("RestoreConfigMacOSX.32"), //$NON-NLS-1$
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (option == JOptionPane.YES_OPTION) {
+						console.appendMessage(Messages.getString("ConfiguratorMacOSX.31")); //$NON-NLS-1$
+						throw new AOCancelledOperationException("El usuario cancelo la insercion de la contrasena del llavero"); //$NON-NLS-1$
+					}
+					continue;
+				}
+			}
+
+			// Restablecemos el valor
+			passwordError = false;
+
+			// Insertamos el certificado raiz
+			try {
+				unlockAppleKeyChain(phrase);
+			}
+			catch (final SecurityException e) {
+
+				LOGGER.log(Level.WARNING, "Error de contrasena al desbloquear el Llavero", e); //$NON-NLS-1$
+				// La contrasena invalida, pero si era el intento de prueba, no lo tendremos en cuenta
+				// y volveremos a empezar la operacion, esta vez pidiendo la contrasena
+				if (!Arrays.equals(DUMMY, phrase)) {
+					passwordError = true;
+				}
+				continue;
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "No se pudo abrir el Llavero", e); //$NON-NLS-1$
+				return DUMMY;
+			}
+
+			keyChainUnlocked = true;
+
+		} while(!keyChainUnlocked);
+
+		return phrase;
+	}
+
+	/**
+	 * Ejecuta el comando para desbloquear el almacen de claves, con el cual ya confirmamos
+	 * si la contrase&ntilde;a proporcionada es la correcta.
+	 * @param phrase Contrase&ntilde;a del almac&eacute;n.
+	 * @throws SecurityException Cuando la contrase&ntilde;a es incorrecta.
+	 * @throws IOException, InterruptedException Cuando falla el desbloqueo del almac&eacute;n.
+	 */
+	private static void unlockAppleKeyChain(final byte[] phrase)
+			throws SecurityException, IOException, InterruptedException {
+		final List<String> params = new ArrayList<>();
+		params.add("sudo"); //$NON-NLS-1$
+		params.add("-S"); //$NON-NLS-1$
+		params.add("security"); //$NON-NLS-1$
+		params.add("unlock-keychain"); //$NON-NLS-1$
+		params.add("-p"); //$NON-NLS-1$
+		params.add(new String(phrase, StandardCharsets.UTF_8));
+
+		final ProcessBuilder builder = new ProcessBuilder(params);
+		final Process process = builder.start();
+
+		// Se proporciona la contrasena de administrador
+		try (OutputStream os = process.getOutputStream()) {
+			os.write(phrase);
+			os.flush();
+		}
+
+		final int exitValue = process.waitFor();
+		if (exitValue != 0) {
+			byte[] errorOutput = null;
+			try (final InputStream errorStream = process.getErrorStream()) {
+				errorOutput = AOUtil.getDataFromInputStream(errorStream);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se pudo leer la salida de error " //$NON-NLS-1$
+						+ "del proceso de desbloqueo del Llavero", e); //$NON-NLS-1$
+			}
+			if (errorOutput != null) {
+				String errorMsg = new String(errorOutput);
+				// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
+				// asi que lo omitimos
+				if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
+					errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+				}
+				LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
+				if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+					throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+				}
+				throw new IOException("Error al desbloquear el llavero"); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -474,124 +591,29 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		return new File(userDir);
 	}
 
-//  /**
-//	 * Devuelve un listado con todos los directorios de usuario del sistema.
-//	 * @return Listado de directorios.
-//	 */
-//	private static List<File> getSystemUsersHomes() {
-//
-//		if (userDirs != null) {
-//			return userDirs;
-//		}
-//		try {
-//			final File getUsersScriptFile = createGetUsersScript();
-//			final Object o = MacUtils.executeScriptFile(getUsersScriptFile, false, true);
-//			if (o == null) {
-//				userDirs = null;
-//			}
-//			else {
-//			userDirs = new ArrayList<>();
-//			try (
-//					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
-//					final BufferedReader resReader = new BoundedBufferedReader(
-//							new InputStreamReader(resIs),
-//							2048, // Maximo 2048 lineas de salida (256 perfiles)
-//							2048 // Maximo 2048 caracteres por linea
-//							);
-//					) {
-//				String line;
-//				while ((line = resReader.readLine()) != null) {
-//					if (line.startsWith(USER_DIR_LINE_PREFIX)){
-//						userDirs.add(new File(line.substring(USER_DIR_LINE_PREFIX.length())));
-//					}
-//				}
-//			}
-//		}
-//		}
-//		catch (final IOException | InterruptedException e) {
-//			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
-//			userDirs = null;
-//		}
-//
-//		return userDirs;
-//	}
-//
-//
-//	/** Crea un fichero de script para la obtenci&oacute;n de los usuarios del sistema.
-//	 * @return Fichero de script para la obtenci&oacute;n de los usuarios del sistema.
-//	 * @throws IOException Cuando no se pueda crear el fichero de script. */
-//	private static File createGetUsersScript() throws IOException {
-//		final StringBuilder script = new StringBuilder(GET_USERS_COMMAND);
-//		final File scriptFile = File.createTempFile(GET_USER_SCRIPTS_NAME, SCRIPT_EXT);
-//		try {
-//			MacUtils.writeScriptFile(script, scriptFile, true);
-//		}
-//		catch (final IOException e) {
-//			LOGGER.log(Level.WARNING, "Ha ocurrido un error al generar el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
-//		}
-//		UnixUtils.addAllPermissionsToFile(scriptFile);
-//		return scriptFile;
-//	}
-
+	/**
+	 * Instala en el Llavero de macOS los certificados en los que debe confiar el sistema
+	 * para permitir la comunicacion SSL con la aplicaci&oacute;n.
+	 * @param caCertFile Certificado ra&iacute;z con el que se genera el certificado SSL.
+	 * @param sslCertFile Certificado SSL.
+	 * @param keyChainPhrase Contrase&ntilde;a de acceso al Llavero.
+	 * @param console Consola en la que mostrar los mensajes al usuario.
+	 * @throws IOException Cuando ocurre un error al leer el fichero
+	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
+	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
+	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 */
 	private static void installTrustedCertsInAppleKeyChain(final File caCertFile,
-			final File sslCertFile, final RestoreConfigPanel console) throws IOException, InterruptedException, KeyChainException {
+			final File sslCertFile, final byte[] keyChainPhrase, final RestoreConfigPanel console)
+					throws IOException, InterruptedException, KeyChainException, SecurityException {
 
+		// Insertamos el certificado raiz
+		installTrustedCertInAppleKeyChain(caCertFile, keyChainPhrase, true);
+		console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.25")); //$NON-NLS-1$
 
-		byte[] data = null;
-		boolean passwordError = false;
-		boolean certInstalled = false;
-		do {
-
-			// La contrasena solo hace falta si no estamos ya en modo administrador, asi que la primera vez probaremos con una generica
-			if (data == null) {
-				data = DUMMY;
-			}
-			else {
-				// Solicitamos la contrasena para la instalacion de los certificados
-				final String text = passwordError
-						? SimpleAfirmaMessages.getString("RestoreConfigMacOSX.30") //$NON-NLS-1$
-						: SimpleAfirmaMessages.getString("RestoreConfigMacOSX.29"); //$NON-NLS-1$
-
-				try {
-					// Se pone en una linea para evitar que la contrasena se exponda en claro en memoria
-					data = new String(AOUIFactory.getPassword(text, console)).getBytes(StandardCharsets.UTF_8);
-				}
-				catch (final AOCancelledOperationException e) {
-					LOGGER.info("Se cancelo el dialogo de entrada de contrasena: " + e); //$NON-NLS-1$
-					final int option = AOUIFactory.showConfirmDialog(console,
-							SimpleAfirmaMessages.getString("RestoreConfigMacOSX.31"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("RestoreConfigMacOSX.32"), //$NON-NLS-1$
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
-					if (option == JOptionPane.YES_OPTION) {
-						console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.33")); //$NON-NLS-1$
-						return;
-					}
-					continue;
-				}
-			}
-
-			// Restablecemos el valor
-			passwordError = false;
-
-			// Insertamos el certificado raiz
-			try {
-				installTrustedCertInAppleKeyChain(caCertFile, data, true);
-			}
-			catch (final SecurityException e) {
-				// La contrasena invalida, pero si era el intento de prueba, no lo tendremos en cuenta
-				if (!Arrays.equals(DUMMY, data)) {
-					passwordError = true;
-				}
-				continue;
-			}
-			console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.25")); //$NON-NLS-1$
-			installTrustedCertInAppleKeyChain(sslCertFile, data, false);
-			console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.26")); //$NON-NLS-1$
-
-			certInstalled = true;
-
-		} while(!certInstalled);
+		// Insertamos el certificado SSL
+		installTrustedCertInAppleKeyChain(sslCertFile, keyChainPhrase, false);
+		console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.26")); //$NON-NLS-1$
 	}
 
 	/**
@@ -675,23 +697,179 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	}
 
 	/**
-	 * Agrega al script de ejecuci&oacute;n los comandos para la desinstalaci&oacute;n
-	 * del certificado generado del llavero OS X y elimina los links simb&oacute;licos.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
+	 * Desinstala del Llavero de macOS los certificados de confianza de la aplicaci&oacute;n.
+	 * @param keyChainPhrase Contrase&ntilde;a del Llavero.
 	 */
-	private static void uninstallSslCertFromKeyChain() throws IOException {
-		LOGGER.info("Desinstalamos los certificados y eliminamos los enlaces simbolicos:"); //$NON-NLS-1$
-		// Creamos comandos para eliminar enlaces simbolicos de firefox y certificados del llavero
-		final String deleteLinks = "ls -ln /usr/local/lib | grep Firefox | awk '{print $9}' | xargs -I {} rm /usr/local/lib/{}"; //$NON-NLS-1$
-		final String deleteCaCerts = "security find-certificate -c " + CERT_CN + " -a -Z|grep SHA-1|awk '{ print $NF }' | xargs -I {} security delete-certificate -Z {}"; //$NON-NLS-1$ //$NON-NLS-2$
-		final String deleteKsCerts = "security find-certificate -c " + CERT_CN_ROOT + " -a -Z|grep SHA-1|awk '{ print $NF }' | xargs -I {} security delete-certificate -Z {}"; //$NON-NLS-1$ //$NON-NLS-2$
-		final StringBuilder sb = new StringBuilder();
-		sb.append(deleteLinks);
-		sb.append(";"); //$NON-NLS-1$
-		sb.append(deleteCaCerts);
-		sb.append(";"); //$NON-NLS-1$
-		sb.append(deleteKsCerts);
-		writeScriptFile(mac_script_path, sb, true);
+	private static void uninstallRootCAMacOSXKeyStore(final byte[] keyChainPhrase) {
+
+		LOGGER.info("Desinstalamos los anteriores certificados del almacen"); //$NON-NLS-1$
+
+		// Eliminamos el certificados SSL
+		try {
+			uninstallTrustedCertFromAppleKeyChain(CERT_CN, keyChainPhrase);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo eliminar el anterior certificado " +  CERT_CN + " del Llavero", e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		// Eliminamos el certificado raiz
+		try {
+			uninstallTrustedCertFromAppleKeyChain(CERT_CN_ROOT, keyChainPhrase);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo eliminar el anterior certificado " +  CERT_CN_ROOT + " del Llavero", e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+
+	/**
+	 * Desinstala todos los certificados con el CN indicado del Llavero de macOS.
+	 * @param commonName Nombre com&uacute;n del certificado a eliminar.
+	 * @param phrase Contrase&ntilde;a del llavero/administrador.
+	 * @throws IOException Cuando ocurre un error al leer el fichero
+	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
+	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
+	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 */
+	private static void uninstallTrustedCertFromAppleKeyChain(final String commonName, final byte[] phrase)
+			throws IOException, InterruptedException, KeyChainException, SecurityException {
+
+		// El comando para la eliminacion de certificados exige que se identifique univocamente
+		// el certificado a eliminar. Como puede que haya mas de un certificado con el mismo CN,
+		// tendremos que buscar cada uno de ellos, sacar su hash y usar este hash en el comando
+		// de eliminacion de certificados.
+
+		boolean certFound = false;
+		do {
+			final List<String> params = new ArrayList<>();
+			params.add("sudo"); //$NON-NLS-1$
+			params.add("-S"); //$NON-NLS-1$
+			params.add("security"); //$NON-NLS-1$
+			params.add("find-certificate"); //$NON-NLS-1$
+			params.add("-c"); //$NON-NLS-1$
+			params.add(commonName);
+			params.add("-Z"); //$NON-NLS-1$
+
+			final ProcessBuilder builder = new ProcessBuilder(params);
+			final Process process = builder.start();
+
+			// Se proporciona la contrasena de administrador
+			try (OutputStream os = process.getOutputStream()) {
+				os.write(phrase);
+				os.flush();
+			}
+
+			// Vamos a buscar en la salida del comando el hash del certificado para usarlo para su eliminacion
+			String hash = null;
+
+			// Esperamos a la salida del comando
+			final int exitValue = process.waitFor();
+			if (exitValue == 0) {
+				// Se ha encontrado un certificado con el CN indicado
+				certFound = true;
+
+				byte[] output = null;
+				try (final InputStream outStream = process.getInputStream()) {
+					output = AOUtil.getDataFromInputStream(outStream);
+				}
+				catch (final Exception e) {
+					throw new SecurityException("Error al leer la salida del comando de busqueda de certificados en el Llavero", e); //$NON-NLS-1$
+				}
+				// Leemos de la salida el hash del certificado. Este se encuentra despues de la
+				// cadena "hash:" hasta el final de la linea
+				if (output != null) {
+					final String msg = new String(output);
+					final int startHashIdx = msg.indexOf(FIND_CERT_HASH_PREFIX);
+					if (startHashIdx > -1) {
+						final int endLineIdx = msg.indexOf("\n", startHashIdx); //$NON-NLS-1$
+						if (endLineIdx > -1) {
+							hash = msg.substring(startHashIdx + FIND_CERT_HASH_PREFIX.length(), endLineIdx).trim();
+						}
+					}
+				}
+			}
+			else {
+				// No se ha encontrado un certificado con el CN indicado
+				certFound = false;
+
+				byte[] errorOutput = null;
+				try (final InputStream errorStream = process.getErrorStream()) {
+					errorOutput = AOUtil.getDataFromInputStream(errorStream);
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se pudo leer la salida de error " //$NON-NLS-1$
+							+ "del proceso de desinstalacion del certificado en el llavero", e); //$NON-NLS-1$
+				}
+				if (errorOutput != null) {
+					String errorMsg = new String(errorOutput);
+					// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
+					// asi que lo omitimos
+					if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
+						errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+					}
+					LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
+					if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+						throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+					}
+				}
+			}
+
+			// Eliminamos el certificado con el hash encontrado
+			if (certFound && hash != null) {
+				uninstallTrustedCertFromAppleKeyChainByHash(hash);
+			}
+
+
+		} while (certFound);
+	}
+
+	/**
+	 * Elimina un certificado del llavero de macOS identific&aacute;ndolo por medio de su hash.
+	 * @param hash Hash del certificado a eliminar.
+	 * @throws IOException Cuando ocurre un error al leer el fichero
+	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
+	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
+	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 */
+	private static void uninstallTrustedCertFromAppleKeyChainByHash(final String hash)
+			throws IOException, InterruptedException, KeyChainException, SecurityException {
+
+		final List<String> params = new ArrayList<>();
+		params.add("sudo"); //$NON-NLS-1$
+		params.add("-S"); //$NON-NLS-1$
+		params.add("security"); //$NON-NLS-1$
+		params.add("delete-certificate"); //$NON-NLS-1$
+		params.add("-Z"); //$NON-NLS-1$
+		params.add(hash);
+		params.add("-t"); //$NON-NLS-1$
+
+		final ProcessBuilder builder = new ProcessBuilder(params);
+		final Process process = builder.start();
+
+		final int exitValue = process.waitFor();
+		if (exitValue != 0) {
+			byte[] errorOutput = null;
+			try (final InputStream errorStream = process.getErrorStream()) {
+				errorOutput = AOUtil.getDataFromInputStream(errorStream);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se pudo leer la salida de error " //$NON-NLS-1$
+						+ "del proceso de desinstalacion del certificado en el llavero", e); //$NON-NLS-1$
+			}
+			if (errorOutput != null) {
+				String errorMsg = new String(errorOutput);
+				// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
+				// asi que lo omitimos
+				if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
+					errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+				}
+				LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
+				if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+					throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+				}
+				throw new KeyChainException("Error al desinstalar el certificado con el hash " + hash //$NON-NLS-1$
+						+ " del llavero de macOS"); //$NON-NLS-1$
+			}
+		}
 	}
 
 	private static void deleteFile(final File file) throws IOException {
@@ -766,7 +944,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Comprobamos si esta abierto el proceos de Firefox
 		try {
-			return checkProcess("Firefox.app"); //$NON-NLS-1$
+			return checkProcess("Firefox.app", "FirefoxNightly.app", "FirefoxDeveloperEdition.app"); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
@@ -789,7 +967,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		return false;
 	}
 
-	private static boolean checkProcess(final String processName) throws IOException {
+	private static boolean checkProcess(final String... processNames) throws IOException {
 
 		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa del proceso
 		final ProcessBuilder pBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -805,8 +983,10 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 				) {
 			String line;
 			while ((line = resReader.readLine()) != null) {
-				if (line.contains(processName)) {
-					return true;
+				for (final String processName : processNames) {
+					if (line.contains(processName)) {
+						return true;
+					}
 				}
 			}
 		}
