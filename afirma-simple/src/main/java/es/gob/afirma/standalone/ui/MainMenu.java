@@ -249,7 +249,7 @@ public final class MainMenu extends JMenuBar {
         // En Mac OS X el menu es "Preferencias" dentro de la opcion principal
         else {
         	try {
-        		final Method showPreferencesMethod = getClass().getDeclaredMethod("showPreferences", new Class[]{EventObject.class}); //$NON-NLS-1$
+        		final Method showPreferencesMethod = getClass().getDeclaredMethod("showPreferences", EventObject.class); //$NON-NLS-1$
         		OSXHandler.setPreferencesHandler(this, showPreferencesMethod);
         	}
         	catch(final Exception | Error e) {
@@ -302,8 +302,8 @@ public final class MainMenu extends JMenuBar {
             acercaMenuItem.addActionListener(ae -> showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent()));
             acercaMenuItem.setMnemonic(KeyEvent.VK_C);
             menuAyuda.add(acercaMenuItem);
-            this.add(menuAyuda);
         }
+        this.add(menuAyuda);
 
         // Los mnemonicos en elementos de menu violan las normas de interfaz de Apple,
         // asi que prescindimos de ellos en Mac OS X
@@ -315,7 +315,7 @@ public final class MainMenu extends JMenuBar {
         // Acciones especificas de Mac OS X
         else {
         	try {
-        		final Method aboutMethod = getClass().getDeclaredMethod("showAbout", new Class[]{EventObject.class}); //$NON-NLS-1$
+        		final Method aboutMethod = getClass().getDeclaredMethod("showAbout", EventObject.class); //$NON-NLS-1$
         		OSXHandler.setAboutHandler(this, aboutMethod);
         	}
         	catch (final Exception e) {
@@ -323,7 +323,7 @@ public final class MainMenu extends JMenuBar {
 			}
 
         	try {
-        		final Method exitApplicationMethod = getClass().getDeclaredMethod("exitApplication", new Class[]{EventObject.class, Object.class}); //$NON-NLS-1$
+        		final Method exitApplicationMethod = getClass().getDeclaredMethod("exitApplication", EventObject.class, Object.class); //$NON-NLS-1$
         		OSXHandler.setQuitHandler(this, exitApplicationMethod);
         	}
         	catch (final Exception e) {
