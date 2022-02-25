@@ -47,10 +47,12 @@ public class PluginLoader {
 		for (final File jar : jars) {
 			urls.add(jar.toURI().toURL());
 		}
-		try (final URLClassLoader classLoader = new URLClassLoader(
-				urls.toArray(new URL[urls.size()]),
-				PluginLoader.class.getClassLoader())) {
 
+		final URLClassLoader classLoader = new URLClassLoader(
+				urls.toArray(new URL[urls.size()]),
+				PluginLoader.class.getClassLoader());
+
+		try {
 			// Cargamos las clases de plugin
 			final List<AfirmaPlugin> plugins = new ArrayList<>();
 			final ServiceLoader<AfirmaPlugin> loader;
@@ -61,14 +63,17 @@ public class PluginLoader {
 				}
 			}
 			catch (final Error e) {
+				classLoader.close();
 				throw new PluginException("Se han contrado plugins mal definidos en el fichero importado"); //$NON-NLS-1$
 			}
 
 			if (plugins.size() == 0) {
+				classLoader.close();
 				throw new PluginException("No se encontro ningun plugin en los archivos"); //$NON-NLS-1$
 			}
 
 			if (plugins.size() > 1) {
+				classLoader.close();
 				throw new PluginException("No se permite la carga simulatea de varios plugins"); //$NON-NLS-1$
 			}
 
@@ -87,13 +92,16 @@ public class PluginLoader {
 				for (final PluginButton button : info.getButtons()) {
 
 					if (button.getActionClassName() == null) {
+						classLoader.close();
 						throw new PluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName())); //$NON-NLS-1$
 					}
 					if (button.getWindow() == null) {
+						classLoader.close();
 						throw new PluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName())); //$NON-NLS-1$
 					}
 					final PluginIntegrationWindow window = PluginIntegrationWindow.getWindow(button.getWindow());
 					if (window == null) {
+						classLoader.close();
 						throw new PluginException(String.format("El plugin '%1s' definio un boton en una ventana desconocida: %2s", //$NON-NLS-1$
 								info.getName(), button.getWindow()));
 					}
@@ -104,14 +112,17 @@ public class PluginLoader {
 						button.setAction(action);
 					}
 					catch (final Exception e) {
+						classLoader.close();
 						throw new PluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
 								info.getName(), button.getActionClassName()), e);
 					}
 				}
 			}
-
 			// Configuramos la informacion obtenida del plugin, en el propio plugin
 			loadedPlugin.setInfo(info);
+		} catch (final Exception e) {
+			classLoader.close();
+			throw new PluginException(String.format("Ha ocurrido un error al intentar cargar el plugin"), e); //$NON-NLS-1$
 		}
 
 		return loadedPlugin;
