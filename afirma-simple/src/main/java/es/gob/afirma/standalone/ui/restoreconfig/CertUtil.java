@@ -69,7 +69,7 @@ import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class CertUtil {
 
-	private static final String AF_ROOT_SUBJECT_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
+	private static final String CA_CERT_COMMONNAME = "AutoFirma ROOT"; //$NON-NLS-1$
 
 	private static final int KEY_SIZE = 2048;
 
@@ -136,7 +136,7 @@ final class CertUtil {
 
 		Security.addProvider(new BouncyCastleProvider());
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
-			AF_ROOT_SUBJECT_PRINCIPAL
+			CA_CERT_COMMONNAME
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
 			DEFAULT_LOCALHOST,
@@ -150,7 +150,7 @@ final class CertUtil {
 		);
 	}
 
-	private static PrivateKeyEntry generateCaCertificate(final String subjectPrincipal) throws NoSuchAlgorithmException,
+	private static PrivateKeyEntry generateCaCertificate(final String commonName) throws NoSuchAlgorithmException,
                                                                                                CertificateException,
                                                                                                IOException {
 		// Generamos el par de claves...
@@ -162,11 +162,11 @@ final class CertUtil {
 		final Date expirationDate = new Date();
 		expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
 		final X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
-			new X500Name(subjectPrincipal),
+			new X500Name("CN=" + commonName), //$NON-NLS-1$
 			BigInteger.valueOf(new Random().nextInt()),
     		new Date(),
     		expirationDate,
-    		new X500Name(subjectPrincipal),
+    		new X500Name("CN=" + commonName), //$NON-NLS-1$
     		keyPair.getPublic()
 		);
 

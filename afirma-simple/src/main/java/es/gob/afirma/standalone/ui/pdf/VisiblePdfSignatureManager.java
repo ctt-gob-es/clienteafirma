@@ -25,7 +25,7 @@ public final class VisiblePdfSignatureManager {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Obtiene la configuracion necesaria para realizar una firma PDF visible.
-	 * @param signConfig Configuraci&oacute;n de firma.
+	 * @param signConfigs Configuraci&oacute;n de firma.
 	 * @param signExecutor Objeto para la ejecuci&oacute;n de las firmas.
 	 * @param signatureVisible Indica si se va a insertar una firma
 	 * @param stampVisible Indica si se va a insertar una marca
@@ -167,7 +167,7 @@ public final class VisiblePdfSignatureManager {
 
 		/** Construye un objeto para ejecutar la firma de uno o varios PDF una vez se
 		 * han obtenido sus par&aacute;metros para la firma visible.
-		 * @param signConfig Operaci&oacute;nes de firma a ejecutar.
+		 * @param signConfigs Operaci&oacute;nes de firma a ejecutar.
 		 * @param executor Objeto para la ejecuci&oacute;n de la/s firma/s. */
 		public SignPdfListener(final List<SignOperationConfig> signConfigs, final SignatureExecutor executor) {
 			this.signConfigs = signConfigs;

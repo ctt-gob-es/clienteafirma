@@ -92,7 +92,8 @@ public class Xmlwise
 	 * Escapes a string to be used in an xml document.
 	 * <p>
 	 * The following replacements are made:
-	 * <table summary="Replacements">
+	 * <table>
+	 * <caption>Replacements</caption>
 	 * <tr><td>&lt;</td><td>&amp;lt;</td></tr>
 	 * <tr><td>&gt;</td><td>&amp;gt;</td></tr>
 	 * <tr><td>&amp;</td><td>&amp;amp;</td></tr>

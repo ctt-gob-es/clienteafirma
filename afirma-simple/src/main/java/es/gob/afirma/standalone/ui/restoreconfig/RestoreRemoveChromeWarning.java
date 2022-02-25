@@ -235,7 +235,7 @@ final public class RestoreRemoveChromeWarning {
 		final ArrayList<String[]> commandList = new ArrayList<>();
 
 		// Final del if
-				final String[] endIfStatement = new String[] {
+				final String[] endIfStatement = {
 						"fi", //$NON-NLS-1$
 				};
 
@@ -315,7 +315,7 @@ final public class RestoreRemoveChromeWarning {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
-		final String[] endIfStatement = new String[] {
+		final String[] endIfStatement = {
 				"fi", //$NON-NLS-1$
 		};
 
@@ -331,7 +331,7 @@ final public class RestoreRemoveChromeWarning {
 
 			// Comandos para agregar la confianza del esquema 'afirma' en caso de tener Chromium v56 o inferior recien instalado
 			final String[] ifContainsString1 = getIfNotContainsStringCommand(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH);
-			final String[] commandInstallChromium56OrLower4 = new String[] {
+			final String[] commandInstallChromium56OrLower4 = {
 					"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 					"'s/last_active_profiles\\([^,]*\\),/" //$NON-NLS-1$
 					+ "last_active_profiles\\1,\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}},/'", //$NON-NLS-1$
@@ -362,7 +362,7 @@ final public class RestoreRemoveChromeWarning {
 
 			final String[] ifContainsString2 = getIfNotContainsStringCommand(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH);
 			// Comando para agregar la confianza del esquema 'afirma' en caso de tener Chrome v56 o inferior recien instalado
-			final String[] commandInstallChrome56OrLower4 = new String[] {
+			final String[] commandInstallChrome56OrLower4 = {
 					"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 					"'s/last_active_profiles\\([^,]*\\),/" //$NON-NLS-1$
 					+ "last_active_profiles\\1,\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}},/'", //$NON-NLS-1$
@@ -428,7 +428,7 @@ final public class RestoreRemoveChromeWarning {
 			                                                                                    final String userDir) throws IOException {
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
-		final String[] endIfStatement = new String[] {
+		final String[] endIfStatement = {
 				"fi", //$NON-NLS-1$
 		};
 
@@ -451,7 +451,7 @@ final public class RestoreRemoveChromeWarning {
 
 			final String[] ifContainsString2 = getIfNotCointainsStringCommand(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
 			// Comando para agregar la confianza del esquema 'afirma' en caso de tener Chrome v56 o inferior recien instalado
-			final String[] commandInstallChrome56OrLower4 = new String[] {
+			final String[] commandInstallChrome56OrLower4 = {
 					"sed -i ''", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 					"'s/last_active_profiles\\([^,]*\\),/" //$NON-NLS-1$
 					+ "last_active_profiles\\1,\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}},/'", //$NON-NLS-1$
@@ -501,15 +501,12 @@ final public class RestoreRemoveChromeWarning {
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
-		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
-		// por el contrario, ya estaba
-		final String[] ifStatement = new String[] {
+		return new String[] {
 				"if ! ", //$NON-NLS-1$
 				"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				"; then", //$NON-NLS-1$
 		};
-		return ifStatement;
 	}
 
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero. (Repetido en
@@ -517,15 +514,12 @@ final public class RestoreRemoveChromeWarning {
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] getIfNotContainsStringCommand(final String userDir, final String browserPath) {
-		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
-		// por el contrario, ya estaba
-		final String[] ifStatement = new String[] {
+		return new String[] {
 				"if ! ", //$NON-NLS-1$
 				"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				"; then", //$NON-NLS-1$
 		};
-		return ifStatement;
 	}
 
 	/** Genera los scripts para confirmar si existe el fichero con el que se va a trabajar.
@@ -533,14 +527,11 @@ final public class RestoreRemoveChromeWarning {
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] getIfFileFoundCommand(final String userDir, final String browserPath) {
-		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
-		// por el contrario, ya estaba
-		final String[] ifStatement = new String[] {
+		return new String[] {
 				"if [ -f ", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				" ]; then", //$NON-NLS-1$
 		};
-		return ifStatement;
 	}
 
 	/** Genera los scripts para reemplazar el fichero original por el temporal con el que se estaba trabajando.
@@ -548,14 +539,11 @@ final public class RestoreRemoveChromeWarning {
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] copyConfigurationFile(final String userDir, final String browserPath) {
-		// Comando para sobreescribir el fichero de configuracion
-		final String[] commandCopy = new String[] {
+		return new String[] {
 				"\\cp", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 		};
-
-		return commandCopy;
 	}
 
 	/** Genera los <i>scripts</i> para eliminar el protocolo <code>afirma</code>.
@@ -564,15 +552,13 @@ final public class RestoreRemoveChromeWarning {
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] deleteProtocolInPreferencesFile1(final String userDir, final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed", //$NON-NLS-1$
 				"'s/\\\"afirma\\\":false,//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				">", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los scripts para eliminar el protocolo afirma.
@@ -581,13 +567,11 @@ final public class RestoreRemoveChromeWarning {
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] deleteProtocolInPreferencesFile2(final String userDir, final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed -i ''", //$NON-NLS-1$
 				"'s/\\\"afirma\\\":false//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los scripts para incluir el protocolo afirma.
@@ -596,14 +580,12 @@ final public class RestoreRemoveChromeWarning {
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] addProtocolInPreferencesFileMac(final String userDir, final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed -i ''", //$NON-NLS-1$
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/" //$NON-NLS-1$
 				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los scripts para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
@@ -612,14 +594,12 @@ final public class RestoreRemoveChromeWarning {
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] correctProtocolInPreferencesFileMac(final String userDir, final String browserPath) {
 
-		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
-		final String[] commandInstall2 = new String[] {
+		return new String[] {
 				"sed -i ''", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,}/" //$NON-NLS-1$
 				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}/g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall2;
 	}
 
 	/** Genera los scripts para incluir el protocolo afirma.
@@ -628,8 +608,7 @@ final public class RestoreRemoveChromeWarning {
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] addProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
-		// Comando para agregar la confianza del esquema 'afirma' en Chrome
-		final String[] commandInstall1 = new String[] {
+		return new String[] {
 				"sed", //$NON-NLS-1$
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/" //$NON-NLS-1$
 				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g'", //$NON-NLS-1$
@@ -637,7 +616,6 @@ final public class RestoreRemoveChromeWarning {
 				">", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall1;
 	}
 
 	/** Genera los <i>scripts</i> para eliminar la coma en caso de que sea el &uacute;nico protocolo definido
@@ -647,14 +625,12 @@ final public class RestoreRemoveChromeWarning {
 	 * @return Nombre del comando y sus par&aacute;metros en un <i>array</i>. */
 	private static String[] correctProtocolInPreferencesFile(final String userDir, final String browserPath) {
 
-		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
-		final String[] commandInstall2 = new String[] {
+		return new String[] {
 				"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,}/" //$NON-NLS-1$
 				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}/g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
-		return commandInstall2;
 	}
 
 
@@ -667,7 +643,7 @@ final public class RestoreRemoveChromeWarning {
 			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
-		final String[] commandUninstall1 = new String[] {
+		final String[] commandUninstall1 = {
 				"sed", //$NON-NLS-1$
 				"'s/\\\"afirma\\\":false,//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
@@ -688,7 +664,7 @@ final public class RestoreRemoveChromeWarning {
 			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
-		final String[] commandUninstall1 = new String[] {
+		final String[] commandUninstall1 = {
 				"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"afirma\\\":false//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
@@ -707,7 +683,7 @@ final public class RestoreRemoveChromeWarning {
 			                                             final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
-		final String[] commandUninstall1 = new String[] {
+		final String[] commandUninstall1 = {
 				"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{}},//g'", //$NON-NLS-1$ Se elimina la lista vacia de protocolos
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$

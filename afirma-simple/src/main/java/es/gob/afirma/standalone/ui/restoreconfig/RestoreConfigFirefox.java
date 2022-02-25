@@ -43,15 +43,8 @@ import es.gob.afirma.standalone.so.macos.UnixUtils;
 
 
 /**Contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
- * asociadas al navegador Firefox para Windows, Linux y MacOsX. */
+ * asociadas al navegador Firefox para Windows y Linux. */
 final class RestoreConfigFirefox {
-
-	static final class MozillaProfileNotFoundException extends Exception {
-
-		/** Versi&oacute;n de serializaci&oacute;n. */
-		private static final long serialVersionUID = 5429606644925911457L;
-
-	}
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -67,12 +60,9 @@ final class RestoreConfigFirefox {
 	private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
-	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
 	private static String WINDOWS_MOZILLA_PATH;
 	private static String USERS_WINDOWS_PATH;
 
-//	private static final String GET_USER_SCRIPT = "scriptGetUsers";//$NON-NLS-1$
-//	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
@@ -117,11 +107,6 @@ final class RestoreConfigFirefox {
 			FILE_CERTUTIL = "certutil.windows.zip"; //$NON-NLS-1$
 			RESOURCE_BASE = "/windows/"; //$NON-NLS-1$
 			break;
-		case MACOSX:
-			CERTUTIL_EXE = "certutil"; //$NON-NLS-1$
-			FILE_CERTUTIL = "certutil.osx.zip"; //$NON-NLS-1$
-			RESOURCE_BASE = "/osx/"; //$NON-NLS-1$
-			break;
 		case LINUX:
 			CERTUTIL_EXE = "certutil"; //$NON-NLS-1$
 			FILE_CERTUTIL = "certutil.linux.zip"; //$NON-NLS-1$
@@ -147,7 +132,7 @@ final class RestoreConfigFirefox {
 	 *   <li>En LINUX contiene el contenido del script a ejecutar.</li>
 	 * </ul> */
 	private static void createScriptsRemoveExecutionWarningInChrome(final File targetDir, final String userDir, final String browserPath) {
-		final String[] commandInstall = new String[] {
+		final String[] commandInstall = {
 				"sed", //$NON-NLS-1$
 				"s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
@@ -155,7 +140,7 @@ final class RestoreConfigFirefox {
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
 
-		final String[] commandUninstall = new String[] {
+		final String[] commandUninstall = {
 				"sed", //$NON-NLS-1$
 				"s/\\\"afirma\\\":false,//g", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
@@ -164,7 +149,7 @@ final class RestoreConfigFirefox {
 		};
 
 		//Se reemplaza el fichero generado por el original
-		final String[] commandCopy = new String[] {
+		final String[] commandCopy = {
 				"\\cp", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 				escapePath(userDir + browserPath),
@@ -195,8 +180,8 @@ final class RestoreConfigFirefox {
 				uninstall.append(s);
 				uninstall.append(' ');
 			}
-			String path = null;
-			String uninstallPath = null;
+			String path;
+			String uninstallPath;
 			sb.append("\n"); //$NON-NLS-1$
 			uninstall.append("\n"); //$NON-NLS-1$
 
@@ -265,7 +250,7 @@ final class RestoreConfigFirefox {
 		for ( final String userDir : usersDirs) {
 			final File file = new File(escapePath(userDir) + LINUX_CHROME_PATH);
 			if( file.isDirectory()) {
-				final String[] certutilCommands = new String[] {
+				final String[] certutilCommands = {
 						certUtilPath, // 0
 						"-d", //$NON-NLS-1$ // 1
 						"sql:" + escapePath(userDir) + LINUX_CHROME_PATH, //$NON-NLS-1$ // 2
@@ -320,7 +305,7 @@ final class RestoreConfigFirefox {
 		}
 	}
 
-	/** Genera el <i>script</i> de instalaci&oacute; del certificado en Firefox para MacOSX y LINUX.
+	/** Genera el <i>script</i> de instalaci&oacute; del certificado en Firefox para LINUX.
 	 * En ambos casos, es necesario crear un <i>script</i> intermedio con el comando <code>certutil</code> y sus argumentos
 	 * y posteriormente ejecutarlo como un comando de consola.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
@@ -357,65 +342,6 @@ final class RestoreConfigFirefox {
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox: " + e); //$NON-NLS-1$
 		}
-	}
-
-	/** Genera y ejecuta el <i>script</i> de desinstalaci&oacute;n del certificado de Firefox
-	 * para macOS.
-	 * @param targetDir Directorio bajo el que se encuentra <code>certutil</code>.
-	 * @param usersDirs Listado con los directorios de los usuarios del sistema.
-	 * @throws IOException Cuando hay errores leyendo o escribiendo datos. */
-	static void generateUninstallScriptMac(final File targetDir, final List<String> usersDirs) throws IOException {
-
-		// TODO: Comprobar que este codigo comentado no sirve para nada y eliminarlo en dicho caso
-//		final StringBuilder sb = new StringBuilder(RestoreConfigMacOSX.OSX_GET_USERS_COMMAND);
-//		final File scriptFile = File.createTempFile(GET_USER_SCRIPT, SCRIPT_EXT);
-//
-//		try {
-//			RestoreConfigMacOSX.writeScriptFile(scriptFile.getAbsolutePath(), sb, true);
-//		}
-//		catch (final IOException e) {
-//			LOGGER.log(Level.WARNING, " Ha ocurrido un error al generar el script de desinstalacion: " + e, e); //$NON-NLS-1$
-//		}
-//		RestoreConfigMacOSX.addExexPermissionsToFile(scriptFile);
-//
-//
-//		scriptFile.delete();
-
-		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
-		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
-		// para cada usuario tenemos sus distintos directorios de perfiles
-		final Set <File> profiles = getProfiles(mozillaUsersProfilesPath);
-		if (profiles.isEmpty()) {
-			LOGGER.info("No se han encontrado perfiles de Mozilla de los que desinstalar los certificados"); //$NON-NLS-1$
-			return;
-		}
-
-		final File certutilFile = new File(getCertUtilPath(targetDir));
-
-		if (!certutilFile.exists() || !certutilFile.isFile() || !certutilFile.canExecute()) {
-			throw new IOException("No se encuentra o no se puede leer el ejecutable para la instalacion en Firefox"); //$NON-NLS-1$
-		}
-
-		for (final File profile : profiles) {
-			if (!profile.isDirectory()) {
-				continue;
-			}
-
-			final String scriptUninstall = "max=$(" //$NON-NLS-1$
-			+ escapePath(certutilFile.getAbsolutePath())
-			+ " -L -d " //$NON-NLS-1$
-			+ escapePath(profile.getAbsolutePath())
-			+ " | grep AutoFirma | wc -l);for ((i=0; i<$max; i++));do " //$NON-NLS-1$
-			+ escapePath(certutilFile.getAbsolutePath())
-			+ " -D -d " //$NON-NLS-1$
-			+ "sql:" + escapePath(profile.getAbsolutePath()) //$NON-NLS-1$
-			+ " -n \"SocketAutoFirma\";done"; //$NON-NLS-1$
-			final String[] certutilCommands = scriptUninstall.split(" "); //$NON-NLS-1$
-
-			execCommandLineCertUtil(targetDir, certutilCommands, true);
-
-		}
-
 	}
 
 	/** Elimina la carpeta certutil generada durante el proceso de instalaci&oacute;n.
@@ -462,10 +388,6 @@ final class RestoreConfigFirefox {
 				throw new IOException("No se encuentra el ejecutable CertUtil para la instalacion en Firefox"); //$NON-NLS-1$
 			}
 
-			if (!certutilFile.canExecute() && Platform.OS.MACOSX.equals(Platform.getOS())) {
-				UnixUtils.addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
-			}
-
 			if (!certutilFile.canExecute()) {
 				throw new IOException("No hay permisos de ejecucion para Mozilla CertUtil"); //$NON-NLS-1$
 			}
@@ -487,13 +409,8 @@ final class RestoreConfigFirefox {
 			                                    final Set<File> profilesDir) throws IOException,
 	                                                                                KeyStoreException {
 
-		final String certUtilPath = getCertUtilPath(workingDir);
+		final String certUtilPath = escapePath(getCertUtilPath(workingDir));
 		boolean error = false;
-
-		if ( Platform.OS.MACOSX.equals(Platform.getOS()) && certUtilPath != null) {
-			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_PATH).append(certUtilPath.substring(0,certUtilPath.lastIndexOf(File.separator) )), true);
-			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_LIBRARY_LD).append(certUtilPath.substring(0,certUtilPath.lastIndexOf(File.separator) )), true);
-		}
 
 		File certificateFile = certFile;
 		if (certificateFile == null) {
@@ -506,8 +423,8 @@ final class RestoreConfigFirefox {
 				continue;
 			}
 
-			final String[] certutilCommands = new String[] {
-					escapePath(certUtilPath),
+			final String[] certutilCommands = {
+					certUtilPath,
 					"-A", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
 					"sql:" + escapePath(profileDir.getAbsolutePath()), //$NON-NLS-1$
@@ -533,7 +450,7 @@ final class RestoreConfigFirefox {
 
 	/** Prepara los comandos de instalacion con certutil para la instalacion del certificado
 	 * SSL y los ejecuta.
-	 *  En MACOSX y Linux, se escribiran scripts intermedios que luego se ejecutaran como comandos.
+	 *  En Linux, se escribiran scripts intermedios que luego se ejecutaran como comandos.
 	 *  En Windows se ejecuta certutil directamente como comando.
 	 *  @param workingDir Directorio en el que se encuentra el subdirectorio de certutil.
 	 *  @param command Comando a ejecutar, con el nombre de comando y sus par&aacute;metros
@@ -555,20 +472,14 @@ final class RestoreConfigFirefox {
 			sb.append(' ');
 		}
 
-		// macOS
-		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, sb, true);
-			return false;
-		}
-
 		// Linux
-		else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+		if (Platform.OS.LINUX.equals(Platform.getOS())) {
 			// Ejecutamos el comando certutil en Linux
 			final StringBuilder uninstall = new StringBuilder();
-			String path = null;
-			String uninstallPath = null;
+			String path;
+			String uninstallPath;
 
-			if(chromeImport) {
+			if (chromeImport) {
 				//En Linux tambien se instala para todos los perfiles de
 				// usuario del almacen de Chrome
 				// Tenemos en command[7] la ruta del fichero .crt, sacamos de
@@ -716,7 +627,7 @@ final class RestoreConfigFirefox {
 						continue;
 					}
 
-					final String[] certutilCommands = new String[] {
+					final String[] certutilCommands = {
 							"\"" + certUtilPath + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-D", //$NON-NLS-1$
 							"-d", //$NON-NLS-1$
@@ -767,9 +678,6 @@ final class RestoreConfigFirefox {
 		final File certutil = new File(workingDir, DIR_CERTUTIL);
 		if (!certutil.exists()) {
 			uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, workingDir);
-			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				UnixUtils.addExexPermissionsToAllFilesOnDirectory(certutil);
-			}
 		}
 	}
 
@@ -873,9 +781,6 @@ final class RestoreConfigFirefox {
 		final List<File> path = new ArrayList<>();
 		if (Platform.OS.LINUX.equals(Platform.getOS())) {
 			pathProfile = LINUX_MOZILLA_PATH;
-		}
-		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			pathProfile = MACOSX_MOZILLA_PATH;
 		}
 		else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			pathProfile = WINDOWS_MOZILLA_PATH;
@@ -1016,7 +921,7 @@ final class RestoreConfigFirefox {
 	}
 
 	/**
-	 * Configur el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
+	 * Configura el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
 	 * sistema operativo como almacen de confianza de Firefox.
 	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
 	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,

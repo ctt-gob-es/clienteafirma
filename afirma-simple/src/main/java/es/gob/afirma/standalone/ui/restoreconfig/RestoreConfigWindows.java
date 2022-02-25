@@ -37,7 +37,6 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
-import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -193,8 +192,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 			LOGGER.log(Level.WARNING, "Error configurando la confianza de Firefox en el almacen del sistema (activando: " + firefoxSecurityRoots + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.43")); //$NON-NLS-1$
 		}
-
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.8")); //$NON-NLS-1$
 	}
 
 	/**

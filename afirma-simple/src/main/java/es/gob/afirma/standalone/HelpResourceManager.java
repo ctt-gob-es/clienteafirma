@@ -12,12 +12,13 @@ package es.gob.afirma.standalone;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -32,94 +33,79 @@ public final class HelpResourceManager {
 	/** Longitud m&aacute;xima del texto de versi&oacute;n que se procesar&aacute;. */
 	private static final int MAX_VERSION_LENGTH = 30;
 
+	/** Nombre del directorio con los ficheros de ayuda. */
+	private static final String INTERNAL_HELP_DIR_NAME = "help/"; //$NON-NLS-1$
+
+	/** Nombre del directorio con los ficheros de ayuda. */
+	private static final String INDEX_HELP_FILENAME = "help/fileslist.txt"; //$NON-NLS-1$
+
+	private static final String HELP_VERSION_FILENAME = "help.version"; //$NON-NLS-1$
+
 	private HelpResourceManager() {
 		// No permitimos instanciar
 	}
 
-    /** Crea el directorio de usuario del programa si no existe, */
-    private static void createApplicationDataDir() {
-    	final File apDir = new File(SimpleAfirma.APPLICATION_HOME);
-    	if (!apDir.exists()) {
-    		apDir.mkdirs();
-    	}
+	static void extractHelpResources(final File helpDir) throws IOException {
 
-    	final File helpDir = new File(SimpleAfirma.APPLICATION_HOME + "\\help"); //$NON-NLS-1$
-    	if (!helpDir.exists()) {
-    		helpDir.mkdirs();
-    	}
-    }
+		// Extraemos los ficheros de ayuda
+		extractResources(helpDir);
 
-	static void createWindowsHelpResources(final File filesList, final File helpVersionFile) throws IOException {
-		extractResource(
-			"help/fileslist.txt", //$NON-NLS-1$
-			filesList
-		);
-
-		// Creamos un fichero que marca la version del fichero de ayuda utilizando la version de la aplicacion
-		try (FileOutputStream fos = new FileOutputStream(helpVersionFile)) {
+		// Creamos un fichero que marca la version de la aplicacion a la que corresponden estos
+		// ficheros de ayuda
+		try (final FileOutputStream fos = new FileOutputStream(new File(helpDir, HELP_VERSION_FILENAME))) {
 			fos.write(Updater.getCurrentVersionText().getBytes());
 		}
 	}
 
-	/** Crea los recursos necesarios para mostrar la ayuda de la aplicaci&oacute;n en formato Apple OS X.
-	 * En concreto, copia una biblioteca JNI nativa de OS X que hace de puente entre Java y el subsistema
-	 * de ayuda de OS X. Esta biblioteca, llamada <code>libJavaHelpHook.jnilib</code> se crea a partir del
-	 * siguiente c&oacute;digo fuente Objective-C (<code>JavaHelpHook.m</code>):
-	 * <pre>
-	 * #import &lt;JavaVM/jni.h&gt;
-     * #import &lt;Cocoa/Cocoa.h&gt;
-     *
-     * JNIEXPORT void JNICALL Java_es_gob_afirma_standalone_ui_MacHelpHooker_showHelp(JNIEnv *env, jclass clazz)
-     * {
-	 *   [[NSApplication sharedApplication] performSelectorOnMainThread:@selector(showHelp:) withObject:NULL waitUntilDone:NO];
-     * }
-	 * </pre>
-	 * @throws IOException Si no se pueden crear los recursos de ayuda. */
-	public static void createOsxHelpResources() throws IOException {
-		final File appleHelpFile = new File(SimpleAfirma.APPLICATION_HOME + "/libJavaHelpHook.jnilib"); //$NON-NLS-1$
-		if (!appleHelpFile.exists()) {
-			extractResource(
-				"help/AppleHelp/libJavaHelpHook.jnilib", //$NON-NLS-1$
-				appleHelpFile
-			);
-		}
+
+	private static void extractResources(final File helpDir) throws IOException {
+
+		// Creamos el directorio de los recursos de ayuda si no existiese
+		createHelpDir(helpDir);
+
+		// Vamos a leer el fichero de indice linea a linea y copiando a disco los ficheros
+		// listados
+    	try (final InputStream indexIs = ClassLoader.getSystemResourceAsStream(INDEX_HELP_FILENAME);
+    			final InputStreamReader isr = new InputStreamReader(indexIs);
+    			final BufferedReader index = new BufferedReader(isr);) {
+
+    		// Leemos la siguiente entrada
+    		String filePath;
+    		while ((filePath = index.readLine()) != null) {
+    			if (!filePath.isBlank()) {
+
+    				// Cargamos el recurso
+    				try (final InputStream fileIs = ClassLoader.getSystemResourceAsStream(INTERNAL_HELP_DIR_NAME + filePath)) {
+
+    					final File resourceFile = new File(helpDir, filePath.replace("/", File.separator)); //$NON-NLS-1$
+
+    					// Si no existia el directorio en el que se debe guardar, se crea
+    					if (!resourceFile.getParentFile().exists()) {
+    						resourceFile.getParentFile().mkdirs();
+    					}
+
+    					// Creamos el fichero local
+    					try (final FileOutputStream fos = new FileOutputStream(resourceFile)) {
+    						fos.write(AOUtil.getDataFromInputStream(fileIs));
+    					}
+    				}
+    				catch (final Exception e) {
+    					LOGGER.log(Level.WARNING, "No se ha encontrado o no ha podido leerse el fichero de ayuda " + filePath, e); //$NON-NLS-1$
+    				}
+    			}
+    		}
+
+
+    	}
 
 	}
 
-	private static void extractResource(final String filesList, final File destination) throws IOException {
-
-		// Creamos el directorio de la aplicacion
-		createApplicationDataDir();
-
-		// Copiamos el recurso con la ruta de todos los archivos desde el JAR hasta el destino especificado
-    	final byte[] bytes = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filesList));
-
-        try (final FileOutputStream fos = new FileOutputStream(destination)) {
-        	fos.write(bytes);
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(destination))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-               final URL url = ClassLoader.getSystemResource("help"+ File.separator + line); //$NON-NLS-1$
-               final String rscFileDecoded = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
-               final File resourceFile = new File(rscFileDecoded);
-               if (resourceFile.exists()) {
-            	   final File newFile = new File(SimpleAfirma.APPLICATION_HOME + "\\help\\" + line);
-            	   if (resourceFile.isDirectory()) {
-            		   newFile.mkdir();
-            	   } else {
-            	    	final byte[] fileData = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("help\\" + line)); //$NON-NLS-1$
-            	        try (final FileOutputStream fos = new FileOutputStream(newFile)) {
-            	        	fos.write(fileData);
-            	        }
-            	   }
-               } else {
-            	   LOGGER.warning("El archivo " + line + " no existe en los recursos");  //$NON-NLS-1$//$NON-NLS-2$
-               }
-            }
-        }
-	}
+    /** Crea el directorio de usuario del programa si no existe, */
+    private static void createHelpDir(final File helpDir) {
+    	if (!helpDir.exists()) {
+    		helpDir.mkdirs();
+    	}
+    }
 
 	/**
 	 * Indica si un fichero con la versi&oacute;n de la ayuda de la aplicaci&oacute;n
@@ -147,5 +133,30 @@ public final class HelpResourceManager {
 		final String trimAppVersion = currentAppVersion.substring(0,  Math.min(currentAppVersion.length(), MAX_VERSION_LENGTH));
 
 		return !trimFileVersion.equals(trimAppVersion);
+	}
+
+	/**
+	 * Comprueba si la ayuda almacenada en local se corresponde a la de la versi&oacute;n actual
+	 * de la aplicaci&oacute;n.
+	 * @param helpDir Directorio en el que debe encontrarse la ayuda.
+	 * @return {@code true} si se encuentra almacenada en local la ayuda de la versi&oacute;n de la
+	 * aplicaci&oacute;n que se est&aacute; ejecutando, {@code false} si no hay almacenada ayuda o
+	 * si se trata de otra versi&oacute;n.
+	 */
+	static boolean isLocalHelpUpdated(final File helpDir) {
+
+		boolean updated;
+		try (InputStream is = new FileInputStream(new File(helpDir, HELP_VERSION_FILENAME))) {
+			final String installedVersion = new String(AOUtil.getDataFromInputStream(is));
+			updated = Updater.getCurrentVersionText().equals(installedVersion);
+		}
+		catch (final Exception e) {
+			if (!(e instanceof FileNotFoundException)) {
+				LOGGER.log(Level.WARNING, "No se ha podido leer el fichero de version de la ayuda local", e); //$NON-NLS-1$
+			}
+			updated = false;
+		}
+
+		return updated;
 	}
 }

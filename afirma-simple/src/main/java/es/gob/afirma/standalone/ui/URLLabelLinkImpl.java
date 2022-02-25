@@ -28,6 +28,7 @@ public final class URLLabelLinkImpl implements LabelLinkListener{
 
     /**
      * Crea un nuevo gestor para URLs.
+     * @param url URL que se debe abrir.
      */
     public URLLabelLinkImpl (final String url) {
     	try {

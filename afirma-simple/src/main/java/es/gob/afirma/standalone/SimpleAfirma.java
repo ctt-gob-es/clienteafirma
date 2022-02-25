@@ -160,7 +160,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	public static final String AVOID_UPDATE_CHECK_ENV = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
 
     /** Versiones de Java soportadas. */
-	private static final String[] SUPPORTED_JAVA_VERSIONS = new String[] { "1.8", //$NON-NLS-1$
+	private static final String[] SUPPORTED_JAVA_VERSIONS = { "1.8", //$NON-NLS-1$
 			"9.0", //$NON-NLS-1$
 			"10.0", //$NON-NLS-1$
 			"11.0" //$NON-NLS-1$
@@ -485,15 +485,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         final String[] frags = locale.split("_"); //$NON-NLS-1$
         if (frags.length == 1) {
             return new Locale(frags[0]);
-		} else if (frags.length == 2) {
+		}
+		if (frags.length == 2) {
             return new Locale(frags[0], frags[1]);
-		} else {
-            return new Locale(frags[0], frags[1], frags[2]);
-        }
+		}
+		return new Locale(frags[0], frags[1], frags[2]);
     }
 
     /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
-	private static Locale[] locales = new Locale[] { Locale.getDefault() };
+	private static Locale[] locales = { Locale.getDefault() };
 
 	/**
 	 * Obtiene los idiomas disponibles para la aplicaci&oacute;n
@@ -542,31 +542,25 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/** Muestra la ayuda de la aplicaci&oacute;n. */
 	public static void showHelp() {
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			final File filesList = new File(APPLICATION_HOME + "\\help\\fileslist.txt"); //$NON-NLS-1$
-			final File helpVersionFile = new File(APPLICATION_HOME + "\\help.version"); //$NON-NLS-1$
-			// Si el fichero no existe lo creamos
-			if (!filesList.exists() || HelpResourceManager.isDifferentHelpFile(helpVersionFile)) {
-				try {
-					HelpResourceManager.createWindowsHelpResources(filesList, helpVersionFile);
-				} catch (final Exception e) {
-					LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
-				}
-			}
 
-			// Cargamos el fichero
+		final File helpDir = new File(APPLICATION_HOME + File.separator + "help"); //$NON-NLS-1$
+
+		// Comprobamos si la ayuda local esta actualizada. Si no, extraemos la ayuda de la
+		// aplicacion al directorio local de ayuda
+		if (!HelpResourceManager.isLocalHelpUpdated(helpDir)) {
 			try {
-				final File indexHelpFile = new File(APPLICATION_HOME + "\\help\\Spanish.lproj\\index.html"); //$NON-NLS-1$
-				Desktop.getDesktop().open(indexHelpFile);
-			} catch (final IOException ioe) {
-				LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + ioe); //$NON-NLS-1$
-				JavaHelp.showHelp();
+				HelpResourceManager.extractHelpResources(helpDir);
+			} catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se han podido copiar los ficheros de ayuda a disco", e); //$NON-NLS-1$
 			}
-		} else if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			// Ultimo recurso, si no es Windows, es Apple OS X pero no disponemos de Apple
-			// Help, o es otro
-	        // sistema operativo (Linux, Solaris), cargamos JavaHelp
-	        JavaHelp.showHelp();
+		}
+
+		// Cargamos el fichero
+		try {
+			final File indexHelpFile = new File(helpDir + File.separator + "Spanish.lproj" + File.separator + "index.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			Desktop.getDesktop().open(indexHelpFile);
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "No se ha podido abrir la ayuda de la aplicacion", e); //$NON-NLS-1$
 		}
 	}
 
@@ -716,85 +710,81 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     			if (!args[0].startsWith(WEBSOCKET_REQUEST_PREFIX)) {
     				forceCloseApplication(0);
     			}
-    		}
-    		// Invocacion normal modo grafico (salvo que la JVM no permita entornos graficos
-    		else {
-    			if (!isSimpleAfirmaAlreadyRunning()) {
+    		} else if (!isSimpleAfirmaAlreadyRunning()) {
 
-        			printSystemInfo();
+				printSystemInfo();
 
-        			LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
+				LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
 
-    				final SimpleAfirma saf = new SimpleAfirma();
+				final SimpleAfirma saf = new SimpleAfirma();
 
-    				final OS os = Platform.getOS();
-    				if (OS.WINDOWS != os && OS.MACOSX != os) {
-						LOGGER.info("Se intenta una precarga temprana de NSS" //$NON-NLS-1$
+				final OS os = Platform.getOS();
+				if (OS.WINDOWS != os && OS.MACOSX != os) {
+					LOGGER.info("Se intenta una precarga temprana de NSS" //$NON-NLS-1$
+					);
+					// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la
+					// inicializacion
+					// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve
+					// siempre
+					// un CKR_DEVICE_ERROR (directamente desde NSS).
+
+					// Configuramos el uso de JMulticard segun lo establecido en el dialogo de
+					// preferencias
+					final boolean enableJMulticard = PreferencesManager
+							.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
+
+			        JMulticardUtilities.configureJMulticard(enableJMulticard);
+
+			    	try {
+						final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						    AOKeyStore.MOZ_UNI, // Store
+						    null, // Lib
+							"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
+							null, // PasswordCallback
+							null // Parent
 						);
-						// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la
-						// inicializacion
-						// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve
-						// siempre
-	    				// un CKR_DEVICE_ERROR (directamente desde NSS).
+						saf.setKeyStoreManager(ksm);
+					} catch (final Exception e1) {
+						LOGGER.severe(
+								"Ha fallado la precarga temprana de NSS, se intentara la carga concurrente normal: " //$NON-NLS-1$
+										+ e1);
+					}
+				}
 
-						// Configuramos el uso de JMulticard segun lo establecido en el dialogo de
-						// preferencias
-						final boolean enableJMulticard = PreferencesManager
-								.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
-
-    			        JMulticardUtilities.configureJMulticard(enableJMulticard);
-
-	    		    	try {
-	    					final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-							    AOKeyStore.MOZ_UNI, // Store
-							    null, // Lib
-								"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
-								null, // PasswordCallback
-								null // Parent
-	    					);
-	    					saf.setKeyStoreManager(ksm);
-						} catch (final Exception e1) {
-	    					LOGGER.severe(
-									"Ha fallado la precarga temprana de NSS, se intentara la carga concurrente normal: " //$NON-NLS-1$
-											+ e1);
-	    				}
-    				}
-
-					// En Linux, para evitar los problemas con los iconos hay que cambiar a bajo
-					// nivel el nombre de la ventana:
-    				// http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6528430
-    				if (OS.LINUX.equals(os)) {
-    					try {
-    						final Toolkit xToolkit = Toolkit.getDefaultToolkit();
-							final java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass()
-									.getDeclaredField("awtAppClassName"); //$NON-NLS-1$
-    						awtAppClassNameField.setAccessible(true);
-    						awtAppClassNameField.set(xToolkit, "simpleafirma"); //$NON-NLS-1$
-						} catch (final Exception e) {
-    						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
-    					}
-    				}
-
-    				LOGGER.info("Cargando plugins"); //$NON-NLS-1$
-    				try {
-    					PluginsManager.getInstance().getPluginsLoadedList();
+				// En Linux, para evitar los problemas con los iconos hay que cambiar a bajo
+				// nivel el nombre de la ventana:
+				// http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6528430
+				if (OS.LINUX.equals(os)) {
+					try {
+						final Toolkit xToolkit = Toolkit.getDefaultToolkit();
+						final java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass()
+								.getDeclaredField("awtAppClassName"); //$NON-NLS-1$
+						awtAppClassNameField.setAccessible(true);
+						awtAppClassNameField.set(xToolkit, "simpleafirma"); //$NON-NLS-1$
 					} catch (final Exception e) {
-    					LOGGER.severe("No se han podido cargar los plugins en la aplicacion"); //$NON-NLS-1$
-						AOUIFactory.showErrorMessage("No se han podido cargar los plugins en la aplicacion.", //$NON-NLS-1$
-        						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-								JOptionPane.WARNING_MESSAGE, e);
-    				}
+						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
+					}
+				}
 
-    				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
-   					saf.initGUI(null);
+				LOGGER.info("Cargando plugins"); //$NON-NLS-1$
+				try {
+					PluginsManager.getInstance().getPluginsLoadedList();
+				} catch (final Exception e) {
+					LOGGER.severe("No se han podido cargar los plugins en la aplicacion"); //$NON-NLS-1$
+					AOUIFactory.showErrorMessage("No se han podido cargar los plugins en la aplicacion.", //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+							JOptionPane.WARNING_MESSAGE, e);
+				}
 
-   					checkJavaVersion(saf.getMainFrame());
-				} else {
-					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE, null);
-    			}
-    		}
+				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
+				saf.initGUI(null);
+
+				checkJavaVersion(saf.getMainFrame());
+			} else {
+				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+						JOptionPane.WARNING_MESSAGE, null);
+			}
 		} catch (final HeadlessException he) {
 			LOGGER.log(Level.WARNING,
 					"No se puede crear el entorno grafico. Se tratar la peticion como una llamada por consola"); //$NON-NLS-1$

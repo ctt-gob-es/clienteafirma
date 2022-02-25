@@ -28,13 +28,12 @@ public class ConfiguratorMacUtils {
 
 
 	/** Escribe un <i>script</i> en un fichero dado.
-	 * @param path Ruta donde se escribir&aacute; el <i>script</i>.
+	 * @param macScript Fichero de <i>script</i>.
 	 * @param script Datos a escribir.
 	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void writeScriptFile(final StringBuilder script, final String path, final boolean append) throws IOException{
+	static void writeScriptFile(final StringBuilder script, final File macScript, final boolean append) throws IOException{
 		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + script.toString()); //$NON-NLS-1$
-		final File macScript = new File(path);
 		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
 			fout.write(script.toString().getBytes());
 			fout.write("\n".getBytes()); //$NON-NLS-1$

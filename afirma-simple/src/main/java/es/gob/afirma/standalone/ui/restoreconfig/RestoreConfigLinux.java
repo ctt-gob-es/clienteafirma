@@ -33,7 +33,6 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
-import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -109,8 +108,6 @@ final class RestoreConfigLinux implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.7")); //$NON-NLS-1$
 			RestoreRemoveChromeWarning.removeChromeWarningsLinux(workingDir, usersDir);
 		}
-
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.8")); //$NON-NLS-1$
 	}
 
 	private static void restoreSslCertificates(final File appDir, final File workingDir, final List<String> usersDir, final RestoreConfigPanel configPanel) {
@@ -245,7 +242,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			final byte[] out = new byte[100];
 			try (final InputStream resIs = p.getInputStream();) {
 				final int r = resIs.read(out);
-				if (r <= 0 || !new String(out, 0, r).equals("0")) { //$NON-NLS-1$
+				if (r <= 0 || !"0".equals(new String(out, 0, r))) { //$NON-NLS-1$
 					searchAllUser = false;
 				}
 			}
@@ -267,7 +264,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 		}
 
         // Comando para sacar los usuarios del sistema
-        final String[] command = new String[] {
+        final String[] command = {
 				"cut", //$NON-NLS-1$
 				"-d:", //$NON-NLS-1$
 				"-f6", //$NON-NLS-1$
@@ -321,16 +318,12 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 * @param certsDir Ruta del directorio con los certificados. */
 	private static void deleteInstalledCertificates(final File certsDir) {
 
-		if (checkSSLKeyStoreGenerated(certsDir)) {
-			if (!new File(certsDir, KS_FILENAME).delete()) {
-				LOGGER.warning("No se ha podido eliminar de disco el almacen de claves SSL de AutoFirma"); //$NON-NLS-1$
-			}
+		if (checkSSLKeyStoreGenerated(certsDir) && !new File(certsDir, KS_FILENAME).delete()) {
+			LOGGER.warning("No se ha podido eliminar de disco el almacen de claves SSL de AutoFirma"); //$NON-NLS-1$
 		}
 
-		if (checkSSLRootCertificateGenerated(certsDir)) {
-			if (!new File(certsDir, FILE_AUTOFIRMA_CERTIFICATE).delete()) {
-				LOGGER.warning("No se ha podido eliminar el certificado de disco raiz SSL de AutoFirma"); //$NON-NLS-1$
-			}
+		if (checkSSLRootCertificateGenerated(certsDir) && !new File(certsDir, FILE_AUTOFIRMA_CERTIFICATE).delete()) {
+			LOGGER.warning("No se ha podido eliminar el certificado de disco raiz SSL de AutoFirma"); //$NON-NLS-1$
 		}
 
 	}
