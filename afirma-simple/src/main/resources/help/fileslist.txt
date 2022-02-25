@@ -1,3 +1,4 @@
+index.html
 shrd/icon_binary.png
 shrd/icon_facturae.png
 shrd/icon_office_win.png
