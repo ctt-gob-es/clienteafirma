@@ -72,7 +72,7 @@ public final class HelpResourceManager {
     		// Leemos la siguiente entrada
     		String filePath;
     		while ((filePath = index.readLine()) != null) {
-    			if (!filePath.isBlank()) {
+    			if (!filePath.trim().isEmpty()) {
 
     				// Cargamos el recurso
     				try (final InputStream fileIs = ClassLoader.getSystemResourceAsStream(INTERNAL_HELP_DIR_NAME + filePath)) {
