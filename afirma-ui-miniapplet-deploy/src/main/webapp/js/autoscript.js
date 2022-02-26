@@ -638,7 +638,9 @@ var AutoScript = ( function ( window, undefined ) {
 			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
 			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
 			// una opcion de red concreta), usamos WebSockets 
-			else if (isWebSocketsSupported() && !Platform.isInternetExplorer()) {
+			// Tampoco usamos websockets en XP o Vista puesto que necesitamos autofirma 1.7 
+			// y en esos sistemas el máximo que se puede instalar es la 1.4
+			else if (isWebSocketsSupported() && !Platform.isInternetExplorer() && !Platform.isWindowsVista() && !Platform.isWindowsXP()) {
 				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
 			}
 			// Si no se esta en una version antigua de Internet Explorer o Safari
@@ -736,6 +738,14 @@ var AutoScript = ( function ( window, undefined ) {
 					navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
 			}
 			
+			function isWindowsXP() {
+				return navigator.userAgent.indexOf("Windows NT 5") >= 0;
+			}
+			
+			function isWindowsVista() {
+				return navigator.userAgent.indexOf("Windows NT 6.0") >= 0;
+			}
+			
 			/* Metodos que publicamos del objeto */
 			return {
 				isAndroid : isAndroid,
@@ -745,7 +755,9 @@ var AutoScript = ( function ( window, undefined ) {
 				isInternetExplorer7orLower : isInternetExplorer7orLower,
 				isSafari10 : isSafari10,
 				isFirefox : isFirefox,
-				isChrome : isChrome				
+				isChrome : isChrome,
+				isWindowsXP : isWindowsXP,
+				isWindowsVista : isWindowsVista		
 			};
 		})(window, undefined);
 		
