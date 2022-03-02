@@ -100,6 +100,12 @@ var AutoScript = ( function ( window, undefined ) {
 		// entre la pagina web y AutoFirma
 		var forceWSMode = false;
 		
+		// Puerto menor del rango de puertos seleccionable
+		var minPort;
+		
+		// Puerto mayor del rango de puertos seleccionable
+		var maxPort;
+		
 		// Version minima del Cliente que se requiere
 		var minimumClientVersion;
 		
@@ -524,6 +530,30 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		/**
+		 * Establece el rango del que se obtendran los puertos aleatorios.
+		 * Los valores fuera de rango se ajustaran al rango maximo y si solo
+		 * se indica un valor se solo ese o el valor mas cercano del rango
+		 * valido si ese no lo fuera.
+		 */
+		var setPortRange = function (minRangeLimit,  maxRangeLimit) {
+			
+			var MIN_PORT = 49152;
+			var MAX_PORT = 65535;
+			
+			// Establecemos los limites del rango
+			minPort = !!minRangeLimit && minRangeLimit >= MIN_PORT && minRangeLimit <= MAX_PORT
+				? minRangeLimit
+				: MIN_PORT;
+			maxPort = !!maxRangeLimit && maxRangeLimit >= minPort  && maxRangeLimit <= MAX_PORT
+				? maxRangeLimit
+				: (!!minRangeLimit && minRangeLimit == minPort ? minPort : MAX_PORT);
+			
+			if (clienteFirma && clienteFirma.setPortRange) {
+				clienteFirma.setPortRange(minPort, maxPort);
+			}
+		}
+
+		/**
 		 * Abre una URL en el navegador.
 		 * @param url URL que se desea abrir.
 		 */
@@ -640,10 +670,18 @@ var AutoScript = ( function ( window, undefined ) {
 			// una opcion de red concreta), usamos WebSockets 
 			else if (isWebSocketsSupported() && !Platform.isInternetExplorer()) {
 				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
+				// Si se establecio un rango de puertos, lo trasladamos al cliente
+				if (!!minPort) {
+					clienteFirma.setPortRange(minPort, maxPort);
+				}
 			}
 			// Si no se esta en una version antigua de Internet Explorer o Safari
 			else if (!Platform.isInternetExplorer10orLower() && !Platform.isSafari10()) {
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
+				// Si se establecio un rango de puertos, lo trasladamos al cliente
+				if (!!minPort) {
+					clienteFirma.setPortRange(minPort, maxPort);
+				}
 			}
 			// En cualquier otro caso, usaremos servidor intermedio
 			else {
@@ -760,6 +798,12 @@ var AutoScript = ( function ( window, undefined ) {
 				/* Caracteres validos para los ID de sesion */
 				var VALID_CHARS_TO_ID = "1234567890abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+				/* Puerto minimo del rango de puertos aleatorios. */
+				var MIN_PORT = 49152;
+				
+				/* Puerto maximo del rango de puertos aleatorios. */
+				var MAX_PORT = 65535;
+				
 				/** Genera un nuevo identificador de sesion aleatorio. */
 				function generateNewIdSession () {
 					var ID_LENGTH = 20;
@@ -782,6 +826,79 @@ var AutoScript = ( function ( window, undefined ) {
 
 					return random;
 				}
+
+				/** Genera numeros aleatorios con una distribucion homogenea. */
+				var seed;
+				function rnd () {
+					if (seed == undefined) {
+						seed = new Date().getMilliseconds() * 1000 * Math.random();
+					}
+				    seed = (seed * 9301 + 49297) % 233280;
+				    return seed / 233280;
+				}
+				
+				/**
+				 * Obtiene 3 puertos aleatorios dentro del rango indicado, sin salirse del rango valido.
+				 * Si no se indican limites, se consideraran el rango minimo y el maximo de puertos aleatorios.
+				 * Si se indica un rango de 
+				 */
+				function getRandomPorts (port1, port2) {
+
+					// Definimos el rango de aleatorios, tomando el minimo y el maximo
+					// definido para los puertos cuando no se indiquen
+					var minPort = !!port1 ? Math.max(port1, MIN_PORT) : MIN_PORT;
+					var maxPort = !!port2 ? Math.min(port2, MAX_PORT) : MAX_PORT;
+					
+					// Obtenemos 3 aleatorios unicos de ese rango, menos si el rango es menor 
+					var ports = new Array();
+					switch (maxPort - minPort) {
+					case 0:
+						ports[0] = minPort;
+						break;
+					case 1:
+						ports[0] = getUniqueRandom(minPort, maxPort, ports);
+						ports[1] = getUniqueRandom(minPort, maxPort, ports);
+						break;
+					default:
+						ports[0] = getUniqueRandom(minPort, maxPort, ports);
+						ports[1] = getUniqueRandom(minPort, maxPort, ports);
+						ports[2] = getUniqueRandom(minPort, maxPort, ports);
+					}
+					return ports;
+				}
+				
+				/**
+				 * Obtiene aleatoriamente un entero de entre un rango indicado
+				 * teniendo en cuenta de que no puede ser  un numero aleatorio
+				 */
+				function getUniqueRandom(startLimit, endLimit, currentRandoms) {
+					
+					// Si no hay mas aleatorios en el rango, devolvemos un
+					// valor para evitar el bucle infinito
+					if (currentRandoms.length > endLimit - startLimit) {
+						return 0; 
+					}
+					
+					var contained;
+					do {
+						var rand = Math.floor((Math.random() * (endLimit + 1 - startLimit))) + startLimit;
+						contained = isContained(rand, currentRandoms);
+					} while (contained);
+					
+					return rand;
+				}
+				
+				/**
+				 * Comprueba si un valor es uno de los valores contenidos en un array.
+				 */
+				function isContained(value, ar) {
+					for (var i = 0; i < ar.length; i++) {
+						if (ar[i] === value) {
+							return true;
+						}
+					}
+					return false;
+				}
 				
 				/**
 				 * Decodifica y parsea los datos como JSON. Si no eran un JSON,
@@ -801,21 +918,12 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 					}
 				}
-
-				/** Genera numeros aleatorios con una distribucion homogenea. */
-				var seed;
-				function rnd () {
-					if (seed == undefined) {
-						seed = new Date().getMilliseconds() * 1000 * Math.random();
-					}
-				    seed = (seed * 9301 + 49297) % 233280;
-				    return seed / 233280;
-				}
 				
 				/* Metodos que publicamos del objeto */
 				return {
 					/** Genera un nuevo identificador de sesion aleatorio. */
 					generateNewIdSession : generateNewIdSession,
+					getRandomPorts : getRandomPorts,
 					parseJSONData : parseJSONData,
 					checkExistingId : checkExistingId
 				};
@@ -826,13 +934,13 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaWebSocketClient = ( function (window, undefined) {
 			
-			var PROTOCOL_VERSION = 3;
+			var PROTOCOL_VERSION = 4;
 			
 			var SERVER_HOST = "127.0.0.1";
 
-			var SERVER_PORT = "63117";
-			
-			var URL_REQUEST = "wss://" + SERVER_HOST + ":" + SERVER_PORT;
+			var URL_REQUEST_PREFIX = "wss://" + SERVER_HOST + ":";
+
+			var DEFAULT_PORT = 63117;
 			
 			var OPERATION_LOAD = "load";
 			
@@ -849,11 +957,10 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Informacion de error. */
 			var errorMessage = '';
 			var errorType = '';
-
-			var idSession;
+		
 			
 			/** WebSocket para la comunicacion con la aplicacion. Antes de crearlo
-			 * (new WebSocket(URL_REQUEST)) es necesario arrancar la aplicacion.  */
+			 * (new WebSocket(urlRequest)) es necesario arrancar la aplicacion.  */
 			var ws = "";
 			
 			/** Operacion que se manda a ejecutar. */
@@ -862,9 +969,15 @@ var AutoScript = ( function ( window, undefined ) {
 			/** URL de la peticion enviada. */
 			var currentOperationUrl = "";
 			
+			/** Puerto actualmente configurado. */
+			var port = '';
+			
 			/** Indica si se ha establecido la conexion o no */
 			var connected = false;
-		
+
+			/** Id de la sesion establecida. */
+			var idSession = AfirmaUtils.generateNewIdSession();
+			
 			/** Almacen de claves cargado por defecto */
 			var defaultKeyStore = null;
 
@@ -873,6 +986,21 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/** Funcion error callback */
 			var errorCallback = null;
+			
+			/** Limite inferior del rango donde buscar el puerto a abrir. */ 
+			var minPort = null;
+			
+			/** Limite superior del rango donde buscar el puerto a abrir. */ 
+			var maxPort = null;
+						
+			/**
+			 * Establece el rango del que se obtendran los puertos aleatorios.
+			 * Si solo se indica un valor, siempre se usara ese puerto.
+			 */
+			var setPortRange = function (minRangeLimit,  maxRangeLimit) {
+				minPort = minRangeLimit;
+				maxPort = maxRangeLimit;
+			}
 			
 			/** Establece el almacen de certificados de que se debe utilizar por defecto. */
 			var setKeyStore = function (keystore) {
@@ -1028,6 +1156,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function createSelectCertificateRequest(extraParams) {
 				var data = new Object();
 				data.op = createKeyValuePair ("op", "selectcert");
+				data.idsession = createKeyValuePair ("idsession", idSession);
 				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
 				data.ksb64 = createKeyValuePair ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore, true) : null, true);
 				data.sticky = createKeyValuePair ("sticky", stickySignatory);
@@ -1042,6 +1171,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function createSignRequest(signId, algorithm, format, extraParams, dataB64) {
 				var data = new Object();
 				data.op = createKeyValuePair("op", signId);
+				data.idsession = createKeyValuePair ("idsession", idSession);
 				data.algorithm = createKeyValuePair ("algorithm", algorithm);
 				data.format = createKeyValuePair ("format", format); 
 				data.properties = createKeyValuePair ("properties", extraParams != null ? Base64.encode(extraParams, true) : null, true);
@@ -1068,6 +1198,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				var data = new Object();
 				data.op = createKeyValuePair("op", "signandsave");
+				data.idsession = createKeyValuePair ("idsession", idSession);
 				data.cryptoOp = createKeyValuePair("cop", signId);
 				data.algorithm = createKeyValuePair ("algorithm", algorithm);
 				data.format = createKeyValuePair ("format", format);
@@ -1089,6 +1220,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function createBatchRequest(batchPreSignerUrl, batchPostSignerUrl, certFilters, batchB64, isJson) {
 				var data = new Object();
 				data.op = createKeyValuePair("op","batch");
+				data.idsession = createKeyValuePair ("idsession", idSession);
 				data.batchpresignerurl = createKeyValuePair("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = createKeyValuePair("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = createKeyValuePair ("properties", certFilters != null ? Base64.encode(certFilters, true) : null, true);
@@ -1112,6 +1244,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function createLoadDataRequest(loadId, title, extensions, description, filePath, multiload) {
 				var data = new Object();
 				data.op = createKeyValuePair("op", loadId);
+				data.idsession = createKeyValuePair ("idsession", idSession);
 				data.title = createKeyValuePair("title", title);
 				data.extensions = createKeyValuePair("exts", extensions);
 				data.description = createKeyValuePair("desc", description);
@@ -1127,6 +1260,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function createSaveDataRequest(dataB64, title, filename, extension, description) {
 				var data = new Object();
 				data.op = createKeyValuePair ("op", "save");
+				data.idsession = createKeyValuePair ("idsession", idSession);
 				data.title = createKeyValuePair ("title", title);
 				data.filename = createKeyValuePair ("filename", filename);
 				data.extension = createKeyValuePair ("exts", extension);
@@ -1168,20 +1302,32 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Envia una peticion a la aplicacion de firma. Si no la encuentra abierta, la arranca. */
 			function execAppIntent (url) {
 				
-				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada porque
-				// al invocar muchas peticiones consecutivas, en caso de introducir un retardo con setTimeout,
-				// queremos que las peticiones se realicen siempre para la ultima operacion establecida y no
-				// la que hubiese antes de empezar la espera (lo que ocurriria si le pasasemos la URL como
-				// parametro).
+				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada
+				// porque al invocar muchas peticiones consecutivas, en caso de introducir un
+				// retardo con setTimeout, queremos que las peticiones se realicen siempre para la
+				// ultima operacion establecida y no la que hubiese antes de empezar la espera (lo
+				// que ocurriria si le pasasemos la URL como parametro).
 				currentOperationUrl = url;
 				
-				// Si la aplicacion no esta abierta (primera ejecucion o se ejecuta despues del cierre de la aplicacion)
-				// es necesario abrirla y esperar a que este lista
+				// Si la aplicacion no esta abierta (primera ejecucion o se ejecuta despues del
+				// cierre de la aplicacion) es necesario abrirla y esperar a que este lista
 				if (!isAppOpened()) {
+					// Definimos los puertos en los que intentar la conexion
+					var ports;
+					// Si se indico un rango de puerto, se toman de el
+					if (!!minPort) {
+						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
+					}
+					// Si no, se usa el puerto por defecto
+					else {
+						ports = new Array();
+						ports[0] = DEFAULT_PORT;
+					}
 					// Invocamos a la aplicacion cliente
-					openNativeApp();
-					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
-					setTimeout(waitAppAndProcessRequest, 3000, AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
+					openNativeApp(ports);
+					// Intentamos conectar con la app despues de esperar un tiempo prudencial
+					console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
+					setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
 				}
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
 				else {
@@ -1196,32 +1342,77 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 		
 			/** Abre la aplicacion para que empiece a escuchar en el puerto por defecto. */
-			function openNativeApp () {
-				var url = "afirma://websocket?v=" + PROTOCOL_VERSION + "&jvc=" + VERSION_CODE;
+			function openNativeApp (ports) {
+
+				// Construimos el parametro de puertos
+				var portsLine = "";
+				for (var i = 0; i < ports.length; i++) {
+					portsLine += ports[i];
+					if (i < (ports.length - 1)) {
+						portsLine += ",";
+					}
+				}
+				
+				// Lanzamos la aplicacion nativa
+				var url = "afirma://websocket?ports=" + portsLine
+					+ "&v=" + PROTOCOL_VERSION
+					+ "&jvc=" + VERSION_CODE
+					+ "&idsession=" + idSession;
 				openUrl(url);
 			}
 
+			/** Comprobacion recursiva de la disponibilidad de la aplicacion en los distintos
+			 * puertos hasta un maximo del numero de intentos indicados. */ 
+			function waitAppAndProcessRequest (ports, retries) {
+								
+				if (!connected) {
+				
+					if (retries > 0) {
+						// Tratamos de conectar al websocket a traves de cualquiera de los posibles puertos
+						for (var i = 0; !connected && i < ports.length; i++) {
+							createWebSocket(ports[i]);
+						}
+
+						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1);
+					}
+					else {
+						processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
+					}
+				}
+				else {
+					
+					// Enviamos la peticion
+					console.log("Enviamos el mensaje al socket");
+					processRequest (AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
+				}
+			}
+			
 			/**
 			 * Crea el websocket con el comportamiento basico.
 			 */
-			function createWebSocket(url) {
+			function createWebSocket(port) {
 				var webSocket;
 				
 				try {
-					webSocket = new WebSocket(url);
+					webSocket = new WebSocket(URL_REQUEST_PREFIX  + port);
 				}
 				catch (e) {
 					console.log("Error estableciendo el WebSocket: " + e);
 				}
 				
 				webSocket.onopen = function() {
+					// Indicamos que la conexion esta activa y que el WebSocket activo es el actual 
 					connected = true;
+					ws = this;
 					console.log("Se abre el socket");
 				};
 				
-				webSocket.onclose = function() {
-					connected = false;
-					console.log("Se cierra el socket");
+				webSocket.onclose = function(e) {
+					if (ws != null && ws === this) {
+						connected = false;
+						ws = null;
+						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
+					}
 				};
 
 				webSocket.onmessage = function(evt) {
@@ -1233,31 +1424,6 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				return webSocket;
-			}
-			
-			/** Comprobacion recursiva de la disponibilidad de la aplicacion hasta un maximo del
-			 * numero de intentos indicados. */ 
-			function waitAppAndProcessRequest (retries) {
-				
-				if (!connected) {
-				
-					if (retries > 0) {
-						console.log("Creamos el cliente para el socket");
-
-						// Abrimos el websocket
-						ws = createWebSocket(URL_REQUEST);
-
-						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, retries - 1);
-					}
-					else {
-						processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
-					}
-				}
-				else {
-					// Enviamos la peticion
-					console.log("Enviamos el mensaje al socket");
-					processRequest (AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
-				}
 			}
 			
 			/**
@@ -1276,7 +1442,7 @@ var AutoScript = ( function ( window, undefined ) {
 					console.log("Error en la comunicacion por websocket: " + evt);
 					sendEcho(ws, idSession, retries - 1);
 				}
-
+				
 				// Enviamos una peticion de eco para comprobar que esta operativo, lo que despues hara que
 				// se lance la operacion real como se establece en la sentencia anterior
 				sendEcho(ws, idSession, retries);
@@ -1304,7 +1470,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				if (ws.readyState === 1) {
-					try {
+					try {						
 						ws.send("echo=-idsession=" + idSession + "@EOF");
 					}
 					catch (ex) {
@@ -1603,6 +1769,7 @@ var AutoScript = ( function ( window, undefined ) {
 			return {
 				echo : echo,
 				setKeyStore : setKeyStore,
+				setPortRange : setPortRange,
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
@@ -1643,7 +1810,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/* Tiempo de retardo para peticiones */
 			var WAITING_TIME = 500;
 			
-			var URL_REQUEST = "https://127.0.0.1:";
+			var URL_REQUEST_PREFIX = "https://127.0.0.1:";
 			
 			/* Respuesta del socket a la peticion realizada */
 			var totalResponseRequest = "";
@@ -1689,6 +1856,19 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/* URL de la operacion que se solicita actualmente. */
 			var currentOperationUrl = null;
+			
+			/* Limite inferior del rango donde buscar el puerto a abrir. */ 
+			var minPort = null;
+			
+			/* Limite superior del rango donde buscar el puerto a abrir. */ 
+			var maxPort = null;
+						
+			/* Establece el rango del que se obtendran los puertos aleatorios.
+			 * Si solo se indica un valor, siempre se usara ese puerto. */
+			var setPortRange = function (minRangeLimit,  maxRangeLimit) {
+				minPort = minRangeLimit;
+				maxPort = maxRangeLimit;
+			}
 			
 			/**
 			 * Establece el almacen de certificados de que se debe utilizar por defecto.
@@ -1897,7 +2077,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Primera ejecucion, no hay puerto definido
 				if (port == "") {
 					// Calculamos los puertos
-					var ports = getRandomPorts();
+					var ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 					// Invocamos a la aplicacion nativa
 					openNativeApp(ports);
 					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
@@ -1909,20 +2089,7 @@ var AutoScript = ( function ( window, undefined ) {
 					executeEchoByService (port, url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES)
 				}
 			}
-			
-			/**
-			 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
-			 */
-			function getRandomPorts () {
-				var MIN_PORT = 49152;
-				var MAX_PORT = 65535;
-				var ports = new Array();
-				ports[0] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-				ports[1] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-				ports[2] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-				return ports;
-			}
-		
+
 		
 			function openNativeApp (ports) {
 			
@@ -2029,12 +2196,12 @@ var AutoScript = ( function ( window, undefined ) {
 				currentOperationUrl = url;
 				
 				var httpRequest = getHttpRequest();
-				httpRequest.open("POST", URL_REQUEST + currentPort + "/afirma", true);
+				httpRequest.open("POST", URL_REQUEST_PREFIX + currentPort + "/afirma", true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText, true) == "OK" && !connection) {
 						port = currentPort;
-						urlHttpRequest = URL_REQUEST + port + "/afirma";
+						urlHttpRequest = URL_REQUEST_PREFIX + port + "/afirma";
 						connection = true;
 						if (semaphore) {
 							semaphore.locked = true;
@@ -2733,11 +2900,12 @@ var AutoScript = ( function ( window, undefined ) {
 				throw new Error();
 			}
 
-			/* Metodos que publicamos del objeto AppAfirmaJS */
+			/* Metodos que publicamos del objeto AppAfirmaJSSocket */
 			return {
 				echo : echo,
 				checkTime : checkTime,
 				setKeyStore : setKeyStore,
+				setPortRange : setPortRange,
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
@@ -2917,7 +3085,7 @@ var AutoScript = ( function ( window, undefined ) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				
-				var idSession = generateNewIdSession();
+				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
 				var i = 0;
@@ -2983,7 +3151,7 @@ var AutoScript = ( function ( window, undefined ) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				
-				var idSession = generateNewIdSession();
+				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
 				var i = 0;
@@ -3046,7 +3214,7 @@ var AutoScript = ( function ( window, undefined ) {
 					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
 				}
 				
-				var idSession = generateNewIdSession();
+				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 				
 				var opId = "batch";
@@ -3100,7 +3268,7 @@ var AutoScript = ( function ( window, undefined ) {
 					certFilters = addSignatoryCertificateToExtraParams(stickyCertificate, certFilters);
 				}
 				
-				var idSession = generateNewIdSession();
+				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 				
 				var opId = "batch";
@@ -3153,7 +3321,7 @@ var AutoScript = ( function ( window, undefined ) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
 
-				var idSession = generateNewIdSession();
+				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
 				var i = 0;
@@ -3286,35 +3454,6 @@ var AutoScript = ( function ( window, undefined ) {
 				return url.length > MAX_LONG_GENERAL_URL;
 			}
 			
-			/* Mayor entero. */
-			var MAX_NUMBER = 2147483648;
-
-			/* Caracteres validos para los ID de sesion */
-			var VALID_CHARS_TO_ID = "1234567890abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-			/* Genera un identificador de sesion. */
-			function generateNewIdSession () {
-				var ID_LENGTH = 20;
-				var random = "";
-				var randomInts;
-				if (typeof window.crypto != "undefined" && typeof window.crypto.getRandomValues != "undefined") {
-					randomInts = new Uint32Array(ID_LENGTH);
-					window.crypto.getRandomValues(randomInts);
-				}
-				else {
-					randomInts = new Array(ID_LENGTH);
-					for (var i = 0; i < ID_LENGTH; i++) {
-						randomInts[i] = rnd() * MAX_NUMBER;
-					}
-				}
-
-				for (var i = 0; i < ID_LENGTH; i++) {
-					random += VALID_CHARS_TO_ID.charAt(Math.floor(randomInts[i] % VALID_CHARS_TO_ID.length));
-				}
-
-				return random;
-			}
-
 			/* Genera un numero aleatorio para utilizar como clave de cifrado. */
 			function generateCipherKey() {
 				var random;
@@ -3341,18 +3480,6 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Genera numeros aleatorios con una distribucion homogenea
-			 */
-			var seed;
-			function rnd () {
-				if (seed == undefined) {
-					seed = new Date().getMilliseconds() * 1000 * Math.random();
-				}
-			    seed = (seed * 9301 + 49297) % 233280;
-			    return seed / 233280;
-			}
-
-			/**
 			 * Envia los datos al servidor intermedio y luego invoca a la
 			 * aplicacion nativa para que los descargue y opere con ellos.
 			 * @param idSession Identificador de la operacion con el que se espera recuperar el resultado.
@@ -3367,7 +3494,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
 
 				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
-				var fileId = generateNewIdSession(); 
+				var fileId = AfirmaUtils.generateNewIdSession(); 
 
 				// Subimos los datos al servidor intermedio
 				var httpRequest = getHttpRequest();
@@ -4001,6 +4128,7 @@ var AutoScript = ( function ( window, undefined ) {
 			setKeyStore : setKeyStore,
 			setForceWSMode : setForceWSMode,
 			setServlets : setServlets,
+			setPortRange : setPortRange,
 			setStickySignatory : setStickySignatory,
 			setLocale : setLocale,
 			setMinimumClientVersion : setMinimumClientVersion,

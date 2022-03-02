@@ -18,7 +18,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,8 +43,6 @@ public final class ServiceInvocationManager {
 
 	/** Listado de versiones de protocolo soportadas. */
 	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { 1, 2, CURRENT_PROTOCOL_VERSION };
-
-	private static final String IDSESSION = "idsession"; //$NON-NLS-1$
 
 	private static final String[] ENABLED_CIPHER_SUITES = new String[] {
 			"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
@@ -100,10 +97,10 @@ public final class ServiceInvocationManager {
 	}
 
 	/** Inicia el servicio. Se intenta establecer un <code>socket</code> que escuche en el puerto pasado por la URL.
-	 * @param urlParams Par&aacute;metros de la URL de llamada (debe indicarse el puerto).
+	 * @param channelInfo Informaci&oacute;n para el establecimiento del canal Par&aacute;metros de la URL de llamada (debe indicarse el puerto).
 	 * @param protocolVersion Versi&oacute;n declarada del protocolo.
 	 * @throws UnsupportedProtocolException Si no se soporta el protocolo o la versi&oacute;n de este. */
-	static void startService(final Map<String, String> urlParams, final int protocolVersion) throws UnsupportedProtocolException {
+	static void startService(final ChannelInfo channelInfo, final int protocolVersion) throws UnsupportedProtocolException {
 
 		checkSupportProtocol(protocolVersion);
 
@@ -112,7 +109,6 @@ public final class ServiceInvocationManager {
 
 			final SSLServerSocketFactory ssocketFactory = sc.getServerSocketFactory();
 
-			final ChannelInfo channelInfo = getChannelInfo(urlParams);
 			final SSLServerSocket ssocket = tryPorts(channelInfo.getPorts(), ssocketFactory);
 			ssocket.setReuseAddress(true);
 
@@ -172,52 +168,6 @@ public final class ServiceInvocationManager {
 		}
 	}
 
-	/** Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
-	 * Asigna cual es la clave.
-	 * @param urlParams Par&aacute;metros de la URL de entre los que obtener los puertos.
-	 * @return Listados de puertos. */
-	private static ChannelInfo getChannelInfo(final Map<String, String> urlParams) {
-
-		final String ps = urlParams.get("ports"); //$NON-NLS-1$
-		checkNullParameter(ps, "La URI de invocacion no contiene el parametro 'ports'"); //$NON-NLS-1$
-
-		final String[] portsText = ps.split(","); //$NON-NLS-1$
-		final int[] ports = new int[portsText.length];
-		for (int i = 0; i < portsText.length; i++) {
-			try {
-				ports[i] = Math.abs(Integer.parseInt(portsText[i]));
-			}
-			catch(final Exception e) {
-				throw new IllegalArgumentException(
-					"El parametro 'ports' de la URI de invocacion contiene valores no numericos: " + e //$NON-NLS-1$
-				, e);
-			}
-		}
-
-		String idSession = urlParams.get(IDSESSION);
-		if (idSession != null && !idSession.isEmpty()){
-		    LOGGER.info("Se ha recibido un idSesion para la transaccion: " + idSession); //$NON-NLS-1$
-		    // El ID de sesion solo puede estar conformado por numeros. Usar otra cadena nos expondria
-		    // a una injeccion de codigo en los AppleScripts que se ejecuten con el
-		    boolean valid = true;
-		    for (final char c : idSession.toCharArray()) {
-		    	if (!Character.isDigit(c)) {
-		    		valid = false;
-		    		break;
-		    	}
-		    }
-		    if (!valid) {
-		    	LOGGER.info("No se ha proporcionado un id de sesion valido"); //$NON-NLS-1$
-		    	idSession = null;
-		    }
-		}
-		else {
-            LOGGER.info("No se utilizara idSesion durante la transaccion"); //$NON-NLS-1$
-        }
-
-		return new ChannelInfo(idSession, ports);
-	}
-
 	/** Intenta realizar una conexi&oacute; por <i>socket</i> en los puertos que se pasan por par&aacute;metro.
 	 * @param ports Puertos a probar.
 	 * @param socket <i>Socket</i> que se intenta conectar.
@@ -267,24 +217,5 @@ public final class ServiceInvocationManager {
 		}
 
 		throw new UnsupportedProtocolException(protocolVersion, protocolVersion > CURRENT_PROTOCOL_VERSION);
-	}
-
-	private static class ChannelInfo {
-
-		private final String idSession;
-		private final int[] ports;
-
-		public ChannelInfo(final String idSession, final int[] ports) {
-			this.idSession = idSession;
-			this.ports = ports;
-		}
-
-		public String getIdSession() {
-			return this.idSession;
-		}
-
-		public int[] getPorts() {
-			return this.ports;
-		}
 	}
 }

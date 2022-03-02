@@ -14,7 +14,9 @@ public enum ProtocolVersion {
 	/** Versi&oacute;n 2: realiza cambios en la codificaci&oacute;n del par&aacute;metro keystore. */
 	VERSION_2 (2),
 	/** Versi&oacute;n 3: devuelve el nombre del fichero seleccionado en las operaciones de firma. */
-	VERSION_3 (3);
+	VERSION_3 (3),
+	/** Seguridad adicional en la comunicacion por WebSockets. */
+	VERSION_4 (4);
 
 	private int version;
 

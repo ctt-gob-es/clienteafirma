@@ -16,7 +16,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -61,11 +60,17 @@ public final class ProtocolInvocationLauncher {
 
     private static final String RESULT_OK = "OK"; //$NON-NLS-1$
 
-    static final ProtocolVersion MAX_PROTOCOL_VERSION_SUPPORTED = ProtocolVersion.VERSION_3;
+    static final ProtocolVersion MAX_PROTOCOL_VERSION_SUPPORTED = ProtocolVersion.VERSION_4;
 
     private static final int MIN_JAVASCRIPT_VERSION_CODE_NEEDED = 1;
 
     private static final int DEFAULT_JAVASCRIPT_VERSION_CODE = 1;
+
+    /** Par&aacute;metro de entrada con el identificador de sesi&oacute;. */
+	private static final String IDSESSION_PARAM = "idsession"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con los puertos en los que se puede intentar abrir el socket. */
+	private static final String PORTS_PARAM = "ports"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con la versi&oacute;n del protocolo que se va a utilizar. */
 	private static final String PROTOCOL_VERSION_PARAM = "v"; //$NON-NLS-1$
@@ -75,6 +80,12 @@ public final class ProtocolInvocationLauncher {
 
 	/** Par&aacute;metro de entrada con la versi&oacute;n m&iacute;nima de aplicaci&oacute;n cliente solicitada. */
 	static final String MIN_REQUESTED_VERSION_PARAM = "mcv"; //$NON-NLS-1$
+
+	/**
+	 * Puerto a trav&eacute;s del que se realizar&aacute; la comunicaci&oacute;n por WebSocket
+	 * cuando no se indique ninguno.
+	 */
+	private static final int DEFAULT_WEBSOCKET_PORT = 63117;
 
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
@@ -216,22 +227,37 @@ public final class ProtocolInvocationLauncher {
         	 LOGGER.info("Se inicia el modo de comunicacion por websockets: " + urlString); //$NON-NLS-1$
 
         	 requestedProtocolVersion = getVersion(urlParams);
+        	 final ChannelInfo channelInfo = getChannelInfo(urlParams);
+
+        	 // Si no se indica ningun puerto, es que usamos el protocolo v3, segun el cual el puerto
+        	 // a traves del que se establecera la conexion sera el
+        	 if (channelInfo.getPorts() == null) {
+        		 LOGGER.severe("Usando puerto por defecto para la comunicacion WebSocket"); //$NON-NLS-1$
+        		 channelInfo.setPorts(new int[] { DEFAULT_WEBSOCKET_PORT });
+        	 }
 
         	 try {
-        		 AfirmaWebSocketServer.startService(requestedProtocolVersion);
+        		 AfirmaWebSocketServerManager.startService(channelInfo, requestedProtocolVersion);
 			} catch (final UnsupportedProtocolException e) {
              	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
              	final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
              	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-             	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
-			} catch (final GeneralSecurityException | IOException e) {
-              	LOGGER.log(Level.SEVERE, "Ocurrio un error durante la carga del almacen de claves", e); //$NON-NLS-1$
-				final String errorCode = e instanceof IOException
-						? ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_SSL_KEYSTORE
-						: ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_SSL_KEYSTORE;
-              	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-              	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
-              }
+             	forceCloseApplication(0);
+			}
+        	catch (final SocketOperationException e) {
+               	LOGGER.log(Level.SEVERE, "No se pudo abrir ninguno de los puertos proporcionados", e); //$NON-NLS-1$
+ 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_OPEN_SOCKET;
+               	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+               	forceCloseApplication(0);
+            }
+//        	 catch (final GeneralSecurityException | IOException e) {
+//              	LOGGER.log(Level.SEVERE, "Ocurrio un error durante la carga del almacen de claves", e); //$NON-NLS-1$
+//				final String errorCode = e instanceof IOException
+//						? ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_SSL_KEYSTORE
+//						: ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_SSL_KEYSTORE;
+//              	ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+//              	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+//              }
 
              return RESULT_OK;
         }
@@ -240,9 +266,19 @@ public final class ProtocolInvocationLauncher {
             LOGGER.info("Se inicia el modo de comunicacion por sockets: " + urlString); //$NON-NLS-1$
 
        	 	requestedProtocolVersion = getVersion(urlParams);
+       	 	final ChannelInfo channelInfo = getChannelInfo(urlParams);
+
+       	 	// El listado de puertos de entre los que seleccionar uno es obligatorio
+       	 	// en esta opcion
+       	 	if (channelInfo.getPorts() == null) {
+       	 		LOGGER.log(Level.SEVERE, "No se ha proporcionado el listado de puertos para la conexion"); //$NON-NLS-1$
+       	 		final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
+       	 		ProtocolInvocationLauncherErrorManager.showError(errorCode);
+       	 		return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+       	 	}
 
             try {
-            	ServiceInvocationManager.startService(urlParams, requestedProtocolVersion);
+            	ServiceInvocationManager.startService(channelInfo, requestedProtocolVersion);
 			} catch (final UnsupportedProtocolException e) {
             	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				final String errorCode = e.isNewVersionNeeded()
@@ -972,4 +1008,62 @@ public final class ProtocolInvocationLauncher {
 
 		return params;
 	}
+
+
+	/** Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
+	 * Asigna cual es la clave.
+	 * @param urlParams Par&aacute;metros de la URL de entre los que obtener los puertos.
+	 * @return Listados de puertos. */
+	private static ChannelInfo getChannelInfo(final Map<String, String> urlParams) {
+
+		int[] ports = null;
+		final String ps = urlParams.get(PORTS_PARAM);
+		if (ps != null) {
+			final String[] portsText = ps.split(","); //$NON-NLS-1$
+			ports = new int[portsText.length];
+			for (int i = 0; i < portsText.length; i++) {
+				try {
+					ports[i] = Math.abs(Integer.parseInt(portsText[i]));
+				}
+				catch(final Exception e) {
+					throw new IllegalArgumentException(
+						"El parametro 'ports' de la URI de invocacion contiene valores no numericos: " + e //$NON-NLS-1$
+					, e);
+				}
+			}
+		}
+
+		String idSession = urlParams.get(IDSESSION_PARAM);
+		if (idSession != null && !idSession.isEmpty()){
+		    LOGGER.info("Se ha recibido un id de sesion: " + idSession); //$NON-NLS-1$
+		    // El ID de sesion solo puede estar conformado por numeros. Usar otra cadena nos expondria
+		    // a una injeccion de codigo en los AppleScripts que se ejecuten con el
+		    boolean valid = true;
+		    for (final char c : idSession.toCharArray()) {
+		    	if (!Character.isLetterOrDigit(c)) {
+		    		valid = false;
+		    		break;
+		    	}
+		    }
+		    if (!valid) {
+		    	LOGGER.info("No se ha proporcionado un id de sesion valido"); //$NON-NLS-1$
+		    	idSession = null;
+		    }
+		}
+		else {
+            LOGGER.info("No se utilizara id para la sesion"); //$NON-NLS-1$
+        }
+
+		return new ChannelInfo(idSession, ports);
+	}
+
+	/**
+	 * Cierra la aplicaci&oacute;n.
+	 *
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+	 *                 indica error y cero indica salida normal.
+	 */
+    public static void forceCloseApplication(final int exitCode) {
+       	Runtime.getRuntime().halt(exitCode);
+    }
 }
