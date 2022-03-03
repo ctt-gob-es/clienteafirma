@@ -148,27 +148,24 @@ public final class PdfSessionManager {
 		final int totalPages = pdfReader.getNumberOfPages();
 
 		if (pagesStr.length > 0) {
-			for (final String pageStr : pagesStr) {
-				if (APPEND_PAGE.equalsIgnoreCase(pageStr)) {
-					pages.add(NEW_PAGE);
+			if (APPEND_PAGE.equalsIgnoreCase(pagesStr[0])) {
+				pages.add(NEW_PAGE);
+			} else if (ALL_PAGES.equalsIgnoreCase(pagesStr[0])) {
+				for (int page = 1; page <= pdfReader.getNumberOfPages(); page++) {
+					pages.add(page);
 				}
-				else if (ALL_PAGES.equalsIgnoreCase(pageStr)) {
-					for (int page = 1 ; page <= pdfReader.getNumberOfPages() ; page++) {
-						pages.add(page);
-					}
-				}
-				else {
-					try {
+			} else {
+				try {
+					for (final String pageStr : pagesStr) {
 						PdfUtil.checkPagesRange(pageStr, totalPages, pages);
-						if (pages.isEmpty()) {
-							throw new InvalidPageNumberException(
-									"Este documento no contiene las paginas que se han seleccionado para firmar, se firmara de manera invisible." //$NON-NLS-1$
-									);
-						}
 					}
-					catch (final InvalidPageNumberException e) {
-						throw e;
+					if (pages.isEmpty()) {
+						throw new IncorrectPageException(
+								"Este documento no contiene las paginas que se han seleccionado para firmar, se firmara de manera invisible." //$NON-NLS-1$
+						);
 					}
+				} catch (final IncorrectPageException e) {
+					throw e;
 				}
 			}
 		}

@@ -33,8 +33,6 @@ import java.util.logging.Logger;
 
 import javax.help.UnsupportedOperationException;
 
-import com.aowagie.text.exceptions.InvalidPageNumberException;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
@@ -58,6 +56,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.IncorrectPageException;
 import es.gob.afirma.signers.pades.InvalidSignaturePositionException;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -566,7 +565,7 @@ final class CommandLineLauncher {
 	private static byte[] sign(final CommandLineCommand command,
 			                   final String fmt,
 			                   final String algorithm,
-			                   String extraParams,
+			                   final String extraParams,
 			                   final File inputFile,
 			                   final String alias,
 			                   final AOKeyStoreManager ksm,
@@ -705,10 +704,10 @@ final class CommandLineLauncher {
 				throw new CommandLineException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
 			}
 		}
-		catch(InvalidSignaturePositionException | InvalidPageNumberException e) {
+		catch(InvalidSignaturePositionException | IncorrectPageException e) {
 			// Si hay algun error de pagina no valida, se vuelve a firmar de manera invisible
-			extraParams = removeSignaturePageProperties(extraParams);
-			resBytes = sign(command, fmt, algorithm, extraParams, inputFile, alias, ksm, storePassword);
+			final String xParams = removeSignaturePageProperties(extraParams);
+			resBytes = sign(command, fmt, algorithm, xParams, inputFile, alias, ksm, storePassword);
 		}
 		catch(final Exception e) {
 			throw new AOException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
@@ -943,42 +942,21 @@ final class CommandLineLauncher {
 	 * @param propertiesParams Parametros de donde borrar.
 	 * @return Devuelve las propiedades sin los par&aacute;metros.
 	 */
-	private static String removeSignaturePageProperties(String propertiesParams) {
+	private static String removeSignaturePageProperties(final String propertiesParams) {
+		String result = null;
 		if (propertiesParams != null) {
-			final String params = propertiesParams.trim();
-			String keyValue;
-
-			// La division no funciona correctamente con split porque el caracter salto de linea se protege
-			// al insertarse por consola, asi que lo hacemos manualmente.
-			int beginIndex = 0;
-			int endIndex;
-			while ((endIndex = params.indexOf("\\n", beginIndex)) != -1) { //$NON-NLS-1$
-				keyValue = params.substring(beginIndex, endIndex).trim();
-				// Solo procesamos las lineas con contenido que no sean comentario
-				if (keyValue.length() > 0 && keyValue.charAt(0) != '#' &&
-						PdfExtraParams.SIGNATURE_PAGE.equals(keyValue)
-						|| PdfExtraParams.SIGNATURE_PAGES.equals(keyValue)
-						|| PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX.equals(keyValue)
-						|| PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY.equals(keyValue)
-						|| PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX.equals(keyValue)
-						|| PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY.equals(keyValue)) {
-							propertiesParams = propertiesParams.replace(keyValue.substring(0, keyValue.indexOf('='))
-												+ keyValue.substring(keyValue.indexOf('=') + 1)
-												, ""); //$NON-NLS-1$
+			final String [] arrayParams = propertiesParams.replace("\\n", "\n").split("\\n");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+			for (final String param : arrayParams) {
+				if (param.indexOf(PdfExtraParams.SIGNATURE_PAGE) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_PAGES) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY) == -1) {
+							result += param + "\\n"; //$NON-NLS-1$
 				}
-				beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
 			}
-			keyValue = params.substring(beginIndex - "\\n".length()).trim(); //$NON-NLS-1$
-			if (params.indexOf(PdfExtraParams.SIGNATURE_PAGE) != 1
-				|| params.indexOf(PdfExtraParams.SIGNATURE_PAGES) != 1
-				|| params.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX) != 1
-				|| params.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY) != 1
-				|| params.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX) != 1
-				|| params.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY) != 1) {
-				propertiesParams = propertiesParams.replace(keyValue, ""); //$NON-NLS-1$
-			}
-
 		}
-		return propertiesParams;
+		return result;
 	}
 }

@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.aowagie.text.exceptions.BadPasswordException;
-import com.aowagie.text.exceptions.InvalidPageNumberException;
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfArray;
 import com.aowagie.text.pdf.PdfDeveloperExtension;
@@ -495,62 +494,49 @@ public final class PdfUtil {
      * @param pagesList Lista de enteros donde se indican las p&aacute;ginas una a una.
      */
     public static void checkPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) {
-    		//Se comprueba si estamos tratando un rango, si es asi se extraeran las paginas
-    		if (pageStr.length() > 2) {
-    			// Se comprueba si el primero es un numero negativo.
-    			// Si el primero es negativo, el segundo debe serlo tambien ya que las ultimas paginas se
-    			// indican de menor a mayor, por lo que lo restamos al numero total de paginas.
-    			// Por ejemplo, -2 es la penultima pagina y -1 la ultima.
-    			int firstNumber;
-    			int limitNumber;
-    			String limitNumberStr;
-    			if (RANGE_INDICATOR.equals(pageStr.substring(0, 1))) {
-    				// Comprobamos si es un rango o si es solo un numero negativo
-    				if (pageStr.indexOf(RANGE_INDICATOR, 1) != -1) {
-    					firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1))) + totalPages + 1;
-        				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1)) + RANGE_INDICATOR, "");  //$NON-NLS-1$
-        				limitNumber = Integer.parseInt(limitNumberStr) + totalPages + 1;
-    				}
-    				else {
-    					firstNumber = Integer.parseInt(pageStr) + totalPages + 1;
-    					limitNumber = firstNumber;
-    				}
-    			}
-    			// Si el numero no es negativo, se obtiene el rango directamente
-    			else {
-    				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)));
-    				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)) + RANGE_INDICATOR, ""); //$NON-NLS-1$
-    				limitNumber = Integer.parseInt(limitNumberStr);
-    				if (limitNumber < 0) {
-    					limitNumber = limitNumber + totalPages + 1;
-    				}
-    			}
 
-    			if (firstNumber <= 0 || limitNumber <= 0 || limitNumber < firstNumber || totalPages < firstNumber) {
-    				throw new InvalidPageNumberException("El rango indicado no es correcto: " + pageStr); //$NON-NLS-1$
-    			}
+    	try {
+    		int page = Integer.parseInt(pageStr);
+			if (page < 0) {
+				page = page + totalPages + 1;
+			}
+			if (page <= 0) {
+				throw new IncorrectPageException("El numero de pagina indicado no es correcto: " + pageStr); //$NON-NLS-1$
+			}
+			// Si el numero que se indica supera las paginas que tiene el documento, no se agregara.
+			if (page <= totalPages && !pagesList.contains(page)) {
+				pagesList.add(page);
+			}
 
-    			// Se agregan las paginas comprendidas entre el primer y ultimo numero
-				for ( ; firstNumber <= limitNumber ; firstNumber++) {
-					if (firstNumber <= totalPages && !pagesList.contains(firstNumber)) {
-						pagesList.add(firstNumber);
-	    			}
+    	} catch (final NumberFormatException nfe) {
+    	// En caso de error al parsear, quiere decir que se ha introducido un rango
+			int firstNumber;
+			int limitNumber;
+			String limitNumberStr;
+			if (RANGE_INDICATOR.equals(pageStr.substring(0, 1))) {
+				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1))) + totalPages + 1;
+    			limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1)) + RANGE_INDICATOR, "");  //$NON-NLS-1$
+    			limitNumber = Integer.parseInt(limitNumberStr) + totalPages + 1;
+			}
+			// Si el primer numero no es negativo, se obtiene el rango directamente
+			else {
+				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)));
+				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)) + RANGE_INDICATOR, ""); //$NON-NLS-1$
+				limitNumber = Integer.parseInt(limitNumberStr);
+				if (limitNumber < 0) {
+					limitNumber = limitNumber + totalPages + 1;
 				}
-    		}
-    		// Si no es un rango, se obtiene el numero directamente
-    		else {
-    			int number = Integer.parseInt(pageStr);
-    			if (number < 0) {
-    				number = number + totalPages + 1;
+			}
+			if (firstNumber <= 0 || limitNumber <= 0 || limitNumber < firstNumber || totalPages < firstNumber) {
+				throw new IncorrectPageException("El rango indicado no es correcto: " + pageStr); //$NON-NLS-1$
+			}
+			// Se agregan las paginas comprendidas entre el primer y ultimo numero
+			for ( ; firstNumber <= limitNumber ; firstNumber++) {
+				if (firstNumber <= totalPages && !pagesList.contains(firstNumber)) {
+					pagesList.add(firstNumber);
     			}
-    			if (number <= 0) {
-    				throw new InvalidPageNumberException("El numero de pagina indicado no es correcto: " + pageStr); //$NON-NLS-1$
-    			}
-    			// Si el numero que se indica supera las paginas que tiene el documento, no se agregara.
-    			if (number <= totalPages && !pagesList.contains(number)) {
-    				pagesList.add(number);
-    			}
-    		}
+			}
+    	}
     }
 
     /**

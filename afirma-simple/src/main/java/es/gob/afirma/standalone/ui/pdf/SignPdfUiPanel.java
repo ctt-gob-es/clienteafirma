@@ -51,10 +51,9 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
-import com.aowagie.text.exceptions.InvalidPageNumberException;
-
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.IncorrectPageException;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -568,7 +567,10 @@ final class SignPdfUiPanel extends JPanel implements
 					final List<Integer> pagesList = new ArrayList<Integer>();
 					try {
 						PdfUtil.checkPagesRange(pageStr, this.pdfPages.size(), pagesList);
-					} catch (final InvalidPageNumberException e) {
+						if (pagesList.isEmpty()) {
+							throw new IncorrectPageException("Numero de pagina no valido"); //$NON-NLS-1$
+						}
+					} catch (final IncorrectPageException e) {
 			    		AOUIFactory.showMessageDialog(
 			    				this,
 			    				SignPdfUiMessages.getString("SignPdfUiPanel.26"), //$NON-NLS-1$,

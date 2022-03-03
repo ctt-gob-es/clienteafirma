@@ -32,8 +32,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import com.aowagie.text.exceptions.InvalidPageNumberException;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
@@ -51,6 +49,7 @@ import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.IncorrectPageException;
 import es.gob.afirma.signers.pades.InvalidSignaturePositionException;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
@@ -499,7 +498,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	signConfig.setExtraParams(newExtraParams);
         	signResult = signData(data, signer, signConfig, algorithm, pke, onlyOneFile, parent);
         }
-    	catch(final InvalidPageNumberException e) {
+    	catch(final IncorrectPageException e) {
         	LOGGER.warning("El documento no dispone de las paginas donde estampar la firma visible: " + e); //$NON-NLS-1$
         	final Properties newExtraParams = (Properties) extraParams.clone();
         	newExtraParams.remove(PdfExtraParams.SIGNATURE_PAGE);
