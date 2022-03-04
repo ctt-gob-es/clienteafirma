@@ -575,11 +575,37 @@ public final class PdfUtil {
      */
     public static boolean checkPagesRangeInputFormat(final String rangeInput) {
     	if (!rangeInput.isEmpty()) {
-	    	final String[] rangesArray = rangeInput.split(","); //$NON-NLS-1$
+
 	    	final String rangeChars = "0123456789-,"; //$NON-NLS-1$
+
+    		if (RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(rangeInput.length() -1)))
+    				|| rangeInput.length() == 1 && RANGE_SEPARATOR.equals(rangeInput)) {
+    			return false;
+    		}
+
+	    	for (int i = 0; i < rangeInput.length(); i++) {
+	    		// Comprobamos que sea un caracter correcto
+	    		if (!rangeChars.contains(String.valueOf(rangeInput.charAt(i)))) {
+	    			return false;
+	            }
+	    		// Comprobamos que no se hayan introducido tres guiones seguidos
+	    		else if (i+2 < rangeInput.length()
+	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i)))
+	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +1)))
+	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +2)))) {
+	    			return false;
+	    		}
+	    		// Comprobamos que no se hayan introducido dos comas seguidas
+	    		else if (i+1 < rangeInput.length()
+	    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i)))
+	    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i +1)))) {
+	    			return false;
+	    		}
+	    	}
+
+	    	final String[] rangesArray = rangeInput.split(","); //$NON-NLS-1$
 	    	for (final String range : rangesArray) {
 
-	    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
 	    		if (RANGE_INDICATOR.equals(String.valueOf(range.charAt(range.length() -1)))) {
 	    			return false;
 	    		}
@@ -594,20 +620,6 @@ public final class PdfUtil {
 	    		else if (range.length() == 1 && RANGE_INDICATOR.equals(range)) {
 	    			return false;
 	    		}
-
-		    	for (int i = 0; i < range.length(); i++) {
-		    		// Comprobamos que sea un caracter correcto
-		    		if (!rangeChars.contains(String.valueOf(range.charAt(i)))) {
-		    			return false;
-		            }
-		    		// Comprobamos que no se hayan intro tres guiones seguidos
-		    		else if (i+2 < range.length()
-		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i)))
-		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i +1)))
-		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(i +2)))) {
-		    			return false;
-		    		}
-		    	}
 	    	}
     	} else {
     		return false;
