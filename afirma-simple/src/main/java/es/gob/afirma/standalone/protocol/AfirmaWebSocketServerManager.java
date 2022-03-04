@@ -13,20 +13,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
-import javax.swing.Timer;
 
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
-
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /** Gestor de la invocaci&oacute;n por <i>WebSocket</i>. */
 public class AfirmaWebSocketServerManager {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-	/** Prefijo de la URL de invocaci&oacute;n. */
-	private static final String URL_PREFIX = "afirma://"; //$NON-NLS-1$
 
 	/** Versi&oacute;n de protocolo en la que el puerto de conexi&oacute;n era fijo. */
 	private static final int PROTOCOL_VERSION_3 = 3;
@@ -39,10 +32,6 @@ public class AfirmaWebSocketServerManager {
 
 	/** Listado de versiones de protocolo soportadas. */
 	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { PROTOCOL_VERSION_3, PROTOCOL_VERSION_4 };
-
-	private static final int SOCKET_TIMEOUT = 60000;
-
-	private static Timer inactivityTimer;
 
 	private static int protocolVersion = -1;
 
@@ -90,17 +79,6 @@ public class AfirmaWebSocketServerManager {
 		if (instance == null) {
 			throw new SocketOperationException("No se ha podido abrir ningun socket. Se aborta la comunicacion."); //$NON-NLS-1$
 		}
-
-		// Temporizador para cerrar la aplicacion cuando pase un determinado tiempo sin haber
-		// recibido peticiones por el socket. Cuando se recibe la primera peticion, se desactiva.
-		inactivityTimer = new Timer(SOCKET_TIMEOUT, evt -> {
-			LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
-			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				MacUtils.closeMacService(URL_PREFIX);
-			}
-			Runtime.getRuntime().halt(0);
-		});
-		inactivityTimer.start();
 	}
 
 	/** Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.
