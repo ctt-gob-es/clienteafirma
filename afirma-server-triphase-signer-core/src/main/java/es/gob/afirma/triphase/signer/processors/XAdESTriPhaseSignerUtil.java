@@ -40,6 +40,8 @@ final class XAdESTriPhaseSignerUtil {
 	private static final String DS_NAMESPACE_URL = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 	private static final String SIGNED_PROPERTIES_TYPE_SUFIX = "#SignedProperties"; //$NON-NLS-1$
 
+	private static final String ENVELOPED_ALGORITHM_TRANSFORM = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"; //$NON-NLS-1$
+
 	private static final String USE_MANIFEST = "useManifest"; //$NON-NLS-1$
 
 	private static final String EXTRA_PARAM_FORMAT = "format"; //$NON-NLS-1$
@@ -109,7 +111,7 @@ final class XAdESTriPhaseSignerUtil {
 	}
 
 	/** Elimina de una firma XML el contenido de los nodos referenciados por la propia firma.
-	 * En caso de tratarse una firma de Manifest, no hace nada.<br>
+	 * En caso de tratarse una firma enveloped o de Manifest, no hace nada.<br>
 	 * @param xml XML de firma sin los nodos referenciados. En el caso de firma de manifest,
 	 * devuelve la propia entrada.
 	 * @param xmlEncoding Encoding del XML.
@@ -349,8 +351,8 @@ final class XAdESTriPhaseSignerUtil {
 		);
 	}
 
-	/** Devuelve todas las referencias, que no apunten a "SignedProperties", de
-	 * los nodos "Signature" con los identificadores indicados.
+	/** Devuelve las URI de todas las referencias de los nodos "Signature" que no apunten a
+	 * "SignedProperties" ni tengan la transformaci&oacute;n enveloped.
 	 * @param doc Documento de firma electr&oacute;nica.
 	 * @return Listado de referencias. */
 	private static List<String> getInmutableReferences(final Document doc) {
@@ -364,7 +366,7 @@ final class XAdESTriPhaseSignerUtil {
 
         // Obtenemos las firmas del documento
         final NodeList nl = signDoc.getElementsByTagNameNS(DS_NAMESPACE_URL, "Signature"); //$NON-NLS-1$
-        for(int i = 0; i < nl.getLength(); i++) {
+        for (int i = 0; i < nl.getLength(); i++) {
         	signatureNodes.add(nl.item(i));
         }
 
@@ -372,11 +374,10 @@ final class XAdESTriPhaseSignerUtil {
         final List<String> unmutableReferences = new ArrayList<>();
         for(final Node sigs : signatureNodes) {
         	final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
-        	for(int j = 0; j < rf.getLength(); j++) {
-        		final Node node = rf.item(j);
-        		final String type = ((Element) node).getAttribute("Type"); //$NON-NLS-1$
-        		if (type == null || !type.endsWith(SIGNED_PROPERTIES_TYPE_SUFIX)) {
-        			final String uri = ((Element) node).getAttribute("URI"); //$NON-NLS-1$
+        	for (int j = 0; j < rf.getLength(); j++) {
+        		final Element refElement = (Element) rf.item(j);
+        		if (!isReferenceToSignedProperties(refElement) && !isEnvelopedReference(refElement)) {
+        			final String uri = refElement.getAttribute("URI"); //$NON-NLS-1$
         			if (uri != null) {
         				unmutableReferences.add(uri);
         			}
@@ -385,6 +386,35 @@ final class XAdESTriPhaseSignerUtil {
         }
 
         return unmutableReferences;
+	}
+
+	/**
+	 * Indica si la referencia apunta a un elemento SignedProperties.
+	 * @param refElement Referencia de la firma.
+	 * @return {@code true} si la referencia apunta a un elemento SignedProperties,
+	 * {@code false} en caso contrario.
+	 */
+	private static boolean isReferenceToSignedProperties(final Element refElement) {
+		final String type = refElement.getAttribute("Type"); //$NON-NLS-1$
+		return type != null && type.endsWith(SIGNED_PROPERTIES_TYPE_SUFIX);
+	}
+
+	/**
+	 * Identifica si una referencia declara una transformaci&oacute;n envelveloped.
+	 * @param element Elemento de la referencia.
+	 * @return {@code true} si la referencia declarara una transformaci&oacute;n
+	 * enveloped, {@code false} en caso contrario.
+	 */
+	private static boolean isEnvelopedReference(final Element element) {
+		boolean enveloped = false;
+		final NodeList transforms = element.getElementsByTagNameNS(DS_NAMESPACE_URL, "Transform"); //$NON-NLS-1$
+		for (int k = 0; !enveloped && k < transforms.getLength(); k++) {
+			if (ENVELOPED_ALGORITHM_TRANSFORM.equals(
+					((Element) transforms.item(k)).getAttribute("Algorithm"))) { //$NON-NLS-1$
+				enveloped = true;
+			}
+		}
+		return enveloped;
 	}
 
 	/** Elimina de la cadena de texto proporcionada la cabecera de XML si empezaba
