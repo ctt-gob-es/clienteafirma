@@ -25,6 +25,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+
 /** Gestor de la seguridad SSL para las conexiones de red.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SslSecurityManager {
@@ -167,7 +169,7 @@ public final class SslSecurityManager {
 			}
 			final File f = new File(keyStore);
 			if (!f.isFile() || !f.canRead()) {
-				LOGGER.warning("El KeyStore SSL no existe o no es legible: " + f.getAbsolutePath()); //$NON-NLS-1$
+				LOGGER.warning("El KeyStore SSL no existe o no es legible: " + LoggerUtil.getCleanUserHomePath(f.getAbsolutePath())); //$NON-NLS-1$
 				return null;
 			}
 			kstore = KeyStore.getInstance(

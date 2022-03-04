@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+
 public class UnixUtils {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -46,7 +48,7 @@ public class UnixUtils {
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido dar permiso de ejecucion a '" + LoggerUtil.getCleanUserHomePath(f.getAbsolutePath()) + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 	}

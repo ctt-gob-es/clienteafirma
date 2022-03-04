@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
@@ -622,7 +623,7 @@ public final class MozillaKeyStoreUtilities {
 			}
 		}
 		if(!f.delete()) {
-			LOGGER.warning("No se ha podido eliminar el fichero '" + f.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se ha podido eliminar el fichero '" + LoggerUtil.getCleanUserHomePath(f.getAbsolutePath())  + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return ret;
 	}

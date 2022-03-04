@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 
 /**
  * Implementaci&oacute;n de cache&eacute; en disco.
@@ -212,7 +213,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 					catch(final Exception e) {
 						// Suponemos que el fichero ha sido eliminado por otro hilo
 						LOGGER.warning(
-								"No se ha podido eliminar el fichero '" + file.getAbsolutePath() //$NON-NLS-1$s
+								"No se ha podido eliminar el fichero '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) //$NON-NLS-1$s
 								+ "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$
 								);
 					}

@@ -378,7 +378,7 @@ public final class AOUtil {
         // Pedimos borrar los temporales cuando se cierre la JVM
         tempLibrary.deleteOnExit();
 
-        LOGGER.info("Cargamos " + tempLibrary.getAbsolutePath()); //$NON-NLS-1$
+        LOGGER.info("Cargamos " + LoggerUtil.getCleanUserHomePath(tempLibrary.getAbsolutePath())); //$NON-NLS-1$
         System.load(tempLibrary.getAbsolutePath());
     }
 

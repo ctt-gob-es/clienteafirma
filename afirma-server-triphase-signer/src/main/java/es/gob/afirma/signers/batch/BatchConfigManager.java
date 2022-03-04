@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.triphase.server.SignatureService;
 
 /**
@@ -182,8 +183,8 @@ public class BatchConfigManager {
 			}
 			catch (final Exception e) {
 				LOGGER.warning(
-						"No se pudo cargar el fichero de configuracion " + configFilename + //$NON-NLS-1$
-						" desde el directorio " + configDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+						"No se pudo cargar el fichero de configuracion " + LoggerUtil.getCleanUserHomePath(configFilename) + //$NON-NLS-1$
+						" desde el directorio " + LoggerUtil.getCleanUserHomePath(configDir) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				configProperties = null;
 			}
 		}
@@ -199,7 +200,7 @@ public class BatchConfigManager {
 			}
 			catch (final Exception e) {
 				LOGGER.warning(
-					"No se pudo cargar el fichero de configuracion " + configFilename + " desde el CLASSPATH: " + e //$NON-NLS-1$ //$NON-NLS-2$
+					"No se pudo cargar el fichero de configuracion " + LoggerUtil.getCleanUserHomePath(configFilename) + " desde el CLASSPATH: " + e //$NON-NLS-1$ //$NON-NLS-2$
 				);
 				configProperties = null;
 			}

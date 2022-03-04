@@ -40,6 +40,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
@@ -509,7 +510,7 @@ final class ConfiguratorMacOSX implements Configurator {
 									Files.delete(file);
 								}
 								catch (final Exception e) {
-									LOGGER.warning("No se pudo eliminar el fichero '" + file + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+									LOGGER.warning("No se pudo eliminar el fichero '" + LoggerUtil.getCleanUserHomePath(file.toAbsolutePath().toString()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								return FileVisitResult.CONTINUE;
 							}
@@ -518,7 +519,7 @@ final class ConfiguratorMacOSX implements Configurator {
 								try {
 									Files.delete(dir);
 								} catch (final IOException e) {
-									LOGGER.warning("No se pudo eliminar el directorio '" + dir + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+									LOGGER.warning("No se pudo eliminar el directorio '" + LoggerUtil.getCleanUserHomePath(dir.toAbsolutePath().toString()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								return FileVisitResult.CONTINUE;
 							}

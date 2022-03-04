@@ -18,6 +18,7 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 
 /** Gestor de registro del Cliente @firma.
@@ -106,7 +107,7 @@ public final class LogManager {
 		}
 		final File path = new File(logFile).getParentFile();
 		if (!path.exists()) {
-			LOGGER.info("La ruta para el fichero de registro ('" + path + "') no existe, se creara");  //$NON-NLS-1$//$NON-NLS-2$
+			LOGGER.info("La ruta para el fichero de registro ('" + LoggerUtil.getCleanUserHomePath(path.getAbsolutePath()) + "') no existe, se creara");  //$NON-NLS-1$//$NON-NLS-2$
 			if (!path.mkdirs()) {
 				LOGGER.severe("No se ha podido crear la ruta para el fichero de registro ('" + path + "')"); //$NON-NLS-1$ //$NON-NLS-2$
 			}

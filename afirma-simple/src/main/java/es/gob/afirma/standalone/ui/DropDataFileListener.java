@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+
 /**
  * Clase con el comportamiento que inicia la carga de ficheros en el panel de
  * firma como respuesta a que se arrastren sobre &eacute;l.
@@ -27,7 +29,7 @@ public class DropDataFileListener implements DropTargetListener {
 	 * Construye la clase para la carga de ficheros.
 	 * @param listener Objeto que lanzar&aacute; la operaci&oacute;n de carga.
 	 */
-	public DropDataFileListener(LoadDataFileListener listener) {
+	public DropDataFileListener(final LoadDataFileListener listener) {
 		this.listener = listener;
 	}
 
@@ -87,7 +89,7 @@ public class DropDataFileListener implements DropTargetListener {
             				 file = new File(new URI(filename));
             			 }
             			 catch (final Exception e) {
-            				 LOGGER.warning(String.format("Error al cargar el fichero '%s', se ignorara: ", filename) + e); //$NON-NLS-1$
+            				 LOGGER.warning(String.format("Error al cargar el fichero '%s', se ignorara: ", LoggerUtil.getCleanUserHomePath(filename)) + e); //$NON-NLS-1$
             				 continue;
             			 }
             		 }

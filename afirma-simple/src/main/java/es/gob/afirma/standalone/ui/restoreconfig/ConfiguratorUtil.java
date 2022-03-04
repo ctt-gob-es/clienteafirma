@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+
 final class ConfiguratorUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -100,7 +102,7 @@ final class ConfiguratorUtil {
 			);
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo borrar el directorio '" + targetDir.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se pudo borrar el directorio '" + LoggerUtil.getCleanUserHomePath(targetDir.getAbsolutePath()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -110,7 +112,7 @@ final class ConfiguratorUtil {
 	 * @param comands Listado de comandos que almacenar.
 	 * @param buffer Buffer de datos en el que se almacen el script.
 	 */
-	static void printScript(String[] comands, StringBuilder buffer) {
+	static void printScript(final String[] comands, final StringBuilder buffer) {
 		for (final String s : comands) {
 			buffer.append(s);
 			buffer.append(' ');
@@ -125,7 +127,7 @@ final class ConfiguratorUtil {
 	 * @param outFile Fichero en el que guardar el script.
 	 * @throws IOException Cuando el fichero no se puede crear o escribir.
 	 */
-	static void writeScript(StringBuilder buffer, File outFile) throws IOException {
+	static void writeScript(final StringBuilder buffer, final File outFile) throws IOException {
 		try (final FileOutputStream fout = new FileOutputStream(outFile, true);) {
 			fout.write(buffer.toString().getBytes());
 		}

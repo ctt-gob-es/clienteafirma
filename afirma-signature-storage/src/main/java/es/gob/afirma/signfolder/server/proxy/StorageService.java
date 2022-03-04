@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.gob.afirma.signfolder.util.LoggerUtil;
+
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y aplicaciones nativas.
  * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s. */
@@ -207,7 +209,7 @@ public final class StorageService extends HttpServlet {
 				catch(final Exception e) {
 					// Suponemos que el fichero ha sido eliminado por otro hilo
 					LOGGER.warning(
-						"No se ha podido eliminar el fichero '" + file.getAbsolutePath() + "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$ //$NON-NLS-2$
+						"No se ha podido eliminar el fichero '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) + "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 			}

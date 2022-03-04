@@ -34,6 +34,7 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
@@ -94,7 +95,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				workingDirectory.mkdirs();
 			}
 			catch (final Exception e) {
-				LOGGER.warning("No se ha podido crear el directorio: " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
+				LOGGER.warning("No se ha podido crear el directorio: " + LoggerUtil.getCleanUserHomePath(workingDirectory.getAbsolutePath())); //$NON-NLS-1$
 			}
 		}
 

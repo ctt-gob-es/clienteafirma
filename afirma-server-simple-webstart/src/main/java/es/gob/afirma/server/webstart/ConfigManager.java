@@ -57,7 +57,7 @@ class ConfigManager {
 				if (!configFile.isFile() || !configFile.canRead()) {
 					LOGGER.warning(
 							"No se encontro el fichero " + CONFIG_FILE + " en el directorio configurado en la variable " + //$NON-NLS-1$ //$NON-NLS-2$
-									ENVIRONMENT_VAR_CONFIG_DIR + ": " + configFile.getAbsolutePath() + //$NON-NLS-1$
+									ENVIRONMENT_VAR_CONFIG_DIR + ": " + configFile.getAbsolutePath().replace(System.getProperty("user.home"), "USERHOME") + //$NON-NLS-1$
 									"\nSe buscara en el CLASSPATH."); //$NON-NLS-1$
 				}
 				else {

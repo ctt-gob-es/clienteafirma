@@ -218,7 +218,7 @@ final public class RestoreRemoveChromeWarning {
 					if (window != null) {
 						window.print(String.format(SimpleAfirmaMessages.getString("ConfiguratorWindows.15"), userDir.getName())); //$NON-NLS-1$
 					}
-					LOGGER.warning("No se pudo configurar Chrome para el usuario " + userDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.warning("No se pudo configurar Chrome para uno de los usuarios: " + e); //$NON-NLS-1$
 				}
 			}
 		}

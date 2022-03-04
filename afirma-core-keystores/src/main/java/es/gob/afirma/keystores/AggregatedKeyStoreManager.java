@@ -145,7 +145,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 			}
 		}
 		LOGGER.warning(
-			"El almacen no contiene ningun certificado con alias '" + alias + "', se devolvera null" //$NON-NLS-1$ //$NON-NLS-2$
+			"El almacen no contiene ningun certificado con el alias especificado, se devolvera null" //$NON-NLS-1$
 		);
 		return null;
 	}
@@ -168,7 +168,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 			}
 		}
 		LOGGER.warning(
-			"El almacen no contiene ninguna clave con alias '" + alias + "', se devolvera null" //$NON-NLS-1$ //$NON-NLS-2$
+			"El almacen no contiene ninguna clave el alias especificado, se devolvera null" //$NON-NLS-1$
 		);
 		return null;
 	}
@@ -189,7 +189,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 			}
 		}
 		LOGGER.warning(
-			"El almacen no contiene ninguna cadena de certificados con alias '" + alias + "', se devolvera null" //$NON-NLS-1$ //$NON-NLS-2$
+			"El almacen no contiene ninguna cadena de certificados con el alias especificado, se devolvera null" //$NON-NLS-1$
 		);
 		return null;
 	}

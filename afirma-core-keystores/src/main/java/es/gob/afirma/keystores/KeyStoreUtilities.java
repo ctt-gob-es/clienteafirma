@@ -36,6 +36,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.filters.CertificateFilter;
@@ -166,7 +167,7 @@ public final class KeyStoreUtilities {
     	if (libPath.contains(")") || libPath.contains("(")) { //$NON-NLS-1$ //$NON-NLS-2$
         	libPath = getWindowsShortName(libPath);
         }
-    	LOGGER.info(String.format("La ruta de la libreria '%s' se interpretara como '%s'", lib, libPath)); //$NON-NLS-1$
+    	LOGGER.info(LoggerUtil.getCleanUserHomePath(String.format("La ruta de la libreria '%s' se interpretara como '%s'", lib, libPath))); //$NON-NLS-1$
 		return libPath;
 	}
 
@@ -229,7 +230,7 @@ public final class KeyStoreUtilities {
                 }
 
                 if (tmpCert == null) {
-                    LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
+                    LOGGER.warning("El KeyStore no permite extraer el certificado publico para el alias especificado"); //$NON-NLS-1$
                     continue;
                 }
 
@@ -239,7 +240,7 @@ public final class KeyStoreUtilities {
                     }
                     catch (final Exception e) {
                         LOGGER.info(
-                            "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                            "Se ocultara el certificado por no ser valido: " + e //$NON-NLS-1$
                         );
                         aliassesByFriendlyName.remove(al);
                         continue;
@@ -354,7 +355,7 @@ public final class KeyStoreUtilities {
 			}
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se ha podido obtener el nombre corto de " + LoggerUtil.getCleanUserHomePath(originalPath) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return originalPath;

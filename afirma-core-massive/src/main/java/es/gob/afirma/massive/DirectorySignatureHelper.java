@@ -30,6 +30,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -267,7 +268,7 @@ public class DirectorySignatureHelper {
                         files.add(file);
                     }
             	} else {
-            		LOGGER.warning("Por falta de permisos no se procesaran los ficheros del subdirectorio: " + files.get(i).getAbsolutePath()); //$NON-NLS-1$
+            		LOGGER.warning("Por falta de permisos no se procesaran los ficheros del subdirectorio: " + LoggerUtil.getCleanUserHomePath(files.get(i).getAbsolutePath())); //$NON-NLS-1$
             	}
             }
         }
@@ -569,7 +570,7 @@ public class DirectorySignatureHelper {
             try {
                 if (!DirectorySignatureHelper.isValidDataFile(signer, file)) {
                 	LOGGER.warning(
-            			"El fichero no puede ser firmado con la configuracion de firma actual: " + file.getPath() //$NON-NLS-1$
+            			"El fichero no puede ser firmado con la configuracion de firma actual: " + LoggerUtil.getCleanUserHomePath(file.getPath()) //$NON-NLS-1$
         			);
                     addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.4"), file.getPath(), null); //$NON-NLS-1$
                     allOK = false;
@@ -577,7 +578,7 @@ public class DirectorySignatureHelper {
                 }
             }
             catch (final Exception e) {
-                LOGGER.warning("No se pudo leer fichero '" + file.getPath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+                LOGGER.warning("No se pudo leer fichero '" + LoggerUtil.getCleanUserHomePath(file.getPath()) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
                 addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.5"), file.getPath(), null); //$NON-NLS-1$
                 allOK = false;
                 continue;
@@ -592,7 +593,7 @@ public class DirectorySignatureHelper {
                 dataToSign = AOUtil.getDataFromInputStream(fis);
             }
             catch (final Exception e) {
-                LOGGER.warning("No se pudo leer fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.warning("No se pudo leer fichero '" + LoggerUtil.getCleanUserHomePath(file.getPath()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.5"), file.getPath(), null); //$NON-NLS-1$
                 dataToSign = null;
                 allOK = false;
@@ -680,7 +681,7 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
-            LOGGER.info("El fichero se ha firmado correctamente: " + file.getPath());  //$NON-NLS-1$
+            LOGGER.info("El fichero se ha firmado correctamente: " + LoggerUtil.getCleanUserHomePath(file.getPath()));  //$NON-NLS-1$
             addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.3"), file.getPath(), signFilePath); //$NON-NLS-1$
         }
         return allOK;
@@ -790,7 +791,7 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
-            LOGGER.info("Se ha operado (" + textAux + ") correctamente sobre el fichero '" + file.getPath() + "'");   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+            LOGGER.info("Se ha operado (" + textAux + ") correctamente sobre el fichero '" + LoggerUtil.getCleanUserHomePath(file.getPath()) + "'");   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
             addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.10") + " (" + textAux + ")", file.getPath(), signFilePath); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         return allOK;
@@ -1003,7 +1004,7 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
-            LOGGER.info("El fichero se ha contrafirmado correctamente: " + file.getPath()); //$NON-NLS-1$
+            LOGGER.info("El fichero se ha contrafirmado correctamente: " + LoggerUtil.getCleanUserHomePath(file.getPath())); //$NON-NLS-1$
             addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.20"), file.getPath(), signFilePath); //$NON-NLS-1$
         }
         return allOK;
@@ -1284,7 +1285,7 @@ public class DirectorySignatureHelper {
                 this.logHandler.close(params);
             }
             catch (final Exception e) {
-                LOGGER.warning("No se cerrar el fichero de log: " + e); //$NON-NLS-1$
+                LOGGER.warning("El fichero de log no se ha cerrado correctamente: " + e); //$NON-NLS-1$
             }
         }
         this.warnCount = 0;

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.bintutil.ElfParser;
 
@@ -129,7 +130,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 					}
 					catch (final Exception | Error e) {
 						LOGGER.warning(
-							"Descartamos el NSS situado en '" + path + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
+							"Descartamos el NSS situado en '" + LoggerUtil.getCleanUserHomePath(path) + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
 						);
 					}
 				}
@@ -263,7 +264,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		}
 		catch (final IOException e) {
 			LOGGER.warning(
-				"No se ha podido comprobar la existencia del directorio '" + fullPath + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido comprobar la existencia del directorio '" + LoggerUtil.getCleanUserHomePath(fullPath) + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			return false;
 		}

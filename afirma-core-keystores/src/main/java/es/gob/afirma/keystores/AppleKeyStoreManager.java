@@ -27,7 +27,6 @@ import java.util.Set;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.InvalidOSException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 
 /** Gestor de claves del llavero de Apple OS X.
@@ -75,7 +74,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
             }
             return new KeyStore.PrivateKeyEntry(key, getCertificateChain(alias));
 		}
-		LOGGER.warning("El almacen no contiene ninguna clave con el alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.warning("El almacen no contiene ninguna clave con el alias especificado, se devolvera null"); //$NON-NLS-1$
 		return null;
 	}
 
@@ -131,7 +130,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 			}
 			catch (final KeyStoreException e) {
             	LOGGER.info(
-        			"Se ignora el certificado '" + alias + "' por no poderse operar con su clave privada: " + e //$NON-NLS-1$ //$NON-NLS-2$
+        			"Se ignora uno de los certificados por no poderse operar con su clave privada: " + e //$NON-NLS-1$
     			);
 			}
 		}
@@ -147,7 +146,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 			}
 			else {
 				LOGGER.info(
-					"Retirado certificado '" + AOUtil.getCN(tmpCert) + "' (serie=" + tmpCert.getSerialNumber() + ") por estar duplicado" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					"Se retira el certificado con numero de serie=" + tmpCert.getSerialNumber() + " por estar duplicado" //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
 		}

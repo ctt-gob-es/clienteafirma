@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 
 /** Prueba de obtenci&oacute;n de nombre corto en Windows.
@@ -42,7 +43,7 @@ public final class TestGetShort {
 			}
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se ha podido obtener el nombre corto de " + LoggerUtil.getCleanUserHomePath(originalPath) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return originalPath;
 	}

@@ -21,6 +21,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+
 /**
  * Clase con diversas utilidades necesarias para llevar a cabo la tarea de restauraci&oacute;n de
  * la configuraci&oacute;n de navegadores.
@@ -75,7 +77,7 @@ final class RestoreConfigUtil {
 			);
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo borrar el directorio '" + targetDir.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se pudo borrar el directorio '" + LoggerUtil.getCleanUserHomePath(targetDir.getAbsolutePath()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

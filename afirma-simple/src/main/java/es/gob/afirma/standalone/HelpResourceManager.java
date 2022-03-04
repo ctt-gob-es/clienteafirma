@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.updater.Updater;
 
 /** Gestor de los recursos de las diferentes formas de ayuda de la aplicaci&oacute;n,
@@ -90,7 +91,7 @@ public final class HelpResourceManager {
     					}
     				}
     				catch (final Exception e) {
-    					LOGGER.log(Level.WARNING, "No se ha encontrado o no ha podido leerse el fichero de ayuda " + filePath, e); //$NON-NLS-1$
+    					LOGGER.log(Level.WARNING, "No se ha encontrado o no ha podido leerse el fichero de ayuda " + LoggerUtil.getCleanUserHomePath(filePath), e); //$NON-NLS-1$
     				}
     			}
     		}

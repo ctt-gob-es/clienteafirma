@@ -252,7 +252,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
         if (capiKsMy == null) {
             LOGGER.warning(
-        		"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera null" //$NON-NLS-1$ //$NON-NLS-2$
+        		"No se ha podido recuperar el certificado con el alias especificado porque el KeyStore no estaba inicializado, se devolvera null" //$NON-NLS-1$
     		);
             return null;
         }
@@ -262,11 +262,11 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
             cert = (X509Certificate) capiKsMy.getCertificate(alias);
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("No se ha podido recuperar el certificado con el alias especificado', se devolvera null: " + e); //$NON-NLS-1$
             return null;
         }
         if (cert == null) {
-            LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("No se ha podido recuperar el certificado con el alias especificado, se devolvera null"); //$NON-NLS-1$
             return null;
         }
         return cert;
@@ -281,7 +281,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
     @Override
 	public X509Certificate[] getCertificateChain(final String alias) {
         if (capiKsMy == null) {
-            LOGGER.warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias '" + alias + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias especificado"); //$NON-NLS-1$
             return null;
         }
         try {

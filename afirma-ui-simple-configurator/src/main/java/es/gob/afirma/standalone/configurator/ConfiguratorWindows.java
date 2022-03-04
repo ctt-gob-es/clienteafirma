@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 
 
@@ -225,7 +226,7 @@ final class ConfiguratorWindows implements Configurator {
 									Files.delete(file);
 								}
 								catch (final Exception e) {
-									LOGGER.warning("No se pudo eliminar el fichero: " + file); //$NON-NLS-1$
+									LOGGER.warning("No se pudo eliminar el fichero: " + LoggerUtil.getCleanUserHomePath(file.toAbsolutePath().toString())); //$NON-NLS-1$
 								}
 								return FileVisitResult.CONTINUE;
 							}
@@ -234,7 +235,7 @@ final class ConfiguratorWindows implements Configurator {
 								try {
 									Files.delete(dir);
 								} catch (final IOException e) {
-									LOGGER.warning("No se pudo eliminar el directorio: " + dir); //$NON-NLS-1$
+									LOGGER.warning("No se pudo eliminar el directorio: " + LoggerUtil.getCleanUserHomePath(dir.toAbsolutePath().toString())); //$NON-NLS-1$
 								}
 								return FileVisitResult.CONTINUE;
 							}
@@ -320,7 +321,7 @@ final class ConfiguratorWindows implements Configurator {
 					if (window != null) {
 						window.print(String.format(Messages.getString("ConfiguratorWindows.15"), userDir.getName())); //$NON-NLS-1$
 					}
-					LOGGER.warning("No se pudo configurar Chrome para el usuario " + userDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.warning("No se pudo configurar Chrome para el usuario " + LoggerUtil.getCleanUserHomePath(userDir.getAbsolutePath().toString()) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}

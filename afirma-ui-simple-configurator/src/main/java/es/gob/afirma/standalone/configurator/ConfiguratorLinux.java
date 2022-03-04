@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 
 /** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de AutoFirma. */
@@ -624,7 +625,7 @@ final class ConfiguratorLinux implements Configurator {
     								Files.delete(file);
     							}
     							catch (final Exception e) {
-    								LOGGER.warning("No se pudo eliminar el fichero: " + file); //$NON-NLS-1$
+    								LOGGER.warning("No se pudo eliminar el fichero: " + LoggerUtil.getCleanUserHomePath(file.toAbsolutePath().toString())); //$NON-NLS-1$
     							}
     							return FileVisitResult.CONTINUE;
     						}
@@ -633,7 +634,7 @@ final class ConfiguratorLinux implements Configurator {
     							try {
     								Files.delete(dir);
     							} catch (final IOException e) {
-    								LOGGER.warning("No se pudo eliminar el directorio: " + dir); //$NON-NLS-1$
+    								LOGGER.warning("No se pudo eliminar el directorio: " + LoggerUtil.getCleanUserHomePath(dir.toAbsolutePath().toString())); //$NON-NLS-1$
     							}
     							return FileVisitResult.CONTINUE;
     						}

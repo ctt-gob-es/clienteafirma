@@ -69,8 +69,7 @@ class ProfilesIni {
 						this.profilesList.add(readProfile(in, profilesIniFile.getParentFile()));
 					}
 					catch (final Exception e) {
-						LOGGER.warning("No se ha podido leer la informacion del perfil " + //$NON-NLS-1$
-								line + " de Firefox: " + e); //$NON-NLS-1$
+						LOGGER.warning("No se ha podido leer la informacion de uno de los perfiles de Firefox: " + e); //$NON-NLS-1$
 					}
 				}
 				// Bloque de configuracion general

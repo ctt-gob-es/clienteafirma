@@ -21,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.bintutil.MsPortableExecutable;
@@ -147,7 +148,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 				else {
 					LOGGER.warning(
-						"No se ha podido duplicar NSS encontrado en '" + dir + "' a un directorio temporal" //$NON-NLS-1$ //$NON-NLS-2$
+						"No se ha podido duplicar NSS encontrado en '" + LoggerUtil.getCleanUserHomePath(dir) + "' a un directorio temporal" //$NON-NLS-1$ //$NON-NLS-2$
 						+ "se intentara utilizar el NSS de la aplicacion '" + BundledNssHelper.getBundledNssDirectory() //$NON-NLS-1$
 					);
 					return BundledNssHelper.getBundledNssDirectory();

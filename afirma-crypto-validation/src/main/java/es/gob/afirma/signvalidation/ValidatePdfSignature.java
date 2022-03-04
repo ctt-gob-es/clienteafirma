@@ -84,7 +84,7 @@ public final class ValidatePdfSignature implements SignValider{
 					}
 				}
 				catch (final Exception e) {
-					LOGGER.warning("Error validando la firma '" + name + "' del PDF: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.warning("Error validando una de las firmas del PDF: " + e); //$NON-NLS-1$
 					return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e);
 				}
     		}

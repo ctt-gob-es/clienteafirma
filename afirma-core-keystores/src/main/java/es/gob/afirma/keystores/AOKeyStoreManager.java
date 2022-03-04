@@ -313,7 +313,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
         if (this.ks == null) {
             LOGGER.warning(
-        		"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera null" //$NON-NLS-1$ //$NON-NLS-2$
+        		"No se ha podido recuperar el certificado con el alias especificado porque el KeyStore no estaba inicializado, se devolvera null" //$NON-NLS-1$
     		);
             return null;
         }
@@ -344,7 +344,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
          if (this.ks == null) {
              LOGGER.warning(
-         		"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera una cadena vacia" //$NON-NLS-1$ //$NON-NLS-2$
+         		"No se ha podido recuperar el certificado con el alias especificado porque el KeyStore no estaba inicializado, se devolvera una cadena vacia" //$NON-NLS-1$
      		 );
              return new X509Certificate[0];
          }
@@ -369,7 +369,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
  				"Error intentando recuperar la cadena del certificado con alias '" + alias + "', se continuara con el siguiente almacen: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
      	 }
-         LOGGER.warning("El almacen no contiene ningun certificado con el alias '" + alias + "', se devolvera una cadena vacia"); //$NON-NLS-1$ //$NON-NLS-2$
+         LOGGER.warning("El almacen no contiene ningun certificado con el alias especificado, se devolvera una cadena vacia"); //$NON-NLS-1$
          return new X509Certificate[0];
     }
 
