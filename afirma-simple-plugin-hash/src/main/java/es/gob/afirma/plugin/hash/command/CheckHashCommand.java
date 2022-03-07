@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.plugin.hash.CheckHashDirDialog;
 import es.gob.afirma.plugin.hash.CheckHashFileDialog;
@@ -33,13 +34,13 @@ public class CheckHashCommand extends PluginCommandAction {
 	protected String process(final String[] args) throws PluginControlledException {
 
 		// Comprobamos si debemos mostrar la ayuda del comando
-		if (args != null && args.length > 0
-				&& HashParameters.PARAM_HELP.equalsIgnoreCase(args[0])) {
+		if (args == null || args.length == 0
+				|| HashParameters.PARAM_HELP.equalsIgnoreCase(args[0])) {
 			return getHelpText();
 		}
 
 		String response = null;
-		final HashParameters params = new HashParameters(HashCommands.CREATEHASH, args);
+		final HashParameters params = new HashParameters(HashCommands.CHECKHASH, args);
 
 		if (params.isGui()) {
 			checkHashByGui(params);
@@ -72,6 +73,10 @@ public class CheckHashCommand extends PluginCommandAction {
 			throws IllegalArgumentException, IOException, AOException {
 
 		final File dataFile = params.getMainFile();
+		if (dataFile == null) {
+			throw new IllegalArgumentException(Messages.getString("CommandLine.5")); //$NON-NLS-1$
+		}
+
 		if (!dataFile.exists()) {
 			throw new IOException(Messages.getString("CommandLine.87", dataFile.getAbsolutePath())); //$NON-NLS-1$
 		}
@@ -81,7 +86,7 @@ public class CheckHashCommand extends PluginCommandAction {
 
 		final File hashFile = params.getInputFile();
 		if (hashFile == null) {
-			throw new IllegalArgumentException(Messages.getString("CommandLine.5")); //$NON-NLS-1$
+			throw new IllegalArgumentException(Messages.getString("CommandLine.6")); //$NON-NLS-1$
 		}
 		if (!hashFile.exists()) {
 			throw new IOException(Messages.getString("CommandLine.98", hashFile.getAbsolutePath())); //$NON-NLS-1$
@@ -89,7 +94,6 @@ public class CheckHashCommand extends PluginCommandAction {
 		if (!hashFile.canRead()) {
 			throw new IOException(Messages.getString("CommandLine.99", hashFile.getAbsolutePath())); //$NON-NLS-1$
 		}
-
 
 		boolean result;
 		if (dataFile.isDirectory()) {
@@ -144,11 +148,30 @@ public class CheckHashCommand extends PluginCommandAction {
 	private static void checkHashByGui(final HashParameters params)
 			throws IllegalArgumentException {
 
-		final File dataFile = params.getMainFile();
+		// Tomamos el fichero/directorio que se desea comprobar
+		File dataFile = params.getMainFile();
+
+		// Si no se indico el fichero/directorio, pediremos cargarlo.
 		if (dataFile == null) {
-			throw new IllegalArgumentException(Messages.getString("CommandLine.5")); //$NON-NLS-1$
+			try {
+				// Si se nos ha indicado validar un directorio, permitimos seleccionarlo
+				if (params.isDirectory()) {
+					dataFile = HashUIHelper.loadDirToCheck();
+				}
+				// Si no se indico, permitiremos seleccionar un fichero
+				else {
+					dataFile = HashUIHelper.loadFileToCheck();
+				}
+			}
+			catch (final AOCancelledOperationException e) {
+				// El usuario cancelo la operacion
+				return;
+			}
 		}
+
+		// Tomamos el fichero de hash (que podria no haberse indicado)
 		final File hashFile = params.getInputFile();
+
 		HashUIHelper.checkHashUI(dataFile, hashFile);
 	}
 

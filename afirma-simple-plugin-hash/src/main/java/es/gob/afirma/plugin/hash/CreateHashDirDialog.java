@@ -73,6 +73,8 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 	private static final String FILEEXT_TXT = "txthashfiles"; //$NON-NLS-1$
 	private static final String FILEEXT_CSV = "csv"; //$NON-NLS-1$
 
+	private static final String DEFAULT_FORMAT = HashDocumentFactory.FORMAT_XML;
+
 	private final JComboBox<String> hashAlgorithms = new JComboBox<>(HASH_ALGOS);
 	private final JTextField selectedFile = new JTextField();
 	private final JButton examineButton = new JButton();
@@ -199,7 +201,7 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 						new File(getFileTextField().getText()),
 						null,
 						getSelectedHashAlgorithm(),
-						HashDocumentFactory.FORMAT_XML,
+						DEFAULT_FORMAT,
 						isRecursive());
 			}
 			catch (final AOCancelledOperationException e) {
@@ -266,6 +268,10 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 			                  final String defaultHashFormat,
 			                  final boolean recursive) throws AOCancelledOperationException {
 
+		final String hashFormat = defaultHashFormat != null
+				? defaultHashFormat
+				: DEFAULT_FORMAT;
+
 		// Se crea la ventana de espera
 		JDialog dialog;
 		try {
@@ -283,7 +289,7 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 		try {
 			final Map<String, byte[]> hashs = calculateHashes(dir, recursive, hashAlgorithm, dialog);
 
-			final String defaultExtension = getDefaultExtension(defaultHashFormat);
+			final String defaultExtension = getDefaultExtension(hashFormat);
 
 			// El fichero de huellas se almacenaria en la carpeta que eligiese el usuario.
 			final File saveFile = AOUIFactory.getSaveDataToFile(

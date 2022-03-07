@@ -34,7 +34,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /**
- * Documento XML con los hashes de los gficheros de un directorio. El documento seguir&aacute;
+ * Documento XML con los hashes de los ficheros de un directorio. El documento seguir&aacute;
  * el esquema:
  * <pre>
  * &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;

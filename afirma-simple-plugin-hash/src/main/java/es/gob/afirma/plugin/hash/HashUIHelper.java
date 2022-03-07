@@ -41,12 +41,13 @@ public final class HashUIHelper {
 
 	private static final String REPORT_EXT = "hashreport"; //$NON-NLS-1$
 
-	/** Comprueba las huellas digitales del fichero de huella proporcionados mediante un
+	/**
+	 * Comprueba las huellas digitales del fichero de huella proporcionados mediante un
 	 * interfaz gr&aacute;fico.
 	 * @param dataFile Fichero o directorio del que comprobar las huellas.
-	 * @param defaultHashFile Fichero por defecto que deber&iacute;a contener las huellas
-	 * del fichero de datos o directorio. */
-	public static void checkHashUI(final File dataFile, final File defaultHashFile) {
+	 * @param hashFile Fichero con las huellas del fichero de datos o directorio.
+	 */
+	public static void checkHashUI(final File dataFile, final File hashFile) {
 		if (dataFile == null) {
 			AOUIFactory.showErrorMessage(
 				Messages.getString("HashHelper.4"), //$NON-NLS-1$
@@ -77,55 +78,48 @@ public final class HashUIHelper {
 
 		// Comprobacion de las huellas de un directorio
 		if (dataFile.isDirectory()) {
-			final File hashFile;
-			try {
-				hashFile = AOUIFactory.getLoadFiles(
-						Messages.getString("HashHelper.10"), //$NON-NLS-1$
-						defaultHashFile != null ? defaultHashFile.getParent() : dataFile.getParent(),
-						defaultHashFile != null ? defaultHashFile.getName() : null,
-						new String[] {"hashfiles", "txthashfiles"}, //$NON-NLS-1$ //$NON-NLS-2$
-						Messages.getString("HashHelper.15"), //$NON-NLS-1$
-						false,
-						false,
-						getDialogIcon(),
-						null)[0];
+			File selectedHashFile;
+			if (hashFile != null && hashFile.isFile()) {
+				selectedHashFile = hashFile;
 			}
-			catch(final AOCancelledOperationException e) {
-				// Operacion cancelada
-				return;
+			else {
+				try {
+					selectedHashFile = AOUIFactory.getLoadFiles(
+							Messages.getString("HashHelper.10"), //$NON-NLS-1$
+							hashFile != null ? hashFile.getParent() : dataFile.getParent(),
+									hashFile != null ? hashFile.getName() : null,
+											new String[] {"hashfiles", "txthashfiles"}, //$NON-NLS-1$ //$NON-NLS-2$
+											Messages.getString("HashHelper.15"), //$NON-NLS-1$
+											false,
+											false,
+											getDialogIcon(),
+											null)[0];
+				}
+				catch(final AOCancelledOperationException e) {
+					// Operacion cancelada
+					return;
+				}
 			}
 
 			// Comprobamos los hashes
 			HashReport report;
 			try {
 				// Se crea la ventana de espera
-				final JDialog dialog = UIFactory.getWaitingDialog(
+				JDialog dialog;
+				try {
+					dialog = UIFactory.getWaitingDialog(
 							null,
 							Messages.getString("CreateHashFiles.21"), //$NON-NLS-1$
 							Messages.getString("CreateHashFiles.22") //$NON-NLS-1$
 							);
+				}
+				catch (final Exception e) {
+					// No se puede mostrar el dialogo de espera
+					dialog = null;
+				}
 
 				// Arrancamos el proceso en un hilo aparte
-				final SwingWorker<HashReport, Void> worker = new SwingWorker<HashReport, Void>() {
-					@Override
-					protected HashReport doInBackground() throws Exception {
-						final HashReport hashReport =  new HashReport();
-						CheckHashDirDialog.checkHash(
-								Paths.get(dataFile.toURI()),
-								hashFile,
-								hashReport
-								);
-						return hashReport;
-					}
-
-					@Override
-					protected void done() {
-						super.done();
-						if (dialog != null) {
-							dialog.dispose();
-						}
-					}
-				};
+				final SwingWorker<HashReport, Void> worker = new CheckHashWorker(dataFile, selectedHashFile, dialog);
 				worker.execute();
 
 				// Se muestra la ventana de espera
@@ -174,7 +168,7 @@ public final class HashUIHelper {
 						Level.SEVERE,
 						"Error comprobando las huellas digitales del directorio '" +  //$NON-NLS-1$
 								dataFile.getAbsolutePath()  + "' con el fichero: " +  //$NON-NLS-1$
-								hashFile.getAbsolutePath(), ex
+								selectedHashFile.getAbsolutePath(), ex
 						);
 				AOUIFactory.showErrorMessage(
 						Messages.getString("CheckHashDialog.6"), //$NON-NLS-1$
@@ -221,25 +215,31 @@ public final class HashUIHelper {
 		// Comprobacion de la huella de un fichero
 		else {
 			// Cargamos el fichero de huellas
-			final File hashFile;
-			try {
-				hashFile = AOUIFactory.getLoadFiles(
-						Messages.getString("HashHelper.7"), //$NON-NLS-1$
-						defaultHashFile != null ? defaultHashFile.getParent() : dataFile.getParent(),
-						defaultHashFile != null ? defaultHashFile.getName() : null,
-						new String[] {"hash", "hashb64", "hexhash"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						Messages.getString("HashHelper.16"), //$NON-NLS-1$
-						false,
-						false,
-						getDialogIcon(),
-						null)[0];
+			final File selectedHashFile;
+			if (hashFile != null && hashFile.isFile()) {
+				selectedHashFile = hashFile;
 			}
-			catch(final AOCancelledOperationException e) {
-				// Operacion cancelada
-				return;
+			else {
+				try {
+					selectedHashFile = AOUIFactory.getLoadFiles(
+							Messages.getString("HashHelper.7"), //$NON-NLS-1$
+							hashFile != null ? hashFile.getParent() : dataFile.getParent(),
+									hashFile != null ? hashFile.getName() : null,
+											new String[] {"hash", "hashb64", "hexhash"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+											Messages.getString("HashHelper.16"), //$NON-NLS-1$
+											false,
+											false,
+											getDialogIcon(),
+											null)[0];
+				}
+				catch(final AOCancelledOperationException e) {
+					// Operacion cancelada
+					return;
+				}
 			}
+
 			try {
-				if (CheckHashFileDialog.checkHash(hashFile.getAbsolutePath(), dataFile.getAbsolutePath())) {
+				if (CheckHashFileDialog.checkHash(selectedHashFile.getAbsolutePath(), dataFile.getAbsolutePath())) {
 					AOUIFactory.showMessageDialog(
 						null,
 						Messages.getString("HashHelper.11"), //$NON-NLS-1$
@@ -259,7 +259,7 @@ public final class HashUIHelper {
 			catch (final Exception e) {
 				LOGGER.log(
 					Level.SEVERE,
-					"Error comprobando la huella digital de fichero '" + dataFile.getAbsolutePath() + "' con la huella guardada en " + hashFile.getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
+					"Error comprobando la huella digital de fichero '" + dataFile.getAbsolutePath() + "' con la huella guardada en " + selectedHashFile.getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
 					e
 				);
 				AOUIFactory.showErrorMessage(
@@ -350,6 +350,38 @@ public final class HashUIHelper {
 			);
 	}
 
+	public static File loadDirToCheck() {
+
+		return AOUIFactory.getLoadFiles(
+				Messages.getString("CheckHashFiles.24"), // Titulo //$NON-NLS-1$
+				null,	// Directorio actual
+				null,	// Nombre de directorio por defecto
+				null,	// Extensiones de fichero
+				Messages.getString("CheckHashFiles.13"), // Descripcion //$NON-NLS-1$
+				true,	// Seleccion de directorio
+				false,	// Multiseleccion
+				getDialogIcon(),
+				null // Componente padre
+				)[0];
+
+	}
+
+	public static File loadFileToCheck() {
+
+		return AOUIFactory.getLoadFiles(
+				Messages.getString("CheckHashDialog.13"), // Titulo //$NON-NLS-1$
+				null,	// Directorio actual
+				null,	// Nombre de directorio por defecto
+				null,	// Extensiones de fichero
+				Messages.getString("CheckHashDialog.21"), // Descripcion //$NON-NLS-1$
+				false,	// Seleccion de fichero
+				false,	// Multiseleccion
+				getDialogIcon(),
+				null // Componente padre
+				)[0];
+
+	}
+
 	private static Image getDialogIcon() {
 		Image icon;
 		try {
@@ -360,5 +392,37 @@ public final class HashUIHelper {
 			icon = null;
 		}
 		return icon;
+	}
+
+	private static class CheckHashWorker extends SwingWorker<HashReport, Void> {
+
+		private final File dataFile;
+		private final File hashFile;
+		private final JDialog waitingDialog;
+
+		public CheckHashWorker(final File dataFile, final File hashFile, final JDialog dialog) {
+			this.dataFile = dataFile;
+			this.hashFile = hashFile;
+			this.waitingDialog = dialog;
+		}
+
+		@Override
+		protected HashReport doInBackground() throws Exception {
+			final HashReport hashReport =  new HashReport();
+			CheckHashDirDialog.checkHash(
+					Paths.get(this.dataFile.toURI()),
+					this.hashFile,
+					hashReport
+					);
+			return hashReport;
+		}
+
+		@Override
+		protected void done() {
+			super.done();
+			if (this.waitingDialog != null) {
+				this.waitingDialog.dispose();
+			}
+		}
 	}
 }

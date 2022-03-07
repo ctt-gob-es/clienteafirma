@@ -2,7 +2,7 @@ package es.gob.afirma.plugin.hash.command;
 
 public enum HashCommands {
 	CREATEHASH("createdigest", true), //$NON-NLS-1$
-	CHECKHASH("checkdigest", true); //$NON-NLS-1$
+	CHECKHASH("checkdigest", false); //$NON-NLS-1$
 
 	private String op;
 	private boolean mainFileNeeded;

@@ -27,6 +27,9 @@ final class HashParameters {
 	private static final String PARAM_HASH_ALGO   = "-halgorithm"; //$NON-NLS-1$
 	private static final String PARAM_RECURSIVE   = "-r"; //$NON-NLS-1$
 
+	// Parametro oculto para indicar que se desea validar un directorio
+	private static final String PARAM_DIRECTORY   = "-d"; //$NON-NLS-1$
+
 	public static final String FORMAT_HASH_FILE_HEX     = "hex"; //$NON-NLS-1$
 	public static final String FORMAT_HASH_FILE_BASE64  = "b64"; //$NON-NLS-1$
 	public static final String FORMAT_HASH_FILE_BIN     = "bin"; //$NON-NLS-1$
@@ -46,6 +49,7 @@ final class HashParameters {
 	private boolean xml = false;
 	private boolean gui = false;
 	private boolean recursive = false;
+	private boolean directory = false;
 
 	public HashParameters(final HashCommands command, final String[] params)
 			throws IllegalArgumentException {
@@ -57,6 +61,7 @@ final class HashParameters {
 				throw new IllegalArgumentException(Messages.getString("CommandLine.120")); //$NON-NLS-1$
 			}
 
+			this.mainFile = readMainFile(params[i]);
 			this.mainFile = new File(params[i]);
 
 			if (!this.mainFile.exists()) {
@@ -79,6 +84,9 @@ final class HashParameters {
 			}
 			else if (PARAM_RECURSIVE.equals(params[i])) {
 				this.recursive = true;
+			}
+			else if (PARAM_DIRECTORY.equals(params[i])) {
+				this.directory = true;
 			}
 			else if (PARAM_HASH_ALGO.equals(params[i])) {
 				if (this.hashAlgorithm != null) {
@@ -138,10 +146,25 @@ final class HashParameters {
 				}
 				i++;
 			}
+			// Suponemos que el fichero principal era opcional y se ha indicado
+			else if (i == 0) {
+				this.mainFile = readMainFile(params[i]);
+			}
 			else {
 				throw new IllegalArgumentException(Messages.getString("CommandLine.25", params[i])); //$NON-NLS-1$
 			}
 		}
+	}
+
+	private static File readMainFile(final String path) {
+		final File file = new File(path);
+		if (!file.exists()) {
+			throw new IllegalArgumentException(Messages.getString("CommandLine.121", path)); //$NON-NLS-1$
+		}
+		if (!file.canRead()) {
+			throw new IllegalArgumentException(Messages.getString("CommandLine.122", path)); //$NON-NLS-1$
+		}
+		return file;
 	}
 
 	/**
@@ -223,24 +246,54 @@ final class HashParameters {
 		return this.hashAlgorithm != null ? this.hashAlgorithm : DEFAULT_HASH_ALGORITHM;
 	}
 
+	/**
+	 * Indica si se ha solicitado que la salida sea XML.
+	 * @return {@code true} si se ha solicitado que la salida sea XML,
+	 * {@code false} en caso contrario.
+	 */
 	public boolean isXml() {
 		return this.xml;
 	}
 
+	/**
+	 * Indica si se ha solicitado mostrar la interfaz gr&aacute;fica.
+	 * @return {@code true} si se ha solicitado mostrar la interfaz gr&aacute;fica,
+	 * {@code false} en caso contrario.
+	 */
 	public boolean isGui() {
 		return this.gui;
 	}
 
+	/**
+	 * Indica si se ha solicitado procesar los ficheros de los subdirectorios.
+	 * @return {@code true} si se ha solicitado procesar los ficheros de los subdirectorios,
+	 * {@code false} en caso contrario.
+	 */
 	public boolean isRecursive() {
 		return this.recursive;
 	}
 
-	public static String buildSyntaxError(final HashCommands op, final String errorMessage) {
-		switch (op) {
+	/**
+	 * Indica si se ha se&ntilde;alado que se quiere procesar un directorio.
+	 * @return {@code true} si se ha se&ntilde;alado que se quiere procesar un directorio,
+	 * {@code false} en caso contrario.
+	 */
+	public boolean isDirectory() {
+		return this.directory;
+	}
+
+	/**
+	 * Construye la respuesta de s&iacute;ntaxis incorrecta.
+	 * @param cmds Comandos introducidos.
+	 * @param errorMessage Mensaje con el error detectado.
+	 * @return Mensaje completo con la s&iacute;ntaxis.
+	 */
+	public static String buildSyntaxError(final HashCommands cmds, final String errorMessage) {
+		switch (cmds) {
 			case CHECKHASH:
-				return buildOperationCheckHashSyntaxError(op.getOp(), errorMessage);
+				return buildOperationCheckHashSyntaxError(cmds.getOp(), errorMessage);
 			case CREATEHASH:
-				return buildOperationCreateHashSyntaxError(op.getOp(), errorMessage);
+				return buildOperationCreateHashSyntaxError(cmds.getOp(), errorMessage);
 			default:
 				return errorMessage;
 		}
@@ -258,19 +311,19 @@ final class HashParameters {
 		}
 		// Sintaxis
 		sb.append(Messages.getString("CommandLine.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  AutoFirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(Messages.getString("CommandLine.108")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  AutoFirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(Messages.getString("CommandLine.109")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  AutoFirma ").append(op).append(" [FICHERO] [opciones...]\t\t- ").append(Messages.getString("CommandLine.108")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  AutoFirma ").append(op).append(" [DIRECTORIO] [opciones...]\t- ").append(Messages.getString("CommandLine.109")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// Parametros
 		.append(Messages.getString("CommandLine.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append("FICHERO").append("\t\t(").append(Messages.getString("CommandLine.106")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append("  ").append("DIRECTORIO").append("\t\t(").append(Messages.getString("CommandLine.107")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		// Opciones de fichero
 		.append(Messages.getString("CommandLine.116")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(Messages.getString("CommandLine.95")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(Messages.getString("CommandLine.100")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_INPUT).append(" FICHERO\t\t(").append(Messages.getString("CommandLine.67")).append(")\n\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// Opciones de directorio
 		.append(Messages.getString("CommandLine.117")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(Messages.getString("CommandLine.95")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_GUI).append("\t\t\t(").append(Messages.getString("CommandLine.100")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_INPUT).append(" FICHERO\t\t(").append(Messages.getString("CommandLine.105")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_OUTPUT).append(" FICHERO\t\t(").append(Messages.getString("CommandLine.97")).append(")\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
