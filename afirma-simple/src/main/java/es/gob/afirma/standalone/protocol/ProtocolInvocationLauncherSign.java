@@ -848,8 +848,13 @@ final class ProtocolInvocationLauncherSign {
 					newParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX));
 			extraParams.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY,
 					newParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY));
-			extraParams.setProperty(PdfExtraParams.SIGNATURE_PAGE,
-					newParams.getProperty(PdfExtraParams.SIGNATURE_PAGE));
+			if (newParams.getProperty(PdfExtraParams.SIGNATURE_PAGE) != null) {
+				extraParams.setProperty(PdfExtraParams.SIGNATURE_PAGE,
+						newParams.getProperty(PdfExtraParams.SIGNATURE_PAGE));
+			} else {
+				extraParams.setProperty(PdfExtraParams.SIGNATURE_PAGES,
+						newParams.getProperty(PdfExtraParams.SIGNATURE_PAGES));
+			}
 
 			// Atributos asociados al aspecto de la firma.
 			if (newParams.getProperty(PdfExtraParams.LAYER2_TEXT) != null) {
