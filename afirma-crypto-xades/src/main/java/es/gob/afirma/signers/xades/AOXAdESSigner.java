@@ -1444,12 +1444,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     }
 
     @Override
-    public boolean needData(final Properties config) {
-
-    	// Sera obligatorio que se indiquen los datos de entrada siempre que el formato no sea
-    	// Externally Detached y no se trate de una firma manifest
-    	return !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(XAdESExtraParams.FORMAT)) &&
-    			!Boolean.parseBoolean(config.getProperty(XAdESExtraParams.USE_MANIFEST));
+    public boolean needData(final String cryptoOperation, final Properties config) {
+    	return XAdESUtil.isDataMandatory(cryptoOperation, config);
     }
 
     private static Properties getExtraParams(final Properties extraParams) {
@@ -1494,7 +1490,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             	}
             }
 
-            if(XAdESUtil.checkCompatibility(signNodes)) {
+            if (XAdESUtil.checkCompatibility(signNodes)) {
             	isBaselineSign = true;
             }
         }

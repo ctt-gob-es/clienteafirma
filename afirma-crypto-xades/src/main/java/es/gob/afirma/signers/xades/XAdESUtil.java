@@ -79,6 +79,8 @@ public final class XAdESUtil {
 		XAdESConstants.NAMESPACE_XADES_1_4_1_SIGNED_PROPERTIES
 	};
 
+    private static final String CRYPTO_OPERATION_SIGN = "SIGN"; //$NON-NLS-1$
+
 	private XAdESUtil() {
 		// No permitimos la instanciacion
 	}
@@ -853,5 +855,23 @@ public final class XAdESUtil {
 				extraParams.put(XAdESExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_ADVANCED);
 			}
     	}
+    }
+
+    /**
+     * Indica si los datos a firmar son obligatorios para la operaci&oacute;n de firma con la
+     * configuraci&oacute;n proporcionada.
+     * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica (SIGN, COSIGN o COUNTERSIGN).
+     * @param config Configuraci&oacute;n de firma (extraParams).
+     * @return {@code true} si la operaci&oacute;n de firma requiere los datos a firmar,
+     * {@code false} en caso de que la configuraci&oacute;n pueda ya proporcionar estos datos.
+     */
+    public static boolean isDataMandatory(final String cryptoOperation, final Properties config) {
+
+    	// Sera obligatorio que se indiquen los datos de entrada para las cofirmas y contrafirmas
+    	// y siempre que el formato no sea Externally Detached y no se trate de una firma manifest
+    	return !CRYPTO_OPERATION_SIGN.equalsIgnoreCase(cryptoOperation)
+    			|| config == null
+    			|| !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(XAdESExtraParams.FORMAT))
+    					&& !Boolean.parseBoolean(config.getProperty(XAdESExtraParams.USE_MANIFEST));
     }
 }

@@ -260,7 +260,7 @@ final class ProtocolInvocationLauncherSign {
 		boolean needRequestData = false;
 		if (data == null) {
 			if (signer instanceof OptionalDataInterface) {
-				needRequestData = ((OptionalDataInterface) signer).needData(extraParams);
+				needRequestData = ((OptionalDataInterface) signer).needData(signOperation.getCryptoOperation().toString(), extraParams);
 			} else {
 				needRequestData = true;
 			}

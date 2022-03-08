@@ -163,7 +163,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		boolean needRequestData = false;
 		if (this.dataStore.length() == 0) {
 			if (signer instanceof OptionalDataInterface) {
-				needRequestData = ((OptionalDataInterface) signer).needData(params);
+				needRequestData = ((OptionalDataInterface) signer).needData(CRYPTO_OPERATION_SIGN, params);
 			}
 			else {
 				needRequestData = true;

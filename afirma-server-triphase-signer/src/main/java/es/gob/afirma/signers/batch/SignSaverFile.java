@@ -65,6 +65,10 @@ public final class SignSaverFile implements SignSaver {
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
 
 		if (!DISABLED) {
+
+
+			LOGGER.info("Vamos a guardar una firma");
+
 			if (this.filename == null) {
 				final Properties customExtraParams = sign.getExtraParams();
 				final String file = customExtraParams.getProperty(PROP_FILENAME);
@@ -77,6 +81,10 @@ public final class SignSaverFile implements SignSaver {
 			}
 
 			final File f = new File(this.filename);
+
+
+			LOGGER.info(" ======== GUARDAMOS EN " + f.getAbsolutePath());
+
 			if (f.getParentFile() == null || !f.getParentFile().isDirectory()) {
 				throw new IOException(
 					"El directorio de guardado de la firma no existe: " + f.getParent() //$NON-NLS-1$

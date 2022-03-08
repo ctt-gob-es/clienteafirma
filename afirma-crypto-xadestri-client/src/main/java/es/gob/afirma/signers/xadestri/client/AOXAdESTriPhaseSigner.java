@@ -39,6 +39,7 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.core.signers.TriphaseUtil;
@@ -56,7 +57,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
  * (prevaleciendo estos sobre el identificador) de tal forma que estos viajan en cada una de las operaciones con el
  * servidor. El resultado ser&aacute; an&aacute;logo al anterior, recuperandose &uacute;nicamente el identificador
  * remoto asignado al resultado. */
-public class AOXAdESTriPhaseSigner implements AOSigner {
+public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -323,7 +324,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		if (certChain == null || certChain.length == 0) {
 			throw new IllegalArgumentException("Es necesario proporcionar el certificado de firma"); //$NON-NLS-1$
 		}
-		if (data == null) {
+		if (data == null && isDataMandatory(cryptoOperation, extraParams)) {
 			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
 		}
 
@@ -345,12 +346,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		xParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
 		// Decodificamos el identificador del documento
-		final String documentId = Base64.encode(data, true);
+		final String documentId = data != null ? Base64.encode(data, true) : null;
 
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// Preparamos el parametro de cadena de certificados
-		String cerChainParamContent;
+		final String cerChainParamContent;
 		try {
 			cerChainParamContent = TriphaseUtil.prepareCertChainParam(certChain, xParams);
 		}
@@ -380,8 +381,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(cerChainParamContent).append(HTTP_AND).
-			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(cerChainParamContent);
+
+			if (documentId != null) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
+				append(documentId);
+			}
 
 			if (xParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
@@ -455,8 +460,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format)                   .append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm)             .append(HTTP_AND).
 			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(cerChainParamContent)       .append(HTTP_AND).
-			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId).append(HTTP_AND).
 			append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).append(preResultAsBase64);
+
+			if (documentId != null) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
+				append(documentId);
+			}
 
 			if (xParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
@@ -503,4 +512,22 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		}
 		return exception;
 	}
+
+	private static final String EXTRAPARAM_FORMAT = "format"; //$NON-NLS-1$
+	private static final String USE_MANIFEST = "useManifest"; //$NON-NLS-1$
+
+    @Override
+    public boolean needData(final String cryptoOperation, final Properties config) {
+    	return isDataMandatory(cryptoOperation, config);
+    }
+
+    private static boolean isDataMandatory(final String cryptoOperation, final Properties config) {
+
+    	// Sera obligatorio que se indiquen los datos de entrada para las cofirmas y contrafirmas
+    	// y siempre que el formato no sea Externally Detached y no se trate de una firma manifest
+    	return !CRYPTO_OPERATION_SIGN.equalsIgnoreCase(cryptoOperation)
+    			|| config == null
+    			|| !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(EXTRAPARAM_FORMAT))
+    					&& !Boolean.parseBoolean(config.getProperty(USE_MANIFEST));
+    }
 }

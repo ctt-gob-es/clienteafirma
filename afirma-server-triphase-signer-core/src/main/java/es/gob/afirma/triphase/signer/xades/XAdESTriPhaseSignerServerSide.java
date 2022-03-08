@@ -55,6 +55,7 @@ import es.gob.afirma.signers.xades.XAdESCoSigner;
 import es.gob.afirma.signers.xades.XAdESCounterSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xades.XAdESSigner;
+import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
@@ -125,7 +126,9 @@ public final class XAdESTriPhaseSignerServerSide {
 			                                                   InvalidKeyException,
 			                                                   SignatureException,
 			                                                   XmlPreSignException {
-		if (data == null || data.length < 1) {
+
+
+		if ((data == null || data.length < 1) && XAdESUtil.isDataMandatory(op.name(), xParams)) {
 			throw new IllegalArgumentException("Los datos a prefirmar no pueden ser nulos ni vacios"); //$NON-NLS-1$
 		}
 		if (algorithm == null || "".equals(algorithm)) { //$NON-NLS-1$
