@@ -46,7 +46,11 @@ public class SignatureAttributesDialog {
 			PROP_ROLES
 	};
 
+	private static String accessibleDescription = ""; //$NON-NLS-1$
+
 	public static JDialog newInstance(final Component parent, final SignOperationConfig config) {
+
+		accessibleDescription = ""; //$NON-NLS-1$
 
 		final JOptionPane optionPane = new JOptionPane();
 		optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
@@ -76,6 +80,7 @@ public class SignatureAttributesDialog {
 		// Si tiene  atributos de firma adicionales definidos, mostramos el detalle.
 		if (hasAdditionalSignedAttributes(config)) {
 			panel.add(new JLabel(SimpleAfirmaMessages.getString("SignatureAttributesDialog.1")), c); //$NON-NLS-1$
+			accessibleDescription += SimpleAfirmaMessages.getString("SignatureAttributesDialog.1"); //$NON-NLS-1$
 
 			final Properties p = config.getExtraParams();
 			if (p.containsKey(PROP_POLICY_ID)) {
@@ -127,6 +132,7 @@ public class SignatureAttributesDialog {
 		// Si no hay atributos de firma adicionales, mostramos la informacion basica
 		else {
 			panel.add(new JLabel(SimpleAfirmaMessages.getString("SignatureAttributesDialog.16")), c); //$NON-NLS-1$
+			accessibleDescription += SimpleAfirmaMessages.getString("SignatureAttributesDialog.16"); //$NON-NLS-1$
 		}
 
 		return panel;
@@ -155,6 +161,7 @@ public class SignatureAttributesDialog {
 		final JLabel label = new JLabel(text);
 		label.setFont(label.getFont().deriveFont(Font.BOLD));
 		panel.add(label, c);
+		accessibleDescription += text;
 	}
 
 	public static void addData(final Container panel, final GridBagConstraints c, final String data, final String value) {
@@ -168,6 +175,7 @@ public class SignatureAttributesDialog {
 		c.weightx = 1.0;
 		c.gridx = 1;
 		panel.add(new JLabel(value), c);
+		accessibleDescription += data + " " + value; //$NON-NLS-1$
 	}
 
 
@@ -184,4 +192,9 @@ public class SignatureAttributesDialog {
 		}
 		return parent;
 	}
+
+	public static String getAccessibleDescription() {
+		return accessibleDescription;
+	}
+
 }

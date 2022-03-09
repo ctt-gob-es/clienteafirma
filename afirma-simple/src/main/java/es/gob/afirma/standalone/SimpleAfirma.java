@@ -256,6 +256,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			((MainScreen) this.window).showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH,
 					DEFAULT_WINDOW_HEIGHT);
             this.container = this.window;
+            this.container.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("DNIeWaitPanel.3") + //$NON-NLS-1$
+            																SimpleAfirmaMessages.getString("DNIeWaitPanel.7")); //$NON-NLS-1$
 		} else {
         	this.currentPanel = new SignPanel(this.window, this);
 			((MainScreen) this.window).showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH,

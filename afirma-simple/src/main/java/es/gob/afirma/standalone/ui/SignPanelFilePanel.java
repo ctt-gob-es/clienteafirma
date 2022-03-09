@@ -77,7 +77,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         if (ext == null || !isExecutable(ext) && !isLink(ext)) {
 
         	openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
-        	openFileButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignPanel.52"));
+        	openFileButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignPanel.52")); //$NON-NLS-1$
         	this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.52"); 	//$NON-NLS-1$
         	openFileButton.setMnemonic('c');
         	openFileButton.addActionListener(

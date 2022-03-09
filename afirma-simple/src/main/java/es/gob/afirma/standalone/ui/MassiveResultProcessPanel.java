@@ -81,8 +81,6 @@ final class MassiveResultProcessPanel extends JPanel {
 
         // Texto con la ruta del directorio de salida
         final JTextField outDirPath = new JTextField();
-        outDirPath.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.0")); //$NON-NLS-1$
-        outDirPath.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.1")); //$NON-NLS-1$
         outDirPath.setBorder(BorderFactory.createEmptyBorder());
 
         outDirPath.setEditable(false);
@@ -107,6 +105,8 @@ final class MassiveResultProcessPanel extends JPanel {
         dirPathPanel.setLayout(new BoxLayout(dirPathPanel, BoxLayout.X_AXIS));
         dirPathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         dirPathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        dirPathPanel.setFocusable(true);
+        dirPathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.3") + outDir.getAbsolutePath()); //$NON-NLS-1$
 
 
         // Boton de apertura del fichero firmado
@@ -146,27 +146,13 @@ final class MassiveResultProcessPanel extends JPanel {
         // Panel con los datos del certificado
         if (cert != null) {
             final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
+            certDescPanel = new JPanel();
 
             if (certInfo != null) {
 
 	            this.certIcon.setIcon(certInfo.getIcon());
 	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
 	            this.certIcon.setFocusable(false);
-
-//	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
-//	            // el tipo de contenido antes que el contenido
-//	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-//	            setFocusable(false);
-//	            this.certDescription.setEditable(false);
-//	            this.certDescription.setOpaque(false);
-//	            this.certDescription.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.12")); //$NON-NLS-1$
-//	            this.certDescription.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.13")); //$NON-NLS-1$
-//	            this.certDescription.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.14")); //$NON-NLS-1$
-//
-//	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, (he, linkIndex) -> openCertificate(cert, MassiveResultProcessPanel.this));
-//                this.certDescription.addFocusListener(editorFocusManager);
-//                this.certDescription.addKeyListener(editorFocusManager);
-//	            this.certDescription.addHyperlinkListener(editorFocusManager);
 
 	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
 	            // el tipo de contenido antes que el contenido
@@ -180,13 +166,22 @@ final class MassiveResultProcessPanel extends JPanel {
             	// Este gestor se encargara de controlar los eventos de foco y raton
                 final LabelLinkManager labelLinkManager = new LabelLinkManager(this.holderCertLabel);
                 labelLinkManager.setLabelLinkListener(new CertInfoLabelLinkImpl(cert));
+
+                certDescPanel.setFocusable(true);
+                certDescPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.21") //$NON-NLS-1$
+						+ SimpleAfirmaMessages.getString("CertificateInfo.1") //$NON-NLS-1$
+						+ certInfo.getHolderName()
+						+ SimpleAfirmaMessages.getString("CertificateInfo.2") //$NON-NLS-1$
+						+ certInfo.getIssuerName());
             }
-            certDescPanel = new JPanel();
+
+
             // Se agrega un borde y un padding al panel con la informacion del certificado
             certDescPanel.setBorder(BorderFactory.createCompoundBorder
             		(BorderFactory.createLineBorder(Color.GRAY),
             		BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             certDescPanel.setLayout(new GridBagLayout());
+
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
             c.weightx = 0.0;
@@ -236,6 +231,24 @@ final class MassiveResultProcessPanel extends JPanel {
     		getSignResultList(signConfigList, this)
 		);
         resultListPanel.setBorder(BorderFactory.createEmptyBorder());
+
+		String signsDataAccesibility = SimpleAfirmaMessages.getString("MassiveResultProcessPanel.12"); //$NON-NLS-1$
+
+		for (final SignOperationConfig sign : signConfigList) {
+			signsDataAccesibility += SimpleAfirmaMessages.getString("MassiveResultProcessPanel.9") //$NON-NLS-1$
+									+ sign.getDataFile().getName()
+									+ SimpleAfirmaMessages.getString("MassiveResultProcessPanel.11"); //$NON-NLS-1$
+			if (sign.getSignatureFile() != null) {
+				signsDataAccesibility += SimpleAfirmaMessages.getString("MassiveResultProcessPanel.13") //$NON-NLS-1$
+										+ SimpleAfirmaMessages.getString("MassiveResultProcessPanel.10") //$NON-NLS-1$
+										+ sign.getSignatureFile().length() / 1024 + "KB"; //$NON-NLS-1$
+			} else {
+				signsDataAccesibility += SimpleAfirmaMessages.getString("MassiveResultProcessPanel.14"); //$NON-NLS-1$
+			}
+		}
+
+		resultListPanel.setFocusable(true);
+		resultListPanel.getAccessibleContext().setAccessibleDescription(signsDataAccesibility);
 
         // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {

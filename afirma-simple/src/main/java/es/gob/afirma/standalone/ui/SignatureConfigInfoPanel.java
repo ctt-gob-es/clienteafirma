@@ -289,8 +289,8 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 		private static void executeAction(final Component component, final SignOperationConfig config) {
 			final JDialog dialog = SignatureAttributesDialog.newInstance(component, config);
+    		dialog.getAccessibleContext().setAccessibleDescription(SignatureAttributesDialog.getAccessibleDescription());
 			dialog.setVisible(true);
-
 		}
 
 		@Override
