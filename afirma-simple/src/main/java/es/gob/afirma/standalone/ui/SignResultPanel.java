@@ -113,8 +113,6 @@ final class SignResultPanel extends JPanel {
 
                     this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.27") //$NON-NLS-1$
    						 						+ SimpleAfirmaMessages.getString("SignResultPanel.28") //$NON-NLS-1$
-   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.29") //$NON-NLS-1$
-                    							+ SimpleAfirmaMessages.getString("SignResultPanel.46") //$NON-NLS-1$
                     								+ SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
             	}
                 this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$

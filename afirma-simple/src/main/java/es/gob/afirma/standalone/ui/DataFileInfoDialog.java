@@ -31,6 +31,8 @@ public class DataFileInfoDialog {
 	private final DataFileInfo dataInfo;
 	final Component parent;
 
+	private static String accessibleDescription = ""; //$NON-NLS-1$
+
 	/**
 	 * Construye el di&aacute;logo para visualizar los datos del fichero.
 	 * @param dataInfo Informaci&oacute;n del fichero.
@@ -48,6 +50,8 @@ public class DataFileInfoDialog {
 	 * seleccion&oacute; ninguna.
 	 */
 	public Options show() {
+
+		accessibleDescription = ""; //$NON-NLS-1$
 
         // Preparamos el dialogo
 		this.optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
@@ -80,6 +84,7 @@ public class DataFileInfoDialog {
 
 		// Mostramos el dialogo
 		final JDialog dialog = this.optionPane.createDialog(this.parent, SimpleAfirmaMessages.getString("DataFileInfoDialog.3")); //$NON-NLS-1$
+		dialog.getAccessibleContext().setAccessibleDescription(accessibleDescription);
 		dialog.setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
 		dialog.setVisible(true);
 
@@ -91,7 +96,7 @@ public class DataFileInfoDialog {
 	 * @param info Informaci&oacute;n de los datos.
 	 * @return Panel con la informaci&oacute;n de los datos.
 	 */
-	private static JPanel createInfoPanel(DataFileInfo info) {
+	private static JPanel createInfoPanel(final DataFileInfo info) {
 
 		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
@@ -130,6 +135,7 @@ public class DataFileInfoDialog {
 				info.getDescription() : SimpleAfirmaMessages.getString("DataFileInfoDialog.5"); //$NON-NLS-1$
 		label = new JLabel(format);
 		dataPanel.add(label, c2);
+		accessibleDescription += SimpleAfirmaMessages.getString("DataFileInfoDialog.4") + format; //$NON-NLS-1$
 
 		// Extension asociada al tipo de dato
 		c2.insets = new Insets(3, 3, 3, 3);
@@ -144,6 +150,7 @@ public class DataFileInfoDialog {
 					SimpleAfirmaMessages.getString("DataFileInfoDialog.7"); //$NON-NLS-1$
 		label = new JLabel(ext);
 		dataPanel.add(label, c2);
+		accessibleDescription += SimpleAfirmaMessages.getString("DataFileInfoDialog.6") + ext; //$NON-NLS-1$
 
 		// Tamano de los datos
 		c2.insets = new Insets(3, 3, 3, 3);
@@ -156,6 +163,7 @@ public class DataFileInfoDialog {
 		final String size = formatFileSize(info.getSize());
 		label = new JLabel(size);
 		dataPanel.add(label, c2);
+		accessibleDescription += SimpleAfirmaMessages.getString("DataFileInfoDialog.8") + size; //$NON-NLS-1$
 
 		c.insets = new Insets(0, 6, 0, 0);
 		c.weightx = GridBagConstraints.REMAINDER;
@@ -166,7 +174,7 @@ public class DataFileInfoDialog {
 		return mainPanel;
 	}
 
-	private static String formatFileSize(int numBytes) {
+	private static String formatFileSize(final int numBytes) {
 
 		// Medido en bytes
 		if (numBytes < 1024 ) {
@@ -188,7 +196,7 @@ public class DataFileInfoDialog {
 	/**
 	 * Opciones selecionables desde el di&aacute;logo.
 	 */
-	public static enum Options {
+	public enum Options {
 		/** Opci&oacute;n para el guardado de los datos. */
 		SAVE(SimpleAfirmaMessages.getString("DataFileInfoDialog.0")), //$NON-NLS-1$
 		/** Opci&oacute;n para la apertura del fichero desde un temporal. */
@@ -198,7 +206,7 @@ public class DataFileInfoDialog {
 
 		private String text;
 
-		private Options(String text) {
+		Options(final String text) {
 			this.text = text;
 		}
 

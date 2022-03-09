@@ -58,6 +58,8 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private String accessibleDescription = ""; //$NON-NLS-1$
+
 	SignPanelMultiFilePanel(final List<SignOperationConfig> operations) {
         super(true);
 
@@ -74,8 +76,15 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
         titlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.45")); //$NON-NLS-1$
         titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, LookAndFeelManager.HIGH_CONTRAST ? Color.white : Color.black));
 
-        final JList<SignOperationConfig> fileList =
-        		new JList<>(operations.toArray(new SignOperationConfig[operations.size()]));
+        final SignOperationConfig [] operationsArray = operations.toArray(new SignOperationConfig[operations.size()]);
+        this.accessibleDescription += SimpleAfirmaMessages.getString("SignDataPanel.47"); //$NON-NLS-1$
+        for (final SignOperationConfig opConfig : operationsArray) {
+        	this.accessibleDescription += SimpleAfirmaMessages.getString("SignDataPanel.43") + opConfig.getDataFile().getName() //$NON-NLS-1$
+        							+ SimpleAfirmaMessages.getString("SignDataPanel.44") + opConfig.getSignatureFormatName() //$NON-NLS-1$
+        							+ SimpleAfirmaMessages.getString("SignDataPanel.45") + opConfig.getDataFile().length() / 1024 + "KB"; //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        final JList<SignOperationConfig> fileList = new JList<>(operationsArray);
+        fileList.getAccessibleContext().setAccessibleDescription(this.accessibleDescription);
         fileList.setCellRenderer(new FileOperationCellRenderer());
 
         // Definimos que al hacer doble clic sobre una firma del listado, se visualicen sus datos
@@ -424,6 +433,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 	    	}
 	    	else if (e.getSource() == this.seeAttributesItem) {
 	    		final JDialog dialog = SignatureAttributesDialog.newInstance(this.parent, this.config);
+	    		dialog.getAccessibleContext().setAccessibleDescription(SignatureAttributesDialog.getAccessibleDescription());
 	    		dialog.setVisible(true);
 	    	}
 	    }
