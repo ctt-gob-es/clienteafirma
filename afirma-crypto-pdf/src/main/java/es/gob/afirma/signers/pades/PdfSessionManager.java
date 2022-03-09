@@ -13,8 +13,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -45,7 +47,7 @@ public final class PdfSessionManager {
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     static final int LAST_PAGE = -1;
 
-    static final int NEW_PAGE = -2;
+    static final int NEW_PAGE = 0;
 
     private static final int UNDEFINED = -1;
 
@@ -58,6 +60,14 @@ public final class PdfSessionManager {
 
     /** Rotaci&oacute;n de las firmas en grados (cuando se indica que deben rotarse). */
     private static final String DEFAULT_SIGNATURE_ROTATION = "0"; //$NON-NLS-1$
+
+    /** Valor en el par&aacute;metro signaturePage o signaturePages que
+     * indica una nueva p&aacute;gina para agregar al final del documento*/
+    private static final String APPEND_PAGE = "append"; //$NON-NLS-1$
+
+    /** Valor en el par&aacute;metro signaturePage o signaturePages que
+     * indica que se estampar&aacute; la firma visible en todas las paginas*/
+    private static final String ALL_PAGES = "all"; //$NON-NLS-1$
 
     private PdfSessionManager() {
     	// No permitimos la instanciacion
@@ -87,15 +97,17 @@ public final class PdfSessionManager {
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
 		// *********************************************************************************************************************
 
-    	final Properties extraParams = xParams != null ? xParams : new Properties();
+		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-    	// Omision de informacion del firmante diccionario o estructura de apariencia PDF. */
-    	final boolean doNotUseCertChainOnPostSign = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_USE_CERTCHAIN_ON_POSTSIGN));
+		// Omision de informacion del firmante diccionario o estructura de apariencia PDF.
+		final boolean doNotUseCertChainOnPostSign = Boolean
+				.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_USE_CERTCHAIN_ON_POSTSIGN));
 
-    	// Rotacion del campo de firma (90 grados)
-    	final int signatureRotation = Integer.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION, DEFAULT_SIGNATURE_ROTATION));
+		// Rotacion del campo de firma (90 grados)
+		final int signatureRotation = Integer
+				.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_ROTATION, DEFAULT_SIGNATURE_ROTATION));
 
-    	// Imagen de la rubrica
+		// Imagen de la rubrica
 		final com.aowagie.text.Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE), secureMode);
 
 		// Motivo de la firma
@@ -110,20 +122,51 @@ public final class PdfSessionManager {
 		// Datos de contacto (correo electronico) del firmante
 		final String signerContact = extraParams.getProperty(PdfExtraParams.SIGNER_CONTACT);
 
-		// Pagina donde situar la firma visible
-		int page = LAST_PAGE;
-		final String pageStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(LAST_PAGE));
-		if ("append".equalsIgnoreCase(pageStr)) { //$NON-NLS-1$
-			page = NEW_PAGE;
+		String[] pagesStr = new String[0];
+		// Pagina o rango de paginas donde situar la firma visible
+		if (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGE)) {
+			pagesStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE).split(","); //$NON-NLS-1$
 		}
-		else {
-			try {
-				page = Integer.parseInt(pageStr.trim());
-			}
-			catch (final Exception e) {
-				LOGGER.warning(
-					"Se ha indicado un numero de pagina invalido ('" + pageStr + "'), se usara la ultima pagina: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
+		// Si se encuentra el parametro signaturePages, prevalecera sobre el antiguo signaturePage
+		if (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGES)) {
+			pagesStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(","); //$NON-NLS-1$
+		}
+		final List<Integer> pages = new ArrayList<Integer>();
+
+		byte[] inPDF;
+		try {
+			inPDF = XmpHelper.addSignHistoryToXmp(pdfBytes, signTime);
+		}
+		catch (final Exception e1) {
+			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
+			inPDF = pdfBytes;
+		}
+
+		final PdfReader pdfReader = PdfUtil.getPdfReader(inPDF, extraParams,
+				Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS)));
+
+		final int totalPages = pdfReader.getNumberOfPages();
+
+		if (pagesStr.length > 0) {
+			if (APPEND_PAGE.equalsIgnoreCase(pagesStr[0])) {
+				pages.add(NEW_PAGE);
+			} else if (ALL_PAGES.equalsIgnoreCase(pagesStr[0])) {
+				for (int page = 1; page <= pdfReader.getNumberOfPages(); page++) {
+					pages.add(page);
+				}
+			} else {
+				try {
+					for (final String pageStr : pagesStr) {
+						PdfUtil.checkPagesRange(pageStr, totalPages, pages);
+					}
+					if (pages.isEmpty()) {
+						throw new IncorrectPageException(
+								"Este documento no contiene las paginas que se han seleccionado para firmar, se firmara de manera invisible." //$NON-NLS-1$
+						);
+					}
+				} catch (final IncorrectPageException e) {
+					throw e;
+				}
 			}
 		}
 
@@ -141,18 +184,18 @@ public final class PdfSessionManager {
 		if (policyID != null || AOSignConstants.SIGN_PROFILE_BASELINE.equals(profile)) {
 			signatureSubFilter = AOSignConstants.PADES_SUBFILTER_BES;
 			extraParams.setProperty(PdfExtraParams.SIGNATURE_SUBFILTER, AOSignConstants.PADES_SUBFILTER_BES);
-    	}
+		}
 
 		// Nivel de certificacion del PDF
 		int certificationLevel;
 		try {
-			certificationLevel = extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL).trim()) :
-					UNDEFINED;
+			certificationLevel = extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) != null
+					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL).trim())
+					: UNDEFINED;
 		}
-		catch(final Exception e) {
-			LOGGER.warning(
-				"Se ha indicado un nivel de certificacion no valido ('" + extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+		catch (final Exception e) {
+			LOGGER.warning("Se ha indicado un nivel de certificacion no valido ('" //$NON-NLS-1$
+					+ extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) + "'): " + e //$NON-NLS-1$
 			);
 			certificationLevel = UNDEFINED;
 		}
@@ -160,11 +203,11 @@ public final class PdfSessionManager {
 		// Establecimiento de version PDF
 		int pdfVersion;
 		try {
-			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION).trim()) :
-					PDF_MAX_VERSION;
+			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null
+					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION).trim())
+					: PDF_MAX_VERSION;
 		}
-		catch(final Exception e) {
+		catch (final Exception e) {
 			LOGGER.warning("Error en el establecimiento de la version PDF, se usara " + PDF_MAX_VERSION + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			pdfVersion = PDF_MAX_VERSION;
 		}
@@ -190,14 +233,14 @@ public final class PdfSessionManager {
 
 		// Texto en capa 4
 		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
-			extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
-			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
-			signTime,
-			reason,
-			signatureProductionCity,
-			signerContact,
-			obfuscate,
-			pdfMaskConfig
+				extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
+				certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
+				signTime,
+				reason,
+				signatureProductionCity,
+				signerContact,
+				obfuscate,
+				pdfMaskConfig
 		);
 
 		// Texto en capa 2
@@ -206,26 +249,26 @@ public final class PdfSessionManager {
 			configuredLayer2Text = getDefaultLayer2Text(reason != null, signatureProductionCity != null);
 		}
 		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
-			configuredLayer2Text,
-			certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
-			signTime,
-			reason,
-			signatureProductionCity,
-			signerContact,
-			obfuscate,
-			pdfMaskConfig
+				configuredLayer2Text,
+				certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
+				signTime,
+				reason,
+				signatureProductionCity,
+				signerContact,
+				obfuscate,
+				pdfMaskConfig
 		);
 
 		// Tipo de letra en capa 2
 		int layer2FontFamily;
 		try {
-			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim()) :
-					UNDEFINED;
+			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null
+					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim())
+					: UNDEFINED;
 		}
-		catch(final Exception e) {
-			LOGGER.warning(
-				"Se ha indicado un tipo de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+		catch (final Exception e) {
+			LOGGER.warning("Se ha indicado un tipo de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
+					+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) + "'): " + e //$NON-NLS-1$
 			);
 			layer2FontFamily = UNDEFINED;
 		}
@@ -233,13 +276,13 @@ public final class PdfSessionManager {
 		// Tamano del tipo de letra en capa 2
 		int layer2FontSize;
 		try {
-			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim()) :
-					UNDEFINED;
+			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null
+					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim())
+					: UNDEFINED;
 		}
-		catch(final Exception e) {
-			LOGGER.warning(
-				"Se ha indicado un tamano de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+		catch (final Exception e) {
+			LOGGER.warning("Se ha indicado un tamano de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
+					+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) + "'): " + e //$NON-NLS-1$
 			);
 			layer2FontSize = UNDEFINED;
 		}
@@ -247,13 +290,13 @@ public final class PdfSessionManager {
 		// Estilo del tipo de letra en capa 2
 		int layer2FontStyle;
 		try {
-			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null ?
-				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim()) :
-					UNDEFINED;
+			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null
+					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim())
+					: UNDEFINED;
 		}
-		catch(final Exception e) {
-			LOGGER.warning(
-				"Se ha indicado un estilo de letra no valido para la capa 2 del PDF ('" + extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+		catch (final Exception e) {
+			LOGGER.warning("Se ha indicado un estilo de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
+					+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) + "'): " + e //$NON-NLS-1$
 			);
 			layer2FontStyle = UNDEFINED;
 		}
@@ -268,21 +311,6 @@ public final class PdfSessionManager {
 		// **************** FIN LECTURA PARAMETROS ADICIONALES *****************************************************************
 		// *********************************************************************************************************************
 
-		byte[] inPDF;
-		try {
-			inPDF = XmpHelper.addSignHistoryToXmp(pdfBytes, signTime);
-		}
-		catch (final Exception e1) {
-			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
-			inPDF = pdfBytes;
-		}
-
-		final PdfReader pdfReader = PdfUtil.getPdfReader(
-			inPDF,
-			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))
-		);
-
 		// **************************************************************
 		// ***** Comprobaciones y parametros necesarios para PDF-A1 *****
 		final byte[] xmpBytes = pdfReader.getMetadata();
@@ -296,7 +324,8 @@ public final class PdfSessionManager {
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
-		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader) && !Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
+		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader)
+			&& !Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
 			throw new PdfHasUnregisteredSignaturesException();
 		}
 
@@ -309,86 +338,97 @@ public final class PdfSessionManager {
 		// Activar el atributo de "agregar firma" (quinto parametro del metodo
 		// "PdfStamper.createSignature") hace que se cree una nueva revision del
 		// documento y evita que las firmas previas queden invalidadas.
-		// Sin embargo, este procedimiento no funciona cuando los PDF contienen informacion
-		// despues de la ultima marca %%EOF, aspecto no permitido en PDF 1.7 (ISO 32000-1:2008)
-		// pero si en PDF 1.3 (Adobe) y que se da con frecuencia en PDF generados con bibliotetcas
+		// Sin embargo, este procedimiento no funciona cuando los PDF contienen
+		// informacion
+		// despues de la ultima marca %%EOF, aspecto no permitido en PDF 1.7 (ISO
+		// 32000-1:2008)
+		// pero si en PDF 1.3 (Adobe) y que se da con frecuencia en PDF generados con
+		// bibliotetcas
 		// de software libre como QPDF.
 		//
-		//  Especificacion PDF 1.3
-		//   3.4.4, "File Trailer"
-		//     Acrobat viewers require only that the %%EOF marker appear somewhere within
-		//     the last 1024 bytes of the file.
+		// Especificacion PDF 1.3
+		// 	3.4.4, "File Trailer"
+		// 		Acrobat viewers require only that the %%EOF marker appear somewhere within
+		// 		the last 1024 bytes of the file.
 		//
-		//  Especificacion PDF 1.7
-		//   7.5.5. File Trailer
-		//     The trailer of a PDF file enables a conforming reader to quickly find the
-		//     cross-reference table and certain special objects. Conforming readers should read a
-		//     PDF file from its end. The last line of the file shall contain only the end-of-file
-		//     marker, %%EOF.
-        //
-		// Para aceptar al menos en algunos casos PDF 1.3 (son aun muy frecuentes, especialmente
-		// en archivos, lo mantendremos desactivado para la primera firma y activado para las
-		// subsiguientes.
+		// Especificacion PDF 1.7
+		// 	7.5.5. File Trailer
+		// 		The trailer of a PDF file enables a conforming reader to quickly find the
+		// 		cross-reference table and certain special objects. Conforming readers should read a
+		// 		PDF file from its end. The last line of the file shall contain only the
+		// 		end-of-file marker, %%EOF.
+		//
+		// Para aceptar al menos en algunos casos PDF 1.3 (son aun muy frecuentes,
+		// especialmente
+		// en archivos, lo mantendremos desactivado para la primera firma y activado
+		// para las subsiguientes.
 		//
 		// No obstante, el integrador puede siempre forzar la creacion de revisiones mediante
 		// el parametro "alwaysCreateRevision".
-		final PdfStamper stp;
+		// Aplicamos todos los atributos de firma
+		PdfStamper stp;
+
 		try {
-			stp = PdfStamper.createSignature(
-				pdfReader, // PDF de entrada
-				baos,      // Salida
-				pdfVersion == UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
-				null,      // No crear temporal
-				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
-				signTime   // Momento de la firma
+			stp = PdfStamper.createSignature(pdfReader, // PDF de entrada
+					baos, // Salida
+					pdfVersion == UNDEFINED ? '\0' /* Mantener version */
+							: Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
+					null, // No crear temporal
+					PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
+					signTime // Momento de la firma
 			);
 		}
 		catch (final DocumentException e) {
 			LOGGER.severe("Error al crear la firma para estampar: " + e); //$NON-NLS-1$
 			throw new AOException("Error al crear la firma para estampar", e); //$NON-NLS-1$
 		}
-		catch(final BadPasswordException e) {
-	        // Comprobamos que el signer esta en modo interactivo, y si no lo
-            // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
-            // desatendido
-            if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
-                throw new BadPdfPasswordException(e);
-            }
-            // La contrasena que nos han proporcionada no es buena o no nos
-            // proporcionaron ninguna
-            final String userPwd = new String(
-                AOUIFactory.getPassword(
-                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING) == null ?
-                		CommonPdfMessages.getString("AOPDFSigner.0") : //$NON-NLS-1$
-                			CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
-                    null
-                )
-            );
-            extraParams.put("userPassword", userPwd); //$NON-NLS-1$
-            return getSessionData(inPDF, certChain, signTime, extraParams, secureMode);
+		catch (final BadPasswordException e) {
+			// Comprobamos que el signer esta en modo interactivo, y si no lo
+			// esta no pedimos contrasena por dialogo, principalmente para no interrumpir un
+			// firmado por lotes
+			// desatendido
+			if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
+				throw new BadPdfPasswordException(e);
+			}
+			// La contrasena que nos han proporcionada no es buena o no nos
+			// proporcionaron ninguna
+			final String userPwd = new String(AOUIFactory.getPassword(
+					extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING) == null
+							? CommonPdfMessages.getString("AOPDFSigner.0") //$NON-NLS-1$
+							: CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
+					null));
+			extraParams.put("userPassword", userPwd); //$NON-NLS-1$
+			return getSessionData(inPDF, certChain, signTime, extraParams, secureMode);
 		}
 
-		// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco para poner ahi la firma
-		// visible
+		// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco
+		// para poner ahi la firma visible
 
 		// Posicion de la firma
 		final Rectangle signaturePositionOnPage = PdfVisibleAreasUtils.getSignaturePositionOnPage(extraParams);
-		if (page == NEW_PAGE && signaturePositionOnPage != null && signatureField == null) {
-			stp.insertPage(pdfReader.getNumberOfPages() + 1, pdfReader.getPageSizeWithRotation(1));
+		if (pages.contains(NEW_PAGE) && signaturePositionOnPage != null && signatureField == null) {
+			stp.insertPage(totalPages + 1, pdfReader.getPageSizeWithRotation(1));
 			// La pagina pasa a ser la nueva, que es la ultima,
-			page = LAST_PAGE;
+			pages.remove(Integer.valueOf(NEW_PAGE));
+			pages.add(totalPages + 1);
 		}
 
-		// Aplicamos todos los atributos de firma
+		// Comprobamos que la posicion indicada para la firma visible
+		// se pueda estampar al menos en una de las paginas del documento
+		PdfUtil.checkCorrectPositionSignature(pdfReader, pages, extraParams);
+
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
+
 		// La compresion solo para versiones superiores a la 4
 		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
-		if (pdfVersion > PDF_MIN_VERSION && !pdfA1 && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
+		if (pdfVersion > PDF_MIN_VERSION && !pdfA1
+				&& !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
 			stp.setFullCompression();
 		}
 
 		// Si se ha configurado, permitimos que el lector de PDF muestre una marca junto a la firma
-		final boolean includeQuestionMark = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_QUESTION_MARK));
+		final boolean includeQuestionMark = Boolean
+				.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_QUESTION_MARK));
 		if (includeQuestionMark) {
 			sap.setAcro6Layers(false);
 			sap.setLayer4Text(PdfSignatureAppearance.questionMark);
@@ -415,16 +455,11 @@ public final class PdfSessionManager {
 
 		sap.setSignDate(signTime);
 
-		// Pagina en donde se imprime la firma
-		if (page == LAST_PAGE) {
-			page = pdfReader.getNumberOfPages();
-		}
-
 		sap.setCrypto(
-			null,
-			doNotUseCertChainOnPostSign ? null : certChain,
-			null,
-			null
+				null,
+				doNotUseCertChainOnPostSign ? null : certChain,
+				null,
+				null
 		);
 
 		// Localizacion en donde se produce la firma
@@ -452,12 +487,12 @@ public final class PdfSessionManager {
 		if (layer2Text != null) {
 			sap.setLayer2Text(layer2Text);
 			sap.setLayer2Font(
-				PdfVisibleAreasUtils.getFont(
-					layer2FontFamily,
-					layer2FontSize,
-					layer2FontStyle,
-					layer2FontColor
-				)
+					PdfVisibleAreasUtils.getFont(
+							layer2FontFamily,
+							layer2FontSize,
+							layer2FontStyle,
+							layer2FontColor
+					)
 			);
 		}
 
@@ -467,10 +502,10 @@ public final class PdfSessionManager {
 		}
 
 		// Firma visible
-		if (signaturePositionOnPage != null && signatureField == null) {
+		if (signaturePositionOnPage != null && signatureField == null && !pages.isEmpty()) {
 			if (signatureRotation == 0) {
 				try {
-					sap.setVisibleSignature(signaturePositionOnPage, page, null);
+					sap.setVisibleSignature(signaturePositionOnPage, pages.get(0), null);
 				}
 				catch (final InvalidPageNumberException e) {
 					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
@@ -479,21 +514,20 @@ public final class PdfSessionManager {
 			else {
 				try {
 					PdfVisibleAreasUtils.setVisibleSignatureRotated(
-						stp,
-						sap,
-						signaturePositionOnPage,
-						page,
-						null,
-						signatureRotation,
-						rubric
+							stp,
+							sap,
+							signaturePositionOnPage,
+							pages.get(0),
+							null,
+							signatureRotation,
+							rubric
 					);
 				}
 				catch (final InvalidPageNumberException e) {
 					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
 				}
 				catch (final DocumentException e) {
-					throw new IOException(
-						"Error en la insercion de la firma rotada: " + e, e //$NON-NLS-1$
+					throw new IOException("Error en la insercion de la firma rotada: " + e, e //$NON-NLS-1$
 					);
 				}
 			}
@@ -508,10 +542,10 @@ public final class PdfSessionManager {
 		// ***************************
 
 		final PdfSignature dic = new PdfSignature(
-			PdfName.ADOBE_PPKLITE,
-			signatureSubFilter != null && !signatureSubFilter.isEmpty() ?
-				new PdfName(signatureSubFilter) :
-					PdfName.ADBE_PKCS7_DETACHED
+				PdfName.ADOBE_PPKLITE,
+				signatureSubFilter != null && !signatureSubFilter.isEmpty() ?
+						new PdfName(signatureSubFilter)
+						: PdfName.ADBE_PKCS7_DETACHED
 		);
 
 		// Fecha de firma
@@ -554,7 +588,7 @@ public final class PdfSessionManager {
 		final HashMap<PdfName, Integer> exc = reserveSignSizes(extraParams);
 
 		try {
-			sap.preClose(exc, signTime);
+			sap.preClose(exc, signTime, pages);
 		}
 		catch (final DocumentException e) {
 			LOGGER.severe("Error al estampar la firma: " + e); //$NON-NLS-1$
@@ -564,7 +598,7 @@ public final class PdfSessionManager {
 		final PdfObject pdfObject = ((com.aowagie.text.pdf.PdfStamperImp) stp.getWriter()).getFileID();
 
 		return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
-    }
+	}
 
     private static String getDefaultLayer2Text(final boolean hasReason, final boolean hasLocation) {
     	final StringBuilder buf = new StringBuilder();

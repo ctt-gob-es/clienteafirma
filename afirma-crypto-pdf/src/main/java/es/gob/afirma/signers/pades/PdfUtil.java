@@ -47,6 +47,10 @@ public final class PdfUtil {
 
 	private static final String FILTER_ADOBE_PKCS7_DETACHED = "/adbe.pkcs7.detached"; //$NON-NLS-1$
 
+	private static final String RANGE_INDICATOR = "-"; //$NON-NLS-1$
+
+	private static final String RANGE_SEPARATOR = ","; //$NON-NLS-1$
+
 	private static final Set<String> SUPPORTED_SUBFILTERS;
 	static {
 		SUPPORTED_SUBFILTERS = new HashSet<>();
@@ -188,8 +192,7 @@ public final class PdfUtil {
 			// y "no establecido"
 			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
 			if ("true".equalsIgnoreCase(allow)) { //$NON-NLS-1$
-				// Se permite, no se hace nada
-				return;
+
 			}
 			else if ("false".equalsIgnoreCase(allow)) { //$NON-NLS-1$
 				// No se permite, se lanza excepcion
@@ -465,7 +468,7 @@ public final class PdfUtil {
 	    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
 			extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null && //$NON-NLS-1$
 			extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null //$NON-NLS-1$
-		) {
+	    	) {
 	        try {
 	            return new com.aowagie.text.Rectangle(
 	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX").trim()), //$NON-NLS-1$
@@ -481,5 +484,146 @@ public final class PdfUtil {
 	        }
 	    	}
 	    	return null;
+    }
+
+    /**
+     * Metodo que controla si se ha introducido alg&uacute;n rango en el par&aacute;metro con las p&aacute;ginas donde estampar la firma
+     * visible para introducirlo en un array correctamente.
+     * @param pageStr P&aacute;gina o rango de p&aacute;ginas a tratar.
+     * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
+     * @param pagesList Lista de enteros donde se indican las p&aacute;ginas una a una.
+     */
+    public static void checkPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) {
+
+    	try {
+    		int page = Integer.parseInt(pageStr);
+			if (page < 0) {
+				page = page + totalPages + 1;
+			}
+			if (page <= 0) {
+				throw new IncorrectPageException("El numero de pagina indicado no es correcto: " + pageStr); //$NON-NLS-1$
+			}
+			// Si el numero que se indica supera las paginas que tiene el documento, no se agregara.
+			if (page <= totalPages && !pagesList.contains(page)) {
+				pagesList.add(page);
+			}
+
+    	} catch (final NumberFormatException nfe) {
+    	// En caso de error al parsear, quiere decir que se ha introducido un rango
+			int firstNumber;
+			int limitNumber;
+			String limitNumberStr;
+			if (RANGE_INDICATOR.equals(pageStr.substring(0, 1))) {
+				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1))) + totalPages + 1;
+    			limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1)) + RANGE_INDICATOR, "");  //$NON-NLS-1$
+    			limitNumber = Integer.parseInt(limitNumberStr) + totalPages + 1;
+			}
+			// Si el primer numero no es negativo, se obtiene el rango directamente
+			else {
+				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)));
+				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)) + RANGE_INDICATOR, ""); //$NON-NLS-1$
+				limitNumber = Integer.parseInt(limitNumberStr);
+				if (limitNumber < 0) {
+					limitNumber = limitNumber + totalPages + 1;
+				}
+			}
+			if (firstNumber <= 0 || limitNumber <= 0 || limitNumber < firstNumber || totalPages < firstNumber) {
+				throw new IncorrectPageException("El rango indicado no es correcto: " + pageStr); //$NON-NLS-1$
+			}
+			// Se agregan las paginas comprendidas entre el primer y ultimo numero
+			for ( ; firstNumber <= limitNumber ; firstNumber++) {
+				if (firstNumber <= totalPages && !pagesList.contains(firstNumber)) {
+					pagesList.add(firstNumber);
+    			}
+			}
+    	}
+    }
+
+    /**
+     * Comprueba que la posici&oacute;n indicada donde estampar la firma visible corresponda a alguna de las p&aacute;ginas a estampar
+     * del documento. En caso contrario, se lanzara una InvalidSignaturePositionException.
+     * @param pdfReader Lector de PDF donde se encuentran las p&aacute;ginas del documento a firmar.
+     * @param pagesList Lista con las p&aacute;ginas donde estampar la firma visible.
+     * @param extraParams Par&aacute;metros extra con informaci&aacute;n sobre la posici&oacute;n.
+     */
+    public static void checkCorrectPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Properties extraParams) {
+    	if (!pagesList.isEmpty()) {
+	    	for (final int page : pagesList) {
+	    		if (pdfReader.getPageSize(page).getBottom() - 15 <
+						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
+					&& pdfReader.getPageSize(page).getLeft() - 15 <
+						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX))
+	    			&& pdfReader.getPageSize(page).getTop() - 15 >
+	    				Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY))
+	    			&& pdfReader.getPageSize(page).getRight() - 15 >
+						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)))
+	    		{
+	    				return;
+	    		}
+	    	}
+
+	    	throw new InvalidSignaturePositionException(
+	    			"La posicion proporcionada no se encuentra en el rango de ninguna de las paginas a estampar del documento" //$NON-NLS-1$
+	    	);
+    	}
+    }
+
+    /**
+     * Comprueba que la cadena introducida en el campo de texto para la selecci&oacute;n de p&aacute;ginas sea correcta.
+     * @param rangeInput Entrada de texto.
+     * @return Devuelve true en caso de que el formato sea correcto y false en caso contrario.
+     */
+    public static boolean checkPagesRangeInputFormat(final String rangeInput) {
+    	if (!rangeInput.isEmpty()) {
+
+	    	final String rangeChars = "0123456789-,"; //$NON-NLS-1$
+
+    		if (RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(rangeInput.length() -1)))
+    				|| rangeInput.length() == 1 && RANGE_SEPARATOR.equals(rangeInput)) {
+    			return false;
+    		}
+
+	    	for (int i = 0; i < rangeInput.length(); i++) {
+	    		// Comprobamos que sea un caracter correcto
+	    		if (!rangeChars.contains(String.valueOf(rangeInput.charAt(i)))) {
+	    			return false;
+	            }
+	    		// Comprobamos que no se hayan introducido tres guiones seguidos
+	    		else if (i+2 < rangeInput.length()
+	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i)))
+	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +1)))
+	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +2)))) {
+	    			return false;
+	    		}
+	    		// Comprobamos que no se hayan introducido dos comas seguidas
+	    		else if (i+1 < rangeInput.length()
+	    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i)))
+	    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i +1)))) {
+	    			return false;
+	    		}
+	    	}
+
+	    	final String[] rangesArray = rangeInput.split(","); //$NON-NLS-1$
+	    	for (final String range : rangesArray) {
+
+	    		if (RANGE_INDICATOR.equals(String.valueOf(range.charAt(range.length() -1)))) {
+	    			return false;
+	    		}
+	    		// Comprobamos que el rango no termine con un guion
+	    		else if (range.length() >= 2
+	    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(0)))
+	    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(1))) )
+	    		{
+	    			return false;
+	    		}
+	    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
+	    		else if (range.length() == 1 && RANGE_INDICATOR.equals(range)) {
+	    			return false;
+	    		}
+	    	}
+    	} else {
+    		return false;
+    	}
+    	return true;
     }
 }

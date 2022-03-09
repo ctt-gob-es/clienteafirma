@@ -56,6 +56,9 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.IncorrectPageException;
+import es.gob.afirma.signers.pades.InvalidSignaturePositionException;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
@@ -660,7 +663,7 @@ final class CommandLineLauncher {
 		}
 
 		// Obtenemos el resultado de la operacion adecuada
-		final byte[] resBytes;
+		byte[] resBytes = null;
 		try {
 			if (command == CommandLineCommand.SIGN) {
 				resBytes = signer.sign(
@@ -700,6 +703,11 @@ final class CommandLineLauncher {
 			else {
 				throw new CommandLineException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
 			}
+		}
+		catch(InvalidSignaturePositionException | IncorrectPageException e) {
+			// Si hay algun error de pagina no valida, se vuelve a firmar de manera invisible
+			final String xParams = removeSignaturePageProperties(extraParams);
+			resBytes = sign(command, fmt, algorithm, xParams, inputFile, alias, ksm, storePassword);
 		}
 		catch(final Exception e) {
 			throw new AOException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
@@ -927,5 +935,28 @@ final class CommandLineLauncher {
 					);
 		}
 		return properties;
+	}
+
+	/**
+	 * Elimina los parametros relacionados con la firma visible de los par&aacute;metros extra.
+	 * @param propertiesParams Parametros de donde borrar.
+	 * @return Devuelve las propiedades sin los par&aacute;metros.
+	 */
+	private static String removeSignaturePageProperties(final String propertiesParams) {
+		String result = null;
+		if (propertiesParams != null) {
+			final String [] arrayParams = propertiesParams.replace("\\n", "\n").split("\\n");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+			for (final String param : arrayParams) {
+				if (param.indexOf(PdfExtraParams.SIGNATURE_PAGE) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_PAGES) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX) == -1
+						&& param.indexOf(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY) == -1) {
+							result += param + "\\n"; //$NON-NLS-1$
+				}
+			}
+		}
+		return result;
 	}
 }

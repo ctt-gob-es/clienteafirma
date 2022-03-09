@@ -291,18 +291,30 @@ public final class PdfExtraParams {
 	public static final String VISIBLE_APPEARANCE_VALUE_CUSTOM = "custom"; //$NON-NLS-1$
 
 	/**
-	 * P&aacute;gina del documento PDF donde insertar la firma. Si no se establece o
-	 * es -1 se usar&aacute; la &uacute;ltima p&aacute;gina del documento PDF.<br>
-	 * Las p&aacute;ginas comienzan su numeraci&oacute;n desde el uno. Este
-	 * par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro
-	 * <code>signatureField</code>, y necesita que se establezcan valores
-	 * v&aacute;lidos a los par&aacute;metros
+	 * P&aacute;gina del documento PDF donde insertar la firma.
+	 * Se podr&aacute;n seleccionar todas las p&aacute;ginas usando la palabra clave all.
+	 * Se podr&aacute;n seleccionar p&aacute;ginas individuales list&aacute;ndolas separadas por comas (,).
+	 * Por ejemplo, para mostrar la firma en las p&aacute;ginas 1, 2, 5 y 7, se usar&aacute;: 1,2,5,7
+	 * Se podr&aacute;n seleccionar rangos de p&aacute;ginas separadas por guion (-), en donde en las dos p&aacute;ginas
+	 * que limitan el rango tambi&eacute;n se imprimir&aacute; la r&uacute;brica.
+	 * Por ejemplo, para mostrar la firma en las p&aacute;ginas 2, 3, 4 y 5, se usar&aacute;: 2-5
+	 * Se podr&aacute;n seleccionar p&aacute;ginas contando desde el final del documento utilizando valores negativos.
+	 * Por ejemplo, para mostrar la firma en la pen&uacute;ltima p&aacute;gina, se usar&aacute;: -2
+	 * Estos mecanismos podr&aacute;n usarse de forma conjunta, a excepci&oacute;n de la palabra clave “all”
+	 * que ya implica la firma en todas las p&aacute;ginas.
+	 * Por ejemplo, para mostrar la firma en las tres primeras p&aacute;ginas y en las tres &uacute;ltimas, se usar&aacute;: 1-3,-3--1
 	 * <code>signaturePositionOnPageLowerLeftX</code>,
 	 * <code>signaturePositionOnPageLowerLeftY</code>,
 	 * <code>signaturePositionOnPageUpperRightX</code> y
 	 * <code>signaturePositionOnPageUpperRightY</code>.
 	 */
 	public static final String SIGNATURE_PAGE = "signaturePage";//$NON-NLS-1$
+
+	/**
+	 * Tiene el mismo funcionamiento que el par&aacute;metro signaturePage.
+	 * Se admite este parametro para evitar confusiones por parte de los integradores.
+	 */
+	public static final String SIGNATURE_PAGES = "signaturePages";//$NON-NLS-1$
 
 	/**
 	 * Coordenada horizontal inferior izquierda de la posici&oacute;n del recuadro
