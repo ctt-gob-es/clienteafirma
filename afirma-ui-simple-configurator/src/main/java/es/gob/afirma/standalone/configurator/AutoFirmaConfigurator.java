@@ -116,8 +116,10 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		this(new ConfigArgs(args));
 	}
 
-	/** Configurador de AutoFirma.
-	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso. */
+	/**
+	 * Configurador de AutoFirma.
+	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso.
+	 */
 	public AutoFirmaConfigurator(final ConfigArgs config) {
 
 		this.config = config;
@@ -152,7 +154,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
-	public void configure() throws IOException, ConfigurationException, GeneralSecurityException {
+	public void configure() throws GeneralSecurityException, ConfigurationException, IOException {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
@@ -162,12 +164,6 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		// Preparamos la consola para las trazas
 		this.mainScreen = ConsoleManager.getConsole(this.config.isHeadless() ? null : this);
 		this.mainScreen.showConsole();
-
-		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
-		if (this.config.isUninstallation()) {
-			uninstall();
-			return;
-		}
 
 		// Creamos el almacen para la configuracion del SSL
 		try {
@@ -193,6 +189,11 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	/** Inicia la desinstalaci&oacute;n del certificado ra&iacute;z de confianza
 	 * del almac&eacute;n de claves. */
 	private void uninstall() {
+
+		if (this.configurator == null) {
+			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
+			return;
+		}
 
 		// Creamos el almacen para la configuracion del SSL
 		this.configurator.uninstall(this.mainScreen);
@@ -224,20 +225,26 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		closeApplication(0);
 	}
 
-	/** Inicia el proceso de configuraci&oacute;n.
+    /** Inicia el proceso de configuraci&oacute;n.
 	 * @param args No usa par&aacute;metros. */
 	public static void main(final String[] args) {
 
 		final ConfigArgs config = new ConfigArgs(args);
 		final AutoFirmaConfigurator configurator = new AutoFirmaConfigurator(config);
 
-		// Iniciamos la configuracion
-		try {
-			configurator.configure();
+		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
+		if (config.isUninstallation()) {
+			configurator.uninstall();
 		}
-		catch (final Exception | Error e) {
-			LOGGER.log(Level.SEVERE, "Error grave durante el proceso de configuracion", e); //$NON-NLS-1$
-			configurator.closeApplication(-1, config.isNeedKeep());
+		// Si no, instalamos
+		else {
+			try {
+				configurator.configure();
+			}
+			catch (final Exception | Error e) {
+				LOGGER.log(Level.SEVERE, "Error grave durante el proceso de configuracion", e); //$NON-NLS-1$
+				configurator.closeApplication(-1, config.isNeedKeep());
+			}
 		}
 
 		configurator.closeApplication(0, config.isNeedKeep());
@@ -317,6 +324,5 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		public String getKeystorePath() {
 			return this.keystorePath;
 		}
-
 	}
 }

@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone.configurator;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -29,6 +28,9 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
 	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
+
+	/** Indica que la operacion que se debe realizar es la de instalaci&oacute;n. */
+	public static final String PARAMETER_INSTALL = "-install"; //$NON-NLS-1$
 
 	/** Indica que la operacion que se debe realizar es la de desinstalaci&oacute;n. */
 	public static final String PARAMETER_UNINSTALL = "-uninstall"; //$NON-NLS-1$
@@ -98,17 +100,23 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 	}
 
+	/** Configurador de AutoFirma.
+	* @param args Argumentos para configurar la ejecuci&oacute;n del proceso. */
+	public AutoFirmaConfiguratorSilent(final String[] args) {
+		this(new ConfigArgs(args));
+	}
+
 	/**
 	 * Configurador de AutoFirma.
-	 * @param config Par&aacute;metros de configuraci&oacute;n para la instalaci&oacute;n de AutoFirma.
+	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso.
 	 */
 	public AutoFirmaConfiguratorSilent(final ConfigArgs config) {
 
 		this.config = config;
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots()
-								, this.config.getCertificatePath(), this.config.getKeystorePath());
+			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots(),
+					this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(false);
@@ -153,12 +161,6 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			LOGGER.log(Level.SEVERE, "Error en la importacion de la CA de confianza o la limpieza del almacen", e); //$NON-NLS-1$
 			throw e;
 		}
-	}
-
-	/** Devuelve la ventana padre del configurador.
-	 * @return Ventana padre del configurador. */
-	private Component getParentComponent() {
-		return this.mainScreen.getParentComponent();
 	}
 
 	/** Inicia la desinstalaci&oacute;n del certificado ra&iacute;z de confianza
@@ -210,6 +212,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 						Messages.getString("AutoFirmaConfigurator.0"), //$NON-NLS-1$
 						e
 						);
+				LOGGER.log(Level.SEVERE, "Error grave durante el proceso de configuracion", e); //$NON-NLS-1$
 				configurator.closeApplication(-1);
 			}
 		}
@@ -235,7 +238,9 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
 					final String arg = args[i];
-					if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
+					if (PARAMETER_INSTALL.equalsIgnoreCase(arg)) {
+						this.op = Operation.INSTALLATION;
+					} else if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
 						this.op = Operation.UNINSTALLATION;
 					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
 						this.firefoxSecurityRoots = true;
@@ -260,13 +265,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			return this.firefoxSecurityRoots;
 		}
 
-		public String getKeystorePath() {
-			return this.keystorePath;
-		}
-
 		public String getCertificatePath() {
 			return this.certificatePath;
 		}
 
+		public String getKeystorePath() {
+			return this.keystorePath;
+		}
 	}
 }

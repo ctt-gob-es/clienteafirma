@@ -73,8 +73,8 @@ public final class CAdESExtraParams {
      *  incluir&aacute; el atributo, ya sea con los valores calculados autom&aacute;ticamente a
      *  partir de los datos o con los valores establecidos en las propiedades
      *  {@code #CONTENT_TYPE_OID} y {@code #CONTENT_DESCRIPTION}.<br><br>
-     *  Esta propiedad s&oacute;lo deber&iacute;a utilizarse para generar firmas PAdES para aptas para ser
-     *  incluidas como para de una firma PAdES.
+     *  Esta propiedad s&oacute;lo deber&iacute;a utilizarse para generar firmas aptas para ser
+     *  incluidas como parte de una firma PAdES.
      */
     public static final String INCLUDE_CONTENT_HINT_ATTRIBUTE = "includeContentHintAttribute"; //$NON-NLS-1$
 

@@ -133,9 +133,6 @@
 
 		function createBatchConfiguration() {
 
-			var config1 = AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA1.xml");
-			var config2 = AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA2.xml");
-
 			var i = 0;
 			return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n" + //$NON-NLS-1$
 			"<signbatch stoponerror=\"false\" algorithm=\"SHA256withRSA\">\r\n" + //$NON-NLS-1$
@@ -147,6 +144,16 @@
 			"  <signsaver>\r\n" + //$NON-NLS-1$
 			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
 			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMA" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+ 			" <singlesign Id=\"FirmaManifest" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
+			"  <datasource></datasource>\r\n" + //$NON-NLS-1$
+			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>dXNlTWFuaWZlc3Q9dHJ1ZQp1cmkxPXVybjppZDozMDg2Cm1kMT00aHJuLzNZOWMvZm4vdXlxMTJ3K0Q5QTJhS2M9Cm1pbWVUeXBlMT1wbGFpbi94bWwKcHJlY2FsY3VsYXRlZEhhc2hBbGdvcml0aG09U0hBLTE=</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + AutoScript.getBase64FromText("FileName=C:/Users/carlos.gamuci/Desktop/salida/FIRMAManifest" + ++i + ".xml") + "</config>\r\n" + //$NON-NLS-1$
 			"  </signsaver>\r\n" + //$NON-NLS-1$
 			" </singlesign>\r\n" + //$NON-NLS-1$
  			" <singlesign Id=\"" + Math.floor(Math.random() * 10000000) + "\">\r\n" + //$NON-NLS-1$
@@ -437,10 +444,11 @@
 		 <option value="Adobe PDF">PAdES</option>
 		 <option value="PAdEStri">PAdEStri</option>
 		 <option value="XAdES">XAdES</option>
-		 <option value="XMLdSig">XMLdSig</option>
 		 <option value="XAdEStri">XAdEStri</option>
 		 <option value="FacturaE">FacturaE</option>
 		 <option value="FacturaEtri">FacturaEtri</option>
+		 <option value="CMS/PKCS#7">CMS</option>
+		 <option value="XMLdSig">XMLdSig</option>
 		 <option value="ODF">ODF</option>
 		 <option value="OOXML">OOXML</option>
 		 <option value="NONE">PKCS#1</option>
@@ -503,7 +511,7 @@
 		
 		<script>
 			var paramsElement = document.getElementById("params");
-			paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
+			paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService\nuseManifest=true\nuri1=urn:id:3086\nmd1=4hrn/3Y9c/fn/uyq12w+D9A2aKc=\nmimeType1=plain/xml\nprecalculatedHashAlgorithm=SHA-1";
 		</script>
 	</body>
 </html>	
