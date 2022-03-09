@@ -771,7 +771,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 					PluginsManager.getInstance().getPluginsLoadedList();
 				} catch (final Exception e) {
 					LOGGER.severe("No se han podido cargar los plugins en la aplicacion"); //$NON-NLS-1$
-					AOUIFactory.showErrorMessage("No se han podido cargar los plugins en la aplicacion.", //$NON-NLS-1$
+					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.4"), //$NON-NLS-1$
 							SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 							JOptionPane.WARNING_MESSAGE, e);
 				}
@@ -784,6 +784,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 						JOptionPane.WARNING_MESSAGE, null);
+				forceCloseApplication(0);
 			}
 		} catch (final HeadlessException he) {
 			LOGGER.log(Level.WARNING,
