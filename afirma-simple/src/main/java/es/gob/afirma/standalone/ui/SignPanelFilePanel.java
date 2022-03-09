@@ -42,6 +42,8 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 
     private SignatureConfigInfoPanel configInfoPanel;
 
+    private String accesibleDescription;
+
     SignPanelFilePanel(final SignOperationConfig signConfig) {
     	super(true);
 
@@ -63,8 +65,9 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         	bgColor = LookAndFeelManager.WINDOW_COLOR;
         }
         setBackground(bgColor);
+        setFocusable(true);
 
-        // Panel con el detalle del documenot
+        // Panel con el detalle del documento
         final JPanel detailPanel = createDetailsPanel(signConfig, bgColor);
 
         // Boton para la apertura del fichero
@@ -74,7 +77,9 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         if (ext == null || !isExecutable(ext) && !isLink(ext)) {
 
         	openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
-        	openFileButton.setMnemonic('v');
+        	openFileButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignPanel.52"));
+        	this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.52"); 	//$NON-NLS-1$
+        	openFileButton.setMnemonic('c');
         	openFileButton.addActionListener(
         			ae -> {
         				if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -100,6 +105,8 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         			}
         			);
         }
+
+        this.getAccessibleContext().setAccessibleDescription(this.accesibleDescription);
 
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(bgColor);
@@ -142,7 +149,6 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
     	final JPanel emptyPanel = new JPanel();
     	emptyPanel.setBackground(bgColor);
     	add(emptyPanel, c);
-
     }
 
     /**
@@ -164,18 +170,23 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
     	final File file = signConfig.getDataFile();
 
 		final JLabel pathLabel = new JLabel(file.getAbsolutePath());
+		this.accesibleDescription += file.getAbsolutePath();
         pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
 
         // Panel de informacion del documento
         final JLabel documentInfoLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.145")); //$NON-NLS-1$
+        this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.145"); //$NON-NLS-1$
         documentInfoLabel.setFont(documentInfoLabel.getFont().deriveFont(Font.BOLD));
 
         final JPanel documentInfoPanel = new DocumentInfoPanel(signConfig, bgColor);
+        this.accesibleDescription += ((DocumentInfoPanel) documentInfoPanel).getAccesibleDescription();
 
         // Panel de configuracion de firma
 		final JLabel signConfigLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.142")); //$NON-NLS-1$
+		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.142"); //$NON-NLS-1$
 		signConfigLabel.setFont(signConfigLabel.getFont().deriveFont(Font.BOLD));
 		this.configInfoPanel = new SignatureConfigInfoPanel(signConfig, bgColor);
+		this.accesibleDescription += this.configInfoPanel.getAccesibleDescription();
 
         // Componemos el panel
 		final JPanel detailPanel = new JPanel(new GridBagLayout());

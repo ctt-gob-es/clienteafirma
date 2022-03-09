@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +46,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import es.gob.afirma.core.misc.Platform;
@@ -114,6 +116,7 @@ final class SignDataPanel extends JPanel {
         this.filePathText.setLabelFor(filePath);
 
         final JPanel filePathPanel = new JPanel();
+        filePathPanel.setFocusable(true);
         filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
         filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
@@ -163,7 +166,7 @@ final class SignDataPanel extends JPanel {
         if (isOpennable && signFile != null) {
             openFileButton = new JButton(SimpleAfirmaMessages.getString("SignDataPanel.3")); //$NON-NLS-1$
             openFileButton.setPreferredSize(new Dimension(150, 24));
-            openFileButton.setMnemonic('v');
+            openFileButton.setMnemonic('c');
             openFileButton.setToolTipText(SimpleAfirmaMessages.getString("SignDataPanel.4")); //$NON-NLS-1$
             openFileButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.5")); //$NON-NLS-1$
             openFileButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.6")); //$NON-NLS-1$
@@ -188,6 +191,7 @@ final class SignDataPanel extends JPanel {
 
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(filePath);
+        filePathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.2") + filePath.getText()); //$NON-NLS-1$
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         if (openFileButton != null) {
             filePathPanel.add(openFileButton);
@@ -221,6 +225,7 @@ final class SignDataPanel extends JPanel {
             }
 
             certDescPanel = new JPanel();
+            certDescPanel.setFocusable(true);
             // Se agrega un borde y un padding al panel con la informacion del certificado
             certDescPanel.setBorder(BorderFactory.createCompoundBorder
             		(BorderFactory.createLineBorder(Color.GRAY),
@@ -262,6 +267,11 @@ final class SignDataPanel extends JPanel {
 
             this.certDescText.setText(SimpleAfirmaMessages.getString("SignDataPanel.21")); //$NON-NLS-1$
             this.certDescText.setLabelFor(this.holderCertLabel);
+            certDescPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.21") //$NON-NLS-1$
+            															+ this.holderDescCertLabel.getText()
+            															+ this.holderCertLabel.getText()
+            															+ this.issuerDescCertLabel.getText()
+            															+ this.issuerCertLabel.getText());
         }
 
         // Panel el detalle de la firma
@@ -276,9 +286,22 @@ final class SignDataPanel extends JPanel {
 
         this.currentSignInfo = signInfo;
 
-        final JScrollPane detailPanel = new JScrollPane(
-    		signInfo == null ? null : SignDataPanel.getSignDataTree(signInfo, extKeyListener, SignDataPanel.this)
-		);
+        JTree signTree = null;
+        String treeAccessibleDesc = ""; //$NON-NLS-1$
+        if (signInfo != null) {
+        	signTree = SignDataPanel.getSignDataTree(signInfo, extKeyListener, SignDataPanel.this);
+        	final TreeNode root = (TreeNode) signTree.getModel().getRoot();
+        	treeAccessibleDesc += root;
+        	if (root.getChildCount() >= 0) {
+        		for (final Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
+	        		final TreeNode n = (TreeNode)e.nextElement();
+	        		treeAccessibleDesc += n.toString();
+        		}
+        	}
+        }
+
+        final JScrollPane detailPanel = new JScrollPane(signTree);
+        detailPanel.setFocusable(true);
 
         // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -291,6 +314,8 @@ final class SignDataPanel extends JPanel {
 
         final JLabel detailPanelText = new JLabel(SimpleAfirmaMessages.getString("SignDataPanel.22")); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);
+        detailPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.22") //$NON-NLS-1$
+        															+ treeAccessibleDesc);
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {

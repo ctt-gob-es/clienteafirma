@@ -482,13 +482,22 @@ public class JSEUIManager implements AOUIManager {
 			                           final int optionType,
 			                           final int messageType) {
 
-        return JOptionPane.showConfirmDialog(
-    		parentComponent instanceof Component ? (Component) parentComponent : null,
-    		message,
-    		title,
-    		optionType,
-    		messageType
-		);
+    	final JOptionPane option = new JOptionPane(
+    			message,
+    			messageType,
+				optionType
+				);
+		final JDialog overwriteDialog = option.createDialog(
+							parentComponent instanceof Component ? (Component) parentComponent : null,
+							title
+							);
+		overwriteDialog.getAccessibleContext().setAccessibleDescription((String) message);
+		overwriteDialog.setVisible(true);
+
+        if (option.getValue() == null) {
+        	return JOptionPane.CANCEL_OPTION;
+        }
+		return (int) option.getValue();
     }
 
     @Override
@@ -497,12 +506,16 @@ public class JSEUIManager implements AOUIManager {
    								  final String title,
    								  final int messageType) {
 
-    	JOptionPane.showMessageDialog(
-			parentComponent instanceof Component ? (Component) parentComponent : null,
-			message,
-			title,
-			messageType
-		);
+    	final JOptionPane option = new JOptionPane(
+    			message,
+    			messageType
+				);
+		final JDialog overwriteDialog = option.createDialog(
+							parentComponent instanceof Component ? (Component) parentComponent : null,
+							title
+							);
+		overwriteDialog.getAccessibleContext().setAccessibleDescription((String) message);
+		overwriteDialog.setVisible(true);
     }
 
     @Override
@@ -512,13 +525,18 @@ public class JSEUIManager implements AOUIManager {
 								  final int messageType,
 								  final Object icon) {
 
-        JOptionPane.showMessageDialog(
-    		parentComponent instanceof Component ? (Component) parentComponent : null,
-    		message,
-    		title,
-    		messageType,
-    		icon instanceof Icon ? (Icon) icon : null
-		);
+    	final JOptionPane option = new JOptionPane(
+    			message,
+    			messageType,
+    			JOptionPane.DEFAULT_OPTION,
+    			icon instanceof Icon ? (Icon) icon : null
+				);
+    	option.getAccessibleContext().setAccessibleDescription((String) message);
+		final JDialog overwriteDialog = option.createDialog(
+							parentComponent instanceof Component ? (Component) parentComponent : null,
+							title
+							);
+		overwriteDialog.setVisible(true);
     }
 
     /** {@inheritDoc} */
@@ -726,12 +744,12 @@ public class JSEUIManager implements AOUIManager {
             		}
 
 	                if (file.exists()) {
-	                    selectedOption = JOptionPane.showConfirmDialog(
-                    		parentComponent,
-	                        JSEUIMessages.getString("JSEUIManager.77", file.getAbsolutePath()), //$NON-NLS-1$
-	                        JSEUIMessages.getString("JSEUIManager.85"), //$NON-NLS-1$
-	                        JOptionPane.YES_NO_CANCEL_OPTION
-                        );
+	                	selectedOption = showConfirmDialog(parentComponent,
+	                						JSEUIMessages.getString("JSEUIManager.77", file.getAbsolutePath()),  //$NON-NLS-1$
+	                						JSEUIMessages.getString("JSEUIManager.85"),  //$NON-NLS-1$
+	                						JOptionPane.YES_NO_CANCEL_OPTION,
+	                						JOptionPane.INFORMATION_MESSAGE);
+
 	                    if (selectedOption == JOptionPane.CANCEL_OPTION) {
 	                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
 	                        throw new AOCancelledOperationException();

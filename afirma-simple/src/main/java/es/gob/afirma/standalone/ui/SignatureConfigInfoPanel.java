@@ -43,6 +43,8 @@ public class SignatureConfigInfoPanel extends JPanel {
 
     private JCheckBox pdfStamp = null;
 
+    private String accesibleDescription;
+
 	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor) {
 		createUI(signConfig, bgColor);
 	}
@@ -54,10 +56,12 @@ public class SignatureConfigInfoPanel extends JPanel {
 		// Formato de firma
 		final JLabel signFormatLabel = new JLabel(
 				SimpleAfirmaMessages.getString("SignPanel.103", signConfig.getSignatureFormatName())); //$NON-NLS-1$
+		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.103", signConfig.getSignatureFormatName()); //$NON-NLS-1$
 
 		// Resumen de atributos
 		final JLabel attrLabel = new JLabel(
 				SimpleAfirmaMessages.getString("SignPanel.143")); //$NON-NLS-1$
+		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.143"); //$NON-NLS-1$
 		final JPanel attrPanel = createAttributesPanel(signConfig);
 
 		// Opciones de firma
@@ -82,7 +86,7 @@ public class SignatureConfigInfoPanel extends JPanel {
         }
 	}
 
-	private static JPanel createAttributesPanel(final SignOperationConfig config) {
+	private JPanel createAttributesPanel(final SignOperationConfig config) {
 
 		String policyId = null;
 		String roles = null;
@@ -117,6 +121,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 			} else {
 				policyDescription = SimpleAfirmaMessages.getString("PreferencesPanel.26"); //$NON-NLS-1$
 			}
+			this.accesibleDescription += policyDescription;
 			panel.add(new JLabel(" - " + policyDescription)); //$NON-NLS-1$
 			panel.add(Box.createRigidArea(new Dimension(0, 4)));
 		}
@@ -124,6 +129,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 		// Resumen del lugar de firma
 		if (definedPlace) {
 			final String placeDescription = SimpleAfirmaMessages.getString("SignPanel.149"); //$NON-NLS-1$
+			this.accesibleDescription += placeDescription;
 			panel.add(new JLabel(" - " + placeDescription)); //$NON-NLS-1$
 			panel.add(Box.createRigidArea(new Dimension(0, 4)));
 		}
@@ -131,16 +137,18 @@ public class SignatureConfigInfoPanel extends JPanel {
 		// Resumen de roles
 		if (roles != null) {
 			panel.add(new JLabel(" - " + SimpleAfirmaMessages.getString("SignPanel.144", roles))); //$NON-NLS-1$ //$NON-NLS-2$
+			this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.144", roles); //$NON-NLS-1$
 			panel.add(Box.createRigidArea(new Dimension(0, 4)));
 		}
 
 		// Enlace para ver todos los atributos
 		panel.add(createAttributesHiperlink(SimpleAfirmaMessages.getString("SignPanel.146"), config)); //$NON-NLS-1$
+		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.146"); //$NON-NLS-1$
 
 		return panel;
 	}
 
-	private static JLabel createAttributesHiperlink(final String text, final SignOperationConfig signConfig) {
+	private JLabel createAttributesHiperlink(final String text, final SignOperationConfig signConfig) {
 
 		final JLabel hlLabel = new JLabel(" - " + text); //$NON-NLS-1$
 
@@ -152,6 +160,7 @@ public class SignatureConfigInfoPanel extends JPanel {
     	hlLabel.setFont(font.deriveFont(attributes));
 
     	hlLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + text);  //$NON-NLS-1$//$NON-NLS-2$
+    	this.accesibleDescription += SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + text;  //$NON-NLS-1$//$NON-NLS-2$
 
 		final SignatureAttributesListener linkListener = new SignatureAttributesListener(signConfig);
 		hlLabel.addMouseListener(linkListener);
@@ -178,6 +187,7 @@ public class SignatureConfigInfoPanel extends JPanel {
         		SimpleAfirmaMessages.getString("SignPanel.44"), //$NON-NLS-1$
         		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE)
         	);
+            this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.44"); //$NON-NLS-1$
             this.pdfVisible.setBackground(bgColor);
             this.pdfVisible.setMnemonic('H');
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
@@ -188,6 +198,7 @@ public class SignatureConfigInfoPanel extends JPanel {
             		SimpleAfirmaMessages.getString("SignPanel.120"), //$NON-NLS-1$
             		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_STAMP)
             	);
+            this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.120"); //$NON-NLS-1$
             this.pdfStamp.setBackground(bgColor);
             this.pdfStamp.setMnemonic('S');
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
@@ -198,12 +209,14 @@ public class SignatureConfigInfoPanel extends JPanel {
             	this.pdfStamp.setEnabled(false);
             	panel.add(Box.createRigidArea(new Dimension(0, 4)));
             	panel.add(new JLabel(SimpleAfirmaMessages.getString("SignPanel.121"))); //$NON-NLS-1$
+            	this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.121"); //$NON-NLS-1$
             }
         }
 
         // Agrega boton de opciones avanzadas de multifirma CAdES y XAdES
         if (fileType == FileType.SIGN_CADES || fileType == FileType.SIGN_XADES) {
         	final JButton avanzado = new JButton(SimpleAfirmaMessages.getString("SignPanel.119")); //$NON-NLS-1$
+        	this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.119"); //$NON-NLS-1$
 
         	panel.add(Box.createRigidArea(new Dimension(0, 6)));
         	avanzado.setMnemonic('a');
@@ -229,6 +242,10 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	public boolean isPdfStampSignatureSelected() {
 		return this.pdfStamp != null && this.pdfStamp.isSelected();
+	}
+
+	public String getAccesibleDescription() {
+		return this.accesibleDescription;
 	}
 
 	static class SignatureAttributesListener implements MouseListener, FocusListener, KeyListener {

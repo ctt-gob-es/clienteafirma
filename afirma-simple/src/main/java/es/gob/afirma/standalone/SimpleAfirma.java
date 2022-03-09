@@ -347,6 +347,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             this.currentPanel.setEnabled(false);
         }
         this.container.repaint();
+        this.container.requestFocus();
         this.currentPanel = newPanel;
     }
 

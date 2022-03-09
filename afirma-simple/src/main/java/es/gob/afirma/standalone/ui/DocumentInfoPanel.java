@@ -22,8 +22,9 @@ public class DocumentInfoPanel extends JPanel {
 	/** Serial Id. */
 	private static final long serialVersionUID = 1627010163673368615L;
 
+	private String accesibleDescription;
+
 	public DocumentInfoPanel(final SignOperationConfig signConfig, final Color bgColor) {
-		super();
 		createUI(signConfig, bgColor);
 	}
 
@@ -34,6 +35,7 @@ public class DocumentInfoPanel extends JPanel {
 		// Tipo de documento
 		final JLabel descLabel = new JLabel(
         		SimpleAfirmaMessages.getString("SignPanel.46", signConfig.getFileType().getFileDescription())); //$NON-NLS-1$
+		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.46", signConfig.getFileType().getFileDescription()); //$NON-NLS-1$
 
 		// Fecha de modificacion
 		final Date fileLastModified = new Date(signConfig.getDataFile().lastModified());
@@ -42,12 +44,16 @@ public class DocumentInfoPanel extends JPanel {
         				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
         				.format(fileLastModified))
         		);
+		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.47",  //$NON-NLS-1$
+				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
+				.format(fileLastModified));
 
 		// Tamano
 		final String fileSize = NumberFormat.getNumberInstance().format(signConfig.getDataFile().length() / 1024);
         final JLabel sizeLabel = new JLabel(
     		SimpleAfirmaMessages.getString("SignPanel.49") + (fileSize.equals("0") ? "<1" : fileSize) + " KB" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
+        this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.49") + (fileSize.equals("0") ? "<1" : fileSize) + " KB"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         // Validez de la firma (si era una firma)
         final String invalidSignatureText = signConfig.getInvalidSignatureText();
@@ -62,6 +68,7 @@ public class DocumentInfoPanel extends JPanel {
         		errorIcon = ImageLoader.loadImage("ko_icon.png"); //$NON-NLS-1$
         	}
         	invalidSignatureErrorLabel = new JLabel(invalidSignatureText, new ImageIcon(errorIcon), SwingConstants.LEFT);
+        	this.accesibleDescription += invalidSignatureText;
         	invalidSignatureErrorLabel.setForeground(Color.RED);
         }
 
@@ -77,5 +84,9 @@ public class DocumentInfoPanel extends JPanel {
 			add(Box.createRigidArea(new Dimension(0, 4)));
 			add(invalidSignatureErrorLabel);
 		}
+	}
+
+	public String getAccesibleDescription() {
+		return this.accesibleDescription;
 	}
 }
