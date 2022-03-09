@@ -44,6 +44,7 @@ public final class RestoreConfigDialog extends JDialog {
 		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		this.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("RestoreConfigPanel.4")); //$NON-NLS-1$
 	}
 
 	/** Muestra el di&aacute;logo.
