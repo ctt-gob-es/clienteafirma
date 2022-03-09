@@ -111,7 +111,7 @@ public final class MainMenu extends JMenuBar {
 
         final JMenu menuArchivo = new JMenu();
         menuArchivo.setText(SimpleAfirmaMessages.getString("MainMenu.0")); //$NON-NLS-1$
-        menuArchivo.setMnemonic(KeyEvent.VK_A);
+        menuArchivo.setMnemonic(KeyEvent.VK_ALT);
         menuArchivo.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("MainMenu.1") //$NON-NLS-1$
         );

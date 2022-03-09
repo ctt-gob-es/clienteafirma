@@ -22,6 +22,7 @@ public final class ErrorManagementDialog extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setEnabled(true);
 		setAlwaysOnTop(true);
+		this.getAccessibleContext().setAccessibleDescription((String) message);
 
 		resize();
 	}
@@ -35,6 +36,7 @@ public final class ErrorManagementDialog extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setEnabled(true);
 		setAlwaysOnTop(true);
+		this.getAccessibleContext().setAccessibleDescription((String) message);
 
 		resize();
 	}

@@ -381,6 +381,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      		}
      		this.lowerPanel.loadDataInfo(configs);
      		this.lowerPanel.updateSignButtonState(this.saf.isKeyStoreReady());
+     		this.lowerPanel.requestFocusInWindow();
 
      		this.signOperationConfigs = configs;
      	}
@@ -811,6 +812,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        final JLabel introText = new JLabel(intro);
 	        introText.setLabelFor(getSelectButton());
 	        introText.setFocusable(false);
+	        this.getAccessibleContext().setAccessibleDescription(intro);
 
 	        final JPanel introPanel = new JPanel(new BorderLayout());
 	        introPanel.add(introText, BorderLayout.PAGE_START);

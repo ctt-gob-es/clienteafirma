@@ -37,6 +37,8 @@ final class SignResultPanel extends JPanel {
     private final JLabel resultTextLabel = new JLabel();
     private final JLabel linkLabel = new JLabel();
 
+    private String accessibleDescription = ""; //$NON-NLS-1$
+
     SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener));
     }
@@ -88,6 +90,11 @@ final class SignResultPanel extends JPanel {
                 this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
                 		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
 
+                this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.2") //$NON-NLS-1$
+                						 + SimpleAfirmaMessages.getString("SignResultPanel.3") //$NON-NLS-1$
+                						 + SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                						 + SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
+
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
             case OK:
@@ -95,27 +102,35 @@ final class SignResultPanel extends JPanel {
             		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.8")); //$NON-NLS-1$
             		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.9")); //$NON-NLS-1$
             		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.10"); //$NON-NLS-1$
+                    this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.8") //$NON-NLS-1$
+   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.9") //$NON-NLS-1$
+   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
             	}
             	else {
             		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.27")); //$NON-NLS-1$
             		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.28")); //$NON-NLS-1$
             		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.29"); //$NON-NLS-1$
 
-                    this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
-
-                	// Este gestor se encargara de controlar los eventos de foco y raton
-                    labelLinkManager = new LabelLinkManager(this.linkLabel);
-                    labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
-							SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
-					));
-
-                    if (extKeyListener != null) {
-                    	this.linkLabel.addKeyListener(extKeyListener);
-                    }
-
-                    this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
-                    		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+                    this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.27") //$NON-NLS-1$
+   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.28") //$NON-NLS-1$
+   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.29") //$NON-NLS-1$
+                    							+ SimpleAfirmaMessages.getString("SignResultPanel.46") //$NON-NLS-1$
+                    								+ SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
             	}
+                this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                labelLinkManager = new LabelLinkManager(this.linkLabel);
+                labelLinkManager.setLabelLinkListener(new URLLabelLinkImpl(
+						SimpleAfirmaMessages.getString("SignResultPanel.33") //$NON-NLS-1$
+				));
+
+                if (extKeyListener != null) {
+                	this.linkLabel.addKeyListener(extKeyListener);
+                }
+
+                this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
                 break;
             case KO:
                 if (singleSign) {
@@ -140,6 +155,9 @@ final class SignResultPanel extends JPanel {
                 	}
                 	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
                     resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
+
+                    this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.5") //$NON-NLS-1$
+   						 						+ errorMessage;
                 }
                 else {
                 	this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.30")); //$NON-NLS-1$
@@ -160,6 +178,9 @@ final class SignResultPanel extends JPanel {
                     this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
                     		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
                     resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.32"); //$NON-NLS-1$
+                    this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.30") //$NON-NLS-1$
+   						 						+ errorMessage
+   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
                 }
                 break;
             default:
@@ -179,6 +200,9 @@ final class SignResultPanel extends JPanel {
                 }
                 this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.13"); //$NON-NLS-1$
+                this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.11") //$NON-NLS-1$
+						 						+ errorMessage
+						 						+ SimpleAfirmaMessages.getString("SignResultPanel.13"); //$NON-NLS-1$
                 break;
         }
 
@@ -194,6 +218,9 @@ final class SignResultPanel extends JPanel {
         }
 
         setLayout(new GridBagLayout());
+
+        this.setFocusable(true);
+        this.getAccessibleContext().setAccessibleDescription(this.accessibleDescription);
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -215,8 +242,9 @@ final class SignResultPanel extends JPanel {
         c.weighty = 0.0;
         c.weightx = 3.0;
         c.gridy = 2;
-        c.insets = new Insets(0, 6, 0, 460);
+        c.insets = new Insets(0, 6, 0, 430);
         this.add(this.linkLabel, c);
 
     }
+
 }
