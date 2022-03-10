@@ -2,6 +2,7 @@ package es.gob.afirma.ui.core.jse.errors;
 
 import java.awt.Frame;
 
+import javax.accessibility.Accessible;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
@@ -18,11 +19,18 @@ public final class ErrorManagementDialog extends JDialog {
 		setTitle(title);
 		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
 		add(errorPanel);
+
+		if (message instanceof Accessible) {
+			getAccessibleContext().setAccessibleDescription(
+					((Accessible) message).getAccessibleContext().getAccessibleDescription());
+		} else if (message instanceof String) {
+			getAccessibleContext().setAccessibleDescription((String) message);
+		}
+
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setEnabled(true);
 		setAlwaysOnTop(true);
-		this.getAccessibleContext().setAccessibleDescription((String) message);
 
 		resize();
 	}
@@ -32,11 +40,18 @@ public final class ErrorManagementDialog extends JDialog {
 		setTitle(title);
 		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
 		add(errorPanel);
+
+		if (message instanceof Accessible) {
+			getAccessibleContext().setAccessibleDescription(
+					((Accessible) message).getAccessibleContext().getAccessibleDescription());
+		} else if (message instanceof String) {
+			getAccessibleContext().setAccessibleDescription((String) message);
+		}
+
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setEnabled(true);
 		setAlwaysOnTop(true);
-		this.getAccessibleContext().setAccessibleDescription((String) message);
 
 		resize();
 	}
