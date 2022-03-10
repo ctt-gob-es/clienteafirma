@@ -487,12 +487,19 @@ public class JSEUIManager implements AOUIManager {
     			messageType,
 				optionType
 				);
-		final JDialog overwriteDialog = option.createDialog(
+		final JDialog dialog = option.createDialog(
 							parentComponent instanceof Component ? (Component) parentComponent : null,
 							title
 							);
-		overwriteDialog.getAccessibleContext().setAccessibleDescription((String) message);
-		overwriteDialog.setVisible(true);
+
+		if (message instanceof JPanel) {
+			dialog.getAccessibleContext().setAccessibleDescription(
+					((JPanel)message).getAccessibleContext().getAccessibleDescription());
+		} else {
+			dialog.getAccessibleContext().setAccessibleDescription((String) message);
+		}
+
+		dialog.setVisible(true);
 
         if (option.getValue() == null) {
         	return JOptionPane.CANCEL_OPTION;
@@ -510,12 +517,19 @@ public class JSEUIManager implements AOUIManager {
     			message,
     			messageType
 				);
-		final JDialog overwriteDialog = option.createDialog(
+		final JDialog dialog = option.createDialog(
 							parentComponent instanceof Component ? (Component) parentComponent : null,
 							title
 							);
-		overwriteDialog.getAccessibleContext().setAccessibleDescription((String) message);
-		overwriteDialog.setVisible(true);
+
+		if (message instanceof JPanel) {
+			dialog.getAccessibleContext().setAccessibleDescription(
+					((JPanel)message).getAccessibleContext().getAccessibleDescription());
+		} else {
+			dialog.getAccessibleContext().setAccessibleDescription((String) message);
+		}
+
+		dialog.setVisible(true);
     }
 
     @Override
@@ -531,12 +545,19 @@ public class JSEUIManager implements AOUIManager {
     			JOptionPane.DEFAULT_OPTION,
     			icon instanceof Icon ? (Icon) icon : null
 				);
-    	option.getAccessibleContext().setAccessibleDescription((String) message);
-		final JDialog overwriteDialog = option.createDialog(
+		final JDialog dialog = option.createDialog(
 							parentComponent instanceof Component ? (Component) parentComponent : null,
 							title
 							);
-		overwriteDialog.setVisible(true);
+
+		if (message instanceof JPanel) {
+			dialog.getAccessibleContext().setAccessibleDescription(
+					((JPanel)message).getAccessibleContext().getAccessibleDescription());
+		} else {
+			dialog.getAccessibleContext().setAccessibleDescription((String) message);
+		}
+
+		dialog.setVisible(true);
     }
 
     /** {@inheritDoc} */
@@ -836,7 +857,7 @@ public class JSEUIManager implements AOUIManager {
     	// un ArrayIndexOutOfBoundsException al intentar prefijar el directorio y
     	// nombre por defecto del fichero. En esos casos, ignoramos estos parametros
     	catch (final ArrayIndexOutOfBoundsException e) {
-    		LOGGER.warning("No se pudo seleccionar el directorio/nombre de fichero por defecto para el guardado: " + e);
+    		LOGGER.warning("No se pudo seleccionar el directorio/nombre de fichero por defecto para el guardado: " + e); //$NON-NLS-1$
     	}
     }
 

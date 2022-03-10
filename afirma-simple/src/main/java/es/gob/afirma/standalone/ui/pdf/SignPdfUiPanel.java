@@ -570,17 +570,12 @@ final class SignPdfUiPanel extends JPanel implements
 						if (pagesList.isEmpty()) {
 							throw new IncorrectPageException("Numero de pagina no valido"); //$NON-NLS-1$
 						}
+						pageNumber = pagesList.get(0);
+						page = this.pdfPages.get(pageNumber -1);
 					} catch (final IncorrectPageException e) {
-			    		AOUIFactory.showMessageDialog(
-			    				this,
-			    				SignPdfUiMessages.getString("SignPdfUiPanel.26"), //$NON-NLS-1$,
-			    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			    				JOptionPane.ERROR_MESSAGE
-			    		);
-			    		return null;
+						pageNumber = 1;
+						page = this.pdfPages.get(0);
 					}
-					pageNumber = pagesList.get(0);
-					page = this.pdfPages.get(pageNumber -1);
 					if (page == null) {
 						try {
 							preLoadNecessaryPage(pageNumber);

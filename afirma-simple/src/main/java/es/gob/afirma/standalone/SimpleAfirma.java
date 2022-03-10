@@ -862,7 +862,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		closeApplication(0);
             return true;
     	}
-		if (AOUIFactory.showConfirmDialog(this.container, new ClosePanel(),
+    	final ClosePanel closePanel = new ClosePanel();
+    	closePanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SimpleAfirma.47")); //$NON-NLS-1$
+		if (AOUIFactory.showConfirmDialog(this.container, closePanel,
             SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
             closeApplication(0);

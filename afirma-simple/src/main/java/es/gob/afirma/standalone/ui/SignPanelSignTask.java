@@ -352,29 +352,28 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	    		);
         }
         else {
-
-        	if (!invalidPageNumberFilesList.isEmpty()) {
-        		String invalidPageNumberFiles = ""; //$NON-NLS-1$
-        		for (final String fileName : invalidPageNumberFilesList) {
-        			invalidPageNumberFiles += fileName + "\n"; //$NON-NLS-1$
-        		}
-
-    			AOUIFactory.showMessageDialog(
-    					this,
-    					SimpleAfirmaMessages.getString("SignResultPanel.34") + "\n" + invalidPageNumberFiles, //$NON-NLS-1$ //$NON-NLS-2$
-    	                SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-    	                JOptionPane.WARNING_MESSAGE
-    	        );
-
-    			invalidPageNumberFilesList.clear();
-        	}
-
         	this.resultViewer.showResultsInfo(
     			this.signConfigs,
     			outDir,
     			(X509Certificate) pke.getCertificate()
 			);
         }
+
+    	if (!invalidPageNumberFilesList.isEmpty()) {
+    		String invalidPageNumberFiles = ""; //$NON-NLS-1$
+    		for (final String fileName : invalidPageNumberFilesList) {
+    			invalidPageNumberFiles += fileName + "\n"; //$NON-NLS-1$
+    		}
+
+			AOUIFactory.showMessageDialog(
+					this,
+					SimpleAfirmaMessages.getString("SignResultPanel.34") + "\n" + invalidPageNumberFiles, //$NON-NLS-1$ //$NON-NLS-2$
+	                SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+	                JOptionPane.WARNING_MESSAGE
+	        );
+
+			invalidPageNumberFilesList.clear();
+    	}
 
     }
 

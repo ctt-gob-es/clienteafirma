@@ -490,6 +490,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
     	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
     	final ProxyPanel proxyPanel = new ProxyPanel();
+    	proxyPanel.getAccessibleContext().setAccessibleDescription(
+    			SimpleAfirmaMessages.getString("ProxyDialog.15")); //$NON-NLS-1$
 
     	// Cursor por defecto
     	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -532,6 +534,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
     	final DefaultFormatPanel formatPanel = new DefaultFormatPanel();
     	formatPanel.loadPreferences();
     	formatPanel.setBlocked(blocked);
+    	formatPanel.getAccessibleContext().setAccessibleDescription(
+    			SimpleAfirmaMessages.getString("DefaultFormatPanel.1")); //$NON-NLS-1$
 
     	if(AOUIFactory.showConfirmDialog(
     			parent,
