@@ -560,7 +560,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Cargamos el fichero
 		try {
-			final File indexHelpFile = new File(helpDir + File.separator + "Spanish.lproj" + File.separator + "index.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			final File indexHelpFile = new File(helpDir + File.separator + "index.html"); //$NON-NLS-1$
 			Desktop.getDesktop().open(indexHelpFile);
 		} catch (final IOException e) {
 			LOGGER.log(Level.WARNING, "No se ha podido abrir la ayuda de la aplicacion", e); //$NON-NLS-1$
