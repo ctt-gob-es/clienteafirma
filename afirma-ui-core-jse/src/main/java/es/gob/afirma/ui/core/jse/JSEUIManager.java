@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.accessibility.Accessible;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -492,10 +493,10 @@ public class JSEUIManager implements AOUIManager {
 							title
 							);
 
-		if (message instanceof JPanel) {
+		if (message instanceof Accessible) {
 			dialog.getAccessibleContext().setAccessibleDescription(
-					((JPanel)message).getAccessibleContext().getAccessibleDescription());
-		} else {
+					((Accessible) message).getAccessibleContext().getAccessibleDescription());
+		} else if (message instanceof String) {
 			dialog.getAccessibleContext().setAccessibleDescription((String) message);
 		}
 
@@ -522,10 +523,10 @@ public class JSEUIManager implements AOUIManager {
 							title
 							);
 
-		if (message instanceof JPanel) {
+		if (message instanceof Accessible) {
 			dialog.getAccessibleContext().setAccessibleDescription(
-					((JPanel)message).getAccessibleContext().getAccessibleDescription());
-		} else {
+					((Accessible) message).getAccessibleContext().getAccessibleDescription());
+		} else if (message instanceof String) {
 			dialog.getAccessibleContext().setAccessibleDescription((String) message);
 		}
 
