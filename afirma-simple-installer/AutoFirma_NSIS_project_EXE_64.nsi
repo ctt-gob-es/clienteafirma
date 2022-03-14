@@ -243,6 +243,7 @@ Section "Programa" sPrograma
 	File  AutoFirma64\AutoFirma.exe
 	File  AutoFirma64\AutoFirmaConfigurador.exe
 	File  AutoFirma64\AutoFirmaCommandLine.exe
+	File  .accessibility.properties
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -348,6 +349,11 @@ Section "Programa" sPrograma
 	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\$PATH\autofirma.pfx"
+	
+	; Copiamos el archivo para permitir la accesibilidad a traves de JAB, sustituimos el anterior en caso de que existiera
+	IfFileExists "$PROFILE\.accessibility.properties" 0 +1
+	Delete "$PROFILE\.accessibility.properties"
+	CopyFiles /SILENT ".accessibility.properties" "$PROFILE"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R0 ""
