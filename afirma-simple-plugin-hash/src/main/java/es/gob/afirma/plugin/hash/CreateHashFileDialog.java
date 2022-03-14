@@ -439,6 +439,15 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 				);
 		}
 
+		// Guardamos en el Portapapeles si es necesario
+		if (copyToClipboard) {
+			// Se guardara la huella en el portapapeles en el formato seleccionado, salvo que
+			// se seleccione el formato binario, en cuyo caso se guardara en hexadecimal
+			copyToClipBoard(
+					HashFormat.BINARY.equals(format) ? AOUtil.hexify(dataToSave, false) + "h" : new String(dataToSave) //$NON-NLS-1$
+					);
+		}
+
 		// Guardamos los datos
 		try {
 			AOUIFactory.getSaveDataToFile(
@@ -458,12 +467,6 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 							),
 					parent
 					);
-			// Si se selecciona Base64 se usa Base64 en portapapeles, en cualquier otro caso, HEX pasado a ASCII.
-			if (copyToClipboard) {
-				copyToClipBoard(
-						HashFormat.BASE64.equals(format) ? new String(dataToSave) : AOUtil.hexify(dataToSave, false)
-						);
-			}
 		}
 		catch (final AOCancelledOperationException e) {
 			throw e;
