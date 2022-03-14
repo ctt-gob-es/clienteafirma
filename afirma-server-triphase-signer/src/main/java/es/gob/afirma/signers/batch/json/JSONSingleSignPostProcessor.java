@@ -24,11 +24,11 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.batch.LegacyFunctions;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.TriPhaseHelper;
-import es.gob.afirma.signers.batch.xml.LegacyFunctions;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -49,7 +49,7 @@ final class JSONSingleSignPostProcessor {
 	 * @param sSign Firma sobre la que hay que hacer el postproceso.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param tdata Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
-	 *           Debe serializarse como un XML con esta forma (ejemplo):
+	 *           Debe serializarse como un JSON con esta forma (ejemplo):
 	 *           <pre>
 	 *{
  	 *	"signs":[
@@ -72,6 +72,7 @@ final class JSONSingleSignPostProcessor {
 	 * @param batchId Identificador del lote de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
+	 * @throws AOSaveDataException Cuando no se puede guardar la firma generada.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
@@ -82,6 +83,7 @@ final class JSONSingleSignPostProcessor {
 			                  final String batchId,
 			                  final DocumentManager docManager,
 			                  final DocumentCacheManager docCacheManager) throws IOException,
+																						AOSaveDataException,
 			                                                                            AOException,
 			                                                                            NoSuchAlgorithmException {
 		if (certChain == null || certChain.length < 1) {
@@ -197,14 +199,17 @@ final class JSONSingleSignPostProcessor {
 		}
 
 		// Se almacenara el documento con la configuracion indicada en el DocumentManager
-		if(ConfigManager.isConcurrentModeEnable()) {
-			TempStoreFactory.getTempStore().store(signedDoc, sSign, batchId);
-		} else {
-			final Properties singleSignProps = sSign.getExtraParams();
-			singleSignProps.put("format", sSign.getSignFormat().toString()); //$NON-NLS-1$
-			docManager.storeDocument(sSign.getDataRef(), certChain, signedDoc, singleSignProps);
+		try {
+			if (ConfigManager.isConcurrentModeEnable()) {
+				TempStoreFactory.getTempStore().store(signedDoc, sSign, batchId);
+			} else {
+				final Properties singleSignProps = sSign.getExtraParams();
+				singleSignProps.put("format", sSign.getSignFormat().toString()); //$NON-NLS-1$
+				docManager.storeDocument(sSign.getDataRef(), certChain, signedDoc, singleSignProps);
+			}
+		} catch (final Exception e) {
+			throw new AOSaveDataException("No se pudo guardar la firma", e); //$NON-NLS-1$
 		}
-
 	}
 
 	/** Elimina los datos de sesi&oacute;n que no est&eacute;n relacionados con la firma actual.

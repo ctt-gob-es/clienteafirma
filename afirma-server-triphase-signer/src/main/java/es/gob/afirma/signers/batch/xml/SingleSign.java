@@ -25,6 +25,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.DataDownloader;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchConfigManager;
+import es.gob.afirma.signers.batch.ProcessResult;
 import es.gob.afirma.signers.batch.SignSaver;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;

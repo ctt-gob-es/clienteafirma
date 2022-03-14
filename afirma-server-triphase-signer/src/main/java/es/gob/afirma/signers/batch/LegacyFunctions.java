@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.batch.xml;
+package es.gob.afirma.signers.batch;
 
 import java.util.Properties;
 

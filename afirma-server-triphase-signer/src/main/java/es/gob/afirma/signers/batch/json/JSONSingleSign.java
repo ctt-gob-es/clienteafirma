@@ -134,8 +134,7 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param algorithm Algoritmo de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para el guardado de datos en cach&eacute;.
-	 * @return Nodo <code>firma</code> del XML de datos trif&aacute;sicos (sin ninguna etiqueta
-	 *         antes ni despu&eacute;s).
+	 * @return Objeto JSON con los datos trif&aacute;sicos.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
 	String doPreProcess(final X509Certificate[] certChain,
@@ -162,7 +161,7 @@ public final class JSONSingleSign extends SingleSign {
 	/** Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param td Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
-	 *           Debe serializarse como un XML con esta forma (ejemplo):
+	 *           Debe serializarse como un JSON con esta forma (ejemplo):
 	 *<pre>
 	 * {
 	 * "format":"PAdES",

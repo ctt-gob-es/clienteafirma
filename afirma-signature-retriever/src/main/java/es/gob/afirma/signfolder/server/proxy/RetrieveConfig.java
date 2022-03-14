@@ -17,8 +17,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import es.gob.afirma.signfolder.util.LoggerUtil;
-
 /** Configuraci&oacute;n para la gesti&oacute;n del almacenamiento temporal de ficheros en servidor. */
 final class RetrieveConfig {
 
@@ -70,7 +68,7 @@ final class RetrieveConfig {
 					LOGGER.warning(
 						"No se encontro o no se pudo leer el fichero " + CONFIG_FILE + //$NON-NLS-1$
 						" en el directorio configurado en la variable " + ENVIRONMENT_VAR_CONFIG_DIR + //$NON-NLS-1$
-						" (" + LoggerUtil.getCleanUserHomePath(configFile.getAbsolutePath()) + "), se buscara en el CLASSPATH."); //$NON-NLS-1$ //$NON-NLS-2$
+						" (" + configFile.getAbsolutePath() + "), se buscara en el CLASSPATH."); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				else {
 					LOGGER.info("Se carga un fichero de configuracion externo: " + configFile.getAbsolutePath()); //$NON-NLS-1$
@@ -129,7 +127,7 @@ final class RetrieveConfig {
 		File tmpDir = filePath != null ? new File(filePath.trim()) : null;
 		if (tmpDir == null || !tmpDir.isDirectory() || !tmpDir.canRead()) {
 			LOGGER.warning(
-				"El directorio temporal indicado en el fichero de propiedades (" + tmpDir + ") no existe, se usara el por defecto: " +  LoggerUtil.getCleanUserHomePath(defaultTmpDir) //$NON-NLS-1$ //$NON-NLS-2$
+				"El directorio temporal indicado en el fichero de propiedades (" + tmpDir + ") no existe, se usara el por defecto: " +  defaultTmpDir //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			tmpDir = new File(defaultTmpDir);
 			if (!tmpDir.isDirectory() ||!tmpDir.canRead()) {

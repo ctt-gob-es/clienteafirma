@@ -16,7 +16,7 @@ import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
-import es.gob.afirma.signers.batch.xml.ProcessResult;
+import es.gob.afirma.signers.batch.ProcessResult;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta secuencialmente. */
@@ -120,7 +120,14 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 
 				error = true;
 
-				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_POST, e.toString()));
+				final ProcessResult.Result resultado;
+				if (e instanceof AOSaveDataException) {
+					resultado = ProcessResult.Result.DONE_BUT_ERROR_SAVING;
+				} else {
+					resultado = ProcessResult.Result.ERROR_POST;
+				}
+
+				ss.setProcessResult(new ProcessResult(resultado, e.toString()));
 
 				if (this.stopOnError) {
 					LOGGER.log(

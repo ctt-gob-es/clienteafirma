@@ -411,7 +411,9 @@ var AutoScript = ( function ( window, undefined ) {
 			batchConfig.algorithm = algorithm; 
 			batchConfig.format = format;
 			batchConfig.suboperation = suboperation;
-			batchConfig.extraparams = Base64.encode(extraparams);
+			if (!!extraparams) { 
+				batchConfig.extraparams = Base64.encode(extraparams);
+			}
 
 			batchConfig.singlesigns = new Array(); 
 			
@@ -420,9 +422,9 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var addDocumentToBatch = function (id, datareference, format, suboperation, extraparams) {
 			
-			if (id == null || datareference == null) { 
+			if (!id || datareference == null) { 
 				throw new Error("No se ha indicado el id o datareference de la firma");
-			} else if (jsonRequest == null){
+			} else if (!jsonRequest) {
 				throw new Error("No hay ningun lote creado. Es necesario crear uno antes de agregar firmas");
 			}
 			
@@ -433,13 +435,13 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			singleSign.id = id;
 			singleSign.datareference = datareference;
-			if (format) { 
+			if (!!format) { 
 				singleSign.format = format; 
 			}
-			if (suboperation) { 
+			if (!!suboperation) { 
 				singleSign.suboperation = suboperation; 
 			}
-			if (extraparams) { 
+			if (!!extraparams) { 
 				singleSign.extraparams = Base64.encode(extraparams); 
 			}
 			jsonRequest.singlesigns.push(singleSign);
@@ -447,7 +449,7 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback) {
 			
-			if (jsonRequest == undefined || jsonRequest == null) {
+			if (!jsonRequest) {
 				throw new Error("No hay ningun lote creado. Es necesario crear uno antes de firmar.");
 			}
 			
@@ -1232,7 +1234,7 @@ var AutoScript = ( function ( window, undefined ) {
 				data.needcert = createKeyValuePair ("needcert", true);
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
 				if (isJson){
-					data.jsonBatch = createKeyValuePair ("jsonBatch", true);	
+					data.jsonbatch = createKeyValuePair ("jsonbatch", true);	
 				}
 				
 				return data;
@@ -2038,7 +2040,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				if (isJson) {
-					data.jsonBatch = generateDataKeyValue ("jsonBatch", true);	
+					data.jsonbatch = generateDataKeyValue ("jsonbatch", true);	
 				}
 
 				return data;
@@ -3292,7 +3294,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
 				
-				params[i++] = {key:"jsonBatch", value:"true"}; 
+				params[i++] = {key:"jsonbatch", value:"true"}; 
 				params[i++] = {key:"dat", value:jsonRequestB64}; 
 
 				var url = buildUrl(opId, params);

@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Implementaci&oacute;n de acceso a gestor documental usando simplemente el sistema de ficheros.
@@ -81,7 +80,7 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 			fis.close();
 		}
 		catch (final IOException e) {
-			LOGGER.warning("Error en la lectura del fichero '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("Error en la lectura del fichero '" + file.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw e;
 		}
 

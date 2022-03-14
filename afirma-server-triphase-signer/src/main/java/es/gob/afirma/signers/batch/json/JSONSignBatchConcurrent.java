@@ -24,10 +24,10 @@ import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
+import es.gob.afirma.signers.batch.ProcessResult;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.json.JSONSingleSign.CallableResult;
-import es.gob.afirma.signers.batch.xml.ProcessResult;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 

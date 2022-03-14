@@ -14,9 +14,9 @@
 		desactivateSingleConf();
 	}, false);
 
-	function showResultCallback(signatureB64, certificateB64) {
+	function showResultCallback(jsonBatch, certificateB64) {
 		showLog("Firma OK");
-		document.getElementById('result').value = signatureB64;
+		document.getElementById('result').value = JSON.stringify(jsonBatch);
 	}
 
 	function showLogCallback(errorType, errorMessage) {
@@ -26,10 +26,6 @@
 	function doSignBatch() {
 		try {
 			
-			document.getElementById("console").value = "Peticion :\n{\n"
-				+ "  \"stoponerror\":" + "\"" + document.getElementById("stopOnError").checked + "\","
-				+ AutoScript.printJSONRequest().substring(1);
-
 			AutoScript
 					.signBatchProcess(
 							document.getElementById("stopOnError").checked,
@@ -217,6 +213,7 @@
 </head>
 <body>
 	<script type="text/javascript">
+			AutoScript.setForceWSMode(true);
 			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(Constants.URL_BASE_SERVICES 
 					+ "/afirma-signature-storage/StorageService", 

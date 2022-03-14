@@ -44,7 +44,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
-	private static final String PARAM_JSON_BATCH = "jsonBatch"; //$NON-NLS-1$
+	private static final String PARAM_JSON_BATCH = "jsonbatch"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;

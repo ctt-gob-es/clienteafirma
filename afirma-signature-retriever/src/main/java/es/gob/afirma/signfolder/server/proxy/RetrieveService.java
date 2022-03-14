@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.gob.afirma.signfolder.util.LoggerUtil;
-
 /** Servicio de almacenamiento temporal de firmas.
  * &Uacute;til para servir de intermediario en comunicaci&oacute;n entre JavaScript y aplicaciones nativas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -108,16 +106,16 @@ public final class RetrieveService extends HttpServlet {
 		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, RetrieveConfig.getExpirationTime())) {
 
 			if (!inFile.exists()) {
-				LOGGER.warning("El fichero con el identificador '" + id + "' no existe: " + LoggerUtil.getCleanUserHomePath(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + id + "' no existe: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (!inFile.isFile()) {
-				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero: " + LoggerUtil.getCleanUserHomePath(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (!inFile.canRead()) {
-				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura: " + LoggerUtil.getCleanUserHomePath(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
-				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado: " + LoggerUtil.getCleanUserHomePath(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			out.println(
@@ -167,7 +165,7 @@ public final class RetrieveService extends HttpServlet {
 				catch(final Exception e) {
 					// Suponemos que el fichero ha sido eliminado por otro hilo
 					LOGGER.warning(
-						"No se ha podido eliminar el fichero '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) + "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$ //$NON-NLS-2$
+						"No se ha podido eliminar el fichero '" + file.getAbsolutePath() + "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 			}
