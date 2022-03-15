@@ -345,15 +345,14 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
-	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
-	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
-	Delete "$INSTDIR\$PATH\autofirma.pfx"
+	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
+		Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
+		Delete "$INSTDIR\$PATH\autofirma.pfx"
 	
 	; Copiamos el archivo para permitir la accesibilidad a traves de JAB, sustituimos el anterior en caso de que existiera
-	IfFileExists "$PROFILE\.accessibility.properties" 0 +1
-	Delete "$PROFILE\.accessibility.properties"
-	CopyFiles /SILENT ".accessibility.properties" "$PROFILE"
+	IfFileExists "$PROFILE\.accessibility.properties" +2 0
+		CopyFiles /SILENT ".accessibility.properties" "$PROFILE"
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R0 ""
