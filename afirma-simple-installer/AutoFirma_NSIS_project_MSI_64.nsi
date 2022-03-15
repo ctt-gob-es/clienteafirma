@@ -3,6 +3,9 @@
   !include "nsProcess.nsh"
   !include "Sections.nsh"
   !include "FileFunc.nsh"
+  
+;Incluimos la libreria que permite obtener todas las rutas de los usuarios en el sistema
+  !include "NTProfiles.nsh"
 
 ;Seleccionamos el algoritmo de compresion utilizado para comprimir nuestra aplicacion
 SetCompressor lzma
@@ -305,10 +308,8 @@ Section "Programa" sPrograma
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 		Delete "$INSTDIR\$PATH\autofirma.pfx"
 		
-	; Copiamos el archivo para permitir la accesibilidad a traves de JAB, sustituimos el anterior en caso de que existiera
-	IfFileExists "$PROFILE\.accessibility.properties" 0 +1
-	Delete "$PROFILE\.accessibility.properties"
-	CopyFiles /SILENT ".accessibility.properties" "$PROFILE"
+	; Copiamos el archivo .accessibility.properties	en todos los usuarios para permitir la accesibilidad a traves de JAB
+    ${EnumProfilePaths} enableAllUsersJAB
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R4 ""
@@ -651,4 +652,19 @@ done:
   Pop $R3
   Pop $R2
   Exch $R1 ; $R1=old$R1, stack=[result,...]
+FunctionEnd
+
+Function enableAllUsersJAB 
+
+    ; Se obtiene el perfil
+        Pop $0
+ 
+    ; Comprobamos si ya existe el archivo o no para copiarlo
+	IfFileExists "$0\.accessibility.properties" +2 0
+		CopyFiles /SILENT ".accessibility.properties" "$0"
+ 
+    ; Se continua con la operacion
+        Push ""
+        Return
+
 FunctionEnd
