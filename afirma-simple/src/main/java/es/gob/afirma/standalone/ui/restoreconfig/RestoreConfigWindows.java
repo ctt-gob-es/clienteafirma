@@ -72,7 +72,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	public void restore(final RestoreConfigPanel configPanel) {
 
 		// Identificamos el directorio de instalacion
-		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
+		LOGGER.info("Ruta de appDir: " + LoggerUtil.getCleanUserHomePath(appDir.getAbsolutePath())); //$NON-NLS-1$
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
 		// Comprobamos si se debe configurar Firefox para que use el almacen de confianza del sistema
@@ -89,7 +89,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			usingAlternativeDirectory = true;
 		}
 
-		LOGGER.info("Ruta de trabajo:  " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
+		LOGGER.info("Ruta de trabajo:  " + LoggerUtil.getCleanUserHomePath(workingDirectory.getAbsolutePath())); //$NON-NLS-1$
 		if (!workingDirectory.exists()) {
 			try {
 				workingDirectory.mkdirs();
@@ -556,7 +556,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRootFile);
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco los certificados SSL. Los almacenaresmos en un directorio alternativod", e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco los certificados SSL. Los almacenaremos en un directorio alternativo", e); //$NON-NLS-1$
 				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
 				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
 					throw new IOException("No se ha podido guardar en disco los certificados SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$

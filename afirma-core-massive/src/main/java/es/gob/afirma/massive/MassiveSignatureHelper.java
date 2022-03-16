@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -313,13 +314,13 @@ public final class MassiveSignatureHelper {
         	data = AOUtil.getDataFromInputStream(is);
         }
         catch (final FileNotFoundException e) {
-            LOGGER.severe("No ha sido posible encontrar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            addLog(MassiveSignMessages.getString("MassiveSignatureHelper.8") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
+            LOGGER.severe("No ha sido posible encontrar el fichero '" + LoggerUtil.getCleanUserHomePath(fileUri) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            addLog(MassiveSignMessages.getString("MassiveSignatureHelper.8") + REG_FIELD_SEPARATOR + LoggerUtil.getCleanUserHomePath(fileUri)); //$NON-NLS-1$
             return null;
         }
         catch (final Exception e) {
-            LOGGER.severe("No es posible acceder al contenido del fichero '" + fileUri + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
-            addLog(MassiveSignMessages.getString("MassiveSignatureHelper.9") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
+            LOGGER.severe("No es posible acceder al contenido del fichero '" + LoggerUtil.getCleanUserHomePath(fileUri) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            addLog(MassiveSignMessages.getString("MassiveSignatureHelper.9") + REG_FIELD_SEPARATOR + LoggerUtil.getCleanUserHomePath(fileUri)); //$NON-NLS-1$
             return null;
         }
 
@@ -348,15 +349,15 @@ public final class MassiveSignatureHelper {
             }
         }
         catch (final AOFormatFileException e) {
-            LOGGER.severe("El fichero '" + fileUri + "' no tiene un formato valido: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-            addLog(MassiveSignMessages.getString("MassiveSignatureHelper.13") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
+            LOGGER.severe("El fichero '" + LoggerUtil.getCleanUserHomePath(fileUri) + "' no tiene un formato valido: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+            addLog(MassiveSignMessages.getString("MassiveSignatureHelper.13") + REG_FIELD_SEPARATOR + LoggerUtil.getCleanUserHomePath(fileUri)); //$NON-NLS-1$
             return null;
         }
         catch (final Exception e) {
             LOGGER.severe("Error al realizar la operacion "  //$NON-NLS-1$
                     + this.massiveConfiguration.getMassiveOperation()
                     + " sobre el fichero '" //$NON-NLS-1$
-                    + fileUri
+                    + LoggerUtil.getCleanUserHomePath(fileUri)
                     + "': " //$NON-NLS-1$
                     + e.getMessage());
             addLog(MassiveSignMessages.getString("MassiveSignatureHelper.14") + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$

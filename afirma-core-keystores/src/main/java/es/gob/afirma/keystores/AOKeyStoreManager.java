@@ -329,7 +329,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	}
     	catch(final Exception e) {
     		LOGGER.severe(
-				"Error intentando recuperar el certificado con el alias '" + alias + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"Error intentando recuperar el certificado, se devolvera null: " + e //$NON-NLS-1$
 			);
     		return null;
     	}
@@ -366,7 +366,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
      	 }
      	 catch(final Exception e) {
      		LOGGER.severe(
- 				"Error intentando recuperar la cadena del certificado con alias '" + alias + "', se continuara con el siguiente almacen: " + e //$NON-NLS-1$ //$NON-NLS-2$
+ 				"Error intentando recuperar la cadena del certificado, se continuara con el siguiente almacen: " + e //$NON-NLS-1$
 			);
      	 }
          LOGGER.warning("El almacen no contiene ningun certificado con el alias especificado, se devolvera una cadena vacia"); //$NON-NLS-1$
@@ -442,7 +442,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 			}
 			catch (final CertificateEncodingException e) {
 				LOGGER.severe(
-					"No se ha obtener la huela del certificado '" + alias + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido obtener la huella del certificado actual, pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$
 				);
 				continue;
 			}

@@ -395,7 +395,7 @@ final class ConfiguratorWindows implements Configurator {
 				certAlias = windowsKs.getCertificateAlias(caCert);
 
 				if (certAlias != null) {
-					LOGGER.info("Se ha encontrado el certificado con el alias: " + certAlias); //$NON-NLS-1$
+					LOGGER.info("Se ha encontrado el certificado con el numero de serie: " + caCert.getSerialNumber()); //$NON-NLS-1$
 				}
 				else {
 					certAlias = CertUtil.ROOT_CERTIFICATE_PRINCIPAL;

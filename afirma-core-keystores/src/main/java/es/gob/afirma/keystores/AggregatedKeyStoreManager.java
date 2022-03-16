@@ -98,7 +98,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 						}
 						catch (final CertificateEncodingException e) {
 							LOGGER.severe(
-								"No se ha podido obtener la huella del certificado '" + alias + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
+								"No se ha podido obtener la huella del certificado con numero de serie '" + ksm.getCertificate(alias).getSerialNumber() + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
 							);
 							continue;
 						}

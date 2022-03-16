@@ -37,6 +37,7 @@ import java.util.zip.ZipInputStream;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
@@ -763,7 +764,7 @@ final class RestoreConfigFirefox {
 									MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
 											USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH)
 							).getParentFile());
-					LOGGER.info("Fichero de perfiles de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
+					LOGGER.info("Fichero de perfiles de Firefox: " + LoggerUtil.getCleanUserHomePath(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH)); //$NON-NLS-1$
 				}
 			}
 		}

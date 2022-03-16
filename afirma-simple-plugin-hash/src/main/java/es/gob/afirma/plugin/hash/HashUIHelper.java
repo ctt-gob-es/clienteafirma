@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.plugin.hash.CreateHashFileDialog.HashFormat;
@@ -259,7 +260,7 @@ public final class HashUIHelper {
 			catch (final Exception e) {
 				LOGGER.log(
 					Level.SEVERE,
-					"Error comprobando la huella digital de fichero '" + dataFile.getAbsolutePath() + "' con la huella guardada en " + selectedHashFile.getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
+					"Error comprobando la huella digital de fichero '" + LoggerUtil.getCleanUserHomePath(dataFile.getAbsolutePath()) + "' con la huella guardada en " + selectedHashFile.getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
 					e
 				);
 				AOUIFactory.showErrorMessage(

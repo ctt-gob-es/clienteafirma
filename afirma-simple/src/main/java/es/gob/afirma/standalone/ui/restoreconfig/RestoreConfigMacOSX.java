@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -94,7 +95,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// y establece como directorio de trabajo otro distinto en caso de no tenerlos
 		if (!appDir.isDirectory() && !appDir.mkdirs()) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.1")); //$NON-NLS-1$
-			LOGGER.severe("No se puede crear el directorio '" + appDir.getAbsolutePath() + "' se aborta la restauracion"); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("No se puede crear el directorio '" + LoggerUtil.getCleanUserHomePath(appDir.getAbsolutePath()) + "' se aborta la restauracion"); //$NON-NLS-1$ //$NON-NLS-2$
 			return;
 		}
 
@@ -279,7 +280,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			writeScriptFile(mac_script_path, new StringBuilder(cmd), true);
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido agregar al script el comando para el cambio de propiedad de: " + file.getAbsolutePath(), e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se ha podido agregar al script el comando para el cambio de propiedad de: " + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e); //$NON-NLS-1$
 		}
 
 		try {
@@ -682,7 +683,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n del script. */
 	public static Object executeScript(final String path, final boolean administratorMode, final boolean delete) throws IOException, InterruptedException {
 
-		LOGGER.info("Se ejecuta el fichero: " + path); //$NON-NLS-1$
+		LOGGER.info("Se ejecuta el fichero: " + LoggerUtil.getCleanUserHomePath(path)); //$NON-NLS-1$
 
 		String result;
 		final ShellScript appleScript = new ShellScript(new File(path), delete);
@@ -901,7 +902,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	static void writeScriptFile(final String path, final String data, final boolean append) throws IOException{
-		LOGGER.info("Se escribira en el fichero (" + path + ") el siguiente comando:\n" + data); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Se escribira en el fichero (" + LoggerUtil.getCleanUserHomePath(path) + ") el siguiente comando:\n" + data); //$NON-NLS-1$ //$NON-NLS-2$
 		final File macScript = new File(path);
 		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
 			fout.write((data + "\n").getBytes()); //$NON-NLS-1$

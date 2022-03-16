@@ -25,6 +25,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
@@ -135,7 +136,7 @@ public abstract class SignBatch {
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al cargar el fichero XML de definicion de lote: " + e + //$NON-NLS-1$
-					"\n" + new String(xml, DEFAULT_CHARSET)); //$NON-NLS-1$
+					"\n" + LoggerUtil.getTrimStr(new String(xml, DEFAULT_CHARSET))); //$NON-NLS-1$
 			throw new IOException("Error al cargar el fichero XML de definicion de lote: " + e, e); //$NON-NLS-1$
 		}
 

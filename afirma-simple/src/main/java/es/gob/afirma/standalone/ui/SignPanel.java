@@ -55,6 +55,7 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -375,7 +376,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      			}
      			catch (final Exception e) {
      				LOGGER.log(Level.WARNING,
-     						String.format("Error al cargar el fichero %s, se salta al siguiente", dataFile.getAbsolutePath()), //$NON-NLS-1$
+     						String.format("Error al cargar el fichero %s, se salta al siguiente", LoggerUtil.getCleanUserHomePath(dataFile.getAbsolutePath())), //$NON-NLS-1$
      						e);
      			}
      		}

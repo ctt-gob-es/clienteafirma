@@ -206,7 +206,7 @@ final class PreferencesPlistHandler {
 				signMessage = SimpleAfirmaMessages.getString("PreferencesPlistHandler.5", AOUtil.getCN(signerCert)); //$NON-NLS-1$
 				if (!ALLOW_UNSIGNED_PREFERENCES && !Base64.encode(signerCert.getPublicKey().getEncoded()).equals(PREFERENCES_SIGNATURE_PUK_BASE64)) {
 					LOGGER.severe(
-						"El firmante de las preferencias no esta autorizado: " + AOUtil.getCN(signerCert) //$NON-NLS-1$
+						"El firmante de las preferencias con el siguiente numero de serie no esta autorizado: " + signerCert.getSerialNumber() //$NON-NLS-1$
 					);
 					AOUIFactory.showErrorMessage(
 						SimpleAfirmaMessages.getString("PreferencesPlistHandler.6", AOUtil.getCN(signerCert)), //$NON-NLS-1$

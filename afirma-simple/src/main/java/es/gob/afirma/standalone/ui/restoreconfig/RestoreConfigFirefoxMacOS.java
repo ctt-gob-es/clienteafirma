@@ -29,6 +29,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.so.macos.ShellScript;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
@@ -462,7 +463,7 @@ final class RestoreConfigFirefoxMacOS {
 				configureUseSystemTrustStore(profileDir, enable);
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "No se pudo editar la confianza de Firefox para el perfil: " + profileDir.getName(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se pudo editar la confianza de Firefox para el perfil: " + LoggerUtil.getCleanUserHomePath(profileDir.getName()), e); //$NON-NLS-1$
 				this.restorePanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.39", profileDir.getName())); //$NON-NLS-1$
 			}
 		}
