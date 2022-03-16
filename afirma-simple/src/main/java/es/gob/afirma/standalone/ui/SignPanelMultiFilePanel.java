@@ -46,6 +46,7 @@ import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -157,7 +158,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
     				try {
     					Desktop.getDesktop().open(signConfig.getDataFile());
     				} catch (final IOException ex) {
-    					LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + signConfig.getDataFile().getAbsolutePath(), ex); //$NON-NLS-1$
+    					LOGGER.log(Level.WARNING, "No se pudo abrir el fichero: " + LoggerUtil.getCleanUserHomePath(signConfig.getDataFile().getAbsolutePath()), ex); //$NON-NLS-1$
     				}
     			});
     		}

@@ -527,18 +527,18 @@ public class DirectorySignatureHelper {
         for (final String filename : filenames) {
             tempFile = new File(filename);
             if (!tempFile.exists()) {
-                LOGGER.severe("El fichero no existe: " + filename);  //$NON-NLS-1$
-                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.0"), filename, null); //$NON-NLS-1$
+                LOGGER.severe("El fichero no existe: " + LoggerUtil.getCleanUserHomePath(filename));  //$NON-NLS-1$
+                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.0"), LoggerUtil.getCleanUserHomePath(filename), null); //$NON-NLS-1$
                 continue;
             }
             if (!tempFile.isFile()) {
-                LOGGER.severe("El archivo '" + filename + "' es un directorio y no puede firmarse"); //$NON-NLS-1$ //$NON-NLS-2$
-                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.1"), filename, null); //$NON-NLS-1$
+                LOGGER.severe("El archivo '" + LoggerUtil.getCleanUserHomePath(filename) + "' es un directorio y no puede firmarse"); //$NON-NLS-1$ //$NON-NLS-2$
+                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.1"), LoggerUtil.getCleanUserHomePath(filename), null); //$NON-NLS-1$
                 continue;
             }
             if (!tempFile.canRead()) {
-                LOGGER.severe("No se puede leer el fichero '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.2"), filename, null); //$NON-NLS-1$
+                LOGGER.severe("No se puede leer el fichero '" + LoggerUtil.getCleanUserHomePath(filename) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.2"), LoggerUtil.getCleanUserHomePath(filename), null); //$NON-NLS-1$
                 continue;
             }
             vFiles.add(tempFile);
@@ -639,27 +639,27 @@ public class DirectorySignatureHelper {
         		);
             }
             catch(final UnsupportedOperationException e) {
-                LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + e.getMessage(), file.getPath(), null); //$NON-NLS-1$
+                LOGGER.severe("No ha sido posible firmar el fichero '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + e.getMessage(), LoggerUtil.getCleanUserHomePath(file.getPath()), null); //$NON-NLS-1$
                 allOK = false;
                 continue;
             }
             catch (final Exception e) {
             	// Esta excepcion se comprueba por nombre para no acoplar los proyectos
             	if ("es.gob.afirma.signers.xades.EFacturaAlreadySignedException".equals(e.getClass().getName())) { //$NON-NLS-1$
-                	LOGGER.warning("La factura ya estaba firmada y no admite firmas adicionales '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
-                	addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.27"), file.getPath(), null); //$NON-NLS-1$
+                	LOGGER.warning("La factura ya estaba firmada y no admite firmas adicionales '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
+                	addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.27"), LoggerUtil.getCleanUserHomePath(file.getPath()), null); //$NON-NLS-1$
                     allOK = false;
                     continue;
             	}
-                LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
-                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7"), file.getPath(), null); //$NON-NLS-1$
+                LOGGER.severe("No ha sido posible firmar el fichero '" + LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()) + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
+                addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7"), LoggerUtil.getCleanUserHomePath(file.getPath()), null); //$NON-NLS-1$
                 allOK = false;
                 continue;
             }
 			catch (final OutOfMemoryError e) {
 				LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
-				addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8"), file.getPath(), null); //$NON-NLS-1$
+				addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8"), LoggerUtil.getCleanUserHomePath(file.getPath()), null); //$NON-NLS-1$
                 allOK = false;
                 continue;
 			}
@@ -827,13 +827,13 @@ public class DirectorySignatureHelper {
     		);
         }
         catch (final Exception e) {
-            LOGGER.severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty(URI_STR) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.11") + ": " + e.getMessage(), signConfig.getProperty(URI_STR), null); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("No ha sido posible cofirmar el fichero '" + LoggerUtil.getCleanUserHomePath(signConfig.getProperty(URI_STR)) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.11") + ": " + e.getMessage(), LoggerUtil.getCleanUserHomePath(signConfig.getProperty(URI_STR)), null); //$NON-NLS-1$ //$NON-NLS-2$
             signedData = null;
         }
 		catch (final OutOfMemoryError e) {
 			LOGGER.severe("Error de falta de memoria durante la cofirma: " + e); //$NON-NLS-1$
-			addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8"), signConfig.getProperty(URI_STR), null); //$NON-NLS-1$
+			addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8"), LoggerUtil.getCleanUserHomePath(signConfig.getProperty(URI_STR)), null); //$NON-NLS-1$
             signedData = null;
 		}
         return signedData;
@@ -896,8 +896,8 @@ public class DirectorySignatureHelper {
         			);
         }
         catch (final Exception e) {
-            LOGGER.severe("No ha sido posible firmar el fichero de datos '" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
-            addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.13") + ": " + e.getMessage(), signConfig.getProperty(URI_STR), null); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("No ha sido posible firmar el fichero de datos '" + LoggerUtil.getCleanUserHomePath(signConfig.getProperty(URI_STR)) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.13") + ": " + e.getMessage(), LoggerUtil.getCleanUserHomePath(signConfig.getProperty(URI_STR)), null); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
 
@@ -966,20 +966,20 @@ public class DirectorySignatureHelper {
             		);
                 }
                 catch (final FileNotFoundException e) {
-                    LOGGER.severe("No se ha encontrado el fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    LOGGER.severe("No se ha encontrado el fichero '" + LoggerUtil.getCleanUserHomePath(file.getPath()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
                     addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.24"), file.getPath(), null); //$NON-NLS-1$
                     allOK = false;
                     continue;
                 }
                 catch (final Exception e) {
-                    LOGGER.severe("No ha sido posible contrafirmar el fichero '" + file.getPath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
-                    addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.15"), file.getPath(), null); //$NON-NLS-1$
+                    LOGGER.severe("No ha sido posible contrafirmar el fichero '" + LoggerUtil.getCleanUserHomePath(file.getPath()) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+                    addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.15"), LoggerUtil.getCleanUserHomePath(file.getPath()), null); //$NON-NLS-1$
                     allOK = false;
                     continue;
                 }
     			catch (final OutOfMemoryError e) {
     				LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
-    				addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8"), file.getPath(), null); //$NON-NLS-1$
+    				addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8"), LoggerUtil.getCleanUserHomePath(file.getPath()), null); //$NON-NLS-1$
                     allOK = false;
                     continue;
     			}
@@ -992,7 +992,7 @@ public class DirectorySignatureHelper {
                                  + "'" //$NON-NLS-1$
         		);
                 addLogRegistry(Level.SEVERE,
-                    MassiveSignMessages.getString("DirectorySignatureHelper.16"), file.getPath(), null //$NON-NLS-1$
+                    MassiveSignMessages.getString("DirectorySignatureHelper.16"), LoggerUtil.getCleanUserHomePath(file.getPath()), null //$NON-NLS-1$
                 );
                 allOK = false;
                 continue;

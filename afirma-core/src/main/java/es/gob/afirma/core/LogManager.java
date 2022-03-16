@@ -109,7 +109,7 @@ public final class LogManager {
 		if (!path.exists()) {
 			LOGGER.info("La ruta para el fichero de registro ('" + LoggerUtil.getCleanUserHomePath(path.getAbsolutePath()) + "') no existe, se creara");  //$NON-NLS-1$//$NON-NLS-2$
 			if (!path.mkdirs()) {
-				LOGGER.severe("No se ha podido crear la ruta para el fichero de registro ('" + path + "')"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.severe("No se ha podido crear la ruta para el fichero de registro ('" + LoggerUtil.getCleanUserHomePath(path.getAbsolutePath()) + "')"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		LOGGER.addHandler(createFileHandler(logFile));

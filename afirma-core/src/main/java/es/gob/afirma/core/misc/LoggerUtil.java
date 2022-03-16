@@ -12,6 +12,8 @@ package es.gob.afirma.core.misc;
 /** Clase con m&eacute;todos para el trabajo con logs. */
 public final class LoggerUtil {
 
+	private static Boolean allowExtendedLogs = null;
+
 	private LoggerUtil() {
 		// No permitimos la instanciacion
 	}
@@ -23,5 +25,31 @@ public final class LoggerUtil {
      */
     public static String getCleanUserHomePath(final String path) {
     	return path.replace(Platform.getUserHome(), "USERHOME"); //$NON-NLS-1$
+    }
+
+    /**
+     * Limita la cadena a 200 caracteres en el caso de que la propiedad allow.extended.logs est&eacute; activa.
+     * @param str Cadena a recortar.
+     * @return Cadena tratada.
+     */
+    public static String getTrimStr(final String str) {
+    	if (allowExtendedLogs == null) {
+    		try {
+    			final String allowExtLogs = System.getProperty("allow.extended.logs"); //$NON-NLS-1$
+    			if (allowExtLogs != null) {
+					allowExtendedLogs = Boolean.parseBoolean(allowExtLogs);
+				} else {
+					allowExtendedLogs = false;
+				}
+    		} catch (final Exception e) {
+    			allowExtendedLogs = false;
+    		}
+    	}
+
+    	if (allowExtendedLogs && str != null && str.length() >= 200) {
+    		return str.substring(0, 200) + "..."; //$NON-NLS-1$
+    	}
+
+    	return str;
     }
 }

@@ -289,8 +289,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
         }
         catch (final Exception e) {
             LOGGER.severe(
-              "Error al obtener la cadena de certificados para el alias '" + alias //$NON-NLS-1$
-                 + "', se devolvera una cadena vacia: " + e //$NON-NLS-1$
+              "Error al obtener la cadena de certificados para el alias certificado actual, se devolvera una cadena vacia: " + e //$NON-NLS-1$
             );
             return new X509Certificate[0];
         }

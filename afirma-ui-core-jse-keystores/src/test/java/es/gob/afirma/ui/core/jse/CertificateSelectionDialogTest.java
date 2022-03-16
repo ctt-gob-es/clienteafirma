@@ -51,7 +51,7 @@ public class CertificateSelectionDialogTest {
 			return;
 		}
 
-		LOGGER.info("Certificado:\n" + ksm.getCertificate(alias)); //$NON-NLS-1$
+		LOGGER.info("Certificado con numero de serie:\n" + ksm.getCertificate(alias).getSerialNumber()); //$NON-NLS-1$
 	}
 
 }

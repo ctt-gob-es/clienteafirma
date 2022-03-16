@@ -31,6 +31,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 
@@ -72,7 +73,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			}
 		}
 
-		LOGGER.info("Directorio de trabajo: " + workingDir.getAbsolutePath()); //$NON-NLS-1$
+		LOGGER.info("Directorio de trabajo: " + LoggerUtil.getCleanUserHomePath(workingDir.getAbsolutePath())); //$NON-NLS-1$
 
 		List<String> usersDir = null;
 		try {
