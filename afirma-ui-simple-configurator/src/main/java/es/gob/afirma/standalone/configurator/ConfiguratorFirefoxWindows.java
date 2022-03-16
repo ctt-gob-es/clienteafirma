@@ -33,7 +33,6 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
-import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 
@@ -571,7 +570,7 @@ final class ConfiguratorFirefoxWindows {
 						new File(userDir, PROFILES_INI_RELATIVE_PATH).getAbsolutePath());
 			}
 			catch (final Exception e) {
-				LOGGER.warning("No se pudieron recuperar los directorios de perfil de Mozilla para el usuario " + LoggerUtil.getCleanUserHomePath(userDir.getName()) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("No se pudieron recuperar los directorios de perfil de Mozilla para el usuario " + userDir.getName() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				continue;
 			}
 

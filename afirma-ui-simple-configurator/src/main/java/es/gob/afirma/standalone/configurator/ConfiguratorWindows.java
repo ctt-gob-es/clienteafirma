@@ -321,7 +321,7 @@ final class ConfiguratorWindows implements Configurator {
 					if (window != null) {
 						window.print(String.format(Messages.getString("ConfiguratorWindows.15"), userDir.getName())); //$NON-NLS-1$
 					}
-					LOGGER.warning("No se pudo configurar Chrome para el usuario " + LoggerUtil.getCleanUserHomePath(userDir.getAbsolutePath().toString()) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.warning("No se pudo configurar Chrome para el usuario " + LoggerUtil.getCleanUserHomePath(userDir.getAbsolutePath()) + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
