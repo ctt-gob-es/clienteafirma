@@ -34,16 +34,7 @@ public final class LoggerUtil {
      */
     public static String getTrimStr(final String str) {
     	if (allowExtendedLogs == null) {
-    		try {
-    			final String allowExtLogs = System.getProperty("allow.extended.logs"); //$NON-NLS-1$
-    			if (allowExtLogs != null) {
-					allowExtendedLogs = Boolean.parseBoolean(allowExtLogs);
-				} else {
-					allowExtendedLogs = true;
-				}
-    		} catch (final Exception e) {
-    			allowExtendedLogs = true;
-    		}
+    		allowExtendedLogs = Boolean.getBoolean("allow.extended.logs"); //$NON-NLS-1$
     	}
 
     	if (!allowExtendedLogs && str != null && str.length() >= 200) {
