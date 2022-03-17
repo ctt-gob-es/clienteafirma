@@ -39,14 +39,14 @@ public final class LoggerUtil {
     			if (allowExtLogs != null) {
 					allowExtendedLogs = Boolean.parseBoolean(allowExtLogs);
 				} else {
-					allowExtendedLogs = false;
+					allowExtendedLogs = true;
 				}
     		} catch (final Exception e) {
-    			allowExtendedLogs = false;
+    			allowExtendedLogs = true;
     		}
     	}
 
-    	if (allowExtendedLogs && str != null && str.length() >= 200) {
+    	if (!allowExtendedLogs && str != null && str.length() >= 200) {
     		return str.substring(0, 200) + "..."; //$NON-NLS-1$
     	}
 
