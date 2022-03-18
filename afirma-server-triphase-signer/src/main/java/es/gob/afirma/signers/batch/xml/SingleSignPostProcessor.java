@@ -93,7 +93,7 @@ final class SingleSignPostProcessor {
 		}
 		catch (final IncompatiblePolicyException e) {
 			LOGGER.log(
-					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
+					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica", e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
 		}
 

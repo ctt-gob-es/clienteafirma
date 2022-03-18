@@ -397,7 +397,7 @@ public class SingleSign {
 				tempStore.delete(tempResource);
 			}
 			catch (final Exception e) {
-				LOGGER.warning(String.format("No se puede recuperar el recurso temporal %0s, se cargara de la fuente original: " + e, tempResource)); //$NON-NLS-1$
+				LOGGER.warning(String.format("No se puede recuperar el recurso temporal %s, se cargara de la fuente original: " + e, tempResource)); //$NON-NLS-1$
 			}
 		}
 

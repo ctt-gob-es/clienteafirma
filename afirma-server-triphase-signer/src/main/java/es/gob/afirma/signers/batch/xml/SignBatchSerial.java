@@ -130,15 +130,17 @@ public final class SignBatchSerial extends SignBatch {
 				if (this.stopOnError) {
 					LOGGER.log(
 						Level.SEVERE,
-						"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
+						"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso", //$NON-NLS-1$ //$NON-NLS-2$
 						e
 					);
 					ignoreRemaining = true;
 				}
 				else {
-					LOGGER.severe(
-							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
-							);
+					LOGGER.log(
+							Level.SEVERE,
+							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento", //$NON-NLS-1$ //$NON-NLS-2$
+							e
+					);
 				}
 				continue;
 			}
