@@ -539,15 +539,15 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var setPortRange = function (minRangeLimit,  maxRangeLimit) {
 			
-			var MIN_PORT = 49152;
+			var MIN_PORT = 1024;
 			var MAX_PORT = 65535;
 			
 			// Establecemos los limites del rango
 			minPort = !!minRangeLimit && minRangeLimit >= MIN_PORT && minRangeLimit <= MAX_PORT
 				? minRangeLimit
 				: MIN_PORT;
-			maxPort = !!maxRangeLimit && maxRangeLimit >= minPort  && maxRangeLimit <= MAX_PORT
-				? maxRangeLimit
+			maxPort = !!maxRangeLimit 
+				? (maxRangeLimit <= MAX_PORT && maxRangeLimit >= minPort ? maxRangeLimit : MAX_PORT) 
 				: (!!minRangeLimit && minRangeLimit == minPort ? minPort : MAX_PORT);
 			
 			if (clienteFirma && clienteFirma.setPortRange) {
@@ -800,10 +800,13 @@ var AutoScript = ( function ( window, undefined ) {
 				/* Caracteres validos para los ID de sesion */
 				var VALID_CHARS_TO_ID = "1234567890abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-				/* Puerto minimo del rango de puertos aleatorios. */
-				var MIN_PORT = 49152;
+				/* Numero de puerto minimo seleccionable. */
+				var MIN_PORT = 1024;
 				
-				/* Puerto maximo del rango de puertos aleatorios. */
+				/* Puerto minimo del rango de puertos aleatorios. */
+				var DEFAULT_MIN_PORT = 49152;
+				
+				/* Numero de puerto maximo seleccionable. */
 				var MAX_PORT = 65535;
 				
 				/** Genera un nuevo identificador de sesion aleatorio. */
@@ -818,7 +821,7 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						randomInts = new Array(ID_LENGTH);
 						for (var i = 0; i < ID_LENGTH; i++) {
-							randomInts[i] = rnd() * MAX_NUMBER;
+							randomInts[i] = getRandom();
 						}
 					}
 
@@ -827,6 +830,10 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 
 					return random;
+				}
+				
+				function getRandom() {
+					return rnd() * MAX_NUMBER;
 				}
 
 				/** Genera numeros aleatorios con una distribucion homogenea. */
@@ -845,12 +852,13 @@ var AutoScript = ( function ( window, undefined ) {
 				 * Si se indica un rango de 
 				 */
 				function getRandomPorts (port1, port2) {
-
-					// Definimos el rango de aleatorios, tomando el minimo y el maximo
-					// definido para los puertos cuando no se indiquen
-					var minPort = !!port1 ? Math.max(port1, MIN_PORT) : MIN_PORT;
-					var maxPort = !!port2 ? Math.min(port2, MAX_PORT) : MAX_PORT;
 					
+					// Definimos el rango de aleatorios. Si no se define el puerto minimo,
+					// tomaremos el minimo del ranfo de puertos aleatorios. Si se definen
+					// minimo y/o maximo, deberan estar dentro del rango valido
+					var minPort = !!port1 ? Math.max(port1, MIN_PORT) : DEFAULT_MIN_PORT;
+					var maxPort = !!port2 ? Math.min(port2, MAX_PORT) : MAX_PORT;
+
 					// Obtenemos 3 aleatorios unicos de ese rango, menos si el rango es menor 
 					var ports = new Array();
 					switch (maxPort - minPort) {
@@ -927,7 +935,8 @@ var AutoScript = ( function ( window, undefined ) {
 					generateNewIdSession : generateNewIdSession,
 					getRandomPorts : getRandomPorts,
 					parseJSONData : parseJSONData,
-					checkExistingId : checkExistingId
+					checkExistingId : checkExistingId,
+					getRandom : getRandom
 				};
 		})(window, undefined);
 
@@ -1315,16 +1324,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// cierre de la aplicacion) es necesario abrirla y esperar a que este lista
 				if (!isAppOpened()) {
 					// Definimos los puertos en los que intentar la conexion
-					var ports;
-					// Si se indico un rango de puerto, se toman de el
-					if (!!minPort) {
-						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
-					}
-					// Si no, se usa el puerto por defecto
-					else {
-						ports = new Array();
-						ports[0] = DEFAULT_PORT;
-					}
+					var ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 					// Invocamos a la aplicacion cliente
 					openNativeApp(ports);
 					// Intentamos conectar con la app despues de esperar un tiempo prudencial
@@ -2176,9 +2176,9 @@ var AutoScript = ( function ( window, undefined ) {
 				connection = false;
 				var semaphore = new Object();
 				semaphore.locked = false;
-				executeEchoByService (ports[0], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
-				executeEchoByService (ports[1], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
-				executeEchoByService (ports[2], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
+				for (var i = 0; !connection && i < ports.length; i++) {
+					executeEchoByService (ports[i], url, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, semaphore);
+				}
 			}
 
 			/**
@@ -2188,7 +2188,6 @@ var AutoScript = ( function ( window, undefined ) {
 			* peticion sea aceptada.
 			*/
 			function executeEchoByService (currentPort, url, timeoutResetCounter, semaphore) {
-
 				
 				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada porque
 				// al invocar muchas peticiones consecutivas, en caso de introducir un retardo con setTimeout,
@@ -3465,7 +3464,7 @@ var AutoScript = ( function ( window, undefined ) {
 					random = zeroFill(randomInts[0] % 100000000, 8);
 				}
 				else {
-					random = zeroFill(Math.floor(((rnd() * MAX_NUMBER) + 1) % 100000000), 8);
+					random = zeroFill(Math.floor((AfirmaUtils.getRandom() + 1) % 100000000), 8);
 				}
 
 				return random;
@@ -4013,38 +4012,6 @@ var AutoScript = ( function ( window, undefined ) {
 					return base64UrlSave;
 				}
 				return base64UrlSave.replace(/\-/g, "+").replace(/\_/g, "/")
-			}
-			
-			/**
-			 * Rellena los singleSigns para configurar el JSON
-			 */
-			function fillSingleSigns(singleSigns) {	
-				
-				var configuration = ", \"singleSigns\" : [";
-					
-				for (var i = 0 ; i < singleSigns.length ; i++) {
-					configuration += "\"Id\" : \"" + singleSigns[i].id+ "\"";
-					configuration += ", \"datasource\" : \"" + singleSigns[i].dataSource + "\"";
-					
-					if (singleSigns[i].format) {
-						configuration += ", \"format\" : \"" + singleSigns[i].format + "\"";
-					}		
-					if (singleSigns[i].subOperation) {
-						configuration += ", \"subOperation\" : \"" + singleSigns[i].subOperation + "\"";
-					}					
-					if (singleSigns[i].extraParams) {
-						configuration += ", \"extraParams\" : \"" + singleSigns[i].extraParams + "\"";
-					}
-					if (singleSigns[i].signsaver) {
-						configuration += ", \"signsaver\" : [";
-						configuration += ", \"class\" : \"" + singleSigns[i].signsaver.class.value+ "\"";
-						configuration += ", \"config\" : \"" + singleSigns[i].signsaver.config.value + "\" ] ";
-					}
-				}
-				
-				configuration += "]";
-				
-				return configuration;
 			}
 			
 			/* Metodos que publicamos del objeto AppAfirmaJSWebService */

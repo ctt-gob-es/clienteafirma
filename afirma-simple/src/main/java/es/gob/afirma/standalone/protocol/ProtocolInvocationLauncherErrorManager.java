@@ -75,6 +75,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_SIGN_WITHOUT_DATA = "SAF_44"; //$NON-NLS-1$
 	static final String ERROR_CANNOT_OPEN_SOCKET = "SAF_45"; //$NON-NLS-1$
 	static final String ERROR_INVALID_SESSION_ID = "SAF_46"; //$NON-NLS-1$
+	static final String ERROR_EXTERNAL_REQUEST_TO_SOCKET = "SAF_47"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
@@ -125,6 +126,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_SIGN_WITHOUT_DATA, ProtocolMessages.getString("ProtocolLauncher.56")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_OPEN_SOCKET, ProtocolMessages.getString("ProtocolLauncher.57")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_SESSION_ID, ProtocolMessages.getString("ProtocolLauncher.58")); //$NON-NLS-1$
+		ERRORS.put(ERROR_EXTERNAL_REQUEST_TO_SOCKET, ProtocolMessages.getString("ProtocolLauncher.59")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {

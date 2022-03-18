@@ -14,8 +14,6 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.Timer;
-
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -33,7 +31,6 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	/** Respuesta que se debe enviar ante las peticiones de echo correctas. */
 	private static final String ECHO_OK_RESPONSE = "OK"; //$NON-NLS-1$
-	private static Timer inactivityTimer;
 
 	private static int protocolVersion = -1;
 
@@ -93,13 +90,6 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
 		LOGGER.info("Recibimos una peticion en el socket"); //$NON-NLS-1$
-
-		// Si aun corre el temporizador de inactividad, lo detenemos para que no
-		// cierre la aplicacion
-		if (inactivityTimer != null) {
-			inactivityTimer.stop();
-			inactivityTimer = null;
-		}
 
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {

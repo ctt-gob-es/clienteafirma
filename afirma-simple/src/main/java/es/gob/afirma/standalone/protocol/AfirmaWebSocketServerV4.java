@@ -9,9 +9,8 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.net.InetAddress;
 import java.util.Collections;
-
-import javax.swing.Timer;
 
 import org.java_websocket.WebSocket;
 
@@ -35,8 +34,8 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 	/** Respuesta que se debe enviar ante las peticiones de echo correctas. */
 	private static final String ECHO_OK_RESPONSE = "OK"; //$NON-NLS-1$
 
-	private static Timer inactivityTimer;
-
+	/** IP local. */
+	private static final String LOCALHOST_ADDRESS = "127.0.0.1"; //$NON-NLS-1$
 
 	/**
 	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
@@ -50,20 +49,23 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 	public void onMessage(final WebSocket ws, final String message) {
 		LOGGER.info("Recibimos una peticion en el socket"); //$NON-NLS-1$
 
-		// Si aun corre el temporizador de inactividad, lo detenemos para que no
-		// cierre la aplicacion
-		if (inactivityTimer != null) {
-			inactivityTimer.stop();
-			inactivityTimer = null;
+		// Comprobamos que la peticion haya llegado del mismo equipo
+		final InetAddress remoteAddress = ws.getRemoteSocketAddress().getAddress();
+		if (remoteAddress == null || !isLocalAddress(remoteAddress)) {
+			LOGGER.warning("Peticion al socket desde IP externa o sin identificar: " + remoteAddress); //$NON-NLS-1$
+			final String errorResponse = ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.ERROR_EXTERNAL_REQUEST_TO_SOCKET);
+			broadcast(errorResponse, Collections.singletonList(ws));
+			return;
 		}
 
 		// Si se proporciono un ID de sesion al crear el socket y el ID del
 		// mensaje enviado no coincide con el mismo, ignoraremos la peticion
 		if (this.sessionId != null && !this.sessionId.equals(getSessionId(message))) {
+			LOGGER.warning("La peticion no incluia el id de sesion correcto"); //$NON-NLS-1$
 			final String errorResponse = ProtocolInvocationLauncherErrorManager.getErrorMessage(
 					ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SESSION_ID);
 			broadcast(errorResponse, Collections.singletonList(ws));
-
 			return;
 		}
 
@@ -76,6 +78,15 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 		else {
 			broadcast(ProtocolInvocationLauncher.launch(message, PROTOCOL_VERSION, true), Collections.singletonList(ws));
 		}
+	}
+
+	/**
+	 * Comprueba que una direcci&oacute;n de red sea la 127.0.0.1.
+	 * @param address Direcci&oacute;n de red.
+	 * @return {@code true} si la direccion de red es la 127.0.0.1, {@code false} en caso contrario.
+	 */
+	private static boolean isLocalAddress(final InetAddress address) {
+		return address != null && LOCALHOST_ADDRESS.equals(address.getHostAddress());
 	}
 
 	/**
