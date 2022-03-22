@@ -13,6 +13,12 @@ public class XAdESConstants {
 
 	static final String TAG_SIGNING_CERTIFICATE_V2 = "SigningCertificateV2"; //$NON-NLS-1$
 
+	static final String TAG_SIGNED_DATA_OBJECT_PROPERTIES = "SignedDataObjectProperties"; //$NON-NLS-1$
+
+	static final String TAG_DATA_OBJECT_FORMAT = "DataObjectFormat"; //$NON-NLS-1$
+
+	static final String TAG_REFERENCE = "Reference"; //$NON-NLS-1$
+
     /** Nombre del nodo en el que se englobara&aacute;n las firmas cuando sea necesario. */
     static final String TAG_PARENT_NODE = "AFIRMA"; //$NON-NLS-1$
 
@@ -60,5 +66,8 @@ public class XAdESConstants {
 
     /** URI que define una referencia de tipo MANIFEST. */
     static final String REFERENCE_TYPE_MANIFEST = "http://www.w3.org/2000/09/xmldsig#Manifest"; //$NON-NLS-1$
+
+    /** Atributo identificador de elementos. */
+    static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
 }

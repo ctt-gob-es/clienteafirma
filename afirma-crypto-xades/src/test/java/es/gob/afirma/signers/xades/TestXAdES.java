@@ -13,9 +13,14 @@ package es.gob.afirma.signers.xades;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Properties;
@@ -25,7 +30,6 @@ import java.util.logging.Logger;
 import javax.xml.crypto.dsig.DigestMethod;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,17 +49,9 @@ import es.gob.afirma.signers.xml.Utils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestXAdES {
 
-    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
-
-//    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
-//    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
-//    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
-//
-    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
+    private static final String CERT_PATH = "EIDAS_CERTIFICADO_PRUEBAS___99999999R__1234.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "1234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "eidas_certificado_pruebas___99999999r"; //$NON-NLS-1$
 
     private static final Properties[] XADES_MODES;
 
@@ -149,11 +145,11 @@ public final class TestXAdES {
     	}
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH3), CERT_PASS3.toCharArray());
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
 
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
-    		CERT_ALIAS3,
-    		new KeyStore.PasswordProtection(CERT_PASS3.toCharArray())
+    		CERT_ALIAS,
+    		new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
 
     	final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xml_with_ids.xml")); //$NON-NLS-1$
@@ -572,7 +568,7 @@ public final class TestXAdES {
      * @throws Exception Cuando ocurre un error. */
     @SuppressWarnings("static-method")
 	@Test
-    @Ignore // Necesita GUI
+    //@Ignore // Necesita GUI
     public void testSignExternalStyle() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -764,6 +760,53 @@ public final class TestXAdES {
             }
         }
 
+    }
+
+    /**
+     * Prueba de firma externally detached.
+     * @throws Exception en cualquier error
+     */
+    @SuppressWarnings("static-method")
+	@Test
+	public void testSignExternallyDetached() throws Exception {
+
+    	System.out.println("Prueba con JAVA: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+    	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+
+    	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+    	ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+    	final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+    	final PrivateKey pk = pke.getPrivateKey();
+    	final Certificate[] certChain = pke.getCertificateChain();
+
+    	final AOSigner signer = new AOXAdESSigner();
+
+
+    	final String digestAlgorithm = "SHA-256"; //$NON-NLS-1$
+
+    	byte[] data = null;
+    	final URL url = new URL("http://estaticos.redsara.es/comunes/autofirma/autofirma.version"); //$NON-NLS-1$
+    	final URLConnection conn = url.openConnection();
+    	try (InputStream is = conn.getInputStream()) {
+    		data = AOUtil.getDataFromInputStream(is);
+    	}
+
+    	final Properties extraParams = new Properties();
+    	extraParams.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+    	extraParams.setProperty("uri", url.toString()); //$NON-NLS-1$
+    	extraParams.setProperty("precalculatedHashAlgorithm", digestAlgorithm); //$NON-NLS-1$
+
+    	final byte[] md = MessageDigest.getInstance(digestAlgorithm).digest(data);
+
+    	final byte[] signature = signer.sign(md, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pk, certChain, extraParams);
+
+    	final File f = File.createTempFile("externallyDetached", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+    	try (final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)) {
+    		fos.write(signature);
+    		fos.flush();
+    	}
+    	System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
     }
 
     /** Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)

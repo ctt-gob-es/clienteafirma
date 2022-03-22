@@ -593,7 +593,7 @@ public final class XAdESCounterSigner {
 
 			referenceList.add(
 				fac.newReference(
-					"#" + signatureValue.getAttribute("Id"), //$NON-NLS-1$ //$NON-NLS-2$
+					"#" + signatureValue.getAttribute(XAdESConstants.ID_IDENTIFIER), //$NON-NLS-1$
 					digestMethod,
 					transformList,
 					referenceType,

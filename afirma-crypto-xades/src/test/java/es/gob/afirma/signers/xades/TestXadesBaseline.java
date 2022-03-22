@@ -16,9 +16,9 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 
 public class TestXadesBaseline {
 
-    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
+    private static final String CERT_PATH = "EIDAS_CERTIFICADO_PRUEBAS___99999999R__1234.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "1234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "eidas_certificado_pruebas___99999999r"; //$NON-NLS-1$
 
 	private PrivateKeyEntry pke;
 	private byte[] data;

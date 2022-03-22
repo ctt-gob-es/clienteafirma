@@ -246,7 +246,7 @@ public final class XAdESUtil {
 	static Element findElementById(final String nodeId, final Element currentElement, final boolean omitSignatures) {
 
 		// Si es este el nodo, lo devolvemos
-		if (nodeId.equals(currentElement.getAttribute("Id"))) { //$NON-NLS-1$
+		if (nodeId.equals(currentElement.getAttribute(XAdESConstants.ID_IDENTIFIER))) {
 			return currentElement;
 		}
 
@@ -415,7 +415,7 @@ public final class XAdESUtil {
 				);
 			}
 		}
-		afirmaRoot.setAttributeNS(null, XAdESSigner.ID_IDENTIFIER, nodeName + "-Root-" + UUID.randomUUID().toString());  //$NON-NLS-1$
+		afirmaRoot.setAttributeNS(null, XAdESConstants.ID_IDENTIFIER, nodeName + "-Root-" + UUID.randomUUID().toString());  //$NON-NLS-1$
 
 		return afirmaRoot;
 	}

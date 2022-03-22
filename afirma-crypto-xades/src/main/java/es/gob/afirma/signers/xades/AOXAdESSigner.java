@@ -259,8 +259,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
-
     /** Etiqueta de los nodos de sello de tiempo. */
 	private static final String TIMESTAMP_TAG = "Timestamp"; //$NON-NLS-1$
 
@@ -798,7 +796,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                 // Si el contenido firmado es un nodo de texto, lo extramos como tal
                 if (firstChild.getFirstChild().getNodeType() == Node.TEXT_NODE) {
                 	// Si existe una transformacion Base64, la deshacemos
-                	return isBase64TransformationDeclared(docElement, firstChild.getAttribute(ID_IDENTIFIER)) ?
+                	return isBase64TransformationDeclared(docElement, firstChild.getAttribute(XAdESConstants.ID_IDENTIFIER)) ?
         				Base64.decode(firstChild.getTextContent()) :
         					firstChild.getTextContent().getBytes();
                 }
@@ -819,7 +817,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                 // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	// Se deshace el Base64 si existe la transformacion Base64
-                	return isBase64TransformationDeclared(docElement, object.getAttribute(ID_IDENTIFIER)) ?
+                	return isBase64TransformationDeclared(docElement, object.getAttribute(XAdESConstants.ID_IDENTIFIER)) ?
         				Base64.decode(object.getTextContent()) :
         					object.getTextContent().getBytes();
                 }
@@ -893,7 +891,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	}
 
     	Element reference = null;
-		final NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+		final NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_REFERENCE);
 		for (int i = 0; i < references.getLength(); i++) {
 			reference = (Element) references.item(i);
 			if (reference.hasAttribute("URI") && ("#" + objectId).equals(reference.getAttribute("URI"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1201,7 +1199,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     		final Element signature = (Element) signatures.item(i);
 
     		// Recogemos el identificador del nodo de firma
-    		arrayIds.add(signature.getAttribute(ID_IDENTIFIER));
+    		arrayIds.add(signature.getAttribute(XAdESConstants.ID_IDENTIFIER));
 
     		// Recogemos los objetos que identificaran a los nodos de firma
     		if (asSimpleSignInfo) {
@@ -1363,7 +1361,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         // Crea un nuevo documento con la raiz "AFIRMA"
         final Document docAfirma = Utils.getNewDocumentBuilder().newDocument();
         final Element rootAfirma = docAfirma.createElement(XAdESConstants.TAG_PARENT_NODE);
-        rootAfirma.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
+        rootAfirma.setAttributeNS(null, XAdESConstants.ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
 
         // Inserta el documento pasado por parametro en el nuevo documento
         rootAfirma.appendChild(docAfirma.adoptNode(docu.getDocumentElement()));

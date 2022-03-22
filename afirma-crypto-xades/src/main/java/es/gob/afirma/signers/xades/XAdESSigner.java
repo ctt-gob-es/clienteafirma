@@ -79,9 +79,6 @@ public final class XAdESSigner {
     private static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
     private static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
 
-    /** Identificador de identificadores en los nodos XML. */
-    static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
-
 	private XAdESSigner() {
 		// No permitimos la instanciacion
 	}
@@ -468,7 +465,7 @@ public final class XAdESSigner {
 				// Si no, creamos un nuevo nodo con identificador para insertar el contenido
 				else {
 					dataElement = docum.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
-					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
+					dataElement.setAttributeNS(null, XAdESConstants.ID_IDENTIFIER, contentId);
 					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
 					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
 						dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_ENCODING_STR, encoding);
@@ -480,7 +477,7 @@ public final class XAdESSigner {
 				if (xmlStyle.getStyleElement() != null) {
 					try {
 						final Element tmpStyleElement = docum.createElement(AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME);
-						tmpStyleElement.setAttributeNS(null, ID_IDENTIFIER, styleId);
+						tmpStyleElement.setAttributeNS(null, XAdESConstants.ID_IDENTIFIER, styleId);
 						if (xmlStyle.getStyleType() != null) {
 							tmpStyleElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, xmlStyle.getStyleType());
 						}
@@ -523,7 +520,7 @@ public final class XAdESSigner {
 					final Document docFile = docBuilder.newDocument();
 					dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 
-					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
+					dataElement.setAttributeNS(null, XAdESConstants.ID_IDENTIFIER, contentId);
 
 
 					// Si es Base64, lo firmamos indicando como contenido el dato pero, ya que puede
@@ -1041,7 +1038,7 @@ public final class XAdESSigner {
 				// 3.- Se firma todo el XML con ""
 				if (nodeToSign == null) {
 					// Tiene la raiz un Id?
-					final String ident = docSignature.getDocumentElement().getAttribute(ID_IDENTIFIER);
+					final String ident = docSignature.getDocumentElement().getAttribute(XAdESConstants.ID_IDENTIFIER);
 					if (ident != null && !ident.isEmpty()) {
 						nodeToSign = ident;
 					}

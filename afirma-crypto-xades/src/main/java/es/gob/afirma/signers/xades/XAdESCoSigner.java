@@ -48,14 +48,13 @@ import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 
 /** Co-firmador XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class XAdESCoSigner {
-
-    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
 	private static final Logger	LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -146,7 +145,7 @@ public final class XAdESCoSigner {
 		final String outputXmlEncoding = extraParams.getProperty(
 		        XAdESExtraParams.OUTPUT_XML_ENCODING);
 
-		String oid = extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID);
+		final String oid = extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID);
 
 		String mimeType = extraParams.getProperty(XAdESExtraParams.CONTENT_MIME_TYPE);
 
@@ -243,10 +242,12 @@ public final class XAdESCoSigner {
 		// Creamos el listado de referencias que deberan aparecer en la firma
 		final List<Reference> referenceList = new ArrayList<>();
 
+		// Creamos el listado con la informacion de los datos firmados que se agregaran a la firma
+		final ArrayList<DataObjectFormat> objectFormats = new ArrayList<>();
+
 		// Objeto en donde se almacenaran los datos firmados en caso de tratarse de
 		// una firma enveloping
-		ObjectIdentifierImpl objectIdentifier = null;
-		XMLObject envelopingObject = null;
+		XMLObject newInternalObject = null;
 		boolean isEnveloping = false;
 		String referenceId = null;
 		final List<Element> dataReferencesList = XAdESUtil.getSignatureDataReferenceList(signatureElement);
@@ -268,14 +269,13 @@ public final class XAdESCoSigner {
 			// Creamos un identificador de referencia para el objeto a firmar y lo almacenamos
 			// para mantener un listado con todas. En el caso de las hojas de estilo lo creamos con un
 			// identificador descriptivo
-			if (currentReference.getAttribute(ID_IDENTIFIER) != null &&
-					currentReference.getAttribute(ID_IDENTIFIER).startsWith("StyleReference-")) { //$NON-NLS-1$
+			if (currentReference.getAttribute(XAdESConstants.ID_IDENTIFIER) != null &&
+					currentReference.getAttribute(XAdESConstants.ID_IDENTIFIER).startsWith("StyleReference-")) { //$NON-NLS-1$
 				referenceId = "StyleReference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 			}
 			else {
 				referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 			}
-
 
 			// Buscamos y analizamos el nodo de datos para obtener su tipo
 			final String referenceUri = currentReference.getAttribute("URI"); //$NON-NLS-1$
@@ -284,9 +284,43 @@ public final class XAdESCoSigner {
 				referenceType = null;
 			}
 
-			// Firmas enveloped
-			if ("".equals(referenceUri)) { //$NON-NLS-1$
 
+			// Agregamos a la firma las referencia al dato y los tipos que esta tenga asociados
+
+			// Firmas manifest
+			if (XAdESConstants.REFERENCE_TYPE_MANIFEST.equals(referenceType)) {
+
+				// Hacemos una copia del manifest de la firma original
+				final Element newManifestElement = copyManifest(referenceUri, signatureElement);
+
+				// Hacemos copia de los DataObjectFormat de la firma original
+				final ArrayList<DataObjectFormat> dataObjectFormats = copyDataObjectFormats(signedPropertiesElement);
+
+				// Actualizamos los identificadores del manifest y de los datos referenciados
+				final String newManifestId = renewManifestIds(newManifestElement, dataObjectFormats);
+
+				// Creamos un nuevo objeto con el manifest para agregarlo a la firma
+				newInternalObject = createSignatureObject(newManifestElement, fac, mimeType, encoding);
+
+				// Agregamos a la firma la referencia al nuevo manifest
+				referenceList.add(
+						fac.newReference(
+								"#" + newManifestId, //$NON-NLS-1$
+								digestMethod,
+								currentTransformList,
+								referenceType,
+								referenceId
+								)
+						);
+
+				// Agregamos al listado de formatos de datos los del nuevo manifest
+				objectFormats.addAll(dataObjectFormats);
+			}
+
+			// Firmas enveloped
+			else if ("".equals(referenceUri)) { //$NON-NLS-1$
+
+				// Si no se declaro un mimetype, se usara el de XML
 				if (mimeType == null) {
 					mimeType = "text/xml"; //$NON-NLS-1$
 				}
@@ -302,7 +336,10 @@ public final class XAdESCoSigner {
 								)
 						);
 
+				// Agregamos a la firma el tipo de los datos de esta referencia (DataObjectFormat)
+				addReferenceDataObjectFormat(objectFormats, referenceId, mimeType, oid, encoding);
 			}
+
 			// Firmas enveloping y detached
 			else {
 
@@ -312,7 +349,7 @@ public final class XAdESCoSigner {
 
 				// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
 				Node nodeAttributeId = docElement.getAttributes() != null ?
-						docElement.getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+						docElement.getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) : null;
 				if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 					dataObjectElement = docElement;
 				}
@@ -322,7 +359,7 @@ public final class XAdESCoSigner {
 					for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
 
 						nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ?
-								rootChildNodes.item(j).getAttributes().getNamedItem(ID_IDENTIFIER) :
+								rootChildNodes.item(j).getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) :
 									null;
 								if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 									dataObjectElement = (Element) rootChildNodes.item(j);
@@ -334,7 +371,7 @@ public final class XAdESCoSigner {
 									final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
 									for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
 										nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
-												subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) :
+												subChildsNodes.item(k).getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) :
 													null;
 												if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 													dataObjectElement = (Element) subChildsNodes.item(k);
@@ -363,20 +400,21 @@ public final class XAdESCoSigner {
 					final Node subNode = signatureChildNodes.item(j);
 					final NamedNodeMap nnm = subNode.getAttributes();
 					if (nnm != null) {
-						final Node idAttrNode = nnm.getNamedItem(ID_IDENTIFIER);
+						final Node idAttrNode = nnm.getNamedItem(XAdESConstants.ID_IDENTIFIER);
 						if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
 							isEnveloping = true;
 						}
 					}
 				}
 
+				// Firma enveloping
 				if (isEnveloping && dataObjectElement != null) {
 					// crea el nuevo elemento Object que con el documento afirmar
 					final List<XMLStructure> structures = new ArrayList<>(1);
 					structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
 
 					final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-					envelopingObject = fac.newXMLObject(
+					newInternalObject = fac.newXMLObject(
 							structures,
 							objectId,
 							mimeType,
@@ -393,7 +431,6 @@ public final class XAdESCoSigner {
 									referenceId
 									)
 							);
-
 				}
 				// Firma detached
 				else {
@@ -407,21 +444,12 @@ public final class XAdESCoSigner {
 									referenceId
 									)
 							);
-
 				}
 
+				// Agregamos a la firma el tipo de los datos de esta referencia (DataObjectFormat)
+				addReferenceDataObjectFormat(objectFormats, referenceId, mimeType, oid, encoding);
 			}
-			if (oid == null && mimeType != null) {
-				try {
-					oid = MimeHelper.transformMimeTypeToOid(mimeType);
-				} catch (final IOException e) {
-					LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
-				}
-			}
-			if (oid != null) {
-				objectIdentifier = new ObjectIdentifierImpl(
-						"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			}
+
 		}
 
 		// Instancia XAdES
@@ -439,17 +467,8 @@ public final class XAdESCoSigner {
 		// Metadatos de firma
 		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
-		// DataObjectFormat
-		if (objectIdentifier != null || mimeType != null || encoding != null) {
-			final ArrayList<DataObjectFormat> objectFormats = new ArrayList<>();
-			final DataObjectFormat objectFormat = new DataObjectFormatImpl(
-				null,
-				objectIdentifier,
-				mimeType,
-				encoding,
-				"#" + referenceId //$NON-NLS-1$
-			);
-			objectFormats.add(objectFormat);
+		// Agregamos los elementos creados con los tipos de los datos firmados
+		if (!objectFormats.isEmpty()) {
 			xades.setDataObjectFormats(objectFormats);
 		}
 
@@ -461,10 +480,11 @@ public final class XAdESCoSigner {
 			canonicalizationAlgorithm
 		);
 
-		// en el caso de formato enveloping se inserta el elemento Object con el
-		// documento a firmar
-		if (isEnveloping) {
-			xmlSignature.addXMLObject(envelopingObject);
+		// Si se creo un nuevo objeto para incluir en la firma (caso de las
+		// cofirmas enveloping y de manifest, en las que se copia el objeto
+		// que se firma), lo agregamos
+		if (newInternalObject != null) {
+			xmlSignature.addXMLObject(newInternalObject);
 		}
 
 		try {
@@ -513,6 +533,154 @@ public final class XAdESCoSigner {
 			null,
 			null
 		);
+	}
+
+	/**
+	 * Hace una copia del manifest de una firma.
+	 * @param referenceUri URI del manifest.
+	 * @param signatureElement Firma en la que se encuentra el manifest.
+	 * @return Copia del elemento manifest.
+	 * @throws AOException Cuando no se puede localizar el manifest en la firma.
+	 */
+	private static Element copyManifest(final String referenceUri, final Element signatureElement) throws AOException {
+		// Obtenemos el manifest de la firma original
+		if (!referenceUri.startsWith("#")) { //$NON-NLS-1$
+			throw new AOException("La URI de la firma original que referencia al manifest debe ser local"); //$NON-NLS-1$
+		}
+		final String manifestId = referenceUri.substring(1);
+		final Element manifestElement = XAdESUtil.findElementById(manifestId, signatureElement, false);
+		if (manifestElement == null) {
+			throw new AOException("No se encontro el manifest dentro de la firma"); //$NON-NLS-1$
+		}
+
+		// Clonamos el nodo del manifest
+		return (Element) manifestElement.cloneNode(true);
+	}
+
+	/**
+	 * Obtiene una copia de los elementos DataObjectFormat declarados en una
+	 * firma.
+	 * @param signedPropertiesElement Propiedades firmadas de la firma de la
+	 * que copiar los elementos.
+	 * return Listado de DataObjectFormat.
+	 */
+	private static ArrayList<DataObjectFormat> copyDataObjectFormats(final Element signedPropertiesElement) {
+
+		// Identificamos el nodo de los atributos firmados de los datos
+		Element signedDataObjectPropertiesElement = null;
+		final NodeList signedPropertiesNodeList = signedPropertiesElement.getChildNodes();
+		for (int i = 0; signedDataObjectPropertiesElement == null && i < signedPropertiesNodeList.getLength(); i++) {
+			if (signedPropertiesNodeList.item(i).getNodeType() == Node.ELEMENT_NODE
+					&& XAdESConstants.TAG_SIGNED_DATA_OBJECT_PROPERTIES.equals(signedPropertiesNodeList.item(i).getLocalName())) {
+				signedDataObjectPropertiesElement = (Element) signedPropertiesNodeList.item(i);
+			}
+		}
+
+		final ArrayList<DataObjectFormat> dataObjectFormats = new ArrayList<>();
+
+		// Si la firma tenia declaramos los tipos de los datos, replicamos esta
+		// informacion en la nueva firma
+		if (signedDataObjectPropertiesElement != null) {
+			final NodeList dataObjectFormatNodeList = signedDataObjectPropertiesElement.getElementsByTagNameNS(
+					signedDataObjectPropertiesElement.getNamespaceURI(),
+					XAdESConstants.TAG_DATA_OBJECT_FORMAT);
+
+			// Recorremos el listado de elementos con los tipos de datos y
+			// agregamos los mismos parametros a la nueva firma
+			for (int i = 0; i < dataObjectFormatNodeList.getLength(); i++) {
+				final DataObjectFormat dataObjectFormat = DataObjectFormatParser.parseDataObjectFormat(
+						(Element) dataObjectFormatNodeList.item(i));
+				dataObjectFormats.add(dataObjectFormat);
+			}
+		}
+
+		return dataObjectFormats;
+	}
+
+
+	private static String renewManifestIds(final Element newManifestElement, final ArrayList<DataObjectFormat> dataObjectFormats) {
+
+		// Actualizamos el ID del nuevo manifest
+		final String newManifestId = "Manifest-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+		newManifestElement.setAttribute(XAdESConstants.ID_IDENTIFIER, newManifestId);
+
+		// Recorremos las referencias del manifest y actualizamos sus Ids a la
+		// vez que actualizamos las de los formatos datos asociados
+		final NodeList references = newManifestElement.getElementsByTagNameNS(newManifestElement.getNamespaceURI(), XAdESConstants.TAG_REFERENCE);
+		for (int i = 0; i < references.getLength(); i++) {
+			final Element reference = (Element) references.item(i);
+			final String referenceId = reference.getAttribute(XAdESConstants.ID_IDENTIFIER);
+			if (referenceId != null) {
+				final String newReferenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+				reference.setAttribute(XAdESConstants.ID_IDENTIFIER, newReferenceId);
+				for (int j = 0; j < dataObjectFormats.size(); j++) {
+					final DataObjectFormat objectFormat = dataObjectFormats.get(j);
+					final String objectReference = objectFormat.getObjectReference();
+					if (objectReference != null && objectReference.equals("#" + referenceId)) { //$NON-NLS-1$
+						final DataObjectFormat newObjectFormat = new DataObjectFormatImpl(
+								objectFormat.getDescription(),
+								objectFormat.getObjectIdentifier(),
+								objectFormat.getMimeType(),
+								objectFormat.getEncoding(),
+								"#" + newReferenceId); //$NON-NLS-1$
+						dataObjectFormats.set(j, newObjectFormat);
+					}
+				}
+			}
+		}
+
+		return newManifestId;
+	}
+
+	/**
+	 * Crea un nuevo objeto de firma.
+	 * @param contentElement Elemento que se incorpora al objeto de firma.
+	 * @param fac Factoria de la firma a la que se agregar&aacute; el objeto.
+	 * @param mimeType Mimetype de los datos o {@code null} si no hay que declararlo.
+	 * @param encoding Codificaci&oacute;n de los datos o {@code null} si no hay que declararla.
+	 * @return Objeto de firma.
+	 */
+	private static XMLObject createSignatureObject(final Element contentElement, final XMLSignatureFactory fac, final String mimeType, final String encoding) {
+
+		final List<XMLStructure> structures = new ArrayList<>(1);
+		structures.add(new DOMStructure(contentElement));
+		final String objectId = "ManifestObject-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+		return fac.newXMLObject(
+				structures,
+				objectId,
+				mimeType,
+				encoding
+				);
+	}
+
+
+	private static void addReferenceDataObjectFormat(final List<DataObjectFormat> objectFormats, final String referenceId,
+			final String mimeType, final String fixedOid, final String encoding) {
+
+		String oid = fixedOid;
+		if (oid == null && mimeType != null) {
+			try {
+				oid = MimeHelper.transformMimeTypeToOid(mimeType);
+			} catch (final IOException e) {
+				LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
+			}
+		}
+
+		ObjectIdentifier objectIdentifier = null;
+		if (oid != null) {
+			objectIdentifier = new ObjectIdentifierImpl(
+					"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}
+
+		// Cremos los elementos descriptivos de los datos
+		final DataObjectFormat objectFormat = new DataObjectFormatImpl(
+				null,
+				objectIdentifier,
+				mimeType,
+				encoding,
+				"#" + referenceId //$NON-NLS-1$
+				);
+		objectFormats.add(objectFormat);
 	}
 
 	/**
