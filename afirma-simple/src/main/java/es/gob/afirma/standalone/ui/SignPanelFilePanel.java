@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -58,11 +57,10 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         setLayout(new GridBagLayout());
         setAlignmentY(Component.TOP_ALIGNMENT);
 
-        // Establecemos la configuracion de color
-        Color bgColor = Color.BLACK;
         // Configuramos los colores
-        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-        	bgColor = LookAndFeelManager.WINDOW_COLOR;
+        Color bgColor = Color.WHITE;
+        if (LookAndFeelManager.HIGH_CONTRAST) {
+        	bgColor = Color.BLACK;
         }
         setBackground(bgColor);
         setFocusable(true);
@@ -106,7 +104,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         			);
         }
 
-        this.getAccessibleContext().setAccessibleDescription(this.accesibleDescription);
+        getAccessibleContext().setAccessibleDescription(this.accesibleDescription);
 
         final JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(bgColor);
@@ -215,11 +213,6 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         c.insets = new Insets(4, 11, 0, 0);
         detailPanel.add(this.configInfoPanel, c);
 
-        // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-        	detailPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-        }
-
         return detailPanel;
 	}
 
@@ -273,3 +266,4 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 		return false;
 	}
 }
+

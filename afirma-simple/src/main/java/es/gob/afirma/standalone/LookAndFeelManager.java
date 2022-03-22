@@ -33,7 +33,13 @@ public final class LookAndFeelManager {
 	}
 
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-    public static final Color WINDOW_COLOR;
+    public static final Color DEFAULT_COLOR;
+
+    /** Color de fondo secundario para los JPanel, JFrame y Applet. */
+    public static final Color SECUNDARY_COLOR;
+
+    /** Color transparente. */
+    public static final Color TRANSPARENT_COLOR = new Color(255, 255, 255, 0);
 
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean HIGH_CONTRAST;
@@ -54,12 +60,12 @@ public final class LookAndFeelManager {
     	try {
 	    	 windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
 	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
-	    			Color.WHITE;
+	    			 new Color(238, 238, 238);
     	}
     	catch (final Throwable e) {
-    		windowColor = Color.WHITE;
+    		windowColor = new Color(238, 238, 238);
 		}
-    	WINDOW_COLOR = windowColor;
+    	DEFAULT_COLOR = windowColor;
 
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
@@ -73,6 +79,8 @@ public final class LookAndFeelManager {
         else {
             HIGH_CONTRAST = false;
         }
+
+        SECUNDARY_COLOR = HIGH_CONTRAST ? Color.BLACK : Color.WHITE;
 
         final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
         if (defaultFontHeight instanceof Integer) {
@@ -96,13 +104,13 @@ public final class LookAndFeelManager {
 
         if (!useSystemLookAndFeel) {
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-            UIManager.put("RootPane.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("TextPane.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("TextArea.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("InternalFrameTitlePane.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("InternalFrame.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("Label.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("PopupMenuSeparator.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("RootPane.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("TextPane.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("TextArea.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("InternalFrameTitlePane.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("InternalFrame.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("Label.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("PopupMenuSeparator.background", DEFAULT_COLOR); //$NON-NLS-1$
         }
 
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -110,8 +118,8 @@ public final class LookAndFeelManager {
 
         // Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("Panel.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("OptionPane.background", DEFAULT_COLOR); //$NON-NLS-1$
+            UIManager.put("Panel.background", DEFAULT_COLOR); //$NON-NLS-1$
             System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$

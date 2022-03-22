@@ -262,7 +262,7 @@ final class SignDataPanel extends JPanel {
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
             }
             if (!LookAndFeelManager.HIGH_CONTRAST) {
-                certDescPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                certDescPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
             }
 
             this.certDescText.setText(SimpleAfirmaMessages.getString("SignDataPanel.21")); //$NON-NLS-1$
@@ -319,9 +319,8 @@ final class SignDataPanel extends JPanel {
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
-            filePath.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            filePathPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+            filePathPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 
         setLayout(new GridBagLayout());

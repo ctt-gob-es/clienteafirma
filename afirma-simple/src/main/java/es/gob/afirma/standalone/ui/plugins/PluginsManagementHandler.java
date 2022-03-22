@@ -1,7 +1,5 @@
 package es.gob.afirma.standalone.ui.plugins;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -16,11 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -52,7 +47,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 
 	/** Extensi&oacute;n de fichero asociada a los plugins de la aplicaci&oacute;n. */
-	private static final String[] PLUGIN_EXTENSIONS = new String[] { "jar", "zip" }; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String[] PLUGIN_EXTENSIONS = { "jar", "zip" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private final PluginsManagementPanel view;
 
@@ -121,9 +116,12 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 
 		// Comprobamos que el plugin sea valido
-		final AfirmaPlugin plugin = PluginsManager.loadPluginFromFiles(new File[] { pluginFile });
-		if (plugin == null) {
-			LOGGER.warning("El plugin no es valido y no se cargara"); //$NON-NLS-1$
+		final AfirmaPlugin plugin;
+		try {
+			plugin = PluginsManager.loadPluginFromFiles(new File[] { pluginFile });
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo cargar el plugin", e); //$NON-NLS-1$
 			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), null); //$NON-NLS-1$
 			return;
 		}
@@ -508,35 +506,11 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		dialog.setVisible(true);
 	}
 
-	private void showError(final String message, final Throwable t) {
+	private static void showError(final String message, final Throwable t) {
 		AOUIFactory.showErrorMessage(message,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE,
 				t);
-	}
-
-	private JComponent createScrollableTextPanel() {
-		final JLabel infoError = new JLabel() {
-			@Override public Dimension getPreferredSize() {
-		        return new Dimension(getParent().getSize().width, super.getPreferredSize().height);
-		    }
-		};
-		infoError.setFocusable(false);
-
-		final JPanel textPanel = new JPanel() {
-			@Override public Dimension getPreferredSize() {
-		        return new Dimension(getParent().getSize().width, super.getPreferredSize().height);
-		    }
-		};
-		final GridBagConstraints c2 = new GridBagConstraints();
-		c2.fill = GridBagConstraints.VERTICAL;
-		c2.gridy = 0;
-		textPanel.add(infoError, c2);
-		c2.weighty = 1.0;
-		c2.gridy++;
-		textPanel.add(new JPanel(), c2); // Panel vacio para rellenar la vertical
-
-		return textPanel;
 	}
 
 	/**

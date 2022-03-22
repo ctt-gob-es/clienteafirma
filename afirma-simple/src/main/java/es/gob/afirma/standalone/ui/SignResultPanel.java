@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -45,10 +44,6 @@ final class SignResultPanel extends JPanel {
 
     void createUI(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
 
-        // Para que se detecten apropiadamente los hipervinculos hay que establecer
-        // el tipo de contenido antes que el contenido
-        //this.editorLinkTextLabel.setContentType("text/plain"); //$NON-NLS-1$
-
         String iconFilename;
         switch (validity.getValidity()) {
         case KO:
@@ -64,7 +59,7 @@ final class SignResultPanel extends JPanel {
 
         final BufferedImage image = ImageLoader.loadImage(iconFilename);
         final ScalablePane resultOperationIcon = new ScalablePane(image, true);
-        resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
+        resultOperationIcon.setBackground(LookAndFeelManager.TRANSPARENT_COLOR);
         resultOperationIcon.setFocusable(false);
         resultOperationIcon.setMinimumSize(new Dimension(120, 120));
 
@@ -209,16 +204,10 @@ final class SignResultPanel extends JPanel {
         this.resultTextLabel.setFont(getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
-        // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
-            this.resultTextLabel.setForeground(new Color(3399));
-        }
-
         setLayout(new GridBagLayout());
 
-        this.setFocusable(true);
-        this.getAccessibleContext().setAccessibleDescription(this.accessibleDescription);
+        setFocusable(true);
+        getAccessibleContext().setAccessibleDescription(this.accessibleDescription);
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -238,7 +227,7 @@ final class SignResultPanel extends JPanel {
         c.insets = new Insets(0, 6, 0, 11);
         this.add(this.descTextLabel, c);
         c.weighty = 0.0;
-        c.weightx = 3.0;
+        c.weightx = 1.0;
         c.gridy = 2;
         c.insets = new Insets(0, 6, 0, 430);
         this.add(this.linkLabel, c);

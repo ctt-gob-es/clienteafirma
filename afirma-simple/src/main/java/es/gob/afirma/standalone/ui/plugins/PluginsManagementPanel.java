@@ -31,6 +31,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 
@@ -181,21 +182,21 @@ public final class PluginsManagementPanel extends JPanel {
 		final JComponent textPanel = createScrollableTextPanel();
 
 		final JScrollPane scrollPane = new JScrollPane(textPanel);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+		scrollPane.setBorder(BorderFactory.createLineBorder(LookAndFeelManager.DEFAULT_COLOR, 1));
 		scrollPane.setFocusable(true);
 		scrollPane.addFocusListener(new FocusListener() {
 			@Override
-			public void focusLost(FocusEvent evt) {
-				((JComponent) evt.getSource()).setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+			public void focusLost(final FocusEvent evt) {
+				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(LookAndFeelManager.DEFAULT_COLOR, 1));
 			}
 			@Override
-			public void focusGained(FocusEvent evt) {
+			public void focusGained(final FocusEvent evt) {
 				((JComponent) evt.getSource()).setBorder(BorderFactory.createLineBorder(Color.black, 1));
 			}
 		});
 		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-		// Panel con el boton para la configuracion del plugin. El boton perman
+		// Panel con el boton para la configuracion del plugin.
 		final JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 		this.configButton = new JButton(SimpleAfirmaMessages.getString("PluginsManagementPanel.4")); //$NON-NLS-1$
 		this.configButton.setVisible(false);

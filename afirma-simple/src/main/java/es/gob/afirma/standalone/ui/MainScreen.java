@@ -46,7 +46,7 @@ public final class MainScreen extends JFrame {
 
     void createUI(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
         if (LookAndFeelManager.needMaximizeWindow()) {

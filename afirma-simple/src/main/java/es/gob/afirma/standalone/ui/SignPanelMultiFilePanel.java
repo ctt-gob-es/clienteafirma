@@ -189,7 +189,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
     		// Configuramos los colores
     		if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-    			final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
+    			final Color bgColor = LookAndFeelManager.DEFAULT_COLOR;
     			setBackground(bgColor);
     		}
 
@@ -269,9 +269,8 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
             // Configuramos los colores
-            if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-            	final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
-            	setBackground(bgColor);
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            	setBackground(Color.WHITE);
             }
 
 			setLayout(new GridBagLayout());

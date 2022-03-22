@@ -33,7 +33,6 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.OutputData;
@@ -117,12 +116,6 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
         returnPanel.add(this.returnButton);
         this.returnButton.addActionListener(ae -> goToBack());
 
-        // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
-            returnPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-        }
-
         // Agregamos un panel adicional en el que se mostraran los botones de los plugins
         this.mainPluginsButtonsPanel = buildMainPluginsButtonsPanel();
 
@@ -170,11 +163,6 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
     	mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), c);
     	c.gridy++;
     	mainPanel.add(this.pluginButtonsPanel, c);
-
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
-    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-    	}
 
     	return mainPanel;
 	}

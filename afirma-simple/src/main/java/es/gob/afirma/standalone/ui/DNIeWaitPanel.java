@@ -132,16 +132,12 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         	vectorDNIeHelpPicture = null;
         }
 
-        Color bgColor = Color.WHITE;
         // Configuramos los colores
-        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-        	bgColor = LookAndFeelManager.WINDOW_COLOR;
-        }
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-        	setBackground(bgColor);
-        	dniePanel.setBackground(bgColor);
-        	textPanel.setBackground(bgColor);
-        	textPanelExtra.setBackground(bgColor);
+        	setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        	dniePanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        	textPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        	textPanelExtra.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -172,6 +168,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
     		SimpleAfirmaMessages.getString("DNIeWaitPanel.8"), //$NON-NLS-1$
     		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN)
 		);
+        hideDniWaitScreen.addKeyListener(this);
         hideDniWaitScreen.addChangeListener(
     		e -> PreferencesManager.putBoolean(
 				PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN,
@@ -179,9 +176,9 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 			)
     	);
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-        	hideDniWaitScreen.setBackground(Color.WHITE);
+        	hideDniWaitScreen.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
-        this.add(hideDniWaitScreen, c);
+        add(hideDniWaitScreen, c);
     }
 
     /** {@inheritDoc} */

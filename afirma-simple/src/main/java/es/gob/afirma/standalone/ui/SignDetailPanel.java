@@ -159,8 +159,8 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
-            buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+            buttonPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
         // Agregamos un panel adicional en el que se mostraran los botones de los plugins
@@ -213,8 +213,8 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
     	mainPanel.add(this.pluginButtonsPanel, c);
 
     	if (!LookAndFeelManager.HIGH_CONTRAST) {
-    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}
 
     	return mainPanel;

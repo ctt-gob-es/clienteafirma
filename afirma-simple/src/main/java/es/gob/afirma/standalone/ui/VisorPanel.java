@@ -109,7 +109,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 
     private void createUI(final File signFile, final byte[] sign, final boolean addReloadButton) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -194,7 +194,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            bottonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            bottonPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
         // Agregamos un panel adicional en el que se mostraran los botones de los plugins
@@ -337,8 +337,8 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     	mainPanel.add(this.pluginButtonsPanel, c);
 
     	if (!LookAndFeelManager.HIGH_CONTRAST) {
-    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}
 
     	return mainPanel;

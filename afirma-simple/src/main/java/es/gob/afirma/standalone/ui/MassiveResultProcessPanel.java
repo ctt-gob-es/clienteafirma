@@ -108,6 +108,9 @@ final class MassiveResultProcessPanel extends JPanel {
         dirPathPanel.setFocusable(true);
         dirPathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.3") + outDir.getAbsolutePath()); //$NON-NLS-1$
 
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            dirPathPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        }
 
         // Boton de apertura del fichero firmado
         JButton openDirButton;
@@ -213,7 +216,7 @@ final class MassiveResultProcessPanel extends JPanel {
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
             }
             if (!LookAndFeelManager.HIGH_CONTRAST) {
-                certDescPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                certDescPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
             }
 
             this.certDescText.setText(SimpleAfirmaMessages.getString("SignDataPanel.21")); //$NON-NLS-1$
@@ -271,13 +274,6 @@ final class MassiveResultProcessPanel extends JPanel {
         resultConstraints.weighty = 1.0;
         resultConstraints.gridy++;
         resultPanel.add(resultListPanel, resultConstraints);
-
-        // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
-            outDirPath.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            dirPathPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-        }
 
         setLayout(new GridBagLayout());
 
@@ -408,9 +404,8 @@ final class MassiveResultProcessPanel extends JPanel {
 			this.resultLabel.setPreferredSize(new Dimension(52, 14));
 
 			// Configuramos los colores
-			if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-				final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
-				setBackground(bgColor);
+			if (!LookAndFeelManager.HIGH_CONTRAST) {
+				setBackground(LookAndFeelManager.SECUNDARY_COLOR);
 			}
 
 			setLayout(new GridBagLayout());
@@ -494,9 +489,8 @@ final class MassiveResultProcessPanel extends JPanel {
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
 			// Configuramos los colores
-			if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-				final Color bgColor = LookAndFeelManager.WINDOW_COLOR;
-				setBackground(bgColor);
+			if (!LookAndFeelManager.HIGH_CONTRAST) {
+				setBackground(LookAndFeelManager.SECUNDARY_COLOR);
 			}
 
 			setLayout(new GridBagLayout());
@@ -595,18 +589,8 @@ final class MassiveResultProcessPanel extends JPanel {
 		}
 
 		private static ImageIcon buildIcon(final boolean ok) {
-			ImageIcon resultIcon;
 			final String imageName = ok ? "ok_icon_large.png" : "ko_icon_large.png"; //$NON-NLS-1$ //$NON-NLS-2$
-
-//			final Image image = ImageLoader.loadImage(imageName);
-//			final ScalablePane resultOperationIcon = new ScalablePane(image);
-//			resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
-//			resultOperationIcon.setFocusable(false);
-//			resultIcon = resultOperationIcon.getScaledInstanceToFit(image, new Dimension(32,  32));
-
-			resultIcon = ImageLoader.loadIcon(imageName, ImageLoader.SMALL_ICON);
-
-	        return resultIcon;
+			return ImageLoader.loadIcon(imageName, ImageLoader.SMALL_ICON);
 		}
 
 		/**

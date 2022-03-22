@@ -142,7 +142,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	private void createUI() {
 
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
 		setLayout(new GridBagLayout());
@@ -613,8 +613,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	mainPanel.add(this.pluginButtonsPanel, c);
 
     	if (!LookAndFeelManager.HIGH_CONTRAST) {
-    		mainPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+    		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}
 
     	return mainPanel;
@@ -825,9 +825,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	        // Configuramos el color
 	        if (!LookAndFeelManager.HIGH_CONTRAST) {
-	            setBackground(LookAndFeelManager.WINDOW_COLOR);
-	            introPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-	            selectPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+	            introPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
+	            selectPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            welcomeLabel.setForeground(new Color(3399));
 	        }
 
@@ -860,7 +860,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        // Identificamos el color de fondo
 	        Color bgColor = Color.WHITE;
 	        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
-	        	bgColor = LookAndFeelManager.WINDOW_COLOR;
+	        	bgColor = LookAndFeelManager.DEFAULT_COLOR;
 	        }
 
 	        final JPanel panel = new ResizingTextPanel(SimpleAfirmaMessages.getString("SignPanel.41")); //$NON-NLS-1$
@@ -912,10 +912,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	        // Establecemos la configuracion de color
 	        if (!LookAndFeelManager.HIGH_CONTRAST) {
-	            setBackground(LookAndFeelManager.WINDOW_COLOR);
+	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            panel.setBackground(Color.DARK_GRAY);
 	            panel.setForeground(Color.LIGHT_GRAY);
-	            buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+	            buttonPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	        }
 
 	        this.add(buttonPanel, BorderLayout.PAGE_END);
