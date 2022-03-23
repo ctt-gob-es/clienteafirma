@@ -13,12 +13,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
+
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 
 /** Utilidades para el c&aacute;culo y comprobaci&oacute;n de huellas digitales.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class HashUtil {
+
+	private static final Logger LOGGER = Logger.getLogger(HashUtil.class.getName());
 
 	private HashUtil() {
 		// No instanciable
@@ -63,5 +69,31 @@ public final class HashUtil {
 			result = managerStreamHash.digest();
 		}
 		return result;
+	}
+
+	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
+	 * @return Directorio de ejecuci&oacute;n. */
+	public static File getApplicationDirectory() {
+
+		// Identificamos el directorio de instalacion
+		try {
+			return new File(
+				AfirmaPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+			).getParentFile();
+		}
+		catch (final URISyntaxException e) {
+			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion: " + e); //$NON-NLS-1$
+		}
+
+		return null;
+	}
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Windows.
+	 * @return Directorio de instalaci&oacute;n.
+	 */
+	public static File getWindowsAlternativeAppDir() {
+		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
+		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
 	}
 }
