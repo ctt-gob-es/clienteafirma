@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -299,7 +298,7 @@ public final class MainMenu extends JMenuBar {
         		SimpleAfirmaMessages.getString("MainMenu.17") //$NON-NLS-1$
             );
             acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-            acercaMenuItem.addActionListener(ae -> showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent()));
+            acercaMenuItem.addActionListener(ae -> AboutDialog.showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent()));
             acercaMenuItem.setMnemonic(KeyEvent.VK_C);
             menuAyuda.add(acercaMenuItem);
         }
@@ -439,21 +438,7 @@ public final class MainMenu extends JMenuBar {
      * @param event Evento que desencadena la acci&oacute;n.
      */
     void showAbout(final EventObject event) {
-    	showAbout(getParentComponent() == null ? MainMenu.this : getParentComponent());
-    }
-
-    /** Muestra ek di&aacute;logo "Acerca de...".
-     * @param parentComponent Componente padre para la modalidad. */
-    public static void showAbout(final Component parentComponent) {
-        AOUIFactory.showMessageDialog(
-    		parentComponent,
-			SimpleAfirmaMessages.getString("MainMenu.14", //$NON-NLS-1$
-					SimpleAfirma.getVersion(),
-					System.getProperty("java.version"), //$NON-NLS-1$,
-					Platform.getJavaArch()),
-            SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
-            JOptionPane.PLAIN_MESSAGE
-        );
+    	AboutDialog.showAbout(getParentComponent() == null ? this : getParentComponent());
     }
 
     /**

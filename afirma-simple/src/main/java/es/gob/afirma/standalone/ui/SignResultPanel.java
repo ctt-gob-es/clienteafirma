@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -203,6 +204,13 @@ final class SignResultPanel extends JPanel {
 
         this.resultTextLabel.setFont(getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
+
+        // Establecemos la configuracion de color cuando no se encuentra
+        // activado el alto contraste y estamos en Windows (en donde se
+        // utiliza un Look&Feel determinado)
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+            setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        }
 
         setLayout(new GridBagLayout());
 

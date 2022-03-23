@@ -21,10 +21,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.text.NumberFormat;
 import java.util.List;
@@ -275,6 +272,13 @@ final class MassiveResultProcessPanel extends JPanel {
         resultConstraints.gridy++;
         resultPanel.add(resultListPanel, resultConstraints);
 
+        // Establecemos la configuracion de color cuando no se encuentra
+        // activado el alto contraste y estamos en Windows (en donde se
+        // utiliza un Look&Feel determinado)
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+            setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        }
+
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -356,30 +360,6 @@ final class MassiveResultProcessPanel extends JPanel {
 			}
 		}
 	}
-
-	static void openCertificate(final X509Certificate cert, final Component parent) {
-        try {
-            final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
-            tmp.deleteOnExit();
-            try (
-        		final OutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
-    		) {
-            	bos.write(cert.getEncoded());
-            }
-            Desktop.getDesktop().open(tmp);
-        }
-        catch(final Exception e) {
-        	LOGGER.warning(
-    			"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
-			);
-        	AOUIFactory.showErrorMessage(
-                SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$
-                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE,
-                e
-            );
-        }
-    }
 
 	/**
 	 * Renderer de los t&iacute;tulos del listado de firmas realizadas.
