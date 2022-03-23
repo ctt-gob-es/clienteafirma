@@ -9,7 +9,7 @@
 		],
 		"description": "Plugin para el cálculo y la comprobación de hashes.<br><br>El componente permite generar ficheros de hashes con el hash de un fichero o de todos los ficheros de un directorio. También permite comprobar que un fichero de hashes es válido seleccionando el fichero o directorio a partir del cuál se generó.<br><br>El plugin permite realizar las nuevas operaciones tanto desde interfaces gráficos como desde línea de comandos."
 	},
-	"permissions": ["RESET", "MENU", "COMMANDS"],
+	"permissions": ["INSTALL","UNINSTALL","RESET", "MENU", "COMMANDS"],
 	"menu": {
 		"title": "Huellas digitales",
 		"items": [
