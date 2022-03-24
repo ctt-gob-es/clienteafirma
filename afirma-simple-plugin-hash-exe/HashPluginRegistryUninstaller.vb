@@ -13,6 +13,8 @@ Module Program
         Registry.ClassesRoot.DeleteSubKey(".hashb64\shell\afirma.hasbh64")
         Registry.ClassesRoot.DeleteSubKey(".hashfiles\shell\afirma.hashfiles\command")
         Registry.ClassesRoot.DeleteSubKey(".hashfiles\shell\afirma.hashfiles")
+		Registry.ClassesRoot.DeleteSubKey(".hexhash\shell\afirma.hexhash\command")
+        Registry.ClassesRoot.DeleteSubKey(".hexhash\shell\afirma.hexhash")
         Console.WriteLine("Registros eliminados correctamente")
     End Sub
 End Module
