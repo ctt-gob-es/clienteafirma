@@ -1,0 +1,53 @@
+#!/bin/sh
+# generamos certificado CA y SSL
+java -jar /usr/lib/AutoFirma/AutoFirmaConfigurador.jar
+# damos permiso al script de instalacion del certificado para firefox y lo ejecutamos
+
+echo "Generacion de certificados"
+
+if [ -f "/usr/lib/AutoFirma/script.sh" ]; then
+chmod +x /usr/lib/AutoFirma/script.sh
+/usr/lib/AutoFirma/script.sh
+
+fi
+
+echo "Instalacion del certificado CA en el almacenamiento de Firefox y Chrome"
+
+#Creacion de certificado .pem y .crt para su importacion en el almacenamiento del sistema
+openssl x509 -inform der -in /usr/lib/AutoFirma/AutoFirma_ROOT.cer -out /usr/lib/AutoFirma/AutoFirma_ROOT.pem
+
+mv /usr/lib/AutoFirma/AutoFirma_ROOT.pem /usr/lib/AutoFirma/AutoFirma_ROOT.crt
+
+if [ -d "/usr/share/ca-certificates/AutoFirma" ]; then
+rm -R /usr/share/ca-certificates/AutoFirma/
+fi
+
+mkdir /usr/share/ca-certificates/AutoFirma/
+cp /usr/lib/AutoFirma/AutoFirma_ROOT.crt /usr/share/ca-certificates/AutoFirma/AutoFirma_ROOT.crt
+cp /usr/lib/AutoFirma/AutoFirma_ROOT.crt /usr/local/share/ca-certificates/AutoFirma_ROOT.crt
+update-ca-certificates
+echo "Instalacion del certificado CA en el almacenamiento del sistema"
+
+# Enlazamos el fichero de asociacion del protocolo "afirma" en Firefox
+# para que aplique a otros navegadores
+if [ -d /etc/icecat ] ; then
+   if [ ! -d /etc/icecat/pref ] ; then
+      mkdir /etc/icecat/pref
+   fi
+   ln -s /etc/firefox/pref/AutoFirma.js /etc/icecat/pref/AutoFirma.js
+fi
+if [ -d /etc/firefox-esr ] ; then
+   if [ ! -d /etc/firefox-esr/pref ] ; then
+      mkdir /etc/firefox-esr/pref
+   fi
+   ln -s /etc/firefox/pref/AutoFirma.js /etc/firefox-esr/pref/AutoFirma.js
+fi
+
+# Definimos la aplicacion autofirma como la de por defecto para abrir los x/handler (no es necesario porque se define en el fichero de control)
+#xdg-mime default /usr/share/applications/afirma.desktop x-scheme-handler/afirma
+
+# borramos los ficheros de instalacion
+rm /usr/lib/AutoFirma/script.sh
+rm /usr/lib/AutoFirma/AutoFirma_ROOT.crt
+exit 0
+
