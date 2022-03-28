@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.7.0
+Type=Application
+Terminal=false
+Categories=Office;Utilities;Signature
+Exec=/usr/bin/autofirma %u
+Name=AutoFirma
+Icon=/usr/lib64/autofirma/autofirma.png

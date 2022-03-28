@@ -1,0 +1,17 @@
+Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?revision=174
+Upstream-Name: AutoFirma
+Upstream-Contact: Gobierno de España
+Source: https://github.com/ctt-gob-es/clienteafirma
+
+Files: *
+Copyright: 2022, Gobierno de España
+License: GPL-2+ or EUPL-1.1
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 2 of the License, or
+ (at your option) any later version.
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2"
+ and the complete text of de EUPL license version 1.1 can be found
+ in "/usr/share/common-licenses/eupl-1.1.txt".

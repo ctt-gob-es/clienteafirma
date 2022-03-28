@@ -929,12 +929,6 @@ Function un.UninstallFromRegistry
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
 
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.sign"
-	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.hashFile"
-	DeleteRegKey HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory"
-	DeleteRegKey HKEY_CLASSES_ROOT ".hash\shell\afirma.hash"
-	DeleteRegKey HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64"
-	DeleteRegKey HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles"
-    DeleteRegKey HKEY_CLASSES_ROOT ".hexhash\shell\afirma.hexhash"
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.verify"
 
 	DeleteRegKey HKEY_CLASSES_ROOT ".csig\shell\Verify"

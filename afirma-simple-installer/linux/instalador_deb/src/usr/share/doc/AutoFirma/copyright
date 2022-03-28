@@ -1,0 +1,13 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: AutoFirma
+Upstream-Contact: Gobierno de España <soporte.afirma@correo.gob.es>
+Source: http://firmaelectronica.gob.es/Home/Descargas.html
+
+License: GPL-2.0
+ El texto completo de la GNU Public License 2.0 puede leerse en el fichero 
+ `GPL-2.0' en el mismo directorio que este fichero.
+
+License: EUPL-1.1
+ El texto completo de la European Union Public Licence 1.1 puede leerse en
+ el fichero `EUPL-1.1' en el mismo directorio que este fichero.
+

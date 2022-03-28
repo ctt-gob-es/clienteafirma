@@ -1,0 +1,59 @@
+#!/bin/sh
+# Cerramos los navegadores Firefox, Chrome y Chromium para eliminar correctamente las preferencias y certificados
+if pgrep chromium; then
+pkill chromium;
+fi
+if pgrep chrome; then
+pkill chrome;
+fi
+if pgrep firefox; then
+pkill firefox;
+fi
+
+# Eliminamos los enlaces creados en el script de postinstalacion
+if [ -f /etc/icecat/pref/AutoFirma.js ] ; then
+   rm /etc/icecat/pref/AutoFirma.js
+fi
+if [ -f /etc/firefox-esr/pref/AutoFirma.js ] ; then
+   rm /etc/firefox-esr/pref/AutoFirma.js
+fi
+
+# damos permisos de desinstalacion de los certificados del almacen de firefox
+if [ -f "/usr/lib/AutoFirma/uninstall.sh" ]; then
+chmod +x /usr/lib/AutoFirma/uninstall.sh
+/usr/lib/AutoFirma/uninstall.sh
+echo "Se ha borrado el certificado CA de los almacenes de Firefox"
+fi
+
+# borramos los certificados instalados en el almacenamiento del sistema
+if [ -d "/usr/share/ca-certificates/AutoFirma" ];
+then
+rm -R /usr/share/ca-certificates/AutoFirma
+fi
+
+if [ -f "/usr/local/share/ca-certificates/AutoFirma_ROOT.crt" ];
+then
+rm /usr/local/share/ca-certificates/AutoFirma_ROOT.crt
+fi
+
+if [ -f "/usr/lib/AutoFirma/uninstall.sh" ];
+then
+rm /usr/lib/AutoFirma/uninstall.sh
+fi
+
+if [ -f "/usr/lib/AutoFirma/autofirma.pfx" ];
+then
+rm /usr/lib/AutoFirma/autofirma.pfx
+fi
+
+if [ -f "/usr/lib/AutoFirma/AutoFirma_ROOT.cer" ];
+then
+rm /usr/lib/AutoFirma/AutoFirma_ROOT.cer
+fi
+
+update-ca-certificates
+
+echo "Se ha borrado el certificado CA en el almacenamiento del sistema"
+
+exit 0
+

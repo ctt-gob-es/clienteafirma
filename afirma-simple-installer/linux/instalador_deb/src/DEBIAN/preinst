@@ -1,0 +1,15 @@
+#!/bin/sh
+# Cerramos los navegadores Firefox, Chrome y Chromium para definir correctamente las preferencias
+if pgrep chromium; then
+pkill chromium;
+fi
+if pgrep chrome; then
+pkill chrome;
+fi
+if pgrep firefox; then
+pkill firefox;
+fi
+
+# Creamos los directorios necesarios para no obtener errores durante la instalacion
+mkdir -p /root/.local/share/applications/
+mkdir -p /root/.config/
