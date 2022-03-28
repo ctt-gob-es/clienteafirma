@@ -242,12 +242,10 @@
 			<modules>
 				<!-- Aplicaciones -->
 				<module>afirma-ui-miniapplet</module>
-				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
 				
 				<!-- Servicios -->
-				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>
@@ -382,7 +380,6 @@
 				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
-				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>
@@ -472,12 +469,10 @@
 				
 				<!-- Aplicaciones -->
 				<module>afirma-ui-miniapplet</module>
-				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
 				
 				<!-- Servicios -->
-				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>
