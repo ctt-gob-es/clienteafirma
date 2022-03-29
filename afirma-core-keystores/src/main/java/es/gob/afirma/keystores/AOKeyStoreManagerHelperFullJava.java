@@ -60,7 +60,7 @@ final class AOKeyStoreManagerHelperFullJava {
 		return init(
 			AOKeyStore.CERES_430,
 			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
-			new es.gob.jmulticard.jse.provider.Ceres430Provider(),
+			new es.gob.jmulticard.jse.provider.ceres.Ceres430Provider(),
 			parentComponent
 		);
 	}

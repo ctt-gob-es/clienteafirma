@@ -94,6 +94,7 @@ public final class MainScreen extends JFrame {
     public void replaceShowingPanel(final JPanel panel ) {
     	if (this.scrollPane != null) {
     		this.scrollPane.setViewportView(panel);
+    		pack();
     	}
     }
 }

@@ -44,7 +44,7 @@ import es.gob.afirma.signers.batch.client.TriphaseDataParser;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
-import es.gob.afirma.standalone.ui.MainMenu;
+import es.gob.afirma.standalone.ui.AboutDialog;
 import es.gob.afirma.standalone.ui.OSXHandler;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
@@ -123,7 +123,7 @@ public final class ProtocolInvocationLauncher {
 
     @SuppressWarnings({ "unused", "static-method" })
 	void showAbout(final EventObject event) {
-    	MainMenu.showAbout(null);
+    	AboutDialog.showAbout(null);
     }
 
 	/**

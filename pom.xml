@@ -51,7 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.8-SNAPSHOT</clienteafirma.version>
-		<jmulticard.version>1.7</jmulticard.version>
+		<jmulticard.version>1.8-SNAPSHOT</jmulticard.version>
 		<afirma.lib.itex.version>1.4</afirma.lib.itex.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
@@ -242,12 +242,10 @@
 			<modules>
 				<!-- Aplicaciones -->
 				<module>afirma-ui-miniapplet</module>
-				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
 				
 				<!-- Servicios -->
-				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>
@@ -382,7 +380,6 @@
 				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
-				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>
@@ -472,12 +469,10 @@
 				
 				<!-- Aplicaciones -->
 				<module>afirma-ui-miniapplet</module>
-				<module>afirma-ui-simple-webstart</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
 				
 				<!-- Servicios -->
-				<module>afirma-server-simple-webstart</module>
 				<module>afirma-server-triphase-signer</module>
 				<module>afirma-signature-retriever</module>
 				<module>afirma-signature-storage</module>

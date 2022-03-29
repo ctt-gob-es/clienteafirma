@@ -31,8 +31,10 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.OutputData;
@@ -116,6 +118,14 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
         returnPanel.add(this.returnButton);
         this.returnButton.addActionListener(ae -> goToBack());
 
+        // Establecemos la configuracion de color cuando no se encuentra
+        // activado el alto contraste y estamos en Windows (en donde se
+        // utiliza un Look&Feel determinado)
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+            setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+            returnPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+        }
+
         // Agregamos un panel adicional en el que se mostraran los botones de los plugins
         this.mainPluginsButtonsPanel = buildMainPluginsButtonsPanel();
 
@@ -163,6 +173,14 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
     	mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), c);
     	c.gridy++;
     	mainPanel.add(this.pluginButtonsPanel, c);
+
+    	// Establecemos la configuracion de color cuando no se encuentra
+        // activado el alto contraste y estamos en Windows (en donde se
+        // utiliza un Look&Feel determinado)
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+    		mainPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+    		this.pluginButtonsPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
+    	}
 
     	return mainPanel;
 	}

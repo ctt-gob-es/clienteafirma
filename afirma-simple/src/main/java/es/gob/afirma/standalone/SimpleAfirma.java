@@ -278,8 +278,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
             }
+        	this.mainMenu.setEnabledOpenCommand(true);
             this.window.setJMenuBar(this.mainMenu);
-            this.mainMenu.setEnabledOpenCommand(true);
         }
 	}
 
@@ -311,10 +311,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		}
             loadMainApp();
     	}
-    	if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
+    	else if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
     		showHelp();
     	}
-    	if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
+    	else if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
                 new SimpleKeyStoreManagerWorker(this, null, true, this.ksManager != null).execute();
@@ -336,21 +336,22 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	configureMenuBar();
 
-        final JPanel newPanel = new SignPanel(this.window, this);
+    	final JPanel newPanel = new SignPanel(this.window, this);
 
-        if (this.container instanceof MainScreen) {
-        	((MainScreen) this.container).replaceShowingPanel(newPanel);
-		} else {
-        	this.container.add(newPanel, BorderLayout.CENTER);
-        }
-        if (this.currentPanel != null) {
-            this.currentPanel.setVisible(false);
-            this.currentPanel.setFocusable(false);
-            this.currentPanel.setEnabled(false);
-        }
-        this.container.repaint();
-        this.container.requestFocus();
-        this.currentPanel = newPanel;
+    	if (this.container instanceof MainScreen) {
+    		((MainScreen) this.container).replaceShowingPanel(newPanel);
+    	} else {
+    		this.container.add(newPanel, BorderLayout.CENTER);
+    	}
+    	if (this.currentPanel != null) {
+    		this.currentPanel.setVisible(false);
+    		this.currentPanel.setFocusable(false);
+    		this.currentPanel.setEnabled(false);
+    	}
+
+    	this.currentPanel = newPanel;
+    	this.container.requestFocus();
+    	this.container.repaint();
     }
 
     @Override
@@ -609,7 +610,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	// Uso en modo linea de comandos
     	if (isUsingCommnadLine(args) || isHeadlessMode()) {
     		CommandLineLauncher.main(args);
-    		forceCloseApplication(0);
+    		return;
     	}
 
     	// Se establece la configuracion del proxy
