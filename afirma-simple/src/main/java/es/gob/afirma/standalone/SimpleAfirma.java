@@ -610,7 +610,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	// Uso en modo linea de comandos
     	if (isUsingCommnadLine(args) || isHeadlessMode()) {
     		CommandLineLauncher.main(args);
-    		forceCloseApplication(0);
+    		return;
     	}
 
     	// Se establece la configuracion del proxy

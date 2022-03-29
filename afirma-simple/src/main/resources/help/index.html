@@ -19,7 +19,7 @@
 
     function loadScreen(page) {
         var folder = getLanguageFolder();
-        document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + page + '" width="107%" height="920px" style="align:right;"></object>';
+        document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + page + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
     }
   </script>
  </head>

@@ -174,6 +174,10 @@ final class CommandLineLauncher {
 
 			// Imprimimos el resultado de la operacion
 			printMessage(pw, response);
+
+			if (response != null) {
+				System.exit(0);
+			}
 		}
 	}
 
