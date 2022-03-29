@@ -1,2 +1,0 @@
-#!/bin/bash
-java -Djdk.tls.maxHandshakeMessageSize=50000 -jar /usr/lib64/autofirma/autofirma.jar $*
