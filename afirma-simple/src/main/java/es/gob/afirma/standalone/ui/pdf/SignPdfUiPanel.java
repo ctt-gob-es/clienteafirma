@@ -11,6 +11,7 @@ package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -29,6 +30,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -37,6 +39,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -56,6 +59,8 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.IncorrectPageException;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil;
+import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 
@@ -71,7 +76,7 @@ final class SignPdfUiPanel extends JPanel implements
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int PREFERRED_WIDTH = 470;
-	private static final int PREFERRED_HEIGHT = 750;
+	private static final int PREFERRED_HEIGHT = 720;
 	private static final int PAGEPANEL_PREFERRED_WIDTH = 466;
 	private static final int PAGEPANEL_PREFERRED_HEIGHT = 400;
 
@@ -311,8 +316,9 @@ final class SignPdfUiPanel extends JPanel implements
 				e -> { this.selectionPagesRange.setEnabled(false); }
 		);
 		this.selectPagesRadioBtn.addActionListener(
-				e -> { this.selectionPagesRange.setEnabled(true); }
+				e -> { this.selectionPagesRange.setEnabled(true);}
 		);
+
 		this.actualPageRadioBtn.setSelected(true);
 		this.selectionPagesRange.setEnabled(false);
 		selectionPagesBtnGroup.add(this.actualPageRadioBtn);
@@ -324,6 +330,8 @@ final class SignPdfUiPanel extends JPanel implements
 		pagesSelectionPanel.add(this.allPagesRadioBtn, selectionPagesGbc);
 		selectionPagesGbc.gridy++;
 		pagesSelectionPanel.add(this.selectPagesRadioBtn, selectionPagesGbc);
+		selectionPagesGbc.gridx++;
+		pagesSelectionPanel.add(createHelpButton(), selectionPagesGbc);
 		selectionPagesGbc.gridx++;
 		selectionPagesGbc.weightx = 1;
 		selectionPagesGbc.insets = new Insets(0, 5, 0, 0);
@@ -548,6 +556,67 @@ final class SignPdfUiPanel extends JPanel implements
 		}
 
 		return panel;
+	}
+
+	/**
+	 * Crea el bot&oacute;n para abrir la ayuda de firmas visibles.
+	 * @return Bot&oacute;n funcional para abrir la ayuda.
+	 */
+	private static JButton createHelpButton() {
+
+		final URL helpImgResource;
+
+		if (LookAndFeelManager.HIGH_CONTRAST) {
+			helpImgResource = SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"); //$NON-NLS-1$;
+		} else {
+			helpImgResource = SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"); //$NON-NLS-1$;
+		}
+
+		final JButton helpBtn = new JButton(
+				new ImageIcon(
+						helpImgResource,
+						SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+				)
+		);
+		helpBtn.setBorder(BorderFactory.createEmptyBorder());
+		helpBtn.setRolloverEnabled(false);
+		helpBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		helpBtn.getAccessibleContext().setAccessibleDescription(
+				SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+		);
+		helpBtn.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						SimpleAfirma.showHelp("pgs/VentanaPdfVisible.html"); //$NON-NLS-1$
+					}
+				}
+		);
+
+		helpBtn.addFocusListener(
+				new FocusListener() {
+					  @Override
+					  public void focusGained(final FocusEvent e) {
+						  if (LookAndFeelManager.HIGH_CONTRAST) {
+							  helpBtn.setIcon(new ImageIcon(
+									  SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+									  SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+							));
+						 }
+					  }
+					  @Override
+					  public void focusLost(final FocusEvent e) {
+						  if (LookAndFeelManager.HIGH_CONTRAST) {
+							 helpBtn.setIcon(new ImageIcon(
+									 SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"), //$NON-NLS-1$
+									 SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+							));
+						 }
+					  }
+				}
+		);
+
+		return helpBtn;
 	}
 
 	BufferedImage getFragmentImage(final Properties p) {

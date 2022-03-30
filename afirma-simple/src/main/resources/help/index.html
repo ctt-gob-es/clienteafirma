@@ -7,6 +7,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <script>
       var lg = "ES_es";
+	  
       function getLanguageFolder() {
         // Segun el valor de lg se selecciona el directorio de idioma
         return "Spanish.lproj/";
@@ -20,7 +21,7 @@
     function loadScreen(page) {
         var folder = getLanguageFolder();
         document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + page + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
-    }
+	}
   </script>
  </head>
  <style>
@@ -85,8 +86,11 @@
  </div>
  <div id='dynamicContent' class='content'>
  </div>
-<script>
-	loadScreen("AutoFirma.html");
+<script>	
+	var urlToString = window.location.search;
+	var urlParams = new URLSearchParams(urlToString);
+	var redirectPage = urlParams.get('redirectPage');
+	loadScreen(redirectPage);
 </script>
 </body>
 </html>

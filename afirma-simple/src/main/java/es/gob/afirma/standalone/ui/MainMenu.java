@@ -286,7 +286,7 @@ public final class MainMenu extends JMenuBar {
               SimpleAfirmaMessages.getString("MainMenu.13") //$NON-NLS-1$
         );
         ayudaMenuItem.addActionListener(
-    		e -> SimpleAfirma.showHelp()
+    		e -> SimpleAfirma.showHelp("AutoFirma.html") //$NON-NLS-1$
 		);
         menuAyuda.add(ayudaMenuItem);
 

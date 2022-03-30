@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -160,4 +161,21 @@ public final class HelpResourceManager {
 
 		return updated;
 	}
+
+	/**
+	 * Forma la URL correcta para la carga del fichero de ayuda con su correspondiente p&aacute;gina a redirigir.
+	 * @param targetUrl URL a abrir.
+	 * @return Devuelve la URL a ejecutar para completar la carga correcta de la p&aacute;gina de ayuda.
+	 * @throws Exception Error durante la formaci&aacute;n de la URL.
+	 */
+    public static String createHelpFileLauncher(final String targetUrl) throws Exception {
+        final String launcherFile = System.getProperty("java.io.tmpdir") + "local_launcher.html";  //$NON-NLS-1$//$NON-NLS-2$
+        final File launcherTempFile = new File(launcherFile);
+        try(PrintWriter writer = new PrintWriter(launcherTempFile, "UTF-8")) { //$NON-NLS-1$
+            writer.println("<meta http-equiv=\"refresh\" content=\"0; url=" + targetUrl + "\" />");  //$NON-NLS-1$//$NON-NLS-2$
+        } catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "Error abriendo archivo a escribir", e); //$NON-NLS-1$
+        }
+        return "file:///" + launcherFile.replace("\\", "/");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+    }
 }

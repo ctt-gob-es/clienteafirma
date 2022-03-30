@@ -25,11 +25,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
@@ -312,7 +315,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             loadMainApp();
     	}
     	else if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
-    		showHelp();
+    		showHelp("AutoFirma.html"); //$NON-NLS-1$
     	}
     	else if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -544,8 +547,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-	/** Muestra la ayuda de la aplicaci&oacute;n. */
-	public static void showHelp() {
+	/**
+	 * Muestra la ayuda de la aplicaci&oacute;n.
+	 * @param redirectPage P&oacute;gina donde redirigir la ayuda
+	 */
+	public static void showHelp(final String redirectPage) {
 
 		final File helpDir = new File(APPLICATION_HOME + File.separator + "help"); //$NON-NLS-1$
 
@@ -560,11 +566,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 
 		// Cargamos el fichero
-		try {
-			final File indexHelpFile = new File(helpDir + File.separator + "index.html"); //$NON-NLS-1$
-			Desktop.getDesktop().open(indexHelpFile);
-		} catch (final IOException e) {
-			LOGGER.log(Level.WARNING, "No se ha podido abrir la ayuda de la aplicacion", e); //$NON-NLS-1$
+		final String indexHelpFile = helpDir + File.separator + "index.html"; //$NON-NLS-1$
+
+		try (final InputStream is = new FileInputStream(indexHelpFile)) {
+			Desktop.getDesktop().browse(new URI(HelpResourceManager.createHelpFileLauncher(indexHelpFile + "?redirectPage=" + redirectPage))); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido leer el archivo de ayuda correctamente", e); //$NON-NLS-1$
 		}
 	}
 
