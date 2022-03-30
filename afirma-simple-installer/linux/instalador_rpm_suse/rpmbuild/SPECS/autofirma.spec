@@ -39,7 +39,6 @@ Type=Application
 Terminal=false
 Categories=Office;Utilities;Signature;Java
 Exec=java -Djdk.tls.maxHandshakeMessageSize=50000 -jar %{_libdir}/%{name}/%{name}.jar \$* %u
-TryExec=%{_libdir}/%{name}/%{name}.jar
 Name=AutoFirma
 Icon=%{_libdir}/%{name}/%{name}.png
 GenericName=Herramienta de firma
