@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,13 +40,41 @@ public final class AutoFirmaUtil {
 	private static final String REG_VALUE_OPT = "/v"; //$NON-NLS-1$
 
 	private static final Image ICON = Toolkit.getDefaultToolkit().getImage(
-		AutoFirmaUtil.class.getResource("/resources/afirma_ico.png") //$NON-NLS-1$
+		AutoFirmaUtil.class.getResource("/resources/logo_cliente_24.png") //$NON-NLS-1$
 	);
+
+	private static List<Image> ICONS = null;
+
+
 
 	/** Obtiene el icono por defecto para los di&aacute;logos gr&aacute;ficos.
 	 * @return Icono por defecto para los di&aacute;logos gr&aacute;ficos. */
 	public static Image getDefaultDialogsIcon() {
 		return ICON;
+	}
+
+	/** Obtiene el icono por defecto para los di&aacute;logos gr&aacute;ficos.
+	 * @return Icono por defecto para los di&aacute;logos gr&aacute;ficos. */
+	public static List<Image> getIconImages() {
+
+		if (ICONS == null) {
+			ICONS = new ArrayList<>();
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_16.png"))); //$NON-NLS-1$
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_24.png"))); //$NON-NLS-1$
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_32.png"))); //$NON-NLS-1$
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_48.png"))); //$NON-NLS-1$
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_128.png"))); //$NON-NLS-1$
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_256.png"))); //$NON-NLS-1$
+			ICONS.add(Toolkit.getDefaultToolkit().getImage(
+					AutoFirmaUtil.class.getResource("/resources/logo_cliente_512.png"))); //$NON-NLS-1$
+		}
+		return ICONS;
 	}
 
 	/** Indica si AutoFirma est&aacute; instalado para ejecutarse al inicio de Windows o no.

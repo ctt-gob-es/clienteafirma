@@ -71,11 +71,11 @@ public final class LookAndFeelManager {
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
         }
-        // En Linux usamos siempre la misma configuracion que al detectar la combinacion de colores
-        // de alto contraste
-        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
-            HIGH_CONTRAST = true;
-        }
+//        // En Linux usamos siempre la misma configuracion que al detectar la combinacion de colores
+//        // de alto contraste
+//        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+//            HIGH_CONTRAST = true;
+//        }
         else {
             HIGH_CONTRAST = false;
         }

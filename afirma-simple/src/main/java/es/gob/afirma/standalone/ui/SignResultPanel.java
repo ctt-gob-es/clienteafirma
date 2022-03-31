@@ -68,9 +68,11 @@ final class SignResultPanel extends JPanel {
         final String resultOperationIconTooltip;
         switch (validity.getValidity()) {
             case GENERATED:
-                this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.2")); //$NON-NLS-1$
-                this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.3")); //$NON-NLS-1$
 
+
+
+                this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.2")); //$NON-NLS-1$
+                this.descTextLabel.setText("<html><p>" + SimpleAfirmaMessages.getString("SignResultPanel.3") + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
 
             	// Este gestor se encargara de controlar los eventos de foco y raton
@@ -94,17 +96,21 @@ final class SignResultPanel extends JPanel {
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
             case OK:
+
+                String okMessage;
             	if (singleSign) {
+            		okMessage = SimpleAfirmaMessages.getString("SignResultPanel.9"); //$NON-NLS-1$
             		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.8")); //$NON-NLS-1$
-            		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.9")); //$NON-NLS-1$
+            		this.descTextLabel.setText("<html><p>" + okMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
             		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.10"); //$NON-NLS-1$
                     this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.8") //$NON-NLS-1$
-   						 						+ SimpleAfirmaMessages.getString("SignResultPanel.9") //$NON-NLS-1$
+   						 						+ okMessage
    						 						+ SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
             	}
             	else {
+            		okMessage = SimpleAfirmaMessages.getString("SignResultPanel.28"); //$NON-NLS-1$
             		this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.27")); //$NON-NLS-1$
-            		this.descTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.28")); //$NON-NLS-1$
+            		this.descTextLabel.setText("<html><p>" + okMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
             		resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.29"); //$NON-NLS-1$
 
                     this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.27") //$NON-NLS-1$
@@ -235,9 +241,8 @@ final class SignResultPanel extends JPanel {
         c.insets = new Insets(0, 6, 0, 11);
         this.add(this.descTextLabel, c);
         c.weighty = 0.0;
-        c.weightx = 1.0;
         c.gridy = 2;
-        c.insets = new Insets(0, 6, 0, 430);
+        c.insets = new Insets(0, 6, 0, 11);
         this.add(this.linkLabel, c);
 
     }

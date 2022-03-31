@@ -11,10 +11,10 @@ package es.gob.afirma.standalone.ui.preferences;
 
 import java.awt.Frame;
 
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Di&aacute;logo de preferencias de Autofirma. */
@@ -29,7 +29,7 @@ public final class PreferencesDialog extends JDialog{
 	public PreferencesDialog(final Frame parent, final boolean modal, final int selectedPreferencesTabIndex) {
 		super(parent, modal);
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.24")); //$NON-NLS-1$
-		setIconImage(new ImageIcon(this.getClass().getResource("/resources/afirma_ico.png")).getImage()); //$NON-NLS-1$
+		setIconImages(AutoFirmaUtil.getIconImages());
 		add(new PreferencesPanel(this, selectedPreferencesTabIndex));
 		setResizable(false);
 		pack();

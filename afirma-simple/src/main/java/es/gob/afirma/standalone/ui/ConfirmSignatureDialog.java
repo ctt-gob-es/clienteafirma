@@ -36,7 +36,7 @@ public class ConfirmSignatureDialog {
 		this.dialog = this.optionPane.createDialog(
 				getParentComponent(parent),
 				SimpleAfirmaMessages.getString("ConfirmSignatureDialog.0")); //$NON-NLS-1$
-		this.dialog.setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
+		this.dialog.setIconImages(AutoFirmaUtil.getIconImages());
 
 		this.optionPane.addPropertyChangeListener(
 			    e -> {

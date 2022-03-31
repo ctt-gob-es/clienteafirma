@@ -37,6 +37,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -108,7 +109,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     }
 
     private void createUI(final File signFile, final byte[] sign, final boolean addReloadButton) {
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
         setLayout(new GridBagLayout());
@@ -193,7 +194,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
         bottonPanel.add(closeVisor);
 
         // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             bottonPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
@@ -336,7 +337,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     	c.gridy++;
     	mainPanel.add(this.pluginButtonsPanel, c);
 
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
     		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}

@@ -9,7 +9,7 @@
 
 package es.gob.afirma.standalone;
 
-/** Excepcion que encapsula cualquier excepcion que se lance durante la operativa del SimpleAfirma en modo consola.
+/** Excepcion que encapsula cualquier excepcion que se lance durante la operativa en modo consola.
  * @author Carlos Gamuci */
 public final class CommandLineException extends Exception {
 

@@ -59,7 +59,7 @@ public class SignatureAttributesDialog {
 		final JDialog dialog = optionPane.createDialog(
 				getParentComponent(parent),
 				SimpleAfirmaMessages.getString("SignatureAttributesDialog.0")); //$NON-NLS-1$
-		dialog.setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
+		dialog.setIconImages(AutoFirmaUtil.getIconImages());
 
 		return dialog;
 	}

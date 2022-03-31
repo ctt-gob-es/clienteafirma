@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 public class DocumentInfoPanel extends JPanel {
@@ -30,7 +31,9 @@ public class DocumentInfoPanel extends JPanel {
 
 	private void createUI(final SignOperationConfig signConfig, final Color bgColor) {
 
-		setBackground(bgColor);
+		if (!LookAndFeelManager.HIGH_CONTRAST) {
+			setBackground(bgColor);
+		}
 
 		// Tipo de documento
 		final JLabel descLabel = new JLabel(

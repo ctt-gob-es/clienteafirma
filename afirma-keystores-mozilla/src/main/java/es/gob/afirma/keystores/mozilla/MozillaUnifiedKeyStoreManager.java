@@ -217,7 +217,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	protected Map<String, String> getExternalStores() {
 		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(
 			// Si no es Linux o NO nos han indicado que incluyamos controlador nativo DNIe, lo excluimos
-			!Platform.OS.LINUX.equals(Platform.OS.LINUX) ||
+			!Platform.OS.LINUX.equals(Platform.getOS()) ||
 				Boolean.getBoolean(KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER) ||
 					Boolean.parseBoolean(System.getenv(KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER_ENV)),
 			true  // Incluir los PKCS#11 que esten instalados en el sistema pero no en Mozilla

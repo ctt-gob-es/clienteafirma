@@ -69,9 +69,7 @@ public final class MainScreen extends JFrame {
         add(this.scrollPane, BorderLayout.CENTER);
 
         try {
-            setIconImage(
-        		AutoFirmaUtil.getDefaultDialogsIcon()
-            );
+            setIconImages(AutoFirmaUtil.getIconImages());
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$

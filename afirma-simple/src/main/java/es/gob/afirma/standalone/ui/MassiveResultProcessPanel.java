@@ -37,7 +37,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
@@ -77,10 +76,9 @@ final class MassiveResultProcessPanel extends JPanel {
     		final X509Certificate cert) {
 
         // Texto con la ruta del directorio de salida
-        final JTextField outDirPath = new JTextField();
+        final JLabel outDirPath = new JLabel();
         outDirPath.setBorder(BorderFactory.createEmptyBorder());
 
-        outDirPath.setEditable(false);
         outDirPath.setFocusable(false);
         outDirPath.setText(outDir.getAbsolutePath());
         outDirPath.addMouseListener(new MouseAdapter() {
@@ -97,8 +95,10 @@ final class MassiveResultProcessPanel extends JPanel {
         this.dirPathText.setText(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.3")); //$NON-NLS-1$
         this.dirPathText.setLabelFor(outDirPath);
 
+        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+
         final JPanel dirPathPanel = new JPanel();
-        dirPathPanel.setBorder(BorderFactory.createLineBorder(LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY));
+        dirPathPanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
         dirPathPanel.setLayout(new BoxLayout(dirPathPanel, BoxLayout.X_AXIS));
         dirPathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         dirPathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -137,6 +137,7 @@ final class MassiveResultProcessPanel extends JPanel {
 
         dirPathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         dirPathPanel.add(outDirPath);
+        dirPathPanel.add(Box.createHorizontalGlue());
         dirPathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         dirPathPanel.add(openDirButton);
         dirPathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -178,7 +179,7 @@ final class MassiveResultProcessPanel extends JPanel {
 
             // Se agrega un borde y un padding al panel con la informacion del certificado
             certDescPanel.setBorder(BorderFactory.createCompoundBorder
-            		(BorderFactory.createLineBorder(Color.GRAY),
+            		(BorderFactory.createLineBorder(lineBorderColor),
             		BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             certDescPanel.setLayout(new GridBagLayout());
 
@@ -225,7 +226,7 @@ final class MassiveResultProcessPanel extends JPanel {
 		resultTitlePanel.setFileNameColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.9")); //$NON-NLS-1$
 		resultTitlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.10")); //$NON-NLS-1$
 		resultTitlePanel.setResultColumnTitle(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.11")); //$NON-NLS-1$
-		resultTitlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY));
+		resultTitlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, lineBorderColor));
 
         final JScrollPane resultListPanel = new JScrollPane(
     		getSignResultList(signConfigList, this)
@@ -261,7 +262,7 @@ final class MassiveResultProcessPanel extends JPanel {
 
         // Creamos un panel que contenga el titulo del listado y el propio listado
         final JPanel resultPanel = new JPanel(new GridBagLayout());
-        resultPanel.setBorder(BorderFactory.createLineBorder(LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY));
+        resultPanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
 
         final GridBagConstraints resultConstraints = new GridBagConstraints();
         resultConstraints.fill = GridBagConstraints.BOTH;
@@ -465,7 +466,9 @@ final class MassiveResultProcessPanel extends JPanel {
 
 			this.formatter = NumberFormat.getNumberInstance();
 
-			this.focusedBorder = BorderFactory.createDashedBorder(LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY);
+			final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+
+			this.focusedBorder = BorderFactory.createDashedBorder(lineBorderColor);
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
 			// Configuramos los colores

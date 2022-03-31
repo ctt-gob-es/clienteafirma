@@ -69,7 +69,7 @@ public class PermissionsDialog extends JDialog implements KeyListener {
 
 	@SuppressWarnings("serial")
 	void createUI() {
-		setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
+		setIconImages(AutoFirmaUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PermissionsDialog.1") //$NON-NLS-1$
 		);

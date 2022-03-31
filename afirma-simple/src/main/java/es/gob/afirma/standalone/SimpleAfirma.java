@@ -573,7 +573,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se ha podido leer el archivo de ayuda correctamente", e); //$NON-NLS-1$
-		}
+	}
 	}
 
 	/**
@@ -772,7 +772,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						final java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass()
 								.getDeclaredField("awtAppClassName"); //$NON-NLS-1$
 						awtAppClassNameField.setAccessible(true);
-						awtAppClassNameField.set(xToolkit, "simpleafirma"); //$NON-NLS-1$
+						awtAppClassNameField.set(xToolkit, "AutoFirma"); //$NON-NLS-1$
 					} catch (final Exception e) {
 						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
 					}

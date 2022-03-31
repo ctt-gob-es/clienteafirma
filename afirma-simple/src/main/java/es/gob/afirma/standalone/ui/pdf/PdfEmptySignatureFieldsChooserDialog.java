@@ -128,9 +128,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
 
-        setIconImage(
-			AutoFirmaUtil.getDefaultDialogsIcon()
-		);
+        setIconImages(AutoFirmaUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(
 			SignPdfUiMessages.getString("SignPdfFieldChooser.1") //$NON-NLS-1$
 		);

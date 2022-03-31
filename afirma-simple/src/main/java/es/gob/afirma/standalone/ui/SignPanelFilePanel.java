@@ -58,11 +58,11 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         setAlignmentY(Component.TOP_ALIGNMENT);
 
         // Configuramos los colores
-        Color bgColor = Color.WHITE;
-        if (LookAndFeelManager.HIGH_CONTRAST) {
-        	bgColor = Color.BLACK;
+        Color bgColor = null;
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	bgColor = Color.WHITE;
+        	setBackground(bgColor);
         }
-        setBackground(bgColor);
         setFocusable(true);
 
         // Panel con el detalle del documento
@@ -107,7 +107,9 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         getAccessibleContext().setAccessibleDescription(this.accesibleDescription);
 
         final JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(bgColor);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	buttonPanel.setBackground(bgColor);
+        }
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
         if (openFileButton != null) {
@@ -145,7 +147,9 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
     	c.anchor = GridBagConstraints.SOUTH;
     	c.weighty = 1.0;
     	final JPanel emptyPanel = new JPanel();
-    	emptyPanel.setBackground(bgColor);
+    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    		emptyPanel.setBackground(bgColor);
+    	}
     	add(emptyPanel, c);
     }
 
@@ -188,7 +192,9 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 
         // Componemos el panel
 		final JPanel detailPanel = new JPanel(new GridBagLayout());
-		detailPanel.setBackground(bgColor);
+		if (!LookAndFeelManager.HIGH_CONTRAST) {
+			detailPanel.setBackground(bgColor);
+		}
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;

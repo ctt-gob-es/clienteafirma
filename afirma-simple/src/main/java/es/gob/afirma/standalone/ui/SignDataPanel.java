@@ -40,7 +40,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -92,13 +91,17 @@ final class SignDataPanel extends JPanel {
 
     void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
 
+    	// Color de fondo
+    	if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+    	}
+
         // Texto con la ruta del fichero
-        final JTextField filePath = new JTextField();
+        final JLabel filePath = new JLabel();
         filePath.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.0")); //$NON-NLS-1$
         filePath.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.1")); //$NON-NLS-1$
         filePath.setBorder(BorderFactory.createEmptyBorder());
 
-        filePath.setEditable(false);
         filePath.setFocusable(false);
         filePath.setText(signFile == null ? SimpleAfirmaMessages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
         filePath.addMouseListener(new MouseAdapter() {
@@ -115,9 +118,11 @@ final class SignDataPanel extends JPanel {
         this.filePathText.setText(SimpleAfirmaMessages.getString("SignDataPanel.2")); //$NON-NLS-1$
         this.filePathText.setLabelFor(filePath);
 
+        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+
         final JPanel filePathPanel = new JPanel();
         filePathPanel.setFocusable(true);
-        filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        filePathPanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
         filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
         filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -192,6 +197,7 @@ final class SignDataPanel extends JPanel {
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(filePath);
         filePathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.2") + filePath.getText()); //$NON-NLS-1$
+        filePathPanel.add(Box.createHorizontalGlue());
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         if (openFileButton != null) {
             filePathPanel.add(openFileButton);
@@ -228,7 +234,7 @@ final class SignDataPanel extends JPanel {
             certDescPanel.setFocusable(true);
             // Se agrega un borde y un padding al panel con la informacion del certificado
             certDescPanel.setBorder(BorderFactory.createCompoundBorder
-            		(BorderFactory.createLineBorder(Color.GRAY),
+            		(BorderFactory.createLineBorder(lineBorderColor),
             		BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             certDescPanel.setLayout(new GridBagLayout());
             final GridBagConstraints c = new GridBagConstraints();
@@ -301,6 +307,7 @@ final class SignDataPanel extends JPanel {
         }
 
         final JScrollPane detailPanel = new JScrollPane(signTree);
+        detailPanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
         detailPanel.setFocusable(true);
 
         // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
@@ -319,7 +326,6 @@ final class SignDataPanel extends JPanel {
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.DEFAULT_COLOR);
             filePathPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 

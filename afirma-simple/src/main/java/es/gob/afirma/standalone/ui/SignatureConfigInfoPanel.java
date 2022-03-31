@@ -51,7 +51,9 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	private void createUI(final SignOperationConfig signConfig, final Color bgColor) {
 
-		setBackground(bgColor);
+		if (!LookAndFeelManager.HIGH_CONTRAST) {
+			setBackground(bgColor);
+		}
 
 		// Formato de firma
 		final JLabel signFormatLabel = new JLabel(
@@ -73,14 +75,18 @@ public class SignatureConfigInfoPanel extends JPanel {
 		add(Box.createRigidArea(new Dimension(0, 4)));
 		add(signFormatLabel);
         if (attrPanel != null) {
-        	attrPanel.setBackground(bgColor);
+        	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        		attrPanel.setBackground(bgColor);
+        	}
         	add(Box.createRigidArea(new Dimension(0, 4)));
         	add(attrLabel);
         	add(Box.createRigidArea(new Dimension(0, 4)));
         	add(attrPanel);
         }
         if (optionsPanel != null) {
-        	optionsPanel.setBackground(bgColor);
+        	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        		optionsPanel.setBackground(bgColor);
+        	}
         	add(Box.createRigidArea(new Dimension(0, 4)));
         	add(optionsPanel);
         }
@@ -188,7 +194,9 @@ public class SignatureConfigInfoPanel extends JPanel {
         		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE)
         	);
             this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.44"); //$NON-NLS-1$
-            this.pdfVisible.setBackground(bgColor);
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            	this.pdfVisible.setBackground(bgColor);
+            }
             this.pdfVisible.setMnemonic('H');
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
             panel.add(this.pdfVisible);
@@ -199,7 +207,9 @@ public class SignatureConfigInfoPanel extends JPanel {
             		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_STAMP)
             	);
             this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.120"); //$NON-NLS-1$
-            this.pdfStamp.setBackground(bgColor);
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            	this.pdfStamp.setBackground(bgColor);
+            }
             this.pdfStamp.setMnemonic('S');
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
             panel.add(this.pdfStamp);

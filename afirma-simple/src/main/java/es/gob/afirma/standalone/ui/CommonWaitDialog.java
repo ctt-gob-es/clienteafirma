@@ -88,9 +88,7 @@ public final class CommonWaitDialog extends JDialog {
 		setResizable(false);
 		setTitle(title);
         try {
-            setIconImage(
-        		AutoFirmaUtil.getDefaultDialogsIcon()
-            );
+            setIconImages(AutoFirmaUtil.getIconImages());
         }
         catch (final Exception e) {
             LOGGER.warning(

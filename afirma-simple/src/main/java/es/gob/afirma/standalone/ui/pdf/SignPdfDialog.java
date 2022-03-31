@@ -91,7 +91,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 	private void createUI() {
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
-		setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
+		setIconImages(AutoFirmaUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfDialog.2") //$NON-NLS-1$
 		);
 		setModalityType(ModalityType.TOOLKIT_MODAL);

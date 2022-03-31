@@ -85,7 +85,7 @@ public class DataFileInfoDialog {
 		// Mostramos el dialogo
 		final JDialog dialog = this.optionPane.createDialog(this.parent, SimpleAfirmaMessages.getString("DataFileInfoDialog.3")); //$NON-NLS-1$
 		dialog.getAccessibleContext().setAccessibleDescription(accessibleDescription);
-		dialog.setIconImage(AutoFirmaUtil.getDefaultDialogsIcon());
+		dialog.setIconImages(AutoFirmaUtil.getIconImages());
 		dialog.setVisible(true);
 
 		return (Options) this.optionPane.getValue();

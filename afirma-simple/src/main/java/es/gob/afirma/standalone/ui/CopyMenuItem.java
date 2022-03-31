@@ -14,11 +14,11 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
 final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
@@ -32,17 +32,14 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	private void createUI(final String text) {
 		final JMenuItem copyItem = new JMenuItem(text);
-		copyItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (CopyMenuItem.this.getTextComponent() != null) {
-					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
-						new StringSelection(
-							CopyMenuItem.this.getTextComponent().getText()
-						),
-						CopyMenuItem.this
-					);
-				}
+		copyItem.addActionListener(ae -> {
+			if (CopyMenuItem.this.getTextComponent() != null) {
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
+					new StringSelection(
+						CopyMenuItem.this.getTextComponent().getText()
+					),
+					CopyMenuItem.this
+				);
 			}
 		});
 		add(copyItem);
@@ -50,6 +47,11 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	CopyMenuItem(final JTextComponent tc, final String text) {
 		this.textComponent = tc;
+        createUI(text);
+	}
+
+	CopyMenuItem(final JLabel label, final String text) {
+		this.textComponent = new JTextField(label.getText());
         createUI(text);
 	}
 

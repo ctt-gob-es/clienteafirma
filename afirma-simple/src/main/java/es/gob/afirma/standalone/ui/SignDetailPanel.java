@@ -38,6 +38,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -158,7 +159,7 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
         this.returnButton.addActionListener(ae -> goToBack());
 
         // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             setBackground(LookAndFeelManager.DEFAULT_COLOR);
             buttonPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
@@ -212,7 +213,7 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
     	c.gridy++;
     	mainPanel.add(this.pluginButtonsPanel, c);
 
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
     		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}

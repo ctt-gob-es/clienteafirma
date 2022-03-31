@@ -813,7 +813,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        final JLabel introText = new JLabel(intro);
 	        introText.setLabelFor(getSelectButton());
 	        introText.setFocusable(false);
-	        this.getAccessibleContext().setAccessibleDescription(intro);
+	        getAccessibleContext().setAccessibleDescription(intro);
 
 	        final JPanel introPanel = new JPanel(new BorderLayout());
 	        introPanel.add(introText, BorderLayout.PAGE_START);
@@ -878,6 +878,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.filePanel = new JScrollPane();
 	        this.filePanel.setBackground(bgColor);
 	        this.filePanel.getViewport().setBackground(bgColor);
+
+	        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+	        this.filePanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
 
 	        this.filePanel.getHorizontalScrollBar().setUnitIncrement(30);
 	        this.filePanel.getVerticalScrollBar().setUnitIncrement(30);
