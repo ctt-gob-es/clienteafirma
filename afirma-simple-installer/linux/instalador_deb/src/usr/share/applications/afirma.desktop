@@ -1,15 +1,13 @@
 [Desktop Entry]
 Encoding=UTF-8
-Version=1.8.0
 Name=AutoFirma
-Type=Application
-Terminal=false
-Categories=Office;Utilities;Signature;Java
+Comment=Cliente @firma
 Exec=/usr/bin/AutoFirma %u
 Icon=/usr/lib/AutoFirma/AutoFirma.png
-GenericName=Herramienta de firma
-Comment=Herramienta de firma
 MimeType=x-scheme-handler/afirma;
+Terminal=false
+Type=Application
+Categories=GNOME;Application;Office
 StartupNotify=true
 StartupWMClass=autofirma
 Name[es_ES]=AutoFirma
