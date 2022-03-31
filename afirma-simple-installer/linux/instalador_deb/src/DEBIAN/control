@@ -5,7 +5,7 @@ Priority: optional
 Depends: libnss3-tools
 Recomends: openjdk-11-jre 
 Description: AutoFirma - Cliente @firma
-Version: 1.7.1
+Version: 1.8.0
 License: GPL-2+ | EUPL-1.1
 Maintainer: Gobierno de Espana <soporte.afirma@correo.gob.es>
 Installed-Size: 56115
