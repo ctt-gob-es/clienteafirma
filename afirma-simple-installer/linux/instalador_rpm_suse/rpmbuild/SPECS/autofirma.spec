@@ -38,7 +38,7 @@ Version=1.8.0
 Type=Application
 Terminal=false
 Categories=Office;Utilities;Signature;Java
-Exec=java -Djdk.tls.maxHandshakeMessageSize=50000 -jar %{_libdir}/%{name}/%{name}.jar \$* %u
+Exec=java -Djdk.tls.maxHandshakeMessageSize=50000 -jar %{_libdir}/%{name}/%{name}.jar %u
 Name=AutoFirma
 Icon=%{_libdir}/%{name}/%{name}.png
 GenericName=Herramienta de firma
@@ -76,9 +76,6 @@ else
 x-scheme-handler/afirma=%{name}.desktop
 EOF
 fi
-if [ -e /usr/share/applications/gnome-mimeapps.list ]; then
-  echo x-scheme-handler/afirma=%{name}.desktop >> /usr/share/applications/gnome-mimeapps.list
-fi
 if [ -e /usr/local/share/applications/mimeapps.list ]; then
   echo x-scheme-handler/afirma=%{name}.desktop >> /usr/local/share/applications/mimeapps.list
 else
@@ -86,6 +83,9 @@ else
 [Default Applications]
 x-scheme-handler/afirma=%{name}.desktop
 EOF
+fi
+if [ -e /usr/share/applications/gnome-mimeapps.list ]; then
+  echo x-scheme-handler/afirma=%{name}.desktop >> /usr/share/applications/gnome-mimeapps.list
 fi
 if [ -e /usr/local/share/applications/gnome-mimeapps.list ]; then
   echo x-scheme-handler/afirma=%{name}.desktop >> /usr/local/share/applications/gnome-mimeapps.list
