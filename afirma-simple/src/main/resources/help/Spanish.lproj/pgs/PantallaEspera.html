@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
  <head>
   <title>AutoFirma</title>
@@ -8,20 +8,22 @@
  </head>
  <body>
   <h3>Pantalla de espera a inserci&oacute;n de DNIe</h3>
+  <p>
+   Esta pantalla s&oacute;lo aparecer&aacute; si se ha detectado un lector de tarjetas inteligentes
+   instalado y configurado en el sistema. Aqu&iacute; el programa queda a la espera de que el usuario
+   inserte su DNI electr&oacute;nico en el lector o a que indique que no desea utilizar el DNIe.
+  </p>
   <p align="center">
    <img src="../gfx/pantallaespera_mini.png" alt="Pantalla de espera para la inserci&oacute;n de DNIe">
   </p>
   <p>
-   En esta pantalla el programa queda a la espera de que inserte su DNI electr&oacute;nico en uno de los lectores
-   de tarjetas inteligentes instalados y configurados en el sistema. Esta pantalla s&oacute;lo aparecer&aacute; si se
-   ha detectado alg&uacute;n lector de tarjetas inteligentes instalado y configurado en el sistema. Los controladores
-   del DNIe no son necesarios. Una vez lo inserte, pulse el bot&oacute;n "Continuar con DNIe" para avanzar a la  
-   <a href="PantallaFirma.html">siguiente pantalla</a> y cargar sus certificados de firma.
+   El usuario puede insertar su DNIe en el lector y pulsar el bot&oacute;n "Continuar con DNIe" para avanzar
+   firmar con su certificado de firma del DNIe (no es necesario tener instalados los controladores del DNIe)
+   o pulsar el bot&oacute;n "Usar cualquier certificado" o la tecla <code>Escape</code> si desea utilizar
+   cualquier certificado importado en su sistema operativo.  
   </p>
   <p>
-   Si no dispone usted del DNI electr&oacute;nico o no desea utilizarlo, pulse el bot&oacute;n "Usar cualquier certificado" o
-   la tecla <code>Escape</code>. Si no utiliza DNI electr&oacute;nico se le permitir&aacute; seleccionar cualquier 
-   certificado importado en su sistema operativo. 
+   Una vez seleccionada una opción, se le mostrará la <a href="PantallaFirma.html">pantalla de firma</a>. 
   </p>  
  </body>
 </html>

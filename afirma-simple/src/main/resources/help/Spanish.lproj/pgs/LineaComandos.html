@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
  <head>
   <title>Uso por l&iacute;nea de comandos</title>
@@ -17,7 +17,7 @@
 	  </ul>
 	<li>Linux</li>
 	  <ul>
-	    <li>El proceso de instalaci&oacute;n genera en el directorio "/usr/bin" el script "AutoFirma". Utilice este script para ejecutar la aplicaci&oacute;n proporcion&aacute;ndole directamente los par&aacute;metros de la operaci&oacute;n que desee.</li>
+	    <li>El proceso de instalaci&oacute;n genera en el directorio "/usr/bin" el script "autofirma". Utilice este script para ejecutar la aplicaci&oacute;n proporcion&aacute;ndole directamente los par&aacute;metros de la operaci&oacute;n que desee.</li>
 	  </ul>
 	<li>macOS</li>
 	  <ul>
@@ -467,20 +467,19 @@ Opciones:
   <ul>
   	<li>Nombre del campo de firma preexistente en el que insertar la firma.</li>
   </ul>
-  <li style="margin-top: 10pt"><code>signaturePage</code>:</li>
+   <li style="margin-top: 10pt"><code>signaturePages</code>:</li>
   <ul>
-  	<li><code>all</code>: Para indicar que la firma visible aparezca en todas las p&aacute;ginas del documento, se le deber&aacute; de dar este valor. </li>
-  	<li><code>append</code>: Si la firma visible debe de aparecer en una nueva p&aacute;gina en blanco a&ntilde;adida al final del documento, se le deber&aacute; de dar este valor.</li>
-  	<li>P&aacute;gina o listado de p&aacute;ginas: En esta opci&oacute;n se permite seleccionar la p&aacute;gina o rango de p&aacute;ginas donde aparecer&aacute; la firma
-  	visible. Si se desea indicar una p&aacute;gina o varias p&aacute;ginas donde estampar la firma visible, es posible indicando p&aacute;gina a p&aacute;gina con una 
-  	separaci&oacute;n de comas (<code>1,4,7</code>: Se estampa en las p&aacute;ginas 1, 4 y 7) o indicando un rango de p&aacute;ginas a trav&eacute;s de un gui&oacute;n 
-  	(<code>1-8</code>: Se estampa en las p&aacute;ginas desde la 1 hasta la 8). Tal y como se explica en el p&aacute;rrafo anterior, se permite indicar las p&aacute;ginas 
-  	con un valor negativo, donde se comenzar&aacute; desde el final (<code>1,-1</code>: Se estampar&aacute; en la primera y &uacute;ltima p&aacute;gina).
-  	</li>
-  </ul>
-    <li style="margin-top: 10pt"><code>signaturePages</code>:</li>
-  <ul>
-  	<li>Mismo funcionamiento que <code>signaturePage</code>.</li>
+  	<li>Indica las p&aacute;ginas en las que debe aparecer visible la firma.</li>
+  	<li>Admite los siguientes valores:</li>
+  	<ul>
+	  <li><code>all</code>: Para indicar que la firma visible aparezca en todas las p&aacute;ginas del documento, se le deber&aacute; de dar este valor. </li>
+	  <li><code>append</code>: Si la firma visible debe de aparecer en una nueva p&aacute;gina en blanco a&ntilde;adida al final del documento, se le deber&aacute; de dar este valor.</li>
+	  <li>P&aacute;gina o listado de p&aacute;ginas: En esta opci&oacute;n se permite seleccionar la p&aacute;gina o rango de p&aacute;ginas donde aparecer&aacute; la firma
+	  	visible. Si se desea indicar una p&aacute;gina o varias p&aacute;ginas donde estampar la firma visible, es posible indicando p&aacute;gina a p&aacute;gina con una 
+	  	separaci&oacute;n de comas (<code>1,4,7</code>: Se estampa en las p&aacute;ginas 1, 4 y 7) o indicando un rango de p&aacute;ginas a trav&eacute;s de un gui&oacute;n 
+	  	(<code>1-8</code>: Se estampa en las p&aacute;ginas desde la 1 hasta la 8). Tal y como se explica en el p&aacute;rrafo anterior, se permite indicar las p&aacute;ginas 
+	  	con un valor negativo, donde se comenzar&aacute; desde el final (<code>1,-1</code>: Se estampar&aacute; en la primera y &uacute;ltima p&aacute;gina).</li>
+  	</ul>
   </ul>
   <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftX</code>:</li>
   <ul>
