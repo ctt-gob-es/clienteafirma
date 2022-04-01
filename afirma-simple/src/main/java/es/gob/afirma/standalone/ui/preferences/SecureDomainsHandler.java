@@ -57,6 +57,11 @@ public class SecureDomainsHandler {
 		}
 	}
 
+	/**
+	 * Comprueba que el formato de los dominios indicados sea el correcto.
+	 * @param domainsText Texto con todos los dominios.
+	 * @throws ConfigurationException Error en caso de formato incorrecto en la lista de dominios.
+	 */
 	private static void checkCorrectDomainFormat(final String domainsText) throws ConfigurationException {
 		if (domainsText.indexOf(COMMA_SEPARATOR) != -1
 				&& domainsText.indexOf(LINE_BREAK_SEPARATOR) != -1) {
