@@ -12,7 +12,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -80,12 +79,6 @@ class DefaultFormatPanel extends JPanel {
 		this.odfFilesCombo = new JComboBox<>(new String[] { ODF, CADES, XADES });
 
 		final JPanel signatureDefaultsFormats = new JPanel(new GridBagLayout());
-		signatureDefaultsFormats.setBorder(
-			BorderFactory.createTitledBorder(
-					BorderFactory.createEmptyBorder(),
-					SimpleAfirmaMessages.getString("DefaultFormatPanel.4") //$NON-NLS-1$
-			)
-		);
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;

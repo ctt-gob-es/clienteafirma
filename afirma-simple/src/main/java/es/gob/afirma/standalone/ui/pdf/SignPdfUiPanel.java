@@ -331,11 +331,14 @@ final class SignPdfUiPanel extends JPanel implements
 		selectionPagesGbc.gridy++;
 		pagesSelectionPanel.add(this.selectPagesRadioBtn, selectionPagesGbc);
 		selectionPagesGbc.gridx++;
-		pagesSelectionPanel.add(createHelpButton(), selectionPagesGbc);
-		selectionPagesGbc.gridx++;
-		selectionPagesGbc.weightx = 1;
+		selectionPagesGbc.weightx = 1.0;
 		selectionPagesGbc.insets = new Insets(0, 5, 0, 0);
 		pagesSelectionPanel.add(this.selectionPagesRange, selectionPagesGbc);
+		selectionPagesGbc.gridx++;
+		selectionPagesGbc.weightx = 0;
+		selectionPagesGbc.ipadx = 6;
+		selectionPagesGbc.ipady = 6;
+		pagesSelectionPanel.add(createHelpButton(), selectionPagesGbc);
 
 		add(pagesSelectionPanel, gbc);
 
@@ -585,12 +588,7 @@ final class SignPdfUiPanel extends JPanel implements
 				SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
 		);
 		helpBtn.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						SimpleAfirma.showHelp("pgs/VentanaPdfVisible.html"); //$NON-NLS-1$
-					}
-				}
+				e -> SimpleAfirma.showHelp("pgs/VentanaPdfVisible.html")
 		);
 
 		helpBtn.addFocusListener(
@@ -633,7 +631,7 @@ final class SignPdfUiPanel extends JPanel implements
 					page = this.pdfPages.get(0);
 				}
 				else {
-					final List<Integer> pagesList = new ArrayList<Integer>();
+					final List<Integer> pagesList = new ArrayList<>();
 					try {
 						PdfUtil.checkPagesRange(pageStr, this.pdfPages.size(), pagesList);
 						if (pagesList.isEmpty()) {
