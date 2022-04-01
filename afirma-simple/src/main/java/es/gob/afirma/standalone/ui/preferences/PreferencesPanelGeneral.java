@@ -438,6 +438,18 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			SimpleAfirmaMessages.getString("PreferencesPanel.174") //$NON-NLS-1$
 		);
 
+		final JButton secureDomainsBtn = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.185") //$NON-NLS-1$
+			);
+
+		secureDomainsBtn.setMnemonic('D');
+		secureDomainsBtn.addActionListener(
+				ae -> changeSecureDomainsDlg(getParent())
+			);
+		secureDomainsBtn.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.186") //$NON-NLS-1$
+			);
+
 		final JButton proxyConfigButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.126") //$NON-NLS-1$
 		);
@@ -462,6 +474,12 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		netConstraints.gridwidth = 2;
 		netConstraints.anchor = GridBagConstraints.LINE_START;
 		netConfigInnerPanel.add(this.secureConnections, netConstraints);
+		netConstraints.gridx++;
+		netConstraints.insets = new Insets(0, 25, 0, 0);
+		netConfigInnerPanel.add(secureDomainsBtn, netConstraints);
+		netConstraints.insets = new Insets(0, 0, 4, 7);
+		netConstraints.anchor = GridBagConstraints.LINE_START;
+		netConstraints.gridx = 0;
 		netConstraints.gridwidth = 1;
 		netConstraints.gridy++;
 		netConfigInnerPanel.add(proxyLabel, netConstraints);
@@ -520,6 +538,44 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			// Aplicamos los valores tanto si el checkbox esta marcado o no, en un caso lo establecera y en en otro lo
 			// eliminara
 			ProxyUtil.setProxySettings();
+    	}
+    }
+
+	/** Di&aacute;logo para cambiar la configuraci&oacute;n del listado de dominios seguros.
+	 * @param container Contenedor en el que se define el di&aacute;logo. */
+    public static void changeSecureDomainsDlg(final Container container) {
+
+    	// Cursor en espera
+    	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
+    	final SecureDomainsPanel secureDomainsPanel = new SecureDomainsPanel();
+    	secureDomainsPanel.getAccessibleContext().setAccessibleDescription(
+    			SimpleAfirmaMessages.getString("SecureDomainsDialog.2")); //$NON-NLS-1$
+
+    	// Cursor por defecto
+    	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+    	if(AOUIFactory.showConfirmDialog(
+				container,
+				secureDomainsPanel,
+				SimpleAfirmaMessages.getString("SecureDomainsDialog.0"), //$NON-NLS-1$
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.DEFAULT_OPTION
+		) == JOptionPane.OK_OPTION) {
+
+    		try {
+    			secureDomainsPanel.saveData();
+    		}
+    		catch (final ConfigurationException e) {
+    			AOUIFactory.showErrorMessage(
+					e.getMessage(),
+					SimpleAfirmaMessages.getString("SecureDomainsDialog.1"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					e
+				);
+    			changeSecureDomainsDlg(container);
+    			return;
+			}
     	}
     }
 

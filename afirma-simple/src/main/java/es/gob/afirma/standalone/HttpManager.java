@@ -23,6 +23,7 @@ public class HttpManager {
 		this.urlManager = UrlHttpManagerFactory.getInstalledManager();
 		setSecureConnections(PreferencesManager.getBoolean(
 				PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
+		setSecureDomains(PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
 	}
 
 	/**
@@ -48,7 +49,7 @@ public class HttpManager {
 	}
 
 	/**
-	 * Configura si deben respetarse o no las comprobaciones de seguirdad en las conexiones HTTPS.
+	 * Configura si deben respetarse o no las comprobaciones de seguridad en las conexiones HTTPS.
 	 * @param secure {@code true} si deben respetarse las comprobaciones, {@code false} en caso
 	 * contrario.
 	 */
@@ -56,5 +57,15 @@ public class HttpManager {
 		System.setProperty(
 				UrlHttpManagerImpl.JAVA_PARAM_DISABLE_SSL_CHECKS,
 				Boolean.toString(!secure));
+	}
+
+	/**
+	 * Configura los dominios que se deben de tratar como seguros en las conexiones HTTPS
+	 * @param secureDomains Lista de dominios seguros
+	 */
+	public static void setSecureDomains(final String secureDomains) {
+		if (secureDomains != null && !secureDomains.isEmpty()) {
+			System.setProperty(UrlHttpManagerImpl.JAVA_PARAM_SECURE_DOMAINS_LIST, secureDomains);
+		}
 	}
 }

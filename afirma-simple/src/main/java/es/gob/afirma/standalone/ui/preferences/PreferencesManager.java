@@ -200,6 +200,9 @@ public final class PreferencesManager {
 	/** Indica si debe validarse el certificado SSL en las conexiones de red. */
 	public static final String PREFERENCE_GENERAL_SECURE_CONNECTIONS = "secureConnections"; //$NON-NLS-1$
 
+	/** Lista de dominios seguros donde realizar conexiones SSL. */
+	public static final String PREFERENCE_GENERAL_SECURE_DOMAINS_LIST = "secureDomainsList"; //$NON-NLS-1$
+
 	//**************** FIN PREFERENCIAS GENERALES ******************************************************************************
 	//**************************************************************************************************************************
 
