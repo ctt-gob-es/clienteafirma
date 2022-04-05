@@ -182,7 +182,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final boolean needDisableSslChecks = Boolean.parseBoolean(
 				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false") //$NON-NLS-1$
 		);
-
 		final boolean isSecureDomain = checkIsSecureDomain(uri);
 
 		if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
@@ -309,37 +308,45 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		SslSecurityManager.disableSslChecks();
 	}
 
+	/**
+	 * Comprueba si el dominio de una URL se considera seguro con respecto a una lista de dominios
+	 * seguros establecidos a traves de la propiedad determinado por la constante
+	 * JAVA_PARAM_SECURE_DOMAINS_LIST.
+	 * @param url URL que se desea comprobar.
+	 * @return {@code true} si el dominio de la URL es seguro, {@code false} en caso contrario.
+	 */
 	private static boolean checkIsSecureDomain(final URL url) {
+
 		final String secureDomainsList = System.getProperty(JAVA_PARAM_SECURE_DOMAINS_LIST);
-		if (secureDomainsList != null) {
+		if (secureDomainsList != null && !secureDomainsList.isEmpty()) {
 			final String urlHost = url.getHost();
 			final String [] secureDomainsArray = secureDomainsList.split(","); //$NON-NLS-1$
 			for (final String secureDomain : secureDomainsArray) {
 				// Caso 1 - Dominios con * al principio y al final. Ej: *.redsara.*
 				final String replSecureDomain = secureDomain.replace("*","");  //$NON-NLS-1$//$NON-NLS-2$
-				if (secureDomain.startsWith("*") && secureDomain.substring(secureDomain.length() -1).equals("*")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (secureDomain.startsWith("*") && secureDomain.endsWith("*")) { //$NON-NLS-1$ //$NON-NLS-2$
 					if (urlHost.contains(replSecureDomain)) {
 						return true;
 					}
 				}
 				// Caso 2 - Dominios con * solo al principio
-				else if (secureDomain.startsWith("*") && urlHost.contains(replSecureDomain)) {  //$NON-NLS-1$
-					final String firstPartUrl = urlHost.substring(0, urlHost.indexOf(replSecureDomain));
-					if (urlHost.replace(firstPartUrl + replSecureDomain, "").isEmpty()) { //$NON-NLS-1$
+				else if (secureDomain.startsWith("*")) {  //$NON-NLS-1$
+					if (urlHost.endsWith(replSecureDomain)) {
 						return true;
 					}
 				}
 				// Caso 3 - Dominios con * solo al final
-				else if (secureDomain.substring(secureDomain.length() -1).equals("*") && urlHost.startsWith(replSecureDomain)) { //$NON-NLS-1$
-					return true;
+				else if (secureDomain.endsWith("*")) { //$NON-NLS-1$
+					if (urlHost.startsWith(replSecureDomain)) {
+						return true;
+					}
 				}
 				// Caso 4 - Dominios sin *
-				else if (secureDomain.equals(urlHost)) {
+				else if (urlHost.equals(replSecureDomain)) {
 					return true;
 				}
 			}
 		}
-
 		return false;
 	}
 
