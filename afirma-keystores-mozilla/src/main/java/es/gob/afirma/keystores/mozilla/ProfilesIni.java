@@ -101,7 +101,8 @@ class ProfilesIni {
 
 
 	public List<FirefoxProfile> getProfilesList() {
-		return this.profilesList;
+		final List<FirefoxProfile> profilesListCopy = this.profilesList;
+		return profilesListCopy;
 	}
 
 	public GeneralInfo getGeneralInfo() {

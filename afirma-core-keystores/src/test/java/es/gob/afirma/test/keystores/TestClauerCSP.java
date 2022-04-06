@@ -27,7 +27,7 @@ public final class TestClauerCSP {
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ALIAS, new KeyStore.PasswordProtection(new char[0]));
 
-		final Signature signature = Signature.getInstance("SHA1withRSA"); //$NON-NLS-1$
+		final Signature signature = Signature.getInstance("SHA256withRSA"); //$NON-NLS-1$
 		signature.initSign(pke.getPrivateKey());
 		signature.update("Hola Mundo!!".getBytes()); //$NON-NLS-1$
 		final byte[] mySignature = signature.sign();

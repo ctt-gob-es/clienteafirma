@@ -54,10 +54,8 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -73,6 +71,8 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.SecureXmlTransformer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -113,6 +113,8 @@ public final class AOODFSigner implements AOSigner {
     private static final String DIGEST_METHOD_ALGORITHM_NAME = "SHA1"; //$NON-NLS-1$
 
     private static final String ENTRY_MIMETYPE = "mimetype"; //$NON-NLS-1$
+
+    private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
 
     static {
 
@@ -179,6 +181,10 @@ public final class AOODFSigner implements AOSigner {
 	            final ZipFile zf = new ZipFile(zipFile);
     		) {
 
+    	    	if (zf.size() >= THRESHOLD_FILE_SIZE) {
+    	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	    	}
+
             	final byte[] manifestData;
             	try (
 		            // obtiene el archivo manifest.xml, que indica los ficheros que
@@ -189,7 +195,7 @@ public final class AOODFSigner implements AOSigner {
             	}
 
 	            // obtiene el documento manifest.xml y su raiz
-	            final Document docManifest = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(manifestData));
+	            final Document docManifest = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(manifestData));
 	            final Element rootManifest = docManifest.getDocumentElement();
 
 	            // recupera todos los nodos de manifest.xml
@@ -596,11 +602,11 @@ public final class AOODFSigner implements AOSigner {
             	if (entry == null) {
             		return new AOTreeModel(tree);
             	}
-
+    	    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+    	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	    	}
 	            // recupera la raiz del documento de firmas
-	            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	            dbf.setNamespaceAware(true);
-	            final Element root = dbf.newDocumentBuilder().parse(zis).getDocumentElement();
+	            final Element root = SecureXmlBuilder.getSecureDocumentBuilder().parse(zis).getDocumentElement();
 
 	            // obtiene todas las firmas
 	            final NodeList signatures = root.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Signature"); //$NON-NLS-1$
@@ -742,7 +748,7 @@ public final class AOODFSigner implements AOSigner {
 
     private static void writeXML(final Writer writer, final Node node, final boolean indent) {
         try {
-            final Transformer serializer = TransformerFactory.newInstance().newTransformer();
+            final Transformer serializer = SecureXmlTransformer.getSecureTransformer();
             serializer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 
             if (indent) {
@@ -787,6 +793,9 @@ public final class AOODFSigner implements AOSigner {
     	String mimetypeContent = null;
     	final ZipEntry entry = getEntry(odfZis, ENTRY_MIMETYPE);
     	if (entry != null) {
+	    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+	    	}
     		final byte[] content = AOUtil.getDataFromInputStream(odfZis);
     		mimetypeContent = content != null ? new String(content) : "";  //$NON-NLS-1$
     	}
@@ -804,6 +813,9 @@ public final class AOODFSigner implements AOSigner {
 		ZipEntry entry = null;
 		boolean found = false;
 		while (!found && (entry = zis.getNextEntry()) != null) {
+	    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+	    	}
 			if (entry.getName().equals(entryName)) {
 				found = true;
 			}

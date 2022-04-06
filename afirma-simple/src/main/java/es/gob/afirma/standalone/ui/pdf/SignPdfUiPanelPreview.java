@@ -138,7 +138,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	private final Properties prop;
 	Properties getProp() {
-		return this.prop;
+		return this.prop != null ? (Properties) this.prop.clone() : null;
 	}
 
 	JLabel viewLabel;
@@ -258,7 +258,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			);
 		}
 		this.listener = spul;
-		this.prop = p;
+		this.prop = p != null ? (Properties) p.clone() : null;
 		this.style = 0;
 
 		this.image = im;
@@ -751,9 +751,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 
 		final JEditorPane helpLabel = new JEditorPane();
-		
-		Color bgColor = helpLabel.getBackground();
-		UIDefaults defaults = new UIDefaults();
+
+		final Color bgColor = helpLabel.getBackground();
+		final UIDefaults defaults = new UIDefaults();
 		defaults.put("EditorPane[Enabled].backgroundPainter", bgColor); //$NON-NLS-1$
 		helpLabel.putClientProperty("Nimbus.Overrides", defaults); //$NON-NLS-1$
 		helpLabel.putClientProperty("Nimbus.Overrides.InheritDefaults", true); //$NON-NLS-1$
@@ -787,7 +787,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
         helpLabel.addHyperlinkListener(editorFocusManager);
         helpLabel.addFocusListener(editorFocusManager);
         helpLabel.addKeyListener(editorFocusManager);
-        helpLabel.setEditable(false);       
+        helpLabel.setEditable(false);
 
         return helpLabel;
 	}
@@ -1464,10 +1464,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 				LOGGER.warning("Error al leer la imagen de firma visible"); //$NON-NLS-1$
 			}
 
-			if (image != null) {
-				if (containsAlphaChannel(image) || containsTransparency(image)){
-					hasTransparency = true;
-				}
+			if (image != null && (containsAlphaChannel(image) || containsTransparency(image))){
+				hasTransparency = true;
 			}
 
 		}

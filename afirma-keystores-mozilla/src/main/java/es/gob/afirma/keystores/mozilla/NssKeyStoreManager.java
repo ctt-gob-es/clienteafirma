@@ -115,7 +115,7 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 				Security.removeProvider(nssProvider.getName());
 			}
 			else {
-				return nssProvider;
+				return (Provider) nssProvider.clone();
 			}
 		}
 		try {
@@ -125,6 +125,6 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 			LOGGER.log(Level.SEVERE, "Error obteniendo el proveedor NSS: " + e, e); //$NON-NLS-1$
 			nssProvider = null;
 		}
-		return nssProvider;
+		return nssProvider != null ? (Provider) nssProvider.clone() : null;
 	}
 }

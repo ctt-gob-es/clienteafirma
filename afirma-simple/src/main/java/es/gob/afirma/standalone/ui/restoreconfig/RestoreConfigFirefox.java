@@ -804,6 +804,7 @@ final class RestoreConfigFirefox {
 	 * @return Listado de directorios donde se encuentran los perfiles de usuario de Firefox. */
 	private static Set<File> getProfiles(final List<File> profilesPath){
 		final String PATH = "Path="; //$NON-NLS-1$
+		final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
 		final Set<File> profile = new HashSet<>();
 		for (final File path: profilesPath){
 			String line;
@@ -822,6 +823,9 @@ final class RestoreConfigFirefox {
 								0, path.getAbsolutePath().lastIndexOf(File.separator) + 1) + line.substring(PATH.length()
 							)
 						);
+				    	if (file.length() >= THRESHOLD_FILE_SIZE) {
+				    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+				    	}
 						if (file.exists() && file.isDirectory()){
 							profile.add(file);
 						}

@@ -64,6 +64,6 @@ public class KeyUsagesPattern {
 		if (SIGNATURE_KEYUSAGES.containsKey(this.issuer.toString())) {
 			return SIGNATURE_KEYUSAGES.get(this.issuer.toString());
 		}
-		return DEFAULT_SIGNATURE_KEYUSAGES;
+		return DEFAULT_SIGNATURE_KEYUSAGES.clone();
 	}
 }

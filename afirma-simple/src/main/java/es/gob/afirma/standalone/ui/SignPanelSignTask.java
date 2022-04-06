@@ -96,7 +96,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         this.parent = parent;
         this.signConfigs = signConfigs;
         this.ksm = ksm;
-        this.certFilters = certificateFilters;
+        final List<? extends CertificateFilter> certFiltersCopy = certificateFilters;
+        this.certFilters = certFiltersCopy;
         this.waitDialog = signWaitDialog;
         this.signExecutor = signExecutor;
         this.resultViewer = resultViewer;

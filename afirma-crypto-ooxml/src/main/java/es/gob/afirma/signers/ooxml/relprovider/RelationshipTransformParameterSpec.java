@@ -60,6 +60,7 @@ public final class RelationshipTransformParameterSpec implements TransformParame
     }
 
     List<String> getSourceIds() {
-        return this.sourceIds;
+    	final List<String> sourceIdsCopy = this.sourceIds;
+        return sourceIdsCopy;
     }
 }

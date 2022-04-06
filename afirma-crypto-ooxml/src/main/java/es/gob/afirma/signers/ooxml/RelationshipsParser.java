@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /** Parser de ficheros XML Relationships. Este tipo de fichero se encuentra
  * comunmente dentro de los ficheros OOXML de Microsoft Office con el nombre ".rels". */
@@ -47,7 +47,7 @@ final class RelationshipsParser {
     /** Recupera el listado de relaciones extraido del XML.
      * @return Listado de relaciones. */
     Relationship[] getRelationships() {
-        return this.relations;
+        return this.relations != null ? this.relations.clone() : null;
     }
 
     /** Recupera las relaciones definidas en el XML.
@@ -60,7 +60,7 @@ final class RelationshipsParser {
                                                                                               IOException,
                                                                                               ParserConfigurationException {
 
-        final Document doc = Utils.getNewDocumentBuilder().parse(xmlRelationships);
+        final Document doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(xmlRelationships);
 
         // Obtenemos la raiz
         final Element root = doc.getDocumentElement();

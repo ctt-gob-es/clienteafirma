@@ -136,7 +136,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 	/** Obtiene la configuraci&oacute;n del mejorador de firmas por defecto.
 	 * @return Configuraci&oacute;n del mejorador de firmas por defecto. */
 	public static Properties getSignEnhancerConfig() {
-		return enhancerConfig;
+		return enhancerConfig != null ? (Properties) enhancerConfig.clone() : null;
 	}
 
     /** Firma un documento PDF en formato PAdES.

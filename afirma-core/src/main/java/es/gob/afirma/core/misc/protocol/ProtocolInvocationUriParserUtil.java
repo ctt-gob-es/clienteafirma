@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -32,8 +30,6 @@ public final class ProtocolInvocationUriParserUtil {
 	static final String DEFAULT_URL_ENCODING = StandardCharsets.UTF_8.name();
 
 	private static final String DEFAULT_OPERATION = "SIGN"; //$NON-NLS-1$
-
-	private static DocumentBuilderFactory SECURE_BUILDER_FACTORY = null;
 
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable

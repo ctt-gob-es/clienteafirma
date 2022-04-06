@@ -38,6 +38,8 @@ public final class ASiCUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
+
 	private ASiCUtil() {
 		// No instanciable
 	}
@@ -152,6 +154,9 @@ public final class ASiCUtil {
 		) {
 			ZipEntry entry;
 			while((entry = zis.getNextEntry()) != null) {
+		    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+		    	}
 				if (signatureFilename.equals(entry.getName())) {
 					return AOUtil.getDataFromInputStream(zis);
 				}
@@ -177,6 +182,9 @@ public final class ASiCUtil {
 		) {
 			ZipEntry entry;
 			while((entry = zis.getNextEntry()) != null) {
+		    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+		    	}
 				if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) &&
 					!ENTRY_NAME_XML_SIGNATURE.equals(entry.getName()) &&
 					!ENTRY_NAME_MIMETYPE.equals(entry.getName())
@@ -201,6 +209,9 @@ public final class ASiCUtil {
 		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		ZipEntry entry;
 		while((entry = zis.getNextEntry()) != null) {
+	    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+	    	}
 			final String entryName = entry.getName();
 			if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entryName) &&
 				!ENTRY_NAME_XML_SIGNATURE.equals(entryName) &&

@@ -68,7 +68,6 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -83,7 +82,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.SecureXmlTransformer;
 
 /** Implementaci&oacute;n JSR105 de la transformaci&oacute;n RelationshipTransform.
  * <a href="http://openiso.org/Ecma/376/Part2/12.2.4#26">http://openiso.org/Ecma/376/Part2/12.2.4#26</a>
@@ -102,8 +102,7 @@ public final class RelationshipTransformService extends TransformService {
 
     /** Crea el servicio de la transformaci&oacute;n RelationshipTransform. */
     public RelationshipTransformService() {
-        super();
-        this.sourceIds = new LinkedList<>();
+		this.sourceIds = new LinkedList<>();
     }
 
     /** {@inheritDoc} */
@@ -293,10 +292,7 @@ public final class RelationshipTransformService extends TransformService {
         final Source source = new DOMSource(dom);
         final StringWriter stringWriter = new StringWriter();
         final Result result = new StreamResult(stringWriter);
-        final TransformerFactory factory = TransformerFactory.newInstance();
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
-        final Transformer transformer = factory.newTransformer();
+        final Transformer transformer = SecureXmlTransformer.getSecureTransformer();
         /*
          * We have to omit the ?xml declaration if we want to embed the
          * document.
@@ -310,10 +306,7 @@ public final class RelationshipTransformService extends TransformService {
         final Source source = new DOMSource(node);
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final Result result = new StreamResult(outputStream);
-        final TransformerFactory factory = TransformerFactory.newInstance();
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
-        final Transformer transformer = factory.newTransformer();
+        final Transformer transformer = SecureXmlTransformer.getSecureTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
         transformer.transform(source, result);
         return new OctetStreamData(new ByteArrayInputStream(outputStream.toByteArray()));
@@ -321,7 +314,7 @@ public final class RelationshipTransformService extends TransformService {
 
     private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final InputSource inputSource = new InputSource(documentInputStream);
-        return Utils.getNewDocumentBuilder().parse(inputSource);
+        return SecureXmlBuilder.getSecureDocumentBuilder().parse(inputSource);
     }
 
     /** {@inheritDoc} */

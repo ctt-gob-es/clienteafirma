@@ -108,7 +108,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.checkPrivateKeys = checkPrivateKeys;
 		this.checkValidity = checkValidity;
 		this.showExpiredCertificates = showExpiredCertificates;
-		this.certFilters = certFilters;
+		final List<? extends CertificateFilter> certFiltersCopy = certFilters;
+		this.certFilters = certFiltersCopy;
 		this.mandatoryCertificate = mandatoryCertificate;
 	}
 

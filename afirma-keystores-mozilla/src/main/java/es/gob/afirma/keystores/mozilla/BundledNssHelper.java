@@ -38,6 +38,7 @@ final class BundledNssHelper {
 	 * @throws IOException Cuando no ha sido posible obtener la ruta del fichero. */
 	static String getBundledNssDirectory() throws IOException {
 		final File bundledNssDir = getNssDirFile();
+
 		uncompressZip(getNssZipResourceName(), bundledNssDir);
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -57,10 +58,8 @@ final class BundledNssHelper {
 	private static File getNssDirFile() throws IOException {
 		// Nos aseguramos de que tenemos el diretorio para NSS
 		final File bundledNssDir = new File(AFIRMA_NSS_HOME);
-		if (!bundledNssDir.exists()) {
-			if (!bundledNssDir.mkdirs()) {
-				throw new IOException("No se ha podido crear el directorio de NSS: " + AFIRMA_NSS_HOME); //$NON-NLS-1$
-			}
+		if (!bundledNssDir.exists() && !bundledNssDir.mkdirs()) {
+			throw new IOException("No se ha podido crear el directorio de NSS: " + AFIRMA_NSS_HOME); //$NON-NLS-1$
 		}
 		if (!bundledNssDir.isDirectory()) {
 			throw new IOException("No se ha podido crear el directorio de NSS por encontrarse un fichero con el mismo nombre: " + AFIRMA_NSS_HOME); //$NON-NLS-1$
@@ -78,6 +77,7 @@ final class BundledNssHelper {
      private static void uncompressZip(final String zipFileResourceName, final File outDir) throws IOException {
 
         final byte[] buffer = new byte[BUFFER_SIZE];
+		final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
         try (
 	        final InputStream fis = BundledNssHelper.class.getResourceAsStream(zipFileResourceName);
 	        final ZipInputStream zipIs = new ZipInputStream(
@@ -86,6 +86,9 @@ final class BundledNssHelper {
 		) {
 	        ZipEntry entry;
 	        while ((entry = zipIs.getNextEntry()) != null) {
+	        	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+	        		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+	        	}
 	            if (entry.isDirectory()) {
 	                new File(outDir, entry.getName()).mkdirs();
 	            }

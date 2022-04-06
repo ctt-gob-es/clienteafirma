@@ -43,6 +43,8 @@ import com.aowagie.text.pdf.PdfDate;
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
+
 final class XmpHelper {
 
     private static final String TAG_UUID = "$$UUID$$"; //$NON-NLS-1$
@@ -147,7 +149,7 @@ final class XmpHelper {
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-		final DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilder db = SecureXmlBuilder.getSecureDocumentBuilder();
 		final Document doc = db.parse(new ByteArrayInputStream(xmpBytes));
 
 		String newnode = NEW_HISTORY_LIST_ITEM.replace(

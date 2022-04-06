@@ -17,7 +17,6 @@ import java.util.GregorianCalendar;
 import java.util.Properties;
 
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -27,6 +26,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 
 /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
@@ -53,7 +53,8 @@ public final class PdfSignResult implements Serializable {
 	 * no alteran la huella digital del rango procesable del PDF (por ejemplo, la imagen de la r&uacute;brica)
 	 * @param xParams Par&aacute;metros adicionales de la firma, se sobrescriben los existentes si los hubiera */
 	public void setExtraParams(final Properties xParams) {
-		this.extraParams = xParams;
+		final Properties xParamsCopy = xParams;
+		this.extraParams = xParamsCopy;
 	}
 
     /** Construye el resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
@@ -86,7 +87,7 @@ public final class PdfSignResult implements Serializable {
     /** Obtiene las opciones adicionales de la firma.
      * @return Opciones adicionales de la firma */
     Properties getExtraParams() {
-    	return this.extraParams;
+    	return this.extraParams != null ? (Properties) this.extraParams.clone() : null;
     }
 
     /** Obtiene el FileID (<i>/ID</i>) del diccionario PDF generado.
@@ -154,7 +155,7 @@ public final class PdfSignResult implements Serializable {
 	private void readObject(final ObjectInputStream in) throws IOException {
     	final Document xmlSign;
     	try {
-    		xmlSign = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
+    		xmlSign = SecureXmlBuilder.getSecureDocumentBuilder().parse(in);
 		}
     	catch (final SAXException e) {
 			throw new IOException(e);

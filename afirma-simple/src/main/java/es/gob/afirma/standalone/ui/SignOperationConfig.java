@@ -57,7 +57,7 @@ public final class SignOperationConfig {
 	/** Recupera la configuraci&oacute;n de firma que se va a utilizar.
 	 * @return Configuraci&oacute; de firma. */
 	public Properties getExtraParams() {
-		return this.extraParams;
+		return this.extraParams != null ? (Properties) this.extraParams.clone() : null;
 	}
 
 	/** Establece la configuraci&oacute;n de firma que se va a utilizar.

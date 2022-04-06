@@ -39,7 +39,8 @@ public final class CommitmentTypeIndicationBean {
 			);
 		}
 		this.identifier = id;
-		this.qualifiers = quals;
+		final List<String> qualsCopy = quals;
+		this.qualifiers = qualsCopy;
 	}
 
 	String getIdentifier() {
@@ -50,7 +51,8 @@ public final class CommitmentTypeIndicationBean {
 		if (this.qualifiers == null) {
 			return new ArrayList<>(0);
 		}
-		return this.qualifiers;
+		final List<String> qualifiersCopy = this.qualifiers;
+		return qualifiersCopy;
 	}
 
 }

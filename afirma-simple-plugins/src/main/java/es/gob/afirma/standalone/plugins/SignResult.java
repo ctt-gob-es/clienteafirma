@@ -19,18 +19,18 @@ public class SignResult {
 	}
 
 	public byte[] getCertificate() {
-		return this.certificate;
+		return this.certificate != null ? this.certificate.clone() : null;
 	}
 
 	public void setCertificate(final byte[] certificate) {
-		this.certificate = certificate;
+		this.certificate = certificate != null ? certificate.clone() : null;
 	}
 
 	public Properties getExtraData() {
-		return this.extraData;
+		return this.extraData != null ? (Properties) this.extraData.clone() : null;
 	}
 
 	public void setDataFilename(final Properties extraData) {
-		this.extraData = extraData;
+		this.extraData = extraData != null ? (Properties) extraData.clone() : null;
 	}
 }

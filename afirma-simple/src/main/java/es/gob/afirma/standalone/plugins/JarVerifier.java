@@ -36,6 +36,11 @@ public class JarVerifier {
 			throws IOException, SecurityException, JarNoSignedException {
 
 		final List<X509Certificate[]> signingCerts = new ArrayList<>();
+		final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
+
+    	if (jarFile.length() >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 
 		// Cargamos el archivo pidiendo que se valide
 		try (final JarFile jar = new JarFile(jarFile, true, ZipFile.OPEN_READ)) {

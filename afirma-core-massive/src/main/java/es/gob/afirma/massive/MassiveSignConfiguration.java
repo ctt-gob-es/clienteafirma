@@ -157,7 +157,7 @@ public final class MassiveSignConfiguration {
      * operaci&oacute;n masiva.
      * @return Par&aacute;metros adicionales. */
     public Properties getExtraParams() {
-        return this.extraParams;
+    	return this.extraParams != null ? (Properties) this.extraParams.clone() : null;
     }
 
 

@@ -50,6 +50,8 @@ public final class OfficeAnalizer {
     /** Descripciones de fichero asignadas a cada uno de los mimetypes. */
     private static final Map<String, String> FILE_DESCRIPTIONS = new HashMap<>();
 
+    private static final long THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
+
     static {
         // MimeTypes reconocidos del formato OOXML
         OOXML_MIMETYPES.add("application/vnd.ms-word.document.macroEnabled.12"); //$NON-NLS-1$
@@ -144,6 +146,9 @@ public final class OfficeAnalizer {
 
     	String mimetype = null;
     	final File tempFile = AOFileUtils.createTempFile(data);
+    	if (tempFile.length() >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
     	try (final ZipFile zipFile = new ZipFile(tempFile)) {
     		if (isODFFile(zipFile)) {
     			try (
@@ -265,6 +270,9 @@ public final class OfficeAnalizer {
     	File tempFile = null;
     	try {
     		tempFile = AOFileUtils.createTempFile(document);
+        	if (tempFile.length() >= THRESHOLD_FILE_SIZE) {
+        		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+        	}
 			try (final ZipFile zipFile = new ZipFile(tempFile)) {
 				result = isOOXMLFile(zipFile);
 			}
@@ -286,9 +294,13 @@ public final class OfficeAnalizer {
     /** Indica si un fichero Zip tiene la estructura de un documento OOXML
      * soportado.
      * @param zipFile Fichero Zip que deseamos comprobar.
-     * @return Devuelve <code>true</code> si el fichero era un OOXML soportado, <code>false</code> en caso contrario. */
-    private static boolean isOOXMLFile(final ZipFile zipFile) {
+     * @return Devuelve <code>true</code> si el fichero era un OOXML soportado, <code>false</code> en caso contrario.
+     * @throws IOException Error en el tama&ntilde;o permitido del archivo */
+    private static boolean isOOXMLFile(final ZipFile zipFile) throws IOException {
         // Comprobamos si estan todos los ficheros principales del documento
+    	if (zipFile.size() >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
         return zipFile.getEntry("[Content_Types].xml") != null && zipFile.getEntry("_rels/.rels") != null //$NON-NLS-1$ //$NON-NLS-2$
                && zipFile.getEntry("docProps/app.xml") != null //$NON-NLS-1$
                && zipFile.getEntry("docProps/core.xml") != null; //$NON-NLS-1$
@@ -354,6 +366,9 @@ public final class OfficeAnalizer {
     	File tempFile = null;
     	try {
     		tempFile = AOFileUtils.createTempFile(document);
+        	if (tempFile.length() >= THRESHOLD_FILE_SIZE) {
+        		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+        	}
 			try (final ZipFile zipFile = new ZipFile(tempFile)) {
 				result = isODFFile(zipFile);
 			}
@@ -375,11 +390,15 @@ public final class OfficeAnalizer {
     /** Indica si un fichero Zip tiene la estructura de un documento ODF
      * soportado.
      * @param zipFile Fichero Zip que deseamos comprobar.
-     * @return Devuelve <code>true</code> si el fichero era un ODF soportado, <code>false</code> en caso contrario. */
-    private static boolean isODFFile(final ZipFile zipFile) {
+     * @return Devuelve <code>true</code> si el fichero era un ODF soportado, <code>false</code> en caso contrario.
+     * @throws IOException Error en el tama&ntilde;o permitido del archivo */
+    private static boolean isODFFile(final ZipFile zipFile) throws IOException {
         // Comprobamos si estan todos los ficheros principales del documento
     	// Se separan las comprobaciones en varios if para no tener una sola
     	// sentencia condicional muy larga
+    	if (zipFile.size() >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
     	if (zipFile.getEntry("mimetype") == null) { //$NON-NLS-1$
     		return false;
     	}

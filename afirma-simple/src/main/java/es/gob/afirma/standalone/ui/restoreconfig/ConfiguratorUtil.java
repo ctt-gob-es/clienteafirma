@@ -57,9 +57,13 @@ final class ConfiguratorUtil {
 		int n;
 
 		final byte[] buffer = new byte[1024];
+		final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
 		try (final ZipInputStream zipIs = new ZipInputStream(ConfiguratorUtil.class.getResourceAsStream(resource));) {
 			ZipEntry entry;
 			while ((entry = zipIs.getNextEntry()) != null) {
+		    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+		    	}
 				final File outFile = new File(outDir, entry.getName());
 				if (entry.isDirectory()) {
 					outFile.mkdirs();

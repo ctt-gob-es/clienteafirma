@@ -93,15 +93,15 @@ public class TestKeyStoreWindowsCertACA {
     public void testPkcs12() throws Exception {
 
     	final String ALIAS = "EA=demo.empleado@cgae.redabogacia.org, CN=NOMBRE EMPLEADO EMPLEADO DEMO - NIF 08967425R, OU=Informatica, O=Consejo General de la Abogac\u00EDa Espa\u00F1ola / CGAE / 2000, C=ES, ST=Madrid, OID.2.5.4.12=#1308506572736F6E616C, OID.1.3.6.1.4.1.4710.1.3.2=#1309513238363330303649, OID.2.5.4.5=#1309303839363734323552, OID.2.5.4.42=#130444454D4F, OID.2.5.4.4=#1308454D504C4541444F, OID.1.3.6.1.4.1.16533.30.1=#1308454D504C4541444F"; //$NON-NLS-1$
-    	final char[] PASSWORD = "adm2013".toCharArray(); //$NON-NLS-1$
+    	final char[] PWD = "adm2013".toCharArray(); //$NON-NLS-1$
 
     	final PrivateKeyEntry pke;
     	try (
 			final InputStream ksIs = TestKeyStoreWindowsCertACA.class.getResourceAsStream("/ACA PF Administrativo Activo.p12"); //$NON-NLS-1$
 		) {
 	    	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-	    	ks.load(ksIs, PASSWORD);
-	    	pke = (PrivateKeyEntry) ks.getEntry(ALIAS, new KeyStore.PasswordProtection(PASSWORD));
+	    	ks.load(ksIs, PWD);
+	    	pke = (PrivateKeyEntry) ks.getEntry(ALIAS, new KeyStore.PasswordProtection(PWD));
     	}
 
     	Assert.assertNotNull("No se ha recuperado el par clave-certificado", pke); //$NON-NLS-1$
