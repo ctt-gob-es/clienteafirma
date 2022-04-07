@@ -163,10 +163,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	public static final String AVOID_UPDATE_CHECK_ENV = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
 
     /** Versiones de Java soportadas. */
-	private static final String[] SUPPORTED_JAVA_VERSIONS = { "1.8", //$NON-NLS-1$
+	private static final String[] SUPPORTED_JAVA_VERSIONS = {
+			"1.8", // Version LTS //$NON-NLS-1$
 			"9.0", //$NON-NLS-1$
 			"10.0", //$NON-NLS-1$
-			"11.0" //$NON-NLS-1$
+			"11.0", // Version LTS //$NON-NLS-1$
+			"17.0" // Version LTS //$NON-NLS-1$
 	};
 
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
