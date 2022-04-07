@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.HttpManager;
 
 public class SecureDomainsHandler {
 
@@ -39,12 +39,19 @@ public class SecureDomainsHandler {
 
 		final String textAreaContent = this.view.getSecureDomainsListTA().getText();
 
-		final String secureDomains = textAreaContent
+		final String secureDomains = textAreaContent.trim()
 				.replace(CRLF, COMMA_SEPARATOR).replace(LINE_BREAK, COMMA_SEPARATOR);
 
-		checkCorrectDomainFormat(secureDomains);
+		if (secureDomains.isEmpty()) {
+			PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST);
+		}
+		else {
+			checkCorrectDomainFormat(secureDomains);
+			PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST, secureDomains);
+		}
 
-		PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST, secureDomains);
+		// Configuramos los dominios seguros para que tenga efecto inmediato
+		HttpManager.setSecureDomains(secureDomains);
 
 		try {
 			PreferencesManager.flush();
@@ -60,9 +67,6 @@ public class SecureDomainsHandler {
 	 * @throws ConfigurationException Error en caso de formato incorrecto en la lista de dominios.
 	 */
 	private static void checkCorrectDomainFormat(final String domainsText) throws ConfigurationException {
-		if (domainsText.isEmpty()) {
-			throw new ConfigurationException(SimpleAfirmaMessages.getString("SecureDomainsDialog.5")); //$NON-NLS-1$
-		}
 
 		final String [] domainsArray = domainsText.split(COMMA_SEPARATOR);
 

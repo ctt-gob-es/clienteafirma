@@ -64,8 +64,11 @@ public class HttpManager {
 	 * @param secureDomains Lista de dominios seguros
 	 */
 	public static void setSecureDomains(final String secureDomains) {
-		if (secureDomains != null && !secureDomains.isEmpty()) {
+		if (secureDomains != null && !secureDomains.trim().isEmpty()) {
 			System.setProperty(UrlHttpManagerImpl.JAVA_PARAM_SECURE_DOMAINS_LIST, secureDomains);
+		}
+		else {
+			System.clearProperty(UrlHttpManagerImpl.JAVA_PARAM_SECURE_DOMAINS_LIST);
 		}
 	}
 }
