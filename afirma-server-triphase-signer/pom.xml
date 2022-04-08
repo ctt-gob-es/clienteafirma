@@ -46,6 +46,12 @@
 		</dependency>
 
 		<dependency>
+    		<groupId>org.json</groupId>
+    		<artifactId>json</artifactId>
+    		<version>20201115</version>
+		</dependency>
+
+		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xadestri-client</artifactId>
 			<version>${clienteafirma.version}</version>

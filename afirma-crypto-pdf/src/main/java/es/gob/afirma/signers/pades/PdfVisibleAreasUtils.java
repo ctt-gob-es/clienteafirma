@@ -100,14 +100,14 @@ final class PdfVisibleAreasUtils {
 			);
 
 			return com.aowagie.text.Font.class.getConstructor(
-				Integer.TYPE,
+				BaseFont.class,
 				Float.TYPE,
 				Integer.TYPE,
 				colorClass
 			).newInstance(
 				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2,
 				// SYMBOL = 3, ZAPFDINGBATS = 4)
-				Integer.valueOf(fontFamily == UNDEFINED ? COURIER : fontFamily),
+				getBaseFont(fontFamily),
 				// Size (DEFAULTSIZE = 12)
 				Float.valueOf(fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize),
 				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2,
@@ -121,6 +121,7 @@ final class PdfVisibleAreasUtils {
 			LOGGER.warning(
 				"Error estableciendo el color del tipo de letra para la firma visible PDF, se usara el por defecto: " + e //$NON-NLS-1$
 			);
+
 			return new com.aowagie.text.Font(
 				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3,
 				// ZAPFDINGBATS = 4)
@@ -134,6 +135,30 @@ final class PdfVisibleAreasUtils {
 				null
 			);
 		}
+	}
+
+	private static BaseFont getBaseFont(final int fontFamily) throws DocumentException, IOException {
+		final BaseFont font;
+		switch (fontFamily) {
+		case Font.HELVETICA:
+			font = BaseFont.createFont("/fonts/PDFAHelvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.TIMES_ROMAN:
+			font = BaseFont.createFont("/fonts/PDFATimes.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.SYMBOL:
+			font = BaseFont.createFont(BaseFont.SYMBOL, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+			break;
+		case Font.ZAPFDINGBATS:
+			font = BaseFont.createFont(BaseFont.ZAPFDINGBATS, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+			break;
+		case Font.COURIER:
+		default:
+			//font = BaseFont.createFont("/fonts/PDFACourier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		}
+		return font;
 	}
 
 	/**
@@ -310,7 +335,7 @@ final class PdfVisibleAreasUtils {
     		                               final Rectangle pageRect,
     		                               final int page,
     		                               final String fieldName,
-    		                               final int degrees, 
+    		                               final int degrees,
     		                               final Image rubric) throws DocumentException,
                                                                      IOException {
         final float width = pageRect.getWidth();
@@ -357,20 +382,20 @@ final class PdfVisibleAreasUtils {
 	        textImg.setInterpolation(true);
 	        textImg.setRotationDegrees(degrees);
 	        textImg.setAbsolutePosition(0, 0);
-	        
+
 	        if(rubric != null) {
 	        	//Imagen con la firma rubrica
 	        	rubric.setInterpolation(true);
 	        	rubric.setRotationDegrees(degrees);
 	        	rubric.setAbsolutePosition(0, 0);
-	        
+
 	        	//Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
 	        	if (degrees == 90 || degrees == 270) {
 	        		rubric.scaleAbsolute(height, width);
 	        	} else {
 	        		rubric.scaleAbsolute(width, height);
 	        	}
-	        
+
 	        	n2Layer.addImage(rubric);
 	        }
 	        n2Layer.addImage(textImg);
@@ -542,5 +567,5 @@ final class PdfVisibleAreasUtils {
     	}
     	return digitsCount;
     }
-    
+
 }
