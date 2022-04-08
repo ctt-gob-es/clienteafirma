@@ -53,7 +53,7 @@ public final class AOSimpleSignInfo {
         }
 
         this.certs = chainCert.clone();
-        this.signingTime = signingTime != null ? new Date(signingTime.getTime()) : null;
+        this.signingTime = signingTime;
     }
 
     /** Obtiene el algoritmo de firma.
@@ -101,7 +101,7 @@ public final class AOSimpleSignInfo {
     /** Obtiene la fecha de la firma.
      * @return Fecha de la firma. */
     public Date getSigningTime() {
-        return this.signingTime != null ? new Date(this.signingTime.getTime()) : null;
+        return this.signingTime;
     }
 
     /** Indica si la firma dispone de un sello de tiempo.

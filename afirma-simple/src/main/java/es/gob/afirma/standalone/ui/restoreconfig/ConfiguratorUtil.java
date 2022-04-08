@@ -20,8 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import es.gob.afirma.core.misc.LoggerUtil;
 
@@ -45,40 +43,6 @@ final class ConfiguratorUtil {
 			final BufferedOutputStream bos = new BufferedOutputStream(configScriptOs);
 		) {
 			bos.write(data);
-		}
-	}
-
-	/** Descomprime un fichero ZIP de recurso al disco.
-	 * @param resource Ruta del recurso ZIP.
-	 * @param outDir Directorio local en el que descomprimir.
-	 * @throws IOException Cuando ocurre un error al descomprimir.
-	 **/
-	static void uncompressResource(final String resource, final File outDir) throws IOException {
-		int n;
-
-		final byte[] buffer = new byte[1024];
-		final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
-		try (final ZipInputStream zipIs = new ZipInputStream(ConfiguratorUtil.class.getResourceAsStream(resource));) {
-			ZipEntry entry;
-			while ((entry = zipIs.getNextEntry()) != null) {
-		    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
-		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-		    	}
-				final File outFile = new File(outDir, entry.getName());
-				if (entry.isDirectory()) {
-					outFile.mkdirs();
-				}
-				else {
-					try (final FileOutputStream outFis = new FileOutputStream(outFile);) {
-						while ((n = zipIs.read(buffer)) > 0) {
-							outFis.write(buffer, 0, n);
-						}
-						outFis.flush();
-					}
-				}
-				zipIs.closeEntry();
-			}
-
 		}
 	}
 
@@ -109,7 +73,6 @@ final class ConfiguratorUtil {
 			LOGGER.warning("No se pudo borrar el directorio '" + LoggerUtil.getCleanUserHomePath(targetDir.getAbsolutePath()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
-
 
 	/**
 	 * Guarda los comandos especificados en un buffer.

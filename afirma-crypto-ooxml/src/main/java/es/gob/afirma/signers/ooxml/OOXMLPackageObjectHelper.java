@@ -129,9 +129,7 @@ final class OOXMLPackageObjectHelper {
 
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
-	    	if (zipEntry.getSize() >= THRESHOLD_FILE_SIZE) {
-	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-	    	}
+
     		if (!startsWithAnyOfThose(zipEntry.getName(), applications)) {
     			continue;
     		}
@@ -156,9 +154,6 @@ final class OOXMLPackageObjectHelper {
 	   	final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(ooXmlDocument));
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
-	    	if (zipEntry.getSize() >= THRESHOLD_FILE_SIZE) {
-	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-	    	}
     		if ("[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
     			return zipInputStream;
     		}
@@ -231,9 +226,6 @@ final class OOXMLPackageObjectHelper {
 		);
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
-	    	if (zipEntry.getSize() >= THRESHOLD_FILE_SIZE) {
-	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-	    	}
     		if (!zipEntry.getName().endsWith(".rels")) { //$NON-NLS-1$
     			continue;
     		}

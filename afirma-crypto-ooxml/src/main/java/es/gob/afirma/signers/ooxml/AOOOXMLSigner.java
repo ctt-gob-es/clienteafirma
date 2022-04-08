@@ -47,6 +47,8 @@ public final class AOOOXMLSigner implements AOSigner {
     private static final String EXTENSION_PPSX = ".ppsx"; //$NON-NLS-1$
     private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
 
+    private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
+
     // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
     // de los Base 64
     static {
@@ -273,6 +275,10 @@ public final class AOOOXMLSigner implements AOSigner {
         if (!OfficeAnalizer.isOOXMLDocument(data)) {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML"); //$NON-NLS-1$
         }
+
+    	if (data.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 
         if (certChain == null || certChain.length < 1) {
         	throw new IllegalArgumentException("Debe proporcionarse a menos el certificado del firmante"); //$NON-NLS-1$

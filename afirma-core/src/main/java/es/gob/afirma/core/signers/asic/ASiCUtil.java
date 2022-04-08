@@ -144,6 +144,9 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+    	if (asic.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 		if (signatureFilename == null) {
 			throw new IllegalArgumentException(
 				"La firma entrada de firma del ASiC no puede ser nula" //$NON-NLS-1$
@@ -154,9 +157,6 @@ public final class ASiCUtil {
 		) {
 			ZipEntry entry;
 			while((entry = zis.getNextEntry()) != null) {
-		    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
-		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-		    	}
 				if (signatureFilename.equals(entry.getName())) {
 					return AOUtil.getDataFromInputStream(zis);
 				}
@@ -177,14 +177,14 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+    	if (asic.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 		try (
 			final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		) {
 			ZipEntry entry;
 			while((entry = zis.getNextEntry()) != null) {
-		    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
-		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-		    	}
 				if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) &&
 					!ENTRY_NAME_XML_SIGNATURE.equals(entry.getName()) &&
 					!ENTRY_NAME_MIMETYPE.equals(entry.getName())
@@ -206,6 +206,9 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+    	if (asic.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		ZipEntry entry;
 		while((entry = zis.getNextEntry()) != null) {

@@ -2,6 +2,7 @@ package es.gob.afirma.signers.cades;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -360,7 +361,7 @@ public class CAdESParameters {
 	 * @return Hora de firma o {@code null} si no se debe introducir la hora.
 	 */
 	public Date getSigningTime() {
-		return this.signingTime != null ? new Date(this.signingTime.getTime()) : null;
+		return this.signingTime;
 	}
 
 	/**
@@ -368,7 +369,7 @@ public class CAdESParameters {
 	 * @param signingTime Hora de firma o {@code null} si no se estableci&oacute;.
 	 */
 	public void setSigningTime(final Date signingTime) {
-		this.signingTime = signingTime != null ? new Date(signingTime.getTime()) : null;
+		this.signingTime = signingTime;
 	}
 
 	/**
@@ -408,8 +409,7 @@ public class CAdESParameters {
 	 * @return Listado de tipos de compromisos declarados o {@code null} si no se estableci&oacute;.
 	 */
 	public List<CommitmentTypeIndicationBean> getCommitmentTypeIndications() {
-		final List<CommitmentTypeIndicationBean> commitmentTypeIndicationsCopy = this.commitmentTypeIndications;
-		return commitmentTypeIndicationsCopy;
+		return this.commitmentTypeIndications != null ? new ArrayList<CommitmentTypeIndicationBean>(this.commitmentTypeIndications) : null;
 	}
 
 	/**
@@ -417,8 +417,7 @@ public class CAdESParameters {
 	 * @param commitmentTypeIndications Listado de tipos de compromisos declarados.
 	 */
 	public void setCommitmentTypeIndications(final List<CommitmentTypeIndicationBean> commitmentTypeIndications) {
-		final List<CommitmentTypeIndicationBean> commitmentTypeIndicationsCopy = commitmentTypeIndications;
-		this.commitmentTypeIndications = commitmentTypeIndicationsCopy;
+		this.commitmentTypeIndications = commitmentTypeIndications != null ? new ArrayList<CommitmentTypeIndicationBean>(commitmentTypeIndications) : null;
 	}
 
 	/**

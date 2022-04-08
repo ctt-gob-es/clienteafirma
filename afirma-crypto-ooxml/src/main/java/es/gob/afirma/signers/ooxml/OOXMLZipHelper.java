@@ -95,7 +95,6 @@ final class OOXMLZipHelper {
                                                                                                        TransformerException,
                                                                                                        XPathExpressionException {
         final ZipOutputStream zipOutputStream = new ZipOutputStream(signedOOXMLOutputStream);
-        final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
         try (
 	        final ZipInputStream zipInputStream = new ZipInputStream(
 	    		new ByteArrayInputStream(
@@ -106,9 +105,6 @@ final class OOXMLZipHelper {
 	        ZipEntry zipEntry;
 	        boolean hasOriginSigsRels = false;
 	        while (null != (zipEntry = zipInputStream.getNextEntry())) {
-		    	if (zipEntry.getSize() >= THRESHOLD_FILE_SIZE) {
-		    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-		    	}
 	            zipOutputStream.putNextEntry(new ZipEntry(zipEntry.getName()));
 	            if ("[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
 	                final Document contentTypesDocument = loadDocumentNoClose(zipInputStream);

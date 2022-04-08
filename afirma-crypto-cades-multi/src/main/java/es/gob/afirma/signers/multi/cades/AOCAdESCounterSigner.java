@@ -48,7 +48,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
     		LOGGER.warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$
     	}
 		this.ss = sSigner;
-		this.date = d != null ? new Date(d.getTime()) : null;
+		this.date = d;
 	}
 
 	/** {@inheritDoc} */

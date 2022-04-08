@@ -77,7 +77,6 @@ final class BundledNssHelper {
      private static void uncompressZip(final String zipFileResourceName, final File outDir) throws IOException {
 
         final byte[] buffer = new byte[BUFFER_SIZE];
-		final long THRESHOLD_FILE_SIZE = 1000000000; // 1GB
         try (
 	        final InputStream fis = BundledNssHelper.class.getResourceAsStream(zipFileResourceName);
 	        final ZipInputStream zipIs = new ZipInputStream(
@@ -86,9 +85,6 @@ final class BundledNssHelper {
 		) {
 	        ZipEntry entry;
 	        while ((entry = zipIs.getNextEntry()) != null) {
-	        	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
-	        		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-	        	}
 	            if (entry.isDirectory()) {
 	                new File(outDir, entry.getName()).mkdirs();
 	            }

@@ -9,6 +9,7 @@
 
 package es.gob.afirma.signers.cades;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Metadatos del firmante de una firma CAdES.
@@ -57,8 +58,7 @@ public final class CAdESSignerMetadata {
 			}
 			this.countryName = country;
 			this.localityName = locality;
-			final List<String> addressCopy = address;
-			this.postalAddress = addressCopy;
+			this.postalAddress = address != null ? new ArrayList<String>(address) : null;
 		}
 
 		/** Obtiene el nombre del pa&iacute;s donde se encuentra el firmante.
@@ -79,8 +79,7 @@ public final class CAdESSignerMetadata {
 		 * </pre>
 		 * @return Direcci&oacute;n postal donde se encuentra el firmante. */
 		public List<String> getPostalAddress() {
-			final List<String> postalAddressCopy = this.postalAddress;
-			return postalAddressCopy;
+			return this.postalAddress != null ? new ArrayList<String>(this.postalAddress) : null;
 		}
 
 	}

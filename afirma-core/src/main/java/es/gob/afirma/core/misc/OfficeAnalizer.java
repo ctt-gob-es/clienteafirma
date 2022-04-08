@@ -145,10 +145,10 @@ public final class OfficeAnalizer {
     static String getMimeType(final byte[] data) throws IOException {
 
     	String mimetype = null;
-    	final File tempFile = AOFileUtils.createTempFile(data);
-    	if (tempFile.length() >= THRESHOLD_FILE_SIZE) {
+    	if (data.length >= THRESHOLD_FILE_SIZE) {
     		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
     	}
+    	final File tempFile = AOFileUtils.createTempFile(data);
     	try (final ZipFile zipFile = new ZipFile(tempFile)) {
     		if (isODFFile(zipFile)) {
     			try (
@@ -269,10 +269,10 @@ public final class OfficeAnalizer {
     	boolean result;
     	File tempFile = null;
     	try {
-    		tempFile = AOFileUtils.createTempFile(document);
-        	if (tempFile.length() >= THRESHOLD_FILE_SIZE) {
+        	if (document.length >= THRESHOLD_FILE_SIZE) {
         		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
         	}
+    		tempFile = AOFileUtils.createTempFile(document);
 			try (final ZipFile zipFile = new ZipFile(tempFile)) {
 				result = isOOXMLFile(zipFile);
 			}
@@ -298,9 +298,6 @@ public final class OfficeAnalizer {
      * @throws IOException Error en el tama&ntilde;o permitido del archivo */
     private static boolean isOOXMLFile(final ZipFile zipFile) throws IOException {
         // Comprobamos si estan todos los ficheros principales del documento
-    	if (zipFile.size() >= THRESHOLD_FILE_SIZE) {
-    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-    	}
         return zipFile.getEntry("[Content_Types].xml") != null && zipFile.getEntry("_rels/.rels") != null //$NON-NLS-1$ //$NON-NLS-2$
                && zipFile.getEntry("docProps/app.xml") != null //$NON-NLS-1$
                && zipFile.getEntry("docProps/core.xml") != null; //$NON-NLS-1$
@@ -365,10 +362,10 @@ public final class OfficeAnalizer {
     	boolean result;
     	File tempFile = null;
     	try {
-    		tempFile = AOFileUtils.createTempFile(document);
-        	if (tempFile.length() >= THRESHOLD_FILE_SIZE) {
+        	if (document.length >= THRESHOLD_FILE_SIZE) {
         		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
         	}
+    		tempFile = AOFileUtils.createTempFile(document);
 			try (final ZipFile zipFile = new ZipFile(tempFile)) {
 				result = isODFFile(zipFile);
 			}
@@ -396,9 +393,6 @@ public final class OfficeAnalizer {
         // Comprobamos si estan todos los ficheros principales del documento
     	// Se separan las comprobaciones en varios if para no tener una sola
     	// sentencia condicional muy larga
-    	if (zipFile.size() >= THRESHOLD_FILE_SIZE) {
-    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-    	}
     	if (zipFile.getEntry("mimetype") == null) { //$NON-NLS-1$
     		return false;
     	}

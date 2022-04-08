@@ -173,8 +173,7 @@ public class Version {
 	 * @return Listado de partes del n&uacute;mero de versi&oacute;n.
 	 */
 	public List<Integer> getVersionParts() {
-		final List<Integer> versionPartsCopy = this.versionParts;
-		return versionPartsCopy;
+		return this.versionParts != null ? new ArrayList<>(this.versionParts) : null;
 	}
 
 	/**
