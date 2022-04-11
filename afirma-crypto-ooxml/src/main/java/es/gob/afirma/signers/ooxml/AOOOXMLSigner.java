@@ -178,10 +178,14 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** { {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws IOException {
         if (sign == null) {
             throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
+
+        if (sign.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 
         if (!isSign(sign)) {
             LOGGER.severe("La firma indicada no es de tipo OOXML"); //$NON-NLS-1$
@@ -271,14 +275,14 @@ public final class AOOOXMLSigner implements AOSigner {
                        final java.security.cert.Certificate[] certChain,
                        final Properties extraParams) throws AOException, IOException {
 
+    	if (data.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
+
         // Comprobamos si es un documento OOXML valido.
         if (!OfficeAnalizer.isOOXMLDocument(data)) {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML"); //$NON-NLS-1$
         }
-
-    	if (data.length >= THRESHOLD_FILE_SIZE) {
-    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-    	}
 
         if (certChain == null || certChain.length < 1) {
         	throw new IllegalArgumentException("Debe proporcionarse a menos el certificado del firmante"); //$NON-NLS-1$

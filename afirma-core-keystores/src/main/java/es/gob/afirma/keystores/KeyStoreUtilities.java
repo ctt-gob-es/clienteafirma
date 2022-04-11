@@ -251,15 +251,19 @@ public final class KeyStoreUtilities {
                     try {
                     	if (!ksm.isKeyEntry(al)) {
                     		aliassesByFriendlyName.remove(al);
-                            LOGGER.info(
-                              "Se ha ocultado un certificado (emitido por '" + AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()) + "') por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
-                            );
+                            LOGGER.info(String.format(
+                                    "Se ha ocultado el certificado con numero de serie '%s' (emitido por '%s') por no soportar operaciones de clave privada", //$NON-NLS-1$
+                                    AOUtil.hexify(tmpCert.getSerialNumber().toByteArray(), false),
+                                    AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()))
+                                  );
                     	}
                     }
                     catch (final Exception e) {
                     	aliassesByFriendlyName.remove(al);
-                    	LOGGER.info(
-                            "Se ha ocultado un certificado (emitido por '" + AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()) + "') por no poderse comprobar su clave privada: "  + e //$NON-NLS-1$ //$NON-NLS-2$
+                    	LOGGER.info(String.format(
+                    			"Se ha ocultado el certificado con numero de serie '%s' (emitido por '%s') por no poderse comprobar su clave privada: "  + e, //$NON-NLS-1$
+                    			AOUtil.hexify(tmpCert.getSerialNumber().toByteArray(), false),
+                    			AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()))
             			);
                     }
                 }
@@ -336,7 +340,7 @@ public final class KeyStoreUtilities {
 		File dir;
 		try {
 			dir = new File(path).getCanonicalFile();
-		}catch (final Exception e) {
+		} catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "La ruta de fichero a acortar no es valida", e); //$NON-NLS-1$
 			dir = null;
 		}

@@ -12,6 +12,7 @@ package es.gob.afirma.test.ooxml;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -90,10 +91,11 @@ public final class TestOOXML {
     	}
     }
 
-    /** Prueba de firma convencional. */
+    /** Prueba de firma convencional.
+     * @throws IOException */
     @SuppressWarnings("static-method")
 	@Test
-    public void testGetSignersStructure() {
+    public void testGetSignersStructure() throws IOException {
     	new AOOOXMLSigner().getSignersStructure(DATAS[0], false);
     }
 

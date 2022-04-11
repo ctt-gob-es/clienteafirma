@@ -152,6 +152,10 @@ public final class AOODFSigner implements AOSigner {
                        final java.security.cert.Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
+    	if (data.length >= THRESHOLD_FILE_SIZE) {
+    		throw new AOException("Los datos tienen un tamano superior al permitido"); //$NON-NLS-1$
+    	}
+
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty(AOODFExtraParams.REFERENCES_DIGEST_METHOD, DEFAULT_DIGEST_METHOD);
@@ -160,10 +164,6 @@ public final class AOODFSigner implements AOSigner {
         if (!isValidDataFile(data)) {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento ODF"); //$NON-NLS-1$
         }
-
-    	if (data.length >= THRESHOLD_FILE_SIZE) {
-    		throw new AOException("Los datos tienen un tamano superior al permitido"); //$NON-NLS-1$
-    	}
 
         String fullPath = MANIFEST_PATH;
         boolean isCofirm = false;
@@ -588,12 +588,12 @@ public final class AOODFSigner implements AOSigner {
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
 
-    	if (!isSign(sign)) {
-    		throw new AOInvalidFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
-    	}
-
     	if (sign.length >= THRESHOLD_FILE_SIZE) {
     		throw new IOException("Los datos tienen un tamano superior al permitido."); //$NON-NLS-1$
+    	}
+
+    	if (!isSign(sign)) {
+    		throw new AOInvalidFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
     	}
 
         try {
