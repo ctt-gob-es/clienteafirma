@@ -39,6 +39,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
@@ -68,7 +69,7 @@ public final class ValidateXMLSignature implements SignValider {
 
         final Document doc;
         try {
-            doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
         	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);

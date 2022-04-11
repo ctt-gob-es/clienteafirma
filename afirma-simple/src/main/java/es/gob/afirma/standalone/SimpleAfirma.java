@@ -510,7 +510,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return Locales disponibles para la aplicaci&oacute;n
 	 */
     public static Locale[] getAvailableLocales() {
-        return locales;
+    	return locales != null ? locales.clone() : null;
     }
 
 	/**

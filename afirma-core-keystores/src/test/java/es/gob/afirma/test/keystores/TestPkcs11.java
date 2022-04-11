@@ -79,7 +79,7 @@ public final class TestPkcs11 {
 		final String alias = aliases.nextElement();
 		System.out.println("Alias para la firma: " + alias); //$NON-NLS-1$
 
-		final Signature s = Signature.getInstance("SHA1withRSA", p); //$NON-NLS-1$
+		final Signature s = Signature.getInstance("SHA256withRSA", p); //$NON-NLS-1$
 		s.initSign(
 			((PrivateKeyEntry)ks.getEntry(
 				alias,

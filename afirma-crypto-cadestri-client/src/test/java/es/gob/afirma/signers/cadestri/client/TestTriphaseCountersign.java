@@ -26,7 +26,7 @@ public class TestTriphaseCountersign {
 
 	private static final String PKCS12_KEYSTORE = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 
-	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
+	private static final String PWD = "12341234"; //$NON-NLS-1$
 
 	private static final String SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
 
@@ -43,7 +43,7 @@ public class TestTriphaseCountersign {
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, PASSWORD.toCharArray());
+		ks.load(ksIs, PWD.toCharArray());
 	}
 
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
@@ -63,7 +63,7 @@ public class TestTriphaseCountersign {
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
 
 		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -102,7 +102,7 @@ public class TestTriphaseCountersign {
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
 
 		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,

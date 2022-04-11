@@ -9,12 +9,14 @@
 
 package es.gob.afirma.core.misc.protocol;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
@@ -410,6 +412,7 @@ public abstract class UrlParameters {
 		return null;
 	}
 
+
 	protected static String getDefaultKeyStoreLib(final Map<String, String> params) {
 
 		// Si se ha especificado un almacen, se usara ese
@@ -432,8 +435,24 @@ public abstract class UrlParameters {
 
 		final int separatorPos = ksValue.indexOf(':');
 		if (separatorPos != -1 && separatorPos < ksValue.length() - 1) {
-			return ksValue.substring(separatorPos + 1).trim();
+			return cleanupPath(ksValue.substring(separatorPos + 1));
 		}
 		return null;
+	}
+
+	/**
+	 * Sanea una ruta de archivo.
+	 * @param path Ruta de archivo.
+	 * @return Ruta de archivo limpia.
+	 */
+	private static String cleanupPath(final String path) {
+		String cleanedpath = path.trim().replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		try {
+			cleanedpath = new File(cleanedpath).getCanonicalPath();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Ruta de fichero no valida", e); //$NON-NLS-1$
+			cleanedpath = null;
+		}
+		return cleanedpath;
 	}
 }

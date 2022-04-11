@@ -11,6 +11,7 @@ package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -26,6 +27,7 @@ import java.security.PrivilegedExceptionAction;
 import java.security.cert.CertificateEncodingException;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JApplet;
@@ -1023,7 +1025,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					this.keystoreType = AOKeyStore.valueOf(ksType.substring(0, separatorPos).trim());
 					if (separatorPos < ksType.length() -1 &&
 							ksType.substring(separatorPos + 1).trim().length() > 0) {
-						this.keystoreLib = ksType.substring(separatorPos + 1).trim();
+						this.keystoreLib = cleanupPath(ksType.substring(separatorPos + 1));
 					}
 				}
 			}
@@ -1033,6 +1035,22 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				throw new AOException("El tipo de almacen indicado no existe: " + ksType, e); //$NON-NLS-1$
 			}
 		}
+	}
+
+	/**
+	 * Sanea una ruta de archivo.
+	 * @param path Ruta de archivo.
+	 * @return Ruta de archivo limpia.
+	 */
+	private static String cleanupPath(final String path) {
+		String cleanedpath = path.trim().replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		try {
+			cleanedpath = new File(cleanedpath).getCanonicalPath();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Ruta de fichero no valida", e); //$NON-NLS-1$
+			cleanedpath = null;
+		}
+		return cleanedpath;
 	}
 
 	/** Permite que el usuario seleccione un certificado del almac&eacute;n configurado, o

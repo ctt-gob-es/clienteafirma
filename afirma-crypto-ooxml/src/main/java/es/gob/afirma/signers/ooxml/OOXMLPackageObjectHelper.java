@@ -44,9 +44,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.ooxml.relprovider.RelationshipTransformParameterSpec;
 import es.gob.afirma.signers.ooxml.relprovider.RelationshipTransformService;
-import es.gob.afirma.signers.xml.Utils;
 
 final class OOXMLPackageObjectHelper {
 
@@ -63,6 +63,7 @@ final class OOXMLPackageObjectHelper {
     };
 
     private static final Set<String> EXCLUDED_RELATIONSHIPS = new HashSet<>(6);
+    private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
     static {
     	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"); //$NON-NLS-1$
     	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"); //$NON-NLS-1$
@@ -128,6 +129,7 @@ final class OOXMLPackageObjectHelper {
 
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
+
     		if (!startsWithAnyOfThose(zipEntry.getName(), applications)) {
     			continue;
     		}
@@ -167,7 +169,7 @@ final class OOXMLPackageObjectHelper {
 		) {
 	        final InputSource inputSource = new InputSource(noCloseInputStream);
 
-	        return Utils.getNewDocumentBuilder().parse(inputSource);
+	        return SecureXmlBuilder.getSecureDocumentBuilder().parse(inputSource);
 		}
     }
 

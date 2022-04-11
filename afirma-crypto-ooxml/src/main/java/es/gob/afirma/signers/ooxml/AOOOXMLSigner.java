@@ -47,6 +47,8 @@ public final class AOOOXMLSigner implements AOSigner {
     private static final String EXTENSION_PPSX = ".ppsx"; //$NON-NLS-1$
     private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
 
+    private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
+
     // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
     // de los Base 64
     static {
@@ -176,10 +178,14 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** { {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws IOException {
         if (sign == null) {
             throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
+
+        if (sign.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 
         if (!isSign(sign)) {
             LOGGER.severe("La firma indicada no es de tipo OOXML"); //$NON-NLS-1$
@@ -268,6 +274,10 @@ public final class AOOOXMLSigner implements AOSigner {
                        final PrivateKey key,
                        final java.security.cert.Certificate[] certChain,
                        final Properties extraParams) throws AOException, IOException {
+
+    	if (data.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 
         // Comprobamos si es un documento OOXML valido.
         if (!OfficeAnalizer.isOOXMLDocument(data)) {

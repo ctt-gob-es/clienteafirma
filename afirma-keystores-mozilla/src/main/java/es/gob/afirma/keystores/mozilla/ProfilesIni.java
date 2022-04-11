@@ -101,7 +101,7 @@ class ProfilesIni {
 
 
 	public List<FirefoxProfile> getProfilesList() {
-		return this.profilesList;
+		return this.profilesList != null ? new ArrayList<>(this.profilesList) : null;
 	}
 
 	public GeneralInfo getGeneralInfo() {

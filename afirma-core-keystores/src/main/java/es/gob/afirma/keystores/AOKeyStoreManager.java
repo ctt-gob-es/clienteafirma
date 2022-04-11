@@ -67,7 +67,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     /** Obtiene la lista de alias precargados.
      * @return Lista de alias precargados. */
     protected String[] getCachedAliases() {
-    	return this.cachedAliases;
+    	return this.cachedAliases != null ? this.cachedAliases.clone() : null;
     }
 
     /** Establece la lista de alias precargados.
@@ -380,7 +380,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
             throw new IllegalStateException("Se han pedido alias a un almacen no inicializado"); //$NON-NLS-1$
         }
         if (this.cachedAliases != null) {
-        	return this.cachedAliases;
+        	return this.cachedAliases.clone();
         }
 		try {
 			this.cachedAliases = cleanDeactivatedAliases(
@@ -393,7 +393,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 			);
 			return new String[0];
 		}
-		return this.cachedAliases;
+		return this.cachedAliases.clone();
 
     }
 

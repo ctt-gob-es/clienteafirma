@@ -2,6 +2,7 @@ package es.gob.afirma.signers.cades;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -302,7 +303,7 @@ public class CAdESParameters {
 	 * @see #getDigestAlgorithm()
 	 */
 	public byte[] getDataDigest() {
-		return this.dataDigest;
+		return this.dataDigest != null ? this.dataDigest.clone() : null;
 	}
 
 	/**
@@ -315,7 +316,7 @@ public class CAdESParameters {
 	 * @see #getDigestAlgorithm()
 	 */
 	public void setDataDigest(final byte[] dataDigest) {
-		this.dataDigest = dataDigest;
+		this.dataDigest = dataDigest != null ? dataDigest.clone() : null;
 	}
 
 	/**
@@ -408,7 +409,7 @@ public class CAdESParameters {
 	 * @return Listado de tipos de compromisos declarados o {@code null} si no se estableci&oacute;.
 	 */
 	public List<CommitmentTypeIndicationBean> getCommitmentTypeIndications() {
-		return this.commitmentTypeIndications;
+		return this.commitmentTypeIndications != null ? new ArrayList<CommitmentTypeIndicationBean>(this.commitmentTypeIndications) : null;
 	}
 
 	/**
@@ -416,7 +417,7 @@ public class CAdESParameters {
 	 * @param commitmentTypeIndications Listado de tipos de compromisos declarados.
 	 */
 	public void setCommitmentTypeIndications(final List<CommitmentTypeIndicationBean> commitmentTypeIndications) {
-		this.commitmentTypeIndications = commitmentTypeIndications;
+		this.commitmentTypeIndications = commitmentTypeIndications != null ? new ArrayList<CommitmentTypeIndicationBean>(commitmentTypeIndications) : null;
 	}
 
 	/**
@@ -424,7 +425,7 @@ public class CAdESParameters {
 	 * @return Listado de roles declarados o {@code null} si no se estableci&oacute;.
 	 */
 	public String[] getClaimedRoles() {
-		return this.claimedRoles;
+		return this.claimedRoles != null ? this.claimedRoles.clone() : null;
 	}
 
 	/**
@@ -432,7 +433,7 @@ public class CAdESParameters {
 	 * @param claimedRoles Listado de roles declarados.
 	 */
 	public void setClaimedRoles(final String[] claimedRoles) {
-		this.claimedRoles = claimedRoles;
+		this.claimedRoles = claimedRoles != null ? claimedRoles.clone() : null;
 	}
 
 	/**
@@ -491,7 +492,7 @@ public class CAdESParameters {
 	 * @return Propiedades con la configuraci&oacute;n de firma indicada.
 	 */
 	public Properties getExtraParams() {
-		return this.extraParams;
+		return this.extraParams != null ? (Properties) this.extraParams.clone() : null;
 	}
 
 	/**
@@ -502,7 +503,7 @@ public class CAdESParameters {
 	 * @see #load(byte[], String, Properties)
 	 */
 	public void setExtraParams(final Properties extraParams) {
-		this.extraParams = extraParams;
+		this.extraParams = extraParams != null ? (Properties) extraParams.clone() : null;
 	}
 
 	/**

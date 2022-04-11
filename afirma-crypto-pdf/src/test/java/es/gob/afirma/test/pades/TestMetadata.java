@@ -16,7 +16,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Test;
 import org.w3c.dom.DOMConfiguration;
@@ -117,8 +116,6 @@ public final class TestMetadata {
 			originalXmp.length()
 		);
 
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
 		final DocumentBuilder db = SecureXmlBuilder.getSecureDocumentBuilder();
 		final Document doc = db.parse(new ByteArrayInputStream(xmpBytes));
 		NodeList nl = doc.getElementsByTagName("xmpMM:History"); //$NON-NLS-1$

@@ -172,8 +172,7 @@ public final class AOSecMod {
                 }
             }
         }
-
-        return modules;
+        return modules != null ? new ArrayList<>(modules) : null;
     }
 
     /** M&oacute;dulo de seguridad (PKCS#11) de NSS. */

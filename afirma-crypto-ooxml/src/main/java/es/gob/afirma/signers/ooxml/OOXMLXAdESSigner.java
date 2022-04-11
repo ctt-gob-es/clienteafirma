@@ -39,6 +39,7 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -103,7 +104,7 @@ final class OOXMLXAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-		final Document docSignature = Utils.getNewDocumentBuilder().newDocument();
+		final Document docSignature = SecureXmlBuilder.getSecureDocumentBuilder().newDocument();
 
 		// Instancia XADES_EPES
 		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
@@ -251,7 +252,7 @@ final class OOXMLXAdESSigner {
         writeXMLwithXALAN(writer, node, xmlEncoding);
 
         try {
-        	Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+        	SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
         catch (final Exception e) {
             LOGGER.severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e); //$NON-NLS-1$

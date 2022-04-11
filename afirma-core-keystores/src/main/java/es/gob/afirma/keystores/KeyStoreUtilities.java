@@ -252,10 +252,9 @@ public final class KeyStoreUtilities {
                     	if (!ksm.isKeyEntry(al)) {
                     		aliassesByFriendlyName.remove(al);
                             LOGGER.info(String.format(
-                              "Se ha ocultado el certificado con numero de serie '%s' (emitido por '%s') por no soportar operaciones de clave privada", //$NON-NLS-1$
-                              AOUtil.hexify(tmpCert.getSerialNumber().toByteArray(), false),
-                              AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()))
-                            );
+                            		"Se ha ocultado el certificado con numero de serie '%s' (emitido por '%s') por no soportar operaciones de clave privada", //$NON-NLS-1$
+                            		AOUtil.hexify(tmpCert.getSerialNumber().toByteArray(), false),
+                            		AOUtil.getCN(tmpCert.getIssuerX500Principal().toString())));
                     	}
                     }
                     catch (final Exception e) {
@@ -263,8 +262,7 @@ public final class KeyStoreUtilities {
                     	LOGGER.info(String.format(
                     			"Se ha ocultado el certificado con numero de serie '%s' (emitido por '%s') por no poderse comprobar su clave privada: "  + e, //$NON-NLS-1$
                     			AOUtil.hexify(tmpCert.getSerialNumber().toByteArray(), false),
-                    			AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()))
-            			);
+                    			AOUtil.getCN(tmpCert.getIssuerX500Principal().toString())));
                     }
                 }
             }

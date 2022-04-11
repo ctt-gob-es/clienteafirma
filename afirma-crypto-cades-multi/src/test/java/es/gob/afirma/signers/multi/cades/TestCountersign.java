@@ -26,7 +26,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 public final class TestCountersign {
 
 	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
-	private static final String PASSWORD = "1111"; //$NON-NLS-1$
+	private static final String PWD = "1111"; //$NON-NLS-1$
 	private static final String IMPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
 	private static final String EXPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_explicita.csig"; //$NON-NLS-1$
 	private static final String EXPLICIT_SHA1_CADES_A_FILE = "cadesA.csig"; //$NON-NLS-1$
@@ -41,7 +41,7 @@ public final class TestCountersign {
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, PASSWORD.toCharArray());
+		ks.load(ksIs, PWD.toCharArray());
 		ksIs.close();
 	}
 
@@ -59,7 +59,7 @@ public final class TestCountersign {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -96,7 +96,7 @@ public final class TestCountersign {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
@@ -133,7 +133,7 @@ public final class TestCountersign {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -169,7 +169,7 @@ public final class TestCountersign {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
@@ -217,7 +217,7 @@ public final class TestCountersign {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		byte[] countersign;
 		try {
@@ -268,7 +268,7 @@ public final class TestCountersign {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,

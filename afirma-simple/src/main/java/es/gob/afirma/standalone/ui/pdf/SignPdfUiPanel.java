@@ -95,7 +95,7 @@ final class SignPdfUiPanel extends JPanel implements
 
 	private Properties extraParamsForLocation = null;
 	Properties getExtraParamsForLocation() {
-		return this.extraParamsForLocation;
+		return this.extraParamsForLocation != null ? (Properties) this.extraParamsForLocation.clone() : null;
 	}
 
 	private int currentPage = 1;
@@ -181,7 +181,7 @@ final class SignPdfUiPanel extends JPanel implements
 	}
 
 	private void setProperties(final Properties p) {
-		this.extraParamsForLocation = p;
+		this.extraParamsForLocation = p != null ? (Properties) p.clone() : null;
 	}
 
 	private PageLabel createPageLabel(final BufferedImage page,

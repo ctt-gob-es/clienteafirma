@@ -14,7 +14,7 @@ public final class SignFromCommandLineTest {
 	private static final String PDF_MULTIPLE_PAGES_FILE = "/samples/multiple_pages.pdf"; //$NON-NLS-1$
 	private static final String PKCS12_FILE = "/ANF_PF_Activo.pfx"; //$NON-NLS-1$
 	private static final String ALIAS = "anf usuario activo"; //$NON-NLS-1$
-	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
+	private static final String PWD = "12341234"; //$NON-NLS-1$
 
 	/** Prueba de generacion de firma visible PDF.
 	 * @throws Exception Cuando ocurre cualquier error. */
@@ -34,7 +34,7 @@ public final class SignFromCommandLineTest {
 					"-i", inputFile,  //$NON-NLS-1$
 					"-o", outFile, //$NON-NLS-1$
 					"-store", "pkcs12:" + p12File, //$NON-NLS-1$ //$NON-NLS-2$
-					"-password", PASSWORD, //$NON-NLS-1$
+					"-password", PWD, //$NON-NLS-1$
 					"-alias", ALIAS,  //$NON-NLS-1$,
 					"-format", "pades", //$NON-NLS-1$ //$NON-NLS-2$
 					"-config", "signaturePositionOnPageLowerLeftX=100\\n" + //$NON-NLS-1$ //$NON-NLS-2$
@@ -66,7 +66,7 @@ public final class SignFromCommandLineTest {
 					"-i", inputFile,  //$NON-NLS-1$
 					"-o", outFile, //$NON-NLS-1$
 					"-store", "pkcs12:" + p12File, //$NON-NLS-1$ //$NON-NLS-2$
-					"-password", PASSWORD, //$NON-NLS-1$
+					"-password", PWD, //$NON-NLS-1$
 					"-alias", ALIAS,  //$NON-NLS-1$,
 					"-format", "pades", //$NON-NLS-1$ //$NON-NLS-2$
 					"-config", "signaturePositionOnPageLowerLeftX=100\\n" + //$NON-NLS-1$ //$NON-NLS-2$

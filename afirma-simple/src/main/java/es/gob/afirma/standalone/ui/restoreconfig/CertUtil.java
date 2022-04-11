@@ -97,7 +97,7 @@ final class CertUtil {
 			this.caCert = caCertificate;
 			this.prK = sslCertificatePrivateKeyEntry.getPrivateKey();
 			this.alias = sslCertificateAlias;
-			this.password = storePassword;
+			this.password = storePassword != null ? storePassword.clone() : null;
 		}
 
 		Certificate getSslCertificate() {
@@ -122,7 +122,7 @@ final class CertUtil {
 				keyStore.store(baos, this.password);
 				this.p12 = baos.toByteArray();
 			}
-			return this.p12;
+			return this.p12 != null ? this.p12.clone() : null;
 		}
 	}
 
