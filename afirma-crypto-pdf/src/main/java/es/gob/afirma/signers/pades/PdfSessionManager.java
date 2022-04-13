@@ -131,7 +131,7 @@ public final class PdfSessionManager {
 		if (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGES)) {
 			pagesStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(","); //$NON-NLS-1$
 		}
-		final List<Integer> pages = new ArrayList<Integer>();
+		final List<Integer> pages = new ArrayList<>();
 
 		byte[] inPDF;
 		try {
@@ -491,7 +491,8 @@ public final class PdfSessionManager {
 							layer2FontFamily,
 							layer2FontSize,
 							layer2FontStyle,
-							layer2FontColor
+							layer2FontColor,
+							pdfA1
 					)
 			);
 		}

@@ -32,6 +32,7 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
@@ -53,6 +54,8 @@ public class TestPAdES {
 
     //private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_CTF2 = "pruebafirma_certificado.pdf"; //$NON-NLS-1$
+
+    private static final String TEST_FILE_PDFA1B = "PDF-A1B.pdf"; //$NON-NLS-1$
 
     static {
         final Properties p1 = new Properties();
@@ -692,11 +695,52 @@ public class TestPAdES {
 
     	final byte[] signatureWithReservedSpace = signer.sign(testPdf, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), reservedSpaceConfig);
 
-    	System.out.println("Tamano estandar: " + defaultSignature.length);
-    	System.out.println("Con tamano reservado: " + signatureWithReservedSpace.length);
+    	System.out.println("Tamano estandar: " + defaultSignature.length); //$NON-NLS-1$
+    	System.out.println("Con tamano reservado: " + signatureWithReservedSpace.length); //$NON-NLS-1$
 
     	Assert.assertTrue(
     			"El tamano de la firma con espacio reservado deveria ser considerablemente mayor a la por defecto", //$NON-NLS-1$
     			signatureWithReservedSpace.length > defaultSignature.length + 10000);
+    }
+
+    /** Prueba de firma visible PDF sobre un documento PDF/A.
+     * @throws Exception Cuando ocurre cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testVisibleSignature() throws Exception {
+
+    	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        try (
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+		) {
+        	ks.load(is, CERT_PASS.toCharArray());
+        }
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final byte[] testPdf;
+        try (
+    		final InputStream isPdf = ClassLoader.getSystemResourceAsStream(TEST_FILE_PDFA1B)
+		) {
+        	testPdf = AOUtil.getDataFromInputStream(isPdf);
+        }
+
+    	final Properties config = new Properties();
+    	config.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX, "100"); //$NON-NLS-1$
+    	config.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY, "100"); //$NON-NLS-1$
+    	config.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX, "200"); //$NON-NLS-1$
+    	config.setProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY, "200"); //$NON-NLS-1$
+    	config.setProperty(PdfExtraParams.SIGNATURE_PAGES, "1"); //$NON-NLS-1$
+
+    	final AOSigner signer = new AOPDFSigner();
+    	final byte[] signedPdf = signer.sign(testPdf, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+    	final File tempFile = File.createTempFile("firmavisible-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+    	try (OutputStream fos = new FileOutputStream(tempFile)) {
+    		fos.write(signedPdf);
+    	}
+
+    	System.out.println("Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+    			tempFile.getAbsolutePath());
+
     }
 }

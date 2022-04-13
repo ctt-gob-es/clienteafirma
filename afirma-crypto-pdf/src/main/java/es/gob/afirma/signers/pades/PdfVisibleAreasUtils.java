@@ -39,7 +39,6 @@ final class PdfVisibleAreasUtils {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final int DEFAULT_LAYER_2_FONT_SIZE = 12;
-    private static final int COURIER = 0;
     private static final int UNDEFINED = -1;
     private static final String BLACK = "black"; //$NON-NLS-1$
 
@@ -72,13 +71,40 @@ final class PdfVisibleAreasUtils {
 		// No instanciable
 	}
 
-	static com.aowagie.text.Font getFont(final int fontFamily,
+	/**
+	 * Obtiene la fuente para generar el texto de la firma visible.
+	 * @param fontFamily Identificador de familia de la fuente (0: COURIER, 1: HELVETICA,
+	 * 2: TIMES_ROMAN, 3: SYMBOL, 4: ZAPFDINGBATS). Con -1 se usa el valor por defecto: COURIER.
+	 * @param fontSize Tama&ntilde;o de fuente. Con -1 se usa el valor por defecto: 12.
+	 * @param fontStyle Estilo a aplicar al texto (0: NORMAL, 1: BOLD, 2: ITALIC, 3: BOLDITALIC,
+	 * 4: UNDERLINE, 8: STRIKETHRU). Con -1 se usa el valor por defecto: NORMAL.
+	 * @param fontColor Nombre del color (black, white, lightGray, gray, darkGray, red o pink).
+	 * @param pdfa {@code true} si se trata de un documento PDF/A, {@code false} en caso contrario.
+	 * @return Fuente de letra.
+	 */
+	static Font getFont(final int fontFamily,
 			                             final int fontSize,
 			                             final int fontStyle,
-			                             final String fontColor) {
+			                             final String fontColor,
+			                             final boolean pdfa) {
+
+		final int family = fontFamily == UNDEFINED ? Font.COURIER : fontFamily;
+		final int size = fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize;
+		final int style = fontStyle == UNDEFINED ? Font.NORMAL : fontStyle;
+
+		BaseFont baseFont;
+		try {
+			baseFont = getBaseFont(fontFamily, pdfa);
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+					"Error construyendo la fuente de letra para la firma visible PDF, se usara la por defecto y el PDF no sera compatible PDF/A: " + e //$NON-NLS-1$
+					);
+
+			return new Font(family, size, style, null);
+		}
 
 		final String colorName = fontColor != null ? fontColor.toLowerCase() : BLACK;
-
 		final ColorValues cv = COLORS.get(colorName) != null ? COLORS.get(colorName) : COLORS.get(BLACK);
 
 		try {
@@ -99,65 +125,44 @@ final class PdfVisibleAreasUtils {
 				Integer.valueOf(cv.getB())
 			);
 
-			return com.aowagie.text.Font.class.getConstructor(
+			// Utilizamos el constructor por reflexion para poder
+			// utilizar indistintamente la case de color de Java
+			// y de Android
+			return Font.class.getConstructor(
 				BaseFont.class,
 				Float.TYPE,
 				Integer.TYPE,
 				colorClass
-			).newInstance(
-				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2,
-				// SYMBOL = 3, ZAPFDINGBATS = 4)
-				getBaseFont(fontFamily),
-				// Size (DEFAULTSIZE = 12)
-				Float.valueOf(fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize),
-				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2,
-				// BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-				Integer.valueOf(fontStyle == UNDEFINED ? com.aowagie.text.Font.NORMAL : fontStyle),
-				// Color
-				color
-			);
+			).newInstance(baseFont, Float.valueOf(size), Integer.valueOf(style), color);
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-				"Error estableciendo el color del tipo de letra para la firma visible PDF, se usara el por defecto: " + e //$NON-NLS-1$
-			);
-
-			return new com.aowagie.text.Font(
-				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3,
-				// ZAPFDINGBATS = 4)
-				fontFamily == UNDEFINED ? COURIER : fontFamily,
-				// Size (DEFAULTSIZE = 12)
-				fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize,
-				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3,
-				// UNDERLINE = 4, STRIKETHRU = 8)
-				fontStyle == UNDEFINED ? com.aowagie.text.Font.NORMAL : fontStyle,
-				// Color
-				null
-			);
+				"Error estableciendo el color del tipo de letra para la firma visible PDF, se usara el por defecto: " + e); //$NON-NLS-1$
+			return new Font(baseFont, size, style, null);
 		}
 	}
 
-	private static BaseFont getBaseFont(final int fontFamily) throws DocumentException, IOException {
+	private static BaseFont getBaseFont(final int fontFamily, final boolean pdfa) throws DocumentException, IOException {
 		final BaseFont font;
 		switch (fontFamily) {
 		case Font.HELVETICA:
-			font = BaseFont.createFont("/fonts/PDFAHelvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/Helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		case Font.TIMES_ROMAN:
-			font = BaseFont.createFont("/fonts/PDFATimes.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-			break;
-		case Font.SYMBOL:
-			font = BaseFont.createFont(BaseFont.SYMBOL, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-			break;
-		case Font.ZAPFDINGBATS:
-			font = BaseFont.createFont(BaseFont.ZAPFDINGBATS, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+			font = BaseFont.createFont("/fonts/Times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		case Font.COURIER:
 		default:
-			//font = BaseFont.createFont("/fonts/PDFACourier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-			font = BaseFont.createFont("/fonts/arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/Courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		}
+
+		// Si la firma es PDF/A, incrustamos toda la fuente para seguir
+		// respetando el estandar
+		if (pdfa) {
+			font.setSubset(false);
+		}
+
 		return font;
 	}
 
