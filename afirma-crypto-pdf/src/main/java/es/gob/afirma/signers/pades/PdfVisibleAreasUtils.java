@@ -74,7 +74,7 @@ final class PdfVisibleAreasUtils {
 	/**
 	 * Obtiene la fuente para generar el texto de la firma visible.
 	 * @param fontFamily Identificador de familia de la fuente (0: COURIER, 1: HELVETICA,
-	 * 2: TIMES_ROMAN, 3: SYMBOL, 4: ZAPFDINGBATS). Con -1 se usa el valor por defecto: COURIER.
+	 * 2: TIMES_ROMAN). Con -1 se usa el valor por defecto: COURIER.
 	 * @param fontSize Tama&ntilde;o de fuente. Con -1 se usa el valor por defecto: 12.
 	 * @param fontStyle Estilo a aplicar al texto (0: NORMAL, 1: BOLD, 2: ITALIC, 3: BOLDITALIC,
 	 * 4: UNDERLINE, 8: STRIKETHRU). Con -1 se usa el valor por defecto: NORMAL.
@@ -146,14 +146,14 @@ final class PdfVisibleAreasUtils {
 		final BaseFont font;
 		switch (fontFamily) {
 		case Font.HELVETICA:
-			font = BaseFont.createFont("/fonts/Helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		case Font.TIMES_ROMAN:
-			font = BaseFont.createFont("/fonts/Times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		case Font.COURIER:
 		default:
-			font = BaseFont.createFont("/fonts/Courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		}
 
