@@ -16,9 +16,9 @@ import java.io.InputStream;
 enum FontResource {
 
 	// Ficheros de fuentes cargados de la biblioteca afirma-crypto-pdf
-	TIMES_ROMAN(  "Times Roman",  "/resources/fonts/times.ttf",        2), //$NON-NLS-1$//$NON-NLS-2$
-	COURIER(      "Courier",      "/resources/fonts/courier.ttf",      0), //$NON-NLS-1$ //$NON-NLS-2$
-	HELVETICA(    "Helvetica",    "/resources/fonts/helvetica.ttf",    1); //$NON-NLS-1$ //$NON-NLS-2$
+	TIMES_ROMAN(  "Times Roman",  "/fonts/times.ttf",        2), //$NON-NLS-1$//$NON-NLS-2$
+	COURIER(      "Courier",      "/fonts/courier.ttf",      0), //$NON-NLS-1$ //$NON-NLS-2$
+	HELVETICA(    "Helvetica",    "/fonts/helvetica.ttf",    1); //$NON-NLS-1$ //$NON-NLS-2$
 
 	private final String fontName;
 	private Font font = null;
