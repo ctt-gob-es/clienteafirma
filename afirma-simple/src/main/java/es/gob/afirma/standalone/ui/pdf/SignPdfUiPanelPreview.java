@@ -137,9 +137,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private DropTarget dropTarget;
 
 	private final Properties prop;
-	Properties getProp() {
-		return this.prop != null ? (Properties) this.prop.clone() : null;
-	}
 
 	JLabel viewLabel;
 	JLabel getViewLabel() {
@@ -416,8 +413,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		panel.setDropTarget(this.dropTarget);
 
-		if (getProp().getProperty(PdfExtraParams.SIGNATURE_PAGE) != null &&
-				getProp().getProperty(PdfExtraParams.SIGNATURE_PAGE).equals("append")) { //$NON-NLS-1$
+		if (this.prop.getProperty(PdfExtraParams.SIGNATURE_PAGE) != null &&
+				this.prop.getProperty(PdfExtraParams.SIGNATURE_PAGE).equals("append")) { //$NON-NLS-1$
 			createImage();
 		}
 
@@ -818,12 +815,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.okButton.addActionListener(
 			e -> {
 				if (!getTextArea().getText().trim().isEmpty()) {
-					getProp().put(PdfExtraParams.LAYER2_TEXT, getTextArea().getText().toString());
-					getProp().put(PdfExtraParams.LAYER2_FONTFAMILY, ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex());
-					getProp().put(PdfExtraParams.LAYER2_FONTSIZE, Integer.toString(getSelectedSize()));
-					getProp().put(PdfExtraParams.LAYER2_FONTSTYLE, Integer.toString(getStyleIndex()));
-					getProp().put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey());
-					getProp().put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees()));
+					this.prop.put(PdfExtraParams.LAYER2_TEXT, getTextArea().getText().toString());
+					this.prop.put(PdfExtraParams.LAYER2_FONTFAMILY, ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex());
+					this.prop.put(PdfExtraParams.LAYER2_FONTSIZE, Integer.toString(getSelectedSize()));
+					this.prop.put(PdfExtraParams.LAYER2_FONTSTYLE, Integer.toString(getStyleIndex()));
+					this.prop.put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey());
+					this.prop.put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees()));
 				}
 
 				if (!this.signatureImagePath.getText().isEmpty()) {
@@ -839,14 +836,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					}
 
 					if (signImageFromPath != null) {
-						getProp().put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(signImageFromPath));
+						this.prop.put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(signImageFromPath));
 					}
 				}
 
 				if (this.saveConfig.isSelected()) {
-					saveProperties(getProp());
+					saveProperties(this.prop);
 				}
-				getListener().nextPanel(getProp(), null);
+				getListener().nextPanel(this.prop, null);
 			}
 		);
 
