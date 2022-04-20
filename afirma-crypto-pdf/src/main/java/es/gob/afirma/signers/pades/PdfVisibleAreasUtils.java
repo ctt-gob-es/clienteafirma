@@ -146,14 +146,14 @@ final class PdfVisibleAreasUtils {
 		final BaseFont font;
 		switch (fontFamily) {
 		case Font.HELVETICA:
-			font = BaseFont.createFont("/fonts/Helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/Helvetica.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		case Font.TIMES_ROMAN:
-			font = BaseFont.createFont("/fonts/Times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/Times-Roman.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		case Font.COURIER:
 		default:
-			font = BaseFont.createFont("/fonts/Courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			font = BaseFont.createFont("/fonts/Courier.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
 			break;
 		}
 
