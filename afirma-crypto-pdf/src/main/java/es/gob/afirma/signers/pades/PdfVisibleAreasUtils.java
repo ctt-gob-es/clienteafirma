@@ -144,23 +144,36 @@ final class PdfVisibleAreasUtils {
 
 	private static BaseFont getBaseFont(final int fontFamily, final boolean pdfa) throws DocumentException, IOException {
 		final BaseFont font;
-		switch (fontFamily) {
-		case Font.HELVETICA:
-			font = BaseFont.createFont("/fonts/Helvetica.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-			break;
-		case Font.TIMES_ROMAN:
-			font = BaseFont.createFont("/fonts/Times-Roman.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-			break;
-		case Font.COURIER:
-		default:
-			font = BaseFont.createFont("/fonts/Courier.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-			break;
-		}
 
 		// Si la firma es PDF/A, incrustamos toda la fuente para seguir
 		// respetando el estandar
 		if (pdfa) {
+			switch (fontFamily) {
+			case Font.HELVETICA:
+				font = BaseFont.createFont("/resources/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			case Font.TIMES_ROMAN:
+				font = BaseFont.createFont("/resources/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			case Font.COURIER:
+			default:
+				font = BaseFont.createFont("/resources/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			}
 			font.setSubset(false);
+		} else {
+			switch (fontFamily) {
+			case Font.HELVETICA:
+				font = BaseFont.createFont("/fonts/Helvetica.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			case Font.TIMES_ROMAN:
+				font = BaseFont.createFont("/fonts/Times-Roman.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			case Font.COURIER:
+			default:
+				font = BaseFont.createFont("/fonts/Courier.afm", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			}
 		}
 
 		return font;
