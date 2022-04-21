@@ -30,18 +30,21 @@ final class StorageConfig {
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "intermediate_config.properties"; //$NON-NLS-1$
 
-
 	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
 	private static final String TMP_DIR_KEY = "tmpDir"; //$NON-NLS-1$
 
+	/** Clave para la configuraci&oacute;n del modo de depuraci&oacute;n. */
 	private static final String DEBUG_KEY = "debug"; //$NON-NLS-1$
+
+	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
+	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
+
+	/** Clave para la configuraci&oacute;n del tama&ntilde;o m&aacute;ximo de fichero. */
+	private static final String MAX_SIZE_KEY = "maxFileSize"; //$NON-NLS-1$
 
 	private static final String SYS_PROP_PREFIX = "${"; //$NON-NLS-1$
 
 	private static final String SYS_PROP_SUFIX = "}"; //$NON-NLS-1$
-
-	/** Directorio temporal por defecto. */
-	private static String defaultTmpDir;
 
 	/** Milisegundos que, por defecto, tardan los mensajes en caducar. */
 	private static final long DEFAULT_EXPIRATION_TIME = 60000; // 1 minuto
@@ -55,12 +58,7 @@ final class StorageConfig {
 	/** Modo de depuraci&oacute;n activo o no, en el que no se borran los ficheros en servidor ni se dan por caducados. */
 	static final boolean DEBUG;
 
-	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
-	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
-
 	private static final long EXPIRATION_TIME;
-
-	private static final String MAX_SIZE_KEY = "maxFileSize"; //$NON-NLS-1$
 
 	private static final int MAX_SIZE;
 
@@ -106,6 +104,7 @@ final class StorageConfig {
 			LOGGER.warning("Modo de depuracion activado, no se borraran los ficheros en servidor"); //$NON-NLS-1$
 		}
 
+		String defaultTmpDir;
 		try {
 			defaultTmpDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		}
