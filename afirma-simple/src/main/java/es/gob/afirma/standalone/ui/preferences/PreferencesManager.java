@@ -333,6 +333,10 @@ public final class PreferencesManager {
 	 * documento. */
 	public static final String PREFERENCE_PADES_STAMP = "padesVisibleStamp"; //$NON-NLS-1$
 
+	/** Si est&aacute; establecido a <code>true</code> no se comprobar&aacute;n posibles ataques en la sombra hacia los PDFs
+	 * si se establece a <code>false</code>, se realizar&aacute; la comprobaci&oacute;n y se alertar&aacute; al usuario */
+	public static final String PREFERENCE_PADES_ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+
 	//************************* FIN PREFERENCIAS DE FIRMAS PAdES ***************************************************************
 	//**************************************************************************************************************************
 

@@ -10,6 +10,7 @@
 package es.gob.afirma.signvalidation;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -22,6 +23,7 @@ import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 
@@ -55,6 +57,18 @@ public final class ValidatePdfSignature implements SignValider{
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
 	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException {
+		return validate(sign, checkCertificates, true);
+	}
+
+	/** Valida una firma PDF (PKCS#7/PAdES).
+	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
+     * @param sign PDF firmado.
+     * @param checkCertificates Indica si debe comprobarse la caducidad de los certificados de firma.
+     * @param allowPdfShadowAttack Indica si debe comprobar posibles ataques de tipo PDF Shadow Attack.
+     * @return Validez de la firma.
+     * @throws IOException Si ocurren problemas relacionados con la lectura del documento
+     * o si no se encuentran firmas PDF en el documento. */
+	public static SignValidity validate(final byte[] sign, final boolean checkCertificates, final boolean allowPdfShadowAttack) throws IOException {
 		AcroFields af;
 		try {
 			final PdfReader reader = new PdfReader(sign);
@@ -63,14 +77,25 @@ public final class ValidatePdfSignature implements SignValider{
 		catch (final Exception e) {
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
+		final List<String> signNames = af.getSignatureNames();
 
-		final List<String> sigNames = af.getSignatureNames();
-
-		if (sigNames.size() == 0) {
+		if (signNames.size() == 0) {
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
+		// Si se encuentran varias revisiones firmadas y no se permiten posibles ataques de PDF en la sombra, comprobamos el documento firmado.
+		else if (signNames.size() > 1 && !allowPdfShadowAttack) {
+			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
+			try(final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
+				final byte [] lastReviewData = AOUtil.getDataFromInputStream(lastReviewStream);
+				final SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewData);
+				if (validity != null) {
+					return validity;
+				}
+			}
+		}
 
-		for (final String name : sigNames) {
+		for (final String name : signNames) {
+
 			final PdfPKCS7 pk = af.verifySignature(name);
 
     		// Comprobamos si es una firma o un sello

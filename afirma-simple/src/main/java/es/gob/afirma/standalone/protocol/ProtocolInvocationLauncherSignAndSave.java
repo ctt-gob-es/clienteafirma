@@ -71,6 +71,7 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
+import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
@@ -372,7 +373,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 			if (validator != null) {
 				SignValidity validity;
 				try {
-					validity = validator.validate(data);
+					if (validator instanceof ValidatePdfSignature) {
+						final boolean allowPdfShadowAttack = Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.ALLOW_SHADOW_ATTACK, "false")); //$NON-NLS-1$
+						validity = ValidatePdfSignature.validate(data, true, allowPdfShadowAttack);
+					} else {
+						validity = validator.validate(data);
+					}
 				} catch (final IOException e) {
 					LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
 					validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);

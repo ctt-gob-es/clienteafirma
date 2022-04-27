@@ -72,6 +72,7 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
+import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -513,11 +514,21 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
-				 final SignValidity validity = validator.validate(data);
+				 SignValidity validity;
+				 if (validator instanceof ValidatePdfSignature) {
+					 validity = ValidatePdfSignature.validate(
+							 		data,
+							 		true,
+							 		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_ALLOW_SHADOW_ATTACK)
+							 	);
+				 } else {
+					 validity = validator.validate(data);
+				 }
 				 if (validity != null) {
 					 config.setSignValidity(validity);
 					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO ||
-							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN ||
+							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT ) {
 						config.setInvalidSignatureText(
 								buildErrorText(validity.getValidity(), validity.getError()));
 					 }
@@ -536,7 +547,14 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (result == SIGN_DETAIL_TYPE.UNKNOWN) {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.141"); //$NON-NLS-1$
 		 }
-		 else {
+		 else if (result == SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT) {
+			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
+		 }
+		 else if (result == SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE) {
+			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
+		 }
+		 else
+		 {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
 		 }
 		 switch (error) {
@@ -570,6 +588,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.138"); //$NON-NLS-1$ //$NON-NLS-2$
 			case UNKOWN_SIGNATURE_FORMAT:
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.139"); //$NON-NLS-1$ //$NON-NLS-2$
+			case MODIFIED_DOCUMENT:
+			case OVERLAPPING_SIGNATURE:
 			default:
 				return errorMsg;
 		}

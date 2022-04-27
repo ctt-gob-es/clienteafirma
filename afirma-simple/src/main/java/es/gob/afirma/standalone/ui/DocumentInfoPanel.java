@@ -64,7 +64,9 @@ public class DocumentInfoPanel extends JPanel {
         if (invalidSignatureText != null) {
         	final BufferedImage errorIcon;
         	final SignValidity validity = signConfig.getSignValidity();
-    		if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+    		if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
+    				|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT
+    				|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE) {
         		errorIcon = ImageLoader.loadImage("unknown_icon.png"); //$NON-NLS-1$
         	}
         	else {
