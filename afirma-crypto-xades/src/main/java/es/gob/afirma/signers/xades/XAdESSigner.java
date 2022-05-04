@@ -653,7 +653,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e1) {
 				throw new AOException(
-					"No se ha posido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
 		}
