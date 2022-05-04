@@ -164,7 +164,7 @@ public class CAdESParameters {
 
 		// El atributo content-hint se incluira siempre salvo que desde el exterior se indique que no se haga
 		if (!config.containsKey(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE) ||
-				!Boolean.FALSE.toString().equalsIgnoreCase(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE)) {
+				!Boolean.FALSE.toString().equalsIgnoreCase(config.getProperty(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE))) {
 			// Determinamos el tipo de contenido, ya sea
 			// que obtengamos esta informacion del exterior o que se analicen los datos.
 			String contentTypeOid = config.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
@@ -409,7 +409,7 @@ public class CAdESParameters {
 	 * @return Listado de tipos de compromisos declarados o {@code null} si no se estableci&oacute;.
 	 */
 	public List<CommitmentTypeIndicationBean> getCommitmentTypeIndications() {
-		return this.commitmentTypeIndications != null ? new ArrayList<CommitmentTypeIndicationBean>(this.commitmentTypeIndications) : null;
+		return this.commitmentTypeIndications != null ? new ArrayList<>(this.commitmentTypeIndications) : null;
 	}
 
 	/**
@@ -417,7 +417,7 @@ public class CAdESParameters {
 	 * @param commitmentTypeIndications Listado de tipos de compromisos declarados.
 	 */
 	public void setCommitmentTypeIndications(final List<CommitmentTypeIndicationBean> commitmentTypeIndications) {
-		this.commitmentTypeIndications = commitmentTypeIndications != null ? new ArrayList<CommitmentTypeIndicationBean>(commitmentTypeIndications) : null;
+		this.commitmentTypeIndications = commitmentTypeIndications != null ? new ArrayList<>(commitmentTypeIndications) : null;
 	}
 
 	/**
