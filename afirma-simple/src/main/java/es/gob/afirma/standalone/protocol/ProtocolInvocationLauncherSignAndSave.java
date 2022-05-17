@@ -374,8 +374,36 @@ final class ProtocolInvocationLauncherSignAndSave {
 				SignValidity validity;
 				try {
 					if (validator instanceof ValidatePdfSignature) {
-						final boolean allowPdfShadowAttack = Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.ALLOW_SHADOW_ATTACK, "false")); //$NON-NLS-1$
-						validity = ValidatePdfSignature.validate(data, true, allowPdfShadowAttack);
+						final String allowPdfShadowAttackProp = extraParams.getProperty(AfirmaExtraParams.ALLOW_SHADOW_ATTACK);
+						final boolean allowPdfShadowAttack =  allowPdfShadowAttackProp != null ?
+															Boolean.parseBoolean(allowPdfShadowAttackProp) : false;
+						final String pagesToCheck = extraParams.getProperty(
+								AfirmaExtraParams.PAGES_TO_CHECK_SHADOW_ATTACK, "10" //$NON-NLS-1$
+								);
+						validity = ValidatePdfSignature.validate(data, true, allowPdfShadowAttack, pagesToCheck);
+						// Si no se indica que hacer con los ataques PSA, se pregunta al usuario si continuar o no
+						if (allowPdfShadowAttackProp == null
+								&& validity.getValidity().equals(SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT)
+								&& AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
+								null,
+								ProtocolMessages.getString("ProtocolLauncher.61"), //$NON-NLS-1$
+								ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
+								AOUIFactory.YES_NO_OPTION,
+								AOUIFactory.WARNING_MESSAGE)
+							) {
+								throw new AOCancelledOperationException("El usuario ha cancelado la operacion por un posible PDF Shadow Attack"); //$NON-NLS-1$
+							}
+						else if (allowPdfShadowAttackProp == null
+								&& validity.getValidity().equals(SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE)
+								&& AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
+								null,
+								ProtocolMessages.getString("ProtocolLauncher.62"), //$NON-NLS-1$
+								ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
+								AOUIFactory.YES_NO_OPTION,
+								AOUIFactory.WARNING_MESSAGE)
+							) {
+								throw new AOCancelledOperationException("El usuario ha cancelado la operacion por un posible PDF Shadow Attack"); //$NON-NLS-1$
+							}
 					} else {
 						validity = validator.validate(data);
 					}

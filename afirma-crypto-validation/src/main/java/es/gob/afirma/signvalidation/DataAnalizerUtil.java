@@ -250,11 +250,12 @@ public final class DataAnalizerUtil {
 	 * Indica si el documento ha recibido un posible PDF Shadow Attack.
 	 * @param actualdata Datos del documento actual.
 	 * @param lastReviewData Datos de la &uacute;ltima revisi&oacute;n firmada.
+	 * @param pagesToCheck P&aacuteginas a comprobar.
 	 * @return Validez o no de los datos en el documento.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
 	 * la generaci&oacute;n de las im&aacute;genes.
 	 */
-	public static SignValidity checkPdfShadowAttack(final byte[] actualdata, final byte[] lastReviewData) throws IOException {
+	public static SignValidity checkPdfShadowAttack(final byte[] actualdata, final byte[] lastReviewData, final String pagesToCheck) throws IOException {
 
 		try (final PDDocument actualDoc = PDDocument.load(new ByteArrayInputStream(actualdata));
 				final PDDocument lastReviewDoc = PDDocument.load(new ByteArrayInputStream(lastReviewData))) {
@@ -264,11 +265,22 @@ public final class DataAnalizerUtil {
 			BufferedImage actualReviewImage;
 			BufferedImage lastReviewImage;
 
-			for (int i = 0; i < 10; i++) {
+			int totalPagesToCheck;
+
+			if ("all".equals(pagesToCheck)) { //$NON-NLS-1$
+				totalPagesToCheck = actualDoc.getNumberOfPages();
+			} else {
+				totalPagesToCheck = Integer.parseInt(pagesToCheck);
+			}
+
+			for (int i = 0; i < totalPagesToCheck; i++) {
 				// Se comprueba si en la misma pagina se esta solapando alguna firma visible con otra
-				checkSignatureOverlaping(actualDoc.getPage(i).getAnnotations());
-				actualReviewImage = actualPdfRenderer.renderImageWithDPI(i, 30, ImageType.GRAY);
-				lastReviewImage = lastReviewPdfRenderer.renderImageWithDPI(i, 30, ImageType.GRAY);
+				final boolean isOverlappingSignatures = checkSignatureOverlaping(actualDoc.getPage(i).getAnnotations());
+				if (isOverlappingSignatures) {
+					return new SignValidity(SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE, VALIDITY_ERROR.OVERLAPPING_SIGNATURE);
+				}
+				actualReviewImage = actualPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
+				lastReviewImage = lastReviewPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
 				final boolean equalImages = checkImagesChanges(actualReviewImage, lastReviewImage);
 
 				if (!equalImages) {

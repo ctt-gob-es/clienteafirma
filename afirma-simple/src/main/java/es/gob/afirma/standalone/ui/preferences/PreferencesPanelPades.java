@@ -9,7 +9,7 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_ALLOW_SHADOW_ATTACK;
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_FORMAT;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_OBFUSCATE_CERT_INFO;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH;
@@ -29,6 +29,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
@@ -111,7 +113,7 @@ final class PreferencesPanelPades extends JScrollPane {
 	private final JCheckBox visiblePdfSignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.79")); //$NON-NLS-1$
 	private final JCheckBox obfuscateCertificateInfo = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.175")); //$NON-NLS-1$
 	private final JCheckBox visiblePdfStamp = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.172")); //$NON-NLS-1$
-	private final JCheckBox allowShadowAttack = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.187")); //$NON-NLS-1$
+	private final JCheckBox checkShadowAttack = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.187")); //$NON-NLS-1$
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
@@ -179,14 +181,23 @@ final class PreferencesPanelPades extends JScrollPane {
 		);
 		this.visiblePdfStamp.addItemListener(modificationListener);
     	this.visiblePdfStamp.addKeyListener(keyListener);
-		this.allowShadowAttack.getAccessibleContext().setAccessibleName(
+		this.checkShadowAttack.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.188") //$NON-NLS-1$
 		);
-		this.allowShadowAttack.getAccessibleContext().setAccessibleDescription(
+		this.checkShadowAttack.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.187") //$NON-NLS-1$
 		);
-		this.allowShadowAttack.addItemListener(modificationListener);
-    	this.allowShadowAttack.addKeyListener(keyListener);
+		this.checkShadowAttack.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBox checkPSACheckBox = (JCheckBox) e.getSource();
+                if (checkPSACheckBox.isSelected()) {
+                	AOUIFactory.showMessageDialog(this, SimpleAfirmaMessages.getString("PreferencesPanel.189"), //$NON-NLS-1$
+                			SimpleAfirmaMessages.getString("SimpleAfirma.48"), AOUIFactory.WARNING_MESSAGE); //$NON-NLS-1$
+                }
+			}
+		});
+    	this.checkShadowAttack.addKeyListener(keyListener);
 
 		// Una vez creados todos los componentes, cargamos la configuracion
 		loadPreferences();
@@ -402,7 +413,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		c.gridy++;
 		innerPanel.add(this.visiblePdfStamp, c);
 		c.gridy++;
-		innerPanel.add(this.allowShadowAttack, c);
+		innerPanel.add(this.checkShadowAttack, c);
 
 		final JPanel signatureOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		signatureOptionsPanel.add(innerPanel);
@@ -431,7 +442,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.put(PREFERENCE_PADES_VISIBLE, Boolean.toString(this.visiblePdfSignature.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_OBFUSCATE_CERT_INFO, Boolean.toString(this.obfuscateCertificateInfo.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_STAMP, Boolean.toString(this.visiblePdfStamp.isSelected()));
-		PreferencesManager.put(PREFERENCE_PADES_ALLOW_SHADOW_ATTACK, Boolean.toString(this.allowShadowAttack.isSelected()));
+		PreferencesManager.put(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, Boolean.toString(this.checkShadowAttack.isSelected()));
 
 		if ("".equals(this.padesSignerContact.getText())) { //$NON-NLS-1$
 			PreferencesManager.remove(PREFERENCE_PADES_SIGNER_CONTACT);
@@ -484,7 +495,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_VISIBLE));
 		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP));
-		this.allowShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_ALLOW_SHADOW_ATTACK));
+		this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
 
         final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
         final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT);
@@ -529,7 +540,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_VISIBLE));
 		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_STAMP));
-		this.allowShadowAttack.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_ALLOW_SHADOW_ATTACK));
+		this.checkShadowAttack.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
 
         if (this.padesBasicFormat.getItemCount() > 0) {
 			this.padesBasicFormat.setSelectedIndex(0);

@@ -120,6 +120,83 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		return triphaseData;
 	}
 
+	public static TriphaseData preProcessPreSign(final byte[] data,
+			                        final String algorithm,
+			                        final X509Certificate[] cert,
+			                        final Properties extraParams,
+			                        final boolean checkSignatures,
+			                        final String maxPagesToCheckShadowAttack) throws IOException,
+			                                                             AOException {
+		LOGGER.info("Prefirma PAdES - Firma - INICIO"); //$NON-NLS-1$
+
+		// Comprobamos la validez de la firma de entrada si se solicito
+        if (checkSignatures && new AOPDFSigner().isSign(data)) {
+			final boolean allowPdfShadowAttack = Boolean.parseBoolean(extraParams.getProperty(
+					"allowShadowAttack", "false" //$NON-NLS-1$ //$NON-NLS-2$
+					));
+			final String pagesToCheckShadowAttack = extraParams.getProperty(
+					"pagesToCheckShadowAttack" //$NON-NLS-1$
+					);
+			String pagesToCheckPSA = maxPagesToCheckShadowAttack;
+			if (pagesToCheckShadowAttack != null && !"all".equals(pagesToCheckShadowAttack) //$NON-NLS-1$
+					&& maxPagesToCheckShadowAttack != null && !"all".equals(maxPagesToCheckShadowAttack)) { //$NON-NLS-1$
+				final int maxPagesInt = Integer.parseInt(maxPagesToCheckShadowAttack);
+				final int pagesToCheckInt = Integer.parseInt(pagesToCheckShadowAttack);
+				pagesToCheckPSA = pagesToCheckInt < maxPagesInt ? pagesToCheckShadowAttack : maxPagesToCheckShadowAttack;
+			}
+			final SignValidity validity = ValidatePdfSignature.validate(data, true, allowPdfShadowAttack, pagesToCheckPSA);
+        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
+        	}
+        }
+
+		final GregorianCalendar signTime = new GregorianCalendar();
+
+		// Primera fase (servidor)
+		LOGGER.info("Se invocan las funciones internas de prefirma PAdES"); //$NON-NLS-1$
+		final PdfSignResult preSignature;
+		try {
+			preSignature = PAdESTriPhaseSigner.preSign(
+				AOSignConstants.getDigestAlgorithmName(algorithm),
+				data,
+				cert,
+				signTime,
+				extraParams,
+				true
+			);
+		}
+		catch (final InvalidPdfException e) {
+			LOGGER.severe("El documento no es un PDF y no se puede firmar: " + e); //$NON-NLS-1$
+			throw e;
+		}
+
+		LOGGER.info("Se prepara la respuesta de la prefirma PAdES"); //$NON-NLS-1$
+
+		final TriphaseData triphaseData = new TriphaseData();
+
+		// Ahora pasamos al cliente:
+		// 1.- La prefirma para que haga el PKCS#1
+		// 2.- La fecha generada en el servidor para reutilizarla en la postfirma
+		// 3.- El ID de PDF para reutilizarlo en la postfirma
+
+		final Map<String, String> signConfig = new HashMap<>();
+		signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(preSignature.getSign()));
+		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
+		signConfig.put(PROPERTY_NAME_SIGN_TIME, Long.toString(signTime.getTimeInMillis()));
+		signConfig.put(PROPERTY_NAME_PDF_UNIQUE_ID, Base64.encode(preSignature.getFileID().getBytes()));
+
+		triphaseData.addSignOperation(
+			new TriSign(
+				signConfig,
+				TriPhaseUtil.getSignatureId(extraParams)
+			)
+		);
+
+		LOGGER.info("Prefirma PAdES - Firma - FIN"); //$NON-NLS-1$
+
+		return triphaseData;
+	}
+
 	@Override
 	public byte[] preProcessPostSign(final byte[] docBytes,
 			                         final String algorithm,
@@ -219,6 +296,16 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				                      final boolean checkSignatures) throws IOException,
 			                                                               AOException {
 		return preProcessPreSign(data, signatureAlgorithm, cert, extraParams, checkSignatures);
+	}
+
+	public static TriphaseData preProcessPreCoSign(final byte[] data,
+            final String signatureAlgorithm,
+            final X509Certificate[] cert,
+            final Properties extraParams,
+            final boolean checkSignatures,
+            final String maxPagesToCheckShadowAttack) throws IOException,
+                                                 AOException {
+		return preProcessPreSign(data, signatureAlgorithm, cert, extraParams, checkSignatures, maxPagesToCheckShadowAttack);
 	}
 
 	@Override

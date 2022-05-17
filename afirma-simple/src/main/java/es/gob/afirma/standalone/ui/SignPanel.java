@@ -519,16 +519,18 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 					 validity = ValidatePdfSignature.validate(
 							 		data,
 							 		true,
-							 		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_ALLOW_SHADOW_ATTACK)
+							 		!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK),
+							 		"all" //$NON-NLS-1$
 							 	);
 				 } else {
 					 validity = validator.validate(data);
 				 }
 				 if (validity != null) {
 					 config.setSignValidity(validity);
-					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO ||
-							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN ||
-							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT ) {
+					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
+							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
+							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT
+							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE) {
 						config.setInvalidSignatureText(
 								buildErrorText(validity.getValidity(), validity.getError()));
 					 }

@@ -57,7 +57,7 @@ public final class ValidatePdfSignature implements SignValider{
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
 	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException {
-		return validate(sign, checkCertificates, true);
+		return validate(sign, checkCertificates, true, "all"); //$NON-NLS-1$
 	}
 
 	/** Valida una firma PDF (PKCS#7/PAdES).
@@ -65,10 +65,12 @@ public final class ValidatePdfSignature implements SignValider{
      * @param sign PDF firmado.
      * @param checkCertificates Indica si debe comprobarse la caducidad de los certificados de firma.
      * @param allowPdfShadowAttack Indica si debe comprobar posibles ataques de tipo PDF Shadow Attack.
+     * @param pagesToCheck P&aacute;ginas a comprobar de un posible PDF Shadow Attack.
      * @return Validez de la firma.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
-	public static SignValidity validate(final byte[] sign, final boolean checkCertificates, final boolean allowPdfShadowAttack) throws IOException {
+	public static SignValidity validate(final byte[] sign, final boolean checkCertificates,
+										final boolean allowPdfShadowAttack, final String pagesToCheck) throws IOException {
 		AcroFields af;
 		try {
 			final PdfReader reader = new PdfReader(sign);
@@ -83,11 +85,11 @@ public final class ValidatePdfSignature implements SignValider{
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
 		// Si se encuentran varias revisiones firmadas y no se permiten posibles ataques de PDF en la sombra, comprobamos el documento firmado.
-		else if (signNames.size() > 1 && !allowPdfShadowAttack) {
+		else if (signNames.size() > 1 && !allowPdfShadowAttack && pagesToCheck != null) {
 			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
 			try(final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
 				final byte [] lastReviewData = AOUtil.getDataFromInputStream(lastReviewStream);
-				final SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewData);
+				final SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewData, pagesToCheck);
 				if (validity != null) {
 					return validity;
 				}

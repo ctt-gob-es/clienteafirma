@@ -469,25 +469,49 @@ public final class SignatureService extends HttpServlet {
 				// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
 		        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
 
-				final TriphaseData preRes;
+				TriphaseData preRes;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
-						preRes = prep.preProcessPreSign(
-							docBytes,
-							algorithm,
-							signerCertChain,
-							extraParams,
-							checkSignatures
-						);
+						if (prep instanceof PAdESTriPhasePreProcessor) {
+							final String maxPagesToCheckShadowAttack = ConfigManager.getMaxPagesToCheckPSA();
+							preRes = PAdESTriPhasePreProcessor.preProcessPreSign(
+									docBytes,
+									algorithm,
+									signerCertChain,
+									extraParams,
+									checkSignatures,
+									maxPagesToCheckShadowAttack
+								);
+						} else {
+							preRes = prep.preProcessPreSign(
+									docBytes,
+									algorithm,
+									signerCertChain,
+									extraParams,
+									checkSignatures
+								);
+						}
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
-						preRes = prep.preProcessPreCoSign(
-							docBytes,
-							algorithm,
-							signerCertChain,
-							extraParams,
-							checkSignatures
-						);
+						if (prep instanceof PAdESTriPhasePreProcessor) {
+							final String maxPagesToCheckShadowAttack = ConfigManager.getMaxPagesToCheckPSA();
+							preRes = PAdESTriPhasePreProcessor.preProcessPreCoSign(
+									docBytes,
+									algorithm,
+									signerCertChain,
+									extraParams,
+									checkSignatures,
+									maxPagesToCheckShadowAttack
+								);
+						} else {
+							preRes = prep.preProcessPreCoSign(
+								docBytes,
+								algorithm,
+								signerCertChain,
+								extraParams,
+								checkSignatures
+							);
+						}
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
 
@@ -498,7 +522,6 @@ public final class SignatureService extends HttpServlet {
 								target = CounterSignTarget.TREE;
 							}
 						}
-
 						preRes = prep.preProcessPreCounterSign(
 							docBytes,
 							algorithm,

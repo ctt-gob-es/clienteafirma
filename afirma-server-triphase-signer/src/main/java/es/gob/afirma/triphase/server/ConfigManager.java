@@ -33,9 +33,14 @@ public class ConfigManager {
 
 	private static final String CONFIG_PARAM_CONCURRENT_MAX_SIGNS = "concurrent.maxsigns"; //$NON-NLS-1$
 
+	/** Propiedad que indica el numero m&aacute;ximo de paginas para comprobar un posible PDF Shadow Attack */
+	private static final String CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
+
 	private static final long DEFAULT_CONCURRENT_TIMEOUT = 30;
 
 	private static final int DEFAULT_CONCURRENT_MAXSIGNS = 10;
+
+	private static final String DEFAULT_PARAM_MAX_PAGES_TO_CHECK_PSA= "10";
 
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
 	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
@@ -216,5 +221,9 @@ public class ConfigManager {
 		catch (final Exception e) {
 			return DEFAULT_CONCURRENT_MAXSIGNS;
 		}
+	}
+
+	public static String getMaxPagesToCheckPSA() {
+		return config.getProperty(CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA, DEFAULT_PARAM_MAX_PAGES_TO_CHECK_PSA);
 	}
 }
