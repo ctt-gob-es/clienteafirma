@@ -94,7 +94,25 @@
      <dd>
       Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del 
       <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional. 
-     </dd>     
+     </dd>
+     <dt><b><i>signerClaimedRoles</i></b></dt>
+     <dd>
+      Agrega a la firma campos con los cargos atribuidos al firmante indicados en esta cadena. Deben separarse
+      los cargos con el carácter "|" (y este no puede estar en el propio texto de ning&uacute;n cargo). 
+     </dd>
+     <dt><b><i>includeSigningTimeAttribute</i></b></dt>
+     <dd>
+      Con el valor <code>true</code> se incluye en la firma la marca de tiempo con la hora del equipo. Este
+      es el comportamiento por defecto. Con el valor <code>false</code>, no se incluye. Esta opci&oacute;n
+      s&oacute;lo se deber&iacute;a usar para generar una firma apta para componer una firma PAdES.
+     </dd>
+    <dt><b><i>includeContentHintAttribute</i></b></dt>
+     <dd>
+      Con el valor <code>true</code> se incluye el atributo content-hints en la firma con la informaci&oacute;n
+      de los datos firmados. Este valor se ignorar&aacute; cuando se configure expresamente un tipo de firma
+      que no permite este atributo. Con el valor <code>false</code>, no se incluye. Esta opci&oacute;n
+      s&oacute;lo se deber&iacute;a usar para generar una firma apta para componer una firma PAdES.
+     </dd>
     <dt><b><i>tsaURL</i></b></dt>
      <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
     <dt><b><i>tsaPolicy</i></b></dt>
