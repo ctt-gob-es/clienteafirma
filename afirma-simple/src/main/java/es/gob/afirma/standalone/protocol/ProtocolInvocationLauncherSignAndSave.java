@@ -382,7 +382,15 @@ final class ProtocolInvocationLauncherSignAndSave {
 								);
 						validity = ValidatePdfSignature.validate(data, true, allowPdfShadowAttack, pagesToCheck);
 						// Si no se indica que hacer con los ataques PSA, se pregunta al usuario si continuar o no
-						if (allowPdfShadowAttackProp == null
+						if (allowPdfShadowAttackProp != null
+								&& !allowPdfShadowAttack
+								&& (validity.getValidity().equals(SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT)
+								|| validity.getValidity().equals(SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE))) {
+									LOGGER.log(Level.SEVERE, "La firma de entrada no es valida. Ha sufrido un posible ataque PSA"); //$NON-NLS-1$
+									final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
+									throw new SocketOperationException(errorCode);
+						}
+						else if (allowPdfShadowAttackProp == null
 								&& validity.getValidity().equals(SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT)
 								&& AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
 								null,
