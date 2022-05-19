@@ -35,6 +35,8 @@ public class BatchConfigManager {
 
 	private static long CONCURRENT_TIMEOUT = 30;
 
+	private static final String SYS_PROP_DISABLE_SSL = "disableSslChecks"; //$NON-NLS-1$
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final Properties CONFIG = new Properties();
@@ -70,6 +72,11 @@ public class BatchConfigManager {
 		for (final String k : configProperties.keySet().toArray(new String[0])) {
 			CONFIG.setProperty(k, mapSystemProperties(configProperties.getProperty(k)));
 		}
+
+		// Establecemos si se deben comprobar los certificados SSL de las conexiones remotas
+		final boolean checkSslCerts = Boolean.parseBoolean(
+				CONFIG.getProperty("checksslcerts", "true")); //$NON-NLS-1$ //$NON-NLS-2$
+		System.setProperty(SYS_PROP_DISABLE_SSL, Boolean.toString(!checkSslCerts));
 	}
 
 	/**

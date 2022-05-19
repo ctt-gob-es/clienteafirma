@@ -31,7 +31,8 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 	private static final String FILE_SCHEME = "file:/"; //$NON-NLS-1$
 	private static final String BASE64 = "base64"; //$NON-NLS-1$
 
-	private static final String CONFIG_PARAM_DOCMANEGER_ALLOWSOURCES = "docmanager.legacybatch.allowedsources"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_DOCMANAGER_ALLOWSOURCES = "docmanager.legacybatch.allowedsources"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_DOCMANAGER_CHECKSSLCERTS = "docmanager.legacybatch.checksslcerts"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_SEPARATOR = ";"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_WILD_CARD = "*"; //$NON-NLS-1$
 
@@ -39,9 +40,17 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 
 	private static final String PROP_SIGNSAVER = "signSaver"; //$NON-NLS-1$
 
+	private static final String DEFAULT_VALUE_CHECKSSLCERTS = "true"; //$NON-NLS-1$
+
+	private static final String SYS_PROP_DISABLE_SSL = "disableSslChecks"; //$NON-NLS-1$
+
 	@Override
 	public void init(final Properties config) {
-		// No es necesario inicializar nada en esta clase
+
+		// Establecemos si se deben comprobar los certificados SSL de las conexiones remotas
+		final boolean checkSslCerts = Boolean.parseBoolean(
+				ConfigManager.getConfig().getProperty(CONFIG_PARAM_DOCMANAGER_CHECKSSLCERTS, DEFAULT_VALUE_CHECKSSLCERTS));
+		System.setProperty(SYS_PROP_DISABLE_SSL, Boolean.toString(!checkSslCerts));
 	}
 
 	@Override
@@ -89,7 +98,7 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 				"El origen de los datos no puede ser nulo" //$NON-NLS-1$
 			);
 		}
-		final String allowSources = ConfigManager.getConfig().getProperty(CONFIG_PARAM_DOCMANEGER_ALLOWSOURCES);
+		final String allowSources = ConfigManager.getConfig().getProperty(CONFIG_PARAM_DOCMANAGER_ALLOWSOURCES);
 		if (allowSources != null) {
 			for (final String allowed : allowSources.split(ALLOWSOURCES_SEPARATOR)) {
 				if (BASE64.equalsIgnoreCase(allowed) && Base64.isBase64(dataRef)) {

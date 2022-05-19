@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -91,7 +94,14 @@ final class TempStoreFileSystem implements TempStore {
 		if (!TempStoreFileSystemCleaner.isRunningCleaning()) {
 			if (currentRetrievesBeforeCleaning >= RETRIEVES_BEFORE_CLEANING) {
 				currentRetrievesBeforeCleaning = 0;
-				new Thread(new TempStoreFileSystemCleaner(tempDir)).start();
+				final ExecutorService executor = Executors.newSingleThreadExecutor();
+				try {
+					executor.execute(new TempStoreFileSystemCleaner(tempDir));
+				}
+				catch (final Exception e) {
+					LOGGER.warning("No se pudo ejecutar el hilo de limpieza de de temporales: " + e); //$NON-NLS-1$
+					stopExecution(executor);
+				}
 			}
 			else {
 				currentRetrievesBeforeCleaning++;
@@ -130,5 +140,24 @@ final class TempStoreFileSystem implements TempStore {
 		}
 
 		return Base64.encode(id, true) + "." + batchId; //$NON-NLS-1$
+	}
+
+	/**
+	 * Detiene la ejecuci&oacute;n de las operaciones concurrentes.
+	 * @param executorService Servicio de ejecuci&oacute;n.
+	 */
+	private static void stopExecution(final ExecutorService executorService) {
+		executorService.shutdown();
+		try {
+		    if (!executorService.awaitTermination(200, TimeUnit.MILLISECONDS)) {
+		        executorService.shutdownNow();
+		    }
+		}
+		catch (final InterruptedException ex) {
+			LOGGER.warning(
+				"Error intentando hacer una parada controlada de hilo de limpieza de temporales: " + ex //$NON-NLS-1$
+			);
+		    executorService.shutdownNow();
+		}
 	}
 }
