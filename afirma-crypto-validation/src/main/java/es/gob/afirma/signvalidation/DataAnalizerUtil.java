@@ -277,14 +277,14 @@ public final class DataAnalizerUtil {
 				// Se comprueba si en la misma pagina se esta solapando alguna firma visible con otra
 				final boolean isOverlappingSignatures = checkSignatureOverlaping(actualDoc.getPage(i).getAnnotations());
 				if (isOverlappingSignatures) {
-					return new SignValidity(SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE, VALIDITY_ERROR.OVERLAPPING_SIGNATURE);
+					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.OVERLAPPING_SIGNATURE);
 				}
 				actualReviewImage = actualPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
 				lastReviewImage = lastReviewPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
 				final boolean equalImages = checkImagesChanges(actualReviewImage, lastReviewImage);
 
 				if (!equalImages) {
-					return new SignValidity(SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT, VALIDITY_ERROR.MODIFIED_DOCUMENT);
+					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.MODIFIED_DOCUMENT);
 				}
 			}
         }

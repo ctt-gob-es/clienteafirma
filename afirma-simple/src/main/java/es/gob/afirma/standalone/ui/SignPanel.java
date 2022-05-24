@@ -35,7 +35,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -57,6 +59,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -72,7 +75,6 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -514,23 +516,24 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
-				 SignValidity validity;
-				 if (validator instanceof ValidatePdfSignature) {
-					 validity = ValidatePdfSignature.validate(
-							 		data,
-							 		true,
-							 		!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK),
-							 		"all" //$NON-NLS-1$
-							 	);
-				 } else {
-					 validity = validator.validate(data);
-				 }
+				 SignValidity validity = null;
+				 final Map<String, String> params = new HashMap<String, String>();
+				 params.put("allowShadowAttack", PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK); //$NON-NLS-1$
+				 params.put("checkCertificates", "true");  //$NON-NLS-1$ //$NON-NLS-2$
+				 params.put("pagesToCheckShadowAttack", "all"); //$NON-NLS-1$ //$NON-NLS-2$
+				 try {
+					validity = validator.validate(data, params);
+				} catch (final ConfirmationNeededException e) {
+					// No ocurre nada
+				} catch (final IOException e) {
+					throw e;
+				}
+
 				 if (validity != null) {
 					 config.setSignValidity(validity);
 					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
 							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
-							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT
-							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE) {
+							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
 						config.setInvalidSignatureText(
 								buildErrorText(validity.getValidity(), validity.getError()));
 					 }
@@ -548,15 +551,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 final String errorMsg;
 		 if (result == SIGN_DETAIL_TYPE.UNKNOWN) {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.141"); //$NON-NLS-1$
-		 }
-		 else if (result == SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT) {
-			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
-		 }
-		 else if (result == SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE) {
-			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
-		 }
-		 else
-		 {
+		 } else {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
 		 }
 		 switch (error) {
@@ -591,7 +586,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			case UNKOWN_SIGNATURE_FORMAT:
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.139"); //$NON-NLS-1$ //$NON-NLS-2$
 			case MODIFIED_DOCUMENT:
+				return SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
 			case OVERLAPPING_SIGNATURE:
+				return SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
 			default:
 				return errorMsg;
 		}

@@ -472,46 +472,24 @@ public final class SignatureService extends HttpServlet {
 				TriphaseData preRes;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
-						if (prep instanceof PAdESTriPhasePreProcessor) {
-							final String maxPagesToCheckShadowAttack = ConfigManager.getMaxPagesToCheckPSA();
-							preRes = PAdESTriPhasePreProcessor.preProcessPreSign(
-									docBytes,
-									algorithm,
-									signerCertChain,
-									extraParams,
-									checkSignatures,
-									maxPagesToCheckShadowAttack
-								);
-						} else {
-							preRes = prep.preProcessPreSign(
+						extraParams.put(ConfigManager.CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA, ConfigManager.getMaxPagesToCheckPSA());
+						preRes = prep.preProcessPreSign(
 									docBytes,
 									algorithm,
 									signerCertChain,
 									extraParams,
 									checkSignatures
 								);
-						}
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
-						if (prep instanceof PAdESTriPhasePreProcessor) {
-							final String maxPagesToCheckShadowAttack = ConfigManager.getMaxPagesToCheckPSA();
-							preRes = PAdESTriPhasePreProcessor.preProcessPreCoSign(
-									docBytes,
-									algorithm,
-									signerCertChain,
-									extraParams,
-									checkSignatures,
-									maxPagesToCheckShadowAttack
-								);
-						} else {
-							preRes = prep.preProcessPreCoSign(
+						extraParams.put(ConfigManager.CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA, ConfigManager.getMaxPagesToCheckPSA());
+						preRes = prep.preProcessPreCoSign(
 								docBytes,
 								algorithm,
 								signerCertChain,
 								extraParams,
 								checkSignatures
 							);
-						}
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
 

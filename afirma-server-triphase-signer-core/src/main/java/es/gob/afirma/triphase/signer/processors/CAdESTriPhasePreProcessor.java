@@ -200,7 +200,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
-        	final SignValidity validity = ValidateBinarySignature.validate(sign, null);
+        	final SignValidity validity = new ValidateBinarySignature().validate(sign);
         	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
         		throw new InvalidSignatureException("La firma que se trata de cofirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
         	}
@@ -347,7 +347,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
-        	final SignValidity validity = ValidateBinarySignature.validate(sign, null);
+        	final SignValidity validity = new ValidateBinarySignature().validate(sign);
         	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
         		throw new InvalidSignatureException("La firma que se trata de contrafirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
         	}

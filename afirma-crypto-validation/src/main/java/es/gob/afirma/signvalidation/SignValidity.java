@@ -23,11 +23,8 @@ public final class SignValidity {
 		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
 			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
 		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.MODIFIED_DOCUMENT)) {
-			return "Posible documento modificado"; //$NON-NLS-1$
-		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.OVERLAPPING_SIGNATURE)) {
-			return "Solapamiento entre firmas visibles"; //$NON-NLS-1$
+		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
+			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
 		}
 		final String ret = "Firma no valida"; //$NON-NLS-1$
 		if (this.error == null) {
@@ -78,10 +75,8 @@ public final class SignValidity {
         KO,
         /** Validez desconocida. */
         UNKNOWN,
-        /** Es posible que el documento se haya modificado. */
-        MODIFIED_DOCUMENT,
-        /** Una firma visible est&aacute; solapando a otra. */
-        OVERLAPPING_SIGNATURE,
+        /** Error a confirmar por parte del usuario. */
+        PENDING_CONFIRM_BY_USER,
         /** Firma generada en la misma aplicaci&oacute;n, se considera siempre v&aacute;lida. */
         GENERATED
     }

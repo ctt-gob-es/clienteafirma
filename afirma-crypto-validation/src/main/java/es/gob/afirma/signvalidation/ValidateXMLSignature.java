@@ -19,6 +19,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +60,11 @@ public final class ValidateXMLSignature implements SignValider {
 	public SignValidity validate(final byte[] sign) {
     	return validate(sign, true);
     }
+
+	@Override
+	public SignValidity validate(final byte[] sign, final Map params) {
+		return validate(sign, true);
+	}
 
     /** Valida una firma XML y las fechas de validez de los certificados.
      * @param sign Firma a validar
@@ -208,4 +214,5 @@ public final class ValidateXMLSignature implements SignValider {
 		@Override
 		public Key getKey() { return this.pk; }
     }
+
 }
