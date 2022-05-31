@@ -35,9 +35,4 @@ class AfirmaExtraParams {
 	/** Directorio del di&aacute;logo de guardado de fichero. */
 	static final String SAVE_FILE_CURRENT_DIR = "filenameSaveCurrentDir"; //$NON-NLS-1$
 
-	/** Comprobar si se permiten o no posibles ataques de tipo PDF Shadow Attack. */
-	static final String ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
-
-	/** N&uacute;mero de p&aacute;ginas donde comprobar un posible PDF Shadow Attack. */
-	static final String PAGES_TO_CHECK_SHADOW_ATTACK = "pagesToCheckShadowAttack"; //$NON-NLS-1$
 }

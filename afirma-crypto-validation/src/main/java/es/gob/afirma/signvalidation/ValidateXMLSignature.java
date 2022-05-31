@@ -19,7 +19,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,7 +62,7 @@ public final class ValidateXMLSignature implements SignValider {
     }
 
 	@Override
-	public SignValidity validate(final byte[] sign, final Map params) {
+	public SignValidity validate(final byte[] sign, final Properties params) {
 		return validate(sign, true);
 	}
 

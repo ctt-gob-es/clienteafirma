@@ -15,7 +15,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.pdf.AcroFields;
@@ -26,6 +26,7 @@ import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 
@@ -39,9 +40,7 @@ public final class ValidatePdfSignature implements SignValider {
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
-	static final String PARAM_ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
-	static final String PARAM_PAGES_TO_CHECK_SHADOW_ATTACK = "pagesToCheckShadowAttack"; //$NON-NLS-1$
-	static final String PARAM_CHECK_CERTIFICATES = "checkCertificates"; //$NON-NLS-1$
+	public static final String MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
 
 	/** Valida una firma PDF (PKCS#7/PAdES).
 	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
@@ -74,7 +73,7 @@ public final class ValidatePdfSignature implements SignValider {
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
-	public SignValidity validate(final byte[] sign, final Map<String, String> params) throws ConfirmationNeededException, IOException {
+	public SignValidity validate(final byte[] sign, final Properties params) throws ConfirmationNeededException, IOException {
 		AcroFields af;
 		try {
 			final PdfReader reader = new PdfReader(sign);
@@ -105,7 +104,7 @@ public final class ValidatePdfSignature implements SignValider {
 				}
     		}
 
-    		final boolean checkCertificates = Boolean.parseBoolean(params.get(PARAM_CHECK_CERTIFICATES));
+    		final boolean checkCertificates = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES));
 
     		if (checkCertificates) {
 				final X509Certificate signCert = pk.getSigningCertificate();
@@ -123,9 +122,9 @@ public final class ValidatePdfSignature implements SignValider {
 			}
 		}
 
-		final String allowShadowAttackProp = params.get(PARAM_ALLOW_SHADOW_ATTACK);
+		final String allowShadowAttackProp = params.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
 		final boolean allowPdfShadowAttack = Boolean.parseBoolean(allowShadowAttackProp);
-		final String pagesToCheck = params.get(PARAM_PAGES_TO_CHECK_SHADOW_ATTACK);
+		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
 
 		if (signNames.size() == 0) {
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);

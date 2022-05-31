@@ -50,6 +50,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -426,6 +427,9 @@ public final class SignatureService extends HttpServlet {
 			if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) ||
 				AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
 						prep = new PAdESTriPhasePreProcessor();
+						((PAdESTriPhasePreProcessor) prep).setAllowPdfShadowAttack(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK));
+						((PAdESTriPhasePreProcessor) prep).setMaxPagesToCheckPSA(ConfigManager.getMaxPagesToCheckPSA());
+						((PAdESTriPhasePreProcessor) prep).setPagesToCheckShadowAttack(extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA));
 			}
 			else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
@@ -472,7 +476,6 @@ public final class SignatureService extends HttpServlet {
 				TriphaseData preRes;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
-						extraParams.put(ConfigManager.CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA, ConfigManager.getMaxPagesToCheckPSA());
 						preRes = prep.preProcessPreSign(
 									docBytes,
 									algorithm,
@@ -482,7 +485,6 @@ public final class SignatureService extends HttpServlet {
 								);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
-						extraParams.put(ConfigManager.CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA, ConfigManager.getMaxPagesToCheckPSA());
 						preRes = prep.preProcessPreCoSign(
 								docBytes,
 								algorithm,

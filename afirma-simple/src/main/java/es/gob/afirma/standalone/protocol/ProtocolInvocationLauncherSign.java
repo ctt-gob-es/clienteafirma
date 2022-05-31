@@ -19,9 +19,7 @@ import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -373,24 +371,25 @@ final class ProtocolInvocationLauncherSign {
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
 			SignValidity validity = null;
 			if (validator != null) {
-				final String allowPdfShadowAttackProp = extraParams.getProperty(AfirmaExtraParams.ALLOW_SHADOW_ATTACK);
+				final String allowPdfShadowAttackProp = extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
 				final boolean allowPdfShadowAttack =  allowPdfShadowAttackProp != null ?
 														Boolean.parseBoolean(allowPdfShadowAttackProp) : false;
 				final String pagesToCheck = extraParams.getProperty(
-							AfirmaExtraParams.PAGES_TO_CHECK_SHADOW_ATTACK, "10" //$NON-NLS-1$
-							);
-				final Map<String, String> validationParams = new HashMap<String, String>();
-				validationParams.put(AfirmaExtraParams.ALLOW_SHADOW_ATTACK, allowPdfShadowAttackProp);
-				validationParams.put(AfirmaExtraParams.PAGES_TO_CHECK_SHADOW_ATTACK, pagesToCheck);
-				validationParams.put("checkCertificates", "true");  //$NON-NLS-1$//$NON-NLS-2$
+											PdfExtraParams.PAGES_TO_CHECK_PSA, "10" //$NON-NLS-1$
+											);
+				if (allowPdfShadowAttackProp == null) {
+					extraParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, allowPdfShadowAttack);
+				}
+				extraParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, pagesToCheck);
+				extraParams.put(PdfExtraParams.CHECK_CERTIFICATES, PdfExtraParams.CHECK_CERTIFICATES_VALUE_TRUE);
 				try {
-					validity = validator.validate(data, validationParams);
+					validity = validator.validate(data, extraParams);
 					// Si no se indica que hacer con los ataques PSA, se pregunta al usuario si continuar o no
 					if (allowPdfShadowAttackProp != null
 						&& !allowPdfShadowAttack
 						&& validity.getError() != null
-						&& (validity.getError().equals(VALIDITY_ERROR.MODIFIED_DOCUMENT)
-						|| validity.getError().equals(VALIDITY_ERROR.OVERLAPPING_SIGNATURE))) {
+						&& (VALIDITY_ERROR.MODIFIED_DOCUMENT == validity.getError()
+						|| VALIDITY_ERROR.OVERLAPPING_SIGNATURE == validity.getError())) {
 							LOGGER.log(Level.SEVERE, "La firma de entrada no es valida. Ha sufrido un posible PDF Shadow Attack."); //$NON-NLS-1$
 							final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_SHADOW_ATTACK;
 							throw new SocketOperationException(errorCode);
@@ -399,16 +398,26 @@ final class ProtocolInvocationLauncherSign {
 					LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
 					validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
 				} catch (final ConfirmationNeededException cne) {
-					if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
+					String dialogMessage = cne.getMessage();
+					boolean confirmationNeeded = false;
+					do {
+						if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
 							null,
-							cne.getMessage(),
+							dialogMessage,
 							ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
 							AOUIFactory.YES_NO_OPTION,
 							AOUIFactory.WARNING_MESSAGE)
 						) {
 							try {
-								validity = validator.validate(data, ConfirmationNeededException.PARAMS_YES_OPTION);
-							} catch (ConfirmationNeededException | IOException e) {
+								for (final String key : ConfirmationNeededException.PARAMS_YES_OPTION.keySet()) {
+									extraParams.put(key, ConfirmationNeededException.PARAMS_YES_OPTION.get(key));
+								}
+								validity = validator.validate(data, extraParams);
+								confirmationNeeded = false;
+							} catch (final ConfirmationNeededException e) {
+								confirmationNeeded = true;
+								dialogMessage = e.getMessage();
+							} catch (final IOException e) {
 								LOGGER.severe(e.getMessage());
 								final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
 								throw new SocketOperationException(errorCode);
@@ -418,11 +427,12 @@ final class ProtocolInvocationLauncherSign {
 							final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_SHADOW_ATTACK;
 							throw new SocketOperationException(errorCode);
 						}
+					} while (confirmationNeeded);
 				}
 				// La comprobacion de la operacion se hace aqui ya que hay formatos que tambien
 				// deben comprobar la validadez de las firmas previas para las operaciones de
 				// firma (PAdES, OOXML, etc.).
-				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
+				if (validity != null && validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
 						(cryptoOperation != Operation.SIGN || validity.getError() != VALIDITY_ERROR.NO_SIGN)) {
 					LOGGER.severe("La firma indicada no es valida: " + validity); //$NON-NLS-1$
 					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;

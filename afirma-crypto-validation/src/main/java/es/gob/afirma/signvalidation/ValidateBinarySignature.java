@@ -17,7 +17,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.spongycastle.cert.X509CertificateHolder;
@@ -59,7 +59,7 @@ public final class ValidateBinarySignature implements SignValider{
 	}
 
 	@Override
-	public SignValidity validate(final byte[] sign, final Map<String, String> params) throws IOException {
+	public SignValidity validate(final byte[] sign, final Properties params) throws IOException {
 		return validate(sign, null, true);
 	}
 

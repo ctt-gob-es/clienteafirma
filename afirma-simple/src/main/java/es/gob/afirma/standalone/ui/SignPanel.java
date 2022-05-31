@@ -35,9 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -68,6 +67,7 @@ import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signvalidation.SignValider;
@@ -517,27 +517,27 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
 				 SignValidity validity = null;
-				 final Map<String, String> params = new HashMap<String, String>();
-				 params.put("allowShadowAttack", PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK); //$NON-NLS-1$
-				 params.put("checkCertificates", "true");  //$NON-NLS-1$ //$NON-NLS-2$
-				 params.put("pagesToCheckShadowAttack", "all"); //$NON-NLS-1$ //$NON-NLS-2$
+				 final Properties validationParams = new Properties();
+				 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, PdfExtraParams.CHECK_CERTIFICATES_VALUE_TRUE);
+				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
 				 try {
-					validity = validator.validate(data, params);
+					validity = validator.validate(data, validationParams);
 				} catch (final ConfirmationNeededException e) {
 					// No ocurre nada
 				} catch (final IOException e) {
 					throw e;
 				}
 
-				 if (validity != null) {
-					 config.setSignValidity(validity);
-					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
+				if (validity != null) {
+					config.setSignValidity(validity);
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
 							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
 							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
 						config.setInvalidSignatureText(
 								buildErrorText(validity.getValidity(), validity.getError()));
-					 }
-				 }
+					}
+				}
 			 }
 		 }
 

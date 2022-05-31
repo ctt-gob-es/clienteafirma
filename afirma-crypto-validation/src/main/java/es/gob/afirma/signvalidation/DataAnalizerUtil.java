@@ -34,6 +34,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
@@ -267,7 +268,7 @@ public final class DataAnalizerUtil {
 
 			int totalPagesToCheck;
 
-			if ("all".equals(pagesToCheck)) { //$NON-NLS-1$
+			if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equals(pagesToCheck)) {
 				totalPagesToCheck = actualDoc.getNumberOfPages();
 			} else {
 				totalPagesToCheck = Integer.parseInt(pagesToCheck);

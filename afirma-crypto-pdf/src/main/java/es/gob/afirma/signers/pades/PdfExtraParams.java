@@ -789,6 +789,36 @@ public final class PdfExtraParams {
 	static final String SIGN_RESERVED_SIZE = "signReservedSize";//$NON-NLS-1$
 
 	/**
+	 * Indica el si se permiten o no ataques PDF Shadow Attacks
+	 */
+	public static final String ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Indica el n&uacute;mero m&aacute;ximo de p&aacute;ginas donde comprobar un posible PDF Shadow Attack
+	 */
+	public static final String MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Indica la cantidad de p&aacute;ginas en las que comprobar un PDF Shadow Attack
+	 */
+	public static final String PAGES_TO_CHECK_PSA = "pagesToCheckShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Valor que indica que se deben comprobar todas las p&aacute;ginas de un documento
+	 */
+	public static final String PAGES_TO_CHECK_PSA_VALUE_ALL = "all"; //$NON-NLS-1$
+
+	/**
+	 * Indica si se debe comprobar o no la validez de los certificados
+	 */
+	public static final String CHECK_CERTIFICATES = "checkCertificates"; //$NON-NLS-1$
+
+	/**
+	 * Valor para indicar que se debe comprobar la validez del certificado
+	 */
+	public static final String CHECK_CERTIFICATES_VALUE_TRUE = "true"; //$NON-NLS-1$
+
+	/**
 	 * Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya
 	 * que es est&aacute;tico.
 	 */

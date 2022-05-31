@@ -29,6 +29,7 @@ import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfSignResult;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
@@ -57,6 +58,15 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Manejador de registro. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/** Numero maximo de paginas en las que comprobar un posible Pdf Shadow Attack. */
+	private String maxPagesToCheckPSA;
+
+	/** Indica el numero de p&aacute;ginas para comprobar posible Pdf Shadow Attack. */
+	private String pagesToCheckShadowAttack;
+
+	/** Indica si se permite o no la comprobacion de posibles Pdf Shadow Attacks. */
+	private String allowPdfShadowAttack;
+
 	@Override
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
@@ -68,33 +78,22 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures && new AOPDFSigner().isSign(data)) {
-			final String allowPdfShadowAttack = extraParams.getProperty(
-					"allowShadowAttack" //$NON-NLS-1$
-					);
-			final String pagesToCheckShadowAttack = extraParams.getProperty(
-					"pagesToCheckShadowAttack" //$NON-NLS-1$
-					);
-			final String maxPagesToCheckShadowAttack = extraParams.getProperty(
-					"maxPagesToCheckShadowAttack" //$NON-NLS-1$
-					);
-			String pagesToCheckPSA = maxPagesToCheckShadowAttack;
+			String pagesToCheckPSA = this.maxPagesToCheckPSA;
 
-			if (pagesToCheckShadowAttack != null && !"all".equals(pagesToCheckShadowAttack) //$NON-NLS-1$
-					&& maxPagesToCheckShadowAttack != null && !"all".equals(maxPagesToCheckShadowAttack)) { //$NON-NLS-1$
-				final int maxPagesInt = Integer.parseInt(maxPagesToCheckShadowAttack);
-				final int pagesToCheckInt = Integer.parseInt(pagesToCheckShadowAttack);
-				pagesToCheckPSA = pagesToCheckInt < maxPagesInt ? pagesToCheckShadowAttack : maxPagesToCheckShadowAttack;
+			if (this.pagesToCheckShadowAttack != null && !PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equals(this.pagesToCheckShadowAttack)
+					&& this.maxPagesToCheckPSA != null && !PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equals(this.maxPagesToCheckPSA)) {
+				final int maxPagesInt = Integer.parseInt(this.maxPagesToCheckPSA);
+				final int pagesToCheckInt = Integer.parseInt(this.pagesToCheckShadowAttack);
+				pagesToCheckPSA = pagesToCheckInt < maxPagesInt ? this.pagesToCheckShadowAttack : this.maxPagesToCheckPSA;
 			}
 
-			final Map <String, String> params = new HashMap<String, String>();
-			params.put("allowShadowAttack", allowPdfShadowAttack); //$NON-NLS-1$
-			params.put("pagesToCheckShadowAttack", pagesToCheckPSA); //$NON-NLS-1$
-			params.put("checkCertificates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			extraParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, this.allowPdfShadowAttack);
+			extraParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, pagesToCheckPSA);
+			extraParams.put(PdfExtraParams.CHECK_CERTIFICATES, PdfExtraParams.CHECK_CERTIFICATES_VALUE_TRUE);
 			SignValidity validity;
 
 			try {
-				validity = new ValidatePdfSignature().validate(data, params);
-
+				validity = new ValidatePdfSignature().validate(data, extraParams);
 	        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
 	        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
 	        	}
@@ -305,4 +304,17 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException {
 		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
+
+	public void setMaxPagesToCheckPSA(final String maxPagesToCheckPSA) {
+		this.maxPagesToCheckPSA = maxPagesToCheckPSA;
+	}
+
+	public void setPagesToCheckShadowAttack(final String pagesToCheckShadowAttack) {
+		this.pagesToCheckShadowAttack = pagesToCheckShadowAttack;
+	}
+
+	public void setAllowPdfShadowAttack(final String allowPdfShadowAttack) {
+		this.allowPdfShadowAttack = allowPdfShadowAttack;
+	}
+
 }
