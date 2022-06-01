@@ -427,9 +427,7 @@ public final class SignatureService extends HttpServlet {
 			if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) ||
 				AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
 						prep = new PAdESTriPhasePreProcessor();
-						((PAdESTriPhasePreProcessor) prep).setAllowPdfShadowAttack(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK));
-						((PAdESTriPhasePreProcessor) prep).setMaxPagesToCheckPSA(ConfigManager.getMaxPagesToCheckPSA());
-						((PAdESTriPhasePreProcessor) prep).setPagesToCheckShadowAttack(extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA));
+						configurePdfShadowAttackParameters(extraParams);
 			}
 			else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
@@ -684,6 +682,36 @@ public final class SignatureService extends HttpServlet {
 			}
         	return;
         }
+	}
+
+	private static void configurePdfShadowAttackParameters(final Properties extraParams) {
+		if (!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK))) {
+			final int maxPagestoCheck = ConfigManager.getMaxPagesToCheckPSA();
+			int pagesToCheck = 10;
+			if (extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+				final String pagesToCheckProp = extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
+				if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheckProp)) {
+					pagesToCheck = Integer.MAX_VALUE;
+				}
+				else {
+					try {
+						pagesToCheck = Integer.parseInt(pagesToCheckProp);
+					}
+					catch (final Exception e) {
+						pagesToCheck = 10;
+					}
+				}
+			}
+			// Comprobaremos el menor numero de paginas posible que sera el indicado por la aplicacion
+			// (el por defecto si no se paso un valor) o el maximo establecido por el servicio
+			pagesToCheck = Math.min(pagesToCheck, maxPagestoCheck);
+			if (pagesToCheck <= 0) {
+				extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+			}
+			else {
+				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, Integer.toString(pagesToCheck));
+			}
+		}
 	}
 
 	/**

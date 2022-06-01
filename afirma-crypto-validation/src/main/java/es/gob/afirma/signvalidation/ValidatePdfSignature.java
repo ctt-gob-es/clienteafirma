@@ -40,8 +40,6 @@ public final class ValidatePdfSignature implements SignValider {
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
-	public static final String MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
-
 	/** Valida una firma PDF (PKCS#7/PAdES).
 	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
      * @param sign PDF firmado.
@@ -104,7 +102,7 @@ public final class ValidatePdfSignature implements SignValider {
 				}
     		}
 
-    		final boolean checkCertificates = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES));
+    		final boolean checkCertificates = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString()));
 
     		if (checkCertificates) {
 				final X509Certificate signCert = pk.getSigningCertificate();
@@ -139,7 +137,7 @@ public final class ValidatePdfSignature implements SignValider {
 					if (allowShadowAttackProp != null) {
 						return validity;
 					}
-					throw new ConfirmationNeededException("ProtocolInvocationError.PSA"); //$NON-NLS-1$
+					throw new SuspectedPSAException("ProtocolInvocationError.PSA"); //$NON-NLS-1$
 				}
 			}
 		}

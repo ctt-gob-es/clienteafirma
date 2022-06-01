@@ -62,6 +62,7 @@ import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
+import es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner;
 import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
@@ -372,68 +373,38 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
 			SignValidity validity = null;
 			if (validator != null) {
-				final String allowPdfShadowAttackProp = extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
-				final boolean allowPdfShadowAttack =  allowPdfShadowAttackProp != null ?
-														Boolean.parseBoolean(allowPdfShadowAttackProp) : false;
-				final String pagesToCheck = extraParams.getProperty(
-								PdfExtraParams.PAGES_TO_CHECK_PSA, "10" //$NON-NLS-1$
-							);
-				if (allowPdfShadowAttackProp == null) {
-					extraParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, allowPdfShadowAttackProp);
+				if (signer instanceof AOPDFSigner || signer instanceof AOPDFTriPhaseSigner) {
+					configurePdfSignature(extraParams);
 				}
-				extraParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, pagesToCheck);
-				extraParams.put(PdfExtraParams.CHECK_CERTIFICATES, PdfExtraParams.CHECK_CERTIFICATES_VALUE_TRUE);
-				try {
-					validity = validator.validate(data, extraParams);
-					// Si no se indica que hacer con los ataques PSA, se pregunta al usuario si continuar o no
-					if (allowPdfShadowAttackProp != null
-						&& !allowPdfShadowAttack
-						&& validity.getError() != null
-						&& (VALIDITY_ERROR.MODIFIED_DOCUMENT == validity.getError()
-						|| VALIDITY_ERROR.OVERLAPPING_SIGNATURE == validity.getError())) {
-							LOGGER.log(Level.SEVERE, "La firma de entrada no es valida. Ha sufrido un posible PDF Shadow Attack."); //$NON-NLS-1$
-							final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_SHADOW_ATTACK;
-							throw new SocketOperationException(errorCode);
-						}
-				} catch (final IOException e) {
-					LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
-					validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
-				} catch (final ConfirmationNeededException cne) {
-					String dialogMessage = cne.getMessage();
-					boolean confirmationNeeded = false;
-					do {
-						if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
-							null,
-							dialogMessage,
-							ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
-							AOUIFactory.YES_NO_OPTION,
-							AOUIFactory.WARNING_MESSAGE)
-						) {
-							try {
-								for (final String key : ConfirmationNeededException.PARAMS_YES_OPTION.keySet()) {
-									extraParams.put(key, ConfirmationNeededException.PARAMS_YES_OPTION.get(key));
-								}
-								validity = validator.validate(data, extraParams);
-								confirmationNeeded = false;
-							} catch (final ConfirmationNeededException e) {
-								confirmationNeeded = true;
-								dialogMessage = e.getMessage();
-							} catch (final IOException e) {
-								LOGGER.severe(e.getMessage());
-								final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
-								throw new SocketOperationException(errorCode);
-							}
+
+				do {
+					try {
+						validity = validator.validate(data, extraParams);
+					} catch (final IOException e) {
+						LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
+						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
+					} catch (final ConfirmationNeededException cne) {
+						final String dialogMessage = cne.getMessage();
+						final int confirmation = AOUIFactory.showConfirmDialog(
+								null,
+								dialogMessage,
+								ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
+								AOUIFactory.YES_NO_OPTION,
+								AOUIFactory.WARNING_MESSAGE);
+						if (AOUIFactory.YES_OPTION == confirmation) {
+							final Properties newProperties = cne.getYesParamsOptions();
+							newProperties.putAll(extraParams);
 						} else {
-							LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion"); //$NON-NLS-1$
-							final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_SHADOW_ATTACK;
-							throw new SocketOperationException(errorCode);
+							LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + dialogMessage); //$NON-NLS-1$
+							throw new SocketOperationException(RESULT_CANCEL);
 						}
-					} while (confirmationNeeded);
-				}
+					}
+				} while (validity == null);
+
 				// La comprobacion de la operacion se hace aqui ya que hay formatos que tambien
 				// deben comprobar la validadez de las firmas previas para las operaciones de
 				// firma (PAdES, OOXML, etc.).
-				if (validity != null && validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
+				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
 						(cryptoOperation != Operation.SIGN || validity.getError() != VALIDITY_ERROR.NO_SIGN)) {
 					LOGGER.severe("La firma indicada no es valida: " + validity); //$NON-NLS-1$
 					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
@@ -726,6 +697,15 @@ final class ProtocolInvocationLauncherSignAndSave {
 		result.setDataFilename(extraData);
 
 		return result;
+	}
+
+	private static void configurePdfSignature(final Properties extraParams) {
+		final String allowPdfShadowAttackProp = extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
+		if (!Boolean.parseBoolean(allowPdfShadowAttackProp)) {
+			if (!extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
+			}
+		}
 	}
 
 	/**
