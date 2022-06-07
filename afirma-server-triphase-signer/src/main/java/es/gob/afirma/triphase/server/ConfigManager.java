@@ -231,7 +231,7 @@ public class ConfigManager {
 	public static int getMaxPagesToCheckPSA() {
 		int maxPages;
 		final String maxPagesValue = config.getProperty(CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA);
-		if (VALUE_CHECK_ALL_PAGES.equals(maxPagesValue)) {
+		if (VALUE_CHECK_ALL_PAGES.equalsIgnoreCase(maxPagesValue)) {
 			maxPages = Integer.MAX_VALUE;
 		}
 		else {

@@ -269,7 +269,7 @@ public final class DataAnalizerUtil {
 
 			int totalPagesToCheck;
 
-			if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equals(pagesToCheck)) {
+			if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheck)) {
 				totalPagesToCheck = actualDoc.getNumberOfPages();
 			} else {
 				totalPagesToCheck = Integer.parseInt(pagesToCheck);
