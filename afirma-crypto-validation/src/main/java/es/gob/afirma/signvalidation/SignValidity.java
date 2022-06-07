@@ -23,6 +23,9 @@ public final class SignValidity {
 		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
 			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
 		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
+			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
+		}
 		final String ret = "Firma no valida"; //$NON-NLS-1$
 		if (this.error == null) {
 			return ret;
@@ -72,6 +75,8 @@ public final class SignValidity {
         KO,
         /** Validez desconocida. */
         UNKNOWN,
+        /** Error a confirmar por parte del usuario. */
+        PENDING_CONFIRM_BY_USER,
         /** Firma generada en la misma aplicaci&oacute;n, se considera siempre v&aacute;lida. */
         GENERATED
     }
@@ -107,7 +112,11 @@ public final class SignValidity {
         /** Cuando la firma es inv&aacute;lida pero no se sabe la raz&oacute;n. */
         UNKOWN_ERROR,
         /** Cuando los datos proporcionado no sean ning&uacute;n tipo de firma reconocida. */
-        UNKOWN_SIGNATURE_FORMAT
+        UNKOWN_SIGNATURE_FORMAT,
+        /** Cuando el documento ha sufrido alguna modificaci&oacute;n desde la &uacute;ltima firma. */
+        MODIFIED_DOCUMENT,
+        /** Cuando una firma est&aacute; solapando a otra en un documento PDF. */
+        OVERLAPPING_SIGNATURE
     }
 
     /** Validez de la firma. */

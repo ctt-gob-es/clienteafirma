@@ -50,6 +50,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -127,6 +128,12 @@ public final class SignatureService extends HttpServlet {
 
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+	/**
+	 * N&uacute;mero de p&aacute;ginas por defecto de un PDF sobre las que
+	 * comprobar si se ha producido un PDF Shadow Attack.
+	 */
+	private static final int DEFAULT_PAGES_TO_CHECK_PSA = 10;
 
 	/** Propiedad que indica si la cach&eacute; est&aacute; activada o no. */
 	private static boolean cacheEnabled = false;
@@ -426,6 +433,7 @@ public final class SignatureService extends HttpServlet {
 			if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) ||
 				AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
 						prep = new PAdESTriPhasePreProcessor();
+						configurePdfShadowAttackParameters(extraParams);
 			}
 			else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
@@ -469,25 +477,25 @@ public final class SignatureService extends HttpServlet {
 				// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
 		        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
 
-				final TriphaseData preRes;
+				TriphaseData preRes;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
 						preRes = prep.preProcessPreSign(
-							docBytes,
-							algorithm,
-							signerCertChain,
-							extraParams,
-							checkSignatures
-						);
+									docBytes,
+									algorithm,
+									signerCertChain,
+									extraParams,
+									checkSignatures
+								);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
 						preRes = prep.preProcessPreCoSign(
-							docBytes,
-							algorithm,
-							signerCertChain,
-							extraParams,
-							checkSignatures
-						);
+								docBytes,
+								algorithm,
+								signerCertChain,
+								extraParams,
+								checkSignatures
+							);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
 
@@ -498,7 +506,6 @@ public final class SignatureService extends HttpServlet {
 								target = CounterSignTarget.TREE;
 							}
 						}
-
 						preRes = prep.preProcessPreCounterSign(
 							docBytes,
 							algorithm,
@@ -681,6 +688,36 @@ public final class SignatureService extends HttpServlet {
 			}
         	return;
         }
+	}
+
+	private static void configurePdfShadowAttackParameters(final Properties extraParams) {
+		if (!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK))) {
+			final int maxPagestoCheck = ConfigManager.getMaxPagesToCheckPSA();
+			int pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
+			if (extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+				final String pagesToCheckProp = extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
+				if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheckProp)) {
+					pagesToCheck = Integer.MAX_VALUE;
+				}
+				else {
+					try {
+						pagesToCheck = Integer.parseInt(pagesToCheckProp);
+					}
+					catch (final Exception e) {
+						pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
+					}
+				}
+			}
+			// Comprobaremos el menor numero de paginas posible que sera el indicado por la aplicacion
+			// (el por defecto si no se paso un valor) o el maximo establecido por el servicio
+			pagesToCheck = Math.min(pagesToCheck, maxPagestoCheck);
+			if (pagesToCheck <= 0) {
+				extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+			}
+			else {
+				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, Integer.toString(pagesToCheck));
+			}
+		}
 	}
 
 	/**

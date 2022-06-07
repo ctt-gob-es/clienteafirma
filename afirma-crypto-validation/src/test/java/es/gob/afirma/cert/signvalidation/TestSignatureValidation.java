@@ -28,7 +28,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_IMPLICIT_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(ValidateBinarySignature.validate(cades, null));
+			System.out.println(new ValidateBinarySignature().validate(cades));
 		}
 	}
 
@@ -41,7 +41,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(ValidateBinarySignature.validate(cades, null));
+			System.out.println(new ValidateBinarySignature().validate(cades));
 		}
 	}
 

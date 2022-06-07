@@ -36,6 +36,7 @@ import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -61,6 +62,7 @@ import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
+import es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner;
 import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
@@ -236,6 +238,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 		String format = signOperation.getFormat();
 		final String algorithm = signOperation.getAlgorithm();
 		Properties extraParams = signOperation.getExtraParams();
+		if (extraParams == null) {
+			extraParams = new Properties();
+		}
 		final Operation cryptoOperation = signOperation.getCryptoOperation();
 
 		// En caso de que no se haya solicitado una operacion de multifirma con
@@ -369,20 +374,54 @@ final class ProtocolInvocationLauncherSignAndSave {
 		if (data != null &&
 				Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.CHECK_SIGNATURES))) {
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
+			SignValidity validity = null;
 			if (validator != null) {
-				SignValidity validity;
-				try {
-					validity = validator.validate(data);
-				} catch (final IOException e) {
-					LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
-					validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
+				if (signer instanceof AOPDFSigner || signer instanceof AOPDFTriPhaseSigner) {
+					configurePdfSignature(extraParams);
 				}
+
+				do {
+					try {
+						validity = validator.validate(data, extraParams);
+					} catch (final IOException e) {
+						LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
+						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
+					} catch (final ConfirmationNeededException cne) {
+						// Si no se puede solicitar confirmacion al usuario, se
+						// establecen las opciones por defecto
+						if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+							final Properties newParams = cne.getDefaultParamsOptions();
+							if (newParams != null) {
+								extraParams.putAll(newParams);
+							}
+						}
+
+						// Se solicita confirmacion al usuario
+						final String dialogMessage = cne.getMessage();
+						final int confirmation = AOUIFactory.showConfirmDialog(
+								null,
+								dialogMessage,
+								ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
+								AOUIFactory.YES_NO_OPTION,
+								AOUIFactory.WARNING_MESSAGE);
+						if (AOUIFactory.YES_OPTION == confirmation) {
+							final Properties newParams = cne.getYesParamsOptions();
+							if (newParams != null) {
+								extraParams.putAll(newParams);
+							}
+						} else {
+							LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + dialogMessage); //$NON-NLS-1$
+							throw new SocketOperationException(RESULT_CANCEL);
+						}
+					}
+				} while (validity == null);
+
 				// La comprobacion de la operacion se hace aqui ya que hay formatos que tambien
 				// deben comprobar la validadez de las firmas previas para las operaciones de
 				// firma (PAdES, OOXML, etc.).
 				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
-						!(cryptoOperation == Operation.SIGN && validity.getError() == VALIDITY_ERROR.NO_SIGN)) {
-					LOGGER.severe("La firma indicada no es valida"); //$NON-NLS-1$
+						(cryptoOperation != Operation.SIGN || validity.getError() != VALIDITY_ERROR.NO_SIGN)) {
+					LOGGER.severe("La firma indicada no es valida: " + validity); //$NON-NLS-1$
 					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
 					throw new SocketOperationException(errorCode);
 				}
@@ -673,6 +712,15 @@ final class ProtocolInvocationLauncherSignAndSave {
 		result.setDataFilename(extraData);
 
 		return result;
+	}
+
+	private static void configurePdfSignature(final Properties extraParams) {
+		final String allowPdfShadowAttackProp = extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
+		if (!Boolean.parseBoolean(allowPdfShadowAttackProp)) {
+			if (!extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
+			}
+		}
 	}
 
 	/**

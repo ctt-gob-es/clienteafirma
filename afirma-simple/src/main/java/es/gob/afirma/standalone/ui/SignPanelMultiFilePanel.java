@@ -48,6 +48,7 @@ import javax.swing.border.Border;
 
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
@@ -312,6 +313,14 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
 				if (!LookAndFeelManager.HIGH_CONTRAST) {
 					this.fileNameLabel.setForeground(Color.BLACK);
+				}
+			}
+			else if (value.getSignValidity() != null
+					&& SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER.equals(value.getSignValidity().getValidity())) {
+				this.fileNameLabel.setText(
+						(value.getDataFile().getAbsolutePath() + " (" + value.getSignValidity().getError() + ")").substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!LookAndFeelManager.HIGH_CONTRAST) {
+					this.fileNameLabel.setForeground(Color.RED);
 				}
 			}
 			else {

@@ -292,7 +292,7 @@ public final class PdfExtraParams {
 
 	/**
 	 * P&aacute;gina del documento PDF donde insertar la firma.
-	 * Se podr&aacute;n seleccionar todas las p&aacute;ginas usando la palabra clave all.
+	 * Se podr&aacute;n seleccionar todas las p&aacute;ginas usando la palabra clave {@code all}.
 	 * Se podr&aacute;n seleccionar p&aacute;ginas individuales list&aacute;ndolas separadas por comas (,).
 	 * Por ejemplo, para mostrar la firma en las p&aacute;ginas 1, 2, 5 y 7, se usar&aacute;: 1,2,5,7
 	 * Se podr&aacute;n seleccionar rangos de p&aacute;ginas separadas por guion (-), en donde en las dos p&aacute;ginas
@@ -300,7 +300,7 @@ public final class PdfExtraParams {
 	 * Por ejemplo, para mostrar la firma en las p&aacute;ginas 2, 3, 4 y 5, se usar&aacute;: 2-5
 	 * Se podr&aacute;n seleccionar p&aacute;ginas contando desde el final del documento utilizando valores negativos.
 	 * Por ejemplo, para mostrar la firma en la pen&uacute;ltima p&aacute;gina, se usar&aacute;: -2
-	 * Estos mecanismos podr&aacute;n usarse de forma conjunta, a excepci&oacute;n de la palabra clave “all”
+	 * Estos mecanismos podr&aacute;n usarse de forma conjunta, a excepci&oacute;n de la palabra clave {@code all}
 	 * que ya implica la firma en todas las p&aacute;ginas.
 	 * Por ejemplo, para mostrar la firma en las tres primeras p&aacute;ginas y en las tres &uacute;ltimas, se usar&aacute;: 1-3,-3--1
 	 * <code>signaturePositionOnPageLowerLeftX</code>,
@@ -787,6 +787,26 @@ public final class PdfExtraParams {
 	 * Indica el tama&ntilde;o que se desea reservar para la firma en el PDF.
 	 */
 	static final String SIGN_RESERVED_SIZE = "signReservedSize";//$NON-NLS-1$
+
+	/**
+	 * Indica el si se permiten o no ataques PDF Shadow Attacks
+	 */
+	public static final String ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Indica la cantidad de p&aacute;ginas en las que comprobar un PDF Shadow Attack
+	 */
+	public static final String PAGES_TO_CHECK_PSA = "pagesToCheckShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Valor que indica que se deben comprobar todas las p&aacute;ginas de un documento
+	 */
+	public static final String PAGES_TO_CHECK_PSA_VALUE_ALL = "all"; //$NON-NLS-1$
+
+	/**
+	 * Indica si se debe comprobar o no la validez de los certificados.
+	 */
+	public static final String CHECK_CERTIFICATES = "checkCertificates"; //$NON-NLS-1$
 
 	/**
 	 * Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya

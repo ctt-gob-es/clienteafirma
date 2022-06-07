@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -57,6 +58,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -65,6 +67,7 @@ import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signvalidation.SignValider;
@@ -513,15 +516,28 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
-				 final SignValidity validity = validator.validate(data);
-				 if (validity != null) {
-					 config.setSignValidity(validity);
-					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO ||
-							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+				 SignValidity validity = null;
+				 final Properties validationParams = new Properties();
+				 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
+				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
+				 try {
+					validity = validator.validate(data, validationParams);
+				} catch (final ConfirmationNeededException e) {
+					// No ocurre nada
+				} catch (final IOException e) {
+					throw e;
+				}
+
+				if (validity != null) {
+					config.setSignValidity(validity);
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
+							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
+							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
 						config.setInvalidSignatureText(
 								buildErrorText(validity.getValidity(), validity.getError()));
-					 }
-				 }
+					}
+				}
 			 }
 		 }
 
@@ -535,8 +551,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 final String errorMsg;
 		 if (result == SIGN_DETAIL_TYPE.UNKNOWN) {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.141"); //$NON-NLS-1$
-		 }
-		 else {
+		 } else {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
 		 }
 		 switch (error) {
@@ -570,6 +585,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.138"); //$NON-NLS-1$ //$NON-NLS-2$
 			case UNKOWN_SIGNATURE_FORMAT:
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.139"); //$NON-NLS-1$ //$NON-NLS-2$
+			case MODIFIED_DOCUMENT:
+				return SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
+			case OVERLAPPING_SIGNATURE:
+				return SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
 			default:
 				return errorMsg;
 		}

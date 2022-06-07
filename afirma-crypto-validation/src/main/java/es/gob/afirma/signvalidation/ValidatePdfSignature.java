@@ -10,10 +10,12 @@
 package es.gob.afirma.signvalidation;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.pdf.AcroFields;
@@ -22,18 +24,22 @@ import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
+import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 
 /** Validador de firmas PDF.
  * Se validan los certificados en local revisando si procede las fechas de validez de los certificados.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-public final class ValidatePdfSignature implements SignValider{
+public final class ValidatePdfSignature implements SignValider {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
+
+	private static final String DEFAULT_PAGES_TO_CHECK_PSA = "10"; //$NON-NLS-1$
 
 	/** Valida una firma PDF (PKCS#7/PAdES).
 	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
@@ -55,6 +61,18 @@ public final class ValidatePdfSignature implements SignValider{
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
 	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException {
+		return validate(sign, checkCertificates);
+	}
+
+	/** Valida una firma PDF (PKCS#7/PAdES).
+	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
+     * @param sign PDF firmado.
+     * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
+     * @return Validez de la firma.
+     * @throws IOException Si ocurren problemas relacionados con la lectura del documento
+     * o si no se encuentran firmas PDF en el documento. */
+	@Override
+	public SignValidity validate(final byte[] sign, final Properties params) throws ConfirmationNeededException, IOException {
 		AcroFields af;
 		try {
 			final PdfReader reader = new PdfReader(sign);
@@ -63,14 +81,16 @@ public final class ValidatePdfSignature implements SignValider{
 		catch (final Exception e) {
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
+		final List<String> signNames = af.getSignatureNames();
 
-		final List<String> sigNames = af.getSignatureNames();
 
-		if (sigNames.size() == 0) {
+		// Si no hay firmas, no hay nada que comprobar
+		if (signNames.size() == 0) {
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
 
-		for (final String name : sigNames) {
+		for (final String name : signNames) {
+
 			final PdfPKCS7 pk = af.verifySignature(name);
 
     		// Comprobamos si es una firma o un sello
@@ -88,6 +108,9 @@ public final class ValidatePdfSignature implements SignValider{
 					return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e);
 				}
     		}
+
+    		final boolean checkCertificates = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString()));
+
     		if (checkCertificates) {
 				final X509Certificate signCert = pk.getSigningCertificate();
 				try {
@@ -103,6 +126,38 @@ public final class ValidatePdfSignature implements SignValider{
 				}
 			}
 		}
+
+		final String allowShadowAttackProp = params.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
+		final boolean allowPdfShadowAttack = Boolean.parseBoolean(allowShadowAttackProp);
+		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, DEFAULT_PAGES_TO_CHECK_PSA);
+
+		// Si se debe comprobar si se ha producido un PDF Shadow Attack
+		// (modificacion de un documento tras la firma), se encuentran varias
+		// revisiones en el documento y hay al menos una posterior a la ultima
+		// firma (la de la posicion 0), se comprueba si el documento ha sufrido
+		// un PSA.
+		if (!allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
+			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
+			try (final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
+				SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewStream, pagesToCheck);
+				// Si se devolvio informacion de validez, la firma no es completamente valida
+				if (validity != null) {
+					// Se comprueba si se debe consultar al usuario y si se
+					// cumplen los requisitos para ello
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
+							&& allowShadowAttackProp == null) {
+						throw new SuspectedPSAException("ProtocolInvocationError.PSA"); //$NON-NLS-1$
+					}
+					// Si habia que consultar y no se cumplen los requisitos,
+					// se considera que la firma no es valida
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
+						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, validity.getError());
+					}
+					return validity;
+				}
+			}
+		}
+
 		return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
 	}
 

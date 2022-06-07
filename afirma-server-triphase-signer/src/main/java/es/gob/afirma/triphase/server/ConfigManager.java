@@ -33,9 +33,19 @@ public class ConfigManager {
 
 	private static final String CONFIG_PARAM_CONCURRENT_MAX_SIGNS = "concurrent.maxsigns"; //$NON-NLS-1$
 
+	/** Propiedad que indica el numero m&aacute;ximo de paginas para comprobar un posible PDF Shadow Attack */
+	private static final String CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
+
 	private static final long DEFAULT_CONCURRENT_TIMEOUT = 30;
 
 	private static final int DEFAULT_CONCURRENT_MAXSIGNS = 10;
+
+	/** N&uacute;mero de p&aacute;ginas por defecto en las que comprobar el PSA. */
+	private static final int DEFAULT_PARAM_MAX_PAGES_TO_CHECK_PSA = 10;
+
+	/** Valor para comprobar el PSA sobre todas las p&aacute;ginas. */
+	private static final String VALUE_CHECK_ALL_PAGES = "all"; //$NON-NLS-1$
+
 
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
 	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
@@ -216,5 +226,22 @@ public class ConfigManager {
 		catch (final Exception e) {
 			return DEFAULT_CONCURRENT_MAXSIGNS;
 		}
+	}
+
+	public static int getMaxPagesToCheckPSA() {
+		int maxPages;
+		final String maxPagesValue = config.getProperty(CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA);
+		if (VALUE_CHECK_ALL_PAGES.equals(maxPagesValue)) {
+			maxPages = Integer.MAX_VALUE;
+		}
+		else {
+			try {
+				maxPages = Integer.parseInt(maxPagesValue);
+			}
+			catch (final Exception e) {
+				maxPages = DEFAULT_PARAM_MAX_PAGES_TO_CHECK_PSA;
+			}
+		}
+		return maxPages;
 	}
 }
