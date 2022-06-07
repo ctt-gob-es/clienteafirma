@@ -519,7 +519,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				 SignValidity validity = null;
 				 final Properties validationParams = new Properties();
 				 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
-				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, PdfExtraParams.CHECK_CERTIFICATES_VALUE_TRUE);
+				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
 				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
 				 try {
 					validity = validator.validate(data, validationParams);

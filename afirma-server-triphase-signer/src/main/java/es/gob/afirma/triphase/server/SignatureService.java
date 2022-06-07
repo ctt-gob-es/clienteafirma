@@ -129,6 +129,12 @@ public final class SignatureService extends HttpServlet {
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
+	/**
+	 * N&uacute;mero de p&aacute;ginas por defecto de un PDF sobre las que
+	 * comprobar si se ha producido un PDF Shadow Attack.
+	 */
+	private static final int DEFAULT_PAGES_TO_CHECK_PSA = 10;
+
 	/** Propiedad que indica si la cach&eacute; est&aacute; activada o no. */
 	private static boolean cacheEnabled = false;
 
@@ -687,7 +693,7 @@ public final class SignatureService extends HttpServlet {
 	private static void configurePdfShadowAttackParameters(final Properties extraParams) {
 		if (!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK))) {
 			final int maxPagestoCheck = ConfigManager.getMaxPagesToCheckPSA();
-			int pagesToCheck = 10;
+			int pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
 			if (extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
 				final String pagesToCheckProp = extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
 				if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheckProp)) {
@@ -698,7 +704,7 @@ public final class SignatureService extends HttpServlet {
 						pagesToCheck = Integer.parseInt(pagesToCheckProp);
 					}
 					catch (final Exception e) {
-						pagesToCheck = 10;
+						pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
 					}
 				}
 			}

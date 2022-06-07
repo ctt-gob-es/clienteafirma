@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -250,16 +251,16 @@ public final class DataAnalizerUtil {
 	/**
 	 * Indica si el documento ha recibido un posible PDF Shadow Attack.
 	 * @param actualdata Datos del documento actual.
-	 * @param lastReviewData Datos de la &uacute;ltima revisi&oacute;n firmada.
+	 * @param lastReviewData Flujo de datos de la &uacute;ltima revisi&oacute;n firmada.
 	 * @param pagesToCheck P&aacuteginas a comprobar.
 	 * @return Validez o no de los datos en el documento.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
 	 * la generaci&oacute;n de las im&aacute;genes.
 	 */
-	public static SignValidity checkPdfShadowAttack(final byte[] actualdata, final byte[] lastReviewData, final String pagesToCheck) throws IOException {
+	public static SignValidity checkPdfShadowAttack(final byte[] actualdata, final InputStream lastReviewData, final String pagesToCheck) throws IOException {
 
-		try (final PDDocument actualDoc = PDDocument.load(new ByteArrayInputStream(actualdata));
-				final PDDocument lastReviewDoc = PDDocument.load(new ByteArrayInputStream(lastReviewData))) {
+		try (final PDDocument actualDoc = PDDocument.load(actualdata);
+				final PDDocument lastReviewDoc = PDDocument.load(lastReviewData)) {
 
 			final PDFRenderer actualPdfRenderer = new PDFRenderer(actualDoc);
 			final PDFRenderer lastReviewPdfRenderer = new PDFRenderer(lastReviewDoc);

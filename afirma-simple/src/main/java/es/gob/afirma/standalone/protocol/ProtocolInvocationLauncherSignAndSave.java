@@ -238,6 +238,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 		String format = signOperation.getFormat();
 		final String algorithm = signOperation.getAlgorithm();
 		Properties extraParams = signOperation.getExtraParams();
+		if (extraParams == null) {
+			extraParams = new Properties();
+		}
 		final Operation cryptoOperation = signOperation.getCryptoOperation();
 
 		// En caso de que no se haya solicitado una operacion de multifirma con
@@ -384,6 +387,16 @@ final class ProtocolInvocationLauncherSignAndSave {
 						LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
 						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
 					} catch (final ConfirmationNeededException cne) {
+						// Si no se puede solicitar confirmacion al usuario, se
+						// establecen las opciones por defecto
+						if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+							final Properties newParams = cne.getDefaultParamsOptions();
+							if (newParams != null) {
+								extraParams.putAll(newParams);
+							}
+						}
+
+						// Se solicita confirmacion al usuario
 						final String dialogMessage = cne.getMessage();
 						final int confirmation = AOUIFactory.showConfirmDialog(
 								null,
@@ -392,8 +405,10 @@ final class ProtocolInvocationLauncherSignAndSave {
 								AOUIFactory.YES_NO_OPTION,
 								AOUIFactory.WARNING_MESSAGE);
 						if (AOUIFactory.YES_OPTION == confirmation) {
-							final Properties newProperties = cne.getYesParamsOptions();
-							newProperties.putAll(extraParams);
+							final Properties newParams = cne.getYesParamsOptions();
+							if (newParams != null) {
+								extraParams.putAll(newParams);
+							}
 						} else {
 							LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + dialogMessage); //$NON-NLS-1$
 							throw new SocketOperationException(RESULT_CANCEL);

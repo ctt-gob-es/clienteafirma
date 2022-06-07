@@ -24,7 +24,6 @@ import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
@@ -39,6 +38,8 @@ public final class ValidatePdfSignature implements SignValider {
 
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
+
+	private static final String DEFAULT_PAGES_TO_CHECK_PSA = "10"; //$NON-NLS-1$
 
 	/** Valida una firma PDF (PKCS#7/PAdES).
 	 * De los certificados de firma se revisan &uacute;nicamente las fechas de validez.
@@ -82,6 +83,12 @@ public final class ValidatePdfSignature implements SignValider {
 		}
 		final List<String> signNames = af.getSignatureNames();
 
+
+		// Si no hay firmas, no hay nada que comprobar
+		if (signNames.size() == 0) {
+			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+		}
+
 		for (final String name : signNames) {
 
 			final PdfPKCS7 pk = af.verifySignature(name);
@@ -122,22 +129,31 @@ public final class ValidatePdfSignature implements SignValider {
 
 		final String allowShadowAttackProp = params.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
 		final boolean allowPdfShadowAttack = Boolean.parseBoolean(allowShadowAttackProp);
-		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
+		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, DEFAULT_PAGES_TO_CHECK_PSA);
 
-		if (signNames.size() == 0) {
-			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
-		}
-		// Si se encuentran varias revisiones firmadas y no se permiten posibles PDF Shadow Attacks, comprobamos el documento firmado.
-		else if (signNames.size() > 1 && !allowPdfShadowAttack && pagesToCheck != null) {
+		// Si se debe comprobar si se ha producido un PDF Shadow Attack
+		// (modificacion de un documento tras la firma), se encuentran varias
+		// revisiones en el documento y hay al menos una posterior a la ultima
+		// firma (la de la posicion 0), se comprueba si el documento ha sufrido
+		// un PSA.
+		if (!allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
 			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
-			try(final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
-				final byte [] lastReviewData = AOUtil.getDataFromInputStream(lastReviewStream);
-				final SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewData, pagesToCheck);
+			try (final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
+				SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewStream, pagesToCheck);
+				// Si se devolvio informacion de validez, la firma no es completamente valida
 				if (validity != null) {
-					if (allowShadowAttackProp != null) {
-						return validity;
+					// Se comprueba si se debe consultar al usuario y si se
+					// cumplen los requisitos para ello
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
+							&& allowShadowAttackProp == null) {
+						throw new SuspectedPSAException("ProtocolInvocationError.PSA"); //$NON-NLS-1$
 					}
-					throw new SuspectedPSAException("ProtocolInvocationError.PSA"); //$NON-NLS-1$
+					// Si habia que consultar y no se cumplen los requisitos,
+					// se considera que la firma no es valida
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
+						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, validity.getError());
+					}
+					return validity;
 				}
 			}
 		}

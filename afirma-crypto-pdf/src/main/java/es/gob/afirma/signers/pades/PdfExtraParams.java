@@ -794,11 +794,6 @@ public final class PdfExtraParams {
 	public static final String ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
 
 	/**
-	 * Indica el n&uacute;mero m&aacute;ximo de p&aacute;ginas donde comprobar un posible PDF Shadow Attack
-	 */
-	public static final String MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
-
-	/**
 	 * Indica la cantidad de p&aacute;ginas en las que comprobar un PDF Shadow Attack
 	 */
 	public static final String PAGES_TO_CHECK_PSA = "pagesToCheckShadowAttack"; //$NON-NLS-1$

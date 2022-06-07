@@ -54,6 +54,12 @@ public class TriPhaseHelper {
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
 	/**
+	 * N&uacute;mero de p&aacute;ginas por defecto de un PDF sobre las que
+	 * comprobar si se ha producido un PDF Shadow Attack.
+	 */
+	private static final int DEFAULT_PAGES_TO_CHECK_PSA = 10;
+
+	/**
 	 * Agrega a la informaci&oacute;n de firma trif&aacute;sica un c&oacute;digo de verificaci&oacute;n
 	 * con el que se podr&aacute; comprobar que la prefirma y el certificado no se han modificado entre
 	 * las operaciones de prefirma y postfirma.
@@ -209,7 +215,7 @@ public class TriPhaseHelper {
 			extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.FALSE.toString());
 
 			final int maxPagestoCheck = ConfigManager.getMaxPagesToCheckPSA();
-			int pagesToCheck = 10;
+			int pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
 			if (extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
 				final String pagesToCheckProp = extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
 				if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheckProp)) {
@@ -220,7 +226,7 @@ public class TriPhaseHelper {
 						pagesToCheck = Integer.parseInt(pagesToCheckProp);
 					}
 					catch (final Exception e) {
-						pagesToCheck = 10;
+						pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
 					}
 				}
 			}

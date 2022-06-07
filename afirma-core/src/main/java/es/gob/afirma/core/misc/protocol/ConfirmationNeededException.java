@@ -18,7 +18,8 @@ public abstract class ConfirmationNeededException extends Exception {
         super(ProtocoloMessages.getString(msg));
     }
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
+    /** Crea la excepci&oacute;n con un mensaje determinado que mostrar al
+     * usuario a trav&eacute;s de un di&aacute;logo de confirmaci&oacute;n.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n.
      * @param e
@@ -29,9 +30,19 @@ public abstract class ConfirmationNeededException extends Exception {
 
     /**
      * Indica que par&aacute;metros se deben establecer cuando se pulse en el bot&oacute;n
-     * "S&iacute;"
-     * @return
+     * "S&iacute;" del di&aacute;logo de confirmaci&oacute;n.
+     * @return Conjunto de propiedades que se deber&aacute;n establecer en la
+     * configuraci&oacute;n de firma cuando el usuario pulse en la
+     * opci&oacute;n "S&iacute;" del di&aacute;logo de confirmaci&oacute;n.
      */
     public abstract Properties getYesParamsOptions();
+
+    /**
+     * Indica que par&aacute;metros se deben establecer si no se puede
+     * consultar al usuario.
+     * @return Conjunto de propiedades que se deber&aacute;n establecer en la
+     * configuraci&oacute;n de firma cuando no se pueda consultar al usuario.
+     */
+    public abstract Properties getDefaultParamsOptions();
 
 }

@@ -35,4 +35,6 @@ class AfirmaExtraParams {
 	/** Directorio del di&aacute;logo de guardado de fichero. */
 	static final String SAVE_FILE_CURRENT_DIR = "filenameSaveCurrentDir"; //$NON-NLS-1$
 
+	/** Directorio del di&aacute;logo de guardado de fichero. */
+	static final String HEADLESS = "headless"; //$NON-NLS-1$
 }
