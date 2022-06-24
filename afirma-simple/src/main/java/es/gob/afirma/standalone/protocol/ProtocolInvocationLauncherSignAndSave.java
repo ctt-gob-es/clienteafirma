@@ -435,10 +435,10 @@ final class ProtocolInvocationLauncherSignAndSave {
 					extraParams,
 					data,
 					format);
-		} catch (final IncompatiblePolicyException e1) {
-			LOGGER.info("Se ha indicado una politica no compatible: " + e1); //$NON-NLS-1$
+		} catch (final IncompatiblePolicyException e) {
+			LOGGER.info("Se ha indicado una politica no compatible: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_POLICY;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(errorCode, e);
 		}
 
 		final CertFilterManager filterManager = new CertFilterManager(extraParams);
@@ -473,10 +473,10 @@ final class ProtocolInvocationLauncherSignAndSave {
 					pwc, // PasswordCallback
 					null // Parent
 				);
-			} catch (final Exception e3) {
-				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
+			} catch (final Exception e) {
+				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				throw new SocketOperationException(errorCode);
+				throw new SocketOperationException(errorCode, e);
 			}
 
 			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
@@ -520,7 +520,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				throw new SocketOperationException(errorCode);
+				throw new SocketOperationException(errorCode, e);
 			}
 		}
 
