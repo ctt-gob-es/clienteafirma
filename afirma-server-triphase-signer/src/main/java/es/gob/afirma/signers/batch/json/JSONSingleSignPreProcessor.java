@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
@@ -77,8 +78,15 @@ final class JSONSingleSignPreProcessor {
 
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = TriPhaseHelper.getTriPhasePreProcessor(sSign);
-
-		byte[] docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
+		byte[] docBytes;
+		try {
+			docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
+		}
+		catch (final IOException e) {
+			LOGGER.log(
+					Level.WARNING, "No se ha podido recuperar uno de los documentos a firmar: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
+			throw new IOException("No se ha podido recuperar uno de los documentos a firmar"); //$NON-NLS-1$
+		}
 
 		Properties extraParams;
 		try {
