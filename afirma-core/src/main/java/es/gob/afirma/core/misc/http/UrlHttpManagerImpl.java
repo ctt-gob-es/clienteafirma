@@ -250,6 +250,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 		}
 
+		// Si se ha establecido un tiempo de timeout, se configura como tiempo maximo hasta la conexion
+		if (timeout != DEFAULT_TIMEOUT) {
+			conn.setConnectTimeout(timeout);
+		}
+
 		conn.connect();
 		final int resCode = conn.getResponseCode();
 		final String statusCode = Integer.toString(resCode);
