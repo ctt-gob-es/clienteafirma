@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 
 /**
  * Clase para la ejecuci&oacute;n de scripts de consola.
@@ -112,7 +113,7 @@ public class ShellScript {
 				errorOutput = AOUtil.getDataFromInputStream(errorStream);
 			}
 			LOGGER.warning("El script finalizo con un error y la salida : " + ( //$NON-NLS-1$
-					errorOutput != null ? new String(errorOutput) : "")); //$NON-NLS-1$
+					errorOutput != null ? LoggerUtil.getTrimBytes(errorOutput) : "")); //$NON-NLS-1$
 			throw new IOException("La ejecucion del script devolvio el codigo de finalizacion: " + processResult); //$NON-NLS-1$
 		}
 

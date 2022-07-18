@@ -11,6 +11,8 @@ package es.gob.afirma.core.misc.http;
 
 import java.io.IOException;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+
 /** Error de conexi&oacute;n HTTP.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class HttpError extends IOException {
@@ -51,9 +53,9 @@ public final class HttpError extends IOException {
 	public HttpError(final int resCode, final String resDescription, final byte[] errorStreamContent, final String url) {
 		super(
 			"Error HTTP con codigo  " + resCode + //$NON-NLS-1$
-				(errorStreamContent != null && errorStreamContent.length > 1  ? ", cuerpo '" + new String(errorStreamContent) + "'" : "") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				(errorStreamContent != null && errorStreamContent.length > 0  ? ", cuerpo '" + LoggerUtil.getTrimBytes(errorStreamContent) + "'" : "") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					" y descripcion '" + resDescription  + //$NON-NLS-1$
-						"' para la direccion: " + url //$NON-NLS-1$
+						"' para la direccion: " + LoggerUtil.getTrimStr(url) //$NON-NLS-1$
 		);
 		this.responseCode = resCode;
 		this.responseDescription = resDescription;

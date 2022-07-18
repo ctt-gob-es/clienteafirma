@@ -334,7 +334,7 @@ public final class SignatureService extends HttpServlet {
 				return;
 			}
 			if (sessionData != null) {
-				LOGGER.info("Recibidos los siguientes datos de sesion para '" + operation + "':\n" + new String(sessionData)); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.fine("Recibidos los siguientes datos de sesion para '" + operation + "':\n" + new String(sessionData)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Obtenemos el certificado

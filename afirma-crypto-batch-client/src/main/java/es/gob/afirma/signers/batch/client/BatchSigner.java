@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -381,7 +382,7 @@ public final class BatchSigner {
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
-				"Error al cargar el fichero XML de lote: " + e + "\n" + new String(xml, DEFAULT_CHARSET) //$NON-NLS-1$ //$NON-NLS-2$
+				"Error al cargar el fichero XML de lote: " + e + "\n" + LoggerUtil.getTrimBytes(xml) //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			throw new IOException("Error al cargar el fichero XML de lote: " + e, e); //$NON-NLS-1$
 		}
