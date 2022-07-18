@@ -85,7 +85,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	public static final String REPLACEMENT_CODE = "%i"; //$NON-NLS-1$
 
 	/** Cadena por la que reemplazaremos el PKCS#1 impostado de la firma. */
-	public static final String REPLACEMENT_STRING = "%%REPLACEME_" + REPLACEMENT_CODE + "%%"; //$NON-NLS-1$ //$NON-NLS-2$
+	public static final String REPLACEMENT_STRING = "====REPLACEME_" + REPLACEMENT_CODE + "===="; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final String XML_NODE_ID = "Id"; //$NON-NLS-1$
 

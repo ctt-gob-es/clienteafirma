@@ -44,6 +44,10 @@ public class TestAOXAdESTriPhaseSigner {
 //	private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
 //	private static final String CERT_ALIAS3 = "juan ejemplo espa\u00F1ol"; //$NON-NLS-1$
 
+	private static final String CERT_PATH4 = "EIDAS_CERTIFICADO_PRUEBAS___99999999R.p12"; //$NON-NLS-1$
+	private static final String CERT_PASS4 = "1234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS4 = "eidas_certificado_pruebas___99999999r"; //$NON-NLS-1$
+
 	private static final String DATA_FILENAME = "factura_sinFirmar.xml"; //$NON-NLS-1$
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
 
@@ -108,7 +112,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		for (final Properties config : CONFIGS) {
 
-			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 			final File tempFile = File.createTempFile("xades-asic-s-", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
 			try (
@@ -144,7 +148,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.sign(
 			data,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -187,7 +191,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.cosign(
 			signature,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -228,7 +232,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -265,7 +269,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -305,7 +309,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.cosign(
 			signature,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -346,7 +350,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -383,7 +387,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.sign(
 			data,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -427,7 +431,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.cosign(
 			signature,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -468,7 +472,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -478,6 +482,43 @@ public class TestAOXAdESTriPhaseSigner {
 		}
 
 		System.out.println("El resultado de la contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/**
+	 * Prueba de contrafirma XAdES Detached XL.
+	 * @throws Exception Cuando falla la operaci&oacute;n.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	//@Ignore
+	public void pruebaContrafirmaXAdESDetachedXL() throws Exception {
+
+		final byte[] signature;
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-detached-xl.xml"); //$NON-NLS-1$
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH4), CERT_PASS4.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS4, new KeyStore.PasswordProtection(CERT_PASS4.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(result);
+		}
+
+		System.out.println("El resultado de la contrafirma XAdES Detached XL se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 	/**
@@ -505,7 +546,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -536,7 +577,7 @@ public class TestAOXAdESTriPhaseSigner {
 //
 //		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 //
-//		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+//		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 //
 //		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 //		final FileOutputStream fos = new FileOutputStream(tempFile);
@@ -565,7 +606,7 @@ public class TestAOXAdESTriPhaseSigner {
 //
 //		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 //
-//		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+//		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 //
 //		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 //		final FileOutputStream fos = new FileOutputStream(tempFile);
@@ -604,7 +645,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.cosign(
 			signature,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -645,7 +686,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -682,7 +723,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.sign(
 			data,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -726,7 +767,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.cosign(
 			signature,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -767,7 +808,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -804,7 +845,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -844,7 +885,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final byte[] result = signer.cosign(
 			signature,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			config
@@ -885,7 +926,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
@@ -916,7 +957,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		for (final Properties config : CONFIGS) {
 
-			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 			final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 			try (
@@ -950,7 +991,7 @@ public class TestAOXAdESTriPhaseSigner {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (

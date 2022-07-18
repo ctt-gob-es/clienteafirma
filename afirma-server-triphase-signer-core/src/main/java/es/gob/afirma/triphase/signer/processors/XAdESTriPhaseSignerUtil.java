@@ -106,6 +106,7 @@ final class XAdESTriPhaseSignerUtil {
 			final ContentDelimited content = getContent(source, elDeliSource.get(i));
 
 			final String dummyString = String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i));
+
 			final int idx = base.indexOf(dummyString);
 
 			base = base.replace(
@@ -372,11 +373,13 @@ final class XAdESTriPhaseSignerUtil {
 		final Element signDoc = doc.getDocumentElement();
 
 		final List<Node> signatureNodes = new ArrayList<>();
+
+		// Comprobamos si el nodo principal es de firma
 		if (signDoc.getNodeName().equals("Signature") || signDoc.getNodeName().endsWith(":Signature")) { //$NON-NLS-1$ //$NON-NLS-2$
 			signatureNodes.add(signDoc);
 		}
 
-        // Obtenemos las firmas del documento
+        // Obtenemos las firmas internas del documento
         final NodeList nl = signDoc.getElementsByTagNameNS(DS_NAMESPACE_URL, "Signature"); //$NON-NLS-1$
         for (int i = 0; i < nl.getLength(); i++) {
         	signatureNodes.add(nl.item(i));
@@ -390,7 +393,7 @@ final class XAdESTriPhaseSignerUtil {
         		final Element refElement = (Element) rf.item(j);
         		if (!isReferenceToSignedProperties(refElement) && !isEnvelopedReference(refElement)) {
         			final String uri = refElement.getAttribute("URI"); //$NON-NLS-1$
-        			if (uri != null) {
+        			if (uri != null && !unmutableReferences.contains(uri)) {
         				unmutableReferences.add(uri);
         			}
         		}
