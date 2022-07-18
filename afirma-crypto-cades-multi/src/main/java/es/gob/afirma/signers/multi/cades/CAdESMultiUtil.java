@@ -17,9 +17,12 @@ import java.util.List;
 
 import org.spongycastle.asn1.ASN1Encodable;
 import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1InputStream;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
 import org.spongycastle.asn1.BERSet;
 import org.spongycastle.asn1.cms.AttributeTable;
 import org.spongycastle.asn1.cms.SignedData;
@@ -124,4 +127,28 @@ public final class CAdESMultiUtil {
     static boolean isCounterSignature(final ASN1ObjectIdentifier oid) {
     	return PKCSObjectIdentifiers.pkcs_9_at_counterSignature.equals(oid);
     }
+
+
+    /**
+     * Carga datos firmados.
+     * @param signature Datos firmados.
+     * @return Estructura de datos firmados.
+     * @throws IOException Cuando falla la carga de la firma
+     */
+	static SignedData readData(final byte[] signature) throws IOException {
+		final ASN1Sequence dsq;
+		try (
+			final ASN1InputStream is = new ASN1InputStream(signature);
+		) {
+			dsq = (ASN1Sequence) is.readObject();
+		}
+		final Enumeration<?> e = dsq.getObjects();
+		// Elementos que contienen los elementos OID SignedData
+		e.nextElement();
+		// Contenido de SignedData
+		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject(); // contenido del SignedData
+
+		return SignedData.getInstance(contentSignedData);
+	}
 }

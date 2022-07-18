@@ -17,18 +17,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 import java.util.Properties;
 
 import org.spongycastle.asn1.ASN1EncodableVector;
 import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1InputStream;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.ASN1OctetString;
 import org.spongycastle.asn1.ASN1Primitive;
 import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
 import org.spongycastle.asn1.BEROctetString;
 import org.spongycastle.asn1.DEROctetString;
 import org.spongycastle.asn1.DERSet;
@@ -115,7 +112,6 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * </pre> */
 final class CAdESCoSigner {
 
-
 	/** Se crea una cofirma a partir de los datos del firmante, el archivo
 	 * que se firma y el archivo que contiene las firmas.
 	 * @param signature Archivo que contiene las firmas.
@@ -141,7 +137,34 @@ final class CAdESCoSigner {
 			                                                  CertificateException,
 			                                                  ContainsNoDataException {
 		// Leemos la firma de entrada
-		final SignedData sd = readData(signature);
+		final SignedData sd = CAdESMultiUtil.readData(signature);
+		return coSigner(sd, signatureAlgorithm, key, certChain, config);
+	}
+
+	/** Se crea una cofirma a partir de los datos del firmante, el archivo
+	 * que se firma y el archivo que contiene las firmas.
+	 * @param signedData Datos firmados.
+	 * @param signatureAlgorithm Algoritmo de firma.
+	 * @param key Clave privada usada para firmar.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param config Configuraci&oacute;n de la firma a generar.
+	 * @return El archivo de firmas con la nueva firma.
+	 * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
+	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+	 *                                  digital
+	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+	 *                              firma.
+	 * @throws ContainsNoDataException Cuando no se encuentran los datos dentro de la firma. */
+	static byte[] coSigner(
+			final SignedData signedData,
+			final String signatureAlgorithm,
+			final PrivateKey key,
+			final java.security.cert.Certificate[] certChain,
+			final CAdESParameters config
+                    ) throws IOException,
+			                                                  NoSuchAlgorithmException,
+			                                                  CertificateException,
+			                                                  ContainsNoDataException {
 
 		// 3. CONTENTINFO
 		// si se introduce el contenido o no
@@ -163,7 +186,7 @@ final class CAdESCoSigner {
 		// Si no, obtenemos la informacion directamente de la firma. Si, ademas, no tenemos la huella de los datos
 		// y la firma contenia el documento
 		else {
-			encInfo = sd.getEncapContentInfo();
+			encInfo = signedData.getEncapContentInfo();
 
 			if (config.getDataDigest() == null) {
 				final DEROctetString contentData = (DEROctetString) encInfo.getContent();
@@ -181,7 +204,7 @@ final class CAdESCoSigner {
 
 		// 4. CERTIFICADOS
 		// obtenemos la lista de certificados
-		final ASN1Set certificates = CAdESMultiUtil.addCertificates(sd, certChain);
+		final ASN1Set certificates = CAdESMultiUtil.addCertificates(signedData, certChain);
 
 		// buscamos que tipo de algoritmo es y lo codificamos con su OID
 		final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
@@ -202,7 +225,7 @@ final class CAdESCoSigner {
 		// 5. SIGNERINFO
 		// raiz de la secuencia de SignerInfo
 		// Obtenemos los signerInfos del SignedData
-		final ASN1Set signerInfosSd = sd.getSignerInfos();
+		final ASN1Set signerInfosSd = signedData.getSignerInfos();
 
 		// introducimos los SignerInfos Existentes
 		final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
@@ -236,7 +259,7 @@ final class CAdESCoSigner {
 		// === PREFIRMA ===
 
 		final ASN1Set signedAttr;
-		if ((config.getDataDigest() == null) && (config.getContentData() == null)) {
+		if (config.getDataDigest() == null && config.getContentData() == null) {
 			throw new ContainsNoDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
 		}
 		final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(
@@ -277,31 +300,13 @@ final class CAdESCoSigner {
 		return new ContentInfo(
 			PKCSObjectIdentifiers.signedData,
 			new SignedData(
-				sd.getDigestAlgorithms(),
+				signedData.getDigestAlgorithms(),
 				encInfo,
 				certificates,
 				null,	// CRLS no usado
 				new DERSet(signerInfos)// unsignedAttr
 			)
 		).getEncoded(ASN1Encoding.DER);
-	}
-
-	private static SignedData readData(final byte[] signature) throws IOException {
-		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		final ASN1Sequence dsq;
-		try (
-			final ASN1InputStream is = new ASN1InputStream(signature);
-		) {
-			dsq = (ASN1Sequence) is.readObject();
-		}
-		final Enumeration<?> e = dsq.getObjects();
-		// Elementos que contienen los elementos OID SignedData
-		e.nextElement();
-		// Contenido de SignedData
-		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject(); // contenido del SignedData
-
-		return SignedData.getInstance(contentSignedData);
 	}
 
 	/** Genera el PKCS#1 de los atributos de firma.

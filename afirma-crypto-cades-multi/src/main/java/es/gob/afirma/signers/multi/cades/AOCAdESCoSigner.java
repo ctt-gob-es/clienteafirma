@@ -14,6 +14,8 @@ import java.security.PrivateKey;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.spongycastle.cms.CMSSignedData;
+
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -52,7 +54,15 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         // Purgamos e informamos de las compatibilidades de la configuracion establecida
         noticeIncompatibleConfig(algorithm, extraParams);
 
-        final CAdESParameters parameters = CAdESParameters.load(data, algorithm, extraParams);
+        CMSSignedData signedData;
+        try {
+        	signedData = new CMSSignedData(sign);
+        }
+        catch (final Exception e) {
+        	throw new AOException("La firma proporcionada no es CMS/CAdES", e); //$NON-NLS-1$
+		}
+
+        final CAdESParameters parameters = CAdESParameters.load(data, signedData, algorithm, extraParams);
 
 		try {
 			return CAdESCoSigner.coSigner(

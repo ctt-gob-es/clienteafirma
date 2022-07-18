@@ -85,6 +85,24 @@ public final class CAdESExtraParams {
     public static final String CONTENT_TYPE_OID = "contentTypeOid"; //$NON-NLS-1$
 
     /**
+     *  Si se indica <code>true</code>, se incluir&aacute; el atributo <i>mime-type</i>
+     *  (OID:0.4.0.1733.2.1) seg&uacute;n las reglas definidas en la IETF RFC 2045. El
+     *  valor del mimetype se tomar&acute; de la propiedad {@code #CONTENT_MIME_TYPE}.
+     *  Si esta no se definiese, se identificar&aacute; el mimetype correspondiente al
+     *  OID establecido en la propiedad {@code #CONTENT_TYPE_OID}. Si esta tampoco se
+     *  definiese, se usar&aacute; el mimetype identificado a ra&iacute;z del
+     *  an&aacute;lisis de los datos firmados o el gen&eacute;rico si no se identificase.
+     *  En el caso de cofirmas, se copiar&acute; el mimetype de la firma original si lo
+     *  tuviese. Si no, se seguir&iacute;a con la cadena de comprobaciones ya indicada.
+     *  En las contrafirmas no se incluir&aacute; este atributo.
+     */
+    public static final String INCLUDE_MIMETYPE_ATTRIBUTE = "includeMimeTypeAttribute"; //$NON-NLS-1$
+
+    /** MIME-Type de los datos a firmar. Se utilizar&aacute; s&oacute;lo cuando tambi&eacute;se
+     * utilice la propiedad {@code #INCLUDE_MIMETYPE_ATTRIBUTE}. */
+    public static final String CONTENT_MIME_TYPE = "mimeType"; //$NON-NLS-1$
+
+    /**
      *  Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
      *  &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *  <br> Propiedad compartida con XAdES y PAdES)
