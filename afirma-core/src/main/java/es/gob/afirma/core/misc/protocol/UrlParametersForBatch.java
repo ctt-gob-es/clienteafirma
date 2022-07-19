@@ -43,8 +43,11 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
 	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
-	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
+	/** Par&aacute;metro de entrada que nos indica si es una peticion de tipo JSON. */
 	private static final String PARAM_JSON_BATCH = "jsonbatch"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada que nos indica si es una firma por lotes monofasica. */
+	private static final String PARAM_LOCAL_BATCH_PROCESS = "localBatchProcess"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
@@ -66,12 +69,23 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Indica si la peticion de firma por lotes es con JSON o XML */
 	private boolean jsonBatch;
 
+	/** Indica si la peticion de firma por lotes es monof&aacute;sica o trif&aacute;sica */
+	private boolean localBatchProcess;
+
 	public boolean isJsonBatch() {
 		return this.jsonBatch;
 	}
 
 	public void setJsonBatch(final boolean jsonBatch) {
 		this.jsonBatch = jsonBatch;
+	}
+
+	public boolean isLocalBatchProcess() {
+		return this.localBatchProcess;
+	}
+
+	public void setLocalBatchProcess(final boolean localBatchProcess) {
+		this.localBatchProcess = localBatchProcess;
 	}
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
@@ -260,9 +274,14 @@ public final class UrlParametersForBatch extends UrlParameters {
 			setCertNeeded(false);
 		}
 
-		// Valor del parametro needCert
+		// Valor del parametro jsonBatch
 		if (params.containsKey(PARAM_JSON_BATCH)) {
 			setJsonBatch(Boolean.parseBoolean(params.get(PARAM_JSON_BATCH)));
+		}
+
+		// Valor del parametro localBatchProcess
+		if (params.containsKey(PARAM_LOCAL_BATCH_PROCESS)) {
+			setLocalBatchProcess(Boolean.parseBoolean(params.get(PARAM_LOCAL_BATCH_PROCESS)));
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));

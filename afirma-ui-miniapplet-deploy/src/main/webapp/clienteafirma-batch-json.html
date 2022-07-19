@@ -39,6 +39,32 @@
 			desactivateSingleConf();
 			
 			document.getElementById("signButton").disabled = true;
+			document.getElementById("localSignButton").disabled = true;
+			document.getElementById("singleSignID").value = "";
+			document.getElementById("filters").value = "";
+
+		} catch (e) {
+			showLog(e);
+		}
+	}
+
+	function doLocalSignBatch() {
+		try {
+
+			AutoScript.setLocalBatchProcess("true");
+			
+			AutoScript
+					.signBatchProcess(
+							document.getElementById("stopOnError").checked,
+							null,
+							null,
+							document.getElementById("filters").value,
+							showResultCallback, showLogCallback);
+			
+			desactivateSingleConf();
+			
+			document.getElementById("signButton").disabled = true;
+			document.getElementById("localSignButton").disabled = true;
 			document.getElementById("singleSignID").value = "";
 			document.getElementById("filters").value = "";
 
@@ -53,6 +79,7 @@
 		document.getElementById("datareferenceValue").value= "";
 		document.getElementById("params").value= "";
 		document.getElementById("signButton").disabled = "";
+		document.getElementById("localSignButton").disabled = "";
 		document.getElementById('format').getElementsByTagName('option')[0].selected = true;
 		document.getElementById('suboperation').getElementsByTagName('option')[0].selected = true;
 	}
@@ -201,6 +228,8 @@
 		document.getElementById("generateId").disabled = false; 
 		document.getElementById("datareferenceValue").disabled = false;
 		document.getElementById("codeInB64").disabled = false;
+		document.getElementById("examineFile").disabled = false;
+		document.getElementById("cleanFile").disabled = false;
 		document.getElementById("useSingleConf").disabled = false;
 		document.getElementById("addSign").disabled = false;
 	}
@@ -285,6 +314,11 @@
 		<input type="text" name="datareferenceValue"
 				id="datareferenceValue" style="width: 600px;" class="singleSignConf"/>
 		<button id="codeInB64" type="button" onclick="codeToB64()" class="singleSignConf">Codificar a base 64</button>
+		<br><br>
+		<input id="data" type="hidden">
+		<div><span>Fichero de datos para firma local: </span><span id="dataFilename"></span></div>
+		<input type="button" value="Examinar" id="examineFile" class="singleSignConf" onclick="browseDatos('', document.getElementById('data'), document.getElementById('dataFilename'));">&nbsp;
+		<input type="button" value="Limpiar" id="cleanFile" class="singleSignConf" onclick="cleanDataField(document.getElementById('data'), document.getElementById('dataFilename'));"><br/><br/>
 	</div>
 		<fieldset>
 		<legend><input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" class="singleSignConf"/> 
@@ -328,6 +362,8 @@
 
 	<input type="button" id="signButton" value="Firmar"
 		onclick="doSignBatch();" disabled="disabled">&nbsp;
+	<input type="button" id="localSignButton" value="Firma local"
+		onclick="doLocalSignBatch();" disabled="disabled">&nbsp;
 	<br />
 	<br />
 

@@ -26,7 +26,7 @@ public final class UrlParametersToSign extends UrlParameters {
 
 	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
 	 * de sesi&oacute;n de la firma. */
-	private static final int MAX_ID_LENGTH = 20;
+	private static final int MAX_ID_LENGTH = 40;
 
 	/** Par&aacute;metro de entrada con el formato de firma. */
 	private static final String FORMAT_PARAM = "format"; //$NON-NLS-1$

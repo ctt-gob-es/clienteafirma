@@ -111,6 +111,9 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		// Peticion JSON
 		var jsonRequest = null;
+		
+		// Variable que configura la firma de lotes monofasica si se pone a true
+		var localBatchProcess = false;
         
         /**
          * Indica si el navegador soporta WebSockets.
@@ -445,6 +448,10 @@ var AutoScript = ( function ( window, undefined ) {
 				singleSign.extraparams = Base64.encode(extraparams); 
 			}
 			jsonRequest.singlesigns.push(singleSign);
+		}
+		
+		var setLocalBatchProcess = function (isLocalBatchProcess) {
+			localBatchProcess = isLocalBatchProcess;
 		}
 		
 		var signBatchJSON = function (stopOnError, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback) {
@@ -788,6 +795,7 @@ var AutoScript = ( function ( window, undefined ) {
 				isChrome : isChrome				
 			};
 		})(window, undefined);
+		
 		
 		/**
 		 * Funciones de utilidad.
@@ -1244,6 +1252,9 @@ var AutoScript = ( function ( window, undefined ) {
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
 				if (isJson){
 					data.jsonbatch = createKeyValuePair ("jsonbatch", true);	
+					if (localBatchProcess) {
+						data.localbatchprocess = createKeyValuePair ("localBatchProcess", true);
+					}
 				}
 				
 				return data;
@@ -2041,6 +2052,10 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				if (isJson) {
 					data.jsonbatch = generateDataKeyValue ("jsonbatch", true);	
+				}
+				
+				if (localBatchProcess) {
+					data.localBatchProcess = generateDataKeyValue ("localBatchProcess",  "true");
 				}
 
 				return data;
@@ -3292,10 +3307,11 @@ var AutoScript = ( function ( window, undefined ) {
 				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
+				if (localBatchProcess) {						params[i++] = {key:"localBatchProcess", value:"true"}; }
 				
 				params[i++] = {key:"jsonbatch", value:"true"}; 
 				params[i++] = {key:"dat", value:jsonRequestB64}; 
-
+				 
 				var url = buildUrl(opId, params);
 
 				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
@@ -4081,6 +4097,7 @@ var AutoScript = ( function ( window, undefined ) {
 			counterSign : counterSign,
 			createBatch : createBatch,
 			addDocumentToBatch : addDocumentToBatch,
+			setLocalBatchProcess : setLocalBatchProcess,
 			signBatchProcess : signBatchJSON,
 			signBatch : signBatchXML,
 			selectCertificate : selectCertificate,

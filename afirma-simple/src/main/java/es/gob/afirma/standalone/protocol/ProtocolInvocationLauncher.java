@@ -326,8 +326,8 @@ public final class ProtocolInvocationLauncher {
                     final Map <String, String> paramsMap;
 
                     if (params.isJsonBatch()) {
-                    	 paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
-                    	 params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    	paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
+                    	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
                     } else {
                     	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
                     	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
