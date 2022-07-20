@@ -68,7 +68,6 @@ public class TestINC189027 {
 			);
 		}
 		catch(final AOFormatFileException e) {
-
 			Assert.fail("La contrafirmas de firmas CAdES-T debe estar soportada: " + e); //$NON-NLS-1$
 		}
 

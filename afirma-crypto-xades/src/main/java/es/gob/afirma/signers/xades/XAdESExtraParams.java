@@ -421,10 +421,16 @@ public final class XAdESExtraParams {
     public static final String INTERNAL_VALIDATE_PKCS1 = "validatePkcs1"; //$NON-NLS-1$
 
     /**
-     * Par&aacute;metro que permite solicitar confirmacion para multifirmar con un perfil distinto al que usa la
-     * operaci&oacute;n de firma.
+     * Par&aacute;metro que permite solicitar confirmaci&oacute;n para multifirmar con un perfil
+     * distinto al que usa la operaci&oacute;n de firma.
      */
     public static final String CONFIRM_DIFFERENT_PROFILE = "confirmDifferentProfile"; //$NON-NLS-1$
+
+    /**
+     * Par&aacute;metro que permite configurar si deben multifirmarse firmas de archivo aunque
+     * queden invalidadas.
+     */
+	public static final String FORCE_SIGN_LTS_SIGNATURES = "forceSignLTSignature"; //$NON-NLS-1$
 
     /**
      * Constructor vac&iacute;o privado para que no se pueda instanciar la clase

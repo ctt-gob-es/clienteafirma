@@ -34,6 +34,7 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.signers.AOSigner;
@@ -248,6 +249,14 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             }
             catch(final AOFormatFileException e) {
             	LOGGER.warning("La firma o el documento no son aptos para firmar: " + e); //$NON-NLS-1$
+            	if (onlyOneFile) {
+            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.153"), e); //$NON-NLS-1$
+            		return;
+            	}
+            	continue;
+            }
+            catch(final SigningLTSException e) {
+            	LOGGER.warning("Se trata de multifirmar una firma de archivo longeva: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
             		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.102"), e); //$NON-NLS-1$
             		return;

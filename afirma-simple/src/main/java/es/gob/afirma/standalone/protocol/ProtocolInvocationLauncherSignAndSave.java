@@ -32,6 +32,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
@@ -633,6 +634,11 @@ final class ProtocolInvocationLauncherSignAndSave {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
 			throw new SocketOperationException(errorCode);
+		}
+		catch (final SigningLTSException e) {
+			LOGGER.log(Level.SEVERE, "Se ha tratado de multifirmar una firma de archivo", e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNING_LTS_SIGNATURE;
+			throw new SocketOperationException(errorCode, e);
 		}
 		catch (final UnsupportedOperationException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$

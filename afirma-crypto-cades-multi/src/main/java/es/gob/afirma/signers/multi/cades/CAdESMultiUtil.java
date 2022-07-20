@@ -29,24 +29,26 @@ import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.SignerInformation;
 
-import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.SigningLTSException;
 
 /** Utilidades para las multifirmas CAdES. */
 public final class CAdESMultiUtil {
 
 	private static final ASN1ObjectIdentifier ARCHIVE_TIMESTAMP_V2_OID = new ASN1ObjectIdentifier(
-		"1.2.840.113549.1.9.16.2.48" //$NON-NLS-1$
-	);
+		"1.2.840.113549.1.9.16.2.48"); //$NON-NLS-1$
+
+	private static final ASN1ObjectIdentifier ARCHIVE_TIMESTAMP_V3_OID = new ASN1ObjectIdentifier(
+			"0.4.0.1733.2.4"); //$NON-NLS-1$
+
+	private static final ASN1ObjectIdentifier LONG_TERM_VALIDATION_OID = new ASN1ObjectIdentifier(
+			"0.4.0.1733.2.2"); //$NON-NLS-1$
 
 	private static final List<ASN1ObjectIdentifier> UNSUPPORTED_ATTRIBUTES = new ArrayList<>(8);
 	static {
 		UNSUPPORTED_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V2_OID);
-		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_revocationRefs);
+		UNSUPPORTED_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V3_OID);
+		UNSUPPORTED_ATTRIBUTES.add(LONG_TERM_VALIDATION_OID);
 		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_archiveTimestamp);
-		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_certificateRefs);
-		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_revocationValues);
-		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_certValues);
-		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp);
 	}
 
 	private CAdESMultiUtil() {
@@ -76,10 +78,10 @@ public final class CAdESMultiUtil {
 
 	/** Comprueba si hay atributos no soportados en un <code>SignedData</code> de CMS.
 	 * @param signedDataBytes <code>SignedData</code> de CMS.
-	 * @throws AOFormatFileException Si hay atributos no soportados en el <code>SignedData</code> proporcionado.
+	 * @throws SigningLTSException Si hay atributos no soportados en el <code>SignedData</code> proporcionado.
 	 * @throws IOException Si no se puede tratar el <code>SignedData</code> proporcionado.
 	 */
-	public static void checkUnsupportedAttributes(final byte[] signedDataBytes) throws AOFormatFileException, IOException {
+	public static void checkUnsupportedAttributes(final byte[] signedDataBytes) throws SigningLTSException, IOException {
 		final CMSSignedData signedData;
 		try {
 			signedData = new CMSSignedData(signedDataBytes);
@@ -92,18 +94,18 @@ public final class CAdESMultiUtil {
 		checkUnsupportedAttributes(signedData);
 	}
 
-	private static void checkUnsupportedAttributes(final CMSSignedData signedData) throws AOFormatFileException {
+	private static void checkUnsupportedAttributes(final CMSSignedData signedData) throws SigningLTSException {
 		checkUnsupportedAttributes(
 			signedData.getSignerInfos().getSigners().iterator().next()
 		);
 	}
 
-    private static void checkUnsupportedAttributes(final SignerInformation signerInformation) throws AOFormatFileException {
+    private static void checkUnsupportedAttributes(final SignerInformation signerInformation) throws SigningLTSException {
     	final AttributeTable at = signerInformation.getUnsignedAttributes();
     	if (at != null) {
     		for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
     			if (at.get(unsupOid) != null) {
-        			throw new AOFormatFileException(
+        			throw new SigningLTSException(
     					"No se soportan multifirmas de firmas con atributos longevos (encontrado OID=" + unsupOid + ")" //$NON-NLS-1$ //$NON-NLS-2$
     				);
     			}
@@ -111,10 +113,10 @@ public final class CAdESMultiUtil {
     	}
     }
 
-    static void checkUnsupported(final ASN1ObjectIdentifier oid) throws AOFormatFileException {
+    static void checkUnsupported(final ASN1ObjectIdentifier oid) throws  SigningLTSException {
     	for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
     		if (unsupOid.equals(oid)) {
-    			throw new AOFormatFileException(
+    			throw new SigningLTSException(
 					"No se soportan multifirmas de firmas con atributos longevos (encontrado OID=" + oid + ")" //$NON-NLS-1$ //$NON-NLS-2$
 				);
     		}

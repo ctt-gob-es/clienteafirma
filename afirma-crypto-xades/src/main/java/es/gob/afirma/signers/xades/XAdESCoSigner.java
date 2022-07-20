@@ -189,7 +189,19 @@ public final class XAdESCoSigner {
 			catch (final Exception e) {
 				throw new AOException("No se ha estructurar el documento XML de firmas", e); //$NON-NLS-1$
 			}
+
+			// Comprobamos que la firma principal no sea de archivo
+			XAdESUtil.checkArchiveSignatures(rootSig);
 		}
+		else {
+			// Comprobamos que cualquier firma del documento no sea de archivo
+			final NodeList signaturesList = rootSig.getElementsByTagNameNS(
+					XAdESConstants.NAMESPACE_XADES_1_4_1, XAdESConstants.TAG_ARCHIVE_TIMESTAMP);
+			if (signaturesList.getLength() > 0) {
+				XAdESUtil.checkArchiveSignatures(signaturesList);
+			}
+		}
+
 
 		// Propiedades del documento XML original
 		final Map<String, String> originalXMLProperties = XAdESUtil.getOriginalXMLProperties(

@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -131,8 +130,8 @@ public final class TestCosign {
 				config
 			);
 		}
-		catch(final AOFormatFileException e) {
-			Assert.fail("Se ha indicado que la firma no puede ser cofirmada: " + e); //$NON-NLS-1$
+		catch(final Exception e) {
+			Assert.fail("La firma no puede ser cofirmada: " + e); //$NON-NLS-1$
 			return;
 		}
 
@@ -178,8 +177,8 @@ public final class TestCosign {
 				config
 			);
 		}
-		catch(final AOFormatFileException e) {
-			System.out.println("Se ha indicado correctamente que la firma no puede ser cofirmada: " + e); //$NON-NLS-1$
+		catch(final Exception e) {
+			System.out.println("La firma no puede ser cofirmada: " + e); //$NON-NLS-1$
 			return;
 		}
 		Assert.fail("Deberia haber encontrado sellos y fallar"); //$NON-NLS-1$

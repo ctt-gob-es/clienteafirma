@@ -236,7 +236,7 @@ final class CAdESCoSigner {
 		// === PREFIRMA ===
 
 		final ASN1Set signedAttr;
-		if ((config.getDataDigest() == null) && (config.getContentData() == null)) {
+		if (config.getDataDigest() == null && config.getContentData() == null) {
 			throw new ContainsNoDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
 		}
 		final ASN1EncodableVector signedAttributes = CAdESUtils.generateSignedAttributes(
