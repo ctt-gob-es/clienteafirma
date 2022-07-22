@@ -198,8 +198,9 @@ public final class XAdESCounterSigner {
 		try {
 			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(signDocument, outputXmlEncoding);
 
-			// Si no es un documento, se anade temporalmente el nodo raiz
-			// AFIRMA para que las operaciones de contrafirma funcionen correctamente
+			// Si el nodo principal es la firma, se anade temporalmente el nodo
+			// raiz AFIRMA para que las operaciones de contrafirma funcionen
+			// correctamente
 			if (root.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
 				esFirmaSimple = true;
 				doc = AOXAdESSigner.insertarNodoAfirma(doc);

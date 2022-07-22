@@ -327,6 +327,20 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
     @Override
+    public void relaunchTask(final List<SignOperationConfig> signConfigs) {
+
+    	new SignPanelSignTask(
+        		this,
+        		signConfigs,
+        		this.saf.getAOKeyStoreManager(),
+        		getCertFilters(),
+        		this.signWaitDialog,
+        		this,
+        		this.saf
+    		).execute();
+    }
+
+    @Override
     public void finishTask() {
 
     	// Marcamos la tarea como termiada para evitar mostrar el dialogo espera despues de su fin

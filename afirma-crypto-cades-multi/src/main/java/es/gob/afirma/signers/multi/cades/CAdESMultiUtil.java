@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import org.spongycastle.asn1.ASN1Encodable;
@@ -28,6 +29,7 @@ import org.spongycastle.asn1.x509.Certificate;
 import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationStore;
 
 import es.gob.afirma.core.SigningLTSException;
 
@@ -95,14 +97,18 @@ public final class CAdESMultiUtil {
 	}
 
 	private static void checkUnsupportedAttributes(final CMSSignedData signedData) throws SigningLTSException {
-		checkUnsupportedAttributes(
-			signedData.getSignerInfos().getSigners().iterator().next()
-		);
+		final SignerInformationStore signerInfos = signedData.getSignerInfos();
+		final Iterator<SignerInformation> signerInfoIt = signerInfos.iterator();
+		while (signerInfoIt.hasNext()) {
+			checkUnsupportedAttributes(signerInfoIt.next());
+		}
 	}
 
     private static void checkUnsupportedAttributes(final SignerInformation signerInformation) throws SigningLTSException {
     	final AttributeTable at = signerInformation.getUnsignedAttributes();
     	if (at != null) {
+
+    		// Identificados si la firma es de archivo
     		for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
     			if (at.get(unsupOid) != null) {
         			throw new SigningLTSException(
@@ -113,6 +119,11 @@ public final class CAdESMultiUtil {
     	}
     }
 
+    /**
+     * Comprueba si un atributo es de los que impiden agregar nuevas firmas sobre una anterior.
+     * @param oid Identificador de atributo.
+     * @throws SigningLTSException Cuando el atributo impide agregar nuevas firmas.
+     */
     static void checkUnsupported(final ASN1ObjectIdentifier oid) throws  SigningLTSException {
     	for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
     		if (unsupOid.equals(oid)) {

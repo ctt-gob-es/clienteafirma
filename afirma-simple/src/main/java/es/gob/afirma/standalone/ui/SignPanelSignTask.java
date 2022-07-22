@@ -34,7 +34,8 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.SigningLTSException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.signers.AOSigner;
@@ -84,6 +85,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	private final SignatureExecutor signExecutor;
 	private final SignatureResultViewer resultViewer;
 
+	private boolean needRelaunch = false;
+
 	private final static List<String> invalidPageNumberFilesList = new ArrayList<>();
 
 
@@ -121,11 +124,18 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	@Override
 	protected void done() {
 		if (this.signExecutor != null) {
-			this.signExecutor.finishTask();
+			if (this.needRelaunch) {
+				this.signExecutor.relaunchTask(this.signConfigs);
+			}
+			else {
+				this.signExecutor.finishTask();
+			}
 		}
 	}
 
     void doSignature() {
+
+    	this.needRelaunch = false;
 
         if (this.signConfigs == null || this.signConfigs.isEmpty()) {
             return;
@@ -255,14 +265,44 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	}
             	continue;
             }
-            catch(final SigningLTSException e) {
-            	LOGGER.warning("Se trata de multifirmar una firma de archivo longeva: " + e); //$NON-NLS-1$
+            catch (final RuntimeConfigNeededException e) {
+            	LOGGER.warning("No se puede completar la firma sin intervencion del usuario: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
-            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.102"), e); //$NON-NLS-1$
+            		// Se requiere confirmacion por parte del usuario
+            		if (e.getRequestType() == RequestType.CONFIRM) {
+            			final int result = AOUIFactory.showConfirmDialog(this.parent, SimpleAfirmaMessages.getString(e.getRequestorText()),
+            					SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
+            			if (result == JOptionPane.YES_OPTION) {
+            				this.needRelaunch = true;
+            				signConfig.addExtraParam(e.getParam(), Boolean.TRUE.toString());
+            			}
+            		}
+            		// Se requiere ua contrasena por parte del usuario
+            		else if (e.getRequestType() == RequestType.PASSWORD) {
+            			char[] p;
+            			try {
+            				p = AOUIFactory.getPassword(SimpleAfirmaMessages.getString(e.getRequestorText()), this.parent);
+            			}
+            			catch (final AOCancelledOperationException ce) {
+            				p = null;
+            			}
+            			if (p != null) {
+            				this.needRelaunch = true;
+            				signConfig.addExtraParam(e.getParam(), new String(p));
+            			}
+            		}
             		return;
             	}
             	continue;
-            }
+			}
+//            catch(final SigningLTSException e) {
+//            	LOGGER.warning("Se trata de multifirmar una firma de archivo longeva: " + e); //$NON-NLS-1$
+//            	if (onlyOneFile) {
+//            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.102"), e); //$NON-NLS-1$
+//            		return;
+//            	}
+//            	continue;
+//            }
             catch(final BadPdfPasswordException e) {
             	LOGGER.warning("PDF protegido con contrasena mal proporcionada: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {

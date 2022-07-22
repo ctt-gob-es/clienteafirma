@@ -180,28 +180,26 @@ public final class XAdESCoSigner {
 		// Si el documento contiene una firma simple se inserta como raiz el
 		// nodo AFIRMA
 		Document docSig = signDocument;
-		Element rootSig = signDocument.getDocumentElement();
-		if (rootSig.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
+		Element root = signDocument.getDocumentElement();
+		if (root.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
 			try {
 				docSig = AOXAdESSigner.insertarNodoAfirma(docSig);
-				rootSig = docSig.getDocumentElement();
+				root = docSig.getDocumentElement();
 			}
 			catch (final Exception e) {
 				throw new AOException("No se ha estructurar el documento XML de firmas", e); //$NON-NLS-1$
 			}
-
-			// Comprobamos que la firma principal no sea de archivo
-			XAdESUtil.checkArchiveSignatures(rootSig);
-		}
-		else {
-			// Comprobamos que cualquier firma del documento no sea de archivo
-			final NodeList signaturesList = rootSig.getElementsByTagNameNS(
-					XAdESConstants.NAMESPACE_XADES_1_4_1, XAdESConstants.TAG_ARCHIVE_TIMESTAMP);
-			if (signaturesList.getLength() > 0) {
-				XAdESUtil.checkArchiveSignatures(signaturesList);
-			}
 		}
 
+		// Comprobamos que cualquier firma del documento no sea de archivo
+		final NodeList signaturesList = root.getElementsByTagNameNS(
+				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
+		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
+		// incluso en ese caso
+		final String forceSignLts = extraParams.getProperty(XAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
+		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
+			XAdESUtil.checkArchiveSignatures(signaturesList);
+		}
 
 		// Propiedades del documento XML original
 		final Map<String, String> originalXMLProperties = XAdESUtil.getOriginalXMLProperties(
@@ -471,8 +469,8 @@ public final class XAdESCoSigner {
 				XAdESConstants.DEFAULT_XADES_SIGNATURE_PREFIX,
 				XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
-				rootSig.getOwnerDocument(),
-				rootSig,
+				root.getOwnerDocument(),
+				root,
 				(X509Certificate) certChain[0]
 				);
 
@@ -540,7 +538,7 @@ public final class XAdESCoSigner {
 		}
 
 		return Utils.writeXML(
-			rootSig,
+			root,
 			originalXMLProperties,
 			null,
 			null

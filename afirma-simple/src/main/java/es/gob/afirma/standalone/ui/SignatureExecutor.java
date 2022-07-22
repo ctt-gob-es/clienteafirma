@@ -14,6 +14,11 @@ public interface SignatureExecutor {
 	void initSignTask(List<SignOperationConfig> signConfigs);
 
 	/**
+	 * Relanza la tarea de firma con una nueva configuraci&oacute;n.
+	 */
+	void relaunchTask(List<SignOperationConfig> signConfigs);
+
+	/**
 	 * Finaliza la tarea de firma.
 	 */
 	void finishTask();

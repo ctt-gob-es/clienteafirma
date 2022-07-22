@@ -21,6 +21,9 @@ public class XAdESConstants {
 
 	static final String TAG_REFERENCE = "Reference"; //$NON-NLS-1$
 
+	/** Nombre del nodo de atributos sin firmar de la firma. */
+    static final String TAG_UNSIGNED_SIGNATURE_PROPERTIES = "UnsignedSignatureProperties"; //$NON-NLS-1$
+
 	/** Nombre del nodo de la firma de archivo. */
     static final String TAG_ARCHIVE_TIMESTAMP = "ArchiveTimeStamp"; //$NON-NLS-1$
 
