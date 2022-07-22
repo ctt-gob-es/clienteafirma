@@ -9,19 +9,13 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.CertificateContext;
@@ -29,7 +23,6 @@ import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.HttpError;
-import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
@@ -40,7 +33,6 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
-import es.gob.afirma.signers.batch.client.LocalDataParser;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
@@ -202,11 +194,10 @@ final class ProtocolInvocationLauncherBatch {
 		try {
 			if (options.isJsonBatch()) {
 				if(options.isLocalBatchProcess()) {
-					final List<UrlParametersToSign> urlParamsToSign = getUrlParamsFromSingleSigns(
+					final List<UrlParametersToSign> urlParamsToSign = LocalBatchSigner.getUrlParamsFromSingleSigns(
 							options.getData()
 							);
-					batchResult = signLocalBatch(urlParamsToSign);
-					System.out.println(batchResult);
+					batchResult = LocalBatchSigner.signLocalBatch(urlParamsToSign, pke);
 				} else {
 					batchResult = BatchSigner.signJSON(
 							Base64.encode(options.getData(), true),
@@ -275,7 +266,7 @@ final class ProtocolInvocationLauncherBatch {
 		}
 
 		// Si hay clave de cifrado, ciframos
-		if (options.getDesKey() != null) {
+		if (options.getDesKey() != null && !options.isLocalBatchProcess()) {
 			try {
 				result.append(CypherDataManager.cipherData(batchResult.getBytes(), options.getDesKey()));
 				if (signingCertEncoded != null) {
@@ -297,9 +288,13 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.warning(
 				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
-			result.append(Base64.encode(batchResult.getBytes()));
-			if (signingCertEncoded != null) {
-				result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
+			if (!options.isLocalBatchProcess()) {
+				result.append(Base64.encode(batchResult.getBytes()));
+				if (signingCertEncoded != null) {
+					result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
+				}
+			} else {
+				result.append(batchResult);
 			}
 		}
 
@@ -333,62 +328,6 @@ final class ProtocolInvocationLauncherBatch {
 		}
 
 		return result.toString();
-	}
-
-	private static String signLocalBatch(final List<UrlParametersToSign> urlParamsToSign) {
-
-		String result = "{"; //$NON-NLS-1$
-		for (final UrlParametersToSign urlParam : urlParamsToSign) {
-			try {
-				final StringBuilder signResult = ProtocolInvocationLauncherSign.processSign(urlParam, 1);
-				result += "id:" + urlParam.getId(); //$NON-NLS-1$
-				result += "result:" + signResult.toString(); //$NON-NLS-1$
-			} catch (final SocketOperationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		result += "}"; //$NON-NLS-1$
-
-		return result;
-	}
-
-	public static List<UrlParametersToSign> getUrlParamsFromSingleSigns(final byte[] batchB64)
-			throws IOException,  ParameterException {
-
-		JSONObject jsonObject = null;
-
-		try {
-			jsonObject = new JSONObject(new String(batchB64, StandardCharsets.UTF_8));
-		}catch (final JSONException e){
-			LOGGER.severe("Error al parsear JSON: " + e); //$NON-NLS-1$
-			throw new JSONException(
-					"El JSON de definicion de lote de firmas no esta formado correctamente", e //$NON-NLS-1$
-		 		);
-		}
-
-		List<UrlParametersToSign> signsUrlParams = new ArrayList<UrlParametersToSign>();
-
-		try {
-			signsUrlParams = LocalDataParser.parseJSONToUrlParamsToSign(jsonObject);
-		} catch (final JSONException e) {
-			LOGGER.severe("Error al parsear JSON: " + e); //$NON-NLS-1$
-			throw new JSONException(
-					"El JSON de definicion de lote de firmas no esta formado correctamente", e //$NON-NLS-1$
-		 		);
-		} catch (final ParameterException e) {
-			LOGGER.severe("Error al parsear parametros: " + e); //$NON-NLS-1$
-			throw new ParameterException(
-					"Uno o varios parametros no son correctos", e //$NON-NLS-1$
-		 		);
-		} catch (final IOException e) {
-			LOGGER.severe("Error al leer o escribir datos: " + e); //$NON-NLS-1$
-			throw new IOException(
-					"Error al leer o escribir datos", e //$NON-NLS-1$
-		 		);
-		}
-
-		return signsUrlParams;
 	}
 
 	public static String getResultCancel() {

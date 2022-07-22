@@ -687,7 +687,7 @@ public final class ProtocolInvocationLauncher {
 
                 StringBuilder dataToSend;
                 try {
-                	dataToSend = ProtocolInvocationLauncherSign.processSign(params, requestedProtocolVersion);
+                	dataToSend = ProtocolInvocationLauncherSign.processSign(params, requestedProtocolVersion, null);
                 }
                 // Llegara aqui siempre que tratemos con un error controlado. En caso de estar en
                 // la comunicacion por servidor intermedio, el mensaje de error al servidor

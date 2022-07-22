@@ -108,12 +108,13 @@ final class ProtocolInvocationLauncherSign {
 	 * la firma junto con una serie de metadatos en forma de cadena.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
+	 * @param pkeSelected Clave privada seleccionada previamente.
 	 * @return Resultado de la operaci&oacute;n o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la comunicaci&oacute;n por
 	 * <i>socket</i> local.
 	 */
 	static StringBuilder processSign(final UrlParametersToSign options,
-			final int protocolVersion) throws SocketOperationException {
+			final int protocolVersion, final PrivateKeyEntry pkeSelected) throws SocketOperationException {
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NULL_URI;
@@ -165,7 +166,7 @@ final class ProtocolInvocationLauncherSign {
 		for (int i = 0; i < operations.size(); i++) {
 			final SignOperation op = operations.get(i);
 			try {
-				results.add(signOperation(op, options, isMassiveSign));
+				results.add(signOperation(op, options, isMassiveSign, pkeSelected));
 			}
 			catch (final VisibleSignatureMandatoryException e) {
 				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
@@ -230,7 +231,8 @@ final class ProtocolInvocationLauncherSign {
 		return new NativeSignDataProcessor(protocolVersion);
 	}
 
-	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSign options, final boolean isMassiveSign)
+	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSign options,
+			final boolean isMassiveSign, final PrivateKeyEntry pkeSelected)
 			throws SocketOperationException, VisibleSignatureMandatoryException {
 
 		byte[] data = signOperation.getData();
@@ -459,7 +461,8 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		if (options.getSticky() && !options.getResetSticky()
-				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
+				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null
+				&& pkeSelected == null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 		} else {
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
@@ -482,24 +485,28 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
 			try {
-				MacUtils.focusApplication();
-				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-						ksm,
-						null,
-						true,
-						true, // showExpiredCertificates
-						true, // checkValidity
-						filters,
-						mandatoryCertificate);
-				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
-				dialog.show();
+				if (pkeSelected == null) {
+					MacUtils.focusApplication();
+					final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+								ksm,
+								null,
+								true,
+								true, // showExpiredCertificates
+								true, // checkValidity
+								filters,
+								mandatoryCertificate);
+					dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
+					dialog.show();
 
-				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
-				// que se indico originalmente por haberlo cambiado desde el dialogo de
-				// seleccion)
-				final CertificateContext context = dialog.getSelectedCertificateContext();
-		    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
-				pke = currentKsm.getKeyEntry(context.getAlias());
+					// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
+					// que se indico originalmente por haberlo cambiado desde el dialogo de
+					// seleccion)
+					final CertificateContext context = dialog.getSelectedCertificateContext();
+				    final KeyStoreManager currentKsm = context.getKeyStoreManager();
+					pke = currentKsm.getKeyEntry(context.getAlias());
+				} else {
+					pke = pkeSelected;
+				}
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
@@ -522,6 +529,7 @@ final class ProtocolInvocationLauncherSign {
 				throw new SocketOperationException(errorCode, e);
 			}
 		}
+
 
 		final byte[] sign;
 		try {
@@ -679,10 +687,8 @@ final class ProtocolInvocationLauncherSign {
 
 	private static void configurePdfSignature(final Properties extraParams) {
 		final String allowPdfShadowAttackProp = extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
-		if (!Boolean.parseBoolean(allowPdfShadowAttackProp)) {
-			if (!extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
-				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
-			}
+		if (!Boolean.parseBoolean(allowPdfShadowAttackProp) && !extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+			extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
 		}
 	}
 

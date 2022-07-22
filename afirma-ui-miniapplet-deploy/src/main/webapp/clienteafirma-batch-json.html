@@ -228,8 +228,6 @@
 		document.getElementById("generateId").disabled = false; 
 		document.getElementById("datareferenceValue").disabled = false;
 		document.getElementById("codeInB64").disabled = false;
-		document.getElementById("examineFile").disabled = false;
-		document.getElementById("cleanFile").disabled = false;
 		document.getElementById("useSingleConf").disabled = false;
 		document.getElementById("addSign").disabled = false;
 	}
@@ -315,11 +313,7 @@
 				id="datareferenceValue" style="width: 600px;" class="singleSignConf"/>
 		<button id="codeInB64" type="button" onclick="codeToB64()" class="singleSignConf">Codificar a base 64</button>
 		<br><br>
-		<input id="data" type="hidden">
-		<div><span>Fichero de datos para firma local: </span><span id="dataFilename"></span></div>
-		<input type="button" value="Examinar" id="examineFile" class="singleSignConf" onclick="browseDatos('', document.getElementById('data'), document.getElementById('dataFilename'));">&nbsp;
-		<input type="button" value="Limpiar" id="cleanFile" class="singleSignConf" onclick="cleanDataField(document.getElementById('data'), document.getElementById('dataFilename'));"><br/><br/>
-	</div>
+		</div>
 		<fieldset>
 		<legend><input type="checkbox" id="useSingleConf" name="useSingleConf" onclick="useSingleConfClick();" class="singleSignConf"/> 
 		<label for="suboperation">Aplicar configuraci&oacute;n individual</label><br></legend>

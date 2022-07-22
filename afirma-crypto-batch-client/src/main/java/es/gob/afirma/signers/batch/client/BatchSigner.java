@@ -420,7 +420,8 @@ public final class BatchSigner {
 		final String convertedJson = new String(Base64.decode(batch), DEFAULT_CHARSET);
 		try {
 			jsonObject = new JSONObject(convertedJson);
-		}catch (final JSONException jsonEx){
+		}
+		catch (final JSONException jsonEx) {
 			LOGGER.severe("Error al parsear JSON"); //$NON-NLS-1$
 			throw new JSONException(
 					"El JSON de definicion de lote de firmas no esta formado correctamente" //$NON-NLS-1$

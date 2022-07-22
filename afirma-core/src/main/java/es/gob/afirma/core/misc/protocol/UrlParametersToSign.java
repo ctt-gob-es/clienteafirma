@@ -26,7 +26,7 @@ public final class UrlParametersToSign extends UrlParameters {
 
 	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
 	 * de sesi&oacute;n de la firma. */
-	private static final int MAX_ID_LENGTH = 40;
+	private static final int MAX_ID_LENGTH = 20;
 
 	/** Par&aacute;metro de entrada con el formato de firma. */
 	private static final String FORMAT_PARAM = "format"; //$NON-NLS-1$
@@ -49,6 +49,10 @@ public final class UrlParametersToSign extends UrlParameters {
 	 * cla <code>PrivateKeyEntry</code> fijada. */
 	private static final String RESET_STICKY_PARAM = "resetsticky"; //$NON-NLS-1$
 
+	/** Par&aacute;metro usado por la firma de lotes monof&aacute;sica para indicar si se debe
+	 * parar el proceso o no en caso de error en una de las firmas. */
+	private static final String STOP_ON_ERROR_PARAM = "stoponerror"; //$NON-NLS-1$
+
 	/**
 	 * Par&aacute;metros reconocidos. Se utilizaran para identificar los parametros desconocidos
 	 * introducidos por el JavaScript.
@@ -57,7 +61,7 @@ public final class UrlParametersToSign extends UrlParameters {
 			FORMAT_PARAM, ALGORITHM_PARAM, ID_PARAM, VER_PARAM, STICKY_PARAM, RESET_STICKY_PARAM,
 			PROPERTIES_PARAM, DATA_PARAM, GZIPPED_DATA_PARAM, RETRIEVE_SERVLET_PARAM,
 			STORAGE_SERVLET_PARAM, KEY_PARAM, FILE_ID_PARAM, KEYSTORE_OLD_PARAM, KEYSTORE_PARAM,
-			ACTIVE_WAITING_PARAM, MINIMUM_CLIENT_VERSION_PARAM
+			ACTIVE_WAITING_PARAM, MINIMUM_CLIENT_VERSION_PARAM, STOP_ON_ERROR_PARAM
 	};
 
 	/** Algoritmos de firma soportados. */
@@ -81,6 +85,11 @@ public final class UrlParametersToSign extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe ignorar
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
+
+	/**
+	 * Determina si se debe parar o no el proceso de firma de lotes monof&aacute;sica en caso de error.
+	 */
+	private boolean stopOnError;
 
 	/** Colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los plugins. */
 	private final Map<String, String> anotherParams = new HashMap<>();
@@ -166,6 +175,14 @@ public final class UrlParametersToSign extends UrlParameters {
 	 *         deber&iacute;a usarse este si as&iacute; se indica ({@code false}). */
 	public boolean getResetSticky() {
 		return this.resetSticky;
+	}
+
+	public void setStopOnError(final boolean stopOnError) {
+		this.stopOnError = stopOnError;
+	}
+
+	public boolean getStopOnError() {
+		return this.stopOnError;
 	}
 
 	public void setSignParameters(final Map<String, String> params) throws ParameterException {
@@ -283,6 +300,14 @@ public final class UrlParametersToSign extends UrlParameters {
 		}
 		else {
 			setResetSticky(false);
+		}
+
+		// Valor de parametro stoponerror
+		if (params.containsKey(STOP_ON_ERROR_PARAM)) {
+			setStopOnError(Boolean.parseBoolean(params.get(STOP_ON_ERROR_PARAM)));
+		}
+		else {
+			setStopOnError(false);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));

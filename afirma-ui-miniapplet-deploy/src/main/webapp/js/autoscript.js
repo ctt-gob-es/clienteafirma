@@ -1253,7 +1253,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (isJson){
 					data.jsonbatch = createKeyValuePair ("jsonbatch", true);	
 					if (localBatchProcess) {
-						data.localbatchprocess = createKeyValuePair ("localBatchProcess", true);
+						data.localBatchProcess = createKeyValuePair ("localBatchProcess", true);
 					}
 				}
 				
@@ -3307,7 +3307,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
-				if (localBatchProcess) {						params[i++] = {key:"localBatchProcess", value:"true"}; }
+				if (localBatchProcess) {								params[i++] = {key:"localBatchProcess", value:"true"}; }
 				
 				params[i++] = {key:"jsonbatch", value:"true"}; 
 				params[i++] = {key:"dat", value:jsonRequestB64}; 

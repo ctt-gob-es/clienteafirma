@@ -190,28 +190,36 @@ public final class UrlParametersForBatch extends UrlParameters {
 			return;
 		}
 
-		if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
-			throw new ParameterException(
-				"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
-			);
-		}
-		if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
-			throw new ParameterException(
-				"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
-			);
+		// Valor del parametro localBatchProcess
+		if (params.containsKey(PARAM_LOCAL_BATCH_PROCESS)) {
+			setLocalBatchProcess(Boolean.parseBoolean(params.get(PARAM_LOCAL_BATCH_PROCESS)));
 		}
 
-		setBatchPostsignerUrl(
-			validateURL(
-				params.get(PARAM_BATCH_POSTSIGNER)
-			).toString()
-		);
+		if (!isLocalBatchProcess()) {
 
-		setBatchPresignerUrl(
-			validateURL(
-				params.get(PARAM_BATCH_PRESIGNER)
-			).toString()
-		);
+			if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
+				throw new ParameterException(
+					"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
+				);
+			}
+			if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
+				throw new ParameterException(
+					"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
+				);
+			}
+
+			setBatchPostsignerUrl(
+				validateURL(
+					params.get(PARAM_BATCH_POSTSIGNER)
+				).toString()
+			);
+
+			setBatchPresignerUrl(
+				validateURL(
+					params.get(PARAM_BATCH_PRESIGNER)
+				).toString()
+			);
+		}
 
 		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse
 		if (params.containsKey(STORAGE_SERVLET_PARAM)) {
@@ -277,11 +285,6 @@ public final class UrlParametersForBatch extends UrlParameters {
 		// Valor del parametro jsonBatch
 		if (params.containsKey(PARAM_JSON_BATCH)) {
 			setJsonBatch(Boolean.parseBoolean(params.get(PARAM_JSON_BATCH)));
-		}
-
-		// Valor del parametro localBatchProcess
-		if (params.containsKey(PARAM_LOCAL_BATCH_PROCESS)) {
-			setLocalBatchProcess(Boolean.parseBoolean(params.get(PARAM_LOCAL_BATCH_PROCESS)));
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
