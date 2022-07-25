@@ -36,16 +36,20 @@ public class LocalBatchSigner {
 		for (final UrlParametersToSign urlParam : urlParamsToSign) {
 
 			if (errorOcurred && urlParam.getStopOnError()) {
-				result.append("\nid:").append(urlParam.getId()).append("\nresult:").append(SKIPPED_SIGN); //$NON-NLS-1$ //$NON-NLS-2$
+				result.append("\nid:").append(urlParam.getId()) //$NON-NLS-1$
+				.append("\nresult:").append(SKIPPED_SIGN); //$NON-NLS-1$
 			} else {
 				try {
 					final StringBuilder signResult = ProtocolInvocationLauncherSign.processSign(urlParam, 1, pke);
-					result.append("\nid:").append(urlParam.getId()).append("\nresult:").append(signResult); //$NON-NLS-1$ //$NON-NLS-2$
+					result.append("\nid:").append(urlParam.getId()) //$NON-NLS-1$
+					.append("\nresult:").append(signResult); //$NON-NLS-1$
 				}
 				catch (final SocketOperationException e) {
 					errorOcurred = true;
 					LOGGER.severe("Error al procesar la firma de lotes monofasica con ID: " + urlParam.getId() + "Excepcion :" + e); //$NON-NLS-1$ //$NON-NLS-2$
-					result.append("\nid:").append(urlParam.getId()).append("\nresult:").append(ERROR_SIGN);  //$NON-NLS-1$//$NON-NLS-2$
+					result.append("\nid:").append(urlParam.getId()) //$NON-NLS-1$
+					.append("\nresult:").append(ERROR_SIGN) //$NON-NLS-1$
+					.append("\ndescription:").append(e.getMessage()); //$NON-NLS-1$
 				}
 			}
 		}
