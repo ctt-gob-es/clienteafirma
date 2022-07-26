@@ -18,8 +18,9 @@ public class LocalBatchSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final String DONE_SIGN = "DONE_AND_SAVED"; //$NON-NLS-1$
 	private static final String SKIPPED_SIGN = "SKIPPED"; //$NON-NLS-1$
-	private static final String ERROR_SIGN = "ERROR"; //$NON-NLS-1$
+	private static final String ERROR_SIGN = "ERROR_PRE"; //$NON-NLS-1$
 
 	/**
 	 * Metodo encargado de firmar todas las firmas monof&aacute;sicas que conforman un lote.
@@ -42,7 +43,8 @@ public class LocalBatchSigner {
 				try {
 					final StringBuilder signResult = ProtocolInvocationLauncherSign.processSign(urlParam, 1, pke);
 					result.append("\nid:").append(urlParam.getId()) //$NON-NLS-1$
-					.append("\nresult:").append(signResult); //$NON-NLS-1$
+					.append("\nresult:").append(DONE_SIGN) //$NON-NLS-1$
+					.append("\nsignature:").append(signResult); //$NON-NLS-1$
 				}
 				catch (final SocketOperationException e) {
 					errorOcurred = true;
