@@ -27,12 +27,14 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.SigningLTSException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
@@ -77,6 +79,7 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -167,7 +170,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		for (int i = 0; i < operations.size(); i++) {
 			final SignOperation op = operations.get(i);
 			try {
-				results.add(signOperation(op, options, isMassiveSign));
+				results.add(sign(op, options, isMassiveSign));
 			}
 			catch (final VisibleSignatureMandatoryException e) {
 				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
@@ -232,7 +235,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		return new NativeSignDataProcessor(protocolVersion);
 	}
 
-	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSignAndSave options, final boolean isMassiveSign)
+	private static SignResult sign(final SignOperation signOperation, final UrlParametersToSignAndSave options, final boolean isMassiveSign)
 			throws SocketOperationException, VisibleSignatureMandatoryException {
 
 		byte[] data = signOperation.getData();
@@ -525,12 +528,84 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 		}
 
-		final byte[] sign;
+		final byte[] sign = executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
+
+		// Damos la opcion de guardar la firma generada
+		final String fileExts = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_EXTS);
+
+		final String fileDesc = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_DESCRIPTION, ProtocolMessages.getString("ProtocolLauncher.30")) +  //$NON-NLS-1$
+			(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+		try {
+			AOUIFactory.getSaveDataToFile(
+				sign,
+				ProtocolMessages.getString("ProtocolLauncher.31"), // Titulo del dialogo //$NON-NLS-1$
+				options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_CURRENT_DIR), // Directorio de guardado
+				getFilename(options, inputFilename, signer),
+				Collections.singletonList(
+					new GenericFileFilter(
+						fileExts != null ? fileExts.split(",") : null, // Extensiones de fichero aceptadas //$NON-NLS-1$
+						fileDesc // Descripcion del fichero
+					)
+				),
+				null // Padre para la modalidad
+			);
+		}
+		catch (final AOCancelledOperationException e) {
+			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			throw new SocketOperationException(RESULT_CANCEL);
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_SAVE_DATA;
+			throw new SocketOperationException(errorCode);
+		}
+
+		// Concatenamos el certificado utilizado para firmar y la firma con un separador
+		// para que la pagina pueda recuperar ambos
+		final byte[] certEncoded;
+		try {
+			certEncoded = pke.getCertificateChain()[0].getEncoded();
+		} catch (final CertificateEncodingException e) {
+			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
+			throw new SocketOperationException(errorCode);
+		}
+
+		final SignResult result = new SignResult();
+		result.setSignature(sign);
+		result.setCertificate(certEncoded);
+		Properties extraData = null;
+		if (inputFilename != null) {
+			extraData = new Properties();
+			extraData.setProperty("filename", inputFilename); //$NON-NLS-1$
+		}
+		result.setDataFilename(extraData);
+
+		return result;
+	}
+
+
+	/**
+	 * Ejecuta la operaci&oacute;n de firma con la configuraci&oacute;n data.
+	 * @param signer Manejador de firma.
+	 * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica de firma.
+	 * @param data Datos/firma a firmar o multifirmar.
+	 * @param algorithm Algoritmo de firma.
+	 * @param pke Referencia a la clave privada de firma.
+	 * @param extraParams Par&aacute;metros adicionales para la configuraci&oacute;m del formato de firma.
+	 * @return Firma generada.
+	 * @throws SocketOperationException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
+	 */
+	private static byte[] executeSign(final AOSigner signer, final Operation cryptoOperation, final byte[] data, final String algorithm,
+			final PrivateKeyEntry pke, final Properties extraParams) throws SocketOperationException {
+
+		byte[] signature;
 		try {
 			try {
 				switch (cryptoOperation) {
 				case SIGN:
-					sign = signer.sign(
+					signature = signer.sign(
 							data,
 							algorithm,
 							pke.getPrivateKey(),
@@ -539,7 +614,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 							);
 					break;
 				case COSIGN:
-					sign = signer.cosign(
+					signature = signer.cosign(
 							data,
 							algorithm,
 							pke.getPrivateKey(),
@@ -548,7 +623,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 							);
 					break;
 				case COUNTERSIGN:
-					sign = signer.countersign(
+					signature = signer.countersign(
 							data,
 							algorithm,
 							"tree".equalsIgnoreCase(extraParams.getProperty(AfirmaExtraParams.TARGET)) ? //$NON-NLS-1$
@@ -635,10 +710,44 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
 			throw new SocketOperationException(errorCode);
 		}
-		catch (final SigningLTSException e) {
-			LOGGER.log(Level.SEVERE, "Se ha tratado de multifirmar una firma de archivo", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNING_LTS_SIGNATURE;
-			throw new SocketOperationException(errorCode, e);
+		catch (final RuntimeConfigNeededException e) {
+			LOGGER.warning("No se puede completar la firma sin intervencion del usuario: " + e); //$NON-NLS-1$
+
+			// Se requiere confirmacion por parte del usuario
+			if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+				LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
+				throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+			}
+
+			if (e.getRequestType() == RequestType.CONFIRM) {
+				final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
+						SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
+				if (result == JOptionPane.YES_OPTION) {
+					extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
+					return executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
+				}
+			}
+			// Se requiere ua contrasena por parte del usuario
+			else if (e.getRequestType() == RequestType.PASSWORD) {
+				char[] p;
+				try {
+					p = AOUIFactory.getPassword(SimpleAfirmaMessages.getString(e.getRequestorText()), null);
+				}
+				catch (final AOCancelledOperationException ce) {
+					p = null;
+				}
+				if (p != null) {
+					extraParams.setProperty(e.getParam(), new String(p));
+					return executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
+				}
+			}
+			else {
+				LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma"); //$NON-NLS-1$
+				throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+			}
+
+			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			throw new SocketOperationException(RESULT_CANCEL);
 		}
 		catch (final UnsupportedOperationException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
@@ -665,59 +774,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			throw new SocketOperationException(errorCode);
 		}
 
-		// Damos la opcion de guardar la firma generada
-		final String fileExts = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_EXTS);
-
-		final String fileDesc = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_DESCRIPTION, ProtocolMessages.getString("ProtocolLauncher.30")) +  //$NON-NLS-1$
-			(fileExts == null ? " (*.*)" : String.format(" (*.%1s)", fileExts.replace(",", ",*."))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-		try {
-			AOUIFactory.getSaveDataToFile(
-				sign,
-				ProtocolMessages.getString("ProtocolLauncher.31"), // Titulo del dialogo //$NON-NLS-1$
-				options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_CURRENT_DIR), // Directorio de guardado
-				getFilename(options, inputFilename, signer),
-				Collections.singletonList(
-					new GenericFileFilter(
-						fileExts != null ? fileExts.split(",") : null, // Extensiones de fichero aceptadas //$NON-NLS-1$
-						fileDesc // Descripcion del fichero
-					)
-				),
-				null // Padre para la modalidad
-			);
-		}
-		catch (final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-			throw new SocketOperationException(RESULT_CANCEL);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_SAVE_DATA;
-			throw new SocketOperationException(errorCode);
-		}
-
-		// Concatenamos el certificado utilizado para firmar y la firma con un separador
-		// para que la pagina pueda recuperar ambos
-		final byte[] certEncoded;
-		try {
-			certEncoded = pke.getCertificateChain()[0].getEncoded();
-		} catch (final CertificateEncodingException e) {
-			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-			throw new SocketOperationException(errorCode);
-		}
-
-		final SignResult result = new SignResult();
-		result.setSignature(sign);
-		result.setCertificate(certEncoded);
-		Properties extraData = null;
-		if (inputFilename != null) {
-			extraData = new Properties();
-			extraData.setProperty("filename", inputFilename); //$NON-NLS-1$
-		}
-		result.setDataFilename(extraData);
-
-		return result;
+		return signature;
 	}
 
 	private static void configurePdfSignature(final Properties extraParams) {

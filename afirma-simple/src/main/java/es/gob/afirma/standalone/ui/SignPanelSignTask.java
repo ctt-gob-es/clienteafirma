@@ -81,6 +81,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	private final List<SignOperationConfig> signConfigs;
 	private final AOKeyStoreManager ksm;
 	private final List<? extends CertificateFilter> certFilters;
+	private PrivateKeyEntry selectedPke;
 	private final CommonWaitDialog waitDialog;
 	private final SignatureExecutor signExecutor;
 	private final SignatureResultViewer resultViewer;
@@ -101,10 +102,27 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         this.signConfigs = signConfigs;
         this.ksm = ksm;
         this.certFilters = certificateFilters != null ? new ArrayList<>(certificateFilters) : null;
+        this.selectedPke = null;
         this.waitDialog = signWaitDialog;
         this.signExecutor = signExecutor;
         this.resultViewer = resultViewer;
     }
+
+	SignPanelSignTask(final Component parent,
+			final List<SignOperationConfig> signConfigs,
+			final PrivateKeyEntry pke,
+			final CommonWaitDialog signWaitDialog,
+			final SignatureExecutor signExecutor,
+			final SignatureResultViewer resultViewer) {
+		this.parent = parent;
+		this.signConfigs = signConfigs;
+		this.ksm = null;
+		this.certFilters = null;
+		this.selectedPke = pke;
+		this.waitDialog = signWaitDialog;
+		this.signExecutor = signExecutor;
+		this.resultViewer = resultViewer;
+	}
 
 
 	@Override
@@ -125,7 +143,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	protected void done() {
 		if (this.signExecutor != null) {
 			if (this.needRelaunch) {
-				this.signExecutor.relaunchTask(this.signConfigs);
+				this.signExecutor.relaunchTask(this.selectedPke, this.signConfigs);
 			}
 			else {
 				this.signExecutor.finishTask();
@@ -141,23 +159,24 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             return;
         }
 
-        final PrivateKeyEntry pke;
-        try {
-            pke = getPrivateKeyEntry();
+        if (this.selectedPke == null) {
+        	try {
+        		this.selectedPke = getPrivateKeyEntry();
+        	}
+        	catch (final AOCancelledOperationException e) {
+        		return;
+        	}
+        	catch(final AOCertificatesNotFoundException e) {
+        		LOGGER.severe("El almacen no contiene ningun certificado que se pueda usar para firmar: " + e); //$NON-NLS-1$
+        		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.29"), e); //$NON-NLS-1$
+        		return;
+        	}
+        	catch (final Exception e) {
+        		LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
+        		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
+        		return;
+        	}
         }
-        catch (final AOCancelledOperationException e) {
-            return;
-        }
-        catch(final AOCertificatesNotFoundException e) {
-        	LOGGER.severe("El almacen no contiene ningun certificado que se pueda usar para firmar: " + e); //$NON-NLS-1$
-        	showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.29"), e); //$NON-NLS-1$
-        	return;
-        }
-        catch (final Exception e) {
-        	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
-        	showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
-        	return;
-    	}
 
         // Si se va a firmar mas de un documento, se debera pedir de antemano la carpeta
         // de salida para ir almacenando las firmas en ella a medida que se generan
@@ -227,7 +246,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		signConfig.getSignatureFormatName()
     		);
         	final String signatureAlgorithm;
-        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
+        	final String certAlgo = this.selectedPke.getPrivateKey().getAlgorithm();
         	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
         		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
         	}
@@ -249,7 +268,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             		currentSigner,
             		signConfig,
             		signatureAlgorithm,
-            		pke,
+            		this.selectedPke,
             		onlyOneFile,
             		this.parent
         		);
@@ -271,7 +290,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             		// Se requiere confirmacion por parte del usuario
             		if (e.getRequestType() == RequestType.CONFIRM) {
             			final int result = AOUIFactory.showConfirmDialog(this.parent, SimpleAfirmaMessages.getString(e.getRequestorText()),
-            					SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
+            					SimpleAfirmaMessages.getString("SignPanel.153"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
             			if (result == JOptionPane.YES_OPTION) {
             				this.needRelaunch = true;
             				signConfig.addExtraParam(e.getParam(), Boolean.TRUE.toString());
@@ -291,6 +310,10 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             				signConfig.addExtraParam(e.getParam(), new String(p));
             			}
             		}
+        			else {
+        				LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma: " + e); //$NON-NLS-1$
+        				showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.154", e.getMessage()), e); //$NON-NLS-1$
+        			}
             		return;
             	}
             	continue;
@@ -340,7 +363,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	continue;
     		}
 
-			signResult = pluginsPostProcess(signResult, signConfig.getSignatureFormatName(), pke.getCertificateChain());
+			signResult = pluginsPostProcess(signResult, signConfig.getSignatureFormatName(), this.selectedPke.getCertificateChain());
 
             // En caso de definirse directorio de salida, se guarda la firma
             if (outDir != null) {
@@ -397,14 +420,14 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	this.resultViewer.showResultsInfo(
         			signResult,
         			signConfig,
-        			(X509Certificate) pke.getCertificate()
+        			(X509Certificate) this.selectedPke.getCertificate()
 	    		);
         }
         else {
         	this.resultViewer.showResultsInfo(
     			this.signConfigs,
     			outDir,
-    			(X509Certificate) pke.getCertificate()
+    			(X509Certificate) this.selectedPke.getCertificate()
 			);
         }
 

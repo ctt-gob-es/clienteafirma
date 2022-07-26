@@ -33,6 +33,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -327,13 +328,12 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
     @Override
-    public void relaunchTask(final List<SignOperationConfig> signConfigs) {
+    public void relaunchTask(final PrivateKeyEntry pke, final List<SignOperationConfig> signConfigs) {
 
     	new SignPanelSignTask(
         		this,
         		signConfigs,
-        		this.saf.getAOKeyStoreManager(),
-        		getCertFilters(),
+        		pke,
         		this.signWaitDialog,
         		this,
         		this.saf
