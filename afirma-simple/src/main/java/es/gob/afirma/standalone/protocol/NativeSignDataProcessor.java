@@ -42,7 +42,7 @@ public class NativeSignDataProcessor extends SignDataProcessor {
 	}
 
 	/**
-	 * Comprone la respuesta a partir del resultado de la primera firma, ya que nativamente
+	 * Compone la respuesta a partir del resultado de la primera firma, ya que nativamente
 	 * s&oacute;lo puede generarse una &uacute;nica firma.
 	 * @param results Listado de firmas resultando (s&oacute;lo debe haber un elemento).
 	 * @return Respuesta de la operaci&oacute;n.

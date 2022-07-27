@@ -35,5 +35,8 @@ class SocketOperationException extends Exception {
 		this.errorCode = errorCode;
 	}
 
-
+	@Override
+	public String getMessage() {
+		return super.getMessage() != null ? super.getMessage() : this.errorCode;
+	}
 }

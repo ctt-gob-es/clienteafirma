@@ -46,6 +46,8 @@ public abstract class JSONSignBatch {
 	private static final String JSON_ELEMENT_STOPONERROR = "stoponerror"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
+	private static final String EXTRAPARAM_HEADLESS = "headless"; //$NON-NLS-1$
+
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Lista de firmas a procesar. */
@@ -289,34 +291,32 @@ public abstract class JSONSignBatch {
 		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
 
 		if (singleSignsArray != null) {
-			for (int i=0 ; i<singleSignsArray.length() ; i++){
+			for (int i = 0 ; i < singleSignsArray.length() ; i++){
 
-				final JSONSingleSign singleSign = new JSONSingleSign(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_ID));
+				final JSONObject jsonSingleSign = singleSignsArray.getJSONObject(i);
+				final JSONSingleSign singleSign = new JSONSingleSign(jsonSingleSign.getString(JSON_ELEMENT_ID));
 
-				singleSign.setDataRef(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
+				singleSign.setDataRef(jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE));
 
-				singleSign.setFormat(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_FORMAT)
-						? SingleSignConstants.SignFormat.getFormat(
-								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_FORMAT)
-								)
+				singleSign.setFormat(jsonSingleSign.has(JSON_ELEMENT_FORMAT)
+						? SingleSignConstants.SignFormat.getFormat(jsonSingleSign.getString(JSON_ELEMENT_FORMAT))
 								: this.format);
 
-				singleSign.setSubOperation(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_SUBOPERATION)
-						? SingleSignConstants.SignSubOperation.getSubOperation(
-								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_SUBOPERATION)
-								)
+				singleSign.setSubOperation(jsonSingleSign.has(JSON_ELEMENT_SUBOPERATION)
+						? SingleSignConstants.SignSubOperation.getSubOperation(jsonSingleSign.getString(JSON_ELEMENT_SUBOPERATION))
 								: this.subOperation);
 
 				singleSign.setDocumentManager(this.documentManager);
 
 				try {
-					if (singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_EXTRAPARAMS)) {
-						singleSign.setExtraParams(
-								AOUtil.base642Properties(
-										singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_EXTRAPARAMS)));
-					}else {
-						singleSign.setExtraParams(AOUtil.base642Properties(this.extraParams));
+					Properties signExtraParams;
+					if (jsonSingleSign.has(JSON_ELEMENT_EXTRAPARAMS)) {
+						signExtraParams = AOUtil.base642Properties(jsonSingleSign.getString(JSON_ELEMENT_EXTRAPARAMS));
+					} else {
+						signExtraParams = AOUtil.base642Properties(this.extraParams);
 					}
+					signExtraParams.setProperty(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
+					singleSign.setExtraParams(signExtraParams);
 				} catch (final Exception e) {
 					throw new JSONException(
 							"El objeto JSON no está correctamente formado"); //$NON-NLS-1$

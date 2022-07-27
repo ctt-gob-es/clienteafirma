@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
@@ -24,7 +25,6 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
-import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
@@ -190,14 +190,13 @@ final class ProtocolInvocationLauncherBatch {
 			}
 		}
 
-		String batchResult = ""; //$NON-NLS-1$
+		String batchResult;
 		try {
 			if (options.isJsonBatch()) {
 				if(options.isLocalBatchProcess()) {
-					final List<UrlParametersToSign> urlParamsToSign = LocalBatchSigner.getUrlParamsFromSingleSigns(
-							options.getData()
-							);
-					batchResult = LocalBatchSigner.signLocalBatch(urlParamsToSign, pke);
+					final BatchSignOperation batchConfig =
+							LocalDataParser.parseBatchConfig(options.getData());
+					batchResult = LocalBatchSigner.signLocalBatch(batchConfig, pke);
 				} else {
 					batchResult = BatchSigner.signJSON(
 							Base64.encode(options.getData(), true),
@@ -249,7 +248,7 @@ final class ProtocolInvocationLauncherBatch {
 
 		final StringBuilder result = new StringBuilder();
 
-		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos la resultado con un separador
+		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos al resultado con un separador
 		byte[] signingCertEncoded = null;
 		if (options.isCertNeeded()) {
 			try {
@@ -266,9 +265,9 @@ final class ProtocolInvocationLauncherBatch {
 		}
 
 		// Si hay clave de cifrado, ciframos
-		if (options.getDesKey() != null && !options.isLocalBatchProcess()) {
+		if (options.getDesKey() != null) {
 			try {
-				result.append(CypherDataManager.cipherData(batchResult.getBytes(), options.getDesKey()));
+				result.append(CypherDataManager.cipherData(batchResult.getBytes(StandardCharsets.UTF_8), options.getDesKey()));
 				if (signingCertEncoded != null) {
 					result.append(RESULT_SEPARATOR)
 						.append(CypherDataManager.cipherData(signingCertEncoded, options.getDesKey()));
@@ -288,13 +287,9 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.warning(
 				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
-			if (!options.isLocalBatchProcess()) {
-				result.append(Base64.encode(batchResult.getBytes()));
-				if (signingCertEncoded != null) {
-					result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
-				}
-			} else {
-				result.append(batchResult);
+			result.append(Base64.encode(batchResult.getBytes(StandardCharsets.UTF_8)));
+			if (signingCertEncoded != null) {
+				result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
 			}
 		}
 

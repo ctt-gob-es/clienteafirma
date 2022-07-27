@@ -2044,7 +2044,7 @@ var AutoScript = ( function ( window, undefined ) {
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", certFilters != null ? Base64.encode(certFilters) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
-				data.needcert = generateDataKeyValue ("needcert",  "true");
+				data.needcert = generateDataKeyValue ("needcert",  true);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
 				if (resetStickySignatory) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
@@ -2055,7 +2055,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				if (localBatchProcess) {
-					data.localBatchProcess = generateDataKeyValue ("localBatchProcess",  "true");
+					data.localBatchProcess = generateDataKeyValue ("localBatchProcess",  true);
 				}
 
 				return data;
@@ -3305,11 +3305,11 @@ var AutoScript = ( function ( window, undefined ) {
 				if (batchPostSignerUrl != null &&
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
-				if (localBatchProcess) {								params[i++] = {key:"localBatchProcess", value:"true"}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:true}; } // Espera activa
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:true}; } 
+				if (localBatchProcess) {								params[i++] = {key:"localBatchProcess", value:true}; }
 				
-				params[i++] = {key:"jsonbatch", value:"true"}; 
+				params[i++] = {key:"jsonbatch", value:true}; 
 				params[i++] = {key:"dat", value:jsonRequestB64}; 
 				 
 				var url = buildUrl(opId, params);

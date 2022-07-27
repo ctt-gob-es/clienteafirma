@@ -46,6 +46,10 @@ public abstract class UrlParameters {
 	/** Par&aacute;metro de entrada con el servlet remoto de guardado de datos. */
 	protected static final String STORAGE_SERVLET_PARAM = "stservlet"; //$NON-NLS-1$
 
+	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
+	 * de sesi&oacute;n de la operaci&oacute;n. */
+	protected static final int MAX_ID_LENGTH = 20;
+
 	/** Longitud permitida para la clave de cifrado. */
 	private static final int CIPHER_KEY_LENGTH = 8;
 

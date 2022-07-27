@@ -20,9 +20,6 @@ import es.gob.afirma.core.misc.AOUtil;
  * para la operaci&oacute;n de selecci&oacute;n de certificados. */
 public final class UrlParametersToSelectCert extends UrlParameters {
 
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la firma. */
-	private static final int MAX_ID_LENGTH = 20;
-
 	/** Par&aacute;metro de entrada con el identificador del documento. */
 	private static final String ID_PARAM = "id"; //$NON-NLS-1$
 
@@ -115,7 +112,7 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 
 		if (sessionId != null) {
 			if (sessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)

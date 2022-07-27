@@ -25,10 +25,6 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyExcepti
  * de firma y guardado de resultados. */
 public final class UrlParametersToSignAndSave extends UrlParameters {
 
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
-	 * de sesi&oacute;n de la firma. */
-	private static final int MAX_ID_LENGTH = 20;
-
 	/** Par&aacute;metro de entrada con el formato de firma. */
 	private static final String CRYPTO_OPERATION_PARAM = "cop"; //$NON-NLS-1$
 
@@ -182,29 +178,27 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	public void setSignAndSaveParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-		String signatureSessionId = null;
+		String sessionId = null;
 		if (params.containsKey(ID_PARAM)) {
-			signatureSessionId = params.get(ID_PARAM);
+			sessionId = params.get(ID_PARAM);
 		}
 		else if (params.containsKey(FILE_ID_PARAM)) {
-			 signatureSessionId = params.get(FILE_ID_PARAM);
+			 sessionId = params.get(FILE_ID_PARAM);
 		}
 
-		if (signatureSessionId != null) {
-			if (signatureSessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException(
-					"La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres." //$NON-NLS-1$ //$NON-NLS-2$
-				);
+		if (sessionId != null) {
+			if (sessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
-			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
 					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
 				}
 			}
 
-			setSessionId(signatureSessionId);
+			setSessionId(sessionId);
 		}
 
 		// Version minima requerida del protocolo que se debe soportar

@@ -72,7 +72,6 @@ import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
-import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
@@ -345,7 +344,7 @@ final class ProtocolInvocationLauncherSign {
 		// En no haber fijado aun el firmador significa que se selecciono el formato AUTO y
 		// es necesario identificar cual es el que se deberia usar
 		if (signer == null) {
-			format = identifyFormatFromData(data, cryptoOperation);
+			format = ProtocolInvocationLauncherUtil.identifyFormatFromData(data, cryptoOperation);
 			if (format == null) {
 				LOGGER.severe(
 					"Los datos no se corresponden con una firma electronica o no se pudieron analizar"); //$NON-NLS-1$
@@ -690,54 +689,6 @@ final class ProtocolInvocationLauncherSign {
 		if (!Boolean.parseBoolean(allowPdfShadowAttackProp) && !extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
 			extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Identifica el formato firma que debe generar a partir de los datos y el tipo de
-	 * operaci&oacute;n. En caso de configurarse la operacion de firma, habremos recibido
-	 * simples datos y seleccionaremos segun su formato. En caso contrario, la operaci&oacute;n
-	 * ser&aacute; cofirma o contrafirma, habremos recibido una firma y usaremos el mismo formato
-	 * que tenga esta.
-	 * @param data Datos a firmar o firma a multifirmar.
-	 * @param cryptoOperation Operaci&oacute;n que debe realizarse (firma, cofirma o contrafirma).
-	 * @return Formato de firma.
-	 */
-	private static String identifyFormatFromData(final byte[] data, final Operation cryptoOperation) {
-
-		String format;
-		if (Operation.SIGN == cryptoOperation) {
-			if (DataAnalizerUtil.isPDF(data)) {
-				format = AOSignConstants.SIGN_FORMAT_PADES;
-			}
-			else if (DataAnalizerUtil.isFacturae(data)) {
-				format = AOSignConstants.SIGN_FORMAT_FACTURAE;
-			}
-			else if (DataAnalizerUtil.isXML(data)) {
-				format = AOSignConstants.SIGN_FORMAT_XADES;
-			}
-			else if (DataAnalizerUtil.isODF(data)) {
-				format = AOSignConstants.SIGN_FORMAT_ODF;
-			}
-			else if (DataAnalizerUtil.isOOXML(data)) {
-				format = AOSignConstants.SIGN_FORMAT_OOXML;
-			}
-			else {
-				format = AOSignConstants.SIGN_FORMAT_CADES;
-			}
-		}
-		else {
-			try {
-				final AOSigner signer = AOSignerFactory.getSigner(data);
-				format = AOSignerFactory.getSignFormat(signer);
-			}
-			catch (final IOException e) {
-				LOGGER.severe(
-						"No se han podido analizar los datos para determinar si son una firma: " + e); //$NON-NLS-1$
-				format = null;
-			}
-		}
-
-		return format;
 	}
 
 	/**

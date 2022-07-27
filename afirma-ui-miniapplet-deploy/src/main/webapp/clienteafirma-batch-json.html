@@ -26,6 +26,8 @@
 	function doSignBatch() {
 		try {
 			
+			AutoScript.setLocalBatchProcess(false);
+			
 			AutoScript
 					.signBatchProcess(
 							document.getElementById("stopOnError").checked,
@@ -51,7 +53,7 @@
 	function doLocalSignBatch() {
 		try {
 
-			AutoScript.setLocalBatchProcess("true");
+			AutoScript.setLocalBatchProcess(true);
 			
 			AutoScript
 					.signBatchProcess(
@@ -82,6 +84,14 @@
 		document.getElementById("localSignButton").disabled = "";
 		document.getElementById('format').getElementsByTagName('option')[0].selected = true;
 		document.getElementById('suboperation').getElementsByTagName('option')[0].selected = true;
+		
+		document.getElementById("useSingleConf").checked = false;
+		document.getElementById("format").disabled = true;
+		document.getElementById("suboperation").disabled = true;
+		document.getElementById("newParam").disabled = true;
+		document.getElementById("addParam").disabled = true;
+		document.getElementById("cleanExtraParams").disabled = true;
+		document.getElementById("params").disabled = true;
 	}
 
 	function generateUUID() {
@@ -107,12 +117,11 @@
 		var suboperation = null;
 		var extraParams = null;
 
-		if (document.getElementById("useSingleConf").checked == true) {
+		if (document.getElementById("useSingleConf").checked) {
 			format = document.getElementById("format").value;
 			suboperation = document.getElementById("suboperation").value;
-			if(document.getElementById("params").value != ""){
-				extraParams = AutoScript.getBase64FromText(document
-						.getElementById("params").value);
+			if (!!document.getElementById("params").value){
+				extraParams = document.getElementById("params").value;
 			}
 		}
 		
@@ -120,7 +129,7 @@
 			AutoScript.addDocumentToBatch(singleSignID, datareference, format,
 					suboperation, extraParams);
 			
-			printSingleSign(singleSignID, datareference, format,
+			 printSingleSign(singleSignID, datareference, format,
 					suboperation, extraParams);
 		} catch (e) {
 			showLog(e);
@@ -133,20 +142,10 @@
 		var algorithm = document.getElementById("algorithm").value;
 		var format = document.getElementById("generalFormat").value;
 		var subOperation = document.getElementById("generalSuboperation").value;
-		var extraParams = AutoScript.getBase64FromText(document
-				.getElementById("filters").value);
+		var extraParams = document.getElementById("filters").value;
 
 		AutoScript.createBatch(algorithm, format, subOperation,
 				extraParams);
-	}
-
-	function showAppletLog() {
-		try {
-			showLog(AutoScript.getCurrentLog());
-		} catch (e) {
-			showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
-					+ AutoScript.getErrorMessage());
-		}
 	}
 
 	function cleanDataField(dataField, textDiv) {
@@ -240,7 +239,7 @@
 </head>
 <body>
 	<script type="text/javascript">
-			AutoScript.setForceWSMode(true);
+			//AutoScript.setForceWSMode(true);
 			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(Constants.URL_BASE_SERVICES 
 					+ "/afirma-signature-storage/StorageService", 

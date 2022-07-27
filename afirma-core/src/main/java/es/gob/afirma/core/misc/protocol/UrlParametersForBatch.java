@@ -21,9 +21,6 @@ import es.gob.afirma.core.misc.AOUtil;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class UrlParametersForBatch extends UrlParameters {
 
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la operaci&oacute;n. */
-	private static final int MAX_ID_LENGTH = 20;
-
 	/** Par&aacute;metro de entrada con el identificador de sesi&oacute;n de la operaci&oacute;n. */
 	private static final String ID_PARAM = "id"; //$NON-NLS-1$
 
@@ -161,19 +158,19 @@ public final class UrlParametersForBatch extends UrlParameters {
 		// idSession para el service Web. Con socket no se usa
 		if (params.containsKey(ID_PARAM) || params.containsKey(FILE_ID_PARAM)) {
 			// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-			final String signatureSessionId = params.containsKey(ID_PARAM) ? params.get(ID_PARAM) : params.get(FILE_ID_PARAM);
-			if (signatureSessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+			final String sessionId = params.containsKey(ID_PARAM) ? params.get(ID_PARAM) : params.get(FILE_ID_PARAM);
+			if (sessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
-			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
 					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
 				}
 			}
 
-			setSessionId(signatureSessionId);
+			setSessionId(sessionId);
 		}
 
 		// Version minima requerida del protocolo que se debe soportar
