@@ -32,6 +32,7 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -405,6 +406,16 @@ public class SingleSign {
 		if (data == null) {
 			checkDataSource(this.dataRef);
 			data = DataDownloader.downloadData(this.dataRef);
+		}
+
+		final long maxDocSize = ConfigManager.getBatchXmlDocSize();
+
+		if (maxDocSize > 0 && data.length > maxDocSize) {
+			LOGGER.severe("El tamano del documento supera el permitido por la opcion configurada"); //$NON-NLS-1$
+			throw new IOException(
+					"El tamano del documento supera el permitido por la opcion configurada: " //$NON-NLS-1$
+					+ maxDocSize + "bytes" //$NON-NLS-1$
+					);
 		}
 
 		// Finalmente, si se habia indicado que no habia recurso temporal

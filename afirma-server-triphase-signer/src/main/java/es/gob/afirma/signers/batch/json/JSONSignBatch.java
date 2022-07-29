@@ -104,6 +104,16 @@ public abstract class JSONSignBatch {
 			);
 		}
 
+		final long maxReqSize = ConfigManager.getBatchMaxRequestSize();
+
+		// Se comprueba que el JSON definido no supere el tamano maximo permitido por la opcion configurada
+		if (maxReqSize > 0 && json.length > maxReqSize) {
+			LOGGER.severe("El JSON de definicion de lote supera el tamano permitido por la configuracion"); //$NON-NLS-1$
+			throw new IOException(
+					"El JSON de definicion de lote supera el tamano permitido por la configuracion: " + maxReqSize + "bytes" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+		}
+
 		JSONObject jsonObject = null;
 		final String convertedJson = new String(json);
 		try {
@@ -286,15 +296,40 @@ public abstract class JSONSignBatch {
 		}
 	}
 
-	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) {
+	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) throws IOException {
 		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<>();
 		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
 
 		if (singleSignsArray != null) {
+
+			final long maxDocuments = ConfigManager.getBatchMaxDocuments();
+
+			// Comprobamos si la propiedad batch.maxDocuments esta configurada y si permite el numero de documentos
+			if (maxDocuments > 0 && singleSignsArray.length() > maxDocuments) {
+				LOGGER.severe("La peticion supera el maximo de documentos permitidos por la opcion configurada"); //$NON-NLS-1$
+				throw new IOException(
+						"La peticion supera el maximo de documentos permitidos por la opcion configurada: " //$NON-NLS-1$
+						+ maxDocuments + "documentos" //$NON-NLS-1$
+						);
+			}
+
 			for (int i = 0 ; i < singleSignsArray.length() ; i++){
 
 				final JSONObject jsonSingleSign = singleSignsArray.getJSONObject(i);
 				final JSONSingleSign singleSign = new JSONSingleSign(jsonSingleSign.getString(JSON_ELEMENT_ID));
+
+				final long maxRefSize = ConfigManager.getBatchMaxReferenceSize();
+
+				// Comprobamos si la propiedad batch.maxReferenceSize esta configurada y si permite el numero de documentos
+				if (maxRefSize > 0
+					&& jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE) != null
+					&& jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE).getBytes().length > maxRefSize) {
+					LOGGER.severe("La referencia a los datos supera el tamano maximo permitido por la opcion configurada"); //$NON-NLS-1$
+					throw new IOException(
+							"La referencia a los datos supera el tamano maximo permitido por la opcion configurada: " //$NON-NLS-1$
+							+ maxRefSize + "bytes" //$NON-NLS-1$
+							);
+				}
 
 				singleSign.setDataRef(jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE));
 

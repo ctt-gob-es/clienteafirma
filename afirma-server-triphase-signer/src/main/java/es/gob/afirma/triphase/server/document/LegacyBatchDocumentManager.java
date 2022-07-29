@@ -33,6 +33,7 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 
 	private static final String CONFIG_PARAM_DOCMANAGER_ALLOWSOURCES = "docmanager.legacybatch.allowedsources"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_DOCMANAGER_CHECKSSLCERTS = "docmanager.legacybatch.checksslcerts"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE = "docmanager.legacybatch.maxDocSize"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_SEPARATOR = ";"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_WILD_CARD = "*"; //$NON-NLS-1$
 
@@ -71,6 +72,13 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 		else {
 			checkDataSource(dataRef);
 			data = Base64.decode(dataRef.replace("-", "+").replace("_", "/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}
+
+		if (ConfigManager.getConfig().containsKey(CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE)) {
+			final long maxDocSize = Long.parseLong(ConfigManager.getConfig().getProperty(CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE));
+			if (data.length > maxDocSize) {
+				throw new IOException("Los datos obtenidos superan el tamano maximo permitido de " + maxDocSize + "bytes"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 
 		return data;
