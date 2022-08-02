@@ -67,7 +67,7 @@ public class SingleSign {
 
 	private SignSaver signSaver;
 
-	private ProcessResult processResult = new ProcessResult(ProcessResult.Result.NOT_STARTED, null);
+	private ProcessResult processResult = new ProcessResult(ProcessResult.Result.NOT_STARTED, null, false);
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */

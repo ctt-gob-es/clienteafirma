@@ -155,9 +155,7 @@ public final class BatchPostsigner extends HttpServlet {
 		final String allowOrigin = ConfigManager.getAccessControlAllowOrigin();
 		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
-		try (
-			final PrintWriter writer = response.getWriter();
-		) {
+		try (final PrintWriter writer = response.getWriter()) {
 			writer.write(ret);
 			writer.flush();
 		}

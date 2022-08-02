@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.json.JSONException;
@@ -308,9 +309,8 @@ public final class BatchSigner {
 			);
 		}
 
-		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+		String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 		byte[] ret;
-
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 				batchPresignerUrl + "?" + //$NON-NLS-1$
@@ -318,33 +318,57 @@ public final class BatchSigner {
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 				UrlHttpMethod.POST
 			);
-		}catch (final HttpError e) {
+		} catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
 			throw e;
 		}
 
-		final TriphaseData td1 = TriphaseDataParser.parseFromJSON(ret);
+
+		// Obtenemos el resultado de la prefirma del lote
+		final PresignBatch presignBatch = JSONPreSignBatchParser.parseFromJSON(ret);
+		TriphaseData td = presignBatch.getTriphaseData();
+		final List<BatchDataResult> presignErrors = presignBatch.getErrors();
+
+		// Si no se obtuvo ningun tipo de resultado, devolvemos un resultado sin
+		// elementos (nunca deberiamos llegar a este caso)
+		if (td == null && presignErrors == null) {
+			return JSONBatchInfoParser.buildEmptyResult().toString();
+		}
+
+		// Si no se obtuvo ningun resultado de firma de la prefirma es que fallaron todas las firmas,
+		// en cuyo caso podriamos devolver inmediatamente el resultado
+		if (td == null) {
+			return JSONBatchInfoParser.buildResult(presignErrors).toString();
+		}
+
+		// Si hubo errores, actualizamos la informacion del lote con ellos
+		if (presignErrors != null) {
+			final BatchInfo batchInfo = JSONBatchInfoParser.parse(Base64.decode(batchB64));
+			batchInfo.updateResults(presignErrors);
+			final byte[] batchInfoEncode = batchInfo.getInfoString().getBytes(StandardCharsets.UTF_8);
+			batchUrlSafe = Base64.encode(batchInfoEncode, true);
+		}
 
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
-		final TriphaseData td2 = TriphaseDataSigner.doSign(
-			new AOPkcs1Signer(),
-			getAlgorithmForJSON(batchB64),
-			pk,
-			certificates,
-			td1,
-			null // Sin ExtraParams para el PKCS#1 en lotes
-		);
+		td = TriphaseDataSigner.doSign(
+				new AOPkcs1Signer(),
+				getAlgorithmForJSON(batchB64),
+				pk,
+				certificates,
+				td,
+				null // Sin ExtraParams para el PKCS#1 en lotes
+				);
 
 		// Llamamos al servidor de nuevo para el postproceso
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-				batchPostSignerUrl + "?" + //$NON-NLS-1$
-					BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
-					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-					BATCH_TRI_PARAM + EQU +
-					Base64.encode(TriphaseDataParser.triphaseDataToJsonString(td2).getBytes(DEFAULT_CHARSET), true),
-				UrlHttpMethod.POST
-			);
+					batchPostSignerUrl + "?" + //$NON-NLS-1$
+							BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
+							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
+							BATCH_TRI_PARAM + EQU +
+							Base64.encode(TriphaseDataParser.triphaseDataToJsonString(td).getBytes(DEFAULT_CHARSET), true),
+							UrlHttpMethod.POST
+					);
 		}
 		catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e.getResponseDescription()); //$NON-NLS-1$
@@ -436,5 +460,4 @@ public final class BatchSigner {
 				"El nodo 'signbatch' debe contener al manos el atributo de algoritmo" //$NON-NLS-1$
 			);
 	}
-
 }

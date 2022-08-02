@@ -17,15 +17,16 @@ public class ProcessResult {
 	private final Result result;
 	private final String description;
 	private String signId;
+	private final boolean finished;
 
 	public boolean wasSaved() {
 		return Result.DONE_AND_SAVED.equals(this.result);
 	}
 
-	public static final ProcessResult PROCESS_RESULT_OK_UNSAVED = new ProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null);
-	public static final ProcessResult PROCESS_RESULT_SKIPPED    = new ProcessResult(Result.SKIPPED,                null);
-	public static final ProcessResult PROCESS_RESULT_DONE_SAVED = new ProcessResult(Result.DONE_AND_SAVED,         null);
-	public static final ProcessResult PROCESS_RESULT_ROLLBACKED = new ProcessResult(Result.SAVE_ROLLBACKED,        null);
+	public static final ProcessResult PROCESS_RESULT_OK_UNSAVED = new ProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null, false);
+	public static final ProcessResult PROCESS_RESULT_SKIPPED    = new ProcessResult(Result.SKIPPED,                null, true);
+	public static final ProcessResult PROCESS_RESULT_DONE_SAVED = new ProcessResult(Result.DONE_AND_SAVED,         null, true);
+	public static final ProcessResult PROCESS_RESULT_ROLLBACKED = new ProcessResult(Result.SAVE_ROLLBACKED,        null, true);
 
 	public ProcessResult(final Result r, final String d) {
 		if (r == null) {
@@ -35,6 +36,18 @@ public class ProcessResult {
 		}
 		this.result = r;
 		this.description = d;
+		this.finished = true;
+	}
+
+	public ProcessResult(final Result r, final String d, final boolean finished) {
+		if (r == null) {
+			throw new IllegalArgumentException(
+					"El resultado no puede ser nulo" //$NON-NLS-1$
+					);
+		}
+		this.result = r;
+		this.description = d;
+		this.finished = finished;
 	}
 
 	public String getId() {
@@ -51,5 +64,9 @@ public class ProcessResult {
 
 	public String getDescription() {
 		return this.description;
+	}
+
+	public boolean isFinished() {
+		return this.finished;
 	}
 }

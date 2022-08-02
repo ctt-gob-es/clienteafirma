@@ -11,8 +11,6 @@ package es.gob.afirma.signers.batch.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.logging.Level;
@@ -23,6 +21,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.batch.json.JSONSignBatch;
 import es.gob.afirma.signers.batch.json.JSONSignBatchConcurrent;
 import es.gob.afirma.signers.batch.json.JSONSignBatchSerial;
@@ -38,8 +39,6 @@ public final class JSONBatchPresigner extends HttpServlet {
 
 	private static final String BATCH_JSON_PARAM = "json"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
-
-	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
 	static {
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
@@ -74,10 +73,10 @@ public final class JSONBatchPresigner extends HttpServlet {
 
 		final JSONSignBatch batch;
 		try {
-			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
+			final byte[] jsonBatch = Base64.decode(json, true);
 			batch = ConfigManager.isConcurrentModeEnable() ?
-					new JSONSignBatchConcurrent(batchConfig) :
-						new JSONSignBatchSerial(batchConfig);
+					new JSONSignBatchConcurrent(jsonBatch) :
+						new JSONSignBatchSerial(jsonBatch);
 		}
 		catch(final Exception e) {
 			LOGGER.severe("La definicion de lote es invalida: " + e); //$NON-NLS-1$
@@ -111,9 +110,9 @@ public final class JSONBatchPresigner extends HttpServlet {
 			return;
 		}
 
-		final String pre;
+		final JSONObject jsonPreBatch;
 		try {
-			pre = batch.doPreBatch(certs);
+			jsonPreBatch = batch.doPreBatch(certs);
 		}
 		catch(final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote", e); //$NON-NLS-1$
@@ -128,7 +127,7 @@ public final class JSONBatchPresigner extends HttpServlet {
 		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("application/json;charset=UTF-8"); //$NON-NLS-1$
 		try (PrintWriter writer = response.getWriter()) {
-			writer.write(pre);
+			writer.write(jsonPreBatch.toString());
 			writer.flush();
 		}
 	}

@@ -15,6 +15,10 @@ public final class BatchException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
+	public BatchException(final String msg) {
+		super(msg);
+	}
+
 	public BatchException(final String msg, final Throwable e) {
 		super(msg, e);
 	}

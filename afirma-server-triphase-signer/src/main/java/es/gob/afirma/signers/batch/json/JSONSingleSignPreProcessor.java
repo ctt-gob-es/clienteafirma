@@ -54,22 +54,13 @@ final class JSONSingleSignPreProcessor {
 	 *         antes ni despu&eacute;s).
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
-	static String doPreProcess(final JSONSingleSign sSign,
+	static TriphaseData doPreProcess(final JSONSingleSign sSign,
 			                   final X509Certificate[] certChain,
 			                   final SingleSignConstants.SignAlgorithm algorithm,
 			                   final DocumentManager docManager,
 			                   final DocumentCacheManager docCacheManager) throws IOException,
 			                                                                             AOException {
-		final TriphaseData td = getPreSign(sSign, certChain, algorithm, docManager, docCacheManager);
-		return TriphaseDataParser.triphaseDataToJsonString(td);
-	}
 
-	private static TriphaseData getPreSign(final JSONSingleSign sSign,
-			                               final X509Certificate[] certChain,
-			                               final SingleSignConstants.SignAlgorithm algorithm,
-			                               final DocumentManager docManager,
-			                               final DocumentCacheManager docCacheManager) throws IOException,
-			                                                                                         AOException {
 		if (certChain == null || certChain.length < 1) {
 			throw new IllegalArgumentException(
 				"La cadena de certificados del firmante no puede ser nula ni vacia" //$NON-NLS-1$
@@ -84,8 +75,8 @@ final class JSONSingleSignPreProcessor {
 		}
 		catch (final IOException e) {
 			LOGGER.log(
-					Level.WARNING, "No se ha podido recuperar uno de los documentos a firmar: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
-			throw new IOException("No se ha podido recuperar uno de los documentos a firmar"); //$NON-NLS-1$
+					Level.WARNING, "No se ha podido recuperar el documento a firmar: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
+			throw new IOException("No se ha podido recuperar el documento a firmar"); //$NON-NLS-1$
 		}
 
 		Properties extraParams;
@@ -94,7 +85,7 @@ final class JSONSingleSignPreProcessor {
 		}
 		catch (final IncompatiblePolicyException e) {
 			LOGGER.log(
-					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
+					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica", e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
 		}
 
