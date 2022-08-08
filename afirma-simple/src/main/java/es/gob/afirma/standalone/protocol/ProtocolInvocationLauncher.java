@@ -296,7 +296,7 @@ public final class ProtocolInvocationLauncher {
 
         	try {
                 UrlParametersForBatch params =
-                		ProtocolInvocationUriParserUtil.getParametersForBatch(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -327,10 +327,10 @@ public final class ProtocolInvocationLauncher {
 
                     if (params.isJsonBatch()) {
                     	paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
-                    	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     } else {
                     	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
-                    	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     }
                 }
 

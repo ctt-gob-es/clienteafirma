@@ -164,7 +164,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket){
 					throw new SocketOperationException(RESULT_CANCEL);
 				}
@@ -216,7 +216,14 @@ final class ProtocolInvocationLauncherBatch {
 						);
 			}
 		}
-		catch(final HttpError e) {
+		catch (final AOCancelledOperationException e) {
+			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			if (!bySocket){
+				throw new SocketOperationException(RESULT_CANCEL);
+			}
+			return RESULT_CANCEL;
+		}
+		catch (final HttpError e) {
 			String errorCode;
 			if (e.getResponseCode() / 100 == 4) {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;

@@ -35,13 +35,6 @@ public final class ProtocolInvocationUriParserUtil {
 		// No instanciable
 	}
 
-	public static UrlParametersForBatch getParametersForBatch(final Map<String, String> params) throws ParameterException {
-		final UrlParametersForBatch ret = new UrlParametersForBatch();
-		ret.setCommonParameters(params);
-		ret.setBatchParameters(params);
-		return ret;
-	}
-
 	/** Recupera los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de guardado de datos en el dispositivo. Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
@@ -54,6 +47,19 @@ public final class ProtocolInvocationUriParserUtil {
 		ret.setCommonParameters(params);
 		ret.setSaveParameters(params);
 
+		return ret;
+	}
+
+	/** Recupera los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de firma de lote. Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersToBatch(final Map<String, String> params) throws ParameterException {
+		final UrlParametersForBatch ret = new UrlParametersForBatch();
+		ret.setCommonParameters(params);
+		ret.setBatchParameters(params);
 		return ret;
 	}
 

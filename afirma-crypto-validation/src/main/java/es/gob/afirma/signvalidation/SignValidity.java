@@ -62,6 +62,10 @@ public final class SignValidity {
 				return ret + ": no se puede comprobar la validez de la firma"; //$NON-NLS-1$
 			case UNKOWN_SIGNATURE_FORMAT:
 				return ret + ": los datos proporcionados no se corresponden con ningun formato de firma reconocido"; //$NON-NLS-1$
+			case MODIFIED_DOCUMENT:
+				return ret + ": el documento PDF es sospechoso de haberse modificado tras la firma"; //$NON-NLS-1$
+			case OVERLAPPING_SIGNATURE:
+				return ret + ": las firmas del documento se solapan pudiendo ocultar informacion"; //$NON-NLS-1$
 			default:
 				return ret;
 		}

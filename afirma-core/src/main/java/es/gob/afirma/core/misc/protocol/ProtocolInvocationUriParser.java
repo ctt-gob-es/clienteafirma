@@ -97,23 +97,23 @@ public final class ProtocolInvocationUriParser {
 		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri));
 	}
 
+	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param xml XML con los par&aacute;metros
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersToBatch(final byte[] xml) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
+	}
 
 	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
 	 * entrada de datos para la operaci&oacute;n de firma por lotes predefinidos.
 	 * @param uri URL de llamada.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForBatch(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(parserUri(uri));
-	}
-
-	/** Comprueba que est&eacute;n disponibles  todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma por lotes.
-	 * @param paramsMap mapa con par&aacute;metros de entrada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForBatch(final Map<String, String> paramsMap) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(paramsMap);
+	public static UrlParametersForBatch getParametersToBatch(final String uri) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToBatch(parserUri(uri));
 	}
 
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una

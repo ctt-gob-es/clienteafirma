@@ -1290,7 +1290,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             signDocument = docBuilder.parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-        	LOGGER.log(Level.INFO, "El documento no es un XML"); //$NON-NLS-1$
+        	LOGGER.fine("El documento no es un XML"); //$NON-NLS-1$
             return false;
         }
         return isSign(signDocument);
