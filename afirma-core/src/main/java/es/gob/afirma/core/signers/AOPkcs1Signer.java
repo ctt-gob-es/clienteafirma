@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
@@ -99,6 +100,11 @@ public final class AOPkcs1Signer implements AOSigner {
 			signature = sig.sign();
 		}
 		catch (final Exception e) {
+
+			if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        		throw new AOCancelledOperationException("Cancelacion del dialogo de JMulticard"); //$NON-NLS-1$
+        	}
+
 			throw new AOException("Error durante el proceso de firma PKCS#1: " + e, e); //$NON-NLS-1$
 		}
 

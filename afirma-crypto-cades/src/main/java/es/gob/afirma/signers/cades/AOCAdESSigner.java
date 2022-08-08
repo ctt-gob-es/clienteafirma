@@ -105,11 +105,11 @@ public final class AOCAdESSigner implements AOSigner {
 					certChain,
 					cadesConfig);
         }
+        catch (final AOCancelledOperationException e) {
+        	throw e;
+        }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException();
-        	}
-            throw new AOException("Error generando la firma CAdES: " + e, e); //$NON-NLS-1$
+            throw new AOException("Error al generar la firma CAdES: " + e, e); //$NON-NLS-1$
         }
 
         //***************** SELLO DE TIEMPO ****************

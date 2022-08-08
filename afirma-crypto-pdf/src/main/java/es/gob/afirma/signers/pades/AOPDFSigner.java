@@ -222,11 +222,11 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 	    		extraParams
 			);
         }
+        catch (final AOCancelledOperationException e) {
+        	throw e;
+        }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException();
-        	}
-            throw new AOException("Error durante la firma PAdES: " + e, e); //$NON-NLS-1$
+            throw new AOException("Error al generar la firma PKCS#1 de la firma PAdES: " + e, e); //$NON-NLS-1$
         }
 
         // Postfirma
