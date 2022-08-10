@@ -50,7 +50,8 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 			}
 
 			try {
-				trisigns.put(ss.doPreProcess(certChain, this.algorithm, this.documentManager, this.docCacheManager));
+				final TriphaseData td = ss.doPreProcess(certChain, this.algorithm, this.documentManager, this.docCacheManager);
+				trisigns.put(TriphaseDataParser.triphaseDataToJson(td));
 			}
 			catch(final Exception e) {
 				errors.put(buildSignResult(ss.getId(), Result.ERROR_PRE, e));

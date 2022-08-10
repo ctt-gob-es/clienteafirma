@@ -273,7 +273,7 @@ public final class BatchSigner {
 	 * Puede ver dicho esquema y un ejemplo de petici&oacute;n
 	 * <a href="doc-files/batch-scheme.html">aqu&iacute;</a>.
 	 * @param batchB64 JSON de definici&oacute;n del lote de firmas.
-	 * @param batchPresignerUrl URL del servicio remoto de preproceso de lotes de firma.
+	 * @param batchPreSignerUrl URL del servicio remoto de preproceso de lotes de firma.
 	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
 	 * @param certificates Cadena de certificados del firmante.
 	 * @param pk Clave privada para realizar las firmas cliente.
@@ -284,7 +284,7 @@ public final class BatchSigner {
 	 * @throws AOException Si hay errores en las firmas cliente.
 	 * */
 	public static String signJSON(final String batchB64,
-			                  final String batchPresignerUrl,
+			                  final String batchPreSignerUrl,
 			                  final String batchPostSignerUrl,
 			                  final Certificate[] certificates,
 			                  final PrivateKey pk) throws CertificateEncodingException,
@@ -293,7 +293,7 @@ public final class BatchSigner {
 		if (batchB64 == null || batchB64.isEmpty()) {
 			throw new IllegalArgumentException("El lote de firma no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
-		if (batchPresignerUrl == null || batchPresignerUrl.isEmpty()) {
+		if (batchPreSignerUrl == null || batchPreSignerUrl.isEmpty()) {
 			throw new IllegalArgumentException(
 				"La URL de preproceso de lotes no puede se nula ni vacia" //$NON-NLS-1$
 			);
@@ -313,16 +313,15 @@ public final class BatchSigner {
 		byte[] ret;
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-				batchPresignerUrl + "?" + //$NON-NLS-1$
+				batchPreSignerUrl + "?" + //$NON-NLS-1$
 					BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 				UrlHttpMethod.POST
 			);
 		} catch (final HttpError e) {
-			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
+			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e); //$NON-NLS-1$
 			throw e;
 		}
-
 
 		// Obtenemos el resultado de la prefirma del lote
 		final PresignBatch presignBatch = JSONPreSignBatchParser.parseFromJSON(ret);
@@ -371,7 +370,7 @@ public final class BatchSigner {
 					);
 		}
 		catch (final HttpError e) {
-			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e.getResponseDescription()); //$NON-NLS-1$
+			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e); //$NON-NLS-1$
 			throw e;
 		}
 

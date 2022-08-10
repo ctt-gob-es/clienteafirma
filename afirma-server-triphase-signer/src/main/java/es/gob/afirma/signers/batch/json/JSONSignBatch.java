@@ -211,31 +211,31 @@ public abstract class JSONSignBatch {
 				// Si tiene la referencia a los datos es que la firma aun no se ha completado
 				// y tomamos los datos necesarios para hacerlo
 				if (jsonSingleSign.has(JSON_ELEMENT_DATAREFERENCE)) {
-				singleSign.setDataRef(jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE));
+					singleSign.setDataRef(jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE));
 
-				singleSign.setFormat(jsonSingleSign.has(JSON_ELEMENT_FORMAT)
-						? SingleSignConstants.SignFormat.getFormat(jsonSingleSign.getString(JSON_ELEMENT_FORMAT))
-								: this.format);
+					singleSign.setFormat(jsonSingleSign.has(JSON_ELEMENT_FORMAT)
+							? SingleSignConstants.SignFormat.getFormat(jsonSingleSign.getString(JSON_ELEMENT_FORMAT))
+									: this.format);
 
-				singleSign.setSubOperation(jsonSingleSign.has(JSON_ELEMENT_SUBOPERATION)
-						? SingleSignConstants.SignSubOperation.getSubOperation(jsonSingleSign.getString(JSON_ELEMENT_SUBOPERATION))
-								: this.subOperation);
+					singleSign.setSubOperation(jsonSingleSign.has(JSON_ELEMENT_SUBOPERATION)
+							? SingleSignConstants.SignSubOperation.getSubOperation(jsonSingleSign.getString(JSON_ELEMENT_SUBOPERATION))
+									: this.subOperation);
 
-				singleSign.setDocumentManager(this.documentManager);
+					singleSign.setDocumentManager(this.documentManager);
 
-				try {
-					Properties signExtraParams;
-					if (jsonSingleSign.has(JSON_ELEMENT_EXTRAPARAMS)) {
-						signExtraParams = AOUtil.base642Properties(jsonSingleSign.getString(JSON_ELEMENT_EXTRAPARAMS));
-					} else {
-						signExtraParams = AOUtil.base642Properties(this.extraParams);
+					try {
+						Properties signExtraParams;
+						if (jsonSingleSign.has(JSON_ELEMENT_EXTRAPARAMS)) {
+							signExtraParams = AOUtil.base642Properties(jsonSingleSign.getString(JSON_ELEMENT_EXTRAPARAMS));
+						} else {
+							signExtraParams = AOUtil.base642Properties(this.extraParams);
+						}
+						signExtraParams.setProperty(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
+						singleSign.setExtraParams(signExtraParams);
+					} catch (final Exception e) {
+						throw new JSONException(
+								"El objeto JSON no esta correctamente formado"); //$NON-NLS-1$
 					}
-					signExtraParams.setProperty(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
-					singleSign.setExtraParams(signExtraParams);
-				} catch (final Exception e) {
-					throw new JSONException(
-							"El objeto JSON no esta correctamente formado"); //$NON-NLS-1$
-				}
 				}
 				// Si no esta la referencia a los datos, es que ya se ha obtenido un resultado
 				else {

@@ -144,11 +144,7 @@ public final class JSONSingleSign extends SingleSign {
 			            final DocumentManager docManager,
 			            final DocumentCacheManager docCacheManager) throws IOException,
 			                                                                      AOException {
-		final TriphaseData triData = JSONSingleSignPreProcessor.doPreProcess(this, certChain, algorithm, docManager, docCacheManager);
-
-
-
-		return triData;
+		return JSONSingleSignPreProcessor.doPreProcess(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
 	/** Obtiene la tarea de preproceso de firma para ser ejecutada en paralelo.
