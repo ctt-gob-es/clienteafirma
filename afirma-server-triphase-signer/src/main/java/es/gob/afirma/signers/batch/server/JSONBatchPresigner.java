@@ -79,6 +79,14 @@ public final class JSONBatchPresigner extends HttpServlet {
 					new JSONSignBatchConcurrent(batchConfig) :
 						new JSONSignBatchSerial(batchConfig);
 		}
+		catch(final SecurityException e) {
+			LOGGER.severe("Se sobrepaso alguno de los limites de seguridad establecidos en servidor para los lotes: " + e); //$NON-NLS-1$
+			response.sendError(
+				HttpServletResponse.SC_BAD_REQUEST,
+				"El lote de firma no cumple con los requisitos establecidos en servidor" //$NON-NLS-1$
+			);
+			return;
+		}
 		catch(final Exception e) {
 			LOGGER.severe("La definicion de lote es invalida: " + e); //$NON-NLS-1$
 			response.sendError(

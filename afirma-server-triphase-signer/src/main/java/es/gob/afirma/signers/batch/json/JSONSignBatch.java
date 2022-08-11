@@ -94,9 +94,11 @@ public abstract class JSONSignBatch {
 	 * Crea un lote de firmas a partir de su definici&oacute;n JSON.
 	 * @param json JSON de definici&oacute;n de lote de firmas (<a href="./doc-files/batch-scheme.html">descripci&oacute;n
 	 *            del formato</a>).
-	 * @throws IOException Si hay problemas en el tratamiento de datoso en el an&aacute;lisis del JSON.
+	 * @throws IOException Si hay problemas en el tratamiento de datos en el an&aacute;lisis del JSON.
+	 * @throws SecurityException Si se sobrepasa alguna de las limitaciones establecidas para el lote
+	 * (n&ueacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
 	 */
-	protected JSONSignBatch(final byte[] json) throws IOException {
+	protected JSONSignBatch(final byte[] json) throws IOException, SecurityException {
 
 		if (json == null || json.length < 1) {
 			throw new IllegalArgumentException(
@@ -104,14 +106,11 @@ public abstract class JSONSignBatch {
 			);
 		}
 
-		final long maxReqSize = ConfigManager.getBatchMaxRequestSize();
-
 		// Se comprueba que el JSON definido no supere el tamano maximo permitido por la opcion configurada
+		final long maxReqSize = ConfigManager.getBatchMaxRequestSize();
 		if (maxReqSize > 0 && json.length > maxReqSize) {
-			LOGGER.severe("El JSON de definicion de lote supera el tamano permitido por la configuracion"); //$NON-NLS-1$
-			throw new IOException(
-					"El JSON de definicion de lote supera el tamano permitido por la configuracion: " + maxReqSize + "bytes" //$NON-NLS-1$ //$NON-NLS-2$
-				);
+			throw new SecurityException(
+					"El JSON de definicion de lote supera el tamano permitido: " + maxReqSize); //$NON-NLS-1$
 		}
 
 		JSONObject jsonObject = null;
@@ -302,15 +301,12 @@ public abstract class JSONSignBatch {
 
 		if (singleSignsArray != null) {
 
-			final long maxDocuments = ConfigManager.getBatchMaxDocuments();
-
 			// Comprobamos si la propiedad batch.maxDocuments esta configurada y si permite el numero de documentos
+			final long maxDocuments = ConfigManager.getBatchMaxDocuments();
 			if (maxDocuments > 0 && singleSignsArray.length() > maxDocuments) {
-				LOGGER.severe("La peticion supera el maximo de documentos permitidos por la opcion configurada"); //$NON-NLS-1$
-				throw new IOException(
+				throw new SecurityException(
 						"La peticion supera el maximo de documentos permitidos por la opcion configurada: " //$NON-NLS-1$
-						+ maxDocuments + "documentos" //$NON-NLS-1$
-						);
+						+ maxDocuments);
 			}
 
 			for (int i = 0 ; i < singleSignsArray.length() ; i++){
@@ -318,20 +314,17 @@ public abstract class JSONSignBatch {
 				final JSONObject jsonSingleSign = singleSignsArray.getJSONObject(i);
 				final JSONSingleSign singleSign = new JSONSingleSign(jsonSingleSign.getString(JSON_ELEMENT_ID));
 
-				final long maxRefSize = ConfigManager.getBatchMaxReferenceSize();
+				final String dataReference = jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE);
 
 				// Comprobamos si la propiedad batch.maxReferenceSize esta configurada y si permite el numero de documentos
-				if (maxRefSize > 0
-					&& jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE) != null
-					&& jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE).getBytes().length > maxRefSize) {
-					LOGGER.severe("La referencia a los datos supera el tamano maximo permitido por la opcion configurada"); //$NON-NLS-1$
-					throw new IOException(
-							"La referencia a los datos supera el tamano maximo permitido por la opcion configurada: " //$NON-NLS-1$
-							+ maxRefSize + "bytes" //$NON-NLS-1$
-							);
+				final long maxRefSize = ConfigManager.getBatchMaxReferenceSize();
+				if (maxRefSize > 0 && dataReference != null && dataReference.length() > maxRefSize) {
+					throw new SecurityException(
+							"La referencia a los datos supera el tamano maximo permitido: " //$NON-NLS-1$
+							+ maxRefSize);
 				}
 
-				singleSign.setDataRef(jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE));
+				singleSign.setDataRef(dataReference);
 
 				singleSign.setFormat(jsonSingleSign.has(JSON_ELEMENT_FORMAT)
 						? SingleSignConstants.SignFormat.getFormat(jsonSingleSign.getString(JSON_ELEMENT_FORMAT))
@@ -354,7 +347,7 @@ public abstract class JSONSignBatch {
 					singleSign.setExtraParams(signExtraParams);
 				} catch (final Exception e) {
 					throw new JSONException(
-							"El objeto JSON no está correctamente formado"); //$NON-NLS-1$
+							"El objeto JSON no esta correctamente formado"); //$NON-NLS-1$
 				}
 
 				singleSignsList.add(singleSign);

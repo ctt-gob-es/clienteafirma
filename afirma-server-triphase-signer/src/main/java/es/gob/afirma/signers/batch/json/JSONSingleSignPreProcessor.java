@@ -85,7 +85,12 @@ final class JSONSingleSignPreProcessor {
 		catch (final IOException e) {
 			LOGGER.log(
 					Level.WARNING, "No se ha podido recuperar uno de los documentos a firmar: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
-			throw new IOException("No se ha podido recuperar uno de los documentos a firmar"); //$NON-NLS-1$
+			throw new IOException("No se ha podido recuperar uno de los documentos a firmar", e); //$NON-NLS-1$
+		}
+		catch (final SecurityException e) {
+			LOGGER.log(
+					Level.WARNING, "Se excedio el limite establecido de tamano de documento: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
+			throw new IOException("Se excedio el limite establecido de tamano de documento", e); //$NON-NLS-1$
 		}
 
 		Properties extraParams;
@@ -94,7 +99,7 @@ final class JSONSingleSignPreProcessor {
 		}
 		catch (final IncompatiblePolicyException e) {
 			LOGGER.log(
-					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
+					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica", e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
 		}
 

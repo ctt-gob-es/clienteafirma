@@ -55,7 +55,7 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 	}
 
 	@Override
-	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties config) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties config) throws IOException, SecurityException {
 
 		// Si no se indica el mecanismo de guardado, indicamos ya el error paraevitar que se deba iniciar
 		// el procesado de la firma para fallar mas tarde
@@ -76,8 +76,8 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 
 		if (ConfigManager.getConfig().containsKey(CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE)) {
 			final long maxDocSize = Long.parseLong(ConfigManager.getConfig().getProperty(CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE));
-			if (data.length > maxDocSize) {
-				throw new IOException("Los datos obtenidos superan el tamano maximo permitido de " + maxDocSize + "bytes"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (maxDocSize > 0 && data.length > maxDocSize) {
+				throw new SecurityException("Los datos obtenidos superan el tamano maximo permitido: " + maxDocSize); //$NON-NLS-1$
 			}
 		}
 

@@ -33,10 +33,10 @@ public class ConfigManager {
 
 	private static final String CONFIG_PARAM_CONCURRENT_MAX_SIGNS = "concurrent.maxsigns"; //$NON-NLS-1$
 
-	/** Propiedad que indica el numero m&aacute;ximo de paginas para comprobar un posible PDF Shadow Attack */
+	/** Propiedad que indica el n&uacute;mero m&aacute;ximo de p&aacute;ginas para comprobar un posible PDF Shadow Attack */
 	private static final String CONFIG_PARAM_MAX_PAGES_TO_CHECK_PSA = "maxPagesToCheckShadowAttack"; //$NON-NLS-1$
 
-	/** Propiedad que indica el numero m&aacute;ximo de documentos permitidos en una firma de lotes */
+	/** Propiedad que indica el n&uacute;mero m&aacute;ximo de documentos permitidos en un lote de firmas. */
 	private static final String CONFIG_PARAM_BATCH_MAX_DOCUMENTS = "batch.maxDocuments"; //$NON-NLS-1$
 
 	/** Propiedad que indica el tama&ntilde;o m&aacute;ximo global permitido para una petici&oacute;n */
@@ -47,9 +47,6 @@ public class ConfigManager {
 	 * para la/las referencias a documentos en la petici&oacute;n
 	 */
 	private static final String CONFIG_PARAM_BATCH_MAX_REFERENCE_SIZE = "batch.maxReferenceSize"; //$NON-NLS-1$
-
-	/** Propiedad que indica el tama&ntilde;o m&aacute;ximo permitido para un documento */
-	private static final String CONFIG_PARAM_BATCH_XML_MAX_DOC_SIZE = "batch.maxDocSize"; //$NON-NLS-1$
 
 	private static final long DEFAULT_CONCURRENT_TIMEOUT = 30;
 
@@ -193,14 +190,6 @@ public class ConfigManager {
 	public static long getBatchMaxReferenceSize() {
 		try {
 			return Long.parseLong(config.getProperty(CONFIG_PARAM_BATCH_MAX_REFERENCE_SIZE));
-		} catch (final Exception e) {
-			return 0;
-		}
-	}
-
-	public static long getBatchXmlDocSize() {
-		try {
-			return Long.parseLong(config.getProperty(CONFIG_PARAM_BATCH_XML_MAX_DOC_SIZE));
 		} catch (final Exception e) {
 			return 0;
 		}

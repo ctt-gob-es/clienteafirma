@@ -34,6 +34,9 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	private static final String CONFIG_PARAM_OVERWRITE_LEGACY = "overwrite"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_MAXDOCSIZE = "docmanager.filesystem.maxDocSize"; //$NON-NLS-1$
 
+	/** Tama&ntilde;o m&aacute;ximo de documento permitido. Cero (0) indica sin l&iacute;mite. */
+	private static final long DEFAULT_MAXDOCSIZE = 0;
+
 	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
 	String inDir;
@@ -44,7 +47,7 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
-	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException, SecurityException {
 
 		LOGGER.info("Recuperamos el documento con referencia: " + dataRef); //$NON-NLS-1$
 
@@ -75,9 +78,8 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 		}
 
 		if (this.maxDocSize > 0 && file.length() > this.maxDocSize) {
-			throw new IOException(
-					"El documento supera el tamano maximo permitido de " + this.maxDocSize + "bytes" //$NON-NLS-1$ //$NON-NLS-2$
-				);
+			throw new SecurityException(
+					"El documento supera el tamano maximo permitido: " + this.maxDocSize); //$NON-NLS-1$
 		}
 
 		final byte[] data;
@@ -154,9 +156,14 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 		this.overwrite = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_OVERWRITE, config.getProperty(CONFIG_PARAM_OVERWRITE_LEGACY)));
 
 		if (config.containsKey(CONFIG_PARAM_MAXDOCSIZE)) {
+			try {
 			this.maxDocSize = Long.parseLong(config.getProperty(CONFIG_PARAM_MAXDOCSIZE));
+			}
+			catch (final Exception e) {
+				this.maxDocSize = DEFAULT_MAXDOCSIZE;
+			}
 		} else {
-			this.maxDocSize = 0;
+			this.maxDocSize = DEFAULT_MAXDOCSIZE;
 		}
 
 		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
