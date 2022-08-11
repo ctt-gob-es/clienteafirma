@@ -74,9 +74,14 @@ final class JSONSingleSignPreProcessor {
 			docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
 		}
 		catch (final IOException e) {
-			LOGGER.log(
-					Level.WARNING, "No se ha podido recuperar el documento a firmar: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
-			throw new IOException("No se ha podido recuperar el documento a firmar"); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING,
+					"No se ha podido recuperar uno de los documentos a firmar: " + LoggerUtil.getTrimStr(sSign.getDataRef()), e); //$NON-NLS-1$
+			throw new IOException("No se ha podido recuperar uno de los documentos a firmar", e); //$NON-NLS-1$
+		}
+		catch (final SecurityException e) {
+			LOGGER.log(Level.WARNING,
+					"Se excedio el limite establecido de tamano de documento: " + sSign.getDataRef().length(), e); //$NON-NLS-1$
+			throw new IOException("Se excedio el limite establecido de tamano de documento", e); //$NON-NLS-1$
 		}
 
 		Properties extraParams;

@@ -33,6 +33,7 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 
 	private static final String CONFIG_PARAM_DOCMANAGER_ALLOWSOURCES = "docmanager.legacybatch.allowedsources"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_DOCMANAGER_CHECKSSLCERTS = "docmanager.legacybatch.checksslcerts"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE = "docmanager.legacybatch.maxDocSize"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_SEPARATOR = ";"; //$NON-NLS-1$
 	private static final String ALLOWSOURCES_WILD_CARD = "*"; //$NON-NLS-1$
 
@@ -54,7 +55,7 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 	}
 
 	@Override
-	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties config) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties config) throws IOException, SecurityException {
 
 		// Si no se indica el mecanismo de guardado, indicamos ya el error paraevitar que se deba iniciar
 		// el procesado de la firma para fallar mas tarde
@@ -71,6 +72,13 @@ public class LegacyBatchDocumentManager implements BatchDocumentManager {
 		else {
 			checkDataSource(dataRef);
 			data = Base64.decode(dataRef.replace("-", "+").replace("_", "/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}
+
+		if (ConfigManager.getConfig().containsKey(CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE)) {
+			final long maxDocSize = Long.parseLong(ConfigManager.getConfig().getProperty(CONFIG_PARAM_DOCMANAGER_MAXDOCSIZE));
+			if (maxDocSize > 0 && data.length > maxDocSize) {
+				throw new SecurityException("El tamano del documento es superior al permitido. Tamano del documento: " + data.length); //$NON-NLS-1$
+			}
 		}
 
 		return data;

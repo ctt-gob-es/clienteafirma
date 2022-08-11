@@ -407,6 +407,14 @@ public class SingleSign {
 			data = DataDownloader.downloadData(this.dataRef);
 		}
 
+		// Comprobamos si se ha establecido un tamano maximo de documento y si este lo supera
+		final long maxDocSize = BatchConfigManager.getBatchXmlDocSize();
+		if (maxDocSize > 0 && data.length > maxDocSize) {
+			LOGGER.severe("El tamano del documento supera el permitido: " + maxDocSize); //$NON-NLS-1$
+			throw new IOException(
+					"El tamano del documento supera el permitido: " + maxDocSize); //$NON-NLS-1$
+		}
+
 		// Finalmente, si se habia indicado que no habia recurso temporal
 		// pero deberia haberlo, lo creamos
 		if (!stored && tempResource != null) {

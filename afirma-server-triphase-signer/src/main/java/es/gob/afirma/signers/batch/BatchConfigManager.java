@@ -22,6 +22,8 @@ import es.gob.afirma.triphase.server.SignatureService;
  */
 public class BatchConfigManager {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private static final String CONFIG_FILE = "signbatch_config.properties"; //$NON-NLS-1$
 
 	private static final String SYS_PROP_PREFIX = "${"; //$NON-NLS-1$
@@ -37,7 +39,8 @@ public class BatchConfigManager {
 
 	private static final String SYS_PROP_DISABLE_SSL = "disableSslChecks"; //$NON-NLS-1$
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	/** Propiedad que indica el tama&ntilde;o m&aacute;ximo permitido para un documento */
+	private static final String CONFIG_PARAM_MAX_DOC_SIZE = "batch.maxDocSize"; //$NON-NLS-1$
 
 	private static final Properties CONFIG = new Properties();
 
@@ -126,6 +129,19 @@ public class BatchConfigManager {
 		}
 		return CONCURRENT_SIGNS.intValue();
 	}
+
+	/**
+	 * Devuelve el tama&ntilde;o m&aacute;ximo en bytes que puede tener un documento del lote.
+	 * @return Tama&ntilde;o m&aacute;ximo.
+	 */
+	public static long getBatchXmlDocSize() {
+		try {
+			return Long.parseLong(CONFIG.getProperty(CONFIG_PARAM_MAX_DOC_SIZE));
+		} catch (final Exception e) {
+			return 0;
+		}
+	}
+
 
 	/**
 	 * Obtiene el listado de fuentes permitidas como origen de los datos. El formato

@@ -105,14 +105,23 @@ public abstract class JSONSignBatch {
 	 * Crea un lote de firmas a partir de su definici&oacute;n JSON.
 	 * @param json JSON de definici&oacute;n de lote de firmas (<a href="./doc-files/batch-scheme.html">descripci&oacute;n
 	 *            del formato</a>).
-	 * @throws IOException Si hay problemas en el tratamiento de datoso en el an&aacute;lisis del JSON.
+	 * @throws IOException Si hay problemas en el tratamiento de datos en el an&aacute;lisis del JSON.
+	 * @throws SecurityException Si se sobrepasa alguna de las limitaciones establecidas para el lote
+	 * (n&ueacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
 	 */
-	protected JSONSignBatch(final byte[] json) throws IOException {
+	protected JSONSignBatch(final byte[] json) throws IOException, SecurityException {
 
 		if (json == null || json.length < 1) {
 			throw new IllegalArgumentException(
 				"El JSON de definicion de lote de firmas no puede ser nulo ni vacio" //$NON-NLS-1$
 			);
+		}
+
+		// Se comprueba que el JSON definido no supere el tamano maximo permitido por la opcion configurada
+		final long maxReqSize = ConfigManager.getBatchMaxRequestSize();
+		if (maxReqSize > 0 && json.length > maxReqSize) {
+			throw new SecurityException(
+					"El JSON de definicion de lote supera el tamano permitido: " + maxReqSize); //$NON-NLS-1$
 		}
 
 		JSONObject jsonObject = null;
@@ -192,11 +201,20 @@ public abstract class JSONSignBatch {
 	}
 
 
-	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) {
+	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) throws SecurityException {
 		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<>();
 		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
 
 		if (singleSignsArray != null) {
+
+			// Comprobamos si la propiedad batch.maxDocuments esta configurada y si permite el numero de documentos
+			final long maxDocuments = ConfigManager.getBatchMaxDocuments();
+			if (maxDocuments > 0 && singleSignsArray.length() > maxDocuments) {
+				throw new SecurityException(
+						"El lote incluye mas documentos de los permitidos. Numero de documentos del lote: " //$NON-NLS-1$
+						+ singleSignsArray.length());
+			}
+
 			for (int i = 0 ; i < singleSignsArray.length() ; i++){
 
 				final JSONObject jsonSingleSign = singleSignsArray.getJSONObject(i);
@@ -211,7 +229,18 @@ public abstract class JSONSignBatch {
 				// Si tiene la referencia a los datos es que la firma aun no se ha completado
 				// y tomamos los datos necesarios para hacerlo
 				if (jsonSingleSign.has(JSON_ELEMENT_DATAREFERENCE)) {
-					singleSign.setDataRef(jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE));
+
+					final String dataReference = jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE);
+
+					// Comprobamos si la propiedad batch.maxReferenceSize esta configurada y si permite el numero de documentos
+					final long maxRefSize = ConfigManager.getBatchMaxReferenceSize();
+					if (maxRefSize > 0 && dataReference != null && dataReference.length() > maxRefSize) {
+						throw new SecurityException(
+								"El tamano de la referencia supera el limite permitido. Tamano de la referencia: " //$NON-NLS-1$
+								+ dataReference.length());
+					}
+
+					singleSign.setDataRef(dataReference);
 
 					singleSign.setFormat(jsonSingleSign.has(JSON_ELEMENT_FORMAT)
 							? SingleSignConstants.SignFormat.getFormat(jsonSingleSign.getString(JSON_ELEMENT_FORMAT))
@@ -355,7 +384,6 @@ public abstract class JSONSignBatch {
 			ts.delete(ss, getId());
 		}
 	}
-
 
 	public String getExtraParams() {
 		return this.extraParams;
