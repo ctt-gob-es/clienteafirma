@@ -451,7 +451,7 @@ final class ProtocolInvocationLauncherSign {
 		try {
 			if (isRubricPositionRequired(format, extraParams)) {
 				showRubricPositionDialog(data, extraParams, isMassiveSign);
-				checkShowRubricDialogIsCalceled(extraParams);
+				checkShowRubricDialogIsCanceled(extraParams);
 			}
 		} catch (final AOCancelledOperationException e) {
 			LOGGER.info("El usuario ha cancelado el proceso de firma."); //$NON-NLS-1$
@@ -776,7 +776,7 @@ final class ProtocolInvocationLauncherSign {
 	 * consecuencia.
 	 * @param extraParams Par&aacute;metros de Conjunto de atributos recibidos en la petici&oacute;n.
 	 */
-	private static void checkShowRubricDialogIsCalceled(final Properties extraParams) {
+	private static void checkShowRubricDialogIsCanceled(final Properties extraParams) {
 		if (showRubricIsCanceled) {
 			// Recuperamos el valor del atributo "visibleSignature".
 			final String visibleSignature = extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE) != null

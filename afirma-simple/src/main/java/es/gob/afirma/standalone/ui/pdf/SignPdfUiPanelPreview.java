@@ -36,6 +36,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -43,7 +44,6 @@ import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -123,7 +123,17 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private JDialog dialogParent;
 
 	private float scale = 1;
-	private BufferedImage image;
+
+	// Imagen base del PDF sobre la que se mostrara la firma
+	private BufferedImage baseImage;
+
+	// Imagen de rubrica
+	private BufferedImage rubricImage;
+	BufferedImage getRubricImage() {
+		return this.rubricImage;
+	}
+
+	// Imagen con la previsualizacion (base + rubrica) sin texto
 	private BufferedImage signImage;
 	BufferedImage getSignImage() {
 		return this.signImage;
@@ -133,7 +143,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	SignPdfUiPanelListener getListener() {
 		return this.listener;
 	}
-
 	private DropTarget dropTarget;
 
 	private final Properties prop;
@@ -143,7 +152,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return this.viewLabel;
 	}
 
-	JTextField signatureImagePath;
+	JTextField rubricImagePath;
 
 	private final JButton browseImageButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPreview.38")); //$NON-NLS-1$
 	JButton getBrowseImageButton() {
@@ -258,14 +267,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.prop = p != null ? (Properties) p.clone() : null;
 		this.style = 0;
 
-		this.image = im;
-		this.signImage = null;
+		this.baseImage = im;
+		this.rubricImage = null;
+		this.signImage = cloneImage(im);
 		this.previewPanel = new JPanel();
 
 		createUI();
 
 		loadProperties();
-
 	}
 
 	void createUI() {
@@ -320,6 +329,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
             public void dropActionChanged(final DropTargetDragEvent dtde) { /* No implementado */}
 
             @Override
+            public void dragEnter(final DropTargetDragEvent dtde) { /* No implementado */ }
+
+            @Override
             public void dragOver(final DropTargetDragEvent dtde) { /* No implementado */ }
 
             @Override
@@ -328,86 +340,71 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
             @Override
             public void drop(final DropTargetDropEvent dtde) {
 
-                final Transferable tr = dtde.getTransferable();
-                if (getRotateSignature().getSelectedItem() == RotationAngles.DEGREES_0 &&
-                		tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                    final Object transData;
-                    try {
-                        transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
-                    }
-                    catch (final Exception e) {
-                    	LOGGER.warning(
-                            "Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
-                        );
-                        dtde.dropComplete(false);
-                        return;
-                    }
-                    if (transData instanceof List) {
-                        dtde.getDropTargetContext().dropComplete(true);
-                        final List<?> fileList = (List<?>) transData;
-                        if (fileList.isEmpty()) {
-                            dtde.dropComplete(false);
-                            return;
-                        }
-                        if (fileList.size() > 1) {
-                        	AOUIFactory.showErrorMessage(
-                        			SignPdfUiPanelPreview.this.getDialogParent(),
-                        			SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
-                        			SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-                        			JOptionPane.WARNING_MESSAGE,
-                        			null);
-                        }
-                        File file = null;
-                        final String filename = fileList.get(0).toString();
-                        if (filename.startsWith("http://") || //$NON-NLS-1$
-                        	filename.startsWith("https://") || //$NON-NLS-1$
-                        	filename.startsWith("ftp://") //$NON-NLS-1$
-                        ) {
-                        	AOUIFactory.showErrorMessage(
-                        			SignPdfUiPanelPreview.this.getDialogParent(),
-                        			SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
-                        			SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        			JOptionPane.ERROR_MESSAGE,
-                        			null);
-                            dtde.dropComplete(false);
-                            return;
-                        }
-                        else if (filename.startsWith("file://")) { //$NON-NLS-1$
-                            try {
-                            	file = new File(new URI(filename));
-                            }
-                            catch (final Exception e) {
-                            	LOGGER.warning(
-                            		"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
-                                );
-                                dtde.dropComplete(false);
-                                return;
-                            }
-                        }
-                        try {
-                            loadFile(file != null ? file : new File(filename));
-                        }
-                        catch (final Exception e) {
-                        	LOGGER.warning(
-                                "Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
-                            );
-                            dtde.dropComplete(false);
-                        }
-                    }
-                }
-                else {
-                    dtde.rejectDrop();
-                    dtde.dropComplete(false);
-                }
-            }
-
-            @Override
-            public void dragEnter(final DropTargetDragEvent dtde) {
-                if (getRotateSignature().getSelectedItem() != RotationAngles.DEGREES_0 ||
-                		!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                    dtde.rejectDrag();
-                }
+            	final Transferable tr = dtde.getTransferable();
+            	dtde.acceptDrop(DnDConstants.ACTION_COPY);
+            	final Object transData;
+            	try {
+            		transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
+            	}
+            	catch (final Exception e) {
+            		LOGGER.warning(
+            				"Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
+            				);
+            		dtde.dropComplete(false);
+            		return;
+            	}
+            	if (transData instanceof List) {
+            		dtde.getDropTargetContext().dropComplete(true);
+            		final List<?> fileList = (List<?>) transData;
+            		if (fileList.isEmpty()) {
+            			dtde.dropComplete(false);
+            			return;
+            		}
+            		if (fileList.size() > 1) {
+            			AOUIFactory.showErrorMessage(
+            					SignPdfUiPanelPreview.this.getDialogParent(),
+            					SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
+            					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+            					JOptionPane.WARNING_MESSAGE,
+            					null);
+            		}
+            		File file = null;
+            		final String filename = fileList.get(0).toString();
+            		if (filename.startsWith("http://") || //$NON-NLS-1$
+            				filename.startsWith("https://") || //$NON-NLS-1$
+            				filename.startsWith("ftp://") //$NON-NLS-1$
+            				) {
+            			AOUIFactory.showErrorMessage(
+            					SignPdfUiPanelPreview.this.getDialogParent(),
+            					SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
+            					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+            					JOptionPane.ERROR_MESSAGE,
+            					null);
+            			dtde.dropComplete(false);
+            			return;
+            		}
+            		else if (filename.startsWith("file://")) { //$NON-NLS-1$
+            			try {
+            				file = new File(new URI(filename));
+            			}
+            			catch (final Exception e) {
+            				LOGGER.warning(
+            						"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
+            						);
+            				dtde.dropComplete(false);
+            				return;
+            			}
+            		}
+            		try {
+            			loadRubricFile(file != null ? file : new File(filename));
+            		}
+            		catch (final Exception e) {
+            			LOGGER.warning(
+            					"Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
+            					);
+            			dtde.dropComplete(false);
+            		}
+            	}
             }
         }, true);
 
@@ -415,17 +412,17 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		if (this.prop.getProperty(PdfExtraParams.SIGNATURE_PAGE) != null &&
 				this.prop.getProperty(PdfExtraParams.SIGNATURE_PAGE).equals("append")) { //$NON-NLS-1$
-			createImage();
+			createEmptyImage();
 		}
 
 		this.viewLabel = new JLabel();
 		this.viewLabel.setPreferredSize(new Dimension(VIEWLABEL_PREFERRED_WIDTH, VIEWLABEL_PREFERRED_HEIGHT));
 
-		if (this.image.getHeight() > VIEWLABEL_PREFERRED_HEIGHT || this.image.getWidth() > VIEWLABEL_PREFERRED_WIDTH) {
-			resizeImage(this.viewLabel);
+		if (this.baseImage.getHeight() > VIEWLABEL_PREFERRED_HEIGHT || this.baseImage.getWidth() > VIEWLABEL_PREFERRED_WIDTH) {
+			resizeBaseImage(this.viewLabel);
 		}
 
-		this.viewLabel.setIcon(new ImageIcon(this.image));
+		this.viewLabel.setIcon(new ImageIcon(this.baseImage));
 
 		this.viewLabel.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.26")); //$NON-NLS-1$
 		this.viewLabel.addMouseListener(
@@ -433,7 +430,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	            @Override
 				public void mouseClicked(final MouseEvent evt) {
 	            	if (SwingUtilities.isRightMouseButton(evt)) {
-	            		if (getSignImage() != null) {
+	            		if (getRubricImage() != null) {
 		            		final RemoveImPopUpMenu menu = new RemoveImPopUpMenu();
 		                    menu.show(evt.getComponent(), evt.getX(), evt.getY());
 	            		}
@@ -443,7 +440,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	            		}
 	            	}
 	            	else {
-	            		selectSignatureImage();
+	            		selectRubricImage();
 	                }
 		        }
 			}
@@ -540,7 +537,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.rotateSignature.addKeyListener(this);
 		this.rotateSignature.addItemListener(
 			e -> {
-				showPreview();
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					compoundSignImage();
+					showPreview();
+				}
 			}
 		);
 		this.rotateSignature.getAccessibleContext().setAccessibleName("SignPdfUiPreview.42"); //$NON-NLS-1$
@@ -712,14 +712,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private JPanel createBrowseImagePanel() {
 		final JPanel signatureImagePanel = new JPanel(new GridBagLayout());
 		final JLabel signatureImageLabel = new JLabel(SignPdfUiMessages.getString("SignPdfUiPreview.37")); //$NON-NLS-1$
-		this.signatureImagePath = new JTextField();
-		this.signatureImagePath.setEditable(false);
+		this.rubricImagePath = new JTextField();
+		this.rubricImagePath.setEditable(false);
 		this.browseImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.39")); //$NON-NLS-1$
 		this.browseImageButton.addActionListener(
-				evt -> selectSignatureImage());
+				evt -> selectRubricImage());
 		this.clearImageButton.getAccessibleContext().setAccessibleName(SignPdfUiMessages.getString("SignPdfUiPreview.41")); //$NON-NLS-1$
 		this.clearImageButton.addActionListener(evt -> {
-			clearSignImage();
+			clearRubricImage();
 			showPreview();
 		});
 
@@ -732,7 +732,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		signatureImagePanel.add(signatureImageLabel, imageCons);
 		imageCons.gridy = 1;
 		imageCons.gridwidth = 1;
-		signatureImagePanel.add(this.signatureImagePath, imageCons);
+		signatureImagePanel.add(this.rubricImagePath, imageCons);
 		imageCons.weightx = 0.0;
 		imageCons.gridx = 1;
 		signatureImagePanel.add(this.browseImageButton, imageCons);
@@ -823,20 +823,19 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					this.prop.put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees()));
 				}
 
-				if (!this.signatureImagePath.getText().isEmpty()) {
+				if (!this.rubricImagePath.getText().isEmpty()) {
 
 					// Obtenemos la imagen directamente de la ruta para no perder calidad al reescalarla mas tarde
-					BufferedImage signImageFromPath;
-					final File signImageFile = new File(this.signatureImagePath.getText());
+					final File signImageFile = new File(this.rubricImagePath.getText());
 					try {
-						signImageFromPath = ImageIO.read(signImageFile);
+						this.rubricImage = ImageIO.read(signImageFile);
 					} catch (final IOException ex) {
 						LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen de rubrica desde la ruta proporcionada", ex); //$NON-NLS-1$
-						signImageFromPath = null;
+						this.rubricImage = null;
 					}
 
-					if (signImageFromPath != null) {
-						this.prop.put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(signImageFromPath));
+					if (this.rubricImage != null) {
+						this.prop.put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(this.rubricImage));
 					}
 				}
 
@@ -876,15 +875,16 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	}
 
 	/**
-     * Permite al usuario seleccionar una imagen de firma. Toma como ruta por defecto
-     * la de la imagen actualmente establecida.
+     * Permite al usuario seleccionar una imagen de r&uacute;brica. Toma como
+     * ruta por defecto la de la imagen actualmente establecida.
      */
-	void selectSignatureImage() {
+	void selectRubricImage() {
+
+		// Tomamos como datos por defecto los de la imagen seleccionada hasta ahora
 		String defaultPath = null;
 		String defaultFilename = null;
-
 		try {
-			defaultPath = SignPdfUiPanelPreview.this.signatureImagePath.getText();
+			defaultPath = SignPdfUiPanelPreview.this.rubricImagePath.getText();
 			if (defaultPath != null && !defaultPath.isEmpty()) {
 				final File imgFile = new File(defaultPath);
 				if (imgFile.isFile()) {
@@ -896,8 +896,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se tiene acceso a la ruta definida para la imagen de firma", e); //$NON-NLS-1$
 		}
+
+		// Permitimos al usuario seleccionar el fichero de la nueva imagen de
+		// rubrica
     	try {
-			final String imPath = AOUIFactory.getLoadFiles(
+			final String rubricPath = AOUIFactory.getLoadFiles(
 				SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
 				defaultPath,
 				defaultFilename,
@@ -908,18 +911,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 				null,
 				SignPdfUiPanelPreview.this
 			)[0].getAbsolutePath();
-			loadSignImage(imPath);
-			showPreview();
 
-			if (checkTransparency()) {
-	        	AOUIFactory.showMessageDialog(
-	        			this,
-						SignPdfUiMessages.getString("SignPdfDialog.9"),  //$NON-NLS-1$
-						SignPdfUiMessages.getString("SignPdfDialog.8"),  //$NON-NLS-1$
-	                    JOptionPane.WARNING_MESSAGE,
-	                    null
-	                );
-			}
+			// Cargamos la imagen de rubrica
+			loadRubricFile(new File(rubricPath));
 		}
 		catch(final AOCancelledOperationException ex) {
 			// Operacion cancelada por el usuario
@@ -988,10 +982,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		final String rotateSign = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION);
 		getRotateSignature().setSelectedItem(RotationAngles.parse(Integer.parseInt(rotateSign)));
 
-		final String imagePath = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
-		if (imagePath != null && !imagePath.isEmpty()) {
+		final String rubricPath = PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE);
+		if (rubricPath != null && !rubricPath.isEmpty()) {
 			try {
-				loadSignImage(imagePath);
+				loadRubricImage(rubricPath);
 			} catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
 			}
@@ -1070,19 +1064,18 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		);
 		getRotateSignature().setSelectedItem(RotationAngles.parse(Integer.parseInt(rotateSign)));
 
-		final String imagePath = PreferencesManager.getDefaultPreference(
+		final String rubricPath = PreferencesManager.getDefaultPreference(
 			PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE
 		);
-		if (imagePath != null && !imagePath.isEmpty()) {
+		if (rubricPath != null && !rubricPath.isEmpty()) {
 			try {
-				loadSignImage(imagePath);
+				loadRubricImage(rubricPath);
 			} catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido cargar la imagen almacenada en las preferencias", e); //$NON-NLS-1$
 			}
 		}
 
 		showPreview();
-
 	}
 
 	/** Almacena las propiedades de la firma.
@@ -1114,9 +1107,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		}
 
 		if (params.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE) != null &&
-				this.signatureImagePath.getText() != null) {
+				this.rubricImagePath.getText() != null) {
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, this.signatureImagePath.getText()
+				PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, this.rubricImagePath.getText()
 			);
 		}
 		else {
@@ -1130,26 +1123,26 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	}
 
 	 /** Carga la imagen para a&ntilde;adir a la firma.
-     * @param file Imagen para a&ntilde;adir.
+     * @param rubricFile Imagen de r&uacute;brica.
 	 * @throws IOException Si hay problemas en el pintado de la imagen. */
-	void loadFile(final File file) throws IOException {
+	void loadRubricFile(final File rubricFile) throws IOException {
 
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
         String errorMessage = null;
-        if (!file.exists()) {
+        if (!rubricFile.exists()) {
             errorMessage = SimpleAfirmaMessages.getString("SignPanel.3"); //$NON-NLS-1$
         }
-        else if (file.isDirectory()) {
+        else if (rubricFile.isDirectory()) {
         	errorMessage = SimpleAfirmaMessages.getString("SignPanel.21"); //$NON-NLS-1$
         }
-        else if (!file.canRead()) {
+        else if (!rubricFile.canRead()) {
             errorMessage = SimpleAfirmaMessages.getString("SignPanel.7"); //$NON-NLS-1$
         }
-        else if (file.length() < 1) {
+        else if (rubricFile.length() < 1) {
             errorMessage = SimpleAfirmaMessages.getString("SignPanel.5"); //$NON-NLS-1$
         }
-        else if (!isValidImage(file.getName())) {
+        else if (!isValidImage(rubricFile.getName())) {
         	errorMessage = SimpleAfirmaMessages.getString("SignPanel.101"); //$NON-NLS-1$
         }
         if (errorMessage != null) {
@@ -1163,9 +1156,19 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
             return;
         }
 
-        loadSignImage(file.getAbsolutePath());
+        loadRubricImage(rubricFile.getAbsolutePath());
         showPreview();
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+		if (checkRubricTransparency()) {
+        	AOUIFactory.showMessageDialog(
+        			this,
+					SignPdfUiMessages.getString("SignPdfDialog.9"),  //$NON-NLS-1$
+					SignPdfUiMessages.getString("SignPdfDialog.8"),  //$NON-NLS-1$
+                    JOptionPane.WARNING_MESSAGE,
+                    null
+                );
+		}
     }
 
 	private static boolean isValidImage(final String file) {
@@ -1191,74 +1194,137 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return null;
 	}
 
-	void setInsertImageBase64(final String base64Image) {
-		try (final ByteArrayInputStream isImage = new ByteArrayInputStream(Base64.getDecoder().decode(base64Image))) {
-			final BufferedImage bi = ImageIO.read(isImage);
-
-			if(bi == null) {
-				this.signImage = null;
-				return;
-			}
-
-			final BufferedImage newImage = new BufferedImage(
-			    this.image.getWidth(), this.image.getHeight(), this.image.getType()
-			);
-
-			final Graphics2D g = newImage.createGraphics();
-			g.drawImage(this.image, 0, 0, null);
-			g.drawImage(
-				bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null
-			);
-			g.dispose();
-			this.signImage = newImage;
-		}
-		catch (final Exception e1) {
-			LOGGER.severe(
-					"No ha sido posible recuperar la imagen guardada: " + e1 //$NON-NLS-1$
-			);
-		}
-	}
-
-	private void createImage() {
+	private void createEmptyImage() {
 		final BufferedImage bi = new BufferedImage(
-			this.image.getWidth(),
-			this.image.getHeight(),
+			this.baseImage.getWidth(),
+			this.baseImage.getHeight(),
             BufferedImage.TYPE_INT_RGB
         );
 		final Graphics2D ig2 = bi.createGraphics();
 		ig2.setPaint (Color.WHITE);
 		ig2.fillRect (0, 0, bi.getWidth(), bi.getHeight());
 		ig2.dispose();
-		this.image = bi;
+		this.baseImage = bi;
 	}
 
-	void loadSignImage(final String path) throws IOException, IllegalArgumentException {
+	/**
+	 * Carga la imagen de r&uacute;brica y compone la imagen de firma.
+	 * @param path Imagen de r&uacte;brica.
+	 * @throws IOException Cuando no se puede leer el fichero de imagen.
+	 * @throws IllegalArgumentException Cuando el fichero de imagen no sea
+	 * v&aacute;lido.
+	 */
+	void loadRubricImage(final String path) throws IOException, IllegalArgumentException {
 
-		// Cargamos la imagen
+		// Cargamos la imagen de rubric
 		final BufferedImage bi = ImageIO.read(new File(path));
 
 		if (bi == null) {
 			throw new IllegalArgumentException("La ruta proporcionada no se corresponde con la de un fichero de imagen soportada");  //$NON-NLS-1$
 		}
 
-		final BufferedImage newImage = new BufferedImage(
-		    this.image.getWidth(), this.image.getHeight(), this.image.getType()
-		);
-
-		final Graphics2D g = newImage.createGraphics();
-		g.drawImage(bi.getScaledInstance(this.image.getWidth(), this.image.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
-		g.dispose();
-		this.signImage = newImage;
+		this.rubricImage = bi;
 
 		// Mostramos la ruta en el campo de carga
-		this.signatureImagePath.setText(path);
+		this.rubricImagePath.setText(path);
+
+		// Componemos la imagen de firma
+		compoundSignImage();
 	}
 
-	void clearSignImage() {
-		this.signImage = null;
+	/**
+	 * Compone la imagen de firma a partir de la imagen base y, si la hay, la
+	 * de r&uacute;brica.
+	 */
+	void compoundSignImage() {
+		// Preparamos la previsualizacion de la firma que sera igual a la imagen base
+		// con la imagen de rubrica impresa encima
+		final BufferedImage newImage = cloneImage(this.baseImage);
+
+		// Si hay imagen de rubrica, la imprimimos
+		if (this.rubricImage != null) {
+
+			// Rotamos la imagen segun lo indicado
+			final RotationAngles rotation = (RotationAngles) this.rotateSignature.getSelectedItem();
+			final BufferedImage rotatedRubricImage = rotateImage(this.rubricImage, rotation);
+
+			// Calculamos la posicion en la que imprimir la rubrica
+			final float previewScale = Math.min(
+					this.baseImage.getWidth() / (float) rotatedRubricImage.getWidth(),
+					this.baseImage.getHeight() / (float) rotatedRubricImage.getHeight());
+			final float w = rotatedRubricImage.getWidth() * previewScale;
+			final float h = rotatedRubricImage.getHeight() * previewScale;
+			final float x = (this.baseImage.getWidth() - w) / 2;
+			final float y = (this.baseImage.getHeight() - h) / 2;
+			final Image reducedRubricImage = rotatedRubricImage.getScaledInstance(
+					Math.round(w), Math.round(h), Image.SCALE_SMOOTH);
+
+			// Imprimimos la rubrica sobre la imagen base
+			final Graphics2D g = newImage.createGraphics();
+			g.drawImage(reducedRubricImage, Math.round(x), Math.round(y), null);
+			g.dispose();
+		}
+
+		this.signImage = newImage;
+	}
+
+	/**
+	 * Rota una imagen los &aacute;ngulos indicados.
+	 * @param image Imagen a rotar.
+	 * @param rotation &Aacute;ngulos que se deben rotar.
+	 * @return Imagen rotada.
+	 */
+	private static BufferedImage rotateImage(final BufferedImage image, final RotationAngles rotation) {
+
+		int width;
+		int height;
+		double rotationGradiants;
+		switch (rotation) {
+		case DEGREES_90:
+			width = image.getHeight();
+			height = image.getWidth();
+			// Rotamos en sentido opuesto, asi que cuando nos indican 90 grados giramos en realidad 270
+			rotationGradiants = Math.toRadians(270);
+			break;
+		case DEGREES_180:
+			width = image.getWidth();
+			height = image.getHeight();
+			rotationGradiants = Math.toRadians(180);
+			break;
+		case DEGREES_270:
+			width = image.getHeight();
+			height = image.getWidth();
+			// Rotamos en sentido opuesto, asi que cuando nos indican 270 grados giramos en realidad 90
+			rotationGradiants = Math.toRadians(90);
+			break;
+		default:  // 0 grados:
+			width = image.getWidth();
+			height = image.getHeight();
+			rotationGradiants = 0;
+			break;
+		}
+
+		final BufferedImage rotatedImage = new BufferedImage(
+				width, height, image.getType());
+		final Graphics2D g = rotatedImage.createGraphics();
+		g.rotate(rotationGradiants, width / 2, height / 2);
+		g.drawImage(image, (width - image.getWidth()) / 2, (height - image.getHeight()) / 2, null);
+		g.dispose();
+
+		return rotatedImage;
+	}
+
+	/**
+	 * Elimina la imagen de r&oacute;brica.
+	 */
+	void clearRubricImage() {
+		this.rubricImage = null;
 
 		// Eliminamos la ruta del campo de carga
-		this.signatureImagePath.setText(null);
+		this.rubricImagePath.setText(null);
+
+		// Componemos la imagen de firma sin la rubrica
+		compoundSignImage();
 	}
 
 	public static String breakLines(final String input, final double maxLineLength, final FontMetrics fm ) {
@@ -1286,49 +1352,53 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	void showPreview() {
 
 		final BufferedImage bi = new BufferedImage(
-	    		this.image.getWidth(),
-	    		this.image.getHeight(),
-	    		this.image.getType()
+	    		this.signImage.getWidth(),
+	    		this.signImage.getHeight(),
+	    		this.signImage.getType()
 	    		);
 
 		final Graphics2D g = bi.createGraphics();
-	 	g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g.drawImage(this.image, 0, 0, null);
 
-	    g.setColor(this.colorCombobox.getSelectedItem().getColor());
+		// Imprimimos la imagen de firma
+		g.drawImage(this.signImage, 0, 0, null);
+
+		// Imprimimos el texto definido
+	 	g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setColor(this.colorCombobox.getSelectedItem().getColor());
 	    final int scaledSize = Math.max(1,Math.round(getViewFont().getSize() / this.scale) - 3);
 	    g.setFont(getViewFont().deriveFont(getStyle(), scaledSize));
 
 	    final RotationAngles rotationGrades = (RotationAngles) this.rotateSignature.getSelectedItem();
 
-	    if (this.signImage != null) {
-	    	rotateImgWithText(g, this.signImage, this.signImage.getWidth(), this.signImage.getHeight(),
-	    			 		getTextArea().getText(), rotationGrades, true);
-	    }
-	    else {
-	    	rotateImgWithText(g, this.image, this.image.getWidth(), this.image.getHeight(),
-	    			 		getTextArea().getText(), rotationGrades, false);
-	    }
+    	printTextOverImage(g, this.signImage.getWidth(), this.signImage.getHeight(),
+    			 		getTextArea().getText(), rotationGrades);
 
 	    g.dispose();
 
 	    getViewLabel().setIcon(new ImageIcon(bi));
 	}
 
-	private void rotateImgWithText(final Graphics2D g, final BufferedImage loadedImage, final int imageWidth, final int imageHeight,
-			final String text, final RotationAngles rotation, final boolean isSignImage) {
+	/**
+	 * Imprime el texto de firma sobre la imagen de previsualizacion, rot&aacute;ndolo si es necesario.
+	 * @param g Grafico de la imagen sobre la que se generara el texto.
+	 * @param imageWidth Anchura de la imagen.
+	 * @param imageHeight Altura de la imagen.
+	 * @param text Texto.
+	 * @param rotation Rotaci&oacute;n que se debe aplicar al texto.
+	 */
+	private static void printTextOverImage(final Graphics2D g, final int imageWidth, final int imageHeight,
+			final String text, final RotationAngles rotation) {
 
 		final AffineTransform originalTransform = g.getTransform();
 
 		final FontMetrics fontMetrics = g.getFontMetrics();
 		final int fontHeight = fontMetrics.getHeight();
-		//final int fontHeight = g.getFont().getSize();
 		final int MARGIN = 4;
 
 		int lineWidth;
 		int posX;
 		int posY;
-		BufferedImage res = loadedImage;
+//		BufferedImage res = loadedImage;
 
 		// Realizamos la rotacion correspondiente y calculamos las referencias
 		// para el posicionamiento del texto. La imagen solo se rotara en caso de que sea
@@ -1339,43 +1409,42 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			posX = -imageHeight + MARGIN;
 			posY = 0;
 			g.rotate(-Math.PI/2);
-			if (isSignImage) {
-				res = resizeSignImage(loadedImage);
-				g.drawImage(res, posX - MARGIN, posY, null);
-			}
+//			if (isSignImage) {
+//				res = resizeSignImage(loadedImage);
+//				g.drawImage(res, posX - MARGIN, posY, null);
+//			}
 			break;
 		case DEGREES_180:
 			lineWidth = imageWidth;
 			posX = -imageWidth + MARGIN;
 			posY = -imageHeight;
 			g.rotate(Math.PI);
-			if (isSignImage) {
-				g.drawImage(res, posX - MARGIN, posY, null);
-			}
+//			if (isSignImage) {
+//				g.drawImage(res, posX - MARGIN, posY, null);
+//			}
 			break;
 		case DEGREES_270:
 			lineWidth = imageHeight;
 			posX = MARGIN;
 			posY = -imageWidth;
 			g.rotate(Math.PI/2);
-			if (isSignImage) {
-				res = resizeSignImage(loadedImage);
-				g.drawImage(res, 0, posY, null);
-			}
+//			if (isSignImage) {
+//				res = resizeSignImage(loadedImage);
+//				g.drawImage(res, 0, posY, null);
+//			}
 			break;
 		default:  //case 0:
 			lineWidth = imageWidth;
 			posX = MARGIN;
 			posY = 0;
-			if (isSignImage) {
-				g.drawImage(res, 0, posY, null);
-			}
+//			if (isSignImage) {
+//				g.drawImage(res, 0, posY, null);
+//			}
 			break;
 		}
 
 		// Imprimimos el texto en lineas en base a las referencias determinadas
 		// por la rotacion
-
 		int textLength;
 		for (final String line : text.split("\n")) { //$NON-NLS-1$
 			textLength = fontMetrics.stringWidth(line);
@@ -1393,78 +1462,95 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		g.setTransform(originalTransform);
 	}
 
-	private void resizeImage(final JComponent panel) {
-		int newWidth = this.image.getWidth();
-		int newHeight = this.image.getHeight();
+	/**
+	 * Redimensiona la imagen base para ajustarla al espacio de
+	 * previsualizaci&oacute;n.
+	 * @param panel Panel de previsualizaci&oacute;n.
+	 */
+	private void resizeBaseImage(final JComponent panel) {
+		int newWidth = this.baseImage.getWidth();
+		int newHeight = this.baseImage.getHeight();
 
+		// Calculamos un tamano de imagen que se ajuste al espacio de
+		// previsualizacion
 		final Dimension screen = panel.getPreferredSize();
 		while (newWidth > screen.width || newHeight > screen.height) {
 			newWidth = (int) Math.round(newWidth * 0.9);
 			newHeight = (int) Math.round(newHeight * 0.9);
 		}
-		final float aspectRatio = (float) newWidth / this.image.getWidth();
+		final float aspectRatio = (float) newWidth / this.baseImage.getWidth();
 
-		newWidth = Math.round(this.image.getWidth() * aspectRatio);
-		newHeight = Math.round(this.image.getHeight() * aspectRatio);
+		newWidth = Math.round(this.baseImage.getWidth() * aspectRatio);
+		newHeight = Math.round(this.baseImage.getHeight() * aspectRatio);
 
-		this.scale = this.image.getWidth() / newWidth;
-		final Image newIm = this.image.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+		this.scale = this.baseImage.getWidth() / newWidth;
+
+		final Image newIm = this.baseImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
 	    final BufferedImage newBi = new BufferedImage(
     		newWidth,
     		newHeight,
-	        this.image.getType()
+	        this.baseImage.getType()
         );
 	    final Graphics g = newBi.createGraphics();
 	    g.drawImage(newIm, 0, 0, null);
 
 	    g.dispose();
-		this.image = newBi;
+		this.baseImage = newBi;
 	}
 
 	/**
-	 * M&eacute;todo que permite escalar la imagen al tamaño necesario para que se
-	 * adapte al panel con la vista previa de la firma visible
-	 * @param bi Imagen a escalar
-	 * @return Imagen con el nuevo tama&ntilde;o
+	 * Copia una imagen.
+	 * @param image Imagen origen.
+	 * @return Copia de la imagen.
 	 */
-	private BufferedImage resizeSignImage(final BufferedImage bi) {
+	private static BufferedImage cloneImage(final BufferedImage image) {
 
-		final int newWidth = this.signImage.getWidth();
-		final int newHeight = this.signImage.getHeight();
+	    final BufferedImage newImage = new BufferedImage(
+	    	image.getWidth(),
+    		image.getHeight(),
+    		image.getType()
+        );
+	    final Graphics g = newImage.createGraphics();
+	    g.drawImage(image, 0, 0, null);
+	    g.dispose();
 
-		final Image tmp = bi.getScaledInstance(newHeight, newWidth, Image.SCALE_SMOOTH);
-		final BufferedImage dimg = new BufferedImage(newHeight, newWidth, Image.SCALE_SMOOTH);
-
-		final Graphics2D g2d = dimg.createGraphics();
-	    g2d.drawImage(tmp, 0, 0, null);
-	    g2d.dispose();
-
-		return dimg;
+		return newImage;
 	}
+
+//	/**
+//	 * M&eacute;todo que permite escalar la imagen al tama&ntilde;o necesario para que se
+//	 * adapte al panel con la vista previa de la firma visible
+//	 * @param bi Imagen a escalar
+//	 * @return Imagen con el nuevo tama&ntilde;o
+//	 */
+//	private BufferedImage resizeSignImage(final BufferedImage bi) {
+//
+//		final int newWidth = this.signImage.getWidth();
+//		final int newHeight = this.signImage.getHeight();
+//
+//		final Image tmp = bi.getScaledInstance(newHeight, newWidth, Image.SCALE_SMOOTH);
+//		final BufferedImage dimg = new BufferedImage(newHeight, newWidth, Image.SCALE_SMOOTH);
+//
+//		final Graphics2D g2d = dimg.createGraphics();
+//	    g2d.drawImage(tmp, 0, 0, null);
+//	    g2d.dispose();
+//
+//		return dimg;
+//	}
 
 	/**
 	 * Comprueba si la imag&eacute;n tiene alg&uacute;n canal alfa o alg&eacute;n
 	 * p&iacute; transparente
 	 * @return devuelve true en caso de que detecte transparencias
 	 */
-	public boolean checkTransparency(){
+	public boolean checkRubricTransparency() {
 
 		boolean hasTransparency = false;
 
-		if (!this.signatureImagePath.getText().isEmpty()) {
-
-			final File input = new File(this.signatureImagePath.getText());
-			BufferedImage image = null;
-			try {
-				image = ImageIO.read(input);
-			} catch (final IOException e) {
-				LOGGER.warning("Error al leer la imagen de firma visible"); //$NON-NLS-1$
-			}
-
-			if (image != null && (containsAlphaChannel(image) || containsTransparency(image))){
+		if (this.rubricImage != null) {
+			if (containsAlphaChannel(this.rubricImage) || containsTransparency(this.rubricImage)) {
 				hasTransparency = true;
 			}
-
 		}
 
 		return hasTransparency;
@@ -1725,7 +1811,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	        this.removeImageItem = new JMenuItem(SignPdfUiMessages.getString("SignPdfUiPreview.27")); //$NON-NLS-1$
 	        this.removeImageItem.addActionListener(
     			e -> {
-					clearSignImage();
+					clearRubricImage();
 					showPreview();
 				}
     		);

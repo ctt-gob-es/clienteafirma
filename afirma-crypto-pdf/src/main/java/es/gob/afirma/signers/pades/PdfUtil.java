@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfArray;
@@ -549,13 +550,14 @@ public final class PdfUtil {
     public static void checkCorrectPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Properties extraParams) {
     	if (!pagesList.isEmpty()) {
 	    	for (final int page : pagesList) {
-	    		if (pdfReader.getPageSize(page).getBottom() - 15 <
+	    		final Rectangle pageSize = pdfReader.getPageSize(page);
+	    		if (pageSize.getBottom() <=
 						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
-					&& pdfReader.getPageSize(page).getLeft() - 15 <
+					&& pageSize.getLeft() <=
 						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX))
-	    			&& pdfReader.getPageSize(page).getTop() - 15 >
+	    			&& pageSize.getTop() >=
 	    				Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY))
-	    			&& pdfReader.getPageSize(page).getRight() - 15 >
+	    			&& pageSize.getRight() >=
 						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)))
 	    		{
 	    				return;

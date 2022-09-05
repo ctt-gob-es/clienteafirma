@@ -365,6 +365,9 @@ final class PdfVisibleAreasUtils {
         final float widthTxt = degrees == 0 || degrees == 180 ? width : height;
         final float heightTxt = degrees == 0 || degrees == 180 ? height : width;
 
+        // Escalamos la imagen para que se ajuste al espacio disponible
+        appearance.setImageScale(-1);
+
         // La firma visible se configura inicialmente de forma horizontal.
         appearance.setVisibleSignature(
     		new Rectangle(0, 0, widthTxt, heightTxt),
@@ -386,6 +389,33 @@ final class PdfVisibleAreasUtils {
     		final ByteBuffer internalBuffer = t.getInternalBuffer();
         	final ByteBuffer actualBuffer = n2Layer.getInternalBuffer();
 		) {
+
+        	// Imprimimos la rubrica de fondo
+	        if (rubric != null) {
+	        	//Imagen con la firma rubrica
+	        	rubric.setInterpolation(true);
+	        	rubric.setAbsolutePosition(0, 0);
+
+	        	// Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
+	        	if (degrees == 90 || degrees == 270) {
+	        		final float scale = Math.min(height / rubric.getWidth(), width / rubric.getHeight());
+	                final float w = rubric.getWidth() * scale;
+	                final float h = rubric.getHeight() * scale;
+	                final float x = (width - h) / 2;
+	                final float y = (height - w) / 2;
+	                t.addImage(rubric, w, 0, 0, h, y, x);
+	        	} else {
+	        		final float scale = Math.min(width / rubric.getWidth(), height / rubric.getHeight());
+	                final float w = rubric.getWidth() * scale;
+	                final float h = rubric.getHeight() * scale;
+	                final float x = (width - w) / 2;
+	                final float y = (height - h) / 2;
+	                t.addImage(rubric, w, 0, 0, h, x, y);
+	        	}
+	        }
+
+	        // Creamos el buffer en el que escribir el texto usando el buffer
+	        // anterior lrubrica de fondo
 	        internalBuffer.write(actualBuffer.toByteArray());
 	        final Font f = appearance.getLayer2Font();
             // Traduccion de la fuente a una fuente PDF
@@ -395,27 +425,13 @@ final class PdfVisibleAreasUtils {
 	        }
 
 	        n2Layer.reset();
-	        final Image textImg = Image.getInstance(t);
+
 	        //Imagen con el texto encima de la rubrica
+	        final Image textImg = Image.getInstance(t);
 	        textImg.setInterpolation(true);
 	        textImg.setRotationDegrees(degrees);
 	        textImg.setAbsolutePosition(0, 0);
 
-	        if(rubric != null) {
-	        	//Imagen con la firma rubrica
-	        	rubric.setInterpolation(true);
-	        	rubric.setRotationDegrees(degrees);
-	        	rubric.setAbsolutePosition(0, 0);
-
-	        	//Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
-	        	if (degrees == 90 || degrees == 270) {
-	        		rubric.scaleAbsolute(height, width);
-	        	} else {
-	        		rubric.scaleAbsolute(width, height);
-	        	}
-
-	        	n2Layer.addImage(rubric);
-	        }
 	        n2Layer.addImage(textImg);
 	        n2Layer.setWidth(width);
 	        n2Layer.setHeight(height);

@@ -446,6 +446,10 @@ public final class PdfSessionManager {
 		PdfPreProcessor.addImage(extraParams, stp, pdfReader, secureMode);
 
 		// Establecemos el render segun iText antiguo, varia en versiones modernas
+		//TODO: Se podria configurar PdfSignatureAppearance.SignatureRenderGraphicAndDescription
+		// para que se muestre la imagen y el texto uno al lado del otro, pero eso obligaria a
+		// tener que retocar la previsualizacion en AutoFirma. Tambien se deberia establecer el
+		// campo SignatureGraphic en lugar de Image.
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
 
 		// Razon de firma
@@ -472,9 +476,9 @@ public final class PdfSessionManager {
 			sap.setContact(signerContact);
 		}
 
-		// Rubrica de la firma
+		// Si se ha establecido una imagen de firma, se
+		// elimina el texto por defecto
 		if (rubric != null) {
-			sap.setImage(rubric);
 			sap.setLayer2Text(""); //$NON-NLS-1$
 			sap.setLayer4Text(""); //$NON-NLS-1$
 		}
@@ -505,6 +509,16 @@ public final class PdfSessionManager {
 		// Firma visible
 		if (signaturePositionOnPage != null && signatureField == null && !pages.isEmpty()) {
 			if (signatureRotation == 0) {
+
+				// Rubrica de la firma
+				if (rubric != null) {
+					sap.setImage(rubric);
+
+					// Establecemos que la imagen no se ajuste al campo
+					// para que no se deforme
+					sap.setImageScale(-1);
+				}
+
 				try {
 					sap.setVisibleSignature(signaturePositionOnPage, pages.get(0), null);
 				}
