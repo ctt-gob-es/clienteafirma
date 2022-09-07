@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +86,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 		firefoxVersion = searchLastFirefoxVersion("/opt"); //$NON-NLS-1$
 		if (firefoxVersion != null) {
-			nssPaths.add("/opt/firefox-"); //$NON-NLS-1$
+			nssPaths.add("/opt/firefox-" + firefoxVersion); //$NON-NLS-1$
 		}
 
 		nssPaths.add("/opt/fedora-ds/clients/lib"); //$NON-NLS-1$
@@ -261,6 +262,9 @@ final class MozillaKeyStoreUtilitiesUnix {
 		final Path path;
 		try {
 			path = new File(fullPath).toPath().toRealPath();
+		}
+		catch (final NoSuchFileException e) {
+			return false;
 		}
 		catch (final IOException e) {
 			LOGGER.warning(

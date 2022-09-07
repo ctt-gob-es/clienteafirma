@@ -58,7 +58,14 @@ final class RestoreConfigFirefox {
 	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstallRestore-"; //$NON-NLS-1$
 	private static final String LINUX_SCRIPT_NAME = "installRestore-"; //$NON-NLS-1$
 	private static final String LINUX_MOZILLA_PATH = "/.mozilla/firefox/profiles.ini";//$NON-NLS-1$
-	private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
+	private static final String UBUNTU_22_MOZILLA_PATH = "/snap/firefox/common/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
+	private static final String NSS_LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
+	//TODO: En Chromium ahora solo se instalara el certificado de confianza para el perfil activo
+	private static final String NSS_LINUX_CHROMIUM_PATH = "/snap/chromium/current/.pki/nssdb";//$NON-NLS-1$
+	private static final String[] NSS_DIR_SUBPATH = new String[] {
+			NSS_LINUX_CHROME_PATH,
+			NSS_LINUX_CHROMIUM_PATH
+	};
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static String WINDOWS_MOZILLA_PATH;
@@ -249,22 +256,26 @@ final class RestoreConfigFirefox {
 		final String certUtilPath = getCertUtilPath(workingDir);
 
 		for ( final String userDir : usersDirs) {
-			final File file = new File(escapePath(userDir) + LINUX_CHROME_PATH);
-			if( file.isDirectory()) {
-				final String[] certutilCommands = {
-						certUtilPath, // 0
-						"-d", //$NON-NLS-1$ // 1
-						"sql:" + escapePath(userDir) + LINUX_CHROME_PATH, //$NON-NLS-1$ // 2
-						"-A", //$NON-NLS-1$ // 3
-						"-n", //$NON-NLS-1$ // 4
-						"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$ // 5
-						"-i", //$NON-NLS-1$ // 6
-						escapePath(rootCertFile.getAbsolutePath()), // 7
-						"-t", //$NON-NLS-1$ // 8
-						"\"TCP,TCP,TCP\"" //$NON-NLS-1$ // 9
-				};
-				execCommandLineCertUtil(workingDir, certutilCommands, true);
 
+			for (final String nssDirSubpath : NSS_DIR_SUBPATH) {
+
+				final File file = new File(escapePath(userDir) + nssDirSubpath);
+				if (file.isDirectory()) {
+					final String[] certutilCommands = {
+							certUtilPath, // 0
+							"-d", //$NON-NLS-1$ // 1
+							"sql:" + escapePath(userDir) + nssDirSubpath, //$NON-NLS-1$ // 2
+							"-A", //$NON-NLS-1$ // 3
+							"-n", //$NON-NLS-1$ // 4
+							"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$ // 5
+							"-i", //$NON-NLS-1$ // 6
+							escapePath(rootCertFile.getAbsolutePath()), // 7
+							"-t", //$NON-NLS-1$ // 8
+							"\"TCP,TCP,TCP\"" //$NON-NLS-1$ // 9
+					};
+					execCommandLineCertUtil(workingDir, certutilCommands, true);
+
+				}
 			}
 		}
 	}
@@ -774,26 +785,29 @@ final class RestoreConfigFirefox {
 		return fileList;
 	}
 
-	/** Devuelve un listado con los directorios donde se encuentra el fichero <i>profiles.ini</i> de firefox en Linux y en OS X.
+	/** Devuelve un listado con los directorios donde se encuentra el fichero <i>profiles.ini</i>
+	 * de firefox en Linux y en Windows.
 	 * @param users Listado de usuarios del sistema.
 	 * @return Listado de directorios donde se encuentra el fichero <i>profiles.ini</i>. */
 	private static List<File> getMozillaUsersProfilesPath(final List<String> users){
-		String pathProfile = null;
+		final List<String> pathProfiles = new ArrayList<>();
 		final List<File> path = new ArrayList<>();
 		if (Platform.OS.LINUX.equals(Platform.getOS())) {
-			pathProfile = LINUX_MOZILLA_PATH;
+			pathProfiles.add(UBUNTU_22_MOZILLA_PATH);
+			pathProfiles.add(LINUX_MOZILLA_PATH);
 		}
 		else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			pathProfile = WINDOWS_MOZILLA_PATH;
+			pathProfiles.add(WINDOWS_MOZILLA_PATH);
 		}
 		else {
 			throw new IllegalArgumentException("Sistema operativo no soportado: " + Platform.getOS()); //$NON-NLS-1$
 		}
-		for (final String usr: users){
-			final File mozillaPath = new File(usr, pathProfile);
-			// comprobamos que el fichero exista
-			if (mozillaPath.exists() && mozillaPath.isFile()){
-				path.add(mozillaPath);
+		for (final String usr : users) {
+			for (final String pathProfile : pathProfiles) {
+				final File mozillaPath = new File(usr, pathProfile);
+				if (mozillaPath.isFile()) {
+					path.add(mozillaPath);
+				}
 			}
 		}
 		return path;

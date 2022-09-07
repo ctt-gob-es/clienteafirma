@@ -240,7 +240,7 @@ public final class KeyStoreUtilities {
                     }
                     catch (final Exception e) {
                         LOGGER.info(
-                            "Se ocultara el certificado por no ser valido: " + e //$NON-NLS-1$
+                            "Se ocultara el certificado por no estar vigente: " + e //$NON-NLS-1$
                         );
                         aliassesByFriendlyName.remove(al);
                         continue;

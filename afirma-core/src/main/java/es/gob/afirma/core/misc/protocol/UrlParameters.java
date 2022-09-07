@@ -90,10 +90,17 @@ public abstract class UrlParameters {
 	private Properties extraParams = null;
 	private String filename = null;
 
-	/** Obtiene los par&aacute;metros adicionales de la firma.
-	 * @return Par&aacute;metros adicionales de la firma */
+	/**
+	 * Obtiene los par&aacute;metros adicionales de la firma.
+	 * Se pueden modificar estos parametros a partir del
+	 * objeto devuelto.
+	 * @return Par&aacute;metros adicionales de la firma
+	 */
 	public Properties getExtraParams() {
-		return this.extraParams != null ? this.extraParams : new Properties();
+		if (this.extraParams == null) {
+			this.extraParams = new Properties();
+		}
+		return this.extraParams;
 	}
 
 	/** Establece los par&aacute;metros adicionales para la configuraci&oacute;n

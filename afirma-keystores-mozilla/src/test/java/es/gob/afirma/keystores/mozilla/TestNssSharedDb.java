@@ -8,11 +8,14 @@ import java.io.Reader;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
+import es.gob.afirma.keystores.mozilla.shared.SharedNssKeyStoreManager;
 
 /** Pruebas de la configuraci&oacute;n especial de NSS compartido.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -150,4 +153,27 @@ public final class TestNssSharedDb {
 		}
 	}
 
+	/**
+	 * Carga el almacen NSS del sistema.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void testLoadSystemSharedNSS() {
+
+		final SharedNssKeyStoreManager ksm = new SharedNssKeyStoreManager();
+		try {
+			ksm.init(AOKeyStore.SHARED_NSS, null, null, null, false);
+		}
+		catch (final Exception e) {
+			e.printStackTrace();
+			Assert.fail("No se ha podido cargar el almacen NSS del sistema"); //$NON-NLS-1$
+		}
+
+		System.out.println(" --- Alias del almacen NSS del sistema ---"); //$NON-NLS-1$
+		for (final String alias : ksm.getAliases()) {
+			System.out.println(alias);
+		}
+		System.out.println(" ------ "); //$NON-NLS-1$
+	}
 }
