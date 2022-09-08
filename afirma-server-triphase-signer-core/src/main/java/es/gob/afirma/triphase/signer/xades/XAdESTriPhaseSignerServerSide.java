@@ -41,6 +41,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -193,6 +194,18 @@ public final class XAdESTriPhaseSignerServerSide {
 							}
 						}
 					}
+				}
+			}
+
+			// Si se trara de una cofirma o contrafirma de manifest, pero no se declaro como tal,
+			// lo declaramos para que despues no se eliminen partes comunes que son necesarias
+			if (signatureNodeList.getLength() > 0
+					&& (op == Op.COSIGN || op == Op.COUNTERSIGN)
+					&& !Boolean.parseBoolean(xParams.getProperty(XAdESExtraParams.USE_MANIFEST))) {
+				// Comprobamos los datos firmados de la primera firma
+				final Element signature = (Element) signatureNodeList.item(0);
+				if (XAdESUtil.hasHashManifestReference(signature)) {
+					xParams.setProperty(XAdESExtraParams.USE_MANIFEST,  Boolean.TRUE.toString());
 				}
 			}
 		}

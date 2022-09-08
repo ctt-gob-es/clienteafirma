@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.triphase.signer.xades.NodeDelimiter;
@@ -387,8 +388,16 @@ final class XAdESTriPhaseSignerUtil {
 
         // Por cada firma buscamos sus referencias
         final List<String> unmutableReferences = new ArrayList<>();
-        for(final Node sigs : signatureNodes) {
-        	final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
+        for (final Node sigs : signatureNodes) {
+        	// Buscamos la referencias solo dentro del SignedInfo para evitar problemas con las
+        	// referencias de los manifest. Si no encontramos el elemento, omitimos las
+        	// referencias de la firma
+        	final Element signedInfo = XAdESUtil.getSignedInfo((Element) sigs);
+        	if (signedInfo == null) {
+        		continue;
+        	}
+
+        	final NodeList rf = signedInfo.getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
         	for (int j = 0; j < rf.getLength(); j++) {
         		final Element refElement = (Element) rf.item(j);
         		if (!isReferenceToSignedProperties(refElement) && !isEnvelopedReference(refElement)) {
