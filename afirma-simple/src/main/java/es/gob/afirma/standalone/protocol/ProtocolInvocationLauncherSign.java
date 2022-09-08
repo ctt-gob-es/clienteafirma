@@ -64,6 +64,7 @@ import es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner;
 import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
+import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValider;
@@ -695,11 +696,12 @@ final class ProtocolInvocationLauncherSign {
 	 * Identifica cuando se ha configurado una firma con el formato XAdES y la
 	 * propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma
 	 * correcta pero, por compatibilidad con los tipos de firmas del Applet pesado,
-	 * se ha incluido aqu&iacute;.
+	 * se ha incluido aqu&iacute;. No se considerar&aacute; explicita si se
+	 * configur&oacute; como firma manifest.
 	 * @param format Formato declarado para la firma.
 	 * @param config Par&aacute;metros adicionales declarados para la firma.
-	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>,
-	 *         {@code false} en caso contrario.
+	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>
+	 * 			que no sea de manifest, {@code false} en caso contrario.
 	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES
 	 *             expl&iacute;citas.
 	 */
@@ -708,7 +710,8 @@ final class ProtocolInvocationLauncherSign {
 		return format != null
 				&& format.toLowerCase().startsWith("xades") //$NON-NLS-1$
 				&& config != null
-				&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(AfirmaExtraParams.MODE));
+				&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(AfirmaExtraParams.MODE))
+				&& !Boolean.parseBoolean(config.getProperty(XAdESExtraParams.USE_MANIFEST));
 	}
 
 	/**

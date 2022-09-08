@@ -13,15 +13,16 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 
 /** Pruebas de firmas XAdES con MANIFEST. */
 public final class TestXAdESTriWithManifest {
 
-    private static final String CERT_PATH = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+	private static final String CERT_PATH = "EIDAS_CERTIFICADO_PRUEBAS___99999999R.p12"; //$NON-NLS-1$
+	private static final String CERT_PASS = "1234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS = "eidas_certificado_pruebas___99999999r"; //$NON-NLS-1$
 
-    private static final String ALGORITHM = "SHA1withRSA"; //$NON-NLS-1$
+    private static final String ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
 	private static final String SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
@@ -129,6 +130,72 @@ public final class TestXAdESTriWithManifest {
     		final OutputStream fos = new java.io.FileOutputStream(f);
 		) {
         	fos.write(signature);
+        	fos.flush();
+        }
+		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Pruebas de cofirma XAdES con MANIFEST.
+	 * @throws Exception en cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void testCoSignXadesWithManifest() throws Exception {
+
+		System.out.println("Cofirma de firma XAdES con Manifest"); //$NON-NLS-1$
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final byte[] signature = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("firma_xades_manifest.xsig")); //$NON-NLS-1$
+
+        final AOSigner signer = new AOXAdESTriPhaseSigner();
+
+        final Properties p = new Properties();
+        p.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+        final byte[] cosignature = signer.cosign(signature, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
+
+        final File f = File.createTempFile("xades-manifest-cosign", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        try (
+    		final OutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(cosignature);
+        	fos.flush();
+        }
+		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Pruebas de contrafirma XAdES con MANIFEST.
+	 * @throws Exception en cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void testCounterSignXadesWithManifest() throws Exception {
+
+		System.out.println("Contrafirma de firma XAdES con Manifest"); //$NON-NLS-1$
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final byte[] signature = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("firma_xades_manifest.xsig")); //$NON-NLS-1$
+
+        final AOSigner signer = new AOXAdESTriPhaseSigner();
+
+        final Properties p = new Properties();
+        p.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+        final byte[] cosignature = signer.countersign(signature, ALGORITHM, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), p);
+
+        final File f = File.createTempFile("xades-manifest-countersign", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        try (
+    		final OutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(cosignature);
         	fos.flush();
         }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$

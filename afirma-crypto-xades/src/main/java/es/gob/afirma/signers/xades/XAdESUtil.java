@@ -589,16 +589,7 @@ public final class XAdESUtil {
     static Element getSignedPropertiesReference(final Element signatureElement) {
 
     	// Obtemos el nodo SignedInfo
-    	int i = 0;
-    	Element signedInfoElement = null;
-    	final NodeList childs = signatureElement.getChildNodes();
-    	while (i < childs.getLength() && signedInfoElement == null) {
-    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				childs.item(i).getLocalName().equals(XMLConstants.TAG_SIGNEDINFO)) {
-    			signedInfoElement = (Element) childs.item(i);
-    		}
-    		i++;
-    	}
+    	final Element signedInfoElement = getSignedInfo(signatureElement);
     	if (signedInfoElement == null) {
     		return null;
     	}
@@ -609,7 +600,7 @@ public final class XAdESUtil {
 
     	// Buscamos entre las referencias hasta encontrar la que declare el tipo
     	// correspondiente a los atributos firmados
-    	for (i = 0; i < references.getLength(); i++) {
+    	for (int i = 0; i < references.getLength(); i++) {
     		final Element reference = (Element) references.item(i);
     		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
 			if (type != null && !type.isEmpty() && isSignedPropertiesType(type)) {
@@ -618,6 +609,25 @@ public final class XAdESUtil {
     	}
     	// Si no se encontro la referencia, se devuelve nulo
     	return null;
+    }
+
+	/**
+	 * Obtiene el nodo SignedInfo de un elemento de firma individual.
+	 * @param signature Elemento de firma.
+	 * @return Elemento SignedInfo o {@code null} si no se encuentra.
+	 */
+    public static Element getSignedInfo(final Element signature) {
+
+    	Element signedInfoElement = null;
+    	final NodeList childs = signature.getChildNodes();
+    	for (int i = 0; i < childs.getLength() && signedInfoElement == null; i++) {
+    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE
+    				&& XMLConstants.DSIGNNS.equals(childs.item(i).getNamespaceURI())
+    				&& XMLConstants.TAG_SIGNEDINFO.equals(childs.item(i).getLocalName())) {
+    			signedInfoElement = (Element) childs.item(i);
+    		}
+    	}
+    	return signedInfoElement;
     }
 
     /**
@@ -761,16 +771,7 @@ public final class XAdESUtil {
     static List<Element> getSignatureDataReferenceList(final Element signatureElement) {
 
     	// Obtemos el nodo SignedInfo
-    	int i = 0;
-    	Element signedInfoElement = null;
-    	final NodeList childs = signatureElement.getChildNodes();
-    	while (i < childs.getLength() && signedInfoElement == null) {
-    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				childs.item(i).getLocalName().equals(XMLConstants.TAG_SIGNEDINFO)) {
-    			signedInfoElement = (Element) childs.item(i);
-    		}
-    		i++;
-    	}
+    	final Element signedInfoElement = getSignedInfo(signatureElement);
     	if (signedInfoElement == null) {
     		return null;
     	}
@@ -780,7 +781,7 @@ public final class XAdESUtil {
 
     	// Omitimos del listado la referencia a los atributos firmados
     	final List<Element> dataReferences = new ArrayList<>();
-    	for (i = 0; i < references.getLength(); i++) {
+    	for (int i = 0; i < references.getLength(); i++) {
     		final Element reference = (Element) references.item(i);
     		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
 			if (type != null && !type.isEmpty()) {
@@ -818,6 +819,34 @@ public final class XAdESUtil {
     	}
 
     	return dataReferences;
+    }
+
+	/**
+     * Indica si la firma contiene una referencia a un manifest.
+     * @param signatureElement Elemento XML "Signature" de firma.
+     * @return Listado con las referencias a datos encontradas.
+     */
+    public static boolean hasHashManifestReference(final Element signatureElement) {
+
+    	// Obtemos el nodo SignedInfo
+    	final Element signedInfoElement = getSignedInfo(signatureElement);
+    	if (signedInfoElement == null) {
+    		return false;
+    	}
+
+    	// Obtenemos las referencias declaradas en la firma
+    	final NodeList references = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_REFERENCE);
+
+    	// Omitimos del listado la referencia a los atributos firmados
+    	for (int i = 0; i < references.getLength(); i++) {
+    		final Element reference = (Element) references.item(i);
+    		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
+			if (XAdESConstants.REFERENCE_TYPE_MANIFEST.equals(type)) {
+				return true;
+			}
+    	}
+
+    	return false;
     }
 
     /**
