@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.signers.pades;
+package es.gob.afirma.signers.pades.common;
 
 /** Par&aacute;metros adicionales para las firmas PAdES. */
 public final class PdfExtraParams {
@@ -37,7 +37,7 @@ public final class PdfExtraParams {
 	 * se establece a <code>false</code> se incluye siempre que el certificado la
 	 * declare.
 	 */
-	static final String DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE = "doNotIncludePolicyOnSigningCertificate"; //$NON-NLS-1$
+	public static final String DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE = "doNotIncludePolicyOnSigningCertificate"; //$NON-NLS-1$
 
 	/**
 	 * Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente
@@ -46,7 +46,7 @@ public final class PdfExtraParams {
 	 * incluir&aacute; toda la cadena de certificaci&oacute;n (propiedad compartida
 	 * con XAdES y CAdES).
 	 */
-	static final String INCLUDE_ONLY_SIGNNING_CERTIFICATE = "includeOnlySignningCertificate";//$NON-NLS-1$
+	public static final String INCLUDE_ONLY_SIGNNING_CERTIFICATE = "includeOnlySignningCertificate";//$NON-NLS-1$
 
 	/**
 	 * Establece la fecha y hora indicadas como momento de la firma. Debe
@@ -55,7 +55,7 @@ public final class PdfExtraParams {
 	 * 2010 a las 12 horas, treinta minutos y un segundo. Se toma siempre como zona
 	 * horaria la establecida en la m&aacute;quina donde se ejecuta el firmador.
 	 */
-	static final String SIGN_TIME = "signTime";//$NON-NLS-1$
+	public static final String SIGN_TIME = "signTime";//$NON-NLS-1$
 
 	/** Perfil de firma que se desea generar. */
 	public static final String PROFILE = "profile"; //$NON-NLS-1$
@@ -88,7 +88,7 @@ public final class PdfExtraParams {
 	 * menos tama&ntilde;o. Esta propiedad s&oacute;lo se aplica si se trata de un
 	 * PDF v4 o superior, en versiones anteriores nunca se comprimen los PDF.
 	 */
-	static final String COMPRESS_PDF = "compressPdf";//$NON-NLS-1$
+	public static final String COMPRESS_PDF = "compressPdf";//$NON-NLS-1$
 
 	/**
 	 * Si se establece a <code>true</code> siempre crea una revisi&oacute;n del PDF
@@ -104,7 +104,7 @@ public final class PdfExtraParams {
 	 * En los documentos cifrados <u>siempre</u> se crea una revisi&oacute;n, sea
 	 * cual sea el valor de este par&aacute;metro.
 	 */
-	static final String ALWAYS_CREATE_REVISION = "alwaysCreateRevision";//$NON-NLS-1$
+	public static final String ALWAYS_CREATE_REVISION = "alwaysCreateRevision";//$NON-NLS-1$
 
 	/**
 	 * Imagen que se desea insertar en el PDF antes de que este sea firmado. La
@@ -184,20 +184,20 @@ public final class PdfExtraParams {
 	 * haya establecido tambi&eacute;n el par&aacute;metro
 	 * <code>attachFileName</code>.
 	 */
-	static final String ATTACH = "attach";//$NON-NLS-1$
+	public static final String ATTACH = "attach";//$NON-NLS-1$
 
 	/**
 	 * Nombre de fichero para adjuntar el contenido binario indicado mediante
 	 * <code>attach</code>. Este par&aacute;metro requiere que se haya establecido
 	 * tambi&eacute;n el par&aacute;metro <code>attach</code>.
 	 */
-	static final String ATTACH_FILENAME = "attachFileName";//$NON-NLS-1$
+	public static final String ATTACH_FILENAME = "attachFileName";//$NON-NLS-1$
 
 	/**
 	 * Descripci&oacute;n del contenido binario indicado mediante
 	 * <code>attach</code>.
 	 */
-	static final String ATTACH_DESCRIPTION = "attachDescription";//$NON-NLS-1$
+	public static final String ATTACH_DESCRIPTION = "attachDescription";//$NON-NLS-1$
 
 	/**
 	 * <p>
@@ -246,7 +246,7 @@ public final class PdfExtraParams {
 	 * la creaci&oacute;n de firmas de aprobaci&oacute;n.</li>
 	 * </ul>
 	 */
-	static final String CERTIFICATION_LEVEL = "certificationLevel";//$NON-NLS-1$
+	public static final String CERTIFICATION_LEVEL = "certificationLevel";//$NON-NLS-1$
 
 	/**
 	 * Versi&oacute;n del PDF de salida:
@@ -259,7 +259,7 @@ public final class PdfExtraParams {
 	 * <li><i>7</i> = PDF 1.7</li>
 	 * </ul>
 	 */
-	static final String PDF_VERSION = "pdfVersion";//$NON-NLS-1$
+	public static final String PDF_VERSION = "pdfVersion";//$NON-NLS-1$
 
 	/**
 	 * Nombre del campo en donde insertar la firma. Si el documento PDF tiene ya un
@@ -598,7 +598,7 @@ public final class PdfExtraParams {
 	 * solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para los
 	 * procesos desatendidos y por lotes.
 	 */
-	static final String HEADLESS = "headless";//$NON-NLS-1$
+	public static final String HEADLESS = "headless";//$NON-NLS-1$
 
 	/**
 	 * Si se establece a <code>true</code> permite la firma o cofirma de PDF
@@ -624,13 +624,13 @@ public final class PdfExtraParams {
 	 * <li>3 = Dos sellos, uno a nivel de firma y otro a nivel de documento.</li>
 	 * </ul>
 	 */
-	static final String TS_TYPE = "tsType";//$NON-NLS-1$
+	public static final String TS_TYPE = "tsType";//$NON-NLS-1$
 
 	/**
 	 * URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade
 	 * sello de tiempo).
 	 */
-	static final String TSA_URL = "tsaURL";//$NON-NLS-1$
+	public static final String TSA_URL = "tsaURL";//$NON-NLS-1$
 
 	/** Pol&iacute;tica de sellado de tiempo. */
 	static final String TSA_POLICY = "tsaPolicy";//$NON-NLS-1$
@@ -768,30 +768,36 @@ public final class PdfExtraParams {
 	 * Este texto se escribe &uacute;nicamente si no se ha especificado una imagen
 	 * de r&uacute;brica.
 	 */
-	static final String LAYER4_TEXT = "layer4Text";//$NON-NLS-1$
+	public static final String LAYER4_TEXT = "layer4Text";//$NON-NLS-1$
 
 	/**
 	 * Contrase&ntilde;a del pdf en caso de se encuentre protegido contra
 	 * modificaciones y/o aperturas.
 	 */
-	static final String USER_PASSWORD_STRING = "userPassword";//$NON-NLS-1$
+	public static final String USER_PASSWORD_STRING = "userPassword";//$NON-NLS-1$
 
 	/**
 	 * Si se indica a {@code true}, se mostrar&aacute; una marca junto a la firma
 	 * visible que el lector de PDF podr&aacute; utilizar para indicar si la firma
 	 * es v&aacute;lida o no.
 	 */
-	static final String INCLUDE_QUESTION_MARK = "includeQuestionMark";//$NON-NLS-1$
+	public static final String INCLUDE_QUESTION_MARK = "includeQuestionMark";//$NON-NLS-1$
 
 	/**
 	 * Indica el tama&ntilde;o que se desea reservar para la firma en el PDF.
 	 */
-	static final String SIGN_RESERVED_SIZE = "signReservedSize";//$NON-NLS-1$
+	public static final String SIGN_RESERVED_SIZE = "signReservedSize";//$NON-NLS-1$
 
 	/**
 	 * Indica el si se permiten o no ataques PDF Shadow Attacks
 	 */
 	public static final String ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Indica si se permite firmar un PDF del que se han cambiado valores de los formularios que
+	 * contiene despu&eacute;s de haberlo firmado.
+	 */
+	public static final String ALLOW_SIGN_MODIFIED_FORM = "allowModifiedForm"; //$NON-NLS-1$
 
 	/**
 	 * Indica la cantidad de p&aacute;ginas en las que comprobar un PDF Shadow Attack

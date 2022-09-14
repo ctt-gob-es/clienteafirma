@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -57,7 +58,8 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 
 	/** Prefijo del mensaje de error del servicio de prefirma. */
 	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
-
+	/** Prefijo del mensaje de error cuando para completar la operaci&oacute;n se requiere intervenci&oacute;n del usuario. */
+	private static final String CONFIG_NEEDED_ERROR_PREFIX = ERROR_PREFIX + "21:"; //$NON-NLS-1$
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
@@ -253,7 +255,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			if (headMsg.startsWith(ERROR_PREFIX)) {
 				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
 				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg);
+				throw buildInternalException(msg, extraParams);
 			}
 		}
 
@@ -285,9 +287,9 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 		// POSTFIRMA
 		// ---------
 
-		final byte[] triSignFinalResult;
+		final byte[] postSignResult;
 		try {
-			triSignFinalResult = PostSigner.postSign(
+			postSignResult = PostSigner.postSign(
 				format,
 				algorithm,
 				certChain,
@@ -308,10 +310,20 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la postfirma: " + e1, e1); //$NON-NLS-1$
 		}
 
+		// Comprobamos que no se trate de un error
+		if (postSignResult.length > 8) {
+			final String headMsg = new String(Arrays.copyOf(postSignResult, 8), StandardCharsets.UTF_8);
+			if (headMsg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
+				final String msg = new String(postSignResult, StandardCharsets.UTF_8);
+				LOGGER.warning("Error durante la postfirma: " + msg); //$NON-NLS-1$
+				throw buildInternalException(msg, extraParams);
+			}
+		}
+
 		// Analizamos la respuesta del servidor
-		final String stringTrimmedResult = new String(triSignFinalResult).trim();
+		final String stringTrimmedResult = new String(postSignResult).trim();
 		if (!stringTrimmedResult.startsWith(SUCCESS)) {
-			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
+			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(postSignResult)); //$NON-NLS-1$
 		}
 
 		// Los datos no se devuelven, se quedan en el servidor
@@ -324,21 +336,37 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 		}
 	}
 
-	/** Construye una excepci&oacute;n a partir del mensaje interno de error
+	/**
+	 * Construye una excepci&oacute;n a partir del mensaje interno de error
 	 * notificado por el servidor trif&aacute;sico.
 	 * @param msg Mensaje de error devuelto por el servidor trif&aacute;sico.
+	 * @param extraParams Configuraci&oacute;n aplicada en la operaci&oacute;n.
 	 * @return Excepci&oacute;n construida.
 	 */
-	private static AOException buildInternalException(final String msg) {
-		AOException exception;
-		final int internalExceptionPos = msg.indexOf(":", msg.indexOf(":") + 1); //$NON-NLS-1$ //$NON-NLS-2$
-		if (internalExceptionPos > 0) {
-			final String intMessage = msg.substring(internalExceptionPos + 1).trim();
-			exception = AOTriphaseException.parseException(intMessage);
+	private static AOException buildInternalException(final String msg, final Properties extraParams) {
+
+		AOException exception = null;
+		final int separatorPos = msg.indexOf(":"); //$NON-NLS-1$
+		if (msg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
+			final int separatorPos2 = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
+			final String errorCode = msg.substring(separatorPos + 1, separatorPos2);
+			final String errorMsg = msg.substring(separatorPos2 + 1);
+			if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception = new SigningLTSException(errorMsg);
+			}
 		}
-		else {
-			exception = new AOException(msg);
+
+		if (exception == null) {
+			final int internalExceptionPos = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
+			if (internalExceptionPos > 0) {
+				final String intMessage = msg.substring(internalExceptionPos + 1).trim();
+				exception = AOTriphaseException.parseException(intMessage);
+			}
+			else {
+				exception = new AOException(msg);
+			}
 		}
+
 		return exception;
 	}
 }

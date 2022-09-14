@@ -37,8 +37,10 @@ import com.aowagie.text.pdf.PdfStamper;
 import com.aowagie.text.pdf.PdfString;
 import com.aowagie.text.pdf.PdfWriter;
 
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfIsCertifiedException;
+import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
 /** Utilidades variadas para el tratamiento de PDF.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -123,13 +125,17 @@ public final class PdfUtil {
 	 * @param headless Si se establece a <code>true</code> se evita cualquier di&aacute;logo
 	 *                 gr&aacute;fico.
 	 * @return Lector iText de PDF.
+	 * @throws PdfIsPasswordProtectedException Si el PDF estaba protegido con contrase&ntilde;a y
+	 *                                 esta no se proporcion&oacute;
 	 * @throws BadPdfPasswordException Si el PDF estaba protegido con contrase&ntilde;a y
-	 *                                 esta no se proporcion&oacute; o era inv&aacute;lida.
+	 *                                 se indic&oacute; una incorrecta.
 	 * @throws InvalidPdfException Si el PDF era inv&aacute;lido o estaba corrupto.
-	 * @throws IOException Si hay errores en la lectura o escritura de datos. */
+	 * @throws IOException Si hay errores en la lectura o escritura de datos.
+	 *  */
 	static PdfReader getPdfReader(final byte[] inPDF,
 			                             final Properties xParams,
-			                             final boolean headless) throws BadPdfPasswordException,
+			                             final boolean headless) throws PdfIsPasswordProtectedException,
+																		BadPdfPasswordException,
 			                                                            InvalidPdfException,
 			                                                            IOException {
 
@@ -154,68 +160,27 @@ public final class PdfUtil {
 			}
 		}
 		catch (final BadPasswordException e) {
-			// Comprobamos que el signer esta en modo interactivo, y si no lo
-			// esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
-			// desatendido
-			if (headless) {
-				throw new BadPdfPasswordException(e);
+			// Devolvemos una excepcion u otra segun si se nos proporciono
+			// contrasena o no
+			if (ownerPassword != null || userPassword != null) {
+				throw new BadPdfPasswordException("Se ha indicado una contrasena incorrecta para el PDF", e); //$NON-NLS-1$
 			}
-			// La contrasena que nos han proporcionada no es buena o no nos
-			// proporcionaron ninguna
-			final String pwd = new String(
-				AOUIFactory.getPassword(
-					ownerPassword == null && userPassword == null ?
-						CommonPdfMessages.getString("AOPDFSigner.0") : //$NON-NLS-1$
-							CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
-					null
-				)
-			);
-			try {
-				pdfReader = new PdfReader(inPDF, pwd.getBytes());
-			}
-			catch (final BadPasswordException e2) {
-				throw new BadPdfPasswordException(e2);
-			}
-			extraParams.put("ownerPassword", pwd); //$NON-NLS-1$
+			throw new PdfIsPasswordProtectedException("El PDF esta protegido por contrasena para lectura", e); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			throw new InvalidPdfException(e);
 		}
 		return pdfReader;
-
 	}
 
 	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException {
+
+		// Si el PDF esta certificado, se comprobara si se ha indicado expresamente que se permite
+		// multifirmar este tipo de documentos. Si no se permite, se lanza una excepcion
 		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED) {
-
-			// "allowSigningCertifiedPdfs" puede ser "true", "false" o no estar establecido (vacio, nulo o cualquier otro valor).
-			// Para tratar el caso en el que sea "false" no puedo usar Boolean.parseBoolean(), ya que no distingue entre "false"
-			// y "no establecido"
 			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
-			if ("true".equalsIgnoreCase(allow)) { //$NON-NLS-1$
-
-			}
-			else if ("false".equalsIgnoreCase(allow)) { //$NON-NLS-1$
-				// No se permite, se lanza excepcion
-				throw new PdfIsCertifiedException();
-			}
-			// No establecido
-			else {
-				// Si no podemos preguntar al usuario, lanzamos excepcion
-				if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
-					throw new PdfIsCertifiedException();
-				}
-				// En otro caso, perguntamos al usuario
-				if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
-					null,
-					CommonPdfMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
-					CommonPdfMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
-					AOUIFactory.YES_NO_OPTION,
-					AOUIFactory.WARNING_MESSAGE)
-				) {
-					throw new AOCancelledOperationException("El usuario no ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
-				}
-				extraParams.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, "true"); //$NON-NLS-1$
+			if (!Boolean.parseBoolean(allow)) {
+				throw new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -239,7 +204,8 @@ public final class PdfUtil {
 		return Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALWAYS_CREATE_REVISION)) || pdfReader.getAcroFields().getSignatureNames().size() > 0;
 	}
 
-	static boolean pdfHasUnregisteredSignatures(final byte[] pdf, final Properties xParams) throws InvalidPdfException, BadPdfPasswordException, IOException {
+	static boolean pdfHasUnregisteredSignatures(final byte[] pdf, final Properties xParams)
+			throws InvalidPdfException, PdfIsPasswordProtectedException, BadPdfPasswordException, IOException {
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			pdf,
@@ -259,6 +225,7 @@ public final class PdfUtil {
 	 * @throws BadPdfPasswordException Cuando se ha insertado una contrase&ntilde;a err&oacute;nea en el PDF. */
 	static String getFirstSupportedSignSubFilter(final byte[] pdf, final Properties xParams) throws IOException,
 	                                                                                                InvalidPdfException,
+	                                                                                                PdfIsPasswordProtectedException,
 	                                                                                                BadPdfPasswordException {
 		if (pdf == null) {
 			throw new IllegalArgumentException("El PDF de entrada no puede ser nulo"); //$NON-NLS-1$
@@ -284,7 +251,6 @@ public final class PdfUtil {
 					if (SUPPORTED_SUBFILTERS.contains(subFilter)) {
 						return subFilter;
 					}
-
     			}
     		}
     	}

@@ -28,6 +28,13 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
+import es.gob.afirma.signers.pades.common.PdfHasUnregisteredSignaturesException;
+import es.gob.afirma.signers.pades.common.PdfIsCertifiedException;
+import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
+import es.gob.afirma.signers.pades.common.SuspectedPSAException;
 
 /** Firmador PAdES en tres fases.
  * Las firmas que genera no se etiquetan como ETSI, sino como "Adobe PKCS#7 Detached".
@@ -44,6 +51,8 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	/** Prefijo del mensaje de error del servicio de prefirma. */
 	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
+	/** Prefijo del mensaje de error cuando para completar la operaci&oacute;n se requiere intervenci&oacute;n del usuario. */
+	private static final String CONFIG_NEEDED_ERROR_PREFIX = ERROR_PREFIX + "21:"; //$NON-NLS-1$
 
 	/** Tama&ntilde;o m&iacute;nimo de un PDF.
 	 * <a href="https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf">
@@ -97,7 +106,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			if (headMsg.startsWith(ERROR_PREFIX)) {
 				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
 				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg);
+				throw buildInternalException(msg, extraParams);
 			}
 		}
 
@@ -120,7 +129,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// POSTFIRMA
 		// ---------
 
-		return PDFTriPhaseSignerUtil.doPostSign(
+		final byte[] postSignResult = PDFTriPhaseSignerUtil.doPostSign(
 			preResultAsBase64,
 			signServerUrl,
 			algorithm,
@@ -129,6 +138,16 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			extraParams
 		);
 
+		if (postSignResult.length > 8) {
+			final String headMsg = new String(Arrays.copyOf(postSignResult, 8), StandardCharsets.UTF_8);
+			if (headMsg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
+				final String msg = new String(postSignResult, StandardCharsets.UTF_8);
+				LOGGER.warning("Error durante la postfirma: " + msg); //$NON-NLS-1$
+				throw buildInternalException(msg, extraParams);
+			}
+		}
+
+		return postSignResult;
 	}
 
 	@Override
@@ -241,18 +260,52 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Construye una excepci&oacute;n a partir del mensaje interno de error
 	 * notificado por el servidor trif&aacute;sico.
 	 * @param msg Mensaje de error devuelto por el servidor trif&aacute;sico.
+	 * @param extraParams Configuraci&oacute;n aplicada en la operaci&oacute;n.
 	 * @return Excepci&oacute;n construida.
 	 */
-	private static AOException buildInternalException(final String msg) {
-		AOException exception;
-		final int internalExceptionPos = msg.indexOf(":", msg.indexOf(":") + 1); //$NON-NLS-1$ //$NON-NLS-2$
-		if (internalExceptionPos > 0) {
-			final String intMessage = msg.substring(internalExceptionPos + 1).trim();
-			exception = AOTriphaseException.parseException(intMessage);
+	private static AOException buildInternalException(final String msg, final Properties extraParams) {
+
+		AOException exception = null;
+		final int separatorPos = msg.indexOf(":"); //$NON-NLS-1$
+		if (msg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
+			final int separatorPos2 = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
+			final String errorCode = msg.substring(separatorPos + 1, separatorPos2);
+			final String errorMsg = msg.substring(separatorPos2 + 1);
+			if (PdfIsCertifiedException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception = new PdfIsCertifiedException(errorMsg);
+			}
+			else if (PdfHasUnregisteredSignaturesException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception =  new PdfHasUnregisteredSignaturesException(errorMsg);
+			}
+			else if (PdfFormModifiedException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception =  new PdfFormModifiedException(errorMsg);
+			}
+			else if (SuspectedPSAException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception =  new SuspectedPSAException(errorMsg);
+			}
+			else if (PdfIsPasswordProtectedException.REQUESTOR_MSG_CODE.equals(errorCode)
+					|| BadPdfPasswordException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				if (extraParams != null && (extraParams.containsKey(PdfExtraParams.OWNER_PASSWORD_STRING)
+						|| extraParams.containsKey(PdfExtraParams.USER_PASSWORD_STRING))) {
+					exception = new BadPdfPasswordException(errorMsg);
+				}
+				else {
+					exception = new PdfIsPasswordProtectedException(errorMsg);
+				}
+			}
 		}
-		else {
-			exception = new AOException(msg);
+
+		if (exception == null) {
+			final int internalExceptionPos = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
+			if (internalExceptionPos > 0) {
+				final String intMessage = msg.substring(internalExceptionPos + 1).trim();
+				exception = AOTriphaseException.parseException(intMessage);
+			}
+			else {
+				exception = new AOException(msg);
+			}
 		}
+
 		return exception;
 	}
 

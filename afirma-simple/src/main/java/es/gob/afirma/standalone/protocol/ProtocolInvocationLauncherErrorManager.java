@@ -77,8 +77,11 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_INVALID_SESSION_ID = "SAF_46"; //$NON-NLS-1$
 	static final String ERROR_EXTERNAL_REQUEST_TO_SOCKET = "SAF_47"; //$NON-NLS-1$
 	static final String ERROR_PDF_SHADOW_ATTACK = "SAF_48"; //$NON-NLS-1$
+	static final String ERROR_SIGNING_LTS_SIGNATURE = "SAF_49"; //$NON-NLS-1$
+	static final String ERROR_CONFIRMATION_NEEDED = "SAF_50"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
+
 	static {
 		ERRORS.put(ERROR_CANNOT_READ_DATA, ProtocolMessages.getString("ProtocolLauncher.0")); //$NON-NLS-1$
 		ERRORS.put(ERROR_NULL_URI, ProtocolMessages.getString("ProtocolLauncher.1")); //$NON-NLS-1$
@@ -129,6 +132,8 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_INVALID_SESSION_ID, ProtocolMessages.getString("ProtocolLauncher.58")); //$NON-NLS-1$
 		ERRORS.put(ERROR_EXTERNAL_REQUEST_TO_SOCKET, ProtocolMessages.getString("ProtocolLauncher.59")); //$NON-NLS-1$
 		ERRORS.put(ERROR_PDF_SHADOW_ATTACK, ProtocolMessages.getString("ProtocolLauncher.63")); //$NON-NLS-1$
+		ERRORS.put(ERROR_SIGNING_LTS_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.64")); //$NON-NLS-1$
+		ERRORS.put(ERROR_CONFIRMATION_NEEDED, ProtocolMessages.getString("ProtocolLauncher.65")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {

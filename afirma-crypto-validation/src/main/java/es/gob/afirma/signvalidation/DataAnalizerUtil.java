@@ -17,7 +17,11 @@ import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +32,13 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
+import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PRAcroForm;
+import com.aowagie.text.pdf.PRAcroForm.FieldInformation;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfObject;
+import com.aowagie.text.pdf.PdfReader;
+
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -35,7 +46,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
@@ -402,5 +413,81 @@ public final class DataAnalizerUtil {
 		final float width = pdRect.getUpperRightX() - pdRect.getLowerLeftX();
 		final float height = pdRect.getUpperRightY() - pdRect.getLowerLeftY();
 		return new Rectangle2D.Float(x, y, width, height);
+	}
+
+	/**
+	 * Method that compares the fields of the form between the first version before signing and the one supplied.
+	 * @param reader PDFReader object that corresponds to a signed PDF form.
+	 * @return Null if the PDF has not been altered. Map that contains field identifier and description of the fields that have been altered after signing.
+	 * @throws IOException If an error occurs.
+	 */
+	public static Map<String, String> checkPDFForm(final PdfReader reader) throws IOException{
+		final Map<String, String> errors = new LinkedHashMap<>();
+		// Obtenemos el listado de campos de la version final.
+		final Map<String, PdfObject> currentFields = getFieldValues(reader);
+		//Obtenemos la primera version antes de firma firmada
+		final AcroFields af = reader.getAcroFields();
+		final List<String> names = af.getSignatureNames();
+
+		PdfReader originalReader;
+		try (final InputStream in = af.extractRevision(names.get(names.size() - 1))) {
+			originalReader = new PdfReader(in);
+		}
+		final Map<String, PdfObject> initialFields = getFieldValues(originalReader);
+		final Iterator<String> keysIt = initialFields.keySet().iterator();
+		while (keysIt.hasNext()) {
+			final String idField = keysIt.next();
+			final PdfObject valueObj = initialFields.get(idField);
+			final PdfObject valueObjFin = currentFields.remove(idField);
+			if (valueObj != null) {
+				final String vInitial = valueObj.toString();
+				if (valueObjFin != null) {
+					final String vFin = valueObjFin.toString();
+					if (!vInitial.equals(vFin)) {
+						errors.put(idField, "El campo " + idField + " ha sido modificado tras firma: " + vInitial + " / " + vFin); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				} else {
+					errors.put(idField, "El campo " + idField + " ha sido modificado tras firma: " + vInitial + " / null"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+			} else {
+				if(valueObjFin!=null) {
+					final String vFin = valueObjFin.toString();
+					errors.put(idField, "El campo " + idField + " ha sido modificado tras firma: null / " + vFin); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+
+		if (errors.isEmpty()) {
+			return null;
+		}
+		return errors;
+	}
+
+	/**
+	 * Method that extracts the values of the fields of a PDF form.
+	 * @param reader PDFReader object that corresponds to a PDF form.
+	 * @return Map with the identifier of the form field and its value.
+	 */
+	private static Map<String, PdfObject> getFieldValues(final PdfReader reader){
+		final LinkedHashMap<String, PdfObject> fields = new LinkedHashMap<>();
+		final PRAcroForm form = reader.getAcroForm();
+		final ArrayList<FieldInformation> fiList = form.getFields();
+		for (int i = 0; i < fiList.size(); i++) {
+			final FieldInformation fi = fiList.get(i);
+			if (fi.getInfo() != null) {
+				// Obtenemos el tipo de campo
+				String type = null;
+				if (fi.getInfo().get(PdfName.FT) != null) {
+					type = fi.getInfo().get(PdfName.FT).toString();
+				}
+				// Excluimos los campos signature
+				if (type == null || !type.equals("/Sig")) { //$NON-NLS-1$
+					fields.put(fi.getName(), fi.getInfo().get(PdfName.V));
+				}
+
+			}
+
+		}
+		return fields;
 	}
 }

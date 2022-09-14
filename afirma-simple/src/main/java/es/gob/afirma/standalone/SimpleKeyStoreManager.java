@@ -32,6 +32,8 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SimpleKeyStoreManager {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     private SimpleKeyStoreManager() { /* No permitimos la instanciacion */ }
 
     /** Obtiene un <code>KeyStore</code>.
@@ -136,10 +138,12 @@ public final class SimpleKeyStoreManager {
 
         JMulticardUtilities.configureJMulticard(enableJMulticard);
 
-        // Cargamos el almacen por defecto
-
-        // El por defecto
+        // Identificamos el almacen por defecto
         final AOKeyStore aoks = getDefaultKeyStoreType();
+
+        LOGGER.info("Cargando almacen por defecto: " + aoks.getName()); //$NON-NLS-1$
+
+        // Cargamos el almacen
         try {
 			return getKeyStoreManager(
 				aoks,

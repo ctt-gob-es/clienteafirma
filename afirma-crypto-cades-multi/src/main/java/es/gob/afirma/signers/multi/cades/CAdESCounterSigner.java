@@ -18,6 +18,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 import org.spongycastle.asn1.ASN1Encodable;
 import org.spongycastle.asn1.ASN1EncodableVector;
@@ -50,6 +51,7 @@ import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -280,13 +282,19 @@ final class CAdESCounterSigner {
 
         // Comprobamos si tiene atributos no firmados y los recorremos
         if (signerInfo.getUnauthenticatedAttributes() != null) {
+        	final Properties xParams = config.getExtraParams();
             final Enumeration<?> unauthenticatedAttributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (unauthenticatedAttributes.hasMoreElements()) {
 
             	final Attribute unauthenticatedAttribute = Attribute.getInstance(unauthenticatedAttributes.nextElement());
 
                 // Si es un atributo no soportado, no podremos realizar la firma y se lanzara una excepcion
-                CAdESMultiUtil.checkUnsupported(unauthenticatedAttribute.getAttrType());
+
+            	final String forceSignLts = xParams != null ?
+            			xParams.getProperty(CAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES) : null;
+        		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
+	        		CAdESMultiUtil.checkUnsupported(unauthenticatedAttribute.getAttrType());
+        		}
 
                 // Si es una contrafirma, la analizamos para saber si procesar su contenido y agregar nuevas contrafirmas
                 if (CAdESMultiUtil.isCounterSignature(unauthenticatedAttribute.getAttrType())) {
