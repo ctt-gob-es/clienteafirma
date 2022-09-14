@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>afirma-crypto-padestri-client</artifactId>
+	<artifactId>afirma-crypto-pdf-common</artifactId>
 	<packaging>jar</packaging>
 
-	<name>afirma-crypto-padestri</name>
-	<description>Modulo con el componente cliente para la generacion de firmas PDF/PAdES trifasicas</description>
+	<name>afirma-crypto-pdf-common</name>
+	<description>Modulo con informacion y excepciones asociadas a errores de PDF</description>
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -19,12 +19,6 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
-			<version>${clienteafirma.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-pdf-common</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
 	</dependencies>

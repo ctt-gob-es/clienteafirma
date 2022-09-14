@@ -34,6 +34,23 @@ public class RuntimeConfigNeededException extends AOException {
 	}
 
 	/**
+	 * Construye la excepcion con la informaci&oacute;n necesaria para poder solicitar la
+	 * configuraci&oacute;n que se necesite.
+	 * @param msg Descripci&oacute;n del error.
+	 * @param requestType Tipo de configuraci&oacute;n necesaria.
+	 * @param requestorText Mensaje o c&oacute;digo de mensaje para la solicitud de la informaci&oacute;n.
+	 * @param param Identificador del par&aacute;metro que se configurar&aacute; con la informaci&oacute;n.
+	 * proporcionada.
+	 * @param e Error que origin&oacute; la excepci&oacute;n.
+	 */
+	public RuntimeConfigNeededException(final String msg, final RequestType requestType, final String requestorText, final String param, final Throwable e) {
+		super(msg, e);
+		this.requestType = requestType;
+		this.requestorText = requestorText;
+		this.param = param;
+	}
+
+	/**
 	 * Obtiene el tipo de configuraci&oacute;n necesaria.
 	 * @return Tipo de configuraci&oacute;n necesaria.
 	 */

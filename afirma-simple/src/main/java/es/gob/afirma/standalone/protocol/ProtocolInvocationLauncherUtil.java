@@ -91,7 +91,7 @@ final class ProtocolInvocationLauncherUtil {
 			exceptionClass = (Class<Exception>) Class.forName(ex.getServerExceptionClassname());
 		}
 		catch (final Throwable e) {
-			LOGGER.warning("No se pudo identificar la excepcion enviada por el servidor: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo identificar la excepcion enviada por el servidor (" + ex.getServerExceptionClassname() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			return ex;
 		}
 

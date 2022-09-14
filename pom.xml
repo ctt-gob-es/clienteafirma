@@ -177,7 +177,9 @@
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
 				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-common</module>
 				<module>afirma-crypto-pdf-enhancer</module>
+				<module>afirma-crypto-pdf</module>
 				<module>afirma-crypto-validation</module>
 				<module>afirma-crypto-xades</module>
 				<module>afirma-crypto-xadestri-client</module>
@@ -190,7 +192,6 @@
 				<module>afirma-keystores-single</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
-				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
@@ -281,6 +282,8 @@
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
 				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-common</module>
+				<module>afirma-crypto-pdf</module>
 				<module>afirma-crypto-validation</module>
 				<module>afirma-crypto-xades</module>
 				<module>afirma-crypto-xadestri-client</module>
@@ -290,7 +293,6 @@
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
-				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
@@ -351,7 +353,9 @@
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
 				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-common</module>
 				<module>afirma-crypto-pdf-enhancer</module>
+				<module>afirma-crypto-pdf</module>
 				<module>afirma-crypto-validation</module>
 				<module>afirma-crypto-xades</module>
 				<module>afirma-crypto-xadestri-client</module>
@@ -364,7 +368,6 @@
 				<module>afirma-keystores-single</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
-				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
@@ -439,7 +442,9 @@
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
 				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-pdf-common</module>
 				<module>afirma-crypto-pdf-enhancer</module>
+				<module>afirma-crypto-pdf</module>
 				<module>afirma-crypto-validation</module>
 				<module>afirma-crypto-xades</module>
 				<module>afirma-crypto-xadestri-client</module>
@@ -452,7 +457,6 @@
 				<module>afirma-keystores-single</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
-				<module>afirma-crypto-pdf</module>
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>

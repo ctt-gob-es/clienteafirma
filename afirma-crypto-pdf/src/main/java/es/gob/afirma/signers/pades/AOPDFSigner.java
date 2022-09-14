@@ -42,9 +42,9 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.SignEnhancer;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
  * <p>Para compatibilidad estricta con PAdES-BES/EPES se utiliza <i>ETSI.CAdES.detached</i> como nombre del subfiltro.</p>
@@ -402,31 +402,9 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     	}
     	catch (final BadPasswordException e) {
     		LOGGER.info(
-				"El PDF necesita contrasena: " + e //$NON-NLS-1$
+				"El PDF necesita contrasena. Se devolvera el arbol vacio: " + e //$NON-NLS-1$
 			);
-    		try {
-    			pdfReader = new PdfReader(
-					sign,
-					new String(
-						AOUIFactory.getPassword(
-							CommonPdfMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
-							null
-						)
-					).getBytes()
-				);
-    		}
-    		catch (final BadPasswordException e2) {
-    			LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
-    			return new AOTreeModel(root);
-    		}
-    		catch (final AOCancelledOperationException e2) {
-    			LOGGER.warning("No se introdujo la contrasena. Se propaga la excepcion: " + e2); //$NON-NLS-1$
-    			throw e2;
-    		}
-    		catch (final Exception e3) {
-    			LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3); //$NON-NLS-1$
-    			return new AOTreeModel(root);
-    		}
+    		return new AOTreeModel(root);
     	}
     	catch (final Exception e) {
     		LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$

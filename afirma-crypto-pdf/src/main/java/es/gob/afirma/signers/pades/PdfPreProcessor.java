@@ -27,6 +27,7 @@ import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 
 /** Utilidades para el manejo y modificaci&oacute;n de PDF antes de firmarlo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

@@ -56,10 +56,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -68,7 +68,7 @@ import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signvalidation.SignValider;
@@ -532,26 +532,33 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			 if (validator != null) {
 				 SignValidity validity = null;
 				 final Properties validationParams = new Properties();
-				 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+
+				 final boolean needCheckPsa = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+				 if (!needCheckPsa) {
+					 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+				 }
+
 				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
 				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
+
+				 String errorText = null;
 				 try {
 					validity = validator.validate(data, validationParams);
-				} catch (final ConfirmationNeededException e) {
-					// No ocurre nada
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
+							|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+						errorText = buildErrorText(validity.getValidity(), validity.getError());
+					}
+				} catch (final RuntimeConfigNeededException e) {
+					validity = new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e);
+					errorText = e.getMessage();
 				} catch (final IOException e) {
 					throw e;
 				}
 
-				if (validity != null) {
-					config.setSignValidity(validity);
-					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
-							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
-							 || validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
-						config.setInvalidSignatureText(
-								buildErrorText(validity.getValidity(), validity.getError()));
-					}
-				}
+				 config.setSignValidity(validity);
+				 if (errorText != null) {
+					 config.setInvalidSignatureText(errorText);
+				 }
 			 }
 		 }
 

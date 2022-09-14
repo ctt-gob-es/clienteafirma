@@ -35,11 +35,11 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
+import es.gob.afirma.core.RuntimePasswordNeededException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -59,12 +59,8 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.InvalidPdfException;
-import es.gob.afirma.signers.pades.PdfExtraParams;
-import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
-import es.gob.afirma.signers.pades.PdfIsCertifiedException;
-import es.gob.afirma.signers.pades.PdfIsPasswordProtectedException;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner;
 import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
@@ -390,32 +386,47 @@ final class ProtocolInvocationLauncherSignAndSave {
 					} catch (final IOException e) {
 						LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
 						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
-					} catch (final ConfirmationNeededException cne) {
-						// Si no se puede solicitar confirmacion al usuario, se
-						// establecen las opciones por defecto
+					} catch (final RuntimeConfigNeededException e) {
+						LOGGER.warning("La validacion de la firma ha revelado una situacion que requiere la intervencion del usuario: " + e); //$NON-NLS-1$
+
+						// Se requiere confirmacion por parte del usuario
 						if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
-							final Properties newParams = cne.getDefaultParamsOptions();
-							if (newParams != null) {
-								extraParams.putAll(newParams);
-							}
+							LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
+							throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONFIRMATION_NEEDED, e.getMessage(), e);
 						}
 
-						// Se solicita confirmacion al usuario
-						final String dialogMessage = cne.getMessage();
-						final int confirmation = AOUIFactory.showConfirmDialog(
-								null,
-								dialogMessage,
-								ProtocolMessages.getString("ProtocolLauncher.60"), //$NON-NLS-1$
-								AOUIFactory.YES_NO_OPTION,
-								AOUIFactory.WARNING_MESSAGE);
-						if (AOUIFactory.YES_OPTION == confirmation) {
-							final Properties newParams = cne.getYesParamsOptions();
-							if (newParams != null) {
-								extraParams.putAll(newParams);
+						if (e.getRequestType() == RequestType.CONFIRM) {
+							final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
+									SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
+							if (result == JOptionPane.YES_OPTION) {
+								extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
 							}
-						} else {
-							LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + dialogMessage); //$NON-NLS-1$
-							throw new SocketOperationException(RESULT_CANCEL);
+							else {
+								LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + SimpleAfirmaMessages.getString(e.getRequestorText())); //$NON-NLS-1$
+								throw new SocketOperationException(RESULT_CANCEL);
+							}
+						}
+						// Se requiere ua contrasena por parte del usuario
+						else if (e.getRequestType() == RequestType.PASSWORD) {
+							char[] p;
+							try {
+								p = AOUIFactory.getPassword(SimpleAfirmaMessages.getString(e.getRequestorText()), null);
+							}
+							catch (final AOCancelledOperationException ce) {
+								p = null;
+							}
+							if (p != null) {
+								if (e instanceof RuntimePasswordNeededException) {
+	            					((RuntimePasswordNeededException) e).configure(extraParams, p);
+	            				}
+	            				else {
+	            					extraParams.setProperty(e.getParam(), new String(p));
+	            				}
+							}
+						}
+						else {
+							LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma"); //$NON-NLS-1$
+							throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
 						}
 					}
 				} while (validity == null);
@@ -690,33 +701,13 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
 			throw new SocketOperationException(errorCode);
 		}
-		catch (final BadPdfPasswordException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
-			throw new SocketOperationException(errorCode);
-		}
-		catch (final PdfHasUnregisteredSignaturesException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN;
-			throw new SocketOperationException(errorCode);
-		}
-		catch (final PdfIsCertifiedException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED;
-			throw new SocketOperationException(errorCode);
-		}
-		catch (final PdfIsPasswordProtectedException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
-			throw new SocketOperationException(errorCode);
-		}
 		catch (final RuntimeConfigNeededException e) {
 			LOGGER.warning("No se puede completar la firma sin intervencion del usuario: " + e); //$NON-NLS-1$
 
 			// Se requiere confirmacion por parte del usuario
 			if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
 				LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
-				throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONFIRMATION_NEEDED, e.getMessage(), e);
 			}
 
 			if (e.getRequestType() == RequestType.CONFIRM) {
@@ -737,7 +728,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 					p = null;
 				}
 				if (p != null) {
-					extraParams.setProperty(e.getParam(), new String(p));
+					if (e instanceof RuntimePasswordNeededException) {
+    					((RuntimePasswordNeededException) e).configure(extraParams, p);
+    				}
+    				else {
+    					extraParams.setProperty(e.getParam(), new String(p));
+    				}
 					return executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
 				}
 			}

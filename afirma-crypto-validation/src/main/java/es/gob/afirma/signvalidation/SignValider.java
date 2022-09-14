@@ -12,7 +12,7 @@ package es.gob.afirma.signvalidation;
 import java.io.IOException;
 import java.util.Properties;
 
-import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 
 /** Valida una firma del tipo del validador instanciado.
  * @author Sergio Mart&iacute;nez Rico. */
@@ -35,8 +35,8 @@ public interface SignValider {
      * @param sign Firma a validar
 	 * @param params Indica propiedades a indicar para tener en cuenta en la validaci&oacute;n.
      * @return Validez de la firma.
-	 * @throws ConfirmationNeededException Excepci&oacute;n con las opciones para el di&aacute;logo
-	 * de confirmaci&oacute;n para la operaci&oacute;n.
+	 * @throws RuntimeConfigNeededException Continuar con la operaci&oacute;n requiere
+	 * confirmaci&oacute;n del usuario.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    SignValidity validate(final byte[] sign, final Properties params) throws ConfirmationNeededException, IOException;
+    SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
 }

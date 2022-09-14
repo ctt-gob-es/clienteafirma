@@ -116,7 +116,9 @@ public final class SignValidity {
         /** Cuando el documento ha sufrido alguna modificaci&oacute;n desde la &uacute;ltima firma. */
         MODIFIED_DOCUMENT,
         /** Cuando una firma est&aacute; solapando a otra en un documento PDF. */
-        OVERLAPPING_SIGNATURE
+        OVERLAPPING_SIGNATURE,
+        /** El usuario debe confirmar la validez de la firma. */
+        SUSPECTED_SIGNATURE
     }
 
     /** Validez de la firma. */

@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -50,7 +51,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -521,9 +522,15 @@ public final class SignatureService extends HttpServlet {
 
 					LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve"); //$NON-NLS-1$
 				}
+				catch (final RuntimeConfigNeededException e) {
+					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la prefirma de los datos", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					out.flush();
+					return;
+				}
 				catch (final Exception e) {
-					LOGGER.log(Level.SEVERE, "Error en la prefirma: " + e, e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(9) + ": " + e); //$NON-NLS-1$
+					LOGGER.log(Level.SEVERE, "Error en la prefirma", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -543,7 +550,7 @@ public final class SignatureService extends HttpServlet {
 					}
 					catch (final Exception e) {
 						LOGGER.log(Level.SEVERE, "Error al generar los codigos de verificacion de las firmas: " + e, e); //$NON-NLS-1$
-						out.print(ErrorManager.getErrorMessage(16) + ": " + e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.GENERATING_CSV_ERROR) + ": " + e); //$NON-NLS-1$
 						out.flush();
 						return;
 					}
@@ -570,7 +577,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "El formato de los parametros de operacion requeridos incorrecto", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(19) + ": " + e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.INVALID_DATA_OPERATION_FORMAT) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -586,13 +593,13 @@ public final class SignatureService extends HttpServlet {
 					}
 					catch (final InvalidVerificationCodeException e) {
 						LOGGER.log(Level.SEVERE, "Las prefirmas y/o el certificado obtenido no se corresponden con los generados en la prefirma", e); //$NON-NLS-1$
-						out.print(ErrorManager.getErrorMessage(17) + ": " + e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CHECKING_CSV_ERROR) + ": " + e); //$NON-NLS-1$
 						out.flush();
 						return;
 					}
 					catch (final Exception e) {
 						LOGGER.log(Level.SEVERE, "Error al comprobar los codigos de verificacion de las firmas", e); //$NON-NLS-1$
-						out.print(ErrorManager.getErrorMessage(17) + ": " + e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CHECKING_CSV_ERROR) + ": " + e); //$NON-NLS-1$
 						out.flush();
 						return;
 					}
@@ -641,9 +648,15 @@ public final class SignatureService extends HttpServlet {
 						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 					}
 				}
+				catch (final RuntimeConfigNeededException e) {
+					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la postfirma de los datos", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED) + ":" + e.getRequestorText() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					out.flush();
+					return;
+				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error en la postfirma: " + e, e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(12) + ": " + e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.POSTSIGN_ERROR) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}

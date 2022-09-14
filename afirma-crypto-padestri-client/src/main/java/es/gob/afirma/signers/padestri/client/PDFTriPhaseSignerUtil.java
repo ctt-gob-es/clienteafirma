@@ -183,7 +183,7 @@ final class PDFTriPhaseSignerUtil {
 			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
 		}
 
-		// Los datos no se devuelven, se quedan en el servidor
+		// Se devuelve la respuesta del servidor sin la cabecera
 		try {
 			return Base64.decode(stringTrimmedResult.substring((SUCCESS + " NEWID=").length()), true); //$NON-NLS-1$
 		}

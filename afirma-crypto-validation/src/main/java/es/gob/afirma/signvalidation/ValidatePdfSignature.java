@@ -24,8 +24,9 @@ import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
-import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.SuspectedPSAException;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 
@@ -69,7 +70,7 @@ public final class ValidatePdfSignature implements SignValider {
 		params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
 		try {
 			return validate(sign, params);
-		} catch (final ConfirmationNeededException e) {
+		} catch (final RuntimeConfigNeededException e) {
 			throw new IOException("No se dispone de la informacion necesaria para completar la validacion", e); //$NON-NLS-1$
 		}
 	}
@@ -84,7 +85,7 @@ public final class ValidatePdfSignature implements SignValider {
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
-	public SignValidity validate(final byte[] sign, final Properties params) throws ConfirmationNeededException, IOException {
+	public SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
 		AcroFields af;
 		try {
 			final PdfReader reader = new PdfReader(sign);
@@ -94,7 +95,6 @@ public final class ValidatePdfSignature implements SignValider {
 			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
 		}
 		final List<String> signNames = af.getSignatureNames();
-
 
 		// Si no hay firmas, no hay nada que comprobar
 		if (signNames.size() == 0) {
@@ -165,7 +165,7 @@ public final class ValidatePdfSignature implements SignValider {
 					// cumplen los requisitos para ello
 					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
 							&& allowShadowAttackProp == null) {
-						throw new SuspectedPSAException("ProtocolInvocationError.PSA"); //$NON-NLS-1$
+						throw new SuspectedPSAException("PDF sospechoso de haber sufrido PDF Shadow Attack"); //$NON-NLS-1$
 					}
 					// Si habia que consultar y no se cumplen los requisitos,
 					// se considera que la firma no es valida

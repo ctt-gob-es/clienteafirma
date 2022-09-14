@@ -20,8 +20,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.protocol.ConfirmationNeededException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
@@ -75,8 +75,9 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
 	        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
 	        	}
-			} catch (final ConfirmationNeededException e) {
-				// No se hace nada
+			} catch (final RuntimeConfigNeededException e) {
+				LOGGER.severe("Se detecta durante la validacion de la firma que la operacion requiere intervencion del usuario: " + e); //$NON-NLS-1$
+				throw e;
 			} catch (final IOException e) {
 				LOGGER.severe("Error al validar documento: " + e); //$NON-NLS-1$
 				throw e;
