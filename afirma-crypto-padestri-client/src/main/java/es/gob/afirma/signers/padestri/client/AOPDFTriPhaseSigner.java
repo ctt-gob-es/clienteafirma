@@ -30,6 +30,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
 import es.gob.afirma.signers.pades.common.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.common.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
@@ -275,6 +276,9 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			}
 			else if (PdfHasUnregisteredSignaturesException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception =  new PdfHasUnregisteredSignaturesException(errorMsg);
+			}
+			else if (PdfFormModifiedException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception =  new PdfFormModifiedException(errorMsg);
 			}
 			else if (SuspectedPSAException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception =  new SuspectedPSAException(errorMsg);

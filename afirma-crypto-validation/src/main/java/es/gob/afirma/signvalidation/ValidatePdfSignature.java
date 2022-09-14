@@ -15,6 +15,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -26,6 +27,7 @@ import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
 import es.gob.afirma.signers.pades.common.SuspectedPSAException;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
@@ -86,9 +88,11 @@ public final class ValidatePdfSignature implements SignValider {
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
 	public SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
+
 		AcroFields af;
+		PdfReader reader;
 		try {
-			final PdfReader reader = new PdfReader(sign);
+			reader = new PdfReader(sign);
 			af = reader.getAcroFields();
 		}
 		catch (final Exception e) {
@@ -146,16 +150,41 @@ public final class ValidatePdfSignature implements SignValider {
 			}
 		}
 
+		// COMPROBACION DE CAMBIOS EN LOS FORMULARIOS PDF
+
+		final String allowSignModifiedFormProp = params.getProperty(PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM);
+		final boolean allowSignModifiedForm = Boolean.parseBoolean(allowSignModifiedFormProp);
+
+		// Si se debe comprobar que no haya cambios en los valores de los formularios, lo hacemos
+		// si hay mas de una revision y ha habido cambios desde la ultima firma, comprobamos si ha
+		// habido cambios en campos de formularios
+		if (!allowSignModifiedForm && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
+			final Map<String, String> errors = DataAnalizerUtil.checkPDFForm(reader);
+			if (errors != null && !errors.isEmpty()) {
+				// Si no estaba definido un comportamiento concreto, consultaremos al usuario.
+				if (allowSignModifiedFormProp == null) {
+					throw new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
+				}
+				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM);
+			}
+		}
+
+		// COMPROBACION DE PDF SHADOW ATTACK
+
 		final String allowShadowAttackProp = params.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
 		final boolean allowPdfShadowAttack = Boolean.parseBoolean(allowShadowAttackProp);
 		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, DEFAULT_PAGES_TO_CHECK_PSA);
 
-		// Si se debe comprobar si se ha producido un PDF Shadow Attack
-		// (modificacion de un documento tras la firma), se encuentran varias
-		// revisiones en el documento y hay al menos una posterior a la ultima
-		// firma (la de la posicion 0), se comprueba si el documento ha sufrido
-		// un PSA.
-		if (!allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
+		// La comprobacion de PDF Shadow Attack detecta tambien los cambios en los formularios PDF,
+		// asi que estos cambios impiden que se pueda hacer una comprobacion realista de esta
+		// situacion. Por tanto, si se permiten los cambios en los formularios, se ignorara la
+		// validacion de PDF Shadow Attack
+
+		// Por otra parte, si se debe comprobar si se ha producido un PDF Shadow Attack
+		// (modificacion de un documento tras la firma), se encuentran varias revisiones
+		// en el documento y hay al menos una posterior a la ultima firma (la de la
+		// posicion 0), se comprueba si el documento ha sufrido un PSA.
+		if (!allowSignModifiedForm && !allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
 			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
 			try (final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
 				SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewStream, pagesToCheck);
@@ -179,5 +208,7 @@ public final class ValidatePdfSignature implements SignValider {
 
 		return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
 	}
+
+
 
 }

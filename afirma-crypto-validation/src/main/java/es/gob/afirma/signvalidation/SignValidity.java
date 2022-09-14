@@ -113,6 +113,8 @@ public final class SignValidity {
         UNKOWN_ERROR,
         /** Cuando los datos proporcionado no sean ning&uacute;n tipo de firma reconocida. */
         UNKOWN_SIGNATURE_FORMAT,
+        /** Cuando un formualrio del documento ha sufrido alguna modificaci&oacute;n desde la &uacute;ltima firma. */
+        MODIFIED_FORM,
         /** Cuando el documento ha sufrido alguna modificaci&oacute;n desde la &uacute;ltima firma. */
         MODIFIED_DOCUMENT,
         /** Cuando una firma est&aacute; solapando a otra en un documento PDF. */

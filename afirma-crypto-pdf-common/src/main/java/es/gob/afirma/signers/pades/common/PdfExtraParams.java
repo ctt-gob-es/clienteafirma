@@ -794,6 +794,12 @@ public final class PdfExtraParams {
 	public static final String ALLOW_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
 
 	/**
+	 * Indica si se permite firmar un PDF del que se han cambiado valores de los formularios que
+	 * contiene despu&eacute;s de haberlo firmado.
+	 */
+	public static final String ALLOW_SIGN_MODIFIED_FORM = "allowModifiedForm"; //$NON-NLS-1$
+
+	/**
 	 * Indica la cantidad de p&aacute;ginas en las que comprobar un PDF Shadow Attack
 	 */
 	public static final String PAGES_TO_CHECK_PSA = "pagesToCheckShadowAttack"; //$NON-NLS-1$

@@ -694,12 +694,13 @@ Opciones:
   <ul>
   	<li><code>true</code>: Permite la firma de documentos PDF certificados. El resultado podr&iacute;a invalidar firmas anteriores del PDF.</li>
   	<li><code>false</code>: Produce un error al firmar documentos PDF certificados.</li>
-  	<li>Se omite: En caso de detectar que el documento PDF de entrada est&aacute; certificado, se aplicar&aacute; uno de los siguientes comportamientos:</li>
-  	<ul>
-  	  <li>Si la firma es monof&aacute;sica (formato "PAdES"), se advertir&aacute; al usuario de que la firma podr&iacute;a invalidar firmas anteriores y se le permitir&aacute; elegir si firmar o cancelar la operaci&oacute;n.</li>
-  	  <li>Si la firma es trif&aacute;sica (formato "PAdEStri"), fallar&aacute; la operaci&oacute;n de firma.</li>
-  	</ul>
-	<li>Tenga en cuenta que, en los clientes m&oacute;viles, las firmas podr&iacute;an ser trif&aacute;sicas independientemente del nombre de formato indicado.</li>
+  	<li>Se omite: En caso de detectar que el documento PDF de entrada est&aacute; certificado, se advertir&aacute; al usuario de que la firma podr&iacute;a invalidar firmas anteriores y se le permitir&aacute; elegir si firmar o cancelar la operaci&oacute;n.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li>
+  <ul>
+  	<li><code>true</code>: Permite la firma de documentos PDF certificados. El resultado podr&iacute;a invalidar firmas anteriores del PDF.</li>
+  	<li><code>false</code>: Produce un error al firmar documentos PDF certificados.</li>
+  	<li>Se omite: En caso de detectar que el documento PDF de entrada est&aacute; certificado, se advertir&aacute; al usuario de que la firma podr&iacute;a invalidar firmas anteriores y se le permitir&aacute; elegir si firmar o cancelar la operaci&oacute;n.</li>
   </ul>
   <li style="margin-top: 10pt"><code>allowCosigningUnregisteredSignatures</code>:</li>
   <ul>
@@ -711,6 +712,28 @@ Opciones:
   	<li><code>true</code>: Se utiliza el atributo signingCertificateV2 en las firmas.</li>
   	<li><code>false</code>: Se utiliza el atributo signingCertificateV1 en las firmas.</li>
   	<li>Se omite: Se utiliza el atributo signingCertificateV1 en las firmas SHA1withRSA y signingCertificateV2 en el resto.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signReservedSize</code>:</li>
+  <ul>
+  	<li>Tama&ntilde;o m&aacute;ximo en bytes de la firma que se incorporará al PDF. Por defecto, 27000.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signingCertificateV2</code>:</li>
+  <ul>
+  	<li><code>true</code>: Se utiliza el atributo signingCertificateV2 en las firmas.</li>
+  	<li><code>false</code>: Se utiliza el atributo signingCertificateV1 en las firmas.</li>
+  	<li>Se omite: Se utiliza el atributo signingCertificateV1 en las firmas SHA1withRSA y signingCertificateV2 en el resto.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowShadowAttack</code>:</li>
+  <ul>
+  	<li><code>true</code>: No se realizar&aacute; la comprobación de PDF Shadow Attack durante la validaci&oacute;n de las firmas previas.</li>
+  	<li><code>false</code>: Se realizar&aacute; la comprobación de PDF Shadow Attack durante la validaci&oacute;n de las firmas previas y, en caso de detectarse, se dar&aacute; la firma por inválida.</li>
+  	<li>Se omite: Se realizar&aacute; la comprobaci&oacute;n de PDF Shadow Attack durante la validaci&oacute;n de las firmas previas y, en caso de detectarse, se consultar&aacute; al usuario si se debe continuar con la operaci&oacute;n.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowModifiedForm</code>:</li>
+  <ul>
+  	<li><code>true</code>: No se realizar&aacute; la comprobaci&oacute;n de cambios en los formularios del documento ni PDF Shadow Attack durante la validaci&oacute;n de las firmas previas.</li>
+  	<li><code>false</code>: Se realizar&aacute; la comprobaci&oacute;n de cambios en los formularios del documento durante la validaci&oacute;n de las firmas previas y, en caso de detectarse, se dar&aacute; la firma por inv&aacute;lida.</li>
+  	<li>Se omite: Se realizar&aacute; la comprobaci&oacute;n de cambios en los formularios del documento durante la validaci&oacute;n de las firmas previas y, en caso de detectarse, se consultar&aacute; al usuario si se debe continuar con la operaci&oacute;n.</li>
   </ul>
   </ul>
  </body>
