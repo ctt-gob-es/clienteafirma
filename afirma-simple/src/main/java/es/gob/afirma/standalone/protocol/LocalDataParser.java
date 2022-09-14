@@ -148,7 +148,9 @@ public class LocalDataParser {
 				}
 				else {
 					final Properties extraParamsCopy = new Properties();
-					extraParamsCopy.putAll(extraParams);
+					if (extraParams != null) {
+						extraParamsCopy.putAll(extraParams);
+					}
 					singleOperation.setExtraParams(extraParamsCopy);
 				}
 
