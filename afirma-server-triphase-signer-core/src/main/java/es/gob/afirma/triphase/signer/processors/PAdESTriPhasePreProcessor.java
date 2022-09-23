@@ -71,7 +71,9 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
         if (checkSignatures && new AOPDFSigner().isSign(data)) {
         	SignValidity validity;
 			try {
-				validity = new ValidatePdfSignature().validate(data, extraParams);
+				final ValidatePdfSignature validator = new ValidatePdfSignature();
+				validator.setRelaxed(true);
+				validity = validator.validate(data, extraParams);
 	        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
 	        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
 	        	}

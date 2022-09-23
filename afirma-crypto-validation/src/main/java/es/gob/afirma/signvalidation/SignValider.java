@@ -16,27 +16,56 @@ import es.gob.afirma.core.RuntimeConfigNeededException;
 
 /** Valida una firma del tipo del validador instanciado.
  * @author Sergio Mart&iacute;nez Rico. */
-public interface SignValider {
+public abstract class SignValider {
+
+	private boolean relaxed = false;
+
+	/**
+	 * Establece si la validacion debe ser relajada. Esta cse utiliza cuando
+	 * se admiten problemas en la firma de cara a una operaci&oacute;n posterior.
+	 * @param relaxed {@code true} para habilitar el modo relajado, {@code false}
+	 * en caso contrario.
+	 */
+	public void setRelaxed(final boolean relaxed) {
+		this.relaxed = relaxed;
+	}
+
+	/**
+	 * Devuelve si la validacion ser&aacute; relajada. Esta se utiliza cuando
+	 * se admiten problemas en la firma de cara a una operaci&oacute;n posterior.
+	 * @param relaxed {@code true} para habilitar el modo relajado, {@code false}
+	 * en caso contrario.
+	 */
+	public boolean isRelaxed() {
+		return this.relaxed;
+	}
 
 	/** Valida una firma del tipo del validador instanciado.
      * @param sign Firma a validar
      * @return Validez de la firma.
+     * @throws RuntimeConfigNeededException Antes de realizar una
+     * operaci&oacute;n sobre la firma ser&iacute;a necesaria
+     * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    SignValidity validate(final byte[] sign) throws IOException;
+    public abstract SignValidity validate(final byte[] sign) throws RuntimeConfigNeededException, IOException;
 
 	/** Valida una firma del tipo del validador instanciado.
      * @param sign Firma a validar
 	 * @param checkCertificates Indica si debe comprobarse o no el periodo de validez de los certificados.
      * @return Validez de la firma.
+     * @throws RuntimeConfigNeededException Antes de realizar una
+     * operaci&oacute;n sobre la firma ser&iacute;a necesaria
+     * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException;
+    public abstract SignValidity validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException;
 
 	/** Valida una firma del tipo del validador instanciado.
      * @param sign Firma a validar
 	 * @param params Indica propiedades a indicar para tener en cuenta en la validaci&oacute;n.
      * @return Validez de la firma.
-	 * @throws RuntimeConfigNeededException Continuar con la operaci&oacute;n requiere
-	 * confirmaci&oacute;n del usuario.
+	 * @throws RuntimeConfigNeededException Antes de realizar una
+     * operaci&oacute;n sobre la firma ser&iacute;a necesaria
+     * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
+    public abstract SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
 }

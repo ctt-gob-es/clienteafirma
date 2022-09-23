@@ -257,6 +257,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
 
         if (showDNIeScreen) {
+        	LOGGER.info("Mostramos pantalla del DNIe"); //$NON-NLS-1$
            	this.currentPanel = new DNIeWaitPanel(this);
 			((MainScreen) this.window).showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH,
 					DEFAULT_WINDOW_HEIGHT);
@@ -264,6 +265,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             this.container.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("DNIeWaitPanel.3") + //$NON-NLS-1$
             																SimpleAfirmaMessages.getString("DNIeWaitPanel.7")); //$NON-NLS-1$
 		} else {
+			LOGGER.info("Mostramos pantalla principal"); //$NON-NLS-1$
         	this.currentPanel = new SignPanel(this.window, this);
 			((MainScreen) this.window).showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH,
 					DEFAULT_WINDOW_HEIGHT);
@@ -290,16 +292,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     private void loadDefaultKeyStore() {
     	if (this.ksManager != null) {
-			LOGGER.info("Se omite la carga concurrente de almacen por haberse hecho una precarga previa" //$NON-NLS-1$
-    		);
+			LOGGER.info("Se omite la carga concurrente de almacen por haberse hecho una precarga previa"); //$NON-NLS-1$
     		return;
     	}
+
+    	LOGGER.info("Cargamos el almacen de claves por defecto"); //$NON-NLS-1$
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
             new SimpleKeyStoreManagerWorker(this, null, false, false).execute();
 		} catch (final Exception e) {
-			LOGGER.severe("No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
-            );
+			LOGGER.severe("No se pudo abrir el almacen por defecto del entorno operativo: " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.42"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE, e);

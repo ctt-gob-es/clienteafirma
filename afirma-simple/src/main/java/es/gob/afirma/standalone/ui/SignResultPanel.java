@@ -144,6 +144,9 @@ final class SignResultPanel extends JPanel {
                 		case NO_MATCH_DATA: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.19"); break; //$NON-NLS-1$
                 		case CRL_PROBLEM: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.20"); break; //$NON-NLS-1$
                 		case ALGORITHM_NOT_SUPPORTED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.22"); break; //$NON-NLS-1$
+                		case MODIFIED_FORM: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.35"); break; //$NON-NLS-1$
+                		case MODIFIED_DOCUMENT: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.36"); break; //$NON-NLS-1$
+                		case OVERLAPPING_SIGNATURE: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.37"); break; //$NON-NLS-1$
 
                 		default:
                 			errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$

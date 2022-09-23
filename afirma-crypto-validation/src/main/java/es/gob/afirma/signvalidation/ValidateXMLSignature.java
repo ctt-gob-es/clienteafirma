@@ -49,7 +49,7 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 /** Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
  * Si procede, se validan los certificados en local revisando las fechas de validez de los
  * certificados. */
-public final class ValidateXMLSignature implements SignValider {
+public final class ValidateXMLSignature extends SignValider {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 

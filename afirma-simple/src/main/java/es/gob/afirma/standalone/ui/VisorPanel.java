@@ -36,6 +36,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
@@ -292,7 +293,13 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     public static SignValidity validateSign(final byte[] sign) throws IOException {
     	final SignValider sv = SignValiderFactory.getSignValider(sign);
         if (sv != null) {
-        	return sv.validate(sign);
+        	try {
+        		return sv.validate(sign);
+        	}
+        	catch (final RuntimeConfigNeededException e) {
+        		// No ocurrira nunca por no estar configurada la validacion laxa
+				throw new IOException("Error en la validacion de la firma", e);
+			}
         }
         else if(DataAnalizerUtil.isSignedODF(sign)) {
 			return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.ODF_UNKOWN_VALIDITY);

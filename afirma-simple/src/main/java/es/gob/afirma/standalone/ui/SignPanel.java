@@ -530,6 +530,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
+				 // Establecemos una validacion relajada para que nos informen cuando la firma presenta
+				 // problemas que requiririan la intervencion del usuario para operar con ella
+				 validator.setRelaxed(true);
 				 SignValidity validity = null;
 				 final Properties validationParams = new Properties();
 

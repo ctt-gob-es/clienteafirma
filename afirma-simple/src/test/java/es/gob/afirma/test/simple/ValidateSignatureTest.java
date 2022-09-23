@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
@@ -44,11 +45,12 @@ public class ValidateSignatureTest {
 	}
 
 	/** Prueba de validaci&oacute;n de firmas.
-	 * @throws IOException En errores de tratamiento de datos. */
+	 * @throws IOException En errores de tratamiento de datos.
+	 * @throws RuntimeConfigNeededException No deberia ocurrir nunca. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
-	public void testValidateXMLSign() throws IOException {
+	public void testValidateXMLSign() throws IOException, RuntimeConfigNeededException {
 
 			final String signaturePath = XMLDSIG_ENVELOPED;
 			final byte[] signature;
@@ -67,10 +69,11 @@ public class ValidateSignatureTest {
 	}
 
 	/** Prueba de validaci&oacute;n de firmas.
-	 * @throws IOException En errores de tratamiento de datos. */
+	 * @throws IOException En errores de tratamiento de datos.
+	 * @throws RuntimeConfigNeededException No deberia ocurrir nunca. */
 	@SuppressWarnings("static-method")
 	@Test
-	public void testValidateBinarySign() throws IOException {
+	public void testValidateBinarySign() throws IOException, RuntimeConfigNeededException {
 
 			final String signaturePath = CADES_EXPLICIT;
 			final byte[] signature;

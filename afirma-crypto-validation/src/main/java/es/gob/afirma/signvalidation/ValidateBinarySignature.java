@@ -46,7 +46,7 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 /** Validador de firmas binarias.
  * @author Carlos Gamuci
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-public final class ValidateBinarySignature implements SignValider{
+public final class ValidateBinarySignature extends SignValider {
 
 	@Override
 	public SignValidity validate(final byte[] sign) throws IOException {
@@ -181,7 +181,6 @@ public final class ValidateBinarySignature implements SignValider{
         for (final Object si : s.getSignerInfos().getSigners()) {
 
         	final SignerInformation signer = (SignerInformation) si;
-
 
 			final Iterator<X509CertificateHolder> certIt = store.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
             final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(

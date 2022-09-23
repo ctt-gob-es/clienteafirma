@@ -93,7 +93,14 @@ final class PreferencesPlistHandler {
 					"La firma del fichero de preferencias no es valida" //$NON-NLS-1$
 				);
 			}
-			final SignValidity sv = valider.validate(configData);
+			final SignValidity sv;
+			try {
+				sv = valider.validate(configData);
+			}
+			catch (final Exception e) {
+				throw new InvalidPreferencesFileException(
+						"La firma del fichero de preferencias no es valida", e); //$NON-NLS-1$
+			}
 			if (!sv.getValidity().equals(SIGN_DETAIL_TYPE.OK)) {
 				throw new InvalidPreferencesFileException(
 					"La firma del fichero de preferencias no es valida" //$NON-NLS-1$

@@ -375,6 +375,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
 			SignValidity validity = null;
 			if (validator != null) {
+				// Establecemos una validacion relajada para que nos informen cuando la firma presenta
+				// problemas que requiririan la intervencion del usuario para operar con ella
+				validator.setRelaxed(true);
 				if (signer instanceof AOPDFSigner || signer instanceof AOPDFTriPhaseSigner) {
 					configurePdfSignature(extraParams);
 				}

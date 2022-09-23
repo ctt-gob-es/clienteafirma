@@ -35,7 +35,7 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 /** Validador de firmas PDF.
  * Se validan los certificados en local revisando si procede las fechas de validez de los certificados.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-public final class ValidatePdfSignature implements SignValider {
+public final class ValidatePdfSignature extends SignValider {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -49,11 +49,13 @@ public final class ValidatePdfSignature implements SignValider {
 	 * s&oacute;lo se validar&aacute; el periodo de caducidad.
      * @param sign PDF firmado.
      * @return Validez de la firma.
+     * @throws ConfirmationNeededException Cuando en la validaci&oacute;n laxa se puede considerar que podr&iacute;a
+     * operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento, si no se
      * encuentran firmas PDF en el documento o si se requiere m&aacute;s informacion para la validaci&oacute;n.
      */
 	@Override
-	public SignValidity validate(final byte[] sign) throws IOException {
+	public SignValidity validate(final byte[] sign) throws RuntimeConfigNeededException, IOException {
 		return validate(sign, true);
 	}
 
@@ -63,11 +65,13 @@ public final class ValidatePdfSignature implements SignValider {
      * @param sign PDF firmado.
      * @param checkCertificates Indica si debe comprobarse la caducidad de los certificados de firma.
      * @return Validez de la firma.
+     * @throws ConfirmationNeededException Cuando en la validaci&oacute;n laxa se puede considerar que podr&iacute;a
+     * operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento, si no se
      * encuentran firmas PDF en el documento o si se requiere m&aacute;s informacion para la validaci&oacute;n.
      */
 	@Override
-	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException {
+	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException {
 		final Properties params = new Properties();
 		params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
 		try {
@@ -82,8 +86,8 @@ public final class ValidatePdfSignature implements SignValider {
      * @param sign PDF firmado.
      * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
      * @return Validez de la firma.
-     * @throws ConfirmationNeededException Cuando para completar la validaci&oacute;n se necesita
-     * que se proporcione m&aacute;s informaci&oacute;n.
+     * @throws ConfirmationNeededException Cuando en la validaci&oacute;n laxa se puede considerar que podr&iacute;a
+     * operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
@@ -156,13 +160,12 @@ public final class ValidatePdfSignature implements SignValider {
 		final boolean allowSignModifiedForm = Boolean.parseBoolean(allowSignModifiedFormProp);
 
 		// Si se debe comprobar que no haya cambios en los valores de los formularios, lo hacemos
-		// si hay mas de una revision y ha habido cambios desde la ultima firma, comprobamos si ha
-		// habido cambios en campos de formularios
-		if (!allowSignModifiedForm && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
+		// si hay mas de una revision, comprobamos si ha habido cambios en campos de formularios
+		if (!allowSignModifiedForm && af.getTotalRevisions() > 1) {
 			final Map<String, String> errors = DataAnalizerUtil.checkPDFForm(reader);
 			if (errors != null && !errors.isEmpty()) {
 				// Si no estaba definido un comportamiento concreto, consultaremos al usuario.
-				if (allowSignModifiedFormProp == null) {
+				if (allowSignModifiedFormProp == null && isRelaxed()) {
 					throw new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
 				}
 				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM);
@@ -190,9 +193,9 @@ public final class ValidatePdfSignature implements SignValider {
 				SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewStream, pagesToCheck);
 				// Si se devolvio informacion de validez, la firma no es completamente valida
 				if (validity != null) {
-					// Se comprueba si se debe consultar al usuario y si se
+					// Si es una validacion relajada, se comprueba si se debe consultar al usuario y si se
 					// cumplen los requisitos para ello
-					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
+					if (isRelaxed() &&  validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
 							&& allowShadowAttackProp == null) {
 						throw new SuspectedPSAException("PDF sospechoso de haber sufrido PDF Shadow Attack"); //$NON-NLS-1$
 					}
