@@ -36,7 +36,10 @@ import com.aowagie.text.pdf.PdfStamper;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfHasUnregisteredSignaturesException;
+import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
 /** Gestor del n&uacute;cleo de firma PDF. Esta clase realiza las operaciones necesarias tanto para
  * la firma monof&aacute;sica PAdES como para las trif&aacute;sicas de una forma unificada, pero
@@ -73,7 +76,7 @@ public final class PdfSessionManager {
     	// No permitimos la instanciacion
     }
 
-    /** Obtiene los datos PDF relevantes en cuanto a las firmas electr&oacute;nicas, consistentes en los datos
+    /** Obtiene los datos PDF relevantes en cuanto a las firmas electr&oacute;nicas. Estos son en los datos
      * a ser firmados con CAdES o PKCS#7 y los metadatos necesarios para su correcta inserci&oacute;n en el PDF.
      * @param pdfBytes Documento PDF que se desea firmar
      * @param certChain Cadena de certificados del firmante
@@ -131,7 +134,7 @@ public final class PdfSessionManager {
 		if (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGES)) {
 			pagesStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(","); //$NON-NLS-1$
 		}
-		final List<Integer> pages = new ArrayList<Integer>();
+		final List<Integer> pages = new ArrayList<>();
 
 		byte[] inPDF;
 		try {
@@ -326,7 +329,7 @@ public final class PdfSessionManager {
 
 		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader)
 			&& !Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
-			throw new PdfHasUnregisteredSignaturesException();
+			throw new PdfHasUnregisteredSignaturesException("El PDF contiene firmas sin registrar"); //$NON-NLS-1$
 		}
 
 		// Los derechos van firmados por Adobe, y como desde iText se invalidan
@@ -383,22 +386,12 @@ public final class PdfSessionManager {
 			throw new AOException("Error al crear la firma para estampar", e); //$NON-NLS-1$
 		}
 		catch (final BadPasswordException e) {
-			// Comprobamos que el signer esta en modo interactivo, y si no lo
-			// esta no pedimos contrasena por dialogo, principalmente para no interrumpir un
-			// firmado por lotes
-			// desatendido
-			if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
-				throw new BadPdfPasswordException(e);
+			// Devolvemos una excepcion u otra segun si se nos proporciono
+			// contrasena o no
+			if (extraParams.containsKey(PdfExtraParams.OWNER_PASSWORD_STRING) || extraParams.containsKey(PdfExtraParams.USER_PASSWORD_STRING)) {
+				throw new BadPdfPasswordException("La contrasena del PDF es incorrecta", e); //$NON-NLS-1$
 			}
-			// La contrasena que nos han proporcionada no es buena o no nos
-			// proporcionaron ninguna
-			final String userPwd = new String(AOUIFactory.getPassword(
-					extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING) == null
-							? CommonPdfMessages.getString("AOPDFSigner.0") //$NON-NLS-1$
-							: CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$
-					null));
-			extraParams.put("userPassword", userPwd); //$NON-NLS-1$
-			return getSessionData(inPDF, certChain, signTime, extraParams, secureMode);
+			throw new PdfIsPasswordProtectedException("El PDF esta protegido contra modificaciones", e); //$NON-NLS-1$
 		}
 
 		// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco
@@ -446,6 +439,10 @@ public final class PdfSessionManager {
 		PdfPreProcessor.addImage(extraParams, stp, pdfReader, secureMode);
 
 		// Establecemos el render segun iText antiguo, varia en versiones modernas
+		//TODO: Se podria configurar PdfSignatureAppearance.SignatureRenderGraphicAndDescription
+		// para que se muestre la imagen y el texto uno al lado del otro, pero eso obligaria a
+		// tener que retocar la previsualizacion en AutoFirma. Tambien se deberia establecer el
+		// campo SignatureGraphic en lugar de Image.
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
 
 		// Razon de firma
@@ -472,9 +469,9 @@ public final class PdfSessionManager {
 			sap.setContact(signerContact);
 		}
 
-		// Rubrica de la firma
+		// Si se ha establecido una imagen de firma, se
+		// elimina el texto por defecto
 		if (rubric != null) {
-			sap.setImage(rubric);
 			sap.setLayer2Text(""); //$NON-NLS-1$
 			sap.setLayer4Text(""); //$NON-NLS-1$
 		}
@@ -491,7 +488,8 @@ public final class PdfSessionManager {
 							layer2FontFamily,
 							layer2FontSize,
 							layer2FontStyle,
-							layer2FontColor
+							layer2FontColor,
+							pdfA1
 					)
 			);
 		}
@@ -504,6 +502,16 @@ public final class PdfSessionManager {
 		// Firma visible
 		if (signaturePositionOnPage != null && signatureField == null && !pages.isEmpty()) {
 			if (signatureRotation == 0) {
+
+				// Rubrica de la firma
+				if (rubric != null) {
+					sap.setImage(rubric);
+
+					// Establecemos que la imagen no se ajuste al campo
+					// para que no se deforme
+					sap.setImageScale(-1);
+				}
+
 				try {
 					sap.setVisibleSignature(signaturePositionOnPage, pages.get(0), null);
 				}

@@ -30,7 +30,6 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -46,7 +45,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.SecureXmlTransformer;
 
 final class OOXMLZipHelper {
 
@@ -262,7 +262,7 @@ final class OOXMLZipHelper {
                                                                                                              IOException,
                                                                                                              TransformerException {
 
-    	final Document originSignRelsDocument = Utils.getNewDocumentBuilder().newDocument();
+    	final Document originSignRelsDocument = SecureXmlBuilder.getSecureDocumentBuilder().newDocument();
 
         final Element relationshipsElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationships"); //$NON-NLS-1$
         relationshipsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
@@ -287,7 +287,7 @@ final class OOXMLZipHelper {
     	try (
 			final InputStream is = new NoCloseInputStream(documentInputStream);
 		) {
-    		return Utils.getNewDocumentBuilder().parse(new InputSource(is));
+    		return SecureXmlBuilder.getSecureDocumentBuilder().parse(new InputSource(is));
     	}
     }
 
@@ -298,10 +298,7 @@ final class OOXMLZipHelper {
 			final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
 		) {
     		final Result result = new StreamResult(outputStream);
-    		final TransformerFactory factory = TransformerFactory.newInstance();
-    		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
-	        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
-	        final Transformer xformer = factory.newTransformer();
+	        final Transformer xformer = SecureXmlTransformer.getSecureTransformer();
 	    	if (omitXmlDeclaration) {
 	    		xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
 	    	}

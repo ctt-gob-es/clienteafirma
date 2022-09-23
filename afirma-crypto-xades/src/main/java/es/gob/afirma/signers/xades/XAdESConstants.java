@@ -9,6 +9,8 @@ public class XAdESConstants {
 
 	public static final String TAG_SIGNED_PROPERTIES = "SignedProperties"; //$NON-NLS-1$
 
+	static final String TAG_UNSIGNED_PROPERTIES = "UnsignedProperties";  //$NON-NLS-1$
+
 	static final String TAG_QUALIFYING_PROPERTIES = "QualifyingProperties"; //$NON-NLS-1$
 
 	static final String TAG_SIGNING_CERTIFICATE_V2 = "SigningCertificateV2"; //$NON-NLS-1$
@@ -18,6 +20,12 @@ public class XAdESConstants {
 	static final String TAG_DATA_OBJECT_FORMAT = "DataObjectFormat"; //$NON-NLS-1$
 
 	static final String TAG_REFERENCE = "Reference"; //$NON-NLS-1$
+
+	/** Nombre del nodo de atributos sin firmar de la firma. */
+    static final String TAG_UNSIGNED_SIGNATURE_PROPERTIES = "UnsignedSignatureProperties"; //$NON-NLS-1$
+
+	/** Nombre del nodo de la firma de archivo. */
+    static final String TAG_ARCHIVE_TIMESTAMP = "ArchiveTimeStamp"; //$NON-NLS-1$
 
     /** Nombre del nodo en el que se englobara&aacute;n las firmas cuando sea necesario. */
     static final String TAG_PARENT_NODE = "AFIRMA"; //$NON-NLS-1$

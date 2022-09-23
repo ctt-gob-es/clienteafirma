@@ -56,29 +56,24 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
     @Override
 	public void showConsole() {
     	SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(
-						new WindowListener() {
-						    @Override
-						    public void windowClosing(final WindowEvent we) {
-						    	if (getConsoleListener() != null) {
-						    		getConsoleListener().close();
-						    	}
-						    }
-						    @Override public void windowOpened(final WindowEvent we) { /* No implementado */ }
-						    @Override public void windowClosed(final WindowEvent we) { /* No implementado */ }
-						    @Override public void windowActivated(final WindowEvent we) { /* No implementado */ }
-						    @Override public void windowIconified(final WindowEvent we) { /* No implementado */ }
-						    @Override public void windowDeiconified(final WindowEvent we) { /* No implementado */ }
-						    @Override public void windowDeactivated(final WindowEvent we) { /* No implementado */ }
-						},
-						DEFAULT_WINDOW_WIDTH,
-						DEFAULT_WINDOW_HEIGHT
-					);
-				}
-			}
+			() -> createUI(
+				new WindowListener() {
+				    @Override
+				    public void windowClosing(final WindowEvent we) {
+				    	if (getConsoleListener() != null) {
+				    		getConsoleListener().close();
+				    	}
+				    }
+				    @Override public void windowOpened(final WindowEvent we) { /* No implementado */ }
+				    @Override public void windowClosed(final WindowEvent we) { /* No implementado */ }
+				    @Override public void windowActivated(final WindowEvent we) { /* No implementado */ }
+				    @Override public void windowIconified(final WindowEvent we) { /* No implementado */ }
+				    @Override public void windowDeiconified(final WindowEvent we) { /* No implementado */ }
+				    @Override public void windowDeactivated(final WindowEvent we) { /* No implementado */ }
+				},
+				DEFAULT_WINDOW_WIDTH,
+				DEFAULT_WINDOW_HEIGHT
+			)
 		);
     }
 
@@ -110,7 +105,7 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
 
         try {
             setIconImage(
-        		Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/afirma_ico.png")) //$NON-NLS-1$
+        		Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/logo_cliente_256.png")) //$NON-NLS-1$
             );
         }
         catch (final Exception e) {

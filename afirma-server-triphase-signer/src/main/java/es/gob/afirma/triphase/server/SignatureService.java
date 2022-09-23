@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -50,6 +51,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -127,6 +129,12 @@ public final class SignatureService extends HttpServlet {
 
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+	/**
+	 * N&uacute;mero de p&aacute;ginas por defecto de un PDF sobre las que
+	 * comprobar si se ha producido un PDF Shadow Attack.
+	 */
+	private static final int DEFAULT_PAGES_TO_CHECK_PSA = 10;
 
 	/** Propiedad que indica si la cach&eacute; est&aacute; activada o no. */
 	private static boolean cacheEnabled = false;
@@ -327,7 +335,7 @@ public final class SignatureService extends HttpServlet {
 				return;
 			}
 			if (sessionData != null) {
-				LOGGER.info("Recibidos los siguientes datos de sesion para '" + operation + "':\n" + new String(sessionData)); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.fine("Recibidos los siguientes datos de sesion para '" + operation + "':\n" + new String(sessionData)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Obtenemos el certificado
@@ -426,6 +434,7 @@ public final class SignatureService extends HttpServlet {
 			if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) ||
 				AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
 						prep = new PAdESTriPhasePreProcessor();
+						configurePdfShadowAttackParameters(extraParams);
 			}
 			else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) ||
 					 AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
@@ -469,25 +478,25 @@ public final class SignatureService extends HttpServlet {
 				// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
 		        final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty("checkSignatures")); //$NON-NLS-1$
 
-				final TriphaseData preRes;
+				TriphaseData preRes;
 				try {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
 						preRes = prep.preProcessPreSign(
-							docBytes,
-							algorithm,
-							signerCertChain,
-							extraParams,
-							checkSignatures
-						);
+									docBytes,
+									algorithm,
+									signerCertChain,
+									extraParams,
+									checkSignatures
+								);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
 						preRes = prep.preProcessPreCoSign(
-							docBytes,
-							algorithm,
-							signerCertChain,
-							extraParams,
-							checkSignatures
-						);
+								docBytes,
+								algorithm,
+								signerCertChain,
+								extraParams,
+								checkSignatures
+							);
 					}
 					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
 
@@ -498,7 +507,6 @@ public final class SignatureService extends HttpServlet {
 								target = CounterSignTarget.TREE;
 							}
 						}
-
 						preRes = prep.preProcessPreCounterSign(
 							docBytes,
 							algorithm,
@@ -514,9 +522,15 @@ public final class SignatureService extends HttpServlet {
 
 					LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve"); //$NON-NLS-1$
 				}
+				catch (final RuntimeConfigNeededException e) {
+					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la prefirma de los datos", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					out.flush();
+					return;
+				}
 				catch (final Exception e) {
-					LOGGER.log(Level.SEVERE, "Error en la prefirma: " + e, e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(9) + ": " + e); //$NON-NLS-1$
+					LOGGER.log(Level.SEVERE, "Error en la prefirma", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -536,7 +550,7 @@ public final class SignatureService extends HttpServlet {
 					}
 					catch (final Exception e) {
 						LOGGER.log(Level.SEVERE, "Error al generar los codigos de verificacion de las firmas: " + e, e); //$NON-NLS-1$
-						out.print(ErrorManager.getErrorMessage(16) + ": " + e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.GENERATING_CSV_ERROR) + ": " + e); //$NON-NLS-1$
 						out.flush();
 						return;
 					}
@@ -563,7 +577,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "El formato de los parametros de operacion requeridos incorrecto", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(19) + ": " + e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.INVALID_DATA_OPERATION_FORMAT) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -579,13 +593,13 @@ public final class SignatureService extends HttpServlet {
 					}
 					catch (final InvalidVerificationCodeException e) {
 						LOGGER.log(Level.SEVERE, "Las prefirmas y/o el certificado obtenido no se corresponden con los generados en la prefirma", e); //$NON-NLS-1$
-						out.print(ErrorManager.getErrorMessage(17) + ": " + e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CHECKING_CSV_ERROR) + ": " + e); //$NON-NLS-1$
 						out.flush();
 						return;
 					}
 					catch (final Exception e) {
 						LOGGER.log(Level.SEVERE, "Error al comprobar los codigos de verificacion de las firmas", e); //$NON-NLS-1$
-						out.print(ErrorManager.getErrorMessage(17) + ": " + e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CHECKING_CSV_ERROR) + ": " + e); //$NON-NLS-1$
 						out.flush();
 						return;
 					}
@@ -634,9 +648,15 @@ public final class SignatureService extends HttpServlet {
 						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 					}
 				}
+				catch (final RuntimeConfigNeededException e) {
+					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la postfirma de los datos", e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED) + ":" + e.getRequestorText() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					out.flush();
+					return;
+				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error en la postfirma: " + e, e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(12) + ": " + e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.POSTSIGN_ERROR) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -681,6 +701,36 @@ public final class SignatureService extends HttpServlet {
 			}
         	return;
         }
+	}
+
+	private static void configurePdfShadowAttackParameters(final Properties extraParams) {
+		if (!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK))) {
+			final int maxPagestoCheck = ConfigManager.getMaxPagesToCheckPSA();
+			int pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
+			if (extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+				final String pagesToCheckProp = extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
+				if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheckProp)) {
+					pagesToCheck = Integer.MAX_VALUE;
+				}
+				else {
+					try {
+						pagesToCheck = Integer.parseInt(pagesToCheckProp);
+					}
+					catch (final Exception e) {
+						pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
+					}
+				}
+			}
+			// Comprobaremos el menor numero de paginas posible que sera el indicado por la aplicacion
+			// (el por defecto si no se paso un valor) o el maximo establecido por el servicio
+			pagesToCheck = Math.min(pagesToCheck, maxPagestoCheck);
+			if (pagesToCheck <= 0) {
+				extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+			}
+			else {
+				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, Integer.toString(pagesToCheck));
+			}
+		}
 	}
 
 	/**

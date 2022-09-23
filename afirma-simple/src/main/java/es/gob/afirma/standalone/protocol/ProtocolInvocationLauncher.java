@@ -296,7 +296,7 @@ public final class ProtocolInvocationLauncher {
 
         	try {
                 UrlParametersForBatch params =
-                		ProtocolInvocationUriParserUtil.getParametersForBatch(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -326,11 +326,11 @@ public final class ProtocolInvocationLauncher {
                     final Map <String, String> paramsMap;
 
                     if (params.isJsonBatch()) {
-                    	 paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
-                    	 params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    	paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
+                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     } else {
                     	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
-                    	params = ProtocolInvocationUriParser.getParametersForBatch(paramsMap);
+                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     }
                 }
 
@@ -687,7 +687,7 @@ public final class ProtocolInvocationLauncher {
 
                 StringBuilder dataToSend;
                 try {
-                	dataToSend = ProtocolInvocationLauncherSign.processSign(params, requestedProtocolVersion);
+                	dataToSend = ProtocolInvocationLauncherSign.processSign(params, requestedProtocolVersion, null);
                 }
                 // Llegara aqui siempre que tratemos con un error controlado. En caso de estar en
                 // la comunicacion por servidor intermedio, el mensaje de error al servidor

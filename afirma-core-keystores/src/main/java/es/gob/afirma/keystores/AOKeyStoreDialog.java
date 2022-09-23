@@ -16,6 +16,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -108,7 +109,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.checkPrivateKeys = checkPrivateKeys;
 		this.checkValidity = checkValidity;
 		this.showExpiredCertificates = showExpiredCertificates;
-		this.certFilters = certFilters;
+		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
 	}
 

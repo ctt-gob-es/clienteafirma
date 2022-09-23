@@ -24,9 +24,9 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 public class TestCountersignNode {
 
 	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
-	private static final String PASSWORD = "1111"; //$NON-NLS-1$
+	private static final String PWD = "1111"; //$NON-NLS-1$
 	private static final String PKCS12_KEYSTORE2 = "ANCERTCE_FIRMA.p12"; //$NON-NLS-1$
-	private static final String PASSWORD2 = "1111"; //$NON-NLS-1$
+	private static final String PWD2 = "1111"; //$NON-NLS-1$
 	private static final String SIGN_FILE = "cades_3nodos.csig"; //$NON-NLS-1$
 
 	private static InputStream ksIs;
@@ -40,10 +40,10 @@ public class TestCountersignNode {
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, PASSWORD.toCharArray());
+		ks.load(ksIs, PWD.toCharArray());
 		ksIs2 = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE2);
 		ks2 = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks2.load(ksIs2, PASSWORD2.toCharArray());
+		ks2.load(ksIs2, PWD2.toCharArray());
 	}
 
 	/** Prueba general.
@@ -52,7 +52,7 @@ public class TestCountersignNode {
 	@Test
 	public void pruebaContrafirmaProgresiva() throws Exception {
 
-		final PrivateKeyEntry pkeFirma = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pkeFirma = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
 
@@ -73,7 +73,7 @@ public class TestCountersignNode {
 		);
 
 
-		final PrivateKeyEntry pkeContrafirma = (PrivateKeyEntry) ks2.getEntry(ks2.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD2.toCharArray()));
+		final PrivateKeyEntry pkeContrafirma = (PrivateKeyEntry) ks2.getEntry(ks2.aliases().nextElement(), new KeyStore.PasswordProtection(PWD2.toCharArray()));
 
 		sign = signer.countersign(
 				sign,
@@ -118,7 +118,7 @@ public class TestCountersignNode {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		byte[] countersign = signer.countersign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -165,7 +165,7 @@ public class TestCountersignNode {
 		final Properties config = new Properties();
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 		byte[] countersign = signer.countersign(
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,

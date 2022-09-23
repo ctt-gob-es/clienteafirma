@@ -149,7 +149,7 @@ public final class SimpleTest {
 	                                                                                      SecurityException,
 	                                                                                      ClassNotFoundException {
 
-		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
+		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfig(
 			mozProfileDir,
 			nssDirectory
 		);

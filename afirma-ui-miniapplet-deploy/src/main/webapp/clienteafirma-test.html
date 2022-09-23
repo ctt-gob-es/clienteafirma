@@ -413,10 +413,11 @@
 		<script>
 			//AutoScript.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
 			//AutoScript.setMinimumClientVersion("1.8");
+			
 			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",
 					Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
-//			AutoScript.setPortRange(51010);
+			//AutoScript.setPortRange(63117);
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -511,7 +512,7 @@
 		
 		<script>
 			var paramsElement = document.getElementById("params");
-			paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService\nuseManifest=true\nuri1=urn:id:3086\nmd1=4hrn/3Y9c/fn/uyq12w+D9A2aKc=\nmimeType1=plain/xml\nprecalculatedHashAlgorithm=SHA-1";
+			paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
 		</script>
 	</body>
 </html>	

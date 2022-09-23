@@ -38,6 +38,8 @@ public final class ASiCUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
+
 	private ASiCUtil() {
 		// No instanciable
 	}
@@ -142,6 +144,9 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+    	if (asic.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 		if (signatureFilename == null) {
 			throw new IllegalArgumentException(
 				"La firma entrada de firma del ASiC no puede ser nula" //$NON-NLS-1$
@@ -172,6 +177,9 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+    	if (asic.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 		try (
 			final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		) {
@@ -198,9 +206,15 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+    	if (asic.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+    	}
 		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		ZipEntry entry;
 		while((entry = zis.getNextEntry()) != null) {
+	    	if (entry.getSize() >= THRESHOLD_FILE_SIZE) {
+	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+	    	}
 			final String entryName = entry.getName();
 			if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entryName) &&
 				!ENTRY_NAME_XML_SIGNATURE.equals(entryName) &&

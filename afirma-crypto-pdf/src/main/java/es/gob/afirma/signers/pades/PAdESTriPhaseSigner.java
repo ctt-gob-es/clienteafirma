@@ -29,6 +29,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 

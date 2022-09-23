@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
@@ -18,9 +19,11 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
@@ -163,7 +166,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket){
 					throw new SocketOperationException(RESULT_CANCEL);
 				}
@@ -192,13 +195,19 @@ final class ProtocolInvocationLauncherBatch {
 		String batchResult;
 		try {
 			if (options.isJsonBatch()) {
-				batchResult = BatchSigner.signJSON(
-						Base64.encode(options.getData(), true),
-						options.getBatchPresignerUrl(),
-						options.getBatchPostSignerUrl(),
-						pke.getCertificateChain(),
-						pke.getPrivateKey()
-						);
+				if(options.isLocalBatchProcess()) {
+					final BatchSignOperation batchConfig =
+							LocalDataParser.parseBatchConfig(options.getData());
+					batchResult = LocalBatchSigner.signLocalBatch(batchConfig, pke);
+				} else {
+					batchResult = BatchSigner.signJSON(
+							Base64.encode(options.getData(), true),
+							options.getBatchPresignerUrl(),
+							options.getBatchPostSignerUrl(),
+							pke.getCertificateChain(),
+							pke.getPrivateKey()
+							);
+				}
 			} else {
 				batchResult = BatchSigner.signXML(
 						Base64.encode(options.getData(), true),
@@ -209,18 +218,44 @@ final class ProtocolInvocationLauncherBatch {
 						);
 			}
 		}
-		catch(final HttpError e) {
+		catch (final AOCancelledOperationException e) {
+			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			if (!bySocket){
+				throw new SocketOperationException(RESULT_CANCEL);
+			}
+			return RESULT_CANCEL;
+		}
+		catch (final IllegalArgumentException e) {
+			LOGGER.info("Los parametros de la peticion no eran validos: " + e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+		}
+		catch (final CertificateEncodingException e) {
+			LOGGER.info("Error en la codificacion del certificado: " + LoggerUtil.getTrimStr(e.toString())); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+		}
+		catch (final HttpError e) {
 			String errorCode;
-			if (e.getResponseCode() / 100 == 4) {
+			if (e.getResponseCode() == 400) {
+				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
+				LOGGER.severe("Error en los parametros enviados al servicio: " + e.toString());  //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+			}
+			else if (e.getResponseCode() / 100 == 4) {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
-				LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
-					e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+				LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes: " + e);//$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
 			else {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
-				LOGGER.severe("Error en el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
-						e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+				LOGGER.severe("Error en el servicio de firma de lotes: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
 
@@ -229,9 +264,19 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
 		}
+		catch (final AOException e) {
+			LOGGER.info("Error durante la firma del lote: " + e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
+			if (!bySocket){
+				throw new SocketOperationException(errorCode);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error en el proceso del lote de firmas", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN;
+			final String errorCode = options.isLocalBatchProcess()
+					? ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN
+					: ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
 			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
@@ -241,7 +286,7 @@ final class ProtocolInvocationLauncherBatch {
 
 		final StringBuilder result = new StringBuilder();
 
-		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos la resultado con un separador
+		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos al resultado con un separador
 		byte[] signingCertEncoded = null;
 		if (options.isCertNeeded()) {
 			try {
@@ -260,7 +305,7 @@ final class ProtocolInvocationLauncherBatch {
 		// Si hay clave de cifrado, ciframos
 		if (options.getDesKey() != null) {
 			try {
-				result.append(CypherDataManager.cipherData(batchResult.getBytes(), options.getDesKey()));
+				result.append(CypherDataManager.cipherData(batchResult.getBytes(StandardCharsets.UTF_8), options.getDesKey()));
 				if (signingCertEncoded != null) {
 					result.append(RESULT_SEPARATOR)
 						.append(CypherDataManager.cipherData(signingCertEncoded, options.getDesKey()));
@@ -280,7 +325,7 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.warning(
 				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
-			result.append(Base64.encode(batchResult.getBytes()));
+			result.append(Base64.encode(batchResult.getBytes(StandardCharsets.UTF_8)));
 			if (signingCertEncoded != null) {
 				result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
 			}

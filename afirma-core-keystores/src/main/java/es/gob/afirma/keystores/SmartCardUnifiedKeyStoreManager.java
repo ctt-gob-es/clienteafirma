@@ -208,9 +208,9 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		private String[] pkcs11Names;
 		private boolean preferredKs;
 
-		private KnownSmartCardsPkcs11(final String description, final String[] pkcs11Names, final boolean preferredKs) {
+		KnownSmartCardsPkcs11(final String description, final String[] pkcs11Names, final boolean preferredKs) {
 			this.description = description;
-			this.pkcs11Names = pkcs11Names;
+			this.pkcs11Names = pkcs11Names != null ? pkcs11Names.clone() : null;
 			this.preferredKs = preferredKs;
 		}
 

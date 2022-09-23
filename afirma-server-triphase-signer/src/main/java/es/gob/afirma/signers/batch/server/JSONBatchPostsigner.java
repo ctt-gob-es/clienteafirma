@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.json.JSONSignBatch;
 import es.gob.afirma.signers.batch.json.JSONSignBatchConcurrent;
@@ -75,10 +76,10 @@ public final class JSONBatchPostsigner extends HttpServlet {
 
 		final JSONSignBatch batch;
 		try {
-			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(json.getBytes(DEFAULT_CHARSET));
+			final byte[] jsonBatch = Base64.decode(json, true);
 			batch = ConfigManager.isConcurrentModeEnable() ?
-					new JSONSignBatchConcurrent(batchConfig) :
-						new JSONSignBatchSerial(batchConfig);
+					new JSONSignBatchConcurrent(jsonBatch) :
+						new JSONSignBatchSerial(jsonBatch);
 		}
 		catch(final Exception e) {
 			LOGGER.severe("La definicion de lote es invalida: " + e); //$NON-NLS-1$

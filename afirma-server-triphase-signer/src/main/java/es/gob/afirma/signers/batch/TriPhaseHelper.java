@@ -9,6 +9,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
@@ -20,6 +21,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.batch.xml.SingleSign;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
@@ -50,6 +52,12 @@ public class TriPhaseHelper {
 
 	/** Juego de caracteres usado internamente para la codificaci&oacute;n de textos. */
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+
+	/**
+	 * N&uacute;mero de p&aacute;ginas por defecto de un PDF sobre las que
+	 * comprobar si se ha producido un PDF Shadow Attack.
+	 */
+	private static final int DEFAULT_PAGES_TO_CHECK_PSA = 10;
 
 	/**
 	 * Agrega a la informaci&oacute;n de firma trif&aacute;sica un c&oacute;digo de verificaci&oacute;n
@@ -181,6 +189,7 @@ public class TriPhaseHelper {
 		}
 		switch(sSign.getSignFormat()) {
 			case PADES:
+				configurePdfShadowAttackParameters(sSign.getExtraParams());
 				return new PAdESTriPhasePreProcessor();
 			case CADES:
 				return new CAdESTriPhasePreProcessor();
@@ -199,4 +208,38 @@ public class TriPhaseHelper {
 		}
 	}
 
+	private static void configurePdfShadowAttackParameters(final Properties extraParams) {
+		if (!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK))) {
+			// Evitamos explicitamente que se efirmen documentos susceptibles de haber sufrido PDF
+			// Shadow Attack en caso de que la aplicacion no indicase que hacer con ellos
+			extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.FALSE.toString());
+
+			final int maxPagestoCheck = ConfigManager.getMaxPagesToCheckPSA();
+			int pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
+			if (extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+				final String pagesToCheckProp = extraParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA);
+				if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheckProp)) {
+					pagesToCheck = Integer.MAX_VALUE;
+				}
+				else {
+					try {
+						pagesToCheck = Integer.parseInt(pagesToCheckProp);
+					}
+					catch (final Exception e) {
+						pagesToCheck = DEFAULT_PAGES_TO_CHECK_PSA;
+					}
+				}
+			}
+			// Comprobaremos el menor numero de paginas posible, que sera el indicado por la aplicacion
+			// (el por defecto si no se paso un valor) o el maximo establecido por el servicio. Si el
+			// menor numero de paginas es 0, entonces se evita la comprobacion
+			pagesToCheck = Math.min(pagesToCheck, maxPagestoCheck);
+			if (pagesToCheck <= 0) {
+				extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+			}
+			else {
+				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, Integer.toString(pagesToCheck));
+			}
+		}
+	}
 }

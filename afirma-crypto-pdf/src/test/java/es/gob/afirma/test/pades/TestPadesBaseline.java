@@ -22,7 +22,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 
 public class TestPadesBaseline {
 

@@ -21,6 +21,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESParameters;
 
 /** Contrafirmador CAdES. */
@@ -61,6 +62,14 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                     final java.security.cert.Certificate[] cChain,
                                     final Properties xParams) throws AOException,
                                                                      IOException {
+
+
+		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
+		// incluso en ese caso
+		final String forceSignLts = xParams.getProperty(CAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
+		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
+			CAdESMultiUtil.checkUnsupportedAttributes(sign);
+		}
 
         final Properties extraParams = getExtraParams(xParams);
 

@@ -15,11 +15,10 @@ import java.io.InputStream;
 
 enum FontResource {
 
-	TIMES_ROMAN(  "Times Roman",  "/resources/fonts/times.ttf",        2), //$NON-NLS-1$//$NON-NLS-2$
-	SYMBOL(       "Symbol",       "/resources/fonts/symbol.ttf",       3), //$NON-NLS-1$ //$NON-NLS-2$
-	COURIER(      "Courier",      "/resources/fonts/courier.otf",      0), //$NON-NLS-1$ //$NON-NLS-2$
-	HELVETICA(    "Helvetica",    "/resources/fonts/helvetica.otf",    1), //$NON-NLS-1$ //$NON-NLS-2$
-	ZAPF_DINGBATS("ZapfDingBats", "/resources/fonts/zapfdingbats.otf", 4); //$NON-NLS-1$//$NON-NLS-2$
+	// Ficheros de fuentes cargados de la biblioteca afirma-crypto-pdf
+	TIMES_ROMAN(  "Times Roman",  "/fonts/times.ttf",        2), //$NON-NLS-1$//$NON-NLS-2$
+	COURIER(      "Courier",      "/fonts/courier.ttf",      0), //$NON-NLS-1$ //$NON-NLS-2$
+	HELVETICA(    "Helvetica",    "/fonts/helvetica.ttf",    1); //$NON-NLS-1$ //$NON-NLS-2$
 
 	private final String fontName;
 	private Font font = null;
@@ -28,7 +27,7 @@ enum FontResource {
     private final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private final Font[] fonts = this.ge.getAllFonts(); // Get the fonts
 
-	private FontResource(final String name,
+	FontResource(final String name,
 			             final String file,
 			             final int index) {
 		this.fontName = name;
@@ -66,8 +65,7 @@ enum FontResource {
 		return new FontResource[] {
 			COURIER,
 			HELVETICA,
-			TIMES_ROMAN,
-			ZAPF_DINGBATS
+			TIMES_ROMAN
 		};
 	}
 

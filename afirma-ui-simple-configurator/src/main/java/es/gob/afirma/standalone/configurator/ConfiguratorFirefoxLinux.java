@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,8 +37,14 @@ final class ConfiguratorFirefoxLinux {
 	private static final String CERTUTIL_RELATIVE_PATH = "certutil" + File.separator + CERTUTIL_EXE; //$NON-NLS-1$
 
 	private static final String PROFILES_INI_RELATIVE_PATH = ".mozilla/firefox/profiles.ini";//$NON-NLS-1$
-	private static final String SYSTEM_KEYSTORE_PATH = "/.pki/nssdb";//$NON-NLS-1$
+	private static final String PROFILES_INI_RELATIVE_PATH_UBUNTU_22 = "snap/firefox/common/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
 
+	private static final String NSS_CHROME_PATH = "/.pki/nssdb"; //$NON-NLS-1$
+	private static final String NSS_CHROMIUM_PATH = "/snap/chromium/current/.pki/nssdb"; //$NON-NLS-1$
+	private static final String[] NSS_DIR_SUBPATH = new String[] {
+			NSS_CHROME_PATH,
+			NSS_CHROMIUM_PATH
+	};
 	private static final String PROFILE_INI_PATH_PREFIX = "Path="; //$NON-NLS-1$
 
 	private static final String CERTUTIL_RESOURCE = "/linux/certutil.linux.zip"; //$NON-NLS-1$
@@ -74,46 +81,55 @@ final class ConfiguratorFirefoxLinux {
 			ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
 		}
 
-		// Creamos los scripts para cada uno de los usuarios
+		// Componemos los comandos de instalacion y desinstalacion para cada uno de los usuarios
+		final List<String[]> installCommands = new ArrayList<>();
+		final List<String[]> uninstallCommands = new ArrayList<>();
+
 		for (final String userDir : usersDirs) {
-			final File file = new File(userDir + SYSTEM_KEYSTORE_PATH);
-			if (!file.isDirectory()) {
-				continue;
+
+			for (final String nssSubpath : NSS_DIR_SUBPATH) {
+
+				final String keystorePath = userDir + nssSubpath;
+				if (!new File(keystorePath).isDirectory()) {
+					continue;
+				}
+
+				final String profileReference = escapePath("sql:" + keystorePath); //$NON-NLS-1$
+
+				// Agregamos el comando de instalacion
+				installCommands.add(new String[] {
+						certUtilPath,
+						"-d", //$NON-NLS-1$
+						profileReference,
+						"-A", //$NON-NLS-1$
+						"-n", //$NON-NLS-1$
+						"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+						"-i", //$NON-NLS-1$
+						escapePath(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()),
+						"-t", //$NON-NLS-1$
+						"\"TCP,TCP,TCP\"" //$NON-NLS-1$
+				});
+
+				// Agregamos el script de desinstalacion
+				uninstallCommands.add(new String[] {
+						certUtilPath,
+						"-D", //$NON-NLS-1$
+						"-d", //$NON-NLS-1$
+						profileReference,
+						"-n", //$NON-NLS-1$
+						"\"" + ConfiguratorUtil.CERT_ALIAS + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+				});
 			}
-
-			final String profileReference = escapePath("sql:" + userDir + SYSTEM_KEYSTORE_PATH); //$NON-NLS-1$
-
-			// Creamos el script de instalacion
-			final String[] installCACommands = new String[] {
-					certUtilPath,
-					"-d", //$NON-NLS-1$
-					profileReference,
-					"-A", //$NON-NLS-1$
-					"-n", //$NON-NLS-1$
-					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-					"-i", //$NON-NLS-1$
-					escapePath(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()),
-					"-t", //$NON-NLS-1$
-					"\"TCP,TCP,TCP\"" //$NON-NLS-1$
-			};
-			createScript(installCACommands, installScriptFile);
-
-			// Generamos el script de desinstalacion
-			final String[] uninstallCACommans = new String[] {
-					certUtilPath,
-					"-D", //$NON-NLS-1$
-					"-d", //$NON-NLS-1$
-					profileReference,
-					"-n", //$NON-NLS-1$
-					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"" //$NON-NLS-1$ //$NON-NLS-2$
-			};
-			createScript(uninstallCACommans, uninstallScriptFile);
 		}
+
+		// Guardamos los scripts
+		createScript(installCommands, installScriptFile);
+		createScript(uninstallCommands, uninstallScriptFile);
 	}
 
 	/**
 	 * Genera los scripts para la instalaci&oacute;n y desinstalaci&oacute;n de los certificados
-	 * en el almac&eacute;n central del sistema.
+	 * en el almac&eacute;n de Firefox.
 	 * De la ejecuci&oacute;n de los scripts se encarga el instalador/desinstalador Debian.
 	 * @param appDir Directorio en el que se encuentra la aplicaci&oacute;n y el certificado a instalar.
 	 * @param usersDirs Directorios de usuario.
@@ -258,17 +274,27 @@ final class ConfiguratorFirefoxLinux {
 		}
 	}
 
-	/** Escribe en disco los <i>scripts</i> de instalaci&oacute;n y desinstalaci&oacute;n para
-	 * un almac&eacute;n de claves a partir del comando de instalaci&oacute;n.
-	 * @param scriptFile Fichero donde guardar los <i>script</i>.
-	 * @param commands Comando para la instalaci&oacute;n del certificado en un almac&eacute;n.
-	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
-	private static void createScript(final String[] commands, final File scriptFile)
+	/** Escribe en disco un <i>script</i> con un comando.
+	 * @param command Comando que imprimir en el script.
+	 * @param scriptFile Fichero donde guardar el comando.
+	 * @throws IOException Si no se pudo crear el script. */
+	private static void createScript(final String[] command, final File scriptFile)
+			throws IOException {
+		createScript(Collections.singletonList(command), scriptFile);
+	}
+
+	/** Escribe en disco un <i>script</i> con una serie de comandos.
+	 * @param commands Listado de comandos.
+	 * @param scriptFile Fichero donde guardar los comandos.
+	 * @throws IOException Si no se pudo crear el script. */
+	private static void createScript(final List<String[]> commands, final File scriptFile)
 			throws IOException {
 
 		// Generamos el script de instalacion
 		final StringBuilder script = new StringBuilder();
-		ConfiguratorUtil.printScript(commands, script);
+		for (final String[] command : commands) {
+			ConfiguratorUtil.printScript(command, script);
+		}
 		ConfiguratorUtil.writeScript(script, scriptFile);
 	}
 
@@ -320,9 +346,15 @@ final class ConfiguratorFirefoxLinux {
 
 		final List<File> profilesIniFiles = new ArrayList<>();
 		for (final String userDir : userDirs){
-			final File mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH);
-			if (mozillaPath.isFile()){
+
+			File mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH_UBUNTU_22);
+			if (mozillaPath.isFile()) {
 				profilesIniFiles.add(mozillaPath);
+			} else {
+				mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH);
+				if (mozillaPath.isFile()){
+					profilesIniFiles.add(mozillaPath);
+				}
 			}
 		}
 		return profilesIniFiles;

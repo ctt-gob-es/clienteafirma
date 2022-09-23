@@ -37,10 +37,10 @@ public class SignOperation {
 		this.algorithm = algorithm;
 	}
 	public Properties getExtraParams() {
-		return this.extraParams;
+		return this.extraParams != null ? (Properties) this.extraParams.clone() : null;
 	}
 	public void setExtraParams(final Properties extraParams) {
-		this.extraParams = extraParams;
+		this.extraParams = extraParams != null ? (Properties) extraParams.clone() : null;
 	}
 	public Map<String, String> getAnotherParams() {
 		return this.anotherParams;
@@ -50,7 +50,7 @@ public class SignOperation {
 	}
 
 
-	public static enum Operation {
+	public enum Operation {
 		/** Operaci&oacute;n de firma. */
 		SIGN,
 

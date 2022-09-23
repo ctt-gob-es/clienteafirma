@@ -511,7 +511,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                         // Adicionalmente, si es un base 64 intentamos obtener
                         // el tipo del contenido
                         // decodificado para asi reestablecer el MimeType.
-                        final byte[] decodedData = Base64.decode(new String(data));
+                        final byte[] decodedData = Base64.decode(data, 0, data.length, false);
                         final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
                         final String tempMimeType = mimeTypeHelper.getMimeType();
                         mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;

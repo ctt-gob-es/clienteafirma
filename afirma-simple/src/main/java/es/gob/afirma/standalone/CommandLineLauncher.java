@@ -58,7 +58,7 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.IncorrectPageException;
 import es.gob.afirma.signers.pades.InvalidSignaturePositionException;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
@@ -773,10 +773,11 @@ final class CommandLineLauncher {
 		else if (storeType.startsWith(STORE_P12 + ":")) { //$NON-NLS-1$
 			store = AOKeyStore.PKCS12;
 			final String libName = storeType.replace(STORE_P12 + ":", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!new File(libName).exists()) {
+			final File cleanedLibFile = cleanupPathFile(libName);
+			if (!cleanedLibFile.exists()) {
 				throw new IOException("El fichero PKCS#12 indicado no existe: " + libName); //$NON-NLS-1$
 			}
-			if (!new File(libName).canRead()) {
+			if (!cleanedLibFile.canRead()) {
 				throw new IOException("No se tienen permisos de lectura para el fichero PKCS#12 indicado: " + libName); //$NON-NLS-1$
 			}
 			lib = libName;
@@ -784,13 +785,14 @@ final class CommandLineLauncher {
 		else if (storeType.startsWith(STORE_P11 + ":")) { //$NON-NLS-1$
 			store = AOKeyStore.PKCS11;
 			final String libName = storeType.replace(STORE_P11 + ":", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!new File(libName).exists()) {
+			final File cleanedLibFile = cleanupPathFile(libName);
+			if (!cleanedLibFile.exists()) {
 				throw new IOException("La biblioteca PKCS#11 indicada no existe: " + libName); //$NON-NLS-1$
 			}
-			if (!new File(libName).canRead()) {
+			if (!cleanedLibFile.canRead()) {
 				throw new IOException("No se tienen permisos de lectura para la biblioteca PKCS#11 indicada: " + libName); //$NON-NLS-1$
 			}
-			lib = libName;
+			lib = cleanedLibFile.getAbsolutePath();
 		}
 		else {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.48", storeType)); //$NON-NLS-1$
@@ -803,6 +805,22 @@ final class CommandLineLauncher {
 			pwd != null ? new CachePasswordCallback(pwd.toCharArray()) : null,
 			null
 		);
+	}
+
+	/**
+	 * Sanea una ruta de archivo.
+	 * @param path Ruta de archivo.
+	 * @return Ruta de archivo limpia.
+	 */
+	private static File cleanupPathFile(final String path) {
+		final String cleanedpath = path.trim().replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		File cleanedFile;
+		try {
+			cleanedFile = new File(cleanedpath).getCanonicalFile();
+		} catch (final Exception e) {
+			cleanedFile = null;
+		}
+		return cleanedFile;
 	}
 
 	/** Construye la cadena de texto que explica la sintaxis para el uso de la aplicaci&oacute;n

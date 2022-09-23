@@ -14,8 +14,13 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.protocol.UrlParameters;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOTriphaseException;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
+import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 
 final class ProtocolInvocationLauncherUtil {
 
@@ -91,7 +96,7 @@ final class ProtocolInvocationLauncherUtil {
 			exceptionClass = (Class<Exception>) Class.forName(ex.getServerExceptionClassname());
 		}
 		catch (final Throwable e) {
-			LOGGER.warning("No se pudo identificar la excepcion enviada por el servidor: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo identificar la excepcion enviada por el servidor (" + ex.getServerExceptionClassname() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			return ex;
 		}
 
@@ -123,5 +128,48 @@ final class ProtocolInvocationLauncherUtil {
 
 		LOGGER.warning("No se encontro un constructor para reconstruir la excepcion del servidor"); //$NON-NLS-1$
 		return ex;
+	}
+
+	/**
+	 * Identifica el formato firma que debe generar a partir de los datos y el
+	 * tipo de operaci&oacute;n. En caso de configurarse la operacion de firma,
+	 * habremos recibido simples datos y seleccionaremos segun su formato (por
+	 * defecto, CAdES). En caso contrario, la operaci&oacute;n ser&aacute;
+	 * cofirma o contrafirma, habremos recibido una firma y usaremos el mismo
+	 * formato que tenga esta.
+	 * @param data Datos a firmar o firma a multifirmar.
+	 * @param cryptoOperation Operaci&oacute;n que debe realizarse (firma, cofirma o contrafirma).
+	 * @return Formato de firma o {@code null} si no se determin&oacute; un formato.
+	 */
+	static String identifyFormatFromData(final byte[] data, final Operation cryptoOperation) {
+
+		String format;
+		if (Operation.SIGN == cryptoOperation) {
+			if (DataAnalizerUtil.isPDF(data)) {
+				format = AOSignConstants.SIGN_FORMAT_PADES;
+			}
+			else if (DataAnalizerUtil.isFacturae(data)) {
+				format = AOSignConstants.SIGN_FORMAT_FACTURAE;
+			}
+			else if (DataAnalizerUtil.isXML(data)) {
+				format = AOSignConstants.SIGN_FORMAT_XADES;
+			}
+			else {
+				format = AOSignConstants.SIGN_FORMAT_CADES;
+			}
+		}
+		else {
+			try {
+				final AOSigner signer = AOSignerFactory.getSigner(data);
+				format = AOSignerFactory.getSignFormat(signer);
+			}
+			catch (final IOException e) {
+				LOGGER.severe(
+						"No se han podido analizar los datos para determinar si son una firma: " + e); //$NON-NLS-1$
+				format = null;
+			}
+		}
+
+		return format;
 	}
 }

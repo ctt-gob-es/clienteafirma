@@ -35,9 +35,6 @@ public final class UrlParametersToSave extends UrlParameters {
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
 
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la operaci&oacute;n. */
-	private static final int MAX_ID_LENGTH = 20;
-
 	private String title = null;
 	private String filename = null;
 	private String extensions = null;
@@ -122,27 +119,27 @@ public final class UrlParametersToSave extends UrlParameters {
 		}
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-		String signatureSessionId = null;
+		String sessionId = null;
 		if (params.containsKey(ID_PARAM)) {
-			signatureSessionId = params.get(ID_PARAM);
+			sessionId = params.get(ID_PARAM);
 		}
 		else if (params.containsKey(FILE_ID_PARAM)) {
-			 signatureSessionId = params.get(FILE_ID_PARAM);
+			 sessionId = params.get(FILE_ID_PARAM);
 		}
 
-		if (signatureSessionId != null) {
-			if (signatureSessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+		if (sessionId != null) {
+			if (sessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
-			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
 					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
 				}
 			}
 
-			setSessionId(signatureSessionId);
+			setSessionId(sessionId);
 		}
 
 		// Version minima requerida del protocolo que se debe soportar

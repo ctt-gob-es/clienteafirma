@@ -32,17 +32,22 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	private static final String CONFIG_PARAM_OUT_DIR_LEGACY = "outdir"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_OVERWRITE = "docmanager.filesystem.overwrite"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_OVERWRITE_LEGACY = "overwrite"; //$NON-NLS-1$
+	private static final String CONFIG_PARAM_MAXDOCSIZE = "docmanager.filesystem.maxDocSize"; //$NON-NLS-1$
+
+	/** Tama&ntilde;o m&aacute;ximo de documento permitido. Cero (0) indica sin l&iacute;mite. */
+	private static final long DEFAULT_MAXDOCSIZE = 0;
 
 	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
 	String inDir;
 	String outDir;
 	boolean overwrite;
+	long maxDocSize;
 
 	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
-	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException {
+	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException, SecurityException {
 
 		LOGGER.info("Recuperamos el documento con referencia: " + dataRef); //$NON-NLS-1$
 
@@ -70,6 +75,11 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 			throw new IOException(
 				"No se puede cargar el documento, no se tienen permisos de lectura sobre el" //$NON-NLS-1$
 			);
+		}
+
+		if (this.maxDocSize > 0 && file.length() > this.maxDocSize) {
+			throw new SecurityException(
+					"El tamano del documento es superior al permitido. Tamano del documento: " + file.length()); //$NON-NLS-1$
 		}
 
 		final byte[] data;
@@ -144,6 +154,17 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 		this.inDir = config.getProperty(CONFIG_PARAM_IN_DIR, config.getProperty(CONFIG_PARAM_IN_DIR_LEGACY));
 		this.outDir = config.getProperty(CONFIG_PARAM_OUT_DIR, config.getProperty(CONFIG_PARAM_OUT_DIR_LEGACY));
 		this.overwrite = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_OVERWRITE, config.getProperty(CONFIG_PARAM_OVERWRITE_LEGACY)));
+
+		if (config.containsKey(CONFIG_PARAM_MAXDOCSIZE)) {
+			try {
+			this.maxDocSize = Long.parseLong(config.getProperty(CONFIG_PARAM_MAXDOCSIZE));
+			}
+			catch (final Exception e) {
+				this.maxDocSize = DEFAULT_MAXDOCSIZE;
+			}
+		} else {
+			this.maxDocSize = DEFAULT_MAXDOCSIZE;
+		}
 
 		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
 		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$

@@ -26,6 +26,9 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
 /** Pruebas de firma trif&aacute;sica. */
 public class TestPdfTriphase {
@@ -37,6 +40,7 @@ public class TestPdfTriphase {
 	private static final String PROPERTY_NAME_DOC_ID = "documentId"; //$NON-NLS-1$
 
 	private static final String PDF_FILENAME = "TEST_PDF.pdf"; //$NON-NLS-1$
+	private static final String PDF_WITH_PASSWORD_FILENAME = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_ATTACH = "attach"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_FILENAME = "attachFileName"; //$NON-NLS-1$
@@ -58,11 +62,12 @@ public class TestPdfTriphase {
 	private Properties serverConfig;
 
 	private byte[] data;
+	private byte[] protectedData;
 
 	/** Carga el almac&acute;n de pruebas.
 	 * @throws Exception En cualquier error. */
 	@Before
-	public void loadKeystore() throws Exception {
+	public void init() throws Exception {
 
 		// Cargamos la referencia a la clave privada
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -79,6 +84,8 @@ public class TestPdfTriphase {
 		this.serverConfig.setProperty(PROPERTY_NAME_SIGN_SERVER_URL, PROPERTY_VALUE_SIGN_SERVER_URL);
 
 		this.data = loadFile(PDF_FILENAME);
+
+		this.protectedData = loadFile(PDF_WITH_PASSWORD_FILENAME);
 	}
 
 	/** Prueba de validaci&oacute;n de formato.
@@ -253,5 +260,73 @@ public class TestPdfTriphase {
 			fos.write(content);
 		}
 		return tempFile;
+	}
+
+	/**
+	 * Prueba de firma trif&aacute;sica de un PDF con contrase&ntilde;a para la
+	 * que no se ha indicado contrase&ntilde;a.
+	 * @throws Exception En cualquier error.
+	 */
+	@Test
+	@Ignore
+	public void firmaConContrasenaSinIndicar() throws Exception {
+		final AOSigner signer = new AOPDFTriPhaseSigner();
+
+		final Properties config = new Properties();
+		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
+			config.setProperty(key, this.serverConfig.getProperty(key));
+		}
+
+		try {
+			signer.sign(
+					this.protectedData,
+					"SHA512withRSA", //$NON-NLS-1$
+					this.pke.getPrivateKey(),
+					this.pke.getCertificateChain(),
+					config
+					);
+
+			Assert.fail("Se completo la firma cuando debio fallar"); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			if (!(e instanceof PdfIsPasswordProtectedException)) {
+				Assert.fail("La firma fallo con una error " + e.getClass().getName() + " cuando se esperaba " + PdfIsPasswordProtectedException.class.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+	}
+
+	/**
+	 * Prueba de firma trif&aacute;sica de un PDF con contrase&ntilde;a para la
+	 * que se ha indicado una contrase&ntilde;a incorrecta.
+	 * @throws Exception En cualquier error.
+	 */
+	@Test
+	@Ignore
+	public void firmaConContrasenaErronea() throws Exception {
+		final AOSigner signer = new AOPDFTriPhaseSigner();
+
+		final Properties config = new Properties();
+		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
+			config.setProperty(key, this.serverConfig.getProperty(key));
+		}
+		config.setProperty(PdfExtraParams.OWNER_PASSWORD_STRING, "1234"); //$NON-NLS-1$
+
+		try {
+			signer.sign(
+					this.protectedData,
+					"SHA512withRSA", //$NON-NLS-1$
+					this.pke.getPrivateKey(),
+					this.pke.getCertificateChain(),
+					config
+					);
+
+			Assert.fail("Se completo la firma cuando debio fallar"); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			if (!(e instanceof BadPdfPasswordException)) {
+				Assert.fail("La firma fallo con una error " + e.getClass().getName() + " cuando se esperaba " + BadPdfPasswordException.class.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+
 	}
 }

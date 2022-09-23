@@ -27,6 +27,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /** Mensaje con la informaci&oacute;n requerida para la ejecuci&oacute;n de una
@@ -240,7 +241,7 @@ public final class TriphaseData {
 			doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero XML: " + e + "\n" + new String(xml)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero XML: " + e + "\n" + LoggerUtil.getTrimBytes(xml)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			throw new IOException("Error al cargar el fichero XML: " + e, e); //$NON-NLS-1$
 		}
 

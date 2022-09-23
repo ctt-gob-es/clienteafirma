@@ -33,9 +33,11 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -54,6 +56,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -65,6 +68,7 @@ import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signvalidation.SignValider;
@@ -324,6 +328,19 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
     @Override
+    public void relaunchTask(final PrivateKeyEntry pke, final List<SignOperationConfig> signConfigs) {
+
+    	new SignPanelSignTask(
+        		this,
+        		signConfigs,
+        		pke,
+        		this.signWaitDialog,
+        		this,
+        		this.saf
+    		).execute();
+    }
+
+    @Override
     public void finishTask() {
 
     	// Marcamos la tarea como termiada para evitar mostrar el dialogo espera despues de su fin
@@ -513,14 +530,34 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
-				 final SignValidity validity = validator.validate(data);
-				 if (validity != null) {
-					 config.setSignValidity(validity);
-					 if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO ||
-							 validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
-						config.setInvalidSignatureText(
-								buildErrorText(validity.getValidity(), validity.getError()));
-					 }
+				 SignValidity validity = null;
+				 final Properties validationParams = new Properties();
+
+				 final boolean needCheckPsa = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+				 if (!needCheckPsa) {
+					 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+				 }
+
+				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
+				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
+
+				 String errorText = null;
+				 try {
+					validity = validator.validate(data, validationParams);
+					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
+							|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+						errorText = buildErrorText(validity.getValidity(), validity.getError());
+					}
+				} catch (final RuntimeConfigNeededException e) {
+					validity = new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e);
+					errorText = e.getMessage();
+				} catch (final IOException e) {
+					throw e;
+				}
+
+				 config.setSignValidity(validity);
+				 if (errorText != null) {
+					 config.setInvalidSignatureText(errorText);
 				 }
 			 }
 		 }
@@ -535,8 +572,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 final String errorMsg;
 		 if (result == SIGN_DETAIL_TYPE.UNKNOWN) {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.141"); //$NON-NLS-1$
-		 }
-		 else {
+		 } else {
 			 errorMsg = SimpleAfirmaMessages.getString("SignPanel.140"); //$NON-NLS-1$
 		 }
 		 switch (error) {
@@ -570,6 +606,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.138"); //$NON-NLS-1$ //$NON-NLS-2$
 			case UNKOWN_SIGNATURE_FORMAT:
 				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.139"); //$NON-NLS-1$ //$NON-NLS-2$
+			case MODIFIED_DOCUMENT:
+				return SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
+			case OVERLAPPING_SIGNATURE:
+				return SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
 			default:
 				return errorMsg;
 		}

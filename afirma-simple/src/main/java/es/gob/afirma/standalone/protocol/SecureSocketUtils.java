@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 
 class SecureSocketUtils {
@@ -73,23 +72,9 @@ class SecureSocketUtils {
 			return new File(appDir, KEYSTORE_NAME);
 		}
 
-		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			appDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
-			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
-				return new File(appDir, KEYSTORE_NAME);
-			}
-		}
-		else if (Platform.getOS() == Platform.OS.LINUX) {
-			appDir = AutoFirmaUtil.getLinuxAlternativeAppDir();
-			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
-				return new File(appDir, KEYSTORE_NAME);
-			}
-		}
-		else if (Platform.getOS() == Platform.OS.MACOSX) {
-			appDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
-			if (new File(appDir, KEYSTORE_NAME).exists()) {
-				return new File(appDir, KEYSTORE_NAME);
-			}
+		appDir = AutoFirmaUtil.getAlternativeDirectory();
+		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
+			return new File(appDir, KEYSTORE_NAME);
 		}
 
 		return null;

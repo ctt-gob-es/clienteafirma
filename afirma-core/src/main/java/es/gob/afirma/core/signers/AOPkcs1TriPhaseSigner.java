@@ -337,7 +337,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 		// Analizamos la respuesta del servidor
 		final String stringTrimmedResult = new String(triSignFinalResult).trim();
 		if (!stringTrimmedResult.startsWith(SUCCESS)) {
-			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
+			throw new AOException("La firma trifasica no ha finalizado correctamente: " + stringTrimmedResult); //$NON-NLS-1$
 		}
 
 		// Los datos no se devuelven, se quedan en el servidor

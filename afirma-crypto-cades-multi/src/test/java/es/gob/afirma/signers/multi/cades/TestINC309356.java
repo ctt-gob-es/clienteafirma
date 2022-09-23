@@ -24,7 +24,7 @@ public final class TestINC309356 {
 	private static final String DATA = "data"; //$NON-NLS-1$
 	private static final String SIGNATURE_WITH_CONTENT_TYPE = "firma_contentType_TIFF.csig"; //$NON-NLS-1$
 	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
-	private static final String PASSWORD = "1111"; //$NON-NLS-1$
+	private static final String PWD = "1111"; //$NON-NLS-1$
 
 	private static InputStream ksIs;
 	private static KeyStore ks;
@@ -35,7 +35,7 @@ public final class TestINC309356 {
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, PASSWORD.toCharArray());
+		ks.load(ksIs, PWD.toCharArray());
 	}
 
 	/** Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
@@ -50,7 +50,7 @@ public final class TestINC309356 {
 			data = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 		final AOCAdESSigner signer = new AOCAdESSigner();
@@ -97,7 +97,7 @@ public final class TestINC309356 {
 			data = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 		config.setProperty("contentTypeOid", "1.2.840.10003.5.109.4"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -147,7 +147,7 @@ public final class TestINC309356 {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 

@@ -198,8 +198,9 @@ public final class XAdESCounterSigner {
 		try {
 			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(signDocument, outputXmlEncoding);
 
-			// Si no es un documento, se anade temporalmente el nodo raiz
-			// AFIRMA para que las operaciones de contrafirma funcionen correctamente
+			// Si el nodo principal es la firma, se anade temporalmente el nodo
+			// raiz AFIRMA para que las operaciones de contrafirma funcionen
+			// correctamente
 			if (root.getLocalName().equals(XMLConstants.TAG_SIGNATURE)) {
 				esFirmaSimple = true;
 				doc = AOXAdESSigner.insertarNodoAfirma(doc);
@@ -210,10 +211,22 @@ public final class XAdESCounterSigner {
 			throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
 		}
 
+		// Obtenemos todas las firmas del documento
+		final NodeList signaturesList = root.getElementsByTagNameNS(
+				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
+
+		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
+		// incluso en ese caso
+		final String forceSignLts = extraParams.getProperty(XAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
+		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
+			XAdESUtil.checkArchiveSignatures(signaturesList);
+		}
+
+		// Contrafirmamos
 		try {
 			if (targetType == CounterSignTarget.TREE) {
 				countersignTree(
-						root,
+						signaturesList,
 						key,
 						certChain,
 						extraParams,
@@ -223,7 +236,7 @@ public final class XAdESCounterSigner {
 			}
 			else if (targetType == CounterSignTarget.LEAFS) {
 				countersignLeafs(
-						root,
+						signaturesList,
 						key,
 						certChain,
 						extraParams,
@@ -233,7 +246,7 @@ public final class XAdESCounterSigner {
 			}
 			else if (targetType == CounterSignTarget.NODES) {
 				countersignNodes(
-						root,
+						signaturesList,
 						targets,
 						key,
 						certChain,
@@ -244,7 +257,7 @@ public final class XAdESCounterSigner {
 			}
 			else if (targetType == CounterSignTarget.SIGNERS) {
 				countersignSigners(
-						root,
+						signaturesList,
 						targets,
 						key,
 						certChain,
@@ -290,29 +303,26 @@ public final class XAdESCounterSigner {
 	}
 
 	/** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.
-	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas.
+	 * @param signaturesList Listado completos de firmas del documento.
 	 * @param key Clave privada para la firma.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma.
 	 * @param algorithm Algoritmo de firma XML.
 	 * @param doc Documento DOM XML a contrafirmar.
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-	private static void countersignLeafs(final Element root,
+	private static void countersignLeafs(final NodeList signaturesList,
 			                             final PrivateKey key,
 			                             final Certificate[] certChain,
 			                             final Properties extraParams,
 			                             final String algorithm,
 			                             final Document doc) throws AOException {
 
-		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
-		int numSignatures = signatures.getLength();
+		int numSignatures = signaturesList.getLength();
 
 		// comprueba cuales son hojas
 		try {
 			for (int i = 0; i < numSignatures; i++) {
-				final Element signature = (Element) signatures.item(i);
+				final Element signature = (Element) signaturesList.item(i);
 				final int numCounterSigns = signature.getElementsByTagNameNS(
 						XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE)
 						.getLength();
@@ -332,7 +342,7 @@ public final class XAdESCounterSigner {
 
 	/** Realiza la contrafirma de los nodos indicados en el par&aacute;metro
 	 * <code>targets</code>.
-	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param signaturesList Listado completos de firmas del documento.
 	 * @param tgts Array con las posiciones de los nodos a contrafirmar
 	 * @param key Clave privada para la firma
 	 * @param certChain Cadena de certificados del firmante
@@ -340,7 +350,7 @@ public final class XAdESCounterSigner {
 	 * @param algorithm Algoritmo de firma XML
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-	private static void countersignNodes(final Element root,
+	private static void countersignNodes(final NodeList signaturesList,
 			                             final Object[] tgts,
 			                             final PrivateKey key,
 			                             final Certificate[] certChain,
@@ -357,15 +367,11 @@ public final class XAdESCounterSigner {
 		}
 		final Object[] targets = targetsList.toArray();
 
-		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
-
 		// obtiene los nodos indicados en targets
 		final Element[] nodes = new Element[targets.length];
 		try {
 			for (int i = 0; i < targets.length; i++) {
-				nodes[i] = (Element) signatures.item(((Integer) targets[i]).intValue());
+				nodes[i] = (Element) signaturesList.item(((Integer) targets[i]).intValue());
 				if (nodes[i] == null) {
 					throw new AOException("Posicion de nodo no valida."); //$NON-NLS-1$
 				}
@@ -388,7 +394,7 @@ public final class XAdESCounterSigner {
 
 	/** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
 	 * targets.
-	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param signaturesList Listado completos de firmas del documento.
 	 * @param targets Array con el nombre de los firmantes de los nodos a contrafirmar
 	 * @param key Clave privada para la firma
 	 * @param certChain Cadena de certificados del firmante
@@ -396,7 +402,7 @@ public final class XAdESCounterSigner {
 	 * @param algorithm Algoritmo de firma XML
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-	private static void countersignSigners(final Element root,
+	private static void countersignSigners(final NodeList signaturesList,
 			                               final Object[] targets,
 			                               final PrivateKey key,
 			                               final Certificate[] certChain,
@@ -404,16 +410,12 @@ public final class XAdESCounterSigner {
 			                               final String algorithm,
 			                               final Document doc) throws AOException {
 
-		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
-
 		final List<Object> signers = Arrays.asList(targets);
 		final List<Element> nodes = new ArrayList<>();
 
 		// obtiene los nodos de los firmantes indicados en targets
-		for (int i = 0; i < signatures.getLength(); i++) {
-			final Element node = (Element) signatures.item(i);
+		for (int i = 0; i < signaturesList.getLength(); i++) {
+			final Element node = (Element) signaturesList.item(i);
 			if (signers.contains(AOUtil.getCN(Utils.getCertificate(node
 					.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate") //$NON-NLS-1$
 					.item(0))))) {
@@ -429,28 +431,25 @@ public final class XAdESCounterSigner {
 	}
 
 	/** Realiza la contrafirma de todos los nodos del &aacute;rbol.
-	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param signaturesList Listado completos de firmas del documento.
 	 * @param key Clave privada para la firma
 	 * @param certChain Cadena de certificados del firmante
 	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
 	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-	private static void countersignTree(final Element root,
+	private static void countersignTree(final NodeList signaturesList,
 			                            final PrivateKey key,
 			                            final Certificate[] certChain,
 			                            final Properties extraParams,
 			                            final String algorithm,
 			                            final Document doc) throws AOException {
 
-		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(
-				XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
-		final int numSignatures = signatures.getLength();
+		final int numSignatures = signaturesList.getLength();
 
 		final Element[] nodes = new Element[numSignatures];
 		for (int i = 0; i < numSignatures; i++) {
-			nodes[i] = (Element) signatures.item(i);
+			nodes[i] = (Element) signaturesList.item(i);
 		}
 
 		// y crea sus contrafirmas

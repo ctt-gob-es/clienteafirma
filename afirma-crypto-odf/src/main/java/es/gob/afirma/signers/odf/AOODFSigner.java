@@ -54,10 +54,8 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -73,6 +71,8 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.SecureXmlTransformer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -114,6 +114,8 @@ public final class AOODFSigner implements AOSigner {
 
     private static final String ENTRY_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
+    private static final int THRESHOLD_FILE_SIZE = 1000000000; // 1 GB
+
     static {
 
         // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
@@ -150,6 +152,10 @@ public final class AOODFSigner implements AOSigner {
                        final java.security.cert.Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
+    	if (data.length >= THRESHOLD_FILE_SIZE) {
+    		throw new AOException("Los datos tienen un tamano superior al permitido"); //$NON-NLS-1$
+    	}
+
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty(AOODFExtraParams.REFERENCES_DIGEST_METHOD, DEFAULT_DIGEST_METHOD);
@@ -178,7 +184,6 @@ public final class AOODFSigner implements AOSigner {
 	            // carga el fichero zip
 	            final ZipFile zf = new ZipFile(zipFile);
     		) {
-
             	final byte[] manifestData;
             	try (
 		            // obtiene el archivo manifest.xml, que indica los ficheros que
@@ -189,7 +194,7 @@ public final class AOODFSigner implements AOSigner {
             	}
 
 	            // obtiene el documento manifest.xml y su raiz
-	            final Document docManifest = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(manifestData));
+	            final Document docManifest = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(manifestData));
 	            final Element rootManifest = docManifest.getDocumentElement();
 
 	            // recupera todos los nodos de manifest.xml
@@ -583,6 +588,10 @@ public final class AOODFSigner implements AOSigner {
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
 
+    	if (sign.length >= THRESHOLD_FILE_SIZE) {
+    		throw new IOException("Los datos tienen un tamano superior al permitido."); //$NON-NLS-1$
+    	}
+
     	if (!isSign(sign)) {
     		throw new AOInvalidFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
     	}
@@ -596,11 +605,8 @@ public final class AOODFSigner implements AOSigner {
             	if (entry == null) {
             		return new AOTreeModel(tree);
             	}
-
 	            // recupera la raiz del documento de firmas
-	            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	            dbf.setNamespaceAware(true);
-	            final Element root = dbf.newDocumentBuilder().parse(zis).getDocumentElement();
+	            final Element root = SecureXmlBuilder.getSecureDocumentBuilder().parse(zis).getDocumentElement();
 
 	            // obtiene todas las firmas
 	            final NodeList signatures = root.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Signature"); //$NON-NLS-1$
@@ -742,7 +748,7 @@ public final class AOODFSigner implements AOSigner {
 
     private static void writeXML(final Writer writer, final Node node, final boolean indent) {
         try {
-            final Transformer serializer = TransformerFactory.newInstance().newTransformer();
+            final Transformer serializer = SecureXmlTransformer.getSecureTransformer();
             serializer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 
             if (indent) {

@@ -134,9 +134,9 @@ public final class MozillaKeyStoreUtilities {
 	 * @param userProfileDirectory Directorio donde se encuentra el perfil de
 	 *                             usuario de Mozilla Firefox.
 	 * @param libDir Directorio que contiene las bibliotecas NSS.
-	 * @return Fichero con las propiedades de configuracion del proveedor
+	 * @return Propiedades de configuracion del proveedor
 	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a NSS. */
-	public static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
+	public static String createPKCS11NSSConfig(final String userProfileDirectory, final String libDir) {
 
 		final String softoknLib;
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -524,6 +524,9 @@ public final class MozillaKeyStoreUtilities {
 			return Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"; //$NON-NLS-1$
 		}
 		// Linux / UNIX
+		if (new File(Platform.getUserHome() + "/snap/firefox/common/.mozilla/firefox/profiles.ini").isFile()) { //$NON-NLS-1$
+			return Platform.getUserHome() + "/snap/firefox/common/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
+		}
 		return Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
 	}
 
@@ -713,23 +716,23 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.warning("No se pudo comprobar si el almacen de claves debia cargase como base de datos: " + e); //$NON-NLS-1$
 		}
 
-		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
+		final String p11NSSConfig = MozillaKeyStoreUtilities.createPKCS11NSSConfig(
 			profileDir,
 			nssDirectory
 		);
 
 		// Mostramos la configuracion de NSS, sustituyendo la ruta del usuario del
 		// registro para evitar mostrar datos personales en el log
-		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfig.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final Provider p = AOUtil.isJava9orNewer()
-				? loadNssJava9(nssDirectory, p11NSSConfigFile)
-				: loadNssJava8(nssDirectory, p11NSSConfigFile);
+				? loadNssJava9(nssDirectory, p11NSSConfig)
+				: loadNssJava8(nssDirectory, p11NSSConfig);
 
 		Security.addProvider(p);
 
 		LOGGER.info(
-			"Proveedor PKCS#11 para NSS anadido" + (useSharedNss ? " para perfil compartido" : "") + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"Anadido proveedor PKCS#11 de NSS " + (useSharedNss ? "del sistema" : "de Mozilla") + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
 		return p;
 	}

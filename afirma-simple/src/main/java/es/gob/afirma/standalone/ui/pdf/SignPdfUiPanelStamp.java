@@ -55,7 +55,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
@@ -80,11 +80,8 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 	final Properties extraParams;
 
 	private Properties extraParamsForLocation = null;
-	Properties getExtraParamsForLocation() {
-		return this.extraParamsForLocation;
-	}
 	private void setProperties(final Properties p) {
-		this.extraParamsForLocation = p;
+		this.extraParamsForLocation = p != null ? (Properties) p.clone() : null;
 	}
 
 	private int currentPage = 1;
@@ -548,19 +545,19 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 
 				SignPdfUiPanelStamp.this.extraParams.put(
 					PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX,
-					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX)
+					this.extraParamsForLocation.getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTX)
 				);
 				SignPdfUiPanelStamp.this.extraParams.put(
 					PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY,
-					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY)
+					this.extraParamsForLocation.getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_LOWER_LEFTY)
 				);
 				SignPdfUiPanelStamp.this.extraParams.put(
 					PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX,
-					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX)
+					this.extraParamsForLocation.getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTX)
 				);
 				SignPdfUiPanelStamp.this.extraParams.put(
 					PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY,
-					getExtraParamsForLocation().getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY)
+					this.extraParamsForLocation.getProperty(PdfExtraParams.IMAGE_POSITION_ON_PAGE_UPPER_RIGHTY)
 				);
 				getListener().nextPanel(SignPdfUiPanelStamp.this.extraParams, null);
 			}

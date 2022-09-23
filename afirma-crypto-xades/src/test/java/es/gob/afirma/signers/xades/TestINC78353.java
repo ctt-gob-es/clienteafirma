@@ -22,7 +22,7 @@ public class TestINC78353 {
 	private static final String FILE_XADES_A_DETACHED = "78353__XAdES_A_Detached.xml"; //$NON-NLS-1$
 	private static final String FILE_XADES_A_ENVELOPING = "78353__XAdES_A_Enveloping.xml"; //$NON-NLS-1$
 	private static final String PKCS12_KEYSTORE = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
-	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
+	private static final String PWD = "12341234"; //$NON-NLS-1$
 
 	private static InputStream ksIs;
 	private static KeyStore ks;
@@ -33,7 +33,7 @@ public class TestINC78353 {
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, PASSWORD.toCharArray());
+		ks.load(ksIs, PWD.toCharArray());
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class TestINC78353 {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 		final AOXAdESSigner signer = new AOXAdESSigner();
@@ -88,7 +88,7 @@ public class TestINC78353 {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 		final AOXAdESSigner signer = new AOXAdESSigner();
@@ -128,7 +128,7 @@ public class TestINC78353 {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 		final AOXAdESSigner signer = new AOXAdESSigner();
@@ -164,7 +164,7 @@ public class TestINC78353 {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
 
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
 		final AOXAdESSigner signer = new AOXAdESSigner();

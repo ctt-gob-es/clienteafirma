@@ -48,6 +48,12 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-pdf-common</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xades</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
@@ -77,6 +83,26 @@
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-itext</artifactId>
+		</dependency>
+		
+		<dependency>
+  			<groupId>org.apache.pdfbox</groupId>
+  			<artifactId>pdfbox</artifactId>
+  			<version>2.0.25</version>
+  			<exclusions>
+  				<exclusion>
+           			<groupId>org.bouncycastle</groupId>
+           			<artifactId>bcmail-jdk15</artifactId>
+         		</exclusion>
+            	<exclusion>
+            		<groupId>org.bouncycastle</groupId>
+            		<artifactId>bcprov-jdk15</artifactId>
+  				</exclusion>
+  				<exclusion>
+  					<groupId>com.ibm.icu</groupId>
+            		<artifactId>icu4j</artifactId>
+  				</exclusion>
+        	</exclusions>
 		</dependency>
 		
 	</dependencies>

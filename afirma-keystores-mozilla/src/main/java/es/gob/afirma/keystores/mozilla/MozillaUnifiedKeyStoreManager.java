@@ -62,7 +62,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
 
 		this.passwordCallback = pssCallBack;
-		this.configParams = params != null ? params.clone() : params;
+		this.configParams = params != null ? params.clone() : null;
 
 		// Vaciamos el listado de almacenes agregados ya que esta llamada puede realizarse como
 		// parte de una operacion de refresco del almacen

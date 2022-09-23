@@ -35,8 +35,8 @@ final class RetrieveConfig {
 
 	private static final String DEBUG_KEY = "debug"; //$NON-NLS-1$
 
-	/** Directorio temporal por defecto. */
-	private static String defaultTmpDir;
+	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
+	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
 
 	private static final String SYS_PROP_PREFIX = "${"; //$NON-NLS-1$
 
@@ -50,9 +50,6 @@ final class RetrieveConfig {
 
 	/** Modo de depuraci&oacute;n activo o no, en el que no se borran los ficheros en servidor ni se dan por caducados. */
 	static final boolean DEBUG;
-
-	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
-	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
 
 	private static final long EXPIRATION_TIME;
 
@@ -103,6 +100,7 @@ final class RetrieveConfig {
 			LOGGER.warning("Modo de depuracion activado, no se borraran los ficheros en servidor"); //$NON-NLS-1$
 		}
 
+		String defaultTmpDir;
 		try {
 			defaultTmpDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		}

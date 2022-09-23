@@ -39,7 +39,6 @@ final class PdfVisibleAreasUtils {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final int DEFAULT_LAYER_2_FONT_SIZE = 12;
-    private static final int COURIER = 0;
     private static final int UNDEFINED = -1;
     private static final String BLACK = "black"; //$NON-NLS-1$
 
@@ -72,13 +71,40 @@ final class PdfVisibleAreasUtils {
 		// No instanciable
 	}
 
-	static com.aowagie.text.Font getFont(final int fontFamily,
+	/**
+	 * Obtiene la fuente para generar el texto de la firma visible.
+	 * @param fontFamily Identificador de familia de la fuente (0: COURIER, 1: HELVETICA,
+	 * 2: TIMES_ROMAN, 3: SYMBOL, 4: ZAPFDINGBATS). Con -1 se usa el valor por defecto: COURIER.
+	 * @param fontSize Tama&ntilde;o de fuente. Con -1 se usa el valor por defecto: 12.
+	 * @param fontStyle Estilo a aplicar al texto (0: NORMAL, 1: BOLD, 2: ITALIC, 3: BOLDITALIC,
+	 * 4: UNDERLINE, 8: STRIKETHRU). Con -1 se usa el valor por defecto: NORMAL.
+	 * @param fontColor Nombre del color (black, white, lightGray, gray, darkGray, red o pink).
+	 * @param pdfa {@code true} si se trata de un documento PDF/A, {@code false} en caso contrario.
+	 * @return Fuente de letra.
+	 */
+	static Font getFont(final int fontFamily,
 			                             final int fontSize,
 			                             final int fontStyle,
-			                             final String fontColor) {
+			                             final String fontColor,
+			                             final boolean pdfa) {
+
+		final int family = fontFamily == UNDEFINED ? Font.COURIER : fontFamily;
+		final int size = fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize;
+		final int style = fontStyle == UNDEFINED ? Font.NORMAL : fontStyle;
+
+		BaseFont baseFont;
+		try {
+			baseFont = getBaseFont(fontFamily, pdfa);
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+					"Error construyendo la fuente de letra para la firma visible PDF, se usara la por defecto y el PDF no sera compatible PDF/A: " + e //$NON-NLS-1$
+					);
+
+			return new Font(family, size, style, null);
+		}
 
 		final String colorName = fontColor != null ? fontColor.toLowerCase() : BLACK;
-
 		final ColorValues cv = COLORS.get(colorName) != null ? COLORS.get(colorName) : COLORS.get(BLACK);
 
 		try {
@@ -99,41 +125,58 @@ final class PdfVisibleAreasUtils {
 				Integer.valueOf(cv.getB())
 			);
 
-			return com.aowagie.text.Font.class.getConstructor(
-				Integer.TYPE,
+			// Utilizamos el constructor por reflexion para poder
+			// utilizar indistintamente la case de color de Java
+			// y de Android
+			return Font.class.getConstructor(
+				BaseFont.class,
 				Float.TYPE,
 				Integer.TYPE,
 				colorClass
-			).newInstance(
-				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2,
-				// SYMBOL = 3, ZAPFDINGBATS = 4)
-				Integer.valueOf(fontFamily == UNDEFINED ? COURIER : fontFamily),
-				// Size (DEFAULTSIZE = 12)
-				Float.valueOf(fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize),
-				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2,
-				// BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-				Integer.valueOf(fontStyle == UNDEFINED ? com.aowagie.text.Font.NORMAL : fontStyle),
-				// Color
-				color
-			);
+			).newInstance(baseFont, Float.valueOf(size), Integer.valueOf(style), color);
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-				"Error estableciendo el color del tipo de letra para la firma visible PDF, se usara el por defecto: " + e //$NON-NLS-1$
-			);
-			return new com.aowagie.text.Font(
-				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3,
-				// ZAPFDINGBATS = 4)
-				fontFamily == UNDEFINED ? COURIER : fontFamily,
-				// Size (DEFAULTSIZE = 12)
-				fontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : fontSize,
-				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3,
-				// UNDERLINE = 4, STRIKETHRU = 8)
-				fontStyle == UNDEFINED ? com.aowagie.text.Font.NORMAL : fontStyle,
-				// Color
-				null
-			);
+				"Error estableciendo el color del tipo de letra para la firma visible PDF, se usara el por defecto: " + e); //$NON-NLS-1$
+			return new Font(baseFont, size, style, null);
 		}
+	}
+
+	private static BaseFont getBaseFont(final int fontFamily, final boolean pdfa) throws DocumentException, IOException {
+		final BaseFont font;
+
+		// Si la firma es PDF/A, incrustamos toda la fuente para seguir
+		// respetando el estandar
+		if (pdfa) {
+			switch (fontFamily) {
+			case Font.HELVETICA:
+				font = BaseFont.createFont("/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			case Font.TIMES_ROMAN:
+				font = BaseFont.createFont("/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			case Font.COURIER:
+			default:
+				font = BaseFont.createFont("/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+				break;
+			}
+			font.setSubset(false);
+		} else {
+			switch (fontFamily) {
+			case Font.HELVETICA:
+				font = BaseFont.createFont(BaseFont.HELVETICA, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+			case Font.TIMES_ROMAN:
+				font = BaseFont.createFont(BaseFont.TIMES_ROMAN, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+			case Font.COURIER:
+			default:
+				font = BaseFont.createFont(BaseFont.COURIER, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+			}
+		}
+
+		return font;
 	}
 
 	/**
@@ -310,7 +353,7 @@ final class PdfVisibleAreasUtils {
     		                               final Rectangle pageRect,
     		                               final int page,
     		                               final String fieldName,
-    		                               final int degrees, 
+    		                               final int degrees,
     		                               final Image rubric) throws DocumentException,
                                                                      IOException {
         final float width = pageRect.getWidth();
@@ -321,6 +364,9 @@ final class PdfVisibleAreasUtils {
         // Parametros de rectangulo utilizado para crear el texto
         final float widthTxt = degrees == 0 || degrees == 180 ? width : height;
         final float heightTxt = degrees == 0 || degrees == 180 ? height : width;
+
+        // Escalamos la imagen para que se ajuste al espacio disponible
+        appearance.setImageScale(-1);
 
         // La firma visible se configura inicialmente de forma horizontal.
         appearance.setVisibleSignature(
@@ -343,6 +389,33 @@ final class PdfVisibleAreasUtils {
     		final ByteBuffer internalBuffer = t.getInternalBuffer();
         	final ByteBuffer actualBuffer = n2Layer.getInternalBuffer();
 		) {
+
+        	// Imprimimos la rubrica de fondo
+	        if (rubric != null) {
+	        	//Imagen con la firma rubrica
+	        	rubric.setInterpolation(true);
+	        	rubric.setAbsolutePosition(0, 0);
+
+	        	// Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
+	        	if (degrees == 90 || degrees == 270) {
+	        		final float scale = Math.min(height / rubric.getWidth(), width / rubric.getHeight());
+	                final float w = rubric.getWidth() * scale;
+	                final float h = rubric.getHeight() * scale;
+	                final float x = (width - h) / 2;
+	                final float y = (height - w) / 2;
+	                t.addImage(rubric, w, 0, 0, h, y, x);
+	        	} else {
+	        		final float scale = Math.min(width / rubric.getWidth(), height / rubric.getHeight());
+	                final float w = rubric.getWidth() * scale;
+	                final float h = rubric.getHeight() * scale;
+	                final float x = (width - w) / 2;
+	                final float y = (height - h) / 2;
+	                t.addImage(rubric, w, 0, 0, h, x, y);
+	        	}
+	        }
+
+	        // Creamos el buffer en el que escribir el texto usando el buffer
+	        // anterior lrubrica de fondo
 	        internalBuffer.write(actualBuffer.toByteArray());
 	        final Font f = appearance.getLayer2Font();
             // Traduccion de la fuente a una fuente PDF
@@ -352,27 +425,13 @@ final class PdfVisibleAreasUtils {
 	        }
 
 	        n2Layer.reset();
-	        final Image textImg = Image.getInstance(t);
+
 	        //Imagen con el texto encima de la rubrica
+	        final Image textImg = Image.getInstance(t);
 	        textImg.setInterpolation(true);
 	        textImg.setRotationDegrees(degrees);
 	        textImg.setAbsolutePosition(0, 0);
-	        
-	        if(rubric != null) {
-	        	//Imagen con la firma rubrica
-	        	rubric.setInterpolation(true);
-	        	rubric.setRotationDegrees(degrees);
-	        	rubric.setAbsolutePosition(0, 0);
-	        
-	        	//Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
-	        	if (degrees == 90 || degrees == 270) {
-	        		rubric.scaleAbsolute(height, width);
-	        	} else {
-	        		rubric.scaleAbsolute(width, height);
-	        	}
-	        
-	        	n2Layer.addImage(rubric);
-	        }
+
 	        n2Layer.addImage(textImg);
 	        n2Layer.setWidth(width);
 	        n2Layer.setHeight(height);
@@ -542,5 +601,5 @@ final class PdfVisibleAreasUtils {
     	}
     	return digitsCount;
     }
-    
+
 }

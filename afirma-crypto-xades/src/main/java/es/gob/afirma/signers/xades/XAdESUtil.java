@@ -45,6 +45,7 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -56,6 +57,7 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBaselineAttributes;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XadesWithBasicAttributes;
+import es.uji.crypto.xades.jxades.util.XMLUtils;
 
 /**
  * Utilidades varias para firmas XAdES.
@@ -589,16 +591,7 @@ public final class XAdESUtil {
     static Element getSignedPropertiesReference(final Element signatureElement) {
 
     	// Obtemos el nodo SignedInfo
-    	int i = 0;
-    	Element signedInfoElement = null;
-    	final NodeList childs = signatureElement.getChildNodes();
-    	while (i < childs.getLength() && signedInfoElement == null) {
-    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				childs.item(i).getLocalName().equals(XMLConstants.TAG_SIGNEDINFO)) {
-    			signedInfoElement = (Element) childs.item(i);
-    		}
-    		i++;
-    	}
+    	final Element signedInfoElement = getSignedInfo(signatureElement);
     	if (signedInfoElement == null) {
     		return null;
     	}
@@ -609,7 +602,7 @@ public final class XAdESUtil {
 
     	// Buscamos entre las referencias hasta encontrar la que declare el tipo
     	// correspondiente a los atributos firmados
-    	for (i = 0; i < references.getLength(); i++) {
+    	for (int i = 0; i < references.getLength(); i++) {
     		final Element reference = (Element) references.item(i);
     		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
 			if (type != null && !type.isEmpty() && isSignedPropertiesType(type)) {
@@ -618,6 +611,25 @@ public final class XAdESUtil {
     	}
     	// Si no se encontro la referencia, se devuelve nulo
     	return null;
+    }
+
+	/**
+	 * Obtiene el nodo SignedInfo de un elemento de firma individual.
+	 * @param signature Elemento de firma.
+	 * @return Elemento SignedInfo o {@code null} si no se encuentra.
+	 */
+    public static Element getSignedInfo(final Element signature) {
+
+    	Element signedInfoElement = null;
+    	final NodeList childs = signature.getChildNodes();
+    	for (int i = 0; i < childs.getLength() && signedInfoElement == null; i++) {
+    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE
+    				&& XMLConstants.DSIGNNS.equals(childs.item(i).getNamespaceURI())
+    				&& XMLConstants.TAG_SIGNEDINFO.equals(childs.item(i).getLocalName())) {
+    			signedInfoElement = (Element) childs.item(i);
+    		}
+    	}
+    	return signedInfoElement;
     }
 
     /**
@@ -660,10 +672,31 @@ public final class XAdESUtil {
     		return null;
     	}
 
-    	// Recuperamos el nodo con los elemento firmados
+    	// Recuperamos el nodo con los elementos firmados
     	final String signedPropertiesId = uri.substring(1);
 
     	return findElementById(signedPropertiesId, signatureElement, false);
+    }
+
+    /**
+     * Obtiene el elemento UnsignedProperties de una firma XAdES.
+     * @param signatureElement Elemento "Signature" de una firma XAdES.
+     * @return Elemento "UnsignedProperties" de una firma XAdES.
+     */
+    static Element getUnSignedPropertiesElement(final Element signatureElement) {
+
+    	// Obtenemos el elemento de propiedades firmadas
+    	final Element signedPropertiesElement = getSignedPropertiesElement(signatureElement);
+    	if (signedPropertiesElement == null) {
+    		return null;
+    	}
+
+    	// El elemento de propiedades sin firmar sera un nodo hermano de este
+    	final Element qualifingPropertiesElement = (Element) signedPropertiesElement.getParentNode();
+    	return XMLUtils.getChildElementByTagNameNS(
+    			qualifingPropertiesElement,
+    			XAdESConstants.TAG_UNSIGNED_PROPERTIES,
+    			XAdESConstants.NAMESPACE_XADES_1_3_2);
     }
 
 
@@ -761,16 +794,7 @@ public final class XAdESUtil {
     static List<Element> getSignatureDataReferenceList(final Element signatureElement) {
 
     	// Obtemos el nodo SignedInfo
-    	int i = 0;
-    	Element signedInfoElement = null;
-    	final NodeList childs = signatureElement.getChildNodes();
-    	while (i < childs.getLength() && signedInfoElement == null) {
-    		if (childs.item(i).getNodeType() == Node.ELEMENT_NODE &&
-    				childs.item(i).getLocalName().equals(XMLConstants.TAG_SIGNEDINFO)) {
-    			signedInfoElement = (Element) childs.item(i);
-    		}
-    		i++;
-    	}
+    	final Element signedInfoElement = getSignedInfo(signatureElement);
     	if (signedInfoElement == null) {
     		return null;
     	}
@@ -780,7 +804,7 @@ public final class XAdESUtil {
 
     	// Omitimos del listado la referencia a los atributos firmados
     	final List<Element> dataReferences = new ArrayList<>();
-    	for (i = 0; i < references.getLength(); i++) {
+    	for (int i = 0; i < references.getLength(); i++) {
     		final Element reference = (Element) references.item(i);
     		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
 			if (type != null && !type.isEmpty()) {
@@ -818,6 +842,34 @@ public final class XAdESUtil {
     	}
 
     	return dataReferences;
+    }
+
+	/**
+     * Indica si la firma contiene una referencia a un manifest.
+     * @param signatureElement Elemento XML "Signature" de firma.
+     * @return Listado con las referencias a datos encontradas.
+     */
+    public static boolean hasHashManifestReference(final Element signatureElement) {
+
+    	// Obtemos el nodo SignedInfo
+    	final Element signedInfoElement = getSignedInfo(signatureElement);
+    	if (signedInfoElement == null) {
+    		return false;
+    	}
+
+    	// Obtenemos las referencias declaradas en la firma
+    	final NodeList references = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_REFERENCE);
+
+    	// Omitimos del listado la referencia a los atributos firmados
+    	for (int i = 0; i < references.getLength(); i++) {
+    		final Element reference = (Element) references.item(i);
+    		final String type = reference.getAttribute("Type"); //$NON-NLS-1$
+			if (XAdESConstants.REFERENCE_TYPE_MANIFEST.equals(type)) {
+				return true;
+			}
+    	}
+
+    	return false;
     }
 
     /**
@@ -873,5 +925,47 @@ public final class XAdESUtil {
     			|| config == null
     			|| !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(XAdESExtraParams.FORMAT))
     					&& !Boolean.parseBoolean(config.getProperty(XAdESExtraParams.USE_MANIFEST));
+    }
+
+    /**
+     * Comprueba si alguna de las firmas proporcionadas incluye un sello de archivo.
+     * @param signatures Listado de firmas que verificar.
+     * @throws SigningLTSException Cuando alguna de las firmas incluye sello de archivo.
+     */
+    public static void checkArchiveSignatures(final NodeList signatures) throws SigningLTSException {
+    	for (int i = 0; i < signatures.getLength(); i++) {
+    		final Element signature = (Element) signatures.item(i);
+    		checkArchiveSignatures(signature);
+    	}
+    }
+
+    /**
+     * Comprueba si alguna de las firmas proporcionadas incluye un sello de archivo.
+     * @param signatures Listado de firmas que verificar.
+     * @throws SigningLTSException Cuando alguna de las firmas incluye sello de archivo.
+     */
+    public static void checkArchiveSignatures(final Element signature) throws SigningLTSException {
+    	final Element unsignedProperties = getUnSignedPropertiesElement(signature);
+    	if (unsignedProperties != null) {
+    		final Element unsignedSignatureProperties = XMLUtils.getChildElementByTagNameNS(unsignedProperties,
+    				XAdESConstants.TAG_UNSIGNED_SIGNATURE_PROPERTIES, XAdESConstants.NAMESPACE_XADES_1_3_2);
+    		if (unsignedSignatureProperties != null) {
+    			Element archiveTimeStamp = XMLUtils.getChildElementByTagNameNS(unsignedSignatureProperties,
+    					XAdESConstants.TAG_ARCHIVE_TIMESTAMP, XAdESConstants.NAMESPACE_XADES_1_4_1);
+    			if (archiveTimeStamp != null) {
+    				throw new SigningLTSException("Se han encontrado firmas de sello de archivo"); //$NON-NLS-1$
+    			}
+    			archiveTimeStamp = XMLUtils.getChildElementByTagNameNS(unsignedSignatureProperties,
+    					XAdESConstants.TAG_ARCHIVE_TIMESTAMP, XAdESConstants.NAMESPACE_XADES_1_3_2);
+    			if (archiveTimeStamp != null) {
+    				throw new SigningLTSException("Se han encontrado firmas de sello de archivo"); //$NON-NLS-1$
+    			}
+    			archiveTimeStamp = XMLUtils.getChildElementByTagNameNS(unsignedSignatureProperties,
+    					XAdESConstants.TAG_ARCHIVE_TIMESTAMP, XAdESConstants.NAMESPACE_XADES_1_2_2);
+    			if (archiveTimeStamp != null) {
+    				throw new SigningLTSException("Se han encontrado firmas de sello de archivo"); //$NON-NLS-1$
+    			}
+    		}
+    	}
     }
 }

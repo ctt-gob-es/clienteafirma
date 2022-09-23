@@ -25,7 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.signers.pades.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
@@ -43,9 +43,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private static final int PREFERRED_WIDTH = 500;
 	private static final int PREFERRED_HEIGHT = 800;
 
-	private static final double LOWER_LIMIT_X = 30.0;
-	private static final double LOWER_LIMIT_Y = 45.0;
-	private static final double AREA_LIMIT = 13000.0;
+	private static final int LOWER_LIMIT_X = 30;
+	private static final int LOWER_LIMIT_Y = 45;
+	private static final int AREA_LIMIT = 1350;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -270,7 +270,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 					// Comprobamos la imagen precargada, en caso de que exista, para avisar si
 					// contiene transparencias
-					if (((SignPdfUiPanelPreview) this.activePanel).checkTransparency()) {
+					if (((SignPdfUiPanelPreview) this.activePanel).checkRubricTransparency()) {
 			        	AOUIFactory.showMessageDialog(
 			        			this,
 								SignPdfUiMessages.getString("SignPdfDialog.9"),  //$NON-NLS-1$
@@ -313,6 +313,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		final int upperRightY = Integer.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY));
 		final int dimensionX = Math.abs(upperRightX - lowerLeftX);
 		final int dimensionY = Math.abs(upperRightY - lowerLeftY);
+
 		final boolean limitSizeCondition = dimensionX < LOWER_LIMIT_X || dimensionY < LOWER_LIMIT_Y;
 		final boolean limitAreaCondition = dimensionX * dimensionY < AREA_LIMIT;
 		if (limitSizeCondition || limitAreaCondition) {

@@ -30,7 +30,7 @@ import javax.swing.JLabel;
 
 final class PageLabel extends JLabel {
 
-	static interface PageLabelListener extends EventListener {
+	interface PageLabelListener extends EventListener {
 		void setX(String x);
 		void setY(String y);
 		void setWidth(String width);
@@ -124,16 +124,33 @@ final class PageLabel extends JLabel {
             public void mouseReleased(final MouseEvent e) {
             	final Point initialPoint = getClickPoint();
             	final Point finalPoint = e.getPoint();
+
+            	// Si el area no tiene superficie, seleccionamos el area
             	if (initialPoint.getX() == finalPoint.getX() ||
             			initialPoint.getY() == finalPoint.getY()) {
             		clearAreaValues();
             	}
             	else {
+
+            		// Ajustamos los puntos a las dimensiones reales del campo
+            		final int lWidth = getWidth();
+            		final int lHeight = getHeight();
+
+            		int pX = (int) initialPoint.getX();
+            		final int pointOneX = pX < 0 ? 0 : pX > lWidth ? lWidth : pX;
+            		int pY = (int) initialPoint.getY();
+            		final int pointOneY = pY < 0 ? 0 : pY > lHeight ? lHeight : pY;
+
+            		pX = (int) finalPoint.getX();
+            		final int pointTwoX = pX < 0 ? 0 : pX > lWidth ? lWidth : pX;
+            		pY = (int) finalPoint.getY();
+            		final int pointTwoY = pY < 0 ? 0 : pY > lHeight ? lHeight : pY;
+
             		setAreaValues(
-            				(int) Math.min(initialPoint.getX(), finalPoint.getX()),
-            				(int) Math.min(initialPoint.getY(), finalPoint.getY()),
-            				(int) Math.abs(initialPoint.getX() - finalPoint.getX()),
-            				(int) Math.abs(initialPoint.getY() - finalPoint.getY()));
+            				Math.min(pointOneX, pointTwoX),
+            				Math.min(pointOneY, pointTwoY),
+            				Math.abs(pointOneX - pointTwoX),
+            				Math.abs(pointOneY - pointTwoY));
             	}
             	setClickPoint(null);
             }

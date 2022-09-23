@@ -19,6 +19,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +40,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
@@ -59,6 +61,11 @@ public final class ValidateXMLSignature implements SignValider {
     	return validate(sign, true);
     }
 
+	@Override
+	public SignValidity validate(final byte[] sign, final Properties params) {
+		return validate(sign, true);
+	}
+
     /** Valida una firma XML y las fechas de validez de los certificados.
      * @param sign Firma a validar
      * @param checkCertificates Indica si debe validarse la caducidad de los certificados.
@@ -68,7 +75,7 @@ public final class ValidateXMLSignature implements SignValider {
 
         final Document doc;
         try {
-            doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
         	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
@@ -207,4 +214,5 @@ public final class ValidateXMLSignature implements SignValider {
 		@Override
 		public Key getKey() { return this.pk; }
     }
+
 }

@@ -60,6 +60,6 @@ public final class RelationshipTransformParameterSpec implements TransformParame
     }
 
     List<String> getSourceIds() {
-        return this.sourceIds;
+    	return this.sourceIds != null ? new LinkedList<>(this.sourceIds) : null;
     }
 }

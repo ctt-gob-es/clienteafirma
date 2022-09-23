@@ -56,7 +56,7 @@ public final class ReadNodesTree {
     private final List<X509Certificate[]> listaCert = new ArrayList<>();
 
     int[] getSeleccionados() {
-        return this.seleccionados;
+        return this.seleccionados != null ? this.seleccionados.clone() : null;
     }
 
     void setSeleccionados(final int[] seleccionados) {

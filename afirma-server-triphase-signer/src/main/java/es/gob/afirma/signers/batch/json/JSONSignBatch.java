@@ -9,6 +9,7 @@
 
 package es.gob.afirma.signers.batch.json;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.security.cert.X509Certificate;
@@ -21,11 +22,13 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
+import es.gob.afirma.signers.batch.ProcessResult.Result;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
@@ -45,6 +48,16 @@ public abstract class JSONSignBatch {
 	private static final String JSON_ELEMENT_SUBOPERATION = "suboperation"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_STOPONERROR = "stoponerror"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
+
+	private static final String JSELEM_TD = "td"; //$NON-NLS-1$
+	private static final String JSELEM_RESULTS = "results"; //$NON-NLS-1$
+	private static final String JSELEM_ID = "id"; //$NON-NLS-1$
+	private static final String JSELEM_RESULT = "result"; //$NON-NLS-1$
+	private static final String JSELEM_DESCRIPTION = "description"; //$NON-NLS-1$
+	private static final String JSELEM_FORMAT = "format"; //$NON-NLS-1$
+	private static final String JSELEM_SIGNS = "signs"; //$NON-NLS-1$
+
+	private static final String EXTRAPARAM_HEADLESS = "headless"; //$NON-NLS-1$
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -71,10 +84,10 @@ public abstract class JSONSignBatch {
 	/**
 	 * Ejecuta el preproceso de firma por lote.
 	 * @param certChain Cadena de certificados del firmante.
-	 * @return Datos trif&aacute;sicos de pre-firma del lote.
+	 * @return Resultados parciales y datos trif&aacute;sicos de pre-firma del lote.
 	 * @throws BatchException Cuando hay errores irrecuperables en el preproceso.
 	 */
-	public abstract String doPreBatch(final X509Certificate[] certChain) throws BatchException;
+	public abstract JSONObject doPreBatch(final X509Certificate[] certChain) throws BatchException;
 
 	/**
 	 * Ejecuta el postproceso de firma por lote.
@@ -92,9 +105,11 @@ public abstract class JSONSignBatch {
 	 * Crea un lote de firmas a partir de su definici&oacute;n JSON.
 	 * @param json JSON de definici&oacute;n de lote de firmas (<a href="./doc-files/batch-scheme.html">descripci&oacute;n
 	 *            del formato</a>).
-	 * @throws IOException Si hay problemas en el tratamiento de datoso en el an&aacute;lisis del JSON.
+	 * @throws IOException Si hay problemas en el tratamiento de datos en el an&aacute;lisis del JSON.
+	 * @throws SecurityException Si se sobrepasa alguna de las limitaciones establecidas para el lote
+	 * (n&ueacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
 	 */
-	protected JSONSignBatch(final byte[] json) throws IOException {
+	protected JSONSignBatch(final byte[] json) throws IOException, SecurityException {
 
 		if (json == null || json.length < 1) {
 			throw new IllegalArgumentException(
@@ -102,11 +117,17 @@ public abstract class JSONSignBatch {
 			);
 		}
 
+		// Se comprueba que el JSON definido no supere el tamano maximo permitido por la opcion configurada
+		final long maxReqSize = ConfigManager.getBatchMaxRequestSize();
+		if (maxReqSize > 0 && json.length > maxReqSize) {
+			throw new SecurityException(
+					"El JSON de definicion de lote supera el tamano permitido: " + maxReqSize); //$NON-NLS-1$
+		}
+
 		JSONObject jsonObject = null;
-		final String convertedJson = new String(json);
 		try {
-			jsonObject = new JSONObject(convertedJson);
-		}catch (final JSONException e){
+			jsonObject = new JSONObject(new JSONTokener(new ByteArrayInputStream(json)));
+		} catch (final JSONException e){
 			LOGGER.severe("Error al parsear JSON: " + e); //$NON-NLS-1$
 			throw new JSONException(
 					"El JSON de definicion de lote de firmas no esta formado correctamente", e //$NON-NLS-1$
@@ -173,40 +194,120 @@ public abstract class JSONSignBatch {
 		}
 
 		if (Boolean.parseBoolean(ConfigManager.isCacheEnabled())) {
-
-			final Class<?> docCacheManagerClass;
-			String docCacheManagerClassName;
-			docCacheManagerClassName = ConfigManager.getDocCacheManagerClassName();
-
-			try {
-				docCacheManagerClass = Class.forName(docCacheManagerClassName);
-			}
-			catch (final ClassNotFoundException e) {
-				throw new RuntimeException(
-						"La clase DocumentCacheManager indicada no existe ("  //$NON-NLS-1$
-						+ docCacheManagerClassName +  ")", e //$NON-NLS-1$
-						);
-			}
-
-			try {
-				final Constructor<?> docCacheManagerConstructor = docCacheManagerClass.getConstructor(Properties.class);
-				this.docCacheManager = (DocumentCacheManager) docCacheManagerConstructor.newInstance(ConfigManager.getConfig());
-			}
-			catch (final Exception e) {
-				try {
-					this.docCacheManager = (DocumentCacheManager) docCacheManagerClass.getConstructor().newInstance();
-				}
-				catch (final Exception e2) {
-					throw new RuntimeException(
-							"No se ha podido inicializar el DocumentCacheManager. Debe tener un constructor vacio o que reciba un Properties: " + e2, e //$NON-NLS-1$
-							);
-				}
-			}
-
-			LOGGER.info("Se usara el siguiente 'DocumentCacheManager' para firma trifasica: " + this.docCacheManager.getClass().getName()); //$NON-NLS-1$
+			this.docCacheManager = DocumentCacheFactory.newDocumentCacheManager();
 		}
 
 		this.signs = fillSingleSigns(jsonObject);
+	}
+
+
+	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) throws SecurityException {
+		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<>();
+		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
+
+		if (singleSignsArray != null) {
+
+			// Comprobamos si la propiedad batch.maxDocuments esta configurada y si permite el numero de documentos
+			final long maxDocuments = ConfigManager.getBatchMaxDocuments();
+			if (maxDocuments > 0 && singleSignsArray.length() > maxDocuments) {
+				throw new SecurityException(
+						"El lote incluye mas documentos de los permitidos. Numero de documentos del lote: " //$NON-NLS-1$
+						+ singleSignsArray.length());
+			}
+
+			for (int i = 0 ; i < singleSignsArray.length() ; i++){
+
+				final JSONObject jsonSingleSign = singleSignsArray.getJSONObject(i);
+				final JSONSingleSign singleSign = new JSONSingleSign(jsonSingleSign.getString(JSON_ELEMENT_ID));
+
+				// Cada nodo debe terner una referencia a los datos o el resultado de la operacion
+				if (!jsonSingleSign.has(JSON_ELEMENT_DATAREFERENCE) && !jsonSingleSign.has(JSELEM_RESULT)) {
+					throw new JSONException("La declaracion del lote no es valida. Todas las firmas deben declarar el atributo " //$NON-NLS-1$
+							+ JSON_ELEMENT_DATAREFERENCE + " o " + JSELEM_RESULT); //$NON-NLS-1$
+				}
+
+				// Si tiene la referencia a los datos es que la firma aun no se ha completado
+				// y tomamos los datos necesarios para hacerlo
+				if (jsonSingleSign.has(JSON_ELEMENT_DATAREFERENCE)) {
+
+					final String dataReference = jsonSingleSign.getString(JSON_ELEMENT_DATAREFERENCE);
+
+					// Comprobamos si la propiedad batch.maxReferenceSize esta configurada y si permite el numero de documentos
+					final long maxRefSize = ConfigManager.getBatchMaxReferenceSize();
+					if (maxRefSize > 0 && dataReference != null && dataReference.length() > maxRefSize) {
+						throw new SecurityException(
+								"El tamano de la referencia supera el limite permitido. Tamano de la referencia: " //$NON-NLS-1$
+								+ dataReference.length());
+					}
+
+					singleSign.setDataRef(dataReference);
+
+					singleSign.setFormat(jsonSingleSign.has(JSON_ELEMENT_FORMAT)
+							? SingleSignConstants.SignFormat.getFormat(jsonSingleSign.getString(JSON_ELEMENT_FORMAT))
+									: this.format);
+
+					singleSign.setSubOperation(jsonSingleSign.has(JSON_ELEMENT_SUBOPERATION)
+							? SingleSignConstants.SignSubOperation.getSubOperation(jsonSingleSign.getString(JSON_ELEMENT_SUBOPERATION))
+									: this.subOperation);
+
+					singleSign.setDocumentManager(this.documentManager);
+
+					try {
+						Properties signExtraParams;
+						if (jsonSingleSign.has(JSON_ELEMENT_EXTRAPARAMS)) {
+							signExtraParams = AOUtil.base642Properties(jsonSingleSign.getString(JSON_ELEMENT_EXTRAPARAMS));
+						} else {
+							signExtraParams = AOUtil.base642Properties(this.extraParams);
+						}
+						signExtraParams.setProperty(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
+						singleSign.setExtraParams(signExtraParams);
+					} catch (final Exception e) {
+						throw new JSONException(
+								"El objeto JSON no esta correctamente formado"); //$NON-NLS-1$
+					}
+				}
+				// Si no esta la referencia a los datos, es que ya se ha obtenido un resultado
+				else {
+					final String result = jsonSingleSign.getString(JSELEM_RESULT);
+					String description = null;
+					if (jsonSingleSign.has(JSELEM_DESCRIPTION)) {
+						description = jsonSingleSign.getString(JSELEM_DESCRIPTION);
+					}
+					final ProcessResult processResult = new ProcessResult(Result.valueOf(result), description);
+					singleSign.setProcessResult(processResult);
+				}
+
+				singleSignsList.add(singleSign);
+			}
+		}
+
+		return singleSignsList;
+	}
+
+
+	protected static JSONObject buildSignResult(final String id, final Result result, final Throwable error) {
+		final JSONObject jsonResult = new JSONObject();
+		jsonResult.put(JSELEM_ID, id);
+		jsonResult.put(JSELEM_RESULT, result.name());
+		if (error != null) {
+			jsonResult.put(JSELEM_DESCRIPTION, error.getMessage());
+		}
+		return jsonResult;
+	}
+
+	protected static JSONObject buildPreBatch(final String format, final JSONArray trisigns, final JSONArray errors) {
+		final JSONObject preBatch = new JSONObject();
+		if (trisigns != null && !trisigns.isEmpty()) {
+			final JSONObject triphaseInfo = new JSONObject();
+			triphaseInfo.put(JSELEM_FORMAT, format);
+			triphaseInfo.put(JSELEM_SIGNS, trisigns);
+			preBatch.put(JSELEM_TD, triphaseInfo);
+		}
+		if (errors != null && !errors.isEmpty()) {
+			preBatch.put(JSELEM_RESULTS, errors);
+		}
+
+		return preBatch;
 	}
 
 	@Override
@@ -282,51 +383,6 @@ public abstract class JSONSignBatch {
 		for (final JSONSingleSign ss : this.signs) {
 			ts.delete(ss, getId());
 		}
-	}
-
-	private List<JSONSingleSign> fillSingleSigns(final JSONObject jsonObject) {
-		final ArrayList<JSONSingleSign> singleSignsList = new ArrayList<>();
-		final JSONArray singleSignsArray = jsonObject.getJSONArray(JSON_ELEMENT_SINGLESIGNS);
-
-		if (singleSignsArray != null) {
-			for (int i=0 ; i<singleSignsArray.length() ; i++){
-
-				final JSONSingleSign singleSign = new JSONSingleSign(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_ID));
-
-				singleSign.setDataRef(singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_DATAREFERENCE));
-
-				singleSign.setFormat(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_FORMAT)
-						? SingleSignConstants.SignFormat.getFormat(
-								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_FORMAT)
-								)
-								: this.format);
-
-				singleSign.setSubOperation(singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_SUBOPERATION)
-						? SingleSignConstants.SignSubOperation.getSubOperation(
-								singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_SUBOPERATION)
-								)
-								: this.subOperation);
-
-				singleSign.setDocumentManager(this.documentManager);
-
-				try {
-					if (singleSignsArray.getJSONObject(i).has(JSON_ELEMENT_EXTRAPARAMS)) {
-						singleSign.setExtraParams(
-								AOUtil.base642Properties(
-										singleSignsArray.getJSONObject(i).getString(JSON_ELEMENT_EXTRAPARAMS)));
-					}else {
-						singleSign.setExtraParams(AOUtil.base642Properties(this.extraParams));
-					}
-				} catch (final Exception e) {
-					throw new JSONException(
-							"El objeto JSON no está correctamente formado"); //$NON-NLS-1$
-				}
-
-				singleSignsList.add(singleSign);
-			}
-		}
-
-		return singleSignsList;
 	}
 
 	public String getExtraParams() {

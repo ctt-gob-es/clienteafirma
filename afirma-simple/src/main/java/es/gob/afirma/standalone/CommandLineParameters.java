@@ -327,7 +327,7 @@ final class CommandLineParameters {
 
 	/** Recupera el formato de firma configurado o, si no se ha indicado, el
 	 * formato por defecto.
-	 * @return Formato de firma o "AUTO" para indicar que se seleccione el m&aacute;s apropiado. */
+	 * @return Formato de firma o "auto" para indicar que se seleccione el m&aacute;s apropiado. */
 	public String getFormat() {
 		return this.format != null ? this.format : DEFAULT_FORMAT;
 	}

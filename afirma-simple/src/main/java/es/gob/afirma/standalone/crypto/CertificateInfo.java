@@ -18,7 +18,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
- * @author Carlos gamuci Mill&aacute;n */
+ * @author Carlos Gamuci Mill&aacute;n */
 public final class CertificateInfo {
 
     /** Icono ilustrativo del Certificado. */
@@ -42,34 +42,36 @@ public final class CertificateInfo {
     		        final Icon i,
     		        final String iTooltip) {
 
-    	if (holderName == null || holderName.isEmpty()) {
-        	if (cert == null) {
-        		this.holderName = null;
-        		this.issuerName = null;
-        	}
-        	else {
-        		this.holderName = AOUtil.getCN(cert);
-        		this.issuerName = AOUtil.getCN(cert.getIssuerX500Principal().toString());
-        	}
-        }
-        else {
-        	this.holderName = holderName;
+    	if (holderName != null && !holderName.isEmpty()) {
+    		this.holderName = holderName;
+    	}
+    	else if (cert != null) {
+    		this.holderName = AOUtil.getCN(cert);
+    	}
+    	else {
+    		this.holderName = null;
+    	}
+
+    	if (cert != null) {
+    		this.issuerName = AOUtil.getCN(cert.getIssuerX500Principal().toString());
+    	}
+    	else {
+        	this.issuerName = null;
         }
 
-        if (i == null) {
-        	this.icon = new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")); //$NON-NLS-1$
-        }
-        else {
+        if (i != null) {
         	this.icon = i;
         }
-
-        if (iTooltip == null) {
-        	this.iconTooltip = SimpleAfirmaMessages.getString("CertificateInfo.3"); //$NON-NLS-1$
-        }
         else {
+        	this.icon = new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")); //$NON-NLS-1$
+        }
+
+        if (iTooltip != null) {
         	this.iconTooltip = iTooltip;
         }
-
+        else {
+        	this.iconTooltip = SimpleAfirmaMessages.getString("CertificateInfo.3"); //$NON-NLS-1$
+        }
     }
 
     /** Obtiene el icono del certificado.

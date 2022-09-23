@@ -216,6 +216,13 @@ public final class CAdESExtraParams {
      */
     static final String HEADLESS = "headless";//$NON-NLS-1$
 
+    /**
+     * Par&aacute;metro que permite configurar si deben multifirmarse firmas de archivo aunque
+     * queden invalidadas.
+     */
+	public static final String FORCE_SIGN_LTS_SIGNATURES = "forceSignLTSignature"; //$NON-NLS-1$
+
+
     /** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
     private CAdESExtraParams(){
         // No instanciable

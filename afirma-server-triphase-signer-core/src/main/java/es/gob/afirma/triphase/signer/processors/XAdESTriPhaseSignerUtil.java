@@ -12,6 +12,7 @@ package es.gob.afirma.triphase.signer.processors;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -27,6 +28,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.triphase.signer.xades.NodeDelimiter;
@@ -46,7 +48,7 @@ final class XAdESTriPhaseSignerUtil {
 
 	private static final String EXTRA_PARAM_FORMAT = "format"; //$NON-NLS-1$
 
-	private static final String REPLACEMENT_TEMPLATE = "%%%%REPLACE-%1$d%%%%"; //$NON-NLS-1$
+	private static final String REPLACEMENT_TEMPLATE = "====REPLACE-%1$d===="; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -96,18 +98,26 @@ final class XAdESTriPhaseSignerUtil {
 				getCommonContentDelimiters(docSourceReferences, docSource);
 
 		// Cargamos ambas firmas como cadenas para poder extraer los elementos tal como son
-		String base = new String(xmlBase, docBase.getXmlEncoding());
-		final String source = new String(xmlSource, docSource.getXmlEncoding());
+		StringBuilder base = new StringBuilder(new String(xmlBase, docBase.getXmlEncoding()));
+		final StringBuilder source = new StringBuilder(new String(xmlSource, docSource.getXmlEncoding()));
 
 		// Realizamos el reemplazo
 		for (int i = 0; i < elDeliSource.size(); i++) {
+
+			final ContentDelimited content = getContent(source, elDeliSource.get(i));
+
+			final String dummyString = String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i));
+
+			final int idx = base.indexOf(dummyString);
+
 			base = base.replace(
-				String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)),
-				getContent(source, elDeliSource.get(i))
+				idx,
+				idx + dummyString.length(),
+				content.getContent()
 			);
 
 		}
-		return base.getBytes(docBase.getXmlEncoding());
+		return base.toString().getBytes(docBase.getXmlEncoding());
 	}
 
 	/** Elimina de una firma XML el contenido de los nodos referenciados por la propia firma.
@@ -142,18 +152,29 @@ final class XAdESTriPhaseSignerUtil {
 			return xml;
 		}
 
-		String ret = null;
-		if (doc.getXmlEncoding() != null) {
+		// Identificamos la codificacion del resultado
+		Charset encoding = null;
+		if (xmlEncoding != null) {
 			try {
-				ret = new String(xml, doc.getXmlEncoding());
+				encoding = Charset.forName(xmlEncoding);
 			}
-			catch (final UnsupportedEncodingException e) {
-				LOGGER.warning("Error en la codificacion declarada por el XML (" + doc.getXmlEncoding() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			catch (final Exception e) {
+				LOGGER.warning("La codificacion indicada para el XML no es valida: " + xmlEncoding); //$NON-NLS-1$
 			}
 		}
-		if (ret == null) {
-			ret = new String(xml);
+		if (encoding == null && doc.getXmlEncoding() != null) {
+			try {
+				encoding = Charset.forName(doc.getXmlEncoding());
+			}
+			catch (final Exception e) {
+				LOGGER.warning("La codificacion declarada por el XML no es valida: " + doc.getXmlEncoding()); //$NON-NLS-1$
+			}
 		}
+
+		StringBuilder ret = new StringBuilder(
+				encoding != null
+					? new String(xml, encoding)
+					: new String(xml));
 
 		final List<NodeDelimiter> delits = cleanContentDelimiters(
 			XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
@@ -166,23 +187,16 @@ final class XAdESTriPhaseSignerUtil {
 		// Reemplazamos todo el contenido que haya entre los delimitadores por
 		// una cadena de reemplazo que podamos identificar posteriormente
 		for (int i = 0; i < delits.size(); i++) {
+			final ContentDelimited content = getContent(ret, delits.get(i));
 			ret = ret.replace(
-					getContent(ret, delits.get(i)),
+					content.getStartContentIdx(),
+					content.getEndContentIdx(),
 					String.format(REPLACEMENT_TEMPLATE, Integer.valueOf(i)));
 		}
 
-		if (doc.getXmlEncoding() != null) {
-			try {
-				return ret.getBytes(doc.getXmlEncoding());
-			}
-			catch (final UnsupportedEncodingException e) {
-				LOGGER.warning(
-					"Error en la codificacion declarada por el XML ('" + doc.getXmlEncoding() + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-			}
-		}
-
-		return ret.getBytes();
+		return encoding != null
+				? ret.toString().getBytes(encoding)
+				: ret.toString().getBytes();
 	}
 
 	/** Limpia la lista de delimitadores de nodos.
@@ -192,12 +206,12 @@ final class XAdESTriPhaseSignerUtil {
 	 * @param or Lista original de delimitadores de nodos
 	 * @param orXml XML en su forma de texto.
 	 * @return Lista de delimitadores de nodos con los delimitadores correctos. */
-	private static List<NodeDelimiter> cleanContentDelimiters(final List<NodeDelimiter> or, final String orXml) {
+	private static List<NodeDelimiter> cleanContentDelimiters(final List<NodeDelimiter> or, final StringBuilder orXml) {
 		final List<NodeDelimiter> ret = new ArrayList<>(or.size());
 		for (final NodeDelimiter del : or) {
 			// Las discordancias siempre estan en la apertura del nodo
 			final String orDel = del.getOpenTag();
-			if (orXml.contains(orDel)) {
+			if (orXml.indexOf(orDel) != -1) {
 				ret.add(del);
 			}
 			else {
@@ -219,14 +233,14 @@ final class XAdESTriPhaseSignerUtil {
 				for (final Integer beginIndex : indexes) {
 					retDel = orXml.substring(
 						beginIndex.intValue(),
-						orXml.indexOf('>', beginIndex.intValue()) + 1
+						orXml.indexOf(">", beginIndex.intValue()) + 1 //$NON-NLS-1$
 					);
 
 					// En este punto 'retDel' es un candidato, comprobamos que el Id sea el mismo
 					if (retDel.contains(ID_STR) && retDel.contains(ID_STR)) {
 						final String id = orXml.substring(
 							orXml.indexOf(ID_STR, beginIndex.intValue()),
-							orXml.indexOf('"',  orXml.indexOf(ID_STR, beginIndex.intValue()) + ID_STR.length())
+							orXml.indexOf("\"",  orXml.indexOf(ID_STR, beginIndex.intValue()) + ID_STR.length()) //$NON-NLS-1$
 						);
 						if (retDel.contains(id)) {
 							break;
@@ -260,15 +274,15 @@ final class XAdESTriPhaseSignerUtil {
 	private static List<NodeDelimiter> getCommonContentDelimiters(final List<String> uris,
 			                                                     final Document doc) {
 		final String encoding = doc.getInputEncoding();
-		final List<NodeDelimiter> ret = new ArrayList<>();
+		final List<NodeDelimiter> delimiters = new ArrayList<>();
 		for (final String uriValue : uris) {
 			final Node node = CustomUriDereferencer.getNodeByInternalUriReference(uriValue, doc);
 			if (node != null) {
 				final String nodeContent = getNodeAsText(node, encoding);
-				ret.add(getDelimiterTags(nodeContent));
+				delimiters.add(getDelimiterTags(nodeContent));
 			}
 		}
-		return ret;
+		return delimiters;
 	}
 
 	/**
@@ -303,16 +317,16 @@ final class XAdESTriPhaseSignerUtil {
 	 * con la del XML al que pertenece el nodo).
 	 * @return Nodo en forma de texto.
 	 */
-	private static String getContent(final String text, final NodeDelimiter delimiter) {
-
+	private static ContentDelimited getContent(final StringBuilder text, final NodeDelimiter delimiter) {
 		final String openTag = delimiter.getOpenTag();
 		final String closeTag = delimiter.getCloseTag();
 
 		final int openTagIdx = text.indexOf(openTag);
-
-		return text.substring(
+		final String content = text.substring(
 				openTagIdx + openTag.length(),
 				text.indexOf(closeTag, openTagIdx + openTag.length()));
+
+		return new ContentDelimited(content, openTagIdx + openTag.length());
 	}
 
 	/**
@@ -360,11 +374,13 @@ final class XAdESTriPhaseSignerUtil {
 		final Element signDoc = doc.getDocumentElement();
 
 		final List<Node> signatureNodes = new ArrayList<>();
+
+		// Comprobamos si el nodo principal es de firma
 		if (signDoc.getNodeName().equals("Signature") || signDoc.getNodeName().endsWith(":Signature")) { //$NON-NLS-1$ //$NON-NLS-2$
 			signatureNodes.add(signDoc);
 		}
 
-        // Obtenemos las firmas del documento
+        // Obtenemos las firmas internas del documento
         final NodeList nl = signDoc.getElementsByTagNameNS(DS_NAMESPACE_URL, "Signature"); //$NON-NLS-1$
         for (int i = 0; i < nl.getLength(); i++) {
         	signatureNodes.add(nl.item(i));
@@ -372,13 +388,21 @@ final class XAdESTriPhaseSignerUtil {
 
         // Por cada firma buscamos sus referencias
         final List<String> unmutableReferences = new ArrayList<>();
-        for(final Node sigs : signatureNodes) {
-        	final NodeList rf = ((Element) sigs).getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
+        for (final Node sigs : signatureNodes) {
+        	// Buscamos la referencias solo dentro del SignedInfo para evitar problemas con las
+        	// referencias de los manifest. Si no encontramos el elemento, omitimos las
+        	// referencias de la firma
+        	final Element signedInfo = XAdESUtil.getSignedInfo((Element) sigs);
+        	if (signedInfo == null) {
+        		continue;
+        	}
+
+        	final NodeList rf = signedInfo.getElementsByTagNameNS(DS_NAMESPACE_URL, "Reference"); //$NON-NLS-1$
         	for (int j = 0; j < rf.getLength(); j++) {
         		final Element refElement = (Element) rf.item(j);
         		if (!isReferenceToSignedProperties(refElement) && !isEnvelopedReference(refElement)) {
         			final String uri = refElement.getAttribute("URI"); //$NON-NLS-1$
-        			if (uri != null) {
+        			if (uri != null && !unmutableReferences.contains(uri)) {
         				unmutableReferences.add(uri);
         			}
         		}
@@ -452,5 +476,35 @@ final class XAdESTriPhaseSignerUtil {
 			xmlCleaned = xmlCleaned.substring(0, n1) + xmlCleaned.substring(n2 + 1);
 		}
 		return xmlCleaned;
+	}
+
+	/**
+	 * Contenido delimitado dentro de una cadena. Indica cual es el contenido
+	 * y donde empieza cada elemento.
+	 */
+	private static class ContentDelimited {
+		final String content;
+		final int startContentIdx;
+		final int endDelimiterIdx;
+
+
+		public ContentDelimited(final String content, final int startContentIdx) {
+			this.content = content;
+			this.startContentIdx = startContentIdx;
+			this.endDelimiterIdx = this.startContentIdx + content.length();
+		}
+
+		public String getContent() {
+			return this.content;
+		}
+
+		public int getStartContentIdx() {
+			return this.startContentIdx;
+		}
+
+		public int getEndContentIdx() {
+			return this.endDelimiterIdx;
+		}
+
 	}
 }

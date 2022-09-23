@@ -9,12 +9,35 @@
 
 package es.gob.afirma.signvalidation;
 
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PRAcroForm;
+import com.aowagie.text.pdf.PRAcroForm.FieldInformation;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfObject;
+import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.Base64;
@@ -23,9 +46,12 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 
 /** Utilidad para el an&aacute;lisis de ficheros de datos.
  * @author Carlos Gamuci. */
@@ -232,4 +258,236 @@ public final class DataAnalizerUtil {
         }
         return false;
     }
+
+	/**
+	 * Indica si el documento ha recibido un posible PDF Shadow Attack.
+	 * @param actualdata Datos del documento actual.
+	 * @param lastReviewData Flujo de datos de la &uacute;ltima revisi&oacute;n firmada.
+	 * @param pagesToCheck P&aacuteginas a comprobar.
+	 * @return Validez o no de los datos en el documento.
+	 * @throws IOException Cuando falla la carga del documento como PDF o
+	 * la generaci&oacute;n de las im&aacute;genes.
+	 */
+	public static SignValidity checkPdfShadowAttack(final byte[] actualdata, final InputStream lastReviewData, final String pagesToCheck) throws IOException {
+
+		try (final PDDocument actualDoc = PDDocument.load(actualdata);
+				final PDDocument lastReviewDoc = PDDocument.load(lastReviewData)) {
+
+			final PDFRenderer actualPdfRenderer = new PDFRenderer(actualDoc);
+			final PDFRenderer lastReviewPdfRenderer = new PDFRenderer(lastReviewDoc);
+			BufferedImage actualReviewImage;
+			BufferedImage lastReviewImage;
+
+			int totalPagesToCheck;
+
+			if (PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL.equalsIgnoreCase(pagesToCheck)) {
+				totalPagesToCheck = actualDoc.getNumberOfPages();
+			} else {
+				totalPagesToCheck = Integer.parseInt(pagesToCheck);
+			}
+
+			for (int i = 0; i < totalPagesToCheck; i++) {
+				// Se comprueba si en la misma pagina se esta solapando alguna firma visible con otra
+				final boolean isOverlappingSignatures = checkSignatureOverlaping(actualDoc.getPage(i).getAnnotations());
+				if (isOverlappingSignatures) {
+					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.OVERLAPPING_SIGNATURE);
+				}
+				actualReviewImage = actualPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
+				lastReviewImage = lastReviewPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
+				final boolean equalImages = checkImagesChanges(actualReviewImage, lastReviewImage);
+
+				if (!equalImages) {
+					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.MODIFIED_DOCUMENT);
+				}
+			}
+        }
+		catch (final Exception e) {
+        	LOGGER.log(Level.WARNING, "Error al cargar el fichero, se salta al siguiente"); //$NON-NLS-1$
+ 		}
+
+		return null;
+	}
+
+	/**
+	 * Comprueba si las im&aacute;genes son iguales
+	 * @param img1 {@link BufferedImage}
+	 * @param img2 {@link BufferedImage}
+	 * @return TRUE si son iguales, FALSE si no lo son.
+	 */
+	public static boolean checkImagesChanges(final BufferedImage img1, final BufferedImage img2) {
+		if (imageDimensionsEqual(img1, img2)) {
+			final int diffAmount = drawSubtractionImage(img1, img2, null);
+			return diffAmount == 0;
+		}
+		return false;
+	}
+
+	/**
+	 * Comprueba si las im&aacute;genes tienen el mismo tama&ntilde;o.
+	 * @param img1 {@link BufferedImage}
+	 * @param img2 {@link BufferedImage}
+	 * @return TRUE si las dimensiones de las im&aacute;genes son iguales, FALSE en caso contrario.
+	 */
+	private static boolean imageDimensionsEqual(final BufferedImage img1, final BufferedImage img2) {
+		if (img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()) {
+			LOGGER.log(Level.WARNING, "Las imagenes no tienen el mismo tamano"); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Analiza las im&aacute;genes p&iacute;xel a p&iacute;xel y devuelve la diferencia de p&iacute;xeles entre im&aacute;genes.
+	 * @param img1   {@link BufferedImage} a comparar.
+	 * @param img2   {@link BufferedImage} a comparar.
+	 * @param outImg {@link BufferedImage} la imagen resultante.
+	 * @return Cantidad de p&iacute;xeles distintos entre las im&aacute;genes.
+	 */
+	private static int drawSubtractionImage(final BufferedImage img1, final BufferedImage img2, final BufferedImage outImg) {
+		int diffAmount = 0;
+		int diff;
+		int result;
+		for (int i = 0; i < img1.getHeight() && i < img2.getHeight(); i++) {
+			for (int j = 0; j < img1.getWidth() && j < img2.getWidth(); j++) {
+				final int rgb1 = img1.getRGB(j, i);
+				final int rgb2 = img2.getRGB(j, i);
+				final int r1 = rgb1 >> 16 & 0xff;
+				final int g1 = rgb1 >> 8 & 0xff;
+				final int b1 = rgb1 & 0xff;
+				final int r2 = rgb2 >> 16 & 0xff;
+				final int g2 = rgb2 >> 8 & 0xff;
+				final int b2 = rgb2 & 0xff;
+
+				diff = Math.abs(r1 - r2);
+				diff += Math.abs(g1 - g2);
+				diff += Math.abs(b1 - b2);
+
+				if (diff > 0) {
+					diffAmount++;
+				}
+
+				if (outImg != null) {
+					diff /= 3;
+					result = diff << 16 | diff << 8 | diff;
+					outImg.setRGB(j, i, result);
+				}
+			}
+		}
+		return diffAmount;
+	}
+
+	private static boolean checkSignatureOverlaping(final List<PDAnnotation> signAnnotations) {
+		for (int i = 0 ; i < signAnnotations.size() - 1 ; i++) {
+			if (signAnnotations.get(i) instanceof PDAnnotationWidget) {
+				final Rectangle2D rect = toJavaRectangle(signAnnotations.get(i).getRectangle());
+				if (rect.getWidth() == 0 || rect.getHeight() == 0) {
+					// Es una firma invisible
+					continue;
+				}
+				final boolean isOverlap = checkIsOverlapping(rect, signAnnotations, ++i);
+				if (isOverlap) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean checkIsOverlapping(final Rectangle2D rect1, final List<PDAnnotation> signAnnotations, final int index) {
+		// Se comprueba a partir de la siguiente posicion para no comprobarse a si mismo
+		for (int i = index; i < signAnnotations.size() ; i++) {
+			final Rectangle2D rect2 = toJavaRectangle(signAnnotations.get(i).getRectangle());
+			if (rect1.getMinX() > rect2.getMaxX() || rect2.getMinX() > rect1.getMaxX()) {
+				return false;
+			}
+			if (rect1.getMinY() > rect2.getMaxY() || rect2.getMinY() > rect1.getMaxY()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static Rectangle2D toJavaRectangle(final PDRectangle pdRect) {
+		final float x = pdRect.getLowerLeftX();
+		final float y = pdRect.getLowerLeftY();
+		final float width = pdRect.getUpperRightX() - pdRect.getLowerLeftX();
+		final float height = pdRect.getUpperRightY() - pdRect.getLowerLeftY();
+		return new Rectangle2D.Float(x, y, width, height);
+	}
+
+	/**
+	 * Method that compares the fields of the form between the first version before signing and the one supplied.
+	 * @param reader PDFReader object that corresponds to a signed PDF form.
+	 * @return Null if the PDF has not been altered. Map that contains field identifier and description of the fields that have been altered after signing.
+	 * @throws IOException If an error occurs.
+	 */
+	public static Map<String, String> checkPDFForm(final PdfReader reader) throws IOException{
+		final Map<String, String> errors = new LinkedHashMap<>();
+		// Obtenemos el listado de campos de la version final.
+		final Map<String, PdfObject> currentFields = getFieldValues(reader);
+		//Obtenemos la primera version antes de firma firmada
+		final AcroFields af = reader.getAcroFields();
+		final List<String> names = af.getSignatureNames();
+
+		PdfReader originalReader;
+		try (final InputStream in = af.extractRevision(names.get(names.size() - 1))) {
+			originalReader = new PdfReader(in);
+		}
+		final Map<String, PdfObject> initialFields = getFieldValues(originalReader);
+		final Iterator<String> keysIt = initialFields.keySet().iterator();
+		while (keysIt.hasNext()) {
+			final String idField = keysIt.next();
+			final PdfObject valueObj = initialFields.get(idField);
+			final PdfObject valueObjFin = currentFields.remove(idField);
+			if (valueObj != null) {
+				final String vInitial = valueObj.toString();
+				if (valueObjFin != null) {
+					final String vFin = valueObjFin.toString();
+					if (!vInitial.equals(vFin)) {
+						errors.put(idField, "El campo " + idField + " ha sido modificado tras firma: " + vInitial + " / " + vFin); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				} else {
+					errors.put(idField, "El campo " + idField + " ha sido modificado tras firma: " + vInitial + " / null"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+			} else {
+				if(valueObjFin!=null) {
+					final String vFin = valueObjFin.toString();
+					errors.put(idField, "El campo " + idField + " ha sido modificado tras firma: null / " + vFin); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+
+		if (errors.isEmpty()) {
+			return null;
+		}
+		return errors;
+	}
+
+	/**
+	 * Method that extracts the values of the fields of a PDF form.
+	 * @param reader PDFReader object that corresponds to a PDF form.
+	 * @return Map with the identifier of the form field and its value.
+	 */
+	private static Map<String, PdfObject> getFieldValues(final PdfReader reader){
+		final LinkedHashMap<String, PdfObject> fields = new LinkedHashMap<>();
+		final PRAcroForm form = reader.getAcroForm();
+		final ArrayList<FieldInformation> fiList = form.getFields();
+		for (int i = 0; i < fiList.size(); i++) {
+			final FieldInformation fi = fiList.get(i);
+			if (fi.getInfo() != null) {
+				// Obtenemos el tipo de campo
+				String type = null;
+				if (fi.getInfo().get(PdfName.FT) != null) {
+					type = fi.getInfo().get(PdfName.FT).toString();
+				}
+				// Excluimos los campos signature
+				if (type == null || !type.equals("/Sig")) { //$NON-NLS-1$
+					fields.put(fi.getName(), fi.getInfo().get(PdfName.V));
+				}
+
+			}
+
+		}
+		return fields;
+	}
 }

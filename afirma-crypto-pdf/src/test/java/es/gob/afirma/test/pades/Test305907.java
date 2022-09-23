@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
+import es.gob.afirma.signers.pades.common.PdfHasUnregisteredSignaturesException;
 
 /** Pruebas espec&iacute;ficas para el Bug 305907.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

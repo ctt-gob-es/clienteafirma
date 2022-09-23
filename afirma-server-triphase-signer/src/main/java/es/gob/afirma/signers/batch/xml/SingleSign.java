@@ -67,7 +67,7 @@ public class SingleSign {
 
 	private SignSaver signSaver;
 
-	private ProcessResult processResult = new ProcessResult(ProcessResult.Result.NOT_STARTED, null);
+	private ProcessResult processResult = new ProcessResult(ProcessResult.Result.NOT_STARTED, null, false);
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
 	 * @param id Identificador de la firma. */
@@ -405,6 +405,14 @@ public class SingleSign {
 		if (data == null) {
 			checkDataSource(this.dataRef);
 			data = DataDownloader.downloadData(this.dataRef);
+		}
+
+		// Comprobamos si se ha establecido un tamano maximo de documento y si este lo supera
+		final long maxDocSize = BatchConfigManager.getBatchXmlDocSize();
+		if (maxDocSize > 0 && data.length > maxDocSize) {
+			LOGGER.severe("El tamano del documento supera el permitido: " + maxDocSize); //$NON-NLS-1$
+			throw new IOException(
+					"El tamano del documento supera el permitido: " + maxDocSize); //$NON-NLS-1$
 		}
 
 		// Finalmente, si se habia indicado que no habia recurso temporal

@@ -22,12 +22,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
+import es.gob.afirma.signers.batch.ProcessResult.Result;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
-import es.gob.afirma.signers.batch.json.JSONSingleSign.CallableResult;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
@@ -42,8 +45,10 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 	 * Crea un lote de firmas que se ejecuta de forma concurrente por cada una de sus firmas.
 	 * @param json JSON de definici&oacute;n de lote.
 	 * @throws IOException Si hay problemas en la creaci&oacute;n del lote.
+	 * @throws SecurityException Si se sobrepasa alguna de las limitaciones establecidas para el lote
+	 * (n&ueacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
 	 */
-	public JSONSignBatchConcurrent(final byte[] json) throws IOException {
+	public JSONSignBatchConcurrent(final byte[] json) throws IOException, SecurityException {
 		super(json);
 
 		this.concurrentTimeout = ConfigManager.getConcurrentTimeout();
@@ -51,62 +56,114 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 	}
 
 	@Override
-	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
+	public JSONObject doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
 		final ExecutorService executorService = Executors.newFixedThreadPool(this.concurrentMaxSigns);
-		final Collection<Callable<String>> callables = new ArrayList<>(this.signs.size());
+		final Collection<Callable<PreprocessResult>> callables = new ArrayList<>(this.signs.size());
 
 		for (final JSONSingleSign ss : this.signs) {
-			final Callable<String> callable = ss.getPreProcessCallable(certChain, this.algorithm, this.documentManager,
-																	this.docCacheManager);
+			final Callable<PreprocessResult> callable = ss.getPreProcessCallable(certChain, this.algorithm, this.documentManager,
+					this.docCacheManager);
 			callables.add(callable);
 		}
 
-		final List<Future<String>> results;
+		final List<Future<PreprocessResult>> results;
 		try {
 			results = executorService.invokeAll(callables, this.concurrentTimeout, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
 			stopExecution(executorService);
 			throw new BatchException(
-				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
-				e
-			);
+				"Error en el preproceso en paralelo del lote de firma", e); //$NON-NLS-1$
 		}
 
-		final StringBuilder sb = new StringBuilder("{"); //$NON-NLS-1$
-		sb.append("\"format\":\"" + this.format + "\",");  //$NON-NLS-1$//$NON-NLS-2$
-		sb.append("\"signs\": ["); //$NON-NLS-1$
+		boolean needStop = false;
+
+		final List<TriphaseData> trisigns = new ArrayList<>();
+		final List<ResultSingleSign> errors = new ArrayList<>();
 
 		for (int i = 0 ; i < results.size() ; i++) {
-			final String tmp;
-			try {
-				tmp = results.get(i).get(this.concurrentTimeout, TimeUnit.SECONDS);
-			}
-			catch (final Exception e) {
-				if (this.stopOnError) {
-					stopExecution(executorService);
-					throw new BatchException(
-						"Error en la prefirma de una de las firmas del lote, se parara el proceso", e //$NON-NLS-1$
-					);
-				}
-				LOGGER.log(Level.WARNING,
-					"Error en la prefirma de una de las firmas del lote, se continua con el siguiente elemento: " + e, //$NON-NLS-1$
-					e
-				);
+			final Future<PreprocessResult> futureResult = results.get(i);
+
+			// Si por algun motivo se ha pedido detener la operacion, se
+			// detiene y no continuamos
+			if (needStop) {
+				futureResult.cancel(true);
 				continue;
 			}
-			sb.append(tmp);
-			if (results.size() -1 != i) {
-				sb.append(","); //$NON-NLS-1$
+
+			try {
+				final PreprocessResult preprocessResult = futureResult.get(this.concurrentTimeout, TimeUnit.SECONDS);
+
+				// Si durante la ejecucion se cancelo el proceso, no continuamos.
+				if (futureResult.isCancelled()) {
+					continue;
+				}
+
+				// Registramos el resultado como exito o error segun corresponda
+				if (preprocessResult.getPresign() != null) {
+					final TriphaseData triphaseData = preprocessResult.getPresign();
+					trisigns.add(triphaseData);
+				}
+				else {
+					final ResultSingleSign singleResult = preprocessResult.getSignResult();
+					errors.add(singleResult);
+					if (this.stopOnError) {
+						needStop = true;
+						stopExecution(executorService);
+					}
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "Error no esperado en la prefirma de una de las firmas del lote", e); //$NON-NLS-1$
+				final ProcessResult errorResult = new ProcessResult(Result.ERROR_PRE, null);
+				final ResultSingleSign singleResult = new ResultSingleSign(this.signs.get(i).getId(), false, errorResult);
+				errors.add(singleResult);
+				if (this.stopOnError) {
+					needStop = true;
+					stopExecution(executorService);
+					break;
+				}
 			}
 		}
-
-		sb.append("]}"); //$NON-NLS-1$
 
 		executorService.shutdown();
 
-		return sb.toString();
+		// Si se detecto un error que obligo a detener el proceso, se
+		// identifica a que firma pertenecia, se establece que todas
+		// las demas se omiten y se eliminan los resultados obtenidos
+		if (needStop) {
+			// Como el proceso se detiene ante el primer error, este
+			// sera el de la firma fallida
+			final String failedSignId = errors.get(0).getId();
+			final ProcessResult skippedResult = new ProcessResult(Result.SKIPPED, null);
+			for (final JSONSingleSign ssign : this.signs) {
+				if (!failedSignId.equals(ssign.getId())) {
+					errors.add(new ResultSingleSign(ssign.getId(), false, skippedResult));
+				}
+			}
+			trisigns.clear();
+		}
+
+		return buildPreBatchJson(trisigns, errors);
+	}
+
+	private JSONObject buildPreBatchJson(final List<TriphaseData> trisigns, final List<ResultSingleSign> errors) {
+
+		// Listado de prefirmas y errores
+		final JSONArray trisignsJson = new JSONArray();
+		final JSONArray errorsJson = new JSONArray();
+
+		// Establecemos los errores y exitos de todas las firmas
+		for (final ResultSingleSign error : errors) {
+			errorsJson.put(buildJSONSingleResut(error));
+		}
+		for (final TriphaseData trisign : trisigns) {
+			trisignsJson.put(TriphaseDataParser.triphaseDataToJson(trisign));
+		}
+
+
+		return buildPreBatch(this.format.toString(), trisignsJson, errorsJson);
 	}
 
 	@Override
@@ -120,34 +177,46 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		}
 
 		final ExecutorService executorService = Executors.newFixedThreadPool(this.concurrentMaxSigns);
-		final Collection<Callable<CallableResult>> callables = new ArrayList<>(this.signs.size());
+		final Collection<Callable<ResultSingleSign>> callables = new ArrayList<>(this.signs.size());
 
-		boolean ignoreRemaining = false;
-		boolean error = false;
+		// Indica si se debe detener la ejecucion de las operaciones
+		boolean needStop = false;
 
 		for (final JSONSingleSign ss : this.signs) {
 
-			// Si no se encuentran firmas con ese identificador, es que fallaron en la prefirma
+			// Si la firma ya esta registrada como finalizada, es que fallo previamente y no se
+			// postfirmara
+			if (ss.getProcessResult().isFinished()) {
+				continue;
+			}
+
+			// Si no se encuentran firmas con ese identificador, es que fallaron en la prefirma.
+			// Esto no deberia ocurrir ya que deberia haber un estado de error senalandolo antes
 			if (td.getTriSigns(ss.getId()) == null) {
-				error = true;
 				if (this.stopOnError) {
 					LOGGER.warning("Se detecto un error previo en la firma, se ignoraran el resto de elementos"); //$NON-NLS-1$
-					ignoreRemaining = true;
+					needStop = true;
 				}
 				else {
 					LOGGER.warning("Se detecto un error previo en la firma, se continua con el resto de elementos"); //$NON-NLS-1$
 				}
 				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
-				continue;
+				skipTheOthersSigns(ss.getId());
+				break;
 			}
 
-			final Callable<CallableResult> callable = ss.getPostProcessCallable(
+			final Callable<ResultSingleSign> callable = ss.getPostProcessCallable(
 				certChain, td, this.algorithm, getId(), this.documentManager, this.docCacheManager
 			);
 			callables.add(callable);
 		}
 
-		final List<Future<CallableResult>> results;
+		// Si se encontro algun error y no se permitian, devolvemos inmediantamente el resultado
+		if (needStop) {
+			return getResultLog();
+		}
+
+		final List<Future<ResultSingleSign>> results;
 		try {
 			results = executorService.invokeAll(callables, this.concurrentTimeout, TimeUnit.SECONDS);
 		}
@@ -159,139 +228,154 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			);
 		}
 
-		for (final Future<CallableResult> f : results) {
 
-			final CallableResult signatureResult;
+		for (int i = 0; i < results.size(); i++) {
+
+			final Future<ResultSingleSign> futureResult = results.get(i);
+
+			// Si por algun motivo se ha pedido detener la operacion, se
+			// detiene y no continuamos
+			if (needStop) {
+				futureResult.cancel(true);
+				continue;
+			}
+
+
+			final ResultSingleSign signatureResult;
 			try {
-				signatureResult = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
+				signatureResult = futureResult.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "Error en la postfirma en paralelo del lote de firma", e); //$NON-NLS-1$
-				error = true;
+				LOGGER.log(Level.WARNING, "Error en una postfirma en paralelo del lote de firma", e); //$NON-NLS-1$
+
 				if (this.stopOnError) {
 					LOGGER.severe("Se interrumpe la postfirma de todos los elementos del lote al detectar un error"); //$NON-NLS-1$
+					needStop = true;
 					stopExecution(executorService);
-					break;
+					skipTheOthersSigns(this.signs.get(i).getId());
 				}
 				continue;
 			}
 
-			final JSONSingleSign singleSign = getSingleSignById(signatureResult.getSignatureId());
-			if (!ignoreRemaining) {
-
-				// Si hay error
-				if (!signatureResult.isOk()) {
-					error = true;
-					if (singleSign != null) {
-						singleSign.setProcessResult(
-								new ProcessResult(ProcessResult.Result.ERROR_POST, signatureResult.getError().toString())
-								);
-					}
-
-					if (this.stopOnError) {
-						LOGGER.severe(
-								"Error en una de las firmas del lote (" + signatureResult.getSignatureId() + "), se parara el proceso: " + signatureResult.getError() //$NON-NLS-1$ //$NON-NLS-2$
-								);
-						ignoreRemaining = true;
-					}
-					else {
-						LOGGER.log(Level.WARNING,
-								"Error en una de las firmas del lote (" + signatureResult.getSignatureId() + "), se continua con el siguiente elemento: " + signatureResult.getError(), //$NON-NLS-1$ //$NON-NLS-2$
-								signatureResult.getError());
-					}
-				}
-				// Si todo fue bien
-				else {
-					if (singleSign != null) {
-						singleSign.setProcessResult(
-							ProcessResult.PROCESS_RESULT_OK_UNSAVED);
-					}
-				}
+			// Si durante la ejecucion se cancelo el proceso, no continuamos.
+			if (futureResult.isCancelled()) {
+				continue;
 			}
-			// Cuando se indica que se pare en caso de error, se marcan las firmas que no se han
-			// llegado a procesar
+
+			final JSONSingleSign singleSign = getSingleSignById(signatureResult.getId());
+			if (singleSign == null) {
+				LOGGER.warning("No se encontro en el lote una firma de la que se obtuvo resultado: " + signatureResult.getId()); //$NON-NLS-1$
+				continue;
+			}
+
+
+			// Si todo fue bien
+			if (signatureResult.isCorrect()) {
+				singleSign.setProcessResult(ProcessResult.PROCESS_RESULT_OK_UNSAVED);
+			}
+			// Si hay error
 			else {
-				if (singleSign != null) {
-					singleSign.setProcessResult(
-							ProcessResult.PROCESS_RESULT_SKIPPED
+				singleSign.setProcessResult(
+						new ProcessResult(
+								ProcessResult.Result.ERROR_POST,
+								signatureResult.getResult().getDescription()));
+
+				if (this.stopOnError) {
+					LOGGER.severe(
+							"Error en una de las firmas del lote (" + signatureResult.getId() + "), se parara el proceso: " + signatureResult.getResult().getDescription() //$NON-NLS-1$ //$NON-NLS-2$
 							);
+					needStop = true;
+					stopExecution(executorService);
+					skipTheOthersSigns(signatureResult.getId());
+				}
+				else {
+					LOGGER.log(Level.WARNING,
+							"Error en una de las firmas del lote (" + signatureResult.getId() + "), se continua con el siguiente elemento: " + signatureResult.getResult().getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-
 		}
 
 		// En este punto las firmas estan en almacenamiento temporal
 
 		// Si hubo errores y se indico parar en caso de error, no hacemos los guardados de datos,
 		// borramos los temporales y enviamos el log
-		if (error && this.stopOnError) {
+		if (needStop) {
 			deleteAllTemps();
 			return getResultLog();
 		}
 
 		// En otro caso procedemos a la subida de datos
-
 		final TempStore ts = TempStoreFactory.getTempStore();
 
-		final Collection<Callable<CallableResult>> saveCallables = new ArrayList<>(this.signs.size());
+		final Collection<Callable<ResultSingleSign>> saveCallables = new ArrayList<>(this.signs.size());
 		for (final JSONSingleSign ss : this.signs) {
 
-			// Si no se encuentra la firma, es que fallo en una operacion anterior
-			// y no debe intentar guardarse
-			if (td.getTriSigns(ss.getId()) == null) {
+			// Si la firma ya esta registrada como finalizada, es que fallo previamente y no se
+			// almacenara. Tambien se abortara el guardado si no se tiene resultado de esa firma,
+			// aunque esto no deberia ocurrir ya que deberia haber tenido un estado finalizado
+			if (ss.getProcessResult().isFinished() || td.getTriSigns(ss.getId()) == null) {
 				continue;
 			}
 
-			final Callable<CallableResult> callable = ss.getSaveCallableJSON(
+			final Callable<ResultSingleSign> callable = ss.getSaveCallableJSON(
 				ts, certChain, getId()
 			);
 			saveCallables.add(callable);
 		}
 
-		final List<Future<CallableResult>> saveResults;
+		final List<Future<ResultSingleSign>> saveResults;
 		try {
 			saveResults = executorService.invokeAll(saveCallables, this.concurrentTimeout, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
 			stopExecution(executorService);
 			throw new BatchException(
-				"Error en el preproceso en paralelo del lote de firma: " + e, //$NON-NLS-1$
+				"Error en el guardado en paralelo del lote de firma: " + e, //$NON-NLS-1$
 				e
 			);
 		}
 
-		for (final Future<CallableResult> f : saveResults) {
-			final CallableResult result;
+		for (int i = 0; i < saveResults.size(); i++) {
+
+			final Future<ResultSingleSign> futureResult = saveResults.get(i);
+
+			if (needStop) {
+				futureResult.cancel(true);
+				continue;
+			}
+
+
+			final ResultSingleSign result;
 			try {
-				result = f.get(this.concurrentTimeout, TimeUnit.SECONDS);
+				result = futureResult.get(this.concurrentTimeout, TimeUnit.SECONDS);
 			}
 			catch(final Exception e) {
-				LOGGER.log(Level.WARNING, "Error en la recogida del resultado del guardado en paralelo del lote de firma", e); //$NON-NLS-1$
-				error = true;
+				LOGGER.log(Level.WARNING, "Error en el guardado en paralelo de una firma del lote", e); //$NON-NLS-1$
 				if (this.stopOnError) {
 					LOGGER.severe("Se interrumpe el guardado del lote al detectar un error"); //$NON-NLS-1$
+					needStop = true;
 					stopExecution(executorService);
-					break;
+					skipTheOthersSigns(this.signs.get(i).getId());
 				}
 				continue;
 			}
 
-			if (result.isOk()) {
-				getSingleSignById(result.getSignatureId()).setProcessResult(
+			if (result.isCorrect()) {
+				getSingleSignById(result.getId()).setProcessResult(
 						ProcessResult.PROCESS_RESULT_DONE_SAVED
 				);
 			}
 			else {
-				error = true;
-				getSingleSignById(result.getSignatureId()).setProcessResult(
-					new ProcessResult(
-							ProcessResult.Result.DONE_BUT_ERROR_SAVING,
-						result.getError().toString()
-					)
-				);
+				getSingleSignById(result.getId()).setProcessResult(
+						new ProcessResult(
+								ProcessResult.Result.DONE_BUT_ERROR_SAVING,
+								result.getResult().getDescription()));
+				LOGGER.warning("Error en lel guardado en paralelo del lote de firma"); //$NON-NLS-1$
 				if (this.stopOnError) {
+					LOGGER.severe("Error en el guardadoSe interrumpe el guardado del lote al detectar un error"); //$NON-NLS-1$
+					needStop = true;
 					stopExecution(executorService);
-					break;
+					skipTheOthersSigns(this.signs.get(i).getId());
 				}
 			}
 		}
@@ -304,7 +388,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer
 		// los que se subiesen antes del error si se indico parar en error
-		if (error && this.stopOnError) {
+		if (needStop) {
 			for (final JSONSingleSign ss : this.signs) {
 				if (ss.getProcessResult().wasSaved()) {
 
@@ -328,6 +412,14 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		return getResultLog();
 	}
 
+	private void skipTheOthersSigns(final String signId) {
+		for (final JSONSingleSign ss : this.signs) {
+			if (!ss.getId().equals(signId)) {
+				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
+			}
+		}
+	}
+
 	private JSONSingleSign getSingleSignById(final String singleSignId) {
 		for (final JSONSingleSign ss: this.signs) {
 			if (ss.getId().equals(singleSignId)) {
@@ -337,6 +429,16 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		return null;
 	}
 
+	private static JSONObject buildJSONSingleResut(final ResultSingleSign singleResult) {
+		final JSONObject jsonResult = new JSONObject();
+		jsonResult.put("id", singleResult.getId()); //$NON-NLS-1$
+		final ProcessResult processResult = singleResult.getResult();
+		jsonResult.put("result", processResult.getResult().name()); //$NON-NLS-1$
+		if (processResult.getDescription() != null) {
+			jsonResult.put("description", processResult.getDescription()); //$NON-NLS-1$
+		}
+		return jsonResult;
+	}
 
 	/**
 	 * Detiene la ejecuci&oacute;n de las operaciones concurrentes.

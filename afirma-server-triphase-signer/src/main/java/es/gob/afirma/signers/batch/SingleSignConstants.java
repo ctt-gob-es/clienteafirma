@@ -109,6 +109,15 @@ public final class SingleSignConstants {
 				if (FACTURAE.toString().equalsIgnoreCase(name.trim())) {
 					return FACTURAE;
 				}
+				if (PKCS1.toString().equalsIgnoreCase(name.trim())) {
+					return PKCS1;
+				}
+				if (CADES_ASIC.toString().equalsIgnoreCase(name.trim())) {
+					return CADES_ASIC;
+				}
+				if (XADES_ASIC.toString().equalsIgnoreCase(name.trim())) {
+					return XADES_ASIC;
+				}
 			}
 			throw new IllegalArgumentException(
 				"Tipo de formato de firma no soportado: " + name //$NON-NLS-1$

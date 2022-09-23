@@ -27,12 +27,14 @@ public final class SharedNssUtil {
 
 	private static final String NSSDB_PATH_UNIX_GLOBAL = "/etc/pki/nssdb"; //$NON-NLS-1$
 	private static final String NSSDB_PATH_UNIX_USER = System.getProperty("user.home") + "/.pki/nssdb"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String NSSDB_PATH_UNIX_USER_CHROMIUM = System.getProperty("user.home") + "/snap/chromium/current/.pki/nssdb"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	/** Lista de rutas de posibles directorios de perfil de NSS.
 	 * Deben estar en el apropiado orden de b&uacute;squeda. */
 	private static final String[] NSSDB_PATHS = new String[] {
-		NSSDB_PATH_UNIX_USER,
-		NSSDB_PATH_UNIX_GLOBAL
+			NSSDB_PATH_UNIX_USER,
+			NSSDB_PATH_UNIX_USER_CHROMIUM,
+			NSSDB_PATH_UNIX_GLOBAL
 	};
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -70,7 +72,7 @@ public final class SharedNssUtil {
 		for (final String path : NSSDB_PATHS) {
 			if (isNssProfileDirectory(path)) {
 				LOGGER.info(
-					"Detectado directorio de perfil de NSS: " + path.replace(System.getProperty("user.home"), "\u0334")  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+					"Detectado directorio del almacen NSS de claves: " + path.replace(System.getProperty("user.home"), "\u0334")  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 				);
 				return path;
 			}

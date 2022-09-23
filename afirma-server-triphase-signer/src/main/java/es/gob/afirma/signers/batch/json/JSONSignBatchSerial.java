@@ -14,9 +14,13 @@ import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
+import es.gob.afirma.signers.batch.ProcessResult.Result;
 import es.gob.afirma.triphase.server.document.BatchDocumentManager;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta secuencialmente. */
@@ -26,51 +30,49 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 	 * Crea un lote de firmas que se ejecuta secuencialmente.
 	 * @param json JSON de definici&oacute;n de lote.
 	 * @throws IOException Si hay problemas en la creaci&oacute;n del lote.
+	 * @throws SecurityException Si se sobrepasa alguna de las limitaciones establecidas para el lote
+	 * (n&ueacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
 	 * */
-	public JSONSignBatchSerial(final byte[] json) throws IOException {
+	public JSONSignBatchSerial(final byte[] json) throws IOException, SecurityException {
 		super(json);
 	}
 
 	@Override
-	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
+	public JSONObject doPreBatch(final X509Certificate[] certChain) throws BatchException {
+
+		final JSONArray errors = new JSONArray();
+		final JSONArray trisigns = new JSONArray();
 
 		boolean ignoreRemaining = false;
-		final StringBuilder sb = new StringBuilder("{"); //$NON-NLS-1$
-		sb.append("\"format\":\"" + this.format + "\",");  //$NON-NLS-1$//$NON-NLS-2$
-		sb.append("\"signs\": ["); //$NON-NLS-1$
 		for (int i = 0 ; i < this.signs.size() ; i++) {
 			final JSONSingleSign ss = this.signs.get(i);
 			if (ignoreRemaining) {
-				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
+				errors.put(buildSignResult(ss.getId(), Result.SKIPPED, null));
 				continue;
 			}
-			final String tmp;
+
 			try {
-				tmp = ss.doPreProcess(certChain, this.algorithm, this.documentManager, this.docCacheManager);
+				final TriphaseData td = ss.doPreProcess(certChain, this.algorithm, this.documentManager, this.docCacheManager);
+				trisigns.put(TriphaseDataParser.triphaseDataToJson(td));
 			}
 			catch(final Exception e) {
-				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, e.toString()));
+				errors.put(buildSignResult(ss.getId(), Result.ERROR_PRE, e));
+
 				if (this.stopOnError) {
 					ignoreRemaining = true;
 					LOGGER.log(Level.WARNING,
-							"Error en una de las firmas del lote (" + ss.getId() + "), se ignoraran el resto de elementos: " + e //$NON-NLS-1$ //$NON-NLS-2$
-							, e);
+							"Error en una de las firmas del lote (" + ss.getId() + "), se ignoraran el resto de elementos", e); //$NON-NLS-1$ //$NON-NLS-2$
+
 				}
 				else {
 					LOGGER.log(Level.WARNING,
-							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
-							, e);
+							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento", e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				continue;
 			}
-			sb.append(tmp);
-			if (this.signs.size() -1 != i) {
-				sb.append(","); //$NON-NLS-1$
-			}
 		}
-		sb.append("]}"); //$NON-NLS-1$
 
-		return sb.toString();
+		return buildPreBatch(this.format.toString(), trisigns, errors);
 	}
 
 	@Override
@@ -92,20 +94,18 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				continue;
 			}
 
-			// Si no se encuentran firmas con ese identificador, es que fallaron en la prefirma
-			if (td.getTriSigns(ss.getId()) == null) {
+			// Si la firma ya esta registrada como finalizada, es que fallo previamente y no se
+			// postfirmara
+			if (ss.getProcessResult().isFinished()) {
 				error = true;
 				if (this.stopOnError) {
 					LOGGER.warning("Se detecto un error previo en la firma, se ignoraran el resto de elementos"); //$NON-NLS-1$
 					ignoreRemaining = true;
 				}
-				else {
-					LOGGER.warning("Se detecto un error previo en la firma, se continua con el resto de elementos"); //$NON-NLS-1$
-				}
-				ss.setProcessResult(new ProcessResult(ProcessResult.Result.ERROR_PRE, "Error en la prefirma")); //$NON-NLS-1$
 				continue;
 			}
 
+			// Postfirmamos la firma
 			try {
 				ss.doPostProcess(
 					certChain,
@@ -127,7 +127,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 					resultado = ProcessResult.Result.ERROR_POST;
 				}
 
-				ss.setProcessResult(new ProcessResult(resultado, e.toString()));
+				ss.setProcessResult(new ProcessResult(resultado, e.getMessage()));
 
 				if (this.stopOnError) {
 					LOGGER.log(

@@ -19,17 +19,21 @@ import java.util.Properties;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public interface DocumentManager {
 
-	/** Obtiene un documento en base a su identificador.
+	/**
+	 * Obtiene un documento en base a su identificador.
 	 * Si no es posible recuperar el fichero se debe lanzar una excepci&oacute;n. El mensaje se recibir&aacute;
 	 * como parte del mensaje de error en el cliente de firma.
 	 * @param dataRef Referencia al documento.
 	 * @param certChain Cadena de certificados que se usar&aacute; para realizar la firma
 	 * @param prop Par&aacute;metros para la configuraci&oacute;n de la recuperaci&oacute;n del documento.
 	 * @return Documento (en binario)
-	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n. */
-	byte[] getDocument(String dataRef, X509Certificate[] certChain, Properties prop) throws IOException;
+	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n.
+	 * @throws SecurityException Cuando el documento incumple alguno de los requisitos establecidos para el documento.
+	 */
+	byte[] getDocument(String dataRef, X509Certificate[] certChain, Properties prop) throws IOException, SecurityException;
 
-	/** Almacena un documento firmado.
+	/**
+	 * Almacena un documento firmado.
 	 * Si no es posible almacenar el fichero se debe lanzar una excepci&oacute;n. El mensaje se recibir&aacute;
 	 * como parte del mensaje de error en el cliente de firma.
 	 * @param dataRef Referencia al documento firmado.
@@ -37,6 +41,7 @@ public interface DocumentManager {
 	 * @param data Datos firmados.
 	 * @param prop Par&aacute;metros para la configuraci&oacute;n del guardado del documento.
 	 * @return Identificador del nuevo documento codificado en base 64.
-	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado. */
+	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado.
+	 */
 	String storeDocument(String dataRef, final X509Certificate[] certChain, byte[] data, Properties prop) throws IOException;
 }

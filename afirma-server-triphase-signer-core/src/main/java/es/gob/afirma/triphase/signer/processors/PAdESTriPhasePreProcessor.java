@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -56,21 +57,31 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Manejador de registro. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+
 	@Override
 	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
 			                        final Properties extraParams,
 			                        final boolean checkSignatures) throws IOException,
-			                                                             AOException {
+			                                                             AOException{
 		LOGGER.info("Prefirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures && new AOPDFSigner().isSign(data)) {
-        	final SignValidity validity = new ValidatePdfSignature().validate(data);
-        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
-        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
-        	}
+        	SignValidity validity;
+			try {
+				validity = new ValidatePdfSignature().validate(data, extraParams);
+	        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
+	        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
+	        	}
+			} catch (final RuntimeConfigNeededException e) {
+				LOGGER.severe("Se detecta durante la validacion de la firma que la operacion requiere intervencion del usuario: " + e); //$NON-NLS-1$
+				throw e;
+			} catch (final IOException e) {
+				LOGGER.severe("Error al validar documento: " + e); //$NON-NLS-1$
+				throw e;
+			}
         }
 
 		final GregorianCalendar signTime = new GregorianCalendar();

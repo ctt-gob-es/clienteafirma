@@ -534,7 +534,7 @@ public final class XAdESSigner {
 
 						// Adicionalmente, si es un base 64 intentamos obtener el tipo del contenido
 						// decodificado para asi reestablecer el MimeType.
-						final byte[] decodedData = Base64.decode(new String(data));
+						final byte[] decodedData = Base64.decode(data, 0, data.length, false);
 						if (mimeType == null) {
 							final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
 							final String tempMimeType = mimeTypeHelper.getMimeType();
@@ -653,7 +653,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e1) {
 				throw new AOException(
-					"No se ha posido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
 		}

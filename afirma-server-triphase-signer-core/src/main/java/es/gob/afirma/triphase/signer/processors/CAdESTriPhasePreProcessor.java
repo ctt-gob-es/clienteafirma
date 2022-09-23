@@ -21,11 +21,13 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.multi.cades.CAdESMultiUtil;
@@ -187,26 +189,30 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("Las firma no puede ser nula ni vacia"); //$NON-NLS-1$
 		}
 
-		// Comprobamos si la cofirma de este tipo de firma esta soportada
-		try {
-			CAdESMultiUtil.checkUnsupportedAttributes(sign);
-		}
-		catch (final IOException e) {
-			throw new AOFormatFileException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			throw new AOFormatFileException("No se ha proporcionado una firma CAdES que se pueda cofirmar", e); //$NON-NLS-1$
+		final Properties extraParams = getExtraParams(params);
+
+		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
+		final String forceSignLts = extraParams.getProperty(CAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
+		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
+			try {
+				CAdESMultiUtil.checkUnsupportedAttributes(sign);
+			}
+			catch (final IOException e) {
+				throw new AOFormatFileException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
+			} catch (final RuntimeConfigNeededException e) {
+				throw e;
+			} catch (final Exception e) {
+				throw new AOFormatFileException("No se ha proporcionado una firma CAdES que se pueda cofirmar", e); //$NON-NLS-1$
+			}
 		}
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
-        	final SignValidity validity = ValidateBinarySignature.validate(sign, null);
+        	final SignValidity validity = new ValidateBinarySignature().validate(sign);
         	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
         		throw new InvalidSignatureException("La firma que se trata de cofirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
         	}
         }
-
-		final Properties extraParams = getExtraParams(params);
 
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
 
@@ -338,16 +344,33 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public TriphaseData preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
-			                               final Properties extraParams,
+			                               final Properties params,
 			                               final CounterSignTarget targetType,
 			                               final boolean checkSignatures) throws IOException,
 			                                                                          AOException {
 
 		LOGGER.info("Prefirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
+		final Properties extraParams = getExtraParams(params);
+
+		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
+		final String forceSignLts = extraParams.getProperty(CAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
+		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
+			try {
+				CAdESMultiUtil.checkUnsupportedAttributes(sign);
+			}
+			catch (final IOException e) {
+				throw new AOFormatFileException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
+			} catch (final RuntimeConfigNeededException e) {
+				throw e;
+			} catch (final Exception e) {
+				throw new AOFormatFileException("No se ha proporcionado una firma CAdES que se pueda contrafirmar", e); //$NON-NLS-1$
+			}
+		}
+
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
-        	final SignValidity validity = ValidateBinarySignature.validate(sign, null);
+        	final SignValidity validity = new ValidateBinarySignature().validate(sign);
         	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
         		throw new InvalidSignatureException("La firma que se trata de contrafirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
         	}

@@ -9,12 +9,14 @@
 
 package es.gob.afirma.core.misc.protocol;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
@@ -43,6 +45,10 @@ public abstract class UrlParameters {
 
 	/** Par&aacute;metro de entrada con el servlet remoto de guardado de datos. */
 	protected static final String STORAGE_SERVLET_PARAM = "stservlet"; //$NON-NLS-1$
+
+	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
+	 * de sesi&oacute;n de la operaci&oacute;n. */
+	protected static final int MAX_ID_LENGTH = 20;
 
 	/** Longitud permitida para la clave de cifrado. */
 	private static final int CIPHER_KEY_LENGTH = 8;
@@ -84,10 +90,17 @@ public abstract class UrlParameters {
 	private Properties extraParams = null;
 	private String filename = null;
 
-	/** Obtiene los par&aacute;metros adicionales de la firma.
-	 * @return Par&aacute;metros adicionales de la firma */
+	/**
+	 * Obtiene los par&aacute;metros adicionales de la firma.
+	 * Se pueden modificar estos parametros a partir del
+	 * objeto devuelto.
+	 * @return Par&aacute;metros adicionales de la firma
+	 */
 	public Properties getExtraParams() {
-		return this.extraParams != null ? this.extraParams : new Properties();
+		if (this.extraParams == null) {
+			this.extraParams = new Properties();
+		}
+		return this.extraParams;
 	}
 
 	/** Establece los par&aacute;metros adicionales para la configuraci&oacute;n
@@ -410,6 +423,7 @@ public abstract class UrlParameters {
 		return null;
 	}
 
+
 	protected static String getDefaultKeyStoreLib(final Map<String, String> params) {
 
 		// Si se ha especificado un almacen, se usara ese
@@ -432,8 +446,24 @@ public abstract class UrlParameters {
 
 		final int separatorPos = ksValue.indexOf(':');
 		if (separatorPos != -1 && separatorPos < ksValue.length() - 1) {
-			return ksValue.substring(separatorPos + 1).trim();
+			return cleanupPath(ksValue.substring(separatorPos + 1));
 		}
 		return null;
+	}
+
+	/**
+	 * Sanea una ruta de archivo.
+	 * @param path Ruta de archivo.
+	 * @return Ruta de archivo limpia.
+	 */
+	private static String cleanupPath(final String path) {
+		String cleanedpath = path.trim().replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		try {
+			cleanedpath = new File(cleanedpath).getCanonicalPath();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Ruta de fichero no valida", e); //$NON-NLS-1$
+			cleanedpath = null;
+		}
+		return cleanedpath;
 	}
 }

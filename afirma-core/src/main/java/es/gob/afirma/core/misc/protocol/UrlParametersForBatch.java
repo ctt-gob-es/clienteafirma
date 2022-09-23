@@ -21,9 +21,6 @@ import es.gob.afirma.core.misc.AOUtil;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class UrlParametersForBatch extends UrlParameters {
 
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la operaci&oacute;n. */
-	private static final int MAX_ID_LENGTH = 20;
-
 	/** Par&aacute;metro de entrada con el identificador de sesi&oacute;n de la operaci&oacute;n. */
 	private static final String ID_PARAM = "id"; //$NON-NLS-1$
 
@@ -43,8 +40,11 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
 	private static final String PARAM_NEED_CERT = "needcert"; //$NON-NLS-1$
 
-	/** Par&aacute;metro de entrada que nos indica que se quiere tambien obtener el certificado utilizado. */
+	/** Par&aacute;metro de entrada que nos indica si es una peticion de tipo JSON. */
 	private static final String PARAM_JSON_BATCH = "jsonbatch"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada que nos indica si es una firma por lotes monofasica. */
+	private static final String PARAM_LOCAL_BATCH_PROCESS = "localBatchProcess"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
@@ -66,12 +66,23 @@ public final class UrlParametersForBatch extends UrlParameters {
 	/** Indica si la peticion de firma por lotes es con JSON o XML */
 	private boolean jsonBatch;
 
+	/** Indica si la peticion de firma por lotes es monof&aacute;sica o trif&aacute;sica */
+	private boolean localBatchProcess;
+
 	public boolean isJsonBatch() {
 		return this.jsonBatch;
 	}
 
 	public void setJsonBatch(final boolean jsonBatch) {
 		this.jsonBatch = jsonBatch;
+	}
+
+	public boolean isLocalBatchProcess() {
+		return this.localBatchProcess;
+	}
+
+	public void setLocalBatchProcess(final boolean localBatchProcess) {
+		this.localBatchProcess = localBatchProcess;
 	}
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
@@ -147,19 +158,19 @@ public final class UrlParametersForBatch extends UrlParameters {
 		// idSession para el service Web. Con socket no se usa
 		if (params.containsKey(ID_PARAM) || params.containsKey(FILE_ID_PARAM)) {
 			// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-			final String signatureSessionId = params.containsKey(ID_PARAM) ? params.get(ID_PARAM) : params.get(FILE_ID_PARAM);
-			if (signatureSessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+			final String sessionId = params.containsKey(ID_PARAM) ? params.get(ID_PARAM) : params.get(FILE_ID_PARAM);
+			if (sessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
-			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
 					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
 				}
 			}
 
-			setSessionId(signatureSessionId);
+			setSessionId(sessionId);
 		}
 
 		// Version minima requerida del protocolo que se debe soportar
@@ -176,28 +187,36 @@ public final class UrlParametersForBatch extends UrlParameters {
 			return;
 		}
 
-		if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
-			throw new ParameterException(
-				"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
-			);
-		}
-		if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
-			throw new ParameterException(
-				"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
-			);
+		// Valor del parametro localBatchProcess
+		if (params.containsKey(PARAM_LOCAL_BATCH_PROCESS)) {
+			setLocalBatchProcess(Boolean.parseBoolean(params.get(PARAM_LOCAL_BATCH_PROCESS)));
 		}
 
-		setBatchPostsignerUrl(
-			validateURL(
-				params.get(PARAM_BATCH_POSTSIGNER)
-			).toString()
-		);
+		if (!isLocalBatchProcess()) {
 
-		setBatchPresignerUrl(
-			validateURL(
-				params.get(PARAM_BATCH_PRESIGNER)
-			).toString()
-		);
+			if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
+				throw new ParameterException(
+					"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
+				);
+			}
+			if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
+				throw new ParameterException(
+					"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
+				);
+			}
+
+			setBatchPostsignerUrl(
+				validateURL(
+					params.get(PARAM_BATCH_POSTSIGNER)
+				).toString()
+			);
+
+			setBatchPresignerUrl(
+				validateURL(
+					params.get(PARAM_BATCH_PRESIGNER)
+				).toString()
+			);
+		}
 
 		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse
 		if (params.containsKey(STORAGE_SERVLET_PARAM)) {
@@ -260,7 +279,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 			setCertNeeded(false);
 		}
 
-		// Valor del parametro needCert
+		// Valor del parametro jsonBatch
 		if (params.containsKey(PARAM_JSON_BATCH)) {
 			setJsonBatch(Boolean.parseBoolean(params.get(PARAM_JSON_BATCH)));
 		}
