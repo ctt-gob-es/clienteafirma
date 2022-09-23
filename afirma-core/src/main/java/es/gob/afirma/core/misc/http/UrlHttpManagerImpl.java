@@ -48,6 +48,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * usa la confianza por defecto de la JVM. */
 	public static final String JAVA_PARAM_DISABLE_SSL_CHECKS = "disableSslChecks"; //$NON-NLS-1$
 
+	/** Lista de dominios seguros para conexiones HTTPS. */
+	public static final String JAVA_PARAM_SECURE_DOMAINS_LIST = "secureDomainsList"; //$NON-NLS-1$
+
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
 
@@ -179,10 +182,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final boolean needDisableSslChecks = Boolean.parseBoolean(
 				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false") //$NON-NLS-1$
 		);
+		final boolean isSecureDomain = checkIsSecureDomain(uri);
 
-		if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
+		if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
 			try {
 				disableSslChecks();
+				LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
 			}
 			catch(final Exception e) {
 				LOGGER.warning(
@@ -191,92 +196,102 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 		}
 
-		final HttpURLConnection conn;
-		if (Platform.OS.ANDROID.equals(Platform.getOS()) || isLocal(uri)) {
-			conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
-		}
-		else {
-			conn = (HttpURLConnection) uri.openConnection();
-		}
+		byte[] data;
+		try {
+			final HttpURLConnection conn;
+			if (Platform.OS.ANDROID.equals(Platform.getOS()) || isLocal(uri)) {
+				conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
+			}
+			else {
+				conn = (HttpURLConnection) uri.openConnection();
+			}
 
-		conn.setUseCaches(false);
-		conn.setDefaultUseCaches(false);
+			conn.setUseCaches(false);
+			conn.setDefaultUseCaches(false);
 
-		conn.setRequestMethod(method.toString());
+			conn.setRequestMethod(method.toString());
 
-		// Trabajamos las cabeceras, las por defecto y las que nos indiquen
+			// Trabajamos las cabeceras, las por defecto y las que nos indiquen
 
-		final Properties headers = new Properties();
-		if (requestProperties != null) {
-			headers.putAll(requestProperties);
-		}
+			final Properties headers = new Properties();
+			if (requestProperties != null) {
+				headers.putAll(requestProperties);
+			}
 
-		if (authString != null && !headers.containsKey("Authorization")) { //$NON-NLS-1$
-			conn.addRequestProperty("Authorization", "Basic " + authString); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (!headers.containsKey(ACCEPT)) {
-			conn.addRequestProperty(
-				ACCEPT,
-				"*/*" //$NON-NLS-1$
-			);
-		}
-		if (!headers.containsKey("Connection")) { //$NON-NLS-1$
-			conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (!headers.containsKey("Host")) { //$NON-NLS-1$
-			conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
-		}
-		if (!headers.containsKey("Origin")) { //$NON-NLS-1$
-			conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+			if (authString != null && !headers.containsKey("Authorization")) { //$NON-NLS-1$
+				conn.addRequestProperty("Authorization", "Basic " + authString); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (!headers.containsKey(ACCEPT)) {
+				conn.addRequestProperty(
+						ACCEPT,
+						"*/*" //$NON-NLS-1$
+						);
+			}
+			if (!headers.containsKey("Connection")) { //$NON-NLS-1$
+				conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (!headers.containsKey("Host")) { //$NON-NLS-1$
+				conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
+			}
+			if (!headers.containsKey("Origin")) { //$NON-NLS-1$
+				conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-		// Ponemos el resto de las cabeceras
-		for (final Map.Entry<?, ?> entry: headers.entrySet()) {
-			conn.addRequestProperty(
-				(String) entry.getKey(),
-				(String) entry.getValue()
-			);
-		}
+			// Ponemos el resto de las cabeceras
+			for (final Map.Entry<?, ?> entry: headers.entrySet()) {
+				conn.addRequestProperty(
+						(String) entry.getKey(),
+						(String) entry.getValue()
+						);
+			}
 
-		if (urlParameters != null) {
-			conn.setRequestProperty(
-				"Content-Length", String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length) //$NON-NLS-1$
-			);
-			conn.setDoOutput(true);
+			if (urlParameters != null) {
+				conn.setRequestProperty(
+						"Content-Length", String.valueOf(urlParameters.getBytes(StandardCharsets.UTF_8).length) //$NON-NLS-1$
+						);
+				conn.setDoOutput(true);
+				try (
+						final OutputStream os = conn.getOutputStream()
+						) {
+					os.write(urlParameters.getBytes(StandardCharsets.UTF_8));
+				}
+			}
+
+			// Si se ha establecido un tiempo de timeout, se configura como tiempo maximo hasta la conexion
+			if (timeout != DEFAULT_TIMEOUT) {
+				conn.setConnectTimeout(timeout);
+			}
+
+			conn.connect();
+			final int resCode = conn.getResponseCode();
+			final String statusCode = Integer.toString(resCode);
+			if (statusCode.startsWith("4") || statusCode.startsWith("5")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (uri.getProtocol().equals(HTTPS)) {
+					enableSslChecks();
+				}
+				throw new HttpError(
+						resCode,
+						conn.getResponseMessage(),
+						AOUtil.getDataFromInputStream(
+								conn.getErrorStream()
+								),
+						url
+						);
+			}
+
 			try (
-				final OutputStream os = conn.getOutputStream()
-			) {
-				os.write(urlParameters.getBytes(StandardCharsets.UTF_8));
+					final InputStream is = conn.getInputStream()
+					) {
+				data = AOUtil.getDataFromInputStream(is);
 			}
 		}
-
-		// Si se ha establecido un tiempo de timeout, se configura como tiempo maximo hasta la conexion
-		if (timeout != DEFAULT_TIMEOUT) {
-			conn.setConnectTimeout(timeout);
-		}
-
-		conn.connect();
-		final int resCode = conn.getResponseCode();
-		final String statusCode = Integer.toString(resCode);
-		if (statusCode.startsWith("4") || statusCode.startsWith("5")) { //$NON-NLS-1$ //$NON-NLS-2$
-			if (uri.getProtocol().equals(HTTPS)) {
+		catch (final IOException e) {
+			// Elevamos cualquier excepcion, pero nos aseguramos antes de reactivar
+			// la validacion SSL si corresponde
+			if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
 			}
-			throw new HttpError(
-				resCode,
-				conn.getResponseMessage(),
-				AOUtil.getDataFromInputStream(
-					conn.getErrorStream()
-				),
-				url
-			);
-		}
-
-		final byte[] data;
-		try (
-			final InputStream is = conn.getInputStream()
-		) {
-			data = AOUtil.getDataFromInputStream(is);
+			throw e;
 		}
 
 		if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
@@ -307,6 +322,48 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
 	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		SslSecurityManager.disableSslChecks();
+	}
+
+	/**
+	 * Comprueba si el dominio de una URL se considera seguro con respecto a una lista de dominios
+	 * seguros establecidos a traves de la propiedad determinado por la constante
+	 * JAVA_PARAM_SECURE_DOMAINS_LIST.
+	 * @param url URL que se desea comprobar.
+	 * @return {@code true} si el dominio de la URL es seguro, {@code false} en caso contrario.
+	 */
+	private static boolean checkIsSecureDomain(final URL url) {
+
+		final String secureDomainsList = System.getProperty(JAVA_PARAM_SECURE_DOMAINS_LIST);
+		if (secureDomainsList != null && !secureDomainsList.isEmpty()) {
+			final String urlHost = url.getHost();
+			final String [] secureDomainsArray = secureDomainsList.split(","); //$NON-NLS-1$
+			for (final String secureDomain : secureDomainsArray) {
+				// Caso 1 - Dominios con * al principio y al final. Ej: *.redsara.*
+				final String replSecureDomain = secureDomain.replace("*","");  //$NON-NLS-1$//$NON-NLS-2$
+				if (secureDomain.startsWith("*") && secureDomain.endsWith("*")) { //$NON-NLS-1$ //$NON-NLS-2$
+					if (urlHost.contains(replSecureDomain)) {
+						return true;
+					}
+				}
+				// Caso 2 - Dominios con * solo al principio
+				else if (secureDomain.startsWith("*")) {  //$NON-NLS-1$
+					if (urlHost.endsWith(replSecureDomain)) {
+						return true;
+					}
+				}
+				// Caso 3 - Dominios con * solo al final
+				else if (secureDomain.endsWith("*")) { //$NON-NLS-1$
+					if (urlHost.startsWith(replSecureDomain)) {
+						return true;
+					}
+				}
+				// Caso 4 - Dominios sin *
+				else if (urlHost.equals(replSecureDomain)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

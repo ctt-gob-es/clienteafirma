@@ -78,9 +78,6 @@ public final class SslSecurityManager {
 			null,
 			null //TODO: Poner keystore
 		);
-		LOGGER.warning(
-			"Deshabilitadas comprobaciones SSL" //$NON-NLS-1$
-		);
 	}
 
 	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su

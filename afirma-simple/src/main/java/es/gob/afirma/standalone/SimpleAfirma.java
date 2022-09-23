@@ -633,6 +633,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		HttpManager.setSecureConnections(
 				PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
 
+		// Establecemos el listado de dominios seguros
+		HttpManager.setSecureDomains(
+				PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
+
        	// Comprobamos si es necesario buscar actualizaciones
        	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
 			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
