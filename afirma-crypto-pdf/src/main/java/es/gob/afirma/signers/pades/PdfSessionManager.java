@@ -551,9 +551,9 @@ public final class PdfSessionManager {
 
 		final PdfSignature dic = new PdfSignature(
 				PdfName.ADOBE_PPKLITE,
-				signatureSubFilter != null && !signatureSubFilter.isEmpty() ?
-						new PdfName(signatureSubFilter)
-						: PdfName.ADBE_PKCS7_DETACHED
+				signatureSubFilter != null && !signatureSubFilter.isEmpty()
+						? new PdfName(signatureSubFilter)
+						: new PdfName(AOSignConstants.PADES_SUBFILTER_BES)
 		);
 
 		// Fecha de firma
