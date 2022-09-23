@@ -1,13 +1,25 @@
 package es.gob.afirma.signers.cades;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.DERUTF8String;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.ess.ContentHints;
+import org.spongycastle.cms.CMSSignedData;
+import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationStore;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -43,6 +55,8 @@ public class CAdESParameters {
 
 	private String contentDescription;
 
+	private String mimetype;
+
 	private List<CommitmentTypeIndicationBean> commitmentTypeIndications;
 
 	private String[] claimedRoles;
@@ -57,10 +71,6 @@ public class CAdESParameters {
 
 	private String profileSet = AOSignConstants.DEFAULT_SIGN_PROFILE;
 
-	public CAdESParameters() {
-		// No se permite construir el objeto externamente
-	}
-
 	/**
 	 * Carga la configuraci&oacute;n de firma CAdES a partir del los par&aacute;metros establecidos.
 	 * @param data Huella digital de los datos si se establece el
@@ -72,6 +82,22 @@ public class CAdESParameters {
 	 * @throws AOException Cuando ocurre un error grave al procesasr los par&aacute;metros.
 	 */
 	public static CAdESParameters load(final byte[] data, final String algorithm, final Properties config) throws AOException {
+		return load(data, null, algorithm, config);
+	}
+
+	/**
+	 * Carga la configuraci&oacute;n de firma CAdES a partir del los par&aacute;metros establecidos.
+	 * @param data Huella digital de los datos si se establece el
+	 * "precalculatedMessageDigest". Si no, ser&aacute;n los propios datos o el "procesable array"
+	 * de un PDF en caso de querer la firma para incluirla en una PAdES.
+	 * @param signedData Firma previa que se va a cofirmar y de la que se podr&iacute;a extraer
+	 * informaci&oacute;n.
+	 * @param algorithm Algoritmo de firma.
+	 * @param config Par&aacute;metros extra de configuraci&oacute;n.
+	 * @return Par&aacute;metros para la creaci&oacute;n de la firma.
+	 * @throws AOException Cuando ocurre un error grave al procesasr los par&aacute;metros.
+	 */
+	public static CAdESParameters load(final byte[] data, final CMSSignedData signedData, final String algorithm, final Properties config) throws AOException {
 
 		final CAdESParameters dataConfig = new CAdESParameters();
 
@@ -162,21 +188,115 @@ public class CAdESParameters {
 			dataConfig.setSigningTime(new Date());
 		}
 
-		// El atributo content-hint se incluira siempre salvo que desde el exterior se indique que no se haga
-		if (!config.containsKey(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE) ||
-				!Boolean.FALSE.toString().equalsIgnoreCase(config.getProperty(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE))) {
-			// Determinamos el tipo de contenido, ya sea
-			// que obtengamos esta informacion del exterior o que se analicen los datos.
+		// Si tenemos que indicar el atributo content-hint o el mimetype, nos aseguramos de que se
+		// ha indicado o los tendremos que extraer de los datos
+
+		// El atributo contentHint si incluira, salvo que se indique expresamente que no se haga
+		final boolean contentHintNeeded = !config.containsKey(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE)
+				|| !Boolean.FALSE.toString().equalsIgnoreCase(config.getProperty(CAdESExtraParams.INCLUDE_CONTENT_HINT_ATTRIBUTE));
+		// El atributo mimetype se incluira cuando se pida
+		final boolean mimetypeNeeded = Boolean.parseBoolean(config.getProperty(CAdESExtraParams.INCLUDE_MIMETYPE_ATTRIBUTE));
+
+		if (contentHintNeeded || mimetypeNeeded) {
 			String contentTypeOid = config.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
 			String contentTypeDescription = config.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION);
-			if (data != null && (contentTypeOid == null || contentTypeDescription == null)) {
+			String mimeType = config.getProperty(CAdESExtraParams.CONTENT_MIME_TYPE);
+
+			// Si necesitamos el mimetype y no lo tenemos, pero si tenemos el OID del contenido
+			// obtenemos el mimeType del OID
+			if (mimetypeNeeded && mimeType == null && contentTypeOid != null) {
+				try {
+					mimeType = MimeHelper.transformOidToMimeType(contentTypeOid);
+				} catch (final IOException e) {
+					LOGGER.warning("No se pudo cargar la tabla de correspondencias entre OIDs y MimeTypes: " + e); //$NON-NLS-1$
+				}
+
+				// Si el mimetype extraido del OID es el generico, lo
+				// obviaremos para tratar de identificarlo a partir de los
+				// datos
+				if (MimeHelper.DEFAULT_MIMETYPE.equals(mimeType)) {
+					mimeType = null;
+				}
+			}
+
+			// Si aun nos falta informacion de la que necesitamos, pero hay firmas previas,
+			// tratamos de extraerla de ellas
+			if ((contentHintNeeded && contentTypeOid == null
+							|| mimetypeNeeded && mimeType == null) && signedData != null) {
+
+
+				boolean foundPreviousDataType = false;
+				final SignerInformationStore signersInfo = signedData.getSignerInfos();
+				final Iterator<SignerInformation> signersIt = signersInfo.iterator();
+				while (signersIt.hasNext() && !foundPreviousDataType) {
+					final SignerInformation signerInfo = signersIt.next();
+
+					final AttributeTable signedAttributes = signerInfo.getSignedAttributes();
+
+					if (mimetypeNeeded && mimeType == null) {
+						final Attribute mimetypeAttr = signedAttributes.get(new ASN1ObjectIdentifier(CAdESAttributes.OID_id_aa_ets_mimeType));
+						if (mimetypeAttr != null) {
+							mimeType = mimetypeAttr.getAttributeValues()[0].toString();
+							foundPreviousDataType = true;
+						}
+					}
+
+					if (contentHintNeeded && contentTypeOid == null) {
+						final Attribute contentHintsAttr = signedAttributes.get(CMSAttributes.contentHint);
+						if (contentHintsAttr != null && contentHintsAttr.getAttributeValues() != null
+								&& contentHintsAttr.getAttributeValues().length >= 1) {
+							final ContentHints contentHints = ContentHints.getInstance(contentHintsAttr.getAttributeValues()[0]);
+							contentTypeOid = contentHints.getContentType().getId();
+							// Si no se proporciono la descripcion, aprovechamos y tambien la cogemos
+							if (contentTypeDescription == null) {
+								final DERUTF8String descriptionAttr = contentHints.getContentDescription();
+								if (descriptionAttr != null) {
+									contentTypeDescription = descriptionAttr.getString();
+								}
+							}
+							foundPreviousDataType = true;
+						}
+					}
+
+					try {
+						if (mimeType != null && contentTypeOid == null) {
+							contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeType);
+							if (MimeHelper.DEFAULT_CONTENT_OID_DATA.equals(contentTypeOid)) {
+								contentTypeOid = null;
+							}
+						}
+						else if (mimetypeNeeded && mimeType == null
+								&& contentTypeOid != null && !MimeHelper.DEFAULT_CONTENT_OID_DATA.equals(contentTypeOid)) {
+							mimeType = MimeHelper.transformOidToMimeType(contentTypeOid);
+							if (MimeHelper.DEFAULT_MIMETYPE.equals(mimeType)) {
+								mimeType = null;
+							}
+						}
+					}
+					catch (final Exception e) {
+						LOGGER.warning(
+								"No se han podido las tablas de relacion entre MimeTypes y OIDs: " + e); //$NON-NLS-1$
+					}
+				}
+			}
+
+			// Si aun nos falta informacion de la que necesitamos, pero tenemos los datos,
+			// tratamos de extraerla de ellos
+			if ((contentHintNeeded && contentTypeOid == null
+					|| mimetypeNeeded && mimeType == null) && data != null) {
 				try {
 					final MimeHelper mimeHelper = new MimeHelper(data);
-					if (contentTypeOid == null) {
+					if (contentHintNeeded && contentTypeOid == null) {
 						contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+						if (MimeHelper.DEFAULT_CONTENT_OID_DATA.equals(contentTypeOid)) {
+							contentTypeOid = null;
+						}
 					}
-					if (contentTypeDescription == null) {
+					if (contentHintNeeded && contentTypeDescription == null) {
 						contentTypeDescription = mimeHelper.getDescription();
+					}
+					if (mimetypeNeeded && mimeType == null) {
+						mimeType = mimeHelper.getMimeType();
 					}
 				}
 				catch (final Exception e) {
@@ -185,10 +305,18 @@ public class CAdESParameters {
 							);
 				}
 			}
-			dataConfig.setContentTypeOid(contentTypeOid != null ?
-					contentTypeOid : MimeHelper.DEFAULT_CONTENT_OID_DATA);
-			dataConfig.setContentDescription(contentTypeDescription != null ?
-					contentTypeDescription : MimeHelper.DEFAULT_CONTENT_DESCRIPTION);
+
+			// Asignamos la informacion necesaria a la configuracion
+			if (contentHintNeeded) {
+				dataConfig.setContentTypeOid(contentTypeOid != null ?
+						contentTypeOid : MimeHelper.DEFAULT_CONTENT_OID_DATA);
+				dataConfig.setContentDescription(contentTypeDescription != null ?
+						contentTypeDescription : MimeHelper.DEFAULT_CONTENT_DESCRIPTION);
+			}
+			if (mimetypeNeeded) {
+				dataConfig.setMimeType(mimeType != null ?
+						mimeType : MimeHelper.DEFAULT_MIMETYPE);
+			}
 		}
 
 		// Metadatos con la localizacion de firma
@@ -402,6 +530,22 @@ public class CAdESParameters {
 	 */
 	public void setContentDescription(final String contentDescription) {
 		this.contentDescription = contentDescription;
+	}
+
+	/**
+	 * Recupera el texto descriptivo del tipo de contenido.
+	 * @return Descripci&oacute;n del tipo de contenido o {@code null} si no se estableci&oacute;.
+	 */
+	public String getMimeType() {
+		return this.mimetype;
+	}
+
+	/**
+	 * Establece el texto descriptivo del tipo de contenido.
+	 * @param contentDescription Descripci&oacute;n del tipo de contenido o {@code null} si no se estableci&oacute;.
+	 */
+	private void setMimeType(final String mimeType) {
+		this.mimetype = mimeType;
 	}
 
 	/**

@@ -100,8 +100,8 @@ Opciones:
   <ul>
   <li style="margin-top: 15pt"><code>mode</code>:</li>
   	<ul>
-  	<li><code>explicit</code>:	La firma resultante no incluir&aacute; los datos firmados. Si no se indica el par&aacute;metro mode se configura autom&aacute;ticamente este comportamiento.</li>
-  	<li><code>implicit</code>:	La firma resultante no incluir&aacute; los datos firmados. La firma resultante incluir&aacute; internamente una copia de los datos firmados. El uso de este valor podr&iacute;a generar firmas de gran tama&ntilde;o. En las cofirmas, este par&aacute;metro se ignorar&aacute; si los datos ya estaban contenidos en la firma original o si no se proporcionan los datos.</li>
+  	<li><code>explicit</code>:	La firma resultante no incluir&aacute; los datos firmados. Si no se indica el la propiedad <code>mode</code> se configura autom&aacute;ticamente este comportamiento.</li>
+  	<li><code>implicit</code>:	La firma resultante no incluir&aacute; los datos firmados. La firma resultante incluir&aacute; internamente una copia de los datos firmados. El uso de este valor podr&iacute;a generar firmas de gran tama&ntilde;o. En las cofirmas, esta propiedad se ignorar&aacute; si los datos ya estaban contenidos en la firma original o si no se proporcionan los datos.</li>
 	</ul>
   <li style="margin-top: 10pt"><code>contentTypeOid</code>:</li>
   <ul>
@@ -111,24 +111,33 @@ Opciones:
   <ul>
   	<li>Descripci&oacute;n textual del tipo de datos firmado.</li>
   </ul>
+  <li style="margin-top: 10pt"><code>includeMimeTypeAttribute</code>:</li>
+  <ul>
+ 	<li><code>true</code>:	Incluye en la firma el atributo id-aa-ets-mimeType definido en CAdES v2.1.1 y superiores (v&aacute;lido en firmas baseline). El valor de mimetype se tomar&aacute; de la propiedad <code>mimetype</code> o, si no se incluyo, se extrapolar&aacute; de la propiedad <code>contentTypeOid</code>. Si tampoco fuese posible, se tratar&aacute;n de obtener estos valores de alguna de las firmas previas (en caso de cofirmas). Si tampoco fuese posible, se obtendr&aacute; el tipo del an&aacute;lisis de los datos (que podr&iacute;a no ser correcto o concreto). En caso de que no se pueda obtener el tipo de ninguna manera, se usar&aacute; el mimetype application/octet-stream.</li>
+ 	<li><code>false</code>:	No incluye el atributo id-aa-ets-mimeType en la firma. Valor por defecto.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>mimeType</code>:</li>
+  <ul>
+  	<li>MIME-Type de los datos a firmar. Sólo se incluye cuando se indica la propiedad <code>includeMimeTypeAttribute</code>.</li>
+  </ul>
   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li>
   <ul>
   	<li>Identificador de la pol&iacute;tica de firma, necesario para generar firmas CAdES-EPES.</li>
   </ul>
   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li>
   <ul>
-  	<li>Cadena Base 64 con la huella digital de la pol&iacute;tica de firma. Es obligatorio indicar este par&aacute;metro si de indic&oacute; tambi&eacute;n policyIdentifier, al igual que es obligatorio tambi&eacute;n dar valor al par&aacute;metro policyIdentifierHashAlgorithm.</li>
+  	<li>Cadena Base 64 con la huella digital de la pol&iacute;tica de firma. Es obligatorio indicar este par&aacute;esta propiedad si de indic&oacute; tambi&eacute;n policyIdentifier, al igual que es obligatorio tambi&eacute;n dar valor al a la propiedad <code>policyIdentifierHashAlgorithm</code>.</li>
   </ul>	
   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li>
   	<ul>
-  	<li><code>SHA1</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA1.</li>
-  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-256.</li>
-  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-384.</li>
-  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-512.</li>
+  	<li><code>SHA1</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA1.</li>
+  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-256.</li>
+  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-384.</li>
+  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-512.</li>
 	</ul>
   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li>
   <ul>
-  	<li>URL accesible hacia el documento (normalmente PDF) que contiene una descripci&oacute;n textual de la pol&iacute;tica de firma. Este par&aacute;metro es opcional incluso si se desea generar firmas CAdES-EPES.</li>
+  	<li>URL accesible hacia el documento (normalmente PDF) que contiene una descripci&oacute;n textual de la pol&iacute;tica de firma. Esta propiedad es opcional incluso si se desea generar firmas CAdES-EPES.</li>
   </ul>
   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li>
   	<ul>
@@ -137,7 +146,7 @@ Opciones:
 	</ul>
   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li>
   <ul>
-  	<li>URL accesible hacia el documento (normalmente PDF) que contiene una descripci&oacute;n textual de la pol&iacute;tica de firma. Este par&aacute;metro es opcional incluso si se desea generar firmas CAdES-EPES.</li>
+  	<li>URL accesible hacia el documento (normalmente PDF) que contiene una descripci&oacute;n textual de la pol&iacute;tica de firma. Esta propiedad es opcional incluso si se desea generar firmas CAdES-EPES.</li>
   </ul>
   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li>
   <ul>
@@ -186,7 +195,7 @@ Opciones:
   <ul>
   <li style="margin-top: 10pt"><code>insertEnvelopedSignatureOnNodeByXPath</code>:</li>
   <ul>
-  	<li>Expresi&oacute;n XPath (v1) que indica el nodo bajo el cual debe insertarse el nodo de firma en el caso de una firma Enveloped. Si la expresi&oacute;n devuelve m&aacute;s de un nodo, se usa solo el primero. Si la expresi&oacute;n no devuelve nodos o est&aacute; mal construida se lanzar&aacute; una excepci&oacute;n. Este par&aacute;metro solo tiene efecto en firmas Enveloped.</li>
+  	<li>Expresi&oacute;n XPath (v1) que indica el nodo bajo el cual debe insertarse el nodo de firma en el caso de una firma Enveloped. Si la expresi&oacute;n devuelve m&aacute;s de un nodo, se usa solo el primero. Si la expresi&oacute;n no devuelve nodos o est&aacute; mal construida se lanzar&aacute; una excepci&oacute;n. Esta propiedad solo tiene efecto en firmas Enveloped.</li>
   </ul>
   <li style="margin-top: 10pt"><code>useManifest</code>:</li>
   	<ul>
@@ -211,15 +220,15 @@ Opciones:
 
   <li style="margin-top: 10pt"><code>mimetype<i><b>n</b></i></code>:</li>
   <ul>
-  	<li>MIME-Type de los datos asociados a la referencia ‘n’ en una firma manifest. Si no se indica este par&aacute;metro, se utilizar&aacute; el tipo ‘application/octet-stream’.</li>
+  	<li>MIME-Type de los datos asociados a la referencia ‘n’ en una firma manifest. Si no se indica esta propiedad, se utilizar&aacute; el tipo ‘application/octet-stream’.</li>
   </ul>
   <li style="margin-top: 10pt"><code>contentTypeOid<i><b>n</b></i></code>:</li>
   <ul>
-  	<li>OID o URN del tipo de dato firmado para la referencia n&uacute;mero ‘n’ en una firma manifest. Este par&aacute;metro es complementario (que no excluyente) al par&aacute;metro <code>mimetype<i><b>n</b></i></code>.</li>
+  	<li>OID o URN del tipo de dato firmado para la referencia n&uacute;mero ‘n’ en una firma manifest. Esta propiedad es complementaria (que no excluyente) a la propiedad <code>mimetype<i><b>n</b></i></code>.</li>
   </ul>
   <li style="margin-top: 10pt"><code>encoding<i><b>n</b></i></code>:</li>
   <ul>
-  	<li>Codificaci&oacute;n de los datos asociados a la referencia n&uacute;mero ‘n’ en una firma manifest. Un uso incorrecto de este par&aacute;metro puede provocar la generaci&oacute;n de una firma inv&aacute;lida.</li>
+  	<li>Codificaci&oacute;n de los datos asociados a la referencia n&uacute;mero ‘n’ en una firma manifest. Un uso incorrecto de esta propiedad puede provocar la generaci&oacute;n de una firma inv&aacute;lida.</li>
   </ul>
   <li style="margin-top: 10pt"><code>addKeyInfoKeyValue</code>:</li>
   	<ul>
@@ -233,7 +242,7 @@ Opciones:
 	</ul>
   <li style="margin-top: 10pt"><code>avoidXpathExtraTransformsOnEnveloped</code>:</li>
   	<ul>
-  	<li><code>true</code>: Evita la inclusi&oacute;n de la transformaci&oacute;n XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y que elimina todas las firmas del documento para dejar &uacute;nicamente el contenido. ADVERTENCIA: La cofirma de un documento en el que al menos una de las firmas no incluye la transformaci&oacute;n XPATH, dar&aacute; lugar a un documento de firma que potencialmente ser&aacute; validado incorrectamente por los validadores de firma. Por este motivo, s&oacute;lo se permite el uso de este par&aacute;metro en la operaci&oacute;n de firma (no en la de cofirma).</li>
+  	<li><code>true</code>: Evita la inclusi&oacute;n de la transformaci&oacute;n XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y que elimina todas las firmas del documento para dejar &uacute;nicamente el contenido. ADVERTENCIA: La cofirma de un documento en el que al menos una de las firmas no incluye la transformaci&oacute;n XPATH, dar&aacute; lugar a un documento de firma que potencialmente ser&aacute; validado incorrectamente por los validadores de firma. Por este motivo, s&oacute;lo se permite el uso de esta propiedad en la operaci&oacute;n de firma (no en la de cofirma).</li>
   	<li><code>false</code>: Incluye la transformaci&oacute;n XPATH2 posibilita las cofirmas eliminando todas las firmas del documento para dejar &uacute;nicamente el contenido (comportamiento por defecto).</li>
 	</ul>
   <li style="margin-top: 10pt"><code>format</code>:</li>
@@ -254,22 +263,22 @@ Opciones:
   </ul>
   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li>
   <ul>
-  	<li>Cadena Base 64 con la huella digital de la pol&iacute;tica de firma. Es obligatorio indicar este par&aacute;metro si de indic&oacute; tambi&eacute;n policyIdentifier, al igual que es obligatorio tambi&eacute;n dar valor al par&aacute;metro policyIdentifierHashAlgorithm.</li>
+  	<li>Cadena Base 64 con la huella digital de la pol&iacute;tica de firma. Es obligatorio indicar esta propiedad si de indic&oacute; tambi&eacute;n policyIdentifier, al igual que es obligatorio tambi&eacute;n dar valor a la propiedad <code>policyIdentifierHashAlgorithm</code>.</li>
   </ul>	
   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li>
   	<ul>
-  	<li><code>SHA1</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA1.</li>
-  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-256.</li>
-  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-384.</li>
-  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-512.</li>
+  	<li><code>SHA1</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA1.</li>
+  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-256.</li>
+  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-384.</li>
+  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-512.</li>
 	</ul>
   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li>
   <ul>
-  	<li>URL accesible hacia el documento (normalmente PDF) que contiene una descripci&oacute;n textual de la pol&iacute;tica de firma. Este par&aacute;metro es opcional incluso si se desea generar firmas XAdES-EPES.</li>
+  	<li>URL accesible hacia el documento (normalmente PDF) que contiene una descripci&oacute;n textual de la pol&iacute;tica de firma. Esta propiedad es opcional incluso si se desea generar firmas XAdES-EPES.</li>
   </ul>
   <li style="margin-top: 10pt"><code>policyDescription</code>:</li>
   <ul>
-  	<li>Descripci&oacute;n textual de la pol&iacute;tica de firma. En el caso de que se firme un XML, la codificaci&oacute;n del texto usado debe adecuarse al XML firmado. Este par&aacute;metro es opcional incluso si se desea generar firmas XAdES-EPES.</li>
+  	<li>Descripci&oacute;n textual de la pol&iacute;tica de firma. En el caso de que se firme un XML, la codificaci&oacute;n del texto usado debe adecuarse al XML firmado. Esta propiedad es opcional incluso si se desea generar firmas XAdES-EPES.</li>
   </ul>		
   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li>
   <ul>
@@ -299,11 +308,11 @@ Opciones:
 	</ul>
   <li style="margin-top: 10pt"><code>mimeType</code>:</li>
   <ul>
-  	<li>MIME-Type de los datos a firmar. Si no se indica este par&aacute;metro el sistema intenta auto-detectar el tipo, estableciendo el m&aacute;s aproximado (que puede no ser el estrictamente correcto).</li>
+  	<li>MIME-Type de los datos a firmar. Si no se indica esta propiedad el sistema intenta auto-detectar el tipo, estableciendo el m&aacute;s aproximado (que puede no ser el estrictamente correcto).</li>
   </ul>	
   <li style="margin-top: 10pt"><code>encoding</code>:</li>
   <ul>
-  	<li>URI con la codificaci&oacute;n de los datos a firmar (ver la  documentaci&oacute;n del elemento Object de XMLDSig para m&aacute;s informaci&oacute;n). Un uso incorrecto de este par&aacute;metro puede provocar la generaci&oacute;n de una firma inv&aacute;lida. Si se proporcionan datos a firmar previamente codificados en Base64 pero se desea sean considerados como su forma descodificada, debe establecerse este valor a http://www.w3.org/2000/09/xmldsig#base64 y especificarse el tipo real en el par&aacute;metro mimeType. Por ejemplo, para firmar una imagen PNG haciendo que la firma se refiera a su forma binaria directa, puede proporcionarse la imagen directamente codificada en Base64 indicando el encoding como http://www.w3.org/2000/09/xmldsig#base64 y el mimeType como image/png. El valor debe ser siempre una URI.</li>
+  	<li>URI con la codificaci&oacute;n de los datos a firmar (ver la  documentaci&oacute;n del elemento Object de XMLDSig para m&aacute;s informaci&oacute;n). Un uso incorrecto de esta propiedad puede provocar la generaci&oacute;n de una firma inv&aacute;lida. Si se proporcionan datos a firmar previamente codificados en Base64 pero se desea sean considerados como su forma descodificada, debe establecerse este valor a http://www.w3.org/2000/09/xmldsig#base64 y especificarse el tipo real en la propiedad <code>mimeType</code>. Por ejemplo, para firmar una imagen PNG haciendo que la firma se refiera a su forma binaria directa, puede proporcionarse la imagen directamente codificada en Base64 indicando el encoding como http://www.w3.org/2000/09/xmldsig#base64 y el mimeType como image/png. El valor debe ser siempre una URI.</li>
   </ul>
   <li style="margin-top: 10pt"><code>outputXmlEncoding</code>:</li>
   <ul>
@@ -311,7 +320,7 @@ Opciones:
   </ul>
   <li style="margin-top: 10pt"><code>contentTypeOid</code>:</li>
   <ul>
-  	<li>OID o URN de tipo OID con el identificador del tipo de dato firmado. Este par&aacute;metro es complementario (que no excluyente) al par&aacute;metro mimeType.</li>
+  	<li>OID o URN de tipo OID con el identificador del tipo de dato firmado. Esta propiedad es complementaria (que no excluyente) a la propiedad <code>mimeType</code>.</li>
   </ul>
   <li style="margin-top: 10pt"><code>canonicalizationAlgorithm</code>:</li>
   	<ul>
@@ -323,13 +332,13 @@ Opciones:
   <li style="margin-top: 10pt"><code>xadesNamespace</code>:</li>
   	<ul>
   	<li><code>http://uri.etsi.org/01903/v1.3.2#</code>:	URL de definici&oacute;n del espacio de nombres de XAdES correspondiente a la versi&oacute;n 1.3.2 de XAdES. Este es el valor por defecto.</li>
-  	<li><code>http://uri.etsi.org/01903/v1.4.1#</code>:	URL de definici&oacute;n del espacio de nombres de XAdES correspondiente a la versi&oacute;n 1.4.1 de XAdES. Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro signedPropertiesTypeUrl para evitar incoherencias en la versi&oacute;n de XAdES.</li>
+  	<li><code>http://uri.etsi.org/01903/v1.4.1#</code>:	URL de definici&oacute;n del espacio de nombres de XAdES correspondiente a la versi&oacute;n 1.4.1 de XAdES. Si se establece esta propiedad es posible que se necesite establecer tambi&eacute;n la propiedad <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.</li>
 	</ul>
  <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li>
   	<ul>
   	<li><code>http://uri.etsi.org/01903#SignedProperties</code>:	URL de definici&oacute;n del tipo de las propiedades firmadas (Signed Properties) de XAdES. Este es el valor por defecto.</li>
   	<li><code>http://uri.etsi.org/01903/1.3.2#SignedProperties</code>:	URL de definici&oacute;n del tipo de las propiedades firmadas (Signed Properties) de XAdES v1.3.2.</li>
-  	<li><code>http://uri.etsi.org/01903/1.4.1#SignedProperties</code>:	URL de definici&oacute;n del tipo de las propiedades firmadas (Signed Properties) de XAdES v1.4.1. Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro xadesNamespace para evitar incoherencias en la versi&oacute;n de XAdES.</li>
+  	<li><code>http://uri.etsi.org/01903/1.4.1#SignedProperties</code>:	URL de definici&oacute;n del tipo de las propiedades firmadas (Signed Properties) de XAdES v1.4.1. Si se establece esta propiedad es posible que se necesite establecer tambi&eacute;n la propiedad <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.</li>
 	</ul>
   <li style="margin-top: 10pt"><code>ignoreStyleSheets</code>:</li>
   	<ul>
@@ -417,11 +426,11 @@ Opciones:
   </ul>	
   <li style="margin-top: 10pt"><code>xadesNamespace</code>:</li>
   <ul>
-  	<li>URL de definici&oacute;n del espacio de nombres de XAdES (el uso de este par&aacute;metro puede condicionar la declaraci&oacute;n de versi&oacute;n de XAdES). Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro signedPropertiesTypeUrl para evitar incoherencias en la versi&oacute;n de XAdES.</li>
+  	<li>URL de definici&oacute;n del espacio de nombres de XAdES (el uso de esta propiedad puede condicionar la declaraci&oacute;n de versi&oacute;n de XAdES). Si se establece esta propiedad es posible que se necesite establecer tambi&eacute;n la propiedad signedPropertiesTypeUrl para evitar incoherencias en la versi&oacute;n de XAdES.</li>
   </ul>	
   <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li>
   <ul>
-  	<li>URL de definici&oacute;n del tipo de las propiedades firmadas (Signed Properties) de XAdES. Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro xadesNamespace para evitar incoherencias en la versi&oacute;n de XAdES. Si no se establece se usa el valor por defecto: http://uri.etsi.org/01903#SignedProperties.</li>
+  	<li>URL de definici&oacute;n del tipo de las propiedades firmadas (Signed Properties) de XAdES. Si se establece esta propiedad es posible que se necesite establecer tambi&eacute;n la propiedad <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES. Si no se establece se usa el valor por defecto: http://uri.etsi.org/01903#SignedProperties.</li>
   </ul>	
   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li>
   	<ul>
@@ -442,10 +451,10 @@ Opciones:
   </ul>	
   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li>
   	<ul>
-  	<li><code>SHA1</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA1.</li>
-  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-256.</li>
-  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-384.</li>
-  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-512.</li>
+  	<li><code>SHA1</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA1.</li>
+  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en la propiedad <code> policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-256.</li>
+  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-384.</li>
+  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-512.</li>
 	</ul>
   </ul>
 
@@ -585,7 +594,7 @@ Opciones:
   </ul>
   <li style="margin-top: 10pt"><code>image</code>:</li>
   <ul>
-  	<li>Ruta del fichero de imagen JPEG que insertar en el documento antes de firmarlo. Tambi&eacute;n puede indicarse directamente el Base 64 de la imagen. Este par&aacute;metro s&oacute;lo se puede utilizar en la primera firma del documento.</li>
+  	<li>Ruta del fichero de imagen JPEG que insertar en el documento antes de firmarlo. Tambi&eacute;n puede indicarse directamente el Base 64 de la imagen. Esta propiedad s&oacute;lo se puede utilizar en la primera firma del documento.</li>
   </ul>
   <li style="margin-top: 10pt"><code>imagePage</code>:</li>
   <ul>
@@ -668,14 +677,14 @@ Opciones:
   </ul>  
   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li>
   <ul>
-  	<li>Texto Base 64 con la huella digital de la pol&iacute;tica de firma. Es obligatorio indicar este par&aacute;metro si el valor indicado en policyIdentifier no es universalmente accesible. Si se da valor a este par&aacute;metro es obligatorio tambi&eacute;n dar valor al par&aacute;metro policyIdentifierHashAlgorithm.</li>
+  	<li>Texto Base 64 con la huella digital de la pol&iacute;tica de firma. Es obligatorio indicar esta propiedad si el valor indicado en policyIdentifier no es universalmente accesible. Si se da valor a esta propiedad es obligatorio tambi&eacute;n dar valor a la propiedad <code>policyIdentifierHashAlgorithm</code>.</li>
   </ul>
   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li>
   	<ul>
-  	<li><code>SHA1</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA1.</li>
-  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-256.</li>
-  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-384.</li>
-  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en el par&aacute;metro policyIdentifierHash se calcul&oacute; mediante el algoritmo SHA-512.</li>
+  	<li><code>SHA1</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA1.</li>
+  	<li><code>SHA-256</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-256.</li>
+  	<li><code>SHA-384</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-384.</li>
+  	<li><code>SHA-512</code>:	Indica que la huella digital indicada en la propiedad <code>policyIdentifierHash</code> se calcul&oacute; mediante el algoritmo SHA-512.</li>
 	</ul>
   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li>
   <ul>
