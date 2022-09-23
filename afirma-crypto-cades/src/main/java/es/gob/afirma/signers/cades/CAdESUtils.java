@@ -163,12 +163,6 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  */
 public final class CAdESUtils {
 
-	/**
-	 * Identificador del id-aa-ets-signerAttrV2. Esta propiedad se utiliza para indicar
-	 * los roles en las firmas baseline ETSI EN 319 122-1.
-	 */
-    private static final String OID_id_aa_ets_signerAttrV2 =  "0.4.0.19122.1.1"; //$NON-NLS-1$
-
 	private CAdESUtils() {
         // No permitimos la instanciacion
     }
@@ -535,7 +529,7 @@ public final class CAdESUtils {
         			signerAttrOid = PKCSObjectIdentifiers.id_aa_ets_signerAttr;
         		}
         		else if (AOSignConstants.SIGN_PROFILE_BASELINE.equals(config.getProfileSet()) ) {
-        			signerAttrOid = new ASN1ObjectIdentifier(OID_id_aa_ets_signerAttrV2);
+        			signerAttrOid = new ASN1ObjectIdentifier(CAdESAttributes.OID_id_aa_ets_signerAttrV2);
         		}
         		// Agregamos los roles
         		if (signerAttrOid != null) {
@@ -564,6 +558,16 @@ public final class CAdESUtils {
 						new DERUTCTime(config.getSigningTime())
 					)
 				)
+			);
+        }
+
+        // El mimetype de los datos firmados. Solo se agrega si se indica expresamente y nunca
+        // en las contrafirmas
+        if (!isCountersign && config.getMimeType() != null) {
+        	contextSpecific.add(
+        			new Attribute(
+        					new ASN1ObjectIdentifier(CAdESAttributes.OID_id_aa_ets_mimeType),
+        					new DERSet(new DERUTF8String(config.getMimeType())))
 			);
         }
 
