@@ -20,6 +20,7 @@ Spanish.lproj/gfx/menufirmaspades_mini.png
 Spanish.lproj/gfx/menufirmasxades_mini.png
 Spanish.lproj/gfx/menugeneral_mini.png
 Spanish.lproj/gfx/menugproxy_mini.png
+Spanish.lproj/gfx/menulistablancadominios.png
 Spanish.lproj/gfx/menuplugins_mini.png
 Spanish.lproj/gfx/pantalladetalle2_mini.png
 Spanish.lproj/gfx/pantalladetalle_mini.png
@@ -35,4 +36,5 @@ Spanish.lproj/pgs/PantallaDetalle.html
 Spanish.lproj/pgs/PantallaEspera.html
 Spanish.lproj/pgs/PantallaFirma.html
 Spanish.lproj/pgs/VentanaConfigurarProxy.html
+Spanish.lproj/pgs/VentanaListaBlancaDominios.html
 Spanish.lproj/pgs/VentanaPdfVisible.html
