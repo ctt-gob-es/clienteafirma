@@ -427,10 +427,10 @@ public final class XAdESExtraParams {
     public static final String CONFIRM_DIFFERENT_PROFILE = "confirmDifferentProfile"; //$NON-NLS-1$
 
     /**
-     * Par&aacute;metro que permite configurar si deben multifirmarse firmas de archivo aunque
+     * Par&aacute;metro que permite configurar si se permite la multifirma de firmas de archivo aunque
      * queden invalidadas.
      */
-	public static final String FORCE_SIGN_LTS_SIGNATURES = "forceSignLTSignature"; //$NON-NLS-1$
+	public static final String ALLOW_SIGN_LTS_SIGNATURES = "allowSignLTSignature"; //$NON-NLS-1$
 
     /**
      * Constructor vac&iacute;o privado para que no se pueda instanciar la clase

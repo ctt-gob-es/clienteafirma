@@ -15,7 +15,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Pruebas de firmas XAdES con MANIFEST.
- * @author Tom&aacute;s Garc&iacuute;a-Mer&aacute;s. */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestXAdESWithManifest {
 
     private static final String CERT_PATH = "CATCERT CIUTADANIA PF CPIXSA-2.p12"; //$NON-NLS-1$

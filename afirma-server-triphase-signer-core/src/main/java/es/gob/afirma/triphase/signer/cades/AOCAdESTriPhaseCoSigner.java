@@ -177,7 +177,7 @@ public final class AOCAdESTriPhaseCoSigner {
 					sd.getDigestAlgorithms(),
 					encInfo,
 					certificates,
-					(ASN1Set) null, // CRLS no usado
+					sd.getCRLs(),
 					new DERSet(signerInfos) // UnsignedAttr
 			)
 		).getEncoded(ASN1Encoding.DER);

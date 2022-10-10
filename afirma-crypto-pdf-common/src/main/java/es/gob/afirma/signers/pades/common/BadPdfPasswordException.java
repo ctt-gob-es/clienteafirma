@@ -26,10 +26,9 @@ public final class BadPdfPasswordException extends RuntimePasswordNeededExceptio
 	public static final String REQUESTOR_MSG_CODE = "pdfbadpassword"; //$NON-NLS-1$
 
 	/**
-	 * Crea una excepci&oacute;n que indica que el PDF no ha podido abrirse o firmarse por estar protegido por contrase&ntilde;a
-     * y la que se ha proporcionado no es correcta.
-     * @param msg Mensaje de error.
-	 * @param e Causa inicial de la excepci&oacute;n
+	 * Crea una excepci&oacute;n que indica que el PDF no ha podido abrirse o firmarse
+	 * por estar protegido por contrase&ntilde;a y la que se ha proporcionado no es correcta.
+	 * @param msg Mesaje de error.
 	 */
 	public BadPdfPasswordException(final String msg) {
 		super(msg, REQUESTOR_MSG_CODE, PdfExtraParams.USER_PASSWORD_STRING, null);

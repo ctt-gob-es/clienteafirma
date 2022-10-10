@@ -940,8 +940,8 @@ public final class XAdESUtil {
     }
 
     /**
-     * Comprueba si alguna de las firmas proporcionadas incluye un sello de archivo.
-     * @param signatures Listado de firmas que verificar.
+     * Comprueba si el elemento de firma proporcionado incluye un sello de archivo.
+     * @param signature Elemento de firma XML.
      * @throws SigningLTSException Cuando alguna de las firmas incluye sello de archivo.
      */
     public static void checkArchiveSignatures(final Element signature) throws SigningLTSException {

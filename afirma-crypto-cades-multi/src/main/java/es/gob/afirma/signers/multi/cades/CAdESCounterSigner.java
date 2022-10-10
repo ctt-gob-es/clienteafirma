@@ -47,6 +47,7 @@ import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
@@ -195,7 +196,7 @@ final class CAdESCounterSigner {
 				signedData.getDigestAlgorithms(),
                 signedData.getEncapContentInfo(),
                 certificates,
-                null, // Lista de CRL
+                signedData.getCRLs(),
                 new DERSet(newSignerInfos)
 			)
 		).getEncoded(ASN1Encoding.DER);
@@ -290,10 +291,21 @@ final class CAdESCounterSigner {
 
                 // Si es un atributo no soportado, no podremos realizar la firma y se lanzara una excepcion
 
-            	final String forceSignLts = xParams != null ?
-            			xParams.getProperty(CAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES) : null;
-        		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
-	        		CAdESMultiUtil.checkUnsupported(unauthenticatedAttribute.getAttrType());
+            	final String allowSignLts = xParams != null ?
+            			xParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES) : null;
+        		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
+        			try {
+        				CAdESMultiUtil.checkUnsupported(unauthenticatedAttribute.getAttrType());
+        			}
+        			catch (final SigningLTSException e) {
+        				// Si se indico expresamente que no se debia permitir la cofirma de
+        				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
+        				// Si no, se informa debidamente para que se consulte al usuario
+        				if (allowSignLts != null) {
+        					throw new AOException(e.getMessage());
+        				}
+        				throw e;
+        			}
         		}
 
                 // Si es una contrafirma, la analizamos para saber si procesar su contenido y agregar nuevas contrafirmas

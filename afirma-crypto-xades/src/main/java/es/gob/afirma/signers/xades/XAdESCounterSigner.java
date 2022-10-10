@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -217,9 +218,20 @@ public final class XAdESCounterSigner {
 
 		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
 		// incluso en ese caso
-		final String forceSignLts = extraParams.getProperty(XAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
-		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
-			XAdESUtil.checkArchiveSignatures(signaturesList);
+		final String allowSignLts = extraParams.getProperty(XAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
+		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
+			try {
+				XAdESUtil.checkArchiveSignatures(signaturesList);
+			}
+			catch (final SigningLTSException e) {
+				// Si se indico expresamente que no se debia permitir la contrafirma de
+				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
+				// Si no, se informa debidamente para que se consulte al usuario
+				if (allowSignLts != null) {
+					throw new AOException(e.getMessage());
+				}
+				throw e;
+			}
 		}
 
 		// Contrafirmamos

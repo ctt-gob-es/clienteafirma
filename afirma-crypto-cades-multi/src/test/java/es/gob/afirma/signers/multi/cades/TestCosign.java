@@ -17,17 +17,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 
 /** Pruebas de cofirmas CAdES.
  * @author Carlos Gamuci. */
 public final class TestCosign {
 
-	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
-
-	private static final String PWD = "1111"; //$NON-NLS-1$
+    private static final String CERT_PATH = "EIDAS_CERTIFICADO_PRUEBAS___99999999R__1234.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "1234"; //$NON-NLS-1$
 
 	private static final String IMPLICIT_SHA1_SIGN_FILE = "firma_implicita.csig"; //$NON-NLS-1$
 	private static final String EXPLICIT_SHA1_SIGN_FILE = "firma_explicita.csig"; //$NON-NLS-1$
@@ -46,9 +47,9 @@ public final class TestCosign {
 	 * @throws Exception Cuando ocurre algun problema al cargar el almac&eacute;n o los datos. */
 	@Before
 	public void cargaAlmacen() throws Exception {
-		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
+		ksIs = getClass().getClassLoader().getResourceAsStream(CERT_PATH);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, PWD.toCharArray());
+		ks.load(ksIs, CERT_PASS.toCharArray());
 
 		data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream(DATA_FILE));
 	}
@@ -68,7 +69,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -116,7 +117,7 @@ public final class TestCosign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
 			ks.aliases().nextElement(),
-			new KeyStore.PasswordProtection(PWD.toCharArray())
+			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
 
 		byte[] signature;
@@ -149,7 +150,7 @@ public final class TestCosign {
 	/** Prueba de cofirma impl&iacute;cita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	public void prueba_cofirmar_cades_A_() throws Exception {
+	public void prueba_cofirmar_firma_longeva_error() throws Exception {
 		final byte[] sign;
 		try (
 			final InputStream is = getClass().getClassLoader().getResourceAsStream(
@@ -165,7 +166,7 @@ public final class TestCosign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
 			ks.aliases().nextElement(),
-			new KeyStore.PasswordProtection(PWD.toCharArray())
+			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
 		try {
 			signer.cosign(
@@ -177,11 +178,49 @@ public final class TestCosign {
 				config
 			);
 		}
+		catch(final RuntimeConfigNeededException e) {
+			return;
+		}
+		Assert.fail("Deberia haber encontrado sellos y fallar"); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma impl&iacute;cita de una firma impl&iacute;cita CAdES-LTA Level sin indicar los datos de firma.
+	 * @throws Exception Cuando se produce un error. */
+	@Test
+	public void prueba_cofirmar_firma_longeva_ok() throws Exception {
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(
+				IMPLICIT_SHA1_CADES_A_FILE
+			);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
+
+		final Properties config = new Properties();
+		config.setProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+			ks.aliases().nextElement(),
+			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
+		try {
+			signer.cosign(
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config
+			);
+		}
+		catch (final RuntimeConfigNeededException e) {
+			Assert.fail("La firma se tuvo que haber cofirmado al incluir el parametro " + CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES); //$NON-NLS-1$
+		}
 		catch(final Exception e) {
 			System.out.println("La firma no puede ser cofirmada: " + e); //$NON-NLS-1$
 			return;
 		}
-		Assert.fail("Deberia haber encontrado sellos y fallar"); //$NON-NLS-1$
 	}
 
 	/** Prueba de cofirma implicita de una firma implicita indicando los datos firmados.
@@ -200,7 +239,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			signer.getData(sign),
 			sign,
@@ -237,7 +276,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -275,7 +314,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			data,
 			sign,
@@ -317,7 +356,7 @@ public final class TestCosign {
 		config.setProperty("precalculatedHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			messageDigest,
 			sign,
@@ -354,7 +393,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -392,7 +431,7 @@ public final class TestCosign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 
 		try {
-			final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
+			final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 			signer.cosign(
 					sign,
 					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,

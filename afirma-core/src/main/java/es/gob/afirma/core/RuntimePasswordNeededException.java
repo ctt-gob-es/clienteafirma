@@ -47,6 +47,7 @@ public abstract class RuntimePasswordNeededException extends RuntimeConfigNeeded
 
 	/**
 	 * Establece la configuraci&oacute;n adecuada para el uso de la nueva contrase&ntilde;a.
+	 * @param config Configuraci&oacute;n a la que agregar&aacute; la contrase&ntilde;a.
 	 * @param password Contrase&ntilde;a que se debe agregar a la configuraci&oacute;n.
 	 */
 	public abstract void configure(Properties config, char[] password);

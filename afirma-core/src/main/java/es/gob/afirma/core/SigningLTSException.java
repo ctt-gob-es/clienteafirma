@@ -21,7 +21,7 @@ public class SigningLTSException extends RuntimeConfigNeededException {
 
 	public static final String REQUESTOR_MSG_CODE = "signingLts"; //$NON-NLS-1$
 
-	private static final String EXTRA_PARAM_NEEDED = "forceSignLTSignature"; //$NON-NLS-1$
+	private static final String EXTRA_PARAM_NEEDED = "allowSignLTSignature"; //$NON-NLS-1$
 
 	/**
 	 * Crear la excepci&oacute;n motivada por lo indicado en el mensaje.

@@ -258,7 +258,6 @@ final class CAdESCoSigner {
 
 		// === PREFIRMA ===
 
-		final ASN1Set signedAttr;
 		if (config.getDataDigest() == null && config.getContentData() == null) {
 			throw new ContainsNoDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
 		}
@@ -266,7 +265,7 @@ final class CAdESCoSigner {
 				certChain[0],
 				config,
 				false);
-		signedAttr = SigUtils.getAttributeSet(new AttributeTable(signedAttributes));
+		final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(signedAttributes));
 
 		// === FIRMA ===
 
@@ -303,8 +302,9 @@ final class CAdESCoSigner {
 				signedData.getDigestAlgorithms(),
 				encInfo,
 				certificates,
-				null,	// CRLS no usado
-				new DERSet(signerInfos)// unsignedAttr
+				signedData.getCRLs(),
+				//null,	// CRLS no usado
+				new DERSet(signerInfos)// SignerInfos
 			)
 		).getEncoded(ASN1Encoding.DER);
 	}

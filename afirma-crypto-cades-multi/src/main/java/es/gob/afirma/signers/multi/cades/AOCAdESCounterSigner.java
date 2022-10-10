@@ -18,6 +18,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -66,9 +67,20 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
 		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
 		// incluso en ese caso
-		final String forceSignLts = xParams.getProperty(CAdESExtraParams.FORCE_SIGN_LTS_SIGNATURES);
-		if (forceSignLts == null || !Boolean.parseBoolean(forceSignLts)) {
-			CAdESMultiUtil.checkUnsupportedAttributes(sign);
+		final String allowSignLts = xParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
+		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
+			try {
+				CAdESMultiUtil.checkUnsupportedAttributes(sign);
+			}
+			catch (final SigningLTSException e) {
+				// Si se indico expresamente que no se debia permitir la contrafirma de
+				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
+				// Si no, se informa debidamente para que se consulte al usuario
+				if (allowSignLts != null) {
+					throw new AOException(e.getMessage());
+				}
+				throw e;
+			}
 		}
 
         final Properties extraParams = getExtraParams(xParams);

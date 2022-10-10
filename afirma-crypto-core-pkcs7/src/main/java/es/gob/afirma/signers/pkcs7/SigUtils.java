@@ -56,11 +56,11 @@ public final class SigUtils {
      *        Atributo a formatear.
      * @return SET en formato DER del atributo. */
     public static ASN1Set getAttributeSet(final AttributeTable attr) {
-        if (attr != null) {
-            return new DERSet(attr.toASN1EncodableVector());
+        if (attr == null) {
+        	LOGGER.warning("Los atributos eran nulos, se devolvera null"); //$NON-NLS-1$
+            return null;
         }
-        LOGGER.warning("Los atributos eran nulos, se devolvera null"); //$NON-NLS-1$
-        return null;
+        return new DERSet(attr.toASN1EncodableVector());
     }
 
     /** Genera un estructura de tipo SET de formato ASN1 a partir de una lista de objectos ya existente.

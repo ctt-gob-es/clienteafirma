@@ -187,7 +187,13 @@ Opciones:
   	<li><code>false</code> (U otro valor):	Se incluir&aacute; el atributo SigningCertificate en la firma.</li>
   	<li>Sin especificar:	Se incluir&aacute; SigningCertificate si la firma utiliza un algoritmo de firma SHA1 y SigningCertificateV2 para el resto de algoritmos.</li>
 	</ul>
+  <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
+  	<ul>
+  	<li><code>true</code>:	Se permite la cofirma/contrafirma de firmas de archivo longevo, a pesar de que estas no serán v&aacute;lidas posteriormente. </li>
+  	<li><code>false</code> (U otro valor):	No se permite la cofirma/contrafirma de firmas de archivo longevo.</li>
+	</ul>
   </ul>
+  
   
   
   <h3>Opciones de configuraci&oacute;n de firmas XAdES</h3>
@@ -402,6 +408,11 @@ Opciones:
   <ul>
   	<li>Lista de indicadores textuales separados por el car&aacute;cter '|' que se aportan como calificadores adicionales del CommitmentTypeIndication n&uacute;mero <i><b>n</b></i> (atributo opcional). Normalmente son OID. Los elementos de la lista no pueden contener el car&aacute;cter '|' (ya que este se usa como separador).</li>
   </ul>
+  <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
+  	<ul>
+  	<li><code>true</code>:	Se permite la cofirma/contrafirma de firmas de archivo longevo, a pesar de que estas no serán v&aacute;lidas posteriormente. </li>
+  	<li><code>false</code> (U otro valor):	No se permite la cofirma/contrafirma de firmas de archivo longevo.</li>
+	</ul>
   </ul>
 
 

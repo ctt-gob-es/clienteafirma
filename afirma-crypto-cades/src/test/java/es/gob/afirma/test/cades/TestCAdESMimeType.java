@@ -193,7 +193,7 @@ public class TestCAdESMimeType {
 	 * Comprueba que una firma CAdES en la que se indica que se incluya el
 	 * MimeType y no se indica ni el MimeType ni el OID de los datos ni se
 	 * puede determinar el tipo a trav&eacute;s de los propios datos,
-	 * incluye el MimeType gen&eeacute;rico.
+	 * incluye el MimeType gen&eacute;rico.
 	 * @throws Exception Cuando ocurre un error en la firma.
 	 */
 	@Test

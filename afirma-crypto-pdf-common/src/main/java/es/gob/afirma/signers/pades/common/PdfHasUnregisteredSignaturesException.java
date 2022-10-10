@@ -23,8 +23,11 @@ public final class PdfHasUnregisteredSignaturesException extends RuntimeConfigNe
 
 	public static final String REQUESTOR_MSG_CODE = "signingPdfWithUnregisteredSigns"; //$NON-NLS-1$
 
-	/** Crea una excepci&oacute;n que indica que el PDF no ha podido firmarse por contener firmas previas
-	 * no registradas en campos (<i>AcroFields</i>). */
+	/**
+	 * Crea una excepci&oacute;n que indica que el PDF no ha podido firmarse por contener firmas previas
+	 * no registradas en campos (<i>AcroFields</i>).
+	 * @param msg Mensaje de error.
+	 */
 	public PdfHasUnregisteredSignaturesException(final String msg) {
 		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES);
 	}
