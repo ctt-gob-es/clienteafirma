@@ -1,5 +1,6 @@
 package es.gob.afirma.cert.signvalidation;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.junit.Test;
@@ -26,6 +27,19 @@ public class TestSignatureValidation {
 	public void testCadesImplicitValidation() throws Exception {
 		try (
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_IMPLICIT_FILE);
+		) {
+			final byte[] cades = AOUtil.getDataFromInputStream(is);
+			System.out.println(new ValidateBinarySignature().validate(cades));
+		}
+	}
+
+	/** Prueba de validaci&oacute;n de firma CAdES LTA-Level.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testCadesLTAValidation() throws Exception {
+		try (
+			final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\salida/cades-lta-cosign.csig");
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
 			System.out.println(new ValidateBinarySignature().validate(cades));

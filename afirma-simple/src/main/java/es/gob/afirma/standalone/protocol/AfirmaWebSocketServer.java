@@ -39,6 +39,8 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	/**
 	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
+	 * @param sessionId Identificador con el que se deber&aacute; autenticar la web
+	 * para usar el servicio.
 	 */
 	public AfirmaWebSocketServer(final int port, final String sessionId) {
 		super(new InetSocketAddress(port));

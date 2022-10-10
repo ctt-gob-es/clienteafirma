@@ -91,8 +91,10 @@ public final class TestOOXML {
     	}
     }
 
-    /** Prueba de firma convencional.
-     * @throws IOException */
+    /**
+     * Prueba a extraer la estructura de firma.
+     * @throws IOException Cuando falla la extracci&oacute;n.
+     */
     @SuppressWarnings("static-method")
 	@Test
     public void testGetSignersStructure() throws IOException {

@@ -33,7 +33,7 @@ public abstract class SignValider {
 	/**
 	 * Devuelve si la validacion ser&aacute; relajada. Esta se utiliza cuando
 	 * se admiten problemas en la firma de cara a una operaci&oacute;n posterior.
-	 * @param relaxed {@code true} para habilitar el modo relajado, {@code false}
+	 * @return {@code true} para habilitar el modo relajado, {@code false}
 	 * en caso contrario.
 	 */
 	public boolean isRelaxed() {

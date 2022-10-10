@@ -37,6 +37,7 @@ import com.aowagie.text.pdf.PdfStamper;
 import com.aowagie.text.pdf.PdfString;
 import com.aowagie.text.pdf.PdfWriter;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfIsCertifiedException;
@@ -173,14 +174,25 @@ public final class PdfUtil {
 		return pdfReader;
 	}
 
-	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException {
+	/**
+	 * Comprueba si un PDF esta certificados y se pueden agregar firmas a &eacute;l.
+	 * @param pdfCertificationLevel Nivel de certificaci&oacute;n.
+	 * @param extraParams Configuraci&oacute;n establecida para la operaci&oacute;n.
+	 * @throws PdfIsCertifiedException Cuando el PDF esta certificado y se requiere
+	 * autorizaci&oacute;n del usuario para firmarlo.
+	 * @throws AOException Cuando el PDF est&aacute; certificado y no se permite su firma.
+	 */
+	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException, AOException {
 
 		// Si el PDF esta certificado, se comprobara si se ha indicado expresamente que se permite
 		// multifirmar este tipo de documentos. Si no se permite, se lanza una excepcion
 		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED) {
 			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
-			if (!Boolean.parseBoolean(allow)) {
+			if (allow == null || allow.trim().isEmpty()) {
 				throw new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
+			}
+			if (!Boolean.parseBoolean(allow)) {
+				throw new AOException("El PDF esta certificado y se configuro que no se admitia su firma"); //$NON-NLS-1$
 			}
 		}
 	}

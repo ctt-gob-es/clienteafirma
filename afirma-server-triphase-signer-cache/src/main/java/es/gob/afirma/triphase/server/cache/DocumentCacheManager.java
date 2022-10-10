@@ -17,7 +17,7 @@ import java.io.IOException;
 public interface DocumentCacheManager {
 
 	/**
-	 * Obtiene un documento de cach&eacute en base a su identificador y lo elimina.
+	 * Obtiene un documento de cach&eacute; en base a su identificador y lo elimina.
 	 * @param id Identificador del documento.
 	 * @return Array con los datos del archivo cacheado o {@code null} si no se encontr&oacute;.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n.
@@ -25,7 +25,7 @@ public interface DocumentCacheManager {
 	byte[] getDocumentFromCache(String id) throws IOException;
 
 	/**
-	 * Almacena un documento en cach&eacute.
+	 * Almacena un documento en cach&eacute;.
 	 * @param data Datos a guardar.
 	 * @return Identificador con el que referenciar al documento guardado.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado.
@@ -33,7 +33,7 @@ public interface DocumentCacheManager {
 	String storeDocumentToCache(byte[] data) throws IOException;
 
 	/**
-	 * Permite la limpieza de cach&eacute.
+	 * Permite la limpieza de cach&eacute;.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema en el borrado de archivos.
 	 */
 	void cleanCache() throws IOException;

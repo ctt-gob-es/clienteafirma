@@ -327,9 +327,17 @@ public final class PdfSessionManager {
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
-		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader)
-			&& !Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
-			throw new PdfHasUnregisteredSignaturesException("El PDF contiene firmas sin registrar"); //$NON-NLS-1$
+		// Definimos el comportamiento cuando se encuentran firmas no registradas
+		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader)) {
+			final String allowUnregisteredSignatureValue = extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES);
+			// Si no se especifica el comportamiento, informamos de que se requiere autorizacion para completar la operacion
+			if (allowUnregisteredSignatureValue == null || allowUnregisteredSignatureValue.trim().isEmpty()) {
+				throw new PdfHasUnregisteredSignaturesException("El PDF contiene firmas sin registrar"); //$NON-NLS-1$
+			}
+			// Si se ha indicado expresamente que no se permite, lanzamos un error; y si esta permitido, se continua con el proceso
+			if (!Boolean.parseBoolean(allowUnregisteredSignatureValue)) {
+				throw new AOException("El PDF contiene firmas sin registrar y estas no estan permitidas"); //$NON-NLS-1$
+			}
 		}
 
 		// Los derechos van firmados por Adobe, y como desde iText se invalidan

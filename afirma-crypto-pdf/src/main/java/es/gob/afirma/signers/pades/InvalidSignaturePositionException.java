@@ -15,8 +15,9 @@ public final class InvalidSignaturePositionException extends IllegalArgumentExce
 
 	private static final long serialVersionUID = -2415913095143368605L;
 
-	/** Crea una excepci&oacute;n que indica que la firma visible no se encuentra en el rango en ninguna de las p&aacute;ginas del documento a firmar
-	 * @param e Excepci&oacute;n de origen */
+	/** Crea la excepci&oacute;n indicando que la firma visible no se encuentra en el
+	 * rango en ninguna de las p&aacute;ginas del documento.
+	 * @param msg Mensaje de error. */
 	public InvalidSignaturePositionException(final String msg) {
 		super(msg);
 	}

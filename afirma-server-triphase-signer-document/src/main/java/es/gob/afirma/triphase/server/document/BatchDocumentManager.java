@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
-/** Interfaz para el uso de m&eacutetodos especificos en la firma de lotes */
+/** Interfaz para el uso de m&eacute;todos especificos en la firma de lotes */
 public interface BatchDocumentManager extends DocumentManager {
 
 	/**

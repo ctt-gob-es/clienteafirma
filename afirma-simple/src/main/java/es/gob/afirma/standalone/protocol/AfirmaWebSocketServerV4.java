@@ -40,6 +40,8 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 	/**
 	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
+	 * @param sessionId Identificador de sesi&oacute;n con la que deben autenticarse
+	 * las llamadas.
 	 */
 	public AfirmaWebSocketServerV4(final int port, final String sessionId) {
 		super(port, sessionId);

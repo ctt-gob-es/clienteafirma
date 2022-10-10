@@ -41,7 +41,7 @@ public class LocalBatchSigner {
 
 	/**
 	 * Metodo encargado de firmar todas las firmas monof&aacute;sicas que conforman un lote.
-	 * @param urlParamsToSign Par&aacute;metros de las firmas.
+	 * @param batchConfig Configuraci&oacute;n del lote de firma.
 	 * @param pke Clave privada usada por el certificado.
 	 * @return Resultado del proceso.
 	 */

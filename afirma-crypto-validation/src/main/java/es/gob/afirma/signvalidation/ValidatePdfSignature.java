@@ -49,8 +49,9 @@ public final class ValidatePdfSignature extends SignValider {
 	 * s&oacute;lo se validar&aacute; el periodo de caducidad.
      * @param sign PDF firmado.
      * @return Validez de la firma.
-     * @throws ConfirmationNeededException Cuando en la validaci&oacute;n laxa se puede considerar que podr&iacute;a
-     * operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del usuario.
+     * @throws RuntimeConfigNeededException Cuando en la validaci&oacute;n laxa se puede considerar
+     * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
+     * usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento, si no se
      * encuentran firmas PDF en el documento o si se requiere m&aacute;s informacion para la validaci&oacute;n.
      */
@@ -65,8 +66,9 @@ public final class ValidatePdfSignature extends SignValider {
      * @param sign PDF firmado.
      * @param checkCertificates Indica si debe comprobarse la caducidad de los certificados de firma.
      * @return Validez de la firma.
-     * @throws ConfirmationNeededException Cuando en la validaci&oacute;n laxa se puede considerar que podr&iacute;a
-     * operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del usuario.
+     * @throws RuntimeConfigNeededException Cuando en la validaci&oacute;n laxa se puede considerar
+     * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
+     * usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento, si no se
      * encuentran firmas PDF en el documento o si se requiere m&aacute;s informacion para la validaci&oacute;n.
      */
@@ -86,8 +88,9 @@ public final class ValidatePdfSignature extends SignValider {
      * @param sign PDF firmado.
      * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
      * @return Validez de la firma.
-     * @throws ConfirmationNeededException Cuando en la validaci&oacute;n laxa se puede considerar que podr&iacute;a
-     * operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del usuario.
+     * @throws RuntimeConfigNeededException Cuando en la validaci&oacute;n laxa se puede considerar
+     * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
+     * usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
 	@Override

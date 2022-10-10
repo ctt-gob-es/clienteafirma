@@ -263,7 +263,7 @@ public final class DataAnalizerUtil {
 	 * Indica si el documento ha recibido un posible PDF Shadow Attack.
 	 * @param actualdata Datos del documento actual.
 	 * @param lastReviewData Flujo de datos de la &uacute;ltima revisi&oacute;n firmada.
-	 * @param pagesToCheck P&aacuteginas a comprobar.
+	 * @param pagesToCheck P&aacute;ginas a comprobar.
 	 * @return Validez o no de los datos en el documento.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
 	 * la generaci&oacute;n de las im&aacute;genes.
