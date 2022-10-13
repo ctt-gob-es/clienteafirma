@@ -43,3 +43,24 @@ Con esto, se podrán construir los artefactos:
 Para el despliegue de los distintos módulos en un repositorio de artefactos, además de la construcción de los los propios artefactos, es necesario aportar el código fuente de la aplicación, su JavaDoc y firmar los distintos artefactos. Para evitar generar estos recursos y realizar la firma de los artefactos para la operativa ordinaria de compilación y empaquetado se ha creado un perfil `env=deploy` para que se utilice sólo cuando se va a proceder al despliegue de los artefactos en un repositorio. Se puede hacer eso mediante el comando:
 
 `mvn clean deploy -Denv=deploy`
+
+## Instalación mediante paquetes
+
+### Fedora
+
+> Instrucciones basadas en Fedora 36 Workstation y AutoFirma 1.7.1
+
+Para instalar el paquete en Fedora es necesario tener la versión 11 de Java
+instalada y correctamente configurada:
+
+```
+sudo dnf install java-11-openjdk
+sudo update-alternatives --config java
+```
+
+La instalación del paquete se puede hacer mediante la aplicación Software o por
+línea de comandos:
+
+```
+sudo dnf install ./autofirma-1.7.1-1.noarch_FEDORA.rpm
+```
