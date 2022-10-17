@@ -236,7 +236,6 @@
 			
 			<modules>
 				<!-- Aplicaciones -->
-				<module>afirma-ui-miniapplet</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
 				
