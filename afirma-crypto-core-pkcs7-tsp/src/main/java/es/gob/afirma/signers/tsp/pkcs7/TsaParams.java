@@ -51,9 +51,9 @@ public final class TsaParams {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
-	 * @param requireCert Indicar <code>true</code>Si es necesario incluir el certificado de la TSA,
+	 * @param requireCert Indicar <code>true</code> si es necesario incluir el certificado de la TSA,
 	 *                    <code>false</code> en caso contrario.
-	 * @param policy OID de la pol6iacute;tica de sellado de tiempo.
+	 * @param policy OID de la pol&iacute;tica de sellado de tiempo.
 	 * @param url URL de la TSA.
 	 * @param usr Nombre de usuario para la TSA.
 	 * @param pwd Contrase&ntilde;a para el usuario de la TSA.
@@ -64,10 +64,10 @@ public final class TsaParams {
 	 * @param sslKeyStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
 	 *                            cliente para las conexiones HTTPS.
 	 * @param sslKeyStoreType Tipo de almac&eacute;n que contiene el certificado SSL cliente.
-	 * @param sslTrustStore Almac&eacute;n que contiene los certificados SSL cliente que pedir&aacute; la TSA al
-	 *                      establecer la conexi&oacute;n HTTPS.
-	 * @param sslTrustStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
-	 *                              cliente para las conexiones HTTPS.
+	 * @param sslTrustStore Almac&eacute;n con los certificados de CA reconocidas para la la conexi&oacute;n con
+	 * 						el servicio de TSA.
+	 * @param sslTrustStorePassword Contrase&ntilde;a del almac&eacute;n con los certificados de CA reconocidas
+	 * 								para la la conexi&oacute;n con el servicio de TSA.
 	 * @param sslTrustStoreType Tipo de almac&eacute;n que contiene los certificado de CA reconocidas.
 	 * @param verifyHostname Verifica el nombre de dominio contra los certificados SSL. */
 	public TsaParams(final boolean requireCert,

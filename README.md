@@ -42,7 +42,11 @@ Para el despliegue de los distintos módulos en un repositorio de artefactos, ad
 
 ## Módulos del proyecto
 
-El proyecto está formado por múltiples módulos, algunos de los cuales se utilizan en varias de las aplicaciones del Cliente @firma. Otros son los módulos de las propias aplicaciones o con recursos necesarios para su construcción o su uso. A continuación, se muestra un listado de los distintos módulos actualmente en uso en el proyecto:
+El proyecto está formado por múltiples módulos, algunos de los cuales se utilizan en varias de las aplicaciones del Cliente @firma. Otros son los módulos de las propias aplicaciones o con recursos necesarios para su construcción o su uso.
+
+### Módulos vigentes
+
+A continuación, se muestra un listado de los distintos módulos actualmente en uso en el proyecto:
 
 * `afirma-core`: Módulo con los componentes principales del proyecto.
 * `afirma-core-keystores`: Módulo con las clases de gestión de almacenes de claves de usuario.
@@ -82,6 +86,8 @@ El proyecto está formado por múltiples módulos, algunos de los cuales se util
 * `afirma-ui-miniapplet-deploy`: Módulo principal para el desarrollo de AutoScript.
 * `afirma-ui-simple-configurator`: Módulo principal de la aplicación de configuración ejecutada durante la instalación de AutoFirma.
 
+### Módulos sin mantenimiento
+
 La lista de módulos obsoletos y/o sin soporte que se conservan en el repositorio son los siguientes:
 
 * `afirma-crypto-cipher`: __Obsoleto.__ Módulo con las clases para el cifrado sincrono y asíncrono de datos usado en el antiguo Applet de @firma y StandAlone.
@@ -103,4 +109,4 @@ La lista de módulos obsoletos y/o sin soporte que se conservan en el repositori
 * `afirma-ui-simple-webstart`: __Obsoleto.__ Módulo principal del antiguo empaquetado de AutoFirma como aplicación WebStart,
 * `afirma-windows-store`: __Obsoleto.__ Módulo principal del antiguo cliente de firma para Windows 8.
 
-No se ofrece ningún tipo de mantenimiento ni soporte sobre los módulos marcados como __Sin soporte__ u __Obsoleto__.
+No se ofrece ningún tipo de mantenimiento ni soporte sobre estos módulos.
