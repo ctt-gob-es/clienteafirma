@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.JDialog;
-
 /** Gestor de componentes de interfaz gr&aacute;fico
  * @version 0.4 */
 public interface AOUIManager {
@@ -69,13 +67,13 @@ public interface AOUIManager {
     Object showInputDialog(Object parentComponent, Object message, String title, int messageType, Object icon, Object[] selectionValues, Object initialSelectionValue);
 
     /** Di&aacute;logo de selecci&oacute;n de certificados.
-     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param parentComponent Componente padre. Se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing.
      * @param dialogManager Manejador del di&aacute;logo gr&aacute;fico.
      * @return Alias del certificado seleccionado. */
     String showCertificateSelectionDialog(Object parentComponent, KeyStoreDialogManager dialogManager);
 
     /** JOptionPane.showConfirmDialog().
-     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param parentComponent Componente padre. Se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing.
      * @param message Mensaje
      * @param title Titulo del cuadro de di&aacute;logo
      * @param optionType Tipo de opciones a confirmar
@@ -84,14 +82,14 @@ public interface AOUIManager {
     int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType);
 
     /** JOptionPane.showMessageDialog().
-     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param parentComponent Componente padre. Se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing.
      * @param message Mensaje
      * @param title Titulo del cuadro de di&aacute;logo
      * @param messageType Tipo de mensaje */
     void showMessageDialog(Object parentComponent, Object message, String title, int messageType);
 
     /** JOptionPane.showMessageDialog().
-     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param parentComponent Componente padre. Se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing.
      * @param message Mensaje
      * @param title Titulo del cuadro de di&aacute;logo
      * @param messageType Tipo de mensaje
@@ -105,16 +103,13 @@ public interface AOUIManager {
      * @param t Informaci&oacute;n sobre el error */
     void showErrorMessage(final Object message, final String title, final int messageType, Throwable t);
 
-    /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
-     * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
-     * cerrar. El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
-     * <code>JOptionPane</code>.
-     * @param dialog Componente padre para la modalidad.
+    /** Muestra un di&aacute;logo de error de forma modal.
+     * @param parentComponent Componente padre para la modalidad.
      * @param message Mensaje de error.
      * @param title Titulo de la ventana de error.
      * @param messageType Tipo de mensaje.
      * @param t Informaci&oacute;n sobre el error */
-	void showErrorMessage(JDialog dialog, Object message, String title, int messageType, Throwable t);
+	void showErrorMessage(Object parentComponent, Object message, String title, int messageType, Throwable t);
 
     /** Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
      * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE */

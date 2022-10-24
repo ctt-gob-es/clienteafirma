@@ -11,6 +11,7 @@ package es.gob.afirma.ui.core.jse;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -871,11 +872,30 @@ public class JSEUIManager implements AOUIManager {
 		ErrorManagementDialog.show(errorFrame, true, message, title, messageType, t);
     }
 
-	@Override
-    public void showErrorMessage(final JDialog dialog, final Object message, final String title, final int messageType, final Throwable t) {
 
-		ErrorManagementDialog.show(dialog, true, message, title, messageType, t);
-    }
+    /**
+     * Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con
+     * <code>JOptionPane</code> en que, siguiendo la gu&iacute;a de estilo de interfaces de
+     * Microsoft, el bot&oacute;n no es "OK", sino cerrar. El comportamiento por lo dem&aacute;s es
+     * igual, incluyendo los par&aacute;metros, a <code>JOptionPane</code>
+	 * @param parentComponent Componente padre sobre el que mostrar el di&aacute;logo. Puede ser de
+	 * tipo Frame o JDialog. Si no, se ignorar&aacute;.
+     * @param message Mensaje de error.
+     * @param title Titulo de la ventana de error.
+     * @param messageType Tipo de mensaje.
+     * @param t Informaci&oacute;n sobre el error.
+     */
+	@Override
+    public void showErrorMessage(final Object parentComponent, final Object message, final String title, final int messageType, final Throwable t) {
+
+		if (parentComponent instanceof JDialog) {
+			ErrorManagementDialog.show((JDialog) parentComponent, true, message, title, messageType, t);
+		} else if (parentComponent instanceof Frame) {
+			ErrorManagementDialog.show((Frame) parentComponent, true, message, title, messageType, t);
+		} else {
+			ErrorManagementDialog.show((Frame) null, true, message, title, messageType, t);
+		}
+	}
 
 	/** Di&aacute;logo a medida que permite el control de las extensiones
 	 * de fichero al cambiar de filtro.
