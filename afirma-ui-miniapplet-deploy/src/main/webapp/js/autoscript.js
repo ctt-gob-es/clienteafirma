@@ -3252,7 +3252,7 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:"true"}; } 
+				params[i++] = {key:"needcert", value:"true"}; 
 				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
 
 				var url = buildUrl(opId, params);
@@ -3306,9 +3306,9 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:true}; } // Espera activa
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"needcert", value:true}; } 
 				if (localBatchProcess) {								params[i++] = {key:"localBatchProcess", value:true}; }
 				
+				params[i++] = {key:"needcert", value:true};
 				params[i++] = {key:"jsonbatch", value:true}; 
 				params[i++] = {key:"dat", value:jsonRequestB64}; 
 				 
