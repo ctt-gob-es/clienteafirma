@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -121,16 +120,19 @@ final class SignDataPanel extends JPanel {
         final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
 
         final JPanel filePathPanel = new JPanel();
+        filePathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.2") + filePath.getText()); //$NON-NLS-1$
         filePathPanel.setFocusable(true);
         filePathPanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
-        filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
-        filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        filePathPanel.setLayout(new GridBagLayout());
+
+        final GridBagConstraints fpc = new GridBagConstraints();
+        fpc.fill = GridBagConstraints.HORIZONTAL;
+        fpc.insets = new Insets(5,  5,  5,  5);
 
         boolean isOpennable = false;
 
         if (fileTypeIcon != null) {
-            filePathPanel.add(fileTypeIcon);
+            filePathPanel.add(fileTypeIcon, fpc);
         }
         else {
             final String fileIcon;
@@ -163,7 +165,7 @@ final class SignDataPanel extends JPanel {
             final JLabel iconLabel = new JLabel(new ImageIcon(fileIconImage));
             iconLabel.setToolTipText(fileTooltip);
             iconLabel.setFocusable(false);
-            filePathPanel.add(iconLabel);
+            filePathPanel.add(iconLabel, fpc);
         }
 
         // Boton de apertura del fichero firmado
@@ -193,15 +195,13 @@ final class SignDataPanel extends JPanel {
 			});
         }
 
+        fpc.weightx = 1.0;
+        filePathPanel.add(filePath, fpc);
 
-        filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        filePathPanel.add(filePath);
-        filePathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.2") + filePath.getText()); //$NON-NLS-1$
-        filePathPanel.add(Box.createHorizontalGlue());
-        filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         if (openFileButton != null) {
-            filePathPanel.add(openFileButton);
-            filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        	fpc.weightx = 0.0;
+        	fpc.ipady = 4;
+            filePathPanel.add(openFileButton, fpc);
         }
 
         JPanel certDescPanel = null;
