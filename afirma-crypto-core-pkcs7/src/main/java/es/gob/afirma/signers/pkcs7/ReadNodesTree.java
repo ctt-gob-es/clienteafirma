@@ -236,13 +236,16 @@ public final class ReadNodesTree {
 
     private static boolean isValideAttributeType(final ASN1ObjectIdentifier attributeType) {
     	return  !attributeType.equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken) &&
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_archiveTimestamp) &&
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) &&
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_revocationRefs) &&
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_revocationValues) &&
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_certificateRefs) &&
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_certValues) &&
     			//id_aa_ets_archiveTimestampV2
-    			!attributeType.equals(PKCSObjectIdentifiers.id_aa.branch("48"));  //$NON-NLS-1$
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa.branch("48")) && //$NON-NLS-1$
+    			//id_aa_ets_archiveTimestampV3
+				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.4"));  //$NON-NLS-1$
     }
 
     /** Lee los nodos pertenecientes a un firmante.
