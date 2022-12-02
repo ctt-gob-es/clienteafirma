@@ -80,7 +80,7 @@ public class LocalBatchSigner {
 
 
 
-		return LocalDataParser.buildBatchResultJson(results);
+		return JSONBatchManager.buildBatchResultJson(results);
 	}
 
 	private static byte[] processSign(final SingleSignOperation singleConfig, final PrivateKeyEntry pke) throws SocketOperationException {

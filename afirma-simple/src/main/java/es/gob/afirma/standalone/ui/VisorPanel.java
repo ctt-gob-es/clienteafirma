@@ -298,7 +298,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
         	}
         	catch (final RuntimeConfigNeededException e) {
         		// No ocurrira nunca por no estar configurada la validacion laxa
-				throw new IOException("Error en la validacion de la firma", e);
+				throw new IOException("Error en la validacion de la firma", e); //$NON-NLS-1$
 			}
         }
         else if(DataAnalizerUtil.isSignedODF(sign)) {

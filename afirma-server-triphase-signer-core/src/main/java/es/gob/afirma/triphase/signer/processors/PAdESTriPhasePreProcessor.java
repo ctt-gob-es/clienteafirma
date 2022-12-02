@@ -89,7 +89,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final GregorianCalendar signTime = new GregorianCalendar();
 
 		// Primera fase (servidor)
-		LOGGER.info("Se invocan las funciones internas de prefirma PAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se invocan las funciones internas de prefirma PAdES"); //$NON-NLS-1$
 		final PdfSignResult preSignature;
 		try {
 			preSignature = PAdESTriPhaseSigner.preSign(
@@ -106,7 +106,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw e;
 		}
 
-		LOGGER.info("Se prepara la respuesta de la prefirma PAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se prepara la respuesta de la prefirma PAdES"); //$NON-NLS-1$
 
 		final TriphaseData triphaseData = new TriphaseData();
 
@@ -186,7 +186,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			extraParams
 		);
 
-		LOGGER.info("Se invocan las funciones internas de postfirma PAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se invocan las funciones internas de postfirma PAdES"); //$NON-NLS-1$
 		final byte[] postsign = PAdESTriPhaseSigner.postSign(
 			signatureAlgorithm,
 			docBytes,

@@ -80,7 +80,7 @@ public abstract class UrlParameters {
 	private String fileId = null;
 	private byte[] desKey = null;
 	private URL retrieveServletUrl = null;
-	private URL storageServer = null;
+	private URL storageServerUrl = null;
 	private String id = null;
 	private String minimumClientVersion = null;
 	private boolean activeWaiting = false;
@@ -197,11 +197,11 @@ public abstract class UrlParameters {
 	/** Obtiene la URL del servlet de almacenamiento temporal en servidor.
 	 * @return URL del servlet de almacenamiento temporal en servidor */
 	public URL getStorageServletUrl() {
-		return this.storageServer;
+		return this.storageServerUrl;
 	}
 
 	protected void setStorageServletUrl(final URL url) {
-		this.storageServer = url;
+		this.storageServerUrl = url;
 	}
 
 	/** Obtiene el indicador de si se ha solicitado que se realice una espera activa

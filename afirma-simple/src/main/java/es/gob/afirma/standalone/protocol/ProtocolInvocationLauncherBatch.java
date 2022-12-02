@@ -197,7 +197,7 @@ final class ProtocolInvocationLauncherBatch {
 			if (options.isJsonBatch()) {
 				if(options.isLocalBatchProcess()) {
 					final BatchSignOperation batchConfig =
-							LocalDataParser.parseBatchConfig(options.getData());
+							JSONBatchManager.parseBatchConfig(options.getData());
 					batchResult = LocalBatchSigner.signLocalBatch(batchConfig, pke);
 				} else {
 					batchResult = BatchSigner.signJSON(

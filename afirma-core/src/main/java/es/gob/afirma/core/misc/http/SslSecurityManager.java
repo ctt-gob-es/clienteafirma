@@ -85,7 +85,7 @@ public final class SslSecurityManager {
 	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
-		LOGGER.info(
+		LOGGER.fine(
 			"Habilitadas comprobaciones SSL" //$NON-NLS-1$
 		);
 	}

@@ -291,6 +291,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                                 AOException,
 			                                                                 IOException {
+
+		LOGGER.info("Postfirma XAdES - Firma - INICIO"); //$NON-NLS-1$
+
 		// Con FacturaE solo podemos firmar facturas
 		if (this.facturae && !new AOFacturaESigner().isValidDataFile(data)) {
 			throw new AOInvalidFormatException(
@@ -301,7 +304,11 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Si es FacturaE modificamos los parametros adicionales
 		final Properties xParams = this.facturae ? AOFacturaESigner.getFacturaEExtraParams(extraParams) : extraParams;
 
-		return preProcessPost(data, algorithm, cert, xParams, Op.SIGN, triphaseData);
+		final byte[] postsign = preProcessPost(data, algorithm, cert, xParams, Op.SIGN, triphaseData);
+
+		LOGGER.info("Postfirma XAdES - Firma - FIN"); //$NON-NLS-1$
+
+		return postsign;
 	}
 
 	@Override
@@ -313,7 +320,13 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                        AOException,
 			                                                        IOException {
 
-		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, TriphaseData.parser(session));
+		LOGGER.info("Postfirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
+
+		final byte[] postsign = preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, TriphaseData.parser(session));
+
+		LOGGER.info("Postfirma XAdES - Cofirma - FIN"); //$NON-NLS-1$
+
+		return postsign;
 	}
 
 	@Override
@@ -325,7 +338,13 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                   AOException,
 			                                                                   IOException {
 
-		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, triphaseData);
+		LOGGER.info("Postfirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
+
+		final byte[] postsign = preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, triphaseData);
+
+		LOGGER.info("Postfirma XAdES - Cofirma - FIN"); //$NON-NLS-1$
+
+		return postsign;
 	}
 
 	@Override
@@ -338,9 +357,15 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                        AOException,
 			                                                                        IOException {
 
+		LOGGER.info("Postfirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
+
 		extraParams.setProperty(EXTRAPARAM_NAME_TARGET, targets.name());
 
-		return preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, TriphaseData.parser(session));
+		final byte[] postsign = preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, TriphaseData.parser(session));
+
+		LOGGER.info("Postfirma XAdES - Contrafirma - FIN"); //$NON-NLS-1$
+
+		return postsign;
 	}
 
 	@Override
@@ -353,9 +378,15 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                        AOException,
 			                                                                        IOException {
 
+		LOGGER.info("Postfirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
+
 		extraParams.setProperty(EXTRAPARAM_NAME_TARGET, targets.name());
 
-		return preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, triphaseData);
+		final byte[] postsign = preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, triphaseData);
+
+		LOGGER.info("Postfirma XAdES - Contrafirma - FIN"); //$NON-NLS-1$
+
+		return postsign;
 	}
 
 	private static byte[] preProcessPost(final byte[] data,

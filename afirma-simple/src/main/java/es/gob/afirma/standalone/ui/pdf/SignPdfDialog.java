@@ -99,7 +99,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 		this.scrollPanel = new JScrollPane();
 		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		add(this.scrollPanel);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {

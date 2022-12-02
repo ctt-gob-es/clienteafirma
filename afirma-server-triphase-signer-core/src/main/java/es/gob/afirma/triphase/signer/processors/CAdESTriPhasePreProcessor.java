@@ -78,13 +78,13 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final CAdESParameters parameters = CAdESParameters.load(data, algorithm, extraParams);
 
-		LOGGER.info("Se invocan las funciones internas de prefirma CAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se invocan las funciones internas de prefirma CAdES"); //$NON-NLS-1$
 		final byte[] presign = CAdESTriPhaseSigner.preSign(
 				certChain,
 				new Date(),
 				parameters);
 
-		LOGGER.info("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
 
 		// Generamos el mensaje para la configuracion de la operacion
 		final TriphaseData triphaseData = new TriphaseData();
@@ -162,7 +162,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 
-		LOGGER.info("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
 
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
 			signatureAlgorithm,
@@ -235,7 +235,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			parameters.setDataDigest(messageDigest);
 		}
 
-		LOGGER.info("Se invocan las funciones internas de pre-cofirma CAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se invocan las funciones internas de pre-cofirma CAdES"); //$NON-NLS-1$
 		final byte[] presign;
 		try {
 			presign = AOCAdESTriPhaseCoSigner.preCoSign(
@@ -252,7 +252,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new AOException("Error de algoritmo no soportado en la pre-cofirma CAdES: " + e, e); //$NON-NLS-1$
 		}
 
-		LOGGER.info("Se prepara la respuesta de la pre-cofirma CAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se prepara la respuesta de la pre-cofirma CAdES"); //$NON-NLS-1$
 
 		// Ahora pasamos al cliente los datos de la prefirma
 		final String presignB64 = Base64.encode(presign).replace("\n", "").replace("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -326,7 +326,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final byte[] presign = Base64.decode(config.getProperty(PROPERTY_NAME_PRESIGN));
 		config.deleteProperty(PROPERTY_NAME_PRESIGN);
 
-		LOGGER.info("Se invocan las funciones internas de post-cofirma CAdES"); //$NON-NLS-1$
+		LOGGER.fine("Se invocan las funciones internas de post-cofirma CAdES"); //$NON-NLS-1$
 		final byte[] coSignature;
 		try {
 			coSignature = AOCAdESTriPhaseCoSigner.postCoSign(
@@ -389,7 +389,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
         	}
         }
 
-		return AOCAdESTriPhaseCounterSigner.preCountersign(
+		final TriphaseData triphaseData = AOCAdESTriPhaseCounterSigner.preCountersign(
 				sign,
 				algorithm,
 				targetType,
@@ -398,6 +398,10 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				extraParams,
 				new Date()
 			);
+
+		LOGGER.info("Prefirma CAdES - Contrafirma - FIN"); //$NON-NLS-1$
+
+		return triphaseData;
 	}
 
 	@Override
@@ -429,7 +433,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
-		return AOCAdESTriPhaseCounterSigner.postCountersign(
+		final byte[] counterSignature = AOCAdESTriPhaseCounterSigner.postCountersign(
 				sign,
 				algorithm,
 				targetType,
@@ -438,6 +442,10 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				extraParams,
 				triphaseData
 			);
+
+		LOGGER.info("Postfirma CAdES - Contrafirma - FIN"); //$NON-NLS-1$
+
+		return counterSignature;
 	}
 
     private static Properties getExtraParams(final Properties extraParams) {

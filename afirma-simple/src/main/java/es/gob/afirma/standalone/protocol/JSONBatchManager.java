@@ -22,7 +22,7 @@ import es.gob.afirma.standalone.protocol.SingleSignOperation.Operation;
  * Clase encargada de parsear datos de tipo JSON para la firma de lotes monof&aacute;sica.
  * @author Jose.Montero
  */
-public class LocalDataParser {
+public class JSONBatchManager {
 
 	/* Elementos de las peticiones */
 	private static final String ELEM_STOPONERROR = "stoponerror"; //$NON-NLS-1$
@@ -57,7 +57,7 @@ public class LocalDataParser {
 
 		BatchSignOperation config;
 		try {
-			config = LocalDataParser.parseBatchConfig(jsonObject);
+			config = JSONBatchManager.parseBatchConfig(jsonObject);
 		}
 		catch (final Exception e) {
 			throw new ParameterException("La declaracion del lote suministrada no es correcta", e); //$NON-NLS-1$

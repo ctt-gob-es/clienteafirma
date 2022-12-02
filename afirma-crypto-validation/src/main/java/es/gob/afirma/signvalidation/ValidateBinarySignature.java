@@ -55,7 +55,7 @@ public final class ValidateBinarySignature extends SignValider {
 
 	@Override
 	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException {
-		return validate(sign, null, true);
+		return validate(sign, null, checkCertificates);
 	}
 
 	@Override
