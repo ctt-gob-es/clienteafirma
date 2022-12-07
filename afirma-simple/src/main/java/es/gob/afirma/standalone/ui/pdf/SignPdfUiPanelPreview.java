@@ -108,7 +108,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int PREFERRED_WIDTH = 470;
-	private static final int PREFERRED_HEIGHT = 620;
+	private static final int PREFERRED_HEIGHT = 720;
 	private static final int VIEWLABEL_PREFERRED_WIDTH = 475;
 	private static final int VIEWLABEL_PREFERRED_HEIGHT = 140;
 	private static final int MAX_TEXT_SIZE = 50;
