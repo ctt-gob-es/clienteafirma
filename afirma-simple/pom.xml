@@ -23,17 +23,25 @@
 
 	<dependencies>
 	
-		<!--  Permite usar JPEG mal formados con PDFBox -->
+		<!-- Permite usar JPEG mal formados con PDFBox -->
 		<dependency>
 			<groupId>com.twelvemonkeys.imageio</groupId>
 			<artifactId>imageio-jpeg</artifactId>
 			<version>3.6</version>
 		</dependency>
-	    
+
+		<!-- Paquete para la recoleccion de estadisticas -->	    
 	    <dependency>
 			<groupId>com.dmurph</groupId>
   			<artifactId>JGoogleAnalyticsTracker</artifactId>
   			<version>1.2.0</version>
+		</dependency>
+		
+		<!-- API de impresion de logs para evitar -->
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-simple</artifactId>
+		    <version>1.6.1</version>
 		</dependency>
 
 		<dependency>

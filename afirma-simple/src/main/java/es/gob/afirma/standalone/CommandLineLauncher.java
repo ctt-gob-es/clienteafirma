@@ -103,6 +103,7 @@ final class CommandLineLauncher {
 		// Desactivamos el Logger de consola para que no interfiera con los comandos
 		deactivateConsoleLog("es.gob.afirma"); //$NON-NLS-1$
 		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
+		deactivateSlf4JLogs();
 
 		final Console console = System.console();
 		try (final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out)) {
@@ -309,6 +310,14 @@ final class CommandLineLauncher {
 	 * @param handlerName Nombre del manejador. */
 	private static void deactivateConsoleLog(final String handlerName) {
 		Logger.getLogger(handlerName).setLevel(Level.SEVERE);
+	}
+
+	/**
+	 * Desactiva el log por consola de SLF4J cuando utiliza la
+	 * implementaci&oacute;n simple.
+	 */
+	private static void deactivateSlf4JLogs() {
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "off"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** Mostramos el panel de validaci&oacute;n de certificados y firmas.
@@ -923,6 +932,7 @@ final class CommandLineLauncher {
 	private static void printMessage(final PrintWriter pw, final String message) {
 		if (pw != null && message != null) {
 			pw.write(message);
+			pw.write("\n"); //$NON-NLS-1$
 			pw.flush();
 		}
 	}
