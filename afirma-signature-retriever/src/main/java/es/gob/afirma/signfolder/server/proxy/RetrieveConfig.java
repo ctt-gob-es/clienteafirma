@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Configuraci&oacute;n para la gesti&oacute;n del almacenamiento temporal de ficheros en servidor. */
@@ -100,36 +99,40 @@ final class RetrieveConfig {
 			LOGGER.warning("Modo de depuracion activado, no se borraran los ficheros en servidor"); //$NON-NLS-1$
 		}
 
-		String defaultTmpDir;
-		try {
-			defaultTmpDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-				"El directorio temporal no ha podido determinarse por la variable de entorno 'java.io.tmpdir': " + e //$NON-NLS-1$
-			);
-			try {
-				defaultTmpDir = File.createTempFile("tmp", null).getParentFile().getAbsolutePath(); //$NON-NLS-1$
+		File tmpDir;
+		final String tmpDirName = config.getProperty(TMP_DIR_KEY);
+		if (tmpDirName != null && !tmpDirName.isEmpty()) {
+			tmpDir = new File(tmpDirName);
+			if (!tmpDir.isDirectory()) {
+				throw new IllegalStateException(
+					"El directorio temporal indicado en el fichero de propiedades no existe: " + config.getProperty(TMP_DIR_KEY) //$NON-NLS-1$
+				);
 			}
-			catch (final Exception e1) {
-				defaultTmpDir = null;
-				LOGGER.log(
-					Level.WARNING,
-					"No se ha podido cargar un directorio temporal por defecto, se debera configurar expresamente en el fichero de propiedades: " + e1, //$NON-NLS-1$
-					e1
+			if (!tmpDir.canRead() || !tmpDir.canWrite()) {
+				throw new IllegalStateException(
+					"No se tienen permisos sobre el directorio temporal: " + config.getProperty(TMP_DIR_KEY) //$NON-NLS-1$
 				);
 			}
 		}
-
-		final String filePath = getProperty(config, TMP_DIR_KEY, ""); //$NON-NLS-1$
-		File tmpDir = filePath != null ? new File(filePath.trim()) : null;
-		if (tmpDir == null || !tmpDir.isDirectory() || !tmpDir.canRead()) {
-			LOGGER.warning(
-				"El directorio temporal indicado en el fichero de propiedades (" + tmpDir + ") no existe, se usara el por defecto: " +  defaultTmpDir //$NON-NLS-1$ //$NON-NLS-2$
-			);
-			tmpDir = new File(defaultTmpDir);
-			if (!tmpDir.isDirectory() ||!tmpDir.canRead()) {
-				throw new IllegalStateException("No se ha podido definir un directorio temporal"); //$NON-NLS-1$
+		else {
+			LOGGER.info("No se ha indicado un direcctorio temporal, se usara el por defecto del sistema"); //$NON-NLS-1$
+			try {
+				tmpDir = new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+					"El directorio temporal no ha podido determinarse por la variable de entorno 'java.io.tmpdir': " + e //$NON-NLS-1$
+				);
+				try {
+					final File tmpFile = File.createTempFile("tmp", null); //$NON-NLS-1$
+					tmpDir = new File(tmpFile.getParentFile().getAbsolutePath());
+					tmpFile.deleteOnExit();
+				}
+				catch (final Exception e1) {
+					throw new IllegalStateException(
+						"No se ha podido determinar el directorio temporal por defecto", e1 //$NON-NLS-1$
+					);
+				}
 			}
 		}
 		TMP_DIR = tmpDir;
