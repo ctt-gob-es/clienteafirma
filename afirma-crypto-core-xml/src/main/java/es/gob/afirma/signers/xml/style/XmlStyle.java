@@ -48,7 +48,7 @@ public final class XmlStyle {
 		this.encoding = null;
 	}
 
-	/** Crea un estilo XML (XSL) a firmar.
+	/** Crea un estilo XML (XSL) a firmar. Descarga la hoja de estilo si se indica una referencia externa.
 	 * @param data XML en formato binario
 	 * @param headless Indica si deben omitirse las interacciones con el usuario mediante interfaz gr&aacute;fico
 	 * @throws IOException Cuando hay errores de entrada / salida
@@ -61,6 +61,24 @@ public final class XmlStyle {
 	                                                                  CannotDereferenceException,
 	                                                                  IsInnerlException,
 	                                                                  ReferenceIsNotXmlException {
+		this(data, headless, true);
+	}
+
+	/** Crea un estilo XML (XSL) a firmar.
+	 * @param data XML en formato binario
+	 * @param headless Indica si deben omitirse las interacciones con el usuario mediante interfaz gr&aacute;fico
+	 * @param allowExternal Indica si se deben descargar hojas de estilo remotas.
+	 * @throws IOException Cuando hay errores de entrada / salida
+	 * @throws CannotDereferenceException Si no se puede obtener el estilo referenciado
+	 * @throws IsInnerlException Si la referencia apunta a un elemento dentro del propio XML
+	 * @throws ReferenceIsNotXmlException Cuando el estilo referenciado no est&aacute; en formato XML
+	 * @throws javax.xml.transform.TransformerFactoryConfigurationError Cuando hay errores de configuraci&oacute; en la
+	 *                                                                  factor&iacute;a de transformaciones */
+	public XmlStyle(final byte[] data, final boolean headless, final boolean allowExternal)
+			throws IOException,
+					CannotDereferenceException,
+	                IsInnerlException,
+	                ReferenceIsNotXmlException {
 		final Properties p = getStyleSheetHeader(new String(data));
 		this.type = p.getProperty("type"); //$NON-NLS-1$
 		this.href = p.getProperty("href"); //$NON-NLS-1$
@@ -75,7 +93,8 @@ public final class XmlStyle {
 
 			final Document tmpDoc = dereferenceStyleSheet(
 				this.href,
-				headless
+				headless,
+				allowExternal
 			);
 
 			// Cuidado!! Solo rellenamos el Elemento DOM si no es HTTP o HTTPS,
@@ -155,15 +174,17 @@ public final class XmlStyle {
     }
 
     /** Dereferencia una hoja de estilo en forma de Documento DOM.
-     * @param id Identificador de la hoja de estilo
+     * @param id Identificador de la hoja de estilo.
      * @param headless <code>true</code> si <b>no</b> se desea que se pregunte al
-     *                 usuario para dereferenciar las hojas de estilo enlazadas con rutas locales
-     * @return Documento DOM con la hoja de estilo
-     * @throws CannotDereferenceException Si no se puede dereferenciar
-     * @throws IsInnerlException Si no se puede dereferenciar por ser una referencia local
+     *                 usuario para dereferenciar las hojas de estilo enlazadas con rutas locales.
+     * @param allowExternal {@code true} para indicar que se descarguen URL remotas, {@code false}
+     * 						en caso contrario.
+     * @return Documento DOM con la hoja de estilo.
+     * @throws CannotDereferenceException Si no se puede dereferenciar.
+     * @throws IsInnerlException Si no se puede dereferenciar por ser una referencia local.
      * @throws ReferenceIsNotXmlException Si el objeto dereferenciado no puede transformarse en un
-     *                                    Documento DOM */
-    private static Document dereferenceStyleSheet(final String id, final boolean headless) throws CannotDereferenceException,
+     *                                    Documento DOM. */
+    private static Document dereferenceStyleSheet(final String id, final boolean headless, final boolean allowExternal) throws CannotDereferenceException,
                                                                                                   IsInnerlException,
                                                                                                   ReferenceIsNotXmlException {
         if (id == null || id.isEmpty()) {
@@ -174,11 +195,22 @@ public final class XmlStyle {
 
         // Intentamos dereferenciar directamente, cosa que funciona con
         // http://, https:// y file://
+
         try {
-            final URI styleURI = AOUtil.createURI(id);
-            if (styleURI.getScheme().equals("file")) { //$NON-NLS-1$
+        	final URI styleURI = AOUtil.createURI(id);
+            if (styleURI.getScheme().equalsIgnoreCase("file")) { //$NON-NLS-1$
                 throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://"); //$NON-NLS-1$
             }
+
+        	if (!allowExternal) {
+        		if (styleURI.getScheme().equalsIgnoreCase("http") //$NON-NLS-1$
+        				|| styleURI.getScheme().equalsIgnoreCase("https") //$NON-NLS-1$
+        				|| styleURI.getScheme().equalsIgnoreCase("ftp") //$NON-NLS-1$
+        				|| styleURI.getScheme().equalsIgnoreCase("ftps")) { //$NON-NLS-1$
+                    throw new UnsupportedOperationException("No se acepta la dereferenciacion de direcciones remotas"); //$NON-NLS-1$
+                }
+        	}
+
             // AOUtil.loadFile() usa internamente un ByteArrayInputStream, pero externamente es mejor
             // usar siempre try-with-resources para no depender de esta implementacion concreta
             try (final InputStream is = AOUtil.loadFile(styleURI)) {

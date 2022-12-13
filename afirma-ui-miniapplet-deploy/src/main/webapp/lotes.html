@@ -199,10 +199,12 @@
 	function showResultCallback(jsonBatch, certificateB64) {
 		showLog("Firma OK");
 		document.getElementById('result').value = JSON.stringify(jsonBatch);
+		document.getElementById("cert").innerText = certificateB64;
 	}
 
 	function showLogCallback(errorType, errorMessage) {
 		showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+		document.getElementById("cert").innerText = "";
 	}
 
 	function showLog(newLog) {
@@ -249,6 +251,12 @@
 	<div>
 		<span>Resultado</span> <br>
 		<textarea id="result" cols="150" rows="10">
+		 </textarea>
+	</div>
+	
+		<div>
+		<span>Certificado</span> <br>
+		<textarea id="cert" cols="150" rows="10">
 		 </textarea>
 	</div>
 </body>

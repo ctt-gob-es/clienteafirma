@@ -48,9 +48,11 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException, IOException {
 
+        final Properties extraParams = getExtraParams(xParams);
+
 		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
 		// incluso en ese caso
-		final String allowSignLts = xParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
+		final String allowSignLts = extraParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
 		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
 			try {
 				CAdESMultiUtil.checkUnsupportedAttributes(sign);
@@ -65,8 +67,6 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 				throw e;
 			}
 		}
-
-        final Properties extraParams = getExtraParams(xParams);
 
         // Purgamos e informamos de las compatibilidades de la configuracion establecida
         noticeIncompatibleConfig(algorithm, extraParams);

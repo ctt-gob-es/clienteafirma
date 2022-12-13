@@ -404,7 +404,7 @@ public final class XAdESSigner {
 			// ************************************************
 			if (!ignoreStyleSheets) {
 				try {
-					xmlStyle = new XmlStyle(data, headless);
+					xmlStyle = new XmlStyle(data, headless, false);
 				}
 				catch (final IsInnerlException ex) {
 					LOGGER.info(

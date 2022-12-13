@@ -9,6 +9,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
@@ -20,7 +21,7 @@ public class TestBatchJson {
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
-	private static final String BASE_URL = "http://appprueba:8080/afirma-server-triphase-signer/";
+	private static final String BASE_URL = "http://appprueba:8080/afirma-server-triphase-signer/"; //$NON-NLS-1$
 
 	private Certificate[] certChain;
 	private PrivateKey pk;
@@ -38,6 +39,7 @@ public class TestBatchJson {
 
 
 	@Test
+	@Ignore
 	public void testBatch() throws CertificateEncodingException, IOException, AOException {
 
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$

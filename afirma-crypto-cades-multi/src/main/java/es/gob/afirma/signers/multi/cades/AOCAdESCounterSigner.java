@@ -64,10 +64,11 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                     final Properties xParams) throws AOException,
                                                                      IOException {
 
+        final Properties extraParams = getExtraParams(xParams);
 
 		// Comprobamos que no haya firmas de archivo, salvo que nos indiquen que debe firmarse
 		// incluso en ese caso
-		final String allowSignLts = xParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
+		final String allowSignLts = extraParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
 		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
 			try {
 				CAdESMultiUtil.checkUnsupportedAttributes(sign);
@@ -82,8 +83,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 				throw e;
 			}
 		}
-
-        final Properties extraParams = getExtraParams(xParams);
 
         final CAdESParameters config = CAdESParameters.load(null, algorithm, extraParams);
 

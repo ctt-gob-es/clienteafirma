@@ -490,7 +490,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore
+	@Ignore
 	public void pruebaContrafirmaXAdESDetachedXL() throws Exception {
 
 		final byte[] signature;

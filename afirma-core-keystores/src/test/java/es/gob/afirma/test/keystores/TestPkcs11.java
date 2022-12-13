@@ -42,7 +42,7 @@ public final class TestPkcs11 {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore //Dependiente del PKCS#11
+	@Ignore //Dependiente del PKCS#11
 	public void testPkcs11Dnie() throws Exception {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		AOKeyStore.PKCS11,
@@ -68,7 +68,7 @@ public final class TestPkcs11 {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore //Dependiente del PKCS#11
+	@Ignore //Dependiente del PKCS#11
 	public void testPkcs11Fnmt() throws Exception {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		AOKeyStore.PKCS11,

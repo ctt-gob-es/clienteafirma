@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -154,17 +155,11 @@ public class TestINC189027 {
 				config
 			);
 		}
-		catch(final AOFormatFileException e) {
+		catch(final SigningLTSException e) {
 			return;
 		}
 
 		Assert.fail("Deberia haber saltado un AOFormatFileException"); //$NON-NLS-1$
-
-//		final File tempFile = File.createTempFile("CAdES-A-Countersign", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-//		System.out.println("El resultado de la contrafirma de CAdES-A se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
-//		final FileOutputStream fos = new FileOutputStream(tempFile);
-//		fos.write(countersign);
-//		fos.close();
 	}
 
 	/** Prueba de cofirma de una firma CAdES-A.
@@ -194,16 +189,10 @@ public class TestINC189027 {
 				config
 			);
 		}
-		catch(final AOFormatFileException e) {
+		catch(final SigningLTSException e) {
 			return;
 		}
 
 		Assert.fail("Deberia haber saltado un AOFormatFileException"); //$NON-NLS-1$
-
-//		final File tempFile = File.createTempFile("CAdES-A-Cosign", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-//		System.out.println("El resultado de la cofirma de CAdES-A se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
-//		final FileOutputStream fos = new FileOutputStream(tempFile);
-//		fos.write(countersign);
-//		fos.close();
 	}
 }

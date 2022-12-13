@@ -53,6 +53,8 @@ public class TestINC78353 {
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
+		config.setProperty(XAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
+
 		final AOXAdESSigner signer = new AOXAdESSigner();
 
 		final byte[] cosign = signer.cosign(
@@ -91,6 +93,8 @@ public class TestINC78353 {
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
+		config.setProperty(XAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
+
 		final AOXAdESSigner signer = new AOXAdESSigner();
 
 		final byte[] countersign = signer.countersign(
@@ -131,6 +135,8 @@ public class TestINC78353 {
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
+		config.setProperty(XAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
+
 		final AOXAdESSigner signer = new AOXAdESSigner();
 
 		final byte[] cosign = signer.cosign(
@@ -167,6 +173,8 @@ public class TestINC78353 {
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PWD.toCharArray()));
 
 		final Properties config = new Properties();
+		config.setProperty(XAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
+
 		final AOXAdESSigner signer = new AOXAdESSigner();
 
 		final byte[] countersign = signer.countersign(

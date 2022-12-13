@@ -15,11 +15,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 
 /** Prueba de contrafirmas CAdES.
  * @author Carlos Gamuci. */
@@ -231,11 +232,31 @@ public final class TestCountersign {
 				config
 			);
 		}
-		catch (final AOFormatFileException e) {
-			return;
+		catch (final SigningLTSException e) {
+			countersign = null;
 		}
 
-		Assert.fail("No se soporta la contrafirma de firmas CAdES-A"); //$NON-NLS-1$
+		Assert.assertNull("No se debe firmar una firma CAdES-A/LTA-Level por defecto", countersign); //$NON-NLS-1$
+
+		config.setProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
+
+		try {
+			countersign = signer.countersign(
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				CounterSignTarget.TREE,
+				null,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config
+			);
+		}
+		catch (final SigningLTSException e) {
+			// El objeto countersign seguira siendo nulo en este punto
+		}
+
+		Assert.assertNotNull("Se debe contrafirmar una firma CAdES-A/LTA-Level cuando se fuerza a ello", countersign); //$NON-NLS-1$
+
 
 		final File tempFile = File.createTempFile("CountersignCadesA", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 

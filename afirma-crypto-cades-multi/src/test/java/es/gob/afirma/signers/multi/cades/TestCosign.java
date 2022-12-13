@@ -3,7 +3,6 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
@@ -11,7 +10,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.util.Properties;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,20 +36,23 @@ public final class TestCosign {
 	private static final String DATA_FILE = "data"; //$NON-NLS-1$
 	private static final String DATA_FILE_PDF = "Original.pdf"; //$NON-NLS-1$
 
-	private static InputStream ksIs;
-	private static KeyStore ks;
+	private KeyStore ks;
+	private String certAlias;
 
-	private static byte[] data;
+	private byte[] data;
 
 	/** Carga el almac&eacute;n de certificados.
 	 * @throws Exception Cuando ocurre algun problema al cargar el almac&eacute;n o los datos. */
 	@Before
 	public void cargaAlmacen() throws Exception {
-		ksIs = getClass().getClassLoader().getResourceAsStream(CERT_PATH);
-		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ksIs, CERT_PASS.toCharArray());
+		try (InputStream ksIs = getClass().getClassLoader().getResourceAsStream(CERT_PATH)) {
+			this.ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+			this.ks.load(ksIs, CERT_PASS.toCharArray());
+		}
 
-		data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream(DATA_FILE));
+		this.certAlias = this.ks.aliases().nextElement();
+
+		this.data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream(DATA_FILE));
 	}
 
 	/** Prueba de cofirma implicita de una firma impl&iacute;cita sin indicar los datos de firma.
@@ -69,7 +70,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -115,8 +116,8 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
-			ks.aliases().nextElement(),
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(
+				this.certAlias,
 			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
 
@@ -164,8 +165,8 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
-			ks.aliases().nextElement(),
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(
+			this.certAlias,
 			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
 		try {
@@ -201,8 +202,8 @@ public final class TestCosign {
 		config.setProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES, "true"); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
-			ks.aliases().nextElement(),
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(
+			this.certAlias,
 			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
 		try {
@@ -239,7 +240,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			signer.getData(sign),
 			sign,
@@ -276,7 +277,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -314,9 +315,9 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
-			data,
+			this.data,
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 			pke.getPrivateKey(),
@@ -348,7 +349,7 @@ public final class TestCosign {
 		}
 
 		final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
-		md.update(data);
+		md.update(this.data);
 		final byte[] messageDigest = md.digest();
 
 		final Properties config = new Properties();
@@ -356,7 +357,7 @@ public final class TestCosign {
 		config.setProperty("precalculatedHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			messageDigest,
 			sign,
@@ -393,7 +394,7 @@ public final class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 		final byte[] cosign = signer.cosign(
 			sign,
 			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -431,7 +432,7 @@ public final class TestCosign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 
 		try {
-			final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+			final PrivateKeyEntry pke = (PrivateKeyEntry) this.ks.getEntry(this.certAlias, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 			signer.cosign(
 					sign,
 					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
@@ -445,13 +446,5 @@ public final class TestCosign {
 		}
 
 		Assert.fail("La firma tuvo que haber lanzado una excepcion de tipo AOException"); //$NON-NLS-1$
-	}
-
-	/** Cierra el flujo de lectura del almac&eacute;n de certificados.
-	 * @throws IOException Cuando ocurre alg&uacute;n problema al cerrar el flujo de datos. */
-	@SuppressWarnings("static-method")
-	@After
-	public void cerrar() throws IOException {
-		ksIs.close();
 	}
 }
