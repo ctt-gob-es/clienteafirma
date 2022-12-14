@@ -152,7 +152,7 @@ public final class MsPortableExecutable {
         if (0 != (byte) (characteristics[0] & (byte) 0x40)) {
 			sb.append("\n La imagen debe ejecutarse en una maquina con un unico procesador"); //$NON-NLS-1$
 		}
-        if (0 != (byte) (characteristics[0] & (byte) 0x20)) {
+        if (0 != (byte) (characteristics[0] & (byte) 0x80)) {
 			sb.append("\n Arquitectura Big Endian"); //$NON-NLS-1$
 		}
 
