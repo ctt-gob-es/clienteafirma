@@ -16,6 +16,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.ietf.jgss.Oid;
+
 import es.gob.afirma.core.AOException;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
@@ -207,9 +209,10 @@ final class XAdESCommonMetadataUtil {
 
 		String identifier;
 		try {
-			LOGGER.warning(
-				"Se proporciono directamente un OID como identificador de politica (" + id + "), se tranformara en URN con el prefijo 'urn:oid:'" //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			// Construimos el objeto OID solo para saber si el ID es un OID
+			new Oid(id);
+			LOGGER.warning("Se proporciono directamente un OID como identificador de politica (" + id //$NON-NLS-1$
+					+ "), se tranformara en URN con el prefijo 'urn:oid:'"); //$NON-NLS-1$
 			identifier = "urn:oid:" + id; //$NON-NLS-1$
 		}
 		catch (final Exception e1) {

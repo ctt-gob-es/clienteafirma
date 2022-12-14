@@ -666,15 +666,15 @@ Section "uninstall"
 	; ==== Desinstalador EXE - INICIO ====
    
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
-;	loopFirefox:
-;	${nsProcess::FindProcess} "firefox.exe" $R2
-;	StrCmp $R2 0 0 +2
-;		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
+	loopFirefox:
+	${nsProcess::FindProcess} "firefox.exe" $R2
+	StrCmp $R2 0 0 +2
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 
-;	loopChrome:
-;	${nsProcess::FindProcess} "chrome.exe" $R3
-;	StrCmp $R3 0 0 +2
-;		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
+	loopChrome:
+	${nsProcess::FindProcess} "chrome.exe" $R3
+	StrCmp $R3 0 0 +2
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
 	
 	; ==== Desinstalador EXE - FIN ====
 	
@@ -682,17 +682,17 @@ Section "uninstall"
    
 	; Se fuerza el cierre de Firefox y Chrome si estan abiertos. Los saltos cuentan
 	; un paso mas (+4 en lugar de +3) porque si no se queda en un bucle infinito
-	loopFirefox:
-		${nsProcess::FindProcess} "firefox.exe" $R2
-		StrCmp $R2 0 0 +4
-			${nsProcess::KillProcess} "firefox.exe" $R0
-			Goto loopFirefox
+;	loopFirefox:
+;		${nsProcess::FindProcess} "firefox.exe" $R2
+;		StrCmp $R2 0 0 +4
+;			${nsProcess::KillProcess} "firefox.exe" $R0
+;			Goto loopFirefox
 
-	loopChrome:
-		${nsProcess::FindProcess} "chrome.exe" $R3
-		StrCmp $R3 0 0 +4
-			${nsProcess::KillProcess} "chrome.exe" $R0
-			Goto loopChrome
+;	loopChrome:
+;		${nsProcess::FindProcess} "chrome.exe" $R3
+;		StrCmp $R3 0 0 +4
+;			${nsProcess::KillProcess} "chrome.exe" $R0
+;			Goto loopChrome
 	
 	; ==== Desinstalador MSI - FIN ====
 
@@ -857,12 +857,18 @@ Function RemoveOldVersions
 		Quit
 
 	UninstallOlderVersion:
+	
+MessageBox MB_OK "!!! Desistalamos version antigua" 
+	
+	
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
 		StrCmp $R1 "" +3 0
 			Push "$R1\AutoFirma"
 			Call RemoveFromPath
+
+MessageBox MB_OK "!!! Identificamos la sentencia de desinstalacion" 
 
 		; Preparamos una variable para indicar en ella si tras la desinstalacion deberemos borrar el directorio de
 		; instalacion anterior
@@ -892,6 +898,7 @@ Function RemoveOldVersions
 				StrCpy $R3 "Uninstall"
 
 		EjecutarDesinstalador:
+			MessageBox MB_OK "!!! Ejecutamos el desinstalador MSI: $R2" 
 			ExecWait $R2
 
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
