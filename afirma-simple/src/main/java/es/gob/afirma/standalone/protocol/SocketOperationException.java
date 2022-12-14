@@ -19,6 +19,7 @@ class SocketOperationException extends Exception {
 	private String errorCode ;
 
 	SocketOperationException(final String code) {
+		super();
 		setErrorCode(code);
 	}
 

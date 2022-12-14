@@ -699,7 +699,9 @@ public final class ProtocolInvocationLauncher {
                     final String errorCode = e.getErrorCode();
                     if (ProtocolInvocationLauncherSign.RESULT_CANCEL.equals(errorCode)) {
                     	msg = errorCode;
-                    } else if (e.getMessage() != null) {
+                    // Si el mensaje es igual al codigo, es que no se establecio mensaje
+                    //TODO: Comprobar si realmente no tiene mensaje, en lugar de si el mensaje y el codigo son distintos
+                    } else if (!errorCode.equals(e.getMessage())) {
                     	msg = errorCode + ": " + e.getMessage(); //$NON-NLS-1$
                     } else {
                     	msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
