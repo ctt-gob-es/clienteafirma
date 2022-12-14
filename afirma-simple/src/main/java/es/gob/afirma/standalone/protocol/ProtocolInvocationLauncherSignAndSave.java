@@ -155,7 +155,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		// Determinamos que procesador se utilizara para tratar los datos. Este puede ser uno
 		// derivado de un plugin que se active ante estos datos o el procesador nativo
 		final SignDataProcessor processor = selectProcessor(
-				ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion(),
+				protocolVersion,
 				operation);
 		processor.setCipherKey(options.getDesKey());
 

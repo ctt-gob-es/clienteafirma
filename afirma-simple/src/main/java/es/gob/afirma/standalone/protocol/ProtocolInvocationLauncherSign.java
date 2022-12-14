@@ -121,6 +121,8 @@ final class ProtocolInvocationLauncherSign {
 			throw new SocketOperationException(errorCode);
 		}
 
+		LOGGER.info(" ============ Version del protocolo: " + protocolVersion);
+
 		// Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format(
@@ -156,7 +158,7 @@ final class ProtocolInvocationLauncherSign {
 		// Determinamos que procesador se utilizara para tratar los datos. Este puede ser uno
 		// derivado de un plugin que se active ante estos datos o el procesador nativo
 		final SignDataProcessor processor = selectProcessor(
-				ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion(),
+				protocolVersion,
 				operation);
 		processor.setCipherKey(options.getDesKey());
 
