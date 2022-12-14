@@ -5,7 +5,6 @@
 <title>Ejemplo de firma por lotes con JSON</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <script type="text/javascript" src="js/autoscript.js"></script>
-<script type="text/javascript" src="js/constantes.js"></script>
 <script type="text/javascript">
 
 
@@ -154,8 +153,8 @@
 		try {
 			AutoScript.signBatchProcess(
 					document.getElementById("stopOnError").checked,
-					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/presign",
-					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/postsign",
+					window.location.origin + "/afirma-server-triphase-signer/presign",
+					window.location.origin + "/afirma-server-triphase-signer/postsign",
 					null,
 					showResultCallback,
 					showLogCallback);
@@ -169,8 +168,8 @@
 		try {
 			AutoScript.signBatchProcess(
 					document.getElementById("stopOnError").checked,
-					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/URL_ERROR",
-					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/postsign",
+					window.location.origin + "/afirma-server-triphase-signer/URL_ERROR",
+					window.location.origin + "/afirma-server-triphase-signer/postsign",
 					null,
 					showResultCallback,
 					showLogCallback);
@@ -215,9 +214,9 @@
 </head>
 <body>
 	<script type="text/javascript">
-			AutoScript.setForceWSMode(true);
+			//AutoScript.setForceWSMode(true);
 			AutoScript.cargarAppAfirma();
-			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",  Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",  window.location.origin + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 	<fieldset style="margin-bottom:30px;">

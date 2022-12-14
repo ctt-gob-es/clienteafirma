@@ -4,7 +4,6 @@
 	<title>Ejemplo de despliegue del MiniApplet @firma</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/miniapplet_1_6_5.js"></script>
-	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
 	
 		// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
@@ -108,8 +107,8 @@
 
 				MiniApplet.signBatch(
 					MiniApplet.getBase64FromText(batch),
-					Constants.URL_BASE_SERVICES + '/afirma-server-triphase-signer/BatchPresigner', //$NON-NLS-1$
-					Constants.URL_BASE_SERVICES + '/afirma-server-triphase-signer/BatchPostsigner', //$NON-NLS-1$
+					window.location.origin + '/afirma-server-triphase-signer/BatchPresigner', //$NON-NLS-1$
+					window.location.origin + '/afirma-server-triphase-signer/BatchPostsigner', //$NON-NLS-1$
 					document.getElementById("params").value,
 					showBatchResultCallback,
 					showErrorCallback);
@@ -337,11 +336,11 @@
 	<body>
 		<script>
 			MiniApplet.setForceWSMode(true);
-			//MiniApplet.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
+			//MiniApplet.setJnlpService(window.location.origin + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
 			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
 			//MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
-			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",
-					Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			MiniApplet.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
+					window.location.origin + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -433,7 +432,7 @@
 		
 		<script>
 			var paramsElement = document.getElementById("params");
-			paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService\n" +
+			paramsElement.innerHTML = "serverUrl=" + window.location.origin + "/afirma-server-triphase-signer/SignatureService\n" +
 				"signaturePositionOnPageLowerLeftX=100\n" +
 				"signaturePositionOnPageLowerLeftY=100\n" +
 				"signaturePositionOnPageUpperRightX=300\n" +

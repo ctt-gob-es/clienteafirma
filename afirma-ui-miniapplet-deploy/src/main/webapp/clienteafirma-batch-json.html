@@ -5,7 +5,6 @@
 <title>Ejemplo de firma por lotes con JSON del MiniApplet @firma</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <script type="text/javascript" src="js/autoscript.js"></script>
-<script type="text/javascript" src="js/constantes.js"></script>
 <script type="text/javascript">
 		
 	//Esperar a que la página termine de cargarse
@@ -31,10 +30,8 @@
 			AutoScript
 					.signBatchProcess(
 							document.getElementById("stopOnError").checked,
-							Constants.URL_BASE_SERVICES
-									+ "/afirma-server-triphase-signer/presign",
-							Constants.URL_BASE_SERVICES
-									+ "/afirma-server-triphase-signer/postsign",
+							window.location.origin + "/afirma-server-triphase-signer/presign",
+							window.location.origin + "/afirma-server-triphase-signer/postsign",
 							document.getElementById("filters").value,
 							showResultCallback, showLogCallback);
 			
@@ -241,10 +238,9 @@
 	<script type="text/javascript">
 			//AutoScript.setForceWSMode(true);
 			AutoScript.cargarAppAfirma();
-			AutoScript.setServlets(Constants.URL_BASE_SERVICES 
-					+ "/afirma-signature-storage/StorageService", 
-					Constants.URL_BASE_SERVICES 
-					+ "/afirma-signature-retriever/RetrieveService");
+			AutoScript.setServlets(
+					window.location.origin + "/afirma-signature-storage/StorageService", 
+					window.location.origin + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 	<fieldset style="margin-bottom:30px;">

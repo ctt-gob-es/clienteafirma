@@ -21,7 +21,6 @@
 		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 	</style>
 	<script type="text/javascript" src="js/autoscript.js"></script>
-	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
 		
@@ -96,7 +95,7 @@
 		}
 	-->
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+		AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->

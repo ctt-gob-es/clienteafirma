@@ -21,7 +21,6 @@
 		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 	</style>
 	<script type="text/javascript" src="js/autoscript.js"></script>
-	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
 		var firmarFichero;
@@ -44,7 +43,7 @@
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
-							"serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService"
+							"serverUrl=" + window.location.origin + "/afirma-server-triphase-signer/SignatureService"
 							+ "\nfilters=nonexpired:;qualified:54988af4";
 
 			var dataB64 = null;
@@ -196,7 +195,7 @@
 		}
 		
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+		AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->

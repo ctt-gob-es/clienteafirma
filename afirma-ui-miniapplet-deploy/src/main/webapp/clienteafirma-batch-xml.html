@@ -4,7 +4,6 @@
 	<title>Ejemplo de firma por lotes del MiniApplet @firma</title>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/autoscript.js"></script>
-	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
 
 		var singleSigns = new Array();
@@ -26,8 +25,8 @@
 				
 				AutoScript.signBatch(
 					AutoScript.getBase64FromText(batch),
-					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
-					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
+					window.location.origin + "/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
+					window.location.origin + "/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
 					document.getElementById("filters").value,
 					showResultCallback,
 					showLogCallback);
@@ -169,7 +168,7 @@
 	<body>
 		<script type="text/javascript">
 			AutoScript.cargarAppAfirma();
-			AutoScript.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
 		</script>
 		
 		<fieldset><legend>Configuraci&oacute;n general</legend>

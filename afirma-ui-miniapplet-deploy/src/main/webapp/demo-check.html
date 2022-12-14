@@ -23,7 +23,6 @@
 	<script type="text/javascript" src="js_test/deployJava.js"></script>
 	<script type="text/javascript" src="js_test/TestEnvironment.js"></script>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
-	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
 
@@ -313,7 +312,7 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
+		MiniApplet.cargarMiniApplet(window.location.origin);
 
 		mostrarDialogoEspera();
 		

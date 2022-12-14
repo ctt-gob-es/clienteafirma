@@ -5,7 +5,6 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js_test/deployJava.js"></script>
 	<script type="text/javascript" src="js_test/TestEnvironment.js"></script>
-	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	
 	<script type="text/javascript">
@@ -152,7 +151,7 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
+			MiniApplet.cargarMiniApplet(window.location.origin);
 		</script>
 
 		<table>
