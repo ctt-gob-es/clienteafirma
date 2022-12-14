@@ -39,6 +39,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -73,7 +74,7 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 	private static final int PREFERRED_HEIGHT = 630;
 	private static final int PAGEPANEL_PREFERRED_WIDTH = 466;
 	private static final int PAGEPANEL_PREFERRED_HEIGHT = 410;
-	static final String IMAGE_EXT[] = { "jpg", "jpeg", "png", "gif" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final String IMAGE_EXT[] = { "jpg", "jpeg", "bmp"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	final JTextField fileText = new JTextField();
 
@@ -115,6 +116,8 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 	final JButton nextPageButton = new JButton(">"); //$NON-NLS-1$
 	final JButton lastPageButton = new JButton(">>"); //$NON-NLS-1$
 	final JCheckBox allPagesCheckbox = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiStamp.7")); //$NON-NLS-1$
+
+	private JDialog dialogParent;
 
 	private final PdfDocument pdfDocument;
 	private int pressButton = 0;
@@ -457,53 +460,54 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 		fileButton.getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfUiStamp.19")); //$NON-NLS-1$
 
 		fileButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final File[] files;
-					try {
-						files = AOUIFactory.getLoadFiles(
-							SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
-							null,
-							null,
-							IMAGE_EXT,
-							SignPdfUiMessages.getString("SignPdfUiPreview.22"), //$NON-NLS-1$,
-							false,
-							false,
-							null,
-							SignPdfUiPanelStamp.this
-						);
-					}
-					catch(final AOCancelledOperationException ex) {
-						return;
-					}
+			e -> {
+				final File[] files;
+				try {
+					files = AOUIFactory.getLoadFiles(
+						SignPdfUiMessages.getString("SignPdfUiPreview.21"), //$NON-NLS-1$,
+						null,
+						null,
+						IMAGE_EXT,
+						SignPdfUiMessages.getString("SignPdfUiPreview.43"), //$NON-NLS-1$,
+						false,
+						false,
+						null,
+						SignPdfUiPanelStamp.this
+					);
+				}
+				catch(final AOCancelledOperationException ex) {
+					return;
+				}
 
-					try {
-						final BufferedImage stampImage = ImageIO.read(files[0]);
-						SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, getInsertImageBase64(stampImage));
+				try {
+					final BufferedImage stampImage = ImageIO.read(files[0]);
+					if (stampImage == null) {
+						throw new IOException("No se ha seleccionado un fichero de imagen reconocido"); //$NON-NLS-1$
 					}
-					catch (final IOException ioe) {
-						LOGGER.severe(
-							"No ha sido posible cargar la imagen: " + ioe //$NON-NLS-1$
-						);
-						AOUIFactory.showMessageDialog(
-							this,
-							SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$
-							SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
-						);
-						return;
-					}
+					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, getInsertImageBase64(stampImage));
+				}
+				catch (final Exception ex) {
+					LOGGER.severe(
+						"No ha sido posible cargar la imagen: " + ex //$NON-NLS-1$
+					);
+					AOUIFactory.showErrorMessage(
+						getDialogParent(),
+						SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$
+						SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						ex
+					);
+					return;
+				}
 
-					SignPdfUiPanelStamp.this.fileText.setText(files[0].getAbsolutePath());
+				SignPdfUiPanelStamp.this.fileText.setText(files[0].getAbsolutePath());
 
-					if (SignPdfUiPanelStamp.this.locationSelected) {
-						SignPdfUiPanelStamp.this.okButton.setEnabled(true);
-						SignPdfUiPanelStamp.this.okButton.requestFocusInWindow();
-					}
-					else {
-						SignPdfUiPanelStamp.this.okButton.setEnabled(false);
-					}
+				if (SignPdfUiPanelStamp.this.locationSelected) {
+					SignPdfUiPanelStamp.this.okButton.setEnabled(true);
+					SignPdfUiPanelStamp.this.okButton.requestFocusInWindow();
+				}
+				else {
+					SignPdfUiPanelStamp.this.okButton.setEnabled(false);
 				}
 			}
 		);
@@ -883,5 +887,15 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 			)
 		);
 		return xParams;
+	}
+
+
+
+	public void setDialogParent(final JDialog dialogParent) {
+		this.dialogParent = dialogParent;
+	}
+
+	JDialog getDialogParent() {
+		return this.dialogParent;
 	}
 }

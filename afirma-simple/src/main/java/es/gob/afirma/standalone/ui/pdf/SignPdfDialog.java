@@ -215,6 +215,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 			setTitle(SignPdfUiMessages.getString("SignPdfUiStamp.0")); //$NON-NLS-1$
 			this.activePanel = new SignPdfUiPanelStamp(this.pages, this.pageSizes, this.pdfData, this,
 					new Properties());
+			((SignPdfUiPanelStamp) this.activePanel).setDialogParent(this);
 			this.scrollPanel.setViewportView(this.activePanel);
 		}
 		pack();
@@ -295,6 +296,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		else if (this.activePanel instanceof SignPdfUiPanelPreview && this.stampVisible) {
 			setPreferredSize(getPreferredDimensionToStampDialog());
 			this.activePanel = new SignPdfUiPanelStamp(this.pages, this.pageSizes, this.pdfData, this, p);
+			((SignPdfUiPanelStamp) this.activePanel).setDialogParent(this);
 			this.scrollPanel.setViewportView(this.activePanel);
 			pack();
 			((SignPdfUiPanelStamp) this.activePanel).requestFocusInWindow();
