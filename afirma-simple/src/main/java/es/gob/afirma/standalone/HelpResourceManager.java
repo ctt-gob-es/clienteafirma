@@ -169,13 +169,12 @@ public final class HelpResourceManager {
 	 * @throws Exception Error durante la formaci&aacute;n de la URL.
 	 */
     public static String createHelpFileLauncher(final String targetUrl) throws Exception {
-        final String launcherFile = System.getProperty("java.io.tmpdir") + "local_launcher.html";  //$NON-NLS-1$//$NON-NLS-2$
-        final File launcherTempFile = new File(launcherFile);
+        final File launcherTempFile = new File(System.getProperty("java.io.tmpdir"), "local_launcher.html");  //$NON-NLS-1$//$NON-NLS-2$
         try(PrintWriter writer = new PrintWriter(launcherTempFile, "UTF-8")) { //$NON-NLS-1$
             writer.println("<meta http-equiv=\"refresh\" content=\"0; url=" + targetUrl + "\" />");  //$NON-NLS-1$//$NON-NLS-2$
         } catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error abriendo archivo a escribir", e); //$NON-NLS-1$
         }
-        return "file:///" + launcherFile.replace("\\", "/");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        return "file:///" + launcherTempFile.getAbsolutePath().replace("\\", "/");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     }
 }

@@ -13,11 +13,6 @@
         return "Spanish.lproj/";
       }
 
-    function loadMenu() {
-        var folder = getLanguageFolder();
-        document.getElementById("sidebar").innerHTML = '<object type="text/html" data="' + folder + 'menu.html" width="100%" height="100%"></object>';
-    }
-
     function loadScreen(page) {
         var folder = getLanguageFolder();
         document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + page + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
@@ -39,6 +34,7 @@
 		top: 0;
 		left: 0;
 		padding-top: 60px; 
+		overflow-y: scroll;
 	}
 	
 	.sidebar ul {
