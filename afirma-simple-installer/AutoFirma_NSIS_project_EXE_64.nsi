@@ -857,18 +857,12 @@ Function RemoveOldVersions
 		Quit
 
 	UninstallOlderVersion:
-	
-MessageBox MB_OK "!!! Desistalamos version antigua" 
-	
-	
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
 		StrCmp $R1 "" +3 0
 			Push "$R1\AutoFirma"
 			Call RemoveFromPath
-
-MessageBox MB_OK "!!! Identificamos la sentencia de desinstalacion" 
 
 		; Preparamos una variable para indicar en ella si tras la desinstalacion deberemos borrar el directorio de
 		; instalacion anterior
@@ -898,7 +892,6 @@ MessageBox MB_OK "!!! Identificamos la sentencia de desinstalacion"
 				StrCpy $R3 "Uninstall"
 
 		EjecutarDesinstalador:
-			MessageBox MB_OK "!!! Ejecutamos el desinstalador MSI: $R2" 
 			ExecWait $R2
 
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
