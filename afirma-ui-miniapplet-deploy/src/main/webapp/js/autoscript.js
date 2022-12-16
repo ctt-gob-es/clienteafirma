@@ -963,6 +963,8 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			var OPERATION_LOAD = "load";
 			
+			var OPERATION_MULTI_LOAD = "multiload";
+			
 			var OPERATION_WITHOUT_RETURN = "save";
 			
 			var OPERATION_BATCH = "batch";
@@ -1133,7 +1135,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			var getMultiFileNameContentBase64 = function (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
 				setCallbacks(successCallbackFunction, errorCallbackFunction);
-				currentOperation = OPERATION_LOAD;
+				currentOperation = OPERATION_MULTI_LOAD;
 				var requestData = createLoadDataRequest("load", title, extensions, description, filePath, true);
 				execAppIntent(buildUrl(requestData));
 			}
@@ -1531,7 +1533,10 @@ var AutoScript = ( function ( window, undefined ) {
 					processResponseWithoutReturn(data);
 				}
 				else if (currentOperation == OPERATION_LOAD) {
-					processLoadResponse(data);
+					processLoadResponse(data, false);
+				}
+				else if (currentOperation == OPERATION_MULTI_LOAD) {
+					processLoadResponse(data, true);
 				}
 				else if (currentOperation == OPERATION_SELECT_CERTIFICATE) {
 					processSelectCertificateResponse(data);
@@ -1570,7 +1575,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Procesa la respuesta de las operaciones de carga de ficheros.
 			 */
-			function processLoadResponse(data) {
+			function processLoadResponse(data, multi) {
 
 				// Compruebo si se trata de una respuesta valida de una operacion de carga/multicarga (load).
 				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
@@ -1597,7 +1602,7 @@ var AutoScript = ( function ( window, undefined ) {
 				var fileNamesDataBase64 = data.split("|");
 
 				// Si solo se carga un fichero
-				if (fileNamesDataBase64.length == 1) {
+				if (!multi) {
 
 					var sepPos = fileNamesDataBase64[0].indexOf(":");
 
