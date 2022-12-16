@@ -121,8 +121,6 @@ final class ProtocolInvocationLauncherSign {
 			throw new SocketOperationException(errorCode);
 		}
 
-		LOGGER.info(" ============ Version del protocolo: " + protocolVersion);
-
 		// Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format(

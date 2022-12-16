@@ -730,7 +730,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     			if (!args[0].startsWith(WEBSOCKET_REQUEST_PREFIX)) {
     				forceCloseApplication(0);
     			}
-    		} else if (!isSimpleAfirmaAlreadyRunning()) {
+    		}
+    		// Invocacion como herramienta de escritorio.
+    		// Lo primero es comprobar que no se encuentre ya abierta.
+    		else if (!isSimpleAfirmaAlreadyRunning()) {
 
 				printSystemInfo();
 
@@ -740,13 +743,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 				final OS os = Platform.getOS();
 				if (OS.WINDOWS != os && OS.MACOSX != os) {
-					LOGGER.info("Se intenta una precarga temprana de NSS" //$NON-NLS-1$
-					);
-					// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la
-					// inicializacion
-					// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve
-					// siempre
-					// un CKR_DEVICE_ERROR (directamente desde NSS).
 
 					// Configuramos el uso de JMulticard segun lo establecido en el dialogo de
 					// preferencias
@@ -755,6 +751,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 			        JMulticardUtilities.configureJMulticard(enableJMulticard);
 
+					LOGGER.info("Se intenta una precarga temprana de NSS" //$NON-NLS-1$
+					);
+					// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la
+					// inicializacion
+					// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve
+					// siempre
+					// un CKR_DEVICE_ERROR (directamente desde NSS).
 			    	try {
 						final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 						    AOKeyStore.MOZ_UNI, // Store
