@@ -223,13 +223,28 @@
 		 * El uso del metodo de carga no sera compatible con el Cliente movil.
 		 */
 		function browseFirma(title) {
- 			try {
+/* 			try {
 				AutoScript.getFileNameContentBase64(
 						title,
 						"csig,xsig,sig,pdf,xml",
 						"Fichero de firma electrónica",
 						null,
 						showLoadFirmaResultCallback, showErrorCallback);
+
+			} catch (e) {
+				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
+						+ AutoScript.getErrorMessage());
+			} */
+			
+			
+			
+			try {
+				AutoScript.getMultiFileNameContentBase64(
+						title,
+						"csig,xsig,sig,pdf,xml",
+						"Fichero de firma electrónica",
+						null,
+						showLoadFirmasResultCallback, showErrorCallback);
 
 			} catch (e) {
 				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
@@ -242,6 +257,24 @@
 			dataFilename.innerHTML = fileName;
 			data.value = dataB64;
 		}
+		
+		
+		
+		
+		
+		function showLoadFirmasResultCallback(fileNames, datasB64) {
+
+			var buffer = "";
+			for (var i = 0; i < fileNames.length; i++) {
+				buffer += fileNames[i] + ": " + datasB64[i] + "\n";
+			}
+			showLog(buffer);
+		}
+		
+		
+		
+		
+		
 
 		function showLoadFirmaResultCallback(fileName, dataB64) {
 

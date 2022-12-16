@@ -211,9 +211,14 @@ final class XAdESCommonMetadataUtil {
 		try {
 			// Construimos el objeto OID solo para saber si el ID es un OID
 			new Oid(id);
-			LOGGER.warning("Se proporciono directamente un OID como identificador de politica (" + id //$NON-NLS-1$
-					+ "), se tranformara en URN con el prefijo 'urn:oid:'"); //$NON-NLS-1$
-			identifier = "urn:oid:" + id; //$NON-NLS-1$
+			if (id.toLowerCase().startsWith("urn:oid:")) { //$NON-NLS-1$
+				identifier= id;
+			}
+			else {
+				LOGGER.warning("Se proporciono directamente un OID como identificador de politica (" + id //$NON-NLS-1$
+						+ "), se tranformara en URN con el prefijo 'urn:oid:'"); //$NON-NLS-1$
+				identifier = "urn:oid:" + id; //$NON-NLS-1$
+			}
 		}
 		catch (final Exception e1) {
 			identifier = id;
