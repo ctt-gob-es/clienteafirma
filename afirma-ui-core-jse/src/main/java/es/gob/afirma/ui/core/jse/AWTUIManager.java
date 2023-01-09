@@ -17,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,12 +109,10 @@ public final class AWTUIManager extends JSEUIManager {
         fd.setVisible(true);
 
         final File file;
-        if (fd.getFile() != null) {
-            file = new File(fd.getDirectory() + fd.getFile());
-        }
-        else {
+        if (fd.getFile() == null) {
         	throw new AOCancelledOperationException();
         }
+		file = new File(fd.getDirectory() + fd.getFile());
 
         // Si se proporcionan datos, se guardan y se devuelve el fichero donde se ha hecho.
         // Si no se proporcionan datos, se devuelve el fichero seleccionado, permitiendo que
@@ -136,7 +133,7 @@ public final class AWTUIManager extends JSEUIManager {
     @Override
 	public File[] getLoadFiles(final String dialogTitle,
 			                  final String currentDir,
-			                  final String filename,
+			                  final String defaultFilename,
 			                  final String[] extensions,
 			                  final String description,
 			                  final boolean selectDirectory,
@@ -150,22 +147,12 @@ public final class AWTUIManager extends JSEUIManager {
         	fd.setDirectory(get(PREFERENCE_DIRECTORY, currentDir));
         }
 
-        // Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
-        // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
-        // a la sentencia: "fd.setMultipleMode(multiSelect)"
         if (multiSelect) {
-        	try {
-        		final Method setMultipleModeMethod = FileDialog.class.getMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
-        		setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
-        	}
-        	catch (final Exception e) {
-        		LOGGER.warning("No es posible utilizar la seleccion multiple de ficheros con los dialogos del sistema con versiones anteriores de Java 7, se utilizara Swing: " + e); //$NON-NLS-1$
-        		return super.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parent);
-        	}
-        }
+        	fd.setMultipleMode(multiSelect);
+       	}
 
-        if (filename != null) {
-        	fd.setFile(filename);
+        if (defaultFilename != null) {
+        	fd.setFile(defaultFilename);
         }
 
         if (extensions != null && extensions.length > 0) {
@@ -207,30 +194,24 @@ public final class AWTUIManager extends JSEUIManager {
             throw new AOCancelledOperationException();
         }
 
-        if (multiSelect) {
-        	// getFiles() solo esta disponible en Java 7
-        	File[] files;
-        	try {
-        		final Method getFilesMethod = FileDialog.class.getMethod("getFiles"); //$NON-NLS-1$
-        		files = (File[]) getFilesMethod.invoke(fd);
-        	}
-        	catch (final Exception e) {
-        		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera un unico fichero: " + e); //$NON-NLS-1$
-        		files = new File[] { new File(fd.getFile()) };
-        	}
+		File[] files;
+		if (multiSelect) {
+        	files = fd.getFiles();
         	if (files == null) {
         		files = new File[0];
         	}
-
-        	return files;
         }
-
-        final File ret = new File(fd.getDirectory(), fd.getFile());
+		else {
+			final String filename = fd.getFile();
+			files = filename != null
+				? new File[] { new File(fd.getDirectory(), filename) }
+				: new File[0];
+		}
 
         System.setProperty("apple.awt.fileDialogForDirectories", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
         put(PREFERENCE_DIRECTORY, fd.getDirectory());
 
-        return new File[] { ret };
+        return files;
     }
 }
