@@ -207,7 +207,7 @@ public final class AWTUIManager extends JSEUIManager {
             throw new AOCancelledOperationException();
         }
 
-        if (multiSelect && isJava7()) {
+        if (multiSelect) {
         	// getFiles() solo esta disponible en Java 7
         	File[] files;
         	try {
@@ -233,9 +233,4 @@ public final class AWTUIManager extends JSEUIManager {
 
         return new File[] { ret };
     }
-
-	private static boolean isJava7() {
-		return System.getProperty("java.version").startsWith("1.7"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
 }
