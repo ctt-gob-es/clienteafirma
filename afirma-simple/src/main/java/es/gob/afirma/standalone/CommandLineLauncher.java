@@ -764,7 +764,7 @@ final class CommandLineLauncher {
 				store = AOKeyStore.WINDOWS;
 			}
 			else {
-				store = AOKeyStore.MOZ_UNI;
+				store = AOKeyStore.SHARED_NSS;
 			}
 		}
 		else if (STORE_MAC.equals(storeType)) {

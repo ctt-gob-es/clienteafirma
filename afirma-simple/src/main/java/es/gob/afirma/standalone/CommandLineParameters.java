@@ -13,6 +13,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import es.gob.afirma.core.misc.Platform;
+
 /** Clase que engloba todos los par&aacute;metros admitidos por
  * l&iacute;nea de comandos. */
 final class CommandLineParameters {
@@ -83,7 +85,11 @@ final class CommandLineParameters {
 	private URL postUrl = null;
 	private URL preUrl = null;
 
+	private final Platform.OS system;
+
 	public CommandLineParameters(final CommandLineCommand command, final String[] params) throws CommandLineException {
+
+		this.system = Platform.getOS();
 
 		// El comando exige que se haya indicado un fichero principal de entrada
 		int i = 1;
@@ -217,7 +223,7 @@ final class CommandLineParameters {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.74")); //$NON-NLS-1$
 				}
 
-				this.inputFile = new File(params[i + 1]);
+				this.inputFile = getFile(params[i + 1]);
 
 				if (!this.inputFile.exists()) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.0", params[i + 1])); //$NON-NLS-1$
@@ -268,9 +274,9 @@ final class CommandLineParameters {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.75")); //$NON-NLS-1$
 				}
 
-				this.outputFile = new File(params[i + 1]);
-				final String parent = this.outputFile.getParent();
-				if (parent != null && !new File(parent).canWrite()) {
+				this.outputFile = getFile(params[i + 1]);
+				final File parentFile = this.outputFile.getParentFile();
+				if (parentFile != null && !parentFile.canWrite()) {
 					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.3", params[i + 1])); //$NON-NLS-1$
 				}
 				i++;
@@ -378,6 +384,17 @@ final class CommandLineParameters {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.91", this.hashFormat)); //$NON-NLS-1$
 		}
 		return formatResult;
+	}
+
+	private File getFile(final String path) {
+		File file;
+		if (path.startsWith("\u007E") && Platform.isUnixSystem(this.system)) { //$NON-NLS-1$
+			file = new File(Platform.getUserHome(), path.substring(1));
+		}
+		else {
+			file = new File(path);
+		}
+		return file;
 	}
 
 	/** Recupera la contrase&ntilde;a configurada para acceder al almac&eacute;n de claves.

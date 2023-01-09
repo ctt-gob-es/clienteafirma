@@ -229,6 +229,15 @@ public final class Platform {
         return userHome;
     }
 
+	/**
+	 * Indica si el sistema operativo es Linux, macOS o Solaris.
+	 * @param os Sistem operativo.
+	 * @return {@code true} si el sistema operativo es de la familia de Unix, {@code false}.
+	 */
+	public static boolean isUnixSystem(final Platform.OS os) {
+		return os == Platform.OS.LINUX || os == Platform.OS.MACOSX || os == Platform.OS.SOLARIS;
+	}
+
     /** Obtiene el directorio de instalaci&oacute;n del entorno de
      * ejecuci&oacute;n de Java actualmente en uso. Si no se puede obtener, se
      * devolver&aacute; {@code null}. Copiado de com.sun.deploy.config.Config.
