@@ -814,13 +814,18 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		);
 		this.okButton.addActionListener(
 			e -> {
-				if (!getTextArea().getText().trim().isEmpty()) {
-					this.prop.put(PdfExtraParams.LAYER2_TEXT, getTextArea().getText().toString());
+				final String configuredSignatureText = getTextArea().getText().trim();
+				this.prop.put(PdfExtraParams.LAYER2_TEXT, configuredSignatureText);
+				if (!configuredSignatureText.isEmpty()) {
 					this.prop.put(PdfExtraParams.LAYER2_FONTFAMILY, ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex());
 					this.prop.put(PdfExtraParams.LAYER2_FONTSIZE, Integer.toString(getSelectedSize()));
 					this.prop.put(PdfExtraParams.LAYER2_FONTSTYLE, Integer.toString(getStyleIndex()));
 					this.prop.put(PdfExtraParams.LAYER2_FONTCOLOR, getColorCombobox().getSelectedItem().getPdfColorKey());
-					this.prop.put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees()));
+				}
+
+				final int rotation = ((RotationAngles) getRotateSignature().getSelectedItem()).getDegrees();
+				if (rotation != 0) {
+					this.prop.put(PdfExtraParams.SIGNATURE_ROTATION, Integer.toString(rotation));
 				}
 
 				if (!this.rubricImagePath.getText().isEmpty()) {
@@ -1082,28 +1087,30 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	 * @param params Colecci&oacute;n de propiedades de la firma. */
 	private void saveProperties(final Properties params) {
 
-		if (params.getProperty(PdfExtraParams.LAYER2_TEXT) != null) {
+		final String configuredSignatureText = params.getProperty(PdfExtraParams.LAYER2_TEXT, ""); //$NON-NLS-1$
+		PreferencesManager.put(
+				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT,
+				configuredSignatureText);
+
+		if (configuredSignatureText != null && !configuredSignatureText.isEmpty()) {
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, params.getProperty(PdfExtraParams.LAYER2_TEXT)
-			);
+					PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY,
+					params.getProperty(PdfExtraParams.LAYER2_FONTFAMILY));
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, params.getProperty(PdfExtraParams.LAYER2_FONTFAMILY)
-			);
+					PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE,
+					params.getProperty(PdfExtraParams.LAYER2_FONTSIZE));
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, params.getProperty(PdfExtraParams.LAYER2_FONTSIZE)
-			);
+					PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE,
+					params.getProperty(PdfExtraParams.LAYER2_FONTSTYLE));
 			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, params.getProperty(PdfExtraParams.LAYER2_FONTSTYLE)
-			);
-			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, params.getProperty(PdfExtraParams.LAYER2_FONTCOLOR)
-			);
-			PreferencesManager.put(
-				PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION, params.getProperty(PdfExtraParams.SIGNATURE_ROTATION)
-			);
+					PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR,
+					params.getProperty(PdfExtraParams.LAYER2_FONTCOLOR));
 		}
-		else {
-			PreferencesManager.remove(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT);
+
+		if (params.getProperty(PdfExtraParams.SIGNATURE_ROTATION) != null) {
+			PreferencesManager.put(
+					PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION,
+					params.getProperty(PdfExtraParams.SIGNATURE_ROTATION));
 		}
 
 		if (params.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE) != null &&
