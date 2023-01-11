@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Platform;
@@ -20,7 +21,7 @@ public final class FileDialogsTest {
 	 */
     @SuppressWarnings("static-method")
 	@Test
-	//@Ignore
+	@Ignore
 	public void showSelectMultiFileTest() throws IOException {
 		for (final File f : AOUIFactory.getLoadFiles(
 			"Seleccion multiple de ficheros", //$NON-NLS-1$
