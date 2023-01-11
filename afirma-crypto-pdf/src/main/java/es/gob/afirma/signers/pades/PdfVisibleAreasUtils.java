@@ -21,14 +21,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
+import com.aowagie.text.Element;
+import com.aowagie.text.ExceptionConverter;
 import com.aowagie.text.Font;
 import com.aowagie.text.Image;
+import com.aowagie.text.Phrase;
 import com.aowagie.text.Rectangle;
 import com.aowagie.text.pdf.BaseFont;
 import com.aowagie.text.pdf.ByteBuffer;
+import com.aowagie.text.pdf.ColumnText;
 import com.aowagie.text.pdf.PdfSignatureAppearance;
 import com.aowagie.text.pdf.PdfStamper;
 import com.aowagie.text.pdf.PdfTemplate;
+import com.aowagie.text.pdf.PdfWriter;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -55,6 +60,9 @@ final class PdfVisibleAreasUtils {
 	static final String LAYERTEXT_TAG_REASON = "$$REASON$$"; //$NON-NLS-1$
 	static final String LAYERTEXT_TAG_LOCATION = "$$LOCATION$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CONTACT = "$$CONTACT$$"; //$NON-NLS-1$
+
+	/** Margen de la firmas visibles PDF rotadas. */
+    private static final float MARGIN = 2;
 
 	private static final Map<String, ColorValues> COLORS = new HashMap<>(7);
 	static {
@@ -334,117 +342,208 @@ final class PdfVisibleAreasUtils {
 		}
 	}
 
-	/** A&ntilde;ade al PDF un campo de firma rotado.
-	 * Para ello, se obtiene la representaci&oacute;n gr&aacute;fica de la capa 2 de la apariencia de
-	 * la firma, se convierte a imagen, se rota y se inserta como imagen. Esto hace que se pierda la
-	 * imagen original de la capa 2.
+	/**
+	 * Crea una imagen de firma ya con el texto y/o r&uacute;brica ya rotados.
 	 * @param stamper Estampador PDF.
-	 * @param appearance Apariencia de la firma PDF.
-	 * @param pageRect Rect&aacute;ngulo de firma.
-	 * @param page P&aacute;gina donde insertar la firma.
-	 * @param fieldName Nombre del campo de firma a usar (si se especifica <code>null</code> se
-	 *                  crea uno nuevo.
+	 * @param appearance Apariencia de la firma PDF. De esta se obtiene el texto de la firma y su
+	 * fuente de letra.
+	 * @param rubricRect Rect&aacute;ngulo de firma.
+	 * @param pageRotation Rotaci&oacute;n de la propia p&aacute;gina.
 	 * @param degrees Grados de rotaci&oacute;n del campo de firma.
-	 * @param rubric imagen a estampar
+	 * @param rubricImg imagen a estampar
 	 * @throws DocumentException Si hay problemas tratando el PDF.
 	 * @throws IOException En cualquier otro error. */
-    static void setVisibleSignatureRotated(final PdfStamper stamper,
+    static Image buildRotatedSignatureImage(final PdfStamper stamper,
     		                               final PdfSignatureAppearance appearance,
-    		                               final Rectangle pageRect,
-    		                               final int page,
-    		                               final String fieldName,
+    		                               final Rectangle rubricRect,
     		                               final int degrees,
-    		                               final Image rubric) throws DocumentException,
+    		                               final Image rubricImg) throws DocumentException,
                                                                      IOException {
-        final float width = pageRect.getWidth();
-        final float height = pageRect.getHeight();
-        final float llx = pageRect.getLeft();
-        final float lly = pageRect.getBottom();
 
-        // Parametros de rectangulo utilizado para crear el texto
-        final float widthTxt = degrees == 0 || degrees == 180 ? width : height;
-        final float heightTxt = degrees == 0 || degrees == 180 ? height : width;
+    	// Anchura y altura del espacio en el que se mostrara la firma
+    	final float rubricWidth = rubricRect.getWidth();
+        final float rubricHeight = rubricRect.getHeight();
 
-        // Escalamos la imagen para que se ajuste al espacio disponible
-        appearance.setImageScale(-1);
-
-        // La firma visible se configura inicialmente de forma horizontal.
-        appearance.setVisibleSignature(
-    		new Rectangle(0, 0, widthTxt, heightTxt),
-    		page,
-    		null
-		);
-
-        // Iniciamos la creacion de la apariencia, de forma que la podamos modificar posteriormente.
-        appearance.getAppearance();
-
-        appearance.getTopLayer().setWidth(widthTxt);
-        appearance.getTopLayer().setHeight(heightTxt);
-        final PdfTemplate n2Layer = appearance.getLayer(2);
-        n2Layer.setWidth(widthTxt);
-        n2Layer.setHeight(heightTxt);
-        // Rotamos entonces la capa 2: http://developers.itextpdf.com/question/how-rotate-paragraph.
-        final PdfTemplate t = PdfTemplate.createTemplate(stamper.getWriter(), widthTxt, heightTxt);
-        try (
-    		final ByteBuffer internalBuffer = t.getInternalBuffer();
-        	final ByteBuffer actualBuffer = n2Layer.getInternalBuffer();
-		) {
-
-        	// Imprimimos la rubrica de fondo
-	        if (rubric != null) {
-	        	//Imagen con la firma rubrica
-	        	rubric.setInterpolation(true);
-	        	rubric.setAbsolutePosition(0, 0);
-
-	        	// Reescalamos la imagen para que se adapte al nuevo rectangulo que estamparemos en el PDF
-	        	if (degrees == 90 || degrees == 270) {
-	        		final float scale = Math.min(height / rubric.getWidth(), width / rubric.getHeight());
-	                final float w = rubric.getWidth() * scale;
-	                final float h = rubric.getHeight() * scale;
-	                final float x = (width - h) / 2;
-	                final float y = (height - w) / 2;
-	                t.addImage(rubric, w, 0, 0, h, y, x);
-	        	} else {
-	        		final float scale = Math.min(width / rubric.getWidth(), height / rubric.getHeight());
-	                final float w = rubric.getWidth() * scale;
-	                final float h = rubric.getHeight() * scale;
-	                final float x = (width - w) / 2;
-	                final float y = (height - h) / 2;
-	                t.addImage(rubric, w, 0, 0, h, x, y);
-	        	}
-	        }
-
-	        // Creamos el buffer en el que escribir el texto usando el buffer
-	        // anterior lrubrica de fondo
-	        internalBuffer.write(actualBuffer.toByteArray());
-	        final Font f = appearance.getLayer2Font();
-            // Traduccion de la fuente a una fuente PDF
-	        if (f != null) {
-	        	final BaseFont bf = f.getCalculatedBaseFont(false);
-	        	t.setFontAndSize(bf, f.getSize());
-	        }
-
-	        n2Layer.reset();
-
-	        //Imagen con el texto encima de la rubrica
-	        final Image textImg = Image.getInstance(t);
-	        textImg.setInterpolation(true);
-	        textImg.setRotationDegrees(degrees);
-	        textImg.setAbsolutePosition(0, 0);
-
-	        n2Layer.addImage(textImg);
-	        n2Layer.setWidth(width);
-	        n2Layer.setHeight(height);
-	        appearance.getTopLayer().setWidth(width);
-	        appearance.getTopLayer().setHeight(height);
+        // Normalizamos los grados de rotacion
+        int rotation = degrees % 360;
+        if (rotation < 0) {
+        	rotation += 360;
         }
 
-        // Usamos las dimensiones indicadas.
-        appearance.setVisibleSignature(
-    		new Rectangle(llx, lly, llx + width, lly + height),
-    		page,
-    		fieldName
-		);
+    	// Crear la imagen rotada vamos a generar la imagen sin rotar y despues rotarla. Para ello:
+        // 1. Creamos una plantilla para imprimir la rubrica sin rotar.
+        // 2. Imprimimos en la plantilla la imagen de rubrica si procede.
+        // 3. Imprimimos en la plantilla el texto de firma si procede.
+        // 4. Rotamos la imagen de la plantilla (el rotado solo es a nivel logico).
+        // 5. Creamos una plantilla y le agregamos la nueva imagen para hacer efectivo el rotado.
+        // 6. Devolvemos la imagen de la nueva plantilla.
+
+
+        // 1 -- Creamos una plantilla con las dimensiones apropiadas para imprimir la rubrica sin
+        // rotar
+        final float canvasWidth = rotation == 0 || rotation == 180 ? rubricWidth : rubricHeight;
+        final float canvasHeight = rotation == 0 || rotation == 180 ? rubricHeight : rubricWidth;
+        final PdfTemplate canvas = PdfTemplate.createTemplate(stamper.getWriter(), canvasWidth, canvasHeight);
+
+        // 2 -- Si hay imagen de rubrica, la imprimimos en la plantilla escalandola para que encaje
+        // en ella sin deformarse
+        if (rubricImg != null) {
+
+        	rubricImg.setInterpolation(true);
+        	rubricImg.setAbsolutePosition(0, 0);
+
+        	// Reescalamos la imagen para que se adapte al nuevo rectangulo
+        	if (rotation == 90 || rotation == 270) {
+        		final float scale = Math.min(rubricHeight / rubricImg.getWidth(), rubricWidth / rubricImg.getHeight());
+        		final float w = rubricImg.getWidth() * scale;
+        		final float h = rubricImg.getHeight() * scale;
+        		final float x = (rubricWidth - h) / 2;
+        		final float y = (rubricHeight - w) / 2;
+        		canvas.addImage(rubricImg, w, 0, 0, h, y, x);
+        	} else {
+        		final float scale = Math.min(rubricWidth / rubricImg.getWidth(), rubricHeight / rubricImg.getHeight());
+        		final float w = rubricImg.getWidth() * scale;
+        		final float h = rubricImg.getHeight() * scale;
+        		final float x = (rubricWidth - w) / 2;
+        		final float y = (rubricHeight - h) / 2;
+        		canvas.addImage(rubricImg, w, 0, 0, h, x, y);
+        	}
+        }
+
+    	// 3 -- Si hay texto, configuramos la fuente apropiada y lo agregamos
+        if (appearance.getLayer2Text() != null) {
+
+        	Font f = appearance.getLayer2Font();
+        	if (f == null) {
+        		f = new Font();
+        	}
+        	final BaseFont bf = f.getCalculatedBaseFont(false);
+    		canvas.setFontAndSize(bf, f.getSize());
+
+        	final Rectangle rect = new Rectangle(canvas.getBoundingBox());
+        	printText(canvas, appearance.getLayer2Text(), f, rect);
+        }
+
+        // 4 -- Tomamos la imagen generada en el lienzo y la rotamos
+        Image rotatedRubric = Image.getInstance(canvas);
+        rotatedRubric.setInterpolation(true);
+        rotatedRubric.setRotationDegrees(rotation);
+        rotatedRubric.setAbsolutePosition(0, 0);
+
+        // Ahora, la imagen esta rotada a nivel logico, pero no lo estara realmente hasta que se
+        // imprima, asi que creamos un segundo lienzo con el tamano correspondiente a la firma e
+        // imprimimos en el la imagen rotada
+
+        // 5 -- Creamos un segundo lienzo, con el tamano real de la firma, e imprimimos en el la
+        // imagen rotada
+
+        // Creamos el lienzo y copiamos en la version rotada del anterior. Esto es necesario para
+        // conseguir la imagen rotada, pero, por algun motivo, tiene efectos inexperados:
+        //  - Copiara el texto sin rotar, por lo que tendremos que eliminarlo de la version rotada.
+        //  - Habra rotado la imagen (que incluye tanto la rubrica como el texto), pero no la habra
+        //    agregado al nuevo lienzo, por lo que  habra que agregarla.
+        final PdfTemplate rotatedCanvas = PdfTemplate.createTemplate(stamper.getWriter(), rubricWidth, rubricHeight);
+        try (final ByteBuffer actualBuffer = canvas.getInternalBuffer();
+        		final ByteBuffer rotatedBuffer = rotatedCanvas.getInternalBuffer();) {
+        	rotatedBuffer.write(actualBuffer.toByteArray());
+        }
+
+        // Reseteamos para eliminar el texto sin rotar
+        rotatedCanvas.reset();
+
+        // Agregamos la imagen rotada con la rubrica y el texto
+        rotatedCanvas.addImage(rotatedRubric);
+
+        // 6 -- Tomamos la imagen del lienzo y la devolvemos
+        rotatedRubric = Image.getInstance(rotatedCanvas);
+        rotatedRubric.setInterpolation(true);
+        rotatedRubric.setAbsolutePosition(0, 0);
+
+        return rotatedRubric;
+    }
+
+    /**
+     * Imprime un texto en una plantilla PDF.
+     * @param template Plantilla en la que imprimir el texto.
+     * @param text Texto.
+     * @param font Fuente que aplicar.
+     * @param dataRect Espacio que debe ocupar la firma.
+     * @throws DocumentException Cuando ocurre un error al imprimir el texto.
+     */
+    private static void printText(final PdfTemplate template, final String text, final Font font, final Rectangle dataRect) throws DocumentException {
+
+    	final Rectangle sr = new Rectangle(MARGIN, MARGIN, dataRect.getWidth() - MARGIN, dataRect.getHeight() - MARGIN);
+
+    	final float adjustedFontSize = fitText(font, text, sr, font.getSize(), PdfWriter.RUN_DIRECTION_DEFAULT);
+
+    	final ColumnText ct = new ColumnText(template);
+    	ct.setRunDirection(PdfWriter.RUN_DIRECTION_DEFAULT);
+    	ct.setSimpleColumn(new Phrase(text, font), sr.getLeft(), sr.getBottom(), sr.getRight(), sr.getTop(), adjustedFontSize, Element.ALIGN_LEFT);
+    	ct.go();
+    }
+
+    /**
+     * Fits the text to some rectangle adjusting the font size as needed. M&eacute;todo copiado de iText.
+     * @param font the font to use
+     * @param text the text
+     * @param rect the rectangle where the text must fit
+     * @param maxFontSize the maximum font size
+     * @param runDirection the run direction
+     * @return the calculated font size that makes the text fit.
+     * @author Paulo Soares
+     */
+    private static float fitText(final Font font, final String text, final Rectangle rect, float maxFontSize, final int runDirection) {
+        try {
+            ColumnText ct = null;
+            int status = 0;
+            if (maxFontSize <= 0) {
+                int cr = 0;
+                int lf = 0;
+                final char t[] = text.toCharArray();
+                for (int k = 0; k < t.length; ++k) {
+                    if (t[k] == '\n') {
+						++lf;
+					} else if (t[k] == '\r') {
+						++cr;
+					}
+                }
+                final int minLines = Math.max(cr, lf) + 1;
+                maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
+            }
+            font.setSize(maxFontSize);
+            final Phrase ph = new Phrase(text, font);
+            ct = new ColumnText(null);
+            ct.setSimpleColumn(ph, rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), maxFontSize, Element.ALIGN_LEFT);
+            ct.setRunDirection(runDirection);
+            status = ct.go(true);
+            if ((status & ColumnText.NO_MORE_TEXT) != 0) {
+				return maxFontSize;
+			}
+            final float precision = 0.1f;
+            float min = 0;
+            float max = maxFontSize;
+            float size = maxFontSize;
+            for (int k = 0; k < 50; ++k) { //just in case it doesn't converge
+                size = (min + max) / 2;
+                ct = new ColumnText(null);
+                font.setSize(size);
+                ct.setSimpleColumn(new Phrase(text, font), rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), size, Element.ALIGN_LEFT);
+                ct.setRunDirection(runDirection);
+                status = ct.go(true);
+                if ((status & ColumnText.NO_MORE_TEXT) != 0) {
+                    if (max - min < size * precision) {
+						return size;
+					}
+                    min = size;
+                } else {
+					max = size;
+				}
+            }
+            return size;
+        }
+        catch (final Exception e) {
+            throw new ExceptionConverter(e);
+        }
     }
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse

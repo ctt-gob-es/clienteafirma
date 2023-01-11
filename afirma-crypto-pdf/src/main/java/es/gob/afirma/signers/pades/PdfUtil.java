@@ -528,7 +528,7 @@ public final class PdfUtil {
     public static void checkCorrectPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Properties extraParams) {
     	if (!pagesList.isEmpty()) {
 	    	for (final int page : pagesList) {
-	    		final Rectangle pageSize = pdfReader.getPageSize(page);
+	    		final Rectangle pageSize = pdfReader.getPageSizeWithRotation(page);
 	    		if (pageSize.getBottom() <=
 						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
 					&& pageSize.getLeft() <=

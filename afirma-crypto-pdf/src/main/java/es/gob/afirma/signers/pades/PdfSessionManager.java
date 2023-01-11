@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
+import com.aowagie.text.Image;
 import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.exceptions.InvalidPageNumberException;
@@ -509,43 +510,48 @@ public final class PdfSessionManager {
 
 		// Firma visible
 		if (signaturePositionOnPage != null && signatureField == null && !pages.isEmpty()) {
-			if (signatureRotation == 0) {
 
-				// Rubrica de la firma
-				if (rubric != null) {
-					sap.setImage(rubric);
+			try {
+				// Si no hay que rotar la firma, agregamos la imagen de rubrica si procede y listo
+				if (signatureRotation == 0) {
 
-					// Establecemos que la imagen no se ajuste al campo
-					// para que no se deforme
-					sap.setImageScale(-1);
-				}
+					// Rubrica de la firma
+					if (rubric != null) {
+						sap.setImage(rubric);
 
-				try {
-					sap.setVisibleSignature(signaturePositionOnPage, pages.get(0), null);
+						// Establecemos que la imagen no se ajuste al campo
+						// para que no se deforme
+						sap.setImageScale(-1);
+					}
 				}
-				catch (final InvalidPageNumberException e) {
-					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
-				}
-			}
-			else {
-				try {
-					PdfVisibleAreasUtils.setVisibleSignatureRotated(
+				// Si hay que rotar la firma, generamos una imagen con el texto y la imagen de
+				// rubrica ya rotados y la agregamos
+				else {
+
+					final Image rotatedRubric = PdfVisibleAreasUtils.buildRotatedSignatureImage(
 							stp,
 							sap,
 							signaturePositionOnPage,
-							pages.get(0),
-							null,
 							signatureRotation,
 							rubric
-					);
+							);
+
+					// Eliminamos el texto de la apariencia, ya que este se habra impreso en la imagen
+					// de rubrica
+					sap.setLayer2Text(""); //$NON-NLS-1$
+
+					// Agregamos la imagen con el texto y/o rubrica ya rotadas
+					sap.setImage(rotatedRubric);
 				}
-				catch (final InvalidPageNumberException e) {
-					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
-				}
-				catch (final DocumentException e) {
-					throw new IOException("Error en la insercion de la firma rotada: " + e, e //$NON-NLS-1$
-					);
-				}
+
+				// Configuramos la firma visible
+				sap.setVisibleSignature(signaturePositionOnPage, pages.get(0), null);
+			}
+			catch (final InvalidPageNumberException e) {
+				LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
+			}
+			catch (final DocumentException e) {
+				throw new IOException("Error en la insercion de la firma rotada: " + e, e); //$NON-NLS-1$
 			}
 		}
 		// Firma en un campo preexistente (visile o invisible)

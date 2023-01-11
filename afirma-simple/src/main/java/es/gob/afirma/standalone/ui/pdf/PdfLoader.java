@@ -52,7 +52,7 @@ final class PdfLoader {
 		final int numberOfPages = reader.getNumberOfPages();
 		final List<Dimension> pageSizes = new ArrayList<>(numberOfPages);
 		for(int i=1;i<=numberOfPages;i++) {
-			final com.aowagie.text.Rectangle rect = reader.getPageSize(i);
+			final com.aowagie.text.Rectangle rect = reader.getPageSizeWithRotation(i);
 			pageSizes.add(
 				new Dimension(
 					Math.round(rect.getWidth()),
