@@ -20,6 +20,7 @@ BuildArch: noarch
 Aplicación para la firma electrónica de documentos locales y operaciones de firma desde navegador web compatibles con el Cliente @firma.
 
 %pre
+
 if pgrep chromium; then
   pkill chromium;
 fi
@@ -31,6 +32,7 @@ if pgrep firefox; then
 fi
 
 %build
+
 cat > %{name}.desktop <<EOF
 [Desktop Entry]
 Encoding=UTF-8
@@ -47,10 +49,11 @@ MimeType=x-scheme-handler/afirma
 EOF
 
 cat > %{name} <<EOF
-java -Djdk.tls.maxHandshakeMessageSize=50000 -jar %{_libdir}/%{name}/%{name}.jar \$*
+java -Djdk.tls.maxHandshakeMessageSize=50000 -jar %{_libdir}/%{name}/%{name}.jar "\$@"
 EOF
 
 %install
+
 install -d -m 0755 %{buildroot}%{_libdir}/%{name}
 install -d -m 0755 %{buildroot}%{_bindir}
 install -d -m 0755 %{buildroot}/usr/share/applications/
@@ -66,6 +69,7 @@ install -m 0644 %{name}.desktop %{buildroot}/usr/local/share/applications
 install -m 0755 %{name}.js %{buildroot}%{_libdir}/firefox/defaults/pref
 
 %post
+
 java -Djava.awt.headless=true -jar %{_libdir}/%{name}/%{name}Configurador.jar -install
 
 if [ -e /usr/share/applications/mimeapps.list ]; then
@@ -76,6 +80,9 @@ else
 x-scheme-handler/afirma=%{name}.desktop
 EOF
 fi
+if [ -e /usr/share/applications/gnome-mimeapps.list ]; then
+  echo x-scheme-handler/afirma=%{name}.desktop >> /usr/share/applications/gnome-mimeapps.list
+fi
 if [ -e /usr/local/share/applications/mimeapps.list ]; then
   echo x-scheme-handler/afirma=%{name}.desktop >> /usr/local/share/applications/mimeapps.list
 else
@@ -83,9 +90,6 @@ else
 [Default Applications]
 x-scheme-handler/afirma=%{name}.desktop
 EOF
-fi
-if [ -e /usr/share/applications/gnome-mimeapps.list ]; then
-  echo x-scheme-handler/afirma=%{name}.desktop >> /usr/share/applications/gnome-mimeapps.list
 fi
 if [ -e /usr/local/share/applications/gnome-mimeapps.list ]; then
   echo x-scheme-handler/afirma=%{name}.desktop >> /usr/local/share/applications/gnome-mimeapps.list
@@ -96,38 +100,46 @@ if [ -f "%{_libdir}/%{name}/script.sh" ]; then
 fi
 
 %preun
-java -Djava.awt.headless=true -jar %{_libdir}/%{name}/%{name}Configurador.jar -uninstall
-if [ -f "%{_libdir}/%{name}/uninstall.sh" ]; then
-  if pgrep chromium; then
-    pkill chromium;
-  fi
-  if pgrep chrome; then
-    pkill chrome;
-  fi
-  if pgrep firefox; then
-    pkill firefox;
-  fi
-  chmod +x %{_libdir}/%{name}/uninstall.sh
-  %{_libdir}/%{name}/uninstall.sh
+
+# Ejecutamos solo cuando sea una desinstalacion ($1 = 0),
+# no cuando sea una actualizacion ($1 > 0)
+if [ $1 -eq 0 ] ; then
+    java -Djava.awt.headless=true -jar %{_libdir}/%{name}/%{name}Configurador.jar -uninstall
+    if [ -f "%{_libdir}/%{name}/uninstall.sh" ]; then
+        if pgrep chromium; then
+            pkill chromium;
+        fi
+        if pgrep chrome; then
+            pkill chrome;
+        fi
+        if pgrep firefox; then
+            pkill firefox;
+        fi
+        chmod +x %{_libdir}/%{name}/uninstall.sh
+        %{_libdir}/%{name}/uninstall.sh
+    fi
 fi
 
 %postun
-#Clean files created in post
-if [ -e /usr/share/applications/mimeapps.list ]; then
-  sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/share/applications/mimeapps.list
-fi
-if [ -e /usr/local/share/applications/mimeapps.list ]; then
-  sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/local/share/applications/mimeapps.list
-fi
-if [ -e /usr/share/applications/gnome-mimeapps.list ]; then
-  sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/share/applications/gnome-mimeapps.list
-fi
-if [ -e /usr/local/share/applications/gnome-mimeapps.list ]; then
-  sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/local/share/applications/gnome-mimeapps.list
-fi
-rm -r %{_libdir}/%{name}
-echo "Desinstalación completada con exito"
 
+# Ejecutamos solo cuando sea una desinstalacion ($1 = 0),
+# no cuando sea una actualizacion ($1 > 0)
+if [ $1 -eq 0 ] ; then
+    if [ -e /usr/share/applications/mimeapps.list ]; then
+        sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/share/applications/mimeapps.list
+    fi
+    if [ -e /usr/local/share/applications/mimeapps.list ]; then
+        sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/local/share/applications/mimeapps.list
+    fi
+    if [ -e /usr/share/applications/gnome-mimeapps.list ]; then
+        sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/share/applications/gnome-mimeapps.list
+    fi
+    if [ -e /usr/local/share/applications/gnome-mimeapps.list ]; then
+        sed -i '/x-scheme-handler\/afirma=%{name}.desktop/d' /usr/local/share/applications/gnome-mimeapps.list
+    fi
+    rm -r %{_libdir}/%{name}
+    echo "Desinstalación completada con exito"
+fi
 %files
 %license LICENSE
 %dir %{_libdir}/%{name}
@@ -138,7 +150,7 @@ echo "Desinstalación completada con exito"
 %attr(-, root, root) %{_libdir}/%{name}/*
 
 %changelog
-* Fri Mar 11 2022 Gobierno de España AutoFirma 1.8.0
+* Fri Dec 23 2022 Gobierno de España AutoFirma 1.8.0
 - Se agrega mayor flexibilidad al mecanismo de plugins permitiendo nuevas opciones de seguridad e integración a nivel gráfico y en el proceso de firma por protocolo.
 - Se filtra el log de la aplicación para evitar registrar datos referentes a la cuenta del usuario (ruta del directorio de usuario, alias de certificados, etc).
 - Actualización de la biblioteca Java WebSockets a la versión 1.5.0.
