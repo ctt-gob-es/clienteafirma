@@ -1379,7 +1379,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Comprobacion recursiva de la disponibilidad de la aplicacion en los distintos
 			 * puertos hasta un maximo del numero de intentos indicados. */ 
 			function waitAppAndProcessRequest (ports, retries) {
-								
+
 				if (!connected) {
 				
 					if (retries > 0) {
@@ -3808,17 +3808,6 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						signature = fromBase64UrlSaveToBase64(html);
 					}
-					
-					// Guardamos el dato, por si es necesario para la seleccion
-					// de certificado automatica
-					if (!!stickySignatory) {
-						if (!!signature) {
-							stickyCertificate = signature;
-						}
-					}
-					else {
-						stickyCertificate = null;
-					}
 				}
 				else {
 					var sepPos2 = html.indexOf('|', sepPos + 1);
@@ -3844,17 +3833,17 @@ var AutoScript = ( function ( window, undefined ) {
 							extraInfo = Base64.decode(fromBase64UrlSaveToBase64(html.substring(sepPos2 + 1)));
 						}
 					}
-					
-					if (!!stickySignatory) {
-						if (!!certificate) {
-							stickyCertificate = certificate;
-						}
-					}
-					else {
-						stickyCertificate = null;
-					}
 				}
 
+				if (!!stickySignatory) {
+					if (!!certificate) {
+						stickyCertificate = certificate;
+					}
+				}
+				else {
+					stickyCertificate = null;
+				}
+				
 				successCallback(signature, certificate, extraInfo);
 				return false;
 			}
