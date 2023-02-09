@@ -164,6 +164,14 @@ public final class AOSecMod {
                         modules.add(module);
                     }
                 }
+                // Caso normal de error al identificar nombres
+                catch (final IndexOutOfBoundsException e) {
+                    continue;
+				}
+                // Caso normal de error al no detectar un nombre
+                catch (final UnsupportedOperationException e) {
+                    continue;
+				}
                 catch (final Exception e) {
                 	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
             			"Se omite un modulo PKCS#11 de Mozilla: " + e //$NON-NLS-1$
