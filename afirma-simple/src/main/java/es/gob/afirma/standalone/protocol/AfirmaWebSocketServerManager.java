@@ -53,6 +53,8 @@ public class AfirmaWebSocketServerManager {
 		int i = 0;
 		final int[] ports = channelInfo.getPorts();
 		do {
+			LOGGER.info("Tratamos de abrir el socket en el puerto: " + ports[i]); //$NON-NLS-1$
+
 			try {
 				switch (protocolVersion) {
 				case PROTOCOL_VERSION_4:

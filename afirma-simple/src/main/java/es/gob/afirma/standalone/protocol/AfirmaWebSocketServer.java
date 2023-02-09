@@ -65,7 +65,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	@Override
 	public void onOpen(final WebSocket ws, final ClientHandshake handshake) {
-		LOGGER.info("Apertura del socket"); //$NON-NLS-1$
+		LOGGER.info("Apertura del socket del puerto " + getAddress().getPort()); //$NON-NLS-1$
 
 		if (this.wsClient == null) {
 			this.wsClient = ws;
@@ -77,7 +77,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		// Si se cierra el socket es que se ha terminado de operar con la aplicacion y puede cerrarse.
 		// Sin embargo, comprobamos que sea este el primer cliente que lo abrio y no otra instancia
 		// de la aplicacion que luego ha intentado acceder a el
-		LOGGER.info("Se ha cerrado la comunicacion con el socket: " + code + ": " + reason); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Se ha cerrado la comunicacion con el socket del puerto " + getAddress().getPort() + " . Codigo: " + code + ": " + reason); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.wsClient == null || this.wsClient.equals(ws)) {
 			LOGGER.info("Cerramos la aplicacion"); //$NON-NLS-1$
 			Runtime.getRuntime().halt(0);
@@ -91,7 +91,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
-		LOGGER.info("Recibimos una peticion en el socket"); //$NON-NLS-1$
+		LOGGER.info("Recibimos una peticion en el socket del puerto: " + getAddress().getPort()); //$NON-NLS-1$
 
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {
@@ -106,6 +106,6 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	@Override
 	public void onError(final WebSocket ws, final Exception ex) {
-		LOGGER.log(Level.SEVERE, "Error en el socket", ex); //$NON-NLS-1$
+		LOGGER.log(Level.SEVERE, "Error en el socket del puerto " + getAddress().getPort(), ex); //$NON-NLS-1$
 	}
 }

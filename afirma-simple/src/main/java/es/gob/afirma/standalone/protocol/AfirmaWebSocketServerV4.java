@@ -16,7 +16,7 @@ import org.java_websocket.WebSocket;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n 4
- * del protocolo.
+ * del protocolo de AutoFirma.
  */
 public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 
@@ -49,7 +49,7 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
-		LOGGER.info("Recibimos una peticion en el socket"); //$NON-NLS-1$
+		LOGGER.info("Recibimos una peticion en el socket del puerto " + getAddress().getPort()); //$NON-NLS-1$
 
 		// Comprobamos que la peticion haya llegado del mismo equipo
 		final InetAddress remoteAddress = ws.getRemoteSocketAddress().getAddress();
