@@ -1,8 +1,6 @@
 package es.gob.afirma.standalone.ui.preferences;
 
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import es.gob.afirma.standalone.HttpManager;
 
@@ -46,7 +44,6 @@ public class SecureDomainsHandler {
 			PreferencesManager.remove(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST);
 		}
 		else {
-			checkCorrectDomainFormat(secureDomains);
 			PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST, secureDomains);
 		}
 
@@ -58,28 +55,6 @@ public class SecureDomainsHandler {
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al guardar las preferencias de sitios seguros: " + e); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * Comprueba que el formato de los dominios indicados sea el correcto.
-	 * @param domainsText Texto con todos los dominios.
-	 * @throws ConfigurationException Error en caso de formato incorrecto en la lista de dominios.
-	 */
-	private static void checkCorrectDomainFormat(final String domainsText) throws ConfigurationException {
-
-		final String [] domainsArray = domainsText.split(COMMA_SEPARATOR);
-
-		final String regex = "^((?!-)[A-Za-z0-9-*]{1,63}(?<!-)\\.)+[A-Za-z*]{1,6}"; //$NON-NLS-1$
-
-	    final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-
-		for (final String domain : domainsArray) {
-		    final Matcher matcher = pattern.matcher(domain);
-		    final boolean correctFormat = matcher.find();
-		    if (!correctFormat) {
-		    	throw new ConfigurationException("El dominio " + domain + " tiene un formato incorrecto"); //$NON-NLS-1$ //$NON-NLS-2$
-		    }
 		}
 	}
 }
