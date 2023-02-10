@@ -571,7 +571,7 @@ var AutoScript = ( function ( window, undefined ) {
 			// Usamos el modo de invocacion mas apropiado segun el entorno
 			
 			// Redireccion del navegador
-			if (Platform.isChrome() || Platform.isIOS()) {
+			if (Platform.isChrome() || Platform.isIOS() || (Platform.isAndroid() && Platform.isFirefox())) {
 				// Usamos document.location porque tiene mejor soporte por los navegadores que
 				// window.location que es el mecanismo estandar
 				document.location = url;

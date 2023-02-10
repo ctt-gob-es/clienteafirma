@@ -7,6 +7,24 @@
 <script type="text/javascript" src="js/autoscript.js"></script>
 <script type="text/javascript">
 
+function doSignBatchPdf() {
+	try {
+		AutoScript.createBatch("SHA256withRSA", "PAdES", "sign", "layer2Text=Firmado por $$SUBJECTCN$$ el $$SIGNDATE=dd/MM/yyyy (HH:mm:ss)$$\nlayer2FontFamily=1\nlayer2FontSize=8\nlayer2FontStyle=2\nlayer2FontColor=gray\nsignaturePage=-1\nsignaturePositionOnPageLowerLeftX=45\nsignaturePositionOnPageLowerLeftY=80\nsignaturePositionOnPageUpperRightX=560\nsignaturePositionOnPageUpperRightY=140");
+	
+		var data;
+		
+		data = AutoScript.getBase64FromText("1.pdf");
+		buildAndAddSingleSign(data);
+		
+		data = AutoScript.getBase64FromText("2.pdf");
+		buildAndAddSingleSign(data);
+	
+		doSign();
+	} catch (e) {
+		showLog(e);
+	}
+}
+
 
 	function doSignBatchShort() {
 		try {
@@ -238,6 +256,10 @@
 	<button onclick="doSignBatchDefinitionFatalError()">Fallo total lote</button>&nbsp;&nbsp;
 	
 	<button onclick="doSignBatchComunicationFatalError()">Fallo total comunicación</button>&nbsp;&nbsp;
+
+
+<button onclick="doSignBatchPdf()">Firma PDF</button>&nbsp;&nbsp;
+
 
 	<br><br>
 
