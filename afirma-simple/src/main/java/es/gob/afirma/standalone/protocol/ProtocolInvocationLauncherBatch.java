@@ -77,8 +77,8 @@ final class ProtocolInvocationLauncherBatch {
 		}
 
 		// Comprobamos si se exige una version minima del Cliente
-        if (options.getMinimunClientVersion() != null) {
-        	final String minimumRequestedVersion = options.getMinimunClientVersion();
+        if (options.getMinimumClientVersion() != null) {
+        	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
     			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;

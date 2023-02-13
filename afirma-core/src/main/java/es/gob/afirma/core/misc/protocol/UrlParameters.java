@@ -225,7 +225,7 @@ public abstract class UrlParameters {
 	 * aplicaci&oacute;n.
 	 * @return Versi&oacute;n m&iacute;nima del cliente o {@code null} si no
 	 * se estableci&oacute;. */
-	public String getMinimunClientVersion() {
+	public String getMinimumClientVersion() {
 		return this.minimumClientVersion;
 	}
 
@@ -234,7 +234,7 @@ public abstract class UrlParameters {
 	 * aplicaci&oacute;n.
 	 * @param minimumClientVersion Versi&oacute;n m&iacute;nima del cliente.
 	 */
-	protected void setMinimunClientVersion(final String minimumClientVersion) {
+	protected void setMinimumClientVersion(final String minimumClientVersion) {
 		this.minimumClientVersion = minimumClientVersion;
 	}
 
@@ -256,7 +256,7 @@ public abstract class UrlParameters {
 				Boolean.parseBoolean(params.get(ACTIVE_WAITING_PARAM)));
 
 		if (params.containsKey(MINIMUM_CLIENT_VERSION_PARAM)) {
-			setMinimunClientVersion(params.get(MINIMUM_CLIENT_VERSION_PARAM));
+			setMinimumClientVersion(params.get(MINIMUM_CLIENT_VERSION_PARAM));
 		}
 
 		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
