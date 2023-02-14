@@ -171,7 +171,10 @@ public final class HelpResourceManager {
     public static String createHelpFileLauncher(final String targetUrl) throws Exception {
         final File launcherTempFile = new File(System.getProperty("java.io.tmpdir"), "local_launcher.html");  //$NON-NLS-1$//$NON-NLS-2$
         try(PrintWriter writer = new PrintWriter(launcherTempFile, "UTF-8")) { //$NON-NLS-1$
+        	// Redirigira automaticamente a la pagina de ayuda
             writer.println("<meta http-equiv=\"refresh\" content=\"0; url=" + targetUrl + "\" />");  //$NON-NLS-1$//$NON-NLS-2$
+            // En Firefox la redireccion automatica esta desactivada, asi que agregamos javascript para forzarla
+            writer.println("<body onload=\"setTimeout(location.href='" + targetUrl + "', 1000)\">");  //$NON-NLS-1$//$NON-NLS-2$
         } catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error abriendo archivo a escribir", e); //$NON-NLS-1$
         }
