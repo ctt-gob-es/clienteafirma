@@ -137,7 +137,6 @@ final class ExtraParamsHelper {
 	private static Properties loadPAdESExtraParams() {
 
 		final Properties p = new Properties();
-        p.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Preferencias de politica de firma PAdES
         final String policyId = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER);
