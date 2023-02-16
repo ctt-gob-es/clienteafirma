@@ -7,8 +7,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Properties;
 
 import javax.swing.JButton;
@@ -19,7 +17,7 @@ import javax.swing.WindowConstants;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.ConfigurationPanel;
-import es.gob.afirma.standalone.plugins.PluginException;
+import es.gob.afirma.standalone.plugins.manager.PluginException;
 
 /**
  * Di&aacute;logo base sobre el que se sit&uacute;a el panel para la
@@ -40,7 +38,7 @@ public class PluginConfigurationDialog extends JDialog {
 	 * @param plugin Plugin del que mostrar la configuraci&oacute;n.
 	 * @throws PluginException Cuando ocurre un error al cargar el di&aacute;logo.
 	 */
-	public PluginConfigurationDialog(Window parent, AfirmaPlugin plugin) throws PluginException {
+	public PluginConfigurationDialog(final Window parent, final AfirmaPlugin plugin) throws PluginException {
 		super(parent);
 
 		try {
@@ -70,20 +68,14 @@ public class PluginConfigurationDialog extends JDialog {
 	private JPanel createButtonsPanel() {
 		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		final JButton okButton = new JButton(SimpleAfirmaMessages.getString("PluginConfigurationDialog.0")); //$NON-NLS-1$
-		okButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PluginConfigurationDialog.this.accepted = true;
-				dispose();
-			}
+		okButton.addActionListener(e -> {
+			PluginConfigurationDialog.this.accepted = true;
+			dispose();
 		});
 		final JButton cancelButton = new JButton(SimpleAfirmaMessages.getString("PluginConfigurationDialog.1")); //$NON-NLS-1$
-		cancelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PluginConfigurationDialog.this.accepted = false;
-				dispose();
-			}
+		cancelButton.addActionListener(e -> {
+			PluginConfigurationDialog.this.accepted = false;
+			dispose();
 		});
 
 		panel.add(okButton);
@@ -98,7 +90,7 @@ public class PluginConfigurationDialog extends JDialog {
 	 * actualmente almacenada.
 	 * @param config Configuraci&oacute;n almacenada.
 	 */
-	public void init(Properties config) {
+	public void init(final Properties config) {
 		this.accepted = false;
 		this.configPanel.init(config);
 	}

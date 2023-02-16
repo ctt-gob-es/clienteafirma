@@ -194,6 +194,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugins-manager</module>
 				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 			</modules>
@@ -294,6 +295,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugins-manager</module>
 				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 				
@@ -365,6 +367,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugins-manager</module>
 				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 				
@@ -448,6 +451,7 @@
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugins-manager</module>
 				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 				

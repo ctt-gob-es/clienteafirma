@@ -78,15 +78,14 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
-import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
-import es.gob.afirma.standalone.plugins.PluginsManager;
 import es.gob.afirma.standalone.plugins.SignDataProcessor;
 import es.gob.afirma.standalone.plugins.SignOperation;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 import es.gob.afirma.standalone.plugins.SignResult;
+import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
+import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
@@ -205,7 +204,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 		List<AfirmaPlugin> plugins;
 		try {
-			plugins = PluginsManager.getInstance().getPluginsLoadedList();
+			plugins = SimpleAfirma.getPluginsManager().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se pudo cargar el listado de plugins", e); //$NON-NLS-1$
 			return new NativeSignDataProcessor(protocolVersion);

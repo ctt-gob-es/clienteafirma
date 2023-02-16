@@ -11,15 +11,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
 import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginButton;
-import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
-import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
-import es.gob.afirma.standalone.plugins.PluginsManager;
+import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
+import es.gob.afirma.standalone.plugins.manager.PluginException;
 
 /**
  * Clase para la creaci&oacute;n de componentes gr&aacute;ficos para la integraci&oacute;n de los plugins.
@@ -40,7 +39,7 @@ public class PluginsUiComponentsBuilder {
 		final List<PluginGraphicButton> jButtons = new ArrayList<>();
         List<AfirmaPlugin> plugins = null;
 		try {
-			plugins = PluginsManager.getInstance().getPluginsLoadedList();
+			plugins = SimpleAfirma.getPluginsManager().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se han podido cargar los plugins en la aplicacion", e); //$NON-NLS-1$
 		}
@@ -77,7 +76,7 @@ public class PluginsUiComponentsBuilder {
 		final List<GenericMenuOption> menuList = new ArrayList<>();
 		List<AfirmaPlugin> plugins = null;
 		try {
-			plugins = PluginsManager.getInstance().getPluginsLoadedList();
+			plugins = SimpleAfirma.getPluginsManager().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se han podido cargar los plugins en la aplicacion", e); //$NON-NLS-1$
 		}

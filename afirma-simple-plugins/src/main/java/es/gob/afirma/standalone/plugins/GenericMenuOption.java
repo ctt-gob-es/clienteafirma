@@ -11,11 +11,11 @@ public class GenericMenuOption {
 	private String dialogClass = null;
 	private List<GenericMenuOption> menus = null;
 
-	GenericMenuOption(final String title) {
+	public GenericMenuOption(final String title) {
 		this(title, null);
 	}
 
-	GenericMenuOption(final String title, final String actionClassName) {
+	public GenericMenuOption(final String title, final String actionClassName) {
 		this.title = title;
 		this.actionClassName = actionClassName;
 	}
@@ -40,7 +40,7 @@ public class GenericMenuOption {
 		this.action = action;
 	}
 
-	void addSubMenu(final GenericMenuOption subMenu) {
+	public void addSubMenu(final GenericMenuOption subMenu) {
 		if (this.menus == null) {
 			this.menus = new ArrayList<>();
 		}
@@ -55,7 +55,7 @@ public class GenericMenuOption {
 		return this.dialogClass;
 	}
 
-	void setDialogClass(final String dialogClass) {
+	public void setDialogClass(final String dialogClass) {
 		this.dialogClass = dialogClass;
 	}
 }

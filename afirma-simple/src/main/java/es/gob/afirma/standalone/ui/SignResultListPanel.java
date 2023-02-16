@@ -39,7 +39,6 @@ import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.OutputData;
 import es.gob.afirma.standalone.plugins.PluginAction;
-import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
 /** Panel con el resultado de un proceso de firma masiva. */

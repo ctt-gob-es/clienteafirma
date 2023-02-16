@@ -668,7 +668,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * necesarios para ejecutar la operaci&oacute;n.
 	 * @return El valor cero en caso de &eacute;xito, -1 si no se proporciona un par&aacute;metro
 	 * o cualquier otro c&oacute;digo de error del sistema.
-	 * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)">https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)</a>
+	 * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx">https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)</a>
 	 */
 	private static int restoreProtocolRegistryByApp(final File installDir, final String workingDir) {
 

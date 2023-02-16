@@ -63,14 +63,14 @@ import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginCommand;
 import es.gob.afirma.standalone.plugins.PluginCommandAction;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
-import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
-import es.gob.afirma.standalone.plugins.PluginLoader;
-import es.gob.afirma.standalone.plugins.PluginsManager;
+import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
+import es.gob.afirma.standalone.plugins.manager.PluginException;
+import es.gob.afirma.standalone.plugins.manager.PluginLoader;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -97,6 +97,8 @@ final class CommandLineLauncher {
 	private static final String STORE_NSS  = "mozilla"; //$NON-NLS-1$
 	private static final String STORE_DNI  = "dni"; //$NON-NLS-1$
 	private static final String STORE_P11  = "pkcs11"; //$NON-NLS-1$
+
+    private static PluginsManager pluginsManager = null;
 
 	static void processCommandLine(final String[] args) {
 
@@ -248,7 +250,7 @@ final class CommandLineLauncher {
 	 */
 	private static PluginCommand[] getPluginCommands() throws PluginException {
 		final List<PluginCommand> commands = new ArrayList<>();
-		for (final AfirmaPlugin plugin : PluginsManager.getInstance().getPluginsLoadedList()) {
+		for (final AfirmaPlugin plugin : pluginsManager.getPluginsLoadedList()) {
 			final PluginInfo info = plugin.getInfo();
 			final PluginCommand[] pluginCommands = info.getCommands();
 			if (pluginCommands != null) {
@@ -267,7 +269,7 @@ final class CommandLineLauncher {
 	 * @throws PluginException Cuando falla la carga de la informaci&oacute;n del plugin.
 	 */
 	private static PluginCommand getPluginCommand(final String command) throws PluginException {
-		for (final AfirmaPlugin plugin : PluginsManager.getInstance().getPluginsLoadedList()) {
+		for (final AfirmaPlugin plugin : pluginsManager.getPluginsLoadedList()) {
 			final PluginInfo info = plugin.getInfo();
 			if (PermissionChecker.check(info, Permission.COMMANDS)) {
 				final PluginCommand[] pluginCommands = info.getCommands();
@@ -938,6 +940,11 @@ final class CommandLineLauncher {
 	}
 
 	public static void main(final String[] args) {
+
+		if (pluginsManager == null) {
+			pluginsManager = SimpleAfirma.getPluginsManager();
+		}
+
 		processCommandLine( args );
 	}
 

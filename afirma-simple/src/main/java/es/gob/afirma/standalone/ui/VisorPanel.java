@@ -62,7 +62,6 @@ import es.gob.afirma.standalone.VisorFirma;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 import es.gob.afirma.standalone.plugins.OutputData;
 import es.gob.afirma.standalone.plugins.PluginAction;
-import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
 /** Visor de firmas.

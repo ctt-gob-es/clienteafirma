@@ -49,7 +49,6 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 import es.gob.afirma.standalone.plugins.OutputData;
 import es.gob.afirma.standalone.plugins.PluginAction;
-import es.gob.afirma.standalone.plugins.PluginIntegrationWindow;
 import es.gob.afirma.standalone.plugins.SignatureProcessAction;
 
 /** Panel con detalles de una firma electr&oacute;nica. */

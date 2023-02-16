@@ -12,7 +12,7 @@ public abstract class PluginAction {
 
 	private AfirmaPlugin plugin = null;
 
-	final void setPlugin(final AfirmaPlugin plugin) {
+	public final void setPlugin(final AfirmaPlugin plugin) {
 		this.plugin = plugin;
 	}
 

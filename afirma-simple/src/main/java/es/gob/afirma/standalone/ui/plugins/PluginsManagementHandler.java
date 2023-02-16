@@ -27,16 +27,16 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
-import es.gob.afirma.standalone.plugins.JarNoSignedException;
-import es.gob.afirma.standalone.plugins.JarVerifier;
 import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
-import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
-import es.gob.afirma.standalone.plugins.PluginInstalledException;
-import es.gob.afirma.standalone.plugins.PluginsManager;
-import es.gob.afirma.standalone.plugins.PluginsPreferences;
+import es.gob.afirma.standalone.plugins.manager.JarNoSignedException;
+import es.gob.afirma.standalone.plugins.manager.JarVerifier;
+import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
+import es.gob.afirma.standalone.plugins.manager.PluginException;
+import es.gob.afirma.standalone.plugins.manager.PluginInstalledException;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
+import es.gob.afirma.standalone.plugins.manager.PluginsPreferences;
 
 /**
  * Manegador de eventos de PluginsManagementPanel.
@@ -50,6 +50,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	private static final String[] PLUGIN_EXTENSIONS = { "jar", "zip" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private final PluginsManagementPanel view;
+	private final PluginsManager pluginsManager;
 
 	private List<AfirmaPlugin> pluginsList;
 
@@ -58,8 +59,9 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 * gesti&oacute;n de plugins.
 	 * @param view Panel sobre en el que encuentran los componentes que gestinar.
 	 */
-	public PluginsManagementHandler(final PluginsManagementPanel view) {
+	public PluginsManagementHandler(final PluginsManagementPanel view, final PluginsManager pluginsManager) {
 		this.view = view;
+		this.pluginsManager = pluginsManager;
 	}
 
 	/**
@@ -160,13 +162,11 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 	private void addPlugin(final File pluginFile, final PluginInfo info) {
 
-		final PluginsManager pluginsManager = PluginsManager.getInstance();
-
 		// Copiamos el plugin al subdirectorio correspondiente dentro del
 		// directorio de instalacion
 		AfirmaPlugin plugin;
 		try {
-			plugin = pluginsManager.installPlugin(pluginFile, info.getInternalName());
+			plugin = this.pluginsManager.installPlugin(pluginFile, info.getInternalName());
 		}
 		catch (final PluginControlledException e) {
 			LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
@@ -185,8 +185,8 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 				return;
 			}
 			try {
-				removeLoadedPlugin(pluginsManager, info);
-				plugin = pluginsManager.installPlugin(pluginFile, info.getInternalName());
+				removeLoadedPlugin(info);
+				plugin = this.pluginsManager.installPlugin(pluginFile, info.getInternalName());
 			}
 			catch (final Exception e2) {
 				LOGGER.log(Level.WARNING, "No se ha podido reemplazar la version preexistente del plugin", e2); //$NON-NLS-1$
@@ -206,10 +206,8 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 
 		// Mostramos la informacion del plugin
-		showPluginInfo(pluginsManager, plugin);
+		showPluginInfo(plugin);
 	}
-
-
 
 	private boolean verifyJar(final File pluginFile) {
 
@@ -270,7 +268,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		return files[0];
 	}
 
-	private void showPluginInfo(final PluginsManager manager, final AfirmaPlugin plugin) {
+	private void showPluginInfo(final AfirmaPlugin plugin) {
 
 		// Actualizamos la lista con los plugins cargados
 		final JList<AfirmaPlugin> list = this.view.getPluginsList();
@@ -279,7 +277,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		List<AfirmaPlugin> loadedPlugins;
 		try {
-			loadedPlugins = manager.getPluginsLoadedList();
+			loadedPlugins = this.pluginsManager.getPluginsLoadedList();
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo cargar la nueva lista de plugins cargados, se usara la anterior ", e); //$NON-NLS-1$
@@ -298,12 +296,11 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 	/**
 	 * Elimina una instalaci&oacute;n de un plugin que probablemente este cargado en memoria.
-	 * @param pluginsManager Manejador de plugins.
 	 * @param info Informaci&oacute;n del plugin a eliminar.
 	 * @throws PluginException Cuando no se puede reemplazar la versi&oacute;n
 	 * preexistente del plugin.
 	 */
-	private void removeLoadedPlugin(final PluginsManager pluginsManager, final PluginInfo info) throws PluginException {
+	private void removeLoadedPlugin(final PluginInfo info) throws PluginException {
 
 		// Para desinstalar el plugin anterior, antes vemos si esta en la lista de plugins
 		AfirmaPlugin previousPlugin = null;
@@ -327,7 +324,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		// Si no esta, sera un resto residual de un plugin y tendremos que eliminar su directorio
 		else {
 			try {
-				PluginsManager.forceRemove(info.getInternalName());
+				this.pluginsManager.forceRemove(info.getInternalName());
 			} catch (final IOException e) {
 				throw new PluginException("No se pudo eliminar el directorio residual del plugin anterior", e); //$NON-NLS-1$
 			}
@@ -379,7 +376,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 */
 	private void removePlugin(final AfirmaPlugin plugin) throws IOException {
 		// Desinstalamos el plugin
-		PluginsManager.getInstance().uninstallPlugin(plugin);
+		this.pluginsManager.uninstallPlugin(plugin);
 
 		// Eliminamos el plugin del listado
 		final JList<AfirmaPlugin> list = this.view.getPluginsList();
@@ -400,7 +397,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		File currentFile;
 		try {
-			currentFile = new File(PluginsManager.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			currentFile = new File(PluginsManagementHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se ha podido identificar el fichero ejecutable", e); //$NON-NLS-1$
@@ -553,7 +550,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 */
 	void loadViewData() {
 		try {
-			this.pluginsList = PluginsManager.getInstance().getPluginsLoadedList();
+			this.pluginsList = this.pluginsManager.getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.severe("No se ha podido cargar la lista de plugins"); //$NON-NLS-1$
 			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.8"), e); //$NON-NLS-1$

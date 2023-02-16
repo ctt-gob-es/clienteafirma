@@ -32,6 +32,7 @@ import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 
@@ -61,16 +62,11 @@ public final class PluginsManagementPanel extends JPanel {
 	 */
 	PluginsManagementPanel(final Window w) {
 		this.window = w;
-		this.eventsHandler = new PluginsManagementHandler(this);
+		this.eventsHandler = new PluginsManagementHandler(this, SimpleAfirma.getPluginsManager());
 		createUI();
 		this.eventsHandler.registerComponents();
 
-        new Thread(new Runnable() {
-			@Override
-			public void run() {
-				PluginsManagementPanel.this.eventsHandler.loadViewData();
-			}
-		}).start();
+        new Thread(() -> PluginsManagementPanel.this.eventsHandler.loadViewData()).start();
 	}
 
 	/**

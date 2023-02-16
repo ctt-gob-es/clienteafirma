@@ -58,14 +58,15 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PermissionChecker;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
-import es.gob.afirma.standalone.plugins.PluginException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
-import es.gob.afirma.standalone.plugins.PluginsManager;
+import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
+import es.gob.afirma.standalone.plugins.manager.PluginException;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
@@ -834,7 +835,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
     private static byte[] pluginsPreProcess(final byte[] data, final String format) {
 
-    	final PluginsManager pluginsManager = PluginsManager.getInstance();
+    	final PluginsManager pluginsManager = SimpleAfirma.getPluginsManager();
     	final List<AfirmaPlugin> plugins;
 		try {
 			plugins = pluginsManager.getPluginsLoadedList();
@@ -884,7 +885,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
     private static byte[] pluginsPostProcess(final byte[] signature, final String format, final Certificate[] certChain) {
 
-    	final PluginsManager pluginsManager = PluginsManager.getInstance();
+    	final PluginsManager pluginsManager = SimpleAfirma.getPluginsManager();
     	final List<AfirmaPlugin> plugins;
 		try {
 			plugins = pluginsManager.getPluginsLoadedList();
@@ -934,7 +935,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
     private static void pluginsReset() {
 
-    	final PluginsManager pluginsManager = PluginsManager.getInstance();
+    	final PluginsManager pluginsManager = SimpleAfirma.getPluginsManager();
     	final List<AfirmaPlugin> plugins;
 		try {
 			plugins = pluginsManager.getPluginsLoadedList();

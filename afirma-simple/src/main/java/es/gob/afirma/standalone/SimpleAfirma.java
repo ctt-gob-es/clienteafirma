@@ -64,7 +64,7 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.standalone.plugins.PluginsManager;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncher;
 import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
@@ -114,6 +114,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
 			+ "AutoFirma"; //$NON-NLS-1$
+
+	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
 	/**
 	 * Inicio (en min&uacute;sculas) de una ruta que invoca a la aplicaci&oacute;n
@@ -192,6 +194,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     private AOKeyStoreManager ksManager;
     private final MainMenu mainMenu;
+
+    private static final PluginsManager pluginsManager = new PluginsManager(getPluginsDir());
 
 	/**
 	 * Construye la aplicaci&oacute;n principal y establece el <i>Look&amp;Feel</i>.
@@ -791,7 +795,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 				LOGGER.info("Cargando plugins"); //$NON-NLS-1$
 				try {
-					PluginsManager.getInstance().getPluginsLoadedList();
+					SimpleAfirma.getPluginsManager().getPluginsLoadedList();
 				} catch (final Exception e) {
 					LOGGER.severe("No se han podido cargar los plugins en la aplicacion"); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.4"), //$NON-NLS-1$
@@ -944,15 +948,18 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     static String getIp() throws IOException {
         final URL whatismyip = new URL(IP_DISCOVERY_AUTOMATION);
-		try (BufferedReader in = new BoundedBufferedReader(new InputStreamReader(whatismyip.openStream()), 1, // Solo
-																												// leemos
-																												// una
-																												// linea
+		try (BufferedReader in = new BoundedBufferedReader(
+				new InputStreamReader(whatismyip.openStream()),
+				1, // Solo leemos una linea
 	            2048 // Maximo 2048 octetos en esa linea
 		);) {
         	return in.readLine();
         }
     }
+
+    public static PluginsManager getPluginsManager() {
+		return SimpleAfirma.pluginsManager;
+	}
 
     /**
      * Devuelve el panel que actualmente muestra la aplicaci&oacute;n.
@@ -980,6 +987,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		return version;
 	}
+
+
 
 	/** Imprime a traves del log la informacion b&aacute;sica del sistema. */
 	private static void printSystemInfo() {
@@ -1109,4 +1118,18 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CHECK_JAVA_VERSION, true);
     	}
 	}
+
+    /**
+     * Obtiene el directorio en el que se encuentran guardados o se deben
+     * guardar los plugins.
+     * @return Directorio de plugins.
+     */
+    private static File getPluginsDir() {
+		File appDir = AutoFirmaUtil.getAlternativeDirectory();
+		if (appDir == null) {
+			appDir = AutoFirmaUtil.getApplicationDirectory();
+		}
+		return new File(appDir, PLUGINS_DIRNAME);
+	}
+
 }

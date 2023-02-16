@@ -49,6 +49,12 @@
 			<artifactId>afirma-ui-simpleafirma-plugins</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-simpleafirma-plugins-manager</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
@@ -210,19 +216,7 @@
 		<dependency>
 		    <groupId>org.java-websocket</groupId>
 			<artifactId>Java-WebSocket</artifactId>
- 			<version>1.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.json</groupId>
-			<artifactId>javax.json-api</artifactId>
-			<version>1.0</version>
-		</dependency>
-
-		<dependency>
-    		<groupId>org.glassfish</groupId>
-    		<artifactId>javax.json</artifactId>
-    		<version>1.0.4</version>
+ 			<version>1.5.3</version>
 		</dependency>
 
 		<dependency>
