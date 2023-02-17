@@ -22,6 +22,7 @@ Spanish.lproj/gfx/menugeneral_mini.png
 Spanish.lproj/gfx/menugproxy_mini.png
 Spanish.lproj/gfx/menulistablancadominios.png
 Spanish.lproj/gfx/menuplugins_mini.png
+Spanish.lproj/gfx/menurestaurar_mini.png
 Spanish.lproj/gfx/pantalladetalle2_mini.png
 Spanish.lproj/gfx/pantalladetalle_mini.png
 Spanish.lproj/gfx/pantallaespera_mini.png
@@ -32,6 +33,7 @@ Spanish.lproj/pgs/Licencia.html
 Spanish.lproj/pgs/LineaComandos.html
 Spanish.lproj/pgs/MenuPlugins.html
 Spanish.lproj/pgs/MenuPreferencias.html
+Spanish.lproj/pgs/MenuRestauracion.html
 Spanish.lproj/pgs/PantallaDetalle.html
 Spanish.lproj/pgs/PantallaEspera.html
 Spanish.lproj/pgs/PantallaFirma.html
