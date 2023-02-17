@@ -151,7 +151,10 @@ public final class PdfSessionManager {
 
 		final int totalPages = pdfReader.getNumberOfPages();
 
-		if (pagesStr.length > 0) {
+		if (pagesStr.length == 0) {
+			pages.add(totalPages);
+		}
+		else {
 			if (APPEND_PAGE.equalsIgnoreCase(pagesStr[0])) {
 				pages.add(NEW_PAGE);
 			} else if (ALL_PAGES.equalsIgnoreCase(pagesStr[0])) {
