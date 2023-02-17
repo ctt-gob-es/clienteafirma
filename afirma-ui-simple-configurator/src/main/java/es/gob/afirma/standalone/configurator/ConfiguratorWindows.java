@@ -29,6 +29,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +38,8 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 
 /** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de AutoFirma. */
@@ -189,6 +192,17 @@ final class ConfiguratorWindows implements Configurator {
 		return ConfiguratorUtil.getApplicationDirectory();
 	}
 
+	@Override
+	public File getAplicationDirectory() {
+		return getApplicationDirectory(false);
+	}
+
+	@Override
+	public File getAlternativeApplicationDirectory() {
+		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
+		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+	}
+
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario. */
@@ -197,7 +211,7 @@ final class ConfiguratorWindows implements Configurator {
 	}
 
 	@Override
-	public void uninstall(final Console console) {
+	public void uninstall(final Console console, final PluginsManager pluginsManager) {
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Windows"); //$NON-NLS-1$
 		uninstallRootCAWindowsKeyStore();
@@ -207,12 +221,34 @@ final class ConfiguratorWindows implements Configurator {
 				getApplicationDirectory(this.jnlpInstance),
 				console);
 
-		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
+		// Eliminamos el protocolo afirma del fichero de configuracion de Google Chrome
+		LOGGER.info("Eliminamos el protocolo \"afirma\" del fichero de configuracion de Google Chrome"); //$NON-NLS-1$
 		configureChrome(null, false);
+
+		// Listamos los plugins instalados
+		List<AfirmaPlugin> plugins = null;
+		try {
+			plugins = pluginsManager.getPluginsLoadedList();
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+		}
+
+		// Desinstalamos los plugins instalados si los hubiese
+		if (plugins != null && !plugins.isEmpty()) {
+			LOGGER.info("Desinstalamos los plugins instalados"); //$NON-NLS-1$
+			for (final AfirmaPlugin plugin : plugins) {
+				try {
+					pluginsManager.uninstallPlugin(plugin);
+				} catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se pudo desinstalar el plugin: " + plugin.getInfo().getName(), e); //$NON-NLS-1$
+				}
+			}
+		}
 
 		// Eliminamos el directorio alternativo en el que se instalan los certificados SSL
 		// durante el proceso de restauracion de la instalacion
-		final File alternativeDir = getWindowsAlternativeAppDir();
+		final File alternativeDir = getAlternativeApplicationDirectory();
 		if (alternativeDir.isDirectory()) {
 			try {
 				Files.walkFileTree(
@@ -426,15 +462,6 @@ final class ConfiguratorWindows implements Configurator {
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de confianza de Windows: " + e); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Windows.
-	 * @return Directorio de instalaci&oacute;n.
-	 */
-	private static File getWindowsAlternativeAppDir() {
-		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
 	}
 
 	/**

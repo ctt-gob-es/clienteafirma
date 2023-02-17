@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -46,6 +47,8 @@ import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
  * AutoFirma. */
@@ -94,7 +97,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		console.print(Messages.getString("ConfiguratorMacOSX.2")); //$NON-NLS-1$
 
-		final File resourcesDir = getResourcesDirectory();
+		final File resourcesDir = getResourcesDirectory(true);
 
 		console.print(Messages.getString("ConfiguratorMacOSX.3") + resourcesDir.getAbsolutePath()); //$NON-NLS-1$
 
@@ -475,28 +478,48 @@ final class ConfiguratorMacOSX implements Configurator {
 	}
 
 	@Override
-	public void uninstall(final Console console) {
+	public void uninstall(final Console console, final PluginsManager pluginsManager) {
 
 		LOGGER.info("Desinstalacion del certificado raiz de los almacenes de MacOSX"); //$NON-NLS-1$
 
 		final File resourcesDir;
 		try {
-			resourcesDir = getResourcesDirectory();
+			resourcesDir = getResourcesDirectory(true);
 		}
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "No se pudo obtener el directorio de recursos de la aplicacion", e); //$NON-NLS-1$
 			return;
 		}
 
-
 		// Obtenemos del usuario y probamos la contrasena del Llavero
 		final byte[] keyChainPhrase = getKeyChainPhrase(console);
 
 		uninstallProcess(resourcesDir, keyChainPhrase);
 
+		// Listamos los plugins instalados
+		List<AfirmaPlugin> plugins = null;
+		try {
+			plugins = pluginsManager.getPluginsLoadedList();
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+		}
+
+		// Desinstalamos los plugins instalados si los hubiese
+		if (plugins != null && !plugins.isEmpty()) {
+			LOGGER.info("Desinstalamos los plugins instalados"); //$NON-NLS-1$
+			for (final AfirmaPlugin plugin : plugins) {
+				try {
+					pluginsManager.uninstallPlugin(plugin);
+				} catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se pudo desinstalar el plugin: " + plugin.getInfo().getName(), e); //$NON-NLS-1$
+				}
+			}
+		}
+
 		// Eliminamos si existe el directorio alternativo usado para el guardado de certificados
 		// SSL durante el proceso de restauracion de la instalacion
-		final File alternativeDir = getMacOSAlternativeAppDir();
+		final File alternativeDir = getAlternativeApplicationDirectory();
 		if (alternativeDir.isDirectory()) {
 			try {
 				Files.walkFileTree(
@@ -728,13 +751,17 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	private static File getResourcesDirectory() throws IOException {
+	private static File getResourcesDirectory() {
+		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
+		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+	}
+
+	private static File getResourcesDirectory(final boolean create) throws IOException {
 
 		// Devuelve un directorio en el que copiar y generar los recursos
 		// necesarios por la aplicacion
-		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-		final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
-		if (!appDir.isDirectory() && !appDir.mkdirs()) {
+		final File appDir = getResourcesDirectory();
+		if (create && !appDir.isDirectory() && !appDir.mkdirs()) {
 			throw new IOException("No se ha podido generar el directorio de recursos de la aplicacion: " + appDir.getAbsolutePath()); //$NON-NLS-1$
 		}
 		return appDir;
@@ -1045,12 +1072,20 @@ final class ConfiguratorMacOSX implements Configurator {
 		return path.replace(" ", "\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/**
-	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas macOS.
-	 * @return Directorio de instalaci&oacute;n.
-	 */
-	private static File getMacOSAlternativeAppDir() {
-		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+	@Override
+	public File getAplicationDirectory() {
+		try {
+			return new File(
+					ConfiguratorMacOSX.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+				).getParentFile();
+		} catch (final URISyntaxException e) {
+			LOGGER.log(Level.WARNING, "No se pudo identificar el directorio de instalacion de la aplicacion (en el que se encuentra el configurador)", e); //$NON-NLS-1$
+			return null;
+		}
+	}
+
+	@Override
+	public File getAlternativeApplicationDirectory() {
+		return getResourcesDirectory();
 	}
 }

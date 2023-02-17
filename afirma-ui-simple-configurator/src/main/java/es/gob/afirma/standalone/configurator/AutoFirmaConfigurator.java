@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Configurador de la instalaci&oacute;n de AutoFirma. Identifica el entorno, genera un
  * certificado de firma y lo instala en los almacenes pertinentes. */
@@ -53,6 +54,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path"; //$NON-NLS-1$
+
+	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
 	private Configurator configurator;
 
@@ -196,7 +199,22 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 
 		// Creamos el almacen para la configuracion del SSL
-		this.configurator.uninstall(this.mainScreen);
+		final File pluginsDir = getPluginsDir(this.configurator);
+		final PluginsManager pluginsManager = new PluginsManager(pluginsDir);
+		this.configurator.uninstall(this.mainScreen, pluginsManager);
+	}
+
+    /**
+     * Obtiene el directorio en el que se encuentran guardados o se deben
+     * guardar los plugins.
+     * @return Directorio de plugins.
+     */
+    private static File getPluginsDir(final Configurator configurator) {
+		File appDir = configurator.getAlternativeApplicationDirectory();
+		if (appDir == null) {
+			appDir = configurator.getAplicationDirectory();
+		}
+		return new File(appDir, PLUGINS_DIRNAME);
 	}
 
     /** Cierra la aplicaci&oacute;n.

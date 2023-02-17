@@ -9,8 +9,11 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Interfaz que define los m&eacute;todos necesarios para configurar el sistema operativo tras la
  * instalaci&oacute;n de AutoFirma. */
@@ -23,7 +26,24 @@ interface Configurator {
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados. */
 	void configure(Console window) throws IOException, ConfigurationException, GeneralSecurityException;
 
-	/** Desinstala los componentes necesarios del sistema.
-	 * @param window Ventana padre con consola. */
-	void uninstall(Console window);
+	/**
+	 * Desinstala del sistema los recursos de la aplicaci&oacute;n y los plugins instalados.
+	 * @param window Ventana padre con consola.
+	 * @param pluginsManager Gestor de plugins.
+	 */
+	void uninstall(Console window, final PluginsManager pluginsManager);
+
+	/**
+	 * Obtiene el directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @return Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 */
+	File getAplicationDirectory();
+
+	/**
+	 * Obtiene el directorio alternativo en el que se almacenaran los recursos
+	 * de la aplicaci&oacute;n que se hayan generado posteriormente a la
+	 * instalaci&oacute;n.
+	 * @return Directorio alternativo de la aplicaci&oacute;n.
+	 */
+	File getAlternativeApplicationDirectory();
 }

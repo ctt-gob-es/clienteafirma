@@ -6,8 +6,6 @@ package es.gob.afirma.standalone.plugins;
 public enum Permission {
 	/** Permiso de instalaci&oacute;n. */
 	INSTALL(1),
-	/** Permiso de desinstalaci&oacute;n. */
-	UNINSTALL(2),
 	/** Permiso para reiniciar la aplicaci&oacute;n. */
 	RESET(3),
 	/** Permiso para procesar los datos antes de la firma. */

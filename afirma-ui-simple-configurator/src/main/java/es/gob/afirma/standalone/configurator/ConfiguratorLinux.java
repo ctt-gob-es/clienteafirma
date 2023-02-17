@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de AutoFirma. */
 final class ConfiguratorLinux implements Configurator {
@@ -162,6 +164,17 @@ final class ConfiguratorLinux implements Configurator {
 			throw new IOException("No ha podido crearse el directorio para los ficheros de aplicacion"); //$NON-NLS-1$
 		}
 		return appDir;
+	}
+
+	@Override
+	public File getAplicationDirectory() {
+		return getApplicationDirectory(false);
+	}
+
+	@Override
+	public File getAlternativeApplicationDirectory() {
+		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
 	}
 
     /** Obtiene los directorios de usuarios del sistema.
@@ -604,14 +617,35 @@ final class ConfiguratorLinux implements Configurator {
 	}
 
     @Override
-    public void uninstall(final Console console) {
+    public void uninstall(final Console console, final PluginsManager pluginsManager) {
         // No es necesario hacer nada mas  alla de eliminar los elementos creados por la aplicacion
     	// porque el  proceso de desinstalacion de linux eliminara el directorio de aplicacion con
     	// todo su contenido.
 
+    	// Listamos los plugins instalados
+    	List<AfirmaPlugin> plugins = null;
+    	try {
+    		plugins = pluginsManager.getPluginsLoadedList();
+    	}
+    	catch (final Exception e) {
+    		LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+    	}
+
+    	// Desinstalamos los plugins instalados si los hubiese
+    	if (plugins != null && !plugins.isEmpty()) {
+    		LOGGER.info("Desinstalamos los plugins instalados"); //$NON-NLS-1$
+    		for (final AfirmaPlugin plugin : plugins) {
+    			try {
+    				pluginsManager.uninstallPlugin(plugin);
+    			} catch (final Exception e) {
+    				LOGGER.log(Level.WARNING, "No se pudo desinstalar el plugin: " + plugin.getInfo().getName(), e); //$NON-NLS-1$
+    			}
+    		}
+    	}
+
     	// Eliminamos si existe el directorio alternativo usado para el guardado de certificados
-    	// SSL durante el proceso de restauracion de la instalacion
-    	final File alternativeDir = getLinuxAlternativeAppDir();
+    	// SSL durante el proceso de instalacion
+    	final File alternativeDir = getAlternativeApplicationDirectory();
     	if (alternativeDir.isDirectory()) {
     		try {
     			Files.walkFileTree(
@@ -645,13 +679,4 @@ final class ConfiguratorLinux implements Configurator {
     		}
     	}
     }
-
-	/**
-	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Linux.
-	 * @return Directorio de instalaci&oacute;n.
-	 */
-	private static File getLinuxAlternativeAppDir() {
-		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
-	}
 }

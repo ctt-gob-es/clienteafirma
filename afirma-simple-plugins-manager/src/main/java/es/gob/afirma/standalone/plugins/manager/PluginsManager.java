@@ -334,7 +334,7 @@ public class PluginsManager {
 		final PluginInfo info = plugin.getInfo();
 
 		// Ejecutamos el proceso de desinstalacion del plugin si este lo tenia declarado
-		if (PermissionChecker.check(info, Permission.UNINSTALL)) {
+		if (PermissionChecker.check(info, Permission.INSTALL)) {
 			try {
 				plugin.uninstall();
 			} catch (final Exception e) {
