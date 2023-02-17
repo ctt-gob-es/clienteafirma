@@ -151,7 +151,10 @@ public final class PdfSessionManager {
 
 		final int totalPages = pdfReader.getNumberOfPages();
 
-		if (pagesStr.length > 0) {
+		if (pagesStr.length == 0) {
+			pages.add(totalPages);
+		}
+		else {
 			if (APPEND_PAGE.equalsIgnoreCase(pagesStr[0])) {
 				pages.add(NEW_PAGE);
 			} else if (ALL_PAGES.equalsIgnoreCase(pagesStr[0])) {
@@ -408,16 +411,20 @@ public final class PdfSessionManager {
 
 		// Posicion de la firma
 		final Rectangle signaturePositionOnPage = PdfVisibleAreasUtils.getSignaturePositionOnPage(extraParams);
-		if (pages.contains(NEW_PAGE) && signaturePositionOnPage != null && signatureField == null) {
-			stp.insertPage(totalPages + 1, pdfReader.getPageSizeWithRotation(1));
-			// La pagina pasa a ser la nueva, que es la ultima,
-			pages.remove(Integer.valueOf(NEW_PAGE));
-			pages.add(totalPages + 1);
-		}
 
-		// Comprobamos que la posicion indicada para la firma visible
-		// se pueda estampar al menos en una de las paginas del documento
-		PdfUtil.checkCorrectPositionSignature(pdfReader, pages, extraParams);
+		// Comprobamos la posicion si se ha definido
+		if (signaturePositionOnPage != null) {
+			if (pages.contains(NEW_PAGE) && signaturePositionOnPage != null && signatureField == null) {
+				stp.insertPage(totalPages + 1, pdfReader.getPageSizeWithRotation(1));
+				// La pagina pasa a ser la nueva, que es la ultima,
+				pages.remove(Integer.valueOf(NEW_PAGE));
+				pages.add(totalPages + 1);
+			}
+
+			// Comprobamos que la posicion indicada para la firma visible
+			// se pueda estampar al menos en una de las paginas del documento
+			PdfUtil.checkCorrectPositionSignature(pdfReader, pages, extraParams);
+		}
 
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
 
