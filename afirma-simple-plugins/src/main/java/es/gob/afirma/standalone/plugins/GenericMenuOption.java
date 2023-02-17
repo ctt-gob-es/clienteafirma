@@ -32,7 +32,7 @@ public class GenericMenuOption {
 		this.actionClassName = actionClassName;
 	}
 
-	public PluginAction getActionAction() {
+	public PluginAction getAction() {
 		return this.action;
 	}
 

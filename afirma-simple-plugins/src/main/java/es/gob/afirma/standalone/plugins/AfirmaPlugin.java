@@ -125,7 +125,7 @@ public abstract class AfirmaPlugin {
 			if (processorClassName != null) {
 				try {
 					final Class<SignDataProcessor> processorClass =
-							(Class<SignDataProcessor>) Class.forName(processorClassName);
+							(Class<SignDataProcessor>) Class.forName(processorClassName, true, this.getClass().getClassLoader());
 
 					final Constructor<SignDataProcessor> processorConstructor =
 							processorClass.getConstructor(Integer.TYPE);
@@ -133,7 +133,7 @@ public abstract class AfirmaPlugin {
 					this.inlineProcessor = processorConstructor.newInstance(protocolVersion);
 				}
 				catch (final Exception e) {
-					throw new PluginControlledException("No se ha podido cargar el dialogo de espera", e); //$NON-NLS-1$
+					throw new PluginControlledException("No se ha podido cargar la clase de procesado en linea", e); //$NON-NLS-1$
 				}
 			}
 		}

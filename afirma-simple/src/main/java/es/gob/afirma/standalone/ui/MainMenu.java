@@ -332,12 +332,12 @@ public final class MainMenu extends JMenuBar {
     }
 
     public static void addSubMenus(final JMenu jmenu, final GenericMenuOption menu, final JFrame parent) {
-    	for(final GenericMenuOption subMenu : menu.getMenus()) {
+    	for (final GenericMenuOption subMenu : menu.getMenus()) {
     		final JMenu subJMenu = new JMenu(subMenu.getTitle());
-    		if(subMenu.getMenus() != null && !subMenu.getMenus().isEmpty()) {
+    		if (subMenu.getMenus() != null && !subMenu.getMenus().isEmpty()) {
     			addSubMenus(subJMenu, subMenu, parent);
     		}
-    		if(subMenu.getMenus() == null || subMenu.getMenus().isEmpty()) {
+    		if (subMenu.getMenus() == null || subMenu.getMenus().isEmpty()) {
     			final JMenuItem leafItem = new JMenuItem(subMenu.getTitle());
     			leafItem.addActionListener(ev -> {
 					try {

@@ -217,6 +217,12 @@ final class ProtocolInvocationLauncherSign {
 					final PluginInfo pluginInfo = plugin.getInfo();
 					if (PermissionChecker.check(pluginInfo, Permission.INLINE_PROCESS)) {
 						final SignDataProcessor processor = plugin.getInlineProcessor(protocolVersion);
+						if (processor == null) {
+							LOGGER.warning(String.format(
+									"El plugin '%s' definio que procesaba las peticiones del navegador, pero no declaro ningun procesador", //$NON-NLS-1$
+									pluginInfo.getName()));
+							break;
+						}
 						if (processor != null && processor.checkTrigger(operation)) {
 							return processor;
 						}
