@@ -333,8 +333,12 @@ public class PluginsManager {
 
 		final PluginInfo info = plugin.getInfo();
 
+		LOGGER.info("Se desinstala el plugin: " + info.getName()); //$NON-NLS-1$
+
 		// Ejecutamos el proceso de desinstalacion del plugin si este lo tenia declarado
 		if (PermissionChecker.check(info, Permission.INSTALL)) {
+
+			LOGGER.info("Se ejecuta la funcion de desinstalacion del plugin"); //$NON-NLS-1$
 			try {
 				plugin.uninstall();
 			} catch (final Exception e) {
