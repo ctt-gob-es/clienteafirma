@@ -676,15 +676,16 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
 			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
-			// una opcion de red concreta), usamos WebSockets 
-			else if (isWebSocketsSupported() && !Platform.isInternetExplorer()) {
+			// una opcion de red concreta), ni en un Firefox antiguo (con el que las llamadas
+			// multiples pueden dar problemas despues de los cambios para VDI) usamos WebSockets 
+			else if (isWebSocketsSupported() && !Platform.isInternetExplorer() && !Platform.isFirefox60orLower()) {
 				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
 				// Si se establecio un rango de puertos, lo trasladamos al cliente
 				if (!!minPort) {
 					clienteFirma.setPortRange(minPort, maxPort);
 				}
 			}
-			// Si no se esta en una version antigua de Internet Explorer o Safari
+			// Si no se esta en una version antigua de Internet Explorer, Firefox o Safari
 			else if (!Platform.isInternetExplorer10orLower() && !Platform.isSafari10()) {
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				// Si se establecio un rango de puertos, lo trasladamos al cliente
@@ -776,6 +777,27 @@ var AutoScript = ( function ( window, undefined ) {
 			function isFirefox() {
 				return navigator.userAgent.toUpperCase().indexOf("FIREFOX") != -1
 			}
+			
+			/** Indica si el navegador es Firefox 60 o inferior. */
+			function isFirefox60orLower() {
+				navigator.sayswho= (function(){
+				    var ua= navigator.userAgent, tem, 
+				    M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+				    if(/trident/i.test(M[1])){
+				        tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+				        return 'IE '+(tem[1] || '');
+				    }
+				    if(M[1]=== 'Chrome'){
+				        tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+				        if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+				    }
+				    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+				    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+				    return M.join(' ');
+				})();
+				var myNav = navigator.sayswho;
+				return (myNav.indexOf('Firefox') != -1) ? (60 >= parseInt(myNav.split('Firefox')[1])) : false;
+			}
 
 			/** Indica si el navegador es Chrome. */
 			function isChrome() {
@@ -792,6 +814,7 @@ var AutoScript = ( function ( window, undefined ) {
 				isInternetExplorer7orLower : isInternetExplorer7orLower,
 				isSafari10 : isSafari10,
 				isFirefox : isFirefox,
+				isFirefox60orLower : isFirefox60orLower,
 				isChrome : isChrome				
 			};
 		})(window, undefined);
