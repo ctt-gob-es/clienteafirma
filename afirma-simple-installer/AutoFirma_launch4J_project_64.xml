@@ -22,7 +22,7 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Xms512m -Xmx8g</opt>
+    <opt>-Xms512m -Xmx8g -Djdk.tls.maxHandshakeMessageSize=65536</opt>
   </jre>
   <splash>
     <file>splash.bmp</file>
