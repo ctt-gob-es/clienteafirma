@@ -154,9 +154,12 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 			// Tomamos lo numeros de version de firefox identificados
 			final List<String> firefoxVersions = new ArrayList<>();
-			for (final String filename : directoryLib.list()) {
-				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
-					firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			final String[] filenames = directoryLib.list();
+			if (filenames != null) {
+				for (final String filename : directoryLib.list()) {
+					if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+						firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
 
