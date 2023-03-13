@@ -49,6 +49,7 @@ MimeType=x-scheme-handler/afirma
 EOF
 
 cat > %{name} <<EOF
+#!/bin/bash
 java -Djdk.tls.maxHandshakeMessageSize=50000 -jar %{_libdir}/%{name}/%{name}.jar "\$@"
 EOF
 
