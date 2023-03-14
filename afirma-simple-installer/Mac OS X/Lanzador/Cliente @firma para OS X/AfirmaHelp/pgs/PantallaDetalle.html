@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title>Firma facil con @firma - Detalles de las firmas</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="certificado, OCSP, contrafirma, cofirma, mancomunada">
+  <meta name="description" content="Mostrar los detalles de una firma realizada.">
+ </head>
+ <body>
+  <h3>Pantalla de detalle de firma realizada</h3>
+  <p align="center">
+   <img src="../gfx/pantalladetalle_mini.png" alt="Pantalla con informaci&oacute;n de la firma realizada">
+  </p>
+  <p>
+   Tras finalizar una firma electr&oacute;nica, se muestra una pantalla con informaci&oacute;n sobre el resultado de la 
+   operaci&oacute;n. Esta informaci&oacute;n se divide en tres secciones principales:
+  </p>
+  <p>
+   <b>Informaci&oacute;n sobre el fichero firmado</b><br/>
+   Se nuestra la ruta completa hacia el fichero firmado (puede copiar esta ruta pulsando sobre ella con el bot&oacute;n 
+   derecho del rat&oacute;n), d&aacute;ndose la posibilidad de abrirlo en caso de que se trate de un documento Adobe PDF 
+   (se abrir&aacute; con la aplicaci&oacute;n predeterminada del sistema operativo).
+  </p>
+  <p>
+   <b>Informaci&oacute;n sobre el certificado utilizado para realizar la firma</b><br/>
+   Es posible ver el certificado (mediante la aplicaci&oacute;n predeterminada del sistema operativo) pulsando en los
+   hiperenlaces. Adicionalmente, si se utiliz&oacute; DNIe para firmar, se da la posibilidad de comprobar la validez
+   del certificado de firma del DNIe. Para realizar esta comprobaci&oacute;n es necesario contar con conexi&oacute;n a
+   Internet, ya que se accede a los servidores OCSP de la FNMT-RCM. Es importante tener en cuenta que el periodo de validez 
+   se comprueba contra la fecha del sistema, por lo que debe comprobar que esta est&eacute; bien establecida para evitar
+   errores de comprobaci&oacute;n.
+  </p>
+  <p>
+   <b>Informaci&oacute;n detallada sobre la firma electr&oacute;nica</b><br/>
+   Informando al menos de los siguientes puntos mediante una estructura de &aacute;rbol:
+  </p>
+  <ul>
+   <li>Tipo de firma (CAdES, PAdES o XAdES).</li>
+   <li>Acceso a los datos firmados (&uacute;til cuando estos se encuentran empotrados en la misma firma).</li>
+   <li>
+    Estructura ger&aacute;rquica de las firmas encontradas en el fichero (se pueden ver los certificados usados para
+    cada una de las firmas pulsando en los hiperenlaces, para lo que se usar&aacute; la aplicaci&oacute;n prederminada
+    del sistema operativo).
+   </li>
+  </ul>
+  <p>
+   Para desplazarse entre los hiperv&iacute;nculos de un mismo p&aacute;rrafo de texto o entre los elementos del &aacute;rbol
+   es posible usar los cursores del teclado. Tenga en cuenta que para acceder al destino de algunos de estos hiperv&iacute;nculos
+   es posible que se necesite conexi&oacute;n a Internet (se le indicar&aacute; que el destino est&aacute; en la Web en el mismo
+   texto).
+  </p>
+ </body>
+</html>

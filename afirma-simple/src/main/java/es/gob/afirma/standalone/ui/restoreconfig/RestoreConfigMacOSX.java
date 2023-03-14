@@ -20,12 +20,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,12 +95,26 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		final File appDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
-		// Nos aseguramos de que el directorio de instalacionVerifica si se tiene permisos para escribir en el directorio de instalacion
+		// Nos aseguramos de que el directorio de instalacion tiene permisos para escribir en el directorio de instalacion
 		// y establece como directorio de trabajo otro distinto en caso de no tenerlos
-		if (!appDir.isDirectory() && !appDir.mkdirs()) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.1")); //$NON-NLS-1$
-			LOGGER.severe("No se puede crear el directorio '" + LoggerUtil.getCleanUserHomePath(appDir.getAbsolutePath()) + "' se aborta la restauracion"); //$NON-NLS-1$ //$NON-NLS-2$
-			return;
+		if (!appDir.isDirectory()) {
+
+			// Creamos el directorio con permisos para despues poder crear subdirectorios desde la propia aplicacion
+			try {
+				final Set<PosixFilePermission> ownerWritable = PosixFilePermissions.fromString("rwxrwxr-x"); //$NON-NLS-1$
+				final FileAttribute<?> permissions = PosixFilePermissions.asFileAttribute(ownerWritable);
+				Files.createDirectories(appDir.toPath(), permissions);
+			}
+			catch (final Exception e) {
+				appDir.mkdirs();
+			}
+
+			// Si no se puede crear el directorio, se aborta la operacion
+			if (!appDir.isDirectory()) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.1")); //$NON-NLS-1$
+				LOGGER.severe("No se puede crear el directorio '" + LoggerUtil.getCleanUserHomePath(appDir.getAbsolutePath()) + "' se aborta la restauracion"); //$NON-NLS-1$ //$NON-NLS-2$
+				return;
+			}
 		}
 
 		// Preparamos el script de ejecucion para las operaciones
@@ -945,7 +963,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Comprobamos si esta abierto el proceos de Firefox
 		try {
-			return checkProcess("Firefox.app", "FirefoxNightly.app", "FirefoxDeveloperEdition.app"); //$NON-NLS-1$
+			return checkProcess("Firefox.app", "FirefoxNightly.app", "FirefoxDeveloperEdition.app"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$

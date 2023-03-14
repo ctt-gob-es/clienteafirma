@@ -198,7 +198,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			throw new IOException("Error creando script temporal", e); //$NON-NLS-1$
 		}
 
-		// Damos permisos al script
+		// Damos permisos sobre el directorio de la aplicacion
 		ConfiguratorMacUtils.addExexPermissionsToAllFilesOnDirectory(appDir);
 
 		// Generamos los certificados de CA y SSL
@@ -761,9 +761,18 @@ final class ConfiguratorMacOSX implements Configurator {
 		// Devuelve un directorio en el que copiar y generar los recursos
 		// necesarios por la aplicacion
 		final File appDir = getResourcesDirectory();
-		if (create && !appDir.isDirectory() && !appDir.mkdirs()) {
-			throw new IOException("No se ha podido generar el directorio de recursos de la aplicacion: " + appDir.getAbsolutePath()); //$NON-NLS-1$
+		if (create && !appDir.isDirectory()) {
+
+			if (appDir.mkdirs()) {
+				ConfiguratorMacUtils.addExexPermissionsToFile(appDir);
+			}
+
+			// Si no hemos podido crearlo, lanzamos una excepcion
+			if (!appDir.isDirectory()) {
+				throw new IOException("No se ha podido generar el directorio de recursos de la aplicacion: " + appDir.getAbsolutePath()); //$NON-NLS-1$
+			}
 		}
+
 		return appDir;
 	}
 
