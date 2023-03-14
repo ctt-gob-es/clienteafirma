@@ -9,8 +9,12 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,33 +70,38 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				final File appDir = new File (System.getenv("HOME"), "Library/Application Support/AutoFirma"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (appDir.isDirectory() && appDir.canWrite() || appDir.mkdirs()) {
+
+				if (appDir.mkdirs()) {
+					ConfiguratorMacUtils.addExexPermissionsToFile(appDir);
+				}
+
+				if (appDir.isDirectory() && appDir.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, appDir.getAbsolutePath());
 				}
-				else if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+				else if (TMP.isDirectory() && TMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
 				}
-				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+				else if (TEMP.isDirectory() && TEMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
 				}
 				else {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 				}
 			}
-			else if (Platform.getOS().equals(Platform.OS.LINUX)) {
-				if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+			else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+				if (TMP.isDirectory() && TMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
 				}
-				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+				else if (TEMP.isDirectory() && TEMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
 				}
 				else {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 				}
 			}
-			else if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+			else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 				// En Windows se ejecutara en modo administrador y el directorio de usuario apuntara al del administrador,
 				// asi que componemos el directorio de usuario real
 				final String drive = System.getenv("HOMEDRIVE"); //$NON-NLS-1$
@@ -250,6 +259,21 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		final ConfigArgs config = new ConfigArgs(args);
 		final AutoFirmaConfigurator configurator = new AutoFirmaConfigurator(config);
 
+       	// Propiedades especificas para Mac OS X
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			final Image icon = Toolkit.getDefaultToolkit()
+					.getImage(AutoFirmaConfigurator.class.getResource("/logo_cliente_256.png")); //$NON-NLS-1$
+        	try {
+        		settingDockMacIconWithJava8(icon);
+			} catch (final Exception | Error e) {
+        		try {
+        			settingDockMacIconWithJava9(icon);
+				} catch (Exception | Error e2) {
+        			LOGGER.warning("No ha sido posible establecer el icono del Dock de macOS: " + e); //$NON-NLS-1$
+				}
+        	}
+        }
+
 		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
 		if (config.isUninstallation()) {
 			configurator.uninstall();
@@ -268,6 +292,26 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		configurator.closeApplication(0, config.isNeedKeep());
 	}
 
+	private static void settingDockMacIconWithJava8(final Image icon)
+			throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+		final Class<?> applicationClass = Class.forName("com.apple.eawt.Application"); //$NON-NLS-1$
+		final Method getApplicationMethod = applicationClass.getMethod("getApplication"); //$NON-NLS-1$
+		final Object applicationObject = getApplicationMethod.invoke(null);
+		final Method setDockIconImageMethod = applicationClass.getMethod("setDockIconImage", Image.class); //$NON-NLS-1$
+		setDockIconImageMethod.invoke(applicationObject, icon);
+    }
+
+	private static void settingDockMacIconWithJava9(final Image icon)
+			throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+
+    	final Class<?> taskbarClass = Class.forName("java.awt.Taskbar"); //$NON-NLS-1$
+    	final Method getTaskbarMethod = taskbarClass.getMethod("getTaskbar"); //$NON-NLS-1$
+    	final Object taskbarObject = getTaskbarMethod.invoke(null);
+    	final Method setIconImageMethod = taskbarClass.getMethod("setIconImage", Image.class); //$NON-NLS-1$
+    	setIconImageMethod.invoke(taskbarObject, icon);
+    }
 
 	/** Operaciones admitidas. */
 	private enum Operation {
@@ -306,10 +350,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 						if (i < args.length - 1) {
 							this.certificatePath = args[++i];
 						}
-					} else if (PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg)) {
-						if (i < args.length - 1) {
-							this.keystorePath = args[++i];
-						}
+					} else if (PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg) && i < args.length - 1) {
+						this.keystorePath = args[++i];
 					}
 				}
 			}

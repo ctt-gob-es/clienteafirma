@@ -37,6 +37,7 @@ import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginInstalledException;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsPreferences;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /**
  * Manegador de eventos de PluginsManagementPanel.
@@ -455,11 +456,20 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		// La aplicacion se ejecuta desde un JAR
 		List<String> command;
 		if (currentFile.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
-			final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			command = new ArrayList<>();
-			command.add(java);
-			command.add("-jar"); //$NON-NLS-1$
-			command.add(currentFile.getPath());
+
+			// Si ese JAR forma parte de un ejecutable macOS, usamos el ejecutable
+			final File appMac = MacUtils.getMacApp(currentFile);
+			if (appMac != null && appMac.isFile()) {
+				command = new ArrayList<>();
+				command.add(appMac.getAbsolutePath());
+			}
+			else {
+				final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				command = new ArrayList<>();
+				command.add(java);
+				command.add("-jar"); //$NON-NLS-1$
+				command.add(currentFile.getPath());
+			}
 		}
 		// La aplicacion es un ejecutable de Windows
 		else if (currentFile.getName().toLowerCase().endsWith(".exe")) { //$NON-NLS-1$

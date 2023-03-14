@@ -57,7 +57,7 @@ public class ConfiguratorMacUtils {
 	 * Concede permisos POSIX completos a un fichero para todos los usuarios.
 	 * @param f Fichero al que se le conceden permisos.
 	 */
-	static void addExexPermissionsToFile(final File f) {
+	public static void addExexPermissionsToFile(final File f) {
 		final Set<PosixFilePermission> perms = new HashSet<>();
 		perms.add(PosixFilePermission.OWNER_EXECUTE);
 		perms.add(PosixFilePermission.GROUP_EXECUTE);

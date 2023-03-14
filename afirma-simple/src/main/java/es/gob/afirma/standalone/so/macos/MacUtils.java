@@ -107,4 +107,32 @@ public class MacUtils {
 			}
 		}
 	}
+
+	/**
+	 * Comprueba si un fichero JAR se encuentra dentro de la estructura de una aplicaci&oacute;n Mac
+	 * y devuelve el ejecutable del mismo nombre para su arranque.
+	 * @param jarFile Fichero JAR
+	 * @return Fichero de ejecuci&oacute;n o {@code null} si no se puede localizar.
+	 */
+	public static File getMacApp(final File jarFile) {
+
+		final File jarDir = jarFile.getParentFile();
+		if (jarDir != null && "JAR".equals(jarDir.getName())) { //$NON-NLS-1$
+			final File resourcesDir = jarDir.getParentFile();
+			if (resourcesDir != null && "Resources".equals(resourcesDir.getName())) { //$NON-NLS-1$
+				final File contentsDir = resourcesDir.getParentFile();
+				if (contentsDir != null && "Contents".equals(contentsDir.getName())) { //$NON-NLS-1$
+					final File macOSDir = new File(contentsDir, "MacOS"); //$NON-NLS-1$
+					if (macOSDir.isDirectory()) {
+						final String exeName = jarFile.getName().substring(0, jarFile.getName().length() - ".jar".length()); //$NON-NLS-1$
+						final File exeFile = new File(macOSDir, exeName);
+						if (exeFile.isFile()) {
+							return exeFile;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 }
