@@ -28,6 +28,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
@@ -46,6 +48,9 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 
 	private static final int PREFERRED_WIDTH = 500;
 	private static final int PREFERRED_HEIGHT = 615;
+
+	private static final String MESSAGE_REFERENCE_NEED_PASSWORD = "pdfpasswordprotected"; //$NON-NLS-1$
+	private static final String MESSAGE_REFERENCE_BAD_PASSWORD = "pdfbadpassword"; //$NON-NLS-1$
 
 	private final SignPdfDialogListener listener;
 	SignPdfDialogListener getListener() {
@@ -170,7 +175,30 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	BufferedImage getFragmentImage(final SignatureField sf) throws IOException {
 
 		final int currentPage = sf.getPage() - 1;
-		final List<BufferedImage> pages = Pdf2ImagesConverter.pdf2ImagesUsefulSections(this.pdf, currentPage);
+
+		char[] password = null;
+		List<BufferedImage> pages = null;
+		do {
+			try {
+				pages = Pdf2ImagesConverter.pdf2ImagesUsefulSections(this.pdf, password, currentPage);
+			}
+			catch (final InvalidPasswordException e) {
+				// Si no se pudo abrir porque requiere contrasena, la pedimos, teniendo en cuenta si lo
+				// hemos hecho antes para usar un mensaje u otro
+				final String msgRequest = password == null ? MESSAGE_REFERENCE_NEED_PASSWORD : MESSAGE_REFERENCE_BAD_PASSWORD;
+    			try {
+    				password = AOUIFactory.getPassword(SimpleAfirmaMessages.getString(msgRequest), this);
+    			}
+    			catch (final AOCancelledOperationException ce) {
+    				throw e;
+    			}
+			}
+			catch (final IOException e) {
+				throw e;
+			}
+		}
+		while (pages == null);
+
 		final BufferedImage page = pages.get(currentPage);
 
 		final int uxr = sf.getSignaturePositionOnPageUpperRightX();
@@ -281,8 +309,39 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 	}
 
 	@Override
-	public void pdfLoaded(final boolean signed, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] document) {
+	public void pdfLoaded(final boolean signed, final boolean isMassiveSign, final byte[] document) throws IOException {
 		getContentPane().remove(this.activePanel);
+
+		char[] password = null;
+		List<BufferedImage> pages = null;
+		final Properties initialParams = new Properties();
+		do {
+			try {
+				pages = Pdf2ImagesConverter.pdf2ImagesUsefulSections(document, password, 0);
+			}
+			catch (final InvalidPasswordException e) {
+				// Si no se pudo abrir porque requiere contrasena, la pedimos, teniendo en cuenta si lo
+				// hemos hecho antes para usar un mensaje u otro
+				final String msgRequest = password == null ? MESSAGE_REFERENCE_NEED_PASSWORD : MESSAGE_REFERENCE_BAD_PASSWORD;
+    			try {
+    				password = AOUIFactory.getPassword(SimpleAfirmaMessages.getString(msgRequest), this);
+    			}
+    			catch (final AOCancelledOperationException ce) {
+    				throw e;
+    			}
+			}
+			catch (final IOException e) {
+				throw e;
+			}
+		}
+		while (pages == null);
+
+		final List<Dimension> pageSizes = SignPdfUiUtil.getPageSizes(document, password);
+
+		if (password != null) {
+			initialParams.setProperty(PdfExtraParams.OWNER_PASSWORD_STRING, new String(password));
+		}
+
 		this.activePanel = new SignPdfUiPanelStamp(
 			pages,
 			pageSizes,

@@ -117,6 +117,8 @@ final class SignPdfUiPanel extends JPanel implements
 	private final boolean isMassiveSign;
 	private BufferedImage appendPage;
 	private final List<Dimension> pdfPageSizes;
+	private final Properties initialExtraParams;
+
 	private PageLabel pageLabel;
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPanel.0")); //$NON-NLS-1$
 	private final JTextField posX = new JTextField(4);
@@ -143,6 +145,7 @@ final class SignPdfUiPanel extends JPanel implements
 				   final List<BufferedImage> pages,
 				   final List<Dimension> pageSizes,
 				   final byte[] pdf,
+				   final Properties initialParams,
 			       final SignPdfUiPanelListener spul) {
 
 		if (pages == null || pages.isEmpty()) {
@@ -165,6 +168,7 @@ final class SignPdfUiPanel extends JPanel implements
 		this.listener = spul;
 		this.isSignPdf = isSign;
 		this.isMassiveSign = isMassiveSign;
+		this.initialExtraParams = initialParams == null ? new Properties() : initialParams;
 
 		this.pdfDocument = new PdfDocument();
 		this.pdfDocument.setBytesPdf(pdf);
@@ -502,7 +506,7 @@ final class SignPdfUiPanel extends JPanel implements
 		);
 		this.okButton.addActionListener(
 			e -> {
-				final Properties p = new Properties();
+				final Properties p = this.initialExtraParams != null ? this.initialExtraParams : new Properties();
 				if (this.allPagesRadioBtn.isSelected()) {
 					p.put(PdfExtraParams.SIGNATURE_PAGES, "all"); //$NON-NLS-1$
 				}
@@ -1042,8 +1046,8 @@ final class SignPdfUiPanel extends JPanel implements
 		final int areaWidth = original.width + original.x > this.pageLabel.getWidth() ?
 				this.pageLabel.getWidth() - original.x : original.width;
 
-		final Properties extraParams = new Properties();
-		extraParams.put(
+		final Properties positionParams = new Properties();
+		positionParams.put(
 			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX,
 			Integer.toString(
 				Math.round(
@@ -1051,7 +1055,7 @@ final class SignPdfUiPanel extends JPanel implements
 				)
 			)
 		);
-		extraParams.put(
+		positionParams.put(
 			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY,
 			Integer.toString(
 				Math.round(
@@ -1059,7 +1063,7 @@ final class SignPdfUiPanel extends JPanel implements
 				)
 			)
 		);
-		extraParams.put(
+		positionParams.put(
 			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX,
 			Integer.toString(
 				Math.round(
@@ -1067,7 +1071,7 @@ final class SignPdfUiPanel extends JPanel implements
 				)
 			)
 		);
-		extraParams.put(
+		positionParams.put(
 			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY,
 			Integer.toString(
 				Math.round(
@@ -1076,6 +1080,6 @@ final class SignPdfUiPanel extends JPanel implements
 			)
 		);
 
-		return extraParams;
+		return positionParams;
 	}
 }

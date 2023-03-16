@@ -9,14 +9,8 @@
 
 package es.gob.afirma.standalone.ui.pdf;
 
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.List;
-
-import com.aowagie.text.pdf.PdfReader;
 
 final class PdfLoader {
 
@@ -25,7 +19,7 @@ final class PdfLoader {
 	}
 
 	interface PdfLoaderListener extends EventListener {
-		void pdfLoaded(boolean isSign, final boolean isMassiveSign, List<BufferedImage> pages, List<Dimension> pageSizes, byte[] pdf);
+		void pdfLoaded(boolean isSign, final boolean isMassiveSign, byte[] pdf) throws IOException;
 		void pdfLoadedFailed(Throwable cause);
 	}
 
@@ -35,8 +29,6 @@ final class PdfLoader {
 					pll.pdfLoaded(
 						isSign,
 						isMassiveSign,
-						Pdf2ImagesConverter.pdf2ImagesUsefulSections(inPdf, 0),
-						getPageSizes(inPdf),
 						inPdf
 					);
 				}
@@ -46,21 +38,4 @@ final class PdfLoader {
 			}
 		).start();
 	}
-
-	static List<Dimension> getPageSizes(final byte[] inPdf) throws IOException {
-		final PdfReader reader = new PdfReader(inPdf);
-		final int numberOfPages = reader.getNumberOfPages();
-		final List<Dimension> pageSizes = new ArrayList<>(numberOfPages);
-		for(int i=1;i<=numberOfPages;i++) {
-			final com.aowagie.text.Rectangle rect = reader.getPageSizeWithRotation(i);
-			pageSizes.add(
-				new Dimension(
-					Math.round(rect.getWidth()),
-					Math.round(rect.getHeight())
-				)
-			);
-		}
-		return pageSizes;
-	}
-
 }

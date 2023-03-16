@@ -10,10 +10,17 @@
 package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.aowagie.text.pdf.PdfReader;
 
 final class SignPdfUiUtil {
 
@@ -55,4 +62,20 @@ final class SignPdfUiUtil {
 		return wnd.getToolkit().getScreenInsets(wnd.getGraphicsConfiguration());
     }
 
+	static List<Dimension> getPageSizes(final byte[] inPdf, final char[] pwdChars) throws IOException {
+		final byte[] password = pwdChars != null ? new String(pwdChars).getBytes(StandardCharsets.UTF_8) : null;
+		final PdfReader reader = new PdfReader(inPdf, password);
+		final int numberOfPages = reader.getNumberOfPages();
+		final List<Dimension> pageSizes = new ArrayList<>(numberOfPages);
+		for(int i=1;i<=numberOfPages;i++) {
+			final com.aowagie.text.Rectangle rect = reader.getPageSizeWithRotation(i);
+			pageSizes.add(
+				new Dimension(
+					Math.round(rect.getWidth()),
+					Math.round(rect.getHeight())
+				)
+			);
+		}
+		return pageSizes;
+	}
 }

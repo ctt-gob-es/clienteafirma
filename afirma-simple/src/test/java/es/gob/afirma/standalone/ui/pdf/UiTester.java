@@ -2,6 +2,7 @@ package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -73,8 +74,12 @@ public final class UiTester {
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
+				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final byte[] pdf) throws IOException {
 					LOGGER.info("Cargado"); //$NON-NLS-1$
+
+					final List<BufferedImage> pages = Pdf2ImagesConverter.pdf2ImagesUsefulSections(pdf, null, 0);
+					final List<Dimension> pageSizes = SignPdfUiUtil.getPageSizes(pdf, null);
+
 					frame.add(
 						new SignPdfUiPanel(
 							isSign,
@@ -82,10 +87,12 @@ public final class UiTester {
 							pages,
 							pageSizes,
 							pdf,
+							null,
 							new SignPdfUiPanelListener() {
 
 								@Override
 								public void nextPanel(final Properties p, final BufferedImage im) {
+									// No hace nada
 								}
 
 								@Override

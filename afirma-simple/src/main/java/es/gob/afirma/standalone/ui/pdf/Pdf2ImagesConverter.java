@@ -45,14 +45,16 @@ final class Pdf2ImagesConverter {
 	 * necesitar del PDF. Estas son las primeras, las &uacute;ltimas y las del entorno
 	 * de la p&aacute;gina actual.
 	 * @param inPdf Documento PDF.
+	 * @param password Contrase&ntilde;a de apertura del PDF.
 	 * @param currentPage P&aacute;gina mostrada actualmente.
 	 * @return Listado de im&aacute;genes.
 	 * @throws IOException Cuando falla la carga del documento como PDF o
 	 * la generaci&oacute;n de las im&aacute;genes.
 	 */
-	static List<BufferedImage> pdf2ImagesUsefulSections(final byte[] inPdf, final int currentPage) throws IOException {
+	static List<BufferedImage> pdf2ImagesUsefulSections(final byte[] inPdf, final char[] passwordChars, final int currentPage) throws IOException {
 		List<BufferedImage> pagesAsImages;
-		try (final PDDocument document = PDDocument.load(new ByteArrayInputStream(inPdf))) {
+		final String password = passwordChars != null ? new String(passwordChars) : null;
+		try (final PDDocument document = PDDocument.load(new ByteArrayInputStream(inPdf), password)) {
 			final PDFRenderer pdfRenderer = new PDFRenderer(document);
 			pagesAsImages = new ArrayList<>(document.getNumberOfPages());
 			for (int i = 0; i < document.getNumberOfPages(); i++) {

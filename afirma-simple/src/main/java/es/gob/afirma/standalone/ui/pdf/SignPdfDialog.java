@@ -14,6 +14,7 @@ import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -24,10 +25,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
+
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
@@ -46,6 +51,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private static final int LOWER_LIMIT_X = 30;
 	private static final int LOWER_LIMIT_Y = 45;
 	private static final int AREA_LIMIT = 1350;
+
+	private static final String MESSAGE_REFERENCE_NEED_PASSWORD = "pdfpasswordprotected"; //$NON-NLS-1$
+	private static final String MESSAGE_REFERENCE_BAD_PASSWORD = "pdfbadpassword"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -112,8 +120,8 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	}
 
 	/**
-	 * Obtiene los par&aacute;metros adicionales de una firma visible PDF mediante
-	 * un di&aacute;logo gr&aacute;fico.
+	 * Muestra un di&aacute;logo para la selecci&oacute;n de las propiedades de firma visible PDF
+	 * que aplicar a la firma.
 	 *
 	 * @param isSign           {@code true} si el PDF de entrada ya contiene
 	 *                         firmas electr&oacute;nicas previas,
@@ -125,8 +133,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	 * @param signatureVisible Indica si se va a insertar una firma.
 	 * @param customAppearance Indica si se va a establecer una apariencia distinta a la por defecto.
 	 * @param stampVisible     Indica si se va a insertar una marca.
-	 * @param spdl             Clase a la que notificar la obtencion de propiedades
-	 *                         de la firma visible.
+	 * @param spdl             Clase a la que notificar la configuraci&oacute;n de firma obtenida.
 	 */
 	public static void getVisibleSignatureExtraParams(final boolean isSign, final boolean isMassiveSign, final byte[] pdf, final Frame parentFrame,
 			final boolean signatureVisible, final boolean customAppearance, final boolean stampVisible,
@@ -152,8 +159,8 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	}
 
 	/**
-	 * Obtiene los par&aacute;metros adicionales de una firma visible PDF mediante
-	 * un di&aacute;logo gr&aacute;fico.
+	 * Obtiene un di&aacute;logo para la selecci&oacute;n de las propiedades de firma visible PDF
+	 * que aplicar a la firma.
 	 *
 	 * @param isSign           <code>true</code> si el PDF de entrada ya contiene
 	 *                         firmas electr&oacute;nicas previas,
@@ -197,24 +204,51 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private List<Dimension> pageSizes;
 
 	@Override
-	public void pdfLoaded(final boolean isSign, final boolean isMassive ,final List<BufferedImage> listPages,
-			final List<Dimension> listPageSizes, final byte[] pdf) {
+	public void pdfLoaded(final boolean isSign, final boolean isMassive,
+			final byte[] pdf) throws IOException {
 
 		this.isPdfSign = isSign;
 		this.isMassiveSign = isMassive;
-		this.pages = listPages;
-		this.pageSizes = listPageSizes;
 		this.pdfData = pdf;
+
+		char[] password = null;
+		final Properties initialParams = new Properties();
+		do {
+			try {
+				this.pages = Pdf2ImagesConverter.pdf2ImagesUsefulSections(this.pdfData, password, 0);
+			}
+			catch (final InvalidPasswordException e) {
+				// Si no se pudo abrir porque requiere contrasena, la pedimos, teniendo en cuenta si lo
+				// hemos hecho antes para usar un mensaje u otro
+				final String msgRequest = password == null ? MESSAGE_REFERENCE_NEED_PASSWORD : MESSAGE_REFERENCE_BAD_PASSWORD;
+    			try {
+    				password = AOUIFactory.getPassword(SimpleAfirmaMessages.getString(msgRequest), this.parent);
+    			}
+    			catch (final AOCancelledOperationException ce) {
+    				throw e;
+    			}
+			}
+			catch (final IOException e) {
+				throw e;
+			}
+		}
+		while (this.pages == null);
+
+		this.pageSizes = SignPdfUiUtil.getPageSizes(this.pdfData, password);
+
+		if (password != null) {
+			initialParams.setProperty(PdfExtraParams.OWNER_PASSWORD_STRING, new String(password));
+		}
 
 		if (this.signatureVisible) {
 			setPreferredSize(getPreferredDimensionToSignatureDialog());
-			this.activePanel = new SignPdfUiPanel(this.isPdfSign, this.isMassiveSign, this.pages, this.pageSizes, this.pdfData, this);
+			this.activePanel = new SignPdfUiPanel(this.isPdfSign, this.isMassiveSign, this.pages, this.pageSizes, this.pdfData, initialParams, this);
 			this.scrollPanel.setViewportView(this.activePanel);
 		} else if (this.stampVisible) {
 			setPreferredSize(getPreferredDimensionToStampDialog());
 			setTitle(SignPdfUiMessages.getString("SignPdfUiStamp.0")); //$NON-NLS-1$
 			this.activePanel = new SignPdfUiPanelStamp(this.pages, this.pageSizes, this.pdfData, this,
-					new Properties());
+					initialParams);
 			((SignPdfUiPanelStamp) this.activePanel).setDialogParent(this);
 			this.scrollPanel.setViewportView(this.activePanel);
 		}

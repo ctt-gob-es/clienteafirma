@@ -40,7 +40,7 @@ public final class Pdf2ImagesConverterTests {
 	//XXX: Esto va a fallar porque ahora la conversion de imagenes no realiza las de todo el documento
 	public void testPdf2ImagesConverter() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
-		final List<BufferedImage> images = Pdf2ImagesConverter.pdf2ImagesUsefulSections(testPdf, 0);
+		final List<BufferedImage> images = Pdf2ImagesConverter.pdf2ImagesUsefulSections(testPdf, null, 0);
 		for (final BufferedImage im : images) {
 	        final File saveFile = File.createTempFile("PDFCONVERTED-", ".png"); //$NON-NLS-1$ //$NON-NLS-2$
 	        try (
@@ -66,7 +66,7 @@ public final class Pdf2ImagesConverterTests {
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
+				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final byte[] pdf) {
 					LOGGER.info(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
@@ -104,7 +104,7 @@ public final class Pdf2ImagesConverterTests {
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final List<BufferedImage> pages, final List<Dimension> pageSizes, final byte[] pdf) {
+				public void pdfLoaded(final boolean isSign, final boolean isMassiveSign, final byte[] pdf) {
 					LOGGER.info(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
