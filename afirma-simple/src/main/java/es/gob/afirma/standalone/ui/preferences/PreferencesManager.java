@@ -131,6 +131,15 @@ public final class PreferencesManager {
 	 * har&aacute; que no se desactive el uso de JMulticard para estas tarjetas. */
 	public static final String PREFERENCE_GENERAL_ENABLED_JMULTICARD = "enabledJmulticard"; //$NON-NLS-1$
 
+	/**
+	 * Configura una propiedad que indica a la biblioteca WebSocket para la comunicaci&oacute;n con el
+	 * navegador que aplique un peque&ntilde;o retardo en las comunicaciones para as&iacute; evitar que
+	 * se bloquee el canal. Esto relantizar&aacute; las comunicaciones, lo cual es muy evidente conforme
+	 * se trabaje con ficheros m&aacute;s grandes. S&oacute;lo se recomienda el su uso de esta propiedad
+	 * cuando se use el cliente sobre VDI para evitar un mal mayor.
+	 */
+	public static final String PREFERENCE_GENERAL_VDI_OPTIMIZATION = "vdiOptimization"; //$NON-NLS-1$
+
 	/** Algoritmo de huella para firma.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>

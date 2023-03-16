@@ -66,6 +66,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
+	private final JCheckBox optimizedForVdi = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.190")); //$NON-NLS-1$
+
 	private final JCheckBox confirmToSign = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.179")); //$NON-NLS-1$
 
 	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.176")); //$NON-NLS-1$
@@ -285,11 +287,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.sendAnalytics.addKeyListener(keyListener);
 		signConfigPanel.add(this.sendAnalytics, signConstraint);
 
-		signConstraint.gridy++;
-
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.LINUX) {
+			signConstraint.gridy++;
+
 			this.enableJMulticard.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
@@ -301,6 +303,18 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
 		}
 
+		// En Windows, se dara la posibilidad de configurar el comportamiento de
+		// JMulticard. Para el resto de sistemas, es obligatorio su uso
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			signConstraint.gridy++;
+
+			this.optimizedForVdi.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("PreferencesPanel.191")); //$NON-NLS-1$
+			this.optimizedForVdi.setMnemonic('z');
+			this.optimizedForVdi.addItemListener(modificationListener);
+			this.optimizedForVdi.addKeyListener(keyListener);
+			signConfigPanel.add(this.optimizedForVdi, signConstraint);
+		}
 
 		mainPanel.add(signConfigPanel, gbc);
 
@@ -636,6 +650,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES, this.allowSignInvalidSignatures.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_VDI_OPTIMIZATION, this.optimizedForVdi.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE, this.massiveOverwrite.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS, this.secureConnections.isSelected());
 
@@ -685,6 +700,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		else {
 			this.enableJMulticard.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD));
 		}
+
+		this.optimizedForVdi.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_VDI_OPTIMIZATION));
 
 		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
 

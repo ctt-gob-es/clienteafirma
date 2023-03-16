@@ -16,6 +16,8 @@ import javax.net.ssl.SSLContext;
 
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+
 /** Gestor de la invocaci&oacute;n por <i>WebSocket</i>. */
 public class AfirmaWebSocketServerManager {
 
@@ -33,6 +35,9 @@ public class AfirmaWebSocketServerManager {
 	/** Listado de versiones de protocolo soportadas. */
 	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { PROTOCOL_VERSION_3, PROTOCOL_VERSION_4 };
 
+    /** Propiedad del sistema para configurar la optimizacion de WebSockets para VDI. */
+	private static final String SYSTEM_PROPERTY_OPTIMIZED_FOR_VDI = "websockets.optimizedForVdi"; //$NON-NLS-1$
+
 	private static int protocolVersion = -1;
 
 	static AfirmaWebSocketServer instance = null;
@@ -49,6 +54,11 @@ public class AfirmaWebSocketServerManager {
 		checkSupportProtocol(requestedProtocolVersion);
 
 		protocolVersion = requestedProtocolVersion;
+
+ 		// Configuramos la optimizacion para VDI segun lo establecido en el dialogo de preferencias
+ 		final boolean optimizedForVdi = PreferencesManager
+ 				.getBoolean(PreferencesManager.PREFERENCE_GENERAL_VDI_OPTIMIZATION);
+         System.setProperty(SYSTEM_PROPERTY_OPTIMIZED_FOR_VDI, Boolean.toString(optimizedForVdi));
 
 		int i = 0;
 		final int[] ports = channelInfo.getPorts();
