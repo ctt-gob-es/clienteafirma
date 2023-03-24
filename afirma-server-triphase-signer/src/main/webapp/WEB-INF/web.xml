@@ -7,7 +7,7 @@
 	<display-name>TriPhaseSignerServer</display-name>
 	
 	<servlet>
-		<description>Servicio de firma electronica en 3 fases v2.3.1</description>
+		<description>Servicio de firma electronica en 3 fases</description>
 		<servlet-name>SignatureService</servlet-name>
 		<servlet-class>es.gob.afirma.triphase.server.SignatureService</servlet-class>
 	</servlet>
@@ -18,7 +18,7 @@
 	</servlet-mapping>
 
 	<servlet>
-		<description>Realiza la primera fase de un proceso de firma por lote v1.5</description>
+		<description>Realiza la primera fase de un proceso de firma por lote</description>
 		<servlet-name>BatchPresigner</servlet-name>
 		<servlet-class>es.gob.afirma.signers.batch.server.BatchPresigner</servlet-class>
 	</servlet>
@@ -29,7 +29,7 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<description>Realiza la primera fase de un proceso de firma por lote con JSON v1.0</description>
+		<description>Realiza la primera fase de un proceso de firma por lote con JSON</description>
 		<servlet-name>JSONBatchPresigner</servlet-name>
 		<servlet-class>es.gob.afirma.signers.batch.server.JSONBatchPresigner</servlet-class>
 	</servlet>
@@ -40,7 +40,7 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote v1.5</description>
+		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote</description>
 		<servlet-name>BatchPostsigner</servlet-name>
 		<servlet-class>es.gob.afirma.signers.batch.server.BatchPostsigner</servlet-class>
 	</servlet>
@@ -51,7 +51,7 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote con JSON v1.0</description>
+		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote con JSON</description>
 		<servlet-name>JSONBatchPostsigner</servlet-name>
 		<servlet-class>es.gob.afirma.signers.batch.server.JSONBatchPostsigner</servlet-class>
 	</servlet>
@@ -59,6 +59,17 @@
 	<servlet-mapping>
 		<servlet-name>JSONBatchPostsigner</servlet-name>
 		<url-pattern>/postsign</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<description>Indica la version del servicio</description>
+		<servlet-name>Version</servlet-name>
+		<servlet-class>es.gob.afirma.triphase.server.VersionService</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>Version</servlet-name>
+		<url-pattern>/version</url-pattern>
 	</servlet-mapping>
 
 </web-app>
