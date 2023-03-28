@@ -22,6 +22,78 @@
 		showLog("Type: " + errorType + "\nMessage: " + errorMessage);
 	}
 
+	function createBatchConf() {
+		createBatchConfiguration();
+		
+		document.getElementById("singleSignID").disabled = false;
+		document.getElementById("generateId").disabled = false; 
+		document.getElementById("datareferenceValue").disabled = false;
+		document.getElementById("codeInB64").disabled = false;
+		document.getElementById("useSingleConf").disabled = false;
+		document.getElementById("addSign").disabled = false;
+	}
+	
+	function createBatchConfiguration() {
+
+		var algorithm = document.getElementById("algorithm").value;
+		var format = document.getElementById("generalFormat").value;
+		var subOperation = document.getElementById("generalSuboperation").value;
+		var extraParams = document.getElementById("filters").value;
+
+		AutoScript.createBatch(algorithm, format, subOperation,
+				extraParams);
+	}
+
+	
+	function addSingleSign() {
+		buildAndAddSingleSign();
+		document.getElementById("singleSignID").value= "";
+		document.getElementById("datareferenceValue").value= "";
+		document.getElementById("params").value= "";
+		document.getElementById("signButton").disabled = "";
+		document.getElementById("localSignButton").disabled = "";
+		document.getElementById('format').getElementsByTagName('option')[0].selected = true;
+		document.getElementById('suboperation').getElementsByTagName('option')[0].selected = true;
+		
+		document.getElementById("useSingleConf").checked = false;
+		document.getElementById("format").disabled = true;
+		document.getElementById("suboperation").disabled = true;
+		document.getElementById("newParam").disabled = true;
+		document.getElementById("addParam").disabled = true;
+		document.getElementById("cleanExtraParams").disabled = true;
+		document.getElementById("params").disabled = true;
+	}
+
+	
+	function buildAndAddSingleSign() {
+
+		var singleSignID = document.getElementById("singleSignID").value;
+		var datareference = document.getElementById("datareferenceValue").value;
+		var format = null;
+		var suboperation = null;
+		var extraParams = null;
+
+		if (document.getElementById("useSingleConf").checked) {
+			format = document.getElementById("format").value;
+			suboperation = document.getElementById("suboperation").value;
+			if (!!document.getElementById("params").value){
+				extraParams = document.getElementById("params").value;
+			}
+		}
+		
+		try {
+			AutoScript.addDocumentToBatch(singleSignID, datareference, format,
+					suboperation, extraParams);
+			
+			 printSingleSign(singleSignID, datareference, format,
+					suboperation, extraParams);
+		} catch (e) {
+			showLog(e);
+		}
+		
+	}
+
+	
 	function doSignBatch() {
 		try {
 			
@@ -72,24 +144,6 @@
 		}
 	}
 
-	function addSingleSign() {
-		buildAndAddSingleSign();
-		document.getElementById("singleSignID").value= "";
-		document.getElementById("datareferenceValue").value= "";
-		document.getElementById("params").value= "";
-		document.getElementById("signButton").disabled = "";
-		document.getElementById("localSignButton").disabled = "";
-		document.getElementById('format').getElementsByTagName('option')[0].selected = true;
-		document.getElementById('suboperation').getElementsByTagName('option')[0].selected = true;
-		
-		document.getElementById("useSingleConf").checked = false;
-		document.getElementById("format").disabled = true;
-		document.getElementById("suboperation").disabled = true;
-		document.getElementById("newParam").disabled = true;
-		document.getElementById("addParam").disabled = true;
-		document.getElementById("cleanExtraParams").disabled = true;
-		document.getElementById("params").disabled = true;
-	}
 
 	function generateUUID() {
 		var d = new Date().getTime();
@@ -104,45 +158,6 @@
 					return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
 				});
 		return uuid;
-	}
-
-	function buildAndAddSingleSign() {
-
-		var singleSignID = document.getElementById("singleSignID").value;
-		var datareference = document.getElementById("datareferenceValue").value;
-		var format = null;
-		var suboperation = null;
-		var extraParams = null;
-
-		if (document.getElementById("useSingleConf").checked) {
-			format = document.getElementById("format").value;
-			suboperation = document.getElementById("suboperation").value;
-			if (!!document.getElementById("params").value){
-				extraParams = document.getElementById("params").value;
-			}
-		}
-		
-		try {
-			AutoScript.addDocumentToBatch(singleSignID, datareference, format,
-					suboperation, extraParams);
-			
-			 printSingleSign(singleSignID, datareference, format,
-					suboperation, extraParams);
-		} catch (e) {
-			showLog(e);
-		}
-		
-	}
-
-	function createBatchConfiguration() {
-
-		var algorithm = document.getElementById("algorithm").value;
-		var format = document.getElementById("generalFormat").value;
-		var subOperation = document.getElementById("generalSuboperation").value;
-		var extraParams = document.getElementById("filters").value;
-
-		AutoScript.createBatch(algorithm, format, subOperation,
-				extraParams);
 	}
 
 	function cleanDataField(dataField, textDiv) {
@@ -215,17 +230,6 @@
 		for (var i = 0 ; i < elements.length ; i++) {
 			elements[i].disabled = true;
 		}
-	}
-	
-	function createBatchConf() {
-		createBatchConfiguration();
-		
-		document.getElementById("singleSignID").disabled = false;
-		document.getElementById("generateId").disabled = false; 
-		document.getElementById("datareferenceValue").disabled = false;
-		document.getElementById("codeInB64").disabled = false;
-		document.getElementById("useSingleConf").disabled = false;
-		document.getElementById("addSign").disabled = false;
 	}
 	
 	function generateSingleSignId() {

@@ -328,9 +328,9 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +1
+	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
 	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
-	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +1
+	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 	Delete "$INSTDIR\$PATH\autofirma.pfx"
 	
 	; Copiamos el archivo .accessibility.properties	en todos los usuarios para permitir la accesibilidad a traves de JAB
