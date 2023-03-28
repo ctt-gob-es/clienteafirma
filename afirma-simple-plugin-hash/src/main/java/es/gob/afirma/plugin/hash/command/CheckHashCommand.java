@@ -44,6 +44,7 @@ public class CheckHashCommand extends PluginCommandAction {
 
 		if (params.isGui()) {
 			checkHashByGui(params);
+			Runtime.getRuntime().halt(0);
 		}
 		else {
 			boolean valid;

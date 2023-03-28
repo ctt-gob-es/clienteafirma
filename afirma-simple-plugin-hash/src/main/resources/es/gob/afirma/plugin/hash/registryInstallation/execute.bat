@@ -5,9 +5,9 @@
     @goto :EOF
 )
 echo.Performing admin tasks...
-call "$$PATH_EXE$$" "\"$$INSTALL_DIR$$\""
+call "$$PATH_BAT$$" "\"$$AUTOFIRMA_EXE$$\""
 @goto :EOF
 @end @ELSE
 ShA=new ActiveXObject("Shell.Application")
-ShA.ShellExecute("$$PATH_EXE$$","\"$$INSTALL_DIR$$\"","","runas",5);
+ShA.ShellExecute("cmd.exe", "/c $$PATH_BAT$$ $$AUTOFIRMA_EXE$$","","runas",5);
 @end

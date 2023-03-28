@@ -48,6 +48,7 @@ public class CreateHashCommand extends PluginCommandAction {
 
 		if (params.isGui()) {
 			createHashByGui(params);
+			Runtime.getRuntime().halt(0);
 		}
 		else {
 			try {
