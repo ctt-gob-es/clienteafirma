@@ -424,7 +424,8 @@ final class CAdESCounterSigner {
     				signedAttr.getEncoded(ASN1Encoding.DER),
     				signatureAlgorithm,
     				key,
-				    certChain
+				    certChain,
+				    config.getExtraParams()
 				)
     		);
         }
@@ -485,14 +486,16 @@ final class CAdESCounterSigner {
      * @param signatureAlgorithm Algoritmo de firma
      * @param key Clave para firmar.
      * @param certChain Cadena de certificados del firmante.
+     * @param extraParams Par&aacute;metros de configuraci&oacute;n de firma.
      * @return Firma de los atributos.
      * @throws AOException En caso de cualquier otro tipo de error */
     private byte[] pkcs1Sign(final byte[] data,
     		                 final String signatureAlgorithm,
     		                 final PrivateKey key,
-    		                 final java.security.cert.Certificate[] certChain) throws AOException {
+    		                 final java.security.cert.Certificate[] certChain,
+    		                 final Properties extraParams) throws AOException {
     	try {
-			return this.ss.sign(data, signatureAlgorithm, key, certChain, null);
+			return this.ss.sign(data, signatureAlgorithm, key, certChain, extraParams);
 		}
     	catch (final IOException e) {
 			throw new AOException(
