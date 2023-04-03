@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.8</version>
+		<version>1.8.1</version>
 	</parent>
 	
 	<dependencies>
@@ -74,6 +74,27 @@
 	
 	<build>
 		<plugins>
+		
+			<!-- Plugin para obtener la fecha en la propiedad "current.date" para adjuntarla a la version -->
+			<plugin>
+			  <groupId>org.codehaus.mojo</groupId>
+			  <artifactId>build-helper-maven-plugin</artifactId>
+			  <version>1.12</version>
+			  <executions>
+			    <execution>
+			      <id>timestamp-property</id>
+			      <goals>
+			        <goal>timestamp-property</goal>
+			      </goals>
+			      <phase>validate</phase>
+			      <configuration>
+			        <name>current.date</name>
+			        <pattern>yyyy-MM-dd hh:mm</pattern>
+			      </configuration>
+			    </execution>
+			  </executions>
+			</plugin>
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -109,6 +130,13 @@
 			</plugin>
 		</plugins>
 		<resources>
+			<resource>
+				<directory>src/main/resources/</directory>
+				<includes>
+					<include>version</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
 			<resource>
 				<directory>src/main/resources/</directory>
 				<excludes>

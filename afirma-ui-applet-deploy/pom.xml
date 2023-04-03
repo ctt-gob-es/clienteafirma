@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.8</version>
+		<version>1.8.1</version>
 	</parent>
 	
 </project>
