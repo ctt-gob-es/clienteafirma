@@ -21,6 +21,10 @@ public class ConfigManager {
 	private static final String CONFIG_PARAM_DOCUMENT_MANAGER_CLASS = "document.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_DOCUMENT_CACHE_MANAGER_CLASS = "document.cache.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
+
+	/** Propiedad para configurar el proveedor de Apache o no. */
+	private static final String CONFIG_PARAM_PROVIDER_APACHE = "xml.provider.apache"; //$NON-NLS-1$
+
 	private static final String CONFIG_PARAM_VERIFICATION_KEY = "verification.key"; //$NON-NLS-1$
 	/** Propiedad que indica si se deber habilitar o no la cach&eacute; */
 	private static final String CONFIG_PARAM_CACHE_ENABLED = "cacheEnabled"; //$NON-NLS-1$
@@ -279,5 +283,9 @@ public class ConfigManager {
 			}
 		}
 		return maxPages;
+	}
+
+	public static boolean isProviderApacheConfigured() {
+		return !Boolean.FALSE.toString().equalsIgnoreCase(config.getProperty(CONFIG_PARAM_PROVIDER_APACHE));
 	}
 }

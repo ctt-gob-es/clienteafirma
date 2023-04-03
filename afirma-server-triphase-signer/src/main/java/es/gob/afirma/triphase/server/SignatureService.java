@@ -214,7 +214,7 @@ public final class SignatureService extends HttpServlet {
 		}
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
-		XmlDSigProviderHelper.configureXmlDSigProvider();
+		XmlDSigProviderHelper.configureXmlDSigProvider(true, ConfigManager.isProviderApacheConfigured());
 	}
 
 	@Override
