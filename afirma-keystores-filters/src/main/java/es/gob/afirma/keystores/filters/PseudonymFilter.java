@@ -10,7 +10,9 @@
 package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -28,6 +30,20 @@ public final class PseudonymFilter extends CertificateFilter {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	static final String VALUE_PSEUDONYM_AND_OTHERS = "andothers"; //$NON-NLS-1$
+
+	private static final String VALUE_ONLY = "only"; //$NON-NLS-1$
+
+	private final String value;
+
+	public PseudonymFilter() {
+		this.value = VALUE_PSEUDONYM_AND_OTHERS;
+	}
+
+	public PseudonymFilter(final String value) {
+		this.value = value;
+	}
+
 	@Override
 	public boolean matches(final X509Certificate cert) {
 		return AOUtil.isPseudonymCert(cert);
@@ -35,6 +51,45 @@ public final class PseudonymFilter extends CertificateFilter {
 
 	@Override
 	public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
+
+		String[] filteredAlias;
+		if (VALUE_ONLY.equalsIgnoreCase(this.value)) {
+			filteredAlias = getOnlyCertsWithPseudonymExtension(aliases, ksm);
+		}
+		else {
+			filteredAlias = getCertsWithPseudonymOrOthers(aliases, ksm);
+		}
+
+		return filteredAlias;
+	}
+
+	/**
+	 * Devuelve los alias de los certificados del almac&eacute;n que incluyen la extensi&oacute;n propia
+	 * de los filtros de pseud&oacute;nimo.
+	 * @param aliases Listado de alias del almac&eacute;n de entre los que filtrar.
+	 * @param ksm Gestor del almac&eacute;n de claves.
+	 * @return Listado filtrados de alias de certificados.
+	 */
+	private String[] getOnlyCertsWithPseudonymExtension(final String[] aliases, final KeyStoreManager ksm) {
+		final List<String> pseudoByAlias = new ArrayList<>();
+		for (final String alias : aliases) {
+			final X509Certificate cert = ksm.getCertificate(alias);
+			if (matches(cert)) {
+				pseudoByAlias.add(alias);
+			}
+		}
+		return pseudoByAlias.toArray(new String[0]);
+	}
+
+	/**
+	 * Devuelve los alias de los certificados del almac&eacute;n que incluyen la extensi&oacute;n propia
+	 * de los filtros de pseud&oacute;nimo o aquellos que no tienen un certificado de seud&oacute;nimo
+	 * equivalente.
+	 * @param aliases Listado de alias del almac&eacute;n de entre los que filtrar.
+	 * @param ksm Gestor del almac&eacute;n de claves.
+	 * @return Listado filtrados de alias de certificados.
+	 */
+	private String[] getCertsWithPseudonymOrOthers(final String[] aliases, final KeyStoreManager ksm) {
 		final Map<String, X509Certificate> certsByAlias = new ConcurrentHashMap<>(aliases.length);
 		final Map<String, X509Certificate> psudoByAlias = new ConcurrentHashMap<>();
 
@@ -57,8 +112,8 @@ public final class PseudonymFilter extends CertificateFilter {
 		// Omitimos del listado de certificados normales todos aquellos que tengan un
 		// certificado de seudonimo asociado, ya que en ese caso solo se debera mostrar
 		// el de seudonimo.
-		for (final String pseuAlias : psudoByAlias.keySet()) {
-			final X509Certificate pseuCert = psudoByAlias.get(pseuAlias);
+		for (final String pseudoByAlias : psudoByAlias.keySet()) {
+			final X509Certificate pseuCert = psudoByAlias.get(pseudoByAlias);
 			for (final String certAlias : certsByAlias.keySet()) {
 				final X509Certificate normCert = certsByAlias.get(certAlias);
 				if (isPseudonymFor(pseuCert, normCert)) {

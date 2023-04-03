@@ -205,7 +205,11 @@ public final class CertFilterManager {
 				}
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_PSEUDONYM)) {
-				filtersList.add(new PseudonymFilter());
+				String value = PseudonymFilter.VALUE_PSEUDONYM_AND_OTHERS;
+				if (!filter.toLowerCase().equals(FILTER_TYPE_PSEUDONYM)) {
+					value = filter.substring(FILTER_TYPE_PSEUDONYM.length());
+				}
+				filtersList.add(new PseudonymFilter(value));
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_ENCODED_CERT)) {
 				filtersList.add(new EncodedCertificateFilter(filter.substring(FILTER_TYPE_ENCODED_CERT.length())));
