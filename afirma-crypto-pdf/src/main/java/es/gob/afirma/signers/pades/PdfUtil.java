@@ -466,57 +466,111 @@ public final class PdfUtil {
     }
 
     /**
-     * Metodo que controla si se ha introducido alg&uacute;n rango en el par&aacute;metro con las p&aacute;ginas donde estampar la firma
-     * visible para introducirlo en un array correctamente.
+     * Carga en el listado de p&aacute;ginas las p&aacute;ginas indicadas en una cadena, que puede
+     * ser un n&uacute;mero de p&aacute;gina o un rango de ellas. Las p&aacute;ginas se enumeran
+     * desde 1 y se pueden referenciar desde el final mediante n&uacute;meros negativos, donde la
+     * &uacute;ltima p&aacute;gina ser&iacute;a -1. Cualquier n&uacute;mero que exceda el
+     * n&uacute;mero de p&aacute;ginas ser&aacute; se interpretar&aacute; como la &uacute;ltima
+     * p&aacute;gina si era positivo o la primera si era negativo. Los rangos se indican con guion
+     * ('-').
      * @param pageStr P&aacute;gina o rango de p&aacute;ginas a tratar.
      * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
      * @param pagesList Lista de enteros donde se indican las p&aacute;ginas una a una.
+     * @throws IncorrectPageException Cuando la cadena no es v&aacute;lida.
      */
-    public static void checkPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) {
+    public static void checkPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) throws IncorrectPageException {
 
+
+    	final String range = pageStr.replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
+    	// Intentamos cargar la cadena como si fuese el numero de pagina.
+    	// Si falla, intentaremos hacerlo como si fuese un rango de paginas.
+    	int page;
     	try {
-    		int page = Integer.parseInt(pageStr);
-			if (page < 0) {
-				page = page + totalPages + 1;
-			}
-			if (page <= 0) {
-				throw new IncorrectPageException("El numero de pagina indicado no es correcto: " + pageStr); //$NON-NLS-1$
-			}
-			// Si el numero que se indica supera las paginas que tiene el documento, no se agregara.
-			if (page <= totalPages && !pagesList.contains(page)) {
-				pagesList.add(page);
-			}
-
+    		page = normalizePage(range, totalPages);
     	} catch (final NumberFormatException nfe) {
-    	// En caso de error al parsear, quiere decir que se ha introducido un rango
-			int firstNumber;
-			int limitNumber;
-			String limitNumberStr;
-			if (RANGE_INDICATOR.equals(pageStr.substring(0, 1))) {
-				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1))) + totalPages + 1;
-    			limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR, 1)) + RANGE_INDICATOR, "");  //$NON-NLS-1$
-    			limitNumber = Integer.parseInt(limitNumberStr) + totalPages + 1;
-			}
-			// Si el primer numero no es negativo, se obtiene el rango directamente
-			else {
-				firstNumber = Integer.parseInt(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)));
-				limitNumberStr = pageStr.replaceAll(pageStr.substring(0, pageStr.indexOf(RANGE_INDICATOR)) + RANGE_INDICATOR, ""); //$NON-NLS-1$
-				limitNumber = Integer.parseInt(limitNumberStr);
-				if (limitNumber < 0) {
-					limitNumber = limitNumber + totalPages + 1;
-				}
-			}
-			if (firstNumber <= 0 || limitNumber <= 0 || limitNumber < firstNumber || totalPages < firstNumber) {
-				throw new IncorrectPageException("El rango indicado no es correcto: " + pageStr); //$NON-NLS-1$
-			}
-			// Se agregan las paginas comprendidas entre el primer y ultimo numero
-			for ( ; firstNumber <= limitNumber ; firstNumber++) {
-				if (firstNumber <= totalPages && !pagesList.contains(firstNumber)) {
-					pagesList.add(firstNumber);
-    			}
-			}
+    		page = -1;
+    	}
+
+    	if (page <= 0) {
+    		addPageToResult(page, pagesList);
+    	}
+    	else {
+    		addRangeToResult(range, totalPages, pagesList);
     	}
     }
+
+	/**
+     * Traduce un texto a n&uacute;mero de p&aacute;gina. Las p&aacute;ginas se enumeran
+     * desde 1 y se pueden referenciar desde el final mediante n&uacute;meros negativos, donde la
+     * &uacute;ltima p&aacute;gina ser&iacute;a -1. Cualquier n&uacute;mero que exceda el
+     * n&uacute;mero de p&aacute;ginas ser&aacute; se interpretar&aacute; como la &uacute;ltima
+     * p&aacute;gina si era positivo o la primera si era negativo o cero.
+     * @param pageStr P&aacute;gina a normalizar.
+     * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
+     * @throws NumberFormatException Cuando la cadena no sea un n&uacute;mero.
+     */
+    private static int normalizePage(final String pageStr, final int totalPages) {
+		int page = Integer.parseInt(pageStr);
+		// Si es un numero negativo, calculamos el numero de pagina
+		if (page < 0) {
+			page = page + totalPages + 1;
+		}
+		// Si se introdujo un numero negativo mayor que el numero de paginas, se firmara en la primera pagina
+		if (page <= 0) {
+			page = 1;
+		}
+		// Si el numero que se indica es mayor que el numero de paginas, se agregara en la ultima pagina.
+		if (page > totalPages) {
+			page = totalPages;
+		}
+		return page;
+    }
+
+    /**
+     * Agrega una p&aacute;gina al listado de p&aacute;ginas resultantes siempre y cuando no
+     * est&eacute; ya incluida en &eacute;l.
+     * @param page P&aacute;gina que se quiere agregar al resultado.
+     * @param pagesList Listado de p&aacute;ginas resultante.
+     */
+    private static void addPageToResult(final int page, final List<Integer> pagesList) {
+		if (!pagesList.contains(Integer.valueOf(page))) {
+			pagesList.add(Integer.valueOf(page));
+		}
+    }
+
+    /**
+     * Agrega un rango de p&aacute;ginas al resultado.
+     * @param range Cadena con el rango de p&aacute;ginas.
+     * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
+     * @param pagesList Listado de p&aacute;ginas de resultado.
+     */
+    private static void addRangeToResult(final String range, final int totalPages, final List<Integer> pagesList) {
+
+		int firstNumber;
+		int limitNumber;
+		try {
+			// Obtenemos la posicion del separador de rango teniendo en cuenta que el primer
+			// numero podria ser negativo
+			final int sepIdx = range.startsWith(RANGE_INDICATOR)
+					? range.indexOf(RANGE_INDICATOR, 1) : range.indexOf(RANGE_INDICATOR);
+			firstNumber = normalizePage(range.substring(0, sepIdx), totalPages);
+			limitNumber = normalizePage(range.substring(sepIdx + RANGE_INDICATOR.length()), totalPages);
+		}
+		catch (final Exception e) {
+			final String cleanedText = range.length() > 12 ? range.substring(0, 12) + "..." : range; //$NON-NLS-1$
+			throw new IncorrectPageException("La cadena introducida no se corresponde con un rango de paginas: " + cleanedText); //$NON-NLS-1$
+		}
+
+		if (limitNumber < firstNumber) {
+			final String cleanedText = range.length() > 12 ? range.substring(0, 12) + "..." : range; //$NON-NLS-1$
+			throw new IncorrectPageException("Se ha indicado un rango incorrecto: " + cleanedText); //$NON-NLS-1$
+		}
+		// Se agregan las paginas comprendidas entre el primer y ultimo numero
+		for (int i = firstNumber; i <= limitNumber; i++) {
+			addPageToResult(i, pagesList);
+		}
+	}
 
     /**
      * Comprueba que la posici&oacute;n indicada donde estampar la firma visible corresponda a alguna de las p&aacute;ginas a estampar
