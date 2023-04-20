@@ -15,7 +15,14 @@
 
     function loadScreen(page) {
         var folder = getLanguageFolder();
-        document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + page + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
+        
+        var cleanedPageAddress = cleanAddress(page);
+        document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + cleanedPageAddress + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
+	}
+    
+    function cleanAddress(page) {
+    	return page.replace('\\', '/').replace('..', '').replace(' ', '%20')
+    		.replace('?', '%3F').replace('&', '%26').replace('<', '%3C').replace('>', '%3E');
 	}
   </script>
  </head>

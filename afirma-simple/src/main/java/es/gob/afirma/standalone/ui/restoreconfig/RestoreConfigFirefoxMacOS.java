@@ -331,7 +331,13 @@ final class RestoreConfigFirefoxMacOS {
 				 RestoreConfigFirefoxMacOS.class.getResourceAsStream(resource));) {
 
 			 while ((entry = zipIs.getNextEntry()) != null) {
-				 final File outFile = new File(outDir, entry.getName());
+				 final File outFile = new File(outDir, entry.getName()).getCanonicalFile();
+
+				 if (!isParent(outDir, outFile)) {
+					 zipIs.closeEntry();
+					 throw new IOException("Se ha encontrado en el archivo comprimido una ruta que apuntaba fuera del directorio de destino"); //$NON-NLS-1$
+				 }
+
 				 if (entry.isDirectory()) {
 					 outFile.mkdirs();
 				 }
@@ -349,6 +355,25 @@ final class RestoreConfigFirefoxMacOS {
 				 zipIs.closeEntry();
 			 }
 		 }
+	 }
+
+	 /**
+	  * Comprueba que el fichero {@code parentFile} es un directorio padre de la
+	  * ruta de {@code childFile}.
+	  * @param parentDir Directorio padre.
+	  * @param childFile Fichero/directorio hijo.
+	  * @return {@code true} cuando el directorio forma parte de la ruta de directorio,
+	  * {@code false} en caso contrario.
+	  * @throws IOException Cuando no se pueda canonizar el nombre de fichero hijo.
+	  */
+	 private static boolean isParent(final File parentDir, final File childFile) throws IOException {
+
+		 final File parent = parentDir.getCanonicalFile();
+		 File intermediateDir = childFile.getCanonicalFile();
+		 while (intermediateDir != null && !intermediateDir.equals(parent)) {
+			 intermediateDir = intermediateDir.getParentFile();
+		 }
+		 return intermediateDir != null;
 	 }
 
 	 /** Obtiene el path para la llamada a CertUtil.

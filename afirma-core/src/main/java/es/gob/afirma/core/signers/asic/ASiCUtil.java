@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 
 /** Utilidades para firmas ASiC.
@@ -163,7 +164,7 @@ public final class ASiCUtil {
 			}
 		}
 		throw new IOException(
-			"Los datos proporcionados no son una firma ASiC-S conteniendo la entrada " + signatureFilename //$NON-NLS-1$
+			"Los datos proporcionados no son una firma ASiC-S conteniendo la entrada " + LoggerUtil.getTrimStr(signatureFilename) //$NON-NLS-1$
 		);
 	}
 

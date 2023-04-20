@@ -42,6 +42,8 @@ public class AutoFirmaJnlpService extends HttpServlet {
 	private static final String TEMPLATE_REPLACE_CODEBASE = "%CODEBASE%"; //$NON-NLS-1$
 	private static final String TEMPLATE_REPLACE_ARGUMENT = "%ARGUMENT%"; //$NON-NLS-1$
 
+	private static final String ARGUMENT_PREFIX = "afirma://"; //$NON-NLS-1$
+
 	private static final String TEMPLATE_NODE_REFERENCE = "<jar href=\"%CODEBASE%%OSNAME%.jar\"/>"; //$NON-NLS-1$
 
 	/**
@@ -73,7 +75,7 @@ public class AutoFirmaJnlpService extends HttpServlet {
 		response.getWriter().append(
 				template
 				.replace(TEMPLATE_REPLACE_CODEBASE, codebase)
-				.replace(TEMPLATE_REPLACE_ARGUMENT, arg != null && !arg.isEmpty() ?
+				.replace(TEMPLATE_REPLACE_ARGUMENT, arg != null && !arg.isEmpty() && arg.startsWith(ARGUMENT_PREFIX) ?
 						"<argument>" + new String(Base64.decode(arg, true)) + "</argument>" : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		response.flushBuffer();
 	}
@@ -84,7 +86,7 @@ public class AutoFirmaJnlpService extends HttpServlet {
 	 * @return Plantilla JNLP.
 	 * @throws IOException Cuando ocurre un error en la lectura.
 	 */
-	private static String loadJnlpTemplate(boolean complete) throws IOException {
+	private static String loadJnlpTemplate(final boolean complete) throws IOException {
 
 		final String template = complete ? COMPLETE_INSTALATION_TEMPLATE : PROTOCOL_CONSUMER_TEMPLATE;
 

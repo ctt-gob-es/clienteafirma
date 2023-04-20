@@ -808,7 +808,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 				checkJavaVersion(saf.getMainFrame());
 			} else {
-				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "La aplicacion ya se encuentra activa en otra ventana. Se cerrara esta instancia"); //$NON-NLS-1$
+	    		AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 						JOptionPane.WARNING_MESSAGE, null);
 				forceCloseApplication(0);
@@ -819,6 +820,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		CommandLineLauncher.main(args);
 		} catch (final Exception e) {
     		LOGGER.log(Level.SEVERE, "Error global en la aplicacion: " + e, e); //$NON-NLS-1$
+    		// En caso de error
+			if (args != null && args.length > 0 && args[0].startsWith(WEBSOCKET_REQUEST_PREFIX)) {
+				forceCloseApplication(-1);
+			}
     	}
     }
 

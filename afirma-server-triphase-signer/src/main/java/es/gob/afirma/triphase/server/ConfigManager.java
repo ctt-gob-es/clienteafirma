@@ -87,6 +87,10 @@ public class ConfigManager {
 			configDir = null;
 		}
 
+		if (configDir == null) {
+			LOGGER.warning("No se definio la variable " + CONFIG_FILE + " con el directorio del fichero de configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		// Cargamos la configuracion del servicio
 		Properties configProperties = loadConfigFile(configDir, CONFIG_FILE);
 		if (configProperties == null) {
