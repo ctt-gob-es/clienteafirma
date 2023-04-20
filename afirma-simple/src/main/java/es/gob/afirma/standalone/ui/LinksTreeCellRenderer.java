@@ -43,7 +43,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
         	if (focus) {
         		linkLbl.setText(getText());
         		linkLbl.setOpaque(true);
-        		if (!LookAndFeelManager.HIGH_CONTRAST) {
+        		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         			linkLbl.setForeground(Color.WHITE);
             		linkLbl.setBackground(Color.decode("#39698a")); //$NON-NLS-1$
         		} else {
@@ -52,7 +52,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
         		}
         	} else {
         		linkLbl.setText(getText());
-        		if (!LookAndFeelManager.HIGH_CONTRAST) {
+        		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         			linkLbl.setForeground(Color.BLUE);
         		} else {
         			linkLbl.setForeground(Color.YELLOW);

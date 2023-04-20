@@ -573,7 +573,7 @@ final class SignPdfUiPanel extends JPanel implements
 
 		final URL helpImgResource;
 
-		if (LookAndFeelManager.HIGH_CONTRAST) {
+		if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 			helpImgResource = SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"); //$NON-NLS-1$;
 		} else {
 			helpImgResource = SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"); //$NON-NLS-1$;
@@ -599,7 +599,7 @@ final class SignPdfUiPanel extends JPanel implements
 				new FocusListener() {
 					  @Override
 					  public void focusGained(final FocusEvent e) {
-						  if (LookAndFeelManager.HIGH_CONTRAST) {
+						  if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 							  helpBtn.setIcon(new ImageIcon(
 									  SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
 									  SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
@@ -608,7 +608,7 @@ final class SignPdfUiPanel extends JPanel implements
 					  }
 					  @Override
 					  public void focusLost(final FocusEvent e) {
-						  if (LookAndFeelManager.HIGH_CONTRAST) {
+						  if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 							 helpBtn.setIcon(new ImageIcon(
 									 SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"), //$NON-NLS-1$
 									 SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
@@ -637,7 +637,7 @@ final class SignPdfUiPanel extends JPanel implements
 				else {
 					final List<Integer> pagesList = new ArrayList<>();
 					try {
-						PdfUtil.checkPagesRange(pageStr, this.pdfPages.size(), pagesList);
+						PdfUtil.getPagesRange(pageStr, this.pdfPages.size(), pagesList);
 						if (pagesList.isEmpty()) {
 							throw new IncorrectPageException("Numero de pagina no valido"); //$NON-NLS-1$
 						}

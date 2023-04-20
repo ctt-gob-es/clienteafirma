@@ -144,7 +144,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /** Crea la interfaz grafica del panel. */
 	private void createUI() {
 
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
@@ -654,7 +654,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	c.gridy++;
     	mainPanel.add(this.pluginButtonsPanel, c);
 
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
     		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}
@@ -866,7 +866,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.add(selectPanel, BorderLayout.PAGE_END);
 
 	        // Configuramos el color
-	        if (!LookAndFeelManager.HIGH_CONTRAST) {
+	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            introPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            selectPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
@@ -901,7 +901,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	        // Identificamos el color de fondo
 	        Color bgColor = Color.WHITE;
-	        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 	        	bgColor = LookAndFeelManager.DEFAULT_COLOR;
 	        }
 
@@ -921,7 +921,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.filePanel.setBackground(bgColor);
 	        this.filePanel.getViewport().setBackground(bgColor);
 
-	        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+	        final Color lineBorderColor = LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
 	        this.filePanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
 
 	        this.filePanel.getHorizontalScrollBar().setUnitIncrement(30);
@@ -956,7 +956,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			);
 
 	        // Establecemos la configuracion de color
-	        if (!LookAndFeelManager.HIGH_CONTRAST) {
+	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            panel.setBackground(Color.DARK_GRAY);
 	            panel.setForeground(Color.LIGHT_GRAY);

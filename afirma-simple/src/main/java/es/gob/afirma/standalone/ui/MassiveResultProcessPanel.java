@@ -95,7 +95,7 @@ final class MassiveResultProcessPanel extends JPanel {
         this.dirPathText.setText(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.3")); //$NON-NLS-1$
         this.dirPathText.setLabelFor(outDirPath);
 
-        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+        final Color lineBorderColor = LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
 
         final JPanel dirPathPanel = new JPanel();
         dirPathPanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
@@ -105,7 +105,7 @@ final class MassiveResultProcessPanel extends JPanel {
         dirPathPanel.setFocusable(true);
         dirPathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MassiveResultProcessPanel.3") + outDir.getAbsolutePath()); //$NON-NLS-1$
 
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             dirPathPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 
@@ -213,7 +213,7 @@ final class MassiveResultProcessPanel extends JPanel {
                 certDescPanel.add(this.validateCertButton);
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
             }
-            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
                 certDescPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
             }
 
@@ -276,7 +276,7 @@ final class MassiveResultProcessPanel extends JPanel {
         // Establecemos la configuracion de color cuando no se encuentra
         // activado el alto contraste y estamos en Windows (en donde se
         // utiliza un Look&Feel determinado)
-        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 
@@ -385,7 +385,7 @@ final class MassiveResultProcessPanel extends JPanel {
 			this.resultLabel.setPreferredSize(new Dimension(52, 14));
 
 			// Configuramos los colores
-			if (!LookAndFeelManager.HIGH_CONTRAST) {
+			if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 				setBackground(LookAndFeelManager.SECUNDARY_COLOR);
 			}
 
@@ -466,13 +466,13 @@ final class MassiveResultProcessPanel extends JPanel {
 
 			this.formatter = NumberFormat.getNumberInstance();
 
-			final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+			final Color lineBorderColor = LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
 
 			this.focusedBorder = BorderFactory.createDashedBorder(lineBorderColor);
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
 			// Configuramos los colores
-			if (!LookAndFeelManager.HIGH_CONTRAST) {
+			if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 				setBackground(LookAndFeelManager.SECUNDARY_COLOR);
 			}
 

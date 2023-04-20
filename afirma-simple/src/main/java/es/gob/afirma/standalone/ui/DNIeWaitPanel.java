@@ -133,7 +133,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         }
 
         // Configuramos los colores
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         	setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         	dniePanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         	textPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
@@ -175,7 +175,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 				hideDniWaitScreen.isSelected()
 			)
     	);
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         	hideDniWaitScreen.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
         add(hideDniWaitScreen, c);

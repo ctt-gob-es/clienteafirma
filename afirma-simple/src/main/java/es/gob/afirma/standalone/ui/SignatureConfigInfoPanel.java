@@ -51,7 +51,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	private void createUI(final SignOperationConfig signConfig, final Color bgColor) {
 
-		if (!LookAndFeelManager.HIGH_CONTRAST) {
+		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 			setBackground(bgColor);
 		}
 
@@ -75,7 +75,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 		add(Box.createRigidArea(new Dimension(0, 4)));
 		add(signFormatLabel);
         if (attrPanel != null) {
-        	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         		attrPanel.setBackground(bgColor);
         	}
         	add(Box.createRigidArea(new Dimension(0, 4)));
@@ -84,7 +84,7 @@ public class SignatureConfigInfoPanel extends JPanel {
         	add(attrPanel);
         }
         if (optionsPanel != null) {
-        	if (!LookAndFeelManager.HIGH_CONTRAST) {
+        	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         		optionsPanel.setBackground(bgColor);
         	}
         	add(Box.createRigidArea(new Dimension(0, 4)));
@@ -159,7 +159,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 		final JLabel hlLabel = new JLabel(" - " + text); //$NON-NLS-1$
 
 		hlLabel.setFocusable(true);
-		hlLabel.setForeground(LookAndFeelManager.HIGH_CONTRAST ? Color.yellow : Color.blue);
+		hlLabel.setForeground(LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.yellow : Color.blue);
     	final Font font = hlLabel.getFont();
     	final Map attributes = font.getAttributes();
     	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
@@ -194,7 +194,7 @@ public class SignatureConfigInfoPanel extends JPanel {
         		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE)
         	);
             this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.44"); //$NON-NLS-1$
-            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             	this.pdfVisible.setBackground(bgColor);
             }
             this.pdfVisible.setMnemonic('H');
@@ -207,7 +207,7 @@ public class SignatureConfigInfoPanel extends JPanel {
             		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_STAMP)
             	);
             this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.120"); //$NON-NLS-1$
-            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             	this.pdfStamp.setBackground(bgColor);
             }
             this.pdfStamp.setMnemonic('S');

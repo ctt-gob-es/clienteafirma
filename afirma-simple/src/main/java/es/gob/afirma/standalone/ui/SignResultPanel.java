@@ -217,7 +217,7 @@ final class SignResultPanel extends JPanel {
         // Establecemos la configuracion de color cuando no se encuentra
         // activado el alto contraste y estamos en Windows (en donde se
         // utiliza un Look&Feel determinado)
-        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 

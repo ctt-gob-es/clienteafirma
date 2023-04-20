@@ -31,7 +31,7 @@ public class DocumentInfoPanel extends JPanel {
 
 	private void createUI(final SignOperationConfig signConfig, final Color bgColor) {
 
-		if (!LookAndFeelManager.HIGH_CONTRAST) {
+		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 			setBackground(bgColor);
 		}
 

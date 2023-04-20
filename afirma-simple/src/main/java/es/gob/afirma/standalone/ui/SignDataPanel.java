@@ -91,7 +91,7 @@ final class SignDataPanel extends JPanel {
     void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
 
     	// Color de fondo
-    	if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+    	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}
 
@@ -117,7 +117,7 @@ final class SignDataPanel extends JPanel {
         this.filePathText.setText(SimpleAfirmaMessages.getString("SignDataPanel.2")); //$NON-NLS-1$
         this.filePathText.setLabelFor(filePath);
 
-        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+        final Color lineBorderColor = LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
 
         final JPanel filePathPanel = new JPanel();
         filePathPanel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignDataPanel.2") + filePath.getText()); //$NON-NLS-1$
@@ -267,7 +267,7 @@ final class SignDataPanel extends JPanel {
                 certDescPanel.add(this.validateCertButton);
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
             }
-            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
                 certDescPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
             }
 
@@ -325,7 +325,7 @@ final class SignDataPanel extends JPanel {
         															+ treeAccessibleDesc);
 
         // Establecemos la configuracion de color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             filePathPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
 
