@@ -15,12 +15,14 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.aowagie.text.Rectangle;
@@ -54,6 +56,17 @@ public final class PdfUtil {
 	private static final String RANGE_INDICATOR = "-"; //$NON-NLS-1$
 
 	private static final String RANGE_SEPARATOR = ","; //$NON-NLS-1$
+
+    /** Valor en el par&aacute;metro signaturePage o signaturePages que
+     * indica una nueva p&aacute;gina para agregar al final del documento*/
+    private static final String APPEND_PAGE = "append"; //$NON-NLS-1$
+
+    /** N&uacute;mero que indica una p&aacute;gina nueva. */
+    private static final int NEW_PAGE = 0;
+
+    /** Valor en el par&aacute;metro signaturePage o signaturePages que
+     * indica que se estampar&aacute; la firma visible en todas las paginas*/
+    private static final String ALL_PAGES = "all"; //$NON-NLS-1$
 
 	private static final Set<String> SUPPORTED_SUBFILTERS;
 	static {
@@ -465,6 +478,8 @@ public final class PdfUtil {
 	    	return null;
     }
 
+
+
     /**
      * Carga en el listado de p&aacute;ginas las p&aacute;ginas indicadas en una cadena, que puede
      * ser un n&uacute;mero de p&aacute;gina o un rango de ellas. Las p&aacute;ginas se enumeran
@@ -478,10 +493,10 @@ public final class PdfUtil {
      * @param pagesList Lista de enteros donde se indican las p&aacute;ginas una a una.
      * @throws IncorrectPageException Cuando la cadena no es v&aacute;lida.
      */
-    public static void checkPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) throws IncorrectPageException {
+    public static void getPagesRange(final String pageStr, final int totalPages, final List<Integer> pagesList) throws IncorrectPageException {
 
 
-    	final String range = pageStr.replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    	final String range = pageStr.trim().replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
     	// Intentamos cargar la cadena como si fuese el numero de pagina.
     	// Si falla, intentaremos hacerlo como si fuese un rango de paginas.
@@ -492,8 +507,8 @@ public final class PdfUtil {
     		page = -1;
     	}
 
-    	if (page <= 0) {
-    		addPageToResult(page, pagesList);
+    	if (page > 0) {
+    		addPageToResult(page, totalPages, pagesList);
     	}
     	else {
     		addRangeToResult(range, totalPages, pagesList);
@@ -508,6 +523,7 @@ public final class PdfUtil {
      * p&aacute;gina si era positivo o la primera si era negativo o cero.
      * @param pageStr P&aacute;gina a normalizar.
      * @param totalPages N&uacute;mero total de p&aacute;ginas del documento.
+     * @return N&uacute;mero de p&aacute;gina normalizada (n&uacute;mero positivo).
      * @throws NumberFormatException Cuando la cadena no sea un n&uacute;mero.
      */
     private static int normalizePage(final String pageStr, final int totalPages) {
@@ -528,13 +544,14 @@ public final class PdfUtil {
     }
 
     /**
-     * Agrega una p&aacute;gina al listado de p&aacute;ginas resultantes siempre y cuando no
-     * est&eacute; ya incluida en &eacute;l.
+     * Agrega una p&aacute;gina al listado de p&aacute;ginas resultantes siempre y cuando sea un
+     * n&uacute;mero de p&aacute;gina v&aacute;lido y no est&eacute; ya incluida en &eacute;l.
      * @param page P&aacute;gina que se quiere agregar al resultado.
+     * @param totalPages N&uacute;mero p&aacute;ginas del documento.
      * @param pagesList Listado de p&aacute;ginas resultante.
      */
-    private static void addPageToResult(final int page, final List<Integer> pagesList) {
-		if (!pagesList.contains(Integer.valueOf(page))) {
+    private static void addPageToResult(final int page, final int totalPages, final List<Integer> pagesList) {
+		if (page <= totalPages && !pagesList.contains(Integer.valueOf(page))) {
 			pagesList.add(Integer.valueOf(page));
 		}
     }
@@ -568,37 +585,43 @@ public final class PdfUtil {
 		}
 		// Se agregan las paginas comprendidas entre el primer y ultimo numero
 		for (int i = firstNumber; i <= limitNumber; i++) {
-			addPageToResult(i, pagesList);
+			addPageToResult(i, totalPages, pagesList);
 		}
 	}
 
     /**
-     * Comprueba que la posici&oacute;n indicada donde estampar la firma visible corresponda a alguna de las p&aacute;ginas a estampar
-     * del documento. En caso contrario, se lanzara una InvalidSignaturePositionException.
+     * Corrige el tama&ntilde;o del area de firma visible para que no se imprima completamente
+     * fuera de ninguna p&aacute;gina y que no sobresalga en al menos la primera de las
+     * p&aacute;ginas en la que se va a imprimir.
      * @param pdfReader Lector de PDF donde se encuentran las p&aacute;ginas del documento a firmar.
      * @param pagesList Lista con las p&aacute;ginas donde estampar la firma visible.
-     * @param extraParams Par&aacute;metros extra con informaci&aacute;n sobre la posici&oacute;n.
+     * @param signaturePosition Posici&oacute;n de la firma.
      */
-    public static void checkCorrectPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Properties extraParams) {
-    	if (!pagesList.isEmpty()) {
-	    	for (final int page : pagesList) {
-	    		final Rectangle pageSize = pdfReader.getPageSizeWithRotation(page);
-	    		if (pageSize.getBottom() <=
-						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY))
-					&& pageSize.getLeft() <=
-						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX))
-	    			&& pageSize.getTop() >=
-	    				Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY))
-	    			&& pageSize.getRight() >=
-						Float.parseFloat(extraParams.getProperty(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX)))
-	    		{
-	    				return;
-	    		}
-	    	}
+    public static void correctPositionSignature(final PdfReader pdfReader, final List<Integer> pagesList, final Rectangle signaturePosition) {
 
-	    	throw new InvalidSignaturePositionException(
-	    			"La posicion proporcionada no se encuentra en el rango de ninguna de las paginas a estampar del documento" //$NON-NLS-1$
-	    	);
+    	// Comprobamos que la firma se pueda estampar en al menos una de las paginas
+    	final Integer[] pages = pagesList.toArray(new Integer[0]);
+    	for (final Integer page : pages) {
+
+    		final Rectangle pageSize = pdfReader.getPageSizeWithRotation(page.intValue());
+    		if (pageSize.getWidth() <= signaturePosition.getLeft() || pageSize.getHeight() <= signaturePosition.getBottom()) {
+    			pagesList.remove(page);
+    		}
+    	}
+
+    	if (pagesList.isEmpty()) {
+    		throw new InvalidSignaturePositionException(
+    				"La posicion proporcionada no se encuentra en el rango de ninguna de las paginas a estampar del documento"); //$NON-NLS-1$
+    	}
+
+    	// Redimensionamos el area de firma para que quede completamente dentro de la primera pagina en la que se vaya a imprimir
+    	final int firstPage = pagesList.get(0).intValue();
+    	final Rectangle firstPageSize = pdfReader.getPageSizeWithRotation(firstPage);
+    	if (signaturePosition.getTop() > firstPageSize.getTop()) {
+    		signaturePosition.setTop(firstPageSize.getTop());
+    	}
+    	if (signaturePosition.getRight() > firstPageSize.getRight()) {
+    		signaturePosition.setRight(firstPageSize.getRight());
     	}
     }
 
@@ -637,7 +660,7 @@ public final class PdfUtil {
 	    		}
 	    	}
 
-	    	final String[] rangesArray = rangeInput.split(","); //$NON-NLS-1$
+	    	final String[] rangesArray = rangeInput.split(RANGE_SEPARATOR);
 	    	for (final String range : rangesArray) {
 
 	    		if (RANGE_INDICATOR.equals(String.valueOf(range.charAt(range.length() -1)))) {
@@ -660,4 +683,62 @@ public final class PdfUtil {
     	}
     	return true;
     }
+
+
+
+    /**
+     * Obtiene el listado de p&aacute;ginas del documento que se han pedido firmar.
+     * Si se devuelve una p&aacute;gina '0', se referir&aacute; a una p&aacute;gina
+     * posterior a la &oacute;ltima.
+     * @param extraParams Propiedades con la configuracion de firma de las que extraer
+     * las p&aacute;ginas.
+     * @param totalPages N&oacute;mero la &uacute;ltima p&aacute;gina del documento.
+     * @return P&aacute;ginas del documento.
+     */
+	public static List<Integer> getPages(final Properties extraParams, final int totalPages) {
+
+		// Comprobamos si se han indicado los parametros Si se encuentra el parametro signaturePages, prevalecera sobre el antiguo signaturePage
+		final String[] pagesStr = extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGES)
+				? extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(RANGE_SEPARATOR)
+				: extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGE)
+					? extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE).split(RANGE_SEPARATOR)
+					: new String[0];
+
+		final List<Integer> pages = new ArrayList<>();
+
+		// Si no se ha indicado ninguna pagina, se firmara en la ultima
+		if (pagesStr.length == 0) {
+			pages.add(totalPages);
+		}
+		// El valor APPEND_PAGE pide que se firme en una pagina posterior a la primera
+		else if (APPEND_PAGE.equalsIgnoreCase(pagesStr[0].trim())) {
+			pages.add(NEW_PAGE);
+		// El valor ALL_PAGES pide que se firme en todas las paginas
+		} else if (ALL_PAGES.equalsIgnoreCase(pagesStr[0].trim())) {
+			for (int page = 1; page <= totalPages; page++) {
+				pages.add(page);
+			}
+		// Rellenamos con las paginas y rangos indicados, evitando que se indiquen
+		// paginas posteriores a la ultima
+		} else {
+			for (final String pageStr : pagesStr) {
+				try {
+					getPagesRange(pageStr, totalPages, pages);
+				} catch (final IncorrectPageException e) {
+					LOGGER.log(Level.WARNING, "Se ha indicado un numero o rango de paginas invalido. Se ignorara.", e); //$NON-NLS-1$
+				}
+			}
+		}
+
+		// Ordenamos el listado de paginas
+		Collections.sort(pages);
+
+		// Si nada de lo que se configuro definio un numero de pagina valido para el documento,
+		// se usara la ultima pagina para la firma visible PDF
+		if (pages.isEmpty()) {
+			pages.add(totalPages);
+		}
+
+		return pages;
+	}
 }

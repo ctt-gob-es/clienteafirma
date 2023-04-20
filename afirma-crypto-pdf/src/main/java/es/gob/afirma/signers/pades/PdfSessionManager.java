@@ -13,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -64,14 +63,6 @@ public final class PdfSessionManager {
 
     /** Rotaci&oacute;n de las firmas en grados (cuando se indica que deben rotarse). */
     private static final String DEFAULT_SIGNATURE_ROTATION = "0"; //$NON-NLS-1$
-
-    /** Valor en el par&aacute;metro signaturePage o signaturePages que
-     * indica una nueva p&aacute;gina para agregar al final del documento*/
-    private static final String APPEND_PAGE = "append"; //$NON-NLS-1$
-
-    /** Valor en el par&aacute;metro signaturePage o signaturePages que
-     * indica que se estampar&aacute; la firma visible en todas las paginas*/
-    private static final String ALL_PAGES = "all"; //$NON-NLS-1$
 
     private PdfSessionManager() {
     	// No permitimos la instanciacion
@@ -126,17 +117,6 @@ public final class PdfSessionManager {
 		// Datos de contacto (correo electronico) del firmante
 		final String signerContact = extraParams.getProperty(PdfExtraParams.SIGNER_CONTACT);
 
-		String[] pagesStr = new String[0];
-		// Pagina o rango de paginas donde situar la firma visible
-		if (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGE)) {
-			pagesStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE).split(","); //$NON-NLS-1$
-		}
-		// Si se encuentra el parametro signaturePages, prevalecera sobre el antiguo signaturePage
-		if (extraParams.containsKey(PdfExtraParams.SIGNATURE_PAGES)) {
-			pagesStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGES).split(","); //$NON-NLS-1$
-		}
-		final List<Integer> pages = new ArrayList<>();
-
 		byte[] inPDF;
 		try {
 			inPDF = XmpHelper.addSignHistoryToXmp(pdfBytes, signTime);
@@ -148,34 +128,6 @@ public final class PdfSessionManager {
 
 		final PdfReader pdfReader = PdfUtil.getPdfReader(inPDF, extraParams,
 				Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS)));
-
-		final int totalPages = pdfReader.getNumberOfPages();
-
-		if (pagesStr.length == 0) {
-			pages.add(totalPages);
-		}
-		else {
-			if (APPEND_PAGE.equalsIgnoreCase(pagesStr[0].trim())) {
-				pages.add(NEW_PAGE);
-			} else if (ALL_PAGES.equalsIgnoreCase(pagesStr[0].trim())) {
-				for (int page = 1; page <= pdfReader.getNumberOfPages(); page++) {
-					pages.add(page);
-				}
-			} else {
-				try {
-					for (final String pageStr : pagesStr) {
-						PdfUtil.checkPagesRange(pageStr, totalPages, pages);
-					}
-					if (pages.isEmpty()) {
-						throw new IncorrectPageException(
-								"Este documento no contiene las paginas que se han seleccionado para firmar, se firmara de manera invisible." //$NON-NLS-1$
-						);
-					}
-				} catch (final IncorrectPageException e) {
-					throw e;
-				}
-			}
-		}
 
 		// Nombre del subfiltro de firma en el diccionario PDF
 		String signatureSubFilter = extraParams.getProperty(PdfExtraParams.SIGNATURE_SUBFILTER);
@@ -406,24 +358,31 @@ public final class PdfSessionManager {
 			throw new PdfIsPasswordProtectedException("El PDF esta protegido contra modificaciones", e); //$NON-NLS-1$
 		}
 
-		// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco
-		// para poner ahi la firma visible
-
-		// Posicion de la firma
+		// Obtenemos la posicion de la firma si se ha indicado
+		List<Integer> pages = null;
 		final Rectangle signaturePositionOnPage = PdfVisibleAreasUtils.getSignaturePositionOnPage(extraParams);
-
-		// Comprobamos la posicion si se ha definido
 		if (signaturePositionOnPage != null) {
-			if (pages.contains(NEW_PAGE) && signaturePositionOnPage != null && signatureField == null) {
+
+			final int totalPages = pdfReader.getNumberOfPages();
+
+			// Definimos las paginas en las que imprimir la firma
+			pages = PdfUtil.getPages(extraParams, totalPages);
+
+			// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco
+			// para poner ahi la firma visible, en cuyo caso, una pagina con el mismo tamano
+			// que la primera del documento
+			if (pages.contains(Integer.valueOf(NEW_PAGE)) && signatureField == null) {
 				stp.insertPage(totalPages + 1, pdfReader.getPageSizeWithRotation(1));
 				// La pagina pasa a ser la nueva, que es la ultima,
 				pages.remove(Integer.valueOf(NEW_PAGE));
-				pages.add(totalPages + 1);
+				pages.add(Integer.valueOf(totalPages + 1));
 			}
 
 			// Comprobamos que la posicion indicada para la firma visible
-			// se pueda estampar al menos en una de las paginas del documento
-			PdfUtil.checkCorrectPositionSignature(pdfReader, pages, extraParams);
+			// se pueda estampar en al menos en una de las paginas indicadas
+			// y que sus dimensiones no soprepasen fuera de la primera pagina
+			// en la que se imprima
+			PdfUtil.correctPositionSignature(pdfReader, pages, signaturePositionOnPage);
 		}
 
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
@@ -516,7 +475,7 @@ public final class PdfSessionManager {
 		}
 
 		// Firma visible
-		if (signaturePositionOnPage != null && signatureField == null && !pages.isEmpty()) {
+		if (signaturePositionOnPage != null && signatureField == null) {
 
 			try {
 				// Si no hay que rotar la firma, agregamos la imagen de rubrica si procede y listo
@@ -552,7 +511,7 @@ public final class PdfSessionManager {
 				}
 
 				// Configuramos la firma visible
-				sap.setVisibleSignature(signaturePositionOnPage, pages.get(0), null);
+				sap.setVisibleSignature(signaturePositionOnPage, pages != null ? pages.get(0).intValue() : pdfReader.getNumberOfPages(), null);
 			}
 			catch (final InvalidPageNumberException e) {
 				LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
