@@ -121,21 +121,6 @@ Function leaveConfigPage
 
 FunctionEnd
 
-Function enableAllUsersJAB 
-
-    ; Se obtiene el perfil
-        Pop $0
- 
-    ; Comprobamos si ya existe el archivo o no para copiarlo
-	IfFileExists "$0\.accessibility.properties" +2 0
-		CopyFiles /SILENT ".accessibility.properties" "$0"
- 
-    ; Se continua con la operacion
-        Push ""
-        Return
-
-FunctionEnd
-
 ;--------------------------------
 ;Idiomas
  
@@ -257,7 +242,6 @@ Section "Programa" sPrograma
 	File  AutoFirma64\AutoFirma.exe
 	File  AutoFirma64\AutoFirmaConfigurador.exe
 	File  AutoFirma64\AutoFirmaCommandLine.exe
-	File  .accessibility.properties
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -341,9 +325,6 @@ Section "Programa" sPrograma
 		Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 		Delete "$INSTDIR\$PATH\autofirma.pfx"
-	
-	; Copiamos el archivo .accessibility.properties	en todos los usuarios para permitir la accesibilidad a traves de JAB
-    ${EnumProfilePaths} enableAllUsersJAB
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R0 ""
