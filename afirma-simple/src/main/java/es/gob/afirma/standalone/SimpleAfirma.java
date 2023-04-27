@@ -104,7 +104,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
 	private static final int DEFAULT_WINDOW_HEIGHT = 580;
 
-	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
 	private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$
 
 	private static final String SYSTEM_PROPERTY_DEBUG_FILE = "afirma_debug"; //$NON-NLS-1$
@@ -134,19 +133,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * aplicaci&oacute;n.
 	 */
     private static boolean updatesEnabled = true;
-
-	/**
-	 * Propiedad Java que hay que establecer (a nivel de JVM) a <code>true</code>
-	 * para evitar el env&iacute;o de estad&iacute;sticas a Google Analytics.
-	 */
-    public static final String DO_NOT_SEND_ANALYTICS = "es.gob.afirma.doNotSendAnalytics"; //$NON-NLS-1$
-
-	/**
-	 * Variable de entorno que hay que establecer (a nivel de sistema operativo) a
-	 * <code>true</code> para evitar el env&iacute;o de estad&iacute;sticas a Google
-	 * Analytics.
-	 */
-    public static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
 
 	/**
 	 * Variable de entorno que hay que establecer (a nivel de sistema operativo o
@@ -630,7 +616,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
 
     	// Se establece la configuracion del proxy
-       	ProxyUtil.setProxySettings();
+    	try {
+    		ProxyUtil.setProxySettings();
+    	}
+    	catch (final Throwable e) {
+    		LOGGER.log(Level.SEVERE, "Error al aplicar la configuracion de proxy", e); //$NON-NLS-1$
+			if (isUsingGUI(args) && !isHeadlessMode()) {
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.11"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.WARNING_MESSAGE, e); //$NON-NLS-1$
+    		}
+		}
 
 		// Establecemos si deben respetarse las comprobaciones de seguridad de las
 		// conexiones de red
@@ -650,28 +645,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
        					);
        		}
        	}
-
-		// Google Analytics
-		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS)
-				&& !Boolean.getBoolean(DO_NOT_SEND_ANALYTICS)
-				&& !Boolean.parseBoolean(System.getenv(DO_NOT_SEND_ANALYTICS_ENV))) {
-	    	new Thread(() ->  {
-				// No importamos directamente los paquetes para no crear una dependencia
-				// absoluta de ellos.
-	    			// En AutoFirma WS, podrian no importarse.
-			    	try {
-					final com.dmurph.tracking.AnalyticsConfigData config = new com.dmurph.tracking.AnalyticsConfigData(
-							GOOGLE_ANALYTICS_TRACKING_CODE);
-						final com.dmurph.tracking.JGoogleAnalyticsTracker tracker = new com.dmurph.tracking.JGoogleAnalyticsTracker(
-								config, com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion.V_4_7_2);
-					tracker.trackPageView("AutoFirma", //$NON-NLS-1$
-							"AutoFirma", //$NON-NLS-1$
-							getIp());
-				} catch (final Exception e) {
-			    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
-			    	}
-			}).start();
-				}
 
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -1022,11 +995,22 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * comandos.
 	 *
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
-	 * @return {@code true} si la llamada se debe procesar como si se hubiese
-	 *         recibido por l&iacute;nea de comandos.
+	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta
+	 * 		en l&iacute;nea de comandos.
 	 */
 	private static boolean isUsingCommnadLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
+	}
+
+	/**
+	 * Indica si la ejecuci&oacute;n de AutoFirma se est&aacute; haciendo en modo
+	 * escritorio.
+	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
+	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta
+	 * 		como aplicaci&oacute;n de escritorio.
+	 */
+	private static boolean isUsingGUI(final String[] args) {
+		return args == null || args.length == 0;
 	}
 
 	/**

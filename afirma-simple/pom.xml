@@ -29,13 +29,6 @@
 			<artifactId>imageio-jpeg</artifactId>
 			<version>3.6</version>
 		</dependency>
-
-		<!-- Paquete para la recoleccion de estadisticas -->	    
-	    <dependency>
-			<groupId>com.dmurph</groupId>
-  			<artifactId>JGoogleAnalyticsTracker</artifactId>
-  			<version>1.2.0</version>
-		</dependency>
 		
 		<!-- API de impresion de logs para evitar -->
 		<dependency>

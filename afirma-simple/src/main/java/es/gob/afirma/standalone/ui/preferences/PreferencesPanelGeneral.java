@@ -62,8 +62,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox checkForUpdates = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.87")); //$NON-NLS-1$
 
-	private final JCheckBox sendAnalytics = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.89")); //$NON-NLS-1$
-
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox optimizedForVdi = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.190")); //$NON-NLS-1$
@@ -276,22 +274,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			signConstraint.gridy++;
 		}
 
-		this.sendAnalytics.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.sendAnalytics.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.90") //$NON-NLS-1$
-		);
-		this.sendAnalytics.setMnemonic('t');
-		this.sendAnalytics.addItemListener(modificationListener);
-		this.sendAnalytics.addKeyListener(keyListener);
-		signConfigPanel.add(this.sendAnalytics, signConstraint);
-
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.LINUX) {
-			signConstraint.gridy++;
-
 			this.enableJMulticard.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
@@ -301,19 +286,21 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.enableJMulticard.addItemListener(modificationListener);
 			this.enableJMulticard.addKeyListener(keyListener);
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
+
+			signConstraint.gridy++;
 		}
 
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			signConstraint.gridy++;
-
 			this.optimizedForVdi.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.191")); //$NON-NLS-1$
 			this.optimizedForVdi.setMnemonic('z');
 			this.optimizedForVdi.addItemListener(modificationListener);
 			this.optimizedForVdi.addKeyListener(keyListener);
 			signConfigPanel.add(this.optimizedForVdi, signConstraint);
+
+			signConstraint.gridy++;
 		}
 
 		mainPanel.add(signConfigPanel, gbc);
@@ -551,7 +538,14 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			}
 			// Aplicamos los valores tanto si el checkbox esta marcado o no, en un caso lo establecera y en en otro lo
 			// eliminara
-			ProxyUtil.setProxySettings();
+    		try {
+    			ProxyUtil.setProxySettings();
+    		}
+    		catch (final Throwable e) {
+    			LOGGER.log(Level.SEVERE, "Error al aplicar la configuracion de proxy", e); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.11"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.WARNING_MESSAGE, e); //$NON-NLS-1$
+    		}
     	}
     }
 
@@ -636,7 +630,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.blocked = blocked;
 	}
 
-
 	void savePreferences() {
 		// Opciones varias
 		PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signatureAlgorithms.getSelectedItem().toString());
@@ -646,7 +639,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		if (SimpleAfirma.isUpdatesEnabled()) {
 			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		}
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES, this.allowSignInvalidSignatures.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
@@ -679,16 +671,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		else {
 			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK));
 		}
-
-		if (Boolean.getBoolean(SimpleAfirma.DO_NOT_SEND_ANALYTICS) ||
-				Boolean.parseBoolean(System.getenv(SimpleAfirma.DO_NOT_SEND_ANALYTICS_ENV))) {
-			this.sendAnalytics.setSelected(false);
-			this.sendAnalytics.setEnabled(false);
-		}
-		else {
-			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS));
-		}
-
 
 		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 		this.allowSignInvalidSignatures.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES));
