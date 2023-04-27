@@ -11,6 +11,7 @@
 
 	<artifactId>afirma-ui-simpleafirma-plugin-hash</artifactId>
 	<name>afirma-ui-simpleafirma-plugin-hash</name>
+	<version>1.0</version>
 	<description>Plugin para la generacion y validacion de huellas digitales.</description>
 
 	<dependencies>
