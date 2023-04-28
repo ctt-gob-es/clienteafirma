@@ -796,7 +796,7 @@ Function RemoveOldVersions
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalación de AutoFirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	${EndIf}
 
