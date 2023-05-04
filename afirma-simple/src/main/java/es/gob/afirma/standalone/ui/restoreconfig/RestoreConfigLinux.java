@@ -103,12 +103,6 @@ final class RestoreConfigLinux implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.16")); //$NON-NLS-1$
 			LOGGER.log(Level.WARNING, "Error en la restauracion del protocolo afirma", e); //$NON-NLS-1$
 		}
-
-		// Se restaura la confianza en el protocolo afirma en Chrome
-		if (usersDir != null) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.7")); //$NON-NLS-1$
-			RestoreRemoveChromeWarning.removeChromeWarningsLinux(workingDir, usersDir);
-		}
 	}
 
 	private static void restoreSslCertificates(final File appDir, final File workingDir, final List<String> usersDir, final RestoreConfigPanel configPanel) {

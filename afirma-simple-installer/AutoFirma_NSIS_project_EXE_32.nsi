@@ -242,18 +242,13 @@ Section "Programa" sPrograma
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
    
-	;Se pide que se cierre Firefox y Chrome si estan abiertos
+	;Se pide que se cierre Firefox si esta abierto
 	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
 		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
 
-	loopChrome:
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalación de AutoFirma.' IDOK loopChrome
-	
 	${nsProcess::Unload}
 	
 	Sleep 2000
@@ -642,34 +637,23 @@ Section "uninstall"
 
 	; ==== Desinstalador EXE - INICIO ====
 	
-	;Se pide que se cierre Firefox y Chrome si estan abiertos
+	;Se pide que se cierre Firefox si esta abierto
 	loopFirefox:
 		${nsProcess::FindProcess} "firefox.exe" $R2
 		StrCmp $R2 0 0 +2
 			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 	
-	loopChrome:
-		${nsProcess::FindProcess} "chrome.exe" $R3
-		StrCmp $R3 0 0 +2
-			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
-
 	; ==== Desinstalador EXE - FIN ====
 		
 	; ==== Desinstalador MSI - INICIO ====
    
-	; Se fuerza el cierre de Firefox y Chrome si estan abiertos. Los saltos cuentan
+	; Se fuerza el cierre de Firefox si esta abierto. Los saltos cuentan
 	; un paso mas (+4 en lugar de +3) porque si no se queda en un bucle infinito
 ;	loopFirefox:
 ;		${nsProcess::FindProcess} "firefox.exe" $R2
 ;		StrCmp $R2 0 0 +4
 ;			${nsProcess::KillProcess} "firefox.exe" $R0
 ;			Goto loopFirefox
-
-;	loopChrome:
-;		${nsProcess::FindProcess} "chrome.exe" $R3
-;		StrCmp $R3 0 0 +4
-;			${nsProcess::KillProcess} "chrome.exe" $R0
-;			Goto loopChrome
 
 	; ==== Desinstalador MSI - FIN ====
 

@@ -170,10 +170,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.25")); //$NON-NLS-1$
 		}
 
-		// Configuramos el protocolo afirma en Chrome para que no muestre advertencias al llamarlo
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.23")); //$NON-NLS-1$
-		configureChrome(configPanel);
-
 		// Configuramos Firefox para que confie o no en los prestadores dados de alta en el almacen de confianza
 		// del sistema
 
@@ -235,21 +231,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 */
 	private static boolean checkSSLRootCertificateGenerated(final File installDir) {
 		return new File(installDir, CA_CERTIFICATE_FILENAME).exists();
-	}
-
-
-	/**
-	 * Configura el protocolo "afirma" en Chrome para todos los usuarios de
-	 * Windows.
-	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
-	 */
-	private static void configureChrome(final Component parent) {
-
-		// Solicitamos el cierre del navegador Google Chrome
-		closeChrome(parent);
-
-		RestoreRemoveChromeWarning.removeChromeWarningsWindows(null, true);
-
 	}
 
 	/**
@@ -316,34 +297,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 
 		return option == JOptionPane.OK_OPTION;
-	}
-
-	/**
-	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace
-	 * o acepta el no continuar con este apartado de la instalaci&oacute;n.
-	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
-	 */
-	private static void closeChrome(final Component parent) {
-
-		if (isProcessRunningWindows("chrome.exe").booleanValue()) { //$NON-NLS-1$
-			JOptionPane.showMessageDialog(
-					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE);
-		}
-
-		int option = JOptionPane.OK_OPTION;
-		while (option == JOptionPane.OK_OPTION
-				&& isProcessRunningWindows("chrome.exe").booleanValue()) { //$NON-NLS-1$
-
-			option = JOptionPane.showConfirmDialog(
-					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.11"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
-					JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.WARNING_MESSAGE);
-		}
 	}
 
 	/** Instala el certificado ra&iacute;z CA de AutoFirma

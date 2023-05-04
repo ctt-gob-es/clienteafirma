@@ -187,14 +187,10 @@ Section "Programa" sPrograma
 	IntCmp $1 1 +2 0 0
 		Quit
 	
-	;Se cierra Firefox y Chrome si están abiertos
+	;Se cierra Firefox si esta abierto
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +1
 	${nsProcess::KillProcess} "firefox.exe" $R0
-	
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "chrome.exe" $R0
 
 	${nsProcess::Unload}
 
