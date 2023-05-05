@@ -647,8 +647,8 @@ Section "uninstall"
 		
 	; ==== Desinstalador MSI - INICIO ====
    
-	; Se fuerza el cierre de Firefox si esta abierto. Los saltos cuentan
-	; un paso mas (+4 en lugar de +3) porque si no se queda en un bucle infinito
+	; Se fuerza el cierre de Firefox si esta abierto. Los saltos cuentan un paso mas
+	; (+4 en lugar de +3) porque si no se queda en un bucle infinito
 ;	loopFirefox:
 ;		${nsProcess::FindProcess} "firefox.exe" $R2
 ;		StrCmp $R2 0 0 +4
@@ -812,7 +812,7 @@ Function RemoveOldVersions
 		StrCmp $3 "AutoFirma" 0 End
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalación de AutoFirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 
 	; No se encontro AutoFirma instalado, asi que finalizamos el proceso
@@ -821,7 +821,37 @@ Function RemoveOldVersions
 	Exit:
 		Quit
 
+	; Iniciamos el proceso de desinstalacion de la version antigua
 	UninstallOlderVersion:
+
+		; Comprobamos si existe configuracion de usuario de AutoFirma. Si no existe, vamos directamente a la
+		; desinstalacion de la version anterior de AutoFirma y, si existe, hacemos copia para restaurarla una
+		; vez que desinstalemos esa version (el desinstalar una version elimina la configuracion).
+		StrCpy $6 "0"
+		ClearErrors
+		EnumRegKey $0 HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences" 0
+
+		IfErrors InitUninstall
+
+			; Identificamos una clave en la que poder hacer la copia de los datos. Esta queda registrada en $R0
+			ClearErrors
+			StrCpy $0 0
+			loopsearch:
+				StrCpy $6 "Software\JavaSoft\Prefs\copia$0"
+				EnumRegKey $1 HKCU $6 0
+				IfErrors donesearch
+				IntOp $0 $0 + 1
+				Goto loopsearch
+			donesearch:
+		
+			; Copiamos los valores a la nueva clave
+			StrCpy $0 $6
+			Push "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences"
+			Push $0
+			Call CopyRegValues
+
+	; Iniciamos la desinstalacion
+	InitUninstall:
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
@@ -861,7 +891,7 @@ Function RemoveOldVersions
  
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
 		; Si no, terminamos el proceso
-		StrCmp $R3 "Uninstall" 0 End
+		StrCmp $R3 "Uninstall" 0 EndUninstall
 			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "AutoFirma")
 			Push $R1
 			Push "Program Files (x86)\"
@@ -877,12 +907,59 @@ Function RemoveOldVersions
 			Push $PATH
 			Call StrContains
 			Pop $0
-			StrCmp $0 "" End
+			StrCmp $0 "" EndUninstall
 			EliminarDirectorio:
 				RMDir /r $R1
 
+	EndUninstall:
+
+	; Si habia una configuracion anterior de AutoFirma, la restauramos
+	StrCmp $6 "0" End
+		StrCpy $0 $6
+		Push $0
+		Push "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences"
+		Call CopyRegValues
+		
+		; Eliminamos la copia
+		DeleteRegKey HKCU $6
+
 	End:
  
+FunctionEnd
+
+; Funcion para copiar los valores de una clave de registro a otra.
+; Uso:
+;	Push sourceDir
+;	Push targetDir
+;   Call CopyRegValues sourceKey targetKey
+Function CopyRegValues
+	; Obtenemos los dos primeros parametros de la pila
+	Exch $R0	# Clave destino
+	Exch
+	Exch $R1	# Clave origen
+
+	; Nos aseguramos de reservar variables para el metodo
+	Push $0
+	Push $1
+	Push $2
+
+	StrCpy $0 0
+	looplist:
+	  	  
+	  ClearErrors
+	  EnumRegValue $1 HKCU $R1 $0
+	  IfErrors donelist
+	  IntOp $0 $0 + 1
+	  ReadRegStr $2 HKCU $R1 $1
+	  WriteRegStr HKCU $R0 $1 $2
+	  Goto looplist
+	donelist:
+
+	; Limpiamos las variables
+	Pop $2
+	Pop $1
+	Pop $0
+
 FunctionEnd
 
 ; Funcion para eliminar de registro las entradas agregadas por la aplicacion
@@ -902,11 +979,12 @@ Function un.UninstallFromRegistry
 	DeleteRegKey HKEY_CLASSES_ROOT "afirma"
 	
 	;Borramos las claves de registro en las que se almacenan las preferencias de la aplicacion
-	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\ui"
-	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\standalone"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\ui"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\plugin"
+	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob\afirma"
+	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob"
+	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
 	Push "$INSTDIR\$PATH"
