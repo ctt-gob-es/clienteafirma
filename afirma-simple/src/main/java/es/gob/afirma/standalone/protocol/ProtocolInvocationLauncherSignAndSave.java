@@ -207,7 +207,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			plugins = SimpleAfirma.getPluginsManager().getPluginsLoadedList();
 		} catch (final PluginException e) {
 			LOGGER.log(Level.SEVERE, "No se pudo cargar el listado de plugins", e); //$NON-NLS-1$
-			return new NativeSignDataProcessor(protocolVersion);
+			plugins = null;
 		}
 
 		if (plugins != null) {
@@ -226,6 +226,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 				}
 			}
 		}
+
 		return new NativeSignDataProcessor(protocolVersion);
 	}
 

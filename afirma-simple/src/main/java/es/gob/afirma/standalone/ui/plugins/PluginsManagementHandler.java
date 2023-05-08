@@ -552,7 +552,6 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		this.view.getPluginInfoPane().setText(html.toString());
 		this.view.getConfigButton().setVisible(info != null ? info.getConfigPanel() != null : false);
-
 	}
 
 	/**

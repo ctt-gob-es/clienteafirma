@@ -11,12 +11,17 @@ import java.io.OutputStream;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.MinimalPluginInfo;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -81,6 +86,7 @@ public class PluginsManager {
 			catch (final Exception e) {
 				throw new PluginException("Error al cargar el listado de plugins", e); //$NON-NLS-1$
 			}
+
 			for (final MinimalPluginInfo info : installedPlugins) {
 				try {
 					final AfirmaPlugin plugin = loadPlugin(info);
@@ -91,6 +97,7 @@ public class PluginsManager {
 				}
 			}
 
+			// Si no se pudo cargar alguno de los plugins, actualizamos la lista
 			try {
 				savePluginsList(relationFile, list);
 			} catch (final IOException e) {
@@ -166,7 +173,7 @@ public class PluginsManager {
 			}
 			fos.flush();
 		}
-
+		setWritablePermissions(relationsFile);
 	}
 
 	/**
@@ -298,6 +305,7 @@ public class PluginsManager {
 		try (OutputStream fos = new FileOutputStream(outPluginFile)) {
 			Files.copy(pluginFile.toPath(), fos);
 		}
+		setWritablePermissions(outPluginFile);
 		return outPluginFile;
 	}
 
@@ -318,6 +326,7 @@ public class PluginsManager {
 				fos.write(pluginRegistry);
 				fos.flush();
 			}
+			setWritablePermissions(relationsFile);
 		}
 		else {
 			Files.write(relationsFile.toPath(), pluginRegistry, StandardOpenOption.APPEND);
@@ -401,5 +410,42 @@ public class PluginsManager {
 			}
 		}
 		Files.delete(dir.toPath());
+	}
+
+	/**
+	 * Establece permisos de lectura y escritura de un fichero para todos los usuarios.
+	 * No lanza error en ning&uacute;n caso.
+	 * @param file Fichero del que establecer los permisos.
+	 */
+	private static void setWritablePermissions(final File file) {
+
+		try {
+			file.setReadable(true, false);
+			file.setWritable(true, false);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,
+					"No se han podido establecer los permisos del fichero " //$NON-NLS-1$
+							+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
+		}
+
+		final Set<PosixFilePermission> perms = new HashSet<>();
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.OTHERS_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.GROUP_WRITE);
+		perms.add(PosixFilePermission.OTHERS_WRITE);
+		try {
+			Files.setPosixFilePermissions(
+					Paths.get(file.getAbsolutePath()),
+					perms
+					);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,
+					"No se han podido dar permisos posix sobre el fichero " //$NON-NLS-1$
+							+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
+		}
 	}
 }
