@@ -151,39 +151,73 @@ final class PdfVisibleAreasUtils {
 	}
 
 	private static BaseFont getBaseFont(final int fontFamily, final boolean pdfa) throws DocumentException, IOException {
-		final BaseFont font;
+
+		BaseFont font;
 
 		// Si la firma es PDF/A, incrustamos toda la fuente para seguir
 		// respetando el estandar
 		if (pdfa) {
-			switch (fontFamily) {
-			case Font.HELVETICA:
-				font = BaseFont.createFont("/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-				break;
-			case Font.TIMES_ROMAN:
-				font = BaseFont.createFont("/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-				break;
-			case Font.COURIER:
-			default:
-				font = BaseFont.createFont("/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-				break;
+			try {
+				font = loadFontToEmbed(fontFamily);
 			}
-			font.setSubset(false);
-		} else {
-			switch (fontFamily) {
-			case Font.HELVETICA:
-				font = BaseFont.createFont(BaseFont.HELVETICA, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
-			break;
-			case Font.TIMES_ROMAN:
-				font = BaseFont.createFont(BaseFont.TIMES_ROMAN, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
-			break;
-			case Font.COURIER:
-			default:
-				font = BaseFont.createFont(BaseFont.COURIER, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
-			break;
+			// En Android puede fallar con un error la carga de una fuente, asi que se
+			// protege con un Throwable
+			catch (final Throwable e) {
+				LOGGER.warning(
+						"No se ha podido cargar la fuente de letra para incrustar. Puede que el resultado no sea un PDF/A: " + e); //$NON-NLS-1$
+				font = loadInternalFont(fontFamily);
 			}
 		}
+		else {
+			font = loadInternalFont(fontFamily);
+		}
+		return font;
+	}
 
+	/**
+	 * Carga una de las fuentes incluidas en la biblioteca y la marca para que se incruste en el PDF.
+	 * @param fontFamily Familia de fuentes.
+	 * @return Fuente de letra.
+	 * @throws DocumentException Cuando falla la composici&oacute;n de la fuente.
+	 * @throws IOException Cuando falla la carga de la fuente.
+	 */
+	private static BaseFont loadFontToEmbed(final int fontFamily) throws DocumentException, IOException {
+		BaseFont font;
+		switch (fontFamily) {
+		case Font.HELVETICA:
+			font = BaseFont.createFont("/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.TIMES_ROMAN:
+			font = BaseFont.createFont("/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.COURIER:
+		default:
+			font = BaseFont.createFont("/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+		}
+		font.setSubset(false);
+		return font;
+	}
+
+	/**
+	 * Compone una de las fuentes por defecto de PDF.
+	 * @param fontFamily Familia de fuentes.
+	 * @return Fuente de letra.
+	 * @throws DocumentException Cuando falla la composici&oacute;n de la fuente.
+	 * @throws IOException Cuando falla la carga de la fuente.
+	 */
+	private static BaseFont loadInternalFont(final int fontFamily) throws DocumentException, IOException {
+		BaseFont font;
+		switch (fontFamily) {
+		case Font.HELVETICA:
+			font = BaseFont.createFont(BaseFont.HELVETICA, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.TIMES_ROMAN:
+			font = BaseFont.createFont(BaseFont.TIMES_ROMAN, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.COURIER:
+		default:
+			font = BaseFont.createFont(BaseFont.COURIER, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+		}
 		return font;
 	}
 
