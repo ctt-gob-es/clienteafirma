@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -52,11 +53,11 @@ final class RestoreConfigWindows implements RestoreConfig {
 	private static final String CA_CERTIFICATE_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
-	private static final String RESTORE_PROTOCOL_EXE = "afirma_register.exe"; //$NON-NLS-1$
+	private static final String ADMIN_EXECUTOR_BAT = "execute.bat"; //$NON-NLS-1$
 	private static final String RESTORE_PROTOCOL_BAT = "afirma_register.bat"; //$NON-NLS-1$
 
-	private static final String REPLACE_PATH_EXE = "$$PATH_EXE$$"; //$NON-NLS-1$
-	private static final String REPLACE_INSTALL_DIR = "$$INSTALL_DIR$$"; //$NON-NLS-1$
+	private static final String REPLACE_EXE_DIR = "$$PATH_DIR_EXE$$"; //$NON-NLS-1$
+	private static final String REPLACE_PATH_BAT = "$$PATH_BAT$$"; //$NON-NLS-1$
 
 	/**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
@@ -202,11 +203,12 @@ final class RestoreConfigWindows implements RestoreConfig {
 				new File(source, SSL_KEYSTORE_FILENAME).toPath(),
 				new File(target, SSL_KEYSTORE_FILENAME).toPath(),
 				StandardCopyOption.REPLACE_EXISTING);
+		AOFileUtils.setAllPermissions(new File(target, SSL_KEYSTORE_FILENAME));
 		Files.copy(
 				new File(source, CA_CERTIFICATE_FILENAME).toPath(),
 				new File(target, CA_CERTIFICATE_FILENAME).toPath(),
 				StandardCopyOption.REPLACE_EXISTING);
-
+		AOFileUtils.setAllPermissions(new File(target, CA_CERTIFICATE_FILENAME));
 	}
 
 	/**
@@ -626,41 +628,42 @@ final class RestoreConfigWindows implements RestoreConfig {
 	private static int restoreProtocolRegistryByApp(final File installDir, final String workingDir) {
 
 		// Copiamos al directorio de instalacion la aplicacion para restaurar el protocolo
-		final File exeFile = new File(workingDir, RESTORE_PROTOCOL_EXE);
-		try (final FileOutputStream os = new FileOutputStream(exeFile);
-				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_EXE);) { //$NON-NLS-1$
+		final File batFile = new File(workingDir, RESTORE_PROTOCOL_BAT);
+		try (final FileOutputStream os = new FileOutputStream(batFile);
+				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_BAT);) { //$NON-NLS-1$
 			os.write(AOUtil.getDataFromInputStream(is));
 			os.flush();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo copiar a disco el bat de restauracion. Se abortara su ejecucion", e); //$NON-NLS-1$
 			return 2; // ERROR_FILE_NOT_FOUND
 		}
+		AOFileUtils.setAllPermissions(batFile);
 
 		// Copiamos a disco y completamos el script para ejecutar la aplicacion con
 		// permisos de administrador
-		final File batFile = new File(workingDir, RESTORE_PROTOCOL_BAT);
-		try (final FileOutputStream os = new FileOutputStream(batFile);
-				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_BAT);) { //$NON-NLS-1$
+		final File executorFile = new File(workingDir, ADMIN_EXECUTOR_BAT);
+		try (final FileOutputStream os = new FileOutputStream(executorFile);
+				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + ADMIN_EXECUTOR_BAT);) { //$NON-NLS-1$
 			String batchScript = new String(AOUtil.getDataFromInputStream(is));
 			batchScript = batchScript
-					.replace(REPLACE_PATH_EXE, exeFile.getAbsolutePath().replace("\\", "\\\\")) //$NON-NLS-1$ //$NON-NLS-2$
-					.replace(REPLACE_INSTALL_DIR, installDir.getAbsolutePath().replace("\\", "\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
+					.replace(REPLACE_PATH_BAT, batFile.getAbsolutePath().replace("\\", "\\\\")) //$NON-NLS-1$ //$NON-NLS-2$
+					.replace(REPLACE_EXE_DIR, installDir.getAbsolutePath().replace("\\", "\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
 			os.write(batchScript.getBytes());
 			os.flush();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo copiar a disco el bat para la ejecucion de la restauracion como administrador. Se abortara su ejecucion", e); //$NON-NLS-1$
 			return 2; // ERROR_FILE_NOT_FOUND
 		}
+		AOFileUtils.setAllPermissions(executorFile);
 
 		// Ejecumos el script
 		int result = -2;
 		try {
-			final Process process = Runtime.getRuntime().exec(new String[] {
-					batFile.getAbsolutePath()
-			});
+			final Process process = new ProcessBuilder(executorFile.getAbsolutePath()).start();
 			result = process.waitFor();
+			process.destroyForcibly();
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error durante la ejecucion del proceso de restauracion del protocolo \"afirma\"", e); //$NON-NLS-1$
@@ -676,7 +679,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		// Eliminamos los ficheros
 		try {
-			Files.delete(exeFile.toPath());
+			Files.delete(executorFile.toPath());
 			Files.delete(batFile.toPath());
 		}
 		catch (final IOException e) {

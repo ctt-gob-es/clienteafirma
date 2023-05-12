@@ -14,6 +14,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryFlag;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.UserPrincipal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
@@ -29,6 +43,11 @@ public final class AOFileUtils {
 	private static final String SHORTENER_ELLIPSE = "..."; //$NON-NLS-1$
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	/** Indica si el sistema admite atributos POSIX. */
+	private static boolean posixSupported = false;
+	/** Valor bandera para indicar si la variable posixSupported se ha inicializado. */
+	private static boolean posixSupportDefined = false;
 
 
 	private AOFileUtils() {
@@ -141,4 +160,127 @@ public final class AOFileUtils {
     	}
     	return true;
     }
+
+
+	/**
+	 * Establece permisos de lectura y escritura de un fichero para todos los usuarios.
+	 * No lanza error en ning&uacute;n caso.
+	 * @param file Fichero del que establecer los permisos.
+	 */
+	public static void setAllPermissions(final File file) {
+
+		// Hacemos un establecimiento basico de permisos
+		try {
+			file.setReadable(true, false);
+			file.setWritable(true, false);
+			file.setExecutable(true, false);
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,
+					"No se han podido establecer los permisos del archivo " //$NON-NLS-1$
+							+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
+		}
+
+		// Si se soportan las listas de control de acceso, establecemos con ellas los mismos
+		// permisos que elementos que sepamos que tienen los mismos permisos que queremos
+		final AclFileAttributeView acl = getAclAttributes(file);
+		if (acl != null) {
+
+			try {
+				final List<AclEntry> aclList = acl.getAcl();
+				final List<AclEntry> newAclList = new ArrayList<>();
+
+				for (final AclEntry entry : aclList) {
+					final UserPrincipal principal = entry.principal();
+					final AclEntry newEntry = AclEntry.newBuilder()
+							.setType(AclEntryType.ALLOW)
+							.setPrincipal(principal)
+							.setFlags(
+									AclEntryFlag.DIRECTORY_INHERIT,
+									AclEntryFlag.FILE_INHERIT)
+							.setPermissions(
+									AclEntryPermission.WRITE_NAMED_ATTRS,
+									AclEntryPermission.WRITE_ATTRIBUTES,
+									AclEntryPermission.DELETE,
+									AclEntryPermission.WRITE_DATA,
+									AclEntryPermission.READ_ACL,
+									AclEntryPermission.APPEND_DATA,
+									AclEntryPermission.READ_ATTRIBUTES,
+									AclEntryPermission.READ_DATA,
+									AclEntryPermission.EXECUTE,
+									AclEntryPermission.SYNCHRONIZE,
+									AclEntryPermission.READ_NAMED_ATTRS,
+									AclEntryPermission.DELETE,
+									AclEntryPermission.DELETE_CHILD)
+							.build();
+					newAclList.add(newEntry);
+				}
+				acl.setAcl(newAclList);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING,
+						"No se ha podido establecer la ACL del archivo " //$NON-NLS-1$
+						+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
+			}
+		}
+
+		// Si se soporta POSIX, establecemos los permisos con el
+		if (isPosixSupported()) {
+			final Set<PosixFilePermission> perms = new HashSet<>();
+			perms.add(PosixFilePermission.OWNER_READ);
+			perms.add(PosixFilePermission.GROUP_READ);
+			perms.add(PosixFilePermission.OTHERS_READ);
+			perms.add(PosixFilePermission.OWNER_WRITE);
+			perms.add(PosixFilePermission.GROUP_WRITE);
+			perms.add(PosixFilePermission.OTHERS_WRITE);
+			perms.add(PosixFilePermission.OWNER_EXECUTE);
+			perms.add(PosixFilePermission.GROUP_EXECUTE);
+			perms.add(PosixFilePermission.OTHERS_EXECUTE);
+			try {
+				Files.setPosixFilePermissions(file.toPath(), perms);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING,
+						"No se han podido dar permisos posix sobre el archivo " //$NON-NLS-1$
+						+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
+			}
+		}
+	}
+
+	/**
+	 * Indica si el sistema de ficheros admite el uso de atributos POSIX.
+	 * @return {@code true} si admite atributos POSIX, {@code false} en caso contrario.
+	 */
+	private static boolean isPosixSupported() {
+		if (!posixSupportDefined) {
+			posixSupported = FileSystems.getDefault().supportedFileAttributeViews().contains("posix"); //$NON-NLS-1$
+			posixSupportDefined = true;
+		}
+		return posixSupported;
+	}
+
+
+	/**
+	 * Obtiene la ACL con los permisos del fichero indicado.
+	 * @param file Fichero del que obtener los permisos.
+	 * @return ACL asociada al fichero.
+	 */
+	private static AclFileAttributeView getAclAttributes(final File file) {
+	    return Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
+	}
+
+	/**
+	 * Obtiene la ACL con los permisos del fichero indicado.
+	 * @param file Fichero del que obtener los permisos.
+	 * @return ACL asociada al fichero.
+	 */
+	private static void setAclAttributes(final File file, final AclFileAttributeView aclView) {
+		final AclFileAttributeView aclFileView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
+		try {
+			aclFileView.setAcl(aclView.getAcl());
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "No se pudo establecer la ACL de permisos sobre el fichero " //$NON-NLS-1$
+					+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
+		}
+	}
 }
