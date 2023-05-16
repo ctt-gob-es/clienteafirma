@@ -230,7 +230,7 @@ public final class XAdESCounterSigner {
 				if (allowSignLts != null) {
 					throw new AOException(e.getMessage());
 				}
-				throw e;
+				throw new SigningLTSException("La contrafirma de firmas de archivo podria invalidar el sello de archivo si se aplicase a contrafirmas internas", e, true); //$NON-NLS-1$
 			}
 		}
 

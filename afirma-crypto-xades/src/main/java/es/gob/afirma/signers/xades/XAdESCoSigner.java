@@ -209,7 +209,7 @@ public final class XAdESCoSigner {
 				if (allowSignLts != null) {
 					throw new AOException(e.getMessage());
 				}
-				throw e;
+				throw new SigningLTSException("La cofirma de firmas de archivo invalidara el sello de archivo", e, false); //$NON-NLS-1$
 			}
 		}
 
