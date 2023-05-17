@@ -1,5 +1,5 @@
 Name:           autofirma
-Version:        1.8.1
+Version:        1.8.2
 Release:        1
 Summary:        Aplicación de firma electrónica en escritorio y en trámites web
 
@@ -36,7 +36,7 @@ fi
 cat > %{name}.desktop <<EOF
 [Desktop Entry]
 Encoding=UTF-8
-Version=1.8.1
+Version=1.8.2
 Type=Application
 Terminal=false
 Categories=Office;Utilities;Signature;Java
@@ -150,5 +150,5 @@ fi
 %attr(-, root, root) %{_libdir}/%{name}/*
 
 %changelog
-* Fri Dec 23 2022 Gobierno de España AutoFirma 1.8.1
+* Fri Dec 23 2022 Gobierno de España AutoFirma 1.8.2
 - Correcciones de seguridad.

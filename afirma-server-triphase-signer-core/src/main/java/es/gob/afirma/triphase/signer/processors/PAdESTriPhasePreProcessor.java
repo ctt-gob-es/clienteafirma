@@ -68,7 +68,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Prefirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		if (!new AOPDFSigner().isValidDataFile(data)) {
-			throw new InvalidPdfException("El documento no es un PDF y no se puede firmar");
+			throw new InvalidPdfException("El documento no es un PDF y no se puede firmar"); //$NON-NLS-1$
 		}
 
 		// Comprobamos la validez de la firma de entrada si se solicito
