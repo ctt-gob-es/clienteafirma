@@ -1,16 +1,22 @@
 package es.gob.afirma.test.pades;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PRAcroForm;
+import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -40,6 +46,49 @@ public final class TestListSignatureFields {
 		final AcroFields fields = reader.getAcroFields();
 		final List<String> emptySignatureFields = fields.getBlankSignatureNames();
 		System.out.println(emptySignatureFields);
+	}
+
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void testAnalizeSignatureFields() throws Exception {
+		PdfReader reader;
+		try (InputStream fis = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\test\\descargar_signed_campo.pdf")) { //$NON-NLS-1$
+			reader = new PdfReader(fis);
+		}
+
+		System.out.println("Campos de formulario que empiezan por 'Signature': "); //$NON-NLS-1$
+		for (final Object formField : reader.getAcroForm().getFields()) {
+			final PRAcroForm.FieldInformation fieldInfo = (PRAcroForm.FieldInformation) formField;
+			if (fieldInfo.getName().startsWith("Signature")) { //$NON-NLS-1$
+				System.out.println("\t" + fieldInfo.getName()); //$NON-NLS-1$
+				System.out.println("\t\tDetalle:"); //$NON-NLS-1$
+				for (final PdfName pdfName : fieldInfo.getInfo().getKeys().toArray(new PdfName[0])) {
+					System.out.println("\t\t\t" + pdfName + ": " + fieldInfo.getInfo().get(pdfName).toString()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+
+		final AcroFields fields = reader.getAcroFields();
+
+		final Map<String, AcroFields.Item> fieldsMap = fields.getFields();
+
+
+		System.out.println("Campos de firma: "); //$NON-NLS-1$
+		for (final String fieldName : fieldsMap.keySet().toArray(new String[0])) {
+			System.out.println("\t" + fieldName); //$NON-NLS-1$
+		}
+
+		System.out.println("Firmas: "); //$NON-NLS-1$
+		for (final String signatureName : fields.getSignatureNames()) {
+			System.out.println("\t" + signatureName); //$NON-NLS-1$
+		}
+
+		System.out.println("Campos de firma vacios: "); //$NON-NLS-1$
+		final List<String> emptySignatureFields = fields.getBlankSignatureNames();
+		System.out.println("\t" + emptySignatureFields); //$NON-NLS-1$
+
+		System.out.println("Revisiones: " + fields.getTotalRevisions()); //$NON-NLS-1$
 	}
 
 	/** Prueba de firma usando un campo de un PDF.
