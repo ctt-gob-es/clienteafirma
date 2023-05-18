@@ -456,24 +456,23 @@ public final class PdfUtil {
 	    		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
 	    		return null;
 	    	}
-	    	if (extraParams.getProperty(prefix + "PositionOnPageLowerLeftX") != null && //$NON-NLS-1$
-	    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
-			extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null && //$NON-NLS-1$
-			extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null //$NON-NLS-1$
-	    	) {
-	        try {
-	            return new com.aowagie.text.Rectangle(
-	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX").trim()), //$NON-NLS-1$
-	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY").trim()), //$NON-NLS-1$
-	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX").trim()), //$NON-NLS-1$
-	            	   Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightY").trim()) //$NON-NLS-1$
-	            );
-	        }
-	        catch (final Exception e) {
-	        		LOGGER.severe(
-	    				"Se ha indicado una posicion invalida para el elemento grafico '" + prefix + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-	        }
+	    	if (extraParams.getProperty(prefix + "PositionOnPageLowerLeftX") != null //$NON-NLS-1$
+	    			&& extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null //$NON-NLS-1$
+	    			&& extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null //$NON-NLS-1$
+	    			&& extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null) { //$NON-NLS-1$
+	    		try {
+	    			return new com.aowagie.text.Rectangle(
+	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX").trim()), //$NON-NLS-1$
+	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY").trim()), //$NON-NLS-1$
+	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX").trim()), //$NON-NLS-1$
+	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightY").trim()) //$NON-NLS-1$
+	    					);
+	    		}
+	    		catch (final Exception e) {
+	    			LOGGER.severe(
+	    					"Se ha indicado una posicion invalida para el elemento grafico '" + prefix + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+	    					);
+	    		}
 	    	}
 	    	return null;
     }

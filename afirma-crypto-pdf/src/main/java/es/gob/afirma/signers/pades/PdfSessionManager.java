@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.DocumentException;
+import com.aowagie.text.Font;
 import com.aowagie.text.Image;
 import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
@@ -175,101 +176,6 @@ public final class PdfSessionManager {
 			pdfVersion = UNDEFINED;
 		}
 
-		// *****************************
-		// **** Texto firma visible ****
-
-		// Por defecto, siempre se ofuscara la informacion del certificado, salvo que usemos un certificado
-		// de seudonimo
-		boolean obfuscate = true;
-		if (extraParams.containsKey(PdfExtraParams.OBFUSCATE_CERT_DATA)) {
-			obfuscate = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.OBFUSCATE_CERT_DATA));
-		}
-		if (obfuscate && AOUtil.isPseudonymCert((X509Certificate) certChain[0])) {
-			obfuscate = false;
-		}
-
-		final String pdfMaskConfig = extraParams.getProperty(PdfExtraParams.OBFUSCATION_MASK);
-
-		// Texto en capa 4
-		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
-				extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
-				certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
-				signTime,
-				reason,
-				signatureProductionCity,
-				signerContact,
-				obfuscate,
-				pdfMaskConfig
-		);
-
-		// Texto en capa 2
-		String configuredLayer2Text = extraParams.getProperty(PdfExtraParams.LAYER2_TEXT);
-		if (configuredLayer2Text == null && !extraParams.containsKey(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE)) {
-			configuredLayer2Text = getDefaultLayer2Text(reason != null, signatureProductionCity != null);
-		}
-		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
-				configuredLayer2Text,
-				certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
-				signTime,
-				reason,
-				signatureProductionCity,
-				signerContact,
-				obfuscate,
-				pdfMaskConfig
-		);
-
-		// Tipo de letra en capa 2
-		int layer2FontFamily;
-		try {
-			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null
-					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim())
-					: UNDEFINED;
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Se ha indicado un tipo de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
-					+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) + "'): " + e //$NON-NLS-1$
-			);
-			layer2FontFamily = UNDEFINED;
-		}
-
-		// Tamano del tipo de letra en capa 2
-		int layer2FontSize;
-		try {
-			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null
-					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim())
-					: UNDEFINED;
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Se ha indicado un tamano de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
-					+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) + "'): " + e //$NON-NLS-1$
-			);
-			layer2FontSize = UNDEFINED;
-		}
-
-		// Estilo del tipo de letra en capa 2
-		int layer2FontStyle;
-		try {
-			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null
-					? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim())
-					: UNDEFINED;
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Se ha indicado un estilo de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
-					+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) + "'): " + e //$NON-NLS-1$
-			);
-			layer2FontStyle = UNDEFINED;
-		}
-
-		// Color del tipo de letra en capa 2
-		final String layer2FontColor = extraParams.getProperty(PdfExtraParams.LAYER2_FONTCOLOR);
-
-		// ** Fin texto firma visible **
-		// *****************************
-
-		// *********************************************************************************************************************
-		// **************** FIN LECTURA PARAMETROS ADICIONALES *****************************************************************
-		// *********************************************************************************************************************
-
 		// **************************************************************
 		// ***** Comprobaciones y parametros necesarios para PDF-A1 *****
 		final byte[] xmpBytes = pdfReader.getMetadata();
@@ -280,6 +186,113 @@ public final class PdfSessionManager {
 
 		// *** Fin comprobaciones y parametros necesarios para PDF-A1 ***
 		// **************************************************************
+
+		// *****************************
+		// **** Texto firma visible ****
+
+		String layer4Text = null;
+		String layer2Text = null;
+		Font layer2Font = null;
+		if (PdfVisibleAreasUtils.isVisibleSignature(extraParams)) {
+			// Por defecto, siempre se ofuscara la informacion del certificado, salvo que usemos un certificado
+			// de seudonimo
+			boolean obfuscate = true;
+			if (extraParams.containsKey(PdfExtraParams.OBFUSCATE_CERT_DATA)) {
+				obfuscate = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.OBFUSCATE_CERT_DATA));
+			}
+			else if (AOUtil.isPseudonymCert((X509Certificate) certChain[0])) {
+				obfuscate = false;
+			}
+
+			final String pdfMaskConfig = extraParams.getProperty(PdfExtraParams.OBFUSCATION_MASK);
+
+			// Texto en capa 4
+			layer4Text = PdfVisibleAreasUtils.getLayerText(
+					extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
+					certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
+							signTime,
+							reason,
+							signatureProductionCity,
+							signerContact,
+							obfuscate,
+							pdfMaskConfig
+					);
+
+			// Texto en capa 2
+			String configuredLayer2Text = extraParams.getProperty(PdfExtraParams.LAYER2_TEXT);
+			if (configuredLayer2Text == null && !extraParams.containsKey(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE)) {
+				configuredLayer2Text = getDefaultLayer2Text(reason != null, signatureProductionCity != null);
+			}
+			layer2Text = PdfVisibleAreasUtils.getLayerText(
+					configuredLayer2Text,
+					certChain != null && certChain.length > 0 ? (X509Certificate) certChain[0] : null,
+							signTime,
+							reason,
+							signatureProductionCity,
+							signerContact,
+							obfuscate,
+							pdfMaskConfig
+					);
+
+			// Tipo de letra en capa 2
+			int layer2FontFamily;
+			try {
+				layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null
+						? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY).trim())
+								: UNDEFINED;
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Se ha indicado un tipo de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
+						+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) + "'): " + e //$NON-NLS-1$
+						);
+				layer2FontFamily = UNDEFINED;
+			}
+
+			// Tamano del tipo de letra en capa 2
+			int layer2FontSize;
+			try {
+				layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null
+						? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE).trim())
+								: UNDEFINED;
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Se ha indicado un tamano de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
+						+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) + "'): " + e //$NON-NLS-1$
+						);
+				layer2FontSize = UNDEFINED;
+			}
+
+			// Estilo del tipo de letra en capa 2
+			int layer2FontStyle;
+			try {
+				layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null
+						? Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE).trim())
+								: UNDEFINED;
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Se ha indicado un estilo de letra no valido para la capa 2 del PDF ('" //$NON-NLS-1$
+						+ extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) + "'): " + e //$NON-NLS-1$
+						);
+				layer2FontStyle = UNDEFINED;
+			}
+
+			// Color del tipo de letra en capa 2
+			final String layer2FontColor = extraParams.getProperty(PdfExtraParams.LAYER2_FONTCOLOR);
+
+			layer2Font = PdfVisibleAreasUtils.getFont(
+					layer2FontFamily,
+					layer2FontSize,
+					layer2FontStyle,
+					layer2FontColor,
+					pdfA1
+					);
+		}
+		// ** Fin texto firma visible **
+		// *****************************
+
+		// *********************************************************************************************************************
+		// **************** FIN LECTURA PARAMETROS ADICIONALES *****************************************************************
+		// *********************************************************************************************************************
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
@@ -455,74 +468,71 @@ public final class PdfSessionManager {
 		// ** Texto en las capas ****
 		// **************************
 
-		// Capa 2
-		if (layer2Text != null) {
-			sap.setLayer2Text(layer2Text);
-			sap.setLayer2Font(
-					PdfVisibleAreasUtils.getFont(
-							layer2FontFamily,
-							layer2FontSize,
-							layer2FontStyle,
-							layer2FontColor,
-							pdfA1
-					)
-			);
-		}
+		if (PdfVisibleAreasUtils.isVisibleSignature(extraParams)) {
 
-		// Capa 4
-		if (layer4Text != null) {
-			sap.setLayer4Text(layer4Text);
-		}
+			// Capa 2
+			if (layer2Text != null) {
+				sap.setLayer2Text(layer2Text);
+			}
+			if (layer2Font != null) {
+				sap.setLayer2Font(layer2Font);
+			}
 
-		// Firma visible
-		if (signaturePositionOnPage != null && signatureField == null) {
+			// Capa 4
+			if (layer4Text != null) {
+				sap.setLayer4Text(layer4Text);
+			}
 
-			try {
-				// Si no hay que rotar la firma, agregamos la imagen de rubrica si procede y listo
-				if (signatureRotation == 0) {
+			// Firma visible
+			if (signaturePositionOnPage != null && signatureField == null) {
 
-					// Rubrica de la firma
-					if (rubric != null) {
-						sap.setImage(rubric);
+				try {
+					// Si no hay que rotar la firma, agregamos la imagen de rubrica si procede y listo
+					if (signatureRotation == 0) {
 
-						// Establecemos que la imagen no se ajuste al campo
-						// para que no se deforme
-						sap.setImageScale(-1);
+						// Rubrica de la firma
+						if (rubric != null) {
+							sap.setImage(rubric);
+
+							// Establecemos que la imagen no se ajuste al campo
+							// para que no se deforme
+							sap.setImageScale(-1);
+						}
 					}
+					// Si hay que rotar la firma, generamos una imagen con el texto y la imagen de
+					// rubrica ya rotados y la agregamos
+					else {
+
+						final Image rotatedRubric = PdfVisibleAreasUtils.buildRotatedSignatureImage(
+								stp,
+								sap,
+								signaturePositionOnPage,
+								signatureRotation,
+								rubric
+								);
+
+						// Eliminamos el texto de la apariencia, ya que este se habra impreso en la imagen
+						// de rubrica
+						sap.setLayer2Text(""); //$NON-NLS-1$
+
+						// Agregamos la imagen con el texto y/o rubrica ya rotadas
+						sap.setImage(rotatedRubric);
+					}
+
+					// Configuramos la firma visible
+					sap.setVisibleSignature(signaturePositionOnPage, pages != null ? pages.get(0).intValue() : pdfReader.getNumberOfPages(), null);
 				}
-				// Si hay que rotar la firma, generamos una imagen con el texto y la imagen de
-				// rubrica ya rotados y la agregamos
-				else {
-
-					final Image rotatedRubric = PdfVisibleAreasUtils.buildRotatedSignatureImage(
-							stp,
-							sap,
-							signaturePositionOnPage,
-							signatureRotation,
-							rubric
-							);
-
-					// Eliminamos el texto de la apariencia, ya que este se habra impreso en la imagen
-					// de rubrica
-					sap.setLayer2Text(""); //$NON-NLS-1$
-
-					// Agregamos la imagen con el texto y/o rubrica ya rotadas
-					sap.setImage(rotatedRubric);
+				catch (final InvalidPageNumberException e) {
+					LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
 				}
-
-				// Configuramos la firma visible
-				sap.setVisibleSignature(signaturePositionOnPage, pages != null ? pages.get(0).intValue() : pdfReader.getNumberOfPages(), null);
+				catch (final DocumentException e) {
+					throw new IOException("Error en la insercion de la firma rotada: " + e, e); //$NON-NLS-1$
+				}
 			}
-			catch (final InvalidPageNumberException e) {
-				LOGGER.warning("Numero de pagina incorrecto. La firma no sera visible: " + e); //$NON-NLS-1$
+			// Firma en un campo preexistente (visile o invisible)
+			else if (signatureField != null) {
+				sap.setVisibleSignature(signatureField);
 			}
-			catch (final DocumentException e) {
-				throw new IOException("Error en la insercion de la firma rotada: " + e, e); //$NON-NLS-1$
-			}
-		}
-		// Firma en un campo preexistente (visile o invisible)
-		else if (signatureField != null) {
-			sap.setVisibleSignature(signatureField);
 		}
 
 		// ***************************
