@@ -53,6 +53,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private boolean allowExternalStores = true;
 
+	private final String libFileName;
+
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
      *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
@@ -63,12 +65,15 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
      * @param checkValidity Indica si se debe comprobar la validez temporal de un
      *                      certificado al ser seleccionado.
      * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
-     *                                a&uacute;n no v&aacute;lidos. */
+     *                                a&uacute;n no v&aacute;lidos.
+	 * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
+	 * */
     public AOKeyStoreDialog(final AOKeyStoreManager ksm,
     		                final Object parentComponent,
     		                final boolean checkPrivateKeys,
     		                final boolean showExpiredCertificates,
-    		                final boolean checkValidity) {
+    		                final boolean checkValidity,
+    		                final String libFileName) {
 		this(
 			ksm,
 			parentComponent,
@@ -76,7 +81,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			showExpiredCertificates,
 			checkValidity,
 			null,
-			false
+			false,
+			libFileName
 		);
     }
 
@@ -91,14 +97,17 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
      *                      certificado al ser seleccionado.
      * @param certFilters Filtros sobre los certificados a mostrar.
      * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
-     *                             filtro) debe ser solo uno. */
+     *                             filtro) debe ser solo uno.
+     * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
+     * */
 	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
 			                final Object parentComponent,
                             final boolean checkPrivateKeys,
                             final boolean showExpiredCertificates,
                             final boolean checkValidity,
                             final List<? extends CertificateFilter> certFilters,
-                            final boolean mandatoryCertificate) {
+                            final boolean mandatoryCertificate,
+                            final String libFileName) {
 
 		if (ksm == null) {
     		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
@@ -111,6 +120,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.showExpiredCertificates = showExpiredCertificates;
 		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
+		this.libFileName = libFileName;
 	}
 
 	@Override
@@ -286,7 +296,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openPkcs12KeyStore(final Component parent) throws Exception {
+	public static AOKeyStoreManager openPkcs12KeyStore(final Component parent) throws Exception {
 
 		final File[] ksFile;
 		ksFile = AOUIFactory.getLoadFiles(
@@ -507,4 +517,10 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	public boolean isExternalStoresOpeningAllowed() {
 		return this.allowExternalStores;
 	}
+
+	@Override
+	public String getLibName() {
+		return this.libFileName;
+	}
+
 }

@@ -52,10 +52,18 @@ public enum AOKeyStore {
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.0")), //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.1")) //$NON-NLS-1$
 	),
+    /** PKCS#12 sin solicitar contrasena */
+    PKCS12_NO_PASS(
+		"PKCS#12 / PFX", //$NON-NLS-1$
+		4,
+		"PKCS12_NO_PASS", //$NON-NLS-1$
+		null,
+		null
+	),
     /** Java KeyStore (JKS). */
     JAVA(
 		"Java KeyStore / JKS", //$NON-NLS-1$
-		4,
+		5,
 		"JKS", //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.2")), //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.3")) //$NON-NLS-1$
@@ -63,7 +71,7 @@ public enum AOKeyStore {
     /** PKCS#11. */
     PKCS11(
 		"PKCS#11", //$NON-NLS-1$
-		5,
+		6,
 		"PKCS11", //$NON-NLS-1$
 		NullPasswordCallback.getInstance(),
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.4")) //$NON-NLS-1$
@@ -71,7 +79,7 @@ public enum AOKeyStore {
     /** PKCS#7 / X.509 en Base64. */
     SINGLE(
 		"PKCS#7 / X.509", //$NON-NLS-1$
-		6,
+		7,
 		"PKCS7", //$NON-NLS-1$
 		NullPasswordCallback.getInstance(),
 		NullPasswordCallback.getInstance()
@@ -80,7 +88,7 @@ public enum AOKeyStore {
      * internos y externos unificados). */
     MOZ_UNI(
 		"Mozilla / Firefox (unificado)", //$NON-NLS-1$
-		7,
+		8,
 		"PKCS11", //$NON-NLS-1$
 		NullPasswordCallback.getInstance(),
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.5")) //$NON-NLS-1$
@@ -88,7 +96,7 @@ public enum AOKeyStore {
     /** Java Cryptography Extension KeyStore (JCEKS). */
     JCEKS(
 		"Java Cryptography Extension KeyStore (JCEKS)", //$NON-NLS-1$
-		8,
+		9,
 		"JCEKS", //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.6")), //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.7")) //$NON-NLS-1$
@@ -97,7 +105,7 @@ public enum AOKeyStore {
      * min&uacute;sculas). */
     JAVACE(
 		"Java KeyStore / JKS (Case Exact)", //$NON-NLS-1$
-		9,
+		10,
 		"CaseExactJKS", //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.8")), //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.9")) //$NON-NLS-1$
@@ -105,7 +113,7 @@ public enum AOKeyStore {
 	/** Tarjeta del Ministerio de Defensa. */
 	TEMD(
 		"TEMD (Tarjeta del Ministerio de Defensa)", //$NON-NLS-1$
-		10,
+		11,
 		"PKCS11", //$NON-NLS-1$
 		null, // Sin contrasena para los certificados sueltos
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.14")) //$NON-NLS-1$
@@ -114,7 +122,7 @@ public enum AOKeyStore {
      * libreta de direcciones). */
     WINADDRESSBOOK(
 		"Windows / Internet Explorer (otras personas / libreta de direcciones)", //$NON-NLS-1$
-		11,
+		12,
 		"Windows-ADDRESSBOOK", //$NON-NLS-1$
 		new CachePasswordCallback("winotherdummy".toCharArray()), //$NON-NLS-1$
 		NullPasswordCallback.getInstance()
@@ -122,7 +130,7 @@ public enum AOKeyStore {
     /** Windows / Internet Explorer (CAPI, certificados CA intermedias). */
     WINCA(
 		"Windows / Internet Explorer (CA intermedias)", //$NON-NLS-1$
-		12,
+		13,
 		"Windows-ROOT", //$NON-NLS-1$
 		new CachePasswordCallback("wincadummy".toCharArray()), //$NON-NLS-1$
 		NullPasswordCallback.getInstance()
@@ -130,7 +138,7 @@ public enum AOKeyStore {
 	/** Tarjeta CERES con controlador nativo Java. */
 	CERES(
 		"Tarjeta FNMT-RCM CERES", //$NON-NLS-1$
-		13,
+		14,
 		"CERES", //$NON-NLS-1$
 		null, // Al igual que en el DNIe el PIN se pide al firmar
 		null  // Sin password para el almacen en si
@@ -138,7 +146,7 @@ public enum AOKeyStore {
     /** DNIe con controlador nativo Java. */
     DNIEJAVA(
 		"DNIe y tarjetas FNMT-TIF", //$NON-NLS-1$
-		14,
+		15,
 		"DNI", //$NON-NLS-1$
 		null,
 		null
@@ -146,7 +154,7 @@ public enum AOKeyStore {
     /** Conjunto de tarjetas conocidas, accedidas v&iacute;a PKCS#11. */
     KNOWN_SMARTCARDS(
     	"Tarjetas inteligentes conocidas mediante PKCS#11", //$NON-NLS-1$
-    	15,
+    	16,
     	"SMARTCARDS", //$NON-NLS-1$
     	null,
     	null
@@ -154,7 +162,7 @@ public enum AOKeyStore {
     /** G&amp;D SmartCafe con Applet PKCS#15. */
     SMARTCAFE(
     	"G&D SmartCafe con Applet PKCS#15", //$NON-NLS-1$
-    	16,
+    	17,
     	"GDSCPKCS15", //$NON-NLS-1$
     	null,
     	null
@@ -162,7 +170,7 @@ public enum AOKeyStore {
     /** Tarjeta CERES 430 con controlador nativo Java. */
 	CERES_430(
 		"Tarjeta FNMT-RCM CERES 4.30 o superior", //$NON-NLS-1$
-		17,
+		18,
 		"CERES430", //$NON-NLS-1$
 		null, // Al igual que en el DNIe el PIN se pide al firmar
 		null  // Sin password para el almacen en si
@@ -177,7 +185,7 @@ public enum AOKeyStore {
     private PasswordCallback certificatePasswordCallback = null;
     private PasswordCallback storePasswordCallback = null;
 
-    private AOKeyStore(final String n,
+    AOKeyStore(final String n,
     		           final int o,
     		           final String pn,
     		           final PasswordCallback certPwc,
@@ -189,7 +197,7 @@ public enum AOKeyStore {
         this.storePasswordCallback = storePwc;
     }
 
-    private AOKeyStore() {
+    AOKeyStore() {
     	this.name = "Tipo desconocido"; //$NON-NLS-1$
     	this.ordinal = 18;
     	this.providerName = null;
@@ -272,4 +280,5 @@ public enum AOKeyStore {
 		}
 		return this.storePasswordCallback;
 	}
+
 }

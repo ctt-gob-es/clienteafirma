@@ -537,7 +537,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
     public void signLoadedFile() {
         if (this.currentPanel instanceof SignPanel) {
-            ((SignPanel) this.currentPanel).sign();
+            try {
+				((SignPanel) this.currentPanel).sign();
+			} catch (final Exception e) {
+				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
+	                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE, e);
+			}
         }
     }
 

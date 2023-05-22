@@ -63,6 +63,10 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
@@ -81,6 +85,7 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.standalone.plugins.DataProcessAction;
 import es.gob.afirma.standalone.plugins.InputData;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
@@ -202,8 +207,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	private CommonWaitDialog signWaitDialog = null;
 
-    /** Firma el fichero actualmente cargado. */
-    public void sign() {
+    /** Firma el fichero actualmente cargado.
+     * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
+     * @throws IOException Error al leer almac&eacute;n. */
+    public void sign() throws AOKeystoreAlternativeException, IOException {
 
     	// Si se trata de firmar un documento que sabemos que es una firma invalida y no se
     	// se permite esto, se lanza un error
@@ -302,18 +309,43 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /**
      * Inicia el proceso de firma.
      * @param signConfigs Operaciones de firma a ejecutar.
+     * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
+     * @throws IOException Error al leer almac&eacute;n.
      */
     @Override
-    public void initSignTask(final List<SignOperationConfig> signConfigs) {
+    public void initSignTask(final List<SignOperationConfig> signConfigs) throws AOKeystoreAlternativeException, IOException {
 
     	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
     	this.taskIsRunning = true;
 
+    	//Obtenemos el almacen por defecto
+    	AOKeyStoreManager ksm = null;
+    	try {
+    		final AOKeyStore aoks = SimpleKeyStoreManager.getDefaultKeyStoreType();
+    		String lib = null;
+    		if (aoks.equals(AOKeyStore.PKCS12)) {
+    			lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+    		}
+			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					aoks, // Store
+				    lib, // Lib
+					"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
+					aoks.getStorePasswordCallback(this), // PasswordCallback
+					this // Parent
+			);
+		} catch (final AOKeystoreAlternativeException e) {
+ 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
+			throw e;
+		} catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "Error al leer el almacen", e); //$NON-NLS-1$
+			throw e;
+		}
+
     	new SignPanelSignTask(
         		this,
         		signConfigs,
-        		this.saf.getAOKeyStoreManager(),
+        		ksm,
         		getCertFilters(),
         		this.signWaitDialog,
         		this,
@@ -952,7 +984,15 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.signButton.setEnabled(false);
 	        buttonPanel.add(this.signButton);
 	        this.signButton.addActionListener(
-	    		ae -> sign()
+	    		ae -> {
+					try {
+						sign();
+					} catch (final Exception e) {
+						AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
+			                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+									JOptionPane.ERROR_MESSAGE, e);
+					}
+				}
 			);
 
 	        // Establecemos la configuracion de color

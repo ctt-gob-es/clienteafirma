@@ -58,8 +58,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox avoidAskForClose = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.36")); //$NON-NLS-1$
 
-	private final JCheckBox hideDniStartScreen = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.81")); //$NON-NLS-1$
-
 	private final JCheckBox checkForUpdates = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.87")); //$NON-NLS-1$
 
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
@@ -67,8 +65,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 	private final JCheckBox optimizedForVdi = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.190")); //$NON-NLS-1$
 
 	private final JCheckBox confirmToSign = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.179")); //$NON-NLS-1$
-
-	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.176")); //$NON-NLS-1$
 
 	private final JCheckBox allowSignInvalidSignatures = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.178")); //$NON-NLS-1$
 
@@ -245,19 +241,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		signConstraint.gridy++;
 
-		this.hideDniStartScreen.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
-		);
-		this.hideDniStartScreen.setMnemonic('D');
-		this.hideDniStartScreen.addItemListener(modificationListener);
-		this.hideDniStartScreen.addKeyListener(keyListener);
-		signConfigPanel.add(this.hideDniStartScreen, signConstraint);
-
-		signConstraint.gridy++;
-
 		// Solo mostramos el check de buscar actualizaciones si esta habilitado
 		// su uso
 		if (SimpleAfirma.isUpdatesEnabled()) {
@@ -380,18 +363,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.confirmToSign.addItemListener(modificationListener);
 		this.confirmToSign.addKeyListener(keyListener);
 		innerPanel.add(this.confirmToSign, c);
-
-		c.gridy++;
-
-		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
-		this.showExpiredCerts.setMnemonic('M');
-		this.showExpiredCerts.addItemListener(modificationListener);
-		this.showExpiredCerts.addKeyListener(keyListener);
-		innerPanel.add(this.showExpiredCerts, c);
 
 		c.gridy++;
 
@@ -635,11 +606,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signatureAlgorithms.getSelectedItem().toString());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN, this.confirmToSign.isSelected());
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
 		if (SimpleAfirma.isUpdatesEnabled()) {
 			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		}
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES, this.allowSignInvalidSignatures.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_VDI_OPTIMIZATION, this.optimizedForVdi.isSelected());
@@ -662,7 +631,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		}
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
 		this.confirmToSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN));
-		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 
 		if (!SimpleAfirma.isUpdatesEnabled()) {
 			this.checkForUpdates.setSelected(false);
@@ -672,7 +640,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK));
 		}
 
-		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 		this.allowSignInvalidSignatures.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES));
 
 		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {

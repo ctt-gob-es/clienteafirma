@@ -10,6 +10,7 @@
 package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
@@ -115,7 +116,11 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 			filters = this.filterManager.getFilters();
 			mandatoryCertificate = this.filterManager.isMandatoryCertificate();
 		}
-
+		String libName = null;
+		if (this.library != null) {
+			final File file = new File(this.library);
+			libName = file.getName();
+		}
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 			ksm,
 			this,
@@ -123,7 +128,8 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 			true, // showExpiredCertificates
 			true, // checkValidity
 			filters,
-			mandatoryCertificate
+			mandatoryCertificate,
+			libName
 		);
 		dialog.allowOpenExternalStores(
 			this.filterManager.isExternalStoresOpeningAllowed()

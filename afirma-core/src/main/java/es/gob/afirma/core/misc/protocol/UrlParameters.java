@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.DataDownloader;
 
 /** Par&aacute;metros habitualmente comunes para todas las operaciones. */
@@ -406,20 +405,6 @@ public abstract class UrlParameters {
 			);
 		}
 
-		// Si no se ha especificado almacen, se usara el del sistema operativo
-
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return "WINDOWS"; //$NON-NLS-1$
-		}
-		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			return "APPLE"; //$NON-NLS-1$
-		}
-		if (Platform.OS.LINUX.equals(Platform.getOS())) {
-			return "SHARED_NSS"; //$NON-NLS-1$
-		}
-		if (Platform.OS.SOLARIS.equals(Platform.getOS())) {
-			return "MOZ_UNI"; //$NON-NLS-1$
-		}
 		return null;
 	}
 

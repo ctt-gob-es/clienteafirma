@@ -71,8 +71,33 @@ final class UtilActions {
 		}
 	}
 
+	static void doRefresh(final ShowCertificatesDialog showCertificatesDialog, final Component parent) {
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		}
+
+		showCertificatesDialog.refreshKeystore();
+
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
+
 	static void doChangeView(final NameCertificateBean[] nameCertificates, final CertificateLineView view,
 			final CertificateSelectionDialog selectionDialog, final Component parent) {
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		}
+
+		selectionDialog.refreshDialog(nameCertificates, view);
+
+		if (parent != null) {
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+	}
+
+	static void doChangeView(final NameCertificateBean[] nameCertificates, final CertificateLineView view,
+			final ShowCertificatesDialog selectionDialog, final Component parent) {
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}

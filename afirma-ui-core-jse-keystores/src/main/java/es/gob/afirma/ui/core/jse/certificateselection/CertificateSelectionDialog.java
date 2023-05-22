@@ -118,7 +118,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		this.certDialog = this.optionPane.createDialog(
 			this.parent,
 			CertificateSelectionDialogMessages.getString(
-					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName) //$NON-NLS-1$
+					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName + " : " + this.ksdm.getLibName()) //$NON-NLS-1$ //$NON-NLS-2$
 		);
 
 		this.certDialog.setBackground(Color.WHITE);

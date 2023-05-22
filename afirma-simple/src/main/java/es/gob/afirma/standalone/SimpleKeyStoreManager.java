@@ -9,6 +9,8 @@
 
 package es.gob.afirma.standalone;
 
+import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE;
+
 import java.awt.Component;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -151,16 +153,40 @@ public final class SimpleKeyStoreManager {
 			);
 		}
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException(
-        		"No se ha podido incializar el almacen '" +  aoks  + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-    		);
+        	AOUIFactory.showErrorMessage(
+				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11"), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE,
+				e
+			);
+
+        	final OS os = Platform.getOS();
+        	final AOKeyStore osks = getDefaultKeyStoreTypeByOs(os);
+        	try {
+        		PreferencesManager.put(
+        				PREFERENCE_KEYSTORE_DEFAULT_STORE,
+        				osks.name()
+        		);
+				return getKeyStoreManager(
+						osks,
+						parent
+					);
+			} catch (final Exception e1) {
+				throw new AOKeyStoreManagerException(
+		        		"No se ha podido incializar el almacen '" +  aoks  + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+		    		);
+			}
 		}
     }
 
     private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, AOKeystoreAlternativeException {
+    	String lib = null;
+    	if (aoks.equals(AOKeyStore.PKCS12)) {
+    		lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+    	}
     	return AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		aoks,
-    		null,
+    		lib,
     		null,
     		aoks.getStorePasswordCallback(parent),
     		parent

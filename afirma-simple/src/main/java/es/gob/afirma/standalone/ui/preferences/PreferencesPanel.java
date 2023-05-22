@@ -47,6 +47,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	//private PreferencesPanelKeyStores preferencesPanelKeyStores;
 	private PreferencesPanelFacturaE preferencesPanelFacturaE;
 	private PreferencesPanelXades preferencesPanelXades;
+	private PreferencesPanelCertificates preferencesPanelCertificates;
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -60,6 +61,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		//this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, blocked);
 		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, blocked);
 		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, blocked);
+		this.preferencesPanelCertificates = new PreferencesPanelCertificates(this, this.modificationListener, blocked);
 
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(610, screenHeight * 0.8));
@@ -111,6 +113,15 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			SimpleAfirmaMessages.getString("PreferencesPanel.101") //$NON-NLS-1$
 		);
 		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_L);
+
+		count = this.tabbedPane.getTabCount();
+		this.tabbedPane.addTab(
+			SimpleAfirmaMessages.getString("PreferencesPanel.192"), //$NON-NLS-1$
+			null,
+			this.preferencesPanelCertificates,
+			SimpleAfirmaMessages.getString("PreferencesPanel.193") //$NON-NLS-1$
+		);
+		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_C);
 
 //		// Pestana de configuracion de almacen
 //		count = this.tabbedPane.getTabCount();
@@ -173,6 +184,11 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		//**** PREFERENCIAS XADES ****************************************************
 		//****************************************************************************
 		this.preferencesPanelXades.savePreferences();
+
+		//****************************************************************************
+		//**** PREFERENCIAS CERTIFICADOS ****************************************************
+		//****************************************************************************
+		this.preferencesPanelCertificates.savePreferences();
 
 		try {
 			PreferencesManager.flush();

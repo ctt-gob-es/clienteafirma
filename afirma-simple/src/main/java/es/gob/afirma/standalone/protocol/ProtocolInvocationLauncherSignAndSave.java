@@ -90,6 +90,7 @@ import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class ProtocolInvocationLauncherSignAndSave {
 
@@ -254,11 +255,28 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 		}
 
-		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
+		AOKeyStore aoks;
+		if (useDefaultStore) {
+			aoks = AOKeyStore.getKeyStore(PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE));
+		} else {
+			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+		}
+
 		if (aoks == null) {
-			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_KEYSTORE;
-			throw new SocketOperationException(errorCode);
+			// Si no se ha especificado almacen, se usara el del sistema operativo
+			if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+				aoks = AOKeyStore.WINDOWS;
+			}
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				aoks = AOKeyStore.APPLE;
+			}
+			if (Platform.OS.LINUX.equals(Platform.getOS())) {
+				aoks = AOKeyStore.SHARED_NSS;
+			}
+			if (Platform.OS.SOLARIS.equals(Platform.getOS())) {
+				aoks = AOKeyStore.MOZ_UNI;
+			}
 		}
 
 		// Comprobamos si es necesario pedir datos de entrada al usuario
@@ -481,7 +499,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 		} else {
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
-			final String aoksLib = options.getDefaultKeyStoreLib();
+			final String aoksLib;
+			if (useDefaultStore && aoks.equals(AOKeyStore.PKCS12)) {
+				aoksLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+			} else {
+				aoksLib = options.getDefaultKeyStoreLib();
+			}
 			final AOKeyStoreManager ksm;
 			try {
 				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
@@ -501,6 +524,11 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 			try {
 				MacUtils.focusApplication();
+				String libName = null;
+				if (aoksLib != null) {
+					final File file = new File(aoksLib);
+					libName = file.getName();
+				}
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 						ksm,
 						null,
@@ -508,7 +536,8 @@ final class ProtocolInvocationLauncherSignAndSave {
 						true, // showExpiredCertificates
 						true, // checkValidity
 						filters,
-						mandatoryCertificate);
+						mandatoryCertificate,
+						libName);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 
@@ -777,10 +806,8 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 	private static void configurePdfSignature(final Properties extraParams) {
 		final String allowPdfShadowAttackProp = extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
-		if (!Boolean.parseBoolean(allowPdfShadowAttackProp)) {
-			if (!extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
-				extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
-			}
+		if (!Boolean.parseBoolean(allowPdfShadowAttackProp) && !extraParams.containsKey(PdfExtraParams.PAGES_TO_CHECK_PSA)) {
+			extraParams.setProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, "10"); //$NON-NLS-1$
 		}
 	}
 

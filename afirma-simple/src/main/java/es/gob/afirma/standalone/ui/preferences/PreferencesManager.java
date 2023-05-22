@@ -212,6 +212,9 @@ public final class PreferencesManager {
 	//**************************************************************************************************************************
 	//**************** PREFERENCIAS DE ALMACENES DE CLAVES *********************************************************************
 
+	/** Indica si se usa o no el certificado por defecto configurado en llamadas desde el navegador. */
+	public static final String PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS = "useDefaultStoreInBrowserCalls"; //$NON-NLS-1$
+
 	/** En firma, restringir que &uacute;nicamente se puedan usar certificados de firma.
 	 * Un valor de <code>true</code> en esta preferencia permitir&aacute; usar solo certificados espec&iacute;ficos
 	 * para firma en las firmas electr&oacute;nicas. */
@@ -224,6 +227,9 @@ public final class PreferencesManager {
 
 	/** Almac&eacute;n de claves por defecto. */
 	public static final String PREFERENCE_KEYSTORE_DEFAULT_STORE = "defaultStore"; //$NON-NLS-1$
+
+	/** Ruta del almac&eacute;n de claves local seleccionado por defecto. */
+	public static final String PREFERENCE_LOCAL_KEYSTORE_PATH = "defaultLocalKeystorePath"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************
@@ -461,6 +467,15 @@ public final class PreferencesManager {
 
 	/** Imagen de fondo de la firma visible en pdf.*/
 	public static final String PREFERENCE_PDF_SIGN_IMAGE = "pdfSignatureImage"; //$NON-NLS-1$
+
+	//**************** FIN PREFERENCIAS DE FIRMA VISIBLE EN PDF ****************************************************************
+	//**************************************************************************************************************************
+
+	//**************************************************************************************************************************
+	//**************** PREFERENCIAS DE certificados ********************************************************************
+
+	/** Texto contenido en la firma visible en pdf.*/
+	public static final String PREFERENCE_DEFAULT_KEYSTORE = "defaultKeystore"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE FIRMA VISIBLE EN PDF ****************************************************************
 	//**************************************************************************************************************************

@@ -193,7 +193,8 @@ final class PreferencesPanelKeyStores extends JScrollPane {
 								this,
 								true,
 								true,
-								false
+								false,
+								null
 							),
 							SimpleAfirmaMessages.getString(
 								"PreferencesPanelKeyStores.10", //$NON-NLS-1$
