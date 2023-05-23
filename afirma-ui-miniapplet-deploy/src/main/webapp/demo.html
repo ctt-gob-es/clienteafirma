@@ -113,7 +113,39 @@
 		}
 		
 		function guardar() {
-			AutoScript.saveDataToFile(document.getElementById("firmaB64").innerHTML, "Guardar firma", "firma.csig", "csig", "Firma CAdES");
+
+			mostrarDialogoEspera();
+			
+			var format = document.getElementById("fFormat").value;
+			
+			var ext = "";
+			if (format.startsWith("CAdES")) {
+				ext = "csig";
+			} else if (format.startsWith("XAdES")) {
+				ext = "xsig";
+			} else if (format.startsWith("PAdES")) {
+				ext = "pdf";
+			} else if (format.startsWith("FacturaE")) {
+				ext = "xml";
+			} else if (format.startsWith("NONE")) {
+				ext = "sig";
+			}
+			
+			AutoScript.saveDataToFile(document.getElementById("firmaB64").innerHTML, "Guardar firma", !!ext ? "firma." + ext : "firma", ext, "Firma electronica", guardarSuccessCallback, guardarErrorCallback);
+		}
+		
+		function guardarSuccessCallback() {
+			
+			ocultarDialogoEspera();
+			
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al guardar</div><br>' +
+					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
+		}
+		
+		function guardarErrorCallback() {
+			
+			ocultarDialogoEspera();
 		}
 		
 		function mostrarPantalla() {
