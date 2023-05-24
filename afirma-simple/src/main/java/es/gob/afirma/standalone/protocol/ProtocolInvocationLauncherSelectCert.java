@@ -107,18 +107,7 @@ final class ProtocolInvocationLauncherSelectCert {
 
 		if (aoks == null) {
 			// Si no se ha especificado almacen, se usara el del sistema operativo
-			if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-				aoks = AOKeyStore.WINDOWS;
-			}
-			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				aoks = AOKeyStore.APPLE;
-			}
-			if (Platform.OS.LINUX.equals(Platform.getOS())) {
-				aoks = AOKeyStore.SHARED_NSS;
-			}
-			if (Platform.OS.SOLARIS.equals(Platform.getOS())) {
-				aoks = AOKeyStore.MOZ_UNI;
-			}
+			aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
 		}
 
 		final String aoksLib;

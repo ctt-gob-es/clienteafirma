@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
@@ -280,5 +282,27 @@ public enum AOKeyStore {
 		}
 		return this.storePasswordCallback;
 	}
+
+	/**
+	 * Obtiene el almac&eacute;n que corresponda al SO indicado por par&aacute;metro.
+	 * @param os Sistema operativo
+	 * @return Almac&eacute;n correspondiente al sistema operativo.
+	 */
+    public static AOKeyStore getDefaultKeyStoreTypeByOs(final OS os) {
+    	AOKeyStore aoks = null;
+		if (Platform.OS.WINDOWS.equals(os)) {
+			aoks = AOKeyStore.WINDOWS;
+		}
+		if (Platform.OS.MACOSX.equals(os)) {
+			aoks = AOKeyStore.APPLE;
+		}
+		if (Platform.OS.LINUX.equals(os)) {
+			aoks = AOKeyStore.SHARED_NSS;
+		}
+		if (Platform.OS.SOLARIS.equals(os)) {
+			aoks = AOKeyStore.MOZ_UNI;
+		}
+		return aoks;
+    }
 
 }

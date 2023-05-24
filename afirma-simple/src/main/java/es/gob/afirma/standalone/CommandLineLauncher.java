@@ -480,8 +480,8 @@ final class CommandLineLauncher {
 						true, // Mostrar certificados caducados
 						false, // Advertir si certicado caducado
 						filters,
-						false,
-						null);
+						false
+						);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 

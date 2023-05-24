@@ -44,10 +44,9 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	private PreferencesPanelGeneral preferencesPanelGeneral;
 	private PreferencesPanelCades preferencesPanelCades;
 	private PreferencesPanelPades preferencesPanelPades;
-	//private PreferencesPanelKeyStores preferencesPanelKeyStores;
 	private PreferencesPanelFacturaE preferencesPanelFacturaE;
 	private PreferencesPanelXades preferencesPanelXades;
-	private PreferencesPanelCertificates preferencesPanelCertificates;
+	private PreferencesPanelKeystores preferencesPanelKeystores;
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -58,10 +57,9 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, blocked);
 		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, blocked);
 		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, blocked);
-		//this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, blocked);
 		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, blocked);
 		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, blocked);
-		this.preferencesPanelCertificates = new PreferencesPanelCertificates(this, this.modificationListener, blocked);
+		this.preferencesPanelKeystores = new PreferencesPanelKeystores(this, this.modificationListener, blocked);
 
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(610, screenHeight * 0.8));
@@ -118,20 +116,10 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		this.tabbedPane.addTab(
 			SimpleAfirmaMessages.getString("PreferencesPanel.192"), //$NON-NLS-1$
 			null,
-			this.preferencesPanelCertificates,
+			this.preferencesPanelKeystores,
 			SimpleAfirmaMessages.getString("PreferencesPanel.193") //$NON-NLS-1$
 		);
 		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_C);
-
-//		// Pestana de configuracion de almacen
-//		count = this.tabbedPane.getTabCount();
-//		this.tabbedPane.addTab(
-//			SimpleAfirmaMessages.getString("PreferencesPanel.84"), //$NON-NLS-1$
-//			null,
-//			this.preferencesPanelKeyStores,
-//			SimpleAfirmaMessages.getString("PreferencesPanel.85") //$NON-NLS-1$
-//		);
-//		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_V);
 
 		this.tabbedPane.setSelectedIndex(selectedTabIndex);
 
@@ -154,11 +142,6 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		if (!checkPreferences()) {
 			return false;
 		}
-
-		//****************************************************************************
-		//**** PREFERENCIAS ALMACENES ************************************************
-		//****************************************************************************
-		//this.preferencesPanelKeyStores.savePreferences();
 
 		//****************************************************************************
 		//**** PREFERENCIAS FACTURAE ************************************************
@@ -188,7 +171,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		//****************************************************************************
 		//**** PREFERENCIAS CERTIFICADOS ****************************************************
 		//****************************************************************************
-		this.preferencesPanelCertificates.savePreferences();
+		this.preferencesPanelKeystores.savePreferences();
 
 		try {
 			PreferencesManager.flush();

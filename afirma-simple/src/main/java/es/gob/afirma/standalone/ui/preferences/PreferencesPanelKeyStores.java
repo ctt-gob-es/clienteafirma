@@ -9,20 +9,23 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS;
 
+import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -32,8 +35,8 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -44,220 +47,488 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
 
-final class PreferencesPanelKeyStores extends JScrollPane {
+/** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de certificados.
+ * @author Jos&eacute; Montero. */
+final class PreferencesPanelKeystores extends JScrollPane {
 
-	private static final long serialVersionUID = 3255071607793273334L;
+	private static final long serialVersionUID = 3491050093362323228L;
 
-	private final JCheckBox onlySignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0")); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4")); //$NON-NLS-1$
+	JComboBox<AOKeyStore> keystores;
 
-	private final JComboBox<AOKeyStore> defaultStore;
-	AOKeyStore getDefaultStore() {
-		return this.defaultStore.getItemAt(this.defaultStore.getSelectedIndex());
-	}
+	private final JComboBox<Object> intelligentCards = new JComboBox<>();
 
-	private final JButton contentButton = new JButton(
-		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.9") //$NON-NLS-1$
-	);
+	private final JPanel panelKeystores = new JPanel();
 
-	JButton getContentButton() {
-		return this.contentButton;
-	}
+	private final JButton showContentButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.2")); //$NON-NLS-1$
 
-	PreferencesPanelKeyStores(final KeyListener keyListener,
-							  final ModificationListener modificationListener,
-							  final boolean blocked) {
+	private final JButton connectButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.10")); //$NON-NLS-1$
 
-		// Obtenemos primero la lista de almacenes disponibles para asignarla al JComboBox
-		final AOKeyStore[] defaultStores;
-		final List<AOKeyStore> stores = new ArrayList<>();
-		final Platform.OS os = Platform.getOS();
-		if (Platform.OS.WINDOWS.equals(os)) {
-			stores.add(AOKeyStore.WINDOWS);
-		}
-		else if (Platform.OS.MACOSX.equals(os)) {
-			stores.add(AOKeyStore.APPLE);
-		}
-		else {
-			stores.add(AOKeyStore.SHARED_NSS);
-		}
-		if (SimpleKeyStoreManager.isFirefoxAvailable()) {
-			stores.add(AOKeyStore.MOZ_UNI);
-		}
-		defaultStores = stores.toArray(new AOKeyStore[0]);
-		this.defaultStore = new JComboBox<>(defaultStores);
+	private final JButton addCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.11")); //$NON-NLS-1$
 
-		// Creamos el UI
+	private final JCheckBox callsFromNavigator = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.3")); //$NON-NLS-1$
+
+	private final JCheckBox hideDniStartScreen = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.81")); //$NON-NLS-1$
+
+	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.6")); //$NON-NLS-1$
+
+	private final JCheckBox onlySignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.7")); //$NON-NLS-1$
+
+	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.8")); //$NON-NLS-1$
+
+	static final String[] EXTS = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
+
+	private static final String EXTS_DESC = " (*.p12, *.pfx)"; //$NON-NLS-1$
+
+	String localKeystoreSelectedPath;
+
+	/**
+	 * Atributo que permite gestionar el bloqueo de preferencias.
+	 */
+	private boolean blocked = true;
+
+	PreferencesPanelKeystores(final KeyListener keyListener,
+			  final ItemListener modificationListener, final boolean blocked) {
+
+		setBlocked(blocked);
 		createUI(keyListener, modificationListener);
 	}
 
 	void createUI(final KeyListener keyListener,
-				  final ModificationListener modificationListener) {
+			  final ItemListener modificationListener) {
 
 		final JPanel mainPanel = new JPanel(new GridBagLayout());
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.gridy = 0;
+
+		final Platform.OS os = Platform.getOS();
+		final List<AOKeyStore> stores = new ArrayList<>();
+
+		if (Platform.OS.WINDOWS.equals(os)) {
+			stores.add(AOKeyStore.WINDOWS);
+			if (SimpleKeyStoreManager.isFirefoxAvailable()) {
+				stores.add(AOKeyStore.MOZ_UNI);
+			}
+		}
+		else if (Platform.OS.MACOSX.equals(os)) {
+			stores.add(AOKeyStore.APPLE);
+			if (SimpleKeyStoreManager.isFirefoxAvailable()) {
+				stores.add(AOKeyStore.MOZ_UNI);
+			}
+		}
+		else {
+			stores.add(AOKeyStore.SHARED_NSS);
+		}
+
+		stores.add(AOKeyStore.PKCS12_NO_PASS);
+
+		stores.add(AOKeyStore.DNIEJAVA);
+
+		this.keystores = new JComboBox<>(stores.toArray(new AOKeyStore[0]));
+
+		this.keystores.addActionListener (new ActionListener () {
+		    @Override
+			public void actionPerformed(final ActionEvent e) {
+		       if (PreferencesPanelKeystores.this.keystores.getSelectedItem().equals(AOKeyStore.PKCS12_NO_PASS) && e.getModifiers() != 0) {
+			   		final File[] ksFile;
+			   		try {
+						ksFile = AOUIFactory.getLoadFiles(
+							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.12"), //$NON-NLS-1$
+							null,
+							null,
+							EXTS,
+							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.13") + EXTS_DESC, //$NON-NLS-1$
+							false,
+							false,
+							null,
+							this
+						);
+						PreferencesPanelKeystores.this.localKeystoreSelectedPath = ksFile[0].getAbsolutePath();
+			   		} catch(final AOCancelledOperationException acoe) {
+			   			PreferencesPanelKeystores.this.keystores.setSelectedIndex(0);
+						return;
+			   		}
+		       } else if (PreferencesPanelKeystores.this.keystores.getSelectedItem().equals(AOKeyStore.DNIEJAVA) && e.getModifiers() != 0) {
+			    	final AOKeyStoreManager ksm = new AOKeyStoreManager();
+			   		try {
+						// Proporcionamos el componente padre como parametro
+						ksm.init(
+							AOKeyStore.DNIEJAVA,
+							null,
+							null,
+							new Object[] { this },
+							true
+						);
+					}
+					catch (final AOCancelledOperationException aoce) {
+						PreferencesPanelKeystores.this.keystores.setSelectedIndex(0);
+						throw aoce;
+					}
+			   		catch (final Exception exc) {
+			   			PreferencesPanelKeystores.this.keystores.setSelectedIndex(0);
+			   			LOGGER.log(Level.WARNING,"No se ha podido cargar el DNIe: " + exc, exc); //$NON-NLS-1$
+			   			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.14"), //$NON-NLS-1$
+		    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, exc); //$NON-NLS-1$
+					}
+		       }
+		    }
+		});
+
+        loadPreferences();
+
+        this.panelKeystores.setBorder(
+    		BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.1") //$NON-NLS-1$
+			)
+		);
+
+        this.panelKeystores.setLayout(new GridBagLayout());
+
+        final GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.fill = GridBagConstraints.BOTH;
+        gbc1.gridy = 0;
+        gbc1.weightx = 1.0;
+        gbc1.gridx = 0;
+
+		this.keystores.addItemListener(modificationListener);
+		this.keystores.addKeyListener(keyListener);
+
+        this.panelKeystores.add(this.keystores, gbc1);
+
+        gbc1.gridx++;
+
+        this.showContentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+				final AOKeyStoreManager ksm;
+				final AOKeyStore ks = AOKeyStore.getKeyStore(((AOKeyStore) PreferencesPanelKeystores.this.keystores.getSelectedItem()).getName());
+				try {
+					String lib = null;
+					if (ks.equals(AOKeyStore.PKCS12)) {
+						lib = PreferencesPanelKeystores.this.localKeystoreSelectedPath;
+						if (lib == null) {
+							lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+						}
+					}
+					ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						ks,
+						lib,
+						"default", //$NON-NLS-1$
+						ks.getStorePasswordCallback(this),
+						this
+					);
+
+					String libName = null;
+					if (lib != null) {
+						final File file = new File(lib);
+						libName = file.getName();
+					}
+
+					final CertificateSelectionDialog csd = new CertificateSelectionDialog(
+						PreferencesPanelKeystores.this,
+						new AOKeyStoreDialog(
+							ksm,
+							this,
+							true,
+							true,
+							false,
+							libName
+						),
+						SimpleAfirmaMessages.getString(
+							"PreferencesPanelKeyStores.18", //$NON-NLS-1$
+							ks.toString()
+						),
+						SimpleAfirmaMessages.getString(
+							"PreferencesPanelKeyStores.19", //$NON-NLS-1$
+							ks.toString()
+						),
+						false,
+						true
+					);
+					csd.showDialog();
+				} 	catch (final Exception kse) {
+						AOUIFactory.showErrorMessage(
+						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.20"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.18", ks.toString()), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						kse
+						);
+						Logger.getLogger("es.gob.afirma").warning("Error al recuperar el almacen por defecto seleccionado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+            }
+        });
+
+        this.panelKeystores.add(this.showContentButton, gbc1);
+
+        gbc1.gridy++;
+        gbc1.gridx = 0;
+
+		this.callsFromNavigator.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.callsFromNavigator.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17") //$NON-NLS-1$
+		);
+		this.callsFromNavigator.setMnemonic('N');
+		this.callsFromNavigator.addItemListener(modificationListener);
+		this.callsFromNavigator.addKeyListener(keyListener);
+
+        this.panelKeystores.add(this.callsFromNavigator, gbc1);
+
+        mainPanel.add(this.panelKeystores, gbc);
+
+        final JPanel certsFiltersPanel = new JPanel();
+        certsFiltersPanel.setBorder(
+    		BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4") //$NON-NLS-1$
+			)
+		);
+        certsFiltersPanel.setLayout(new GridBagLayout());
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(5, 0, 0, 0);
+        c.weightx = 1.0;
+        c.gridy = 0;
+        c.gridy++;
+
+		this.hideDniStartScreen.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
+		);
+		this.hideDniStartScreen.setMnemonic('D');
+		this.hideDniStartScreen.addItemListener(modificationListener);
+		this.hideDniStartScreen.addKeyListener(keyListener);
+
+        certsFiltersPanel.add(this.hideDniStartScreen, c);
+        c.gridy++;
+		c.gridy++;
+
+		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
+		this.showExpiredCerts.setMnemonic('M');
+		this.showExpiredCerts.addItemListener(modificationListener);
+		this.showExpiredCerts.addKeyListener(keyListener);
+
+        certsFiltersPanel.add(this.showExpiredCerts, c);
+        c.gridy++;
+
+		this.onlySignature.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.onlySignature.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.2")); //$NON-NLS-1$
+		this.onlySignature.setMnemonic('E');
+		this.onlySignature.addItemListener(modificationListener);
+		this.onlySignature.addKeyListener(keyListener);
+
+        certsFiltersPanel.add(this.onlySignature, c);
+        c.gridy++;
+
+		this.onlyAlias.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.onlyAlias.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.5")); //$NON-NLS-1$
+		this.onlyAlias.setMnemonic('S');
+		this.onlyAlias.addItemListener(modificationListener);
+		this.onlyAlias.addKeyListener(keyListener);
+        certsFiltersPanel.add(this.onlyAlias, c);
+
+        gbc.gridy++;
+        mainPanel.add(certsFiltersPanel, gbc);
+
+        final JPanel inteligentCardsPanel = new JPanel();
+        inteligentCardsPanel.setBorder(
+    		BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.9") //$NON-NLS-1$
+			)
+		);
+        inteligentCardsPanel.setLayout(new GridBagLayout());
+
+        final GridBagConstraints icpConstraints = new GridBagConstraints();
+        icpConstraints.fill = GridBagConstraints.BOTH;
+        icpConstraints.gridy = 0;
+        icpConstraints.weightx = 1.0;
+        icpConstraints.gridx = 0;
+
+        inteligentCardsPanel.add(this.intelligentCards, icpConstraints);
+
+        icpConstraints.gridx++;
+
+        inteligentCardsPanel.add(this.connectButton, icpConstraints);
+
+        icpConstraints.gridx++;
+
+        this.addCardButton.addActionListener(
+        		ae -> addIntelligentCardDlg(this)
+		);
+
+        inteligentCardsPanel.add(this.addCardButton, icpConstraints);
+
+        gbc.gridy++;
+        mainPanel.add(inteligentCardsPanel, gbc);
+
+        gbc.gridy++;
+        gbc.weighty = 1.0;
+        mainPanel.add(new JPanel(), gbc);
+
+		// Panel para el boton de restaurar la configuracion
+		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+
+		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
+		);
+
+		restoreConfigButton.setMnemonic('R');
+		restoreConfigButton.addActionListener(ae -> {
+			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.15"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+				loadDefaultPreferences();
+
+			}
+		});
+		restoreConfigButton.getAccessibleContext()
+				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
+		);
+
+		gbc.gridy++;
+		gbc.weighty = 0.0;
+		panelGeneral.add(restoreConfigButton, gbc);
+
+		gbc.gridy++;
+
+		mainPanel.add(panelGeneral, gbc);
+
+		setViewportView(mainPanel);
+	}
+
+	/** Di&aacute;logo para a&ntilde;adir tarjeta inteligente.
+	 * @param container Contenedor en el que se define el di&aacute;logo. */
+    public static void addIntelligentCardDlg(final Container container) {
+
+    	// Cursor en espera
+    	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
+    	final AddIntelligentCardPanel addIntelligentCardPanel = new AddIntelligentCardPanel();
+    	addIntelligentCardPanel.getAccessibleContext().setAccessibleDescription(
+    			SimpleAfirmaMessages.getString("SecureDomainsDialog.2")); //$NON-NLS-1$
+
+    	// Cursor por defecto
+    	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+    	if(AOUIFactory.showConfirmDialog(
+				container,
+				addIntelligentCardPanel,
+				SimpleAfirmaMessages.getString("AddIntelligentCardDialog.0"), //$NON-NLS-1$
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.DEFAULT_OPTION
+		) == JOptionPane.OK_OPTION) {
+
+    		try {
+    			addIntelligentCardPanel.saveData();
+    		}
+    		catch (final ConfigurationException e) {
+    			AOUIFactory.showErrorMessage(
+					e.getMessage(),
+					SimpleAfirmaMessages.getString("SecureDomainsDialog.1"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					e
+				);
+    			addIntelligentCardDlg(container);
+    			return;
+			}
+    	}
+    }
+
+	/** Guarda las preferencias. */
+	void savePreferences() {
+
+		if (this.localKeystoreSelectedPath != null) {
+			PreferencesManager.put(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH, this.localKeystoreSelectedPath);
+		}
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS, this.callsFromNavigator.isSelected());
+		AOKeyStore aoks = getDefaultStore();
+		if (aoks.equals(AOKeyStore.PKCS12_NO_PASS)) {
+			aoks = AOKeyStore.PKCS12;
+		}
+		PreferencesManager.put(
+				PREFERENCE_KEYSTORE_DEFAULT_STORE,
+				aoks.name()
+		);
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
+		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, this.onlySignature.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
+
+	}
+
+	void loadPreferences() {
+
+		String ks = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
+		if (ks.equals(AOKeyStore.PKCS12.name())) {
+			ks = AOKeyStore.PKCS12_NO_PASS.name();
+		}
+		this.keystores.setSelectedItem(AOKeyStore.getKeyStore(ks));
+		this.callsFromNavigator.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS));
+		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
+		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
+		this.onlySignature.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS));
+		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS));
+
+        this.panelKeystores.removeAll();
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridy = 0;
+        revalidate();
+        repaint();
 
-        loadPreferences();
-        final JPanel keysFilerPanel = new JPanel(new GridBagLayout());
-        keysFilerPanel.setBorder(
-			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.6")) //$NON-NLS-1$
-			)
-		);
-
-		final GridBagConstraints kfc = new GridBagConstraints();
-		kfc.fill = GridBagConstraints.HORIZONTAL;
-		kfc.weightx = 1.0;
-		kfc.gridy = 0;
-		kfc.insets = new Insets(5, 7, 5, 7);
-
-	    this.onlySignature.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.2") //$NON-NLS-1$
-		);
-	    this.onlySignature.setMnemonic('i');
-	    this.onlySignature.addItemListener(modificationListener);
-	    this.onlySignature.addKeyListener(keyListener);
-	    keysFilerPanel.add(this.onlySignature, kfc);
-
-        kfc.gridy++;
-
-	    this.onlyAlias.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.5") //$NON-NLS-1$
-		);
-	    this.onlyAlias.setMnemonic('s');
-	    this.onlyAlias.addItemListener(modificationListener);
-	    this.onlyAlias.addKeyListener(keyListener);
-	    keysFilerPanel.add(this.onlyAlias, kfc);
-
-	    final JPanel trustPanel = new JPanel();
-	    trustPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-	    kfc.insets = new Insets(0,2,0,0);
-	    keysFilerPanel.add(trustPanel, kfc);
-	    kfc.insets = new Insets(5, 7, 5, 7);
-
-        final JPanel keysStorePanel = new JPanel(new GridBagLayout());
-        keysStorePanel.setBorder(
-			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.7")) //$NON-NLS-1$
-			)
-		);
-
-		final GridBagConstraints ksc = new GridBagConstraints();
-		ksc.anchor = GridBagConstraints.LINE_START;
-		ksc.gridy = 0;
-		ksc.insets = new Insets(5, 7, 5, 7);
-
-		this.defaultStore.addItemListener(
-			e -> {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					SwingUtilities.invokeLater(() -> AOUIFactory.showMessageDialog(
-						PreferencesPanelKeyStores.this,
-						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.16"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17"), //$NON-NLS-1$
-						JOptionPane.WARNING_MESSAGE
-					));
-				}
-			}
-		);
-
-		this.defaultStore.addItemListener(modificationListener);
-		this.defaultStore.addKeyListener(keyListener);
-
-		keysStorePanel.add(this.defaultStore, ksc);
-
-		this.contentButton.setMnemonic('V');
-		this.contentButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					final AOKeyStoreManager ksm;
-					try {
-						ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-							getDefaultStore(),
-							null,
-							"default", //$NON-NLS-1$
-							getDefaultStore().getStorePasswordCallback(this),
-							this
-						);
-
-						final CertificateSelectionDialog csd = new CertificateSelectionDialog(
-							PreferencesPanelKeyStores.this,
-							new AOKeyStoreDialog(
-								ksm,
-								this,
-								true,
-								true,
-								false,
-								null
-							),
-							SimpleAfirmaMessages.getString(
-								"PreferencesPanelKeyStores.10", //$NON-NLS-1$
-								getDefaultStore().toString()
-							),
-							SimpleAfirmaMessages.getString(
-								"PreferencesPanelKeyStores.15", //$NON-NLS-1$
-								getDefaultStore().toString()
-							),
-							false,
-							true
-						);
-						csd.showDialog();
-					}
-					catch (final Exception e) {
-						AOUIFactory.showErrorMessage(
-							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.11"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.10", getDefaultStore().toString()), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE,
-							e
-						);
-						Logger.getLogger("es.gob.afirma").warning("Error al recuperar el almacen por defecto seleccionado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-
-				}
-			}
-		);
-		this.contentButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.8") //$NON-NLS-1$
-		);
-		this.contentButton.addKeyListener(keyListener);
-
-		keysStorePanel.add(this.contentButton, ksc);
-
-		ksc.weightx = 1.0;
-		keysStorePanel.add(new JPanel(), ksc);
-
-	    mainPanel.add(keysFilerPanel, c);
-	    c.gridy++;
-
-	    mainPanel.add(keysStorePanel, c);
-
-	    c.weighty = 1.0;
-	    c.gridy++;
-		mainPanel.add(new JPanel(), c);
-
-		setViewportView(mainPanel);
 	}
 
-	void savePreferences() {
-		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, this.onlySignature.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
-		PreferencesManager.put(
-			PREFERENCE_KEYSTORE_DEFAULT_STORE,
-			getDefaultStore().name()
-		);
+	void loadDefaultPreferences() {
+		this.keystores.setSelectedItem(Integer.valueOf(0));
+		this.callsFromNavigator.setSelected(false);
+		this.showExpiredCerts.setSelected(false);
+		this.hideDniStartScreen.setSelected(false);
+		this.onlySignature.setSelected(false);
+		this.onlyAlias.setSelected(false);
+
+        revalidate();
+        repaint();
+
 	}
 
-	void loadPreferences() {
-		this.onlySignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS));
-		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS));
-		this.defaultStore.setSelectedItem(
-			SimpleKeyStoreManager.getDefaultKeyStoreType()
-		);
+	/**
+	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
+	 * @return {@code true} si est&aacute; bloqueado y no permite la edici&oacute;n,
+	 * {@code false} en caso contrario.
+	 */
+	public boolean isBlocked() {
+		return this.blocked;
+	}
+
+	/**
+	 * Establece si deben bloquearse las opciones de configuraci&oacute;n del panel.
+	 * @param blocked {@code true} si las opciones de configuraci&oacute;n deben bloquearse,
+	 * {@code false} en caso contrario.
+	 */
+	public void setBlocked(final boolean blocked) {
+		this.blocked = blocked;
+	}
+
+	AOKeyStore getDefaultStore() {
+		return this.keystores.getItemAt(this.keystores.getSelectedIndex());
 	}
 }

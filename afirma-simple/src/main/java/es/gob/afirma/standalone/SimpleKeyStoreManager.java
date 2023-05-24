@@ -9,8 +9,6 @@
 
 package es.gob.afirma.standalone;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE;
-
 import java.awt.Component;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -154,19 +152,15 @@ public final class SimpleKeyStoreManager {
 		}
         catch (final Exception e) {
         	AOUIFactory.showErrorMessage(
-				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11"), //$NON-NLS-1$
+        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE,
 				e
 			);
 
         	final OS os = Platform.getOS();
-        	final AOKeyStore osks = getDefaultKeyStoreTypeByOs(os);
+        	final AOKeyStore osks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
         	try {
-        		PreferencesManager.put(
-        				PREFERENCE_KEYSTORE_DEFAULT_STORE,
-        				osks.name()
-        		);
 				return getKeyStoreManager(
 						osks,
 						parent
@@ -212,16 +206,6 @@ public final class SimpleKeyStoreManager {
 		return false;
     }
 
-    private static AOKeyStore getDefaultKeyStoreTypeByOs(final OS os) {
-    	if (Platform.OS.WINDOWS.equals(os)) {
-    		return AOKeyStore.WINDOWS;
-    	}
-    	if (Platform.OS.MACOSX.equals(os)) {
-    		return AOKeyStore.APPLE;
-    	}
-    	return AOKeyStore.SHARED_NSS;
-    }
-
     /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
      * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */
     public static AOKeyStore getDefaultKeyStoreType() {
@@ -235,26 +219,26 @@ public final class SimpleKeyStoreManager {
     				if (isFirefoxAvailable()) {
     					return ks;
     				}
-					return getDefaultKeyStoreTypeByOs(os);
+					return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
     			// No deberia pasar
     			if (AOKeyStore.WINDOWS.equals(ks)) {
     				if (OS.WINDOWS.equals(os)) {
     					return ks;
     				}
-    				return getDefaultKeyStoreTypeByOs(os);
+    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
     			// No deberia pasar
     			if (AOKeyStore.APPLE.equals(ks)) {
     				if (OS.MACOSX.equals(os)) {
     					return ks;
     				}
-    				return getDefaultKeyStoreTypeByOs(os);
+    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
     			return ks;
     		}
     	}
-    	return getDefaultKeyStoreTypeByOs(os);
+    	return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     }
 
 }

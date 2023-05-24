@@ -66,6 +66,34 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
      *                      certificado al ser seleccionado.
      * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
      *                                a&uacute;n no v&aacute;lidos.
+	 * */
+    public AOKeyStoreDialog(final AOKeyStoreManager ksm,
+    		                final Object parentComponent,
+    		                final boolean checkPrivateKeys,
+    		                final boolean showExpiredCertificates,
+    		                final boolean checkValidity) {
+		this(
+			ksm,
+			parentComponent,
+			checkPrivateKeys,
+			showExpiredCertificates,
+			checkValidity,
+			null,
+			false
+		);
+    }
+
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *            otra cosa que no sean certificados X.509 (como claves de cifrado).
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                a&uacute;n no v&aacute;lidos.
 	 * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
 	 * */
     public AOKeyStoreDialog(final AOKeyStoreManager ksm,
@@ -85,6 +113,41 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			libFileName
 		);
     }
+
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                aun no v&aacute;lidos.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param certFilters Filtros sobre los certificados a mostrar.
+     * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
+     *                             filtro) debe ser solo uno.
+     * */
+	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
+			                final Object parentComponent,
+                            final boolean checkPrivateKeys,
+                            final boolean showExpiredCertificates,
+                            final boolean checkValidity,
+                            final List<? extends CertificateFilter> certFilters,
+                            final boolean mandatoryCertificate) {
+
+		if (ksm == null) {
+    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
+    	}
+
+		this.ksm = new AggregatedKeyStoreManager(ksm);
+		this.parentComponent = parentComponent;
+		this.checkPrivateKeys = checkPrivateKeys;
+		this.checkValidity = checkValidity;
+		this.showExpiredCertificates = showExpiredCertificates;
+		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
+		this.mandatoryCertificate = mandatoryCertificate;
+		this.libFileName = null;
+	}
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.

@@ -9,16 +9,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignatureExecutor;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
@@ -70,13 +66,7 @@ public final class VisiblePdfSignatureManager {
 		}
 		// Si no, procedemos inmediatamente con la firma
 		else {
-			try {
-				signExecutor.initSignTask(signConfigs);
-			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
-	                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE, e);
-			}
+			signExecutor.initSignTask(signConfigs);
 		}
 	}
 
@@ -112,13 +102,7 @@ public final class VisiblePdfSignatureManager {
 			}
 			// Si no es una firma visible, se firma directamente
 			else {
-				try {
-					executor.initSignTask(signConfigs);
-				} catch (final Exception e) {
-					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
-		                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE, e);
-				}
+				executor.initSignTask(signConfigs);
 			}
 		}
 		// Si se selecciono el campo de firma que se debe usar, se firmar ese campo
@@ -135,13 +119,7 @@ public final class VisiblePdfSignatureManager {
 			}
 			// Si no, se firma directamente
 			else {
-				try {
-					executor.initSignTask(signConfigs);
-				} catch (final Exception e) {
-					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
-		                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE, e);
-				}
+				executor.initSignTask(signConfigs);
 			}
 		}
 	}
@@ -207,13 +185,7 @@ public final class VisiblePdfSignatureManager {
 				}
 			}
 
-			try {
-				this.executor.initSignTask(this.signConfigs);
-			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
-	                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE, e);
-			}
+			this.executor.initSignTask(this.signConfigs);
 		}
 
 	}

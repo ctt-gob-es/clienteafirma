@@ -1,10 +1,7 @@
 package es.gob.afirma.standalone.ui;
 
-import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
-
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 
 /**
  * Clase para la ejecuci&oacute;n de una operaci&oacute;n de firma.
@@ -14,10 +11,8 @@ public interface SignatureExecutor {
 	/**
 	 * Inicia una operaci&oacute;n de firma.
 	 * @param signConfigs Configuraci&oacute;n de las operaciones de firma.
-	 * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
-     * @throws IOException Error al leer almac&eacute;n.
 	 */
-	void initSignTask(List<SignOperationConfig> signConfigs) throws AOKeystoreAlternativeException, IOException;
+	void initSignTask(List<SignOperationConfig> signConfigs);
 
 	/**
 	 * Relanza la tarea de firma con una nueva configuraci&oacute;n. Si ya

@@ -293,7 +293,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 			setResetSticky(false);
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStore(getKeyStoreName(params));
 		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 
 		// Comprobamos si se ha proporcionado un nombre de fichero por defecto

@@ -376,7 +376,7 @@ public abstract class UrlParameters {
 		return servletUrl;
 	}
 
-	protected static String getDefaultKeyStoreName(final Map<String, String> params) {
+	protected static String getKeyStoreName(final Map<String, String> params) {
 
 		// Si se ha especificado un almacen, se usara ese
 		String ksValue = null;

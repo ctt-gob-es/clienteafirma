@@ -61,6 +61,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
@@ -409,7 +410,34 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return <code>AOKeyStoreManager</code> en uso en la aplicaci&oacute;n
 	 */
     public synchronized AOKeyStoreManager getAOKeyStoreManager() {
-        return this.ksManager;
+    	AOKeyStoreManager ksm = null;
+    	try {
+    		final AOKeyStore aoks = SimpleKeyStoreManager.getDefaultKeyStoreType();
+    		String lib = null;
+    		if (aoks.equals(AOKeyStore.PKCS12)) {
+    			lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+    		}
+			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					aoks, // Store
+				    lib, // Lib
+					null, // Description
+					aoks.getStorePasswordCallback(this), // PasswordCallback
+					this // Parent
+			);
+		} catch (final AOKeystoreAlternativeException e) {
+ 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
+ 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
+ 			final OS os = Platform.getOS();
+ 			AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+		} catch (final IOException e) {
+			LOGGER.log(Level.SEVERE, "Error al leer el almacen", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.55"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
+			final OS os = Platform.getOS();
+			AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+		}
+        return ksm;
     }
 
 	/**
@@ -537,13 +565,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
     public void signLoadedFile() {
         if (this.currentPanel instanceof SignPanel) {
-            try {
-				((SignPanel) this.currentPanel).sign();
-			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelCertificates.16"), //$NON-NLS-1$
-	                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE, e);
-			}
+			((SignPanel) this.currentPanel).sign();
         }
     }
 

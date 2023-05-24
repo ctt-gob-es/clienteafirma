@@ -711,9 +711,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS), // Mostrar certificados caducados
 			true,             // Comprobar validez temporal del certificado
 			this.certFilters, // Filtros
-			false,            // mandatoryCertificate
-			null
-		);
+			false            // mandatoryCertificate
+			);
     	dialog.show();
 
     	final CertificateContext context = dialog.getSelectedCertificateContext();
