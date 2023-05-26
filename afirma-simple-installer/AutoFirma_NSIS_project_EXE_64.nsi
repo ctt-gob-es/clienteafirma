@@ -400,7 +400,7 @@ FunctionEnd
 
 ;Identifica la version instalada de AutoFirma.
 ;Devuelve la cadena con el numero de version y deja el registro configurado
-;para la arquitectura corresondiente a la version identificada
+;para la arquitectura correspondiente a la version identificada
 Function CheckVersionInstalled
 
   ;Buscamos en 64 bits			  
@@ -830,6 +830,7 @@ Function RemoveOldVersions
 		StrCpy $6 "0"
 		ClearErrors
 		EnumRegKey $0 HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences" 0
+
 		IfErrors InitUninstall
 			
 			; Identificamos una clave en la que poder hacer la copia de los datos. Esta queda registrada en $R0
