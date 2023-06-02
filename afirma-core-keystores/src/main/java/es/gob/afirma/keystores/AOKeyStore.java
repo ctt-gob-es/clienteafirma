@@ -231,6 +231,13 @@ public enum AOKeyStore {
         return this.name;
     }
 
+    /** Asigna el Nombre del almac&eacute;n de claves.
+     * @return Nombre del almac&eacute;n de claves. */
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+
     /** Recupera el repositorio con el nombre indicado. Si no existe un <code>KeyStore</code> con
      * ese nombre, se devuelve <code>null</code>.
      * @param name Nombre del repositorio que se desea recuperar.
