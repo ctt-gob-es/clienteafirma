@@ -85,7 +85,7 @@ class DefaultCertificateLine extends CertificateLine {
 
 		this.issuer = new JLabel(
 				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2", //$NON-NLS-1$
-						AOUtil.getCN(getCertificate().getIssuerDN().toString()),
+						AOUtil.getCN(getCertificate().getIssuerX500Principal().getName()),
 						new KeyUsage(getCertificate()).toString()
 						)
 		);
