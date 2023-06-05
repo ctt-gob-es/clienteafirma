@@ -178,12 +178,11 @@ public final class SimpleKeyStoreManager {
 			nssLibDir = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		}
 		catch(final Exception e) {
+			LOGGER.warning("No se ha podido obtener el directorio de NSS del usuario: " + e); //$NON-NLS-1$
 			return false;
 		}
-		if (mozProfileDir != null && nssLibDir !=null) {
-			return true;
-		}
-		return false;
+
+		return mozProfileDir != null && nssLibDir != null;
     }
 
     private static AOKeyStore getDefaultKeyStoreTypeByOs(final OS os) {

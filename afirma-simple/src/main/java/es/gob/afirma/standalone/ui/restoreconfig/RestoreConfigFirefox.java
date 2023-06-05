@@ -629,11 +629,19 @@ final class RestoreConfigFirefox {
 			final String profilesIniPath = USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH;
 			if (new File(profilesIniPath).exists()) {
 				LOGGER.info("Se ha encontrado el perfil de Firefox: " + profilesIniPath); //$NON-NLS-1$
-				final File profilesDir = new File(
-						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-								profilesIniPath
-								)
-						).getParentFile();
+				MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+						profilesIniPath
+						);
+
+				final String userProfile = MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+						profilesIniPath);
+				if (userProfile == null) {
+					LOGGER.warning("No se ha encontrado un directorio de perfil de un usuario"); //$NON-NLS-1$
+					error = true;
+					continue;
+				}
+
+				final File profilesDir = new File(userProfile).getParentFile();
 				for (final File profileDir : profilesDir.listFiles()) {
 					if (!profileDir.isDirectory()) {
 						continue;

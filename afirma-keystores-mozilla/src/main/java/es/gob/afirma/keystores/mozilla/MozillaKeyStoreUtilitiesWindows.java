@@ -73,8 +73,15 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// No permitimos la instanciacion
 	}
 
+	/**
+	 * Proporciona la ruta corta del directorio de perfil de Firefox con el formato
+	 * adecuado para permitir su carga con el NSS de Windows.
+	 * @param dir Directorio de NSS.
+	 * @return Ruta del directorio formateada o {@code null}
+	 */
 	static String cleanMozillaUserProfileDirectoryWindows(final String dir) {
-		return KeyStoreUtilities.getWindowsShortName(dir).replace('\\', '/');
+		final String shortName = KeyStoreUtilities.getWindowsShortName(dir);
+		return shortName != null ? shortName.replace('\\', '/') : null;
 	}
 
 	static String getSystemNSSLibDirWindows() throws IOException {
