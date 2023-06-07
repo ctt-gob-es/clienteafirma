@@ -54,14 +54,6 @@ public enum AOKeyStore {
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.0")), //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.1")) //$NON-NLS-1$
 	),
-    /** PKCS#12 sin solicitar contrasena */
-    PKCS12_NO_PASS(
-		"PKCS#12 / PFX", //$NON-NLS-1$
-		4,
-		"PKCS12_NO_PASS", //$NON-NLS-1$
-		null,
-		null
-	),
     /** Java KeyStore (JKS). */
     JAVA(
 		"Java KeyStore / JKS", //$NON-NLS-1$

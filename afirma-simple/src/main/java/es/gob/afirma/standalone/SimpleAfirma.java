@@ -52,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
@@ -411,9 +412,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
     public synchronized AOKeyStoreManager getAOKeyStoreManager() {
     	AOKeyStoreManager ksm = null;
+    	String lib = null;
     	try {
     		final AOKeyStore aoks = SimpleKeyStoreManager.getDefaultKeyStoreType();
-    		String lib = null;
     		if (aoks.equals(AOKeyStore.PKCS12)) {
     			lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
     		}
@@ -424,18 +425,68 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 					aoks.getStorePasswordCallback(this), // PasswordCallback
 					this // Parent
 			);
+
 		} catch (final AOKeystoreAlternativeException e) {
  			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
  			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
  			final OS os = Platform.getOS();
- 			AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+ 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+ 			try {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						aoks, // Store
+					    lib, // Lib
+						null, // Description
+						aoks.getStorePasswordCallback(this), // PasswordCallback
+						this // Parent
+				);
+			} catch (final Exception e1) {
+	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
+	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+			}
+
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Error al leer el almacen", e); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.55"), //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.56"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
 			final OS os = Platform.getOS();
-			AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+ 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+ 			try {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						aoks, // Store
+					    lib, // Lib
+						null, // Description
+						aoks.getStorePasswordCallback(this), // PasswordCallback
+						this // Parent
+				);
+			} catch (final Exception e1) {
+	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e); //$NON-NLS-1$
+	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+			}
+
+		} catch (final AOCancelledOperationException aoce) {
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.56"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, aoce); //$NON-NLS-1$
+			final OS os = Platform.getOS();
+ 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+ 			try {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						aoks, // Store
+					    lib, // Lib
+						null, // Description
+						aoks.getStorePasswordCallback(this), // PasswordCallback
+						this // Parent
+				);
+			} catch (final Exception e1) {
+	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
+	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+			}
 		}
         return ksm;
     }

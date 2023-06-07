@@ -60,19 +60,19 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 	private static JComboBox<RegisteredKeystore> keystores;
 
-	private static JComboBox<RegisteredKeystore> smartCards;
+	static JComboBox<RegisteredKeystore> smartCards;
 
 	private final JPanel panelKeystores = new JPanel();
 
 	private final JButton showContentButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.2")); //$NON-NLS-1$
 
-	private final JButton connectButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.10")); //$NON-NLS-1$
+	final JButton connectButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.10")); //$NON-NLS-1$
 
-	private final JButton addCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.11")); //$NON-NLS-1$
+	final JButton addCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.11")); //$NON-NLS-1$
 
-	private final JButton modifyCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.23")); //$NON-NLS-1$
+	final JButton modifyCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.23")); //$NON-NLS-1$
 
-	private final JButton deleteCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.24")); //$NON-NLS-1$
+	final JButton deleteCardButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.24")); //$NON-NLS-1$
 
 	private final JCheckBox callsFromNavigator = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.3")); //$NON-NLS-1$
 
@@ -83,6 +83,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 	private final JCheckBox onlySignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.7")); //$NON-NLS-1$
 
 	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.8")); //$NON-NLS-1$
+
+	private final JCheckBox skipAuthCertDnie = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.32")); //$NON-NLS-1$
 
 	static final String[] EXTS_PKCS12 = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -131,7 +133,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 			stores.add(new RegisteredKeystore(AOKeyStore.SHARED_NSS));
 		}
 
-		stores.add(new RegisteredKeystore(AOKeyStore.PKCS12_NO_PASS));
+		stores.add(new RegisteredKeystore(AOKeyStore.PKCS12));
 
 		stores.add(new RegisteredKeystore(AOKeyStore.DNIEJAVA));
 
@@ -141,7 +143,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		    @Override
 			public void actionPerformed(final ActionEvent e) {
 		       final RegisteredKeystore ks = (RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem();
-		       if (ks.getName().equals(AOKeyStore.PKCS12_NO_PASS.getName()) && e.getModifiers() != 0) {
+		       if (ks.getName().equals(AOKeyStore.PKCS12.getName()) && e.getModifiers() != 0) {
 			   		final File[] ksFile;
 			   		try {
 						ksFile = AOUIFactory.getLoadFiles(
@@ -365,6 +367,18 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.onlyAlias.addKeyListener(keyListener);
         certsFiltersPanel.add(this.onlyAlias, c);
 
+        c.gridy++;
+
+		this.skipAuthCertDnie.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.skipAuthCertDnie.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.32")); //$NON-NLS-1$
+		this.skipAuthCertDnie.setMnemonic('C');
+		this.skipAuthCertDnie.addItemListener(modificationListener);
+		this.skipAuthCertDnie.addKeyListener(keyListener);
+        certsFiltersPanel.add(this.skipAuthCertDnie, c);
+
         gbc.gridy++;
         mainPanel.add(certsFiltersPanel, gbc);
 
@@ -386,6 +400,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
         smartCards = new JComboBox<RegisteredKeystore>();
 
+        final RegisteredKeystore emptyItem = new RegisteredKeystore();
+        emptyItem.setName(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.31")); //$NON-NLS-1$
+        smartCards.addItem(emptyItem);
+
         if (regResult!= null && !regResult.get(0).isEmpty()) {
 			for (int k = 0 ; k < regResult.size() ; k = k + 9) {
 				final String smartCardName = regResult.get(k + 5);
@@ -398,13 +416,27 @@ final class PreferencesPanelKeystores extends JScrollPane {
 			}
         }
 
-		if (smartCards.getItemCount() == 0) {
-			this.modifyCardButton.setEnabled(false);
-			this.deleteCardButton.setEnabled(false);
-		}
+		this.connectButton.setEnabled(false);
+		this.modifyCardButton.setEnabled(false);
+		this.deleteCardButton.setEnabled(false);
 
 		smartCards.repaint();
 		keystores.repaint();
+
+		smartCards.addActionListener (new ActionListener () {
+		    @Override
+			public void actionPerformed(final ActionEvent e) {
+		    	if (e.getModifiers() != 0 && smartCards.getSelectedIndex() == 0) {
+		    		PreferencesPanelKeystores.this.connectButton.setEnabled(false);
+					PreferencesPanelKeystores.this.modifyCardButton.setEnabled(false);
+					PreferencesPanelKeystores.this.deleteCardButton.setEnabled(false);
+		    	} else {
+		    		PreferencesPanelKeystores.this.connectButton.setEnabled(true);
+					PreferencesPanelKeystores.this.modifyCardButton.setEnabled(true);
+					PreferencesPanelKeystores.this.deleteCardButton.setEnabled(true);
+		    	}
+		    }
+		});
 
 		loadPreferences();
 
@@ -502,10 +534,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
 			}
 		} catch (final Exception kse) {
 			AOUIFactory.showErrorMessage(
-			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.28"), //$NON-NLS-1$
-			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.18", ks.toString()), //$NON-NLS-1$
-			JOptionPane.ERROR_MESSAGE,
-			kse
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.28"), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.18", ks.toString()), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE,
+				kse
 			);
 			Logger.getLogger("es.gob.afirma").warning("Error al conectar tarjeta inteligente: " + kse); //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -535,8 +567,14 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     		if (smartCardPanel.getCardNameTxt().getText().isEmpty()
     			|| smartCardPanel.getControllerNameTxt().getText().isEmpty() ) {
-    			AOUIFactory.showMessageDialog(PreferencesPanelKeystores.class, SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					AOUIFactory.ERROR_MESSAGE,
+    					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27")) //$NON-NLS-1$
+    					);
+
+    			addSmartCardDlg(container);
+
     		} else {
 
     			final boolean regAdded = addSmartCardToReg(smartCardPanel);
@@ -547,12 +585,14 @@ final class PreferencesPanelKeystores extends JScrollPane {
     				ks.setLib(smartCardPanel.getControllerNameTxt().getText());
     				ks.setProviderName(AOKeyStore.PKCS11.getProviderName());
     				smartCards.addItem(ks);
+    				smartCards.setSelectedItem(ks);
     				smartCards.repaint();
     				keystores.addItem(ks);
     				keystores.repaint();
     			}
 
-    			if (smartCards.getItemCount() > 0) {
+    			if (smartCards.getItemCount() > 1) {
+    				this.connectButton.setEnabled(true);
     				this.modifyCardButton.setEnabled(true);
     				this.deleteCardButton.setEnabled(true);
     			}
@@ -590,8 +630,13 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     		if (smartCardPanel.getCardNameTxt().getText().isEmpty()
         			|| smartCardPanel.getControllerNameTxt().getText().isEmpty() ) {
-        			AOUIFactory.showMessageDialog(PreferencesPanelKeystores.class, SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
-        					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					AOUIFactory.ERROR_MESSAGE,
+    					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27")) //$NON-NLS-1$
+    					);
+
+    			modifySmartCardDlg(container);
         	} else {
     			final boolean regDeleted = deleteSmartCardReg(oldCardName);
 
@@ -620,6 +665,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     				ks.setLib(smartCardPanel.getControllerNameTxt().getText());
     				ks.setProviderName(AOKeyStore.PKCS11.getProviderName());
     				smartCards.addItem(ks);
+    				smartCards.setSelectedItem(ks);
     				smartCards.repaint();
     				keystores.addItem(ks);
     				keystores.repaint();
@@ -663,13 +709,14 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				}
 			}
 
-			if (smartCards.getItemCount() == 0) {
+			keystores.repaint();
+			smartCards.repaint();
+
+			if (smartCards.getItemCount() == 1 || smartCards.getSelectedIndex() == 0) {
+				this.connectButton.setEnabled(false);
 				this.modifyCardButton.setEnabled(false);
 				this.deleteCardButton.setEnabled(false);
 			}
-
-			keystores.repaint();
-			smartCards.repaint();
     	}
     }
 
@@ -684,16 +731,16 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		final RegisteredKeystore rks = getDefaultStore();
 		AOKeyStore aoks = AOKeyStore.getKeyStore(rks.getName());
 
-		if (aoks == null && rks.getProviderName().equals(AOKeyStore.PKCS11.getProviderName())) {
+		if (aoks == null && AOKeyStore.PKCS11.getProviderName().equals(rks.getProviderName())) {
 			aoks = AOKeyStore.PKCS11;
 			aoks.setName(rks.getName());
 		}
 
-		if (aoks != null && aoks.getProviderName().equals(AOKeyStore.PKCS11.getProviderName())) {
+		if (aoks != null && AOKeyStore.PKCS11.getProviderName().equals(aoks.getProviderName()) && rks.getLib() != null) {
 			PreferencesManager.put(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH, rks.getLib());
 		}
 
-		if (rks.getName().equals(AOKeyStore.PKCS12_NO_PASS.getName())) {
+		if (AOKeyStore.PKCS12.getName().equals(rks.getName())) {
 			aoks = AOKeyStore.PKCS12;
 		}
 
@@ -708,15 +755,13 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, this.onlySignature.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE, this.skipAuthCertDnie.isSelected());
 
 	}
 
 	void loadPreferences() {
 
-		String ks = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
-		if (ks.equals(AOKeyStore.PKCS12.name())) {
-			ks = AOKeyStore.PKCS12_NO_PASS.name();
-		}
+		final String ks = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
 		RegisteredKeystore rks = null;
 
@@ -748,6 +793,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 		this.onlySignature.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS));
 		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS));
+		this.skipAuthCertDnie.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
 
         revalidate();
         repaint();
@@ -761,6 +807,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.hideDniStartScreen.setSelected(false);
 		this.onlySignature.setSelected(false);
 		this.onlyAlias.setSelected(false);
+		this.skipAuthCertDnie.setSelected(false);
 
         revalidate();
         repaint();

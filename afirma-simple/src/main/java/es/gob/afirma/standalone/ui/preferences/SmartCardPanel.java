@@ -31,7 +31,7 @@ final class SmartCardPanel extends JPanel {
 
 	private static final long serialVersionUID = -6040435120676908406L;
 	private static final int PREFERRED_WIDTH = 620;
-	private static final int PREFERRED_HEIGHT = 210;
+	private static final int PREFERRED_HEIGHT = 140;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -52,7 +52,7 @@ final class SmartCardPanel extends JPanel {
 	 */
 	private void createUI() {
 		setLayout(new GridBagLayout());
-		setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		this.cardnameLbl.setFocusable(true);
 		this.cardNameTxt.setFocusable(true);
@@ -95,32 +95,26 @@ final class SmartCardPanel extends JPanel {
             }
             });
 
-		final JButton connectCardButton = new JButton(SimpleAfirmaMessages.getString("SmartCardDialog.4")); //$NON-NLS-1$
-		connectCardButton.setFocusable(true);
-
-		connectCardButton.addActionListener(
-        		ae -> PreferencesPanelKeystores.connectSmartCard(this)
-		);
-
 		// Colocamos los componentes en el panel
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
+		c.insets = new Insets(5, 5, 5, 5);
+		c.weightx = 3.0;
+		c.gridwidth = 3;
 		c.gridx = 0;
 		c.gridy = 0;
 		this.add(this.cardnameLbl, c);
-		c.insets = new Insets(0, 0, 0, 0);
 		c.gridy++;
 		this.add(this.cardNameTxt, c);
-		c.gridy++;
-		this.add(this.controllerNameLbl, c);
-		c.gridy++;
-		this.add(this.controllerNameTxt, c);
-		c.gridx++;
-		this.add(selectFileButton, c);
 		c.gridx = 0;
 		c.gridy++;
-		this.add(connectCardButton, c);
+		this.add(this.controllerNameLbl, c);
+		c.weightx = 1.0;
+		c.gridwidth = 1;
+		c.gridy++;
+		this.add(this.controllerNameTxt, c);
+		c.gridx = 3;
+		this.add(selectFileButton, c);
 	}
 
 	/**

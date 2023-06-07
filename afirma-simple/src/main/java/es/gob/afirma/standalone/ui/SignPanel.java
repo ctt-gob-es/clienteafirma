@@ -63,6 +63,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
@@ -361,9 +362,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         }
     }
 
-    static List<? extends CertificateFilter> getCertFilters() {
+    List<? extends CertificateFilter> getCertFilters() {
+
     	final List<CertificateFilter> filters = new ArrayList<>();
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
+
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)
+    		|| AOKeyStore.DNIEJAVA.equals(this.saf.getAOKeyStoreManager().getType())
+    		&& PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
@@ -373,8 +378,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     		return Arrays.asList(
 				new MultipleCertificateFilter(filters.toArray(new CertificateFilter[0]))
 			);
-    	}
-    	else if (filters.size() == 1) {
+    	} 
+		else if (filters.size() == 1) {
     		return filters;
     	}
     	return null;
