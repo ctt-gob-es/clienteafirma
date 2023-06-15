@@ -107,7 +107,7 @@ public abstract class JSONSignBatch {
 	 *            del formato</a>).
 	 * @throws IOException Si hay problemas en el tratamiento de datos en el an&aacute;lisis del JSON.
 	 * @throws SecurityException Si se sobrepasa alguna de las limitaciones establecidas para el lote
-	 * (n&ueacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
+	 * (n&uacute;mero de documentos, tama&ntilde;o de las referencias, tama&ntilde;o de documento, etc.)
 	 */
 	protected JSONSignBatch(final byte[] json) throws IOException, SecurityException {
 
