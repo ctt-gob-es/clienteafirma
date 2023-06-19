@@ -40,6 +40,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	private final Component parent;
 	private final KeyStoreDialogManager ksdm;
 	private String currentKeyStoreTypeName;
+	private static final String MOZ_UNI_KS_NAME = "Mozilla / Firefox (unificado)";
 
 	private final boolean disableSelection;
 
@@ -257,7 +258,12 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		// Si se ha completado el cambio de almacen, refrescamos el dialogo
 		if (changed) {
-			KeyStorePreferencesManager.setLastSelectedKeystore(this.ksdm.getKeyStoreName());
+			if (ksType == 2) {
+				// Usamos el nombre del almacen de Mozilla para que realmente se intente cargar ese y no el SHARED NSS
+				KeyStorePreferencesManager.setLastSelectedKeystore(MOZ_UNI_KS_NAME);
+			} else {
+				KeyStorePreferencesManager.setLastSelectedKeystore(this.ksdm.getKeyStoreName());
+			}
 			if (ksLibPath != null && !ksLibPath.isEmpty()) {
 				KeyStorePreferencesManager.setLastSelectedKeystoreLib(ksLibPath);
 			}

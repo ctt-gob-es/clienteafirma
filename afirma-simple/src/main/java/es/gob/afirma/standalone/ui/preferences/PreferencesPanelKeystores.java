@@ -747,6 +747,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 		if (this.localKeystoreSelectedPath != null) {
 			PreferencesManager.put(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH, this.localKeystoreSelectedPath);
+			KeyStorePreferencesManager.setLastSelectedKeystoreLib(this.localKeystoreSelectedPath);
 		}
 
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS, this.callsFromNavigator.isSelected());
@@ -771,6 +772,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 					PREFERENCE_KEYSTORE_DEFAULT_STORE,
 					aoks.getName()
 			);
+			KeyStorePreferencesManager.setLastSelectedKeystore(aoks.getName());
 		}
 
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());

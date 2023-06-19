@@ -172,8 +172,8 @@ public final class SimpleKeyStoreManager {
 						AOUIFactory.showMessageDialog(
 								parent,
 				        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.13"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
+								SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+								JOptionPane.WARNING_MESSAGE
 						);
 						return loadSystemAOKSManager(parent);
 					} catch (final IOException ioe2) {
@@ -211,8 +211,8 @@ public final class SimpleKeyStoreManager {
 			AOUIFactory.showMessageDialog(
 					parent,
 	        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.13"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
+					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE
 			);
 			return loadSystemAOKSManager(parent);
 		} catch (final Exception e) {

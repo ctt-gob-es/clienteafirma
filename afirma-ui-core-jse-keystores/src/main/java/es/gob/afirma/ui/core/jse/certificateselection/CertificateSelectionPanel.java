@@ -263,7 +263,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
 				for (final String key : regResult.keySet()) {
 				    final String value = regResult.get(key);
-					final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.39", key)); //$NON-NLS-1$
+					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
 					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, value));
 					keystoresMenu.add(menuItemOpenDnieKs);
 				}

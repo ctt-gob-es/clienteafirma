@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -237,7 +238,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 			// Almacen PKCS#12
 			case KEYSTORE_ID_PKCS12:
-				newKsm = openPkcs12KeyStore(parent);
+				newKsm = openPkcs12KeyStore(parent, null);
 				break;
 
 			// DNIe
@@ -252,9 +253,41 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				break;
 			}
 		}
-		catch (final AOCancelledOperationException | AOKeystoreAlternativeException e) {
+		catch (final AOCancelledOperationException e) {
 			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 			return false;
+		}
+		catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+					&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+					AOUIFactory.showMessageDialog(
+							parent,
+							KeyStoreMessages.getString("AOKeyStoreDialog.11"), //$NON-NLS-1$
+							KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+							AOUIFactory.ERROR_MESSAGE,
+							ioe
+						);
+					boolean stopOperation = false;
+					while (!stopOperation) {
+						try {
+							if (changeKeyStoreManager(keyStoreId, parent) == false) {
+								stopOperation = true;
+							}
+						} catch (final AOCancelledOperationException aoce) {
+							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
+							stopOperation = true;
+						}
+						catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+									KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE,
+									e
+								);
+				        	stopOperation = true;
+						}
+					}
+				}
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
@@ -281,9 +314,41 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		try {
 			newKsm = openPkcs11KeyStore(parent, ksLibPath);
 		}
-		catch (final AOCancelledOperationException | AOKeystoreAlternativeException e) {
+		catch (final AOCancelledOperationException e) {
 			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 			return false;
+		}
+		catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+					&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+					AOUIFactory.showMessageDialog(
+							parent,
+							KeyStoreMessages.getString("AOKeyStoreDialog.11"), //$NON-NLS-1$
+							KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+							AOUIFactory.ERROR_MESSAGE,
+							ioe
+						);
+					boolean stopOperation = false;
+					while (!stopOperation) {
+						try {
+							if (changeKeyStoreManagerToPKCS11(parent, ksLibPath) == false) {
+								stopOperation = true;
+							}
+						} catch (final AOCancelledOperationException aoce) {
+							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
+							stopOperation = true;
+						}
+						catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+									KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE,
+									e
+								);
+				        	stopOperation = true;
+						}
+					}
+				}
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
@@ -383,31 +448,39 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	/**
 	 * Permite seleccionar un fichero PKCS#12, introducir su contrase&ntilde;a y cargarlo.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @param filePath Ruta del fichero PKCS#12 en caso de que se haya seleccionado anteriormente.
 	 * @return Gestor del almac&eacute;n PKCS#12 o {@code null} si no se pudo cargar o si se
 	 * cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	public static AOKeyStoreManager openPkcs12KeyStore(final Component parent) throws Exception {
+	public static AOKeyStoreManager openPkcs12KeyStore(final Component parent, final String filePath) throws Exception {
 
-		final File[] ksFile;
-		ksFile = AOUIFactory.getLoadFiles(
-			KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
-			null,
-			null,
-			EXTS,
-			KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
-			false,
-			false,
-			null,
-			parent
-		);
+		String libPath = filePath;
+
+		AOKeyStoreManager aoks = null;
+
+		if (libPath == null || libPath.isEmpty()) {
+			final File[] ksFile;
+			ksFile = AOUIFactory.getLoadFiles(
+				KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
+				null,
+				null,
+				EXTS,
+				KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
+				false,
+				false,
+				null,
+				parent
+			);
+			libPath = ksFile[0].getAbsolutePath();
+		}
 
 		// Cargamos el almacen
 		try {
-			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			aoks = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				AOKeyStore.PKCS12,
-				ksFile[0].getAbsolutePath(),
+				libPath,
 				null,
 				AOKeyStore.PKCS12.getStorePasswordCallback(parent),
 				parent
@@ -416,10 +489,46 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		catch (final AOCancelledOperationException e) {
 			throw e;
 		}
+		catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+					&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+					AOUIFactory.showMessageDialog(
+							parent,
+							KeyStoreMessages.getString("AOKeyStoreDialog.11"), //$NON-NLS-1$
+							KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+							AOUIFactory.ERROR_MESSAGE,
+							ioe
+						);
+					boolean stopOperation = false;
+					while (!stopOperation) {
+						try {
+							final AOKeyStoreManager newAoks = openPkcs12KeyStore(parent, libPath);
+							if (newAoks != null) {
+								aoks = newAoks;
+								stopOperation = true;
+							}
+						} catch (final AOCancelledOperationException aoce) {
+							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
+							stopOperation = true;
+						}
+						catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+									KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE,
+									e
+								);
+				        	stopOperation = true;
+						}
+					}
+				}
+		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
+
+		return aoks;
 	}
 
 	/**
