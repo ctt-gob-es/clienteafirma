@@ -12,7 +12,6 @@ package es.gob.afirma.standalone.ui.preferences;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
@@ -30,7 +29,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 final class SmartCardPanel extends JPanel {
 
 	private static final long serialVersionUID = -6040435120676908406L;
-	private static final int PREFERRED_WIDTH = 620;
+	private static final int PREFERRED_WIDTH = 520;
 	private static final int PREFERRED_HEIGHT = 140;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -97,23 +96,22 @@ final class SmartCardPanel extends JPanel {
 
 		// Colocamos los componentes en el panel
 		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(5, 5, 5, 5);
-		c.weightx = 3.0;
+		c.fill = GridBagConstraints.BOTH;
 		c.gridwidth = 3;
+		c.weightx = 3.0;
 		c.gridx = 0;
 		c.gridy = 0;
 		this.add(this.cardnameLbl, c);
 		c.gridy++;
 		this.add(this.cardNameTxt, c);
-		c.gridx = 0;
 		c.gridy++;
 		this.add(this.controllerNameLbl, c);
-		c.weightx = 1.0;
 		c.gridwidth = 1;
 		c.gridy++;
+		c.weightx = 1.0;
 		this.add(this.controllerNameTxt, c);
-		c.gridx = 3;
+		c.weightx = 0;
+		c.gridx = 2;
 		this.add(selectFileButton, c);
 	}
 

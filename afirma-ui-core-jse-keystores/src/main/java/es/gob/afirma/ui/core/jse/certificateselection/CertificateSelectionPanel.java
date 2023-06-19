@@ -28,6 +28,7 @@ import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -52,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
@@ -254,6 +256,15 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				if (contains(availablesKeyStoreTypes, 4)) {
 					final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
 					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4));
+					keystoresMenu.add(menuItemOpenDnieKs);
+				}
+
+				//Se obtienen todas las tarjetas inteligentes configuradas como almacen de claves
+				final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+				for (final String key : regResult.keySet()) {
+				    final String value = regResult.get(key);
+					final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.39", key)); //$NON-NLS-1$
+					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, value));
 					keystoresMenu.add(menuItemOpenDnieKs);
 				}
 
@@ -867,16 +878,26 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;
 		private final int keyStoreType;
+		private final String ksLibPath;
 
 		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final int keyStoreType) {
 			this.panel = panel;
 			this.dialog = dialog;
 			this.keyStoreType = keyStoreType;
+			this.ksLibPath = null;
+		}
+
+		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog,
+											final int keyStoreType, final String ksLibPath) {
+			this.panel = panel;
+			this.dialog = dialog;
+			this.keyStoreType = keyStoreType;
+			this.ksLibPath = ksLibPath;
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel);
+			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel, this.ksLibPath);
 		}
 	}
 }

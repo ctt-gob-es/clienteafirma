@@ -9,10 +9,12 @@
 
 package es.gob.afirma.keystores;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
@@ -243,6 +245,15 @@ public enum AOKeyStore {
                 return tempKs;
             }
         }
+        // Buscamos entre los registros de los almacenes de clave PKCS#11
+        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+        final boolean existSmartCard = regResult.containsKey(name);
+        if (existSmartCard) {
+			final AOKeyStore result = AOKeyStore.PKCS11;
+			result.setName(name);
+			return result;
+		}
+
         try {
         	return valueOf(name);
         }

@@ -274,6 +274,35 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
+	public boolean changeKeyStoreManagerToPKCS11(final Component parent, final String ksLibPath) {
+
+		AOKeyStoreManager newKsm = null;
+
+		try {
+			newKsm = openPkcs11KeyStore(parent, ksLibPath);
+		}
+		catch (final AOCancelledOperationException | AOKeystoreAlternativeException e) {
+			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			return false;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+				KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+				KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+				AOUIFactory.ERROR_MESSAGE,
+				e
+			);
+			return false;
+		}
+
+		// Establece el nuevo almacen cargado como el actual
+		setKeyStoreManager(newKsm);
+
+		return true;
+	}
+
+	@Override
 	public int[] getAvailablesKeyStores() {
 
 		// En linux no se puede cambiar entre el almacen central del sistema y el almacen de
@@ -422,6 +451,35 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			throw e;
 		}
 		return ksm;
+	}
+
+	/**
+	 * Permite cargar una tarjeta inteligente a trav&eacute;s de su controlador.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n PKCS#11 o {@code null} si no se pudo cargar o si se
+	 * cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	public static AOKeyStoreManager openPkcs11KeyStore(final Component parent, final String ksLibPath) throws Exception {
+
+		// Cargamos el almacen
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.PKCS11,
+				ksLibPath,
+				null,
+				AOKeyStore.PKCS11.getStorePasswordCallback(parent),
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
+			throw e;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado: " + e, e); //$NON-NLS-1$
+			throw e;
+		}
 	}
 
 

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
@@ -238,18 +239,28 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Cambia el almac&eacute;n de claves actual.
 	 * @param ksType Tipo de almac&eacute;n de claves. */
-	public void changeKeyStore(final int ksType) {
+	public void changeKeyStore(final int ksType, final String ksLibPath) {
 
 		// Ya que el cambio de dialogo puede hacer aparecer otros nuevos (como alguno
 		// de seleccion de fichero o de solicitud de PIN), dejamos de obligar a que
 		// este este siempre encima
 		this.certDialog.setAlwaysOnTop(false);
 
+		final boolean changed;
+
 		// Cambiamos de almacen
-		final boolean changed = this.ksdm.changeKeyStoreManager(ksType, this.parent);
+		if (ksLibPath == null || ksLibPath.isEmpty()) {
+			changed = this.ksdm.changeKeyStoreManager(ksType, this.parent);
+		} else {
+			changed = this.ksdm.changeKeyStoreManagerToPKCS11(this.parent, ksLibPath);
+		}
 
 		// Si se ha completado el cambio de almacen, refrescamos el dialogo
 		if (changed) {
+			KeyStorePreferencesManager.setLastSelectedKeystore(this.ksdm.getKeyStoreName());
+			if (ksLibPath != null && !ksLibPath.isEmpty()) {
+				KeyStorePreferencesManager.setLastSelectedKeystoreLib(ksLibPath);
+			}
 			// Actualizamos el dialogo para cargar los nuevos certificados
 			refreshDialog();
 

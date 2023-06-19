@@ -63,11 +63,11 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
+import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -362,14 +362,15 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         }
     }
 
-    List<? extends CertificateFilter> getCertFilters() {
+    static List<? extends CertificateFilter> getCertFilters() {
 
     	final List<CertificateFilter> filters = new ArrayList<>();
 
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)
-    		|| AOKeyStore.DNIEJAVA.equals(this.saf.getAOKeyStoreManager().getType())
-    		&& PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
+    	}
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
+    		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
     		filters.add(new PseudonymFilter());
@@ -378,7 +379,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     		return Arrays.asList(
 				new MultipleCertificateFilter(filters.toArray(new CertificateFilter[0]))
 			);
-    	} 
+    	}
 		else if (filters.size() == 1) {
     		return filters;
     	}

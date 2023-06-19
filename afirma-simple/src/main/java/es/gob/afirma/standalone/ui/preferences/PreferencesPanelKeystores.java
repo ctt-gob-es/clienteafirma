@@ -23,10 +23,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,18 +34,24 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
+import es.gob.afirma.keystores.filters.PseudonymFilter;
+import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
+import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
@@ -139,7 +145,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 		PreferencesPanelKeystores.setKeystores(new JComboBox<RegisteredKeystore>(stores.toArray(new RegisteredKeystore[0])));
 
-		PreferencesPanelKeystores.getKeystores().addActionListener (new ActionListener () {
+		keystores.addActionListener (new ActionListener () {
 		    @Override
 			public void actionPerformed(final ActionEvent e) {
 		       final RegisteredKeystore ks = (RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem();
@@ -206,10 +212,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
         gbc1.weightx = 1.0;
         gbc1.gridx = 0;
 
-		PreferencesPanelKeystores.getKeystores().addItemListener(modificationListener);
-		PreferencesPanelKeystores.getKeystores().addKeyListener(keyListener);
+		keystores.addItemListener(modificationListener);
+		keystores.addKeyListener(keyListener);
 
-        this.panelKeystores.add(PreferencesPanelKeystores.getKeystores(), gbc1);
+        this.panelKeystores.add(keystores, gbc1);
 
         gbc1.gridx++;
 
@@ -220,19 +226,18 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				AOKeyStore ks = AOKeyStore.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName());
 				try {
 					String lib = null;
-					if (ks != null && (AOKeyStore.PKCS12.equals(ks) || AOKeyStore.PKCS11.getProviderName().equals(ks.getProviderName()))) {
+					if (ks != null && (AOKeyStore.PKCS12.equals(ks) || AOKeyStore.PKCS11.getName().equals(ks.getName()))) {
 						lib = PreferencesPanelKeystores.this.localKeystoreSelectedPath;
 						if (lib == null) {
 							lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
 						}
 					} else if (ks == null) {
-				        final List<String> regResult = getSmartCardsRegistered();
-						for (int k = 0 ; k < regResult.size() ; k = k + 9) {
-							final String smartCardName = regResult.get(k + 5);
-							if (((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName().equals(smartCardName)){
+				        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+						for (final String key : regResult.keySet()) {
+							if (((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName().equals(key)){
 								ks = AOKeyStore.PKCS11;
-								ks.setName(smartCardName);
-								lib = regResult.get(k + 8);
+								ks.setName(key);
+								lib = regResult.get(key);
 							}
 						}
 					}
@@ -255,12 +260,13 @@ final class PreferencesPanelKeystores extends JScrollPane {
 						PreferencesPanelKeystores.this,
 						new AOKeyStoreDialog(
 							ksm,
-							this,
-							true,
-							true,
-							false,
-							libName
-						),
+				        	this,
+		                	true,
+		                	PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS),
+		                 	false,
+		                 	getCertFilters(),
+		                 	false,
+		                    libName),
 						SimpleAfirmaMessages.getString(
 							"PreferencesPanelKeyStores.18", //$NON-NLS-1$
 							ks.toString()
@@ -391,12 +397,15 @@ final class PreferencesPanelKeystores extends JScrollPane {
         inteligentCardsPanel.setLayout(new GridBagLayout());
 
         final GridBagConstraints icpConstraints = new GridBagConstraints();
-        icpConstraints.fill = GridBagConstraints.BOTH;
+        icpConstraints.fill = GridBagConstraints.HORIZONTAL;
         icpConstraints.gridy = 0;
-        icpConstraints.weightx = 1.0;
         icpConstraints.gridx = 0;
+        icpConstraints.weightx = 5.0;
+        icpConstraints.gridwidth = 5;
 
-        final List<String> regResult = getSmartCardsRegistered();
+        final JLabel smartCardDescLbl = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.33")); //$NON-NLS-1$
+
+        inteligentCardsPanel.add(smartCardDescLbl, icpConstraints);
 
         smartCards = new JComboBox<RegisteredKeystore>();
 
@@ -404,12 +413,13 @@ final class PreferencesPanelKeystores extends JScrollPane {
         emptyItem.setName(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.31")); //$NON-NLS-1$
         smartCards.addItem(emptyItem);
 
-        if (regResult!= null && !regResult.get(0).isEmpty()) {
-			for (int k = 0 ; k < regResult.size() ; k = k + 9) {
-				final String smartCardName = regResult.get(k + 5);
+        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+
+        if (!regResult.isEmpty()) {
+			for (final String smartCardName : regResult.keySet()) {
 				final RegisteredKeystore newPKCS11 = new RegisteredKeystore(AOKeyStore.PKCS11);
 				newPKCS11.setName(smartCardName);
-				final String lib = regResult.get(k + 8);
+				final String lib = regResult.get(smartCardName);
 				newPKCS11.setLib(lib);
 				smartCards.addItem(newPKCS11);
 				keystores.addItem(newPKCS11);
@@ -439,6 +449,11 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		});
 
 		loadPreferences();
+
+		icpConstraints.gridy++;
+
+		icpConstraints.weightx = 1.0;
+		icpConstraints.gridwidth = 1;
 
         inteligentCardsPanel.add(PreferencesPanelKeystores.smartCards, icpConstraints);
 
@@ -520,6 +535,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 		final AOKeyStore ks = AOKeyStore.PKCS11;
 
+    	// Cursor en espera
+    	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
 		try {
 			final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 					ks,
@@ -540,7 +558,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				kse
 			);
 			Logger.getLogger("es.gob.afirma").warning("Error al conectar tarjeta inteligente: " + kse); //$NON-NLS-1$ //$NON-NLS-2$
-	}
+		}
+
+    	// Cursor por defecto
+    	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	/** Di&aacute;logo para a&ntilde;adir tarjeta inteligente.
@@ -577,7 +598,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     		} else {
 
-    			final boolean regAdded = addSmartCardToReg(smartCardPanel);
+    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToRec(smartCardPanel.getCardNameTxt().getText() ,
+    																					smartCardPanel.getControllerNameTxt().getText());
 
     			if (regAdded) {
     				final RegisteredKeystore ks = new RegisteredKeystore();
@@ -638,7 +660,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     			modifySmartCardDlg(container);
         	} else {
-    			final boolean regDeleted = deleteSmartCardReg(oldCardName);
+    			final boolean regDeleted = KeyStorePreferencesManager.deleteSmartCardRec(oldCardName);
 
     			if (regDeleted) {
     				for (int i = 0 ; i < smartCards.getItemCount() ; i++) {
@@ -657,7 +679,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     			keystores.repaint();
     			smartCards.repaint();
 
-    			final boolean regAdded = addSmartCardToReg(smartCardPanel);
+    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToRec(smartCardPanel.getCardNameTxt().getText() , smartCardPanel.getControllerNameTxt().getText());
 
     			if (regAdded) {
     				final RegisteredKeystore ks = new RegisteredKeystore();
@@ -689,12 +711,12 @@ final class PreferencesPanelKeystores extends JScrollPane {
     	if(AOUIFactory.showConfirmDialog(
 				container,
 				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.25"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.24"), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("SmartCardDialog.10"), //$NON-NLS-1$
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.DEFAULT_OPTION
 		) == JOptionPane.OK_OPTION) {
 
-			final boolean regDeleted = deleteSmartCardReg(name);
+			final boolean regDeleted = KeyStorePreferencesManager.deleteSmartCardRec(name);
 
 			if (regDeleted) {
 				for (int i = 0 ; i < keystores.getItemCount() ; i++) {
@@ -766,10 +788,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		RegisteredKeystore rks = null;
 
 		if (aoks == null) {
-			final List<String> regResult = getSmartCardsRegistered();
-			if (regResult != null && !regResult.get(0).isEmpty()) {
-				for (int k = 0 ; k < regResult.size() ; k = k + 9) {
-					final String smartCardName = regResult.get(k + 5);
+			final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+			if (!regResult.isEmpty()) {
+				for (final String smartCardName : regResult.keySet()) {
 					if (ks.equals(smartCardName)) {
 						rks = new RegisteredKeystore(AOKeyStore.PKCS11);
 						rks.setName(smartCardName);
@@ -801,7 +822,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 	}
 
 	void loadDefaultPreferences() {
-		PreferencesPanelKeystores.getKeystores().setSelectedItem(Integer.valueOf(0));
+		PreferencesPanelKeystores.getKeystores().setSelectedIndex(0);
 		this.callsFromNavigator.setSelected(false);
 		this.showExpiredCerts.setSelected(false);
 		this.hideDniStartScreen.setSelected(false);
@@ -814,174 +835,29 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 	}
 
-	/**
-	 * Agrega una tarjeta inteligente al registro del sistema
-	 * @param smartCardPanel panel con la informaci&oacute;n de la tarjeta a agregar
-	 * @return devuelve true si se ha agregado correctamente
-	 */
-	private static boolean addSmartCardToReg(final SmartCardPanel smartCardPanel) {
+    static List<? extends CertificateFilter> getCertFilters() {
 
-		boolean regAdded = false;
+    	final List<CertificateFilter> filters = new ArrayList<>();
 
-		try {
-
-			boolean noExistReg = true;
-
-			int cont = 1;
-
-			while (noExistReg) {
-
-				final Process p = new ProcessBuilder(
-						"reg", //$NON-NLS-1$
-						"QUERY", //$NON-NLS-1$
-						"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores\\" + cont, //$NON-NLS-1$
-						"/s"  //$NON-NLS-1$
-					).start();
-
-				final String regResult;
-
-				try (InputStream inputStream = p.getInputStream()) {
-					regResult = new String(AOUtil.getDataFromInputStream(inputStream)).trim();
-				}
-
-				if (regResult.isEmpty()) {
-
-					new ProcessBuilder(
-						"reg", //$NON-NLS-1$
-						"ADD", //$NON-NLS-1$
-						"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores\\" + cont //$NON-NLS-1$
-					).start();
-
-					new ProcessBuilder(
-						"reg", //$NON-NLS-1$
-						"ADD", //$NON-NLS-1$
-						"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores\\" + cont, //$NON-NLS-1$
-						"/v",  //$NON-NLS-1$
-						"name", "/t", "REG_SZ", "/d", smartCardPanel.getCardNameTxt().getText() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					).start();
-
-					new ProcessBuilder(
-						"reg", //$NON-NLS-1$
-						"ADD", //$NON-NLS-1$
-						"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores\\" + cont, //$NON-NLS-1$
-						"/v",  //$NON-NLS-1$
-						"lib", "/t", "REG_SZ", "/d", smartCardPanel.getControllerNameTxt().getText() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					).start();
-
-					noExistReg = false;
-
-					regAdded = true;
-
-				}
-
-				cont++;
-			}
-
-		} catch (final IOException e) {
-   			LOGGER.log(Level.WARNING,"Error al escribir en el registro la tarjeta inteligente: " + e, e); //$NON-NLS-1$
-   			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.21"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
-		}
-
-		return regAdded;
-	}
-
-	/**
-	 * Elimina del registro el almac&eacute;n indicado
-	 * @param name Nombre del almac&eacute;n de la tarjeta a eliminar
-	 * @return devuelve true en caso de que se haya eliminado correctamente
-	 */
-	private static boolean deleteSmartCardReg(final String name) {
-
-		boolean deleteReg = false;
-
-		try {
-
-			int cont = 1;
-
-			while (!deleteReg) {
-
-				final Process p = new ProcessBuilder(
-						"reg", //$NON-NLS-1$
-						"QUERY", //$NON-NLS-1$
-						"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores\\" + cont, //$NON-NLS-1$
-						"/v",  //$NON-NLS-1$
-						"name"  //$NON-NLS-1$
-					).start();
-
-				final String regResult;
-
-				try (InputStream inputStream = p.getInputStream()) {
-					regResult = new String(AOUtil.getDataFromInputStream(inputStream)).trim();
-				}
-
-				if (!regResult.isEmpty()) {
-					final String [] regs = regResult.split("    "); //$NON-NLS-1$
-
-					if (regs[3].equals(name)) {
-						new ProcessBuilder(
-								"reg", //$NON-NLS-1$
-								"DELETE", //$NON-NLS-1$
-								"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores\\" + cont, //$NON-NLS-1$
-								"/f"  //$NON-NLS-1$
-						).start();
-						deleteReg = true;
-					}
-				}
-
-				cont++;
-			}
-
-		} catch (final IOException e) {
-   			LOGGER.log(Level.WARNING,"Error al eliminar el registro la tarjeta inteligente: " + e, e); //$NON-NLS-1$
-   			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.26"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
-		}
-
-		return deleteReg;
-	}
-
-	/**
-	 * Se obtienen todos los registros de tarjetas inteligentes que hay en el sistema.
-	 * @return lista con los registros
-	 */
-	static List<String> getSmartCardsRegistered(){
-		final List<String> finalRegResult = new ArrayList<String>();
-		try {
-			final Process p = new ProcessBuilder(
-					"reg", //$NON-NLS-1$
-					"QUERY", //$NON-NLS-1$
-					"HKCU\\Software\\JavaSoft\\Prefs\\es\\gob\\afirma\\standalone\\keystores", //$NON-NLS-1$
-					"/s"  //$NON-NLS-1$
-				).start();
-
-			final String regResult;
-
-			try (InputStream inputStream = p.getInputStream()) {
-				regResult = new String(AOUtil.getDataFromInputStream(inputStream)).trim();
-			}
-
-			final String [] regs = regResult.split("    "); //$NON-NLS-1$
-			for (int i = 0 ; i < regs.length ; i++) {
-				if (regs[i].contains("\r\n")) { //$NON-NLS-1$
-					final String [] splReg = regs[i].split("\r\n"); //$NON-NLS-1$
-					for (int j = 0 ; j < splReg.length ; j++) {
-						if (!splReg[j].isEmpty()) {
-							finalRegResult.add(splReg[j]);
-						}
-					}
-				} else {
-					finalRegResult.add(regs[i]);
-				}
-			}
-
-		} catch (final IOException e) {
-   			LOGGER.log(Level.WARNING,"Error al obtener los registros de tarjetas inteligentes: " + e, e); //$NON-NLS-1$
-   			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.22"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
-		}
-		return finalRegResult;
-	}
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
+    		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
+    	}
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
+    		filters.add(new SkipAuthDNIeFilter());
+    	}
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
+    		filters.add(new PseudonymFilter());
+    	}
+    	if (filters.size() > 1) {
+    		return Arrays.asList(
+				new MultipleCertificateFilter(filters.toArray(new CertificateFilter[0]))
+			);
+    	}
+		else if (filters.size() == 1) {
+    		return filters;
+    	}
+    	return null;
+    }
 
 	/**
 	 * Indica si el panel permite o no la edici&oacute;n de sus valores.
