@@ -164,7 +164,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 							this
 						);
 						PreferencesPanelKeystores.this.localKeystoreSelectedPath = ksFile[0].getAbsolutePath();
-			   		} catch(final AOCancelledOperationException acoe) {
+			   		} catch (final AOCancelledOperationException acoe) {
 			   			PreferencesPanelKeystores.getKeystores().setSelectedIndex(0);
 						return;
 			   		}
@@ -279,6 +279,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 						true
 					);
 					csd.showDialog();
+				} catch (final AOCancelledOperationException acoe) {
+						return;
 				} catch (final Exception kse) {
 						AOUIFactory.showErrorMessage(
 						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.20"), //$NON-NLS-1$

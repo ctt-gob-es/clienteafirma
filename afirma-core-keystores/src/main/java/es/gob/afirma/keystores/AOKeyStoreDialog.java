@@ -27,6 +27,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -234,22 +235,26 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
 				newKsm = openMozillaKeyStore(parent);
+				KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
 				break;
 
 			// Almacen PKCS#12
 			case KEYSTORE_ID_PKCS12:
 				newKsm = openPkcs12KeyStore(parent, null);
+				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 				break;
 
 			// DNIe
 			case KEYSTORE_ID_DNIE:
 				newKsm = openDnieKeyStore(parent);
+				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 				break;
 
 			// Almacen del sistema
 			case KEYSTORE_ID_SYSTEM:
 			default:
 				newKsm = openSystemKeyStore(parent);
+				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 				break;
 			}
 		}
@@ -363,6 +368,11 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 		// Establece el nuevo almacen cargado como el actual
 		setKeyStoreManager(newKsm);
+
+		if (newKsm != null && newKsm.getType() != null) {
+			KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+			KeyStorePreferencesManager.setLastSelectedKeystoreLib(ksLibPath);
+		}
 
 		return true;
 	}
@@ -485,6 +495,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				AOKeyStore.PKCS12.getStorePasswordCallback(parent),
 				parent
 			);
+			KeyStorePreferencesManager.setLastSelectedKeystoreLib(libPath);
 		}
 		catch (final AOCancelledOperationException e) {
 			throw e;
@@ -509,7 +520,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 							}
 						} catch (final AOCancelledOperationException aoce) {
 							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
-							stopOperation = true;
+							throw aoce;
 						}
 						catch (final Exception e) {
 							AOUIFactory.showErrorMessage(
@@ -518,7 +529,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 									AOUIFactory.ERROR_MESSAGE,
 									e
 								);
-				        	stopOperation = true;
+				        	throw e;
 						}
 					}
 				}

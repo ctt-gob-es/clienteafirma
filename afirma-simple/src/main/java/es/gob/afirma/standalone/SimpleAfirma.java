@@ -553,8 +553,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     				}
 
     			} catch (final AOCancelledOperationException aoce) {
-    				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.56"), //$NON-NLS-1$
-    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, aoce); //$NON-NLS-1$
+    				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.57"), //$NON-NLS-1$
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.WARNING_MESSAGE, aoce); //$NON-NLS-1$
     				final OS os = Platform.getOS();
     	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
 
