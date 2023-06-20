@@ -30,7 +30,7 @@ final class SmartCardPanel extends JPanel {
 
 	private static final long serialVersionUID = -6040435120676908406L;
 	private static final int PREFERRED_WIDTH = 520;
-	private static final int PREFERRED_HEIGHT = 140;
+	private static final int PREFERRED_HEIGHT = 100;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -113,6 +113,10 @@ final class SmartCardPanel extends JPanel {
 		c.weightx = 0;
 		c.gridx = 2;
 		this.add(selectFileButton, c);
+		// Establecemos un panel vacio que ocupara el resto de la altura
+		c.gridy++;
+		c.weighty = 1.0;
+		this.add(new JPanel(), c);
 	}
 
 	/**
