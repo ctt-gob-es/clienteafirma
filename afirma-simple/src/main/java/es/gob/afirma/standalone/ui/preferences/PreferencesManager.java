@@ -231,9 +231,6 @@ public final class PreferencesManager {
 	/** Ruta del almac&eacute;n de claves local seleccionado por defecto. */
 	public static final String PREFERENCE_LOCAL_KEYSTORE_PATH = "defaultLocalKeystorePath"; //$NON-NLS-1$
 
-	/** Omite el certificado de autenticaci&oacute;n en almacenes de claves para DNIe. */
-	public static final String PREFERENCE_SKIP_AUTH_CERT_DNIE= "skipAuthCertDnie"; //$NON-NLS-1$
-
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************
 

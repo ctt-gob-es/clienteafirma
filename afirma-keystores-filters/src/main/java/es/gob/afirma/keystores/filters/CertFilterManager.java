@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.SscdFilter;
@@ -98,6 +99,12 @@ public final class CertFilterManager {
 		// Agregamos el filtro correspondiente a cada uno de los filtros desclarados
 		for (final String filterValue : filterValues) {
 			this.filters.add(parseFilter(filterValue));
+		}
+
+		// Si en las preferencias de AutoFirma, se decide omitir el certificado de autenticacion,
+		// se agregara el filtro correspondiente
+		if (KeyStorePreferencesManager.getSkipAuthCertDNIe()) {
+			this.filters.add(new SkipAuthDNIeFilter());
 		}
 
 		// Siguiendo los criterios de la ETSI TS 119 102-1, un usuario no deberia firmar nunca con

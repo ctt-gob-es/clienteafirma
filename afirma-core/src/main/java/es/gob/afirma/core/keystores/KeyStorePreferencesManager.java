@@ -18,6 +18,9 @@ public final class KeyStorePreferencesManager {
 	/** Indica cual fue la libreria del &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. */
 	public static final String PREFERENCE_LAST_KEYSTORE_LIB_SELECTED= "lastKeystoreLibSelected"; //$NON-NLS-1$
 
+	/** Indica si omitir o no el certificado de autenticaci&oacute;n para DNIe. */
+	public static final String PREFERENCE_SKIP_AUTH_CERT_DNIE= "skipAuthCertDnie"; //$NON-NLS-1$
+
 	static {
 		PREFERENCES = Preferences.userNodeForPackage(KeyStorePreferencesManager.class);
 	}
@@ -139,6 +142,22 @@ public final class KeyStorePreferencesManager {
 	 */
 	public static String getLastSelectedKeystoreLib() {
 		return PREFERENCES.get(PREFERENCE_LAST_KEYSTORE_LIB_SELECTED, ""); //$NON-NLS-1$
+	}
+
+	/**
+	 * Asigna la preferencia para omitir o no el cerificado de autenticaci&oacute;n para DNIe
+	 * @param skipCert Valor para la preferencia
+	 */
+	public static void setSkipAuthCertDNIe(final boolean skipCert) {
+		PREFERENCES.putBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, skipCert);
+	}
+
+	/**
+	 * Obtiene la preferencia para omitir o no el cerificado de autenticaci&oacute;n para DNIe
+	 * @return true si se va a omitir el certificado
+	 */
+	public static boolean getSkipAuthCertDNIe() {
+		return PREFERENCES.getBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, false);
 	}
 
 }

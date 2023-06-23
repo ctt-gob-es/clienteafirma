@@ -118,7 +118,7 @@ final class ProtocolInvocationLauncherBatch {
 		} else {
 
 			final String aoksLib;
-			if (useDefaultStore && aoks.equals(AOKeyStore.PKCS12)) {
+			if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
 				aoksLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
 			} else {
 				aoksLib = options.getDefaultKeyStoreLib();
