@@ -44,9 +44,11 @@ import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Base64;
 import java.util.HashMap;
@@ -93,6 +95,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.text.DefaultFormatter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -118,7 +121,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private static final char NEWLINE = '\n';
 	private static final String SPACE_SEPARATOR = " "; //$NON-NLS-1$
 	private static final String SPLIT_REGEXP= "\\s+"; //$NON-NLS-1$
-	static final String IMAGE_EXT[] = {"jpg", "jpeg", "png", "gif"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final String IMAGE_EXT[] = {"jpg", "jpeg", "png", "gif", "bmp"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 	private JDialog dialogParent;
 
@@ -830,17 +833,26 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 				if (!this.rubricImagePath.getText().isEmpty()) {
 
-					// Obtenemos la imagen directamente de la ruta para no perder calidad al reescalarla mas tarde
+					// Obtenemos la imagen directamente de la ruta, la cargamos y la codificamos
+					// para su paso al firmador
 					final File signImageFile = new File(this.rubricImagePath.getText());
-					try {
-						this.rubricImage = ImageIO.read(signImageFile);
-					} catch (final IOException ex) {
-						LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen de rubrica desde la ruta proporcionada", ex); //$NON-NLS-1$
-						this.rubricImage = null;
+					try (InputStream is = new FileInputStream(signImageFile)) {
+						final byte[] imageEncoded = AOUtil.getDataFromInputStream(is);
+						try (InputStream imageIs = new ByteArrayInputStream(imageEncoded)) {
+							this.rubricImage = ImageIO.read(imageIs);
+						}
+						this.prop.put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, Base64.getEncoder().encodeToString(imageEncoded));
 					}
-
-					if (this.rubricImage != null) {
-						this.prop.put(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE, getInsertImageBase64(this.rubricImage));
+					catch (final IOException ex) {
+						LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen de rubrica", ex); //$NON-NLS-1$
+						this.rubricImage = null;
+						AOUIFactory.showErrorMessage(
+								this.dialogParent,
+								SignPdfUiMessages.getString("SignPdfUiPreview.24"),  //$NON-NLS-1$
+								SignPdfUiMessages.getString("SignPdfUiPreview.23"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE,
+								ex);
+						return;
 					}
 				}
 
@@ -1186,19 +1198,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			}
 		}
 		return valid;
-	}
-
-	static String getInsertImageBase64(final BufferedImage bi) {
-		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
-			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
-			return Base64.getEncoder().encodeToString(osImage.toByteArray());
-		}
-        catch (final Exception e1) {
-        	LOGGER.severe(
-				"No ha sido posible pasar la imagen a JPG: " + e1 //$NON-NLS-1$
-			);
-		}
-		return null;
 	}
 
 	private void createEmptyImage() {
