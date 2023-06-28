@@ -237,8 +237,10 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	}
 
 	/** Cambia el almac&eacute;n de claves actual.
-	 * @param ksType Tipo de almac&eacute;n de claves. */
-	public void changeKeyStore(final int ksType, final String ksLibPath) {
+	 * @param ksType Tipo de almac&eacute;n de claves.
+	 * @param ksName Nombrede almac&eacute;n de claves
+	 * @param ksLibPath Librer&iacute;a de almac&eacute;n de claves.  */
+	public void changeKeyStore(final int ksType, final String ksName, final String ksLibPath) {
 
 		// Ya que el cambio de dialogo puede hacer aparecer otros nuevos (como alguno
 		// de seleccion de fichero o de solicitud de PIN), dejamos de obligar a que
@@ -251,7 +253,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		if (ksLibPath == null || ksLibPath.isEmpty()) {
 			changed = this.ksdm.changeKeyStoreManager(ksType, this.parent);
 		} else {
-			changed = this.ksdm.changeKeyStoreManagerToPKCS11(this.parent, ksLibPath);
+			changed = this.ksdm.changeKeyStoreManagerToPKCS11(this.parent, ksName, ksLibPath);
 		}
 
 		// Si se ha completado el cambio de almacen, refrescamos el dialogo

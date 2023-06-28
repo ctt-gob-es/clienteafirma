@@ -312,12 +312,12 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public boolean changeKeyStoreManagerToPKCS11(final Component parent, final String ksLibPath) {
+	public boolean changeKeyStoreManagerToPKCS11(final Component parent, final String ksName, final String ksLibPath) {
 
 		AOKeyStoreManager newKsm = null;
 
 		try {
-			newKsm = openPkcs11KeyStore(parent, ksLibPath);
+			newKsm = openPkcs11KeyStore(parent, ksName, ksLibPath);
 		}
 		catch (final AOCancelledOperationException e) {
 			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
@@ -336,7 +336,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 					boolean stopOperation = false;
 					while (!stopOperation) {
 						try {
-							if (changeKeyStoreManagerToPKCS11(parent, ksLibPath) == false) {
+							if (changeKeyStoreManagerToPKCS11(parent, ksName, ksLibPath) == false) {
 								stopOperation = true;
 							}
 						} catch (final AOCancelledOperationException aoce) {
@@ -576,15 +576,19 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	/**
 	 * Permite cargar una tarjeta inteligente a trav&eacute;s de su controlador.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @param ksName Nombre del almac&eacute;n PKCS#11.
+	 * @param ksLibPath Nombre de la
 	 * @return Gestor del almac&eacute;n PKCS#11 o {@code null} si no se pudo cargar o si se
 	 * cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	public static AOKeyStoreManager openPkcs11KeyStore(final Component parent, final String ksLibPath) throws Exception {
+	public static AOKeyStoreManager openPkcs11KeyStore(final Component parent, final String ksName, final String ksLibPath) throws Exception {
 
 		// Cargamos el almacen
 		try {
+			AOKeyStore.PKCS11.setName(ksName);
+
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				AOKeyStore.PKCS11,
 				ksLibPath,

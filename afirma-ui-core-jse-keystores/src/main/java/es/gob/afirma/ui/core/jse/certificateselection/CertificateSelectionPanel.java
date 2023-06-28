@@ -264,7 +264,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				for (final String key : regResult.keySet()) {
 				    final String value = regResult.get(key);
 					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
-					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, value));
+					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
 					keystoresMenu.add(menuItemOpenDnieKs);
 				}
 
@@ -878,26 +878,29 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;
 		private final int keyStoreType;
+		private final String keyStoreName;
 		private final String ksLibPath;
 
 		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final int keyStoreType) {
 			this.panel = panel;
 			this.dialog = dialog;
 			this.keyStoreType = keyStoreType;
+			this.keyStoreName = null;
 			this.ksLibPath = null;
 		}
 
 		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog,
-											final int keyStoreType, final String ksLibPath) {
+											final int keyStoreType, final String ksName, final String ksLibPath) {
 			this.panel = panel;
 			this.dialog = dialog;
 			this.keyStoreType = keyStoreType;
+			this.keyStoreName = ksName;
 			this.ksLibPath = ksLibPath;
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel, this.ksLibPath);
+			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel, this.keyStoreName, this.ksLibPath);
 		}
 	}
 }

@@ -293,6 +293,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
             }
         });
 
+        this.showContentButton.setMnemonic('V');
         this.panelKeystores.add(this.showContentButton, gbc1);
 
         gbc1.gridy++;
@@ -382,7 +383,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.skipAuthCertDnie.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.32")); //$NON-NLS-1$
-		this.skipAuthCertDnie.setMnemonic('C');
+		this.skipAuthCertDnie.setMnemonic('O');
 		this.skipAuthCertDnie.addItemListener(modificationListener);
 		this.skipAuthCertDnie.addKeyListener(keyListener);
         certsFiltersPanel.add(this.skipAuthCertDnie, c);
@@ -536,6 +537,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 	 static void connectSmartCard(final Container container) {
 
 		final AOKeyStore ks = AOKeyStore.PKCS11;
+		ks.setName(((RegisteredKeystore) smartCards.getSelectedItem()).getName());
 
     	// Cursor en espera
     	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));

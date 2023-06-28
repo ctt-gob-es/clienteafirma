@@ -65,11 +65,12 @@ public interface KeyStoreDialogManager {
 	/**
 	 * Cambia el almac&eacute;n cargado a uno de tipo PKCS#11
 	 * @param parent Componente padre sobre el que mostrar cualquier di&aacute;logo gr&aacute;fico.
+	 * @param ksName Nombre del almac&eacute;n de claves PKCS#11.
 	 * @param ksLibPath Ruta con el controlador del almac&eacute;n de claves PKCS#11.
 	 * @return {@code true} si se completa el cambio de almac&eacute;n, {@code false} en caso
 	 * contrario.
 	 */
-	boolean changeKeyStoreManagerToPKCS11(Component parent, String ksLibPath);
+	boolean changeKeyStoreManagerToPKCS11(Component parent, String ksName, String ksLibPath);
 
 	/**
 	 * Indica entre qu&eacute; tipos de almacenes se permite cambiar desde el di&aacute;logo de selecci&oacute;n.
