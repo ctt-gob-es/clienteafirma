@@ -35,13 +35,13 @@ public final class KeyStorePreferencesManager {
 	 * el valor es la ruta hacia el controlador de la misma.
 	 */
 	public static Map<String, String> getSmartCardsRegistered() {
-		final Map<String, String> result = new HashMap<String, String>();
+		final Map<String, String> result = new HashMap<>();
 		try {
-			final String[] childNames = PREFERENCES.node("/es/gob/afirma/core/keystores").childrenNames(); //$NON-NLS-1$
+			final String[] childNames = PREFERENCES.childrenNames();
 			if (childNames != null && childNames.length > 0) {
 				for (int i = 0 ; i < childNames.length ; i++) {
-						final String cardName = PREFERENCES.node("/es/gob/afirma/core/keystores/" + childNames[i]).keys()[0]; //$NON-NLS-1$
-						final String lib = PREFERENCES.node("/es/gob/afirma/core/keystores/" + childNames[i]).get(cardName, null); //$NON-NLS-1$
+						final String cardName = PREFERENCES.node(childNames[i]).keys()[0];
+						final String lib = PREFERENCES.node(childNames[i]).get(cardName, null);
 						result.put(cardName, lib);
 				}
 			}
