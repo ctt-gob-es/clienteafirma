@@ -347,7 +347,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
-		this.showExpiredCerts.setMnemonic('M');
+		this.showExpiredCerts.setMnemonic('U');
 		this.showExpiredCerts.addItemListener(modificationListener);
 		this.showExpiredCerts.addKeyListener(keyListener);
 
@@ -359,7 +359,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.onlySignature.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.2")); //$NON-NLS-1$
-		this.onlySignature.setMnemonic('E');
+		this.onlySignature.setMnemonic('R');
 		this.onlySignature.addItemListener(modificationListener);
 		this.onlySignature.addKeyListener(keyListener);
 
@@ -466,10 +466,12 @@ final class PreferencesPanelKeystores extends JScrollPane {
         		ae -> connectSmartCard(this)
 		);
 
+        this.connectButton.setMnemonic('T');
         inteligentCardsPanel.add(this.connectButton, icpConstraints);
 
         icpConstraints.gridx++;
 
+        this.addCardButton.setMnemonic('J');
         this.addCardButton.addActionListener(
         		ae -> addSmartCardDlg(this)
 		);
@@ -478,6 +480,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
         icpConstraints.gridx++;
 
+        this.modifyCardButton.setMnemonic('I');
         this.modifyCardButton.addActionListener(
         		ae -> modifySmartCardDlg(this)
 		);
@@ -486,6 +489,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
         icpConstraints.gridx++;
 
+        this.deleteCardButton.setMnemonic('M');
         this.deleteCardButton.addActionListener(
         		ae -> deleteSmartCardDlg(this, ((RegisteredKeystore) smartCards.getSelectedItem()).getName())
 		);
