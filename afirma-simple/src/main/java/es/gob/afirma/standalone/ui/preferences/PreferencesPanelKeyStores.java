@@ -305,7 +305,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.callsFromNavigator.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17") //$NON-NLS-1$
 		);
-		this.callsFromNavigator.setMnemonic('N');
 		this.callsFromNavigator.addItemListener(modificationListener);
 		this.callsFromNavigator.addKeyListener(keyListener);
 
@@ -334,7 +333,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
 		);
-		this.hideDniStartScreen.setMnemonic('D');
 		this.hideDniStartScreen.addItemListener(modificationListener);
 		this.hideDniStartScreen.addKeyListener(keyListener);
 
@@ -347,7 +345,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
-		this.showExpiredCerts.setMnemonic('U');
 		this.showExpiredCerts.addItemListener(modificationListener);
 		this.showExpiredCerts.addKeyListener(keyListener);
 
@@ -359,7 +356,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.onlySignature.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.2")); //$NON-NLS-1$
-		this.onlySignature.setMnemonic('R');
 		this.onlySignature.addItemListener(modificationListener);
 		this.onlySignature.addKeyListener(keyListener);
 
@@ -371,7 +367,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.onlyAlias.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.5")); //$NON-NLS-1$
-		this.onlyAlias.setMnemonic('S');
 		this.onlyAlias.addItemListener(modificationListener);
 		this.onlyAlias.addKeyListener(keyListener);
         certsFiltersPanel.add(this.onlyAlias, c);
@@ -383,7 +378,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		);
 		this.skipAuthCertDnie.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.32")); //$NON-NLS-1$
-		this.skipAuthCertDnie.setMnemonic('O');
 		this.skipAuthCertDnie.addItemListener(modificationListener);
 		this.skipAuthCertDnie.addKeyListener(keyListener);
         certsFiltersPanel.add(this.skipAuthCertDnie, c);

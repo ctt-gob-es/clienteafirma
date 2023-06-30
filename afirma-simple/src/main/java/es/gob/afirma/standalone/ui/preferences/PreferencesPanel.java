@@ -119,7 +119,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			this.preferencesPanelKeystores,
 			SimpleAfirmaMessages.getString("PreferencesPanel.193") //$NON-NLS-1$
 		);
-		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_C);
+		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_N);
 
 		this.tabbedPane.setSelectedIndex(selectedTabIndex);
 

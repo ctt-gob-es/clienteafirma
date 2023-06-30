@@ -151,7 +151,6 @@ final class PreferencesPanelCades extends JScrollPane {
 	    this.signatureMode.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.45") //$NON-NLS-1$
 		);
-	    this.signatureMode.setMnemonic('i');
 	    this.signatureMode.addItemListener(modificationListener);
 	    this.signatureMode.addKeyListener(keyListener);
 	    this.signatureMode.setEnabled(!isBlocked());

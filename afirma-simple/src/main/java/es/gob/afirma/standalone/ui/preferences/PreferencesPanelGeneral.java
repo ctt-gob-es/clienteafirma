@@ -234,7 +234,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.avoidAskForClose.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.44") //$NON-NLS-1$
 		);
-		this.avoidAskForClose.setMnemonic('N');
 		this.avoidAskForClose.addItemListener(modificationListener);
 		this.avoidAskForClose.addKeyListener(keyListener);
 		signConfigPanel.add(this.avoidAskForClose, signConstraint);
@@ -250,7 +249,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
 			);
-			this.checkForUpdates.setMnemonic('B');
 			this.checkForUpdates.addItemListener(modificationListener);
 			this.checkForUpdates.addKeyListener(keyListener);
 			signConfigPanel.add(this.checkForUpdates, signConstraint);
@@ -265,7 +263,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			);
 			this.enableJMulticard.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.166")); //$NON-NLS-1$
-			this.enableJMulticard.setMnemonic('j');
 			this.enableJMulticard.addItemListener(modificationListener);
 			this.enableJMulticard.addKeyListener(keyListener);
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
@@ -278,7 +275,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		if (Platform.getOS() == Platform.OS.WINDOWS) {
 			this.optimizedForVdi.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.191")); //$NON-NLS-1$
-			this.optimizedForVdi.setMnemonic('z');
 			this.optimizedForVdi.addItemListener(modificationListener);
 			this.optimizedForVdi.addKeyListener(keyListener);
 			signConfigPanel.add(this.optimizedForVdi, signConstraint);
@@ -359,7 +355,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		);
 		this.confirmToSign.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.180")); //$NON-NLS-1$
-		this.confirmToSign.setMnemonic('N');
 		this.confirmToSign.addItemListener(modificationListener);
 		this.confirmToSign.addKeyListener(keyListener);
 		innerPanel.add(this.confirmToSign, c);
@@ -382,7 +377,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		);
 		this.massiveOverwrite.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
-		this.massiveOverwrite.setMnemonic('S');
 		this.massiveOverwrite.addItemListener(modificationListener);
 		this.massiveOverwrite.addKeyListener(keyListener);
 		innerPanel.add(this.massiveOverwrite, c);
@@ -397,7 +391,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		final JPanel netConfigInnerPanel = new JPanel(new GridBagLayout());
 		netConfigPanel.add(netConfigInnerPanel);
 
-		this.secureConnections.setMnemonic('c');
 		this.secureConnections.addItemListener(modificationListener);
 		this.secureConnections.addKeyListener(keyListener);
 		this.secureConnections.setToolTipText(
