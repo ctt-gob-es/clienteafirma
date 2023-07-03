@@ -121,7 +121,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
         gbc.gridy = 0;
 
 		final Platform.OS os = Platform.getOS();
-		final List<RegisteredKeystore> stores = new ArrayList<RegisteredKeystore>();
+		final List<RegisteredKeystore> stores = new ArrayList<>();
 
 		if (Platform.OS.WINDOWS.equals(os)) {
 			stores.add(new RegisteredKeystore(AOKeyStore.WINDOWS));
@@ -143,7 +143,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 		stores.add(new RegisteredKeystore(AOKeyStore.DNIEJAVA));
 
-		PreferencesPanelKeystores.setKeystores(new JComboBox<RegisteredKeystore>(stores.toArray(new RegisteredKeystore[0])));
+		PreferencesPanelKeystores.setKeystores(new JComboBox<>(stores.toArray(new RegisteredKeystore[0])));
 
 		keystores.addActionListener (new ActionListener () {
 		    @Override
@@ -404,7 +404,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
         inteligentCardsPanel.add(smartCardDescLbl, icpConstraints);
 
-        smartCards = new JComboBox<RegisteredKeystore>();
+        smartCards = new JComboBox<>();
 
         final RegisteredKeystore emptyItem = new RegisteredKeystore();
         emptyItem.setName(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.31")); //$NON-NLS-1$
@@ -430,19 +430,16 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		smartCards.repaint();
 		keystores.repaint();
 
-		smartCards.addActionListener (new ActionListener () {
-		    @Override
-			public void actionPerformed(final ActionEvent e) {
-		    	if (e.getModifiers() != 0 && smartCards.getSelectedIndex() == 0) {
-		    		PreferencesPanelKeystores.this.connectButton.setEnabled(false);
-					PreferencesPanelKeystores.this.modifyCardButton.setEnabled(false);
-					PreferencesPanelKeystores.this.deleteCardButton.setEnabled(false);
-		    	} else {
-		    		PreferencesPanelKeystores.this.connectButton.setEnabled(true);
-					PreferencesPanelKeystores.this.modifyCardButton.setEnabled(true);
-					PreferencesPanelKeystores.this.deleteCardButton.setEnabled(true);
-		    	}
-		    }
+		smartCards.addActionListener (e -> {
+			if (e.getModifiers() != 0 && smartCards.getSelectedIndex() == 0) {
+				PreferencesPanelKeystores.this.connectButton.setEnabled(false);
+				PreferencesPanelKeystores.this.modifyCardButton.setEnabled(false);
+				PreferencesPanelKeystores.this.deleteCardButton.setEnabled(false);
+			} else {
+				PreferencesPanelKeystores.this.connectButton.setEnabled(true);
+				PreferencesPanelKeystores.this.modifyCardButton.setEnabled(true);
+				PreferencesPanelKeystores.this.deleteCardButton.setEnabled(true);
+			}
 		});
 
 		loadPreferences();
@@ -850,7 +847,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
-    		filters.add(new PseudonymFilter());
+    		filters.add(new PseudonymFilter(PseudonymFilter.VALUE_ONLY));
     	}
     	if (filters.size() > 1) {
     		return Arrays.asList(
