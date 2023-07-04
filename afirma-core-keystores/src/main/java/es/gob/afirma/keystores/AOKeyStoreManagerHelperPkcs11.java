@@ -29,6 +29,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 final class AOKeyStoreManagerHelperPkcs11 {
 
@@ -127,7 +128,10 @@ final class AOKeyStoreManagerHelperPkcs11 {
 
         if (pssCallBack == null) {
         	return getKeyStoreWithNullPassword(p11Provider);
-        }
+        } else if (pssCallBack instanceof UIPasswordCallback) {
+			final String promptText = KeyStoreMessages.getString("AOKeyStore.15", AOKeyStore.PKCS11.getName()); //$NON-NLS-1$
+			((UIPasswordCallback) pssCallBack).setPrompt(promptText);
+		}
         try {
 			return KeyStoreUtilities.getKeyStoreWithPasswordCallbackHandler(
 				AOKeyStore.PKCS11,

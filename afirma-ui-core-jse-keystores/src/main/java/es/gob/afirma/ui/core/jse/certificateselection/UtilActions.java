@@ -84,12 +84,12 @@ final class UtilActions {
 		}
 	}
 
-	static void doChangeKeyStore(final int keyStoreType, final CertificateSelectionDialog selectionDialog, final Component parent) {
+	static void doChangeKeyStore(final int keyStoreType, final CertificateSelectionDialog selectionDialog, final Component parent , final String ksName, final String ksLibPath) {
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}
 
-		selectionDialog.changeKeyStore(keyStoreType);
+		selectionDialog.changeKeyStore(keyStoreType, ksName, ksLibPath);
 
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

@@ -11,10 +11,13 @@ package es.gob.afirma.standalone;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.security.UnrecoverableKeyException;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -149,18 +152,90 @@ public final class SimpleKeyStoreManager {
 				aoks,
 				parent
 			);
-		}
-        catch (final Exception e) {
-            throw new AOKeyStoreManagerException(
-        		"No se ha podido incializar el almacen '" +  aoks  + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-    		);
+		} catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+				&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+				AOUIFactory.showMessageDialog(
+						parent,
+		        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.12"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+				final boolean stopOperation = false;
+				while (!stopOperation) {
+					try {
+						return getKeyStoreManager(
+							aoks,
+							parent
+						);
+					} catch (final AOCancelledOperationException aoce) {
+						AOUIFactory.showMessageDialog(
+								parent,
+				        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.13"), //$NON-NLS-1$
+								SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+								JOptionPane.WARNING_MESSAGE
+						);
+						return loadSystemAOKSManager(parent);
+					} catch (final IOException ioe2) {
+						if (ioe.getCause() != null && ioe.getCause().getCause() != null
+								&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+							AOUIFactory.showMessageDialog(
+									parent,
+					        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.12"), //$NON-NLS-1$
+									SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+									JOptionPane.ERROR_MESSAGE
+							);
+							continue;
+						}
+					} catch (final Exception e) {
+			        	AOUIFactory.showErrorMessage(
+			            		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
+			    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			    				JOptionPane.ERROR_MESSAGE,
+			    				e
+			    			);
+			        	return loadSystemAOKSManager(parent);
+					}
+				}
+			}
+			AOUIFactory.showErrorMessage(
+					SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					ioe
+			);
+
+			return loadSystemAOKSManager(parent);
+
+		} catch (final AOCancelledOperationException aoce) {
+			AOUIFactory.showMessageDialog(
+					parent,
+	        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.13"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE
+			);
+			return loadSystemAOKSManager(parent);
+		} catch (final Exception e) {
+        	AOUIFactory.showErrorMessage(
+        		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE,
+				e
+			);
+
+        	return loadSystemAOKSManager(parent);
+
 		}
     }
 
     private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, AOKeystoreAlternativeException {
+    	String lib = null;
+    	if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+    		lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+    	}
     	return AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		aoks,
-    		null,
+    		lib,
     		null,
     		aoks.getStorePasswordCallback(parent),
     		parent
@@ -185,16 +260,6 @@ public final class SimpleKeyStoreManager {
 		return mozProfileDir != null && nssLibDir != null;
     }
 
-    private static AOKeyStore getDefaultKeyStoreTypeByOs(final OS os) {
-    	if (Platform.OS.WINDOWS.equals(os)) {
-    		return AOKeyStore.WINDOWS;
-    	}
-    	if (Platform.OS.MACOSX.equals(os)) {
-    		return AOKeyStore.APPLE;
-    	}
-    	return AOKeyStore.SHARED_NSS;
-    }
-
     /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
      * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */
     public static AOKeyStore getDefaultKeyStoreType() {
@@ -208,26 +273,82 @@ public final class SimpleKeyStoreManager {
     				if (isFirefoxAvailable()) {
     					return ks;
     				}
-					return getDefaultKeyStoreTypeByOs(os);
+					return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
     			// No deberia pasar
     			if (AOKeyStore.WINDOWS.equals(ks)) {
     				if (OS.WINDOWS.equals(os)) {
     					return ks;
     				}
-    				return getDefaultKeyStoreTypeByOs(os);
+    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
     			// No deberia pasar
     			if (AOKeyStore.APPLE.equals(ks)) {
     				if (OS.MACOSX.equals(os)) {
     					return ks;
     				}
-    				return getDefaultKeyStoreTypeByOs(os);
+    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
     			return ks;
     		}
     	}
-    	return getDefaultKeyStoreTypeByOs(os);
+    	return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+    }
+
+    /** Obtiene el &uacuteltimo almac&eacute;n de claves seleccionado por el usuario en caso de que se haya seleccionado.
+     * @return Almac&eacute;n de claves seleccionado por el usuario. */
+    public static AOKeyStore getLastKeystoreSelected() {
+    	final String savedStoreName = KeyStorePreferencesManager.getLastSelectedKeystore();
+    	if (savedStoreName != null && !savedStoreName.isEmpty()) {
+    		final OS os = Platform.getOS();
+    		final AOKeyStore ks = AOKeyStore.getKeyStore(savedStoreName);
+    		if (ks != null) {
+    			// Si desinstalan Firefox que no se quede una seleccion mala
+    			if (AOKeyStore.MOZ_UNI.equals(ks)) {
+    				if (isFirefoxAvailable()) {
+    					return ks;
+    				}
+					return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+    			}
+    			// No deberia pasar
+    			if (AOKeyStore.WINDOWS.equals(ks)) {
+    				if (OS.WINDOWS.equals(os)) {
+    					return ks;
+    				}
+    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+    			}
+    			// No deberia pasar
+    			if (AOKeyStore.APPLE.equals(ks)) {
+    				if (OS.MACOSX.equals(os)) {
+    					return ks;
+    				}
+    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+    			}
+    			return ks;
+    		}
+    	}
+    	return null;
+    }
+
+    /**
+     * Devuelve el gestor del almac&eacute;n de claves del sistema.
+     * @param parent Componente padre.
+     * @return Gestor del almac&eacute;n de claves del sistema.
+     * @throws AOKeyStoreManagerException Error al obtener el gestor.
+     */
+    private static AOKeyStoreManager loadSystemAOKSManager(final Component parent) throws AOKeyStoreManagerException {
+    	final OS os = Platform.getOS();
+    	final AOKeyStore osks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+    	try {
+			return getKeyStoreManager(
+					osks,
+					parent
+				);
+		} catch (final Exception e1) {
+			throw new AOKeyStoreManagerException(
+	        		"No se ha podido incializar el almacen del sistema", e1 //$NON-NLS-1$
+	    		);
+		}
     }
 
 }

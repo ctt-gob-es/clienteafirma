@@ -279,7 +279,7 @@ public final class UrlParametersToSign extends UrlParameters {
 			setResetSticky(false);
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStore(getKeyStoreName(params));
 		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 
 	}

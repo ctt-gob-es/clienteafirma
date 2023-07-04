@@ -28,6 +28,7 @@ import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -52,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
@@ -257,6 +259,15 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 					keystoresMenu.add(menuItemOpenDnieKs);
 				}
 
+				//Se obtienen todas las tarjetas inteligentes configuradas como almacen de claves
+				final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+				for (final String key : regResult.keySet()) {
+				    final String value = regResult.get(key);
+					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
+					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
+					keystoresMenu.add(menuItemOpenDnieKs);
+				}
+
 				URL openInBrowserImgResource;
 
 				if (!CertificateSelectionPanel.highContrast) {
@@ -305,75 +316,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 						}
 
 
-			// Boton para el cambio de vista de certificados
-			c.gridx++;
 
-			final JPopupMenu popupMenu = new JPopupMenu();
-
-			final ButtonGroup certViewsGroup = new ButtonGroup();
-			final JRadioButtonMenuItem menuItemPersonalView = new JRadioButtonMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.25")); //$NON-NLS-1$
-			menuItemPersonalView.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.PERSONAL));
-			menuItemPersonalView.setSelected(this.certLineView == CertificateLineView.PERSONAL);
-			certViewsGroup.add(menuItemPersonalView);
-			popupMenu.add(menuItemPersonalView);
-
-			final JRadioButtonMenuItem menuItemRepresentativeView = new JRadioButtonMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.26")); //$NON-NLS-1$
-			menuItemRepresentativeView.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.REPRESENTATIVE));
-			menuItemRepresentativeView.setSelected(this.certLineView == CertificateLineView.REPRESENTATIVE);
-			certViewsGroup.add(menuItemRepresentativeView);
-			popupMenu.add(menuItemRepresentativeView);
-
-			final JRadioButtonMenuItem menuItemPseudonymView = new JRadioButtonMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.27")); //$NON-NLS-1$
-			menuItemPseudonymView.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.PSEUDONYM));
-			menuItemPseudonymView.setSelected(this.certLineView == CertificateLineView.PSEUDONYM);
-			certViewsGroup.add(menuItemPseudonymView);
-			popupMenu.add(menuItemPseudonymView);
-
-			URL viewArrowImgResource;
-
-			if (!CertificateSelectionPanel.highContrast) {
-				viewArrowImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_black.png"); //$NON-NLS-1$
-			} else {
-				viewArrowImgResource = CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_white.png"); //$NON-NLS-1$
-			}
-
-			final JDropDownButton dropDownButton = new JDropDownButton(
-					new ImageIcon(
-						viewArrowImgResource,
-						CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
-					)
-				);
-			dropDownButton.setComponentPopupMenu(popupMenu);
-			dropDownButton.setRolloverEnabled(false);
-			dropDownButton.setBorder(BorderFactory.createEmptyBorder());
-			dropDownButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			dropDownButton.getAccessibleContext().setAccessibleDescription(
-				CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
-			);
-			dropDownButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.4")); //$NON-NLS-1$
-			dropDownButton.addFocusListener(
-					new FocusListener() {
-						  @Override
-						  public void focusGained(final FocusEvent e) {
-							  if (isHighContrast()) {
-								  dropDownButton.setIcon(new ImageIcon(
-										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_black.png"), //$NON-NLS-1$
-										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-								));
-							 }
-						  }
-						  @Override
-						  public void focusLost(final FocusEvent e) {
-							  if (isHighContrast()) {
-								  dropDownButton.setIcon(new ImageIcon(
-										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_white.png"), //$NON-NLS-1$
-										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-								));
-							 }
-						  }
-					}
-			);
-			this.add(dropDownButton, c);
 
 			// Boton de ayuda
 			c.insets = new Insets(13, 0, 8, 15);
@@ -432,6 +375,80 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			);
 			this.add(help, c);
 		}
+
+		// Boton para el cambio de vista de certificados
+		c.gridx++;
+
+		final JPopupMenu popupMenu = new JPopupMenu();
+
+		final ButtonGroup certViewsGroup = new ButtonGroup();
+		final JRadioButtonMenuItem menuItemPersonalView = new JRadioButtonMenuItem(
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.25")); //$NON-NLS-1$
+		menuItemPersonalView
+				.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.PERSONAL));
+		menuItemPersonalView.setSelected(this.certLineView == CertificateLineView.PERSONAL);
+		certViewsGroup.add(menuItemPersonalView);
+		popupMenu.add(menuItemPersonalView);
+
+		final JRadioButtonMenuItem menuItemRepresentativeView = new JRadioButtonMenuItem(
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.26")); //$NON-NLS-1$
+		menuItemRepresentativeView.addActionListener(
+				new ChangeViewActionListener(this, selectionDialog, CertificateLineView.REPRESENTATIVE));
+		menuItemRepresentativeView.setSelected(this.certLineView == CertificateLineView.REPRESENTATIVE);
+		certViewsGroup.add(menuItemRepresentativeView);
+		popupMenu.add(menuItemRepresentativeView);
+
+		final JRadioButtonMenuItem menuItemPseudonymView = new JRadioButtonMenuItem(
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.27")); //$NON-NLS-1$
+		menuItemPseudonymView
+				.addActionListener(new ChangeViewActionListener(this, selectionDialog, CertificateLineView.PSEUDONYM));
+		menuItemPseudonymView.setSelected(this.certLineView == CertificateLineView.PSEUDONYM);
+		certViewsGroup.add(menuItemPseudonymView);
+		popupMenu.add(menuItemPseudonymView);
+
+		URL viewArrowImgResource;
+
+		if (!CertificateSelectionPanel.highContrast) {
+			viewArrowImgResource = CertificateSelectionPanel.class
+					.getResource("/resources/toolbar/ic_view_arrow_black.png"); //$NON-NLS-1$
+		} else {
+			viewArrowImgResource = CertificateSelectionPanel.class
+					.getResource("/resources/toolbar/ic_view_arrow_white.png"); //$NON-NLS-1$
+		}
+
+		final JDropDownButton dropDownButton = new JDropDownButton(
+				new ImageIcon(viewArrowImgResource, CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
+				));
+		dropDownButton.setComponentPopupMenu(popupMenu);
+		dropDownButton.setRolloverEnabled(false);
+		dropDownButton.setBorder(BorderFactory.createEmptyBorder());
+		dropDownButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		dropDownButton.getAccessibleContext()
+				.setAccessibleDescription(CertificateSelectionDialogMessages.getString("UtilToolBar.4") //$NON-NLS-1$
+				);
+		dropDownButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.4")); //$NON-NLS-1$
+		dropDownButton.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(final FocusEvent e) {
+				if (isHighContrast()) {
+					dropDownButton.setIcon(new ImageIcon(
+							CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_black.png"), //$NON-NLS-1$
+							CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+					));
+				}
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {
+				if (isHighContrast()) {
+					dropDownButton.setIcon(new ImageIcon(
+							CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_view_arrow_white.png"), //$NON-NLS-1$
+							CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+					));
+				}
+			}
+		});
+		this.add(dropDownButton, c);
 
 		c.gridwidth = 5;
 		c.insets = new Insets(0, 15, 4, 15);
@@ -861,16 +878,29 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;
 		private final int keyStoreType;
+		private final String keyStoreName;
+		private final String ksLibPath;
 
 		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final int keyStoreType) {
 			this.panel = panel;
 			this.dialog = dialog;
 			this.keyStoreType = keyStoreType;
+			this.keyStoreName = null;
+			this.ksLibPath = null;
+		}
+
+		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog,
+											final int keyStoreType, final String ksName, final String ksLibPath) {
+			this.panel = panel;
+			this.dialog = dialog;
+			this.keyStoreType = keyStoreType;
+			this.keyStoreName = ksName;
+			this.ksLibPath = ksLibPath;
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel);
+			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel, this.keyStoreName, this.ksLibPath);
 		}
 	}
 }

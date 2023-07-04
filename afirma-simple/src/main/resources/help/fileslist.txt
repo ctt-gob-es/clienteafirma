@@ -11,6 +11,7 @@ shrd/logo_cliente.png
 Spanish.lproj/AutoFirma.html
 Spanish.lproj/AutoFirmaHelpIcon.png
 Spanish.lproj/index.html
+Spanish.lproj/gfx/menualmacenesclaves_mini.png
 Spanish.lproj/gfx/menufirmascades_mini.png
 Spanish.lproj/gfx/menufirmasfacturae_mini.png
 Spanish.lproj/gfx/menufirmaspadesvisible1_mini.png

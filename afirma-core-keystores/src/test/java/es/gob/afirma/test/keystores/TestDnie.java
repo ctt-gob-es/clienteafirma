@@ -9,10 +9,20 @@
 
 package es.gob.afirma.test.keystores;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.Provider;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.security.auth.callback.PasswordCallback;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -23,6 +33,7 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreUtilities;
+import es.gob.afirma.keystores.KeyStoreUtilities.PasswordCallbackHandler;
 
 /** Pruebas espec&iacute;ficas para el almac&eacute;n DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -114,8 +125,11 @@ public class TestDnie {
 		new TestDnie().testDnieJava();
 	}
 
-    /** Prueba de carga y uso del almac&eacute;n DNIe 100% Java.
-     * @throws Exception En cualquier error. */
+    /**
+     * Prueba de carga y uso del DNIe a trav&eacute;s del proveedor del
+     * gestor de almac&eacute;n de tipo PKCS#11 del Cliente.
+     * @throws Exception En cualquier error.
+     */
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore // Necesita un DNIe
@@ -144,7 +158,63 @@ public class TestDnie {
         signature.update("Hola mundo!".getBytes()); //$NON-NLS-1$
         final byte[] sign = signature.sign();
         System.out.println("FIRMA: " + AOUtil.hexify(sign, true)); //$NON-NLS-1$
-
     }
 
+    /**
+     * Prueba de carga y uso de DNIe directamente a trav&eacute;s de su PKCS#11, sin usar clases
+     * del cliente.
+     * @throws Exception En cualquier error.
+     */
+    @SuppressWarnings("static-method")
+	@Test
+	@Ignore // Necesita un DNIe
+    public void testRawDniePkcs11() throws Exception {
+
+        final String p11ProviderName = "Afirma-P11-64"; //$NON-NLS-1$
+        final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(DNIE_P11_64, p11ProviderName, null).getBytes();
+
+        final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
+        final File f = File.createTempFile("pkcs11_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
+        try (
+        		final OutputStream fos = new FileOutputStream(f);
+        		) {
+        	fos.write(config);
+        	fos.close();
+        }
+
+        final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
+        final Provider configuredProvider = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
+        f.deleteOnExit();
+        Security.addProvider(configuredProvider);
+
+
+        final PasswordCallback storePasswordCallback = AOKeyStore.PKCS11.getStorePasswordCallback(null);
+
+    	final PasswordCallbackHandler handler = new PasswordCallbackHandler(null, storePasswordCallback);
+    	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(handler);
+
+    	final KeyStore.Builder builder = KeyStore.Builder.newInstance(
+    		AOKeyStore.PKCS11.getProviderName(),
+			configuredProvider,
+			chp
+		);
+
+    	final KeyStore ks = builder.getKeyStore();
+    	ks.load(null, null);
+
+    	final PasswordCallback certPasswordCallback = AOKeyStore.PKCS11.getCertificatePasswordCallback(null);
+    	final PrivateKeyEntry keyEntry = (PrivateKeyEntry) ks.getEntry(SIGN_ALIAS, new KeyStore.PasswordProtection(certPasswordCallback.getPassword()));
+
+    	final Signature signature = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
+    	signature.initSign(keyEntry.getPrivateKey());
+
+
+//    	final Provider signProvider = signature.getProvider();
+//    	System.out.println(signProvider.getName() + ": " + signProvider.getClass());
+
+    	signature.update("Hola mundo!".getBytes()); //$NON-NLS-1$
+        final byte[] sign = signature.sign();
+        System.out.println("FIRMA: " + AOUtil.hexify(sign, true)); //$NON-NLS-1$
+
+    }
 }

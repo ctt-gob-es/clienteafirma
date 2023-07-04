@@ -141,6 +141,10 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 		this.keystoreFile = pkcs12File;
 	}
 
+	protected String getKeyStoreFile() {
+		return this.keystoreFile;
+	}
+
 	@Override
 	public void refresh() throws IOException {
 		// Para recargar el almacen, volvemos a cargar el fichero indicado.

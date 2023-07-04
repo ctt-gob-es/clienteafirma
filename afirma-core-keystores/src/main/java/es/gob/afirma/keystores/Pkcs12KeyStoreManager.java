@@ -9,10 +9,13 @@
 
 package es.gob.afirma.keystores;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.security.auth.callback.PasswordCallback;
+
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo PKCS#12 / PFX.
  * Contempla la posibilidad de que el almac&eacute;n y las claves tengan distintas contrase&ntilde;as
@@ -35,6 +38,16 @@ public final class Pkcs12KeyStoreManager extends FileKeyStoreManager {
                                                       IOException {
 
 		this.passwordCallBack = pssCallBack;
+
+		// Si es posible, personalizamos el dialogo de solicitud de contrasena con el nombre del fichero PKCS#12
+		if (this.passwordCallBack instanceof UIPasswordCallback) {
+			final String ksFile = getKeyStoreFile();
+			final String promptText = ksFile != null
+					? KeyStoreMessages.getString("AOKeyStore.15", new File(ksFile).getName()) //$NON-NLS-1$
+					: KeyStoreMessages.getString("AOKeyStore.1"); //$NON-NLS-1$
+			((UIPasswordCallback) this.passwordCallBack).setPrompt(promptText);
+		}
+
 		setKeyStore(init(store, this.passwordCallBack));
 	}
 }

@@ -30,9 +30,9 @@ public final class PseudonymFilter extends CertificateFilter {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final String VALUE_PSEUDONYM_AND_OTHERS = "andothers"; //$NON-NLS-1$
+	public static final String VALUE_PSEUDONYM_AND_OTHERS = "andothers"; //$NON-NLS-1$
 
-	private static final String VALUE_ONLY = "only"; //$NON-NLS-1$
+	public static final String VALUE_ONLY = "only"; //$NON-NLS-1$
 
 	private final String value;
 

@@ -102,7 +102,7 @@ public final class KeyStoreUtilities {
      * @param slot Lector de tarjetas en el que buscar la biblioteca.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
-    static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot) {
+    public static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot) {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
