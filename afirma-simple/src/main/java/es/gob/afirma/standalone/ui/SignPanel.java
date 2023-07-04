@@ -847,22 +847,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        welcomeLabel.setLabelFor(getSelectButton());
 	        this.add(welcomeLabel, BorderLayout.PAGE_START);
 
-	        String intro = SimpleAfirmaMessages.getString("SignPanel.40"); //$NON-NLS-1$
-
-	        try {
-				final int nReaders = javax.smartcardio.TerminalFactory.getDefault().terminals().list().size();
-	            if (nReaders == 1) {
-	                intro = intro + SimpleAfirmaMessages.getString("SignPanel.2"); //$NON-NLS-1$
-	            }
-	            else if (nReaders > 1) {
-	                intro = intro + SimpleAfirmaMessages.getString("SignPanel.4"); //$NON-NLS-1$
-	            }
-	        }
-	        catch(final Exception | Error e) {
-	        	LOGGER.warning(
-	    			"No ha sido posible obtener la lista de lectores de tarjetas del sistema: " + e //$NON-NLS-1$
-				);
-	        }
+	        final String intro = SimpleAfirmaMessages.getString("SignPanel.40"); //$NON-NLS-1$
 
 	        final JLabel introText = new JLabel(intro);
 	        introText.setLabelFor(getSelectButton());
