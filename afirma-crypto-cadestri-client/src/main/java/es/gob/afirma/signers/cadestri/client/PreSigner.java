@@ -57,7 +57,7 @@ final class PreSigner {
 		//  - Certificado de firma
 		//  - Parametros extra de configuracion
 		//  - Datos o identificador del documento a firmar
-		final StringBuffer urlBuffer = new StringBuffer();
+		final StringBuilder urlBuffer = new StringBuilder();
 		urlBuffer.append(signServerUrl).append(HTTP_CGI).
 		append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_PRESIGN).append(HTTP_AND).
 		append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
@@ -66,6 +66,10 @@ final class PreSigner {
 		append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(TriphaseUtil.prepareCertChainParam(certChain, extraParams)).append(HTTP_AND).
 		append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
+		// Estos parametros se pasan por URL, se quitan aqui para evitar un doble proceso
+		extraParams.remove("serverUrl"); //$NON-NLS-1$
+		extraParams.remove("documentId"); //$NON-NLS-1$
+
 		if (extraParams.size() > 0) {
 			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
 			append(AOUtil.properties2Base64(extraParams));
@@ -73,5 +77,4 @@ final class PreSigner {
 
 		return urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
 	}
-
 }

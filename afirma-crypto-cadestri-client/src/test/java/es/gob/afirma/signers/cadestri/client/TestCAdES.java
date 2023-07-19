@@ -12,6 +12,7 @@ package es.gob.afirma.signers.cadestri.client;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -50,8 +51,8 @@ public final class TestCAdES {
 	private static final List<byte[]> DATA = new ArrayList<>(2);
 	static {
 		for (final String dataFile : DATA_FILES) {
-			try {
-				DATA.add(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(dataFile)));
+			try (InputStream is = ClassLoader.getSystemResourceAsStream(dataFile)) {
+				DATA.add(AOUtil.getDataFromInputStream(is));
 			}
 			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas '" + dataFile + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -83,30 +84,30 @@ public final class TestCAdES {
 		p3.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 
 		CADES_MODES = new Properties[] {
-				p1, p2, p3
+			p1, p2, p3
 		};
 	}
 
 	/** Algoritmos de firma a probar. */
-	private final static String[] ALGOS = new String[] {
+	private final static String[] ALGOS = {
 		AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 		//		AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA
 	};
 
-	/**
-	 * Prueba de firma convencional.
-	 * @throws Exception en cualquier error
-	 */
+	/** Prueba de firma convencional.
+	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Necesita el servidor
+	@Ignore("Necesita el servidor")
 	public void testSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 		final PrivateKeyEntry pke;
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		try (InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)) {
+			ks.load(is, CERT_PASS.toCharArray());
+		}
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
@@ -133,7 +134,7 @@ public final class TestCAdES {
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 					try (
-						final OutputStream os = new FileOutputStream(saveFile);
+						OutputStream os = new FileOutputStream(saveFile);
 					) {
 						os.write(result);
 						os.flush();
@@ -150,7 +151,7 @@ public final class TestCAdES {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Necesita el servidor
+	@Ignore("Necesita el servidor")
 	public void testCoSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -189,7 +190,7 @@ public final class TestCAdES {
 
 					final File saveFile = File.createTempFile("Cofirma_CAdES_" + algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					try (
-						final OutputStream os = new FileOutputStream(saveFile);
+						OutputStream os = new FileOutputStream(saveFile)
 					) {
 						os.write(sign3);
 						os.flush();
@@ -200,42 +201,41 @@ public final class TestCAdES {
 		}
 	}
 
-	/**
-	 * Carga la clave privada un certificado de un almac&eacute;n en disco.
+	/** Carga la clave privada un certificado de un almac&eacute;n en disco.
 	 * @param pkcs12File Fichero P12/PFX.
 	 * @param alias Alias del certificado.
 	 * @param password Contrase&ntilde;a.
 	 * @return Clave privada del certificado.
-	 * @throws Exception Cuando falla la carga de la clave.
-	 */
-	private static PrivateKeyEntry loadKeyEntry(final String pkcs12File, final String alias, final String password) throws Exception {
-		final PrivateKeyEntry pke;
-
+	 * @throws Exception Cuando falla la carga de la clave. */
+	private static PrivateKeyEntry loadKeyEntry(final String pkcs12File,
+			                                    final String alias,
+			                                    final String password) throws Exception {
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(pkcs12File), password.toCharArray());
-		pke = (PrivateKeyEntry) ks.getEntry(alias, new KeyStore.PasswordProtection(password.toCharArray()));
-
-		return pke;
+		try (InputStream is = ClassLoader.getSystemResourceAsStream(pkcs12File)) {
+			ks.load(is, password.toCharArray());
+		}
+		return (PrivateKeyEntry) ks.getEntry(alias, new KeyStore.PasswordProtection(password.toCharArray()));
 	}
 
-	private static byte[] sign(final AOSigner signer, final byte[] data, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
+	private static byte[] sign(final AOSigner signer,
+			                   final byte[] data,
+			                   final String algorithm,
+			                   final PrivateKeyEntry pke,
+			                   final Properties params) throws Exception {
 		return signer.sign(data, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params);
 	}
 
-	/**
-	 * Cofirma sin necesidad de los datos originales.
+	/** Cofirma sin necesidad de los datos originales.
 	 * @param signer Firmador.
 	 * @param sign Firma que se debe cofirmar.
 	 * @param algorithm Algoritmo de firma.
 	 * @param pke Entra de clave privada para la firma.
 	 * @param params Par&aacute;metros extra de configuraci&oacute;n.
 	 * @return Cofirma.
-	 * @throws Exception Cuando falla la cofirma.
-	 */
+	 * @throws Exception Cuando falla la cofirma. */
 	private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
 		return signer.cosign(sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params);
 	}
-
 
 	private static byte[] cosign(final AOSigner signer, final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
 		return signer.cosign(data, sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params);
