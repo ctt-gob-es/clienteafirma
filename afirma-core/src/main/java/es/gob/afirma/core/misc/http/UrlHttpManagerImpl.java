@@ -9,6 +9,9 @@
 
 package es.gob.afirma.core.misc.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,13 +26,21 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -184,19 +195,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		);
 		final boolean isSecureDomain = checkIsSecureDomain(uri);
 
-		if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
-			try {
-				disableSslChecks();
-				LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
-			}
-			catch(final Exception e) {
-				LOGGER.warning(
-					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-				);
-			}
-		}
-
-		byte[] data;
+		final byte[] data;
 		try {
 			final HttpURLConnection conn;
 			if (Platform.OS.ANDROID.equals(Platform.getOS()) || isLocal(uri)) {
@@ -260,6 +259,22 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			// Si se ha establecido un tiempo de timeout, se configura como tiempo maximo hasta la conexion
 			if (timeout != DEFAULT_TIMEOUT) {
 				conn.setConnectTimeout(timeout);
+			}
+
+			if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
+				try {
+					disableSslChecks();
+					LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
+				}
+				catch(final Exception e) {
+					LOGGER.warning(
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+					);
+				}
+			} else {
+
+				configureTrustManagers(conn);
+
 			}
 
 			conn.connect();
@@ -365,5 +380,95 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 		return false;
 	}
+
+	private static void configureTrustManagers(final HttpURLConnection conn) {
+
+		final File cacertsDir = new File(System.getProperty("java.home") + File.separator + "lib" + File.separator + "security");
+		final File cacertsFile = new File(cacertsDir, "cacerts");
+
+		final TrustManager[] trustManagers = new TrustManager[2];
+
+		try (InputStream trustedKSStream = new FileInputStream(cacertsFile)) {
+			final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+			ks.load(trustedKSStream, "changeit".toCharArray());
+			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
+			final Enumeration<String> aliases = ks.aliases();
+			final X509Certificate[] cacertsCerts = new X509Certificate[ks.size()];
+			for (int i = 0 ; i < ks.size() ; i++) {
+				final Certificate cert = ks.getCertificate(aliases.nextElement());
+				final X509Certificate x509cert = (X509Certificate) certFactory.generateCertificate(
+																new ByteArrayInputStream(cert.getEncoded())
+																);
+				cacertsCerts[i] = x509cert;
+			}
+
+			trustManagers[0] = new X509TrustManager() {
+				@Override
+				public X509Certificate[] getAcceptedIssuers() {
+					return cacertsCerts;
+				}
+				@Override
+				public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+				@Override
+				public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+			};
+
+
+		} catch (final Exception e) {
+			LOGGER.warning(
+					"Error al leer el almacen de confianza de Java: " + e //$NON-NLS-1$
+				);
+		}
+
+		final File afirmaTrustKSFile = new File(Platform.getUserHome() + File.separator + ".afirma" + File.separator + "TrustedCertsKeystore.jks");
+
+		try (InputStream trustedKSStream = new FileInputStream(afirmaTrustKSFile)) {
+			final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+			ks.load(trustedKSStream, "changeit".toCharArray());
+			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
+			final Enumeration<String> aliases = ks.aliases();
+			final X509Certificate[] afirmaTrustedCerts  = new X509Certificate[ks.size()];
+			for (int i = 0 ; i < ks.size() ; i++) {
+				final Certificate cert = ks.getCertificate(aliases.nextElement());
+				final X509Certificate x509cert = (X509Certificate) certFactory.generateCertificate(
+																new ByteArrayInputStream(cert.getEncoded())
+																);
+				afirmaTrustedCerts[i] = x509cert;
+			}
+
+			trustManagers[1] = new X509TrustManager() {
+				@Override
+				public X509Certificate[] getAcceptedIssuers() {
+					return afirmaTrustedCerts;
+				}
+				@Override
+				public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+				@Override
+				public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+			};
+
+		} catch (final Exception e) {
+			LOGGER.warning(
+					"Error al leer el almacen de confianza de AutoFirma: " + e //$NON-NLS-1$
+				);
+		}
+
+
+		try {
+			SSLContext sslContext;
+			sslContext = SSLContext.getInstance(SSLContext.getDefault().getProtocol());
+			sslContext.init(null, trustManagers, new SecureRandom());
+
+	        if (conn instanceof HttpsURLConnection) {
+	            ((HttpsURLConnection) conn).setSSLSocketFactory(sslContext.getSocketFactory());
+	        }
+		} catch (final Exception e) {
+			LOGGER.warning(
+					"Error al iniciar el contexto de SSL: " + e //$NON-NLS-1$
+				);
+		}
+
+	}
+
 
 }

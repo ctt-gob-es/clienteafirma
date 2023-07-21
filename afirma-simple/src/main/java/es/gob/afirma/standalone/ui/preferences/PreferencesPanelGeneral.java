@@ -432,6 +432,18 @@ final class PreferencesPanelGeneral extends JScrollPane {
 				"</html>"); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
 
+		final JButton trustedCertificatesButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.194") //$NON-NLS-1$
+			);
+
+		trustedCertificatesButton.setMnemonic('t');
+		trustedCertificatesButton.addActionListener(
+			ae -> trustedCertificatesDlg(this)
+		);
+		trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.195") //$NON-NLS-1$
+		);
+
 		final GridBagConstraints netConstraints = new GridBagConstraints();
 		netConstraints.insets = new Insets(0, 0, 4, 7);
 		netConstraints.gridx = 0;
@@ -451,6 +463,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		netConstraints.gridx++;
 		netConstraints.anchor = GridBagConstraints.LINE_END;
 		netConfigInnerPanel.add(proxyConfigButton, netConstraints);
+		netConstraints.insets = new Insets(0, 0, 0, 0);
+		netConstraints.anchor = GridBagConstraints.LINE_START;
+		netConstraints.gridy++;
+		netConstraints.gridx = 0;
+		netConfigInnerPanel.add(trustedCertificatesButton, netConstraints);
 
 		gbc.gridy++;
 		mainPanel.add(signGeneralPanel, gbc);
@@ -549,6 +566,22 @@ final class PreferencesPanelGeneral extends JScrollPane {
     			return;
 			}
     	}
+    }
+
+	/** Di&aacute;logo para configurar los certificados de confianza.
+	 * @param container Contenedor en el que se define el di&aacute;logo. */
+    public static void trustedCertificatesDlg(final Container container) {
+
+    	final TrustedCertificatesPanel trustedCertPanel = new TrustedCertificatesPanel();
+
+    	AOUIFactory.showConfirmDialog(
+				container,
+				trustedCertPanel,
+				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.0"), //$NON-NLS-1$
+				JOptionPane.CLOSED_OPTION,
+				JOptionPane.CLOSED_OPTION
+		);
+
     }
 
     /**

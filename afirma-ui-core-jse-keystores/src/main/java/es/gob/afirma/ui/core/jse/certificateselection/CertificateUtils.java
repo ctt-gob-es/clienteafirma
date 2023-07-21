@@ -31,7 +31,7 @@ import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.ui.core.jse.JSEUIManager;
 
 /** Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados. */
-final class CertificateUtils {
+public final class CertificateUtils {
 
     private CertificateUtils() {
         // No permitimos la instanciacion
@@ -43,7 +43,7 @@ final class CertificateUtils {
 	 * puede hacerlo, permite que el usuario lo almacene en la ruta que desee.
 	 * @param parent Componente padre sobre el que se muestran los di&aacute;logos.
 	 * @param certificate Certificado que deseamos abrir. */
-	static void openCert(final Component parent, final X509Certificate certificate) {
+	public static void openCert(final Component parent, final X509Certificate certificate) {
 
 		// Tratamos de abrir el certificado en Java 6
 		Class<?> desktopClass;
@@ -73,11 +73,7 @@ final class CertificateUtils {
 			try {
 				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
 				new ProcessBuilder(
-					new String[] {
-						"cmd", "/C", "start", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						"\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						"\"" + certFile.getAbsolutePath() + "\"" //$NON-NLS-1$ //$NON-NLS-2$
-					}
+					"cmd", "/C", "start", "\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", "\"" + certFile.getAbsolutePath() + "\"" //$NON-NLS-1$ //$NON-NLS-2$
 				).start();
 				return;
 			}
@@ -153,4 +149,5 @@ final class CertificateUtils {
 		final long currentDate = new Date().getTime();
 		return currentDate >= cert.getNotAfter().getTime() || currentDate <= cert.getNotBefore().getTime();
 	}
+
 }
