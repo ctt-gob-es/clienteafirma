@@ -35,6 +35,9 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PRAcroForm;
 import com.aowagie.text.pdf.PRAcroForm.FieldInformation;
+import com.aowagie.text.pdf.PRIndirectReference;
+import com.aowagie.text.pdf.PdfArray;
+import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfObject;
 import com.aowagie.text.pdf.PdfReader;
@@ -470,6 +473,8 @@ public final class DataAnalizerUtil {
 	 */
 	private static Map<String, PdfObject> getFieldValues(final PdfReader reader){
 		final LinkedHashMap<String, PdfObject> fields = new LinkedHashMap<>();
+
+		// Obtenermos los valores de los campos declarados
 		final PRAcroForm form = reader.getAcroForm();
 		final ArrayList<FieldInformation> fiList = form.getFields();
 		for (int i = 0; i < fiList.size(); i++) {
@@ -488,6 +493,51 @@ public final class DataAnalizerUtil {
 			}
 
 		}
+
+		// Por si acaso, buscamos en todas las paginas campos de formulario que no estuviesen bien
+		// declarados y los agregamos al listado anterior
+		for (int pagN = 1; pagN <= reader.getNumberOfPages(); pagN++) {
+			final PdfDictionary pageDict = reader.getPageN(pagN);
+			final PdfArray annots = pageDict.getAsArray(PdfName.ANNOTS);
+			if (annots != null) {
+				for (int i = 0; i < annots.size(); i++) {
+
+					// Comprobamos que podamos obtener la informacion de la anotacion
+					PdfDictionary annotDict = null;
+					final PdfObject annotRef = annots.getPdfObject(i);
+					if (annotRef instanceof PRIndirectReference) {
+						final PRIndirectReference indRef = (PRIndirectReference) annotRef;
+						annotDict = (PdfDictionary) reader.getPdfObject(indRef.getNumber());
+					}
+					else if (annotRef instanceof PdfDictionary) {
+						annotDict = (PdfDictionary) annotRef;
+					}
+
+					// Si encontramos una anotacion que puede ser un campo de formulario y no
+					// es de tipo firma, la analizamos
+					if (annotDict != null
+							&& PdfName.ANNOT.equals(annotDict.get(PdfName.TYPE))
+							&& PdfName.WIDGET.equals(annotDict.get(PdfName.SUBTYPE))
+							&& !PdfName.SIG.equals(annotDict.get(PdfName.FT))) {
+
+						// Tomamos el nombre (o generamos uno si no lo encontramos)
+
+						final PdfObject nameObject = annotDict.get(PdfName.T);
+						final String name = nameObject != null
+								? nameObject.toString()
+								: "P" + pagN + "A" + i; //$NON-NLS-1$ //$NON-NLS-2$
+
+						// Solo agregamos la anotacion al listado de campos de formulario
+						// si no existe ya un campo con ese nombre
+						if (!fields.containsKey(name)) {
+							final PdfObject valueObj = annotDict.get(PdfName.V);
+							fields.put(name, valueObj);
+						}
+					}
+				}
+			}
+		}
+
 		return fields;
 	}
 }

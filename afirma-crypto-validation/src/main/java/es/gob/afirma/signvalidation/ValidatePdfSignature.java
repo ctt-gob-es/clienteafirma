@@ -75,7 +75,7 @@ public final class ValidatePdfSignature extends SignValider {
 	@Override
 	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException {
 		final Properties params = new Properties();
-		params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
+		params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.toString(checkCertificates));
 		try {
 			return validate(sign, params);
 		} catch (final RuntimeConfigNeededException e) {

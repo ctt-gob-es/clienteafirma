@@ -66,6 +66,10 @@ public final class SignValidity {
 				return ret + ": el documento PDF es sospechoso de haberse modificado tras la firma"; //$NON-NLS-1$
 			case OVERLAPPING_SIGNATURE:
 				return ret + ": las firmas del documento se solapan pudiendo ocultar informacion"; //$NON-NLS-1$
+			case MODIFIED_FORM:
+				return ret + ": un formulario del documento fue modificado tras la firma"; //$NON-NLS-1$
+			case SUSPECTED_SIGNATURE:
+				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
