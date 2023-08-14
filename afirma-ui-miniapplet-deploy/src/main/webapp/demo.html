@@ -25,12 +25,9 @@
 		var firmarPdf;
 		var firmarFacturaE;
 		
-		function initOptions() {
-			firmarFichero = true;
-			firmarDatosGenerados = false;
-			firmarPdf = false;
-			firmarFacturaE = false;
-        }
+		var servletsBase = window.location.href.indexOf("/firmaMovil/") > 0
+				? window.location.href.substring(0, window.location.href.indexOf("/firmaMovil/") + "/firmaMovil/".length - 1)
+				: window.location.origin;
 		
 		function firmar() {
 			var divMensaje = document.getElementById('divmensaje');
@@ -40,10 +37,7 @@
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
-							"serverUrl=" + (window.location.href.indexOf("/firmaMovil/") > 0
-									? window.location.href.substring(0, window.location.href.indexOf("/firmaMovil/") + "/firmaMovil/".length - 1)
-									: window.location.origin)
-									+ "/afirma-server-triphase-signer/SignatureService"
+							"serverUrl=" + servletsBase + "/afirma-server-triphase-signer/SignatureService"
 							+ "\nfilters=nonexpired:";
 
 			var dataB64 = null;
@@ -169,8 +163,8 @@
 				document.getElementById("targetFile").style.display = "inline";
 				document.getElementById("targetFileText").style.display = "inline";
 				document.getElementById("targetFile").checked = "checked";
-				firmarFichero = false;
-				firmarDatosGenerados = true;
+				firmarFichero = true;
+				firmarDatosGenerados = false;
 				firmarPdf = false;
 				firmarFacturaE = false;
 
@@ -180,7 +174,6 @@
 
 				document.getElementById("faq_link").style.display = "none";
 			}
-			initOptions();
 		}
 		
 		function mostrarFormulario(form) {
@@ -225,7 +218,7 @@
 		}
 		
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
+		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->
@@ -265,11 +258,11 @@
 	<div class="separadorSeccion"></div>
 	<fieldset style="background-color: rgb(252,252,252)">
 	<div id="divmensaje"></div>
-	<p>Para realizar la firma de un formulario o un fichero localizado en su dispositivo m&oacute;vil:</p><br/>
+	<p>Esta p&aacute;gina le permitir&aacute; probar la operaci&oacute;n de firma del cliente m&oacute;vil al firmar un fichero localizado en su dispositivo m&oacute;vil, datos de ejemplo o un formulario web simple:</p><br/>
 
 	<div class="lblAnchoMaxMB">
 			<span>1. <a id="afirmaStoreLink" href="http://firmaelectronica.gob.es/Home/Descargas.html">Descargue Autofirma</a></span>
-			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="https://github.com/ctt-gob-es/clienteafirma/wiki/Instalaci%C3%B3n-AutoFirma:-Problemas-conocidos">Wiki del proyecto</a></span>
+			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="https://github.com/ctt-gob-es/clienteafirma/wiki/Preguntas-y-respuestas">Wiki del proyecto</a></span>
 	</div><br/>
 	<div class="lb2AnchoMaxMB">
 			<span>2. Seleccione el formato de firma que desea utilizar</span>
@@ -286,7 +279,6 @@
 				<option value="FacturaEtri">FacturaEtri</option>
 				<option value="NONE">NONE</option>
 				<option value="NONEtri">NONEtri</option>
-				<option value="AUTO">AUTO</option>
 			</select>
 	</div><br/>
 	<div class="lblAnchoMaxMB">

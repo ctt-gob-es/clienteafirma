@@ -19,7 +19,10 @@
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
-		
+		var servletsBase = window.location.href.indexOf("/firmaMovil/") > 0
+			? window.location.href.substring(0, window.location.href.indexOf("/firmaMovil/") + "/firmaMovil/".length - 1)
+			: window.location.origin;
+	
 		function seleccionarCertificado() {
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='';
@@ -90,7 +93,7 @@
 		}
 	-->
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
+		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->
