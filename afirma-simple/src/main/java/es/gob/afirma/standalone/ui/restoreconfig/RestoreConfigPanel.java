@@ -228,5 +228,4 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 					RestoreConfigPanel.this.taskOutput.getDocument().getLength());
 		});
 	}
-
 }
