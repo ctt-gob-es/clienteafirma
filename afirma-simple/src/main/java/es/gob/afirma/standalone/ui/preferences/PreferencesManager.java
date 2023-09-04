@@ -9,6 +9,8 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -22,10 +24,14 @@ public final class PreferencesManager {
 
 	/** Objecto general de preferencias donde se guarda la configuraci&oacute;n de la
 	 * aplicaci&oacute;n. */
-	private static final Preferences PREFERENCES;
+	private static final Preferences USER_PREFERENCES;
+	private static final Preferences SYSTEM_PREFERENCES;
 	private static final Properties PROPERTIES;
+	private static final String TRUE_VALUE = "true"; //$NON-NLS-1$
+	private static final String FALSE_VALUE = "false"; //$NON-NLS-1$
 	static {
-		PREFERENCES = Preferences.userNodeForPackage(PreferencesManager.class);
+		USER_PREFERENCES = Preferences.userNodeForPackage(PreferencesManager.class);
+		SYSTEM_PREFERENCES = Preferences.systemNodeForPackage(PreferencesManager.class);
 
 		PROPERTIES = new Properties();
 		try {
@@ -496,7 +502,16 @@ public final class PreferencesManager {
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
 	public static String get(final String key) {
-		return PREFERENCES.get(key, getDefaultPreference(key));
+		return USER_PREFERENCES.get(key, getSystemPreference(key));
+	}
+
+	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
+	 * aplicaci&oacute;n o, si no se encuentra, devuelve el valor configurado en el sistema para esa
+	 * propiedad.
+	 * @param key Clave del valor que queremos recuperar.
+	 * @return El valor almacenado de la propiedad o el valor configurado en el sistema si no se encontr&oacute;. */
+	public static String getSystemPreference(final String key) {
+		return SYSTEM_PREFERENCES.get(key, getDefaultPreference(key));
 	}
 
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
@@ -504,7 +519,7 @@ public final class PreferencesManager {
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return El valor almacenado de la propiedad o {@code null} si no se encontr&oacute;. */
 	public static String getConfiguredProperty(final String key) {
-		return PREFERENCES.get(key, null);
+		return USER_PREFERENCES.get(key, null);
 	}
 
 	/**
@@ -518,9 +533,17 @@ public final class PreferencesManager {
 	/** Recupera el valor {@code true} o {@code false} almacenado entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
+	 * @return La preferencia almacenada o la configurada en el sistema si no se encontr&oacute;. */
 	public static boolean getBoolean(final String key) {
-		return PREFERENCES.getBoolean(key, getBooleanDefaultPreference(key));
+		return USER_PREFERENCES.getBoolean(key, getBooleanSystemPreference(key));
+	}
+
+	/**
+	 * Recupera el valor de una cadena de texto almacenada en las propiedades del sistema.
+	 * @param key Clave del valor que queremos recuperar.
+	 * @return La preferencia almacenada o la que se encuentra configurada por defecto si no se encontr&oacute;. */
+	public static boolean getBooleanSystemPreference(final String key) {
+		return SYSTEM_PREFERENCES.getBoolean(key, getBooleanDefaultPreference(key));
 	}
 
 	/**
@@ -529,7 +552,6 @@ public final class PreferencesManager {
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static boolean getBooleanDefaultPreference(final String key) {
 		return Boolean.parseBoolean(PROPERTIES.getProperty(key));
-
 	}
 
 	/** Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
@@ -538,7 +560,11 @@ public final class PreferencesManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void put(final String key, final String value) {
-		PREFERENCES.put(key, value);
+		// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
+		final String configuratedProp = get(key);
+		if (configuratedProp != value) {
+			USER_PREFERENCES.put(key, value);
+		}
 	}
 
 	/** Establece un {@code true} o {@code false} en la configuraci&oacute;n de la aplicaci&oacute;n
@@ -547,28 +573,56 @@ public final class PreferencesManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void putBoolean(final String key, final boolean value) {
-		PREFERENCES.putBoolean(key, value);
+		// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
+		final boolean configuratedProp = getBoolean(key);
+		if (configuratedProp != value) {
+			USER_PREFERENCES.putBoolean(key, value);
+		}
+	}
+
+	/** Establece una cadena con clave y valor en las preferencias del sistema. Para realizar el guardado completo, es
+	 * necesario ejecutar el m&eacute;todo {@code flush()}.
+	 * @param key Clave con la que identificaremos el valor.
+	 * @param value Valor que se desea almacenar. */
+	public static void putSystemPref(final String key, final String value) {
+		SYSTEM_PREFERENCES.put(key, value);
+	}
+
+	/** Establece un {@code true} o {@code false} en las preferencias del sistema. Para realizar el guardado completo, es
+	 * necesario ejecutar el m&eacute;todo {@code flush()}.
+	 * @param key Clave con la que identificaremos el valor.
+	 * @param value Valor que se desea almacenar. */
+	public static void putBooleanSystemPref(final String key, final boolean value) {
+		SYSTEM_PREFERENCES.putBoolean(key, value);
 	}
 
 	/** Elimina una clave de entre la configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @param key Clave que eliminar. */
 	public static void remove(final String key) {
-		PREFERENCES.remove(key);
+		USER_PREFERENCES.remove(key);
 	}
 
 	/**
-	 * Elimina todas las preferencias de la aplicaci&oacute;n.
+	 * Elimina todas las preferencias del usuario de la aplicaci&oacute;n.
 	 * @throws BackingStoreException Si ocurre un error eliminando las preferencias.
 	 */
 	public static void clearAll() throws BackingStoreException {
-		PREFERENCES.clear();
+		USER_PREFERENCES.clear();
 	}
 
-	/** Almacena en las preferencias de la aplicaci&oacute;n todos los valores
+	/**
+	 * Elimina todas las preferencias del sistema de la aplicaci&oacute;n.
+	 * @throws BackingStoreException Si ocurre un error eliminando las preferencias.
+	 */
+	public static void clearAllSystemPrefs() throws BackingStoreException {
+		SYSTEM_PREFERENCES.clear();
+	}
+
+	/** Almacena en las preferencias del usuario de la aplicaci&oacute;n todos los valores
 	 * establecidos hasta el momento.
 	 * @throws BackingStoreException Cuando ocurre un error durante el guardado. */
 	public static void flush() throws BackingStoreException {
-		PREFERENCES.flush();
+		USER_PREFERENCES.flush();
 	}
 
 	/**
@@ -601,4 +655,27 @@ public final class PreferencesManager {
 				|| key.equals(PREFERENCE_CADES_IMPLICIT)
 				|| key.equals(PREFERENCE_FACTURAE_POLICY);
 	}
+
+	public static Map<String, Object> getUserPreferences() {
+
+		final Map<String, Object> result = new HashMap<String, Object>();
+		try {
+			final String[] keys = USER_PREFERENCES.keys();
+			for (int i = 0 ; i < keys.length ; i++) {
+				final String value = USER_PREFERENCES.get(keys[i], null);
+				if (value != null && (value.equals(TRUE_VALUE) || value.equals(FALSE_VALUE))) {
+					result.put(keys[i], Boolean.parseBoolean(value));
+				} else {
+					result.put(keys[i], value);
+				}
+			}
+		} catch (final BackingStoreException e) {
+			LOGGER.severe(
+					"Error al obtener preferencias configuradas por el usuario" //$NON-NLS-1$
+						+ e
+				);
+		}
+		return result;
+	}
+
 }

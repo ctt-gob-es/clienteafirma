@@ -39,15 +39,19 @@ import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import xmlwise.Plist;
+import xmlwise.XmlElement;
 import xmlwise.XmlParseException;
 
 /** Carga las preferencias de la aplicaci&oacute;n desde un fichero PList. */
-final class PreferencesPlistHandler {
+public final class PreferencesPlistHandler {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String PREFERENCES_SIGNATURE_PUK_BASE64;
 	private static final boolean ALLOW_UNSIGNED_PREFERENCES;
+	private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; //$NON-NLS-1$
+	private static final String PLIST_OPEN_TAG = "<plist version=\"1.0\">"; //$NON-NLS-1$
+	private static final String PLIST_CLOSE_TAG = "</plist>"; //$NON-NLS-1$
 	static {
 		final Properties p = new Properties();
 		try {
@@ -115,7 +119,7 @@ final class PreferencesPlistHandler {
 				);
 			}
 		}
-		importPreferencesFromXml(new String(configData), unprotected);
+		importUserPreferencesFromXml(new String(configData), unprotected);
 	}
 
 	/** Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
@@ -249,7 +253,7 @@ final class PreferencesPlistHandler {
 		}
 
 		try {
-			importPreferencesFromXml(new String(configData), unprotected);
+			importUserPreferencesFromXml(new String(configData), unprotected);
 		}
 		catch (final Exception e) {
 			LOGGER.log(
@@ -267,7 +271,7 @@ final class PreferencesPlistHandler {
 
 	}
 
-	private static void importPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
+	public static void importUserPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;
 		try {
 			properties = Plist.fromXml(xml);
@@ -277,7 +281,26 @@ final class PreferencesPlistHandler {
 		}
 
 		checkPreferences(properties);
-		storePreferences(properties, unprotected);
+		storeUserPreferences(properties, unprotected);
+	}
+
+	public static void importSystemPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
+		final Map<String, Object> properties;
+		try {
+			properties = Plist.fromXml(xml);
+		}
+		catch (final XmlParseException e) {
+			throw new InvalidPreferencesFileException("Error analizando el fichero XML: " + e, e); //$NON-NLS-1$
+		}
+
+		checkPreferences(properties);
+		storeSystemPreferences(properties, unprotected);
+	}
+
+	public static String exportPreferencesToXml() {
+		final Map<String, Object> userProperties = PreferencesManager.getUserPreferences();
+		final XmlElement xml = Plist.objectToXml(userProperties);
+		return XML_HEAD + PLIST_OPEN_TAG + xml.toXml() + PLIST_CLOSE_TAG;
 	}
 
 	/** Comprueba que las preferencias pasadas sean <code>String</code> o <code>Boolean</code>.
@@ -301,14 +324,14 @@ final class PreferencesPlistHandler {
 	}
 
 	/**
-	 * Almacena las preferencias en el registro del sistema de Windows.
+	 * Almacena las preferencias del usuario en el registro del sistema de Windows.
 	 * @param prefs
 	 *            Preferencias que se guardar&aacute; en el registro de Windows.
 	 * @param unprotected
 	 *            {@code true} Si las preferencias no est&aacute;n protegidas,
 	 *            {@code false} en caso contrario
 	 */
-	private static void storePreferences(final Map<String, Object> prefs, final boolean unprotected){
+	private static void storeUserPreferences(final Map<String, Object> prefs, final boolean unprotected){
 		final Set<String> keys = prefs.keySet();
 		for(final String key : keys) {
 			final Object o = prefs.get(key);
@@ -319,6 +342,30 @@ final class PreferencesPlistHandler {
 				}
 				else {
 					PreferencesManager.put(key, o.toString());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Almacena las preferencias del sistema en el registro del sistema de Windows.
+	 * @param prefs
+	 *            Preferencias que se guardar&aacute; en el registro de Windows.
+	 * @param unprotected
+	 *            {@code true} Si las preferencias no est&aacute;n protegidas,
+	 *            {@code false} en caso contrario
+	 */
+	private static void storeSystemPreferences(final Map<String, Object> prefs, final boolean unprotected){
+		final Set<String> keys = prefs.keySet();
+		for(final String key : keys) {
+			final Object o = prefs.get(key);
+			// Si unprotected es false, se pueden modificar todas las preferencias
+			if (!PreferencesManager.isProtectedPreference(key) || !unprotected) {
+				if (o instanceof Boolean) {
+					PreferencesManager.putBooleanSystemPref(key, ((Boolean) o).booleanValue());
+				}
+				else {
+					PreferencesManager.putSystemPref(key, o.toString());
 				}
 			}
 		}

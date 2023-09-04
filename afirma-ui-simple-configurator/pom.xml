@@ -60,6 +60,12 @@
 			<artifactId>afirma-ui-core-jse</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-simpleafirma</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
 
 		<dependency>
 		    <groupId>com.madgag.spongycastle</groupId>

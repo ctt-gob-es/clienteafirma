@@ -14,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -46,10 +48,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -79,8 +82,6 @@ final class ImportCertificatesDialog extends JDialog {
 		pack();
 		final Window ancestor = SwingUtilities.getWindowAncestor(this);
 		setLocationRelativeTo(ancestor);
-		//setLocation(Toolkit.getDefaultToolkit().getScreenSize().width/2 - getWidth()/2, Toolkit.getDefaultToolkit().getScreenSize().height/2 - getHeight()/2);
-		//setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLayout(new GridBagLayout());
 		setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
@@ -142,14 +143,53 @@ final class ImportCertificatesDialog extends JDialog {
 
 		importWebConstr.gridx = 2;
 
-		final JButton obtainCertButton= new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.12")); //$NON-NLS-1$
+		final JButton obtainCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.12")); //$NON-NLS-1$
 		obtainCertButton.addActionListener(
 				ae -> downloadRemoteCert(this, domainTxt)
-			);
+		);
+		obtainCertButton.setEnabled(false);
 		importWebCertPanel.add(obtainCertButton, importWebConstr);
+
+		domainTxt.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(final DocumentEvent e) {
+				if (domainTxt.getText().isEmpty()) {
+					obtainCertButton.setEnabled(false);
+				} else {
+					obtainCertButton.setEnabled(true);
+				}
+			}
+			@Override
+			public void removeUpdate(final DocumentEvent e) {
+				if (domainTxt.getText().isEmpty()) {
+					obtainCertButton.setEnabled(false);
+				} else {
+					obtainCertButton.setEnabled(true);
+				}
+			}
+			@Override
+			public void changedUpdate(final DocumentEvent e) {
+				if (domainTxt.getText().isEmpty()) {
+					obtainCertButton.setEnabled(false);
+				} else {
+					obtainCertButton.setEnabled(true);
+				}
+			}
+		});
 
         c.gridy++;
         this.add(importWebCertPanel, c);
+
+		final JButton closeDialogButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.28")); //$NON-NLS-1$
+		closeDialogButton.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(final ActionEvent e) {
+		        dispose();
+		    }
+		});
+
+        c.gridy++;
+        this.add(closeDialogButton, c);
 	}
 
 	private void downloadRemoteCert(final Container container, final JTextField domainTxt) {
@@ -176,8 +216,8 @@ final class ImportCertificatesDialog extends JDialog {
 		} catch (final SSLHandshakeException sslhe) {
 			try {
 				final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), true);
-		    	final VerifyImportCertDialog verifyImportCertDialog = new VerifyImportCertDialog(x509certs, this.ks, domainTxt.getText(), this);
-		    	verifyImportCertDialog.setVisible(true);
+				final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this);
+				confirmImportCertDialog.setVisible(true);
 			} catch (final Exception e) {
 				AOUIFactory.showErrorMessage(
 						container,
@@ -203,9 +243,9 @@ final class ImportCertificatesDialog extends JDialog {
 			certFile = AOUIFactory.getLoadFiles(
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.20"), //$NON-NLS-1$
 				null,
-				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.21"), //$NON-NLS-1$
-				new String[] { "cer", "cert", "crt" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				null,
+				new String[] { "cer", "cert", "crt" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.21"), //$NON-NLS-1$
 				false,
 				true,
 				AutoFirmaUtil.getDefaultDialogsIcon(),
@@ -287,16 +327,10 @@ final class ImportCertificatesDialog extends JDialog {
 		try (InputStream trustedKSStream = new FileInputStream(trustedKSFile)) {
 
 			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-			if (disableSSL) {
-				SslSecurityManager.disableSslChecks();
-			}
 			final URL url = new URL(domainName);
 			final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 			conn.connect();
 			final Certificate [] trustedServerCerts = conn.getServerCertificates();
-			if (disableSSL) {
-				SslSecurityManager.enableSslChecks();
-			}
 			conn.disconnect();
 			if (this.ks == null) {
 				this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$

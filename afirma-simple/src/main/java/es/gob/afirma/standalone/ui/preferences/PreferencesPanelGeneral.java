@@ -191,6 +191,46 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		importConfigFromFileButton.setEnabled(!this.blocked);
 
+		final JButton exportConfigToFileButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.196") //$NON-NLS-1$
+		);
+
+		exportConfigToFileButton.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.197") //$NON-NLS-1$
+			);
+
+		exportConfigToFileButton.setMnemonic('G');
+		exportConfigToFileButton.addActionListener(
+				ae -> {
+						try {
+							final String xmlPrefs = PreferencesPlistHandler.exportPreferencesToXml();
+							AOUIFactory.getSaveDataToFile(xmlPrefs.getBytes(),
+									SimpleAfirmaMessages.getString("PreferencesPanel.198"), //$NON-NLS-1$
+									null,
+									null,
+									null,
+									PreferencesPanelGeneral.this);
+							AOUIFactory.showMessageDialog(
+									getParent(),
+									SimpleAfirmaMessages.getString("PreferencesPanel.199"), //$NON-NLS-1$
+									SimpleAfirmaMessages.getString("PreferencesPanel.200"), //$NON-NLS-1$
+									JOptionPane.INFORMATION_MESSAGE
+								);
+						} catch(final AOCancelledOperationException ex) {
+							// Operacion cancelada por el usuario
+							return;
+						} catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									SimpleAfirmaMessages.getString("PreferencesPanel.116"), //$NON-NLS-1$
+									SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
+									JOptionPane.ERROR_MESSAGE,
+									e
+							);
+							return;
+						}
+				}
+			);
+
 		final JButton restoreConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.135") //$NON-NLS-1$
 		);
@@ -218,6 +258,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		panelConstraint.weightx = 0.5;
 		panelConstraint.gridx = 0;
 		panel.add(importConfigFromFileButton, panelConstraint);
+		panelConstraint.gridx++;
+		panel.add(exportConfigToFileButton, panelConstraint);
 		panelConstraint.gridx++;
 		panel.add(restoreConfigFromFileButton, panelConstraint);
 

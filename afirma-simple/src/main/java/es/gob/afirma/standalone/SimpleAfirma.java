@@ -59,6 +59,7 @@ import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -800,6 +801,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		// Establecemos el listado de dominios seguros
 		HttpManager.setSecureDomains(
 				PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
+
+		// Establecemos los almacenes de claves de Java y de AutoFirma como de confianza para las
+		// conexiones remotas
+		UrlHttpManagerImpl.configureTrustManagers();
 
        	// Comprobamos si es necesario buscar actualizaciones
        	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera

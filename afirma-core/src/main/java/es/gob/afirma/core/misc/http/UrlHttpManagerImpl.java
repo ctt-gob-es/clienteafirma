@@ -40,6 +40,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
@@ -271,10 +272,20 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
 					);
 				}
-			} else {
+			}
 
-				configureTrustManagers(conn);
-
+			if (conn instanceof HttpsURLConnection) {
+				try {
+					final TrustManager[] trustManagers = obtainTrustManagers();
+					final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+					sslContext.init(null, trustManagers, new SecureRandom());
+			        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+			        HttpsURLConnection.setDefaultHostnameVerifier(((HttpsURLConnection) conn).getHostnameVerifier());
+				} catch (final Exception e) {
+					LOGGER.warning(
+							"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+					);
+				}
 			}
 
 			conn.connect();
@@ -381,38 +392,57 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		return false;
 	}
 
-	private static void configureTrustManagers(final HttpURLConnection conn) {
+	public static void configureTrustManagers() {
 
-		final File cacertsDir = new File(System.getProperty("java.home") + File.separator + "lib" + File.separator + "security");
-		final File cacertsFile = new File(cacertsDir, "cacerts");
+		final TrustManager[] trustManagers = obtainTrustManagers();
 
-		final TrustManager[] trustManagers = new TrustManager[2];
-
-		try (InputStream trustedKSStream = new FileInputStream(cacertsFile)) {
-			final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-			ks.load(trustedKSStream, "changeit".toCharArray());
-			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-			final Enumeration<String> aliases = ks.aliases();
-			final X509Certificate[] cacertsCerts = new X509Certificate[ks.size()];
-			for (int i = 0 ; i < ks.size() ; i++) {
-				final Certificate cert = ks.getCertificate(aliases.nextElement());
-				final X509Certificate x509cert = (X509Certificate) certFactory.generateCertificate(
-																new ByteArrayInputStream(cert.getEncoded())
-																);
-				cacertsCerts[i] = x509cert;
+		try {
+			final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+			sslContext.init(null, trustManagers, new java.security.SecureRandom());
+			final URL url = new URL("https://www.google.com/"); //$NON-NLS-1$
+			final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+			try {
+			    HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+			    HttpsURLConnection.setDefaultHostnameVerifier(conn.getHostnameVerifier());
+			} catch (final Exception e) {
+				LOGGER.warning(
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
 			}
+			conn.connect();
+			conn.disconnect();
+		} catch (final Exception e) {
+			LOGGER.warning(
+					"Error al iniciar el contexto de SSL: " + e //$NON-NLS-1$
+				);
+		}
+	}
 
-			trustManagers[0] = new X509TrustManager() {
-				@Override
-				public X509Certificate[] getAcceptedIssuers() {
-					return cacertsCerts;
-				}
-				@Override
-				public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
-				@Override
-				public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
-			};
+	public static TrustManager[] obtainTrustManagers() {
 
+		TrustManager[] trustManagers = null;
+
+		//Primero se configura el almacen de confianza de Java
+		try {
+			final TrustManagerFactory trustManagerFactory =
+					   TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+
+			trustManagerFactory.init((KeyStore) null);
+			trustManagers = new TrustManager[trustManagerFactory.getTrustManagers().length + 1];
+
+			for (int i = 0 ; i < trustManagerFactory.getTrustManagers().length ; i++) {
+				final X509TrustManager javaTrustManager = (X509TrustManager)trustManagerFactory.getTrustManagers()[i];
+				trustManagers[i] = new X509TrustManager() {
+					@Override
+					public X509Certificate[] getAcceptedIssuers() {
+						return javaTrustManager.getAcceptedIssuers();
+					}
+					@Override
+					public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+					@Override
+					public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+				};
+			}
 
 		} catch (final Exception e) {
 			LOGGER.warning(
@@ -420,11 +450,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				);
 		}
 
-		final File afirmaTrustKSFile = new File(Platform.getUserHome() + File.separator + ".afirma" + File.separator + "TrustedCertsKeystore.jks");
+		//En segundo lugar, se configura el almacen de claves de AutoFirma
+		final File afirmaTrustKSFile = new File(Platform.getUserHome() + File.separator + ".afirma" + File.separator + "TrustedCertsKeystore.jks");  //$NON-NLS-1$//$NON-NLS-2$
 
 		try (InputStream trustedKSStream = new FileInputStream(afirmaTrustKSFile)) {
 			final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-			ks.load(trustedKSStream, "changeit".toCharArray());
+			ks.load(trustedKSStream, "changeit".toCharArray()); //$NON-NLS-1$
 			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
 			final Enumeration<String> aliases = ks.aliases();
 			final X509Certificate[] afirmaTrustedCerts  = new X509Certificate[ks.size()];
@@ -436,16 +467,18 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				afirmaTrustedCerts[i] = x509cert;
 			}
 
-			trustManagers[1] = new X509TrustManager() {
-				@Override
-				public X509Certificate[] getAcceptedIssuers() {
-					return afirmaTrustedCerts;
-				}
-				@Override
-				public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
-				@Override
-				public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
-			};
+			if (trustManagers != null) {
+				trustManagers[trustManagers.length -1] = new X509TrustManager() {
+					@Override
+					public X509Certificate[] getAcceptedIssuers() {
+						return afirmaTrustedCerts;
+					}
+					@Override
+					public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+					@Override
+					public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+				};
+			}
 
 		} catch (final Exception e) {
 			LOGGER.warning(
@@ -453,21 +486,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				);
 		}
 
-
-		try {
-			SSLContext sslContext;
-			sslContext = SSLContext.getInstance(SSLContext.getDefault().getProtocol());
-			sslContext.init(null, trustManagers, new SecureRandom());
-
-	        if (conn instanceof HttpsURLConnection) {
-	            ((HttpsURLConnection) conn).setSSLSocketFactory(sslContext.getSocketFactory());
-	        }
-		} catch (final Exception e) {
-			LOGGER.warning(
-					"Error al iniciar el contexto de SSL: " + e //$NON-NLS-1$
-				);
-		}
-
+		return trustManagers;
 	}
 
 

@@ -22,7 +22,9 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -31,10 +33,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.ui.core.jse.certificateselection.CertificateUtils;
 
 final class TrustedCertificatesPanel extends JPanel  {
 
@@ -47,6 +52,12 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 	private JTable table;
 	private DefaultTableModel model;
+	JButton importCertButton = null;
+	JButton viewCertButton = null;
+	JButton deleteCertButton = null;
+	List<X509Certificate> savedCerts = new ArrayList<X509Certificate>();
+	private boolean noCerts = true;
+	private Integer rowSelected = null;
 
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 
@@ -89,44 +100,68 @@ final class TrustedCertificatesPanel extends JPanel  {
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 
-		final JButton importCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.2")); //$NON-NLS-1$
-		importCertButton.addActionListener(
+		this.importCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.2")); //$NON-NLS-1$
+		this.importCertButton.addActionListener(
 				ae -> importCertificatesDlg(this)
 			);
 
-		buttonsPanel.add(importCertButton, c);
+		buttonsPanel.add(this.importCertButton, c);
 
-		final JButton viewCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.3")); //$NON-NLS-1$
+		this.viewCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.3")); //$NON-NLS-1$
+		this.viewCertButton.addActionListener(
+        		ae -> CertificateUtils.openCert(this, this.savedCerts.get(this.rowSelected))
+		);
+		this.viewCertButton.setEnabled(false);
 
 		c.gridx++;
-		buttonsPanel.add(viewCertButton, c);
+		buttonsPanel.add(this.viewCertButton, c);
 
-		final JButton deleteCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.5")); //$NON-NLS-1$
+		this.deleteCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.5")); //$NON-NLS-1$
+		this.deleteCertButton.setEnabled(false);
 
 		c.gridx++;
-		buttonsPanel.add(deleteCertButton, c);
+		buttonsPanel.add(this.deleteCertButton, c);
+
+		if (this.noCerts == true) {
+			this.viewCertButton.setEnabled(false);
+			this.deleteCertButton.setEnabled(false);
+		}
 
 		return buttonsPanel;
 
 	}
 
-	private JScrollPane createImportedCertsTable () {
+	private JScrollPane createImportedCertsTable() {
 
 		  final JScrollPane scrollPane = new JScrollPane();
 		  scrollPane.setBounds(10, 11, 560, 227);
 
 		  final String[] columnNames = { "Nombre", "Emitido por", "Fecha de expiracion" };  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		  this.model = new DefaultTableModel(null, columnNames);
+		  this.model = new DefaultTableModel(null, columnNames) {
+			  @Override
+			  public boolean isCellEditable(final int row, final int column) {
+				  return false;
+			  }
+		  };
 
 		  final Object [] trustedCerts = obtainTrustedCerts(this);
 
 		  if (trustedCerts != null) {
 			  for (int i = 0; i < trustedCerts.length ; i++) {
 				  this.model.addRow((Object[]) trustedCerts[i]);
+				  this.noCerts = false;
 			  }
 		  }
 
 		  this.table = new JTable(this.model);
+		  this.table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		        @Override
+				public void valueChanged(final ListSelectionEvent event) {
+		        	TrustedCertificatesPanel.this.rowSelected = TrustedCertificatesPanel.this.table.getSelectedRow();
+		        	TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
+		        	TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
+		        }
+		    });
 		  scrollPane.setViewportView(this.table);
 
 		  return scrollPane;
@@ -135,12 +170,11 @@ final class TrustedCertificatesPanel extends JPanel  {
 	/** Di&aacute;logo para importar los certificados de confianza.
 	 * @param container Contenedor en el que se define el di&aacute;logo. */
     public static void importCertificatesDlg(final Container container) {
-
     	final ImportCertificatesDialog importCertDialog = new ImportCertificatesDialog(null);
     	importCertDialog.setVisible(true);
     }
 
-    private static Object[] obtainTrustedCerts(final Container parent) {
+    private Object[] obtainTrustedCerts(final Container parent) {
     	final File trustedKSFile = new File(ImportCertificatesDialog.getTrustedCertKSPath());
     	Object [] result = null;
     	if (trustedKSFile.exists()) {
@@ -155,6 +189,7 @@ final class TrustedCertificatesPanel extends JPanel  {
 					final X509Certificate x509cert = (X509Certificate) certFactory.generateCertificate(
 																	new ByteArrayInputStream(cert.getEncoded())
 																	);
+					this.savedCerts.add(x509cert);
 					final Object [] auxArray = {
 												x509cert.getSubjectDN(),
 												x509cert.getIssuerDN(),

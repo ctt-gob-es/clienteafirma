@@ -788,18 +788,20 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
 		RegisteredKeystore rks = null;
 
-		if (aoks == null) {
-			final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-			if (!regResult.isEmpty()) {
-				for (final String smartCardName : regResult.keySet()) {
-					if (ks.equals(smartCardName)) {
-						rks = new RegisteredKeystore(AOKeyStore.PKCS11);
-						rks.setName(smartCardName);
+		if (ks != null) {
+			if (aoks == null) {
+				final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+				if (!regResult.isEmpty()) {
+					for (final String smartCardName : regResult.keySet()) {
+						if (ks.equals(smartCardName)) {
+							rks = new RegisteredKeystore(AOKeyStore.PKCS11);
+							rks.setName(smartCardName);
+						}
 					}
 				}
+			} else {
+				rks = new RegisteredKeystore(aoks);
 			}
-		} else {
-			rks = new RegisteredKeystore(aoks);
 		}
 
 		if (rks != null) {
