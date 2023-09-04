@@ -8,7 +8,9 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -27,7 +29,8 @@ public class JarVerifier {
 
 	/**
 	 * Comprueba que un fichero se corresponda con un archivo JAR, que est&eacute; firmado
-	 * y que la firma sea integra.
+	 * y que las firmas sean integras y que todas las entradas est&eacute;n firmadas por los
+	 * mismos firmantes.
 	 * @param jarFile Fichero que hay que validar
 	 * @return Listado con las cadenas de certificados de firma del JAR o {@code null}
 	 * si no se encontraron certificados.
@@ -42,6 +45,7 @@ public class JarVerifier {
     		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
     	}
 
+    	final Set<CodeSigner> signers = new HashSet<>();
 		final List<X509Certificate[]> signingCerts = new ArrayList<>();
 
 		// Cargamos el archivo pidiendo que se valide
@@ -75,17 +79,30 @@ public class JarVerifier {
 				}
 
 				// Comprobamos que la entrada este firmada
-				final CodeSigner[] signers = entry.getCodeSigners();
-				if (signers == null) {
+				final CodeSigner[] entrySigners = entry.getCodeSigners();
+				if (entrySigners == null) {
 					throw new JarNoSignedException("Se han encontrado entradas sin firmar: " + entry.getName()); //$NON-NLS-1$
 				}
 
-				// Obtenemos los firmantes asociados a la entrada cargada.
-				// Aqui solo entraremos la primera vez
-				if (signingCerts.isEmpty()) {
-					for (final CodeSigner signer : signers) {
+				// Si no hemos registrado antes firmantes, los registramos
+				if (signers.isEmpty()) {
+					for (final CodeSigner signer : entrySigners) {
+						signers.add(signer);
+						// Agregamos sus certificados como certificados de firma
 						final List<? extends Certificate> certs = signer.getSignerCertPath().getCertificates();
 						signingCerts.add(certs.toArray(new X509Certificate[0]));
+					}
+				}
+				// Si ya estaban registrados, comprobamos que la entrada este firmada exactamente
+				// por los mismos firmantes que tenemos registrados
+				else {
+					if (entrySigners.length != signers.size()) {
+						throw new JarNoSignedException("Se han encontrado entradas no firmadas por todos los firmantes: " + entry.getName()); //$NON-NLS-1$
+					}
+					for (final CodeSigner signer : entrySigners) {
+						if (!signers.contains(signer)) {
+							throw new JarNoSignedException("Se han encontrado entradas firmadas por firmantes distintos al resto: " + entry.getName()); //$NON-NLS-1$
+						}
 					}
 				}
 			}
