@@ -10,12 +10,10 @@
 package es.gob.afirma.standalone.ui.preferences;
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -63,9 +61,6 @@ final class ImportCertificatesDialog extends JDialog {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final int PREFERRED_WIDTH = 600;
-	private static final int PREFERRED_HEIGHT = 300;
-
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 	private KeyStore ks;
 
@@ -79,76 +74,107 @@ final class ImportCertificatesDialog extends JDialog {
 		setTitle(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.6")); //$NON-NLS-1$
 		setIconImages(AutoFirmaUtil.getIconImages());
 		setResizable(false);
-		pack();
-		final Window ancestor = SwingUtilities.getWindowAncestor(this);
-		setLocationRelativeTo(ancestor);
+
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLayout(new GridBagLayout());
-		setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+		//setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 0.0;
+		c.weightx = 1.0;
 		c.gridy = 0;
+		c.insets = new Insets(11,  11,  0,  11);
 
 		final JLabel importDescLbl = new JLabel(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.7")); //$NON-NLS-1$
-
 		this.add(importDescLbl, c);
 
-        final JPanel importLocalCertPanel = new JPanel();
+		final JPanel importLocalCertPanel = createImportLocalCertUI();
+        c.gridy++;
+        this.add(importLocalCertPanel, c);
+
+
+        final JPanel importRemoteCertPanel = createImportRemoteCertUI();
+        c.gridy++;
+        this.add(importRemoteCertPanel, c);
+
+		final JButton closeDialogButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.28")); //$NON-NLS-1$
+		closeDialogButton.addActionListener(e -> dispose());
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.SOUTHEAST;
+		c.insets = new Insets(11,  11,  11,  11);
+        c.gridy++;
+        this.add(closeDialogButton, c);
+
+        pack();
+
+        final Window ancestor = SwingUtilities.getWindowAncestor(this);
+		setLocationRelativeTo(ancestor);
+	}
+
+	private JPanel createImportLocalCertUI() {
+		final JPanel importLocalCertPanel = new JPanel();
         importLocalCertPanel.setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.6") //$NON-NLS-1$
 			)
 		);
         importLocalCertPanel.setLayout(new GridBagLayout());
-		final GridBagConstraints importLocalConstr = new GridBagConstraints();
-		importLocalConstr.fill = GridBagConstraints.BOTH;
-		importLocalConstr.weightx = 0.0;
-		importLocalConstr.gridy = 0;
+
+        final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
+		c.gridx = 0;
+		c.insets = new Insets(5,  5,  5,  5);
 
 		final JLabel importLocalCertDesc = new JLabel(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.9")); //$NON-NLS-1$
-		importLocalCertPanel.add(importLocalCertDesc, importLocalConstr);
+		importLocalCertPanel.add(importLocalCertDesc, c);
 
-		importLocalConstr.gridx = 2;
 		final JButton fileButton= new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.13")); //$NON-NLS-1$
 		fileButton.addActionListener(
 				ae -> downloadLocalCert(this)
 			);
-		importLocalCertPanel.add(fileButton, importLocalConstr);
+		c.weightx = 0.0;
+		c.gridx++;
+		importLocalCertPanel.add(fileButton, c);
 
-        c.gridy++;
-        this.add(importLocalCertPanel, c);
+		return importLocalCertPanel;
+	}
 
-        final JPanel importWebCertPanel = new JPanel();
-        importWebCertPanel.setBorder(
+	private JPanel createImportRemoteCertUI() {
+		final JPanel importRemoteCertPanel = new JPanel();
+        importRemoteCertPanel.setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.10") //$NON-NLS-1$
 			)
 		);
-        importWebCertPanel.setLayout(new GridBagLayout());
-		final GridBagConstraints importWebConstr = new GridBagConstraints();
-		importWebConstr.fill = GridBagConstraints.BOTH;
-		importWebConstr.weightx = 0.0;
-		importWebConstr.gridy = 0;
-		importWebConstr.gridx = 0;
+        importRemoteCertPanel.setLayout(new GridBagLayout());
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1.0;
+		c.gridy = 0;
+		c.gridx = 0;
+		c.gridwidth = 2;
+		c.insets = new Insets(5,  5,  0,  5);
 
 		final JLabel importTrustedCertbl = new JLabel(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.11")); //$NON-NLS-1$
-		importWebCertPanel.add(importTrustedCertbl, importWebConstr);
+		importRemoteCertPanel.add(importTrustedCertbl, c);
 
-		importWebConstr.gridy++;
+		c.gridy++;
+		c.gridwidth = 1;
+		c.insets = new Insets(0,  5,  5,  5);
 
 		final JTextField domainTxt = new JTextField();
-		importWebCertPanel.add(domainTxt, importWebConstr);
+		importRemoteCertPanel.add(domainTxt, c);
 
-		importWebConstr.gridx = 2;
+		c.weightx = 0.0;
+		c.gridx++;
 
 		final JButton obtainCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.12")); //$NON-NLS-1$
 		obtainCertButton.addActionListener(
 				ae -> downloadRemoteCert(this, domainTxt)
 		);
 		obtainCertButton.setEnabled(false);
-		importWebCertPanel.add(obtainCertButton, importWebConstr);
+		importRemoteCertPanel.add(obtainCertButton, c);
 
 		domainTxt.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -177,19 +203,7 @@ final class ImportCertificatesDialog extends JDialog {
 			}
 		});
 
-        c.gridy++;
-        this.add(importWebCertPanel, c);
-
-		final JButton closeDialogButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.28")); //$NON-NLS-1$
-		closeDialogButton.addActionListener(new ActionListener() {
-		    @Override
-		    public void actionPerformed(final ActionEvent e) {
-		        dispose();
-		    }
-		});
-
-        c.gridy++;
-        this.add(closeDialogButton, c);
+		return importRemoteCertPanel;
 	}
 
 	private void downloadRemoteCert(final Container container, final JTextField domainTxt) {
@@ -347,5 +361,9 @@ final class ImportCertificatesDialog extends JDialog {
 
 
 		return x509certs;
+	}
+
+	public static void main(final String[] args) {
+		new ImportCertificatesDialog(null).setVisible(true);
 	}
 }
