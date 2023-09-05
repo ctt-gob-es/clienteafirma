@@ -34,6 +34,9 @@ public interface KeyStoreDialogManager {
 	/** Identificador de almac&eacute;n de DNIe. */
 	int KEYSTORE_ID_DNIE = 4;
 
+	/** Identificador de almac&eacute;n externo PKCS#11. */
+	int KEYSTORE_ID_PKCS11 = 5;
+
 	/** Manda recargar al almac&eacute;n asociado actualmente al di&aacute;logo de
 	 * selecci&oacute;n.
 	 * @throws IOException En caso de errores de entrada / salida. */
@@ -58,6 +61,16 @@ public interface KeyStoreDialogManager {
 	 * contrario.
 	 */
 	boolean changeKeyStoreManager(int keyStoreId, Component parent);
+
+	/**
+	 * Cambia el almac&eacute;n cargado a uno de tipo PKCS#11
+	 * @param parent Componente padre sobre el que mostrar cualquier di&aacute;logo gr&aacute;fico.
+	 * @param ksName Nombre del almac&eacute;n de claves PKCS#11.
+	 * @param ksLibPath Ruta con el controlador del almac&eacute;n de claves PKCS#11.
+	 * @return {@code true} si se completa el cambio de almac&eacute;n, {@code false} en caso
+	 * contrario.
+	 */
+	boolean changeKeyStoreManagerToPKCS11(Component parent, String ksName, String ksLibPath);
 
 	/**
 	 * Indica entre qu&eacute; tipos de almacenes se permite cambiar desde el di&aacute;logo de selecci&oacute;n.
@@ -109,4 +122,9 @@ public interface KeyStoreDialogManager {
 	 * certificados en el di&aacute;logo.
 	 * @return Nombre del tipo de almac&eacute;n o {@code null} si no se conoce. */
 	String getKeyStoreName();
+
+	/** Obtiene el nombre dde la librer&iacute;a en caso de que se utilice.
+	 * @return Nombre de la librer&iacute;a o {@code null} si no se conoce. */
+	String getLibName();
+
 }

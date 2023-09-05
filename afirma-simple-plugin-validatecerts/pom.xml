@@ -5,6 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>afirma-ui-simpleafirma-plugin-validatecerts</artifactId>
 	<packaging>jar</packaging>
+	<version>1.0</version>
 	
 	<name>afirma-ui-simpleafirma-plugin-validatecerts</name>
 	<description>Plugin para la validacion del certificado utilizado para firmar</description>
@@ -12,7 +13,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.8.1</version>
+		<version>1.9-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>

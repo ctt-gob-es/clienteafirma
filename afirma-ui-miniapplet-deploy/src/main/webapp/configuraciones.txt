@@ -1,0 +1,17 @@
+Firma manifest con una referencia:
+
+				+ "useManifest=true\n"
+				+ "mode=explicit\n"
+				+ "format=XAdES Detached\n"
+				+ "uri1=urn:portafirmas:lV1RI4C35q:csv:lyHzsJ4ylyAGQoU2j1JBrQ==\n"
+				+ "md1=kS3coDqvm2Hhyqx8L3yFhQAjXu4=\n";
+				+ "precalculatedHashAlgorithm=SHA1\n"
+
+
+Firma visible PDF:
+
+				+ "signaturePositionOnPageLowerLeftX=100\n"
+				+ "signaturePositionOnPageLowerLeftY=100\n"
+				+ "signaturePositionOnPageUpperRightX=200\n"
+				+ "signaturePositionOnPageUpperRightY=200\n"
+				+ "signaturePage=ALL"

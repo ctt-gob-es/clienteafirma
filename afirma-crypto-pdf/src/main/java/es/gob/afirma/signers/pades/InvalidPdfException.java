@@ -18,10 +18,20 @@ public final class InvalidPdfException extends AOFormatFileException {
 
 	private static final long serialVersionUID = 674827105543544636L;
 
-	/** Crea una excepci&oacute;n para notificar que se ha proporcionado un fichero que no es un PDF
-	 * @param e Excepci&oacute;n de orien */
-	public InvalidPdfException(final Throwable e) {
-		super("El fichero no es un PDF o es un PDF no soportado", e); //$NON-NLS-1$
+	/**
+	 * Crea una excepci&oacute;n para notificar que se ha proporcionado un fichero que no es un PDF.
+	 * @param cause Origen del error.
+	 */
+	public InvalidPdfException(final Throwable cause) {
+		super("El fichero no es un PDF o es un PDF no soportado", cause); //$NON-NLS-1$
+	}
+
+	/**
+	 * Crea una excepci&oacute;n para notificar que se ha proporcionado un fichero que no es un PDF.
+	 * @param msg Mensaje de error.
+	 */
+	public InvalidPdfException(final String msg) {
+		super(msg);
 	}
 
 }

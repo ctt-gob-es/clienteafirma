@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.io.File;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
@@ -21,6 +22,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -32,6 +34,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class ProtocolInvocationLauncherSelectCert {
 
@@ -94,18 +97,25 @@ final class ProtocolInvocationLauncherSelectCert {
         	}
         }
 
-		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
-		if (aoks == null) {
-			LOGGER.severe("No hay un KeyStore asociado al valor: " + options.getDefaultKeyStore()); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_FIND_KEYSTORE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
+		AOKeyStore aoks;
+		if (useDefaultStore) {
+			aoks = AOKeyStore.getKeyStore(PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE));
+		} else {
+			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		}
 
-		final String aoksLib = options.getDefaultKeyStoreLib();
+		if (aoks == null) {
+			// Si no se ha especificado almacen, se usara el del sistema operativo
+			aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
+		}
+
+		final String aoksLib;
+		if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
+			aoksLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+		} else {
+			aoksLib = options.getDefaultKeyStoreLib();
+		}
 		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
 		final List<CertificateFilter> filters = filterManager.getFilters();
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
@@ -142,6 +152,11 @@ final class ProtocolInvocationLauncherSelectCert {
 
 			try {
 				MacUtils.focusApplication();
+				String libName = null;
+				if (aoksLib != null) {
+					final File file = new File(aoksLib);
+					libName = file.getName();
+				}
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 					ksm,
 					null,
@@ -149,7 +164,8 @@ final class ProtocolInvocationLauncherSelectCert {
 					true, // showExpiredCertificates
 					true, // checkValidity
 					filters,
-					mandatoryCertificate
+					mandatoryCertificate,
+					libName
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();

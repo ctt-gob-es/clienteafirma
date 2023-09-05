@@ -217,6 +217,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			certs = JarVerifier.verify(pluginFile);
 		}
 		catch (final JarNoSignedException e) {
+			LOGGER.log(Level.WARNING, "Se han encontrado entradas del plugin sin firmar", e); //$NON-NLS-1$
 			final int option = JOptionPane.showConfirmDialog(
 					this.view,
 					SimpleAfirmaMessages.getString("PluginsManagementHandler.20"), //$NON-NLS-1$
@@ -226,6 +227,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			return option == JOptionPane.YES_OPTION;
 		}
 		catch (final SecurityException e) {
+			LOGGER.log(Level.WARNING, "Se han encontrado problemas en la firma del plugin", e); //$NON-NLS-1$
 			final int option = JOptionPane.showConfirmDialog(
 					this.view,
 					SimpleAfirmaMessages.getString("PluginsManagementHandler.22"), //$NON-NLS-1$
@@ -552,7 +554,6 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 
 		this.view.getPluginInfoPane().setText(html.toString());
 		this.view.getConfigButton().setVisible(info != null ? info.getConfigPanel() != null : false);
-
 	}
 
 	/**

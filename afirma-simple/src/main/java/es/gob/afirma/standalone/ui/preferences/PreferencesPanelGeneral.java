@@ -58,19 +58,13 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private final JCheckBox avoidAskForClose = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.36")); //$NON-NLS-1$
 
-	private final JCheckBox hideDniStartScreen = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.81")); //$NON-NLS-1$
-
 	private final JCheckBox checkForUpdates = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.87")); //$NON-NLS-1$
-
-	private final JCheckBox sendAnalytics = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.89")); //$NON-NLS-1$
 
 	private final JCheckBox enableJMulticard = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.165")); //$NON-NLS-1$
 
 	private final JCheckBox optimizedForVdi = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.190")); //$NON-NLS-1$
 
 	private final JCheckBox confirmToSign = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.179")); //$NON-NLS-1$
-
-	private final JCheckBox showExpiredCerts = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.176")); //$NON-NLS-1$
 
 	private final JCheckBox allowSignInvalidSignatures = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.178")); //$NON-NLS-1$
 
@@ -240,23 +234,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.avoidAskForClose.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.44") //$NON-NLS-1$
 		);
-		this.avoidAskForClose.setMnemonic('N');
 		this.avoidAskForClose.addItemListener(modificationListener);
 		this.avoidAskForClose.addKeyListener(keyListener);
 		signConfigPanel.add(this.avoidAskForClose, signConstraint);
-
-		signConstraint.gridy++;
-
-		this.hideDniStartScreen.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
-		);
-		this.hideDniStartScreen.setMnemonic('D');
-		this.hideDniStartScreen.addItemListener(modificationListener);
-		this.hideDniStartScreen.addKeyListener(keyListener);
-		signConfigPanel.add(this.hideDniStartScreen, signConstraint);
 
 		signConstraint.gridy++;
 
@@ -269,51 +249,37 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
 			);
-			this.checkForUpdates.setMnemonic('B');
 			this.checkForUpdates.addItemListener(modificationListener);
 			this.checkForUpdates.addKeyListener(keyListener);
 			signConfigPanel.add(this.checkForUpdates, signConstraint);
 			signConstraint.gridy++;
 		}
 
-		this.sendAnalytics.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.sendAnalytics.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.90") //$NON-NLS-1$
-		);
-		this.sendAnalytics.setMnemonic('t');
-		this.sendAnalytics.addItemListener(modificationListener);
-		this.sendAnalytics.addKeyListener(keyListener);
-		signConfigPanel.add(this.sendAnalytics, signConstraint);
-
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.LINUX) {
-			signConstraint.gridy++;
-
 			this.enableJMulticard.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
 			this.enableJMulticard.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.166")); //$NON-NLS-1$
-			this.enableJMulticard.setMnemonic('j');
 			this.enableJMulticard.addItemListener(modificationListener);
 			this.enableJMulticard.addKeyListener(keyListener);
 			signConfigPanel.add(this.enableJMulticard, signConstraint);
+
+			signConstraint.gridy++;
 		}
 
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			signConstraint.gridy++;
-
 			this.optimizedForVdi.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.191")); //$NON-NLS-1$
-			this.optimizedForVdi.setMnemonic('z');
 			this.optimizedForVdi.addItemListener(modificationListener);
 			this.optimizedForVdi.addKeyListener(keyListener);
 			signConfigPanel.add(this.optimizedForVdi, signConstraint);
+
+			signConstraint.gridy++;
 		}
 
 		mainPanel.add(signConfigPanel, gbc);
@@ -389,22 +355,9 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		);
 		this.confirmToSign.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.180")); //$NON-NLS-1$
-		this.confirmToSign.setMnemonic('N');
 		this.confirmToSign.addItemListener(modificationListener);
 		this.confirmToSign.addKeyListener(keyListener);
 		innerPanel.add(this.confirmToSign, c);
-
-		c.gridy++;
-
-		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.showExpiredCerts.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.177")); //$NON-NLS-1$
-		this.showExpiredCerts.setMnemonic('M');
-		this.showExpiredCerts.addItemListener(modificationListener);
-		this.showExpiredCerts.addKeyListener(keyListener);
-		innerPanel.add(this.showExpiredCerts, c);
 
 		c.gridy++;
 
@@ -424,7 +377,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		);
 		this.massiveOverwrite.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
-		this.massiveOverwrite.setMnemonic('S');
 		this.massiveOverwrite.addItemListener(modificationListener);
 		this.massiveOverwrite.addKeyListener(keyListener);
 		innerPanel.add(this.massiveOverwrite, c);
@@ -439,7 +391,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		final JPanel netConfigInnerPanel = new JPanel(new GridBagLayout());
 		netConfigPanel.add(netConfigInnerPanel);
 
-		this.secureConnections.setMnemonic('c');
 		this.secureConnections.addItemListener(modificationListener);
 		this.secureConnections.addKeyListener(keyListener);
 		this.secureConnections.setToolTipText(
@@ -551,7 +502,14 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			}
 			// Aplicamos los valores tanto si el checkbox esta marcado o no, en un caso lo establecera y en en otro lo
 			// eliminara
-			ProxyUtil.setProxySettings();
+    		try {
+    			ProxyUtil.setProxySettings();
+    		}
+    		catch (final Throwable e) {
+    			LOGGER.log(Level.SEVERE, "Error al aplicar la configuracion de proxy", e); //$NON-NLS-1$
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.11"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.WARNING_MESSAGE, e); //$NON-NLS-1$
+    		}
     	}
     }
 
@@ -636,18 +594,14 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.blocked = blocked;
 	}
 
-
 	void savePreferences() {
 		// Opciones varias
 		PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signatureAlgorithms.getSelectedItem().toString());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN, this.confirmToSign.isSelected());
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
 		if (SimpleAfirma.isUpdatesEnabled()) {
 			PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		}
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
-		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS, this.showExpiredCerts.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES, this.allowSignInvalidSignatures.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD, this.enableJMulticard.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_VDI_OPTIMIZATION, this.optimizedForVdi.isSelected());
@@ -670,7 +624,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		}
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
 		this.confirmToSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN));
-		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN));
 
 		if (!SimpleAfirma.isUpdatesEnabled()) {
 			this.checkForUpdates.setSelected(false);
@@ -680,17 +633,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK));
 		}
 
-		if (Boolean.getBoolean(SimpleAfirma.DO_NOT_SEND_ANALYTICS) ||
-				Boolean.parseBoolean(System.getenv(SimpleAfirma.DO_NOT_SEND_ANALYTICS_ENV))) {
-			this.sendAnalytics.setSelected(false);
-			this.sendAnalytics.setEnabled(false);
-		}
-		else {
-			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS));
-		}
-
-
-		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 		this.allowSignInvalidSignatures.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES));
 
 		if (JMulticardUtilities.isJMulticardConfigurateBySystem()) {

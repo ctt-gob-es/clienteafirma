@@ -123,7 +123,7 @@ public final class TimestampsAnalyzer {
 
 					}
 					catch (final Exception e) {
-						LOGGER.severe(
+						LOGGER.warning(
 							"Error extrayendo los sellos de tiempo de la firma CMS, se continuara con la siguiente: " + e //$NON-NLS-1$
 						);
 						continue;
@@ -200,7 +200,7 @@ public final class TimestampsAnalyzer {
 			}
 			catch (final CMSException e) {
 				LOGGER.severe(
-					"La fimra encontrada no es compatible CMS, se continua con las siguientes: " + e //$NON-NLS-1$
+					"La firma encontrada no es compatible CMS, se continua con las siguientes: " + e //$NON-NLS-1$
 				);
 				continue;
 			}
@@ -214,7 +214,7 @@ public final class TimestampsAnalyzer {
 					tst = new TimeStampToken(signedData);
 				}
 				catch (final Exception e) {
-					LOGGER.severe(
+					LOGGER.warning(
 						"El sello encontrado no es compatible, se continua con los siguientes: " + e //$NON-NLS-1$
 					);
 					continue;
@@ -225,7 +225,7 @@ public final class TimestampsAnalyzer {
 	    			pcks7 = af.verifySignature(signatureName);
 	    		}
 	    		catch(final Exception e) {
-	    			LOGGER.severe(
+	    			LOGGER.warning(
 						"El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
 							signatureName +
 								"), se continua con las siguientes si las hubiese: " + e //$NON-NLS-1$

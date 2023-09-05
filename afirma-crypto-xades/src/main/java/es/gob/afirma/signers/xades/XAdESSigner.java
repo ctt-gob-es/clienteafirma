@@ -47,6 +47,7 @@ import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -1408,7 +1409,7 @@ public final class XAdESSigner {
 	 */
 	private static Document loadDataAsXml(final DocumentBuilder docBuilder, final byte[] data) {
 		Document doc;
-		if (data != null) {
+		if (data != null && AOFileUtils.isXML(data)) {
 			try {
 				doc = docBuilder.parse(
 					new ByteArrayInputStream(data)

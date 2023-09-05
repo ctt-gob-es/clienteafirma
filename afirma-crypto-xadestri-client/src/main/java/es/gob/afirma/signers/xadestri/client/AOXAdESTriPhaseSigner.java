@@ -526,6 +526,8 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			final String errorMsg = msg.substring(separatorPos2 + 1);
 			if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg);
+			} else if (SigningLTSException.REQUESTOR_POSSIBLE_MSG_CODE.equals(errorCode)) {
+				exception = new SigningLTSException(errorMsg, true);
 			}
 		}
 

@@ -23,8 +23,8 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.8.1"
-!define FILE_VERSION "1.8.1.0"
+!define VERSION "1.8.2"
+!define FILE_VERSION "1.8.2.0"
 
 VIProductVersion "${FILE_VERSION}"
 VIFileVersion "${FILE_VERSION}"
@@ -121,21 +121,6 @@ Function leaveConfigPage
 
 FunctionEnd
 
-Function enableAllUsersJAB 
-
-    ; Se obtiene el perfil
-        Pop $0
- 
-    ; Comprobamos si ya existe el archivo o no para copiarlo
-	IfFileExists "$0\.accessibility.properties" +2 0
-		CopyFiles /SILENT ".accessibility.properties" "$0"
- 
-    ; Se continua con la operacion
-        Push ""
-        Return
-
-FunctionEnd
-
 ;--------------------------------
 ;Idiomas
  
@@ -151,7 +136,7 @@ FunctionEnd
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma32/AutoFirma_32_v1_8_0_installer.exe
+OutFile AutoFirma32/AutoFirma_32_v1_8_2_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -248,7 +233,6 @@ Section "Programa" sPrograma
 	File  AutoFirma32\AutoFirma.exe
 	File  AutoFirma32\AutoFirmaConfigurador.exe
 	File  AutoFirma32\AutoFirmaCommandLine.exe
-	File  .accessibility.properties
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -258,18 +242,13 @@ Section "Programa" sPrograma
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
    
-	;Se pide que se cierre Firefox y Chrome si estan abiertos
+	;Se pide que se cierre Firefox si esta abierto
 	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
 		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
 
-	loopChrome:
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalación de AutoFirma.' IDOK loopChrome
-	
 	${nsProcess::Unload}
 	
 	Sleep 2000
@@ -332,9 +311,6 @@ Section "Programa" sPrograma
 	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 	Delete "$INSTDIR\$PATH\autofirma.pfx"
-	
-	; Copiamos el archivo .accessibility.properties	en todos los usuarios para permitir la accesibilidad a traves de JAB
-    ${EnumProfilePaths} enableAllUsersJAB
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R0 ""
@@ -415,7 +391,7 @@ FunctionEnd
  
 ;Identifica la version instalada de AutoFirma.
 ;Devuelve la cadena con el numero de version y deja el registro configurado
-;para la arquitectura corresondiente a la version identificada
+;para la arquitectura correspondiente a la version identificada
 Function CheckVersionInstalled
 
   ;Buscamos en 64 bits (solo en sistemas de 64 bits)
@@ -661,34 +637,23 @@ Section "uninstall"
 
 	; ==== Desinstalador EXE - INICIO ====
 	
-	;Se pide que se cierre Firefox y Chrome si estan abiertos
+	;Se pide que se cierre Firefox si esta abierto
 	loopFirefox:
 		${nsProcess::FindProcess} "firefox.exe" $R2
 		StrCmp $R2 0 0 +2
 			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 	
-	loopChrome:
-		${nsProcess::FindProcess} "chrome.exe" $R3
-		StrCmp $R3 0 0 +2
-			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
-
 	; ==== Desinstalador EXE - FIN ====
 		
 	; ==== Desinstalador MSI - INICIO ====
    
-	; Se fuerza el cierre de Firefox y Chrome si estan abiertos. Los saltos cuentan
-	; un paso mas (+4 en lugar de +3) porque si no se queda en un bucle infinito
+	; Se fuerza el cierre de Firefox si esta abierto. Los saltos cuentan un paso mas
+	; (+4 en lugar de +3) porque si no se queda en un bucle infinito
 ;	loopFirefox:
 ;		${nsProcess::FindProcess} "firefox.exe" $R2
 ;		StrCmp $R2 0 0 +4
 ;			${nsProcess::KillProcess} "firefox.exe" $R0
 ;			Goto loopFirefox
-
-;	loopChrome:
-;		${nsProcess::FindProcess} "chrome.exe" $R3
-;		StrCmp $R3 0 0 +4
-;			${nsProcess::KillProcess} "chrome.exe" $R0
-;			Goto loopChrome
 
 	; ==== Desinstalador MSI - FIN ====
 
@@ -815,7 +780,7 @@ Function RemoveOldVersions
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalación de AutoFirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	${EndIf}
 
@@ -847,7 +812,7 @@ Function RemoveOldVersions
 		StrCmp $3 "AutoFirma" 0 End
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalación de AutoFirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 
 	; No se encontro AutoFirma instalado, asi que finalizamos el proceso
@@ -856,7 +821,37 @@ Function RemoveOldVersions
 	Exit:
 		Quit
 
+	; Iniciamos el proceso de desinstalacion de la version antigua
 	UninstallOlderVersion:
+
+		; Comprobamos si existe configuracion de usuario de AutoFirma. Si no existe, vamos directamente a la
+		; desinstalacion de la version anterior de AutoFirma y, si existe, hacemos copia para restaurarla una
+		; vez que desinstalemos esa version (el desinstalar una version elimina la configuracion).
+		StrCpy $6 "0"
+		ClearErrors
+		EnumRegKey $0 HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences" 0
+
+		IfErrors InitUninstall
+
+			; Identificamos una clave en la que poder hacer la copia de los datos. Esta queda registrada en $R0
+			ClearErrors
+			StrCpy $0 0
+			loopsearch:
+				StrCpy $6 "Software\JavaSoft\Prefs\copia$0"
+				EnumRegKey $1 HKCU $6 0
+				IfErrors donesearch
+				IntOp $0 $0 + 1
+				Goto loopsearch
+			donesearch:
+		
+			; Copiamos los valores a la nueva clave
+			StrCpy $0 $6
+			Push "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences"
+			Push $0
+			Call CopyRegValues
+
+	; Iniciamos la desinstalacion
+	InitUninstall:
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
@@ -896,7 +891,7 @@ Function RemoveOldVersions
  
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
 		; Si no, terminamos el proceso
-		StrCmp $R3 "Uninstall" 0 End
+		StrCmp $R3 "Uninstall" 0 EndUninstall
 			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "AutoFirma")
 			Push $R1
 			Push "Program Files (x86)\"
@@ -912,12 +907,59 @@ Function RemoveOldVersions
 			Push $PATH
 			Call StrContains
 			Pop $0
-			StrCmp $0 "" End
+			StrCmp $0 "" EndUninstall
 			EliminarDirectorio:
 				RMDir /r $R1
 
+	EndUninstall:
+
+	; Si habia una configuracion anterior de AutoFirma, la restauramos
+	StrCmp $6 "0" End
+		StrCpy $0 $6
+		Push $0
+		Push "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences"
+		Call CopyRegValues
+		
+		; Eliminamos la copia
+		DeleteRegKey HKCU $6
+
 	End:
  
+FunctionEnd
+
+; Funcion para copiar los valores de una clave de registro a otra.
+; Uso:
+;	Push sourceDir
+;	Push targetDir
+;   Call CopyRegValues sourceKey targetKey
+Function CopyRegValues
+	; Obtenemos los dos primeros parametros de la pila
+	Exch $R0	# Clave destino
+	Exch
+	Exch $R1	# Clave origen
+
+	; Nos aseguramos de reservar variables para el metodo
+	Push $0
+	Push $1
+	Push $2
+
+	StrCpy $0 0
+	looplist:
+	  	  
+	  ClearErrors
+	  EnumRegValue $1 HKCU $R1 $0
+	  IfErrors donelist
+	  IntOp $0 $0 + 1
+	  ReadRegStr $2 HKCU $R1 $1
+	  WriteRegStr HKCU $R0 $1 $2
+	  Goto looplist
+	donelist:
+
+	; Limpiamos las variables
+	Pop $2
+	Pop $1
+	Pop $0
+
 FunctionEnd
 
 ; Funcion para eliminar de registro las entradas agregadas por la aplicacion
@@ -937,11 +979,12 @@ Function un.UninstallFromRegistry
 	DeleteRegKey HKEY_CLASSES_ROOT "afirma"
 	
 	;Borramos las claves de registro en las que se almacenan las preferencias de la aplicacion
-	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\ui"
-	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\standalone"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"
-	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\ui"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\plugin"
+	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob\afirma"
+	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob"
+	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
 	Push "$INSTDIR\$PATH"

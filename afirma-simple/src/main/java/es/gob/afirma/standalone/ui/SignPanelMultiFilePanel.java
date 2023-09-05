@@ -76,7 +76,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
         titlePanel.setFileNameColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.43")); //$NON-NLS-1$
         titlePanel.setSignatureFormatColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.44")); //$NON-NLS-1$
         titlePanel.setSizeColumnTitle(SimpleAfirmaMessages.getString("SignDataPanel.45")); //$NON-NLS-1$
-        titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, LookAndFeelManager.HIGH_CONTRAST ? Color.white : Color.black));
+        titlePanel.setBorder(BorderFactory.createMatteBorder(0,  0,  1,  0, LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.white : Color.black));
 
         final SignOperationConfig [] operationsArray = operations.toArray(new SignOperationConfig[operations.size()]);
         this.accessibleDescription += SimpleAfirmaMessages.getString("SignDataPanel.47"); //$NON-NLS-1$
@@ -189,7 +189,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
     		this.sizeLabel.setPreferredSize(new Dimension(60, 14));
 
     		// Configuramos los colores
-    		if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+    		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
     			final Color bgColor = LookAndFeelManager.DEFAULT_COLOR;
     			setBackground(bgColor);
     		}
@@ -270,7 +270,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 			this.unfocusedBorder = BorderFactory.createEmptyBorder(1,  1,  1,  1);
 
             // Configuramos los colores
-            if (!LookAndFeelManager.HIGH_CONTRAST) {
+            if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             	setBackground(Color.WHITE);
             }
 
@@ -311,7 +311,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
 			if (value.getInvalidSignatureText() == null) {
 				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
-				if (!LookAndFeelManager.HIGH_CONTRAST) {
+				if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 					this.fileNameLabel.setForeground(Color.BLACK);
 				}
 			}
@@ -319,14 +319,14 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 					&& SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER.equals(value.getSignValidity().getValidity())) {
 				this.fileNameLabel.setText(
 						(value.getDataFile().getAbsolutePath() + " (" + value.getSignValidity().getError() + ")").substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
-				if (!LookAndFeelManager.HIGH_CONTRAST) {
+				if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 					this.fileNameLabel.setForeground(Color.RED);
 				}
 			}
 			else {
 				this.fileNameLabel.setText(
 						(value.getDataFile().getAbsolutePath() + " " + SimpleAfirmaMessages.getString("SignPanel.147")).substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
-				if (!LookAndFeelManager.HIGH_CONTRAST) {
+				if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 					this.fileNameLabel.setForeground(Color.RED);
 				}
 			}

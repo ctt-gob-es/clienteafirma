@@ -38,6 +38,7 @@ import com.aowagie.text.pdf.PdfWriter;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 
 final class PdfVisibleAreasUtils {
 
@@ -151,39 +152,74 @@ final class PdfVisibleAreasUtils {
 	}
 
 	private static BaseFont getBaseFont(final int fontFamily, final boolean pdfa) throws DocumentException, IOException {
-		final BaseFont font;
+
+		BaseFont font;
 
 		// Si la firma es PDF/A, incrustamos toda la fuente para seguir
 		// respetando el estandar
 		if (pdfa) {
-			switch (fontFamily) {
-			case Font.HELVETICA:
-				font = BaseFont.createFont("/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-				break;
-			case Font.TIMES_ROMAN:
-				font = BaseFont.createFont("/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-				break;
-			case Font.COURIER:
-			default:
-				font = BaseFont.createFont("/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
-				break;
+			try {
+				font = loadFontToEmbed(fontFamily);
 			}
-			font.setSubset(false);
-		} else {
-			switch (fontFamily) {
-			case Font.HELVETICA:
-				font = BaseFont.createFont(BaseFont.HELVETICA, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
-			break;
-			case Font.TIMES_ROMAN:
-				font = BaseFont.createFont(BaseFont.TIMES_ROMAN, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
-			break;
-			case Font.COURIER:
-			default:
-				font = BaseFont.createFont(BaseFont.COURIER, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
-			break;
+			// En Android puede fallar con un error la carga de una fuente, asi que se
+			// protege con un Throwable
+			catch (final Throwable e) {
+				LOGGER.log(Level.WARNING,
+						"No se ha podido cargar la fuente de letra para incrustar. Puede que el resultado no sea un PDF/A", //$NON-NLS-1$
+						e);
+				font = loadInternalFont(fontFamily);
 			}
 		}
+		else {
+			font = loadInternalFont(fontFamily);
+		}
+		return font;
+	}
 
+	/**
+	 * Carga una de las fuentes incluidas en la biblioteca y la marca para que se incruste en el PDF.
+	 * @param fontFamily Familia de fuentes.
+	 * @return Fuente de letra.
+	 * @throws DocumentException Cuando falla la composici&oacute;n de la fuente.
+	 * @throws IOException Cuando falla la carga de la fuente.
+	 */
+	private static BaseFont loadFontToEmbed(final int fontFamily) throws DocumentException, IOException {
+		BaseFont font;
+		switch (fontFamily) {
+		case Font.HELVETICA:
+			font = BaseFont.createFont("/fonts/helvetica.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.TIMES_ROMAN:
+			font = BaseFont.createFont("/fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.COURIER:
+		default:
+			font = BaseFont.createFont("/fonts/courier.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED); //$NON-NLS-1$
+		}
+		font.setSubset(false);
+		return font;
+	}
+
+	/**
+	 * Compone una de las fuentes por defecto de PDF.
+	 * @param fontFamily Familia de fuentes.
+	 * @return Fuente de letra.
+	 * @throws DocumentException Cuando falla la composici&oacute;n de la fuente.
+	 * @throws IOException Cuando falla la carga de la fuente.
+	 */
+	private static BaseFont loadInternalFont(final int fontFamily) throws DocumentException, IOException {
+		BaseFont font;
+		switch (fontFamily) {
+		case Font.HELVETICA:
+			font = BaseFont.createFont(BaseFont.HELVETICA, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.TIMES_ROMAN:
+			font = BaseFont.createFont(BaseFont.TIMES_ROMAN, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+			break;
+		case Font.COURIER:
+		default:
+			font = BaseFont.createFont(BaseFont.COURIER, "", BaseFont.NOT_EMBEDDED); //$NON-NLS-1$
+		}
 		return font;
 	}
 
@@ -492,11 +528,12 @@ final class PdfVisibleAreasUtils {
      * @return the calculated font size that makes the text fit.
      * @author Paulo Soares
      */
-    private static float fitText(final Font font, final String text, final Rectangle rect, float maxFontSize, final int runDirection) {
-        try {
+    private static float fitText(final Font font, final String text, final Rectangle rect, final float maxFontSize, final int runDirection) {
+        float maxSize = maxFontSize;
+    	try {
             ColumnText ct = null;
             int status = 0;
-            if (maxFontSize <= 0) {
+            if (maxSize <= 0) {
                 int cr = 0;
                 int lf = 0;
                 final char t[] = text.toCharArray();
@@ -508,21 +545,21 @@ final class PdfVisibleAreasUtils {
 					}
                 }
                 final int minLines = Math.max(cr, lf) + 1;
-                maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
+                maxSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
             }
-            font.setSize(maxFontSize);
+            font.setSize(maxSize);
             final Phrase ph = new Phrase(text, font);
             ct = new ColumnText(null);
             ct.setSimpleColumn(ph, rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), maxFontSize, Element.ALIGN_LEFT);
             ct.setRunDirection(runDirection);
             status = ct.go(true);
             if ((status & ColumnText.NO_MORE_TEXT) != 0) {
-				return maxFontSize;
+				return maxSize;
 			}
             final float precision = 0.1f;
             float min = 0;
-            float max = maxFontSize;
-            float size = maxFontSize;
+            float max = maxSize;
+            float size = maxSize;
             for (int k = 0; k < 50; ++k) { //just in case it doesn't converge
                 size = (min + max) / 2;
                 ct = new ColumnText(null);
@@ -555,6 +592,36 @@ final class PdfVisibleAreasUtils {
      *          debe agregarse la firma*/
     static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
     	return PdfUtil.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
+    }
+
+    /**
+     * Indica si se ha establecido una configuraci&oacute;n que d&eacute; pie
+     * a realizar una firma visible PDF. Se considerar&aacute; que ser&aacute;
+     * una firma visible aquella que defina un &aacute;rea de firma o un campo
+     * de firma.
+     * @param extraParams Conjunto de propiedades con la cofiguraci&oacute;n de
+     * la firma.
+     * @return  {@code true} si la firma es visible, {@code false} si no lo es.
+     */
+    static boolean isVisibleSignature(final Properties extraParams) {
+
+    	if (extraParams == null) {
+    		return true;
+    	}
+
+    	final String signatureField = extraParams.getProperty(PdfExtraParams.SIGNATURE_FIELD);
+    	if (signatureField != null) {
+    		return true;
+    	}
+
+    	final Rectangle signatureRect = PdfUtil.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
+    	if (signatureRect != null
+    			&& Math.signum(signatureRect.getWidth()) != 0
+    			&& Math.signum(signatureRect.getHeight()) != 0) {
+    		return true;
+    	}
+
+    	return false;
     }
 
     /**
@@ -700,5 +767,4 @@ final class PdfVisibleAreasUtils {
     	}
     	return digitsCount;
     }
-
 }

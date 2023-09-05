@@ -102,7 +102,7 @@ public final class KeyStoreUtilities {
      * @param slot Lector de tarjetas en el que buscar la biblioteca.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
-    static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot) {
+    public static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot) {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
@@ -323,10 +323,12 @@ public final class KeyStoreUtilities {
         return aliassesByFriendlyName;
     }
 
-	/** Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
+	/**
+	 * Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
 	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
-	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
-	 *         obtenerse la versi&oacute;n corta */
+	 * @return Nombre corto del fichero o directorio con su ruta completa, la cadena originalmente indicada si no puede
+	 *         obtenerse la versi&oacute;n corta o {@code null} si se proporcion&oacute; {@code null} en la entrada.
+	 */
 	public static String getWindowsShortName(final String originalPath) {
 		if (originalPath == null || !Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return originalPath;

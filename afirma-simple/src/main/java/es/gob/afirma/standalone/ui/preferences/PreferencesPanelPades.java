@@ -162,7 +162,6 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.visiblePdfSignature.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.79") //$NON-NLS-1$
 		);
-		this.visiblePdfSignature.setMnemonic('i');
 		this.visiblePdfSignature.addItemListener(modificationListener);
 		this.visiblePdfSignature.addKeyListener(keyListener);
 		this.obfuscateCertificateInfo.getAccessibleContext().setAccessibleName(

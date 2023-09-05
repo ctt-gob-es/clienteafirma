@@ -3,6 +3,7 @@ package es.gob.afirma.cert.signvalidation;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -37,6 +38,7 @@ public class TestSignatureValidation {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore("Ruta local de Gamuci")
 	public void testCadesLTAValidation() throws Exception {
 		try (
 			final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\salida/cades-lta-cosign.csig");

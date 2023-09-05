@@ -120,7 +120,7 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
         // Establecemos la configuracion de color cuando no se encuentra
         // activado el alto contraste y estamos en Windows (en donde se
         // utiliza un Look&Feel determinado)
-        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
             setBackground(LookAndFeelManager.SECUNDARY_COLOR);
             returnPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
         }
@@ -176,7 +176,7 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
     	// Establecemos la configuracion de color cuando no se encuentra
         // activado el alto contraste y estamos en Windows (en donde se
         // utiliza un Look&Feel determinado)
-        if (!LookAndFeelManager.HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
     		mainPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
     		this.pluginButtonsPanel.setBackground(LookAndFeelManager.SECUNDARY_COLOR);
     	}

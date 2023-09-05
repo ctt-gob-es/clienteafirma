@@ -21,7 +21,7 @@ public abstract class SignValider {
 	private boolean relaxed = false;
 
 	/**
-	 * Establece si la validacion debe ser relajada. Esta cse utiliza cuando
+	 * Establece si la validacion debe ser relajada. Esta se utiliza cuando
 	 * se admiten problemas en la firma de cara a una operaci&oacute;n posterior.
 	 * @param relaxed {@code true} para habilitar el modo relajado, {@code false}
 	 * en caso contrario.

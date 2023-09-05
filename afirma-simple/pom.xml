@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.8.1</version>
+		<version>1.9-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -29,19 +29,12 @@
 			<artifactId>imageio-jpeg</artifactId>
 			<version>3.6</version>
 		</dependency>
-
-		<!-- Paquete para la recoleccion de estadisticas -->	    
-	    <dependency>
-			<groupId>com.dmurph</groupId>
-  			<artifactId>JGoogleAnalyticsTracker</artifactId>
-  			<version>1.2.0</version>
-		</dependency>
 		
-		<!-- API de impresion de logs para evitar -->
+		<!-- Incluimos el puente de logs de Java para SLF4J para evitar que se use otro. -->
 		<dependency>
 		    <groupId>org.slf4j</groupId>
 		    <artifactId>slf4j-simple</artifactId>
-		    <version>1.6.1</version>
+		    <version>1.7.36</version>
 		</dependency>
 
 		<dependency>
@@ -245,17 +238,18 @@
         	</exclusions>
 		</dependency>
 		
+		<!--  Biblioteca para obtener la configuración de proxy del sistema. -->
 		<dependency>
-			<groupId>com.github.markusbernhardt</groupId>
-			<artifactId>proxy-vole</artifactId>
-			<version>1.0.4</version>
+		    <groupId>org.bidib.com.github.markusbernhardt</groupId>
+		    <artifactId>proxy-vole</artifactId>
+		    <version>1.0.18</version>
 		</dependency>
 
 		<!-- Libreria "Java Native Access" -->
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>5.6.0</version>
+			<version>5.13.0</version>
 		</dependency>
 
 	</dependencies>

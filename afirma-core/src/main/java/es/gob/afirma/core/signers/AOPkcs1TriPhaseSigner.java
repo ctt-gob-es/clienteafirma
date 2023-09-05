@@ -15,10 +15,12 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -264,7 +266,9 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 
 			final String postUrl = urlBuffer.toString();
 
-			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
+			if (LOGGER.isLoggable(Level.INFO)) {
+				LOGGER.info("Se llamara por POST a la siguiente URL:\n" + LoggerUtil.getTrimStr(postUrl));  //$NON-NLS-1$
+			}
 
 			preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
 			urlBuffer.setLength(0);

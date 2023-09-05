@@ -11,6 +11,7 @@ shrd/logo_cliente.png
 Spanish.lproj/AutoFirma.html
 Spanish.lproj/AutoFirmaHelpIcon.png
 Spanish.lproj/index.html
+Spanish.lproj/gfx/menualmacenesclaves_mini.png
 Spanish.lproj/gfx/menufirmascades_mini.png
 Spanish.lproj/gfx/menufirmasfacturae_mini.png
 Spanish.lproj/gfx/menufirmaspadesvisible1_mini.png
@@ -29,6 +30,10 @@ Spanish.lproj/gfx/pantallaespera_mini.png
 Spanish.lproj/gfx/pantallafirma1_mini.png
 Spanish.lproj/gfx/pantallafirma2_mini.png
 Spanish.lproj/gfx/pantallafirma3_mini.png
+Spanish.lproj/gfx/pluginhash_calculo_directorio_mini.png
+Spanish.lproj/gfx/pluginhash_calculo_fichero_mini.png
+Spanish.lproj/gfx/pluginhash_comprobacion_directorio_mini.png
+Spanish.lproj/gfx/pluginhash_comprobacion_fichero_mini.png
 Spanish.lproj/pgs/Licencia.html
 Spanish.lproj/pgs/LineaComandos.html
 Spanish.lproj/pgs/MenuPlugins.html
@@ -37,6 +42,7 @@ Spanish.lproj/pgs/MenuRestauracion.html
 Spanish.lproj/pgs/PantallaDetalle.html
 Spanish.lproj/pgs/PantallaEspera.html
 Spanish.lproj/pgs/PantallaFirma.html
+Spanish.lproj/pgs/Plugins.html
 Spanish.lproj/pgs/VentanaConfigurarProxy.html
 Spanish.lproj/pgs/VentanaListaBlancaDominios.html
 Spanish.lproj/pgs/VentanaPdfVisible.html

@@ -1,6 +1,7 @@
 ;Incluimos el Modern UI
   !include "MUI.nsh"
   !include "nsProcess.nsh"
+  !include "Registry.nsh"
   !include "Sections.nsh"
   !include "FileFunc.nsh"	 
   
@@ -22,8 +23,8 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.8.1"
-!define FILE_VERSION "1.8.1.0"
+!define VERSION "1.8.2"
+!define FILE_VERSION "1.8.2.0"
 
 VIProductVersion "${FILE_VERSION}"
 VIFileVersion "${FILE_VERSION}"
@@ -180,14 +181,10 @@ Section "Programa" sPrograma
 	SectionIn RO
 	StrCpy $PATH "AutoFirma"
 
-	;Se cierra Firefox y Chrome si están abiertos
+	;Se cierra Firefox si esta abierto
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +1
 	${nsProcess::KillProcess} "firefox.exe" $R0
-
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "chrome.exe" $R0
 
 	${nsProcess::Unload}
 
@@ -227,7 +224,6 @@ Section "Programa" sPrograma
 	File  AutoFirma32\AutoFirma.exe
 	File  AutoFirma32\AutoFirmaConfigurador.exe
 	File  AutoFirma32\AutoFirmaCommandLine.exe
-	File  .accessibility.properties
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -279,9 +275,6 @@ Section "Programa" sPrograma
 		Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 		Delete "$INSTDIR\$PATH\autofirma.pfx"
-		
-	; Copiamos el archivo .accessibility.properties	en todos los usuarios para permitir la accesibilidad a traves de JAB
-    ${EnumProfilePaths} enableAllUsersJAB
 
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	StrCpy $R4 ""
@@ -458,6 +451,33 @@ Function RemoveOldVersions
 	IfFileExists "$R0\no_ejecutar_x86.exe" 0 +2
 		StrCpy $R1 "no_ejecutar_x86.exe"
 
+	; Comprobamos si existe configuracion de usuario de AutoFirma. Si no existe, vamos directamente a la
+	; desinstalacion de la version anterior de AutoFirma y, si existe, hacemos copia para restaurarla una
+	; vez que desinstalemos esa version (el desinstalar una version elimina la configuracion).
+	StrCpy $6 "0"
+	ClearErrors
+	EnumRegKey $0 HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences" 0
+	IfErrors InitUninstall
+	
+			; Identificamos una clave en la que poder hacer la copia de los datos. Esta queda registrada en $R0
+			ClearErrors
+			StrCpy $0 0
+			loopsearch:
+				StrCpy $6 "Software\JavaSoft\Prefs\copia$0"
+				EnumRegKey $1 HKCU $6 0
+				IfErrors donesearch
+				IntOp $0 $0 + 1
+				Goto loopsearch
+			donesearch:
+		
+			; Copiamos los valores a la nueva clave
+			StrCpy $0 $6
+			Push "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences"
+			Push $0
+			Call CopyRegValues
+
+	InitUninstall:
+
 	;Ejecutamos el desinstalador si se ha encontrado y lo eliminamos despues
 	StrCmp $R1 "" +3 0
 		ExecWait '"$R0\$R1" /S _?=$R0'
@@ -468,7 +488,52 @@ Function RemoveOldVersions
 	StrCmp $INSTDIR $R0 +2 0
 		RMDir /r /REBOOTOK $R0
 
+	; Si habia una configuracion anterior de AutoFirma, la restauramos
+	StrCmp $6 "0" End 
+		StrCpy $0 $6
+		Push $0
+		Push "Software\JavaSoft\Prefs\es\gob\afirma\standalone\ui\preferences"
+		Call CopyRegValues
+		
+		; Eliminamos la copia
+		DeleteRegKey HKCU $6
+
 	End:
+
+FunctionEnd
+
+; Funcion para copiar los valores de una clave de registro a otra.
+; Uso:
+;	Push sourceDir
+;	Push targetDir
+;   Call CopyRegValues sourceKey targetKey
+Function CopyRegValues
+	; Obtenemos los dos primeros parametros de la pila
+	Exch $R0	# Clave destino
+	Exch
+	Exch $R1	# Clave origen
+
+	; Nos aseguramos de reservar variables para el metodo
+	Push $0
+	Push $1
+	Push $2
+
+	StrCpy $0 0
+	looplist:
+	  	  
+	  ClearErrors
+	  EnumRegValue $1 HKCU $R1 $0
+	  IfErrors donelist
+	  IntOp $0 $0 + 1
+	  ReadRegStr $2 HKCU $R1 $1
+	  WriteRegStr HKCU $R0 $1 $2
+	  Goto looplist
+	donelist:
+
+	; Limpiamos las variables
+	Pop $2
+	Pop $1
+	Pop $0
 
 FunctionEnd
 
@@ -550,6 +615,7 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
+
 ; RemoveFromPath - Removes dir from PATH
 ;
 ; Usage:
@@ -624,19 +690,4 @@ done:
   Pop $R3
   Pop $R2
   Exch $R1 ; $R1=old$R1, stack=[result,...]
-FunctionEnd
-
-Function enableAllUsersJAB 
-
-    ; Se obtiene el perfil
-        Pop $0
- 
-    ; Comprobamos si ya existe el archivo o no para copiarlo
-	IfFileExists "$0\.accessibility.properties" +2 0
-		CopyFiles /SILENT ".accessibility.properties" "$0"
- 
-    ; Se continua con la operacion
-        Push ""
-        Return
-
 FunctionEnd

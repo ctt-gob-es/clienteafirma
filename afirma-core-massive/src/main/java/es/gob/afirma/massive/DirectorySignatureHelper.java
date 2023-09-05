@@ -1049,12 +1049,12 @@ public class DirectorySignatureHelper {
                 createdParent = parentFile.mkdirs();
             }
             catch (final Exception e) {
-                LOGGER.severe("Error al crearse la estructura de directorios del fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.severe("Error al crearse la estructura de directorios del fichero '" + LoggerUtil.getCleanUserHomePath(filename) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.21"), null, filename); //$NON-NLS-1$
                 return null;
             }
             if (!createdParent) {
-                LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + LoggerUtil.getCleanUserHomePath(filename) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
                 addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.22"), null, filename); //$NON-NLS-1$
                 return null;
             }
@@ -1070,6 +1070,12 @@ public class DirectorySignatureHelper {
             finalFile = new File(parentFile, signer.getSignedName(signFilename, (inText != null ? inText : "") + "(" + ++ind + ")"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
 
+		if (!isParent(parentFile, finalFile)) {
+			LOGGER.severe("No se pudo verificar que se fuese a guardar en un subdirectorio del directorio padre el fichero " + LoggerUtil.getCleanUserHomePath(filename)); //$NON-NLS-1$
+            addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.23"), null, filename); //$NON-NLS-1$
+            return null;
+		}
+
         // Almacenamos el fichero
         try (
     		final OutputStream fos = new FileOutputStream(finalFile);
@@ -1078,7 +1084,7 @@ public class DirectorySignatureHelper {
             fos.flush();
         }
         catch (final Exception e) {
-            LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + LoggerUtil.getCleanUserHomePath(filename) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
             addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.22"), null, finalFile.getPath()); //$NON-NLS-1$
         }
 
@@ -1087,6 +1093,32 @@ public class DirectorySignatureHelper {
 
         return finalFile.getAbsolutePath();
     }
+
+	 /**
+	  * Comprueba que el fichero {@code parentFile} es un directorio padre de la
+	  * ruta de {@code childFile}.
+	  * @param parentDir Directorio padre.
+	  * @param childFile Fichero/directorio hijo.
+	  * @return {@code true} cuando el directorio forma parte de la ruta de directorio,
+	  * {@code false} en caso contrario.
+	  */
+	 private static boolean isParent(final File parentDir, final File childFile) {
+
+		 File parent;
+		 File intermediateDir;
+
+		 try {
+			 parent = parentDir.getCanonicalFile();
+			 intermediateDir = childFile.getCanonicalFile();
+		 }
+		 catch (final Exception e) {
+			 return false;
+		 }
+		 while (intermediateDir != null && !intermediateDir.equals(parent)) {
+			 intermediateDir = intermediateDir.getParentFile();
+		 }
+		 return intermediateDir != null;
+	 }
 
     /** Recupera un manejador de firma compatible para el fichero de firma
      * introducido. Si no se encuentra uno o no se encuentra el fichero se lanza

@@ -75,7 +75,6 @@ final class BundledNssHelper {
      * @param outDir Directorio local en el que descomprimir.
      * @throws IOException Cuando ocurre un error al descomprimir. */
      private static void uncompressZip(final String zipFileResourceName, final File outDir) throws IOException {
-
         final byte[] buffer = new byte[BUFFER_SIZE];
         try (
 	        final InputStream fis = BundledNssHelper.class.getResourceAsStream(zipFileResourceName);
@@ -85,18 +84,19 @@ final class BundledNssHelper {
 		) {
 	        ZipEntry entry;
 	        while ((entry = zipIs.getNextEntry()) != null) {
+
+	        	final File outFile = new File(outDir, entry.getName()).getCanonicalFile();
+
+				 if (!isParent(outDir, outFile)) {
+					 zipIs.closeEntry();
+					 throw new IOException("Se ha encontrado en el archivo comprimido una ruta que apuntaba fuera del directorio de destino"); //$NON-NLS-1$
+				 }
+
 	            if (entry.isDirectory()) {
-	                new File(outDir, entry.getName()).mkdirs();
+	                outFile.mkdirs();
 	            }
 	            else {
-	            	try (
-                		final FileOutputStream outFis = new FileOutputStream(
-            				new File(
-        						outDir,
-        						entry.getName()
-    						)
-        				);
-        			) {
+	            	try (final FileOutputStream outFis = new FileOutputStream(outFile);) {
 	            		int n;
 	            		while ((n = zipIs.read(buffer)) > 0) {
 	            			outFis.write(buffer, 0, n);
@@ -117,4 +117,22 @@ final class BundledNssHelper {
         }
     }
 
+	 /**
+	  * Comprueba que el fichero {@code parentFile} es un directorio padre de la
+	  * ruta de {@code childFile}.
+	  * @param parentDir Directorio padre.
+	  * @param childFile Fichero/directorio hijo.
+	  * @return {@code true} cuando el directorio forma parte de la ruta de directorio,
+	  * {@code false} en caso contrario.
+	  * @throws IOException Cuando no se pueda canonizar el nombre de fichero hijo.
+	  */
+	 private static boolean isParent(final File parentDir, final File childFile) throws IOException {
+
+		 final File parent = parentDir.getCanonicalFile();
+		 File intermediateDir = childFile.getCanonicalFile();
+		 while (intermediateDir != null && !intermediateDir.equals(parent)) {
+			 intermediateDir = intermediateDir.getParentFile();
+		 }
+		 return intermediateDir != null;
+	 }
 }

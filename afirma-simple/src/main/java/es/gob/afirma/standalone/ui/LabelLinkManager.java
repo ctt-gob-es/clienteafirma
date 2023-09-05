@@ -47,7 +47,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     	final Map attributes = font.getAttributes();
     	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
     	this.label.setFont(font.deriveFont(attributes));
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         	this.label.setForeground(Color.BLUE);
     	} else {
         	this.label.setForeground(Color.YELLOW);
@@ -69,7 +69,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     @Override
     public void focusGained(final FocusEvent e) {
     	this.label.setOpaque(true);
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         	this.label.setForeground(Color.WHITE);
     	} else {
         	this.label.setForeground(Color.YELLOW);
@@ -81,7 +81,7 @@ public final class LabelLinkManager extends KeyAdapter implements FocusListener,
     @Override
     public void focusLost(final FocusEvent e) {
     	this.label.setOpaque(false);
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         	this.label.setForeground(Color.BLUE);
     	} else {
         	this.label.setForeground(Color.YELLOW);

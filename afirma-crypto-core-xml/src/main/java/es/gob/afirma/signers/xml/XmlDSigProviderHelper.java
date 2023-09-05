@@ -73,7 +73,7 @@ public class XmlDSigProviderHelper {
     			installProvider(SUN_PROVIDER_CLASS);
     		}
 	    }
-	    catch (final Exception e) {
+	    catch (final Throwable e) {
 	    	LOGGER.log(Level.SEVERE, "No se pudo dar preferencia al proveedor configurado", e); //$NON-NLS-1$
 	    }
 

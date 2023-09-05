@@ -69,9 +69,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	static final String EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
 	static final String EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
 
-	private static final String GOOGLE_CHROME_PATH = "/Library/Application Support/Google/Chrome"; //$NON-NLS-1$
-
-
 	private static final byte[] DUMMY = "dummy".getBytes(); //$NON-NLS-1$
 
 	private static final String CHANGE_OWN_COMMAND = "chown %USERNAME% \"%DIR%\""; //$NON-NLS-1$
@@ -150,11 +147,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			if (certFiles != null) {
 				restoreSslCertificatesInFirefox(firefoxRestorer, appDir, certFiles, configPanel);
 			}
-		}
-
-		// Identificamos existe el directorio de Chrome y restauramos la confianza en el protocolo "afirma"
-		if (new File(GOOGLE_CHROME_PATH).isDirectory()) {
-			configureChrome(appDir, configPanel);
 		}
 
 		// Eliminamos el script de ejecucion para las operaciones
@@ -265,22 +257,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			LOGGER.log(Level.WARNING, "Error configurando la confianza de Firefox en el almacen del sistema (activando: " + firefoxSecurityRoots + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.23")); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Configurar Chrome para que conf&iacute;e en el esquema "afirma".
-	 * @param appDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
-	 * @param configPanel Panel de restauraci&oacute;n.
-	 */
-	private static void configureChrome(final File appDir, final RestoreConfigPanel configPanel) {
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.34")); //$NON-NLS-1$
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
-		closeChrome(configPanel);
-		final List<String> userDirPaths = new ArrayList<>();
-		for (final File userDir : userDirs) {
-			userDirPaths.add(userDir.getAbsolutePath());
-		}
-		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirPaths);
 	}
 
 	/**
@@ -510,29 +486,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 				}
 				throw new IOException("Error al desbloquear el llavero"); //$NON-NLS-1$
 			}
-		}
-	}
-
-	/**
-	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
-	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
-	 */
-	private static void closeChrome(final Component parent) {
-		if (isChromeOpen()) {
-			JOptionPane.showMessageDialog(
-					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE);
-		}
-
-		int option = JOptionPane.OK_OPTION;
-		while (option == JOptionPane.OK_OPTION && isChromeOpen()) {
-			option = JOptionPane.showConfirmDialog(
-					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.11"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
-					JOptionPane.OK_CANCEL_OPTION);
 		}
 	}
 
@@ -964,21 +917,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Comprobamos si esta abierto el proceos de Firefox
 		try {
 			return checkProcess("Firefox.app", "FirefoxNightly.app", "FirefoxDeveloperEdition.app"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		catch (final IOException e) {
-			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
-		}
-		return false;
-	}
-
-	/** Detecta si Chrome est&aacute; abierto.
-	 * @return <code>true</code> si Chrome est&aacute; abierto,
-	 *         <code>false</code> en caso contrario. */
-	private static boolean isChromeOpen() {
-
-		// Comprobamos si esta abierto el proceos de Chrome
-		try {
-			return checkProcess("Google Chrome.app"); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$

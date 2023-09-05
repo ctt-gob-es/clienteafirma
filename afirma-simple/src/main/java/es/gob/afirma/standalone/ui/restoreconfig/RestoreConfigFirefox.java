@@ -629,11 +629,19 @@ final class RestoreConfigFirefox {
 			final String profilesIniPath = USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH;
 			if (new File(profilesIniPath).exists()) {
 				LOGGER.info("Se ha encontrado el perfil de Firefox: " + profilesIniPath); //$NON-NLS-1$
-				final File profilesDir = new File(
-						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-								profilesIniPath
-								)
-						).getParentFile();
+				MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+						profilesIniPath
+						);
+
+				final String userProfile = MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+						profilesIniPath);
+				if (userProfile == null) {
+					LOGGER.warning("No se ha encontrado un directorio de perfil de un usuario"); //$NON-NLS-1$
+					error = true;
+					continue;
+				}
+
+				final File profilesDir = new File(userProfile).getParentFile();
 				for (final File profileDir : profilesDir.listFiles()) {
 					if (!profileDir.isDirectory()) {
 						continue;
@@ -706,16 +714,19 @@ final class RestoreConfigFirefox {
 				RestoreConfigFirefox.class.getResourceAsStream(resource));) {
 			// en linux el funcionamiento es ligeramente diferente
 			if (Platform.OS.LINUX == Platform.getOS()) {
+
+				new File(outDir, DIR_CERTUTIL).mkdirs();
+
 				while ((entry = zipIs.getNextEntry()) != null) {
-					new File(outDir, "certutil").mkdirs(); //$NON-NLS-1$
-					try (
-							final FileOutputStream outFis = new FileOutputStream(
-									new File(
-											outDir,
-											entry.getName()
-											)
-									);
-							) {
+
+					final File outFile = new File(outDir, entry.getName()).getCanonicalFile();
+
+					 if (!isParent(outDir, outFile)) {
+						 zipIs.closeEntry();
+						 throw new IOException("Se ha encontrado en el archivo comprimido una ruta que apuntaba fuera del directorio de destino"); //$NON-NLS-1$
+					 }
+
+					try (final OutputStream outFis = new FileOutputStream(outFile);) {
 						while ((n = zipIs.read(buffer)) > 0) {
 							outFis.write(buffer, 0, n);
 						}
@@ -728,6 +739,12 @@ final class RestoreConfigFirefox {
 			else {
 				while ((entry = zipIs.getNextEntry()) != null) {
 					final File outFile = new File(outDir, entry.getName());
+
+					if (!isParent(outDir, outFile)) {
+						 zipIs.closeEntry();
+						 throw new IOException("Se ha encontrado en el archivo comprimido una ruta que apuntaba fuera del directorio de destino"); //$NON-NLS-1$
+					 }
+
 					if (entry.isDirectory()) {
 						outFile.mkdirs();
 					}
@@ -748,6 +765,25 @@ final class RestoreConfigFirefox {
 
 		}
 	}
+
+	 /**
+	  * Comprueba que el fichero {@code parentFile} es un directorio padre de la
+	  * ruta de {@code childFile}.
+	  * @param parentDir Directorio padre.
+	  * @param childFile Fichero/directorio hijo.
+	  * @return {@code true} cuando el directorio forma parte de la ruta de directorio,
+	  * {@code false} en caso contrario.
+	  * @throws IOException Cuando no se pueda canonizar el nombre de fichero hijo.
+	  */
+	 private static boolean isParent(final File parentDir, final File childFile) throws IOException {
+
+		 final File parent = parentDir.getCanonicalFile();
+		 File intermediateDir = childFile.getCanonicalFile();
+		 while (intermediateDir != null && !intermediateDir.equals(parent)) {
+			 intermediateDir = intermediateDir.getParentFile();
+		 }
+		 return intermediateDir != null;
+	 }
 
 	/**
 	 * Obtiene los perfiles de usuarios de Firefox en Windows

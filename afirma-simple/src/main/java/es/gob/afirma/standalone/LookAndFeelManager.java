@@ -12,6 +12,9 @@ package es.gob.afirma.standalone;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 import javax.swing.JDialog;
@@ -20,6 +23,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.Platform.OS;
 
 /** Maneja el LookAndFeel aplicado al aplicativo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
@@ -41,8 +45,11 @@ public final class LookAndFeelManager {
     /** Color transparente. */
     public static final Color TRANSPARENT_COLOR = new Color(255, 255, 255, 0);
 
-    /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
-    public static final boolean HIGH_CONTRAST;
+    /** Indica si se detecta el uso de Windows en modo alto contraste. */
+    public static final boolean WINDOWS_HIGH_CONTRAST;
+
+    /** Indica si se detecta un sistema linux con GNOME y un tema oscuro habilitado. */
+    public static final boolean GNOME_DARK_MODE;
 
     /** Tama&ntilde;o m&aacute;ximo de las fuentes por defecto antes de considerarse grandes. */
     private static final int LARGE_FONT_LIMIT = 13;
@@ -69,18 +76,13 @@ public final class LookAndFeelManager {
 
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
-            HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
+            WINDOWS_HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
         }
-//        // En Linux usamos siempre la misma configuracion que al detectar la combinacion de colores
-//        // de alto contraste
-//        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
-//            HIGH_CONTRAST = true;
-//        }
         else {
-            HIGH_CONTRAST = false;
+            WINDOWS_HIGH_CONTRAST = false;
         }
 
-        SECUNDARY_COLOR = HIGH_CONTRAST ? Color.BLACK : Color.WHITE;
+        SECUNDARY_COLOR = WINDOWS_HIGH_CONTRAST ? Color.BLACK : Color.WHITE;
 
         final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
         if (defaultFontHeight instanceof Integer) {
@@ -93,6 +95,14 @@ public final class LookAndFeelManager {
         else {
             LARGE_FONT = false;
         }
+
+        if (Platform.getOS() == OS.LINUX) {
+        	GNOME_DARK_MODE = isGnomeDarkMode();
+        }
+        else {
+        	GNOME_DARK_MODE = false;
+        }
+
     }
 
     /** Establece el decorado de la aplicaci&oacute;n. */
@@ -100,7 +110,7 @@ public final class LookAndFeelManager {
 
     	// Comprobamos si esta activado algun modo de accesibilidad. Si es asi,
     	// usaremos el LookAndFeel del sistema
-        final boolean useSystemLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
+        final boolean useSystemLookAndFeel = WINDOWS_HIGH_CONTRAST || LARGE_FONT || GNOME_DARK_MODE;
 
         if (!useSystemLookAndFeel) {
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
@@ -183,5 +193,44 @@ public final class LookAndFeelManager {
 	 */
 	public static boolean needMaximizeWindow() {
 		return getScreenSize().height <= 600;
+	}
+
+
+
+	/**
+	 * C&Oacute;DIGO EXTRA&Iacute;DO DEL PROYECTO jSystemThemeDetector (https://github.com/Dansoftowner/jSystemThemeDetector).
+	 * Detecta si nos encontramos en un entorno con GNOME y un tema declarado como oscuro.
+	 * @return {@code true} si encontramos configurado un tema oscuro de GNOME, {@code false} en caso contrario.
+	 */
+	private static boolean isGnomeDarkMode() {
+        return
+             (queryResultContains("echo $XDG_CURRENT_DESKTOP", "gnome") || //$NON-NLS-1$ //$NON-NLS-2$
+             queryResultContains("echo $XDG_DATA_DIRS | grep -Eo 'gnome'", "gnome") || //$NON-NLS-1$ //$NON-NLS-2$
+             queryResultContains("ps -e | grep -E -i \"gnome\"", "gnome")) //$NON-NLS-1$ //$NON-NLS-2$
+             	&& queryResultContains("gsettings get org.gnome.desktop.interface gtk-theme", "dark") //$NON-NLS-1$ //$NON-NLS-2$
+        ;
+    }
+
+	private static boolean queryResultContains(final String cmd, final String subResult) {
+		return query(cmd).toLowerCase().contains(subResult);
+	}
+
+	private static String query(final String cmd) {
+		try {
+			final Process process = Runtime.getRuntime().exec(cmd);
+			final StringBuilder stringBuilder = new StringBuilder();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String actualReadLine;
+				while ((actualReadLine = reader.readLine()) != null) {
+					if (stringBuilder.length() != 0) {
+						stringBuilder.append('\n');
+					}
+					stringBuilder.append(actualReadLine);
+				}
+			}
+			return stringBuilder.toString();
+		} catch (final IOException e) {
+			return ""; //$NON-NLS-1$
+		}
 	}
 }

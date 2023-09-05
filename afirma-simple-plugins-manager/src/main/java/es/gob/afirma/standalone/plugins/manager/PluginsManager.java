@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.AOFileUtils;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.MinimalPluginInfo;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -73,6 +75,7 @@ public class PluginsManager {
 
 		// Cargamos los plugins que haya configurados
 		final File relationFile = new File(this.pluginsDir, PLUGIN_RELATION_FILENAME);
+
 		if (relationFile.isFile() && relationFile.canRead()) {
 			MinimalPluginInfo[] installedPlugins;
 			try {
@@ -81,6 +84,7 @@ public class PluginsManager {
 			catch (final Exception e) {
 				throw new PluginException("Error al cargar el listado de plugins", e); //$NON-NLS-1$
 			}
+
 			for (final MinimalPluginInfo info : installedPlugins) {
 				try {
 					final AfirmaPlugin plugin = loadPlugin(info);
@@ -89,12 +93,6 @@ public class PluginsManager {
 				catch (final PluginException e) {
 					LOGGER.log(Level.WARNING, String.format("No se ha podido cargar la informacion del plugin %s. Se eliminara del listado", info.getInternalName()), e); //$NON-NLS-1$
 				}
-			}
-
-			try {
-				savePluginsList(relationFile, list);
-			} catch (final IOException e) {
-				throw new PluginException("No se pudo guardar la lista de plugins cargados", e); //$NON-NLS-1$
 			}
 		}
 
@@ -157,16 +155,23 @@ public class PluginsManager {
 	private static void savePluginsList(final File relationsFile, final List<AfirmaPlugin> plugins)
 			throws IOException {
 
-		try (final FileOutputStream fos = new FileOutputStream(relationsFile);) {
-			for (final AfirmaPlugin plugin : plugins) {
-				final PluginInfo info = plugin.getInfo();
-				final String line = info.getInternalName() + RELATIONS_SEPARATOR +
-						info.getVersionCode() + "\n"; //$NON-NLS-1$
-				fos.write(line.getBytes(StandardCharsets.UTF_8));
+		// Si hay plugins en el listado, actualizamos la relacion de plugins
+		if (!plugins.isEmpty()) {
+			try (final FileOutputStream fos = new FileOutputStream(relationsFile);) {
+				for (final AfirmaPlugin plugin : plugins) {
+					final PluginInfo info = plugin.getInfo();
+					final String line = info.getInternalName() + RELATIONS_SEPARATOR +
+							info.getVersionCode() + "\n"; //$NON-NLS-1$
+					fos.write(line.getBytes(StandardCharsets.UTF_8));
+				}
+				fos.flush();
 			}
-			fos.flush();
+			AOFileUtils.setAllPermissions(relationsFile);
 		}
-
+		// Si ya no hay plugins, eliminamos la relacion y el directorio de plugins
+		else {
+			deleteDirectoryAndContent(relationsFile.getParentFile());
+		}
 	}
 
 	/**
@@ -229,7 +234,7 @@ public class PluginsManager {
 			plugin = loadPluginFromFiles(new File[] { outPluginFile });
 		}
 		catch (final Exception e) {
-			deleteDirectory(outPluginFile.getParentFile());
+			deleteDirectoryAndContent(outPluginFile.getParentFile());
 			throw new PluginException("No se pudo cargar el plugin recien importado", e); //$NON-NLS-1$
 		}
 
@@ -282,8 +287,16 @@ public class PluginsManager {
 	private static File copyPluginToDirectory(final File pluginFile, final String pluginName, final File pluginsDir) throws IOException, PluginInstalledException {
 
 		// Creamos el directorio de plugins si es preciso
-		if (!pluginsDir.isDirectory() && !pluginsDir.mkdirs()) {
-			throw new IOException("No se ha podido crear el directorio interno de plugins: " + pluginsDir.getAbsolutePath()); //$NON-NLS-1$
+		if (!pluginsDir.isDirectory()) {
+			try {
+				if (!pluginsDir.getParentFile().exists()) {
+					createDirWithPermissions(pluginsDir.getParentFile());
+				}
+				createDirWithPermissions(pluginsDir);
+			}
+			catch (final Exception e) {
+				throw new IOException("No se ha podido crear el directorio interno de plugins: " + LoggerUtil.getCleanUserHomePath(pluginsDir.getAbsolutePath()), e); //$NON-NLS-1$
+			}
 		}
 
 		// Creamos un directorio para el nuevo plugin
@@ -291,13 +304,19 @@ public class PluginsManager {
 		if (pluginDir.exists()) {
 			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$
 		}
-		pluginDir.mkdir();
+		try {
+			createDirWithPermissions(pluginDir);
+		}
+		catch (final Exception e) {
+			throw new IOException("No se ha podido crear el directorio para la copia del plugin: " + LoggerUtil.getCleanUserHomePath(pluginDir.getAbsolutePath()), e); //$NON-NLS-1$
+		}
 
 		// Copiamos los JAR del plugin a su directorio
 		final File outPluginFile = new File(pluginDir, pluginFile.getName());
 		try (OutputStream fos = new FileOutputStream(outPluginFile)) {
 			Files.copy(pluginFile.toPath(), fos);
 		}
+		AOFileUtils.setAllPermissions(outPluginFile);
 		return outPluginFile;
 	}
 
@@ -318,6 +337,7 @@ public class PluginsManager {
 				fos.write(pluginRegistry);
 				fos.flush();
 			}
+			AOFileUtils.setAllPermissions(relationsFile);
 		}
 		else {
 			Files.write(relationsFile.toPath(), pluginRegistry, StandardOpenOption.APPEND);
@@ -363,7 +383,7 @@ public class PluginsManager {
 			return;
 		}
 
-		deleteDirectory(pluginDir);
+		deleteDirectoryAndContent(pluginDir);
 
 		final File relationFile = new File(this.pluginsDir, PLUGIN_RELATION_FILENAME);
 
@@ -381,7 +401,7 @@ public class PluginsManager {
 			LOGGER.warning("El plugin seleccionado, no se encuentra instalado"); //$NON-NLS-1$
 			return;
 		}
-		deleteDirectory(pluginDir);
+		deleteDirectoryAndContent(pluginDir);
 	}
 
 	/**
@@ -390,16 +410,30 @@ public class PluginsManager {
 	 * @throws IOException Cuando se produce un error al eliminar el directorio
 	 * o cualquiera de los ficheros que contiene.
 	 */
-	private static void deleteDirectory(final File dir) throws IOException {
+	private static void deleteDirectoryAndContent(final File dir) throws IOException {
 
 		for (final File file : dir.listFiles()) {
 			if (file.isFile()) {
 				Files.delete(file.toPath());
 			}
 			else {
-				deleteDirectory(file);
+				deleteDirectoryAndContent(file);
 			}
 		}
 		Files.delete(dir.toPath());
 	}
+
+	/**
+	 * Crea un directorio y sus subdirectorios y le concede permisos de lectura, escritura y ejecucion a todos los usuarios.
+	 * @param dir Directorio.
+	 * @throws IOException Cuando falla la creaci&oacute;n del directorio.
+	 */
+	private static void createDirWithPermissions(final File dir) throws IOException {
+
+		if (!dir.mkdirs()) {
+			throw new IOException("No se pudo crear el directorio: " + LoggerUtil.getCleanUserHomePath(dir.getAbsolutePath())); //$NON-NLS-1$
+		}
+		AOFileUtils.setAllPermissions(dir);
+	}
 }
+

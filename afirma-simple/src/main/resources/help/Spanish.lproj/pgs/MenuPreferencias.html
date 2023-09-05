@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
  <head>
   <title>Men&uacute; preferencias</title>
@@ -29,10 +28,7 @@
      <li><b>Importar configuraci&oacute;n general de la aplicaci&oacute;n:</b> Opci&oacute;n para importar un fichero de la configuraci&oacute;n proporcionado por un administrador.</li>
      <li><b>Restaurar configuraci&oacute;n general de la aplicaci&oacute;n:</b> Opci&oacute;n para restaurar la configuraci&oacute;n por defecto de la aplicaci&oacute;n.</li>
      <li><b>No pedir confirmaci&oacute;n al cerrar la aplicaci&oacute;n:</b> Permite salir de la aplicaci&oacute;n sin confirmaci&oacute;n del usuario.</li>
-     <li><b>No mostrar la pantalla inicial de DNIe y trabajar siempre con cualquier certificado:</b> Opci&oacute;n para omitir la pantalla inicial de detecci&oacute;n de DNIe y
-     permitir al usuario seleccionar el certificado de firma de entre los disponibles en el almac&eacute;n del sistema.</li>
      <li><b>Buscar actualizaciones al inicio:</b> Permite configurar si se deben b&uacute;scar si hay actualizaciones disponibles al iniciar la aplicacion.</li>
-     <li><b>Enviar estad&iacute;sticas de uso de forma an&oacute;nima para ayudar a mejorar la aplicaci&oacute;n:</b> Permite configurar si se desea permitir el env&iacute;o de estad&iacute;sticas de uso.</li>
      <li><b>Habilitar JMulticard para el uso de las tarjetas de la FNMT y DNIe:</b> S&oacute;lo en Windows y Linux. Configura si debe utilizarse el controlador integrado en AutoFirma para el uso de las tarjetas de FNMT y DNIe. En caso de desactivarse, se utilizar&aacute;n los controladores encontrados en el sistema. El uso de esta funci&oacute;n permite usar las tarjetas compatibles cuando el usuario no tiene instalado su controlador o existe alguna incompatibilidad con &eacute;l. Esta funci&oacute;n puede ocasionar que se solicite al usuario m&uacute;ltiples veces la inserci&oacute;n del PIN de la tarjeta en procesos de firma masiva. Esta configuraci&oacute;n no tendr&aacute; efecto hasta la pr&oacute;xima vez que se abra la aplicaci&oacute;n.</li>
      <li><b>Funcionamiento optimizado para VDI:</b> S&oacute;lo en Windows. Configura la comunicaci&oacute;n por WebScokets con el navegador de tal modo que se evitar&aacute;n bloqueos cuando se utilice AutoFirma en un entorno VDI. Sin embargo, esta configuraci&oacute;n ralentiza la comunicaci&oacute;n cuando la cantidad de datos a transmitir es grande, por lo que no se recomienda en otros entornos.</li>
     </ul>
@@ -61,7 +57,6 @@
       </p>
 	 <li><b>Solicitar confirmaci&oacute;n para firmar:</b>
 	   Cuando est&aacute; habilitada esta opci&oacute;n se solicita confirmaci&oacute;n al usuario antes de firmar.</li>
-	 <li><b>Permitir el uso de certificados caducados:</b> Al estar habilitada esta opci&oacute;n, los certificados caducados aparecer&aacute;n en el di&aacute;logo de selecci&oacute;n de certificados de firma, lo que permitir&aacute; firmar con ellos.</li>
 	 <li><b>Permitir agregar nuevas firmas a documentos con firmas no v&aacute;lidas:</b> Al habilitar esta opci&oacute;n, AutoFirma no impedir&aacute; agregar nuevas firmas (cofirma o contrafirma) a documentos en los que se encuentre que ya hay firmas y estas no sean v&aacute;lidas (est&eacute;n corruptas o con certificados caducados).</li>
      <li><b>Sobreescribir ficheros en el directorio de salida:</b> Opci&oacute;n para configurar si se desea
        que, al generar la estructura de directorios de firmas resultante de un proceso de firma masiva, y en caso
@@ -223,6 +218,37 @@
       <li>Provincia en la que se realiza la firma: Provincia en la que se localiza el firmante en el momento de la firma.</li>
       <li>C&oacute;digo postal en la que se realiza la firma: C&oacute;digo postal en la que se localiza el firmante en el momento de la firma.</li>
       <li>Pa&iacute;s en el que se realiza la firma: Pa&iacute;s la que se localiza el firmante en el momento de la firma.</li>
+     </ul>
+    </li>
+   </ul>
+      <h3>Men&uacute; "Almacenes de claves"</h3>
+   <p align="center">
+  	<img src="../gfx/menualmacenesclaves_mini.png" alt="Pantalla para la configuraci&oacute;n de las firmas de facturas electr&oacute;nicas">
+   </p>
+   <ul>
+    <li><b>Almac&eacute;n por defecto:</b>
+     <ul>
+      <li>Permite seleccionar el almac&eacute;n de claves que se cargará por defecto en la interfaz de escritorio.</li>
+      <li><b>Ver contenido:</b> Permite ver los certificados que contiene el almac&eacute;n seleccionado.</li>
+      <li><b>Usar tambi&eacute;n en las llamadas de AutoFirma desde el navegador:</b> Indica si se desea que el almac&eacute;n configurado sea el que se cargue por defecto también cuando se llame a AutoFirma desde el navegador.</li>
+	 </ul>
+	</li>
+    <li><b>Filtros de certificados:</b>
+     <ul>
+      <li><b>No mostrar la pantalla inicial de DNIe y trabajar siempre con el almac&eacute;n por defecto:</b> Omite la pantalla inicial al detectar un DNIe y se utilizar&aacute; el almac&eacute;n por defecto que est&eacute; configurado.</li>
+	  <li><b>Permitir el uso de certificados caducados:</b> Al estar habilitada esta opci&oacute;n, los certificados caducados aparecer&aacute;n en el di&aacute;logo de selecci&oacute;n de certificados de firma, lo que permitir&aacute; firmar con ellos.</li>
+	  <li><b>Usar solo certificados espec&iacute;ficos para firma en las firmas electr&oacute;nicas (atributo de no repudio):</b> Si est&aacute; marcada esta opci&oacute;n, s&oacute;lo se mostrar&aacute;n los certificados que declaren espec&iacute;ficamente ser de firma.</li>
+	  <li><b>Usar exclusivamente certificados de seud&oacute;nimo cuando est&aacute;n disponibles:</b> Restringe que &uacute;nicamente se puedan usar certificados de seud&oacute;nimo cuando estos est&eacute;n disponibles.</li>
+	  <li><b>Omitir certificado de autenticaci&oacute;n de DNIe:</b> Oculta el certificado de autenticaci&oacute;n incluido en los almacenes de claves para DNIe.</li>
+     </ul>
+    </li>
+    <li><b>Tarjetas inteligentes:</b>
+     <ul>
+      <li>Permite dar de alta tarjetas inteligentes a partir de su controlador PKCS#11 para poder usarlas directamente como un almac&eacute;n de claves accesible desde el di&aacute;logo de selecc&iacute;n de certificados. Las tarjetas inteligentes agregadas aqu&iacute;, se podr&aacute;n configurar como almacenes por defecto en el desplegable del primer apartado.</li>
+      <li><b>Conectar:</b> Realiza una prueba de conexi&oacute;n con el almac&eacute;n de claves de la tarjeta inteligente seleccionada.</li>
+      <li><b>Agregar tarjeta:</b> A&ntilde;ade una nueva tarjeta inteligente. Se abrir&aacute; un di&aacute;logo donde introducir un nombre para la tarjeta inteligente y la ruta donde se encuentra su controlador PKCS#11.</li>
+      <li><b>Modificar:</b> Permite modificar el nombre y la ruta del controlador de la tarjeta inteligente seleccionada.</li>
+	  <li><b>Eliminar:</b> Elimina la tarjeta inteligente seleccionada en el desplegable.</li>
      </ul>
     </li>
    </ul>

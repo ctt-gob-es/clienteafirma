@@ -68,7 +68,7 @@ public final class EditorFocusManager extends KeyAdapter implements FocusListene
         final String bodyRule = "body { font-family: " + defaultFont.getFamily() + "; font-size: " + defaultFont.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
 
-        if (LookAndFeelManager.HIGH_CONTRAST) {
+        if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             final Color color = new JLabel().getForeground();
             final String colorConfig = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             final String highContrastColorRule = "body {color: " + colorConfig + "; }";  //$NON-NLS-1$//$NON-NLS-2$

@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -26,6 +27,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -53,6 +55,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private boolean allowExternalStores = true;
 
+	private final String libFileName;
+
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
      *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
@@ -63,7 +67,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
      * @param checkValidity Indica si se debe comprobar la validez temporal de un
      *                      certificado al ser seleccionado.
      * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
-     *                                a&uacute;n no v&aacute;lidos. */
+     *                                a&uacute;n no v&aacute;lidos.
+	 * */
     public AOKeyStoreDialog(final AOKeyStoreManager ksm,
     		                final Object parentComponent,
     		                final boolean checkPrivateKeys,
@@ -81,6 +86,37 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
     }
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *            otra cosa que no sean certificados X.509 (como claves de cifrado).
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                a&uacute;n no v&aacute;lidos.
+	 * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
+	 * */
+    public AOKeyStoreDialog(final AOKeyStoreManager ksm,
+    		                final Object parentComponent,
+    		                final boolean checkPrivateKeys,
+    		                final boolean showExpiredCertificates,
+    		                final boolean checkValidity,
+    		                final String libFileName) {
+		this(
+			ksm,
+			parentComponent,
+			checkPrivateKeys,
+			showExpiredCertificates,
+			checkValidity,
+			null,
+			false,
+			libFileName
+		);
+    }
+
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
      * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
      * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
@@ -91,7 +127,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
      *                      certificado al ser seleccionado.
      * @param certFilters Filtros sobre los certificados a mostrar.
      * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
-     *                             filtro) debe ser solo uno. */
+     *                             filtro) debe ser solo uno.
+     * */
 	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
 			                final Object parentComponent,
                             final boolean checkPrivateKeys,
@@ -111,6 +148,44 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.showExpiredCertificates = showExpiredCertificates;
 		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
+		this.libFileName = null;
+	}
+
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                aun no v&aacute;lidos.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param certFilters Filtros sobre los certificados a mostrar.
+     * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
+     *                             filtro) debe ser solo uno.
+     * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
+     * */
+	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
+			                final Object parentComponent,
+                            final boolean checkPrivateKeys,
+                            final boolean showExpiredCertificates,
+                            final boolean checkValidity,
+                            final List<? extends CertificateFilter> certFilters,
+                            final boolean mandatoryCertificate,
+                            final String libFileName) {
+
+		if (ksm == null) {
+    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
+    	}
+
+		this.ksm = new AggregatedKeyStoreManager(ksm);
+		this.parentComponent = parentComponent;
+		this.checkPrivateKeys = checkPrivateKeys;
+		this.checkValidity = checkValidity;
+		this.showExpiredCertificates = showExpiredCertificates;
+		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
+		this.mandatoryCertificate = mandatoryCertificate;
+		this.libFileName = libFileName;
 	}
 
 	@Override
@@ -160,28 +235,64 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
 				newKsm = openMozillaKeyStore(parent);
+				KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
 				break;
 
 			// Almacen PKCS#12
 			case KEYSTORE_ID_PKCS12:
-				newKsm = openPkcs12KeyStore(parent);
+				newKsm = openPkcs12KeyStore(parent, null);
+				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 				break;
 
 			// DNIe
 			case KEYSTORE_ID_DNIE:
 				newKsm = openDnieKeyStore(parent);
+				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 				break;
 
 			// Almacen del sistema
 			case KEYSTORE_ID_SYSTEM:
 			default:
 				newKsm = openSystemKeyStore(parent);
+				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 				break;
 			}
 		}
-		catch (final AOCancelledOperationException | AOKeystoreAlternativeException e) {
+		catch (final AOCancelledOperationException e) {
 			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 			return false;
+		}
+		catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+					&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+					AOUIFactory.showMessageDialog(
+							parent,
+							KeyStoreMessages.getString("AOKeyStoreDialog.11"), //$NON-NLS-1$
+							KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+							AOUIFactory.ERROR_MESSAGE,
+							ioe
+						);
+					boolean stopOperation = false;
+					while (!stopOperation) {
+						try {
+							if (changeKeyStoreManager(keyStoreId, parent) == false) {
+								stopOperation = true;
+							}
+						} catch (final AOCancelledOperationException aoce) {
+							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
+							stopOperation = true;
+						}
+						catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+									KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE,
+									e
+								);
+				        	stopOperation = true;
+						}
+					}
+				}
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
@@ -196,6 +307,72 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 		// Establece el nuevo almacen cargado como el actual
 		setKeyStoreManager(newKsm);
+
+		return true;
+	}
+
+	@Override
+	public boolean changeKeyStoreManagerToPKCS11(final Component parent, final String ksName, final String ksLibPath) {
+
+		AOKeyStoreManager newKsm = null;
+
+		try {
+			newKsm = openPkcs11KeyStore(parent, ksName, ksLibPath);
+		}
+		catch (final AOCancelledOperationException e) {
+			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			return false;
+		}
+		catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+					&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+					AOUIFactory.showMessageDialog(
+							parent,
+							KeyStoreMessages.getString("AOKeyStoreDialog.11"), //$NON-NLS-1$
+							KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+							AOUIFactory.ERROR_MESSAGE,
+							ioe
+						);
+					boolean stopOperation = false;
+					while (!stopOperation) {
+						try {
+							if (changeKeyStoreManagerToPKCS11(parent, ksName, ksLibPath) == false) {
+								stopOperation = true;
+							}
+						} catch (final AOCancelledOperationException aoce) {
+							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
+							stopOperation = true;
+						}
+						catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+									KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE,
+									e
+								);
+				        	stopOperation = true;
+						}
+					}
+				}
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Error cambiando de almacen de claves: " + e, e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+				KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+				KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+				AOUIFactory.ERROR_MESSAGE,
+				e
+			);
+			return false;
+		}
+
+		// Establece el nuevo almacen cargado como el actual
+		setKeyStoreManager(newKsm);
+
+		if (newKsm != null && newKsm.getType() != null) {
+			KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+			KeyStorePreferencesManager.setLastSelectedKeystoreLib(ksLibPath);
+		}
 
 		return true;
 	}
@@ -281,43 +458,88 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	/**
 	 * Permite seleccionar un fichero PKCS#12, introducir su contrase&ntilde;a y cargarlo.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @param filePath Ruta del fichero PKCS#12 en caso de que se haya seleccionado anteriormente.
 	 * @return Gestor del almac&eacute;n PKCS#12 o {@code null} si no se pudo cargar o si se
 	 * cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openPkcs12KeyStore(final Component parent) throws Exception {
+	public static AOKeyStoreManager openPkcs12KeyStore(final Component parent, final String filePath) throws Exception {
 
-		final File[] ksFile;
-		ksFile = AOUIFactory.getLoadFiles(
-			KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
-			null,
-			null,
-			EXTS,
-			KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
-			false,
-			false,
-			null,
-			parent
-		);
+		String libPath = filePath;
+
+		AOKeyStoreManager aoks = null;
+
+		if (libPath == null || libPath.isEmpty()) {
+			final File[] ksFile;
+			ksFile = AOUIFactory.getLoadFiles(
+				KeyStoreMessages.getString("AOKeyStoreDialog.6"), //$NON-NLS-1$
+				null,
+				null,
+				EXTS,
+				KeyStoreMessages.getString("AOKeyStoreDialog.7") + EXTS_DESC, //$NON-NLS-1$
+				false,
+				false,
+				null,
+				parent
+			);
+			libPath = ksFile[0].getAbsolutePath();
+		}
 
 		// Cargamos el almacen
 		try {
-			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			aoks = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				AOKeyStore.PKCS12,
-				ksFile[0].getAbsolutePath(),
+				libPath,
 				null,
 				AOKeyStore.PKCS12.getStorePasswordCallback(parent),
 				parent
 			);
+			KeyStorePreferencesManager.setLastSelectedKeystoreLib(libPath);
 		}
 		catch (final AOCancelledOperationException e) {
 			throw e;
+		}
+		catch (final IOException ioe) {
+			if (ioe.getCause() != null && ioe.getCause().getCause() != null
+					&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
+					AOUIFactory.showMessageDialog(
+							parent,
+							KeyStoreMessages.getString("AOKeyStoreDialog.11"), //$NON-NLS-1$
+							KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+							AOUIFactory.ERROR_MESSAGE,
+							ioe
+						);
+					boolean stopOperation = false;
+					while (!stopOperation) {
+						try {
+							final AOKeyStoreManager newAoks = openPkcs12KeyStore(parent, libPath);
+							if (newAoks != null) {
+								aoks = newAoks;
+								stopOperation = true;
+							}
+						} catch (final AOCancelledOperationException aoce) {
+							LOGGER.info("Operacion cancelada por el usuario: " + aoce); //$NON-NLS-1$
+							throw aoce;
+						}
+						catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									KeyStoreMessages.getString("AOKeyStoreDialog.10"), //$NON-NLS-1$
+									KeyStoreMessages.getString("AOKeyStoreDialog.9"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE,
+									e
+								);
+				        	throw e;
+						}
+					}
+				}
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
+
+		return aoks;
 	}
 
 	/**
@@ -349,6 +571,39 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			throw e;
 		}
 		return ksm;
+	}
+
+	/**
+	 * Permite cargar una tarjeta inteligente a trav&eacute;s de su controlador.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @param ksName Nombre del almac&eacute;n PKCS#11.
+	 * @param ksLibPath Nombre de la
+	 * @return Gestor del almac&eacute;n PKCS#11 o {@code null} si no se pudo cargar o si se
+	 * cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	public static AOKeyStoreManager openPkcs11KeyStore(final Component parent, final String ksName, final String ksLibPath) throws Exception {
+
+		// Cargamos el almacen
+		try {
+			AOKeyStore.PKCS11.setName(ksName);
+
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.PKCS11,
+				ksLibPath,
+				null,
+				AOKeyStore.PKCS11.getStorePasswordCallback(parent),
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
+			throw e;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado: " + e, e); //$NON-NLS-1$
+			throw e;
+		}
 	}
 
 
@@ -507,4 +762,10 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	public boolean isExternalStoresOpeningAllowed() {
 		return this.allowExternalStores;
 	}
+
+	@Override
+	public String getLibName() {
+		return this.libFileName;
+	}
+
 }

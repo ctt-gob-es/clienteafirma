@@ -52,8 +52,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
@@ -61,6 +63,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
@@ -104,7 +107,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
 	private static final int DEFAULT_WINDOW_HEIGHT = 580;
 
-	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
 	private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$
 
 	private static final String SYSTEM_PROPERTY_DEBUG_FILE = "afirma_debug"; //$NON-NLS-1$
@@ -134,19 +136,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * aplicaci&oacute;n.
 	 */
     private static boolean updatesEnabled = true;
-
-	/**
-	 * Propiedad Java que hay que establecer (a nivel de JVM) a <code>true</code>
-	 * para evitar el env&iacute;o de estad&iacute;sticas a Google Analytics.
-	 */
-    public static final String DO_NOT_SEND_ANALYTICS = "es.gob.afirma.doNotSendAnalytics"; //$NON-NLS-1$
-
-	/**
-	 * Variable de entorno que hay que establecer (a nivel de sistema operativo) a
-	 * <code>true</code> para evitar el env&iacute;o de estad&iacute;sticas a Google
-	 * Analytics.
-	 */
-    public static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
 
 	/**
 	 * Variable de entorno que hay que establecer (a nivel de sistema operativo o
@@ -300,6 +289,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		return;
     	}
 
+    	// Al iniciar la aplicacion, el usuario no habra seleccionado ningun almacen de claves todavia
+    	KeyStorePreferencesManager.setLastSelectedKeystore(""); //$NON-NLS-1$
+    	KeyStorePreferencesManager.setLastSelectedKeystoreLib(""); //$NON-NLS-1$
+
     	LOGGER.info("Cargamos el almacen de claves por defecto"); //$NON-NLS-1$
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
@@ -423,6 +416,164 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return <code>AOKeyStoreManager</code> en uso en la aplicaci&oacute;n
 	 */
     public synchronized AOKeyStoreManager getAOKeyStoreManager() {
+    	String lib = null;
+    	if (this.ksManager == null) {
+	    	try {
+	    		final AOKeyStore aoks = SimpleKeyStoreManager.getDefaultKeyStoreType();
+	    		if (aoks.equals(AOKeyStore.PKCS12) || aoks.equals(AOKeyStore.PKCS11)) {
+	    			lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+	    		}
+	    		this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						aoks, // Store
+					    lib, // Lib
+						null, // Description
+						aoks.getStorePasswordCallback(this), // PasswordCallback
+						this // Parent
+				);
+
+			} catch (final AOKeystoreAlternativeException e) {
+	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
+	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
+	 			final OS os = Platform.getOS();
+	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+	 			try {
+	 				this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+							aoks, // Store
+						    lib, // Lib
+							null, // Description
+							aoks.getStorePasswordCallback(this), // PasswordCallback
+							this // Parent
+					);
+				} catch (final Exception e1) {
+		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
+		 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+				}
+
+			} catch (final IOException e) {
+				LOGGER.log(Level.SEVERE, "Error al leer el almacen", e); //$NON-NLS-1$
+				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.56"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
+				final OS os = Platform.getOS();
+	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+	 			try {
+	 				this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+							aoks, // Store
+						    lib, // Lib
+							null, // Description
+							aoks.getStorePasswordCallback(this), // PasswordCallback
+							this // Parent
+					);
+				} catch (final Exception e1) {
+		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e); //$NON-NLS-1$
+		 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+				}
+
+			} catch (final AOCancelledOperationException aoce) {
+				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.56"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, aoce); //$NON-NLS-1$
+				final OS os = Platform.getOS();
+	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+	 			try {
+	 				this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+							aoks, // Store
+						    lib, // Lib
+							null, // Description
+							aoks.getStorePasswordCallback(this), // PasswordCallback
+							this // Parent
+					);
+				} catch (final Exception e1) {
+		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
+		 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+				}
+			}
+    	} else {
+    		final String lastKeystoreSelected = KeyStorePreferencesManager.getLastSelectedKeystore();
+    		// Si el usuario ha seleccionado otro almacen de claves en el dialogo de seleccion de certificados, se cargara ese
+    		if (!lastKeystoreSelected.isEmpty() && !lastKeystoreSelected.equals(this.ksManager.getType().getName())) {
+    			try {
+    	    		final AOKeyStore aoks = SimpleKeyStoreManager.getLastKeystoreSelected();
+    	    		if (aoks.equals(AOKeyStore.PKCS12) || aoks.equals(AOKeyStore.PKCS11)) {
+    	    			lib = KeyStorePreferencesManager.getLastSelectedKeystoreLib();
+    	    		}
+    	    		this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    						aoks, // Store
+    					    lib, // Lib
+    						null, // Description
+    						aoks.getStorePasswordCallback(this), // PasswordCallback
+    						this // Parent
+    				);
+
+    			} catch (final AOKeystoreAlternativeException e) {
+    	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
+    	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
+    	 			final OS os = Platform.getOS();
+    	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+    	 			try {
+    	 				this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    							aoks, // Store
+    						    lib, // Lib
+    							null, // Description
+    							aoks.getStorePasswordCallback(this), // PasswordCallback
+    							this // Parent
+    					);
+    				} catch (final Exception e1) {
+    		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
+    		 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+    							SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+    				}
+
+    			} catch (final IOException e) {
+    				LOGGER.log(Level.SEVERE, "Error al leer el almacen", e); //$NON-NLS-1$
+    				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.56"), //$NON-NLS-1$
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
+    				final OS os = Platform.getOS();
+    	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+    	 			try {
+    	 				this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    							aoks, // Store
+    						    lib, // Lib
+    							null, // Description
+    							aoks.getStorePasswordCallback(this), // PasswordCallback
+    							this // Parent
+    					);
+    				} catch (final Exception e1) {
+    		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e); //$NON-NLS-1$
+    		 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+    							SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+    				}
+
+    			} catch (final AOCancelledOperationException aoce) {
+    				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.57"), //$NON-NLS-1$
+    						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.WARNING_MESSAGE, aoce); //$NON-NLS-1$
+    				final OS os = Platform.getOS();
+    	 			final AOKeyStore aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+
+    	 			try {
+    	 				this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    							aoks, // Store
+    						    lib, // Lib
+    							null, // Description
+    							aoks.getStorePasswordCallback(this), // PasswordCallback
+    							this // Parent
+    					);
+    				} catch (final Exception e1) {
+    		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
+    		 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+    							SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e1); //$NON-NLS-1$
+    				}
+    			}
+    		}
+    	}
         return this.ksManager;
     }
 
@@ -551,7 +702,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
     public void signLoadedFile() {
         if (this.currentPanel instanceof SignPanel) {
-            ((SignPanel) this.currentPanel).sign();
+			((SignPanel) this.currentPanel).sign();
         }
     }
 
@@ -630,7 +781,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
 
     	// Se establece la configuracion del proxy
-       	ProxyUtil.setProxySettings();
+    	try {
+    		ProxyUtil.setProxySettings();
+    	}
+    	catch (final Throwable e) {
+    		LOGGER.log(Level.SEVERE, "Error al aplicar la configuracion de proxy", e); //$NON-NLS-1$
+			if (isUsingGUI(args) && !isHeadlessMode()) {
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.11"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.WARNING_MESSAGE, e); //$NON-NLS-1$
+    		}
+		}
 
 		// Establecemos si deben respetarse las comprobaciones de seguridad de las
 		// conexiones de red
@@ -650,28 +810,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
        					);
        		}
        	}
-
-		// Google Analytics
-		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS)
-				&& !Boolean.getBoolean(DO_NOT_SEND_ANALYTICS)
-				&& !Boolean.parseBoolean(System.getenv(DO_NOT_SEND_ANALYTICS_ENV))) {
-	    	new Thread(() ->  {
-				// No importamos directamente los paquetes para no crear una dependencia
-				// absoluta de ellos.
-	    			// En AutoFirma WS, podrian no importarse.
-			    	try {
-					final com.dmurph.tracking.AnalyticsConfigData config = new com.dmurph.tracking.AnalyticsConfigData(
-							GOOGLE_ANALYTICS_TRACKING_CODE);
-						final com.dmurph.tracking.JGoogleAnalyticsTracker tracker = new com.dmurph.tracking.JGoogleAnalyticsTracker(
-								config, com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion.V_4_7_2);
-					tracker.trackPageView("AutoFirma", //$NON-NLS-1$
-							"AutoFirma", //$NON-NLS-1$
-							getIp());
-				} catch (final Exception e) {
-			    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
-			    	}
-			}).start();
-				}
 
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -808,7 +946,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 				checkJavaVersion(saf.getMainFrame());
 			} else {
-				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "La aplicacion ya se encuentra activa en otra ventana. Se cerrara esta instancia"); //$NON-NLS-1$
+	    		AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 						JOptionPane.WARNING_MESSAGE, null);
 				forceCloseApplication(0);
@@ -819,6 +958,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		CommandLineLauncher.main(args);
 		} catch (final Exception e) {
     		LOGGER.log(Level.SEVERE, "Error global en la aplicacion: " + e, e); //$NON-NLS-1$
+    		// En caso de error
+			if (args != null && args.length > 0 && args[0].startsWith(WEBSOCKET_REQUEST_PREFIX)) {
+				forceCloseApplication(-1);
+			}
     	}
     }
 
@@ -1017,11 +1160,22 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * comandos.
 	 *
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
-	 * @return {@code true} si la llamada se debe procesar como si se hubiese
-	 *         recibido por l&iacute;nea de comandos.
+	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta
+	 * 		en l&iacute;nea de comandos.
 	 */
 	private static boolean isUsingCommnadLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
+	}
+
+	/**
+	 * Indica si la ejecuci&oacute;n de AutoFirma se est&aacute; haciendo en modo
+	 * escritorio.
+	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
+	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta
+	 * 		como aplicaci&oacute;n de escritorio.
+	 */
+	private static boolean isUsingGUI(final String[] args) {
+		return args == null || args.length == 0;
 	}
 
 	/**

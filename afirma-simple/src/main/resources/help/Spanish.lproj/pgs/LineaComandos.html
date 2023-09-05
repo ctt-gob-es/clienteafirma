@@ -13,7 +13,7 @@
   <ul>
     <li>Windows</li>
 	  <ul>
-	    <li>El proceso de instalaci&oacute;n copia en el directorio de AutoFirma el ejecutable "AutoFirmaCommandLine"". Utilice este ejecutable desde l&iacute;nea de comandos para realizar las distintas operaciones que se soportan.</li>
+	    <li>El proceso de instalaci&oacute;n copia en el directorio de AutoFirma el ejecutable "AutoFirmaCommandLine"" y, si le es posible, incluye el directorio en el <i>path</i>. Utilice este ejecutable desde l&iacute;nea de comandos para realizar las distintas operaciones que se soportan.</li>
 	  </ul>
 	<li>Linux</li>
 	  <ul>
@@ -21,7 +21,7 @@
 	  </ul>
 	<li>macOS</li>
 	  <ul>
-	    <li>Para el uso de la aplicaci&oacute;n por l&iacute;nea de comandos es necesario ejecutar el JAR interno de la aplicaci&oacute;n mediante Java. Esto puede hacerse accediendo al directorio interno "Resources" de la aplicaci&oacute;n (com&uacute;nmente, "/Applications/AutoFirma.app/Contents/Resources") y ejecutando el JAR con la instancia interna de Java, cuyo ejecutable se renombra como "AutoFirma".</li>
+	    <li>Para el uso de la aplicaci&oacute;n por l&iacute;nea de comandos se crea dentro de la aplicación un script "AutoFirmaCommandLine" en el directorio de la aplicación. Se puede ejecutar este script accediendo al directorio interno "Resources" de la aplicaci&oacute;n (com&uacute;nmente, "/Applications/AutoFirma.app/Contents/MacOS"). Es importante que <b>los parámetros que puedan contener espacios se pasen en el comando entre comillas simples</b>.</li>
 	  </ul>
   </ul>
   <p>Por ejemplo, se puede ejecutar AutoFirma y listar las distintas operaciones disponibles a trav&eacute;s de la l&iacute;nea de comandos con el comando "-help" de la siguiente manera:</p>
@@ -655,6 +655,7 @@ Opciones:
   </ul>
   <li style="margin-top: 10pt"><code>pdfVersion</code>:</li>
   <ul>
+  	<li><code>-1</code>: Se declara que se respete la versi&oacute;n del PDF que se firme.</li>
   	<li><code>2</code>: Se declara que la versi&oacute;n del PDF de salida es 1.2.</li>
   	<li><code>3</code>: Se declara que la versi&oacute;n del PDF de salida es 1.3.</li>
   	<li><code>4</code>: Se declara que la versi&oacute;n del PDF de salida es 1.4.</li>

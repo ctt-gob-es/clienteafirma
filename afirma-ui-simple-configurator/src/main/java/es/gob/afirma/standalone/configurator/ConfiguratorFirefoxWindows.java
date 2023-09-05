@@ -574,7 +574,9 @@ final class ConfiguratorFirefoxWindows {
 				continue;
 			}
 
-			profileDirs.add(new File(profileDir));
+			if (profileDir != null) {
+				profileDirs.add(new File(profileDir));
+			}
 		}
 
 		return profileDirs.toArray(new File[profileDirs.size()]);

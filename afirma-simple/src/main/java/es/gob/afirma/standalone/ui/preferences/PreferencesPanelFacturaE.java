@@ -508,7 +508,6 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 				throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
 			}
 		}
-
 	}
 
 	/**

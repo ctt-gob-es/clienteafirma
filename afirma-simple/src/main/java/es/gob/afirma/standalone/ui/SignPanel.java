@@ -57,15 +57,18 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
+import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -144,7 +147,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /** Crea la interfaz grafica del panel. */
 	private void createUI() {
 
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
+        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
@@ -202,7 +205,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	private CommonWaitDialog signWaitDialog = null;
 
-    /** Firma el fichero actualmente cargado. */
+    /** Firma el fichero actualmente cargado.
+     * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
+     * @throws IOException Error al leer almac&eacute;n. */
     public void sign() {
 
     	// Si se trata de firmar un documento que sabemos que es una firma invalida y no se
@@ -302,6 +307,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /**
      * Inicia el proceso de firma.
      * @param signConfigs Operaciones de firma a ejecutar.
+     * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
+     * @throws IOException Error al leer almac&eacute;n.
      */
     @Override
     public void initSignTask(final List<SignOperationConfig> signConfigs) {
@@ -357,19 +364,24 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
     static List<? extends CertificateFilter> getCertFilters() {
+
     	final List<CertificateFilter> filters = new ArrayList<>();
+
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
+    	if (KeyStorePreferencesManager.getSkipAuthCertDNIe()) {
+    		filters.add(new SkipAuthDNIeFilter());
+    	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
-    		filters.add(new PseudonymFilter());
+    		filters.add(new PseudonymFilter(PseudonymFilter.VALUE_ONLY));
     	}
     	if (filters.size() > 1) {
     		return Arrays.asList(
 				new MultipleCertificateFilter(filters.toArray(new CertificateFilter[0]))
 			);
     	}
-    	else if (filters.size() == 1) {
+		else if (filters.size() == 1) {
     		return filters;
     	}
     	return null;
@@ -654,7 +666,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	c.gridy++;
     	mainPanel.add(this.pluginButtonsPanel, c);
 
-    	if (!LookAndFeelManager.HIGH_CONTRAST) {
+    	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
     		mainPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     		this.pluginButtonsPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
     	}
@@ -835,22 +847,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        welcomeLabel.setLabelFor(getSelectButton());
 	        this.add(welcomeLabel, BorderLayout.PAGE_START);
 
-	        String intro = SimpleAfirmaMessages.getString("SignPanel.40"); //$NON-NLS-1$
-
-	        try {
-				final int nReaders = javax.smartcardio.TerminalFactory.getDefault().terminals().list().size();
-	            if (nReaders == 1) {
-	                intro = intro + SimpleAfirmaMessages.getString("SignPanel.2"); //$NON-NLS-1$
-	            }
-	            else if (nReaders > 1) {
-	                intro = intro + SimpleAfirmaMessages.getString("SignPanel.4"); //$NON-NLS-1$
-	            }
-	        }
-	        catch(final Exception | Error e) {
-	        	LOGGER.warning(
-	    			"No ha sido posible obtener la lista de lectores de tarjetas del sistema: " + e //$NON-NLS-1$
-				);
-	        }
+	        final String intro = SimpleAfirmaMessages.getString("SignPanel.40"); //$NON-NLS-1$
 
 	        final JLabel introText = new JLabel(intro);
 	        introText.setLabelFor(getSelectButton());
@@ -866,7 +863,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.add(selectPanel, BorderLayout.PAGE_END);
 
 	        // Configuramos el color
-	        if (!LookAndFeelManager.HIGH_CONTRAST) {
+	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            introPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            selectPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
@@ -901,7 +898,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	        // Identificamos el color de fondo
 	        Color bgColor = Color.WHITE;
-	        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 	        	bgColor = LookAndFeelManager.DEFAULT_COLOR;
 	        }
 
@@ -921,7 +918,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.filePanel.setBackground(bgColor);
 	        this.filePanel.getViewport().setBackground(bgColor);
 
-	        final Color lineBorderColor = LookAndFeelManager.HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
+	        final Color lineBorderColor = LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.WHITE : Color.GRAY;
 	        this.filePanel.setBorder(BorderFactory.createLineBorder(lineBorderColor));
 
 	        this.filePanel.getHorizontalScrollBar().setUnitIncrement(30);
@@ -952,11 +949,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        this.signButton.setEnabled(false);
 	        buttonPanel.add(this.signButton);
 	        this.signButton.addActionListener(
-	    		ae -> sign()
+	    		ae -> {
+					sign();
+				}
 			);
 
 	        // Establecemos la configuracion de color
-	        if (!LookAndFeelManager.HIGH_CONTRAST) {
+	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            panel.setBackground(Color.DARK_GRAY);
 	            panel.setForeground(Color.LIGHT_GRAY);

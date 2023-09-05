@@ -115,10 +115,16 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
 	public String showDialog() throws  CertificatesNotFoundException {
 
+		String title = CertificateSelectionDialogMessages.getString(
+				"CertificateSelectionDialog.0", this.currentKeyStoreTypeName); //$NON-NLS-1$
+
+		if (this.ksdm.getLibName() != null) {
+			title += " : " + this.ksdm.getLibName(); //$NON-NLS-1$
+		}
+
 		this.certDialog = this.optionPane.createDialog(
 			this.parent,
-			CertificateSelectionDialogMessages.getString(
-					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName) //$NON-NLS-1$
+			title
 		);
 
 		this.certDialog.setBackground(Color.WHITE);
@@ -231,16 +237,24 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	}
 
 	/** Cambia el almac&eacute;n de claves actual.
-	 * @param ksType Tipo de almac&eacute;n de claves. */
-	public void changeKeyStore(final int ksType) {
+	 * @param ksType Tipo de almac&eacute;n de claves.
+	 * @param ksName Nombrede almac&eacute;n de claves
+	 * @param ksLibPath Librer&iacute;a de almac&eacute;n de claves.  */
+	public void changeKeyStore(final int ksType, final String ksName, final String ksLibPath) {
 
 		// Ya que el cambio de dialogo puede hacer aparecer otros nuevos (como alguno
 		// de seleccion de fichero o de solicitud de PIN), dejamos de obligar a que
 		// este este siempre encima
 		this.certDialog.setAlwaysOnTop(false);
 
+		final boolean changed;
+
 		// Cambiamos de almacen
-		final boolean changed = this.ksdm.changeKeyStoreManager(ksType, this.parent);
+		if (ksLibPath == null || ksLibPath.isEmpty()) {
+			changed = this.ksdm.changeKeyStoreManager(ksType, this.parent);
+		} else {
+			changed = this.ksdm.changeKeyStoreManagerToPKCS11(this.parent, ksName, ksLibPath);
+		}
 
 		// Si se ha completado el cambio de almacen, refrescamos el dialogo
 		if (changed) {

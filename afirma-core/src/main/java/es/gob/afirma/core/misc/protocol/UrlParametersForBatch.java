@@ -284,7 +284,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 			setJsonBatch(Boolean.parseBoolean(params.get(PARAM_JSON_BATCH)));
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStore(getKeyStoreName(params));
 		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 	}
 

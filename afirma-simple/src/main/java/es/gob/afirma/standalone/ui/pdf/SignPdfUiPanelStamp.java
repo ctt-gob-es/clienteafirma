@@ -26,9 +26,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -53,7 +56,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -74,7 +77,7 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 	private static final int PREFERRED_HEIGHT = 630;
 	private static final int PAGEPANEL_PREFERRED_WIDTH = 466;
 	private static final int PAGEPANEL_PREFERRED_HEIGHT = 410;
-	static final String IMAGE_EXT[] = { "jpg", "jpeg", "bmp"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	static final String IMAGE_EXT[] = { "jpg", "jpeg", "png", "gif", "bmp"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 	final JTextField fileText = new JTextField();
 
@@ -434,19 +437,6 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 		return panel;
 	}
 
-	static String getInsertImageBase64(final BufferedImage bi) throws IOException{
-		try (final ByteArrayOutputStream osImage = new ByteArrayOutputStream()) {
-			ImageIO.write(bi, "jpg", osImage); //$NON-NLS-1$
-			return Base64.encode(osImage.toByteArray());
-		}
-        catch (final IOException e1) {
-        	LOGGER.severe(
-				"No ha sido posible pasar la imagen a JPG: " + e1 //$NON-NLS-1$
-			);
-        	throw e1;
-		}
-	}
-
 	/** Crea el panel con un bot&oacute;n de selecci&oacute;n de archivo de imagen.
 	 * @return Panel de selecci&oacute;n de imagen. */
 	private JPanel createFilePanel() {
@@ -479,17 +469,17 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 					return;
 				}
 
-				try {
-					final BufferedImage stampImage = ImageIO.read(files[0]);
-					if (stampImage == null) {
-						throw new IOException("No se ha seleccionado un fichero de imagen reconocido"); //$NON-NLS-1$
+				// Cargamos el fichero, comprobamos que realmente es una imagen compatible y la
+				// codificamos para su uso por el firmador
+				try (InputStream is = new FileInputStream(files[0])) {
+					final byte[] imageEncoded = AOUtil.getDataFromInputStream(is);
+					try (InputStream imageIs = new ByteArrayInputStream(imageEncoded)) {
+						ImageIO.read(imageIs);
 					}
-					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, getInsertImageBase64(stampImage));
+					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE, Base64.getEncoder().encodeToString(imageEncoded));
 				}
 				catch (final Exception ex) {
-					LOGGER.severe(
-						"No ha sido posible cargar la imagen: " + ex //$NON-NLS-1$
-					);
+					LOGGER.log(Level.WARNING, "No se ha podido cargar la imagen de rubrica", ex); //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
 						getDialogParent(),
 						SignPdfUiMessages.getString("SignPdfUiPreview.24"), //$NON-NLS-1$

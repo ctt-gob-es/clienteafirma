@@ -16,14 +16,13 @@
 	<meta name="locality" content="Madrid, España">
 	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
 	<meta name="description" content="Firma móvil. Web de pruebas del Cliente @firma móvil ">
-	<style>
-		OBJECT   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
-		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
-	</style>
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
-		
+		var servletsBase = window.location.href.indexOf("/firmaMovil/") > 0
+			? window.location.href.substring(0, window.location.href.indexOf("/firmaMovil/") + "/firmaMovil/".length - 1)
+			: window.location.origin;
+	
 		function seleccionarCertificado() {
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='';
@@ -67,7 +66,6 @@
 		}
 		
 		function mostrarPantalla() {
-			document.getElementById("cargandoApplet").style.display = "none";
 			document.getElementById("pantalla").style.display = "block";
 			
 			if (AutoScript.isIOS()) {				
@@ -95,7 +93,7 @@
 		}
 	-->
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
+		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->
@@ -107,7 +105,7 @@
 	<a title="Cliente Afirma" class="floatLeft">
 		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
 	</a>
-	<a href="http://www.lamoncloa.gob.es/home.htm" title="Gobierno de España">
+	<a href="https://www.lamoncloa.gob.es/" title="Gobierno de España">
 		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
 	</a>
 </div>
@@ -123,12 +121,6 @@
 	<div style="background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;">
 		<span style="text-align: center; font-weight: bold; font-size: 20pt;">Cargando...</span>
 	</div>
-</div>
-<div style="display: none;" id="cargandoApplet" class="error cursiva">
-	<br>
-	Cargando el applet para la extracción de certificados. Tenga paciencia.
-	<br><br>
-	<span>ESPERE POR FAVOR...</span>
 </div>
 <div id="pantalla" style="display: block;">
 <form id="sede">

@@ -14,7 +14,7 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var AutoScript = ( function ( window, undefined ) {
 
-		var VERSION = "1.8.0";
+		var VERSION = "1.8.2";
 		var VERSION_CODE = 2;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
@@ -1414,7 +1414,7 @@ var AutoScript = ( function ( window, undefined ) {
 						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1);
 					}
 					else {
-						processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
+						processErrorResponse("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
 					}
 				}
 				else {
@@ -1438,7 +1438,8 @@ var AutoScript = ( function ( window, undefined ) {
 					console.log("Error estableciendo el WebSocket: " + e);
 				}
 				
-				webSocket.onopen = function() {
+				webSocket.onopen = function(arg0, arg1) {
+					
 					// Indicamos que la conexion esta activa y que el WebSocket activo es el actual 
 					connected = true;
 					ws = this;
@@ -1450,6 +1451,7 @@ var AutoScript = ( function ( window, undefined ) {
 						connected = false;
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
+						processErrorResponse("java.lang.InterruptedException", "AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion");
 					}
 				};
 
@@ -1503,7 +1505,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function sendEcho(ws, idSession, retries) {
 				
 				if (retries <= 0) {
-					processErrorResponse("java.util.concurrent.TimeoutException", "No se pudo contactar con AutoFirma");
+					processErrorResponse("java.util.concurrent.TimeoutException", "AutoFirma no respondio al saludo.");
 					return;
 				}
 				
@@ -1577,6 +1579,7 @@ var AutoScript = ( function ( window, undefined ) {
 					console.log("Operacion desconocida. Se devuelve directamente su resultado.");
 					if (!!successCallback) {
 						successCallback(data);
+						setCallbacks(null, null);
 					}
 					else {
 						console.log("No se ha proporcionado funcion callback para procesar el resultado de la operacion");
@@ -1592,6 +1595,7 @@ var AutoScript = ( function ( window, undefined ) {
 				errorMessage = message;
 				if (!!errorCallback) {
 					errorCallback(exception, message);
+					setCallbacks(null, null);
 				}
 			}
 			
@@ -1647,7 +1651,13 @@ var AutoScript = ( function ( window, undefined ) {
 
 				}
 
-				successCallback(filenames, datasB64);
+				if (!!successCallback) {
+					successCallback(filenames, datasB64);
+					setCallbacks(null, null);
+				}
+				else {
+					console.log("No se ha proporcionado funcion callback a la que notificar el resultado de la carga de datos");
+				}
 			}
 			
 			/**
@@ -1659,6 +1669,10 @@ var AutoScript = ( function ( window, undefined ) {
 					// Si no se ha indicado funcion de guardado, entonces no se hace nada
 					if (!!successCallback) {
 						successCallback(data);
+						setCallbacks(null, null);
+					}
+					else {
+						console.log("No se ha proporcionado funcion callback a la notificar el resultado");
 					}
 				}
 				// Termina mal
@@ -1674,9 +1688,10 @@ var AutoScript = ( function ( window, undefined ) {
 			function processSelectCertificateResponse(data) {
 				if (!!successCallback) {
 					successCallback(data.replace(/\-/g, "+").replace(/\_/g, "/"));
+					setCallbacks(null, null);
 				}
 				else {
-					console.log("No se ha proporcionado funcion callback para procesar el certificado seleccionado");
+					console.log("No se ha proporcionado funcion callback para devolver el certificado seleccionado");
 				}
 			}
 
@@ -1701,7 +1716,14 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 					catch (e) {}
 					
-					successCallback(result, certificate);
+					
+					if (!!successCallback) {
+						successCallback(result, certificate);
+						setCallbacks(null, null);
+					}
+					else {
+						console.log("No se ha proporcionado funcion callback a la que devolver el resultado del lote");
+					}
 				}
 				else {
 					console.log("No se ha proporcionado funcion callback para procesar el resultado del lote de firma");
@@ -1730,7 +1752,13 @@ var AutoScript = ( function ( window, undefined ) {
 				"\nscreen.height: " + (window.screen ? screen.height : 0) +
 				"\n\n   === CLIENTE LOG === \n" + data;
 				
-				successCallback(log);
+				if (!!successCallback) {
+					successCallback(log);
+					setCallbacks(null, null);
+				}
+				else {
+					console.log("No se ha proporcionado funcion callback a la que devolver el log");
+				}
 			}
 
 			/**
@@ -1765,7 +1793,13 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 				}
 
-				successCallback(signature, certificate, extraInfo);
+				if (!!successCallback) {
+					successCallback(signature, certificate, extraInfo);
+					setCallbacks(null, null);
+				}
+				else {
+					console.log("No se ha proporcionado funcion callback a la que devolver la firma generada");
+				}
 			}
 			
 			/** Crea un objeto con los parametros indicados. */
