@@ -290,14 +290,15 @@ final class ImportCertificatesDialog extends JDialog {
 				this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
 			}
 			this.ks.load(trustedKSStream, TRUSTED_KS_PWD.toCharArray());
-			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-			final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
-					new FileInputStream(certFile)
-					);
-			final X509Certificate [] certsToImport = new X509Certificate[1];
-			certsToImport[0] = cert;
 
-	    	final ConfirmImportCertDialog comfirmImportCertDialog= new ConfirmImportCertDialog(certsToImport, this.ks, this);
+			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
+			X509Certificate cert;
+			try (InputStream fis = new FileInputStream(certFile)) {
+				cert = (X509Certificate) certFactory.generateCertificate(fis);
+			}
+			final X509Certificate [] certsToImport = new X509Certificate[] {cert};
+
+	    	final ConfirmImportCertDialog comfirmImportCertDialog = new ConfirmImportCertDialog(certsToImport, this.ks, this);
 	    	comfirmImportCertDialog.setVisible(true);
 
 		} catch (final Exception e) {
@@ -361,9 +362,5 @@ final class ImportCertificatesDialog extends JDialog {
 
 
 		return x509certs;
-	}
-
-	public static void main(final String[] args) {
-		new ImportCertificatesDialog(null).setVisible(true);
 	}
 }

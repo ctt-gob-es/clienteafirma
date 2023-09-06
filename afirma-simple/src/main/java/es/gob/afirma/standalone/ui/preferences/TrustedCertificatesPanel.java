@@ -33,8 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -55,9 +53,8 @@ final class TrustedCertificatesPanel extends JPanel  {
 	JButton importCertButton = null;
 	JButton viewCertButton = null;
 	JButton deleteCertButton = null;
-	List<X509Certificate> savedCerts = new ArrayList<X509Certificate>();
+	List<X509Certificate> savedCerts = new ArrayList<>();
 	private boolean noCerts = true;
-	private Integer rowSelected = null;
 
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 
@@ -109,7 +106,7 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 		this.viewCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.3")); //$NON-NLS-1$
 		this.viewCertButton.addActionListener(
-        		ae -> CertificateUtils.openCert(this, this.savedCerts.get(this.rowSelected))
+        		ae -> CertificateUtils.openCert(this, this.savedCerts.get(this.table.getSelectedRow()))
 		);
 		this.viewCertButton.setEnabled(false);
 
@@ -138,7 +135,10 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 		  final String[] columnNames = { "Nombre", "Emitido por", "Fecha de expiracion" };  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		  this.model = new DefaultTableModel(null, columnNames) {
-			  @Override
+			  /** Serial Id. */
+			private static final long serialVersionUID = -3513927556747399446L;
+
+			@Override
 			  public boolean isCellEditable(final int row, final int column) {
 				  return false;
 			  }
@@ -154,14 +154,10 @@ final class TrustedCertificatesPanel extends JPanel  {
 		  }
 
 		  this.table = new JTable(this.model);
-		  this.table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-		        @Override
-				public void valueChanged(final ListSelectionEvent event) {
-		        	TrustedCertificatesPanel.this.rowSelected = TrustedCertificatesPanel.this.table.getSelectedRow();
-		        	TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
-		        	TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
-		        }
-		    });
+		  this.table.getSelectionModel().addListSelectionListener(event -> {
+			TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
+			TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
+		});
 		  scrollPane.setViewportView(this.table);
 
 		  return scrollPane;
