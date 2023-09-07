@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,7 @@ import javax.swing.JScrollPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.JMulticardUtilities;
@@ -207,8 +209,13 @@ final class PreferencesPanelGeneral extends JScrollPane {
 							AOUIFactory.getSaveDataToFile(xmlPrefs.getBytes(),
 									SimpleAfirmaMessages.getString("PreferencesPanel.198"), //$NON-NLS-1$
 									null,
-									null,
-									null,
+									SimpleAfirmaMessages.getString("PreferencesPanel.201"), //$NON-NLS-1$
+				    				Collections.singletonList(
+				    						new GenericFileFilter(
+				    								new String [] {"afconfig"}, //$NON-NLS-1$
+				    								SimpleAfirmaMessages.getString("PreferencesPanel.111") //$NON-NLS-1$
+				    								)
+				    						),
 									PreferencesPanelGeneral.this);
 							AOUIFactory.showMessageDialog(
 									getParent(),

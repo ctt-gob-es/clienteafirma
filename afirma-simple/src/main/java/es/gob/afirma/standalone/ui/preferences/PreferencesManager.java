@@ -237,6 +237,9 @@ public final class PreferencesManager {
 	/** Ruta del almac&eacute;n de claves local seleccionado por defecto. */
 	public static final String PREFERENCE_LOCAL_KEYSTORE_PATH = "defaultLocalKeystorePath"; //$NON-NLS-1$
 
+	/** Valor default para indicar que se desea seleccionar el almac&eacute;n de claves del sistema. */
+	public static final String VALUE_DEFAULT = "default"; //$NON-NLS-1$
+
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************
 
@@ -496,12 +499,18 @@ public final class PreferencesManager {
 	/** Formato de fecha con el que se guarda el valor de la propiedad {@code HIDDEN_CONFIG_LASTCHECKDATE}. */
 	public static final String LASTCHECKDATE_DATEFORMAT = "yyyyMMdd"; //$NON-NLS-1$
 
+	/** Ruta alternativa donde almacenar preferencias. */
+	public static final String ALTERNATIVE_PATH = "es/gob/afirma/standalone"; //$NON-NLS-1$
+
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
 	 * aplicaci&oacute;n o, si no se encuentra, devuelve el valor por defecto para esa
 	 * propiedad.
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
 	public static String get(final String key) {
+		if (key.equals(HIDDEN_CONFIG_LASTCHECKDATE)) {
+			return Preferences.userRoot().node(ALTERNATIVE_PATH).get(key, null);
+		}
 		return USER_PREFERENCES.get(key, getSystemPreference(key));
 	}
 
@@ -560,10 +569,14 @@ public final class PreferencesManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void put(final String key, final String value) {
-		// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
-		final String configuratedProp = get(key);
-		if (configuratedProp != value) {
-			USER_PREFERENCES.put(key, value);
+		if (key.equals(HIDDEN_CONFIG_LASTCHECKDATE)) {
+			Preferences.userRoot().node(ALTERNATIVE_PATH).put(key, value);
+		} else {
+			// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
+			final String configuratedProp = get(key);
+			if (!value.equals(configuratedProp)) {
+				USER_PREFERENCES.put(key, value);
+			}
 		}
 	}
 
@@ -656,17 +669,31 @@ public final class PreferencesManager {
 				|| key.equals(PREFERENCE_FACTURAE_POLICY);
 	}
 
-	public static Map<String, Object> getUserPreferences() {
+	/**
+	 * Se obtienen las preferencias a exportar que se hayan registrado en el sistema y en el usuario.
+	 * Si la preferencia existe en usuario y sistema, tendr&aacute; prioridad la del usuario.
+	 * @return Mapa con las claves y valores del sistema.
+	 */
+	public static Map<String, Object> getPrefsToExport() {
 
 		final Map<String, Object> result = new HashMap<String, Object>();
 		try {
-			final String[] keys = USER_PREFERENCES.keys();
-			for (int i = 0 ; i < keys.length ; i++) {
-				final String value = USER_PREFERENCES.get(keys[i], null);
+			final String[] systemKeys = SYSTEM_PREFERENCES.keys();
+			for (int i = 0 ; i < systemKeys.length ; i++) {
+				final String value = SYSTEM_PREFERENCES.get(systemKeys[i], null);
 				if (value != null && (value.equals(TRUE_VALUE) || value.equals(FALSE_VALUE))) {
-					result.put(keys[i], Boolean.parseBoolean(value));
+					result.put(systemKeys[i], Boolean.parseBoolean(value));
 				} else {
-					result.put(keys[i], value);
+					result.put(systemKeys[i], value);
+				}
+			}
+			final String[] userKeys = USER_PREFERENCES.keys();
+			for (int i = 0 ; i < userKeys.length ; i++) {
+				final String value = USER_PREFERENCES.get(userKeys[i], null);
+				if (value != null && (value.equals(TRUE_VALUE) || value.equals(FALSE_VALUE))) {
+					result.put(userKeys[i], Boolean.parseBoolean(value));
+				} else {
+					result.put(userKeys[i], value);
 				}
 			}
 		} catch (final BackingStoreException e) {

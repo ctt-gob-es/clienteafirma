@@ -34,6 +34,7 @@ import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -49,16 +50,17 @@ final class ConfirmImportCertDialog extends JDialog  {
 
 	private final List<X509Certificate> certsToImport;
 	private final KeyStore ks;
+	private final boolean isLocalImport;
 
-	JButton openCertBtn;
-	JButton deleteCertBtn;
-	JButton importCertBtn;
-
+	private JButton openCertBtn;
+	private JButton deleteCertBtn;
+	private JButton importCertBtn;
 	private JTable table;
 
-	ConfirmImportCertDialog(final X509Certificate [] certsToImport, final KeyStore ks, final Container parent) {
+	ConfirmImportCertDialog(final X509Certificate [] certsToImport, final KeyStore ks, final Container parent, final boolean isLocalImport) {
 		this.certsToImport = new ArrayList<>(Arrays.asList(certsToImport));
 		this.ks = ks;
+		this.isLocalImport = isLocalImport;
 	    createUI(parent);
 	}
 
@@ -125,8 +127,8 @@ final class ConfirmImportCertDialog extends JDialog  {
 		final Object [] loadedCerts = new Object [this.certsToImport.size()];
 		for (int i = 0 ; i < this.certsToImport.size(); i++) {
 			final Object [] auxArray = {
-					this.certsToImport.get(i).getSubjectDN(),
-					this.certsToImport.get(i).getIssuerDN(),
+					AOUtil.getCN(this.certsToImport.get(i).getSubjectX500Principal().toString()),
+					AOUtil.getCN(this.certsToImport.get(i).getIssuerX500Principal().toString()),
 					new SimpleDateFormat("dd-MM-yyyy").format(this.certsToImport.get(i).getNotAfter()).toString() //$NON-NLS-1$
 			};
 			loadedCerts[i] = auxArray;
@@ -208,13 +210,16 @@ final class ConfirmImportCertDialog extends JDialog  {
 		try (final OutputStream fos = new FileOutputStream(trustedCertKSPath)) {
 			if (this.certsToImport.size() == 1) {
 				this.ks.setCertificateEntry(this.certsToImport.get(0).getSubjectDN().toString(), this.certsToImport.get(0));
-				this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
+			} else if (this.isLocalImport){
+				for (int i = 0; i < this.certsToImport.size(); i++) {
+					this.ks.setCertificateEntry(this.certsToImport.get(i).getSubjectDN().toString(), this.certsToImport.get(i));
+				}
 			} else {
 				for (int i = 1; i < this.certsToImport.size(); i++) {
 					this.ks.setCertificateEntry(this.certsToImport.get(i).getSubjectDN().toString(), this.certsToImport.get(i));
-					this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
 				}
 			}
+			this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
 			UrlHttpManagerImpl.configureTrustManagers();
 			setVisible(false);
 		} catch (final Exception e) {

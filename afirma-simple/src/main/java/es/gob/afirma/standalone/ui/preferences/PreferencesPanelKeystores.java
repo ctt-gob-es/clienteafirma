@@ -96,6 +96,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 	private static final String EXTS_DESC_PKCS12 = " (*.p12, *.pfx)"; //$NON-NLS-1$
 
+	private static final String DEFAULT_VALUE = "default"; //$NON-NLS-1$
+
 	String localKeystoreSelectedPath;
 
 	/**
@@ -767,9 +769,13 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		}
 
 		if (aoks != null) {
+			String ksName = aoks.getName();
+			if (PreferencesPanelKeystores.getKeystores().getSelectedIndex() == 0) {
+				ksName = PreferencesManager.VALUE_DEFAULT;
+			}
 			PreferencesManager.put(
 					PREFERENCE_KEYSTORE_DEFAULT_STORE,
-					aoks.getName()
+					ksName
 			);
 			KeyStorePreferencesManager.setLastSelectedKeystore(aoks.getName());
 		}
@@ -788,29 +794,34 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
 		RegisteredKeystore rks = null;
 
-		if (ks != null) {
-			if (aoks == null) {
-				final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-				if (!regResult.isEmpty()) {
-					for (final String smartCardName : regResult.keySet()) {
-						if (ks.equals(smartCardName)) {
-							rks = new RegisteredKeystore(AOKeyStore.PKCS11);
-							rks.setName(smartCardName);
+		if (DEFAULT_VALUE.equals(ks)) {
+			getKeystores().setSelectedIndex(0);
+		} else {
+			if (ks != null) {
+				if (aoks == null) {
+					final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+					if (!regResult.isEmpty()) {
+						for (final String smartCardName : regResult.keySet()) {
+							if (ks.equals(smartCardName)) {
+								rks = new RegisteredKeystore(AOKeyStore.PKCS11);
+								rks.setName(smartCardName);
+							}
 						}
 					}
+				} else {
+					rks = new RegisteredKeystore(aoks);
 				}
-			} else {
-				rks = new RegisteredKeystore(aoks);
+			}
+
+			if (rks != null) {
+				for (int i = 0; i < PreferencesPanelKeystores.getKeystores().getItemCount() ; i++) {
+					if (rks.getName().equals(getKeystores().getItemAt(i).getName())) {
+						getKeystores().setSelectedIndex(i);
+					}
+				}
 			}
 		}
 
-		if (rks != null) {
-			for (int i = 0; i < PreferencesPanelKeystores.getKeystores().getItemCount() ; i++) {
-				if (rks.getName().equals(getKeystores().getItemAt(i).getName())) {
-					getKeystores().setSelectedIndex(i);
-				}
-			}
-		}
 		PreferencesPanelKeystores.getKeystores().repaint();
 		this.callsFromNavigator.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS));
 		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));

@@ -225,12 +225,12 @@ final class ImportCertificatesDialog extends JDialog {
 
 		try {
 			final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), false);
-	    	final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this);
+	    	final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this, false);
 	    	confirmImportCertDialog.setVisible(true);
 		} catch (final SSLHandshakeException sslhe) {
 			try {
 				final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), true);
-				final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this);
+				final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this, false);
 				confirmImportCertDialog.setVisible(true);
 			} catch (final Exception e) {
 				AOUIFactory.showErrorMessage(
@@ -252,9 +252,9 @@ final class ImportCertificatesDialog extends JDialog {
 
 	private void downloadLocalCert(final Container container) {
 
-		final File certFile;
+		final File [] certFiles;
 		try {
-			certFile = AOUIFactory.getLoadFiles(
+			certFiles = AOUIFactory.getLoadFiles(
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.20"), //$NON-NLS-1$
 				null,
 				null,
@@ -264,7 +264,7 @@ final class ImportCertificatesDialog extends JDialog {
 				true,
 				AutoFirmaUtil.getDefaultDialogsIcon(),
 				this
-			)[0];
+			);
 		}
 		catch(final AOCancelledOperationException e) {
 			return;
@@ -292,13 +292,13 @@ final class ImportCertificatesDialog extends JDialog {
 			this.ks.load(trustedKSStream, TRUSTED_KS_PWD.toCharArray());
 
 			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-			X509Certificate cert;
-			try (InputStream fis = new FileInputStream(certFile)) {
-				cert = (X509Certificate) certFactory.generateCertificate(fis);
+			final X509Certificate [] certsToImport = new X509Certificate[certFiles.length];
+			for (int i = 0 ; i < certFiles.length ; i++) {
+				try (InputStream fis = new FileInputStream(certFiles[i])) {
+					certsToImport[i] = (X509Certificate) certFactory.generateCertificate(fis);
+				}
 			}
-			final X509Certificate [] certsToImport = new X509Certificate[] {cert};
-
-	    	final ConfirmImportCertDialog comfirmImportCertDialog = new ConfirmImportCertDialog(certsToImport, this.ks, this);
+	    	final ConfirmImportCertDialog comfirmImportCertDialog = new ConfirmImportCertDialog(certsToImport, this.ks, this, true);
 	    	comfirmImportCertDialog.setVisible(true);
 
 		} catch (final Exception e) {

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.DataDownloader;
@@ -52,6 +53,8 @@ public final class PreferencesPlistHandler {
 	private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; //$NON-NLS-1$
 	private static final String PLIST_OPEN_TAG = "<plist version=\"1.0\">"; //$NON-NLS-1$
 	private static final String PLIST_CLOSE_TAG = "</plist>"; //$NON-NLS-1$
+	private static final String SMARTCARDS_KEY = "smartcards"; //$NON-NLS-1$
+
 	static {
 		final Properties p = new Properties();
 		try {
@@ -271,6 +274,12 @@ public final class PreferencesPlistHandler {
 
 	}
 
+	/**
+	 * Se importan las preferencias del usuario desde un XML
+	 * @param xml XML con la informaci&oacute;n
+	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no
+	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
+	 */
 	public static void importUserPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;
 		try {
@@ -280,10 +289,28 @@ public final class PreferencesPlistHandler {
 			throw new InvalidPreferencesFileException("Error analizando el fichero XML: " + e, e); //$NON-NLS-1$
 		}
 
+		// Registramos las tarjetas inteligentes que se encuentren en el XML
+		if (properties.containsKey(SMARTCARDS_KEY)) {
+			KeyStorePreferencesManager.putSmartCardsMap((Map<String, Object>) properties.get(SMARTCARDS_KEY));
+		}
+
+		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
+			KeyStorePreferencesManager.setSkipAuthCertDNIe((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
+		}
+
+		properties.remove(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE);
+		properties.remove(SMARTCARDS_KEY);
+
 		checkPreferences(properties);
 		storeUserPreferences(properties, unprotected);
 	}
 
+	/**
+	 * Se importan las preferencias del sistema desde un XML
+	 * @param xml XML con la informaci&oacute;n
+	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no
+	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
+	 */
 	public static void importSystemPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;
 		try {
@@ -297,8 +324,20 @@ public final class PreferencesPlistHandler {
 		storeSystemPreferences(properties, unprotected);
 	}
 
+	/**
+	 * Exporta las preferencias del sistema a una cadena XML.
+	 * @return Cadena con las preferencias en formato XML
+	 */
 	public static String exportPreferencesToXml() {
-		final Map<String, Object> userProperties = PreferencesManager.getUserPreferences();
+		final Map<String, Object> userProperties = PreferencesManager.getPrefsToExport();
+		final Map<String, Object> smartCardsPreferences = KeyStorePreferencesManager.getSmartCardsMap();
+		final Map<String, Object> keystorePreferences = KeyStorePreferencesManager.getSmartCardsMap();
+		if (smartCardsPreferences.size() > 0) {
+			userProperties.put(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE, keystorePreferences.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
+		}
+		if (smartCardsPreferences.size() > 0) {
+			userProperties.put(SMARTCARDS_KEY, smartCardsPreferences);
+		}
 		final XmlElement xml = Plist.objectToXml(userProperties);
 		return XML_HEAD + PLIST_OPEN_TAG + xml.toXml() + PLIST_CLOSE_TAG;
 	}

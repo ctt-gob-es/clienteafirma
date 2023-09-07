@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -399,11 +400,16 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		try {
 			final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 			sslContext.init(null, trustManagers, new java.security.SecureRandom());
-			final URL url = new URL("https://www.google.com/"); //$NON-NLS-1$
+			final URL url = new URL("https://www.google.es/"); //$NON-NLS-1$
 			final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 			try {
 			    HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-			    HttpsURLConnection.setDefaultHostnameVerifier(conn.getHostnameVerifier());
+			    HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+			        @Override
+			        public boolean verify(final String hostname, final SSLSession session) {
+			          return false;
+			        }
+			    });
 			} catch (final Exception e) {
 				LOGGER.warning(
 					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
