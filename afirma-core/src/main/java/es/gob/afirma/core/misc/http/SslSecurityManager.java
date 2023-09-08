@@ -8,6 +8,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -22,10 +23,12 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.Platform;
 
 /** Gestor de la seguridad SSL para las conexiones de red.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -37,12 +40,13 @@ public final class SslSecurityManager {
 		new X509TrustManager() {
 			@Override
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				System.out.println("SSL Desactivado");
 				return null;
 			}
 			@Override
-			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { System.out.println("SSL Desactivado"); }
 			@Override
-			public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+			public void checkServerTrusted(final X509Certificate[] certs, final String authType) { System.out.println("SSL Desactivado");  }
 
 		}
 	};
@@ -188,6 +192,38 @@ public final class SslSecurityManager {
 			kstorePassword
 		);
 		return keyFac.getKeyManagers();
+	}
+
+	/**
+	 * Configura los almacenes de confianza de Java y AutoFirma para realizar conexiones SSL correctamente
+	 * hacia los certificados almacenados.
+	 * @throws Exception Error al configurar Trust Managers
+	 */
+	public static void configureTrustManagers() throws Exception {
+
+		final KeyStore trustStore = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+		try (InputStream cacertIs = new FileInputStream(new File(Platform.getUserHome() + File.separator + ".afirma" + File.separator + "TrustedCertsKeystore.jks"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			trustStore.load(cacertIs, "changeit".toCharArray()); //$NON-NLS-1$
+		}
+
+		final X509TrustManager[] trustManagers = new X509TrustManager[2];
+
+		// Agregamos los trustmanagers por defecto de Java
+		TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		factory.init((KeyStore) null);
+		trustManagers[0] = (X509TrustManager) factory.getTrustManagers()[0];
+
+		// Agregamos los trustmanagers por defecto de AutoFirma
+		factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		factory.init(trustStore);
+		trustManagers[1] = (X509TrustManager) factory.getTrustManagers()[0];
+
+		final MultiX509TrustManager trustManager = new MultiX509TrustManager(trustManagers);
+
+		final SSLContext sslContext = SSLContext.getInstance("SSL");
+		sslContext.init(null, new TrustManager[] { trustManager }, SecureRandom.getInstanceStrong());
+
+		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 	}
 
 }

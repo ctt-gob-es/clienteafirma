@@ -38,7 +38,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateUtils;
@@ -58,6 +58,7 @@ final class TrustedCertificatesPanel extends JPanel  {
 	private JButton viewCertButton = null;
 	private JButton deleteCertButton = null;
 	private JScrollPane certsScrollPane;
+	private JPanel importedCertPanels;
 
 	List<X509Certificate> savedCerts = new ArrayList<>();
 	private boolean noCerts = true;
@@ -76,18 +77,18 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 		c.gridy = 0;
 
-        final JPanel importedCertPanels = new JPanel();
-        importedCertPanels.setBorder(
+        this.importedCertPanels = new JPanel();
+        this.importedCertPanels.setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.1") //$NON-NLS-1$
 			)
 		);
 
-        this.certsScrollPane = createImportedCertsTable();
-        importedCertPanels.add(this.certsScrollPane);
+        createImportedCertsTable();
+        this.importedCertPanels.add(this.certsScrollPane);
 
 		c.gridy++;
-		this.add(importedCertPanels, c);
+		this.add(this.importedCertPanels, c);
 
 		c.gridy++;
 		this.add(createButtonsPanel(), c);
@@ -140,10 +141,7 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 	}
 
-	private JScrollPane createImportedCertsTable() {
-
-		  final JScrollPane scrollPane = new JScrollPane();
-		  scrollPane.setBounds(10, 11, 560, 227);
+	private void createImportedCertsTable() {
 
 		  final String[] columnNames = { "Nombre", "Emitido por", "Fecha de expiracion" };  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		  this.model = new DefaultTableModel(null, columnNames) {
@@ -158,6 +156,8 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 		  final Object [] trustedCerts = obtainTrustedCerts(this);
 
+		  this.model.setRowCount(0);
+
 		  if (trustedCerts != null) {
 			  for (int i = 0; i < trustedCerts.length ; i++) {
 				  this.model.addRow((Object[]) trustedCerts[i]);
@@ -169,17 +169,20 @@ final class TrustedCertificatesPanel extends JPanel  {
 		  this.table.getSelectionModel().addListSelectionListener(event -> {
 			TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
 			TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
-		});
-		  scrollPane.setViewportView(this.table);
+		  });
 
-		  return scrollPane;
+		  this.certsScrollPane = new JScrollPane();
+		  this.certsScrollPane.setBounds(10, 11, 560, 227);
+		  this.certsScrollPane.setViewportView(this.table);
+		  this.certsScrollPane.setVisible(true);
 	}
 
 	/** Di&aacute;logo para importar los certificados de confianza.
 	 * @param container Contenedor en el que se define el di&aacute;logo. */
-    public static void importCertificatesDlg(final Container container) {
+    public void importCertificatesDlg(final Container container) {
     	final ImportCertificatesDialog importCertDialog = new ImportCertificatesDialog(null);
     	importCertDialog.setVisible(true);
+    	updateTableInfo();
     }
 
     /**
@@ -239,21 +242,43 @@ final class TrustedCertificatesPanel extends JPanel  {
 				this.ks.deleteEntry(certAlias);
 				this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
 				// Actualizamos los Trust Managers al eliminar un certificado
-				UrlHttpManagerImpl.configureTrustManagers();
+				SslSecurityManager.configureTrustManagers();
 				for (int i = 0; i < this.savedCerts.size(); i++) {
 					if (certAlias.equals(this.savedCerts.get(i).getSubjectX500Principal().getName())) {
 						this.savedCerts.remove(i);
 						break;
 					}
 				}
-				((DefaultTableModel) this.table.getModel()).removeRow(this.table.getSelectedRow());
-				this.table.repaint();
+				updateTableInfo();
 			} catch (final Exception e) {
 				AOUIFactory.showErrorMessage(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.30"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE, e);
 			}
 		}
+	}
+
+	/**
+	 * Actualiza los campos de la tabla de certificados.
+	 */
+	private void updateTableInfo() {
+		  final Object [] trustedCerts = obtainTrustedCerts(this);
+
+		  this.model.setRowCount(0);
+
+		  if (trustedCerts != null) {
+			  for (int i = 0; i < trustedCerts.length ; i++) {
+				  this.model.addRow((Object[]) trustedCerts[i]);
+				  this.noCerts = false;
+			  }
+		  }
+
+		  this.table = new JTable(this.model);
+		  this.table.getSelectionModel().addListSelectionListener(event -> {
+			TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
+			TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
+		  });
+		  this.certsScrollPane.setViewportView(this.table);
 	}
 
 }
