@@ -572,9 +572,13 @@ public final class PreferencesManager {
 		if (key.equals(HIDDEN_CONFIG_LASTCHECKDATE)) {
 			Preferences.userRoot().node(ALTERNATIVE_PATH).put(key, value);
 		} else {
-			// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
-			final String configuratedProp = get(key);
-			if (!value.equals(configuratedProp)) {
+			// Si el valor que se le va a asignar a la propiedad es el mismo que el del sistema,
+			// se elimina en el registro del usuario y permanece la del sistema
+			final String systemValue = getSystemPreference(key);
+			if (value.equals(systemValue)) {
+				USER_PREFERENCES.remove(key);
+			} else if (!value.equals(get(key))) {
+				// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
 				USER_PREFERENCES.put(key, value);
 			}
 		}
@@ -586,9 +590,13 @@ public final class PreferencesManager {
 	 * @param key Clave con la que identificaremos el valor.
 	 * @param value Valor que se desea almacenar. */
 	public static void putBoolean(final String key, final boolean value) {
-		// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
-		final boolean configuratedProp = getBoolean(key);
-		if (configuratedProp != value) {
+		// Si el valor que se le va a asignar a la propiedad es el mismo que el del sistema,
+		// se elimina en el registro del usuario y permanece la del sistema
+		final boolean systemValue = getBooleanSystemPreference(key);
+		if (value == systemValue) {
+			USER_PREFERENCES.remove(key);
+		} else if (value != getBoolean(key)) {
+			// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
 			USER_PREFERENCES.putBoolean(key, value);
 		}
 	}

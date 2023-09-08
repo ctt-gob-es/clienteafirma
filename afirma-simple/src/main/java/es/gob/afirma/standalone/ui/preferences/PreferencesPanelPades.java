@@ -196,6 +196,7 @@ final class PreferencesPanelPades extends JScrollPane {
                 }
 			}
 		});
+		this.checkShadowAttack.addItemListener(modificationListener);
     	this.checkShadowAttack.addKeyListener(keyListener);
 
 		// Una vez creados todos los componentes, cargamos la configuracion

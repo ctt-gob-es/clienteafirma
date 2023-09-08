@@ -331,9 +331,8 @@ public final class PreferencesPlistHandler {
 	public static String exportPreferencesToXml() {
 		final Map<String, Object> userProperties = PreferencesManager.getPrefsToExport();
 		final Map<String, Object> smartCardsPreferences = KeyStorePreferencesManager.getSmartCardsMap();
-		final Map<String, Object> keystorePreferences = KeyStorePreferencesManager.getSmartCardsMap();
 		if (smartCardsPreferences.size() > 0) {
-			userProperties.put(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE, keystorePreferences.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
+			userProperties.put(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE, KeyStorePreferencesManager.getSkipAuthCertDNIe());
 		}
 		if (smartCardsPreferences.size() > 0) {
 			userProperties.put(SMARTCARDS_KEY, smartCardsPreferences);

@@ -95,15 +95,84 @@ public final class KeyStorePreferencesManager {
 	}
 
 	/**
+	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes en forma de mapa
+	 * @return Mapa con pares de clave-valor donde la clave es el nombre de la tarjeta y
+	 * el valor es la ruta hacia el controlador de la misma.
+	 */
+	public static Map<String, String> getSmartCardNameControllerMap() {
+		final Map<String, String> result = new HashMap<>();
+		try {
+			final String[] childNames = USER_PREFERENCES.childrenNames();
+			if (childNames != null && childNames.length > 0) {
+				for (int i = 0 ; i < childNames.length ; i++) {
+						final String cardName = USER_PREFERENCES.node(childNames[i]).keys()[0];
+						final String lib = USER_PREFERENCES.node(childNames[i]).get(cardName, null);
+						result.put(cardName, lib);
+				}
+			}
+		} catch (final BackingStoreException e) {
+				LOGGER.severe("No se han podido obtener los registros sobre tarjetas inteligentes " + e); //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
+	/**
 	 * Registra los almacenes de claves de tarjetas inteligentes
 	 */
 	public static void putSmartCardsMap(final Map<String, Object> smartCards) {
 		for(final String smartCard : smartCards.keySet()) {
 			final Map<String, String> smartCardKeyValue = (Map<String, String>) smartCards.get(smartCard);
 			for(final String smartCardKey : smartCardKeyValue.keySet()) {
-					addSmartCardToRec(smartCardKey, smartCardKeyValue.get(smartCardKey));
+					final Map<String, String> smartCardsRegistered = getSmartCardNameControllerMap();
+					final boolean existController = checkExistsController(smartCardsRegistered, smartCardKeyValue.get(smartCardKey));
+					if (!existController) {
+						final String smartCardNameChecked = checkCorrectName(smartCardsRegistered, smartCardKey);
+						addSmartCardToRec(smartCardNameChecked, smartCardKeyValue.get(smartCardKey));
+					}
 			}
 		}
+	}
+
+	/**
+	 * Comprueba si existe una tarjeta inteligente con la misma ruta de controlador en el registro.
+	 * @param smartCardsRegistered Mapa de tarjetas inteligentes registradas.
+	 * @param newController Almac&eacute;n a comprobar si existe o no.
+	 * @return Devuelve true en caso de que ya exista, false en caso contrario.
+	 */
+	private static boolean checkExistsController(final Map<String, String> smartCardsRegistered, final String newController) {
+		for(final String smartCardName : smartCardsRegistered.keySet()) {
+			final String controllerName = smartCardsRegistered.get(smartCardName);
+			if (controllerName.equals(newController)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Comprueba si ya existe una tarjeta inteligente con el nombre indicado por par&aacute;metro, y si es as&iacute;,
+	 * genera uno nuevo.
+	 * @param smartCardsRegistered Mapa de tarjetas inteligentes registradas.
+	 * @param newSmartCardName Nombre de tarjeta inteligente a comprobar.
+	 * @return Devuelve el nuevo nombre a registrar
+	 */
+	private static String checkCorrectName(final Map<String, String> smartCardsRegistered, final String newSmartCardName) {
+		String result = newSmartCardName;
+		if (smartCardsRegistered.containsKey(newSmartCardName)) {
+			boolean existCardName = true;
+			int cont = 1;
+			while (existCardName) {
+				final String newName = result + "-" + cont; //$NON-NLS-1$
+				if (!smartCardsRegistered.containsKey(newName)) {
+					result = newName;
+					existCardName = false;
+				} else {
+					cont++;
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -202,9 +271,13 @@ public final class KeyStorePreferencesManager {
 	 * @param skipCert Valor para la preferencia
 	 */
 	public static void setSkipAuthCertDNIe(final boolean skipCert) {
-		// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
-		final boolean configuratedProp = getSkipAuthCertDNIe();
-		if (configuratedProp != skipCert) {
+		// Si el valor que se le va a asignar a la propiedad es el mismo que el del sistema,
+		// se elimina en el registro del usuario y permanece la del sistema
+		final boolean systemValue = getBooleanSystemPreference(PREFERENCE_SKIP_AUTH_CERT_DNIE);
+		if (skipCert == systemValue) {
+			USER_PREFERENCES.remove(PREFERENCE_SKIP_AUTH_CERT_DNIE);
+		} else if (skipCert != getSkipAuthCertDNIe()) {
+			// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
 			USER_PREFERENCES.putBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, skipCert);
 		}
 	}

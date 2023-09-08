@@ -597,7 +597,23 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     			addSmartCardDlg(container);
 
-    		} else {
+    		} else if (checkDuplicatedName(smartCardPanel.getCardNameTxt().getText())) {
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.34"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					AOUIFactory.ERROR_MESSAGE,
+    					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.34")) //$NON-NLS-1$
+    					);
+
+    			addSmartCardDlg(container);
+    		} else if (checkDuplicatedLib(smartCardPanel.getControllerNameTxt().getText())) {
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					AOUIFactory.ERROR_MESSAGE,
+    					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35")) //$NON-NLS-1$
+    					);
+
+    			addSmartCardDlg(container);
+    		}else {
 
     			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToRec(smartCardPanel.getCardNameTxt().getText() ,
     																					smartCardPanel.getControllerNameTxt().getText());
@@ -743,6 +759,36 @@ final class PreferencesPanelKeystores extends JScrollPane {
     	}
     }
 
+    /**
+     * Compruba si ya hay una tarjeta inteligente registrada con el mismo nombre.
+     * @param newName Nombre de la nueva tarjeta a registrar.
+     * @return True en caso de que ya se encuentre el nombre registrado, false en caso contrario.
+     */
+    private boolean checkDuplicatedName(final String newName) {
+    	for (int i = 0 ; i < smartCards.getItemCount() ; i++) {
+    		final RegisteredKeystore rks = smartCards.getItemAt(i);
+    		if (newName.equals(rks.getName())) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+
+    /**
+     * Compruba si ya hay una tarjeta inteligente con el mismo controlador registrada con el mismo nombre.
+     * @param newName Nombre del nuevo controlador.
+     * @return True en caso de que ya se encuentre el controlador registrado, false en caso contrario.
+     */
+    private boolean checkDuplicatedLib(final String newLib) {
+    	for (int i = 0 ; i < smartCards.getItemCount() ; i++) {
+    		final RegisteredKeystore rks = smartCards.getItemAt(i);
+    		if (newLib.equals(rks.getLib())) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+
 	/** Guarda las preferencias. */
 	void savePreferences() {
 
@@ -791,12 +837,14 @@ final class PreferencesPanelKeystores extends JScrollPane {
 	void loadPreferences() {
 
 		final String ks = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
-		final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
-		RegisteredKeystore rks = null;
 
 		if (DEFAULT_VALUE.equals(ks)) {
 			getKeystores().setSelectedIndex(0);
 		} else {
+
+			final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
+			RegisteredKeystore rks = null;
+
 			if (ks != null) {
 				if (aoks == null) {
 					final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
