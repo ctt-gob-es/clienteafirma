@@ -35,7 +35,7 @@ import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -210,17 +210,13 @@ final class ConfirmImportCertDialog extends JDialog  {
 		try (final OutputStream fos = new FileOutputStream(trustedCertKSPath)) {
 			if (this.certsToImport.size() == 1) {
 				this.ks.setCertificateEntry(this.certsToImport.get(0).getSubjectDN().toString(), this.certsToImport.get(0));
-			} else if (this.isLocalImport){
-				for (int i = 0; i < this.certsToImport.size(); i++) {
-					this.ks.setCertificateEntry(this.certsToImport.get(i).getSubjectDN().toString(), this.certsToImport.get(i));
-				}
 			} else {
-				for (int i = 1; i < this.certsToImport.size(); i++) {
+				for (int i = 0; i < this.certsToImport.size(); i++) {
 					this.ks.setCertificateEntry(this.certsToImport.get(i).getSubjectDN().toString(), this.certsToImport.get(i));
 				}
 			}
 			this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
-			UrlHttpManagerImpl.configureTrustManagers();
+			SslSecurityManager.configureTrustManagers();
 			setVisible(false);
 		} catch (final Exception e) {
 			AOUIFactory.showErrorMessage(

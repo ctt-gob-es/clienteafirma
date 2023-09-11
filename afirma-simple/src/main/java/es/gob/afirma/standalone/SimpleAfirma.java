@@ -44,6 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -59,7 +60,7 @@ import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
-import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -804,7 +805,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Establecemos los almacenes de claves de Java y de AutoFirma como de confianza para las
 		// conexiones remotas
-		UrlHttpManagerImpl.configureTrustManagers();
+		try {
+			SslSecurityManager.configureTrustManagers();
+			// Se realiza una primera conexion que fallara para aplicar los cambios en el contexto SSL
+			try {
+				final URL url = new URL("https://www.google.es/"); //$NON-NLS-1$
+				final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+				conn.connect();
+				conn.disconnect();
+			}
+			catch (final Exception e) { /* La primera vez falla para aplicar cambios en trust managers*/ }
+		} catch (final Exception e) {
+			LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
+		}
 
        	// Comprobamos si es necesario buscar actualizaciones
        	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera

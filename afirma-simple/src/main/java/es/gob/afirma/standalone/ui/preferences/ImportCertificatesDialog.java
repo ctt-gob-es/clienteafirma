@@ -51,6 +51,7 @@ import javax.swing.event.DocumentListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -227,11 +228,13 @@ final class ImportCertificatesDialog extends JDialog {
 			final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), false);
 	    	final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this, false);
 	    	confirmImportCertDialog.setVisible(true);
+	    	this.setVisible(false);
 		} catch (final SSLHandshakeException sslhe) {
 			try {
 				final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), true);
 				final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this, false);
 				confirmImportCertDialog.setVisible(true);
+				this.setVisible(false);
 			} catch (final Exception e) {
 				AOUIFactory.showErrorMessage(
 						container,
@@ -300,7 +303,7 @@ final class ImportCertificatesDialog extends JDialog {
 			}
 	    	final ConfirmImportCertDialog comfirmImportCertDialog = new ConfirmImportCertDialog(certsToImport, this.ks, this, true);
 	    	comfirmImportCertDialog.setVisible(true);
-
+	    	this.setVisible(false);
 		} catch (final Exception e) {
 			AOUIFactory.showErrorMessage(
 					container,
@@ -343,21 +346,37 @@ final class ImportCertificatesDialog extends JDialog {
 
 			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
 			final URL url = new URL(domainName);
+			if (disableSSL) {
+				UrlHttpManagerImpl.disableSslChecks();
+			}
 			final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 			conn.connect();
 			final Certificate [] trustedServerCerts = conn.getServerCertificates();
 			conn.disconnect();
+			if (disableSSL) {
+				UrlHttpManagerImpl.enableSslChecks();
+			}
 			if (this.ks == null) {
 				this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
 			}
 			this.ks.load(trustedKSStream, TRUSTED_KS_PWD.toCharArray());
-			x509certs = new X509Certificate [trustedServerCerts.length];
-			for (int i = 0 ; i < trustedServerCerts.length ; i++) {
+			if (trustedServerCerts.length > 1) {
+				// Solo se obtienen los certificados emisores
+				x509certs = new X509Certificate [trustedServerCerts.length - 1];
+				for (int i = 1 ; i < trustedServerCerts.length ; i++) {
+					final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
+																	new ByteArrayInputStream(trustedServerCerts[i].getEncoded())
+																	);
+					x509certs[i - 1] = cert;
+				}
+			} else {
+				x509certs = new X509Certificate [1];
 				final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
-																new ByteArrayInputStream(trustedServerCerts[i].getEncoded())
-																);
-				x509certs[i] = cert;
+						new ByteArrayInputStream(trustedServerCerts[0].getEncoded())
+						);
+				x509certs[0] = cert;
 			}
+
 		}
 
 

@@ -607,6 +607,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     			addSmartCardDlg(container);
 
     		} else if (checkDuplicatedName(smartCardPanel.getCardNameTxt().getText())) {
+
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.34"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     					AOUIFactory.ERROR_MESSAGE,
@@ -614,7 +615,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
     					);
 
     			addSmartCardDlg(container);
+
     		} else if (checkDuplicatedLib(smartCardPanel.getControllerNameTxt().getText())) {
+
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     					AOUIFactory.ERROR_MESSAGE,
@@ -622,7 +625,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
     					);
 
     			addSmartCardDlg(container);
-    		}else {
+
+    		} else {
 
     			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToRec(smartCardPanel.getCardNameTxt().getText() ,
     																					smartCardPanel.getControllerNameTxt().getText());
