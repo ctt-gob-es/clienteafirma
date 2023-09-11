@@ -209,41 +209,49 @@ final class PreferencesPanelKeystores extends JScrollPane {
         this.panelKeystores.setLayout(new GridBagLayout());
 
         final GridBagConstraints gbc1 = new GridBagConstraints();
-        gbc1.fill = GridBagConstraints.BOTH;
-        gbc1.gridy = 0;
+        gbc1.fill = GridBagConstraints.HORIZONTAL;
         gbc1.weightx = 1.0;
         gbc1.gridx = 0;
+        gbc1.gridy = 0;
 
 		keystores.addItemListener(modificationListener);
 		keystores.addKeyListener(keyListener);
 
         this.panelKeystores.add(keystores, gbc1);
 
+        gbc1.gridwidth = 2;
         gbc1.gridx++;
 
         this.showContentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
 				final AOKeyStoreManager ksm;
+				String lib = null;
 				AOKeyStore ks = AOKeyStore.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName());
-				try {
-					String lib = null;
-					if (ks != null && (AOKeyStore.PKCS12.equals(ks) || AOKeyStore.PKCS11.getName().equals(ks.getName()))) {
-						lib = PreferencesPanelKeystores.this.localKeystoreSelectedPath;
-						if (lib == null) {
-							lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
-						}
-					} else if (ks == null) {
-				        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-						for (final String key : regResult.keySet()) {
-							if (((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName().equals(key)){
-								ks = AOKeyStore.PKCS11;
-								ks.setName(key);
-								lib = regResult.get(key);
-							}
+				if (ks == null) {
+			        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+					for (final String key : regResult.keySet()) {
+						if (((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName().equals(key)){
+							ks = AOKeyStore.PKCS11;
+							ks.setName(key);
+							lib = regResult.get(key);
 						}
 					}
+				} else if (AOKeyStore.PKCS12.equals(ks) || AOKeyStore.PKCS11.getName().equals(ks.getName())) {
+					lib = PreferencesPanelKeystores.this.localKeystoreSelectedPath;
+					if (lib == null) {
+						lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+					}
+				}
 
+				// Si no se identifico el tipo de almacen, no intentamos mostrar ningun contenido
+				if (ks == null) {
+					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.36"), //$NON-NLS-1$
+	    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, null); //$NON-NLS-1$
+					return;
+				}
+
+				try {
 					ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 						ks,
 						lib,
@@ -298,8 +306,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
         this.showContentButton.setMnemonic('V');
         this.panelKeystores.add(this.showContentButton, gbc1);
 
-        gbc1.gridy++;
         gbc1.gridx = 0;
+        gbc1.gridy++;
+        gbc1.insets = new Insets(5, 0, 0, 0);
 
 		this.callsFromNavigator.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
@@ -312,6 +321,20 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
         this.panelKeystores.add(this.callsFromNavigator, gbc1);
 
+
+		this.hideDniStartScreen.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
+		);
+		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
+		);
+		this.hideDniStartScreen.addItemListener(modificationListener);
+		this.hideDniStartScreen.addKeyListener(keyListener);
+
+		gbc1.gridy++;
+
+		this.panelKeystores.add(this.hideDniStartScreen, gbc1);
+
         mainPanel.add(this.panelKeystores, gbc);
 
         final JPanel certsFiltersPanel = new JPanel();
@@ -323,24 +346,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
         certsFiltersPanel.setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 0, 0, 0);
         c.weightx = 1.0;
         c.gridy = 0;
-        c.gridy++;
-
-		this.hideDniStartScreen.getAccessibleContext().setAccessibleName(
-				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
-		);
-		this.hideDniStartScreen.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.82") //$NON-NLS-1$
-		);
-		this.hideDniStartScreen.addItemListener(modificationListener);
-		this.hideDniStartScreen.addKeyListener(keyListener);
-
-        certsFiltersPanel.add(this.hideDniStartScreen, c);
-        c.gridy++;
-		c.gridy++;
 
 		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
@@ -764,7 +773,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
      * @param newName Nombre de la nueva tarjeta a registrar.
      * @return True en caso de que ya se encuentre el nombre registrado, false en caso contrario.
      */
-    private boolean checkDuplicatedName(final String newName) {
+    private static boolean checkDuplicatedName(final String newName) {
     	for (int i = 0 ; i < smartCards.getItemCount() ; i++) {
     		final RegisteredKeystore rks = smartCards.getItemAt(i);
     		if (newName.equals(rks.getName())) {
@@ -779,7 +788,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
      * @param newName Nombre del nuevo controlador.
      * @return True en caso de que ya se encuentre el controlador registrado, false en caso contrario.
      */
-    private boolean checkDuplicatedLib(final String newLib) {
+    private static boolean checkDuplicatedLib(final String newLib) {
     	for (int i = 0 ; i < smartCards.getItemCount() ; i++) {
     		final RegisteredKeystore rks = smartCards.getItemAt(i);
     		if (newLib.equals(rks.getLib())) {

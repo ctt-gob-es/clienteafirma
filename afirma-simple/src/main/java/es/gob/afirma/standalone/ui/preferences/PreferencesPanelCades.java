@@ -10,9 +10,6 @@
 package es.gob.afirma.standalone.ui.preferences;
 
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_HASH;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
@@ -52,6 +49,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 final class PreferencesPanelCades extends JScrollPane {
 
@@ -345,9 +343,15 @@ final class PreferencesPanelCades extends JScrollPane {
 			PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 		}
 
-		PreferencesManager.putBoolean(PREFERENCE_CADES_MULTISIGN_COSIGN, this.optionCoSign.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS, this.optionCounterSignLeafs.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE, this.optionCounterSignTree.isSelected());
+		String multiSignValue;
+		if (this.optionCoSign.isSelected()) {
+			multiSignValue = PreferencesManager.VALUE_MULTISIGN_COSIGN;
+		} else if (this.optionCounterSignLeafs.isSelected()) {
+			multiSignValue = PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS;
+		} else {
+			multiSignValue = PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE;
+		}
+		PreferencesManager.put(PreferencesManager.PREFERENCE_CADES_MULTISIGN, multiSignValue);
 
 		this.cadesPolicyDlg.saveCurrentPolicy();
 	}
@@ -370,9 +374,12 @@ final class PreferencesPanelCades extends JScrollPane {
     		isBlocked()
         );
 
-		this.optionCoSign.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_MULTISIGN_COSIGN));
-		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS));
-		this.optionCounterSignTree.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE));
+        final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_MULTISIGN);
+        if (multiSign != null) {
+        	this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
+        	this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
+        	this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
+        }
 
         revalidate();
         repaint();
@@ -380,7 +387,7 @@ final class PreferencesPanelCades extends JScrollPane {
 
 	void loadDefaultPreferences() {
 
-		this.signatureMode.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_IMPLICIT));
+		this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT, PreferencesSource.DEFAULT));
 
 		final List<PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -399,9 +406,10 @@ final class PreferencesPanelCades extends JScrollPane {
 
 		this.currentPolicyValue.setText(this.cadesPolicyDlg.getSelectedPolicyName());
 
-		this.optionCoSign.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COSIGN));
-		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS));
-		this.optionCounterSignTree.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_TREE));
+		final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_MULTISIGN);
+		this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
+		this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
+		this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
 
         revalidate();
         repaint();
@@ -445,16 +453,16 @@ final class PreferencesPanelCades extends JScrollPane {
 		else {
 			try {
 				// Si, por defecto, no debe haber ninguna politica configurada, hacemos eso
-				if (PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER) == null
-						|| PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER).isEmpty()) {
+				if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT) == null
+						|| PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT).isEmpty()) {
 					this.cadesPolicyDlg.loadPolicy(null);
 				} else {
 
 					this.cadesPolicyDlg
-							.loadPolicy(new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_IDENTIFIER),
-									PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_HASH),
-									PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
-									PreferencesManager.getDefaultPreference(PREFERENCE_CADES_POLICY_QUALIFIER)));
+							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH, PreferencesSource.DEFAULT),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, PreferencesSource.DEFAULT),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, PreferencesSource.DEFAULT)));
 				}
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$

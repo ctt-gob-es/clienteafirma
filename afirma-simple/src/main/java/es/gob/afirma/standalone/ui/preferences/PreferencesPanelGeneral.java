@@ -34,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
@@ -43,6 +44,7 @@ import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 final class PreferencesPanelGeneral extends JScrollPane {
 
@@ -702,7 +704,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// Si el valor establecido no es valido, establecemos el valor por defecto
 		if (this.signatureAlgorithms.getSelectedItem() == null) {
 			this.signatureAlgorithms.setSelectedItem(
-					PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM));
+					PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, PreferencesSource.DEFAULT));
 		}
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
 		this.confirmToSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN));
@@ -740,7 +742,13 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			PreferencesManager.clearAll();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo restaurar la configuracion general de la aplicacion: " + e); //$NON-NLS-1$
+		}
+		try {
+			KeyStorePreferencesManager.clearAllPrefs();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo restaurar la configuracion de almacenes de la aplicacion: " + e); //$NON-NLS-1$
 		}
 		loadPreferences();
 		getDisposableInterface().disposeInterface();

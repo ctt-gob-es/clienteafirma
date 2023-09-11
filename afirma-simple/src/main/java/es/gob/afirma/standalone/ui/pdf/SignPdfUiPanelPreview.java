@@ -103,6 +103,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
@@ -1015,11 +1016,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	/** Restaura las propiedades por defecto de la firma. */
 	private void loadDefaultProperties() {
 		getTextArea().setText(
-			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT)
+			PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2TEXT, PreferencesSource.DEFAULT)
 		);
 
 		final String pdfFontIndex =
-			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY);
+			PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTFAMILY, PreferencesSource.DEFAULT);
 		int comboFontIndex = 0;
 		final FontResource[] fonts = FontResource.getAllFontresources();
 		for (int i = 0; i < fonts.length; ++i) {
@@ -1031,11 +1032,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		getLetterType().setSelectedIndex(comboFontIndex);
 
 		setSelectedSize(Integer.parseInt(
-			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE)
+			PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSIZE, PreferencesSource.DEFAULT)
 		));
 
 		final int fontStyle = Integer.parseInt(
-			PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE)
+			PreferencesManager.get(PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTSTYLE, PreferencesSource.DEFAULT)
 		);
 		switch(fontStyle) {
 			case 8:
@@ -1058,8 +1059,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 				LOGGER.warning("Estilo de texto desconocido: " + fontStyle); //$NON-NLS-1$
 		}
 
-		final String pdfColorIndex = PreferencesManager.getDefaultPreference(
-			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR
+		final String pdfColorIndex = PreferencesManager.get(
+			PreferencesManager.PREFERENCE_PDF_SIGN_LAYER2FONTCOLOR, PreferencesSource.DEFAULT
 		);
 		int comboColorIndex = 0;
 		final ColorResource[] colors = ColorResource.getAllColorResources();
@@ -1076,13 +1077,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		atr.put(TextAttribute.FAMILY, fon.getFontName());
 		setViewFont(getViewFont().deriveFont(atr));
 
-		final String rotateSign = PreferencesManager.getDefaultPreference(
-			PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION
+		final String rotateSign = PreferencesManager.get(
+			PreferencesManager.PREFERENCE_PDF_SIGN_SIGNATUREROTATION, PreferencesSource.DEFAULT
 		);
 		getRotateSignature().setSelectedItem(RotationAngles.parse(Integer.parseInt(rotateSign)));
 
-		final String rubricPath = PreferencesManager.getDefaultPreference(
-			PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE
+		final String rubricPath = PreferencesManager.get(
+			PreferencesManager.PREFERENCE_PDF_SIGN_IMAGE, PreferencesSource.DEFAULT
 		);
 		if (rubricPath != null && !rubricPath.isEmpty()) {
 			try {

@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JOptionPane;
 
@@ -330,10 +331,10 @@ public final class PreferencesPlistHandler {
 	 */
 	public static String exportPreferencesToXml() {
 		final Map<String, Object> userProperties = PreferencesManager.getPrefsToExport();
+
+		userProperties.putAll(KeyStorePreferencesManager.getPrefsToExport());
+
 		final Map<String, Object> smartCardsPreferences = KeyStorePreferencesManager.getSmartCardsMap();
-		if (smartCardsPreferences.size() > 0) {
-			userProperties.put(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE, KeyStorePreferencesManager.getSkipAuthCertDNIe());
-		}
 		if (smartCardsPreferences.size() > 0) {
 			userProperties.put(SMARTCARDS_KEY, smartCardsPreferences);
 		}
@@ -406,6 +407,12 @@ public final class PreferencesPlistHandler {
 					PreferencesManager.putSystemPref(key, o.toString());
 				}
 			}
+		}
+
+		try {
+			PreferencesManager.flushSystemPrefs();
+		} catch (final BackingStoreException e) {
+			LOGGER.warning("No se pudo guardar la preferencia del sistema: " + e); //$NON-NLS-1$
 		}
 	}
 

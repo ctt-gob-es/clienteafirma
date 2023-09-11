@@ -313,33 +313,28 @@ public final class KeyStorePreferencesManager {
 	 */
 	public static Map<String, Object> getPrefsToExport() {
 
-		final Map<String, Object> result = new HashMap<String, Object>();
-		try {
-			final String[] systemKeys = SYSTEM_PREFERENCES.keys();
-			for (int i = 0 ; i < systemKeys.length ; i++) {
-				final String value = SYSTEM_PREFERENCES.get(systemKeys[i], null);
-				if (value != null && (value.equals(TRUE_VALUE) || value.equals(FALSE_VALUE))) {
-					result.put(systemKeys[i], Boolean.parseBoolean(value));
-				} else {
-					result.put(systemKeys[i], value);
-				}
-			}
-			final String[] userKeys = USER_PREFERENCES.keys();
-			for (int i = 0 ; i < userKeys.length ; i++) {
-				final String value = USER_PREFERENCES.get(userKeys[i], null);
-				if (value != null && (value.equals(TRUE_VALUE) || value.equals(FALSE_VALUE))) {
-					result.put(userKeys[i], Boolean.parseBoolean(value));
-				} else {
-					result.put(userKeys[i], value);
-				}
-			}
-		} catch (final BackingStoreException e) {
-			LOGGER.severe(
-					"Error al obtener preferencias configuradas por el usuario" //$NON-NLS-1$
-						+ e
-				);
+		final Map<String, Object> result = new HashMap<>();
+
+		String skipAuth = SYSTEM_PREFERENCES.get(PREFERENCE_SKIP_AUTH_CERT_DNIE, null);
+		if (skipAuth != null) {
+			result.put(PREFERENCE_SKIP_AUTH_CERT_DNIE, Boolean.valueOf(skipAuth));
 		}
+		skipAuth = USER_PREFERENCES.get(PREFERENCE_SKIP_AUTH_CERT_DNIE, null);
+		if (skipAuth != null) {
+			result.put(PREFERENCE_SKIP_AUTH_CERT_DNIE, Boolean.valueOf(skipAuth));
+		}
+
 		return result;
 	}
 
+	/**
+	 * Elimina todas las preferencias del usuario de la aplicaci&oacute;n.
+	 * @throws BackingStoreException Si ocurre un error eliminando las preferencias.
+	 */
+	public static void clearAllPrefs() throws BackingStoreException {
+		for (final String key : USER_PREFERENCES.keys()) {
+			USER_PREFERENCES.remove(key);
+		}
+		USER_PREFERENCES.flush();
+	}
 }
