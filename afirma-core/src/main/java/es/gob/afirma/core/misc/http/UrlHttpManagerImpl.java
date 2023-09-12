@@ -130,6 +130,26 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	@Override
 	public byte[] readUrl(final String urlToRead,
+			              final int timeout,
+			              final String contentType,
+			              final String accept,
+			              final UrlHttpMethod method,
+			              final HttpProcessor httpProcessor) throws IOException {
+		final Properties headers = new Properties();
+		if (contentType != null) {
+			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
+		}
+		if (accept != null) {
+			headers.setProperty(ACCEPT, accept);
+		}
+		if (httpProcessor != null) {
+			return httpProcessor.processHttpError(urlToRead, timeout, contentType, accept, method);
+		}
+		return readUrl(urlToRead, timeout, method, headers);
+	}
+
+	@Override
+	public byte[] readUrl(final String urlToRead,
 	                      final int timeout,
 		                  final UrlHttpMethod method,
 		                  final Properties requestProperties) throws IOException {

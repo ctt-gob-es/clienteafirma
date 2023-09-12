@@ -21,9 +21,12 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.HttpManager;
@@ -139,6 +142,16 @@ public final class Updater {
 		}
 		try {
 			version = new String(new HttpManager().readUrl(url, UrlHttpMethod.GET)).trim();
+		}
+		catch (final SSLHandshakeException sslhe) {
+			final HttpProcessor processor = new SSLRequestPermission(sslhe);
+			try {
+				version = new String(new HttpManager().readUrl(url, UrlHttpMethod.GET, processor)).trim();
+			} catch (final Exception e) {
+				LOGGER.severe(
+						"No se ha podido obtener la ultima version disponible desde " + url + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
 		catch (final Exception e) {
 			LOGGER.severe(

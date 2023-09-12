@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,6 +33,8 @@ import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -367,7 +371,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 		// ---------
 
 		// Empezamos la prefirma
-		final byte[] preSignResult;
+		byte[] preSignResult;
 		try {
 			// Llamamos a una URL pasando como parametros los datos necesarios para
 			// configurar la operacion:
@@ -400,7 +404,13 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
 
-			preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
+			try {
+				preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
+			} catch (final SSLHandshakeException sslhe) {
+				final HttpProcessor processor = new SSLRequestPermission(sslhe);
+				preSignResult = UrlHttpManagerFactory.getInstalledManager().readUrl(postUrl, -1, null, null, UrlHttpMethod.POST, processor);
+			}
+
 			urlBuffer.setLength(0);
 		}
 		catch (final IOException e) {

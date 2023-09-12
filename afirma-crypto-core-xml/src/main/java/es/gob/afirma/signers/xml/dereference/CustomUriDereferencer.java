@@ -15,6 +15,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.xml.crypto.Data;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReference;
@@ -32,6 +33,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.signers.xml.Utils;
@@ -98,9 +101,19 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			final String uri = domRef.getURI();
 			if (uri.startsWith("http://") || uri.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 				Logger.getLogger("es.gob.afirma").info("Se ha pedido dereferenciar una URI externa: " + uri);  //$NON-NLS-1$//$NON-NLS-2$
-				final byte[] externalContent;
+				byte[] externalContent;
 				try {
 					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrl(uri, UrlHttpMethod.GET);
+				}
+				catch (final SSLHandshakeException sslhe) {
+					final HttpProcessor processor = new SSLRequestPermission(sslhe);
+					try {
+						externalContent = UrlHttpManagerFactory.getInstalledManager().readUrl(uri, -1, null, null, UrlHttpMethod.GET, processor);
+					} catch (final IOException e1) {
+						throw new URIReferenceException(
+								"No se ha podido descargar manualmente el contenido externo (" + e + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+						);
+					}
 				}
 				catch (final Exception e1) {
 					throw new URIReferenceException(

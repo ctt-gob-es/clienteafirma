@@ -206,7 +206,7 @@ public final class SslSecurityManager {
 			trustStore.load(cacertIs, "changeit".toCharArray()); //$NON-NLS-1$
 		}
 
-		final X509TrustManager[] trustManagers = new X509TrustManager[2];
+		X509TrustManager[] trustManagers = new X509TrustManager[1];
 
 		// Agregamos los trustmanagers por defecto de Java
 		TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -214,13 +214,18 @@ public final class SslSecurityManager {
 		trustManagers[0] = (X509TrustManager) factory.getTrustManagers()[0];
 
 		// Agregamos los trustmanagers por defecto de AutoFirma
-		factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		factory.init(trustStore);
-		trustManagers[1] = (X509TrustManager) factory.getTrustManagers()[0];
+		if (trustStore.aliases() != null && trustStore.aliases().hasMoreElements()) {
+			final X509TrustManager javaTrustManager = trustManagers[0];
+			trustManagers = new X509TrustManager[2];
+			factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			factory.init(trustStore);
+			trustManagers[0] = javaTrustManager;
+			trustManagers[1] = (X509TrustManager) factory.getTrustManagers()[0];
+		}
 
 		final MultiX509TrustManager trustManager = new MultiX509TrustManager(trustManagers);
 
-		final SSLContext sslContext = SSLContext.getInstance("SSL");
+		final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sslContext.init(null, new TrustManager[] { trustManager }, SecureRandom.getInstanceStrong());
 
 		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());

@@ -17,9 +17,13 @@ import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -101,10 +105,22 @@ final class PDFTriPhaseSignerUtil {
 				append(AOUtil.properties2Base64(extraParams));
 			}
 
-			return UrlHttpManagerFactory.getInstalledManager().readUrl(
-				urlBuffer.toString(),
-				UrlHttpMethod.POST
-			);
+			byte[] data;
+			try {
+				data = UrlHttpManagerFactory.getInstalledManager().readUrl(
+						urlBuffer.toString(),
+						UrlHttpMethod.POST
+					);
+			} catch (final SSLHandshakeException sslhe) {
+				final HttpProcessor processor = new SSLRequestPermission(sslhe);
+				try {
+					data = UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), -1, null, null, UrlHttpMethod.POST, processor);
+				} catch (final IOException e1) {
+					throw new AOException("Error en la llamada de prefirma al servidor: " + e1, e1); //$NON-NLS-1$
+				}
+			}
+
+			return data;
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -147,7 +163,7 @@ final class PDFTriPhaseSignerUtil {
                              final Certificate[] certChain,
                              final String documentId,
                              final Properties extraParams) throws AOException {
-		final byte[] triSignFinalResult;
+		byte[] triSignFinalResult;
 		try {
 			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServerUrl).append(HTTP_CGI).
@@ -164,10 +180,19 @@ final class PDFTriPhaseSignerUtil {
 				append(AOUtil.properties2Base64(extraParams));
 			}
 
-			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(
-				urlBuffer.toString(),
-				UrlHttpMethod.POST
-			);
+			try {
+				triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(
+					urlBuffer.toString(),
+					UrlHttpMethod.POST
+				);
+			} catch (final SSLHandshakeException sslhe) {
+				final HttpProcessor processor = new SSLRequestPermission(sslhe);
+				try {
+					triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), -1, null, null, UrlHttpMethod.POST, processor);
+				} catch (final IOException e) {
+					throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
+				}
+			}
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {

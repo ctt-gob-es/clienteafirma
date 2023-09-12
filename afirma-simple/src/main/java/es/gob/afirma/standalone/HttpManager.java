@@ -2,6 +2,7 @@ package es.gob.afirma.standalone;
 
 import java.io.IOException;
 
+import es.gob.afirma.core.misc.http.HttpProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
@@ -35,6 +36,18 @@ public class HttpManager {
 	 */
 	public byte[] readUrl(final String url, final UrlHttpMethod method) throws IOException {
 		return this.urlManager.readUrl(url, method);
+	}
+
+	/**
+	 * Accede a un recurso o servicio remoto.
+	 * @param url URL del recurso/servicio.
+	 * @param method M&eacute;todo HTTP de acceso.
+	 * @param processor Procesador de errores.
+	 * @return Contenido del recurso o resultado del servicio.
+	 * @throws IOException Cuando ocurre un error durante la recuperaci&oacute;n del resultado.
+	 */
+	public byte[] readUrl(final String url, final UrlHttpMethod method, final HttpProcessor processor) throws IOException {
+		return this.urlManager.readUrl(url, -1, null, null, method, processor);
 	}
 
 	/**

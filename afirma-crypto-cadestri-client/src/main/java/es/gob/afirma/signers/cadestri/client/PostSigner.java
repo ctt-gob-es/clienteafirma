@@ -27,8 +27,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.TriphaseUtil;
 
@@ -73,7 +78,14 @@ final class PostSigner {
 			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 		}
 
-		return urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
+		byte[] data;
+		try {
+			data = urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
+		} catch (final SSLHandshakeException sslhe) {
+			final HttpProcessor processor = new SSLRequestPermission(sslhe);
+			data = UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), -1, null, null, UrlHttpMethod.POST, processor);
+		}
+		return data;
 	}
 
 }

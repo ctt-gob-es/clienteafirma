@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -51,6 +52,8 @@ import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -1600,7 +1603,15 @@ public final class XAdESSigner {
 			try {
 
 				final UrlHttpManager httpManager = UrlHttpManagerFactory.getInstalledManager();
-				final byte[] data = httpManager.readUrl(uri, UrlHttpMethod.GET);
+
+				byte[] data;
+				try {
+					data = httpManager.readUrl(uri, UrlHttpMethod.GET);
+				} catch (final SSLHandshakeException sslhe) {
+					final HttpProcessor processor = new SSLRequestPermission(sslhe);
+					data = httpManager.readUrl(uri, -1, null, null, UrlHttpMethod.GET, processor);
+				}
+
 				final byte[] md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm()))
 						.digest(data);
 

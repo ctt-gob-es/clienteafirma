@@ -20,6 +20,8 @@ import java.security.cert.CertificateEncodingException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -31,6 +33,8 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.misc.http.HttpError;
+import es.gob.afirma.core.misc.http.HttpProcessor;
+import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -232,6 +236,14 @@ public final class BatchSigner {
 							UrlHttpMethod.POST
 					);
 		}
+		catch (final SSLHandshakeException sslhe) {
+				final HttpProcessor processor = new SSLRequestPermission(sslhe);
+				ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
+						batchPresignerUrl + "?" + //$NON-NLS-1$
+						BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+						BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
+						-1, null, null, UrlHttpMethod.POST, processor);
+		}
 		catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
 			throw e;
@@ -318,6 +330,12 @@ public final class BatchSigner {
 					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 				UrlHttpMethod.POST
 			);
+		} catch (final SSLHandshakeException sslhe) {
+			final HttpProcessor processor = new SSLRequestPermission(sslhe);
+			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(batchPreSignerUrl + "?" + //$NON-NLS-1$
+					BATCH_JSON_PARAM + EQU + batchUrlSafe + AMP +
+					BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
+					-1, null, null, UrlHttpMethod.POST, processor);
 		} catch (final HttpError e) {
 			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e); //$NON-NLS-1$
 			throw e;

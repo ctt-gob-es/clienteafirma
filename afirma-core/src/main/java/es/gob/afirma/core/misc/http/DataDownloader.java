@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
@@ -81,7 +83,12 @@ public final class DataDownloader {
 
 		// Miramos primero si los datos son una URL, en cuyo caso descargamos los datos
 		if (dataSource.startsWith("http://") || dataSource.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-			return UrlHttpManagerFactory.getInstalledManager().readUrl(dataSource, UrlHttpMethod.GET);
+			try {
+				return UrlHttpManagerFactory.getInstalledManager().readUrl(dataSource, UrlHttpMethod.GET);
+			} catch (final SSLHandshakeException sslhe) {
+				final HttpProcessor processor = new SSLRequestPermission(sslhe);
+				return UrlHttpManagerFactory.getInstalledManager().readUrl(dataSource, -1, null, null, UrlHttpMethod.GET, processor);
+			}
 		}
 
 		if (dataSource.startsWith("ftp://")) { //$NON-NLS-1$
