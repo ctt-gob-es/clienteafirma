@@ -266,7 +266,7 @@ final class ProtocolInvocationLauncherSign {
 		AOKeyStore aoks = null;
 		if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
-			if (!PreferencesManager.VALUE_DEFAULT.equals(defaultStore)) {
+			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
 				aoks = AOKeyStore.getKeyStore(defaultStore);
 			}
 		} else {

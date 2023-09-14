@@ -130,22 +130,6 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_SIGNATURE_ALGORITHM = "signatureHashAlgorithm"; //$NON-NLS-1$
 
-
-	/** Solicitar confirmaci&oacute;n antes de firmar.
-	 * Un valor de <code>true</code> en esta preferencia hace que se muestre un di&aacute;logo de
-	 * confirmaci&oacute;n con las implicaciones de firma al iniciar una firma desde la interfaz
-	 * de escritorio. */
-	public static final String PREFERENCE_GENERAL_CONFIRMTOSIGN = "confirmToSign"; //$NON-NLS-1$
-
-	/** Permitir la multifirma de firmas inv&aacute;lidas.
-	 * Un valor de <code>true</code> en esta preferencia hace que se puedan multifirmar firmas a pesar
-	 * de haberse detectado que no son v&aacute;lidas. */
-	public static final String PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES = "allowInvalidSignatures"; //$NON-NLS-1$
-
-	/** Indica si en los procesos de firma masiva se deben sobreescribir o no los ficheros que
-	 * se encuentren en el directorio de salida. */
-	public static final String PREFERENCE_GENERAL_MASSIVE_OVERWRITE = "massiveOverride"; //$NON-NLS-1$
-
 	/** Formato de firma por defecto para documentos PDF.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
@@ -197,6 +181,22 @@ public final class PreferencesManager {
 	 *  <li>XAdES</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN = "defaultSignatureFormatBin"; //$NON-NLS-1$
+
+	/** Solicitar confirmaci&oacute;n antes de firmar.
+	 * Un valor de <code>true</code> en esta preferencia hace que se muestre un di&aacute;logo de
+	 * confirmaci&oacute;n con las implicaciones de firma al iniciar una firma desde la interfaz
+	 * de escritorio. */
+	public static final String PREFERENCE_GENERAL_CONFIRMTOSIGN = "confirmToSign"; //$NON-NLS-1$
+
+	/** Permitir la multifirma de firmas inv&aacute;lidas.
+	 * Un valor de <code>true</code> en esta preferencia hace que se puedan multifirmar firmas a pesar
+	 * de haberse detectado que no son v&aacute;lidas. */
+	public static final String PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES = "allowInvalidSignatures"; //$NON-NLS-1$
+
+	/** Indica si en los procesos de firma masiva se deben sobreescribir o no los ficheros que
+	 * se encuentren en el directorio de salida. */
+	public static final String PREFERENCE_GENERAL_MASSIVE_OVERWRITE = "massiveOverride"; //$NON-NLS-1$
+
 
 	/** Indica si debe validarse el certificado SSL en las conexiones de red. */
 	public static final String PREFERENCE_GENERAL_SECURE_CONNECTIONS = "secureConnections"; //$NON-NLS-1$
@@ -252,6 +252,18 @@ public final class PreferencesManager {
 	/** Calificador de la pol&iacute;tica de firma para XAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_XADES_POLICY_QUALIFIER = "xadesPolicyQualifier"; //$NON-NLS-1$
 
+	/** Formato de las firmas XAdES.
+	 * Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>XAdES Detached</li>
+	 *  <li>XAdES Enveloping</li>
+	 *  <li>XAdES Enveloped</li>
+	 * </ul> */
+	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
+
+	/** Tipo de multifirma a realizar. */
+	public static final String PREFERENCE_XADES_MULTISIGN = "xadesMultisign";  //$NON-NLS-1$
+
 	/** Ciudad de firma para firmas XAdES. */
 	public static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY = "xadesSignatureProductionCity"; //$NON-NLS-1$
 
@@ -267,32 +279,12 @@ public final class PreferencesManager {
 	/** Cargo supuesto para el firmante en firmas XAdES. */
 	public static final String PREFERENCE_XADES_SIGNER_CLAIMED_ROLE = "xadesSignerClaimedRole"; //$NON-NLS-1$
 
-	/** Formato de las firmas XAdES.
-	 * Esta preferencia debe tener uno de estos valores:
-	 * <ul>
-	 *  <li>XAdES Detached</li>
-	 *  <li>XAdES Enveloping</li>
-	 *  <li>XAdES Enveloped</li>
-	 * </ul> */
-	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
-
-	/** Tipo de multifirma a realizar. */
-	public static final String PREFERENCE_XADES_MULTISIGN = "xadesMultisign";  //$NON-NLS-1$
 
 	//************************* FIN PREFERENCIAS DE FIRMAS XAdES ***************************************************************
 	//**************************************************************************************************************************
 
 	//**************************************************************************************************************************
 	//************************* PREFERENCIAS DE FIRMAS PAdES *******************************************************************
-
-	/** Motivo de la firma en firmas PAdES. */
-	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
-
-	/** Ciudad de firma para firmas PAdES. */
-	public static final String PREFERENCE_PADES_SIGN_PRODUCTION_CITY = "padesSignProductionCity"; //$NON-NLS-1$
-
-	/** Contacto del firmante en firmas PAdES. */
-	public static final String PREFERENCE_PADES_SIGNER_CONTACT = "padesSignerContact"; //$NON-NLS-1$
 
 	/** Formato de firma PAdES (PAdES B&aacute;sico o PAdES-BES).
 	 * Esta preferencia debe tener uno de estos valores:
@@ -338,6 +330,15 @@ public final class PreferencesManager {
 	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
 	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
 	public static final String PREFERENCE_PADES_CHECK_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+
+	/** Motivo de la firma en firmas PAdES. */
+	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
+
+	/** Ciudad de firma para firmas PAdES. */
+	public static final String PREFERENCE_PADES_SIGN_PRODUCTION_CITY = "padesSignProductionCity"; //$NON-NLS-1$
+
+	/** Contacto del firmante en firmas PAdES. */
+	public static final String PREFERENCE_PADES_SIGNER_CONTACT = "padesSignerContact"; //$NON-NLS-1$
 
 	//************************* FIN PREFERENCIAS DE FIRMAS PAdES ***************************************************************
 	//**************************************************************************************************************************
@@ -386,27 +387,6 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_FACTURAE_POLICY = "facturaEPolicy"; //$NON-NLS-1$
 
-	/** Ciudad de firma para firmas FacturaE. */
-	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY = "facturaeSignatureProductionCity"; //$NON-NLS-1$
-
-	/** Provincia de firma para firmas FacturaE. */
-	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE = "facturaeSignatureProductionProvince"; //$NON-NLS-1$
-
-	/** C&oacute;digo de firma para firmas FacturaE. */
-	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE = "facturaeSignatureProductionPostalCode"; //$NON-NLS-1$
-
-	/** Pa&iacute;s de firma para firmas FacturaE. */
-	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY = "facturaeSignatureProductionCountry"; //$NON-NLS-1$
-
-	/** Papel del firmante de las facturas.
-	 * Esta preferencia debe tener uno de estos valores:
-	 * <ul>
-	 *  <li>Emisor</li>
-	 *  <li>Receptor</li>
-	 *  <li>Tercero</li>
-	 * </ul> */
-	public static final String PREFERENCE_FACTURAE_SIGNER_ROLE = "facturaeSignerRole"; //$NON-NLS-1$
-
 	/** Identificador de la pol&iacute;tica de firma para FacturaE. Debe ser un OID.*/
 	public static final String PREFERENCE_FACTURAE_POLICY_IDENTIFIER = "facturaePolicyIdentifier"; //$NON-NLS-1$
 
@@ -425,6 +405,28 @@ public final class PreferencesManager {
 
 	/** Calificador de la pol&iacute;tica de firma para FacturaE. Debe ser una URL. */
 	public static final String PREFERENCE_FACTURAE_POLICY_QUALIFIER = "facturaePolicyQualifier"; //$NON-NLS-1$
+
+	/** Papel del firmante de las facturas.
+	 * Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>Emisor</li>
+	 *  <li>Receptor</li>
+	 *  <li>Tercero</li>
+	 * </ul> */
+	public static final String PREFERENCE_FACTURAE_SIGNER_ROLE = "facturaeSignerRole"; //$NON-NLS-1$
+
+	/** Ciudad de firma para firmas FacturaE. */
+	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY = "facturaeSignatureProductionCity"; //$NON-NLS-1$
+
+	/** Provincia de firma para firmas FacturaE. */
+	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE = "facturaeSignatureProductionProvince"; //$NON-NLS-1$
+
+	/** C&oacute;digo de firma para firmas FacturaE. */
+	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE = "facturaeSignatureProductionPostalCode"; //$NON-NLS-1$
+
+	/** Pa&iacute;s de firma para firmas FacturaE. */
+	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY = "facturaeSignatureProductionCountry"; //$NON-NLS-1$
+
 
 	//**************** FIN PREFERENCIAS DE FACTURAS ELECTRONICAS ***************************************************************
 	//**************************************************************************************************************************
@@ -457,16 +459,16 @@ public final class PreferencesManager {
 	//**************************************************************************************************************************
 
 	//**************************************************************************************************************************
-	//**************** PREFERENCIAS DE certificados ********************************************************************
-
-	/** Texto contenido en la firma visible en pdf.*/
-	public static final String PREFERENCE_DEFAULT_KEYSTORE = "defaultKeystore"; //$NON-NLS-1$
-
-	//**************** FIN PREFERENCIAS DE FIRMA VISIBLE EN PDF ****************************************************************
-	//**************************************************************************************************************************
-
-	//**************************************************************************************************************************
 	//**************** PREFERENCIAS DE ALMACENES DE CLAVES *********************************************************************
+
+	/** Almac&eacute;n de claves por defecto. */
+	public static final String PREFERENCE_KEYSTORE_DEFAULT_STORE = "defaultStore"; //$NON-NLS-1$
+
+	/** Valor default para indicar que se desea seleccionar el almac&eacute;n de claves del sistema. */
+	public static final String VALUE_KEYSTORE_DEFAULT = "default"; //$NON-NLS-1$
+
+	/** Ruta del almac&eacute;n de claves local seleccionado por defecto. */
+	public static final String PREFERENCE_LOCAL_KEYSTORE_PATH = "defaultLocalKeystorePath"; //$NON-NLS-1$
 
 	/** Indica si se usa o no el certificado por defecto configurado en llamadas desde el navegador. */
 	public static final String PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS = "useDefaultStoreInBrowserCalls"; //$NON-NLS-1$
@@ -491,15 +493,6 @@ public final class PreferencesManager {
 	 * disponibles. Un valor de <code>true</code> en esta preferencia permitir&aacute; usar solo  certificados de
 	 * seud&oacute;nimo cuando estos est&eacute;n disponibles.*/
 	public static final String PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS = "useOnlyAliasCertificates"; //$NON-NLS-1$
-
-	/** Almac&eacute;n de claves por defecto. */
-	public static final String PREFERENCE_KEYSTORE_DEFAULT_STORE = "defaultStore"; //$NON-NLS-1$
-
-	/** Ruta del almac&eacute;n de claves local seleccionado por defecto. */
-	public static final String PREFERENCE_LOCAL_KEYSTORE_PATH = "defaultLocalKeystorePath"; //$NON-NLS-1$
-
-	/** Valor default para indicar que se desea seleccionar el almac&eacute;n de claves del sistema. */
-	public static final String VALUE_DEFAULT = "default"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************

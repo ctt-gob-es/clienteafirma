@@ -830,7 +830,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		if (aoks != null) {
 			String ksName = aoks.getName();
 			if (PreferencesPanelKeystores.getKeystores().getSelectedIndex() == 0) {
-				ksName = PreferencesManager.VALUE_DEFAULT;
+				ksName = PreferencesManager.VALUE_KEYSTORE_DEFAULT;
 			}
 			PreferencesManager.put(
 					PREFERENCE_KEYSTORE_DEFAULT_STORE,

@@ -14,16 +14,8 @@ public class CalculateHashFileAction extends PluginAction {
 	@Override
 	public void start(final Window parent) {
 		final Properties config = getConfig();
-		
-		for (final String k : config.keySet().toArray(new String[0])) {
-			System.out.println(k + ": " + config.getProperty(k));
-		}
-		
-		CreateHashFileDialog.startHashCreation(parent, config);
 
-		for (final String k : config.keySet().toArray(new String[0])) {
-			System.out.println(k + ": " + config.getProperty(k));
-		}
+		CreateHashFileDialog.startHashCreation(parent, config);
 
 		saveConfig(config);
 	}

@@ -226,7 +226,7 @@ public final class SslSecurityManager {
 		final MultiX509TrustManager trustManager = new MultiX509TrustManager(trustManagers);
 
 		final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-		sslContext.init(null, new TrustManager[] { trustManager }, SecureRandom.getInstanceStrong());
+		sslContext.init(null, new TrustManager[] { trustManager }, new SecureRandom());
 
 		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 	}
