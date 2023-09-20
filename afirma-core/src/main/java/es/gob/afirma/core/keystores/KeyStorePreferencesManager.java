@@ -15,9 +15,6 @@ public final class KeyStorePreferencesManager {
 	private static final Preferences SYSTEM_PREFERENCES;
 	private static final Properties PROPERTIES;
 
-	private static final String TRUE_VALUE = "true"; //$NON-NLS-1$
-	private static final String FALSE_VALUE = "false"; //$NON-NLS-1$
-
 	/** Indica cual fue el &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. */
 	public static final String PREFERENCE_LAST_KEYSTORE_SELECTED = "lastKeystoreSelected"; //$NON-NLS-1$
 
@@ -28,8 +25,22 @@ public final class KeyStorePreferencesManager {
 	public static final String PREFERENCE_SKIP_AUTH_CERT_DNIE = "skipAuthCertDnie"; //$NON-NLS-1$
 
 	static {
+
 		USER_PREFERENCES = Preferences.userNodeForPackage(KeyStorePreferencesManager.class);
-		SYSTEM_PREFERENCES = Preferences.systemNodeForPackage(KeyStorePreferencesManager.class);
+
+		// Comprobamos la existencia del nodo de preferencias del sistema porque, de no existir, intentaria crearse
+		// cuando lo cargasemos y probablemente no tengamos permisos
+		boolean hasSystemPreferences = false;
+		try {
+			hasSystemPreferences = Preferences.systemRoot().nodeExists("/es/gob/afirma/core/keystores"); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.info("No se ha podido comprobar si hay preferencias del sistema de configuracion de almacenes: " + e); //$NON-NLS-1$
+		}
+		SYSTEM_PREFERENCES = hasSystemPreferences
+				? Preferences.systemNodeForPackage(KeyStorePreferencesManager.class)
+				: null;
+
 		PROPERTIES = new Properties();
 		try {
 			PROPERTIES.load(KeyStorePreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
@@ -295,7 +306,7 @@ public final class KeyStorePreferencesManager {
 	 * @param key Clave del valor que queremos recuperar.
 	 * @return La preferencia almacenada o la que se encuentra configurada por defecto si no se encontr&oacute;. */
 	public static boolean getBooleanSystemPreference(final String key) {
-		return SYSTEM_PREFERENCES.getBoolean(key, getBooleanDefaultPreference(key));
+		return SYSTEM_PREFERENCES == null ? false : SYSTEM_PREFERENCES.getBoolean(key, getBooleanDefaultPreference(key));
 	}
 
 	/**
@@ -315,7 +326,7 @@ public final class KeyStorePreferencesManager {
 
 		final Map<String, Object> result = new HashMap<>();
 
-		String skipAuth = SYSTEM_PREFERENCES.get(PREFERENCE_SKIP_AUTH_CERT_DNIE, null);
+		String skipAuth = SYSTEM_PREFERENCES == null ? null : SYSTEM_PREFERENCES.get(PREFERENCE_SKIP_AUTH_CERT_DNIE, null);
 		if (skipAuth != null) {
 			result.put(PREFERENCE_SKIP_AUTH_CERT_DNIE, Boolean.valueOf(skipAuth));
 		}
