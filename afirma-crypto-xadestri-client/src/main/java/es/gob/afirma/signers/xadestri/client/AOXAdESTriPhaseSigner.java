@@ -30,7 +30,9 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -367,7 +369,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 		// ---------
 
 		// Empezamos la prefirma
-		final byte[] preSignResult;
+		byte[] preSignResult;
 		try {
 			// Llamamos a una URL pasando como parametros los datos necesarios para
 			// configurar la operacion:
@@ -400,7 +402,18 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
 
-			preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
+			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
+			try {
+				preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST, errorProcessor);
+			} catch (final IOException e) {
+				if (errorProcessor.isCancelled()) {
+					LOGGER.info(
+							"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
+							+ LoggerUtil.getTrimStr(signServerUrl.toString()));
+				}
+				throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
+			}
+
 			urlBuffer.setLength(0);
 		}
 		catch (final IOException e) {

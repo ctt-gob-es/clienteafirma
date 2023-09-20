@@ -9,9 +9,6 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_TREE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
@@ -57,6 +54,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 final class PreferencesPanelXades extends JScrollPane {
 
@@ -492,9 +490,15 @@ final class PreferencesPanelXades extends JScrollPane {
 			PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 		}
 
-		PreferencesManager.putBoolean(PREFERENCE_XADES_MULTISIGN_COSIGN, this.optionCoSign.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS, this.optionCounterSignLeafs.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_TREE, this.optionCounterSignTree.isSelected());
+		String multiSignValue;
+		if (this.optionCoSign.isSelected()) {
+			multiSignValue = PreferencesManager.VALUE_MULTISIGN_COSIGN;
+		} else if (this.optionCounterSignLeafs.isSelected()) {
+			multiSignValue = PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS;
+		} else {
+			multiSignValue = PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE;
+		}
+		PreferencesManager.put(PreferencesManager.PREFERENCE_XADES_MULTISIGN, multiSignValue);
 
 		this.xadesPolicyDlg.saveCurrentPolicy();
 
@@ -548,30 +552,33 @@ final class PreferencesPanelXades extends JScrollPane {
         	this.xadesSignFormat.setSelectedItem(previousSubFormat);
         }
 
-		this.optionCoSign.setSelected(PreferencesManager.getBoolean(PREFERENCE_XADES_MULTISIGN_COSIGN));
-		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBoolean(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS));
-		this.optionCounterSignTree.setSelected(PreferencesManager.getBoolean(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_TREE));
+        final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_XADES_MULTISIGN);
+        if (multiSign != null) {
+        	this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
+        	this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
+        	this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
+        }
 
         revalidate();
         repaint();
 	}
 
 	void loadDefaultPreferences() {
-		this.xadesSignatureProductionCity.setText(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY));
+		this.xadesSignatureProductionCity.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, PreferencesSource.DEFAULT));
 		this.xadesSignatureProductionProvince.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE)
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, PreferencesSource.DEFAULT)
 		);
 		this.xadesSignatureProductionPostalCode.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE)
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, PreferencesSource.DEFAULT)
 		);
 		this.xadesSignatureProductionCountry.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY)
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, PreferencesSource.DEFAULT)
 		);
-		this.xadesSignerClaimedRole.setText(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
+		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, PreferencesSource.DEFAULT));
 
 		// Solo establecemos la opcion por defecto si la interfaz no esta bloqueada
 		if (!isBlocked()) {
-			this.xadesSignFormat.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_SIGN_FORMAT));
+			this.xadesSignFormat.setSelectedItem(PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT, PreferencesSource.DEFAULT));
 		}
 
 		final List<PolicyItem> xadesPolicies = new ArrayList<>();
@@ -594,9 +601,10 @@ final class PreferencesPanelXades extends JScrollPane {
 
 		this.currentPolicyValue.setText(this.xadesPolicyDlg.getSelectedPolicyName());
 
-		this.optionCoSign.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_XADES_MULTISIGN_COSIGN));
-		this.optionCounterSignLeafs.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS));
-		this.optionCounterSignTree.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_TREE));
+		final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_XADES_MULTISIGN);
+		this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
+		this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
+		this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
 
         revalidate();
         repaint();
@@ -637,24 +645,21 @@ final class PreferencesPanelXades extends JScrollPane {
 		if (isBlocked()) {
 			adesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 		}
-		// Si no, devolvemos la ocnfiguracion por defecto
+		// Si no, devolvemos la configuracion por defecto
 		else {
 			try {
 
-				if (PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER) == null
-						|| PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER).isEmpty()) {
+				final String policyId = PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT);
+				if (policyId == null || policyId.isEmpty()) {
 					this.xadesPolicyDlg.loadPolicy(null);
 				} else {
-
-					this.xadesPolicyDlg
-							.loadPolicy(new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_IDENTIFIER),
-									PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_HASH),
-									PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
-									PreferencesManager.getDefaultPreference(PREFERENCE_XADES_POLICY_QUALIFIER)));
+					this.xadesPolicyDlg.loadPolicy(new AdESPolicy(policyId,
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH, PreferencesSource.DEFAULT),
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM, PreferencesSource.DEFAULT),
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER, PreferencesSource.DEFAULT)));
 				}
 			} catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
-						.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
+				LOGGER.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
 
 			}
 		}

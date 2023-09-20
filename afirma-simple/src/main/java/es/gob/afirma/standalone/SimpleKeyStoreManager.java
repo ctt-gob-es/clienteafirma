@@ -265,7 +265,7 @@ public final class SimpleKeyStoreManager {
     public static AOKeyStore getDefaultKeyStoreType() {
     	final String savedStoreName = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
     	final OS os = Platform.getOS();
-    	if (savedStoreName != null) {
+    	if (savedStoreName != null && !PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(savedStoreName)) {
     		final AOKeyStore ks = AOKeyStore.getKeyStore(savedStoreName);
     		if (ks != null) {
     			// Si desinstalan Firefox que no se quede una seleccion mala

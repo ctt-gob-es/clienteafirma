@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,14 +34,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 final class PreferencesPanelGeneral extends JScrollPane {
 
@@ -191,6 +195,51 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		importConfigFromFileButton.setEnabled(!this.blocked);
 
+		final JButton exportConfigToFileButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.196") //$NON-NLS-1$
+		);
+
+		exportConfigToFileButton.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("PreferencesPanel.197") //$NON-NLS-1$
+			);
+
+		exportConfigToFileButton.setMnemonic('G');
+		exportConfigToFileButton.addActionListener(
+				ae -> {
+						try {
+							final String xmlPrefs = PreferencesPlistHandler.exportPreferencesToXml();
+							AOUIFactory.getSaveDataToFile(xmlPrefs.getBytes(),
+									SimpleAfirmaMessages.getString("PreferencesPanel.198"), //$NON-NLS-1$
+									null,
+									SimpleAfirmaMessages.getString("PreferencesPanel.201"), //$NON-NLS-1$
+				    				Collections.singletonList(
+				    						new GenericFileFilter(
+				    								new String [] {"afconfig"}, //$NON-NLS-1$
+				    								SimpleAfirmaMessages.getString("PreferencesPanel.111") //$NON-NLS-1$
+				    								)
+				    						),
+									PreferencesPanelGeneral.this);
+							AOUIFactory.showMessageDialog(
+									getParent(),
+									SimpleAfirmaMessages.getString("PreferencesPanel.199"), //$NON-NLS-1$
+									SimpleAfirmaMessages.getString("PreferencesPanel.200"), //$NON-NLS-1$
+									JOptionPane.INFORMATION_MESSAGE
+								);
+						} catch(final AOCancelledOperationException ex) {
+							// Operacion cancelada por el usuario
+							return;
+						} catch (final Exception e) {
+							AOUIFactory.showErrorMessage(
+									SimpleAfirmaMessages.getString("PreferencesPanel.116"), //$NON-NLS-1$
+									SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
+									JOptionPane.ERROR_MESSAGE,
+									e
+							);
+							return;
+						}
+				}
+			);
+
 		final JButton restoreConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.135") //$NON-NLS-1$
 		);
@@ -218,6 +267,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		panelConstraint.weightx = 0.5;
 		panelConstraint.gridx = 0;
 		panel.add(importConfigFromFileButton, panelConstraint);
+		panelConstraint.gridx++;
+		panel.add(exportConfigToFileButton, panelConstraint);
 		panelConstraint.gridx++;
 		panel.add(restoreConfigFromFileButton, panelConstraint);
 
@@ -432,6 +483,18 @@ final class PreferencesPanelGeneral extends JScrollPane {
 				"</html>"); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
 
+		final JButton trustedCertificatesButton = new JButton(
+				SimpleAfirmaMessages.getString("PreferencesPanel.194") //$NON-NLS-1$
+			);
+
+		trustedCertificatesButton.setMnemonic('t');
+		trustedCertificatesButton.addActionListener(
+			ae -> trustedCertificatesDlg(this)
+		);
+		trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.195") //$NON-NLS-1$
+		);
+
 		final GridBagConstraints netConstraints = new GridBagConstraints();
 		netConstraints.insets = new Insets(0, 0, 4, 7);
 		netConstraints.gridx = 0;
@@ -451,6 +514,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		netConstraints.gridx++;
 		netConstraints.anchor = GridBagConstraints.LINE_END;
 		netConfigInnerPanel.add(proxyConfigButton, netConstraints);
+		netConstraints.insets = new Insets(0, 0, 0, 0);
+		netConstraints.anchor = GridBagConstraints.LINE_START;
+		netConstraints.gridy++;
+		netConstraints.gridx = 0;
+		netConfigInnerPanel.add(trustedCertificatesButton, netConstraints);
 
 		gbc.gridy++;
 		mainPanel.add(signGeneralPanel, gbc);
@@ -551,6 +619,21 @@ final class PreferencesPanelGeneral extends JScrollPane {
     	}
     }
 
+	/**
+	 * Di&aacute;logo para configurar los certificados de confianza.
+	 * @param container Contenedor en el que se define el di&aacute;logo.
+	 */
+    public static void trustedCertificatesDlg(final Container container) {
+
+    	final TrustedCertificatesPanel trustedCertPanel = new TrustedCertificatesPanel();
+
+    	JOptionPane.showMessageDialog(
+    			container,
+				trustedCertPanel,
+				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.0"), //$NON-NLS-1$
+				JOptionPane.PLAIN_MESSAGE);
+    }
+
     /**
      * Abre el dialogo de configuracion de los formatos de firma configurados para cada
      * tipo de fichero.
@@ -620,7 +703,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// Si el valor establecido no es valido, establecemos el valor por defecto
 		if (this.signatureAlgorithms.getSelectedItem() == null) {
 			this.signatureAlgorithms.setSelectedItem(
-					PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM));
+					PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, PreferencesSource.DEFAULT));
 		}
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE));
 		this.confirmToSign.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_CONFIRMTOSIGN));
@@ -658,7 +741,13 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			PreferencesManager.clearAll();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo restaurar la configuracion de la aplicacion: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo restaurar la configuracion general de la aplicacion: " + e); //$NON-NLS-1$
+		}
+		try {
+			KeyStorePreferencesManager.clearAllPrefs();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo restaurar la configuracion de almacenes de la aplicacion: " + e); //$NON-NLS-1$
 		}
 		loadPreferences();
 		getDisposableInterface().disposeInterface();

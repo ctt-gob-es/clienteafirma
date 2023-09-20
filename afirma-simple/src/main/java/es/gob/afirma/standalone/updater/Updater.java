@@ -11,12 +11,15 @@ package es.gob.afirma.standalone.updater;
 
 import java.awt.Desktop;
 import java.net.URI;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
@@ -39,8 +42,18 @@ public final class Updater {
 	private static final String PREFERENCE_UPDATE_URL_VERSION_MACOSX = "urlMacosx"; //$NON-NLS-1$
 	private static final String PREFERENCE_UPDATE_URL_SITE = "updateSite"; //$NON-NLS-1$
 
-	private static final SimpleDateFormat DATE_FORMAT =
-			new SimpleDateFormat(PreferencesManager.LASTCHECKDATE_DATEFORMAT);
+
+	//******** Otras propiedades que se almacenan a pesar de no ser configurables por la aplicacion. **********
+	//*********************************************************************************************************
+
+	/** Ruta alternativa donde almacenar preferencias. */
+	private static final String KEY_PREFERENCE_PATH = "es/gob/afirma/standalone"; //$NON-NLS-1$
+
+	/** Clave para el guardado y recuperacaci&oacute;n de la fecha de la &uacute;ltima comprobaci&oacute;n de versi&oacute;n. */
+	private static final String PROPERTY_LASTCHECKDATE = "lastCheckDate"; //$NON-NLS-1$
+
+	/** Formato con el que se guarda la fecha de la &uacute;ltima comprobaci&oacute;n. */
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd"); //$NON-NLS-1$
 
 	private static Properties updaterProperties = null;
 
@@ -119,18 +132,15 @@ public final class Updater {
 		updateSite = updaterProperties.getProperty(PREFERENCE_UPDATE_URL_SITE);
 
 		if (url == null) {
-			LOGGER.warning(
-				"El archivo de recursos del actualizador no contiene una URL de comprobacion" //$NON-NLS-1$
-			);
+			LOGGER.warning("El archivo de recursos del actualizador no contiene una URL de comprobacion"); //$NON-NLS-1$
 			return null;
 		}
+
 		try {
 			version = new String(new HttpManager().readUrl(url, UrlHttpMethod.GET)).trim();
 		}
 		catch (final Exception e) {
-			LOGGER.severe(
-				"No se ha podido obtener la ultima version disponible desde " + url + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			LOGGER.warning("No se pudo recuperar cual es la ultima disponible de la aplicacion"); //$NON-NLS-1$
 		}
 		return version;
 	}
@@ -250,7 +260,7 @@ public final class Updater {
 	 */
 	private static void updateLastCheck() {
 		final Calendar lastCheck = Calendar.getInstance();
-		PreferencesManager.put(PreferencesManager.HIDDEN_CONFIG_LASTCHECKDATE, DATE_FORMAT.format(lastCheck.getTime()));
+		saveLastCheck(lastCheck.getTime());
 		try {
 			PreferencesManager.flush();
 		} catch (final BackingStoreException e) {
@@ -265,11 +275,22 @@ public final class Updater {
 	private static Calendar getLastCheck() {
 		final Calendar lastCheck = Calendar.getInstance();
 		try {
-			lastCheck.setTime(DATE_FORMAT.parse(PreferencesManager.get(PreferencesManager.HIDDEN_CONFIG_LASTCHECKDATE)));
+			lastCheck.setTime(recoverLastCheck());
 		} catch (final Exception e) {
 			LOGGER.warning("No se ha podido recuperar la fecha de la ultima comprobacion de version"); //$NON-NLS-1$
 			lastCheck.set(Calendar.YEAR, 2000);
 		}
 		return lastCheck;
+	}
+
+	private static void saveLastCheck(final Date lastCheckDate) {
+		final String dateText = DATE_FORMAT.format(lastCheckDate);
+		Preferences.userRoot().node(KEY_PREFERENCE_PATH).put(
+				PROPERTY_LASTCHECKDATE, dateText);
+	}
+
+	private static Date recoverLastCheck() throws ParseException {
+		final String dateText = Preferences.userRoot().node(KEY_PREFERENCE_PATH).get(PROPERTY_LASTCHECKDATE, null);
+		return dateText == null ? null : DATE_FORMAT.parse(dateText);
 	}
 }

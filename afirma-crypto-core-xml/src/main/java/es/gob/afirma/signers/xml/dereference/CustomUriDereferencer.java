@@ -31,7 +31,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.signers.xml.Utils;
@@ -51,6 +53,8 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	private static final String DEFAULT_APACHE_NODESET_DATA = "org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
 
 	private final URIDereferencer defaultUriDereferencer;
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Crea un dereferenciador a medida que act&uacute;a solo cuando falla el dereferenciador por defecto. */
 	public CustomUriDereferencer() {
@@ -97,16 +101,24 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			// Si la referencia es http o https salimos, esta clase es para referencias dentro del mismo contexto XML
 			final String uri = domRef.getURI();
 			if (uri.startsWith("http://") || uri.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-				Logger.getLogger("es.gob.afirma").info("Se ha pedido dereferenciar una URI externa: " + uri);  //$NON-NLS-1$//$NON-NLS-2$
-				final byte[] externalContent;
+				LOGGER.info("Se ha pedido dereferenciar una URI externa: " + uri);  //$NON-NLS-1$
+				byte[] externalContent;
+				final SSLErrorProcessor errorProcessor = new SSLErrorProcessor();
 				try {
-					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrl(uri, UrlHttpMethod.GET);
+					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrl(uri, UrlHttpMethod.GET, errorProcessor);
 				}
 				catch (final Exception e1) {
+					if (errorProcessor.isCancelled()) {
+						LOGGER.info("El usuario no permite la importacion del certificado SSL de confianza para referenciar los datos desde el dominio " //$NON-NLS-1$
+								+ LoggerUtil.getTrimStr(uri));
+					} else {
+						LOGGER.severe("No se han podido derreferenciar los datos desde " + LoggerUtil.getTrimStr(uri) + ": " + e1); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 					throw new URIReferenceException(
-						"No se ha podido descargar manualmente el contenido externo (" + e + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+						"No se ha podido descargar el contenido externo (" + LoggerUtil.getTrimStr(uri) + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
+
 				try {
 					return getStreamData(
 							SecureXmlBuilder.getSecureDocumentBuilder().parse(

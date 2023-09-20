@@ -93,9 +93,12 @@ final class ProtocolInvocationLauncherBatch {
         }
 
 		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
-		AOKeyStore aoks;
+		AOKeyStore aoks = null;
 		if (useDefaultStore) {
-			aoks = AOKeyStore.getKeyStore(PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE));
+			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
+			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
+				aoks = AOKeyStore.getKeyStore(defaultStore);
+			}
 		} else {
 			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		}
@@ -220,8 +223,8 @@ final class ProtocolInvocationLauncherBatch {
 							options.getBatchPresignerUrl(),
 							options.getBatchPostSignerUrl(),
 							pke.getCertificateChain(),
-							pke.getPrivateKey()
-							);
+							pke.getPrivateKey(),
+							options.getExtraParams());
 				}
 			} else {
 				batchResult = BatchSigner.signXML(
@@ -229,8 +232,8 @@ final class ProtocolInvocationLauncherBatch {
 						options.getBatchPresignerUrl(),
 						options.getBatchPostSignerUrl(),
 						pke.getCertificateChain(),
-						pke.getPrivateKey()
-						);
+						pke.getPrivateKey(),
+						options.getExtraParams());
 			}
 		}
 		catch (final AOCancelledOperationException e) {

@@ -268,19 +268,4 @@ public final class AOFileUtils {
 	private static AclFileAttributeView getAclAttributes(final File file) {
 	    return Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
 	}
-
-	/**
-	 * Obtiene la ACL con los permisos del fichero indicado.
-	 * @param file Fichero del que obtener los permisos.
-	 * @return ACL asociada al fichero.
-	 */
-	private static void setAclAttributes(final File file, final AclFileAttributeView aclView) {
-		final AclFileAttributeView aclFileView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
-		try {
-			aclFileView.setAcl(aclView.getAcl());
-		} catch (final IOException e) {
-			LOGGER.log(Level.WARNING, "No se pudo establecer la ACL de permisos sobre el fichero " //$NON-NLS-1$
-					+ LoggerUtil.getCleanUserHomePath(file.getAbsolutePath()), e);
-		}
-	}
 }

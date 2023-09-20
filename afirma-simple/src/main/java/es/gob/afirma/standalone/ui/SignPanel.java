@@ -755,13 +755,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		for (final SignOperationConfig signConfig : signConfigs) {
 			if (signConfig.getFileType() == FileType.SIGN_CADES) {
 				if (cadesCryptoOp == null) {
-					cadesCryptoOp = getCadesCryptoOperation();
+					cadesCryptoOp = getCryptoOperation(PreferencesManager.PREFERENCE_CADES_MULTISIGN);
 				}
 				signConfig.setCryptoOperation(cadesCryptoOp);
 			}
 			else if (signConfig.getFileType() == FileType.SIGN_XADES) {
 				if (xadesCryptoOp == null) {
-					xadesCryptoOp = getXadesCryptoOperation();
+					xadesCryptoOp = getCryptoOperation(PreferencesManager.PREFERENCE_XADES_MULTISIGN);
 				}
 				signConfig.setCryptoOperation(xadesCryptoOp);
 			}
@@ -769,27 +769,16 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	}
 
 	/**
-	 * Obtiene la operaci&oacute;n de multifirma que se debe realizar sobre las firmas CAdES.
+	 * Obtiene la operaci&oacute;n de multifirma que se debe realizar.
+	 * @param pref Preferencia que indica la operacion a realizar.
 	 * @return Operaci&oacute;n criptogr&aacute;fica (cofirma, contrafirma de hoja o contrafirma
 	 * de todo el &aacute;rbol).
 	 */
-	private static CryptoOperation getCadesCryptoOperation() {
-		return PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COSIGN)
+	private static CryptoOperation getCryptoOperation(final String pref) {
+		final String multiSign = PreferencesManager.get(pref);
+		return PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign)
 				? CryptoOperation.COSIGN
-				: PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_MULTISIGN_COUNTERSIGN_LEAFS)
-					? CryptoOperation.COUNTERSIGN_LEAFS
-					: CryptoOperation.COUNTERSIGN_TREE;
-	}
-
-	/**
-	 * Obtiene la operaci&oacute;n de multifirma que se debe realizar sobre las firmas XAdES.
-	 * @return Operaci&oacute;n criptogr&aacute;fica (cofirma, contrafirma de hoja o contrafirma
-	 * de todo el &aacute;rbol).
-	 */
-	private static CryptoOperation getXadesCryptoOperation() {
-		return PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COSIGN)
-				? CryptoOperation.COSIGN
-				: PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_XADES_MULTISIGN_COUNTERSIGN_LEAFS)
+				: PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign)
 					? CryptoOperation.COUNTERSIGN_LEAFS
 					: CryptoOperation.COUNTERSIGN_TREE;
 	}

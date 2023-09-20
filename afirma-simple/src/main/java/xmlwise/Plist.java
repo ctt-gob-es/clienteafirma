@@ -25,7 +25,7 @@ public final class Plist
 	/**
 	 * All element types possible for a plist.
 	 */
-	private static enum ElementType
+	private enum ElementType
 	{
 		INTEGER,
 		STRING,
@@ -41,8 +41,8 @@ public final class Plist
 	private static final String BASE64_STRING
 			= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; //$NON-NLS-1$
 	private static final char[] BASE64_CHARS = BASE64_STRING.toCharArray();
-	private final DateFormat m_dateFormat;
-	private final Map<Class<?>, ElementType> m_simpleTypes;
+	private static DateFormat m_dateFormat = null;
+	private static Map<Class<?>, ElementType> m_simpleTypes = null;
 
 	/**
 	 * Utility method to close a closeable.
@@ -78,22 +78,22 @@ public final class Plist
 	/**
 	 * Create a plist handler.
 	 */
-	Plist()
+	static
 	{
-		this.m_dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-		this.m_dateFormat.setTimeZone(TimeZone.getTimeZone("Z")); //$NON-NLS-1$
-		this.m_simpleTypes = new HashMap<>();
-		this.m_simpleTypes.put(Integer.class, ElementType.INTEGER);
-		this.m_simpleTypes.put(Byte.class, ElementType.INTEGER);
-		this.m_simpleTypes.put(Short.class, ElementType.INTEGER);
-		this.m_simpleTypes.put(Short.class, ElementType.INTEGER);
-		this.m_simpleTypes.put(Long.class, ElementType.INTEGER);
-		this.m_simpleTypes.put(String.class, ElementType.STRING);
-		this.m_simpleTypes.put(Float.class, ElementType.REAL);
-		this.m_simpleTypes.put(Double.class, ElementType.REAL);
-		this.m_simpleTypes.put(byte[].class, ElementType.DATA);
-		this.m_simpleTypes.put(Boolean.class, ElementType.TRUE);
-		this.m_simpleTypes.put(Date.class, ElementType.DATE);
+		Plist.m_dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+		Plist.m_dateFormat.setTimeZone(TimeZone.getTimeZone("Z")); //$NON-NLS-1$
+		Plist.m_simpleTypes = new HashMap<>();
+		Plist.m_simpleTypes.put(Integer.class, ElementType.INTEGER);
+		Plist.m_simpleTypes.put(Byte.class, ElementType.INTEGER);
+		Plist.m_simpleTypes.put(Short.class, ElementType.INTEGER);
+		Plist.m_simpleTypes.put(Short.class, ElementType.INTEGER);
+		Plist.m_simpleTypes.put(Long.class, ElementType.INTEGER);
+		Plist.m_simpleTypes.put(String.class, ElementType.STRING);
+		Plist.m_simpleTypes.put(Float.class, ElementType.REAL);
+		Plist.m_simpleTypes.put(Double.class, ElementType.REAL);
+		Plist.m_simpleTypes.put(byte[].class, ElementType.DATA);
+		Plist.m_simpleTypes.put(Boolean.class, ElementType.TRUE);
+		Plist.m_simpleTypes.put(Date.class, ElementType.DATE);
 	}
 
 	/**
@@ -103,9 +103,9 @@ public final class Plist
 	 * Map or List.
 	 * @return an <tt>XmlElement</tt> containing the serialized version of the object.
 	 */
-	XmlElement objectToXml(final Object o)
+	public static XmlElement objectToXml(final Object o)
 	{
-		final ElementType type = this.m_simpleTypes.get(o.getClass());
+		final ElementType type = Plist.m_simpleTypes.get(o.getClass());
 		if (type != null)
 		{
 			switch (type) {
@@ -116,7 +116,7 @@ public final class Plist
 				case TRUE:
 					return new XmlElement(((Boolean) o).booleanValue() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
 				case DATE:
-					return new XmlElement("date", this.m_dateFormat.format((Date) o)); //$NON-NLS-1$
+					return new XmlElement("date", m_dateFormat.format((Date) o)); //$NON-NLS-1$
 				case STRING:
 					return new XmlElement("string", (String) o); //$NON-NLS-1$
 				case DATA:
@@ -142,7 +142,7 @@ public final class Plist
 	 * @param list the list to convert.
 	 * @return an <tt>XmlElement</tt> representing the list.
 	 */
-	private XmlElement toXmlArray(final List<Object> list) {
+	private static XmlElement toXmlArray(final List<Object> list) {
 		final XmlElement array = new XmlElement("array"); //$NON-NLS-1$
 		for (final Object o : list) {
 			array.add(objectToXml(o));
@@ -156,7 +156,7 @@ public final class Plist
 	 * @param map the map to convert, assumed to have string keys.
 	 * @return an <tt>XmlElement</tt> representing the map.
 	 */
-	private XmlElement toXmlDict(final Map<String, Object> map) {
+	 private static XmlElement toXmlDict(final Map<String, Object> map) {
 		final XmlElement dict = new XmlElement("dict"); //$NON-NLS-1$
 		for (final Map.Entry<String, Object> entry : map.entrySet()) {
 			dict.add(new XmlElement("key", entry.getKey())); //$NON-NLS-1$
@@ -214,7 +214,7 @@ public final class Plist
 			case STRING:
 				return element.getValue();
 			case DATE:
-				return this.m_dateFormat.parse(element.getValue());
+				return Plist.m_dateFormat.parse(element.getValue());
 			case DATA:
 				return base64decode(element.getValue());
 			case ARRAY:

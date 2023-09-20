@@ -26,8 +26,11 @@ import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.TriphaseUtil;
@@ -73,7 +76,20 @@ final class PostSigner {
 			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 		}
 
-		return urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
+		byte[] data;
+		final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
+		try {
+			data = urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST, errorProcessor);
+		} catch (final IOException e) {
+			if (errorProcessor.isCancelled()) {
+				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+						"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
+						+ LoggerUtil.getTrimStr(signServerUrl.toString()));
+			}
+			throw e;
+		}
+
+		return data;
 	}
 
 }

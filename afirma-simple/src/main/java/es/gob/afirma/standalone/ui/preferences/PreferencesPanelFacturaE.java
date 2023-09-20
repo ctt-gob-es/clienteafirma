@@ -45,6 +45,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 /** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de facturaE.
  * @author Mariano Mart&iacute;nez. */
@@ -401,23 +402,23 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 
 	void loadDefaultPreferences() {
 		this.facturaeRol.setSelectedItem(
-			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNER_ROLE)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE, PreferencesSource.DEFAULT)
 		);
 
 		this.facturaeSignatureProductionCity.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY, PreferencesSource.DEFAULT)
 		);
 
 		this.facturaeSignatureProductionProvince.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, PreferencesSource.DEFAULT)
 		);
 
 		this.facturaeSignatureProductionPostalCode.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE, PreferencesSource.DEFAULT)
 		);
 
 		this.facturaeSignatureProductionCountry.setText(
-			PreferencesManager.getDefaultPreference(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY)
+			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY, PreferencesSource.DEFAULT)
 		);
 
 		final List<PolicyItem> facturaePolicies = new ArrayList<>();
@@ -484,7 +485,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		}
 		// Si no, establecemos la configuracion por defecto
 		else {
-			final String policy = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY);
+			final String policy = PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY, PreferencesSource.DEFAULT);
 			if (policy.equals(POLICY_FACTURAE_30_NAME)) {
 				adesPolicy = POLICY_FACTURAE_30;
 			}
@@ -494,7 +495,6 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		}
 
 		return adesPolicy;
-
 	}
 
 	void checkPreferences() throws AOException {

@@ -61,6 +61,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
 final class PreferencesPanelPades extends JScrollPane {
@@ -196,6 +197,7 @@ final class PreferencesPanelPades extends JScrollPane {
                 }
 			}
 		});
+		this.checkShadowAttack.addItemListener(modificationListener);
     	this.checkShadowAttack.addKeyListener(keyListener);
 
 		// Una vez creados todos los componentes, cargamos la configuracion
@@ -533,13 +535,13 @@ final class PreferencesPanelPades extends JScrollPane {
 	 * firmas PAdES desde un fichero externo de preferencias. */
 	void loadDefaultPreferences() {
 
-		this.padesSignReason.setText(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_SIGN_REASON));
-		this.padesSignProductionCity.setText(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_SIGN_PRODUCTION_CITY));
-		this.padesSignerContact.setText(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_SIGNER_CONTACT));
-		this.visiblePdfSignature.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_VISIBLE));
-		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
-		this.visiblePdfStamp.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_STAMP));
-		this.checkShadowAttack.setSelected(PreferencesManager.getBooleanDefaultPreference(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
+		this.padesSignReason.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_REASON, PreferencesSource.DEFAULT));
+		this.padesSignProductionCity.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, PreferencesSource.DEFAULT));
+		this.padesSignerContact.setText(PreferencesManager.get(PREFERENCE_PADES_SIGNER_CONTACT, PreferencesSource.DEFAULT));
+		this.visiblePdfSignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_VISIBLE, PreferencesSource.DEFAULT));
+		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO, PreferencesSource.DEFAULT));
+		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP, PreferencesSource.DEFAULT));
+		this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, PreferencesSource.DEFAULT));
 
         if (this.padesBasicFormat.getItemCount() > 0) {
 			this.padesBasicFormat.setSelectedIndex(0);
@@ -547,7 +549,7 @@ final class PreferencesPanelPades extends JScrollPane {
 
         // Solo se reestablece el valor al por defecto, si no se ha bloqueado la edicion de la interfaz
 		if (!isBlocked()) {
-			final String selectedValue = PreferencesManager.getDefaultPreference(PREFERENCE_PADES_FORMAT);
+			final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT, PreferencesSource.DEFAULT);
 			final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
 			for (int i = 0; i < padesFormatModel.getSize(); i++) {
 				if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
@@ -618,16 +620,16 @@ final class PreferencesPanelPades extends JScrollPane {
 		// Si no, devolvemos la configuracion por defecto
 		else {
 			try {
-				if (PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER) == null
-						|| PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER).isEmpty()) {
+				if (PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT) == null
+						|| PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT).isEmpty()) {
 					this.padesPolicyDlg.loadPolicy(null);
 				}
 				else {
 					this.padesPolicyDlg.loadPolicy(
-						new AdESPolicy(PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_IDENTIFIER),
-							PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_HASH),
-							PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
-							PreferencesManager.getDefaultPreference(PREFERENCE_PADES_POLICY_QUALIFIER)
+						new AdESPolicy(PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT),
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH, PreferencesSource.DEFAULT),
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH_ALGORITHM, PreferencesSource.DEFAULT),
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER, PreferencesSource.DEFAULT)
 						)
 					);
 				}

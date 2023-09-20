@@ -16,7 +16,42 @@ import java.util.Properties;
  * @author Carlos Gamuci */
 public interface UrlHttpManager {
 
-	/** Lee una URL HTTP o HTTPS estableciendo un tiempo m&aacute;ximo para la comunicaci&oacute;n.
+	/**
+	 * Lee una URL HTTP o HTTPS.
+	 * @param url URL a leer.
+	 * @param method M&eacute;todo HTTP.
+	 * @return Contenido de la URL.
+	 * @throws IOException Si no se puede leer la URL.
+	 */
+	byte[] readUrl(final String url, final UrlHttpMethod method) throws IOException;
+
+	/**
+	 * Lee una URL HTTP o HTTPS.
+	 * @param url URL a leer.
+	 * @param method M&eacute;todo HTTP.
+	 * @param processor Procesador de errores en la conexi&oacute;n.
+	 * @return Contenido de la URL.
+	 * @throws IOException Si no se puede leer la URL.
+	 */
+	byte[] readUrl(final String url, final UrlHttpMethod method, final HttpErrorProcessor processor) throws IOException;
+
+	/**
+	 * Lee una URL HTTP o HTTPS.
+	 * @param url URL a leer.
+	 * @param timeout Tiempo m&aacute;ximo en milisegundos para la conexi&oacute;n. El valor 0
+	 * indica tiempo infinito y -1 el por defecto de Java.
+	 * @param method M&eacute;todo HTTP.
+	 * @param requestProperties Propiedades a usar en la cabecera de la petici&oacute;n HTTP.
+	 * @return Contenido de la URL.
+	 * @throws IOException Si no se puede leer la URL.
+	 */
+	byte[] readUrl(final String url,
+		           final int timeout,
+			       final UrlHttpMethod method,
+			       final Properties requestProperties) throws IOException;
+
+	/**
+	 * Lee una URL HTTP o HTTPS estableciendo un tiempo m&aacute;ximo para la comunicaci&oacute;n.
 	 * Los par&aacute;metros se indican en la URL.
 	 * @param url URL a leer
 	 * @param timeout Tiempo m&aacute;ximo en milisegundos para la conexi&oacute;n. El valor 0
@@ -25,30 +60,30 @@ public interface UrlHttpManager {
 	 * @param accept Tipo de contenido que se acepta como respuesta.
 	 * @param method M&eacute;todo HTTP.
 	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
+	 * @throws IOException Si no se puede leer la URL.
+	 */
 	byte[] readUrl(final String url,
 			       final int timeout,
 			       final String contentType,
 			       final String accept,
 			       final UrlHttpMethod method) throws IOException;
 
-	/** Lee una URL HTTP o HTTPS.
-	 * @param url URL a leer.
-	 * @param method M&eacute;todo HTTP.
-	 * @return Contenido de la URL.
-	 * @throws IOException Si no se puede leer la URL */
-	byte[] readUrl(final String url, final UrlHttpMethod method) throws IOException;
-
-	/** Lee una URL HTTP o HTTPS.
-	 * @param url URL a leer.
+	/**
+	 * Lee una URL HTTP o HTTPS.
+	 * @param url URL a leer
 	 * @param timeout Tiempo m&aacute;ximo en milisegundos para la conexi&oacute;n. El valor 0
 	 * indica tiempo infinito y -1 el por defecto de Java.
+	 * @param contentType Content-Type a insertar en la cabecera de la petici&oacute;n HTTP.
+	 * @param accept Tipo de contenido que se acepta como respuesta.
 	 * @param method M&eacute;todo HTTP.
-	 * @param requestProperties Propiedades a usar en la cabecera de la petici&oacute;n HTTP.
+	 * @param processor Procesador de errores en la conexi&oacute;n.
 	 * @return Contenido de la URL.
-	 * @throws IOException Si no se puede leer la URL */
+	 * @throws IOException Si no se puede leer la URL.
+	 */
 	byte[] readUrl(final String url,
-		           final int timeout,
-			       final UrlHttpMethod method,
-			       final Properties requestProperties) throws IOException;
+		       final int timeout,
+		       final String contentType,
+		       final String accept,
+		       final UrlHttpMethod method,
+		       final HttpErrorProcessor processor) throws IOException;
 }

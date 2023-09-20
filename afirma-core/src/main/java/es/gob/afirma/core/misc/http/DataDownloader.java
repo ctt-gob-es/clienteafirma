@@ -20,8 +20,11 @@ import java.net.URL;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 
 /** Utilidades para la descarga de datos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -81,7 +84,17 @@ public final class DataDownloader {
 
 		// Miramos primero si los datos son una URL, en cuyo caso descargamos los datos
 		if (dataSource.startsWith("http://") || dataSource.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-			return UrlHttpManagerFactory.getInstalledManager().readUrl(dataSource, UrlHttpMethod.GET);
+			final SSLErrorProcessor processor = new SSLErrorProcessor();
+			try {
+				return UrlHttpManagerFactory.getInstalledManager().readUrl(dataSource, UrlHttpMethod.GET, processor);
+			} catch (final SSLHandshakeException e) {
+				if (processor.isCancelled()) {
+					LOGGER.info("El usuario no permite la importacion del certificado SSL de confianza para el acceso a " //$NON-NLS-1$
+							+ LoggerUtil.getTrimStr(dataSource));
+				}
+				throw e;
+
+			}
 		}
 
 		if (dataSource.startsWith("ftp://")) { //$NON-NLS-1$

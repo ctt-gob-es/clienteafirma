@@ -58,9 +58,9 @@ public final class SignSaverHttpPost implements SignSaver {
 			this.url += "?"; //$NON-NLS-1$
 		}
 		UrlHttpManagerFactory.getInstalledManager().readUrl(
-			this.url + "&" + this.param + "=" + Base64.encode(dataToSave, true), //$NON-NLS-1$ //$NON-NLS-2$
-			UrlHttpMethod.POST
-		);
+				this.url + "&" + this.param + "=" + Base64.encode(dataToSave, true), //$NON-NLS-1$ //$NON-NLS-2$
+				UrlHttpMethod.POST
+				);
 	}
 
 	@Override

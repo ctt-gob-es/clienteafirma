@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 class DefaultFormatPanel extends JPanel {
 
@@ -212,12 +213,12 @@ class DefaultFormatPanel extends JPanel {
 	 * Carga los valores por defecto de los campos del di&aacute;logo.
 	 */
 	void resetPreferences() {
-		this.pdfFilesCombo.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF));
-		this.ooxmlFilesCombo.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML));
-		this.facturaeFilesCombo.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE));
-		this.odfFilesCombo.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF));
-		this.xmlFilesCombo.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML));
-		this.binFilesCombo.setSelectedItem(PreferencesManager.getDefaultPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN));
+		this.pdfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, PreferencesSource.DEFAULT));
+		this.ooxmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML, PreferencesSource.DEFAULT));
+		this.facturaeFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE, PreferencesSource.DEFAULT));
+		this.odfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, PreferencesSource.DEFAULT));
+		this.xmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, PreferencesSource.DEFAULT));
+		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, PreferencesSource.DEFAULT));
 	}
 
 	/**

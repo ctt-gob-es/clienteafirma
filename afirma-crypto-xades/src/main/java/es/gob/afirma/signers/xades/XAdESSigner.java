@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.MessageDigest;
@@ -50,7 +51,9 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -1012,7 +1015,7 @@ public final class XAdESSigner {
 				}
 				// Si no se tiene la huella, habra que crear la referencia a partir de la URI
 				else {
-					ref = createExternalReferenceFromUri(refData.getUri(), fac, digestMethod, referenceId);
+					ref = createExternalReferenceFromUri(refData.getUri(), fac, digestMethod, referenceId, extraParams);
 				}
 				referenceList.add(ref);
 			}
@@ -1557,6 +1560,7 @@ public final class XAdESSigner {
 	 * @param fac Factor&iacute;a de firmas XML.
 	 * @param digestMethod Identificador del algoritmo de huella digital.
 	 * @param referenceId Identificador que se asignara a la nueva referencia.
+	 * @param extraParams Configuraci&oacute;n de la operaci&oacute;n de firma.
 	 * @return Referencia a datos.
 	 * @throws AOException Cuando falla la creaci&oacute;n de la referencia.
 	 */
@@ -1564,7 +1568,8 @@ public final class XAdESSigner {
 			final String uri,
 			final XMLSignatureFactory fac,
 			final DigestMethod digestMethod,
-			final String referenceId) throws AOException {
+			final String referenceId,
+			final Properties extraParams) throws AOException {
 
 		final Reference ref;
 
@@ -1600,7 +1605,20 @@ public final class XAdESSigner {
 			try {
 
 				final UrlHttpManager httpManager = UrlHttpManagerFactory.getInstalledManager();
-				final byte[] data = httpManager.readUrl(uri, UrlHttpMethod.GET);
+
+				byte[] data;
+				final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
+				try {
+					data = httpManager.readUrl(uri, UrlHttpMethod.GET, errorProcessor);
+				} catch (final IOException e) {
+					if (errorProcessor.isCancelled()) {
+						LOGGER.info(
+								"El usuario no permite la importacion del certificado SSL de confianza de un recurso externo en: " //$NON-NLS-1$
+								+ LoggerUtil.getTrimStr(uri));
+					}
+					throw new AOException("Error en la recuperacion de un recurso externo: " + e, e); //$NON-NLS-1$
+				}
+
 				final byte[] md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm()))
 						.digest(data);
 

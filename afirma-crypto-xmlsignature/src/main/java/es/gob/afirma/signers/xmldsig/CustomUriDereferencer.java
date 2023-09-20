@@ -142,7 +142,10 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			final String uri = domRef.getURI();
 			if (uri.startsWith("http://") || uri.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 				Logger.getLogger("es.gob.afirma").info("Se ha pedido dereferenciar una URI externa: " + uri);  //$NON-NLS-1$//$NON-NLS-2$
-				final byte[] externalContent;
+
+				// Descargamos el contenido externo. No configuramos el SSLErrorProcessor en la llamada, ya que
+				// nunca vamos a dejar importar los datos remotos en este caso si el SSL no es de confianza
+				byte[] externalContent;
 				try {
 					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrl(uri, UrlHttpMethod.GET);
 				}

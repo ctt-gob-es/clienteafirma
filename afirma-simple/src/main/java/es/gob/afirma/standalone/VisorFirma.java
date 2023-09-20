@@ -76,7 +76,7 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
 
         // Cargamos las preferencias establecidas
-        String defaultLocale = PreferencesManager.getDefaultPreference(PreferencesManager.PREFERENCES_LOCALE);
+        String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
 			defaultLocale = Locale.getDefault().toString();
 		}

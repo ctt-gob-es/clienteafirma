@@ -99,17 +99,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		return readUrl(url, DEFAULT_TIMEOUT, null, null, method);
 	}
 
-	private static boolean isLocal(final URL url) {
-		if (url == null) {
-			throw new IllegalArgumentException("La URL no puede ser nula"); //$NON-NLS-1$
-		}
-		try {
-			return InetAddress.getByName(url.getHost()).isLoopbackAddress();
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Error comprobando si una URL es el bucle local: " + e); //$NON-NLS-1$
-			return false;
-		}
+	@Override
+	public byte[] readUrl(final String url, final UrlHttpMethod method, final HttpErrorProcessor processor) throws IOException {
+		return readUrl(url, DEFAULT_TIMEOUT, null, null, method, processor);
 	}
 
 	@Override
@@ -130,9 +122,41 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	@Override
 	public byte[] readUrl(final String urlToRead,
+			final int timeout,
+			final String contentType,
+			final String accept,
+			final UrlHttpMethod method,
+			final HttpErrorProcessor httpProcessor) throws IOException {
+		final Properties headers = new Properties();
+		if (contentType != null) {
+			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
+		}
+		if (accept != null) {
+			headers.setProperty(ACCEPT, accept);
+		}
+//		if (httpProcessor != null) {
+//			return httpProcessor.processHttpError(urlToRead, timeout, contentType, accept, method);
+//		}
+		return readUrl(urlToRead, timeout, method, headers, httpProcessor);
+	}
+
+	@Override
+	public byte[] readUrl(final String urlToRead,
 	                      final int timeout,
 		                  final UrlHttpMethod method,
 		                  final Properties requestProperties) throws IOException {
+		return readUrl(urlToRead, timeout, method, requestProperties, null);
+	}
+
+
+
+	public byte[] readUrl(final String urlToRead,
+	                      final int timeout,
+		                  final UrlHttpMethod method,
+		                  final Properties requestProperties,
+		                  final HttpErrorProcessor httpProcessor) throws IOException {
+
+
 		if (urlToRead == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
@@ -184,19 +208,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		);
 		final boolean isSecureDomain = checkIsSecureDomain(uri);
 
-		if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
-			try {
-				disableSslChecks();
-				LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
-			}
-			catch(final Exception e) {
-				LOGGER.warning(
-					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-				);
-			}
-		}
-
-		byte[] data;
+		final byte[] data;
 		try {
 			final HttpURLConnection conn;
 			if (Platform.OS.ANDROID.equals(Platform.getOS()) || isLocal(uri)) {
@@ -262,6 +274,18 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn.setConnectTimeout(timeout);
 			}
 
+			if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
+				try {
+					disableSslChecks();
+					LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
+				}
+				catch(final Exception e) {
+					LOGGER.warning(
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+					);
+				}
+			}
+
 			conn.connect();
 			final int resCode = conn.getResponseCode();
 			final String statusCode = Integer.toString(resCode);
@@ -291,6 +315,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
 			}
+
+			if (httpProcessor != null) {
+				return httpProcessor.processHttpError(e, this, url, timeout, method, requestProperties);
+			}
+
 			throw e;
 		}
 
@@ -299,6 +328,25 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		return data;
+	}
+
+	/**
+	 * Indica si la URL a la que se desea acceder est&aacute; en el bucle
+	 * local (127.0.0.1/localhost).
+	 * @param url Url que se desea comprobar.
+	 * @return {@code true} si es una URL local, {@code false} en caso contrario.
+	 */
+	private static boolean isLocal(final URL url) {
+		if (url == null) {
+			throw new IllegalArgumentException("La URL no puede ser nula"); //$NON-NLS-1$
+		}
+		try {
+			return InetAddress.getByName(url.getHost()).isLoopbackAddress();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("Error comprobando si una URL es el bucle local: " + e); //$NON-NLS-1$
+			return false;
+		}
 	}
 
 	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su

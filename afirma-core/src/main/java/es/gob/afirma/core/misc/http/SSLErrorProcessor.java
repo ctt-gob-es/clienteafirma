@@ -1,0 +1,160 @@
+package es.gob.afirma.core.misc.http;
+
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.net.URL;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLHandshakeException;
+import javax.swing.JOptionPane;
+
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.CoreMessages;
+
+/**
+ * Procesa los errores de confianza en los certificados servidor para permitir a los usuarios importar
+ * esos certificados en un almacen de confianza.
+ */
+public class SSLErrorProcessor implements HttpErrorProcessor {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String PROPERTY_HEADLESS = "headless"; //$NON-NLS-1$
+
+	private static final String PROPERTY_SSL_HEADLESS = "sslOmitImportationDialog"; //$NON-NLS-1$
+
+	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
+
+	private boolean cancelled = false;
+	private boolean headless;
+
+	public SSLErrorProcessor() {
+		this.headless = false;
+	}
+
+	public SSLErrorProcessor(final Properties params) {
+		// Comprobamos si directamente nos indican que no se use entorno grafico
+		this.headless = params != null
+				&& (Boolean.parseBoolean(params.getProperty(PROPERTY_HEADLESS)) ||
+						Boolean.parseBoolean(params.getProperty(PROPERTY_SSL_HEADLESS)));
+
+		// Si podemos usar entornos grafico por lo indicado en la operacion,
+		// comprobamos ahora si realmente lo tenemos disponible para poder usarlo
+		if (!this.headless) {
+			boolean headlessEnviroment = false;
+			try {
+				headlessEnviroment = GraphicsEnvironment.isHeadless();
+			}
+			catch (final Exception e) {
+				headlessEnviroment = true;
+			}
+			this.headless = headlessEnviroment;
+		}
+	}
+
+	public SSLErrorProcessor(final boolean headless) {
+		this.headless = headless;
+	}
+
+	@Override
+	public byte[] processHttpError(final IOException cause, final UrlHttpManager urlManager,
+			final String url, final int timeout, final UrlHttpMethod method,
+			final Properties requestProperties) throws IOException {
+
+		// Si la excepcion no es la que debemos tratar, relanzamos la excepcion sin hacer nada mas
+		if (!(cause instanceof SSLHandshakeException)) {
+			throw cause;
+		}
+
+		// Si se nos ha pedido no mostrar dialogos, relanzamos la excepcion
+		if (this.headless) {
+			LOGGER.info("No se confia en el certificado SSL, pero no se pueden mostrar dialogos para importarlo en el almacen de confianza"); //$NON-NLS-1$
+			throw cause;
+		}
+
+		int userResponse;
+		try {
+			userResponse = AOUIFactory.showConfirmDialog(null,
+					CoreMessages.getString("SSLRequestPermissionDialog.2", new URL(url).getHost()), //$NON-NLS-1$
+					CoreMessages.getString("SSLRequestPermissionDialog.1"), //$NON-NLS-1$
+					AOUIFactory.YES_NO_OPTION,
+					AOUIFactory.WARNING_MESSAGE);
+		}
+		catch (final AOCancelledOperationException ex) {
+			this.cancelled = true;
+			throw cause;
+		}
+		catch (final Exception ex) {
+			throw cause;
+		}
+
+		if (userResponse != JOptionPane.YES_OPTION) {
+			LOGGER.info("El usuario no importo el certificado en el almacen de confianza"); //$NON-NLS-1$
+			this.cancelled = true;
+			throw cause;
+		}
+
+		// Descargamos los certificados SSL del servidor
+		X509Certificate[] serverCerts;
+		try {
+			serverCerts = downloadFromRemoteServer(url);
+		} catch (final Exception e) {
+			LOGGER.severe("Error al descargar certificados SSL del servidor: " + e); //$NON-NLS-1$
+			throw new IOException(e);
+		}
+
+		// Configuramos los certificados SSL en el almacen de confianza
+		try {
+			TrustStoreManager.getInstance().importCerts(serverCerts);
+		} catch (final Exception e) {
+			LOGGER.severe("Error al importar los certificados SSL en el almacen de confianza: " + e); //$NON-NLS-1$
+			throw new IOException(e);
+		}
+
+		// Reconfiguramos el contexto SSL para que tenga en cuenta los nuevos certificados
+		try {
+			SslSecurityManager.configureTrustManagers();
+		} catch (final Exception e) {
+			LOGGER.severe("Error reconfigurando el contexto SSL con los nuevos certificados: " + e); //$NON-NLS-1$
+			throw new IOException(e);
+		}
+
+		// Reintentamos la conexion
+		return urlManager.readUrl(url, timeout, method, requestProperties);
+	}
+
+	private static X509Certificate[] downloadFromRemoteServer(final String domainName) throws Exception {
+
+		final URL url = new URL(domainName);
+		UrlHttpManagerImpl.disableSslChecks();
+		final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		conn.connect();
+		final Certificate[] trustedServerCerts = conn.getServerCertificates();
+		conn.disconnect();
+		UrlHttpManagerImpl.enableSslChecks();
+
+		X509Certificate[] certsToImport;
+		if (trustedServerCerts.length > 1) {
+			certsToImport = new X509Certificate[trustedServerCerts.length - 1];
+
+			// Solo se obtienen los certificados emisores
+			for (int i = 1 ; i < trustedServerCerts.length ; i++) {
+				certsToImport[i - 1] = (X509Certificate) trustedServerCerts[i];
+			}
+		}
+		else {
+			certsToImport = new X509Certificate[] { (X509Certificate) trustedServerCerts[0] };
+		}
+
+		return certsToImport;
+	}
+
+	public boolean isCancelled() {
+		return this.cancelled;
+	}
+}

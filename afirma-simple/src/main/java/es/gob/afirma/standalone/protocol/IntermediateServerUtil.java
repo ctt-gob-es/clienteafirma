@@ -72,13 +72,12 @@ public class IntermediateServerUtil {
 		return send(url);
 	}
 
-	/** Env&iacute;a datos al servidor intermedio.
+	/**
+	 * Hace la llamada al servidor intermedio.
 	 * @param url URL del servicio de guardado.
 	 * @return Respuesta del env&iacute;o.
 	 * @throws IOException Si hay problemas durante el env&iacute;o. */
 	private static byte[] send(final StringBuilder url) throws IOException {
-
-		// Llamamos al servicio para guardar los datos
 		return new HttpManager().readUrl(url.toString(), UrlHttpMethod.POST);
 	}
 

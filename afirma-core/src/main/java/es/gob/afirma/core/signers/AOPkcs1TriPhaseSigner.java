@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -239,12 +240,14 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			throw new AOException("Error decodificando la cadena de certificados: " + e, e); //$NON-NLS-1$
 		}
 
+		final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
+
 		// ---------
 		// PREFIRMA
 		// ---------
 
 		// Empezamos la prefirma
-		final byte[] preSignResult;
+		byte[] preSignResult;
 		try {
 			// Llamamos a una URL pasando como parametros los datos necesarios para
 			// configurar la operacion:
@@ -270,10 +273,15 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 				LOGGER.info("Se llamara por POST a la siguiente URL:\n" + LoggerUtil.getTrimStr(postUrl));  //$NON-NLS-1$
 			}
 
-			preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
+			preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST, errorProcessor);
+
 			urlBuffer.setLength(0);
 		}
 		catch (final IOException e) {
+			if (errorProcessor.isCancelled()) {
+				LOGGER.info("El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
+						+ LoggerUtil.getTrimStr(signServerUrl.toString()));
+			}
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 

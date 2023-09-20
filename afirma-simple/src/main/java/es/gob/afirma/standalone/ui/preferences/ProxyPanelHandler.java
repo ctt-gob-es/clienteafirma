@@ -24,6 +24,7 @@ import es.gob.afirma.standalone.ProxyConfig;
 import es.gob.afirma.standalone.ProxyConfig.ConfigType;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
 
 public class ProxyPanelHandler {
 
@@ -128,7 +129,7 @@ public class ProxyPanelHandler {
 
 		// XXX: Comprobacion por compatibilidad entre AutoFirma 1.7 y anteriores. Si se encuentra configurada
 		// la propiedad antigua, ajustamos la configuracion
-		if (PreferencesManager.getConfiguredProperty(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED) != null) {
+		if (PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED, PreferencesSource.USER) != null) {
 			final boolean selected = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED);
 			if (!selected) {
 				proxyType = ConfigType.SYSTEM;
