@@ -13,9 +13,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
 import javax.swing.JButton;
@@ -24,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
+import es.gob.afirma.core.misc.http.TrustStoreManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -37,13 +35,11 @@ final class VerifyImportCertDialog extends JDialog  {
 	private static final int PREFERRED_HEIGHT = 300;
 
 	private final X509Certificate [] certsToImport;
-	private final KeyStore ks;
 	private final String domain;
 
-	VerifyImportCertDialog(final X509Certificate [] certsToImport, final KeyStore ks, final String domain, final Container parent) {
+	VerifyImportCertDialog(final X509Certificate [] certsToImport, final String domain, final Container parent) {
 		this.certsToImport = certsToImport;
 		this.domain = domain;
-		this.ks = ks;
 	    createUI(parent);
 	}
 
@@ -94,19 +90,19 @@ final class VerifyImportCertDialog extends JDialog  {
 	}
 
 	private void importCerts(final Container parent) {
-		final String trustedCertKSPath = ImportCertificatesDialog.getTrustedCertKSPath();
 
-		try (final OutputStream fos = new FileOutputStream(trustedCertKSPath)) {
+		try {
+			final TrustStoreManager ts = TrustStoreManager.getInstance(parent);
 			if (this.certsToImport.length == 1) {
-				this.ks.setCertificateEntry(this.certsToImport[0].getSubjectDN().toString(), this.certsToImport[0]);
-				this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
+				ts.importCerts(this.certsToImport[0]);
 			} else {
+				final X509Certificate[] certs = new X509Certificate[this.certsToImport.length - 1];
 				for (int i = 1; i < this.certsToImport.length; i++) {
-					this.ks.setCertificateEntry(this.certsToImport[i].getSubjectDN().toString(), this.certsToImport[i]);
-					this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
+					certs[i - 1] = this.certsToImport[i];
 				}
+				ts.importCerts(certs);
 			}
-			this.setVisible(false);
+			setVisible(false);
 		} catch (final Exception e) {
 			AOUIFactory.showErrorMessage(
 					parent,

@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.net.ssl.SSLHandshakeException;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,9 +30,9 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
-import es.gob.afirma.core.misc.http.HttpProcessor;
-import es.gob.afirma.core.misc.http.SSLRequestPermission;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
@@ -404,11 +402,16 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
 
+			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 			try {
-				preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
-			} catch (final SSLHandshakeException sslhe) {
-				final HttpProcessor processor = new SSLRequestPermission(sslhe);
-				preSignResult = UrlHttpManagerFactory.getInstalledManager().readUrl(postUrl, -1, null, null, UrlHttpMethod.POST, processor);
+				preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST, errorProcessor);
+			} catch (final IOException e) {
+				if (errorProcessor.isCancelled()) {
+					LOGGER.info(
+							"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
+							+ LoggerUtil.getTrimStr(signServerUrl.toString()));
+				}
+				throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 			}
 
 			urlBuffer.setLength(0);

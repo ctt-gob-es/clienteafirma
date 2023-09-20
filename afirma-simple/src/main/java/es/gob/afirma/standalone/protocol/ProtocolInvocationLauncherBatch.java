@@ -223,8 +223,8 @@ final class ProtocolInvocationLauncherBatch {
 							options.getBatchPresignerUrl(),
 							options.getBatchPostSignerUrl(),
 							pke.getCertificateChain(),
-							pke.getPrivateKey()
-							);
+							pke.getPrivateKey(),
+							options.getExtraParams());
 				}
 			} else {
 				batchResult = BatchSigner.signXML(
@@ -232,8 +232,8 @@ final class ProtocolInvocationLauncherBatch {
 						options.getBatchPresignerUrl(),
 						options.getBatchPostSignerUrl(),
 						pke.getCertificateChain(),
-						pke.getPrivateKey()
-						);
+						pke.getPrivateKey(),
+						options.getExtraParams());
 			}
 		}
 		catch (final AOCancelledOperationException e) {

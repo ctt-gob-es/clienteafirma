@@ -17,13 +17,11 @@ import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.net.ssl.SSLHandshakeException;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.http.HttpProcessor;
-import es.gob.afirma.core.misc.http.SSLRequestPermission;
+import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -106,18 +104,18 @@ final class PDFTriPhaseSignerUtil {
 			}
 
 			byte[] data;
+			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 			try {
 				data = UrlHttpManagerFactory.getInstalledManager().readUrl(
-						urlBuffer.toString(),
-						UrlHttpMethod.POST
-					);
-			} catch (final SSLHandshakeException sslhe) {
-				final HttpProcessor processor = new SSLRequestPermission(sslhe);
-				try {
-					data = UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), -1, null, null, UrlHttpMethod.POST, processor);
-				} catch (final IOException e1) {
-					throw new AOException("Error en la llamada de prefirma al servidor: " + e1, e1); //$NON-NLS-1$
+						urlBuffer.toString(), UrlHttpMethod.POST, errorProcessor);
+
+			} catch (final IOException e) {
+				if (errorProcessor.isCancelled()) {
+					LOGGER.info(
+							"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
+							+ LoggerUtil.getTrimStr(signServerUrl.toString()));
 				}
+				throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 			}
 
 			return data;
@@ -180,19 +178,19 @@ final class PDFTriPhaseSignerUtil {
 				append(AOUtil.properties2Base64(extraParams));
 			}
 
+			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 			try {
 				triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(
-					urlBuffer.toString(),
-					UrlHttpMethod.POST
-				);
-			} catch (final SSLHandshakeException sslhe) {
-				final HttpProcessor processor = new SSLRequestPermission(sslhe);
-				try {
-					triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), -1, null, null, UrlHttpMethod.POST, processor);
-				} catch (final IOException e) {
-					throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
+						urlBuffer.toString(), UrlHttpMethod.POST, errorProcessor);
+			} catch (final IOException e) {
+				if (errorProcessor.isCancelled()) {
+					LOGGER.info(
+							"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
+							+ LoggerUtil.getTrimStr(signServerUrl.toString()));
 				}
+				throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
 			}
+
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {

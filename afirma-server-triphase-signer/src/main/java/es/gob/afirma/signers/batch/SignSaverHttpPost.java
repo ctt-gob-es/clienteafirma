@@ -13,11 +13,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.net.ssl.SSLHandshakeException;
-
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.http.HttpProcessor;
-import es.gob.afirma.core.misc.http.SSLRequestPermission;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.signers.batch.xml.SingleSign;
@@ -61,16 +57,10 @@ public final class SignSaverHttpPost implements SignSaver {
 		if (!this.url.contains("?")) { //$NON-NLS-1$
 			this.url += "?"; //$NON-NLS-1$
 		}
-		try {
-			UrlHttpManagerFactory.getInstalledManager().readUrl(
+		UrlHttpManagerFactory.getInstalledManager().readUrl(
 				this.url + "&" + this.param + "=" + Base64.encode(dataToSave, true), //$NON-NLS-1$ //$NON-NLS-2$
 				UrlHttpMethod.POST
-			);
-		} catch (final SSLHandshakeException sslhe) {
-			final HttpProcessor processor = new SSLRequestPermission(sslhe);
-			UrlHttpManagerFactory.getInstalledManager().readUrl(this.url + "&" + this.param + "=" + Base64.encode(dataToSave, true), //$NON-NLS-1$//$NON-NLS-2$
-																-1, null, null, UrlHttpMethod.POST, processor);
-		}
+				);
 	}
 
 	@Override

@@ -15,9 +15,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +33,7 @@ import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
+import es.gob.afirma.core.misc.http.TrustStoreManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -49,18 +47,16 @@ final class ConfirmImportCertDialog extends JDialog  {
 	private static final int PREFERRED_HEIGHT = 600;
 
 	private final List<X509Certificate> certsToImport;
-	private final KeyStore ks;
-	private final boolean isLocalImport;
 
 	private JButton openCertBtn;
 	private JButton deleteCertBtn;
 	private JButton importCertBtn;
 	private JTable table;
 
-	ConfirmImportCertDialog(final X509Certificate [] certsToImport, final KeyStore ks, final Container parent, final boolean isLocalImport) {
+	private int result = -1;
+
+	ConfirmImportCertDialog(final X509Certificate [] certsToImport, final Container parent) {
 		this.certsToImport = new ArrayList<>(Arrays.asList(certsToImport));
-		this.ks = ks;
-		this.isLocalImport = isLocalImport;
 	    createUI(parent);
 	}
 
@@ -162,9 +158,16 @@ final class ConfirmImportCertDialog extends JDialog  {
 		this.deleteCertBtn = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.18")); //$NON-NLS-1$
 		this.deleteCertBtn.addActionListener(
         		ae -> {
-        			final int idx = this.table.getSelectedRow();
-        			((DefaultTableModel) this.table.getModel()).removeRow(idx);
-        			this.certsToImport.remove(idx);
+        			// Eliminamos del listado los elementos seleccionados desde atras a adelante para no
+        			// alterar los indices
+        			final int[] idxs = this.table.getSelectedRows();
+        			if (idxs.length > 0) {
+        				for (int i = idxs.length - 1; i > -1; i--) {
+        					final int idx = idxs[i];
+        					((DefaultTableModel) this.table.getModel()).removeRow(idx);
+        					this.certsToImport.remove(idx);
+        				}
+        			}
 
         			// Si no queda ningun elemento seleccionado, se deshabilitan los botones
         			// para abrir y omitir certificados
@@ -192,31 +195,32 @@ final class ConfirmImportCertDialog extends JDialog  {
 		this.importCertBtn = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.19")); //$NON-NLS-1$
 		this.importCertBtn.addActionListener(
         		ae -> {
+					ConfirmImportCertDialog.this.result = JOptionPane.OK_OPTION;
         			importCerts(this);
 				}
 		);
 		buttonsPanel.add(this.importCertBtn);
 
 		final JButton closeDialogButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.28")); //$NON-NLS-1$
-		closeDialogButton.addActionListener(e -> dispose());
+		closeDialogButton.addActionListener(
+				e -> {
+					ConfirmImportCertDialog.this.result = JOptionPane.CANCEL_OPTION;
+					dispose();
+				});
 		buttonsPanel.add(closeDialogButton);
 
 		return buttonsPanel;
 	}
 
 	private void importCerts(final Container parent) {
-		final String trustedCertKSPath = ImportCertificatesDialog.getTrustedCertKSPath();
 
-		try (final OutputStream fos = new FileOutputStream(trustedCertKSPath)) {
-			if (this.certsToImport.size() == 1) {
-				this.ks.setCertificateEntry(this.certsToImport.get(0).getSubjectDN().toString(), this.certsToImport.get(0));
-			} else {
-				for (int i = 0; i < this.certsToImport.size(); i++) {
-					this.ks.setCertificateEntry(this.certsToImport.get(i).getSubjectDN().toString(), this.certsToImport.get(i));
-				}
-			}
-			this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
+		try {
+			final TrustStoreManager ts = TrustStoreManager.getInstance(parent);
+
+			ts.importCerts(this.certsToImport.toArray(new X509Certificate[0]));
+
 			SslSecurityManager.configureTrustManagers();
+
 			setVisible(false);
 		} catch (final Exception e) {
 			AOUIFactory.showErrorMessage(
@@ -227,4 +231,14 @@ final class ConfirmImportCertDialog extends JDialog  {
 					e);
 		}
 	 }
+
+	/**
+	 * Devuelve el bot&oacute;n pulsado por el usuario.
+	 * @return {@code JOptionPane.OK_OPTION} si se acepta el di&aacute;logo,
+	 * {@code JOptionPane.CANCEL_OPTION} si se cancela el di&aacute;logo y
+	 * -1 si se cierra de otro modo.
+	 */
+	public int getResult() {
+		return this.result;
+	}
 }

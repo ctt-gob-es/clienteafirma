@@ -11,11 +11,6 @@ package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
 
-import javax.net.ssl.SSLHandshakeException;
-
-import es.gob.afirma.core.misc.http.HttpProcessor;
-import es.gob.afirma.core.misc.http.SSLRequestPermission;
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.standalone.HttpManager;
 
@@ -77,21 +72,13 @@ public class IntermediateServerUtil {
 		return send(url);
 	}
 
-	/** Env&iacute;a datos al servidor intermedio.
+	/**
+	 * Hace la llamada al servidor intermedio.
 	 * @param url URL del servicio de guardado.
 	 * @return Respuesta del env&iacute;o.
 	 * @throws IOException Si hay problemas durante el env&iacute;o. */
 	private static byte[] send(final StringBuilder url) throws IOException {
-
-		// Llamamos al servicio para guardar los datos
-		byte[] data;
-		try {
-			data = new HttpManager().readUrl(url.toString(), UrlHttpMethod.POST);
-		} catch (final SSLHandshakeException sslhe) {
-			final HttpProcessor processor = new SSLRequestPermission(sslhe);
-			data = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), -1, null, null, UrlHttpMethod.POST, processor);
-		}
-		return data;
+		return new HttpManager().readUrl(url.toString(), UrlHttpMethod.POST);
 	}
 
 	/**

@@ -11,21 +11,12 @@ package es.gob.afirma.standalone.ui.preferences;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -39,6 +30,7 @@ import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
+import es.gob.afirma.core.misc.http.TrustStoreManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateUtils;
@@ -62,7 +54,6 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 	List<X509Certificate> savedCerts = new ArrayList<>();
 	private boolean noCerts = true;
-	private KeyStore ks;
 
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 
@@ -101,16 +92,14 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 	private JPanel createButtonsPanel() {
 
-		final JPanel buttonsPanel = new JPanel();
-		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
+		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 		this.importCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.2")); //$NON-NLS-1$
 		this.importCertButton.addActionListener(
 				ae -> importCertificatesDlg(this)
 			);
 
-		buttonsPanel.add(this.importCertButton, c);
+		buttonsPanel.add(this.importCertButton);
 
 		this.viewCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.3")); //$NON-NLS-1$
 		this.viewCertButton.addActionListener(
@@ -118,19 +107,17 @@ final class TrustedCertificatesPanel extends JPanel  {
 		);
 		this.viewCertButton.setEnabled(false);
 
-		c.gridx++;
-		buttonsPanel.add(this.viewCertButton, c);
+		buttonsPanel.add(this.viewCertButton);
 
 		this.deleteCertButton = new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.5")); //$NON-NLS-1$
 		this.deleteCertButton.addActionListener(
         		ae -> {
-					deleteCert(this.savedCerts.get(this.table.getSelectedRow()));
+					deleteCert(this.table.getSelectedRow());
 				}
 		);
 		this.deleteCertButton.setEnabled(false);
 
-		c.gridx++;
-		buttonsPanel.add(this.deleteCertButton, c);
+		buttonsPanel.add(this.deleteCertButton);
 
 		if (this.noCerts == true) {
 			this.viewCertButton.setEnabled(false);
@@ -188,39 +175,41 @@ final class TrustedCertificatesPanel extends JPanel  {
     /**
      * Obtiene los certificados que se encuentran en el almac&eacute;n de confianza de AutoFirma.
      * @param parent Contenedor padre.
-     * @return Array con la informaci&oacute;n de los certificados.
+     * @return Array con la informaci&oacute;n de los certificados o {@code null} si no se
+     * pudieron cargar los certitifcados.
      */
     private Object[] obtainTrustedCerts(final Container parent) {
-    	final File trustedKSFile = new File(ImportCertificatesDialog.getTrustedCertKSPath());
-    	Object [] result = null;
-    	if (trustedKSFile.exists()) {
-			try (InputStream trustedKSStream = new FileInputStream(trustedKSFile)) {
-				final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-				this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-				this.ks.load(trustedKSStream, TRUSTED_KS_PWD.toCharArray());
-				result = new Object [this.ks.size()];
-				final Enumeration<String> aliases = this.ks.aliases();
-				for (int i = 0 ; i < result.length ; i++) {
-					final Certificate cert = this.ks.getCertificate(aliases.nextElement());
-					final X509Certificate x509cert = (X509Certificate) certFactory.generateCertificate(
-																	new ByteArrayInputStream(cert.getEncoded())
-																	);
-					this.savedCerts.add(x509cert);
-					final Object [] auxArray = {
-												AOUtil.getCN(x509cert.getSubjectX500Principal().toString()),
-												AOUtil.getCN(x509cert.getIssuerX500Principal().toString()),
-												new SimpleDateFormat("dd-MM-yyyy").format(x509cert.getNotAfter()).toString() //$NON-NLS-1$
-												};
-					result[i] = auxArray;
-				}
-			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(
-						parent,
-						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE,
-						e);
-			}
+
+    	// Vaciamos el listado y volvemos a cargar los certificados
+    	this.savedCerts.clear();
+
+    	Object [] result;
+    	try {
+    		final TrustStoreManager ts = TrustStoreManager.getInstance(parent);
+    		final X509Certificate[] certs = ts.getCertificates();
+
+    		result = new Object[certs.length];
+
+    		for (int i = 0; i < certs.length; i++) {
+
+    			final X509Certificate cert = certs[i];
+    			this.savedCerts.add(cert);
+
+    			final Object [] auxArray = {
+    					AOUtil.getCN(cert.getSubjectX500Principal().toString()),
+    					AOUtil.getCN(cert.getIssuerX500Principal().toString()),
+    					new SimpleDateFormat("dd-MM-yyyy").format(cert.getNotAfter()).toString() //$NON-NLS-1$
+    			};
+    			result[i] = auxArray;
+    		}
+    	} catch (final Exception e) {
+    		AOUIFactory.showErrorMessage(
+    				parent,
+    				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
+    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE,
+    				e);
+    		result = null;
     	}
 
     	return result;
@@ -230,33 +219,33 @@ final class TrustedCertificatesPanel extends JPanel  {
      * Elimina el certificado indicado por par&aacute;metro del almac&eacute;n de confianza de AutoFirma
      * @param x509Certificate Certificado a eliminar
      */
-	private void deleteCert(final X509Certificate x509Certificate) {
-		if (AOUIFactory.showConfirmDialog(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.29"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+    private void deleteCert(final int certIdx) {
+    	if (AOUIFactory.showConfirmDialog(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.29"), //$NON-NLS-1$
+    			SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+    			JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-			final String trustedCertKSPath = ImportCertificatesDialog.getTrustedCertKSPath();
+    		try {
 
-			try (final OutputStream fos = new FileOutputStream(trustedCertKSPath)) {
-				final String certAlias = this.ks.getCertificateAlias(x509Certificate);
-				this.ks.deleteEntry(certAlias);
-				this.ks.store(fos, ImportCertificatesDialog.TRUSTED_KS_PWD.toCharArray());
-				// Actualizamos los Trust Managers al eliminar un certificado
-				SslSecurityManager.configureTrustManagers();
-				for (int i = 0; i < this.savedCerts.size(); i++) {
-					if (certAlias.equals(this.savedCerts.get(i).getSubjectX500Principal().getName())) {
-						this.savedCerts.remove(i);
-						break;
-					}
-				}
-				updateTableInfo();
-			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.30"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE, e);
-			}
-		}
-	}
+    			final X509Certificate cert = this.savedCerts.get(certIdx);
+
+    			TrustStoreManager.getInstance().deleteCert(cert);
+
+    			// Actualizamos los Trust Managers al eliminar un certificado
+    			SslSecurityManager.configureTrustManagers();
+
+    			this.savedCerts.remove(certIdx);
+
+    		} catch (final Exception e) {
+    			AOUIFactory.showErrorMessage(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.30"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					JOptionPane.ERROR_MESSAGE, e);
+    			return;
+    		}
+
+    		updateTableInfo();
+    	}
+
+    }
 
 	/**
 	 * Actualiza los campos de la tabla de certificados.
@@ -275,8 +264,9 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 		  this.table = new JTable(this.model);
 		  this.table.getSelectionModel().addListSelectionListener(event -> {
-			TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
-			TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
+			  final boolean elementsSelected = !this.table.getSelectionModel().isSelectionEmpty();
+			  TrustedCertificatesPanel.this.viewCertButton.setEnabled(elementsSelected);
+			  TrustedCertificatesPanel.this.deleteCertButton.setEnabled(elementsSelected);
 		  });
 		  this.certsScrollPane.setViewportView(this.table);
 	}

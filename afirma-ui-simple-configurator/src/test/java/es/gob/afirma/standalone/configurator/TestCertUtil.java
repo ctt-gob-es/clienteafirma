@@ -33,27 +33,30 @@ public final class TestCertUtil {
             "12341234",        // Contrasena del PKCS#12 //$NON-NLS-1$
             "127.0.0.1",       // Nombre comun //$NON-NLS-1$
             "127.0.0.1",       // IP del host SSL //$NON-NLS-1$
-            new String[] { "demo.tgm" },        // Nombre del host SSL //$NON-NLS-1$
+            new String[] { "appprueba",  "servidorcentral", "clavefirmagiss" },        // Nombre del host SSL //$NON-NLS-1$
             "cn=ca-clavefirma" // Nombre de la CA SSL //$NON-NLS-1$
         );
 		final byte[] p12Bytes = certPack.getPkcs12();
+
+		final File p12File = File.createTempFile("PKCS12_SSL_", ".P12"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
-			final OutputStream fos = new FileOutputStream(
-				File.createTempFile("PKCS12_SSL_", ".P12") //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			final OutputStream fos = new FileOutputStream(p12File);
 		) {
 			fos.write(p12Bytes);
 			fos.flush();
 		}
+		System.out.println("Fichero PKCS#12: " + p12File.getAbsolutePath());
+
 		final byte[] caCert = certPack.getCaCertificate().getEncoded();
+
+		final File caFile = File.createTempFile("CA_SSL_", ".cer"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (
-			final OutputStream fos = new FileOutputStream(
-				File.createTempFile("CA_SSL_", ".cer") //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			final OutputStream fos = new FileOutputStream(caFile);
 		) {
 			fos.write(caCert);
 			fos.flush();
 		}
+		System.out.println("Fichero de CA: " + caFile.getAbsolutePath());
 	}
 
 	/** Prueba la generaci&oacute;n del certificado y almac&eacute;n de claves.

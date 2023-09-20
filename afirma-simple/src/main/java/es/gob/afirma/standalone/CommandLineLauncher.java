@@ -405,8 +405,10 @@ final class CommandLineLauncher {
 				preUrl.toString(),
 				postUrl.toString(),
 				pke.getCertificateChain(),
-				pke.getPrivateKey()
+				pke.getPrivateKey(),
+				buildProperties(params.getExtraParams())
 			);
+
 			try (
 				final FileOutputStream fos = new FileOutputStream(outputFile);
 				final BufferedOutputStream bos = new BufferedOutputStream(fos);

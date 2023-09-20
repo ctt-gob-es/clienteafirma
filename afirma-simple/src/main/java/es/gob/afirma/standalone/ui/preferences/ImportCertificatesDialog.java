@@ -14,24 +14,19 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -50,7 +45,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -60,10 +54,10 @@ final class ImportCertificatesDialog extends JDialog {
 
 	private static final long serialVersionUID = -3168095095548385291L;
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final String SCHEMA_SEPARATOR = "://"; //$NON-NLS-1$
+	private static final String HTTPS_SCHEMA = "https" + SCHEMA_SEPARATOR; //$NON-NLS-1$
 
-	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
-	private KeyStore ks;
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	ImportCertificatesDialog(final JFrame parent) {
 		super(parent, true);
@@ -132,7 +126,7 @@ final class ImportCertificatesDialog extends JDialog {
 
 		final JButton fileButton= new JButton(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.13")); //$NON-NLS-1$
 		fileButton.addActionListener(
-				ae -> downloadLocalCert(this)
+				ae -> loadLocalCert(ImportCertificatesDialog.this)
 			);
 		c.weightx = 0.0;
 		c.gridx++;
@@ -209,39 +203,18 @@ final class ImportCertificatesDialog extends JDialog {
 
 	private void downloadRemoteCert(final Container container, final JTextField domainTxt) {
 
-		final File trustedKSFile = new File(getTrustedCertKSPath());
-		if (!trustedKSFile.exists()) {
-			try {
-				createTrustedKeystore(trustedKSFile, this);
-			} catch (final IOException e) {
-				AOUIFactory.showErrorMessage(
-						this,
-						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.26"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE,
-						e);
-				return;
-			}
-		}
-
 		try {
-			final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), false);
-	    	final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this, false);
-	    	confirmImportCertDialog.setVisible(true);
-	    	this.setVisible(false);
-		} catch (final SSLHandshakeException sslhe) {
+			final URL domainUrl = buildUrl(domainTxt.getText());
+			X509Certificate [] x509certs;
 			try {
-				final X509Certificate [] x509certs = downloadFromRemoteServer(trustedKSFile, domainTxt.getText(), true);
-				final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this.ks, this, false);
-				confirmImportCertDialog.setVisible(true);
-				this.setVisible(false);
-			} catch (final Exception e) {
-				AOUIFactory.showErrorMessage(
-						container,
-						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE,
-						e);
+				x509certs = downloadServerCerts(domainUrl, false);
+			} catch (final SSLHandshakeException sslhe) {
+				x509certs = downloadServerCerts(domainUrl, true);
+			}
+			final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this);
+			confirmImportCertDialog.setVisible(true);
+			if (confirmImportCertDialog.getResult() == JOptionPane.OK_OPTION) {
+				setVisible(false);
 			}
 		} catch (final Exception e) {
 			AOUIFactory.showErrorMessage(
@@ -253,9 +226,66 @@ final class ImportCertificatesDialog extends JDialog {
 		}
 	}
 
-	private void downloadLocalCert(final Container container) {
+	/**
+	 * Contrstruye una URL a partir de un nombre de dominio.
+	 * @param domain Nombre de dominio o IP.
+	 * @return URL de conexi&oacute;n con el dominio.
+	 * @throws MalformedURLException Si no se pudo construir la URL.
+	 */
+	private static URL buildUrl(final String domain) throws MalformedURLException {
 
-		final File [] certFiles;
+		String depuredDomain;
+		if (domain.toLowerCase(Locale.ENGLISH).startsWith(HTTPS_SCHEMA)) {
+			depuredDomain = domain;
+		}
+		else {
+			if (domain.indexOf(SCHEMA_SEPARATOR) == -1) {
+				depuredDomain = HTTPS_SCHEMA + domain;
+			}
+			else {
+				depuredDomain = HTTPS_SCHEMA + domain.substring(domain.indexOf(SCHEMA_SEPARATOR) + SCHEMA_SEPARATOR.length());
+			}
+		}
+		return new URL(depuredDomain);
+	}
+
+
+	private static X509Certificate[] downloadServerCerts(final URL domainUrl, final boolean disableSSL) throws FileNotFoundException, IOException, KeyManagementException, NoSuchAlgorithmException {
+
+		if (disableSSL) {
+			UrlHttpManagerImpl.disableSslChecks();
+		}
+
+		final HttpsURLConnection conn = (HttpsURLConnection) domainUrl.openConnection();
+		conn.connect();
+		final Certificate [] trustedServerCerts = conn.getServerCertificates();
+		conn.disconnect();
+
+		if (disableSSL) {
+			UrlHttpManagerImpl.enableSslChecks();
+		}
+
+		X509Certificate [] x509certs = null;
+
+		// Si nos llega mas de un certificado, entendemos que es el del dominio y su cadena de certificacion. En ese caso,
+		// importamos solo la cadena de certificacion (desde el segundo certificado).
+		if (trustedServerCerts.length > 1) {
+			x509certs = new X509Certificate [trustedServerCerts.length - 1];
+			for (int i = 1 ; i < trustedServerCerts.length ; i++) {
+				x509certs[i - 1] = (X509Certificate) trustedServerCerts[i];
+			}
+		}
+		// Si nos llega solo un certificado, importamos este
+		else {
+			x509certs = new X509Certificate[] { (X509Certificate) trustedServerCerts[0] };
+		}
+
+		return x509certs;
+	}
+
+	private void loadLocalCert(final Container parent) {
+
+		final File[] certFiles;
 		try {
 			certFiles = AOUIFactory.getLoadFiles(
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.20"), //$NON-NLS-1$
@@ -273,113 +303,30 @@ final class ImportCertificatesDialog extends JDialog {
 			return;
 		}
 
-		final File trustedKSFile = new File(getTrustedCertKSPath());
-		if (!trustedKSFile.exists()) {
-			try {
-				createTrustedKeystore(trustedKSFile, this);
-			} catch (final IOException e) {
-				AOUIFactory.showErrorMessage(
-						container,
-						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.26"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE,
-						e);
-				return;
-			}
-		}
-
-		try (InputStream trustedKSStream = new FileInputStream(trustedKSFile)) {
-			if (this.ks == null) {
-				this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-			}
-			this.ks.load(trustedKSStream, TRUSTED_KS_PWD.toCharArray());
-
+		X509Certificate [] certsToImport;
+		try {
 			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-			final X509Certificate [] certsToImport = new X509Certificate[certFiles.length];
+			certsToImport = new X509Certificate[certFiles.length];
 			for (int i = 0 ; i < certFiles.length ; i++) {
 				try (InputStream fis = new FileInputStream(certFiles[i])) {
 					certsToImport[i] = (X509Certificate) certFactory.generateCertificate(fis);
 				}
 			}
-	    	final ConfirmImportCertDialog comfirmImportCertDialog = new ConfirmImportCertDialog(certsToImport, this.ks, this, true);
-	    	comfirmImportCertDialog.setVisible(true);
-	    	this.setVisible(false);
 		} catch (final Exception e) {
 			AOUIFactory.showErrorMessage(
-					container,
+					parent,
 					SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE,
 					e);
-		}
-	}
-
-	static String getTrustedCertKSPath() {
-		return Platform.getUserHome() + File.separator + ".afirma" + File.separator + "TrustedCertsKeystore.jks"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	private void createTrustedKeystore(final File trustedKSFile, final Container parent) throws IOException {
-
-		trustedKSFile.createNewFile();
-
-		try (final OutputStream bos = new BufferedOutputStream(new FileOutputStream(trustedKSFile))) {
-
-			this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-			this.ks.load(null, TRUSTED_KS_PWD.toCharArray());
-    		this.ks.store(bos, TRUSTED_KS_PWD.toCharArray());
-
-		} catch (final Exception e) {
-			AOUIFactory.showErrorMessage(
-					parent,
-					SimpleAfirmaMessages.getString("TrustedCertificatesDialog.26"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE,
-					e);
-		}
-	}
-
-	private X509Certificate [] downloadFromRemoteServer(final File trustedKSFile, final String domainName, final boolean disableSSL) throws FileNotFoundException, IOException, KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
-
-		X509Certificate [] x509certs = null;
-
-		try (InputStream trustedKSStream = new FileInputStream(trustedKSFile)) {
-
-			final CertificateFactory certFactory = CertificateFactory.getInstance("X509"); //$NON-NLS-1$
-			final URL url = new URL(domainName);
-			if (disableSSL) {
-				UrlHttpManagerImpl.disableSslChecks();
-			}
-			final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-			conn.connect();
-			final Certificate [] trustedServerCerts = conn.getServerCertificates();
-			conn.disconnect();
-			if (disableSSL) {
-				UrlHttpManagerImpl.enableSslChecks();
-			}
-			if (this.ks == null) {
-				this.ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-			}
-			this.ks.load(trustedKSStream, TRUSTED_KS_PWD.toCharArray());
-			if (trustedServerCerts.length > 1) {
-				// Solo se obtienen los certificados emisores
-				x509certs = new X509Certificate [trustedServerCerts.length - 1];
-				for (int i = 1 ; i < trustedServerCerts.length ; i++) {
-					final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
-																	new ByteArrayInputStream(trustedServerCerts[i].getEncoded())
-																	);
-					x509certs[i - 1] = cert;
-				}
-			} else {
-				x509certs = new X509Certificate [1];
-				final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
-						new ByteArrayInputStream(trustedServerCerts[0].getEncoded())
-						);
-				x509certs[0] = cert;
-			}
-
+			return;
 		}
 
+		final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(certsToImport, parent);
+		confirmImportCertDialog.setVisible(true);
+		if (confirmImportCertDialog.getResult() == JOptionPane.OK_OPTION) {
+			setVisible(false);
+		}
 
-		return x509certs;
 	}
 }

@@ -619,20 +619,19 @@ final class PreferencesPanelGeneral extends JScrollPane {
     	}
     }
 
-	/** Di&aacute;logo para configurar los certificados de confianza.
-	 * @param container Contenedor en el que se define el di&aacute;logo. */
+	/**
+	 * Di&aacute;logo para configurar los certificados de confianza.
+	 * @param container Contenedor en el que se define el di&aacute;logo.
+	 */
     public static void trustedCertificatesDlg(final Container container) {
 
     	final TrustedCertificatesPanel trustedCertPanel = new TrustedCertificatesPanel();
 
-    	AOUIFactory.showConfirmDialog(
-				container,
+    	JOptionPane.showMessageDialog(
+    			container,
 				trustedCertPanel,
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.0"), //$NON-NLS-1$
-				JOptionPane.CLOSED_OPTION,
-				JOptionPane.CLOSED_OPTION
-		);
-
+				JOptionPane.PLAIN_MESSAGE);
     }
 
     /**
