@@ -9,21 +9,31 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.http.DataDownloader;
+import es.gob.afirma.standalone.ui.updateconfig.ConfigUpdaterManager;
 
 final class ConfiguratorUtil {
 
@@ -191,4 +201,65 @@ final class ConfiguratorUtil {
 		}
 		return null;
 	}
+
+	/**
+	 * Registra los datos necesarios para la comprobaci&oacute;n del archivo de actualizaci&oacute;n.
+	 * @param fileConfigPath URL del archivo.
+	 * @param data Array de datos del archivo.
+	 * @throws NoSuchAlgorithmException Error al obtener hash.
+	 */
+	public static void registerUpdateConfig(final String fileConfigPath, final byte[] data) throws NoSuchAlgorithmException {
+		if (data != null) {
+			ConfigUpdaterManager.put(ConfigUpdaterManager.PREFERENCE_UPDATE_CONFIG_FILE_URL, fileConfigPath);
+			final byte [] hash =  MessageDigest.getInstance("SHA-256").digest(data); //$NON-NLS-1$
+			ConfigUpdaterManager.put(ConfigUpdaterManager.PREFERENCE_UPDATE_CONFIG_FILE_SHA256, ConfigUpdaterManager.bytesToHex(hash));
+			ConfigUpdaterManager.putBoolean(ConfigUpdaterManager.PREFERENCE_UPDATE_NEED_UPDATE_CONFIG, true);
+			try {
+				ConfigUpdaterManager.flushSystemPrefs();
+			} catch (final BackingStoreException e) {
+				LOGGER.log(
+						Level.SEVERE,
+						"Error en el guardado de preferencias para el archivo de configuracion: " + e, //$NON-NLS-1$
+						e
+					);
+			}
+		}
+	}
+
+	/**
+	 * Transforma el archivo indicado en la ruta a un array de bytes.
+	 * @param filePath Ruta del archivo.
+	 * @return Archivo convertido en array de bytes.
+	 */
+	public static byte[] readFileToBytes(final String filePath) {
+		byte[] configData = null;
+		if (filePath.startsWith("https://")) { //$NON-NLS-1$
+			try {
+				configData = DataDownloader.downloadData(filePath);
+			} catch(final Exception e) {
+					LOGGER.log(
+						Level.SEVERE,
+						"No ha sido posible leer el fichero de actualizacion de configuracion: " + e, //$NON-NLS-1$
+						e
+					);
+			}
+		} else {
+			try (
+					final InputStream fis = new FileInputStream(filePath);
+					final InputStream bis = new BufferedInputStream(fis);
+				)
+				{
+					configData = AOUtil.getDataFromInputStream(bis);
+				} catch(final Exception e) {
+					LOGGER.log(
+						Level.SEVERE,
+						"No ha sido posible leer el fichero de actualizacion de configuracion: " + e, //$NON-NLS-1$
+						e
+					);
+				}
+		}
+
+		return configData;
+	}
+
 }

@@ -126,24 +126,24 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		final List<RegisteredKeystore> stores = new ArrayList<>();
 
 		if (Platform.OS.WINDOWS.equals(os)) {
-			stores.add(new RegisteredKeystore(AOKeyStore.WINDOWS));
+			stores.add(new RegisteredKeystore(AOKeyStore.WINDOWS, false));
 			if (SimpleKeyStoreManager.isFirefoxAvailable()) {
-				stores.add(new RegisteredKeystore(AOKeyStore.MOZ_UNI));
+				stores.add(new RegisteredKeystore(AOKeyStore.MOZ_UNI, false));
 			}
 		}
 		else if (Platform.OS.MACOSX.equals(os)) {
-			stores.add(new RegisteredKeystore(AOKeyStore.APPLE));
+			stores.add(new RegisteredKeystore(AOKeyStore.APPLE, false));
 			if (SimpleKeyStoreManager.isFirefoxAvailable()) {
-				stores.add(new RegisteredKeystore(AOKeyStore.MOZ_UNI));
+				stores.add(new RegisteredKeystore(AOKeyStore.MOZ_UNI, false));
 			}
 		}
 		else {
-			stores.add(new RegisteredKeystore(AOKeyStore.SHARED_NSS));
+			stores.add(new RegisteredKeystore(AOKeyStore.SHARED_NSS, false));
 		}
 
-		stores.add(new RegisteredKeystore(AOKeyStore.PKCS12));
+		stores.add(new RegisteredKeystore(AOKeyStore.PKCS12, false));
 
-		stores.add(new RegisteredKeystore(AOKeyStore.DNIEJAVA));
+		stores.add(new RegisteredKeystore(AOKeyStore.DNIEJAVA, false));
 
 		PreferencesPanelKeystores.setKeystores(new JComboBox<>(stores.toArray(new RegisteredKeystore[0])));
 
@@ -229,12 +229,20 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				String lib = null;
 				AOKeyStore ks = AOKeyStore.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName());
 				if (ks == null) {
-			        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-					for (final String key : regResult.keySet()) {
+			        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
+					for (final String key : userRegResult.keySet()) {
 						if (((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName().equals(key)){
 							ks = AOKeyStore.PKCS11;
 							ks.setName(key);
-							lib = regResult.get(key);
+							lib = userRegResult.get(key);
+						}
+					}
+			        final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+					for (final String key : systemRegResult.keySet()) {
+						if (((RegisteredKeystore) PreferencesPanelKeystores.getKeystores().getSelectedItem()).getName().equals(key)){
+							ks = AOKeyStore.PKCS11;
+							ks.setName(key);
+							lib = userRegResult.get(key);
 						}
 					}
 				} else if (AOKeyStore.PKCS12.equals(ks) || AOKeyStore.PKCS11.getName().equals(ks.getName())) {
@@ -417,17 +425,30 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
         smartCards = new JComboBox<>();
 
-        final RegisteredKeystore emptyItem = new RegisteredKeystore();
+        final RegisteredKeystore emptyItem = new RegisteredKeystore(false);
         emptyItem.setName(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.31")); //$NON-NLS-1$
         smartCards.addItem(emptyItem);
 
-        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
+        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
 
-        if (!regResult.isEmpty()) {
-			for (final String smartCardName : regResult.keySet()) {
-				final RegisteredKeystore newPKCS11 = new RegisteredKeystore(AOKeyStore.PKCS11);
+        if (!userRegResult.isEmpty()) {
+			for (final String smartCardName : userRegResult.keySet()) {
+				final RegisteredKeystore newPKCS11 = new RegisteredKeystore(AOKeyStore.PKCS11, false);
 				newPKCS11.setName(smartCardName);
-				final String lib = regResult.get(smartCardName);
+				final String lib = userRegResult.get(smartCardName);
+				newPKCS11.setLib(lib);
+				smartCards.addItem(newPKCS11);
+				keystores.addItem(newPKCS11);
+			}
+        }
+
+        final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+
+        if (!systemRegResult.isEmpty()) {
+			for (final String smartCardName : systemRegResult.keySet()) {
+				final RegisteredKeystore newPKCS11 = new RegisteredKeystore(AOKeyStore.PKCS11, true);
+				newPKCS11.setName(smartCardName);
+				final String lib = systemRegResult.get(smartCardName);
 				newPKCS11.setLib(lib);
 				smartCards.addItem(newPKCS11);
 				keystores.addItem(newPKCS11);
@@ -444,6 +465,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		smartCards.addActionListener (e -> {
 			if (e.getModifiers() != 0 && smartCards.getSelectedIndex() == 0) {
 				PreferencesPanelKeystores.this.connectButton.setEnabled(false);
+				PreferencesPanelKeystores.this.modifyCardButton.setEnabled(false);
+				PreferencesPanelKeystores.this.deleteCardButton.setEnabled(false);
+			} else if (e.getModifiers() != 0 && ((RegisteredKeystore) smartCards.getSelectedItem()).isSystemSmartCard()){
+				PreferencesPanelKeystores.this.connectButton.setEnabled(true);
 				PreferencesPanelKeystores.this.modifyCardButton.setEnabled(false);
 				PreferencesPanelKeystores.this.deleteCardButton.setEnabled(false);
 			} else {
@@ -628,11 +653,11 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     		} else {
 
-    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToRec(smartCardPanel.getCardNameTxt().getText() ,
+    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToUserRec(smartCardPanel.getCardNameTxt().getText() ,
     																					smartCardPanel.getControllerNameTxt().getText());
 
     			if (regAdded) {
-    				final RegisteredKeystore ks = new RegisteredKeystore();
+    				final RegisteredKeystore ks = new RegisteredKeystore(false);
     				ks.setName(smartCardPanel.getCardNameTxt().getText());
     				ks.setLib(smartCardPanel.getControllerNameTxt().getText());
     				ks.setProviderName(AOKeyStore.PKCS11.getProviderName());
@@ -689,7 +714,27 @@ final class PreferencesPanelKeystores extends JScrollPane {
     					);
 
     			modifySmartCardDlg(container);
-        	} else {
+        	} else if (checkDuplicatedName(smartCardPanel.getCardNameTxt().getText())) {
+
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.34"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					AOUIFactory.ERROR_MESSAGE,
+    					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.34")) //$NON-NLS-1$
+    					);
+
+    			modifySmartCardDlg(container);
+
+    		} else if (checkDuplicatedLib(smartCardPanel.getControllerNameTxt().getText())) {
+
+    			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35"), //$NON-NLS-1$
+    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    					AOUIFactory.ERROR_MESSAGE,
+    					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35")) //$NON-NLS-1$
+    					);
+
+    			modifySmartCardDlg(container);
+
+    		} else {
     			final boolean regDeleted = KeyStorePreferencesManager.deleteSmartCardRec(oldCardName);
 
     			if (regDeleted) {
@@ -709,10 +754,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
     			keystores.repaint();
     			smartCards.repaint();
 
-    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToRec(smartCardPanel.getCardNameTxt().getText() , smartCardPanel.getControllerNameTxt().getText());
+    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToUserRec(smartCardPanel.getCardNameTxt().getText() , smartCardPanel.getControllerNameTxt().getText());
 
     			if (regAdded) {
-    				final RegisteredKeystore ks = new RegisteredKeystore();
+    				final RegisteredKeystore ks = new RegisteredKeystore(false);
     				ks.setName(smartCardPanel.getCardNameTxt().getText());
     				ks.setLib(smartCardPanel.getControllerNameTxt().getText());
     				ks.setProviderName(AOKeyStore.PKCS11.getProviderName());
@@ -773,7 +818,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     }
 
     /**
-     * Compruba si ya hay una tarjeta inteligente registrada con el mismo nombre.
+     * Comprueba si ya hay una tarjeta inteligente registrada con el mismo nombre.
      * @param newName Nombre de la nueva tarjeta a registrar.
      * @return True en caso de que ya se encuentre el nombre registrado, false en caso contrario.
      */
@@ -788,7 +833,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     }
 
     /**
-     * Compruba si ya hay una tarjeta inteligente con el mismo controlador registrada con el mismo nombre.
+     * Comprueba si ya hay una tarjeta inteligente con el mismo controlador registrada con el mismo nombre.
      * @param newName Nombre del nuevo controlador.
      * @return True en caso de que ya se encuentre el controlador registrado, false en caso contrario.
      */
@@ -860,17 +905,26 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 			if (ks != null) {
 				if (aoks == null) {
-					final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-					if (!regResult.isEmpty()) {
-						for (final String smartCardName : regResult.keySet()) {
+					final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
+					if (!userRegResult.isEmpty()) {
+						for (final String smartCardName : userRegResult.keySet()) {
 							if (ks.equals(smartCardName)) {
-								rks = new RegisteredKeystore(AOKeyStore.PKCS11);
+								rks = new RegisteredKeystore(AOKeyStore.PKCS11, false);
+								rks.setName(smartCardName);
+							}
+						}
+					}
+					final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+					if (!systemRegResult.isEmpty()) {
+						for (final String smartCardName : systemRegResult.keySet()) {
+							if (ks.equals(smartCardName)) {
+								rks = new RegisteredKeystore(AOKeyStore.PKCS11, true);
 								rks.setName(smartCardName);
 							}
 						}
 					}
 				} else {
-					rks = new RegisteredKeystore(aoks);
+					rks = new RegisteredKeystore(aoks, false);
 				}
 			}
 

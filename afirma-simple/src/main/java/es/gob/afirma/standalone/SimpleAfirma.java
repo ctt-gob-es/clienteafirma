@@ -81,6 +81,7 @@ import es.gob.afirma.standalone.ui.SignPanel;
 import es.gob.afirma.standalone.ui.SignResultListPanel;
 import es.gob.afirma.standalone.ui.SignatureResultViewer;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.ui.updateconfig.ConfigUpdaterManager;
 import es.gob.afirma.standalone.updater.Updater;
 
 /**
@@ -734,7 +735,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se ha podido leer el archivo de ayuda correctamente", e); //$NON-NLS-1$
-	}
+		}
 	}
 
 	/**
@@ -817,6 +818,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			catch (final Exception e) { /* La primera vez falla para aplicar cambios en trust managers*/ }
 		} catch (final Exception e) {
 			LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
+		}
+
+		// Comprobamos si hay que actualizar las prferencias con el fichero de configuracion o no.
+		final Boolean checkConfigFile = ConfigUpdaterManager.getBoolean(ConfigUpdaterManager.PREFERENCE_UPDATE_NEED_UPDATE_CONFIG);
+		if (checkConfigFile != null && Boolean.TRUE.equals(checkConfigFile)) {
+			new Thread(() -> {
+				ConfigUpdaterManager.updatePrefsConfigFile();
+			}).start();
 		}
 
        	// Comprobamos si es necesario buscar actualizaciones

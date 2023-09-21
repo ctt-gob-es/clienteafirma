@@ -58,18 +58,41 @@ public final class KeyStorePreferencesManager {
 	}
 
 	/**
-	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes
+	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes del sistema.
 	 * @return Mapa con pares de clave-valor donde la clave es el nombre de la tarjeta y
 	 * el valor es la ruta hacia el controlador de la misma.
 	 */
-	public static Map<String, String> getSmartCardsRegistered() {
+	public static Map<String, String> getSystemSmartCardsRegistered() {
 		final Map<String, String> result = new HashMap<>();
 		try {
-			final String[] childNames = USER_PREFERENCES.childrenNames();
-			if (childNames != null && childNames.length > 0) {
-				for (int i = 0 ; i < childNames.length ; i++) {
-						final String cardName = USER_PREFERENCES.node(childNames[i]).keys()[0];
-						final String lib = USER_PREFERENCES.node(childNames[i]).get(cardName, null);
+			final String[] childNamesSystem = SYSTEM_PREFERENCES.childrenNames();
+			if (childNamesSystem != null && childNamesSystem.length > 0) {
+				for (int i = 0 ; i < childNamesSystem.length ; i++) {
+						final String cardName = SYSTEM_PREFERENCES.node(childNamesSystem[i]).keys()[0];
+						final String lib = SYSTEM_PREFERENCES.node(childNamesSystem[i]).get(cardName, null);
+						result.put(cardName, lib);
+				}
+			}
+		} catch (final BackingStoreException e) {
+				LOGGER.severe("No se han podido obtener los registros sobre tarjetas inteligentes " + e); //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
+	/**
+	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes del usuario.
+	 * @return Mapa con pares de clave-valor donde la clave es el nombre de la tarjeta y
+	 * el valor es la ruta hacia el controlador de la misma.
+	 */
+	public static Map<String, String> getUserSmartCardsRegistered() {
+		final Map<String, String> result = new HashMap<>();
+		try {
+			final String[] childNamesUser = USER_PREFERENCES.childrenNames();
+			if (childNamesUser != null && childNamesUser.length > 0) {
+				for (int i = 0 ; i < childNamesUser.length ; i++) {
+						final String cardName = USER_PREFERENCES.node(childNamesUser[i]).keys()[0];
+						final String lib = USER_PREFERENCES.node(childNamesUser[i]).get(cardName, null);
 						result.put(cardName, lib);
 				}
 			}
@@ -85,32 +108,21 @@ public final class KeyStorePreferencesManager {
 	 * @return Mapa que a su vez contiene mapas con pares de clave-valor donde la clave es el nombre de la tarjeta y
 	 * el valor es la ruta hacia el controlador de la misma.
 	 */
-	public static Map<String, Object> getSmartCardsMap() {
-		final Map<String, Object> result = new HashMap<>();
-		try {
-			final String[] childNames = USER_PREFERENCES.childrenNames();
-			if (childNames != null && childNames.length > 0) {
-				for (int i = 0 ; i < childNames.length ; i++) {
-						final String cardName = USER_PREFERENCES.node(childNames[i]).keys()[0];
-						final String lib = USER_PREFERENCES.node(childNames[i]).get(cardName, null);
-						final Map<String, String> smartCardRecord = new HashMap<>();
-						smartCardRecord.put(cardName, lib);
-						result.put(childNames[i], smartCardRecord);
-				}
-			}
-		} catch (final BackingStoreException e) {
-				LOGGER.severe("No se han podido obtener los registros sobre tarjetas inteligentes " + e); //$NON-NLS-1$
-		}
-
+	public static Map<String, String> getAllSmartCardsMap() {
+		final Map<String, String> result = new HashMap<>();
+		final Map<String, String> userSmartCards = getUserSmartCardsRegistered();
+		final Map<String, String> systemSmartCards = getSystemSmartCardsRegistered();
+		result.putAll(userSmartCards);
+		result.putAll(systemSmartCards);
 		return result;
 	}
 
 	/**
-	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes en forma de mapa
+	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes del usuario en forma de mapa.
 	 * @return Mapa con pares de clave-valor donde la clave es el nombre de la tarjeta y
 	 * el valor es la ruta hacia el controlador de la misma.
 	 */
-	public static Map<String, String> getSmartCardNameControllerMap() {
+	public static Map<String, String> getSmartCardNameControllerUserMap() {
 		final Map<String, String> result = new HashMap<>();
 		try {
 			final String[] childNames = USER_PREFERENCES.childrenNames();
@@ -129,18 +141,57 @@ public final class KeyStorePreferencesManager {
 	}
 
 	/**
-	 * Registra los almacenes de claves de tarjetas inteligentes
+	 * Obtiene todos los registros de almacenes de claves de tarjetas inteligentes del sistema en forma de mapa.
+	 * @return Mapa con pares de clave-valor donde la clave es el nombre de la tarjeta y
+	 * el valor es la ruta hacia el controlador de la misma.
 	 */
-	public static void putSmartCardsMap(final Map<String, Object> smartCards) {
+	public static Map<String, String> getSmartCardNameControllerSystemMap() {
+		final Map<String, String> result = new HashMap<>();
+		try {
+			final String[] childNames = SYSTEM_PREFERENCES.childrenNames();
+			if (childNames != null && childNames.length > 0) {
+				for (int i = 0 ; i < childNames.length ; i++) {
+						final String cardName = SYSTEM_PREFERENCES.node(childNames[i]).keys()[0];
+						final String lib = SYSTEM_PREFERENCES.node(childNames[i]).get(cardName, null);
+						result.put(cardName, lib);
+				}
+			}
+		} catch (final BackingStoreException e) {
+				LOGGER.severe("No se han podido obtener los registros sobre tarjetas inteligentes " + e); //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
+	/**
+	 * Registra los almacenes de claves de tarjetas inteligentes para el usuario.
+	 */
+	public static void putUserSmartCardsMap(final Map<String, Object> smartCards) {
 		for(final String smartCard : smartCards.keySet()) {
-			final Map<String, String> smartCardKeyValue = (Map<String, String>) smartCards.get(smartCard);
-			for(final String smartCardKey : smartCardKeyValue.keySet()) {
-					final Map<String, String> smartCardsRegistered = getSmartCardNameControllerMap();
-					final boolean existController = checkExistsController(smartCardsRegistered, smartCardKeyValue.get(smartCardKey));
-					if (!existController) {
-						final String smartCardNameChecked = checkCorrectName(smartCardsRegistered, smartCardKey);
-						addSmartCardToRec(smartCardNameChecked, smartCardKeyValue.get(smartCardKey));
-					}
+			final Map<String, String> systemSmartCardsRegistered = getSmartCardNameControllerSystemMap();
+			final Map<String, String> userSmartCardsRegistered = getSmartCardNameControllerUserMap();
+			final boolean existControllerInSysReg = checkExistsController(systemSmartCardsRegistered, (String) smartCards.get(smartCard));
+			final boolean existControllerInUserReg = checkExistsController(userSmartCardsRegistered, (String) smartCards.get(smartCard));
+			if (!existControllerInSysReg && !existControllerInUserReg) {
+				final String smartCardNameChecked = checkCorrectName(systemSmartCardsRegistered, userSmartCardsRegistered, smartCard);
+				addSmartCardToUserRec(smartCardNameChecked, (String) smartCards.get(smartCard));
+			}
+		}
+	}
+
+
+	/**
+	 * Registra los almacenes de claves de tarjetas inteligentes para el sistema.
+	 */
+	public static void putSystemSmartCardsMap(final Map<String, Object> smartCards) {
+		for(final String smartCard : smartCards.keySet()) {
+			final Map<String, String> systemSmartCardsRegistered = getSmartCardNameControllerSystemMap();
+			final Map<String, String> userSmartCardsRegistered = getSmartCardNameControllerUserMap();
+			final boolean existControllerInSysReg = checkExistsController(systemSmartCardsRegistered, (String) smartCards.get(smartCard));
+			final boolean existControllerInUserReg = checkExistsController(userSmartCardsRegistered, (String) smartCards.get(smartCard));
+			if (!existControllerInSysReg && !existControllerInUserReg) {
+				final String smartCardNameChecked = checkCorrectName(systemSmartCardsRegistered, userSmartCardsRegistered, smartCard);
+				addSmartCardToSystemRec(smartCardNameChecked, (String) smartCards.get(smartCard));
 			}
 		}
 	}
@@ -164,18 +215,20 @@ public final class KeyStorePreferencesManager {
 	/**
 	 * Comprueba si ya existe una tarjeta inteligente con el nombre indicado por par&aacute;metro, y si es as&iacute;,
 	 * genera uno nuevo.
-	 * @param smartCardsRegistered Mapa de tarjetas inteligentes registradas.
+	 * @param systemSmartCardsRegistered Mapa de tarjetas inteligentes registradas en el sistema.
+	 * @param userSmartCardsRegistered Mapa de tarjetas inteligentes registradas por el usuario.
 	 * @param newSmartCardName Nombre de tarjeta inteligente a comprobar.
 	 * @return Devuelve el nuevo nombre a registrar
 	 */
-	private static String checkCorrectName(final Map<String, String> smartCardsRegistered, final String newSmartCardName) {
+	private static String checkCorrectName(final Map<String, String> systemSmartCardsRegistered, final Map<String, String> userSmartCardsRegistered,
+											final String newSmartCardName) {
 		String result = newSmartCardName;
-		if (smartCardsRegistered.containsKey(newSmartCardName)) {
+		if (systemSmartCardsRegistered.containsKey(newSmartCardName) || userSmartCardsRegistered.containsKey(newSmartCardName)) {
 			boolean existCardName = true;
 			int cont = 1;
 			while (existCardName) {
 				final String newName = result + "-" + cont; //$NON-NLS-1$
-				if (!smartCardsRegistered.containsKey(newName)) {
+				if (!systemSmartCardsRegistered.containsKey(newName) && !userSmartCardsRegistered.containsKey(newName)) {
 					result = newName;
 					existCardName = false;
 				} else {
@@ -187,12 +240,12 @@ public final class KeyStorePreferencesManager {
 	}
 
 	/**
-	 * Agrega el registro de la tarjeta inteligente pasada por par&aacute;metro
-	 * @param smartCardName Nombre de la tarjeta
-	 * @param libPath Ruta del controlador PKCS11
-	 * @return true si se ha agregado correctamente
+	 * Agrega al registro del usuario la tarjeta inteligente pasada por par&aacute;metro.
+	 * @param smartCardName Nombre de la tarjeta.
+	 * @param libPath Ruta del controlador PKCS11.
+	 * @return true si se ha agregado correctamente.
 	 */
-	public static boolean addSmartCardToRec(final String smartCardName, final String libPath) {
+	public static boolean addSmartCardToUserRec(final String smartCardName, final String libPath) {
 
 		boolean regAdded = false;
 		boolean noExistRec = true;
@@ -203,6 +256,37 @@ public final class KeyStorePreferencesManager {
 			try {
 				if (!USER_PREFERENCES.nodeExists("/es/gob/afirma/core/keystores/" + cont)) { //$NON-NLS-1$
 					USER_PREFERENCES.node("/es/gob/afirma/core/keystores/" + cont).put(smartCardName, libPath); //$NON-NLS-1$
+					regAdded = true;
+					noExistRec = false;
+				}
+			} catch (final BackingStoreException e) {
+				LOGGER.severe("No se ha podido agregar la siguiente tarjeta inteligente al registro:" + smartCardName + " " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				noExistRec = false;
+			}
+
+			cont++;
+		}
+
+		return regAdded;
+	}
+
+	/**
+	 * Agrega al registro del sistema la tarjeta inteligente pasada por par&aacute;metro.
+	 * @param smartCardName Nombre de la tarjeta.
+	 * @param libPath Ruta del controlador PKCS11.
+	 * @return true si se ha agregado correctamente.
+	 */
+	public static boolean addSmartCardToSystemRec(final String smartCardName, final String libPath) {
+
+		boolean regAdded = false;
+		boolean noExistRec = true;
+		int cont = 1;
+
+		while (noExistRec) {
+
+			try {
+				if (!SYSTEM_PREFERENCES.nodeExists("/es/gob/afirma/core/keystores/" + cont)) { //$NON-NLS-1$
+					SYSTEM_PREFERENCES.node("/es/gob/afirma/core/keystores/" + cont).put(smartCardName, libPath); //$NON-NLS-1$
 					regAdded = true;
 					noExistRec = false;
 				}

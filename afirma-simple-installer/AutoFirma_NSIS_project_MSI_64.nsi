@@ -105,6 +105,10 @@ Var FIREFOX_SECURITY_ROOTS
 Var CERTIFICATE_PATH
 ;Parametro que indica la ruta del almacen de claves a pasar por el administrador
 Var KEYSTORE_PATH
+;Parametro que indica la ruta del fichero de configuracion PList con las preferencias para el sistema.
+Var CONFIG_PATH
+;Parametro que indica la ruta del fichero de actualizacion de preferencias del sistema.
+Var UPDATE_CONFIG
 
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
@@ -140,6 +144,8 @@ Function .onInit
 	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS
 	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH
 	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
+	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH
+	${GetOptions} $R0 "/UPDATE_CONFIG=" $UPDATE_CONFIG
 	
 	; Comprobamos que no solo se informe de un parametro, sino de
 	; los dos o de ninguno
@@ -293,8 +299,18 @@ Section "Programa" sPrograma
 	StrCpy $R6 ""
 	StrCmp $KEYSTORE_PATH "false" +2
 		StrCpy $R6 '-keystore_path "$KEYSTORE_PATH"'
+	
+	; Comprobamos si el administrador le ha pasado el parametro con el fichero de configuracion PList
+	StrCpy $R7 ""
+	StrCmp $CONFIG_PATH "false" +2
+		StrCpy $R7 '-config_path "$CONFIG_PATH"'
+		
+	; Comprobamos si el administrador le ha pasado el parametro con el fichero de actualizacion de preferencias
+	StrCpy $R8 ""
+	StrCmp $UPDATE_CONFIG "true" 0 +2
+		StrCpy $R8 "-update_config"
 
-	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 $R5 $R6 /passive'
+	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 $R5 $R6 $R7 $R8 /passive'
 
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall

@@ -260,9 +260,17 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				}
 
 				//Se obtienen todas las tarjetas inteligentes configuradas como almacen de claves
-				final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-				for (final String key : regResult.keySet()) {
-				    final String value = regResult.get(key);
+				final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
+				for (final String key : userRegResult.keySet()) {
+				    final String value = userRegResult.get(key);
+					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
+					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
+					keystoresMenu.add(menuItemOpenDnieKs);
+				}
+
+				final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+				for (final String key : systemRegResult.keySet()) {
+				    final String value = systemRegResult.get(key);
 					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
 					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
 					keystoresMenu.add(menuItemOpenDnieKs);

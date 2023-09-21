@@ -246,8 +246,9 @@ public enum AOKeyStore {
             }
         }
         // Buscamos entre los registros de los almacenes de clave PKCS#11
-        final Map<String, String> regResult = KeyStorePreferencesManager.getSmartCardsRegistered();
-        final boolean existSmartCard = regResult.containsKey(name);
+        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
+        final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+        final boolean existSmartCard = userRegResult.containsKey(name) || systemRegResult.containsKey(name);
         if (existSmartCard) {
 			final AOKeyStore result = AOKeyStore.PKCS11;
 			result.setName(name);

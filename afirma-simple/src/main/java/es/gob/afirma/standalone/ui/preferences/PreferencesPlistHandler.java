@@ -292,7 +292,7 @@ public final class PreferencesPlistHandler {
 
 		// Registramos las tarjetas inteligentes que se encuentren en el XML
 		if (properties.containsKey(SMARTCARDS_KEY)) {
-			KeyStorePreferencesManager.putSmartCardsMap((Map<String, Object>) properties.get(SMARTCARDS_KEY));
+			KeyStorePreferencesManager.putUserSmartCardsMap((Map<String, Object>) properties.get(SMARTCARDS_KEY));
 		}
 
 		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
@@ -321,6 +321,18 @@ public final class PreferencesPlistHandler {
 			throw new InvalidPreferencesFileException("Error analizando el fichero XML: " + e, e); //$NON-NLS-1$
 		}
 
+		// Registramos las tarjetas inteligentes que se encuentren en el XML
+		if (properties.containsKey(SMARTCARDS_KEY)) {
+			KeyStorePreferencesManager.putSystemSmartCardsMap((Map<String, Object>) properties.get(SMARTCARDS_KEY));
+		}
+
+		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
+			KeyStorePreferencesManager.setSkipAuthCertDNIe((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
+		}
+
+		properties.remove(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE);
+		properties.remove(SMARTCARDS_KEY);
+
 		checkPreferences(properties);
 		storeSystemPreferences(properties, unprotected);
 	}
@@ -334,7 +346,7 @@ public final class PreferencesPlistHandler {
 
 		userProperties.putAll(KeyStorePreferencesManager.getPrefsToExport());
 
-		final Map<String, Object> smartCardsPreferences = KeyStorePreferencesManager.getSmartCardsMap();
+		final Map<String, String> smartCardsPreferences = KeyStorePreferencesManager.getAllSmartCardsMap();
 		if (smartCardsPreferences.size() > 0) {
 			userProperties.put(SMARTCARDS_KEY, smartCardsPreferences);
 		}
