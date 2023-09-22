@@ -26,9 +26,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
@@ -54,8 +56,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
 
-	private static final String HTTPS = "https"; //$NON-NLS-1$
-
 	private static final String URN_SEPARATOR = ":"; //$NON-NLS-1$
 	private static final String PROT_SEPARATOR = URN_SEPARATOR + "//"; //$NON-NLS-1$
 
@@ -73,25 +73,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	/** Constructor. */
 	protected UrlHttpManagerImpl() {
 		// Vacio y "protected"
-	}
-
-	/** Establece el almac&eacute;n de claves a usar en SSL.
-	 * Esto permite usar un almac&eacute;n de claves que necesite una inicializaci&oacute;n a medida
-	 * y que por lo tanto no baste con indicarlo en las variables de entorno.
-	 * El almac&eacute;n debe proporcionarse inicializado y cargado.
-	 * Si se especifica aqu&iacute; un almac&eacute;n de claves se ignoran las variables de entorno
-	 * que pudiesen estar establecidas.
-	 * @param ks Almac&eacute;n de claves a usar en SSL. */
-	public static void setSslKeyStore(final KeyStore ks) {
-		sslKeyStore = ks;
-	}
-
-	/** Establece el <code>PasswordCallback</code> a usar cuando se establece directamente un
-	 * almac&eacute;n de claves a usar en SSL.
-	 * @param pwc <code>PasswordCallback</code> a usar cuando se establece directamente un
-	 * almac&eacute;n de claves a usar en SSL. */
-	public static void setSslKeyStorePasswordCallback(final PasswordCallback pwc) {
-		sslKeyStorePasswordCallback = pwc;
 	}
 
 	@Override
@@ -134,9 +115,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		if (accept != null) {
 			headers.setProperty(ACCEPT, accept);
 		}
-//		if (httpProcessor != null) {
-//			return httpProcessor.processHttpError(urlToRead, timeout, contentType, accept, method);
-//		}
 		return readUrl(urlToRead, timeout, method, headers, httpProcessor);
 	}
 
@@ -218,6 +196,18 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn = (HttpURLConnection) uri.openConnection();
 			}
 
+			if ((needDisableSslChecks || isSecureDomain) && conn instanceof HttpsURLConnection) {
+				try {
+					SslSecurityManager.disableSslChecks((HttpsURLConnection) conn);
+					LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
+				}
+				catch(final Exception e) {
+					LOGGER.warning(
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+					);
+				}
+			}
+
 			conn.setUseCaches(false);
 			conn.setDefaultUseCaches(false);
 
@@ -274,25 +264,10 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn.setConnectTimeout(timeout);
 			}
 
-			if ((needDisableSslChecks || isSecureDomain) && uri.getProtocol().equals(HTTPS)) {
-				try {
-					disableSslChecks();
-					LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
-				}
-				catch(final Exception e) {
-					LOGGER.warning(
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-					);
-				}
-			}
-
 			conn.connect();
 			final int resCode = conn.getResponseCode();
 			final String statusCode = Integer.toString(resCode);
 			if (statusCode.startsWith("4") || statusCode.startsWith("5")) { //$NON-NLS-1$ //$NON-NLS-2$
-				if (uri.getProtocol().equals(HTTPS)) {
-					enableSslChecks();
-				}
 				throw new HttpError(
 						resCode,
 						conn.getResponseMessage(),
@@ -310,21 +285,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 		}
 		catch (final IOException e) {
-			// Elevamos cualquier excepcion, pero nos aseguramos antes de reactivar
-			// la validacion SSL si corresponde
-			if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
-				enableSslChecks();
-			}
 
 			if (httpProcessor != null) {
+				LOGGER.log(Level.WARNING, "Fallo la conexion pero intentamos recuperarla: " + e); //$NON-NLS-1$
 				return httpProcessor.processHttpError(e, this, url, timeout, method, requestProperties);
 			}
 
 			throw e;
-		}
-
-		if (needDisableSslChecks && uri.getProtocol().equals(HTTPS)) {
-			enableSslChecks();
 		}
 
 		return data;
@@ -349,10 +316,23 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 	}
 
-	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su
-	 * comportamiento por defecto. */
-	public static void enableSslChecks() {
-		SslSecurityManager.enableSslChecks();
+	/** Establece el almac&eacute;n de claves a usar en SSL.
+	 * Esto permite usar un almac&eacute;n de claves que necesite una inicializaci&oacute;n a medida
+	 * y que por lo tanto no baste con indicarlo en las variables de entorno.
+	 * El almac&eacute;n debe proporcionarse inicializado y cargado.
+	 * Si se especifica aqu&iacute; un almac&eacute;n de claves se ignoran las variables de entorno
+	 * que pudiesen estar establecidas.
+	 * @param ks Almac&eacute;n de claves a usar en SSL. */
+	public static void setSslKeyStore(final KeyStore ks) {
+		sslKeyStore = ks;
+	}
+
+	/** Establece el <code>PasswordCallback</code> a usar cuando se establece directamente un
+	 * almac&eacute;n de claves a usar en SSL.
+	 * @param pwc <code>PasswordCallback</code> a usar cuando se establece directamente un
+	 * almac&eacute;n de claves a usar en SSL. */
+	public static void setSslKeyStorePasswordCallback(final PasswordCallback pwc) {
+		sslKeyStorePasswordCallback = pwc;
 	}
 
 	/** Establece los <code>TrustManager</code> de las conexiones SSL.
@@ -362,14 +342,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
 	public static void setTrustManager(final TrustManager[] tms, final HostnameVerifier hv) throws KeyManagementException, NoSuchAlgorithmException {
 		SslSecurityManager.setTrustManagerAndKeyManager(tms, hv, sslKeyStore, sslKeyStorePasswordCallback);
-	}
-
-	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
-	 * cualquier certificado.
-	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
-	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
-	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
-		SslSecurityManager.disableSslChecks();
 	}
 
 	/**
@@ -413,5 +385,4 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 		return false;
 	}
-
 }

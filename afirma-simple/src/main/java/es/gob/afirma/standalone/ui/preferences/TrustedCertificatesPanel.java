@@ -231,7 +231,7 @@ final class TrustedCertificatesPanel extends JPanel  {
     			TrustStoreManager.getInstance().deleteCert(cert);
 
     			// Actualizamos los Trust Managers al eliminar un certificado
-    			SslSecurityManager.configureTrustManagers();
+    			SslSecurityManager.configureAfirmaTrustManagers();
 
     			this.savedCerts.remove(certIdx);
 

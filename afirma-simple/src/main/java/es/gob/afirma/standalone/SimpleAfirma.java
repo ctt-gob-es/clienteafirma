@@ -796,8 +796,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Establecemos si deben respetarse las comprobaciones de seguridad de las
 		// conexiones de red
-		HttpManager.setSecureConnections(
-				PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
+    	final boolean secureConnections = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS);
+
+    	HttpManager.setSecureConnections(secureConnections);
 
 		// Establecemos el listado de dominios seguros
 		HttpManager.setSecureDomains(
@@ -805,18 +806,20 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Establecemos los almacenes de claves de Java y de AutoFirma como de confianza para las
 		// conexiones remotas
-		try {
-			SslSecurityManager.configureTrustManagers();
-			// Se realiza una primera conexion que fallara para aplicar los cambios en el contexto SSL
+		if (secureConnections) {
 			try {
-				final URL url = new URL("https://www.google.es/"); //$NON-NLS-1$
-				final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-				conn.connect();
-				conn.disconnect();
+				SslSecurityManager.configureAfirmaTrustManagers();
+				// Se realiza una primera conexion que fallara para aplicar los cambios en el contexto SSL
+				try {
+					final URL url = new URL("https://www.google.es/"); //$NON-NLS-1$
+					final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+					conn.connect();
+					conn.disconnect();
+				}
+				catch (final Exception e) { /* La primera vez falla para aplicar cambios en trust managers*/ }
+			} catch (final Exception e) {
+				LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
 			}
-			catch (final Exception e) { /* La primera vez falla para aplicar cambios en trust managers*/ }
-		} catch (final Exception e) {
-			LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
 		}
 
        	// Comprobamos si es necesario buscar actualizaciones

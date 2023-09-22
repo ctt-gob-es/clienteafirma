@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -45,7 +44,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -250,20 +249,15 @@ final class ImportCertificatesDialog extends JDialog {
 	}
 
 
-	private static X509Certificate[] downloadServerCerts(final URL domainUrl, final boolean disableSSL) throws FileNotFoundException, IOException, KeyManagementException, NoSuchAlgorithmException {
-
-		if (disableSSL) {
-			UrlHttpManagerImpl.disableSslChecks();
-		}
+	private static X509Certificate[] downloadServerCerts(final URL domainUrl, final boolean disableSSL) throws FileNotFoundException, IOException, GeneralSecurityException {
 
 		final HttpsURLConnection conn = (HttpsURLConnection) domainUrl.openConnection();
+		if (disableSSL) {
+			SslSecurityManager.disableSslChecks(conn);
+		}
 		conn.connect();
 		final Certificate [] trustedServerCerts = conn.getServerCertificates();
 		conn.disconnect();
-
-		if (disableSSL) {
-			UrlHttpManagerImpl.enableSslChecks();
-		}
 
 		X509Certificate [] x509certs = null;
 

@@ -33,6 +33,8 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	private boolean cancelled = false;
 	private boolean headless;
 
+	private boolean showingConfirmDialog = false;
+
 	public SSLErrorProcessor() {
 		this.headless = false;
 	}
@@ -66,8 +68,10 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			final String url, final int timeout, final UrlHttpMethod method,
 			final Properties requestProperties) throws IOException {
 
-		// Si la excepcion no es la que debemos tratar, relanzamos la excepcion sin hacer nada mas
-		if (!(cause instanceof SSLHandshakeException)) {
+		// Si la excepcion no es la que debemos tratar (error de establecimiento de SSL no provocado por el nombre del certificado),
+		// relanzamos la excepcion sin hacer nada mas
+		if (!(cause instanceof SSLHandshakeException)) {// || cause.getCause() instanceof java.security.cert.CertificateException) {
+			LOGGER.info("El error no es de tipo SSLHandShake y no la tratamos"); //$NON-NLS-1$
 			throw cause;
 		}
 
@@ -77,8 +81,15 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			throw cause;
 		}
 
+		// Nos aseguramos de que solo
+		if (this.showingConfirmDialog) {
+			LOGGER.info("Ya se esta mostrando un dialogo de consulta para la importacion del certificado de confianza. Se omitira este."); //$NON-NLS-1$
+			throw cause;
+		}
+
 		int userResponse;
 		try {
+			this.showingConfirmDialog = true;
 			userResponse = AOUIFactory.showConfirmDialog(null,
 					CoreMessages.getString("SSLRequestPermissionDialog.2", new URL(url).getHost()), //$NON-NLS-1$
 					CoreMessages.getString("SSLRequestPermissionDialog.1"), //$NON-NLS-1$
@@ -91,6 +102,9 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		}
 		catch (final Exception ex) {
 			throw cause;
+		}
+		finally {
+			this.showingConfirmDialog = false;
 		}
 
 		if (userResponse != JOptionPane.YES_OPTION) {
@@ -118,7 +132,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		// Reconfiguramos el contexto SSL para que tenga en cuenta los nuevos certificados
 		try {
-			SslSecurityManager.configureTrustManagers();
+			SslSecurityManager.configureAfirmaTrustManagers();
 		} catch (final Exception e) {
 			LOGGER.severe("Error reconfigurando el contexto SSL con los nuevos certificados: " + e); //$NON-NLS-1$
 			throw new IOException(e);
@@ -131,12 +145,11 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	private static X509Certificate[] downloadFromRemoteServer(final String domainName) throws Exception {
 
 		final URL url = new URL(domainName);
-		UrlHttpManagerImpl.disableSslChecks();
 		final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		SslSecurityManager.disableSslChecks(conn);
 		conn.connect();
 		final Certificate[] trustedServerCerts = conn.getServerCertificates();
 		conn.disconnect();
-		UrlHttpManagerImpl.enableSslChecks();
 
 		X509Certificate[] certsToImport;
 		if (trustedServerCerts.length > 1) {

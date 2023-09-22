@@ -219,7 +219,7 @@ final class ConfirmImportCertDialog extends JDialog  {
 
 			ts.importCerts(this.certsToImport.toArray(new X509Certificate[0]));
 
-			SslSecurityManager.configureTrustManagers();
+			SslSecurityManager.configureAfirmaTrustManagers();
 
 			setVisible(false);
 		} catch (final Exception e) {

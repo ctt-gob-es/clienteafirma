@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -51,6 +52,13 @@ public final class SslSecurityManager {
 		}
 	};
 
+	private static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
+		@Override
+		public boolean verify(final String hostname, final SSLSession session) {
+			return true;
+		}
+	};
+
 	private static final String KEYSTORE = "javax.net.ssl.keyStore"; //$NON-NLS-1$
 	private static final String KEYSTORE_PASS = "javax.net.ssl.keyStorePassword"; //$NON-NLS-1$
 	private static final String KEYSTORE_TYPE = "javax.net.ssl.keyStoreType"; //$NON-NLS-1$
@@ -61,6 +69,9 @@ public final class SslSecurityManager {
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
+	private static final SecureRandom secureRandom = new SecureRandom();
+
+	private static boolean afirmaTrustStoreConfigured = false;
 
 	private SslSecurityManager() {
 		// No instanciable
@@ -68,27 +79,43 @@ public final class SslSecurityManager {
 
 	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
 	 * cualquier certificado.
-	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
-	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
-	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
+	public static void disableSslChecks(final HttpsURLConnection conn) throws GeneralSecurityException {
+
+		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
+		sc.init(null, DUMMY_TRUST_MANAGER, secureRandom);
+
+		conn.setSSLSocketFactory(sc.getSocketFactory());
+		conn.setHostnameVerifier(DUMMY_HOSTNAME_VERIFIER);
+	}
+
+	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
+	 * cualquier certificado.
+	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
+	public static void disableSslChecks() throws GeneralSecurityException {
 		setTrustManagerAndKeyManager(
 			DUMMY_TRUST_MANAGER,
-			new HostnameVerifier() {
-				@Override
-				public boolean verify(final String hostname, final SSLSession session) {
-					return true;
-				}
-			},
+			DUMMY_HOSTNAME_VERIFIER,
 			null,
 			null
 		);
 	}
 
-	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su
-	 * comportamiento por defecto. */
-	public static void enableSslChecks() {
-		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
-		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
+	/**
+	 * Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su
+	 * comportamiento por defecto.
+	 * @throws IOException Cuando no se pueda encontrar o leer el almac&eacute;n de confianza.
+	 * @throws GeneralSecurityException Cuando falla la carga del almac&eacute;n.
+	 */
+	public static void enableSslChecks() throws IOException, GeneralSecurityException {
+
+		if (afirmaTrustStoreConfigured) {
+			configureAfirmaTrustManagers();
+		}
+		else {
+			HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
+			HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
+		}
 		LOGGER.fine(
 			"Habilitadas comprobaciones SSL" //$NON-NLS-1$
 		);
@@ -129,11 +156,8 @@ public final class SslSecurityManager {
 			);
 			km = null;
 		}
-		sc.init(
-			km,
-			tms,
-			new java.security.SecureRandom()
-		);
+		sc.init(km, tms, secureRandom);
+
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(hv);
 	}
@@ -197,9 +221,10 @@ public final class SslSecurityManager {
 	/**
 	 * Configura los almacenes de confianza de Java y AutoFirma para la validaci&oacute;n de las
 	 * conexiones SSL.
-	 * @throws Exception Error al configurar el contexto SSL para las conexiones.
+	 * @throws IOException Cuando falla la lectura del almac&eacute;n del cliente.
+	 * @throws GeneralSecurityException Cuando falla la carga del almac&eacute;n.
 	 */
-	public static void configureTrustManagers() throws Exception {
+	public static void configureAfirmaTrustManagers() throws IOException, GeneralSecurityException {
 
 		final File trustStoreFile = TrustStoreManager.getJKSFile();
 
@@ -245,9 +270,14 @@ public final class SslSecurityManager {
 		LOGGER.info("Se configura el almacen de confianza de AutoFirma"); //$NON-NLS-1$
 
 		final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-		sslContext.init(null, new TrustManager[] { trustManager }, new SecureRandom());
+		sslContext.init(null, new TrustManager[] { trustManager }, secureRandom);
+
+
 
 		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-	}
+		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 
+		// Declaramos haber configurado el almacen de confianza del cliente @firma
+		afirmaTrustStoreConfigured = true;
+	}
 }
