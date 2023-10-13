@@ -9,7 +9,6 @@
 
 package es.gob.afirma.keystores;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +30,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
-import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
@@ -558,11 +556,11 @@ public final class KeyStoreUtilities {
         				msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
         			}
     			}
-    			JOptionPane.showMessageDialog(
-    					(Component) parentComponent,
+    			AOUIFactory.showMessageDialog(
+    					parentComponent,
     					msg,
     					KeyStoreMessages.getString("KeyStoreUtilities.6"), //$NON-NLS-1$
-    					JOptionPane.ERROR_MESSAGE);
+    					AOUIFactory.ERROR_MESSAGE);
 
     			// Si el almacen no se encuentra bloqueado, lo seguimos intentando
     			if (!ksLocked) {
@@ -646,7 +644,7 @@ public final class KeyStoreUtilities {
 							this.parentComponent,
 							toc.getMessage(),
 							KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
-							JOptionPane.INFORMATION_MESSAGE
+							AOUIFactory.INFORMATION_MESSAGE
 						);
     					break;
     				case TextOutputCallback.ERROR:
@@ -655,7 +653,7 @@ public final class KeyStoreUtilities {
 							this.parentComponent,
 							toc.getMessage(),
 							KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
+							AOUIFactory.ERROR_MESSAGE
 						);
     					break;
     				case TextOutputCallback.WARNING:
@@ -664,7 +662,7 @@ public final class KeyStoreUtilities {
 							this.parentComponent,
 							toc.getMessage(),
 							KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE
+							AOUIFactory.WARNING_MESSAGE
 						);
     					break;
     				default:
@@ -678,7 +676,7 @@ public final class KeyStoreUtilities {
 						this.parentComponent,
 						KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
 						KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
-						JOptionPane.WARNING_MESSAGE,
+						AOUIFactory.WARNING_MESSAGE,
 						null,
 						null,
     						null

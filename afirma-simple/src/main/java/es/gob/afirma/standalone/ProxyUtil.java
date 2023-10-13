@@ -28,7 +28,7 @@ import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 
 import es.gob.afirma.standalone.crypto.CypherDataManager;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Utilidades para el manejo y establecimiento del <i>Proxy</i> de red para las
  * conexiones de la aplicaci&oacute;n.

@@ -37,7 +37,7 @@ public final class SslSecurityManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
+	static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
 		new X509TrustManager() {
 			@Override
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -48,6 +48,13 @@ public final class SslSecurityManager {
 			@Override
 			public void checkServerTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */  }
 
+		}
+	};
+
+	static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
+		@Override
+		public boolean verify(final String hostname, final SSLSession session) {
+			return true;
 		}
 	};
 
@@ -73,12 +80,7 @@ public final class SslSecurityManager {
 	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		setTrustManagerAndKeyManager(
 			DUMMY_TRUST_MANAGER,
-			new HostnameVerifier() {
-				@Override
-				public boolean verify(final String hostname, final SSLSession session) {
-					return true;
-				}
-			},
+			DUMMY_HOSTNAME_VERIFIER,
 			null,
 			null
 		);

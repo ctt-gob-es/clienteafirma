@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
@@ -105,6 +106,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	}
 
 	@Override
+	public byte[] readUrl(final String url, final UrlHttpMethod method, final HttpErrorProcessor processor, final SSLConfig sslConfig) throws IOException {
+		return readUrl(url, DEFAULT_TIMEOUT, null, null, method, processor, sslConfig);
+	}
+
+	@Override
 	public byte[] readUrl(final String urlToRead,
 			              final int timeout,
 			              final String contentType,
@@ -127,17 +133,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			final String accept,
 			final UrlHttpMethod method,
 			final HttpErrorProcessor httpProcessor) throws IOException {
-		final Properties headers = new Properties();
-		if (contentType != null) {
-			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
-		}
-		if (accept != null) {
-			headers.setProperty(ACCEPT, accept);
-		}
-//		if (httpProcessor != null) {
-//			return httpProcessor.processHttpError(urlToRead, timeout, contentType, accept, method);
-//		}
-		return readUrl(urlToRead, timeout, method, headers, httpProcessor);
+		return readUrl(urlToRead, timeout, contentType, accept, method, httpProcessor, null);
 	}
 
 	@Override
@@ -149,12 +145,23 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	}
 
 
+	@Override
+	public byte[] readUrl(final String urlToRead,
+            final int timeout,
+            final UrlHttpMethod method,
+            final Properties requestProperties,
+            final HttpErrorProcessor httpProcessor) throws IOException {
+		return readUrl(urlToRead, timeout, method, requestProperties, httpProcessor, null);
+	}
 
+
+	@Override
 	public byte[] readUrl(final String urlToRead,
 	                      final int timeout,
 		                  final UrlHttpMethod method,
 		                  final Properties requestProperties,
-		                  final HttpErrorProcessor httpProcessor) throws IOException {
+		                  final HttpErrorProcessor httpProcessor,
+		                  final SSLConfig sslConfig) throws IOException {
 
 
 		if (urlToRead == null) {
@@ -203,7 +210,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final URL uri = new URL(request != null ? request : url);
 
-		final boolean needDisableSslChecks = Boolean.parseBoolean(
+		// Si no se ha establecido una configuracion especifica para SSL y se ha pedido
+		// que se desactive la validacion, se hara
+		final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(
 				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false") //$NON-NLS-1$
 		);
 		final boolean isSecureDomain = checkIsSecureDomain(uri);
@@ -251,10 +260,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 			// Ponemos el resto de las cabeceras
 			for (final Map.Entry<?, ?> entry: headers.entrySet()) {
-				conn.addRequestProperty(
-						(String) entry.getKey(),
-						(String) entry.getValue()
-						);
+				conn.addRequestProperty((String) entry.getKey(), (String) entry.getValue());
 			}
 
 			if (urlParameters != null) {
@@ -283,6 +289,14 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 					LOGGER.warning(
 						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
 					);
+				}
+			}
+			else if (sslConfig != null && uri.getProtocol().equals(HTTPS)) {
+				if (sslConfig.getSSLSocketFactory() != null) {
+					((HttpsURLConnection) conn).setSSLSocketFactory(sslConfig.getSSLSocketFactory());
+				}
+				if (sslConfig.getHostnameVerifier() != null) {
+					((HttpsURLConnection) conn).setHostnameVerifier(sslConfig.getHostnameVerifier());
 				}
 			}
 
@@ -412,6 +426,19 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public byte[] readUrl(final String url, final int timeout, final String contentType, final String accept, final UrlHttpMethod method,
+			final HttpErrorProcessor httpProcessor, final SSLConfig sslConfig) throws IOException {
+		final Properties headers = new Properties();
+		if (contentType != null) {
+			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
+		}
+		if (accept != null) {
+			headers.setProperty(ACCEPT, accept);
+		}
+		return readUrl(url, timeout, method, headers, httpProcessor, sslConfig);
 	}
 
 }

@@ -12,14 +12,17 @@ package es.gob.afirma.standalone.configurator;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
-import es.gob.afirma.standalone.ui.updateconfig.ConfigUpdaterManager;
 
 /** Configurador de la instalaci&oacute;n de AutoFirma.
  * Identifica el entorno, genera un certificado de firma y lo instala en los almacenes pertinentes.
@@ -186,6 +189,18 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		final File pluginsDir = getPluginsDir(this.configurator);
 		final PluginsManager pluginsManager = new PluginsManager(pluginsDir);
 		this.configurator.uninstall(this.mainScreen, pluginsManager);
+
+		// Borramos las preferencias del sistema, que es algo comun a todos los sistemas operativos
+		try {
+			PreferencesManager.removeSystemPrefs();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se han podido eliminar las preferencias del sistema de la aplicacion: " + e); //$NON-NLS-1$
+		}
+		try {
+			KeyStorePreferencesManager.removeSystemPrefs();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se han podido eliminar las preferencias del sistema de los almacenes: " + e); //$NON-NLS-1$
+		}
 	}
 
     /**
@@ -245,17 +260,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		// Si se ha indicado un archivo de configuracion,
 		// se estableceran las nuevas propiedades del sistema indicadas en el mismo
 		if (!config.getConfigPath().isEmpty()) {
-			final byte[] fileData = ConfiguratorUtil.readFileToBytes(config.getConfigPath());
-			ConfigUpdaterManager.importSystemPreferences(fileData);
-			try {
-				if (config.getUpdateConfig() && config.getConfigPath().startsWith("https://")) { //$NON-NLS-1$
-					ConfiguratorUtil.registerUpdateConfig(config.getConfigPath(), fileData);
-				} else {
-					ConfigUpdaterManager.putBoolean(ConfigUpdaterManager.PREFERENCE_UPDATE_NEED_UPDATE_CONFIG, false);
-				}
-			} catch (final Exception e) {
-				LOGGER.warning("No ha sido posible configurar el fichero de actualizacion: " + e); //$NON-NLS-1$
-			}
+			ConfigUpdaterManager.savePrefsConfigFile(config.getConfigPath(), config.getUpdateConfig());
 		}
 
 		configurator.closeApplication(0);
@@ -295,6 +300,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 						this.keystorePath = args[++i];
 					} else if (CONFIG_PATH.equalsIgnoreCase(arg) && i < args.length - 1) {
 						this.configPath = args[++i];
+						// En el paso de parametros del MSI es necesario indicar la barra invertida ya que la
+						// barra simple trunca el parametro. Por si este fuese el caso, aqui la corregimos
+						// para evitar errores
+						if (this.configPath.toLowerCase(Locale.US).startsWith("https:")) { //$NON-NLS-1$
+							this.configPath = this.configPath.replace('\\', '/');
+						}
 					} else if (UPDATE_CONFIG.equalsIgnoreCase(arg)) {
 						this.updateConfig = true;
 					}

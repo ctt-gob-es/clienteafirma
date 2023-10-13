@@ -3,6 +3,7 @@ package es.gob.afirma.standalone.ui.preferences;
 import java.util.logging.Logger;
 
 import es.gob.afirma.standalone.HttpManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 public class SecureDomainsHandler {
 

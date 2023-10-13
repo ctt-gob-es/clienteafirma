@@ -9,9 +9,12 @@ public class RegisteredKeystore {
 	private String providerName;
 	private final boolean isSystemSmartCard;
 
+	RegisteredKeystore() {
+		this.isSystemSmartCard = false;
+	}
 
-	RegisteredKeystore(final boolean isSystemSmartCard) {
-		this.isSystemSmartCard = isSystemSmartCard;
+	RegisteredKeystore(final AOKeyStore aoks) {
+		this(aoks, false);
 	}
 
 	RegisteredKeystore(final AOKeyStore aoks, final boolean isSystemSmartCard) {

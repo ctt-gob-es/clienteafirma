@@ -9,16 +9,16 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_QUALIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGN_FORMAT;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_POLICY_HASH;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_POLICY_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_XADES_SIGN_FORMAT;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -54,7 +54,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class PreferencesPanelXades extends JScrollPane {
 
@@ -361,7 +361,7 @@ final class PreferencesPanelXades extends JScrollPane {
 					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-				loadDefaultPreferences();
+				restorePreferences();
 
 			}
 		});
@@ -527,7 +527,7 @@ final class PreferencesPanelXades extends JScrollPane {
 
         this.panelPolicies.removeAll();
 
-        final AdESPolicy currentPolicy = getXadesPreferedPolicy();
+        final AdESPolicy currentPolicy = getCurrentPolicy();
         this.xadesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
@@ -563,48 +563,78 @@ final class PreferencesPanelXades extends JScrollPane {
         repaint();
 	}
 
-	void loadDefaultPreferences() {
-		this.xadesSignatureProductionCity.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, PreferencesSource.DEFAULT));
+	void restorePreferences() {
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
+		this.xadesSignatureProductionCity.setText(
+				PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY));
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
 		this.xadesSignatureProductionProvince.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, PreferencesSource.DEFAULT)
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE)
 		);
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
 		this.xadesSignatureProductionPostalCode.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, PreferencesSource.DEFAULT)
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE)
 		);
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
 		this.xadesSignatureProductionCountry.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, PreferencesSource.DEFAULT)
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY)
 		);
-		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, PreferencesSource.DEFAULT));
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
+		this.xadesSignerClaimedRole.setText(
+				PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
 
 		// Solo establecemos la opcion por defecto si la interfaz no esta bloqueada
 		if (!isBlocked()) {
-			this.xadesSignFormat.setSelectedItem(PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT, PreferencesSource.DEFAULT));
+
+			final List<PolicyItem> xadesPolicies = new ArrayList<>();
+			xadesPolicies.add(
+					new PolicyItem(
+							SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+							POLICY_XADES_AGE_1_9
+							)
+					);
+
+			this.xadesPolicyDlg = new PolicyPanel(
+					SIGN_FORMAT_XADES,
+					xadesPolicies,
+					restorePolicy(),
+					isBlocked()
+					);
+			this.currentPolicyValue.setText(this.xadesPolicyDlg.getSelectedPolicyName());
+
+			PreferencesManager.remove(PREFERENCE_XADES_SIGN_FORMAT);
+			final String subFormat = PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT);
+
+			final String policyId = PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER);
+
+			if (AgePolicy.isAGEPolicy(policyId, AOSignConstants.SIGN_FORMAT_XADES)) {
+				this.xadesSignFormat.removeAllItems();
+				this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+				this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+				if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(subFormat)) {
+					this.xadesSignFormat.setSelectedItem(subFormat);
+				} else {
+					this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+				}
+			}
+			else {
+				this.xadesSignFormat.removeAllItems();
+				this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+				this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
+				this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+				this.xadesSignFormat.setSelectedItem(subFormat);
+			}
+
+			if (AgePolicy.isAGEPolicy(policyId, AOSignConstants.SIGN_FORMAT_XADES)) {
+				this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+			}
+
+			PreferencesManager.remove(PreferencesManager.PREFERENCE_XADES_MULTISIGN);
+			final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_XADES_MULTISIGN);
+			this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
+			this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
+			this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
 		}
-
-		final List<PolicyItem> xadesPolicies = new ArrayList<>();
-        xadesPolicies.add(
-    		new PolicyItem(
-        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_XADES_AGE_1_9
-    		)
-		);
-
-        this.xadesPolicyDlg = new PolicyPanel(
-    		SIGN_FORMAT_XADES,
-    		xadesPolicies,
-    		getXadesDefaultPolicy(),
-    		isBlocked()
-		);
-
-        this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-        this.xadesSignFormat.setEnabled(!isBlocked());
-
-		this.currentPolicyValue.setText(this.xadesPolicyDlg.getSelectedPolicyName());
-
-		final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_XADES_MULTISIGN);
-		this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
-		this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
-		this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
 
         revalidate();
         repaint();
@@ -613,7 +643,7 @@ final class PreferencesPanelXades extends JScrollPane {
 
 	/** Obtiene la configuraci&oacute;n de politica de firma XAdES establecida actualmente.
 	 * @return Pol&iacute;tica de firma configurada. */
-	private static AdESPolicy getXadesPreferedPolicy() {
+	private static AdESPolicy getCurrentPolicy() {
 
 		if (PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER) == null ||
 				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER).isEmpty()) {
@@ -633,9 +663,12 @@ final class PreferencesPanelXades extends JScrollPane {
 		}
 	}
 
-	/** Obtiene la configuraci&oacute;n de politica de firma XAdES establecida por defecto.
-	 * @return Pol&iacute;tica de firma configurada. */
-	private AdESPolicy getXadesDefaultPolicy() {
+	/**
+	 * Elimina la pol&iacute;tica establecida por el usuario y establece la definida a nivel de
+	 * sistema o, si no se defini&oacute;, la por defecto.
+	 * @return Pol&iacute;tica de firma configurada.
+	 */
+	private AdESPolicy restorePolicy() {
 
 		AdESPolicy adesPolicy = null;
 
@@ -645,22 +678,26 @@ final class PreferencesPanelXades extends JScrollPane {
 		if (isBlocked()) {
 			adesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 		}
-		// Si no, devolvemos la configuracion por defecto
+		// Si no, eliminamos la configuracion del usuario y obtenemos la del sistema o por defecto
 		else {
-			try {
+			//
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_HASH);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 
-				final String policyId = PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT);
+			try {
+				final String policyId = PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER);
 				if (policyId == null || policyId.isEmpty()) {
 					this.xadesPolicyDlg.loadPolicy(null);
 				} else {
 					this.xadesPolicyDlg.loadPolicy(new AdESPolicy(policyId,
-							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH, PreferencesSource.DEFAULT),
-							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM, PreferencesSource.DEFAULT),
-							PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER, PreferencesSource.DEFAULT)));
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH),
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER)));
 				}
 			} catch (final Exception e) {
 				LOGGER.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
-
 			}
 		}
 
@@ -712,7 +749,7 @@ final class PreferencesPanelXades extends JScrollPane {
 			xadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_XADES_AGE_1_9));
 
-			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(), isBlocked());
+			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getCurrentPolicy(), isBlocked());
 		}
 	}
 

@@ -68,7 +68,7 @@ import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class SignPanelSignTask extends SwingWorker<Void, Void> {
 

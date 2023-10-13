@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +37,7 @@ import javax.swing.JScrollPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.http.DataDownloader;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -44,7 +46,9 @@ import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesPlistHandler;
 
 final class PreferencesPanelGeneral extends JScrollPane {
 
@@ -142,7 +146,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 						return;
 					}
 					try {
-						PreferencesPlistHandler.importPreferencesFromUrl(url, isBlocked());
+						final byte[] xmlData = DataDownloader.downloadData(url);
+						PreferencesPlistHandler.importUserPreferencesFromXml(new String(xmlData, StandardCharsets.UTF_8), isBlocked());
 					}
 					catch(final Exception e) {
 						LOGGER.log(
@@ -744,7 +749,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 			LOGGER.warning("No se pudo restaurar la configuracion general de la aplicacion: " + e); //$NON-NLS-1$
 		}
 		try {
-			KeyStorePreferencesManager.clearAllPrefs();
+			KeyStorePreferencesManager.clearKeyStorePrefs();
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo restaurar la configuracion de almacenes de la aplicacion: " + e); //$NON-NLS-1$

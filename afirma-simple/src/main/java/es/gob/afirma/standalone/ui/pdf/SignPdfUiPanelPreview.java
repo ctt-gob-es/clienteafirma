@@ -102,8 +102,8 @@ import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 

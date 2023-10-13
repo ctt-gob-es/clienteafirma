@@ -69,6 +69,8 @@ import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncher;
 import es.gob.afirma.standalone.ui.ClosePanel;
@@ -80,8 +82,6 @@ import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignPanel;
 import es.gob.afirma.standalone.ui.SignResultListPanel;
 import es.gob.afirma.standalone.ui.SignatureResultViewer;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
-import es.gob.afirma.standalone.ui.updateconfig.ConfigUpdaterManager;
 import es.gob.afirma.standalone.updater.Updater;
 
 /**
@@ -777,12 +777,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	// Se define el look and feel
     	LookAndFeelManager.applyLookAndFeel();
 
-    	// Uso en modo linea de comandos
-    	if (isUsingCommnadLine(args) || isHeadlessMode()) {
-    		CommandLineLauncher.main(args);
-    		return;
-    	}
-
     	// Se establece la configuracion del proxy
     	try {
     		ProxyUtil.setProxySettings();
@@ -820,23 +814,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
 		}
 
-		// Comprobamos si hay que actualizar las prferencias con el fichero de configuracion o no.
-		final Boolean checkConfigFile = ConfigUpdaterManager.getBoolean(ConfigUpdaterManager.PREFERENCE_UPDATE_NEED_UPDATE_CONFIG);
-		if (checkConfigFile != null && Boolean.TRUE.equals(checkConfigFile)) {
-			new Thread(() -> {
-				ConfigUpdaterManager.updatePrefsConfigFile();
-			}).start();
-		}
-
-       	// Comprobamos si es necesario buscar actualizaciones
-       	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
-			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
-					&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
-       		if (!updatesEnabled) {
-				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
-       					);
-       		}
-       	}
+    	// Uso en modo linea de comandos
+    	if (isUsingCommnadLine(args) || isHeadlessMode()) {
+    		CommandLineLauncher.main(args);
+    		return;
+    	}
 
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -865,6 +847,17 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     			}
     		}
         }
+
+
+       	// Comprobamos si es necesario buscar actualizaciones
+       	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
+			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
+					&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
+       		if (!updatesEnabled) {
+				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
+       					);
+       		}
+       	}
 
     	// Comprobamos actualizaciones si estan habilitadas
         if (updatesEnabled && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
@@ -907,6 +900,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				printSystemInfo();
 
 				LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
+
+				// Comprobamos si hay que actualizar las preferencias del sistema o no.
+				if (ConfigUpdaterManager.needCheckConfigUpdates()) {
+					new Thread(() -> {
+						LOGGER.info("Comprobamos si existe nueva configuracion remota"); //$NON-NLS-1$
+						ConfigUpdaterManager.updatePrefsConfigFile();
+					}).start();
+				}
 
 				final SimpleAfirma saf = new SimpleAfirma();
 

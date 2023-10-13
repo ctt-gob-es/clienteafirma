@@ -27,7 +27,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.HttpManager;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

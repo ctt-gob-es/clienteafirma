@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
-import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -93,7 +92,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			throw cause;
 		}
 
-		if (userResponse != JOptionPane.YES_OPTION) {
+		if (userResponse != AOUIFactory.YES_OPTION) {
 			LOGGER.info("El usuario no importo el certificado en el almacen de confianza"); //$NON-NLS-1$
 			this.cancelled = true;
 			throw cause;

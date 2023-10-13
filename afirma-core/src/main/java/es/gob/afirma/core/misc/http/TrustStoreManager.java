@@ -18,10 +18,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.CoreMessages;
 
 /**
@@ -73,12 +72,13 @@ public class TrustStoreManager {
 				this.ks = loadTrustedKeyStore();
 			}
 			catch (final Exception e) {
-				final int result = JOptionPane.showConfirmDialog(
+				final int result = AOUIFactory.showConfirmDialog(
 						parent,
 						CoreMessages.getString("AutoFirmaTrustStore.0"), //$NON-NLS-1$
 						CoreMessages.getString("AutoFirmaTrustStore.1"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION);
-				if (result == JOptionPane.OK_OPTION) {
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE);
+				if (result == AOUIFactory.OK_OPTION) {
 					try {
 						Files.delete(this.tsPath.toPath());
 					} catch (final IOException e1) {

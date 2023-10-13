@@ -34,7 +34,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class ProtocolInvocationLauncherSelectCert {
 

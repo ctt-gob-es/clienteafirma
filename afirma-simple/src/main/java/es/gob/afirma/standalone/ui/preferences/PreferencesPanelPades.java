@@ -9,18 +9,18 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_FORMAT;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_OBFUSCATE_CERT_INFO;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_QUALIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGN_REASON;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_STAMP;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_VISIBLE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_FORMAT;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_OBFUSCATE_CERT_INFO;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_POLICY_HASH;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_POLICY_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_SIGN_REASON;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_STAMP;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -61,7 +61,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
 final class PreferencesPanelPades extends JScrollPane {
@@ -320,7 +321,7 @@ final class PreferencesPanelPades extends JScrollPane {
 					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-				loadDefaultPreferences();
+				restorePreferences();
 			}
 		});
 	 	restoreConfigButton.getAccessibleContext().setAccessibleDescription(
@@ -533,7 +534,25 @@ final class PreferencesPanelPades extends JScrollPane {
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel de
 	 * firmas PAdES desde un fichero externo de preferencias. */
-	void loadDefaultPreferences() {
+	void restorePreferences() {
+
+		// Eliminamos la configuracion actual
+		PreferencesManager.remove(PREFERENCE_PADES_SIGN_REASON);
+		PreferencesManager.remove(PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
+		PreferencesManager.remove(PREFERENCE_PADES_SIGNER_CONTACT);
+		PreferencesManager.remove(PREFERENCE_PADES_VISIBLE);
+		PreferencesManager.remove(PREFERENCE_PADES_OBFUSCATE_CERT_INFO);
+		PreferencesManager.remove(PREFERENCE_PADES_STAMP);
+		PreferencesManager.remove(PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+		PreferencesManager.remove(PREFERENCE_PADES_FORMAT);
+
+
+		PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
+		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH);
+		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH_ALGORITHM);
+		PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+
+		// Establecemos la configuracion (que sera la del sistema o la por defecto)
 
 		this.padesSignReason.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_REASON, PreferencesSource.DEFAULT));
 		this.padesSignProductionCity.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, PreferencesSource.DEFAULT));
@@ -620,16 +639,16 @@ final class PreferencesPanelPades extends JScrollPane {
 		// Si no, devolvemos la configuracion por defecto
 		else {
 			try {
-				if (PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT) == null
-						|| PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT).isEmpty()) {
+				if (PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER) == null
+						|| PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER).isEmpty()) {
 					this.padesPolicyDlg.loadPolicy(null);
 				}
 				else {
 					this.padesPolicyDlg.loadPolicy(
-						new AdESPolicy(PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT),
-							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH, PreferencesSource.DEFAULT),
-							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH_ALGORITHM, PreferencesSource.DEFAULT),
-							PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER, PreferencesSource.DEFAULT)
+						new AdESPolicy(PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER),
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH),
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER)
 						)
 					);
 				}

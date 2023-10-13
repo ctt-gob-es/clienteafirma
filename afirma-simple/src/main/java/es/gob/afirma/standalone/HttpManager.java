@@ -9,7 +9,7 @@ import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /**
  * Clase para el acceso a recursos y servicios remotos. Esta clase debe gestionar todas las conexiones
