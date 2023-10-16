@@ -46,7 +46,7 @@ import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.Decrypti
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.AboutDialog;
 import es.gob.afirma.standalone.ui.OSXHandler;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /**
  * Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n por

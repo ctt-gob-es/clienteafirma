@@ -9,11 +9,12 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_HASH;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_CADES_MULTISIGN;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_CADES_POLICY_HASH;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -49,7 +50,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class PreferencesPanelCades extends JScrollPane {
 
@@ -237,7 +238,7 @@ final class PreferencesPanelCades extends JScrollPane {
 					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-				loadDefaultPreferences();
+				restorePreferences();
 
 			}
 		});
@@ -385,9 +386,19 @@ final class PreferencesPanelCades extends JScrollPane {
         repaint();
 	}
 
-	void loadDefaultPreferences() {
+	void restorePreferences() {
 
-		this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT, PreferencesSource.DEFAULT));
+		// Eliminamos la configuracion actual
+		PreferencesManager.remove(PREFERENCE_CADES_IMPLICIT);
+		PreferencesManager.remove(PREFERENCE_CADES_MULTISIGN);
+		PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
+		PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH);
+		PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH_ALGORITHM);
+		PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
+
+		// Establecemos la configuracion (que sera la del sistema o la por defecto)
+
+		this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
 
 		final List<PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -453,16 +464,16 @@ final class PreferencesPanelCades extends JScrollPane {
 		else {
 			try {
 				// Si, por defecto, no debe haber ninguna politica configurada, hacemos eso
-				if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT) == null
-						|| PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT).isEmpty()) {
+				if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER) == null
+						|| PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER).isEmpty()) {
 					this.cadesPolicyDlg.loadPolicy(null);
 				} else {
 
 					this.cadesPolicyDlg
-							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, PreferencesSource.DEFAULT),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH, PreferencesSource.DEFAULT),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, PreferencesSource.DEFAULT),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, PreferencesSource.DEFAULT)));
+							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER)));
 				}
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$

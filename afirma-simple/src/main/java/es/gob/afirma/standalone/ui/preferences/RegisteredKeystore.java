@@ -7,15 +7,21 @@ public class RegisteredKeystore {
 	private String name;
 	private String lib;
 	private String providerName;
+	private final boolean isSystemSmartCard;
 
 	RegisteredKeystore() {
-		// Constructor vacio
+		this.isSystemSmartCard = false;
 	}
 
 	RegisteredKeystore(final AOKeyStore aoks) {
+		this(aoks, false);
+	}
+
+	RegisteredKeystore(final AOKeyStore aoks, final boolean isSystemSmartCard) {
 		this.name = aoks.getName();
 		this.providerName = aoks.getProviderName();
 		this.lib = null;
+		this.isSystemSmartCard = isSystemSmartCard;
 	}
 
 	public String getName() {
@@ -35,6 +41,9 @@ public class RegisteredKeystore {
 	}
 	public void setProviderName(final String providerName) {
 		this.providerName = providerName;
+	}
+	public boolean isSystemSmartCard() {
+		return this.isSystemSmartCard;
 	}
 
 	@Override

@@ -21,7 +21,10 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Configurador de la instalaci&oacute;n de AutoFirma. Identifica el entorno, genera un
@@ -58,6 +61,12 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path"; //$NON-NLS-1$
+
+	/** Indica la ruta del fichero de configuraci&oacute;nn PList con preferencias para el sistema. */
+	public static final String CONFIG_PATH = "-config_path"; //$NON-NLS-1$
+
+	/** Indica la ruta del fichero de actualizaci&oacute;n de preferencias del sistema. */
+	public static final String UPDATE_CONFIG = "-update_config"; //$NON-NLS-1$
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
@@ -211,6 +220,18 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		final File pluginsDir = getPluginsDir(this.configurator);
 		final PluginsManager pluginsManager = new PluginsManager(pluginsDir);
 		this.configurator.uninstall(this.mainScreen, pluginsManager);
+
+		// Borramos las preferencias del sistema, que es algo comun a todos los sistemas operativos
+		try {
+			PreferencesManager.removeSystemPrefs();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se han podido eliminar las preferencias del sistema de la aplicacion: " + e); //$NON-NLS-1$
+		}
+		try {
+			KeyStorePreferencesManager.removeSystemPrefs();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se han podido eliminar las preferencias del sistema de los almacenes: " + e); //$NON-NLS-1$
+		}
 	}
 
     /**
@@ -289,6 +310,12 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			}
 		}
 
+		// Si se ha indicado un archivo de configuracion,
+		// se estableceran las nuevas propiedades del sistema indicadas en el mismo
+		if (!config.getConfigPath().isEmpty()) {
+			ConfigUpdaterManager.savePrefsConfigFile(config.getConfigPath(), config.getUpdateConfig());
+		}
+
 		configurator.closeApplication(0, config.isNeedKeep());
 	}
 
@@ -329,6 +356,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		private boolean firefoxSecurityRoots = false;
 		private String certificatePath = ""; //$NON-NLS-1$
 		private String keystorePath = ""; //$NON-NLS-1$
+		private String configPath = ""; //$NON-NLS-1$
+		private boolean updateConfig = false;
 
 		public ConfigArgs(final String[] args) {
 			if (args != null) {
@@ -352,6 +381,10 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 						}
 					} else if (PARAMETER_KEYSTORE_PATH.equalsIgnoreCase(arg) && i < args.length - 1) {
 						this.keystorePath = args[++i];
+					} else if (CONFIG_PATH.equalsIgnoreCase(arg) && i < args.length - 1) {
+						this.configPath = args[++i];
+					} else if (UPDATE_CONFIG.equalsIgnoreCase(arg)) {
+						this.updateConfig = true;
 					}
 				}
 			}
@@ -384,5 +417,14 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		public String getKeystorePath() {
 			return this.keystorePath;
 		}
+
+		public String getConfigPath() {
+			return this.configPath;
+		}
+
+		public boolean getUpdateConfig() {
+			return this.updateConfig;
+		}
+
 	}
 }

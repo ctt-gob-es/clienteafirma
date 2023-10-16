@@ -16,7 +16,7 @@ import javax.net.ssl.SSLContext;
 
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Gestor de la invocaci&oacute;n por <i>WebSocket</i>. */
 public class AfirmaWebSocketServerManager {

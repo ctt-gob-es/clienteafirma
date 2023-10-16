@@ -56,6 +56,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
 
+
+
 	private static final String URN_SEPARATOR = ":"; //$NON-NLS-1$
 	private static final String PROT_SEPARATOR = URN_SEPARATOR + "//"; //$NON-NLS-1$
 
@@ -83,6 +85,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	@Override
 	public byte[] readUrl(final String url, final UrlHttpMethod method, final HttpErrorProcessor processor) throws IOException {
 		return readUrl(url, DEFAULT_TIMEOUT, null, null, method, processor);
+	}
+
+	@Override
+	public byte[] readUrl(final String url, final UrlHttpMethod method, final HttpErrorProcessor processor, final SSLConfig sslConfig) throws IOException {
+		return readUrl(url, DEFAULT_TIMEOUT, null, null, method, processor, sslConfig);
 	}
 
 	@Override
@@ -127,12 +134,36 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	}
 
 
-
+	@Override
 	public byte[] readUrl(final String urlToRead,
 	                      final int timeout,
 		                  final UrlHttpMethod method,
 		                  final Properties requestProperties,
 		                  final HttpErrorProcessor httpProcessor) throws IOException {
+		return readUrl(urlToRead, timeout, method, requestProperties, httpProcessor, null);
+	}
+
+
+	@Override
+	public byte[] readUrl(final String url, final int timeout, final String contentType, final String accept, final UrlHttpMethod method,
+			final HttpErrorProcessor httpProcessor, final SSLConfig sslConfig) throws IOException {
+		final Properties headers = new Properties();
+		if (contentType != null) {
+			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
+		}
+		if (accept != null) {
+			headers.setProperty(ACCEPT, accept);
+		}
+		return readUrl(url, timeout, method, headers, httpProcessor, sslConfig);
+	}
+
+	@Override
+	public byte[] readUrl(final String urlToRead,
+	                      final int timeout,
+		                  final UrlHttpMethod method,
+		                  final Properties requestProperties,
+		                  final HttpErrorProcessor httpProcessor,
+		                  final SSLConfig sslConfig) throws IOException {
 
 
 		if (urlToRead == null) {
@@ -181,11 +212,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final URL uri = new URL(request != null ? request : url);
 
-		final boolean needDisableSslChecks = Boolean.parseBoolean(
-				System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false") //$NON-NLS-1$
-		);
-		final boolean isSecureDomain = checkIsSecureDomain(uri);
-
 		final byte[] data;
 		try {
 			final HttpURLConnection conn;
@@ -196,15 +222,26 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn = (HttpURLConnection) uri.openConnection();
 			}
 
-			if ((needDisableSslChecks || isSecureDomain) && conn instanceof HttpsURLConnection) {
-				try {
-					SslSecurityManager.disableSslChecks((HttpsURLConnection) conn);
-					LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
+			final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(
+					System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false")); //$NON-NLS-1$
+			final boolean isSecureDomain = checkIsSecureDomain(uri);
+
+			// Si se trata de una conexion SSL:
+			// - Si me indicaron que el dominio es seguro o que directamente noes necesario validad el certificado,
+			// desactivamos la validacion de la conexion.
+			// - Si se establecio una conefiguracion de conexion concreta, la aplicamos.
+			if (conn instanceof HttpsURLConnection) {
+				if (needDisableSslChecks || isSecureDomain) {
+					try {
+						SslSecurityManager.disableSslChecks((HttpsURLConnection) conn);
+						LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
+					}
+					catch(final Exception e) {
+						LOGGER.warning("No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e); //$NON-NLS-1$
+					}
 				}
-				catch(final Exception e) {
-					LOGGER.warning(
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-					);
+				else if (sslConfig != null) {
+					SslSecurityManager.setSslSecurity((HttpsURLConnection) conn, sslConfig);
 				}
 			}
 
@@ -213,7 +250,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 			conn.setRequestMethod(method.toString());
 
-			// Trabajamos las cabeceras, las por defecto y las que nos indiquen
+			// Agregamos a la cabecera del request todas las propiedades indicadas, ademas de los valores
+			// por defecto para aquellas imprescindibles para las que no se haya indicado valor
 
 			final Properties headers = new Properties();
 			if (requestProperties != null) {
@@ -224,10 +262,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn.addRequestProperty("Authorization", "Basic " + authString); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (!headers.containsKey(ACCEPT)) {
-				conn.addRequestProperty(
-						ACCEPT,
-						"*/*" //$NON-NLS-1$
-						);
+				conn.addRequestProperty(ACCEPT, "*/*"); //$NON-NLS-1$
 			}
 			if (!headers.containsKey("Connection")) { //$NON-NLS-1$
 				conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -240,11 +275,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 
 			// Ponemos el resto de las cabeceras
-			for (final Map.Entry<?, ?> entry: headers.entrySet()) {
-				conn.addRequestProperty(
-						(String) entry.getKey(),
-						(String) entry.getValue()
-						);
+			for (final Map.Entry<?, ?> entry : headers.entrySet()) {
+				conn.addRequestProperty((String) entry.getKey(), (String) entry.getValue());
 			}
 
 			if (urlParameters != null) {
@@ -278,14 +310,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 						);
 			}
 
-			try (
-					final InputStream is = conn.getInputStream()
-					) {
+			try (final InputStream is = conn.getInputStream()) {
 				data = AOUtil.getDataFromInputStream(is);
 			}
 		}
 		catch (final IOException e) {
-
 			if (httpProcessor != null) {
 				LOGGER.log(Level.WARNING, "Fallo la conexion pero intentamos recuperarla: " + e); //$NON-NLS-1$
 				return httpProcessor.processHttpError(e, this, url, timeout, method, requestProperties);
@@ -385,4 +414,5 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 		return false;
 	}
+
 }

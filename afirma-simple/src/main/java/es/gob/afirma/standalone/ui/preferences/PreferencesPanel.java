@@ -27,6 +27,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class PreferencesPanel extends JPanel implements KeyListener, DisposableInterface {
 

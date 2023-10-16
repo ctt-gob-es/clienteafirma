@@ -1,4 +1,4 @@
-package xmlwise;
+package es.gob.afirma.standalone.configurator.common.xmlwise;
 
 /**
  * Generic exception when parsing XML.

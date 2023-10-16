@@ -28,7 +28,7 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.SmartCardLockedException;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
  * v&iacute;a controlador 100% Java o el <code>KeyStore</code> por defecto del sistema operativo.

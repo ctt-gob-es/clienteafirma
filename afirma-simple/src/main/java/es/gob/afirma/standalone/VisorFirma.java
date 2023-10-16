@@ -30,7 +30,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Ventana para la visualizaci&oacute;n de datos de firma.
  * @author Carlos Gamuci. */

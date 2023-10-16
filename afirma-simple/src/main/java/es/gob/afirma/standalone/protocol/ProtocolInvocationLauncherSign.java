@@ -89,7 +89,7 @@ import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class ProtocolInvocationLauncherSign {
 

@@ -24,7 +24,8 @@ import es.gob.afirma.standalone.ProxyConfig;
 import es.gob.afirma.standalone.ProxyConfig.ConfigType;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 
 public class ProxyPanelHandler {
 

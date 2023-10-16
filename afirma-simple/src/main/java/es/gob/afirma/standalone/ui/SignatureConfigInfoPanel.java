@@ -32,7 +32,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.AgePolicy;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 public class SignatureConfigInfoPanel extends JPanel {
 

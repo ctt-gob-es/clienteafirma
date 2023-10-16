@@ -690,7 +690,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
 		// Si se declaran commintment type indications y una razon de firma,
 		// solo se tendra en cuenta la razon de firma. El uso de la comprobacion
-		// anterior y esta, permitiria usar porlitica de firma y  commitment
+		// anterior y esta, permitiria usar politica de firma y  commitment
 		// type indications simultaneamente
 		if (extraParams.containsKey(PdfExtraParams.SIGN_REASON) &&
 				extraParams.containsKey(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS)) {

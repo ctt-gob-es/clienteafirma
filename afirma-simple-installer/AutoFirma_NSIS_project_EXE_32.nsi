@@ -981,6 +981,7 @@ Function un.UninstallFromRegistry
 	;Borramos las claves de registro en las que se almacenan las preferencias de la aplicacion
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\ui"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\core"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\plugin"
 	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob\afirma"
 	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob"

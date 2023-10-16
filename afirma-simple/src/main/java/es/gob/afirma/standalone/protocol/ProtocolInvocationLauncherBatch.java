@@ -39,7 +39,7 @@ import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class ProtocolInvocationLauncherBatch {
 

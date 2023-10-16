@@ -1,4 +1,4 @@
-package xmlwise;
+package es.gob.afirma.standalone.configurator.common.xmlwise;
 
 import java.util.LinkedList;
 

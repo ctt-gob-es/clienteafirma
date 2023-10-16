@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>afirma-ui-simpleafirma-configurator-common</artifactId>
+	<packaging>jar</packaging>
+	
+	<name>afirma-ui-simpleafirma-configurator-common</name>
+	<description>Clases de configuracion compartidas por AutoFirma y su configurador</description>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.9-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core</artifactId>
+			<version>${clienteafirma.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>es.gob.afirma.lib</groupId>
+					<artifactId>afirma-lib-jmimemagic</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-xades</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+	</dependencies>
+</project>

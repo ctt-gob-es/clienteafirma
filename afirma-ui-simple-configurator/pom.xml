@@ -63,7 +63,7 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-ui-simpleafirma</artifactId>
+			<artifactId>afirma-ui-simpleafirma-configurator-common</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
 

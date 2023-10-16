@@ -38,7 +38,7 @@ public final class SslSecurityManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
+	static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
 		new X509TrustManager() {
 			@Override
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -52,7 +52,7 @@ public final class SslSecurityManager {
 		}
 	};
 
-	private static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
+	static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
 		@Override
 		public boolean verify(final String hostname, final SSLSession session) {
 			return true;
@@ -272,12 +272,25 @@ public final class SslSecurityManager {
 		final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sslContext.init(null, new TrustManager[] { trustManager }, secureRandom);
 
-
-
 		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 
 		// Declaramos haber configurado el almacen de confianza del cliente @firma
 		afirmaTrustStoreConfigured = true;
+	}
+
+	/**
+	 * Establece la configuraci&oacute;n SSL certificados de confianza y validacion de nombres de
+	 * dominio) para una conexi&oacute;n.
+	 * @param conn Conexi&oacute;n a la que aplicar la configuraci&oacute;n.
+	 * @param sslConfig Configuraci&oacute;n SSL.
+	 */
+	public static void setSslSecurity(final HttpsURLConnection conn, final SSLConfig sslConfig) {
+		if (sslConfig.getSSLSocketFactory() != null) {
+			conn.setSSLSocketFactory(sslConfig.getSSLSocketFactory());
+		}
+		if (sslConfig.getHostnameVerifier() != null) {
+			conn.setHostnameVerifier(sslConfig.getHostnameVerifier());
+		}
 	}
 }
