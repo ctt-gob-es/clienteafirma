@@ -11,6 +11,8 @@ shrd/logo_cliente.png
 Spanish.lproj/AutoFirma.html
 Spanish.lproj/AutoFirmaHelpIcon.png
 Spanish.lproj/index.html
+Spanish.lproj/gfx/dialogocertificadoscargados.png
+Spanish.lproj/gfx/dialogoimportarcertificados.png
 Spanish.lproj/gfx/menualmacenesclaves_mini.png
 Spanish.lproj/gfx/menufirmascades_mini.png
 Spanish.lproj/gfx/menufirmasfacturae_mini.png
@@ -22,6 +24,7 @@ Spanish.lproj/gfx/menufirmasxades_mini.png
 Spanish.lproj/gfx/menugeneral_mini.png
 Spanish.lproj/gfx/menugproxy_mini.png
 Spanish.lproj/gfx/menulistablancadominios.png
+Spanish.lproj/gfx/menulistacertificadosconfianza.png
 Spanish.lproj/gfx/menuplugins_mini.png
 Spanish.lproj/gfx/menurestaurar_mini.png
 Spanish.lproj/gfx/pantalladetalle2_mini.png
