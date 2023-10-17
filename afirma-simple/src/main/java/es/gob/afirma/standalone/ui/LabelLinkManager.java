@@ -27,7 +27,7 @@ import es.gob.afirma.standalone.LookAndFeelManager;
 
 /**
  * Gestor de foco y rat&oacute;n en JLabel con enlaces.
- * @author Jos&eacute;s Montero Rivero.
+ * @author Jos&eacute; Montero Rivero.
  * */
 public final class LabelLinkManager extends KeyAdapter implements FocusListener,
                                           							MouseListener{

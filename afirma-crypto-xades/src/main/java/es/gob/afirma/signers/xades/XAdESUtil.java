@@ -561,7 +561,7 @@ public final class XAdESUtil {
      * @param element Elemento XML.
      * @return Primera firma encontrada o nulo si no se encuentra ninguna.
      */
-    static Element getFirstSignatureElement(final Element element) {
+   public static Element getFirstSignatureElement(final Element element) {
 
     	if (element == null) {
     		return null;
@@ -699,6 +699,12 @@ public final class XAdESUtil {
     			XAdESConstants.NAMESPACE_XADES_1_3_2);
     }
 
+    public static Element getSignatureMethodElement(final Element signatureElement) {
+		final Element signedInfoElement = XAdESUtil.getSignedInfo(signatureElement);
+		final NodeList signatureMethodList = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE_METHOD);
+		return (Element)signatureMethodList.item(0);
+    }
+
 
     /**
      * Crea una nueva instancia para firmar.
@@ -791,7 +797,7 @@ public final class XAdESUtil {
      * @param signatureElement Elemento XML "Signature" de firma.
      * @return Listado con las referencias a datos encontradas.
      */
-    static List<Element> getSignatureDataReferenceList(final Element signatureElement) {
+    public static List<Element> getSignatureDataReferenceList(final Element signatureElement) {
 
     	// Obtemos el nodo SignedInfo
     	final Element signedInfoElement = getSignedInfo(signatureElement);

@@ -452,7 +452,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param references Referencias a datos encontrados en la firma.
      * @return {@code true} si la firma es internally detached, {@code false} en caso contrario.
      */
-    private static boolean isSignatureElementInternallyDetached(final Element docElement, final List<Element> references) {
+    public static boolean isSignatureElementInternallyDetached(final Element docElement, final List<Element> references) {
 
     	if (docElement == null || references == null) {
     		return false;
@@ -515,7 +515,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param references Referencias a datos encontrados en la firma.
      * @return {@code true} si la firma es externally detached, {@code false} en caso contrario.
      */
-    private static boolean isSignatureElementExternallyDetached(final List<Element> references) {
+    public static boolean isSignatureElementExternallyDetached(final List<Element> references) {
 
     	if (references == null) {
     		return false;
@@ -624,7 +624,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param references Referencias a datos declaradas en la firma.
      * @return {@code true} si es una firma enveloped, {@code false} en caso contrario.
      */
-    static boolean isSignatureElementEnveloped(final Element signatureElement, final List<Element> references) {
+    public static boolean isSignatureElementEnveloped(final Element signatureElement, final List<Element> references) {
 
     	if (references == null) {
     		return false;
@@ -688,7 +688,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param references Referencias a datos declaradas en la firma.
      * @return {@code true} si es una firma enveloping, {@code false} en caso contrario.
      */
-    static boolean isSignatureElementEnveloping(final Element signatureElement, final List<Element> references) {
+    public static boolean isSignatureElementEnveloping(final Element signatureElement, final List<Element> references) {
 
     	if (signatureElement == null || references == null) {
     		return false;

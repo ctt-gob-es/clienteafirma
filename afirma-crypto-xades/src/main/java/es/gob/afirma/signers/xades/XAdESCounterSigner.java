@@ -429,7 +429,7 @@ public final class XAdESCounterSigner {
 		for (int i = 0; i < signaturesList.getLength(); i++) {
 			final Element node = (Element) signaturesList.item(i);
 			if (signers.contains(AOUtil.getCN(Utils.getCertificate(node
-					.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate") //$NON-NLS-1$
+					.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_X509_CERTIFICATE)
 					.item(0))))) {
 				nodes.add(node);
 			}

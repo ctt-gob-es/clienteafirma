@@ -3,6 +3,7 @@ package es.gob.afirma.standalone.ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -11,9 +12,11 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -24,6 +27,7 @@ public class DocumentInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1627010163673368615L;
 
 	private String accesibleDescription;
+	final JLabel signsDetailsLbl = new JLabel();
 
 	public DocumentInfoPanel(final SignOperationConfig signConfig, final Color bgColor) {
 		createUI(signConfig, bgColor);
@@ -74,6 +78,28 @@ public class DocumentInfoPanel extends JPanel {
         	invalidSignatureErrorLabel = new JLabel(invalidSignatureText, new ImageIcon(errorIcon), SwingConstants.LEFT);
         	this.accesibleDescription += invalidSignatureText;
         	invalidSignatureErrorLabel.setForeground(Color.RED);
+
+        	this.signsDetailsLbl.setText(SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
+        	// Este gestor se encargara de controlar los eventos de foco y raton
+            final LabelLinkManager labelLinkManager = new LabelLinkManager(this.signsDetailsLbl);
+            byte [] signData = null;
+			try (FileInputStream fl = new FileInputStream(signConfig.getDataFile());) {
+				signData = new byte[(int)signConfig.getDataFile().length()];
+				fl.read(signData);
+			} catch (final Exception e) {
+				AOUIFactory.showErrorMessage(
+						SimpleAfirmaMessages.getString("ValidationInfoDialog.5"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						null
+						);
+			}
+
+            labelLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
+            		signData
+            ));
+            this.signsDetailsLbl.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+            		+ SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
         }
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -87,6 +113,7 @@ public class DocumentInfoPanel extends JPanel {
 		if (invalidSignatureErrorLabel != null) {
 			add(Box.createRigidArea(new Dimension(0, 4)));
 			add(invalidSignatureErrorLabel);
+			add(this.signsDetailsLbl);
 		}
 	}
 
