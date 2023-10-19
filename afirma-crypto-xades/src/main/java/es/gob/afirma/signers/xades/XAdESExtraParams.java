@@ -433,6 +433,12 @@ public final class XAdESExtraParams {
 	public static final String ALLOW_SIGN_LTS_SIGNATURES = "allowSignLTSignature"; //$NON-NLS-1$
 
     /**
+     * Par&aacute;metro que permite configurar si se permite la generaci&oacute;n de firmas que declaren
+     * la politica de firma de la AGE e incorporen incompatibilidades.
+     */
+	public static final String ALLOW_AGE_POLICY_INCOMPATIBILITIES = "allowAGEPolicyIncompatibilities"; //$NON-NLS-1$
+
+    /**
      * Constructor vac&iacute;o privado para que no se pueda instanciar la clase
      * ya que es est&aacute;tico.
      */

@@ -41,10 +41,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.AGEPolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AdESPolicyPropertiesManager;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
@@ -431,6 +433,26 @@ public final class XAdESCoSigner {
 
 				// Firma enveloping
 				if (isEnveloping && dataObjectElement != null) {
+
+					// Salvo que nos indiquen que estan permitidas, identificamos si se ha declarado la firma de la AGE y notificamos
+					// una incompatibilidad con la cofirma XAdES enveloping
+					final String allowAgePolicyIncompatibilities = extraParams.getProperty(XAdESExtraParams.ALLOW_AGE_POLICY_INCOMPATIBILITIES);
+					if (allowAgePolicyIncompatibilities == null || !Boolean.parseBoolean(allowAgePolicyIncompatibilities)) {
+						final String policyId = extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER);
+						if (AdESPolicyPropertiesManager.isAgePolicyConfigurated(policyId)) {
+
+							// Si se indico expresamente que no se permitian incompatibilidades,
+							// lanzamos una excepcion irrecuperable. Si no, lanzamos una que
+							// permite trasladar la consulta al usuario
+							if (allowAgePolicyIncompatibilities != null) {
+								throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping"); //$NON-NLS-1$
+							}
+
+							throw new AGEPolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping", AGEPolicyIncompatibilityException.OP_COSIGN); //$NON-NLS-1$
+						}
+					}
+
+
 					// crea el nuevo elemento Object que con el documento afirmar
 					final List<XMLStructure> structures = new ArrayList<>(1);
 					structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));

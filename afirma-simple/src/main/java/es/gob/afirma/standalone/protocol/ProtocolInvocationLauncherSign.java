@@ -74,6 +74,7 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -89,7 +90,6 @@ import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class ProtocolInvocationLauncherSign {
 
@@ -224,7 +224,7 @@ final class ProtocolInvocationLauncherSign {
 									pluginInfo.getName()));
 							break;
 						}
-						if (processor != null && processor.checkTrigger(operation)) {
+						if (processor.checkTrigger(operation)) {
 							return processor;
 						}
 					}

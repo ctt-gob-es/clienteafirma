@@ -591,7 +591,7 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 				}
 
-				// En el caso de ser una version de internet Explorer que soportase la deteccion de aplicacion
+				// En el caso de ser una version de internet Explorer que soportase la deteccion de aplicaciones
 				// capaces de manejar el protocolo, aprovechamos esta caracteristica (Internet Explorer para Windows 8 Modern UI)
 
 				if (navigator.msLaunchUri) {

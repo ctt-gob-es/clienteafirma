@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.AGEPolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -541,6 +542,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 				exception = new SigningLTSException(errorMsg);
 			} else if (SigningLTSException.REQUESTOR_POSSIBLE_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg, true);
+			} else if (AGEPolicyIncompatibilityException.REQUESTOR_SIGN_MSG_CODE.equals(errorCode)) {
+				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_SIGN);
+			} else if (AGEPolicyIncompatibilityException.REQUESTOR_COSIGN_MSG_CODE.equals(errorCode)) {
+				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_COSIGN);
+			} else if (AGEPolicyIncompatibilityException.REQUESTOR_COUNTERSIGN_MSG_CODE.equals(errorCode)) {
+				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_COUNTERSIGN);
 			}
 		}
 

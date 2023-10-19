@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.protocol.UrlParameters;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -93,10 +94,15 @@ final class ProtocolInvocationLauncherUtil {
 
 		Class<Exception> exceptionClass;
 		try {
-			exceptionClass = (Class<Exception>) Class.forName(ex.getServerExceptionClassname());
+			exceptionClass = (Class<Exception>) Class.forName(ex.getServerExceptionClassname(), false, ProtocolInvocationLauncherUtil.class.getClassLoader());
 		}
 		catch (final Throwable e) {
 			LOGGER.warning("No se pudo identificar la excepcion enviada por el servidor (" + ex.getServerExceptionClassname() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return ex;
+		}
+
+		if (!exceptionClass.isAssignableFrom(RuntimeConfigNeededException.class)) {
+			LOGGER.warning("La clase indicada para pedir confirmacion no es de tipo RuntimeConfigNeededException (" + ex.getServerExceptionClassname() + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			return ex;
 		}
 
