@@ -434,24 +434,29 @@ public final class XAdESCoSigner {
 				// Firma enveloping
 				if (isEnveloping && dataObjectElement != null) {
 
-					// Salvo que nos indiquen que estan permitidas, identificamos si se ha declarado la firma de la AGE y notificamos
-					// una incompatibilidad con la cofirma XAdES enveloping
-					final String allowAgePolicyIncompatibilities = extraParams.getProperty(XAdESExtraParams.ALLOW_AGE_POLICY_INCOMPATIBILITIES);
-					if (allowAgePolicyIncompatibilities == null || !Boolean.parseBoolean(allowAgePolicyIncompatibilities)) {
-						final String policyId = extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER);
-						if (AdESPolicyPropertiesManager.isAgePolicyConfigurated(policyId)) {
-
-							// Si se indico expresamente que no se permitian incompatibilidades,
-							// lanzamos una excepcion irrecuperable. Si no, lanzamos una que
-							// permite trasladar la consulta al usuario
-							if (allowAgePolicyIncompatibilities != null) {
-								throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping"); //$NON-NLS-1$
-							}
-
+					// Si se declara la politica de firma de la AGE, debemos tener en cuenta
+					// que esta no es compatible con las firmas enveloping, asi que debemos
+					// establecer un comportamiento alternativo:
+					//  - Si no se indica que hacer, lanzaremos una excepcion indicando la incompatiblidad. Esto
+					//    puede conllevar que las aplicaciones adapten el comportamiento.
+					//  - Si se indico que se evitasen las incompatibilidades, se adapta la configuraci&oacute;n
+					//    segun lo establecido por la excepcion para generar una firma valida.
+					//  - Se se indico que no se evitasen la incompatibilidades, indicaremos que la operacion
+					//    fallo.
+					final String policyId = extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER);
+					if (AdESPolicyPropertiesManager.isAgePolicyConfigurated(policyId)) {
+						final String avoidAgePolicyIncompatibilities = extraParams.getProperty(XAdESExtraParams.AVOID_AGE_POLICY_INCOMPATIBILITIES);
+						if (avoidAgePolicyIncompatibilities == null) {
 							throw new AGEPolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping", AGEPolicyIncompatibilityException.OP_COSIGN); //$NON-NLS-1$
 						}
+						else if (Boolean.parseBoolean(avoidAgePolicyIncompatibilities)) {
+							new AGEPolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping") //$NON-NLS-1$
+								.prepareOperationWithConfirmation(extraParams);
+						}
+						else {
+							throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping"); //$NON-NLS-1$
+						}
 					}
-
 
 					// crea el nuevo elemento Object que con el documento afirmar
 					final List<XMLStructure> structures = new ArrayList<>(1);

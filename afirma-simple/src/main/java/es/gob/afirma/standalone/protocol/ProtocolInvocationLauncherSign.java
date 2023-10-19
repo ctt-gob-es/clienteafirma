@@ -32,6 +32,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.CustomRuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
@@ -716,7 +717,12 @@ final class ProtocolInvocationLauncherSign {
 				final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 						SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
 				if (result == JOptionPane.YES_OPTION) {
-					extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
+					if (e instanceof CustomRuntimeConfigNeededException) {
+						((CustomRuntimeConfigNeededException) e).prepareOperationWithConfirmation(extraParams);
+					}
+					else {
+						extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
+					}
 					return executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
 				}
 			}

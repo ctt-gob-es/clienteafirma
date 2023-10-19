@@ -9,11 +9,13 @@
 
 package es.gob.afirma.core;
 
+import java.util.Properties;
+
 /**
  * Excepci&oacute;n que denota que se va a generar una firma que declara la pol&iacute;tica de firma
  * de la AGE, pero es incompatible con ella.
  */
-public class AGEPolicyIncompatibilityException extends RuntimeConfigNeededException {
+public class AGEPolicyIncompatibilityException extends CustomRuntimeConfigNeededException {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = 8278487852684799319L;
@@ -22,7 +24,7 @@ public class AGEPolicyIncompatibilityException extends RuntimeConfigNeededExcept
 	public static final String REQUESTOR_COSIGN_MSG_CODE = "agePolicyIncompatibilityCosign"; //$NON-NLS-1$
 	public static final String REQUESTOR_COUNTERSIGN_MSG_CODE = "agePolicyIncompatibilityCounterSign"; //$NON-NLS-1$
 
-	private static final String EXTRA_PARAM_NEEDED = "allowAGEPolicyIncompatibilities"; //$NON-NLS-1$
+	private static final String EXTRA_PARAM_NEEDED = "avoidAGEPolicyIncompatibilities"; //$NON-NLS-1$
 
 	/** Error identificado durante una operaci&oacute;n de firma. */
 	public static final int OP_SIGN = 1;
@@ -63,6 +65,17 @@ public class AGEPolicyIncompatibilityException extends RuntimeConfigNeededExcept
 	 */
 	public AGEPolicyIncompatibilityException(final String message, final int operation, final Throwable cause) {
 		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, getMessageCode(operation), EXTRA_PARAM_NEEDED, cause);
+	}
+
+	@Override
+	public void prepareOperationWithConfirmation(final Properties extraParams) {
+		if (extraParams != null) {
+			extraParams.remove("policyIdentifier");//$NON-NLS-1$
+			extraParams.remove("policyIdentifierHash");//$NON-NLS-1$
+			extraParams.remove("policyIdentifierHashAlgorithm");//$NON-NLS-1$
+			extraParams.remove("policyDescription");//$NON-NLS-1$
+			extraParams.remove("policyQualifier"); //$NON-NLS-1$
+		}
 	}
 
 	/**

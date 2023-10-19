@@ -34,6 +34,7 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.CustomRuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
@@ -60,6 +61,7 @@ import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
@@ -68,7 +70,6 @@ import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
@@ -241,7 +242,12 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         			final int result = AOUIFactory.showConfirmDialog(this.parent, SimpleAfirmaMessages.getString(e.getRequestorText()),
         					SimpleAfirmaMessages.getString("SignPanel.153"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
         			if (result == JOptionPane.YES_OPTION) {
-        				signConfig.addExtraParam(e.getParam(), Boolean.TRUE.toString());
+        				if (e instanceof CustomRuntimeConfigNeededException) {
+    						((CustomRuntimeConfigNeededException) e).prepareOperationWithConfirmation(signConfig.getExtraParams());
+    					}
+    					else {
+            				signConfig.addExtraParam(e.getParam(), Boolean.TRUE.toString());
+    					}
         			} else {
         				return;
         			}
@@ -341,7 +347,12 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             					SimpleAfirmaMessages.getString("SignPanel.153"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
             			if (result == JOptionPane.YES_OPTION) {
             				this.needRelaunch = true;
-            				signConfig.addExtraParam(e.getParam(), Boolean.TRUE.toString());
+            				if (e instanceof CustomRuntimeConfigNeededException) {
+        						((CustomRuntimeConfigNeededException) e).prepareOperationWithConfirmation(signConfig.getExtraParams());
+        					}
+        					else {
+                				signConfig.addExtraParam(e.getParam(), Boolean.TRUE.toString());
+        					}
             			}
             		}
             		// Se requiere ua contrasena por parte del usuario

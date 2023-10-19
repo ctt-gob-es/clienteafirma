@@ -4,7 +4,7 @@ package es.gob.afirma.core;
  * Identifica que no se puede completar una operaci&oacute;n sin configuraci&oacute;n adicional que se podr&iacute;
  * proporcionar en tiempo de ejecuci&oacute;n (probablemente la podr&iacute;a proporcionar un usuario). La
  * configuraci&oacute;n puede ser un dato o una confirmaci&oacute;n y una aplicaci&oacute;n que tenga la capacidad
- * deber&iacute; proporcionar los medios necesarios para pedir esta obtener esta confiinformaci&oacute;n
+ * deber&iacute; proporcionar los medios necesarios para obtener esta confirmaci&oacute;n.
  */
 public class RuntimeConfigNeededException extends AOException {
 
