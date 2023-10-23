@@ -79,6 +79,8 @@ public class XAdESConstants {
 
 	public static final String TAG_X509_CERTIFICATE = "X509Certificate"; //$NON-NLS-1$
 
+	public static final String TAG_STREET_ADDRESS = "StreetAddress"; //$NON-NLS-1$
+
 	/** Nombre del nodo de atributos firmados de la firma. */
 	public static final String TAG_SIGNED_SIGNATURE_PROPERTIES = "SignedSignatureProperties"; //$NON-NLS-1$
 

@@ -9,6 +9,8 @@
 
 package es.gob.afirma.standalone.ui;
 
+import es.gob.afirma.signvalidation.SignValidity;
+
 /**
  * Implementaci&oacute;n para gestionar errores en validaciones de firma.
  * @author Jos&eacute;s Montero Rivero.
@@ -16,14 +18,16 @@ package es.gob.afirma.standalone.ui;
 public final class ValidationErrorsLabelLinkImpl implements LabelLinkListener{
 
 	private final byte [] signData;
+	private final SignValidity generalValidation;
 
-    public ValidationErrorsLabelLinkImpl (final byte [] signData) {
+    public ValidationErrorsLabelLinkImpl (final byte [] signData, final SignValidity generalValidation) {
+    	this.generalValidation = generalValidation;
     	this.signData = signData;
     }
 
 	@Override
 	public void openLink() {
-		final ValidationInfoDialog validationDialog = new ValidationInfoDialog(null, this.signData);
+		final ValidationInfoDialog validationDialog = new ValidationInfoDialog(null, this.signData, this.generalValidation);
     	validationDialog.setVisible(true);
 	}
 

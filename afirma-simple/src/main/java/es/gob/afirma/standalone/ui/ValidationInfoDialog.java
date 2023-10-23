@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.signdetails.SignAnalyzer;
@@ -27,13 +28,15 @@ public class ValidationInfoDialog extends JDialog {
 	private static final long serialVersionUID = -6677845022747809410L;
 
 	private static final int DEFAULT_WINDOW_WIDTH = 780;
-	private static final int DEFAULT_WINDOW_HEIGHT = 350;
+	private static final int DEFAULT_WINDOW_HEIGHT = 550;
 
 	private JScrollPane scrollPane;
 	private final JEditorPane errorsInfo = new JEditorPane();
+	private final SignValidity generalValidation;
 
-	public ValidationInfoDialog(final JFrame parent, final byte [] signData) {
+	public ValidationInfoDialog(final JFrame parent, final byte [] signData, final SignValidity generalValidation) {
 		super(parent, true);
+		this.generalValidation = generalValidation;
 		createUI(signData);
 	}
 
@@ -68,7 +71,7 @@ public class ValidationInfoDialog extends JDialog {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		final String signsinfo = SignDetailsFormatter.formatToHTML(analyzer);
+		final String signsinfo = SignDetailsFormatter.formatToHTML(analyzer, this.generalValidation);
 
 		this.errorsInfo.setContentType("text/html"); //$NON-NLS-1$
 		this.errorsInfo.setText(signsinfo);

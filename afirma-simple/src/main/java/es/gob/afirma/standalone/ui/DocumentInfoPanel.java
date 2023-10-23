@@ -83,7 +83,7 @@ public class DocumentInfoPanel extends JPanel {
         	// Este gestor se encargara de controlar los eventos de foco y raton
             final LabelLinkManager labelLinkManager = new LabelLinkManager(this.signsDetailsLbl);
             byte [] signData = null;
-			try (FileInputStream fl = new FileInputStream(signConfig.getDataFile());) {
+			try (FileInputStream fl = new FileInputStream(signConfig.getDataFile())) {
 				signData = new byte[(int)signConfig.getDataFile().length()];
 				fl.read(signData);
 			} catch (final Exception e) {
@@ -96,7 +96,7 @@ public class DocumentInfoPanel extends JPanel {
 			}
 
             labelLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
-            		signData
+            		signData, validity
             ));
             this.signsDetailsLbl.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
             		+ SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$

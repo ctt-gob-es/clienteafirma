@@ -155,7 +155,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 
         final X509Certificate cert = getCertificate(sign);
 
-        final JPanel resultPanel = new SignResultPanel(validity, true, this);
+        final JPanel resultPanel = new SignResultPanel(validity, true, this, sign);
         this.signDataPanel = new SignDataPanel(
     		signFile,
     		sign,

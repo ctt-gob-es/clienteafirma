@@ -3,6 +3,8 @@ package es.gob.afirma.standalone.signdetails;
 import java.util.List;
 import java.util.Properties;
 
+import es.gob.afirma.signvalidation.SignValidity;
+
 public abstract class SignDetails {
 
 	protected String format;
@@ -11,7 +13,7 @@ public abstract class SignDetails {
 	protected Properties metadata;
 	protected Boolean dataIncluded;
 	protected String dataLocation;
-	protected Properties validityResult;
+	protected List<SignValidity> validityResult;
 	protected List<DataObjectFormat> dataObjectFormats;
 	protected List<SignDetails> signDetails;
 	protected List<CertificateDetails> signers;
@@ -34,7 +36,7 @@ public abstract class SignDetails {
 	public String getDataLocation() {
 		return this.dataLocation;
 	}
-	public Properties getValidityResult() {
+	public List<SignValidity> getValidityResult() {
 		return this.validityResult;
 	}
 	public List<SignDetails> getSignDetails() {
@@ -61,7 +63,7 @@ public abstract class SignDetails {
 	public void setDataLocation(final String dataLocation) {
 		this.dataLocation = dataLocation;
 	}
-	public void setValidityResult(final Properties validityResult) {
+	public void setValidityResult(final List<SignValidity> validityResult) {
 		this.validityResult = validityResult;
 	}
 	public void setDataObjectFormats(final List<DataObjectFormat> dataObjectFormats) {

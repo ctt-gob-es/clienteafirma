@@ -565,7 +565,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param references Referencias a datos encontrados en la firma.
      * @return {@code true} si es una firma con manifest, {@code false} en caso contrario.
      */
-    static boolean isSignatureWithManifest(final List<Element> references) {
+    public static boolean isSignatureWithManifest(final List<Element> references) {
 
     	if (references == null) {
     		return false;

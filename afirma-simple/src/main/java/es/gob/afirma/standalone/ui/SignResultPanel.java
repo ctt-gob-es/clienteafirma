@@ -41,10 +41,14 @@ final class SignResultPanel extends JPanel {
     private String accessibleDescription = ""; //$NON-NLS-1$
 
     SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
-        SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener));
+        SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener, null));
     }
 
-    void createUI(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
+    SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener, final byte [] signData) {
+        SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener, signData));
+    }
+
+    void createUI(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener, final byte [] signData) {
 
         String iconFilename;
         switch (validity.getValidity()) {
@@ -89,6 +93,16 @@ final class SignResultPanel extends JPanel {
                 this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
                 		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
 
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                final LabelLinkManager detailsSignLinkManager = new LabelLinkManager(this.validationLinkLabel);
+                detailsSignLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
+                		signData, validity
+                ));
+
+                this.validationLinkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
+                this.validationLinkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                		+ SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
+
                 this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.2") //$NON-NLS-1$
                 						 + SimpleAfirmaMessages.getString("SignResultPanel.3") //$NON-NLS-1$
                 						 + SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
@@ -132,6 +146,16 @@ final class SignResultPanel extends JPanel {
 
                 this.linkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
                 		+ SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$
+
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                final LabelLinkManager okDetailsSignLinkManager = new LabelLinkManager(this.validationLinkLabel);
+                okDetailsSignLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
+                		signData, validity
+                ));
+
+                this.validationLinkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
+                this.validationLinkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
+                		+ SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
                 break;
             case KO:
                 if (singleSign) {
@@ -162,8 +186,12 @@ final class SignResultPanel extends JPanel {
 
                     this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.5") //$NON-NLS-1$
    						 						+ errorMessage;
+
                 	// Este gestor se encargara de controlar los eventos de foco y raton
-                    final LabelLinkManager validationLabelLinkManager = new LabelLinkManager(this.validationLinkLabel);
+                    final LabelLinkManager koSSDetailsSignLinkManager = new LabelLinkManager(this.validationLinkLabel);
+                    koSSDetailsSignLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
+                    		signData, validity
+                    ));
 
                     this.validationLinkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
                     this.validationLinkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
@@ -191,7 +219,12 @@ final class SignResultPanel extends JPanel {
                     this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.30") //$NON-NLS-1$
    						 						+ errorMessage
    						 						+ SimpleAfirmaMessages.getString("SignResultPanel.33"); //$NON-NLS-1$
-                    final LabelLinkManager validationLabelLinkManager = new LabelLinkManager(this.validationLinkLabel);
+
+                	// Este gestor se encargara de controlar los eventos de foco y raton
+                    final LabelLinkManager koDetailsSignLinkManager = new LabelLinkManager(this.validationLinkLabel);
+                    koDetailsSignLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
+                    		signData, validity
+                    ));
 
                     this.validationLinkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
                     this.validationLinkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
@@ -218,7 +251,12 @@ final class SignResultPanel extends JPanel {
                 this.accessibleDescription += SimpleAfirmaMessages.getString("SignResultPanel.11") //$NON-NLS-1$
 						 						+ errorMessage
 						 						+ SimpleAfirmaMessages.getString("SignResultPanel.13"); //$NON-NLS-1$
-                final LabelLinkManager validationLabelLinkManager = new LabelLinkManager(this.validationLinkLabel);
+
+            	// Este gestor se encargara de controlar los eventos de foco y raton
+                final LabelLinkManager defDetailsSignLinkManager = new LabelLinkManager(this.validationLinkLabel);
+                defDetailsSignLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
+                		signData, validity
+                ));
 
                 this.validationLinkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$
                 this.validationLinkLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$

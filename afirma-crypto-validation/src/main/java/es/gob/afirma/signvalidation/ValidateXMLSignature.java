@@ -17,6 +17,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +39,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.misc.SecureXmlBuilder;
@@ -147,10 +149,60 @@ public final class ValidateXMLSignature extends SignValider {
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
-        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null, e);
+        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e);
         }
 
         return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+	}
+
+	public static List<SignValidity> validateSign(final Element signElement) {
+
+		final ArrayList<SignValidity> result = new ArrayList<SignValidity>();
+		boolean validSign = true;
+
+		try {
+			final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), signElement);
+
+			boolean noMatchData = false;
+
+			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+			if (!signature.validate(valContext)) {
+				LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+				validSign = false;
+				noMatchData = true;
+			}
+			if (!signature.getSignatureValue().validate(valContext)) {
+				LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+				validSign = false;
+				noMatchData = true;
+			}
+
+			// Ahora miramos las referencias una a una
+			final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
+			while (it.hasNext()) {
+				final Reference iNext = (Reference) it.next();
+				if (!iNext.validate(valContext)) {
+					LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+					validSign = false;
+					noMatchData = true;
+				}
+			}
+
+			if (noMatchData) {
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+			}
+
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
+			validSign = false;
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
+		}
+
+		if (validSign) {
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+		}
+
+		return result;
 	}
 
     static final class KeyValueKeySelector extends KeySelector {
