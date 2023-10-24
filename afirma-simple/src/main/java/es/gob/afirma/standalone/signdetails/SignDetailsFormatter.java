@@ -19,7 +19,7 @@ public class SignDetailsFormatter {
 		if (signDetailsParent.get(0).getDataObjectFormats() != null && signDetailsParent.get(0).getDataObjectFormats().size() > 0) {
 			result += "<h3>Informaci&oacute;n sobre datos firmados:</h3>"; //$NON-NLS-1$
 			for (int i = 0 ; i < signDetailsParent.get(0).getDataObjectFormats().size() ; i++) {
-				result += "<ul><li>Referencia: " + signDetailsParent.get(0).getDataObjectFormats().get(i).getIdentifier() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<ul>"; //$NON-NLS-1$
 				if (signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() != null) {
 					result += "<li>Encoding: " + signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
