@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -82,6 +83,13 @@ public final class XAdESUtil {
 	};
 
     private static final String CRYPTO_OPERATION_SIGN = "SIGN"; //$NON-NLS-1$
+
+    /** Transformaci&oacute;n XPATH para eliminar todas las firmas de un XML. */
+    private static final String XPATH_ENVELOPED_EQ = "not(ancestor-or-self::%1$s:Signature)"; //$NON-NLS-1$
+
+    /** Transformaci&oacute;n XPATH equivalente a la transformaci&oacute;n enveloped. Elimina la firma actual. */
+    private static final String XPATH_ENVELOPED_EQ2 = "count(ancestor-or-self::%1$s:Signature|here()/ancestor::%1$s:Signature[1])>count(ancestor-or-self::%1$s:Signature)"; //$NON-NLS-1$
+
 
 	private XAdESUtil() {
 		// No permitimos la instanciacion
@@ -973,5 +981,146 @@ public final class XAdESUtil {
     			}
     		}
     	}
+    }
+
+    /**
+     * Comprueba a trav&eacute;s de las referencias a datos declaradas en una firma si se
+     * trata de una firma enveloped.
+     * @param signatureElement Elemento con la firma a comprobar.
+     * @param references Referencias a datos declaradas en la firma.
+     * @return {@code true} si es una firma enveloped, {@code false} en caso contrario.
+     */
+    public static boolean isSignatureElementEnveloped(final Element signatureElement, final List<Element> references) {
+
+    	if (references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos enveloping si alguno de los datos referenciados esta contenido dentro de
+    	// la propia firma.
+    	for (int i = 0; i < references.size(); i++) {
+    		final NodeList transformList = references.get(i).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
+    		for (int j = 0; j < transformList.getLength(); j++) {
+    			final String algorithm = ((Element) transformList.item(j)).getAttribute("Algorithm"); //$NON-NLS-1$
+    			if (Transform.ENVELOPED.equals(algorithm)) {
+    				return true;
+    			}
+    			else if (Transform.XPATH.equals(algorithm)) {
+    				final String signaturePrefix = signatureElement.getPrefix();
+    				final String xPath = transformList.item(j).getTextContent().replaceAll("\\s+", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    				if (String.format(XPATH_ENVELOPED_EQ, signaturePrefix).equals(xPath) ||
+    						String.format(XPATH_ENVELOPED_EQ2, signaturePrefix).equals(xPath)) {
+    					return true;
+    				}
+    			}
+    		}
+    	}
+    	return false;
+    }
+
+    /**
+     * Indica si la firma utiliza un manifest para referenciar datos.
+     * @param references Referencias a datos encontrados en la firma.
+     * @return {@code true} si es una firma con manifest, {@code false} en caso contrario.
+     */
+    public static boolean isSignatureWithManifest(final List<Element> references) {
+
+    	if (references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos firma con manifest si alguna de las referencias que firma esta
+    	// declarada como de tipo manifest
+    	for (int i = 0; i < references.size(); i++) {
+    		final String type = references.get(i).getAttribute("Type"); //$NON-NLS-1$
+    		if (type != null && type.equals(XAdESConstants.REFERENCE_TYPE_MANIFEST)) {
+    			return true;
+    		}
+    	}
+    	return false;
+	}
+
+    /**
+     * Indica si la firma a la que pertenecen las referencias usadas es externally detached.
+     * @param references Referencias a datos encontrados en la firma.
+     * @return {@code true} si la firma es externally detached, {@code false} en caso contrario.
+     */
+    public static boolean isSignatureElementExternallyDetached(final List<Element> references) {
+
+    	if (references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos externally detached si se encuentra una referencia que utilice el
+    	// esquema http o https
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && (uri.toLowerCase(Locale.US).startsWith("http://") || //$NON-NLS-1$
+    				uri.toLowerCase(Locale.US).startsWith("https://"))) { //$NON-NLS-1$
+    			return true;
+    		}
+    	}
+    	return false;
+	}
+
+    /**
+     * Indica si la firma a la que pertenecen las referencias usadas es internally detached.
+     * @param docElement Elemento ra&iacute;z del XML.
+     * @param references Referencias a datos encontrados en la firma.
+     * @return {@code true} si la firma es internally detached, {@code false} en caso contrario.
+     */
+    public static boolean isSignatureElementInternallyDetached(final Element docElement, final List<Element> references) {
+
+    	if (docElement == null || references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos internally detached si alguno de los datos referenciados esta contenido dentro
+    	// del XML padre, sin entrar en ninguna firma.
+    	// NOTA: Una cofirma de una firma enveloping podria considerarse
+    	// internally detached, ya que tendria una referencia a los datos contenidos en la otra firma, que es
+    	// externa a ella misma. Se omite la busqueda en todas las firmas para omitir, ademas de otros posibles,
+    	// este caso de uso
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && uri.startsWith("#")) { //$NON-NLS-1$
+				final Node referencedNode = XAdESUtil.findElementById(uri.substring(1), docElement, true);
+				// Si los datos referenciados estan contenidos dentro del XML padre y fuera de las firmas,
+				// se trata de una firma internally detached
+				if (referencedNode != null) {
+					return true;
+				}
+    		}
+    	}
+    	// Se supone que los datos estarian dentro de alguna de las firmas o fuera del XML
+    	return false;
+	}
+
+    /**
+     * Comprueba a trav&eacute;s de las referencias a datos declaradas en una firma si se
+     * trata de una firma enveloping.
+     * @param signatureElement Elemento con la firma a comprobar.
+     * @param references Referencias a datos declaradas en la firma.
+     * @return {@code true} si es una firma enveloping, {@code false} en caso contrario.
+     */
+    public static boolean isSignatureElementEnveloping(final Element signatureElement, final List<Element> references) {
+
+    	if (signatureElement == null || references == null) {
+    		return false;
+    	}
+
+    	// La consideraremos enveloping si alguno de los datos referenciados esta contenido dentro de
+    	// la propia firma.
+    	for (int i = 0; i < references.size(); i++) {
+    		final String uri = references.get(i).getAttribute("URI"); //$NON-NLS-1$
+    		if (uri != null && uri.startsWith("#")) { //$NON-NLS-1$
+				final Node referencedNode = XAdESUtil.findElementById(uri.substring(1), signatureElement, false);
+				// Si los datos referenciados estan contenidos en la firma, se trata de una firma enveloping
+				if (referencedNode != null) {
+					return true;
+				}
+    		}
+    	}
+    	return false;
     }
 }

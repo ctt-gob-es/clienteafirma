@@ -183,6 +183,18 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         final JPanel documentInfoPanel = new DocumentInfoPanel(signConfig, bgColor);
         this.accesibleDescription += ((DocumentInfoPanel) documentInfoPanel).getAccesibleDescription();
 
+        JLabel validationInfoLabel = null;
+        JPanel validationInfoPanel = null;
+        if (signConfig.getSignValidity() != null) {
+	        // Panel de validacion del documento
+	        validationInfoLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.155")); //$NON-NLS-1$
+	        this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.155"); //$NON-NLS-1$
+	        validationInfoLabel.setFont(validationInfoLabel.getFont().deriveFont(Font.BOLD));
+
+	        validationInfoPanel = new ValidationInfoPanel(signConfig, bgColor);
+	        this.accesibleDescription += ((ValidationInfoPanel) validationInfoPanel).getAccesibleDescription();
+        }
+
         // Panel de configuracion de firma
 		final JLabel signConfigLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.142")); //$NON-NLS-1$
 		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.142"); //$NON-NLS-1$
@@ -213,7 +225,15 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 
         detailPanel.add(documentInfoPanel, c);
     	c.gridy++;
-    	c.insets = new Insets(11, 0, 0, 0);
+    	if (signConfig.getSignValidity() != null) {
+	    	c.insets = new Insets(11, 0, 0, 0);
+	        detailPanel.add(validationInfoLabel, c);
+	        c.gridy++;
+	        c.insets = new Insets(4, 11, 0, 0);
+	        detailPanel.add(validationInfoPanel, c);
+	        c.gridy++;
+    	}
+        c.insets = new Insets(11, 0, 0, 0);
     	detailPanel.add(signConfigLabel, c);
         c.gridy++;
         c.insets = new Insets(4, 11, 0, 0);

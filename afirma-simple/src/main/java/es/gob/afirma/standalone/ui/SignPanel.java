@@ -84,11 +84,11 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.DataProcessAction;
 import es.gob.afirma.standalone.plugins.InputData;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.pdf.VisiblePdfSignatureManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -569,10 +569,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 					throw e;
 				}
 
-				 config.setSignValidity(validity);
-				 if (errorText != null) {
-					 config.setInvalidSignatureText(errorText);
-				 }
+				config.setSignValidity(validity);
+				if (errorText != null) {
+					config.setInvalidSignatureText(errorText);
+				}
 			 }
 		 }
 

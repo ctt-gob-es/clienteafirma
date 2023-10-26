@@ -74,8 +74,6 @@ final class SignResultPanel extends JPanel {
         switch (validity.getValidity()) {
             case GENERATED:
 
-
-
                 this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.2")); //$NON-NLS-1$
                 this.descTextLabel.setText("<html><p>" + SimpleAfirmaMessages.getString("SignResultPanel.3") + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 this.linkLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.33")); //$NON-NLS-1$

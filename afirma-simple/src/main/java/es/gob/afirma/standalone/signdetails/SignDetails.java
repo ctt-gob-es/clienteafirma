@@ -1,7 +1,7 @@
 package es.gob.afirma.standalone.signdetails;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import es.gob.afirma.signvalidation.SignValidity;
 
@@ -10,7 +10,7 @@ public abstract class SignDetails {
 	protected String format;
 	protected String algorithm;
 	protected SignaturePolicy policy;
-	protected Properties metadata;
+	protected Map<String, String> metadata;
 	protected Boolean dataIncluded;
 	protected String dataLocation;
 	protected List<SignValidity> validityResult;
@@ -27,7 +27,7 @@ public abstract class SignDetails {
 	public SignaturePolicy getPolicy() {
 		return this.policy;
 	}
-	public Properties getMetadata() {
+	public Map<String, String> getMetadata() {
 		return this.metadata;
 	}
 	public Boolean getDataIncluded() {
@@ -54,7 +54,7 @@ public abstract class SignDetails {
 	public void setPolicy(final SignaturePolicy policy) {
 		this.policy = policy;
 	}
-	public void setMetadata(final Properties metadata) {
+	public void setMetadata(final Map<String, String> metadata) {
 		this.metadata = metadata;
 	}
 	public void setDataIncluded(final Boolean dataIncluded) {

@@ -5,25 +5,38 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.text.DefaultCaret;
 
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.signdetails.FacturaESignAnalyzer;
 import es.gob.afirma.standalone.signdetails.SignAnalyzer;
 import es.gob.afirma.standalone.signdetails.SignDetailsFormatter;
 import es.gob.afirma.standalone.signdetails.XAdESSignAnalyzer;
 
 public class ValidationInfoDialog extends JDialog {
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final long serialVersionUID = -6677845022747809410L;
 
@@ -31,7 +44,7 @@ public class ValidationInfoDialog extends JDialog {
 	private static final int DEFAULT_WINDOW_HEIGHT = 550;
 
 	private JScrollPane scrollPane;
-	private final JEditorPane errorsInfo = new JEditorPane();
+	private final JEditorPane validationInfo = new JEditorPane();
 	private final SignValidity generalValidation;
 
 	public ValidationInfoDialog(final JFrame parent, final byte [] signData, final SignValidity generalValidation) {
@@ -64,19 +77,31 @@ public class ValidationInfoDialog extends JDialog {
 		c.gridy++;
 		c.weighty = 2.0;
 
+
 		SignAnalyzer analyzer = null;
 		try {
-			analyzer = new XAdESSignAnalyzer(signData);
+			analyzer = getSignAnalyzer(signData);
 		} catch (final Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			AOUIFactory.showErrorMessage(
+					SimpleAfirmaMessages.getString("ValidationInfoDialog.17"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE,
+					null
+					);
 		}
 		final String signsinfo = SignDetailsFormatter.formatToHTML(analyzer, this.generalValidation);
 
-		this.errorsInfo.setContentType("text/html"); //$NON-NLS-1$
-		this.errorsInfo.setText(signsinfo);
-		this.errorsInfo.setEditable(false);
-		this.scrollPane = new JScrollPane(this.errorsInfo);
+		this.validationInfo.setContentType("text/html"); //$NON-NLS-1$
+		this.validationInfo.setText(signsinfo);
+		this.validationInfo.setEditable(false);
+
+		final DefaultCaret caret = new DefaultCaret();
+	    caret.setBlinkRate(500);
+	    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+	    this.validationInfo.setCaret(caret);
+
+		this.scrollPane = new JScrollPane(this.validationInfo);
+		this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMinimum());
 		final JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 		// Colocamos los componentes en el panel
@@ -102,6 +127,55 @@ public class ValidationInfoDialog extends JDialog {
 
         final Window ancestor = SwingUtilities.getWindowAncestor(this);
 		setLocationRelativeTo(ancestor);
+	}
+
+	private static SignAnalyzer getSignAnalyzer(final byte[] signData) throws Exception {
+		final SignAnalyzer analyzer = null;
+		// Comprobamos si es un fichero PDF
+		if (DataAnalizerUtil.isPDF(signData)) {
+
+		}
+		// Comprobamos si es una factura electronica
+		else if (DataAnalizerUtil.isFacturae(signData)) {
+			return new FacturaESignAnalyzer(signData);
+		}
+		// Comprobamos si es un OOXML
+		else if (DataAnalizerUtil.isOOXML(signData)) {
+
+		}
+		// Comprobamos si es un ODF
+		else if (DataAnalizerUtil.isODF(signData)) {
+
+		}
+		// Comprobamos si es un fichero de firma CAdES o XAdES (los PDF, facturas, OOXML
+		// y ODF pasaran por las condiciones anteriores)
+		else {
+			AOSigner signer;
+			try {
+				signer = AOSignerFactory.getSigner(signData);
+			} catch (final IOException e) {
+				LOGGER.log(Level.WARNING, "Error al leer la informacion de la firma", e); //$NON-NLS-1$
+				throw e;
+			}
+			if (signer != null) {
+				if (signer instanceof AOXAdESSigner) {
+					return new XAdESSignAnalyzer(signData);
+				} else {
+					// CADES
+				}
+
+			}
+			// Comprobamos si es un fichero XML
+			else if (DataAnalizerUtil.isXML(signData)) {
+
+			}
+			// Cualquier otro tipo de fichero
+			else {
+
+			}
+		}
+
+		return analyzer;
 	}
 
 

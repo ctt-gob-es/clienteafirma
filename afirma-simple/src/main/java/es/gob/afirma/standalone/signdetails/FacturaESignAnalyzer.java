@@ -20,6 +20,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
@@ -29,9 +30,8 @@ import es.gob.afirma.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 import es.gob.afirma.standalone.crypto.TimestampsAnalyzer;
-import es.gob.afirma.standalone.ui.preferences.PreferencesPanelXades;
 
-public class XAdESSignAnalyzer implements SignAnalyzer {
+public class FacturaESignAnalyzer implements SignAnalyzer {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -40,7 +40,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	Document signDocument;
 	AOTreeModel signersTree;
 
-	private static final String FORMAT_XADES = "XAdES"; //$NON-NLS-1$s
+	private static final String FACTURAE = "Factura Electr&oacute;nica"; //$NON-NLS-1$s
 
     public static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
     private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
@@ -48,12 +48,22 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
 
     public static final Map<String, String> SIGN_ALGOS_URI;
+    public static final Map<String, String> FACTURAE_CLAIMED_ROLES;
+
     static {
     	SIGN_ALGOS_URI = new HashMap<>();
     	SIGN_ALGOS_URI.put(URL_SHA1_RSA, "SHA1withRSA"); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put(URL_SHA256_RSA, "SHA256withRSA"); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put(URL_SHA384_RSA, "SHA384withRSA"); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put(URL_SHA512_RSA, "SHA512withRSA"); //$NON-NLS-1$
+
+    	FACTURAE_CLAIMED_ROLES = new HashMap<>();
+    	FACTURAE_CLAIMED_ROLES.put("emisor", "Emisor"); //$NON-NLS-1$ //$NON-NLS-2$
+    	FACTURAE_CLAIMED_ROLES.put("supplier", "Emisor"); //$NON-NLS-1$ //$NON-NLS-2$
+    	FACTURAE_CLAIMED_ROLES.put("receptor", "Receptor"); //$NON-NLS-1$ //$NON-NLS-2$
+    	FACTURAE_CLAIMED_ROLES.put("customer", "Receptor"); //$NON-NLS-1$ //$NON-NLS-2$
+    	FACTURAE_CLAIMED_ROLES.put("tercero", "Tercero"); //$NON-NLS-1$ //$NON-NLS-2$
+    	FACTURAE_CLAIMED_ROLES.put("third party", "Tercero"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
@@ -63,7 +73,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 		    XAdESConstants.NAMESPACE_XADES_1_4_1
 	};
 
-	public XAdESSignAnalyzer(final byte [] data) throws Exception {
+	public FacturaESignAnalyzer(final byte [] data) throws Exception {
     	try {
 
             CompleteSignInfo signInfo;
@@ -93,38 +103,12 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 
 	@Override
 	public String getSignFormat() {
-		return FORMAT_XADES;
+		return FACTURAE;
 	}
 
 	@Override
 	public String getDataLocation() {
-        // Tomamos la raiz del documento
-        final Element rootSig = this.signDocument.getDocumentElement();
-
-        // Identificamos el tipo de la firma por medio de las referencias de la primera de ellas
-    	final Element signatureElement = XAdESUtil.getFirstSignatureElement(this.signDocument.getDocumentElement());
-
-    	// Obtenemos el listado de referencias a datos de la firma
-    	final List<Element> dataReferenceList = XAdESUtil.getSignatureDataReferenceList(signatureElement);
-
-        // Establecemos la variante de firma
-    	if (XAdESUtil.isSignatureElementEnveloped(signatureElement, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.12"); //$NON-NLS-1$
-        }
-    	else if (XAdESUtil.isSignatureWithManifest(dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.16"); //$NON-NLS-1$
-        }
-        else if (XAdESUtil.isSignatureElementExternallyDetached(dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.15"); //$NON-NLS-1$
-        }
-        else if (XAdESUtil.isSignatureElementInternallyDetached(rootSig, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.14"); //$NON-NLS-1$
-        }
-        else if (XAdESUtil.isSignatureElementEnveloping(signatureElement, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.13"); //$NON-NLS-1$
-        }
-
-    	return ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+        return null;
 	}
 
 	private void createSignDetails(final NodeList signaturesList) throws AOInvalidFormatException {
@@ -148,13 +132,11 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 		final String format = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signElement);
 		xadesSignDetails.setFormat(format);
 		final Element signatureMethodElement = XAdESUtil.getSignatureMethodElement(signElement);
-		if (signatureMethodElement != null) {
-			String algorithm = SIGN_ALGOS_URI.get(signatureMethodElement.getAttribute("Algorithm")); //$NON-NLS-1$
-			if (algorithm == null) {
-				algorithm = signatureMethodElement.getAttribute("Algorithm"); //$NON-NLS-1$
-			}
-			xadesSignDetails.setAlgorithm(algorithm);
+		String algorithm = SIGN_ALGOS_URI.get(signatureMethodElement.getAttribute("Algorithm")); //$NON-NLS-1$
+		if (algorithm == null) {
+			algorithm = signatureMethodElement.getAttribute("Algorithm"); //$NON-NLS-1$
 		}
+		xadesSignDetails.setAlgorithm(algorithm);
 
 		// ARBOL DE FIRMANTES
 		buildCertDetails(signElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Data").item(0), //$NON-NLS-1$
@@ -185,71 +167,52 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			buildCertDetails(qualifyingProps.getElementsByTagNameNS(namespaceUri, "X509Data").item(0), //$NON-NLS-1$
 					xadesSignDetails.getSigners());
 
-			// INFORMACION DECLARADA DE DATOS
-			final NodeList signedDataObjectPropertiesList = qualifyingProps.getElementsByTagNameNS(namespaceUri,
-					XAdESConstants.TAG_SIGNED_DATA_OBJECT_PROPERTIES);
-			if (signedDataObjectPropertiesList.getLength() > 0) {
-				final NodeList dataObjectFormatList = ((Element) signedDataObjectPropertiesList.item(0))
-						.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_DATA_OBJECT_FORMAT);
-				final List<DataObjectFormat> dataObjectFormats = new ArrayList<DataObjectFormat>();
-				for (int m = 0; m < dataObjectFormatList.getLength(); m++) {
-					final DataObjectFormat dof = new DataObjectFormat();
-					final Element dataObjectFormaElmt = (Element) dataObjectFormatList.item(m);
-					final String ref = dataObjectFormaElmt.getAttribute("ObjectReference"); //$NON-NLS-1$
-					dof.setIdentifier(ref);
-					final NodeList descriptionNodeList = dataObjectFormaElmt
-							.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_DESCRIPTION);
-					if (descriptionNodeList.getLength() > 0) {
-						dof.setDescription(descriptionNodeList.item(0).getTextContent().trim());
-					}
-					dof.setMimeType(dataObjectFormaElmt.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_MIME_TYPE)
-							.item(0).getTextContent().trim());
-					dataObjectFormats.add(dof);
-				}
-
-				xadesSignDetails.setDataObjectFormats(dataObjectFormats);
-			}
-
 			// POLITICA
 			final NodeList signaturePolicyIdentifierList = qualifyingProps.getElementsByTagNameNS(namespaceUri,
 					XAdESConstants.TAG_SIGNATURE_POLICY_IDENTIFIER);
 			if (signaturePolicyIdentifierList != null && signaturePolicyIdentifierList.getLength() > 0) {
+
 				final Element signPolicyIdElement = (Element) signaturePolicyIdentifierList.item(0);
-				if (signPolicyIdElement != null) {
-					final String policyOID = signPolicyIdElement
-							.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_IDENTIFIER).item(0).getTextContent().trim();
+				final String policyOID = signPolicyIdElement
+						.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_IDENTIFIER).item(0).getFirstChild()
+						.getNodeValue();
 
-					final Node descriptionElement = signPolicyIdElement.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_DESCRIPTION).item(0);
-					String descriptionPolicy = ""; //$NON-NLS-1$
-					if (descriptionElement != null) {
-						descriptionPolicy = descriptionElement.getTextContent().trim();
-					}
-
-					if (PreferencesPanelXades.POLICY_XADES_AGE_1_9.getPolicyIdentifier().equals(policyOID)) {
-						final SignaturePolicy signPolicy = new SignaturePolicy(
-								SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-								PreferencesPanelXades.POLICY_XADES_AGE_1_9);
-						xadesSignDetails.setPolicy(signPolicy);
-					} else {
-						final String signElementNS = signElement.getNamespaceURI();
-						final String digestValue = signPolicyIdElement
-								.getElementsByTagNameNS(signElementNS, XAdESConstants.TAG_DIGEST_VALUE).item(0).getTextContent().trim();
-						final String digestMethod = ((Element) signPolicyIdElement
-								.getElementsByTagNameNS(signElementNS, XAdESConstants.TAG_DIGEST_METHOD).item(0))
-										.getAttribute("Algorithm"); //$NON-NLS-1$
-						String spuri = ""; //$NON-NLS-1$
-						final NodeList spuriNodeList = signPolicyIdElement.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_SPURI);
-						if (spuriNodeList.getLength() > 0) {
-							spuri = signPolicyIdElement.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_SPURI)
-									.item(0).getTextContent().trim();
-						}
-
-						final AdESPolicy policy = new AdESPolicy(policyOID, digestValue, digestMethod, spuri);
-
-						final SignaturePolicy signPolicy = new SignaturePolicy(descriptionPolicy, policy);
-						xadesSignDetails.setPolicy(signPolicy);
-					}
+				final Node descriptionElement = signPolicyIdElement.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_DESCRIPTION).item(0);
+				String descriptionPolicy = ""; //$NON-NLS-1$
+				if (descriptionElement != null) {
+					descriptionPolicy = descriptionElement.getTextContent().trim();
 				}
+
+				if (AOFacturaESigner.POLICY_FACTURAE_30.getPolicyIdentifier().equals(policyOID)) {
+					final SignaturePolicy facturaE30signPolicy = new SignaturePolicy(
+							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.0"), //$NON-NLS-1$
+							AOFacturaESigner.POLICY_FACTURAE_30);
+					xadesSignDetails.setPolicy(facturaE30signPolicy);
+				} else if (AOFacturaESigner.POLICY_FACTURAE_31.getPolicyIdentifier().equals(policyOID))  {
+					final SignaturePolicy facturaE31signPolicy = new SignaturePolicy(
+							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+							AOFacturaESigner.POLICY_FACTURAE_31);
+					xadesSignDetails.setPolicy(facturaE31signPolicy);
+				} else {
+					final String signElementNS = signElement.getNamespaceURI();
+					final String digestValue = signPolicyIdElement
+							.getElementsByTagNameNS(signElementNS, XAdESConstants.TAG_DIGEST_VALUE).item(0).getTextContent().trim();
+					final String digestMethod = ((Element) signPolicyIdElement
+							.getElementsByTagNameNS(signElementNS, XAdESConstants.TAG_DIGEST_METHOD).item(0))
+									.getAttribute("Algorithm"); //$NON-NLS-1$
+					String spuri = ""; //$NON-NLS-1$
+					final NodeList spuriNodeList = signPolicyIdElement.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_SPURI);
+					if (spuriNodeList.getLength() > 0) {
+						spuri = signPolicyIdElement.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_SPURI)
+								.item(0).getTextContent().trim();
+					}
+
+					final AdESPolicy policy = new AdESPolicy(policyOID, digestValue, digestMethod, spuri);
+
+					final SignaturePolicy signPolicy = new SignaturePolicy(descriptionPolicy, policy);
+					xadesSignDetails.setPolicy(signPolicy);
+				}
+
 			}
 
 			// METADATOS
@@ -290,6 +253,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 
 			xadesSignDetails.setMetadata(metadata);
 		}
+
 		return xadesSignDetails;
 
 	}
@@ -390,11 +354,13 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     	if (claimedRolesNode.getLength() > 0) {
     		result = new String[claimedRolesNode.getLength()];
 			for (int i = 0 ; i < claimedRolesNode.getLength() ; i++) {
-				final Element role = (Element) claimedRolesNode.item(i);
-				result[i] = role.getTextContent().trim();
+				final String role = claimedRolesNode.item(i).getTextContent().trim();
+				final String roleValue = FACTURAE_CLAIMED_ROLES.getOrDefault(role, role);
+				result[i] = roleValue;
 			}
     	}
     	return result;
     }
+
 
 }

@@ -69,6 +69,8 @@ public class XAdESConstants {
 
 	public static final String TAG_SIGNATURE_PRODUCTION_PLACE = "SignatureProductionPlace"; //$NON-NLS-1$
 
+	public static final String TAG_SIGNATURE_PRODUCTION_PLACE_V2 = "SignatureProductionPlaceV2"; //$NON-NLS-1$
+
 	public static final String TAG_DIGEST_METHOD = "DigestMethod"; //$NON-NLS-1$
 
 	public static final String TAG_DIGEST_VALUE = "DigestValue"; //$NON-NLS-1$
@@ -76,6 +78,10 @@ public class XAdESConstants {
 	public static final String TAG_SPURI = "SPURI"; //$NON-NLS-1$
 
 	public static final String TAG_CLAIMED_ROLE = "ClaimedRole"; //$NON-NLS-1$
+
+	public static final String TAG_SIGNER_ROLE = "SignerRole"; //$NON-NLS-1$
+
+	public static final String TAG_SIGNER_ROLE_V2 = "SignerRoleV2"; //$NON-NLS-1$
 
 	public static final String TAG_X509_CERTIFICATE = "X509Certificate"; //$NON-NLS-1$
 
