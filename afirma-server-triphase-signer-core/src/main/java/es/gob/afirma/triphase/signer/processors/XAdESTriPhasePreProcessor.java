@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -124,9 +125,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
-        	final SignValidity validity = new ValidateXMLSignature().validate(data);
-        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
-        		throw new InvalidSignatureException("La firma que se trata de cofirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
+        	final List<SignValidity> validity = new ValidateXMLSignature().validate(data);
+        	if (validity.get(0).getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("La firma que se trata de cofirmar no es valida: " + validity.get(0).getError().toString()); //$NON-NLS-1$
         	}
         }
 
@@ -150,9 +151,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures) {
-        	final SignValidity validity = new ValidateXMLSignature().validate(sign);
-        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
-        		throw new InvalidSignatureException("La firma que se trata de contrafirmar no es valida: " + validity.getError().toString()); //$NON-NLS-1$
+        	final List<SignValidity> validity = new ValidateXMLSignature().validate(sign);
+        	if (validity.get(0).getValidity() == SIGN_DETAIL_TYPE.KO) {
+        		throw new InvalidSignatureException("La firma que se trata de contrafirmar no es valida: " + validity.get(0).getError().toString()); //$NON-NLS-1$
         	}
         }
 

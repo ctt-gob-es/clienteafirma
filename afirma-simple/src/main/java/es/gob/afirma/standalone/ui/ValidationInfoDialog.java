@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.signdetails.FacturaESignAnalyzer;
+import es.gob.afirma.standalone.signdetails.PDFSignAnalyzer;
 import es.gob.afirma.standalone.signdetails.SignAnalyzer;
 import es.gob.afirma.standalone.signdetails.SignDetailsFormatter;
 import es.gob.afirma.standalone.signdetails.XAdESSignAnalyzer;
@@ -45,9 +47,9 @@ public class ValidationInfoDialog extends JDialog {
 
 	private JScrollPane scrollPane;
 	private final JEditorPane validationInfo = new JEditorPane();
-	private final SignValidity generalValidation;
+	private final List<SignValidity> generalValidation;
 
-	public ValidationInfoDialog(final JFrame parent, final byte [] signData, final SignValidity generalValidation) {
+	public ValidationInfoDialog(final JFrame parent, final byte [] signData, final List<SignValidity> generalValidation) {
 		super(parent, true);
 		this.generalValidation = generalValidation;
 		createUI(signData);
@@ -133,7 +135,7 @@ public class ValidationInfoDialog extends JDialog {
 		final SignAnalyzer analyzer = null;
 		// Comprobamos si es un fichero PDF
 		if (DataAnalizerUtil.isPDF(signData)) {
-
+			return new PDFSignAnalyzer(signData);
 		}
 		// Comprobamos si es una factura electronica
 		else if (DataAnalizerUtil.isFacturae(signData)) {

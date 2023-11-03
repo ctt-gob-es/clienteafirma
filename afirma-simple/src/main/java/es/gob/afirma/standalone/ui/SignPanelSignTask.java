@@ -209,7 +209,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	// Evitamos agregar nuevas firmas a los documentos con firmas no validas
         	if (signConfig.getSignValidity() != null
-        			&& signConfig.getSignValidity().getValidity() == SIGN_DETAIL_TYPE.KO
+        			&& signConfig.getSignValidity().get(0).getValidity() == SIGN_DETAIL_TYPE.KO
         			&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES)) {
         		LOGGER.severe("La entrada es una firma invalida. Se omitira"); //$NON-NLS-1$
         		continue;
@@ -232,12 +232,12 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	signConfig.addExtraParam(EXTRAPARAM_HEADLESS, Boolean.TRUE.toString());
             }
             else if (signConfig.getSignValidity() != null
-            		&& signConfig.getSignValidity().getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
-            		&& signConfig.getSignValidity().getErrorException() != null
-            		&& signConfig.getSignValidity().getErrorException() instanceof RuntimeConfigNeededException) {
+            		&& signConfig.getSignValidity().get(0).getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER
+            		&& signConfig.getSignValidity().get(0).getErrorException() != null
+            		&& signConfig.getSignValidity().get(0).getErrorException() instanceof RuntimeConfigNeededException) {
 
             	// Se requiere confirmacion por parte del usuario
-            	final RuntimeConfigNeededException e = (RuntimeConfigNeededException) signConfig.getSignValidity().getErrorException();
+            	final RuntimeConfigNeededException e = (RuntimeConfigNeededException) signConfig.getSignValidity().get(0).getErrorException();
         		if (e.getRequestType() == RequestType.CONFIRM) {
         			final int result = AOUIFactory.showConfirmDialog(this.parent, SimpleAfirmaMessages.getString(e.getRequestorText()),
         					SimpleAfirmaMessages.getString("SignPanel.153"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$

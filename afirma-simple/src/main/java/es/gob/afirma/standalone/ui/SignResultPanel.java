@@ -16,6 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -40,18 +41,18 @@ final class SignResultPanel extends JPanel {
 
     private String accessibleDescription = ""; //$NON-NLS-1$
 
-    SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener) {
+    SignResultPanel(final List<SignValidity> validity, final boolean singleSign, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener, null));
     }
 
-    SignResultPanel(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener, final byte [] signData) {
+    SignResultPanel(final List<SignValidity> validity, final boolean singleSign, final KeyListener extKeyListener, final byte [] signData) {
         SwingUtilities.invokeLater(() -> createUI(validity, singleSign, extKeyListener, signData));
     }
 
-    void createUI(final SignValidity validity, final boolean singleSign, final KeyListener extKeyListener, final byte [] signData) {
+    void createUI(final List<SignValidity> validity, final boolean singleSign, final KeyListener extKeyListener, final byte [] signData) {
 
         String iconFilename;
-        switch (validity.getValidity()) {
+        switch (validity.get(0).getValidity()) {
         case KO:
             iconFilename = "ko_icon_large.png"; //$NON-NLS-1$
             break;
@@ -71,7 +72,7 @@ final class SignResultPanel extends JPanel {
 
         String errorMessage;
         final String resultOperationIconTooltip;
-        switch (validity.getValidity()) {
+        switch (validity.get(0).getValidity()) {
             case GENERATED:
 
                 this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.2")); //$NON-NLS-1$
@@ -158,8 +159,8 @@ final class SignResultPanel extends JPanel {
             case KO:
                 if (singleSign) {
                 	this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.5")); //$NON-NLS-1$
-                    if (validity.getError() != null) {
-                		switch (validity.getError()) {
+                    if (validity.get(0).getError() != null) {
+                		switch (validity.get(0).getError()) {
                 		case CORRUPTED_SIGN: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.14"); break; //$NON-NLS-1$
                 		case CERTIFICATE_EXPIRED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.16"); break; //$NON-NLS-1$
                 		case CERTIFICATE_NOT_VALID_YET: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.17"); break; //$NON-NLS-1$
@@ -173,7 +174,7 @@ final class SignResultPanel extends JPanel {
 
                 		default:
                 			errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
-                			LOGGER.warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.getError()); //$NON-NLS-1$
+                			LOGGER.warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.get(0).getError()); //$NON-NLS-1$
                 		}
                 	}
                 	else {
@@ -231,8 +232,8 @@ final class SignResultPanel extends JPanel {
                 break;
             default:
                 this.resultTextLabel.setText(SimpleAfirmaMessages.getString("SignResultPanel.11")); //$NON-NLS-1$
-                if (validity.getError() != null) {
-                    switch (validity.getError()) {
+                if (validity.get(0).getError() != null) {
+                    switch (validity.get(0).getError()) {
                     case NO_DATA: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
                     case PDF_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.24"); break; //$NON-NLS-1$
                     case OOXML_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.25"); break; //$NON-NLS-1$

@@ -9,6 +9,8 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.util.List;
+
 import es.gob.afirma.signvalidation.SignValidity;
 
 /**
@@ -18,9 +20,9 @@ import es.gob.afirma.signvalidation.SignValidity;
 public final class ValidationErrorsLabelLinkImpl implements LabelLinkListener{
 
 	private final byte [] signData;
-	private final SignValidity generalValidation;
+	private final List<SignValidity> generalValidation;
 
-    public ValidationErrorsLabelLinkImpl (final byte [] signData, final SignValidity generalValidation) {
+    public ValidationErrorsLabelLinkImpl (final byte [] signData, final List<SignValidity> generalValidation) {
     	this.generalValidation = generalValidation;
     	this.signData = signData;
     }

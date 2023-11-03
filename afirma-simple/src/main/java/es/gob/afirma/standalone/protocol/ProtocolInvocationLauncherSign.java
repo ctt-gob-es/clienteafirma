@@ -402,7 +402,8 @@ final class ProtocolInvocationLauncherSign {
 
 				do {
 					try {
-						validity = validator.validate(data, extraParams);
+						final List<SignValidity> validityList = validator.validate(data, extraParams);
+						validity = validityList.get(0);
 					} catch (final IOException e) {
 						LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
 						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);

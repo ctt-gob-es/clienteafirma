@@ -98,7 +98,7 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
                            final byte[] sig,
                            final SignOperationConfig signConfig,
                            final X509Certificate signingCert,
-                           final SignValidity signValidity,
+                           final List<SignValidity> signValidity,
                            final JComponent fileTypeIcon) {
         this.saf = saf;
 
@@ -117,7 +117,7 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
     private void createUI(final byte[] signature,
     					  final SignOperationConfig config,
                           final X509Certificate cert,
-                          final SignValidity signValidity,
+                          final List<SignValidity> signValidity,
                           final JComponent fileTypeIcon) {
 
     	setPreferredSize(new Dimension(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));

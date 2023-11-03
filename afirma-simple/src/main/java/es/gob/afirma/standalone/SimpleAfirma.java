@@ -36,6 +36,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.FileHandler;
@@ -593,8 +594,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
+    	final List<SignValidity> validityList = new ArrayList<SignValidity>();
+    	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null));
+
 		final JPanel newPanel = new SignDetailPanel(this, signature, signConfig, signingCert,
-				new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null), null);
+				validityList, null);
 
         if (this.container instanceof MainScreen) {
         	((MainScreen) this.container).replaceShowingPanel(newPanel);

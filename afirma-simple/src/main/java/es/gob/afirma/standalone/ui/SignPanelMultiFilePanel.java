@@ -316,9 +316,9 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 				}
 			}
 			else if (value.getSignValidity() != null
-					&& SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER.equals(value.getSignValidity().getValidity())) {
+					&& SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER.equals(value.getSignValidity().get(0).getValidity())) {
 				this.fileNameLabel.setText(
-						(value.getDataFile().getAbsolutePath() + " (" + value.getSignValidity().getError() + ")").substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
+						(value.getDataFile().getAbsolutePath() + " (" + value.getSignValidity().get(0).getError() + ")").substring(this.basePathLength)); //$NON-NLS-1$ //$NON-NLS-2$
 				if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 					this.fileNameLabel.setForeground(Color.RED);
 				}
