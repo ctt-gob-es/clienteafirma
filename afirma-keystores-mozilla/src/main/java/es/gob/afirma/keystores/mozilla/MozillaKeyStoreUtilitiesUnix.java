@@ -154,27 +154,32 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 			// Tomamos lo numeros de version de firefox identificados
 			final List<String> firefoxVersions = new ArrayList<>();
-			for (final String filename : directoryLib.list()) {
-				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
-					firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			final String[] fileList = directoryLib.list();
+			if (fileList != null) {
+				for (final String filename : fileList) {
+					if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+						firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
-			}
 
-			// Calculamos el numero de version mayor
-			for (final String versionText : firefoxVersions) {
-				Version version;
-				try {
-					version = new Version(versionText);
+				// Calculamos el numero de version mayor
+				for (final String versionText : firefoxVersions) {
+					Version version;
+					try {
+						version = new Version(versionText);
+					}
+					catch (final Exception e) {
+						LOGGER.warning(
+							"Se encontro un numero de version de Firefox no soportado (" + versionText + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+						);
+						continue;
+					}
+					if (maxVersion == null || version.compareTo(maxVersion) > 0) {
+						maxVersion = version;
+					}
 				}
-				catch (final Exception e) {
-					LOGGER.warning(
-						"Se encontro un numero de version de Firefox no soportado (" + versionText + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-					);
-					continue;
-				}
-				if (maxVersion == null || version.compareTo(maxVersion) > 0) {
-					maxVersion = version;
-				}
+			} else {
+				 LOGGER.warning("No se pudo listar el directorio " + directoryLib.getAbsolutePath());
 			}
 		}
 		return maxVersion != null ? maxVersion.toString() : null;
