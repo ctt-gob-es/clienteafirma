@@ -10,6 +10,7 @@
 package es.gob.afirma.signvalidation;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
@@ -47,7 +48,7 @@ public abstract class SignValider {
      * operaci&oacute;n sobre la firma ser&iacute;a necesaria
      * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    public abstract SignValidity validate(final byte[] sign) throws RuntimeConfigNeededException, IOException;
+    public abstract List<SignValidity> validate(final byte[] sign) throws RuntimeConfigNeededException, IOException;
 
 	/** Valida una firma del tipo del validador instanciado.
      * @param sign Firma a validar
@@ -57,7 +58,7 @@ public abstract class SignValider {
      * operaci&oacute;n sobre la firma ser&iacute;a necesaria
      * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    public abstract SignValidity validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException;
+    public abstract List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException;
 
 	/** Valida una firma del tipo del validador instanciado.
      * @param sign Firma a validar
@@ -67,5 +68,5 @@ public abstract class SignValider {
      * operaci&oacute;n sobre la firma ser&iacute;a necesaria
      * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
-    public abstract SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
+    public abstract List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
 }

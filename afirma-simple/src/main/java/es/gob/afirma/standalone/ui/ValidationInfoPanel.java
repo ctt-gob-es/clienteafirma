@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -39,11 +40,11 @@ public class ValidationInfoPanel extends JPanel {
         // Validez de la firma (si era una firma)
         final String validitySignatureText = signConfig.getInvalidSignatureText();
         JLabel validitySignatureLabel = null;
-        final SignValidity validity = signConfig.getSignValidity();
+        final List<SignValidity> validityList = signConfig.getSignValidity();
         if (validitySignatureText != null) {
         	final BufferedImage errorIcon;
-    		if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
-    				|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
+    		if (validityList.get(0).getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN
+    				|| validityList.get(0).getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
         		errorIcon = ImageLoader.loadImage("unknown_icon.png"); //$NON-NLS-1$
         	}
         	else {
@@ -52,7 +53,7 @@ public class ValidationInfoPanel extends JPanel {
     		validitySignatureLabel = new JLabel(validitySignatureText, new ImageIcon(errorIcon), SwingConstants.LEFT);
         	this.accesibleDescription += validitySignatureText;
         	validitySignatureLabel.setForeground(Color.RED);
-        } else if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.OK) {
+        } else if (validityList.get(0).getValidity() == SignValidity.SIGN_DETAIL_TYPE.OK) {
         	final BufferedImage okIcon;
         	okIcon = ImageLoader.loadImage("ok_icon.png"); //$NON-NLS-1$
         	validitySignatureLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.156"), new ImageIcon(okIcon), SwingConstants.LEFT); //$NON-NLS-1$
@@ -76,7 +77,7 @@ public class ValidationInfoPanel extends JPanel {
 		}
 
         labelLinkManager.setLabelLinkListener(new ValidationErrorsLabelLinkImpl(
-        		signData, validity
+        		signData, validityList
         ));
         this.signsDetailsLbl.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") //$NON-NLS-1$
         		+ SimpleAfirmaMessages.getString("SignResultPanel.38")); //$NON-NLS-1$

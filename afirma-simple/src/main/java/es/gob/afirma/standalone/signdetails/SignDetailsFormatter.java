@@ -21,14 +21,16 @@ public class SignDetailsFormatter {
     public static final String CITY_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.6"); //$NON-NLS-1$
     public static final String PROVINCE_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.7"); //$NON-NLS-1$
     public static final String COUNTRY_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.9"); //$NON-NLS-1$
-
+    public static final String SIGN_REASON_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.18"); //$NON-NLS-1$
+    public static final String LOCATION_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.19"); //$NON-NLS-1$
+    public static final String CONTACT_INFO_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.20"); //$NON-NLS-1$
 
     static {
     	MIMETYPE_MAPPER = new HashMap<>();
     	MIMETYPE_MAPPER.put(MimeHelper.DEFAULT_MIMETYPE, "SHA1withRSA"); //$NON-NLS-1$
 	}
 
-	public static String formatToHTML(final SignAnalyzer analyzer, final SignValidity generalValidation) {
+	public static String formatToHTML(final SignAnalyzer analyzer, final List<SignValidity> generalValidation) {
 		String result = ""; //$NON-NLS-1$
 		final List<SignDetails> signDetailsParent = analyzer.getAllSignDetails();
 		if (analyzer.getSignFormat() != null) {
@@ -54,7 +56,11 @@ public class SignDetailsFormatter {
 		final AOTreeModel signersTree = analyzer.getSignersTree();
 		result += "<h3>&Aacute;rbol de firmantes:</h3>";  //$NON-NLS-1$
 		result += parseSignersTree((AOTreeNode) signersTree.getRoot());
-		result += "<h3>Resultado de la validaci&oacute;n: </h3>" + generalValidation;  //$NON-NLS-1$
+		result += "<h3>Resultado de la validaci&oacute;n: </h3><ul>";  //$NON-NLS-1$
+		for (final SignValidity validation : generalValidation) {
+			result += "<li>" + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		result += "</ul>"; //$NON-NLS-1$
 		result += parseSignsToHTML(signDetailsParent);
 		return result;
 	}
@@ -117,6 +123,18 @@ public class SignDetailsFormatter {
 
 				if (detail.getMetadata().containsKey(COUNTRY_METADATA)) {
 					metadata += "<li>" + COUNTRY_METADATA + ": " + detail.getMetadata().get(COUNTRY_METADATA) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+
+				if (detail.getMetadata().containsKey(SIGN_REASON_METADATA)) {
+					metadata += "<li>" + SIGN_REASON_METADATA + ": " + detail.getMetadata().get(SIGN_REASON_METADATA) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+
+				if (detail.getMetadata().containsKey(LOCATION_METADATA)) {
+					metadata += "<li>" + LOCATION_METADATA + ": " + detail.getMetadata().get(LOCATION_METADATA) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+
+				if (detail.getMetadata().containsKey(CONTACT_INFO_METADATA)) {
+					metadata += "<li>" + CONTACT_INFO_METADATA + ": " + detail.getMetadata().get(CONTACT_INFO_METADATA) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 
 				if (!claimedRoles.isEmpty()) {

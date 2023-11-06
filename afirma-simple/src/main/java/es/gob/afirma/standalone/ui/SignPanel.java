@@ -214,7 +214,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	// se permite esto, se lanza un error
     	if (this.signOperationConfigs.size() == 1 &&
     			this.signOperationConfigs.get(0).getSignValidity() != null &&
-    			this.signOperationConfigs.get(0).getSignValidity().getValidity() == SIGN_DETAIL_TYPE.KO &&
+    			this.signOperationConfigs.get(0).getSignValidity().get(0).getValidity() == SIGN_DETAIL_TYPE.KO &&
     			!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES)) {
 
     		AOUIFactory.showErrorMessage(
@@ -556,20 +556,22 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
 
 				 String errorText = null;
+				 List<SignValidity> validityList = new ArrayList<SignValidity>();
 				 try {
-					validity = validator.validate(data, validationParams);
+					validityList = validator.validate(data, validationParams);
+					validity = validityList.get(0);
 					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
 							|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
 						errorText = buildErrorText(validity.getValidity(), validity.getError());
 					}
 				} catch (final RuntimeConfigNeededException e) {
-					validity = new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e);
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e));
 					errorText = e.getMessage();
 				} catch (final IOException e) {
 					throw e;
 				}
 
-				config.setSignValidity(validity);
+				config.setSignValidity(validityList);
 				if (errorText != null) {
 					config.setInvalidSignatureText(errorText);
 				}

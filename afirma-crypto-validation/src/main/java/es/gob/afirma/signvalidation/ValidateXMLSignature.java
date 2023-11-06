@@ -59,12 +59,12 @@ public final class ValidateXMLSignature extends SignValider {
      * @param sign Firma a validar
      * @return Validez de la firma. */
     @Override
-	public SignValidity validate(final byte[] sign) {
+	public List<SignValidity> validate(final byte[] sign) {
     	return validate(sign, true);
     }
 
 	@Override
-	public SignValidity validate(final byte[] sign, final Properties params) {
+	public List<SignValidity> validate(final byte[] sign, final Properties params) {
 		return validate(sign, true);
 	}
 
@@ -73,23 +73,29 @@ public final class ValidateXMLSignature extends SignValider {
      * @param checkCertificates Indica si debe validarse la caducidad de los certificados.
      * @return Validez de la firma. */
     @Override
-	public SignValidity validate(final byte[] sign, final boolean checkCertificates) {
+	public List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) {
 
+    	final List<SignValidity> result = new ArrayList<SignValidity>();
         final Document doc;
         try {
             doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-        	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+        	return result;
         }
 
         // Obtenemos el elemento Signature
         final NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+        	return result;
         }
 
         try {
+        	boolean noMatchDataOcurred = false;
+        	boolean certExpiredOcurred = false;
+        	final boolean certNotValidYetOcurred = false;
         	for (int i = 0; i < nl.getLength(); i++) {
         		final DOMValidateContext valContext = new DOMValidateContext(
         				new KeyValueKeySelector(),
@@ -97,13 +103,15 @@ public final class ValidateXMLSignature extends SignValider {
         				);
 
         		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-        		if (!signature.validate(valContext)) {
+        		if (!signature.validate(valContext) && !noMatchDataOcurred) {
         			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
-        			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
         		}
-        		if (!signature.getSignatureValue().validate(valContext)) {
+        		if (!signature.getSignatureValue().validate(valContext) && !noMatchDataOcurred) {
         			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
-        			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
         		}
 
         		if (checkCertificates) {
@@ -125,10 +133,15 @@ public final class ValidateXMLSignature extends SignValider {
         								certImpl.checkValidity();
         							}
         							catch (final CertificateExpiredException expiredEx) {
-        								return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, expiredEx);
+        								if (!certExpiredOcurred) {
+	        								result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, expiredEx));
+	        								certExpiredOcurred = true;
+        								}
         							}
         							catch (final CertificateNotYetValidException notYetValidEx) {
-        								return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, notYetValidEx);
+        								if (!certNotValidYetOcurred) {
+        									result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, notYetValidEx));
+        								}
         							}
         						}
         					}
@@ -138,21 +151,27 @@ public final class ValidateXMLSignature extends SignValider {
 
         		// Ahora miramos las referencias una a una
         		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
-        		while (it.hasNext()) {
+        		boolean isKO = false;
+        		while (it.hasNext() && !isKO && !noMatchDataOcurred) {
         			final Reference iNext = (Reference) it.next();
         			if (!iNext.validate(valContext)) {
         				LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
-        				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        				isKO = true;
         			}
         		}
         	}
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
-        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e);
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
         }
 
-        return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+        if (result.size() == 0) {
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+        }
+
+        return result;
 	}
 
 	public static List<SignValidity> validateSign(final Element signElement) {
