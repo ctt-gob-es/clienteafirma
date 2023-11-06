@@ -1578,8 +1578,9 @@ var AutoScript = ( function ( window, undefined ) {
 				else {
 					console.log("Operacion desconocida. Se devuelve directamente su resultado.");
 					if (!!successCallback) {
-						successCallback(data);
+						var responseSuccessCallback = successCallback;
 						setCallbacks(null, null);
+						responseSuccessCallback(data);
 					}
 					else {
 						console.log("No se ha proporcionado funcion callback para procesar el resultado de la operacion");
@@ -1594,8 +1595,9 @@ var AutoScript = ( function ( window, undefined ) {
 				errorType = exception;
 				errorMessage = message;
 				if (!!errorCallback) {
-					errorCallback(exception, message);
+					var responseErrorCallback = errorCallback;
 					setCallbacks(null, null);
+					responseErrorCallback(exception, message);
 				}
 			}
 			
@@ -1652,8 +1654,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				if (!!successCallback) {
-					successCallback(filenames, datasB64);
+					var responseSuccessCallback = successCallback;
 					setCallbacks(null, null);
+					responseSuccessCallback(filenames, datasB64);
 				}
 				else {
 					console.log("No se ha proporcionado funcion callback a la que notificar el resultado de la carga de datos");
@@ -1668,8 +1671,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (data == "OK" || data == "SAVE_OK") {
 					// Si no se ha indicado funcion de guardado, entonces no se hace nada
 					if (!!successCallback) {
-						successCallback(data);
+						var responseSuccessCallback = successCallback;
 						setCallbacks(null, null);
+						responseSuccessCallback(data);
 					}
 					else {
 						console.log("No se ha proporcionado funcion callback a la notificar el resultado");
@@ -1687,8 +1691,9 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			function processSelectCertificateResponse(data) {
 				if (!!successCallback) {
-					successCallback(data.replace(/\-/g, "+").replace(/\_/g, "/"));
+					var responseSuccessCallback = successCallback;
 					setCallbacks(null, null);
+					responseSuccessCallback(data.replace(/\-/g, "+").replace(/\_/g, "/"));
 				}
 				else {
 					console.log("No se ha proporcionado funcion callback para devolver el certificado seleccionado");
@@ -1718,8 +1723,9 @@ var AutoScript = ( function ( window, undefined ) {
 					
 					
 					if (!!successCallback) {
-						successCallback(result, certificate);
+						var responseSuccessCallback = successCallback;
 						setCallbacks(null, null);
+						responseSuccessCallback(result, certificate);
 					}
 					else {
 						console.log("No se ha proporcionado funcion callback a la que devolver el resultado del lote");
@@ -1753,8 +1759,9 @@ var AutoScript = ( function ( window, undefined ) {
 				"\n\n   === CLIENTE LOG === \n" + data;
 				
 				if (!!successCallback) {
-					successCallback(log);
+					var responseSuccessCallback = successCallback;
 					setCallbacks(null, null);
+					responseSuccessCallback(log);
 				}
 				else {
 					console.log("No se ha proporcionado funcion callback a la que devolver el log");
@@ -1794,8 +1801,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				if (!!successCallback) {
-					successCallback(signature, certificate, extraInfo);
+					var responseSuccessCallback = successCallback;
 					setCallbacks(null, null);
+					responseSuccessCallback(signature, certificate, extraInfo);
 				}
 				else {
 					console.log("No se ha proporcionado funcion callback a la que devolver la firma generada");
