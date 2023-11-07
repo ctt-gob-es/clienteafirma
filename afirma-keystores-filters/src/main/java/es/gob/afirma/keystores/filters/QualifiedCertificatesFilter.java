@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.keystores.CertificateFilter;
 
 /** Filtro que selecciona los certificados con un n&uacute;mero de serie concreto,
  * atendiendo que, si no es un certificado de firma se buscar&aacute; un certificado

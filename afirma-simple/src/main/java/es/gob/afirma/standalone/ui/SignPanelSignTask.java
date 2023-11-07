@@ -46,7 +46,7 @@ import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;

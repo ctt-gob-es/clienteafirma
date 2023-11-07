@@ -32,7 +32,6 @@ import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
-import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Di&aacute;logo para la selecci&oacute;n de certificados.
  * @author Carlos Gamuci. */

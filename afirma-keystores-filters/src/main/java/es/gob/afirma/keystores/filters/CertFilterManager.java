@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
+import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.SscdFilter;
@@ -25,7 +26,8 @@ import es.gob.afirma.keystores.filters.rfc.SscdFilter;
  * @author Carlos Gamuci Mill&aacute;n. */
 public final class CertFilterManager {
 
-	private static final String HEADLESS_PREFIX_KEY = "headless"; //$NON-NLS-1$
+	private static final String HEADLESS_PROPERTY = "headless"; //$NON-NLS-1$
+	private static final String MANDATORY_CERT_SELECTION_PROPERTY = "mandatoryCertSelection"; //$NON-NLS-1$
 
 	private static final String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	private static final String FILTERS_PREFIX_KEY = "filters"; //$NON-NLS-1$
@@ -90,8 +92,7 @@ public final class CertFilterManager {
 	 * establecen los criterios de filtrado. */
 	public CertFilterManager(final Properties propertyFilters) {
 
-		this.mandatoryCertificate = Boolean.parseBoolean(
-				propertyFilters.getProperty(HEADLESS_PREFIX_KEY));
+		this.mandatoryCertificate = isMandatoryCertificate(propertyFilters);
 
 		// Obtenemos los distintos filtros disyuntivos declarados
 		final List<String> filterValues = getFilterValues(propertyFilters);
@@ -101,12 +102,6 @@ public final class CertFilterManager {
 			this.filters.add(parseFilter(filterValue));
 		}
 
-		// Si en las preferencias de AutoFirma, se decide omitir el certificado de autenticacion,
-		// se agregara el filtro correspondiente
-		if (KeyStorePreferencesManager.getSkipAuthCertDNIe()) {
-			this.filters.add(new SkipAuthDNIeFilter());
-		}
-
 		// Siguiendo los criterios de la ETSI TS 119 102-1, un usuario no deberia firmar nunca con
 		// un certificado caducado, asi que, si no se definio ningun tipo de filtrado, se agregara
 		// un filtro omitiendo estos certificados. Si se agregaron filtros, se considerara que es
@@ -114,6 +109,24 @@ public final class CertFilterManager {
 		if (this.filters.isEmpty()) {
 			this.filters.add(new ExpiredCertificateFilter(false));
 		}
+	}
+
+	/**
+	 * Indica si las propiedades establecidas para la operaci&oacute;n indican que se debe omitir
+	 * la selecci&oacute;n de certificado si es posible.
+	 * @param propertyFilters Propiedades de configuraci&oacute;n de la operaci&oacute;n.
+	 * @return {@code true} si se debe seleccionar el certificado autom&aacute;ticamente;,
+	 * {@code false} cuando se deba mostrar el di&aacute;logo de selecci&oacute;n.
+	 */
+	private static boolean isMandatoryCertificate(final Properties propertyFilters) {
+		final boolean headless = propertyFilters != null
+				&& Boolean.parseBoolean(propertyFilters.getProperty(HEADLESS_PROPERTY));
+		final boolean omitSelection = propertyFilters != null
+				&& propertyFilters.containsKey(MANDATORY_CERT_SELECTION_PROPERTY)
+				&& Boolean.FALSE.toString().equalsIgnoreCase(
+						propertyFilters.getProperty(MANDATORY_CERT_SELECTION_PROPERTY));
+
+		return headless || omitSelection;
 	}
 
 	/** Indica si la apertura de almacenes externos al principal desde el UI del di&aacute;logo est&aacute;
@@ -284,5 +297,14 @@ public final class CertFilterManager {
 	 * que supera el filtrado, {@code false} en caso contrario. */
 	public boolean isMandatoryCertificate() {
 		return this.mandatoryCertificate;
+	}
+
+	public static void main(final String[] args) {
+
+		final Properties config = new Properties();
+		//config.setProperty(HEADLESS_PROPERTY, "true");
+		config.setProperty(MANDATORY_CERT_SELECTION_PROPERTY, "true");
+
+		System.out.println(CertFilterManager.isMandatoryCertificate(config));
 	}
 }

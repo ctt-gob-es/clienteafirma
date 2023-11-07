@@ -11,7 +11,7 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.CertificateFilter;
 
 /**
  * Filtro que muestra todos los certificados salvo el de firma del DNIe. Esto no se

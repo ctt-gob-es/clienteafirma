@@ -3789,9 +3789,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				// Si no se obtuvo un error ni hemos recibido ninguno de los resultados anteriores,
-				// procesamos el resultado según el tipo de operacion:
+				// procesamos el resultado segun el tipo de operacion:
 				//  - Si es una firma; se recibira la firma, el certificado + la firma, o el certificado + firma + datos extra.
-				// ´- Si es una seleccion de certificado; solo se recibira el certificado.
+				//  - Si es una seleccion de certificado; solo se recibira el certificado.
 				//  - Si es una firma de lote; se recibira el resultado del lote, o el resultado del lote + certificado. 
 				// Los distintos valores del resultado se separan con una tuberia ('|'). Si se
 				// definio una clave de cifrado, consideramos que cada uno de los datos se han

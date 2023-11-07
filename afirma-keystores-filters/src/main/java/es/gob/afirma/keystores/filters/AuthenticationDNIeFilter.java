@@ -11,6 +11,7 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
+import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 
@@ -18,7 +19,7 @@ import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
  * Filtro de certificados que s&oacute;lo admite el certificado de autenticaci&oacute;n del DNIe.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public final class AuthenticationDNIeFilter extends CertificateFilter {
+public class AuthenticationDNIeFilter extends CertificateFilter {
 
 	private final RFC2254CertificateFilter rfc2254Filter;
 	private final KeyUsageFilter keyUsageFilter;

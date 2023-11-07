@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.keystores.CertificateFilter;
 
 
 /** Filtro de certificados de seud&oacute;nimo.

@@ -65,8 +65,8 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
-import es.gob.afirma.keystores.filters.CertificateFilter;
-import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
+import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
@@ -370,7 +370,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
-    	if (KeyStorePreferencesManager.getSkipAuthCertDNIe()) {
+    	if (KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled()) {
     		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {

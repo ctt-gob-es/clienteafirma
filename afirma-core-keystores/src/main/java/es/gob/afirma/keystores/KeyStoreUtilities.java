@@ -37,7 +37,6 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
 public final class KeyStoreUtilities {
