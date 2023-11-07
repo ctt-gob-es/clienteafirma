@@ -129,7 +129,7 @@ public final class SslSecurityManager {
 	 *                                    <code>KeyStore</code> para el <code>KeyManager</code> SSL.
 	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
-	public static void setTrustManagerAndKeyManager(final TrustManager[] tms,
+	private static void setTrustManagerAndKeyManager(final TrustManager[] tms,
 			                                        final HostnameVerifier hv,
 			                                        final KeyStore keyManagerKeyStore,
 			                                        final PasswordCallback sslKeyStorePasswordCallback) throws KeyManagementException,

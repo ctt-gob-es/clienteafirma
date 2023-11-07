@@ -11,6 +11,8 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
+import es.gob.afirma.keystores.CertificateFilter;
+
 /**
  * Filtro que muestra &uacute;nicamente los certificados preparados para firma. Esto no se
  * realiza mediante KeyUsage, sino que se muestran todos los certificados con clave privada

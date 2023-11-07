@@ -12,6 +12,8 @@ package es.gob.afirma.keystores.filters;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import es.gob.afirma.keystores.CertificateFilter;
+
 /**
  * Filtro para determinar aquellos que est&aacute;n caducados.
  * @author Carlos Gamuci Mill&aacute;n.

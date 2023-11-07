@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.keystores.CertificateFilter;
 
 /**
  * Filtro para especificar un certificado concreto.

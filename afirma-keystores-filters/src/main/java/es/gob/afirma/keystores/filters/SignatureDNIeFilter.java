@@ -11,7 +11,7 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 

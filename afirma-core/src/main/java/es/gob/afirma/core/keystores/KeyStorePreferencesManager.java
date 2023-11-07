@@ -406,13 +406,13 @@ public final class KeyStorePreferencesManager {
 	 * Asigna la preferencia para omitir o no el cerificado de autenticaci&oacute;n para DNIe
 	 * @param skipCert Valor para la preferencia
 	 */
-	public static void setSkipAuthCertDNIe(final boolean skipCert) {
+	public static void setSkipAuthCertDNIeEnabled(final boolean skipCert) {
 		// Si el valor que se le va a asignar a la propiedad es el mismo que el del sistema,
 		// se elimina en el registro del usuario y permanece la del sistema
 		final boolean systemValue = getBooleanSystemPreference(PREFERENCE_SKIP_AUTH_CERT_DNIE);
 		if (skipCert == systemValue) {
 			USER_PREFERENCES.remove(PREFERENCE_SKIP_AUTH_CERT_DNIE);
-		} else if (skipCert != getSkipAuthCertDNIe()) {
+		} else if (skipCert != isSkipAuthCertDNIeEnabled()) {
 			// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
 			USER_PREFERENCES.putBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, skipCert);
 		}
@@ -422,7 +422,7 @@ public final class KeyStorePreferencesManager {
 	 * Obtiene la preferencia para omitir o no el cerificado de autenticaci&oacute;n para DNIe
 	 * @return true si se va a omitir el certificado
 	 */
-	public static boolean getSkipAuthCertDNIe() {
+	public static boolean isSkipAuthCertDNIeEnabled() {
 		return USER_PREFERENCES.getBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, getBooleanSystemPreference(PREFERENCE_SKIP_AUTH_CERT_DNIE));
 	}
 

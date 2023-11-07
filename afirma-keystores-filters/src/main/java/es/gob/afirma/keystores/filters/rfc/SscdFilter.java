@@ -19,7 +19,7 @@ import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.DEROctetString;
 import org.spongycastle.asn1.x509.qualified.QCStatement;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.CertificateFilter;
 
 /** Filtro de certificados que limita el uso &uacute;nicamente a los certificados generados en
  * un SSCD.

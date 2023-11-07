@@ -230,7 +230,7 @@ public final class PreferencesPlistHandler {
 		}
 
 		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
-			KeyStorePreferencesManager.setSkipAuthCertDNIe((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
+			KeyStorePreferencesManager.setSkipAuthCertDNIeEnabled((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
 			properties.remove(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE);
 		}
 
@@ -276,7 +276,7 @@ public final class PreferencesPlistHandler {
 		}
 
 		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
-			KeyStorePreferencesManager.setSkipAuthCertDNIe((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
+			KeyStorePreferencesManager.setSkipAuthCertDNIeEnabled((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
 			properties.remove(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE);
 		}
 

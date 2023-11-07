@@ -913,7 +913,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, this.onlySignature.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
-		KeyStorePreferencesManager.setSkipAuthCertDNIe(this.skipAuthCertDnie.isSelected());
+		KeyStorePreferencesManager.setSkipAuthCertDNIeEnabled(this.skipAuthCertDnie.isSelected());
 
 	}
 
@@ -968,7 +968,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 		this.onlySignature.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS));
 		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS));
-		this.skipAuthCertDnie.setSelected(KeyStorePreferencesManager.getSkipAuthCertDNIe());
+		this.skipAuthCertDnie.setSelected(KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled());
 
         revalidate();
         repaint();
@@ -1025,7 +1025,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
-    	if (KeyStorePreferencesManager.getSkipAuthCertDNIe()) {
+    	if (KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled()) {
     		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {

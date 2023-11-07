@@ -12,7 +12,7 @@ package es.gob.afirma.keystores.filters.rfc;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.CertificateFilter;
 
 /** Filtro de certificados por su n&uacute;mero de serie.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

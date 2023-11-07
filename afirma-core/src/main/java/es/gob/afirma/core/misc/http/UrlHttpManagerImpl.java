@@ -20,18 +20,14 @@ import java.net.InetAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.TrustManager;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -362,15 +358,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * almac&eacute;n de claves a usar en SSL. */
 	public static void setSslKeyStorePasswordCallback(final PasswordCallback pwc) {
 		sslKeyStorePasswordCallback = pwc;
-	}
-
-	/** Establece los <code>TrustManager</code> de las conexiones SSL.
-	 * @param tms <code>TrustManager</code> a establecer.
-	 * @param hv Verificador de nombres de <i>host</i> a usar en las conexiones SSL.
-	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
-	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
-	public static void setTrustManager(final TrustManager[] tms, final HostnameVerifier hv) throws KeyManagementException, NoSuchAlgorithmException {
-		SslSecurityManager.setTrustManagerAndKeyManager(tms, hv, sslKeyStore, sslKeyStorePasswordCallback);
 	}
 
 	/**

@@ -20,6 +20,8 @@ import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.x509.CertificatePolicies;
 import org.spongycastle.asn1.x509.PolicyInformation;
 
+import es.gob.afirma.keystores.CertificateFilter;
+
 /** Filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
  * Si un certificado tiene varias pol&iacute;ticas declaradas, todas deben estar dentro de la
  * lista de pol&iacute;ticas aceptadas.

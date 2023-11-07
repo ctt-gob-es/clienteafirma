@@ -16,6 +16,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.keystores.CertificateFilter;
 
 /** Filtro para identificar un certificado a partir de su <i>thumbprint</i> (tambi&eacute;n
  * conocido como <i>fingerprint</i>) codificado en hexadecimal. El thumbprint de un certificado

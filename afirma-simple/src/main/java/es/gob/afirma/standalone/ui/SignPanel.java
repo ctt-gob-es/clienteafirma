@@ -370,7 +370,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
-    	if (KeyStorePreferencesManager.getSkipAuthCertDNIe()) {
+    	if (KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled()) {
     		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {

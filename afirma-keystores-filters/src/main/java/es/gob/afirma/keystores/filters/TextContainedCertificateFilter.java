@@ -11,6 +11,8 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
+import es.gob.afirma.keystores.CertificateFilter;
+
 /** Filtro de certificados que busca cadenas de texto concretas dentro del Principal
  * del Subject y/o Issuer de un certificado. Las comprobaciones realizadas no tienen
  * en cuenta may&uacute;sculas y min&uacute;sculas. */
