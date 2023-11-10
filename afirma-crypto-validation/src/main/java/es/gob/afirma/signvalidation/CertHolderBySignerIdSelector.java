@@ -13,10 +13,10 @@ import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.cms.SignerId;
 import org.spongycastle.util.Selector;
 
-final class CertHolderBySignerIdSelector implements Selector<X509CertificateHolder> {
+public final class CertHolderBySignerIdSelector implements Selector<X509CertificateHolder> {
 
 	private final SignerId signerId;
-	CertHolderBySignerIdSelector(final SignerId sid) {
+	public CertHolderBySignerIdSelector(final SignerId sid) {
 		if (sid == null) {
 			throw new IllegalArgumentException("El ID del firmante no puede ser nulo"); //$NON-NLS-1$
 		}

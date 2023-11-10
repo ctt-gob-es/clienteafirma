@@ -1,13 +1,11 @@
 package es.gob.afirma.standalone.signdetails;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -16,8 +14,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -29,7 +25,6 @@ import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
-import es.gob.afirma.standalone.crypto.TimestampsAnalyzer;
 
 public class FacturaESignAnalyzer implements SignAnalyzer {
 
@@ -77,7 +72,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     	try {
 
             CompleteSignInfo signInfo;
-            signInfo = getSignInfo(data);
+            signInfo = SignAnalyzer.getSignInfo(data);
 
             this.signersTree = signInfo.getSignsTree();
     		this.signDetailsList = new ArrayList<SignDetails>();
@@ -115,7 +110,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
     			final Element signature = (Element) signaturesList.item(i);
-    			final XAdESSignDetails signDetails = buildSignDetails(signature);
+    			final SignDetails signDetails = buildSignDetails(signature);
     			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature);
     			signDetails.setValidityResult(validity);
     			this.signDetailsList.add(signDetails);
@@ -126,11 +121,11 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     	}
 	}
 
-	private XAdESSignDetails buildSignDetails(final Element signElement) throws AOInvalidFormatException {
-		final XAdESSignDetails xadesSignDetails = new XAdESSignDetails();
+	private SignDetails buildSignDetails(final Element signElement) throws AOInvalidFormatException {
+		final SignDetails xadesSignDetails = new SignDetails();
 
-		final String format = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signElement);
-		xadesSignDetails.setFormat(format);
+		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signElement);
+		xadesSignDetails.setSignProfile(signProfile);
 		final Element signatureMethodElement = XAdESUtil.getSignatureMethodElement(signElement);
 		String algorithm = SIGN_ALGOS_URI.get(signatureMethodElement.getAttribute("Algorithm")); //$NON-NLS-1$
 		if (algorithm == null) {
@@ -270,48 +265,6 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 			signersList.add(certDetails);
 		}
 	}
-
-    /** Recupera la informaci&oacute;n de la firma indicada.
-     * @param signData Firma.
-     * @return Informaci&oacute;n de la firma.
-     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
-    private static CompleteSignInfo getSignInfo(final byte[] signData) throws IOException {
-        final CompleteSignInfo signInfo = new CompleteSignInfo();
-        signInfo.setSignData(signData);
-        final AOSigner signer = AOSignerFactory.getSigner(signData);
-        if (signer == null) {
-        	LOGGER.warning("Formato de firma no reconocido"); //$NON-NLS-1$
-            throw new IllegalArgumentException("Formato de firma no reconocido"); //$NON-NLS-1$
-        }
-        try {
-            signInfo.setSignInfo(signer.getSignInfo(signData));
-        }
-        catch (final Exception e) {
-        	LOGGER.log(Level.WARNING, "Error al leer la informacion de la firma", e); //$NON-NLS-1$
-        }
-        try {
-        	signInfo.setSignsTree(signer.getSignersStructure(signData, true));
-        }
-        catch (final Exception e) {
-        	LOGGER.log(Level.WARNING, "Error al extraer el arbol de firmantes", e);  //$NON-NLS-1$
-        	signInfo.setSignsTree(null);
-        }
-        try {
-            signInfo.setData(signer.getData(signData));
-        }
-        catch (final Exception e) {
-        	LOGGER.log(Level.WARNING, "Error al extraer los datos firmados", e);  //$NON-NLS-1$
-        }
-        try {
-        	signInfo.setTimestampsInfo(
-    			TimestampsAnalyzer.getTimestamps(signData)
-			);
-        }
-        catch (final Exception e) {
-        	LOGGER.log(Level.WARNING, "Error al extraer los sellos de tiempo", e);  //$NON-NLS-1$
-        }
-        return signInfo;
-    }
 
     private static Map<String, String> getProductionPlaceMetadata(final NodeList signatureProductionPlaceList, final String namespaceUri) {
     	final Map<String, String> metadata = new HashMap<String, String>();

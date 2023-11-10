@@ -1,24 +1,26 @@
 package es.gob.afirma.standalone.signdetails;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.cms.AttributeTable;
 import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
-import org.spongycastle.asn1.cms.SignedData;
 import org.spongycastle.asn1.esf.ESFAttributes;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.cert.X509CRLHolder;
 import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.SignerInformation;
 import org.spongycastle.cms.SignerInformationStore;
+import org.spongycastle.util.CollectionStore;
 
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfReader;
 
-public class SignatureFormatDetectorPades {
+public class SignatureFormatDetectorPadesCades {
 
 	/**
 	 * Constant attribute that represents the OID of the
@@ -585,7 +587,7 @@ public class SignatureFormatDetectorPades {
 	 * @throws Exception
 	 * @throws SigningException If the method fails.
 	 */
-	private static CMSSignedData getCMSSignature(final PDFSignatureDictionary signatureDictionary) throws Exception {
+	public static CMSSignedData getCMSSignature(final PDFSignatureDictionary signatureDictionary) throws Exception {
 
 		// Metemos en una variable el contenido de la clave
 		// /Contents, o
@@ -751,53 +753,46 @@ public class SignatureFormatDetectorPades {
 	 *         <li>{@link ISignatureFormatDetector#FORMAT_UNRECOGNIZED}.</li>
 	 *         </ul>
 	 */
-	private static String resolveASN1Format(final byte[] signature) {
+	public static String resolveASN1Format(final CMSSignedData signedData, final SignerInformation signature) {
 		// Inicialmente definidos que el formato no está reconocido
 		String format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
 		try {
-			final CMSSignedData signedData = new CMSSignedData(signature);
-
-			// Obtenemos la información de los firmantes
-			final SignerInformationStore signerInformationStore = signedData.getSignerInfos();
-			final List<SignerInformation> listSignersSignature = (List<SignerInformation>) signerInformationStore
-					.getSigners();
-
 			// Comprobamos si la firma es CMS
-			if (isCMS(listSignersSignature)) {
+			if (isCMS(signature)) {
 				format = FORMAT_CMS;
 				// Comprobamos si la firma contiene sello de tiempo, y por lo
 				// tanto, si es CMS-T
-				if (isCAdEST(listSignersSignature)) {
+				if (isCAdEST(signature)) {
 					format = FORMAT_CMS_T;
 				}
 			}
 			// Comprobamos si la firma es CAdES-EPES
-			else if (isCAdESEPES(listSignersSignature)) {
-				format = resolveFormatOfCAdESEPESSignature(signedData, listSignersSignature);
+			else if (isCAdESEPES(signature)) {
+				format = resolveFormatOfCAdESEPESSignature(signedData, signature);
 			}
 			// Comprobamos si la firma es CAdES-BES
-			else if (isCAdESBES(listSignersSignature)) {
+			else if (isCAdESBES(signature)) {
 				// Establecemos el formato a CAdES-EPES
 				format = FORMAT_CADES_BES;
 				// Comprobamos si la firma es CAdES B-Level, esto es, si tiene
 				// el atributo firmado signing-time
-				if (isCAdESBLevel(listSignersSignature)) {
+				if (isCAdESBLevel(signature)) {
 					// Establecemos el formato a CAdES B-Level
 					format = ISignatureFormatDetector.FORMAT_CADES_B_LEVEL;
 					// Comprobamos si la firma posee signature-time-stamp en
 					// cuyo caso será CAdES T-Level
-					if (isCAdEST(listSignersSignature)) {
+					if (isCAdEST(signature)) {
 						// Establecemos el formato a CAdES T-Level
 						format = ISignatureFormatDetector.FORMAT_CADES_T_LEVEL;
 						// Comprobamos si la firma es LT-Level
-						if (isCAdESLTLevel(listSignersSignature, signedData)) {
+						if (isCAdESLTLevel(signature, signedData)) {
 							format = ISignatureFormatDetector.FORMAT_CADES_LT_LEVEL;
 							// Comprobamos si la firma es LTA-Level
-							if (isCAdESLTALevel(listSignersSignature)) {
+							if (isCAdESLTALevel(signature)) {
 								format = ISignatureFormatDetector.FORMAT_CADES_LTA_LEVEL;
 							}
 						} else {
-							format = resolveCAdESNoBaselineFormat(format, listSignersSignature);
+							format = resolveCAdESNoBaselineFormat(format, signature);
 						}
 					}
 				}
@@ -805,44 +800,13 @@ public class SignatureFormatDetectorPades {
 				else {
 					// Comprobamos si la firma es CAdES-T, CAdES-C, CAdES-X1,
 					// CAdES-X2, CAdES-XL1, CAdES-XL2 o CAdES-A
-					format = resolveCAdESNoBaselineFormat(format, listSignersSignature);
+					format = resolveCAdESNoBaselineFormat(format, signature);
 				}
 			}
 		} catch (final Exception e) {
 			format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
 		}
 		return format;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CMS format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CMS format.
-	 */
-	private static boolean isCMS(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				// Se considera una firma con formato CMS si no posee ningún
-				// atributo firmado
-				// id_aa_signingCertificate, id_aa_signingCertificateV2, ni
-				// id_aa_ets_otherSigCert
-				if (isCMS(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CMS
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCMS((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
 	}
 
 	/**
@@ -884,34 +848,6 @@ public class SignatureFormatDetectorPades {
 	}
 
 	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-T format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-T
-	 *         format.
-	 */
-	private static boolean isCAdEST(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdEST(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-T
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdEST((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
 	 * Method that obtains the concrete format of an ASN.1 signature which has, al
 	 * least, CAdES-EPES form.
 	 *
@@ -936,24 +872,24 @@ public class SignatureFormatDetectorPades {
 	 *         </ul>
 	 */
 	private static String resolveFormatOfCAdESEPESSignature(final CMSSignedData signedData,
-			final List<SignerInformation> listSignersSignature) {
+			final SignerInformation signature) {
 		// Establecemos el formato a CAdES-EPES
 		String format = ISignatureFormatDetector.FORMAT_CADES_EPES;
 		// Comprobamos si la firma es CAdES B-Level, esto es, si tiene
 		// el atributo firmado signing-time
-		if (isCAdESBLevel(listSignersSignature)) {
+		if (isCAdESBLevel(signature)) {
 			// Establecemos el formato a CAdES B-Level
 			format = ISignatureFormatDetector.FORMAT_CADES_B_LEVEL;
 			// Comprobamos si la firma posee signature-time-stamp en
 			// cuyo caso será CAdES T-Level
-			if (isCAdEST(listSignersSignature)) {
+			if (isCAdEST(signature)) {
 				// Establecemos el formato a CAdES T-Level
 				format = ISignatureFormatDetector.FORMAT_CADES_T_LEVEL;
 				// Comprobamos si la firma es LT-Level
-				if (isCAdESLTLevel(listSignersSignature, signedData)) {
+				if (isCAdESLTLevel(signature, signedData)) {
 					format = ISignatureFormatDetector.FORMAT_CADES_LT_LEVEL;
 					// Comprobamos si la firma es LTA-Level
-					if (isCAdESLTALevel(listSignersSignature)) {
+					if (isCAdESLTALevel(signature)) {
 						format = ISignatureFormatDetector.FORMAT_CADES_LTA_LEVEL;
 					}
 				}
@@ -963,7 +899,7 @@ public class SignatureFormatDetectorPades {
 		else {
 			// Comprobamos si la firma es CAdES-T, CAdES-C, CAdES-X1,
 			// CAdES-X2, CAdES-XL1, CAdES-XL2 o CAdES-A
-			format = resolveCAdESNoBaselineFormat(format, listSignersSignature);
+			format = resolveCAdESNoBaselineFormat(format, signature);
 		}
 		return format;
 	}
@@ -995,84 +931,19 @@ public class SignatureFormatDetectorPades {
 	 *         </ul>
 	 */
 	private static String resolveCAdESNoBaselineFormat(final String temporalFormat,
-			final List<SignerInformation> listSignersSignature) {
+			final SignerInformation signature) {
 		// Primero establecemos el formato a devolver como el formato temporal
 		// que posee la firma
 		String format = temporalFormat;
 
 		// Si la firma no es CAdES-T comprobamos si pudiera serlo
-		if (!format.equals(ISignatureFormatDetector.FORMAT_CADES_T_LEVEL) && isCAdEST(listSignersSignature)) {
+		if (!format.equals(ISignatureFormatDetector.FORMAT_CADES_T_LEVEL) && isCAdEST(signature)) {
 			format = ISignatureFormatDetector.FORMAT_CADES_T;
 		}
-		// Si la firma cumple con el formato CAdES-T
-		// if (format.equals(FORMAT_CADES_T)) {
-		format = resolveFormatOfCAdESTSignature(listSignersSignature, format);
-		// }
+
 		return format;
 	}
 
-	/**
-	 * Method that obtains the concrete format of an ASN.1 signature which has, al
-	 * least, CAdES-T form.
-	 *
-	 * @param listSignersSignature Parameter that represents the list of signers of
-	 *                             the signature.
-	 * @param temporalFormat       last value of format checked.
-	 * @return the format of the signature. The format will have one of these
-	 *         values:
-	 *         <ul>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_A}.</li>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_XL2}.</li>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_XL1}.</li>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_X2}.</li>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_X1}.</li>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_T}.</li>
-	 *         <li>{@link ISignatureFormatDetector#FORMAT_CADES_C}.</li>
-	 *         </ul>
-	 */
-	private static String resolveFormatOfCAdESTSignature(final List<SignerInformation> listSignersSignature,
-			final String temporalFormat) {
-		// Establecemos el formato a devolver como CAdES-T
-		String format = temporalFormat;
-
-		// Comprobamos si la firma cumple con el formato CAdES-C
-		if (isCAdESC(listSignersSignature)) {
-			// Establecemos el formato a devolver como CAdES-C
-			format = ISignatureFormatDetector.FORMAT_CADES_C;
-
-			// Comprobamos si la firma es CAdES-XL1
-			if (isCAdESXL1(listSignersSignature)) {
-				// Establecemos el formato a devolver como CAdES-XL1
-				format = ISignatureFormatDetector.FORMAT_CADES_XL1;
-				// Comprobamos si la firma es CAdES-A
-				if (isCAdESA(listSignersSignature)) {
-					// Establecemos el formato a devolver como CAdES-A
-					format = ISignatureFormatDetector.FORMAT_CADES_A;
-				}
-			}
-			// Comprobamos si la firma es CAdES-XL2
-			else if (isCAdESXL2(listSignersSignature)) {
-				// Establecemos el formato a devolver como CAdES-XL2
-				format = ISignatureFormatDetector.FORMAT_CADES_XL2;
-				// Comprobamos si la firma es CAdES-A
-				if (isCAdESA(listSignersSignature)) {
-					// Establecemos el formato a devolver como CAdES-A
-					format = ISignatureFormatDetector.FORMAT_CADES_A;
-				}
-			}
-			// Comprobamos si la firma es CAdES-X1
-			else if (isCAdESX1(listSignersSignature)) {
-				// Establecemos el formato a devolver como CAdES-X1
-				format = ISignatureFormatDetector.FORMAT_CADES_X1;
-			}
-			// Comprobamos si la firma es CAdES-X2
-			else if (isCAdESX2(listSignersSignature)) {
-				// Establecemos el formato a devolver como CAdES-X2
-				format = ISignatureFormatDetector.FORMAT_CADES_X2;
-			}
-		}
-		return format;
-	}
 
 	/**
 	 * Method that checks whether an ASN.1 signature has
@@ -1086,26 +957,6 @@ public class SignatureFormatDetectorPades {
 	public static boolean hasSignaturePolicyIdentifier(final SignerInformation signerInformation) {
 		final AttributeTable signedAttrs = signerInformation.getSignedAttributes();
 		if (signedAttrs != null && signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether a signer has CAdES-C format.
-	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates whether the signer has CAdES-C format.
-	 */
-	private static boolean isCAdESC(final SignerInformation signerInformation) {
-		// Accedemos al conjunto de atributos no firmados
-		final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-		// Se considera una firma con formato CAdES-C si posee los
-		// atributos no firmados
-		// id-aa-ets-CertificateRefs y aa-ets-revocationRefs
-		if (unsignedAttrs != null && (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certificateRefs) != null
-				|| unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_revocationRefs) != null)) {
 			return true;
 		}
 		return false;
@@ -1130,89 +981,26 @@ public class SignatureFormatDetectorPades {
 				|| signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_otherSigCert) != null;
 	}
 
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-BES format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-BES
-	 *         format.
-	 */
-	private static boolean isCAdESBES(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				// Se considera una firma con formato CAdES-BES si posee los
-				// atributos firmados
-				// id_aa_signingCertificate, o id_aa_signingCertificateV2, o
-				// id_aa_ets_otherSigCert
-				if (isCAdESBES(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-BES
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESBES((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
 
 	/**
-	 * Method that checks if a signer contains the <code>signing-time</code>
-	 * attribute.
+	 * Method that checks if the signature has <code>signing-time</code> attribute.
 	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates if the signer contains the
+	 * @param signature Parameter that represents the signer of the
+	 *                             signature.
+	 * @return a boolean that indicates if the signature has
 	 *         <code>signing-time</code> attribute (true) or not (false).
 	 */
-	private static boolean isCAdESBLevel(final SignerInformation signerInformation) {
+	private static boolean isCAdESBLevel(final SignerInformation signature) {
+		// Si la firma posee firmantes
+
 		// Accedemos al conjunto de atributos firmados
-		final AttributeTable signedAttrs = signerInformation.getSignedAttributes();
+		final AttributeTable signedAttrs = signature.getSignedAttributes();
 
 		// Comprobamos si tiene el atributo signing-time
 		if (signedAttrs.get(PKCSObjectIdentifiers.pkcs_9_at_signingTime) != null) {
 			return true;
 		}
-		return false;
-	}
 
-	/**
-	 * Method that checks if the signature has <code>signing-time</code> attribute.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates if the signature has
-	 *         <code>signing-time</code> attribute (true) or not (false).
-	 */
-	private static boolean isCAdESBLevel(final List<SignerInformation> listSignersSignature) {
-		// Si la firma posee firmantes
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				// Accedemos al conjunto de atributos firmados
-				final AttributeTable signedAttrs = signerInformation.getSignedAttributes();
-
-				// Comprobamos si tiene el atributo signing-time
-				if (signedAttrs.get(PKCSObjectIdentifiers.pkcs_9_at_signingTime) != null) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES B-Level
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESBLevel((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-
-			}
-			return false;
-		}
 		return false;
 	}
 
@@ -1255,56 +1043,16 @@ public class SignatureFormatDetectorPades {
 		 *
 		 * y que contenga al menos un elemento de revocación dentro de SignedData.crl
 		 */
-		final SignedData signedData = SignedData.getInstance(cmsSignedData.getSignedContent().getContent());
-		if (checkUnsignedAttributesForCAdESLTLevel(unsignedAttrs) && signedData.getCRLs() != null
-				&& signedData.getCRLs().size() > 0) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks if the signature has LT-Level format, it contains at least
-	 * one revocation value into the signed data, and it doesn't contain any of the
-	 * following unsigned attributes:
-	 * <ul>
-	 * <li>complete-certificate-references.</li>
-	 * <li>complete-revocation-references.</li>
-	 * <li>attribute-certificate-references.</li>
-	 * <li>attribute-revocation-references.</li>
-	 * <li>CAdES-C-time-stamp.</li>
-	 * <li>time-stamped-certs-crls-references.</li>
-	 * <li>certificate-values.</li>
-	 * <li>revocation-values.</li>
-	 * <li>archive-time-stamp.</li>
-	 * <li>archive-time-stampv2.</li>
-	 * <li>long-term-validation.</li>
-	 * </ul>
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @param signedData           Parameter that represents the signed data.
-	 * @return a boolean that indicates if the signature has LT-Level (true) or not
-	 *         (false).
-	 */
-	private static boolean isCAdESLTLevel(final List<SignerInformation> listSignersSignature,
-			final CMSSignedData signedData) {
-		// Recorremos la lista de firmantes
-		for (final SignerInformation signerInformation : listSignersSignature) {
-			if (isCAdESLTLevel(signerInformation, signedData)) {
-				return true;
-			}
-
-			// Si el firmante posee contrafirmas comprobamos si alguna de
-			// ellas es CAdES LT-Level
-			final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-			if (counterSignatures != null && counterSignatures.size() > 0
-					&& isCAdESLTLevel((List<SignerInformation>) counterSignatures.getSigners(), signedData)) {
+		final CollectionStore<X509CRLHolder> crlStore = (CollectionStore<X509CRLHolder>) cmsSignedData.getCRLs();
+		if (checkUnsignedAttributesForCAdESLTLevel(unsignedAttrs) && crlStore != null) {
+			final Iterator<X509CRLHolder> it = crlStore.iterator();
+			if (it.hasNext()) {
 				return true;
 			}
 		}
 		return false;
 	}
+
 
 	/**
 	 * Method that checks if a signature doesn't contain any of the next unsigned
@@ -1428,332 +1176,5 @@ public class SignatureFormatDetectorPades {
 		return false;
 	}
 
-	/**
-	 * Method that checks if the signature has <code>archive-time-stamp-v3</code>
-	 * attribute.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates if the signature has
-	 *         <code>archive-time-stamp-v3</code> attribute (true) or not (false).
-	 */
-	private static boolean isCAdESLTALevel(final List<SignerInformation> listSignersSignature) {
-		// Si la firma posee firmantes
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdESLTALevel(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES LTA-Level
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESLTALevel((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-C format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-C
-	 *         format.
-	 */
-	private static boolean isCAdESC(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdESC(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-C
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESC((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether a signer has CAdES-XL1 format.
-	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates whether the signer has CAdES-XL1 format.
-	 */
-	private static boolean isCAdESXL1(final SignerInformation signerInformation) {
-		// Accedemos al conjunto de atributos no firmados
-		final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-		// Se considera una firma con formato CAdES-XL1 si posee los
-		// atributos no firmados
-		// id-aa-ets-certValues, id-aa-ets-revocationValues e
-		// id-aa-ets-escTimeStamp
-		if (areCAdESXLUnsignedAttributes(unsignedAttrs)
-				&& unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-XL1 format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-XL1
-	 *         format.
-	 */
-	private static boolean isCAdESXL1(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				// Accedemos al conjunto de atributos no firmados
-				final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-				// Se considera una firma con formato CAdES-XL1 si posee los
-				// atributos no firmados
-				// id-aa-ets-certValues, id-aa-ets-revocationValues e
-				// id-aa-ets-escTimeStamp
-				if (areCAdESXLUnsignedAttributes(unsignedAttrs)
-						&& unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) != null) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-XL1
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESXL1((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Method that checks whether a signer has CAdES-XL2 format.
-	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates whether the signer has CAdES-XL2 format.
-	 */
-	private static boolean isCAdESXL2(final SignerInformation signerInformation) {
-		// Accedemos al conjunto de atributos no firmados
-		final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-		// Se considera una firma con formato CAdES-XL2 si posee los
-		// atributos no firmados
-		// id-aa-ets-certValues, id-aa-ets-revocationValues e
-		// id-aa-ets-certCRLTimestamp
-		if (areCAdESXLUnsignedAttributes(unsignedAttrs)
-				&& unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certCRLTimestamp) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-XL2 format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-XL2
-	 *         format.
-	 */
-	private static boolean isCAdESXL2(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdESXL2(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-XL2
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESXL2((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether a signer has CAdES-A format.
-	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates whether the signer has CAdES-A format.
-	 */
-	private static boolean isCAdESA(final SignerInformation signerInformation) {
-		// Accedemos al conjunto de atributos no firmados
-		final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-		// Se considera una firma con formato CAdES-A si al menos uno de
-		// sus firmantes posee el atributo no firmado
-		// id-aa-ets-archiveTimeStamp o id-aa-ets-archiveTimestampV2
-		if (unsignedAttrs != null && (unsignedAttrs.get(ESFAttributes.archiveTimestamp) != null
-				|| unsignedAttrs.get(ESFAttributes.archiveTimestampV2) != null)) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-A format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-A
-	 *         format.
-	 */
-	private static boolean isCAdESA(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdESA(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-A
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESA((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-X1 format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-X1
-	 *         format.
-	 */
-	private static boolean isCAdESX1(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdESX1(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-X1
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESX1((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Method that checks whether a signer has CAdES-X2 format.
-	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates whether the signer has CAdES-X2 format.
-	 */
-	private static boolean isCAdESX2(final SignerInformation signerInformation) {
-		// Accedemos al conjunto de atributos no firmados
-		final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-		// Se considera una firma con formato CAdES-X2 si posee el
-		// atributo no firmado
-		// id-aa-ets-certCRLTimestamp
-		if (unsignedAttrs != null && unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certCRLTimestamp) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether an ASN.1 signature has CAdES-X2 format.
-	 *
-	 * @param listSignersSignature Parameter that represents the signers list of the
-	 *                             signature.
-	 * @return a boolean that indicates whether an ASN.1 signature has CAdES-X2
-	 *         format.
-	 */
-	private static boolean isCAdESX2(final List<SignerInformation> listSignersSignature) {
-		if (listSignersSignature != null && listSignersSignature.size() > 0) {
-			// Recorremos la lista de firmantes
-			for (final SignerInformation signerInformation : listSignersSignature) {
-				if (isCAdESX2(signerInformation)) {
-					return true;
-				}
-				// Si el firmante posee contrafirmas comprobamos si alguna de
-				// ellas es CAdES-X2
-				final SignerInformationStore counterSignatures = signerInformation.getCounterSignatures();
-				if (counterSignatures != null && counterSignatures.size() > 0
-						&& isCAdESX2((List<SignerInformation>) counterSignatures.getSigners())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether a signer has CAdES-X1 format.
-	 *
-	 * @param signerInformation Parameter that represents the information about the
-	 *                          signer.
-	 * @return a boolean that indicates whether the signer has CAdES-X1 format.
-	 */
-	private static boolean isCAdESX1(final SignerInformation signerInformation) {
-		// Accedemos al conjunto de atributos no firmados
-		final AttributeTable unsignedAttrs = signerInformation.getUnsignedAttributes();
-		// Se considera una firma con formato CAdES-X1 si posee el
-		// atributo no firmado
-		// id-aa-ets-escTimeStamp
-		if (unsignedAttrs != null && unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Method that checks whether a set of unsigned attributes are valid for a
-	 * CAdES-XL signature.
-	 *
-	 * @param unsignedAttrs Parameter that represents the set of unsigned
-	 *                      attributes.
-	 * @return a boolean that indicates wheter the unsigned attributes, certValues
-	 *         and revocationValues attributes are not null (true) or yes (false).
-	 */
-	private static boolean areCAdESXLUnsignedAttributes(final AttributeTable unsignedAttrs) {
-		// Se considera una firma con formato CAdES-XL1 si posee los
-		// atributos no firmados
-		// id-aa-ets-certValues y id-aa-ets-revocationValues
-		if (unsignedAttrs != null && unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certValues) != null
-				&& unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_revocationValues) != null) {
-			return true;
-		}
-		return false;
-	}
 
 }

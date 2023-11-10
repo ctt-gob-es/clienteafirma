@@ -7,6 +7,14 @@ public class DataObjectFormat {
     private String mimeType;
     private String encoding;
 
+    public DataObjectFormat() {
+    	//Constructor vacio
+	}
+
+    public DataObjectFormat(final String mimeType) {
+    	this.mimeType = mimeType;
+	}
+
 	public String getIdentifier() {
 		return this.identifier;
 	}

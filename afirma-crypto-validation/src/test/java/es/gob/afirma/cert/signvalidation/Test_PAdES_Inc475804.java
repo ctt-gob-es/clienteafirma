@@ -25,7 +25,7 @@ public class Test_PAdES_Inc475804 {
 				final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_NO_GENERADA_POR_AUTOFIRMA);
 			) {
 				final byte[] signature = AOUtil.getDataFromInputStream(is);
-				final SignValidity validity = SignValiderFactory.getSignValider(signature).validate(signature);
+				final SignValidity validity = SignValiderFactory.getSignValider(signature).validate(signature).get(0);
 				assertEquals(SignValidity.VALIDITY_ERROR.CERTIFICATE_EXPIRED, validity.getError());
 			}
 	}

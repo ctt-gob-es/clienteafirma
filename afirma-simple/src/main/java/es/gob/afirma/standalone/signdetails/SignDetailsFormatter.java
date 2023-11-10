@@ -1,10 +1,7 @@
 package es.gob.afirma.standalone.signdetails;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -14,8 +11,6 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesPanelXades;
 
 public class SignDetailsFormatter {
 
-    public static final Map<String, String> MIMETYPE_MAPPER;
-
     public static final String STREET_ADDRESS_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.11"); //$NON-NLS-1$
     public static final String POSTAL_CODE_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.8"); //$NON-NLS-1$
     public static final String CITY_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.6"); //$NON-NLS-1$
@@ -24,11 +19,8 @@ public class SignDetailsFormatter {
     public static final String SIGN_REASON_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.18"); //$NON-NLS-1$
     public static final String LOCATION_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.19"); //$NON-NLS-1$
     public static final String CONTACT_INFO_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.20"); //$NON-NLS-1$
+    public static final String LOCALITY_METADATA = SimpleAfirmaMessages.getString("ValidationInfoDialog.23"); //$NON-NLS-1$
 
-    static {
-    	MIMETYPE_MAPPER = new HashMap<>();
-    	MIMETYPE_MAPPER.put(MimeHelper.DEFAULT_MIMETYPE, "SHA1withRSA"); //$NON-NLS-1$
-	}
 
 	public static String formatToHTML(final SignAnalyzer analyzer, final List<SignValidity> generalValidation) {
 		String result = ""; //$NON-NLS-1$
@@ -68,7 +60,7 @@ public class SignDetailsFormatter {
 	private static String parseSignsToHTML(final List <SignDetails> details) {
 		String result = ""; //$NON-NLS-1$
 		for (final SignDetails detail : details) {
-			result += "<div style=\"border:5px solid black;border-radius:25px;\"><ul><li><b>Perfil de firma</b>: " + detail.getFormat() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
+			result += "<div style=\"border:5px solid black;border-radius:25px;\"><ul><li><b>Perfil de firma</b>: " + detail.getSignProfile() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
 					+ "<li><b>Algoritmo de firma</b>: " + detail.getAlgorithm()  + "</li>" ;//$NON-NLS-1$ //$NON-NLS-2$
 			if (detail.getValidityResult() != null) {
 				result += "<br>Resultado de la validacion :<ul>"; //$NON-NLS-1$
@@ -115,6 +107,10 @@ public class SignDetailsFormatter {
 
 				if (detail.getMetadata().containsKey(CITY_METADATA)) {
 					metadata += "<li>" + CITY_METADATA + ": " + detail.getMetadata().get(CITY_METADATA) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+
+				if (detail.getMetadata().containsKey(LOCALITY_METADATA)) {
+					metadata += "<li>" + LOCALITY_METADATA + ": " + detail.getMetadata().get(LOCALITY_METADATA) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 
 				if (detail.getMetadata().containsKey(PROVINCE_METADATA)) {

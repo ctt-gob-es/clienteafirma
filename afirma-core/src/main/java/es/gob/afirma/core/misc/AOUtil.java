@@ -495,7 +495,7 @@ public final class AOUtil {
 			return false;
 		}
 		try {
-			// Valoramos si la versión tiene el patron antiguo (1.X)
+			// Valoramos si la version tiene el patron antiguo (1.X)
 			if (ver.startsWith("1.")) { //$NON-NLS-1$
 				return Integer.parseInt(ver.substring(2, 3)) > 8;
 			}

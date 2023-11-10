@@ -2,6 +2,7 @@ package es.gob.afirma.test.simple;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -63,9 +64,9 @@ public class ValidateSignatureTest {
 					"La firma del fichero no se puede comprobar" //$NON-NLS-1$
 				);
 			}
-			final SignValidity validity = valider.validate(signature);
+			final List<SignValidity> validity = valider.validate(signature);
 			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");  //$NON-NLS-1$//$NON-NLS-2$
-			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
+			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.get(0).getValidity()); //$NON-NLS-1$
 	}
 
 	/** Prueba de validaci&oacute;n de firmas.
@@ -86,8 +87,8 @@ public class ValidateSignatureTest {
 					"La firma del fichero no se puede comprobar" //$NON-NLS-1$
 				);
 			}
-			final SignValidity validity = valider.validate(signature);
+			final List<SignValidity> validity = valider.validate(signature);
 			System.out.println(signaturePath + ":\n\t" + validity + "\n===================="); //$NON-NLS-1$ //$NON-NLS-2$
-			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.getValidity()); //$NON-NLS-1$
+			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.get(0).getValidity()); //$NON-NLS-1$
 	}
 }

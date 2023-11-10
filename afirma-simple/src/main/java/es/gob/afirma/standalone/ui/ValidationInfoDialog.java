@@ -30,8 +30,9 @@ import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.signdetails.CAdESSignAnalyzer;
 import es.gob.afirma.standalone.signdetails.FacturaESignAnalyzer;
-import es.gob.afirma.standalone.signdetails.PDFSignAnalyzer;
+import es.gob.afirma.standalone.signdetails.PAdESSignAnalyzer;
 import es.gob.afirma.standalone.signdetails.SignAnalyzer;
 import es.gob.afirma.standalone.signdetails.SignDetailsFormatter;
 import es.gob.afirma.standalone.signdetails.XAdESSignAnalyzer;
@@ -135,19 +136,11 @@ public class ValidationInfoDialog extends JDialog {
 		final SignAnalyzer analyzer = null;
 		// Comprobamos si es un fichero PDF
 		if (DataAnalizerUtil.isPDF(signData)) {
-			return new PDFSignAnalyzer(signData);
+			return new PAdESSignAnalyzer(signData);
 		}
 		// Comprobamos si es una factura electronica
 		else if (DataAnalizerUtil.isFacturae(signData)) {
 			return new FacturaESignAnalyzer(signData);
-		}
-		// Comprobamos si es un OOXML
-		else if (DataAnalizerUtil.isOOXML(signData)) {
-
-		}
-		// Comprobamos si es un ODF
-		else if (DataAnalizerUtil.isODF(signData)) {
-
 		}
 		// Comprobamos si es un fichero de firma CAdES o XAdES (los PDF, facturas, OOXML
 		// y ODF pasaran por las condiciones anteriores)
@@ -162,18 +155,8 @@ public class ValidationInfoDialog extends JDialog {
 			if (signer != null) {
 				if (signer instanceof AOXAdESSigner) {
 					return new XAdESSignAnalyzer(signData);
-				} else {
-					// CADES
 				}
-
-			}
-			// Comprobamos si es un fichero XML
-			else if (DataAnalizerUtil.isXML(signData)) {
-
-			}
-			// Cualquier otro tipo de fichero
-			else {
-
+				return new CAdESSignAnalyzer(signData);
 			}
 		}
 

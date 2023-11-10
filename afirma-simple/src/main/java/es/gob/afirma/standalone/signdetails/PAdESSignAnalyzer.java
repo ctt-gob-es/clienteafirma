@@ -7,6 +7,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.esf.SignaturePolicyId;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.cms.CMSSignedData;
+import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationStore;
+
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfDictionary;
@@ -17,13 +25,15 @@ import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.ValidatePdfSignature;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
-public class PDFSignAnalyzer implements SignAnalyzer {
+public class PAdESSignAnalyzer implements SignAnalyzer {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -33,7 +43,7 @@ public class PDFSignAnalyzer implements SignAnalyzer {
 	private static final String PDF = "PDF"; //$NON-NLS-1$s
 
 
-	public PDFSignAnalyzer(final byte [] data) throws Exception {
+	public PAdESSignAnalyzer(final byte [] data) throws Exception {
     	try {
     		this.signDetailsList = new ArrayList<SignDetails>();
     		createSignDetails(data);
@@ -87,36 +97,54 @@ public class PDFSignAnalyzer implements SignAnalyzer {
         	}
         	catch (final Exception e) {
         		LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
+        		throw e;
         	}
 
-        	for (final String signatureName : af.getSignatureNames()) {
+			final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(data);
 
-        		// Comprobamos si es una firma o un sello
-        		final PdfDictionary pdfDictionary = af.getSignatureDictionary(signatureName);
-        		if (AOPDFSigner.PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER)) || AOPDFSigner.PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
-        			// Ignoramos los sellos
-        			continue;
-        		}
+			for (final String signatureName : af.getSignatureNames()) {
 
-        		final PAdESSignDetails signDetails = buildSignDetails(signatureName, data, pdfDictionary, af);
-        		//final List<SignValidity> validity = ValidatePdfSignature.validate(data);
-    			//signDetails.setValidityResult(validity);
-    			this.signDetailsList.add(signDetails);
+				// Comprobamos si es una firma o un sello
+				final PdfDictionary pdfDictionary = af.getSignatureDictionary(signatureName);
+				if (AOPDFSigner.PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
+						|| AOPDFSigner.PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
+					// Ignoramos los sellos
+					continue;
+				}
 
-        	}
+				final SignDetails signDetails = buildSignDetails(signatureName, pdfDictionary, af, signProfile);
 
-    	}
+				//Se obtiene la politica en caso de que exista
+				final PdfString contents = pdfDictionary.getAsString(PdfName.CONTENTS);
+				if (contents != null) {
+					final byte[] signBytes = pdfDictionary.getAsString(PdfName.CONTENTS).getOriginalBytes();
+					final CMSSignedData cmsSignedData = new CMSSignedData(signBytes);
+					final SignerInformationStore signerInformationStore = cmsSignedData.getSignerInfos();
+					final List<SignerInformation> listSignersSignature = (List<SignerInformation>) signerInformationStore
+							.getSigners();
+					for (final SignerInformation si : listSignersSignature) {
+						final SignaturePolicy policy = analyzePolicy(si);
+						if (policy != null) {
+							signDetails.setPolicy(policy);
+							break;
+						}
+					}
+				}
+
+				this.signDetailsList.add(signDetails);
+			}
+
+		}
     	catch (final Exception e) {
     		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
-	private PAdESSignDetails buildSignDetails(final String signName, final byte[] documentData,
-			final PdfDictionary signPdfDictionary, final AcroFields af) throws Exception {
+	private SignDetails buildSignDetails(final String signName, final PdfDictionary signPdfDictionary, final AcroFields af, final String signProfile) throws Exception {
 
-		final PAdESSignDetails padesSignDetails = new PAdESSignDetails();
-		final String format = SignatureFormatDetectorPades.resolvePDFFormat(documentData);
-		padesSignDetails.setFormat(format);
+		final SignDetails padesSignDetails = new SignDetails();
+
+		padesSignDetails.setSignProfile(signProfile);
 
 		PdfPKCS7 pkcs7 = null;
 		try {
@@ -161,9 +189,27 @@ public class PDFSignAnalyzer implements SignAnalyzer {
 		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af);
 		padesSignDetails.setValidityResult(listValidity);
 
-		//TODO: Obtener datos de politica
-
 		return padesSignDetails;
 	}
+
+    private static SignaturePolicy analyzePolicy(final SignerInformation si) {
+    	final AttributeTable signedAttrs = si.getSignedAttributes();
+    	final Attribute policyAttr = signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId);
+		if (policyAttr != null && policyAttr.getAttrValues() != null && policyAttr.getAttrValues().size() > 0) {
+			final SignaturePolicyId sigPolId = SignaturePolicyId.getInstance(policyAttr.getAttrValues().getObjectAt(0));
+			final String polId = sigPolId.getSigPolicyId().toString();
+
+			if (polId.equals(SignDetails.POLICY_PADES_AGE_1_9.getPolicyIdentifier().substring(8))) {
+				return new SignaturePolicy(SimpleAfirmaMessages.getString("PreferencesPanel.73"), SignDetails.POLICY_PADES_AGE_1_9); //$NON-NLS-1$
+			}
+
+			final String identifierHash = sigPolId.getSigPolicyHash().getHashValue().toString();
+			final String identifierHashAlgorithm = sigPolId.getSigPolicyHash().getHashAlgorithm().getAlgorithm().toString();
+			final String qualifier = sigPolId.getSigPolicyQualifiers().getInfoAt(0).getSigQualifier().toString();
+			final AdESPolicy newPolicy = new AdESPolicy(polId, identifierHash.substring(1), identifierHashAlgorithm, qualifier);
+			return new SignaturePolicy("", newPolicy); //$NON-NLS-1$
+		}
+		return null;
+    }
 
 }
