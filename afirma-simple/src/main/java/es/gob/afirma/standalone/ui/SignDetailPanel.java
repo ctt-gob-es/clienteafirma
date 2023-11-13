@@ -145,7 +145,7 @@ public final class SignDetailPanel extends JPanel implements PluginButtonsContai
             }
         }
 
-        final JPanel infoPanel = new SignResultPanel(signValidity, true, null);
+        final JPanel infoPanel = new SignResultPanel(signValidity, true, null, sig);
         this.componentPanel = new SignDataPanel(config.getSignatureFile(), sig, fileTypeIcon, cert, null);
 
         final JPanel buttonPanel = new JPanel(true);

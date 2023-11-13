@@ -33,6 +33,7 @@ public class SignDetails {
 		this.metadata = new HashMap<String, String>();
 		this.signers = new ArrayList<CertificateDetails>();
 		this.dataObjectFormats = new ArrayList<DataObjectFormat>();
+		this.validityResult = new ArrayList<SignValidity>();
 	}
 
 	static {

@@ -40,7 +40,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 	List <SignDetails> signDetailsList;
 	final AOTreeNode signersTree = new AOTreeNode("Datos"); //$NON-NLS-1$
 
-	private static final String PDF = "PDF"; //$NON-NLS-1$s
+	private static final String PADES = "PAdES"; //$NON-NLS-1$s
 
 
 	public PAdESSignAnalyzer(final byte [] data) throws Exception {
@@ -65,7 +65,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 
 	@Override
 	public String getSignFormat() {
-		return PDF;
+		return PADES;
 	}
 
 	@Override
@@ -73,6 +73,11 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
         return null;
 	}
 
+	/**
+	 * Crea los detalles de cada firma a partir del array indicado por par&aacute;metro.
+	 * @param data Datos a mapear.
+	 * @throws Exception Error transformando los datos.
+	 */
 	private void createSignDetails(final byte [] data) throws Exception {
     	try {
 
@@ -140,6 +145,15 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
     	}
 	}
 
+	/**
+	 * Construye los detalles de la firma que se indica por par&aacute;metro.
+	 * @param signName Nombre de firma.
+	 * @param signPdfDictionary Datos de la firma.
+	 * @param af Campos con informaci&oacute;n sobre la firma.
+	 * @param signProfile Perfil de firma.
+	 * @return Detalles de la firma.
+	 * @throws Exception Error transformando los datos.
+	 */
 	private SignDetails buildSignDetails(final String signName, final PdfDictionary signPdfDictionary, final AcroFields af, final String signProfile) throws Exception {
 
 		final SignDetails padesSignDetails = new SignDetails();
@@ -192,6 +206,10 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		return padesSignDetails;
 	}
 
+    /**
+     * Analiza la pol&iacute;tica y la agrega a los detalles de la firma.
+     * @param si Datos sobre la firma.
+     */
     private static SignaturePolicy analyzePolicy(final SignerInformation si) {
     	final AttributeTable signedAttrs = si.getSignedAttributes();
     	final Attribute policyAttr = signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId);

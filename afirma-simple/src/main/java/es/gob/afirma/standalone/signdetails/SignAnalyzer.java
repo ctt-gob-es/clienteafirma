@@ -15,12 +15,28 @@ public interface SignAnalyzer {
 
 	Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/**
+	 * Obtiene el &aacute;rbol de firmantes.
+	 * @return &aacute;rbol de firmantes.
+	 */
 	AOTreeModel getSignersTree();
 
+	/**
+	 * Obtiene el formato de la firma.
+	 * @return Formato de la firma.
+	 */
 	String getSignFormat();
 
+	/**
+	 * Obtiene la localizaci&oacute;n de los datos en una firma.
+	 * @return Localizaci&oacute;n de los datos.
+	 */
 	String getDataLocation();
 
+	/**
+	 * Devuelve una lista con los detalles de todas las firmas.
+	 * @return Lista con detalles de firmas.
+	 */
 	List<SignDetails> getAllSignDetails();
 
     /** Recupera la informaci&oacute;n de la firma indicada.

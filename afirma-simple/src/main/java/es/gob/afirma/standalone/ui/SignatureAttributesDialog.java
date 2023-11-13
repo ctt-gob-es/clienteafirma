@@ -25,6 +25,8 @@ public class SignatureAttributesDialog {
 	private static final String PROP_POLICY_QUALIFIER = "policyQualifier"; //$NON-NLS-1$
 	private static final String PROP_PLACE_STREET = "signatureProductionStreetAddress"; //$NON-NLS-1$
 	private static final String PROP_PLACE_CITY = "signatureProductionCity"; //$NON-NLS-1$
+	private static final String PROP_SIGN_REASON = "signReason"; //$NON-NLS-1$
+	private static final String PROP_CONTACT_INFO= "signerContact"; //$NON-NLS-1$
 	private static final String PROP_PLACE_PROVINCE = "signatureProductionProvince"; //$NON-NLS-1$
 	private static final String PROP_PLACE_PC = "signatureProductionPostalCode"; //$NON-NLS-1$
 	private static final String PROP_PLACE_COUNTRY = "signatureProductionCountry"; //$NON-NLS-1$
@@ -43,7 +45,9 @@ public class SignatureAttributesDialog {
 			PROP_PLACE_PROVINCE,
 			PROP_PLACE_PC,
 			PROP_PLACE_COUNTRY,
-			PROP_ROLES
+			PROP_ROLES,
+			PROP_CONTACT_INFO,
+			PROP_SIGN_REASON
 	};
 
 	private static String accessibleDescription = ""; //$NON-NLS-1$
@@ -121,6 +125,17 @@ public class SignatureAttributesDialog {
 				}
 				if (p.containsKey(PROP_PLACE_COUNTRY)) {
 					addData(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.13"), p.getProperty(PROP_PLACE_COUNTRY)); //$NON-NLS-1$
+				}
+			}
+
+			if (p.containsKey(PROP_PLACE_CITY) || p.containsKey(PROP_PLACE_PROVINCE)) {
+				addHeader(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.19")); //$NON-NLS-1$
+
+				if (p.containsKey(PROP_SIGN_REASON)) {
+					addData(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.17"), p.getProperty(PROP_SIGN_REASON)); //$NON-NLS-1$
+				}
+				if (p.containsKey(PROP_CONTACT_INFO)) {
+					addData(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.18"), p.getProperty(PROP_CONTACT_INFO)); //$NON-NLS-1$
 				}
 			}
 

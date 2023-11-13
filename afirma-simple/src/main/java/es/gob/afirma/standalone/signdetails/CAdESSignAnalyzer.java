@@ -30,6 +30,8 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.CAdESAttributes;
 import es.gob.afirma.signvalidation.CertHolderBySignerIdSelector;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 
@@ -80,6 +82,11 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
         return SimpleAfirmaMessages.getString("ValidationInfoDialog.22"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Crea los detalles de cada firma a partir del array indicado por par&aacute;metro.
+	 * @param data Datos a mapear.
+	 * @throws Exception Error transformando los datos.
+	 */
 	private void createSignDetails(final byte [] data) throws Exception {
 
 		this.cmsSignedData = new CMSSignedData(data);
@@ -90,6 +97,11 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		}
 	}
 
+	/**
+	 * Construye los detalles de la firma a partir de la informaci&oacte;n indicada.
+	 * @param signer Datos de la firma.
+	 * @throws Exception Error transformando datos.
+	 */
 	private void buildSignDetails(final SignerInformation signer) throws Exception {
 
 		final SignDetails cadesSignDetails = new SignDetails();
@@ -159,6 +171,10 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
 		cadesSignDetails.getSigners().add(certDetails);
 
+		// Validacion de firma
+        final SignValidity validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false);
+        cadesSignDetails.getValidityResult().add(validity);
+
 		this.signDetailsList.add(cadesSignDetails);
 
 		//Tratamos tambien las contrafirmas de la firma en caso de que tenga
@@ -190,6 +206,11 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
         }
     }
 
+    /**
+     * Analiza la pol&iacute;tica y la agrega a los detalles de la firma.
+     * @param si Datos sobre la firma.
+     * @param signDetails Detalles sobre la firma.
+     */
     private static void analyzePolicy(final SignerInformation si, final SignDetails signDetails) {
 		final Attribute policyAttr = si.getSignedAttributes().get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId);
 		if (policyAttr != null && policyAttr.getAttrValues() != null && policyAttr.getAttrValues().size() > 0) {

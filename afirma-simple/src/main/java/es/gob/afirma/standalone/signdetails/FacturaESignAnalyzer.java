@@ -106,6 +106,11 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
         return null;
 	}
 
+	/**
+	 * Construye los detalles de la firma.
+	 * @param signaturesList Lista con datos de firmas.
+	 * @throws AOInvalidFormatException Error formateando los datos.
+	 */
 	private void createSignDetails(final NodeList signaturesList) throws AOInvalidFormatException {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
@@ -121,6 +126,12 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     	}
 	}
 
+	/**
+	 * Construye los detalles de una firma a partir de un elemento CML.
+	 * @param signElement Elemento XML con datos de la firma.
+	 * @return Detalles de la firma.
+	 * @throws AOInvalidFormatException Error formateando datos.
+	 */
 	private SignDetails buildSignDetails(final Element signElement) throws AOInvalidFormatException {
 		final SignDetails xadesSignDetails = new SignDetails();
 
@@ -253,6 +264,11 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 
 	}
 
+	/**
+	 * Construye los detalles del certificado indicado.
+	 * @param dataCertNode Datos del certificado.
+	 * @param signersList Lista de firmantes.
+	 */
 	private void buildCertDetails(final Node dataCertNode, final List<CertificateDetails> signersList) {
 		if (dataCertNode != null) {
 			final Element certElement = (Element) ((Element) dataCertNode).getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_X509_CERTIFICATE).item(0);
@@ -266,6 +282,12 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 		}
 	}
 
+	/**
+	 * Obtiene los datos de localizaci&oacute;n de una firma.
+	 * @param signatureProductionPlaceList Lista con datos de localizaci&oacute;n.
+	 * @param namespaceUri URI del namespace.
+	 * @return Mapa con datos de la localizaci&oacute;n.
+	 */
     private static Map<String, String> getProductionPlaceMetadata(final NodeList signatureProductionPlaceList, final String namespaceUri) {
     	final Map<String, String> metadata = new HashMap<String, String>();
 		final Element signProdPlaceNode = (Element) signatureProductionPlaceList.item(0);
