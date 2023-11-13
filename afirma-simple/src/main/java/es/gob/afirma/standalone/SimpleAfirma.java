@@ -1152,13 +1152,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return Texto descriptivo de la versi&oacute;n.
 	 */
 	public static String getVersion() {
-
-		if (version != null) {
-			return version;
+		if (version == null) {
+			version = Updater.getCurrentVersionText();
 		}
-
-		version = Updater.getCurrentVersionText();
-
 		return version;
 	}
 
