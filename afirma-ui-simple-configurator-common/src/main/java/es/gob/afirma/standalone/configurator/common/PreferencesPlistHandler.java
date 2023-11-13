@@ -260,7 +260,7 @@ public final class PreferencesPlistHandler {
 	 * @param xml XML con la informaci&oacute;n
 	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
 	 */
-	public static void importSystemPreferencesFromXml(final String xml) throws InvalidPreferencesFileException {
+	public static void importSystemPreferencesFromXml(final byte[] xml) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;
 		try {
 			properties = Plist.fromXml(xml);

@@ -76,6 +76,18 @@ public final class Plist
 	}
 
 	/**
+	 * Create a nested {@code map<String, Object>} from a plist xml using the default mapping.
+	 *
+	 * @param xml the plist xml data as a binary array.
+	 * @return the resulting map as read from the plist data.
+	 * @throws XmlParseException if the plist could not be properly parsed.
+	 */
+	public static Map<String, Object> fromXml(final byte[] xml) throws XmlParseException
+	{
+		return PLIST.parse(Xmlwise.createXml(xml));
+	}
+
+	/**
 	 * Create a plist handler.
 	 */
 	static

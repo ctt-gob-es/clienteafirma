@@ -77,6 +77,26 @@ public class Xmlwise
 	}
 
 	/**
+	 * Creates a DOM Document from the specified XML binary array, ignoring DTD-validation.
+	 *
+	 * @param xml a valid XML document, ie it can't be null or empty
+	 * @param validate if we should validate the document or not.
+	 * @return the <code>Document</code> object for the specified string.
+	 * @throws XmlParseException if we fail to parse the XML.
+	 */
+	public static Document createDocument(final byte[] xml, final boolean validate) throws XmlParseException
+	{
+		try
+		{
+			return SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(xml));
+		}
+		catch (final Exception e)
+		{
+			throw new XmlParseException(e);
+		}
+	}
+
+	/**
 	 * Creates a DOM Document from the specified XML string, ignoring DTD-validation.
 	 *
 	 * @param xml a valid XML document, ie the String can't be null or empty
@@ -84,6 +104,18 @@ public class Xmlwise
 	 * @throws XmlParseException if we fail to parse the XML.
 	 */
 	public static Document createDocument(final String xml) throws XmlParseException
+	{
+		return createDocument(xml, false);
+	}
+
+	/**
+	 * Creates a DOM Document from the specified XML binary array, ignoring DTD-validation.
+	 *
+	 * @param xml a valid XML document, ie it can't be null or empty
+	 * @return the <code>Document</code> object for the specified string.
+	 * @throws XmlParseException if we fail to parse the XML.
+	 */
+	public static Document createDocument(final byte[] xml) throws XmlParseException
 	{
 		return createDocument(xml, false);
 	}
@@ -172,6 +204,18 @@ public class Xmlwise
 	 * @throws XmlParseException if parsing the xml failed to validate for some reason.
 	 */
 	public static XmlElement createXml(final String xml) throws XmlParseException
+	{
+		return new XmlElement(createDocument(xml).getDocumentElement());
+	}
+
+	/**
+	 * Creates a document from a string and transforms it into an XmlElement tree.
+	 *
+	 * @param xml the xml as a string.
+	 * @return an XmlElement tree rendered from the file.
+	 * @throws XmlParseException if parsing the xml failed to validate for some reason.
+	 */
+	public static XmlElement createXml(final byte[] xml) throws XmlParseException
 	{
 		return new XmlElement(createDocument(xml).getDocumentElement());
 	}

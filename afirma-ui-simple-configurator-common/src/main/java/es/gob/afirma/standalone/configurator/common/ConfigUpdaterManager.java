@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,7 +93,7 @@ public class ConfigUpdaterManager {
 	 */
 	private static void importSystemPreferences(final byte[] configData) throws InvalidPreferencesFileException, BackingStoreException {
 		PreferencesManager.clearAllSystemPrefs();
-		PreferencesPlistHandler.importSystemPreferencesFromXml(new String(configData, StandardCharsets.UTF_8));
+		PreferencesPlistHandler.importSystemPreferencesFromXml(configData);
 	}
 
 
