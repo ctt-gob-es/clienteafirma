@@ -25,9 +25,10 @@ public class SignDetailsFormatter {
     public static final Map<String, String> MIMETYPE_MAPPER;
     static {
     	MIMETYPE_MAPPER = new HashMap<>();
-    	MIMETYPE_MAPPER.put("data", "Datos binarios"); //$NON-NLS-1$ //$NON-NLS-2$
-    	MIMETYPE_MAPPER.put("application/pdf", "PDF"); //$NON-NLS-1$ //$NON-NLS-2$
-    	MIMETYPE_MAPPER.put("text/xml", "XML"); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("data", SimpleAfirmaMessages.getString("ValidationInfoDialog.24")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("application/pdf", SimpleAfirmaMessages.getString("ValidationInfoDialog.25")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("text/xml", SimpleAfirmaMessages.getString("ValidationInfoDialog.26")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("application/octet-stream", SimpleAfirmaMessages.getString("ValidationInfoDialog.27")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
     /**

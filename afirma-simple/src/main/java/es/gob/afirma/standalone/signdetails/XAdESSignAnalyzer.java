@@ -142,7 +142,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	}
 
 	/**
-	 * Construye los detalles de una firma a partir de un elemento CML.
+	 * Construye los detalles de una firma a partir de un elemento XML.
 	 * @param signElement Elemento XML con datos de la firma.
 	 * @return Detalles de la firma.
 	 * @throws AOInvalidFormatException Error formateando datos.

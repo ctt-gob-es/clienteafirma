@@ -128,7 +128,7 @@ public class SignatureAttributesDialog {
 				}
 			}
 
-			if (p.containsKey(PROP_PLACE_CITY) || p.containsKey(PROP_PLACE_PROVINCE)) {
+			if (p.containsKey(PROP_SIGN_REASON) || p.containsKey(PROP_CONTACT_INFO)) {
 				addHeader(panel, c, SimpleAfirmaMessages.getString("SignatureAttributesDialog.19")); //$NON-NLS-1$
 
 				if (p.containsKey(PROP_SIGN_REASON)) {
