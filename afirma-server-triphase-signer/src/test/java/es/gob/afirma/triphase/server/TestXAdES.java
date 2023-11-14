@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -464,8 +465,8 @@ public class TestXAdES {
 
     private static void validate(final byte[] signature) {
     	final ValidateXMLSignature validator = new ValidateXMLSignature();
-    	final SignValidity validity = validator.validate(signature, false);
-    	Assert.assertEquals("La firma no es valida: " + validity.getErrorException(), SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
+    	final List<SignValidity> validity = validator.validate(signature, false);
+    	Assert.assertEquals("La firma no es valida: " + validity.get(0).getErrorException(), SIGN_DETAIL_TYPE.OK, validity.get(0).getValidity()); //$NON-NLS-1$
     }
 
 }
