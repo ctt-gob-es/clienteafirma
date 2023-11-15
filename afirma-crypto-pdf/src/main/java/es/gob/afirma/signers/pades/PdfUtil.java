@@ -641,39 +641,30 @@ public final class PdfUtil {
 
 	    	for (int i = 0; i < rangeInput.length(); i++) {
 	    		// Comprobamos que sea un caracter correcto
-	    		if (!rangeChars.contains(String.valueOf(rangeInput.charAt(i)))) {
+	    		if (!rangeChars.contains(String.valueOf(rangeInput.charAt(i)))
+	    			// Comprobamos que no se hayan introducido tres guiones seguidos
+	    			|| i+2 < rangeInput.length()
+		    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i)))
+		    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +1)))
+		    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +2)))
+	    			// Comprobamos que no se hayan introducido dos comas seguidas
+	    			|| i+1 < rangeInput.length()
+		    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i)))
+		    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i +1)))) {
 	    			return false;
 	            }
-	    		// Comprobamos que no se hayan introducido tres guiones seguidos
-	    		else if (i+2 < rangeInput.length()
-	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i)))
-	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +1)))
-	    				&& RANGE_INDICATOR.equals(String.valueOf(rangeInput.charAt(i +2)))) {
-	    			return false;
-	    		}
-	    		// Comprobamos que no se hayan introducido dos comas seguidas
-	    		else if (i+1 < rangeInput.length()
-	    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i)))
-	    				&& RANGE_SEPARATOR.equals(String.valueOf(rangeInput.charAt(i +1)))) {
-	    			return false;
-	    		}
 	    	}
 
 	    	final String[] rangesArray = rangeInput.split(RANGE_SEPARATOR);
 	    	for (final String range : rangesArray) {
 
-	    		if (RANGE_INDICATOR.equals(String.valueOf(range.charAt(range.length() -1)))) {
-	    			return false;
-	    		}
-	    		// Comprobamos que el rango no termine con un guion
-	    		else if (range.length() >= 2
-	    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(0)))
-	    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(1))) )
-	    		{
-	    			return false;
-	    		}
-	    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
-	    		else if (range.length() == 1 && RANGE_INDICATOR.equals(range)) {
+	    		if (RANGE_INDICATOR.equals(String.valueOf(range.charAt(range.length() -1)))
+	    			// Comprobamos que el rango no termine con un guion
+	    			|| range.length() >= 2
+		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(0)))
+		    				&& RANGE_INDICATOR.equals(String.valueOf(range.charAt(1)))
+		    		// Comprobamos que se haya introducido un numero en caso de que la longitud sea 1
+		    		|| range.length() == 1 && RANGE_INDICATOR.equals(range)) {
 	    			return false;
 	    		}
 	    	}

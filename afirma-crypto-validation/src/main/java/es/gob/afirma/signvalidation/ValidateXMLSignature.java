@@ -160,6 +160,15 @@ public final class ValidateXMLSignature extends SignValider {
         				isKO = true;
         			}
         		}
+
+        		final Element signatureElement = (Element) nl.item(i);
+        		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signatureElement);
+
+        		if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
+        				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
+        		}
         	}
         }
         catch (final Exception e) {
@@ -174,7 +183,13 @@ public final class ValidateXMLSignature extends SignValider {
         return result;
 	}
 
-	public static List<SignValidity> validateSign(final Element signElement) {
+    /**
+     * Valida la firma indicada en par&aacute;metro.
+     * @param signElement Datos de la firma.
+     * @param signProfile Perfil de firma.
+     * @return Lista de validaciones.
+     */
+	public static List<SignValidity> validateSign(final Element signElement, final String signProfile) {
 
 		final ArrayList<SignValidity> result = new ArrayList<SignValidity>();
 		boolean validSign = true;
@@ -215,6 +230,13 @@ public final class ValidateXMLSignature extends SignValider {
 			LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
 			validSign = false;
 			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
+		}
+
+		if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
+			validSign = false;
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
 		}
 
 		if (validSign) {

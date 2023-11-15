@@ -71,7 +71,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
 
 	/** Operaciones de firma soportadas. */
-	public static enum Op {
+	public enum Op {
 		/** Firma. */
 		SIGN,
 		/** Co-firma. */
@@ -283,17 +283,19 @@ public final class XAdESTriPhaseSignerServerSide {
 			final String cleanSignatureValue = cleanBase64(Base64.encode(signature.sign()));
 
 			// Buscamos el PKCS#1 en Base64 en el XML original y lo sustituimos por la cadena de reemplazo
-			final String signValuePrefix = ">" + cleanSignatureValue.substring(0, NUM_CHARACTERS_TO_COMPARE); //$NON-NLS-1$
-			final int signValuePos = xmlResult.indexOf(signValuePrefix) + 1;
-			final int signValueFinalPos = xmlResult.indexOf('<', signValuePos);
-			final String pkcs1String = xmlResult.substring(signValuePos, signValueFinalPos);
+			if (cleanSignatureValue != null) {
+				final String signValuePrefix = ">" + cleanSignatureValue.substring(0, NUM_CHARACTERS_TO_COMPARE); //$NON-NLS-1$
+				final int signValuePos = xmlResult.indexOf(signValuePrefix) + 1;
+				final int signValueFinalPos = xmlResult.indexOf('<', signValuePos);
+				final String pkcs1String = xmlResult.substring(signValuePos, signValueFinalPos);
 
-			final String cleanPkcs1String = cleanBase64(pkcs1String);
-			if (cleanSignatureValue.equals(cleanPkcs1String)) {
-				xmlResult = xmlResult.replace(
-					pkcs1String,
-					REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i))
-				);
+				final String cleanPkcs1String = cleanBase64(pkcs1String);
+				if (cleanSignatureValue.equals(cleanPkcs1String)) {
+					xmlResult = xmlResult.replace(
+						pkcs1String,
+						REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i))
+					);
+				}
 			}
 		}
 

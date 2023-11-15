@@ -17,16 +17,19 @@ public final class SignValidity {
 
 	@Override
 	public String toString() {
-		if (this.validity.equals(SIGN_DETAIL_TYPE.OK)) {
-			return "Firma valida"; //$NON-NLS-1$
+		String ret = null;
+		if (this.validity.equals(SIGN_DETAIL_TYPE.OK) || this.validity.equals(SIGN_DETAIL_TYPE.GENERATED)) {
+			ret = "Firma valida"; //$NON-NLS-1$
 		}
 		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
-			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
+			ret = "Validaci\u00F3n incompleta"; //$NON-NLS-1$
 		}
 		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
-			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
+			ret = "Validez a confirmar por el usuario"; //$NON-NLS-1$
 		}
-		final String ret = "Firma no valida"; //$NON-NLS-1$
+		if (this.validity.equals(SIGN_DETAIL_TYPE.KO)) {
+			ret = "Firma no valida"; //$NON-NLS-1$
+		}
 		if (this.error == null) {
 			return ret;
 		}
@@ -70,6 +73,8 @@ public final class SignValidity {
 				return ret + ": un formulario del documento fue modificado tras la firma"; //$NON-NLS-1$
 			case SUSPECTED_SIGNATURE:
 				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
+			case SIGN_PROFILE_NOT_CHECKED:
+				return ret + ": el perfil de firma tiene un nivel superior al que se permite validar en AutoFirma"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
@@ -128,7 +133,9 @@ public final class SignValidity {
         /** Cuando una firma est&aacute; solapando a otra en un documento PDF. */
         OVERLAPPING_SIGNATURE,
         /** El usuario debe confirmar la validez de la firma. */
-        SUSPECTED_SIGNATURE
+        SUSPECTED_SIGNATURE,
+        /** La firma no se ha comprobado completamente debido al nivel del perfil de firma. */
+        SIGN_PROFILE_NOT_CHECKED
     }
 
     /** Validez de la firma. */

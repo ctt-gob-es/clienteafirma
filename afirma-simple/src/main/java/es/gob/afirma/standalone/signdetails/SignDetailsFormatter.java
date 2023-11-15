@@ -8,6 +8,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 public class SignDetailsFormatter {
@@ -66,11 +67,22 @@ public class SignDetailsFormatter {
 		}
 		final AOTreeModel signersTree = analyzer.getSignersTree();
 		result += "<br><b>&Aacute;rbol de firmantes:</b>";  //$NON-NLS-1$
-		result += parseSignersTree((AOTreeNode) signersTree.getRoot());
+		result += parseSignersTree((AOTreeNode) signersTree.getRoot(), new Integer(1));
 		result += "<b>Resultado de la validaci&oacute;n</b>: " + generalValidation.get(0) +"<ul>";  //$NON-NLS-1$ //$NON-NLS-2$
 		for (int i = 0 ; i < signDetailsParent.size() ; i++) {
-			for (int j = 0 ; j < signDetailsParent.get(i).getValidityResult().size() ; j++) {
-				result += "<li>Firma " + (i+1) + ": " + signDetailsParent.get(i).getValidityResult().get(j) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			boolean isValidCert = true;
+			for (int j = 0 ; j < signDetailsParent.get(i).getSigners().size() ; j++) {
+				final String validation = (String) signDetailsParent.get(i).getSigners().get(j).getValidityResult().get("Validacion"); //$NON-NLS-1$
+				if (!"OK".equals(validation)) { //$NON-NLS-1$
+					isValidCert = false;
+					result += "<li>Firma " + (i+1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+			}
+			for (int m = 0 ; m < signDetailsParent.get(i).getValidityResult().size() ; m++) {
+				if (!signDetailsParent.get(i).getValidityResult().get(m).getValidity().equals(SIGN_DETAIL_TYPE.OK) && !isValidCert
+						|| isValidCert) {
+					result += "<li>Firma " + (i+1) + ": " + signDetailsParent.get(i).getValidityResult().get(m) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
 			}
 		}
 		result += "</ul>"; //$NON-NLS-1$
@@ -201,15 +213,17 @@ public class SignDetailsFormatter {
 	/**
 	 * Transforma el &aacute;rbol de firmantes a HTML.
 	 * @param signersNode &aacuerbol a transformar.
+	 * @param signID N&uacute;mero de firma.
 	 * @return Cadena en HTML con el &aacuerbol.
 	 */
-	private static String parseSignersTree(final AOTreeNode signersNode) {
+	private static String parseSignersTree(final AOTreeNode signersNode, Integer signID) {
 		String result = "<ul>"; //$NON-NLS-1$
 		for (int i = 0; i < AOTreeModel.getChildCount(signersNode); i++) {
 			final AOTreeNode node = (AOTreeNode) AOTreeModel.getChild(signersNode, i);
-			result += "<li>" + node.toString() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+			result += "<li>Firma " + signID + ": " + node.toString() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			signID++;
 			if (node.getChildCount() > 0) {
-				result += parseSignersTree(node);
+				result += parseSignersTree(node, signID);
 			}
 		}
 		result += "</ul>"; //$NON-NLS-1$

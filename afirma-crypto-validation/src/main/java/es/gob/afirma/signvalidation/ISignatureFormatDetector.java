@@ -1,5 +1,4 @@
-package es.gob.afirma.standalone.signdetails;
-
+package es.gob.afirma.signvalidation;
 
 /**
  * <p>Interface that defines the recognized signature formats.</p>

@@ -50,7 +50,7 @@ public final class CommitmentTypeIndicationBean {
 		if (this.qualifiers == null) {
 			return new ArrayList<>(0);
 		}
-		return this.qualifiers != null ? new ArrayList<String>(this.qualifiers) : null;
+		return new ArrayList<String>(this.qualifiers);
 	}
 
 }

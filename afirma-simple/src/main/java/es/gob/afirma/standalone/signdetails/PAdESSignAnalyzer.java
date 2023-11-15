@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.signdetails;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignatureFormatDetectorPadesCades;
 import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
@@ -177,13 +179,15 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		}
 
 		// Obtenemos el firmante y lo agregamos al arbol
-		this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate())));
+		this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate()) + " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(pkcs7.getSignDate().getTime()) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
 
+		// Detalles del certificado
 		final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
 		final List <CertificateDetails> certDetailsList = new ArrayList<CertificateDetails>();
 		certDetailsList.add(certDetails);
 		padesSignDetails.setSigners(certDetailsList);
 
+		// Metadatos
 		final Map<String, String> metadataMap = new HashMap<String, String>();
 		final PdfString reason = signPdfDictionary.getAsString(PdfName.REASON);
 		if (reason != null) {
@@ -200,7 +204,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		padesSignDetails.setMetadata(metadataMap);
 
 		//Validamos la firma
-		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af);
+		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af, signProfile);
 		padesSignDetails.setValidityResult(listValidity);
 
 		return padesSignDetails;

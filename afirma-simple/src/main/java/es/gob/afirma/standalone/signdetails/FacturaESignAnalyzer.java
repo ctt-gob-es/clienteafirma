@@ -22,6 +22,7 @@ import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignatureFormatDetectorXades;
 import es.gob.afirma.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
@@ -115,8 +116,9 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
     			final Element signature = (Element) signaturesList.item(i);
-    			final SignDetails signDetails = buildSignDetails(signature);
-    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature);
+    			final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signature);
+    			final SignDetails signDetails = buildSignDetails(signature, signProfile);
+    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile);
     			signDetails.setValidityResult(validity);
     			this.signDetailsList.add(signDetails);
     		}
@@ -129,15 +131,18 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 	/**
 	 * Construye los detalles de una firma a partir de un elemento CML.
 	 * @param signElement Elemento XML con datos de la firma.
+	 * @param signProfile Perfil de la firma.
 	 * @return Detalles de la firma.
 	 * @throws AOInvalidFormatException Error formateando datos.
 	 */
-	private SignDetails buildSignDetails(final Element signElement) throws AOInvalidFormatException {
-		final SignDetails xadesSignDetails = new SignDetails();
+	private SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidFormatException {
 
-		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signElement);
+		final SignDetails xadesSignDetails = new SignDetails();
 		xadesSignDetails.setSignProfile(signProfile);
 		final Element signatureMethodElement = XAdESUtil.getSignatureMethodElement(signElement);
+		if (signatureMethodElement == null) {
+			throw new AOInvalidFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
+		}
 		String algorithm = SIGN_ALGOS_URI.get(signatureMethodElement.getAttribute("Algorithm")); //$NON-NLS-1$
 		if (algorithm == null) {
 			algorithm = signatureMethodElement.getAttribute("Algorithm"); //$NON-NLS-1$

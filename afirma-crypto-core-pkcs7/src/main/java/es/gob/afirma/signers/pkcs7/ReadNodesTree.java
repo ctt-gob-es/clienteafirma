@@ -335,20 +335,22 @@ public final class ReadNodesTree {
      * @return El certificado (en la posici&oacute;n 0 y su cadena de confianza
      *         en orden). */
     private static X509Certificate[] searchCert(final ASN1Set certificates, final ASN1Integer serialNumber) {
+    	if (certificates != null) {
         final Enumeration<?> certSet = certificates.getObjects();
-        while (certSet.hasMoreElements()) {
-            final X509Certificate c;
-            try {
-                c = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(((ASN1Sequence) certSet.nextElement()).getEncoded())); //$NON-NLS-1$
-            }
-            catch(final Exception e) {
-                LOGGER.severe("Error extrayendo los certificados del Set ASN.1, puede que se haya omitido un elemento valido" + e); //$NON-NLS-1$
-                continue;
-            }
-            if (c.getSerialNumber().equals(serialNumber.getValue())) {
-                return new X509Certificate[] { c };
-            }
-        }
+	        while (certSet.hasMoreElements()) {
+	            final X509Certificate c;
+	            try {
+	                c = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(((ASN1Sequence) certSet.nextElement()).getEncoded())); //$NON-NLS-1$
+	            }
+	            catch(final Exception e) {
+	                LOGGER.severe("Error extrayendo los certificados del Set ASN.1, puede que se haya omitido un elemento valido" + e); //$NON-NLS-1$
+	                continue;
+	            }
+	            if (c.getSerialNumber().equals(serialNumber.getValue())) {
+	                return new X509Certificate[] { c };
+	            }
+	        }
+    	}
         LOGGER.severe("El certificados pedido no estaba en la lista, se devolvera un array vacio"); //$NON-NLS-1$
         return new X509Certificate[0];
     }

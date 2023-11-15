@@ -117,7 +117,7 @@ public final class PseudonymFilter extends CertificateFilter {
 			for (final String certAlias : certsByAlias.keySet()) {
 				final X509Certificate normCert = certsByAlias.get(certAlias);
 				if (isPseudonymFor(pseuCert, normCert)) {
-					LOGGER.info(String.format("Se omite el certificado '%s' por haber un certificado de seudonimo equivalente")); //$NON-NLS-1$
+					LOGGER.info(String.format("Se omite el certificado '%s' por haber un certificado de seudonimo equivalente", certAlias)); //$NON-NLS-1$
 					certsByAlias.remove(certAlias);
 				}
 			}

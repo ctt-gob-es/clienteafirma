@@ -177,7 +177,8 @@ public final class ValidateBinarySignature extends SignValider {
         final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
         for (final Object si : s.getSignerInfos().getSigners()) {
-        	final SignValidity validity = verifySign(si, store, certFactory, checkCertificates);
+        	final String signProfile = SignatureFormatDetectorPadesCades.resolveASN1Format(s, (SignerInformation) si);
+        	final SignValidity validity = verifySign(si, store, certFactory, checkCertificates, signProfile);
         	signValidity.add(validity);
         }
 
@@ -189,9 +190,10 @@ public final class ValidateBinarySignature extends SignValider {
      * @param store Certificados de la firma.
      * @param certFactory Factor&iacute;a de certificados.
      * @param checkCertificates Indica si se deben verificar certificados o no.
+     * @param signProfile Perfil de firma.
      * @return Validez de la firma.
      */
-    public static SignValidity verifySign(final Object si, final Store<X509CertificateHolder> store, final CertificateFactory certFactory, final boolean checkCertificates) {
+    public static SignValidity verifySign(final Object si, final Store<X509CertificateHolder> store, final CertificateFactory certFactory, final boolean checkCertificates, final String signProfile) {
 
     	try {
     		final SignerInformation signer = (SignerInformation) si;
@@ -230,6 +232,12 @@ public final class ValidateBinarySignature extends SignValider {
             // La firma no es una firma binaria valida
     		return new SignValidity(SIGN_DETAIL_TYPE.KO, null, e);
         }
+
+		if (!ISignatureFormatDetector.FORMAT_CADES_BES.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CADES_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CADES_EPES.equals(signProfile)) {
+				return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED);
+		}
 
     	return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
     }

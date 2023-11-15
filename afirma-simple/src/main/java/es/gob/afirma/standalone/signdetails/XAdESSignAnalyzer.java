@@ -20,7 +20,9 @@ import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signvalidation.ISignatureFormatDetector;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignatureFormatDetectorXades;
 import es.gob.afirma.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
@@ -109,13 +111,13 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
         	return SimpleAfirmaMessages.getString("ValidationInfoDialog.16"); //$NON-NLS-1$
         }
         else if (XAdESUtil.isSignatureElementExternallyDetached(dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.15"); //$NON-NLS-1$
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.22"); //$NON-NLS-1$
         }
         else if (XAdESUtil.isSignatureElementInternallyDetached(rootSig, dataReferenceList)) {
         	return SimpleAfirmaMessages.getString("ValidationInfoDialog.14"); //$NON-NLS-1$
         }
         else if (XAdESUtil.isSignatureElementEnveloping(signatureElement, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.13"); //$NON-NLS-1$
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.21"); //$NON-NLS-1$
         }
 
     	return ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
@@ -130,8 +132,9 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
     			final Element signature = (Element) signaturesList.item(i);
-    			final SignDetails signDetails = buildSignDetails(signature);
-    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature);
+    			final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signature);
+    			final SignDetails signDetails = buildSignDetails(signature, signProfile);
+    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile);
     			signDetails.setValidityResult(validity);
     			this.signDetailsList.add(signDetails);
     		}
@@ -144,13 +147,13 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	/**
 	 * Construye los detalles de una firma a partir de un elemento XML.
 	 * @param signElement Elemento XML con datos de la firma.
+	 * @param signProfile Perfil de la firma.
 	 * @return Detalles de la firma.
 	 * @throws AOInvalidFormatException Error formateando datos.
 	 */
-	private SignDetails buildSignDetails(final Element signElement) throws AOInvalidFormatException {
+	private SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidFormatException {
 		final SignDetails xadesSignDetails = new SignDetails();
 
-		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signElement);
 		xadesSignDetails.setSignProfile(signProfile);
 		final Element signatureMethodElement = XAdESUtil.getSignatureMethodElement(signElement);
 		if (signatureMethodElement != null) {
@@ -159,6 +162,8 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 				algorithm = signatureMethodElement.getAttribute("Algorithm"); //$NON-NLS-1$
 			}
 			xadesSignDetails.setAlgorithm(algorithm);
+		} else {
+			throw new AOInvalidFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
 		}
 
 		// ARBOL DE FIRMANTES

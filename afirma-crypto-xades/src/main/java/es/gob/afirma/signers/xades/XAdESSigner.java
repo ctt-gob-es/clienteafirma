@@ -530,7 +530,7 @@ public final class XAdESSigner {
 					// Si es Base64, lo firmamos indicando como contenido el dato pero, ya que puede
 					// poseer un formato particular o caracteres valido pero extranos para el XML,
 					// realizamos una decodificacion y recodificacion para asi homogenizar el formato.
-					if (Base64.isBase64(data) && XMLConstants.BASE64_ENCODING.equals(encoding)) {
+					if (data != null && Base64.isBase64(data) && XMLConstants.BASE64_ENCODING.equals(encoding)) {
 
 						LOGGER.info(
 							"El documento se ha indicado como Base64, se insertara como tal en el XML" //$NON-NLS-1$

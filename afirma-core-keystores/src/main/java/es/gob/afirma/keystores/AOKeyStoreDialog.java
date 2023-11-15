@@ -235,26 +235,34 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
 				newKsm = openMozillaKeyStore(parent);
-				KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
+				if (newKsm != null) {
+					KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
+				}
 				break;
 
 			// Almacen PKCS#12
 			case KEYSTORE_ID_PKCS12:
 				newKsm = openPkcs12KeyStore(parent, null);
-				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+				if (newKsm != null) {
+					KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+				}
 				break;
 
 			// DNIe
 			case KEYSTORE_ID_DNIE:
 				newKsm = openDnieKeyStore(parent);
-				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+				if (newKsm != null) {
+					KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+				}
 				break;
 
 			// Almacen del sistema
 			case KEYSTORE_ID_SYSTEM:
 			default:
 				newKsm = openSystemKeyStore(parent);
-				KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+				if (newKsm != null) {
+					KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
+				}
 				break;
 			}
 		}

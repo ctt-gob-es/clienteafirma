@@ -707,8 +707,16 @@ public final class XAdESUtil {
     			XAdESConstants.NAMESPACE_XADES_1_3_2);
     }
 
+    /**
+     * Se obtiene el elemento SignatureMethod de una firma XAdES.
+     * @param signatureElement Elemento "Signature" de una firma XAdES.
+     * @return Elemento "SignatureMethod" de una firma XAdES.
+     */
     public static Element getSignatureMethodElement(final Element signatureElement) {
 		final Element signedInfoElement = XAdESUtil.getSignedInfo(signatureElement);
+		if (signedInfoElement == null) {
+			return null;
+		}
 		final NodeList signatureMethodList = signedInfoElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_SIGNATURE_METHOD);
 		return (Element)signatureMethodList.item(0);
     }

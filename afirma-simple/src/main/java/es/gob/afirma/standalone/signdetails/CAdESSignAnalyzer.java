@@ -31,6 +31,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.CAdESAttributes;
 import es.gob.afirma.signvalidation.CertHolderBySignerIdSelector;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignatureFormatDetectorPadesCades;
 import es.gob.afirma.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
@@ -172,7 +173,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		cadesSignDetails.getSigners().add(certDetails);
 
 		// Validacion de firma
-        final SignValidity validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false);
+        final SignValidity validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false, signProfile);
         cadesSignDetails.getValidityResult().add(validity);
 
 		this.signDetailsList.add(cadesSignDetails);

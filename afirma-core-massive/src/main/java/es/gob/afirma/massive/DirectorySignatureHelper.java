@@ -936,7 +936,11 @@ public class DirectorySignatureHelper {
                     signer = DirectorySignatureHelper.getAppropiatedSigner(file);
                 }
                 catch (final Exception e) {
-                    addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.15") + ": " + e.getMessage(), file.getPath(), null); //$NON-NLS-1$ //$NON-NLS-2$
+                	String filePath = ""; //$NON-NLS-1$
+                	if (file != null) {
+                		filePath = file.getPath();
+                	}
+                    addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.15") + ": " + e.getMessage(), filePath, null); //$NON-NLS-1$ //$NON-NLS-2$
                     allOK = false;
                     continue;
                 }

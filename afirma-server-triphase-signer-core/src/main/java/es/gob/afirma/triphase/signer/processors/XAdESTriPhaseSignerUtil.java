@@ -237,7 +237,7 @@ final class XAdESTriPhaseSignerUtil {
 					);
 
 					// En este punto 'retDel' es un candidato, comprobamos que el Id sea el mismo
-					if (retDel.contains(ID_STR) && retDel.contains(ID_STR)) {
+					if (retDel.contains(ID_STR)) {
 						final String id = orXml.substring(
 							orXml.indexOf(ID_STR, beginIndex.intValue()),
 							orXml.indexOf("\"",  orXml.indexOf(ID_STR, beginIndex.intValue()) + ID_STR.length()) //$NON-NLS-1$
@@ -451,7 +451,7 @@ final class XAdESTriPhaseSignerUtil {
 		}
 		String xmlCleaned = xml;
 		if (xml.startsWith("<?xml")) { //$NON-NLS-1$
-			xmlCleaned = xmlCleaned.substring(xmlCleaned.indexOf("?>") + "?>".length(), xmlCleaned.length()).trim(); //$NON-NLS-1$ //$NON-NLS-2$
+			xmlCleaned = xmlCleaned.substring(xmlCleaned.indexOf("?>") + "?>".length()).trim(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Buscamos y eliminamos las declaraciones de espacios de nombres

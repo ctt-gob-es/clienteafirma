@@ -1,4 +1,4 @@
-package es.gob.afirma.standalone.signdetails;
+package es.gob.afirma.signvalidation;
 
 import java.io.Serializable;
 

@@ -116,64 +116,13 @@ public final class ValidatePdfSignature extends SignValider {
 			return validityList;
 		}
 
-		boolean algorithmNotSupportedOcurred = false;
-		boolean noMatchDataOcurred = false;
-		boolean corruptedSignOcurred = false;
-		boolean certExpiredOcurred = false;
-		boolean certNotValidYetOcurred = false;
+		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
 
 		for (final String name : signNames) {
-
-			// Valimamos la firma
-			final PdfPKCS7 pk = af.verifySignature(name);
-
-			// Comprobamos que el algoritmo de hash este bien declarado, supliendo asi la flexibilidad de iText que permite
-			// cargar firmas que usan algoritmos de firma como algoritmos de hash
-			if (pk.getStrictHashAlgorithm() == null && !algorithmNotSupportedOcurred) {
-				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED));
-				algorithmNotSupportedOcurred = true;
-			}
-
-    		// Comprobamos si es una firma o un sello
-    		final PdfDictionary pdfDictionary = af.getSignatureDictionary(name);
-
-    		// Si no es un sello, comprobamos el PKCS#1
-    		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER)) && !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
-				try {
-					if (!pk.verify() && !noMatchDataOcurred) {
-						validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
-						noMatchDataOcurred = true;
-					}
-				}
-				catch (final Exception e) {
-					if (!corruptedSignOcurred) {
-						LOGGER.warning("Error validando una de las firmas del PDF: " + e); //$NON-NLS-1$
-						validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e));
-						corruptedSignOcurred = true;
-					}
-				}
-    		}
-
-    		final boolean checkCertificates = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString()));
-
-    		if (checkCertificates) {
-				final X509Certificate signCert = pk.getSigningCertificate();
-				try {
-					signCert.checkValidity();
-				}
-				catch (final CertificateExpiredException e) {
-					// Certificado caducado
-					if (!certExpiredOcurred) {
-						validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
-						certExpiredOcurred = true;
-					}
-				}
-				catch (final CertificateNotYetValidException e) {
-					// Certificado aun no valido
-					if (!certNotValidYetOcurred) {
-						validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
-						certNotValidYetOcurred = true;
-					}
+			final List<SignValidity> validityListSign = validateSign(name, af, signProfile);
+			for (final SignValidity sv : validityListSign) {
+				if (!validityList.contains(sv)) {
+					validityList.add(sv);
 				}
 			}
 		}
@@ -244,13 +193,14 @@ public final class ValidatePdfSignature extends SignValider {
 	 * s&oacute;lo se validar&aacute; el periodo de caducidad.
      * @param signName Nombre de firma.
      * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
+     * @param signProfile Perfil de firma.
      * @return Lista con las validaciones realizadas en la firma.
      * @throws RuntimeConfigNeededException Cuando en la validaci&oacute;n laxa se puede considerar
      * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
      * usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
-	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields)
+	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields, final String signProfile)
 			throws RuntimeConfigNeededException, IOException {
 
 		final List<SignValidity> validityList = new ArrayList<SignValidity>();
@@ -289,6 +239,13 @@ public final class ValidatePdfSignature extends SignValider {
 		} catch (final CertificateNotYetValidException e) {
 			// Certificado aun no valido
 			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+		}
+
+		if (!ISignatureFormatDetector.FORMAT_PADES_BASIC.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_BES.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_B_LEVEL.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_EPES.equals(signProfile)) {
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
 		}
 
 		if (validityList.size() == 0) {

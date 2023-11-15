@@ -121,8 +121,8 @@ public final class AdESPolicyPropertiesManager {
 		final String hash = getProperty(policyId, PROPERTY_POLICY_HASH, format);
 		if (hash == null || hash.trim().isEmpty()) {
 			final String identifier = getProperty(policyId, PROPERTY_POLICY_IDENTIFIER, format);
-			if (!identifier.toLowerCase().startsWith(HTTP_PREFIX) ||
-					!identifier.toLowerCase().startsWith(HTTPS_PREFIX)) {
+			if (identifier != null && (!identifier.toLowerCase().startsWith(HTTP_PREFIX) ||
+					!identifier.toLowerCase().startsWith(HTTPS_PREFIX))) {
 				return false;
 			}
 		}
