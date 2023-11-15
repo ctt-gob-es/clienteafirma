@@ -62,7 +62,6 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
 final class PreferencesPanelPades extends JScrollPane {
@@ -544,58 +543,56 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.remove(PREFERENCE_PADES_OBFUSCATE_CERT_INFO);
 		PreferencesManager.remove(PREFERENCE_PADES_STAMP);
 		PreferencesManager.remove(PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
-		PreferencesManager.remove(PREFERENCE_PADES_FORMAT);
-
-
-		PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
-		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH);
-		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH_ALGORITHM);
-		PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 
 		// Establecemos la configuracion (que sera la del sistema o la por defecto)
 
-		this.padesSignReason.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_REASON, PreferencesSource.DEFAULT));
-		this.padesSignProductionCity.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, PreferencesSource.DEFAULT));
-		this.padesSignerContact.setText(PreferencesManager.get(PREFERENCE_PADES_SIGNER_CONTACT, PreferencesSource.DEFAULT));
-		this.visiblePdfSignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_VISIBLE, PreferencesSource.DEFAULT));
-		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO, PreferencesSource.DEFAULT));
-		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP, PreferencesSource.DEFAULT));
-		this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, PreferencesSource.DEFAULT));
+		this.padesSignReason.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_REASON));
+		this.padesSignProductionCity.setText(PreferencesManager.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY));
+		this.padesSignerContact.setText(PreferencesManager.get(PREFERENCE_PADES_SIGNER_CONTACT));
+		this.visiblePdfSignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_VISIBLE));
+		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
+		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP));
+		this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
 
-        if (this.padesBasicFormat.getItemCount() > 0) {
-			this.padesBasicFormat.setSelectedIndex(0);
-		}
+        // No se modifican las propiedades bloqueadas
+        if (!isBlocked()) {
 
-        // Solo se reestablece el valor al por defecto, si no se ha bloqueado la edicion de la interfaz
-		if (!isBlocked()) {
-			final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT, PreferencesSource.DEFAULT);
-			final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
-			for (int i = 0; i < padesFormatModel.getSize(); i++) {
-				if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
-					this.padesBasicFormat.setSelectedIndex(i);
-					break;
-				}
-			}
-		}
+        	PreferencesManager.remove(PREFERENCE_PADES_FORMAT);
+        	final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT);
+        	final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
+        	for (int i = 0; i < padesFormatModel.getSize(); i++) {
+        		if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
+        			this.padesBasicFormat.setSelectedIndex(i);
+        			break;
+        		}
+        	}
 
-		this.padesBasicFormat.setEnabled(!isBlocked());
+            if (this.padesBasicFormat.getItemCount() > 0) {
+    			this.padesBasicFormat.setSelectedIndex(0);
+    		}
 
-		final List<PolicyItem> padesPolicies = new ArrayList<>();
-        padesPolicies.add(
-    		new PolicyItem(
-        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_PADES_AGE_1_9
-    		)
-		);
+    		PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
+    		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH);
+    		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH_ALGORITHM);
+    		PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 
-        this.padesPolicyDlg = new PolicyPanel(
-    		SIGN_FORMAT_PADES,
-    		padesPolicies,
-    		getPadesDefaultPolicy(),
-    		isBlocked()
-		);
+        	final List<PolicyItem> padesPolicies = new ArrayList<>();
+        	padesPolicies.add(
+        			new PolicyItem(
+        					SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+        					POLICY_PADES_AGE_1_9
+        					)
+        			);
 
-		this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
+        	this.padesPolicyDlg = new PolicyPanel(
+        			SIGN_FORMAT_PADES,
+        			padesPolicies,
+        			getPadesDefaultPolicy(),
+        			isBlocked()
+        			);
+
+        	this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
+        }
 
         revalidate();
         repaint();

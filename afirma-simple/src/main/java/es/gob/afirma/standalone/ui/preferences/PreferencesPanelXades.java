@@ -564,22 +564,22 @@ final class PreferencesPanelXades extends JScrollPane {
 	}
 
 	void restorePreferences() {
+
+		// Eliminamos la configuracion actual
 		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
+		PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
+
 		this.xadesSignatureProductionCity.setText(
 				PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY));
-		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
 		this.xadesSignatureProductionProvince.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE)
-		);
-		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
+				PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE));
 		this.xadesSignatureProductionPostalCode.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE)
-		);
-		PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
+				PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE));
 		this.xadesSignatureProductionCountry.setText(
-			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY)
-		);
-		PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
+				PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY));
 		this.xadesSignerClaimedRole.setText(
 				PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE));
 

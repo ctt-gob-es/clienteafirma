@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.http.DataDownloader;
 import es.gob.afirma.standalone.configurator.common.PreferencesPlistHandler.InvalidPreferencesFileException;
 
@@ -50,10 +51,11 @@ public class ConfigUpdaterManager {
 	 * en caso de que sea necesario. */
 	public static void updatePrefsConfigFile() {
 
+		final String configUrl = PreferencesManager.getConfigFileUrl();
+
 		// Descargamos el fichero de configuracion
 		ConfigDataInfo configDataInfo;
 		try {
-			final String configUrl = PreferencesManager.getConfigFileUrl();
 			final byte[] updatedConfigData = readFromUrl(configUrl);
 			configDataInfo = new ConfigDataInfo(updatedConfigData);
 
@@ -66,6 +68,7 @@ public class ConfigUpdaterManager {
 		if (PreferencesManager.isNewConfigFile(configDataInfo)) {
 			try {
 				// Importa la configuracion como nueva configuracion por defecto
+				LOGGER.info("Se actualiza la configuracion desde: " + LoggerUtil.getTrimStr(LoggerUtil.getCleanUserHomePath(configUrl))); //$NON-NLS-1$
 				importSystemPreferences(configDataInfo.getData());
 
 				// Actualizamos la informacion del fichero usado para la importacion

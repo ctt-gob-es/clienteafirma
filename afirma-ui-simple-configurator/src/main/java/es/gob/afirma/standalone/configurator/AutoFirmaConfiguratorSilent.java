@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
@@ -260,6 +261,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		// Si se ha indicado un archivo de configuracion,
 		// se estableceran las nuevas propiedades del sistema indicadas en el mismo
 		if (!config.getConfigPath().isEmpty()) {
+			LOGGER.info("Se importa la configuracion desde: " + LoggerUtil.getTrimStr(LoggerUtil.getCleanUserHomePath(config.getConfigPath()))); //$NON-NLS-1$
 			ConfigUpdaterManager.savePrefsConfigFile(config.getConfigPath(), config.getUpdateConfig());
 		}
 

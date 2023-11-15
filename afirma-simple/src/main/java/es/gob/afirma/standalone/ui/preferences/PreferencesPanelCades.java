@@ -388,42 +388,47 @@ final class PreferencesPanelCades extends JScrollPane {
 
 	void restorePreferences() {
 
-		// Eliminamos la configuracion actual
-		PreferencesManager.remove(PREFERENCE_CADES_IMPLICIT);
-		PreferencesManager.remove(PREFERENCE_CADES_MULTISIGN);
-		PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
-		PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH);
-		PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH_ALGORITHM);
-		PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
+		// La configuracion bloqueada no se modifica
+		// En el caso de CAdES, toda la configuracion se puede bloquear
+		if (!isBlocked()) {
 
-		// Establecemos la configuracion (que sera la del sistema o la por defecto)
+			// Eliminamos la configuracion actual
+			PreferencesManager.remove(PREFERENCE_CADES_IMPLICIT);
+			PreferencesManager.remove(PREFERENCE_CADES_MULTISIGN);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 
-		this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
+			// Establecemos la configuracion (que sera la del sistema o la por defecto)
 
-		final List<PolicyItem> cadesPolicies = new ArrayList<>();
-        cadesPolicies.add(
-    		new PolicyItem(
-        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_CADES_AGE_1_9
-    		)
-		);
+			this.signatureMode.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT));
 
-        this.cadesPolicyDlg = new PolicyPanel(
-        		SIGN_FORMAT_CADES,
-        		cadesPolicies,
-        		getCadesDefaultPolicy(),
-        		isBlocked()
-    		);
+			final List<PolicyItem> cadesPolicies = new ArrayList<>();
+			cadesPolicies.add(
+					new PolicyItem(
+							SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+							POLICY_CADES_AGE_1_9
+							)
+					);
 
-		this.currentPolicyValue.setText(this.cadesPolicyDlg.getSelectedPolicyName());
+			this.cadesPolicyDlg = new PolicyPanel(
+					SIGN_FORMAT_CADES,
+					cadesPolicies,
+					getCadesDefaultPolicy(),
+					isBlocked()
+					);
 
-		final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_MULTISIGN);
-		this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
-		this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
-		this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
+			this.currentPolicyValue.setText(this.cadesPolicyDlg.getSelectedPolicyName());
 
-        revalidate();
-        repaint();
+			final String multiSign = PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_MULTISIGN);
+			this.optionCoSign.setSelected(PreferencesManager.VALUE_MULTISIGN_COSIGN.equals(multiSign));
+			this.optionCounterSignLeafs.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_LEAFS.equals(multiSign));
+			this.optionCounterSignTree.setSelected(PreferencesManager.VALUE_MULTISIGN_COUNTERSIGN_TREE.equals(multiSign));
+
+			revalidate();
+			repaint();
+		}
 	}
 
 	/** Obtiene la configuraci&oacute;n de politica de firma CAdES establecida actualmente.

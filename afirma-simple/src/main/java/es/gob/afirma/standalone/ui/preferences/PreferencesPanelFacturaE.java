@@ -409,11 +409,6 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE);
 		PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE);
 		PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY);
-		PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY);
-		PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_IDENTIFIER);
-		PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH);
-		PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH_ALGORITHM);
-		PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_QUALIFIER);
 
 		// Establecemos la configuracion (que sera la del sistema o la por defecto)
 
@@ -437,38 +432,45 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY)
 		);
 
-		final List<PolicyItem> facturaePolicies = new ArrayList<>();
+		if (!isBlocked()) {
 
-		facturaePolicies.add(
-    		new PolicyItem(
-    			SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
-        		POLICY_FACTURAE_31
-    		)
-		);
+			PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY);
+			PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_IDENTIFIER);
+			PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH);
+			PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_QUALIFIER);
 
-		facturaePolicies.add(
-    		new PolicyItem(
-    			SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
-        		POLICY_FACTURAE_30
-    		)
-		);
+			final List<PolicyItem> facturaePolicies = new ArrayList<>();
+			facturaePolicies.add(
+					new PolicyItem(
+							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
+							POLICY_FACTURAE_31
+							)
+					);
+			facturaePolicies.add(
+					new PolicyItem(
+							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+							POLICY_FACTURAE_30
+							)
+					);
 
-        this.panelPolicies.removeAll();
-        this.facturaePolicyPanel = new PolicyPanel(
-    		SIGN_FORMAT_FACTURAE,
-    		facturaePolicies,
-    		getFacturaEDefaultPolicy(),
-    		false,
-    		false,
-    		false,
-    		isBlocked()
-		);
+			this.panelPolicies.removeAll();
+			this.facturaePolicyPanel = new PolicyPanel(
+					SIGN_FORMAT_FACTURAE,
+					facturaePolicies,
+					getFacturaEDefaultPolicy(),
+					false,
+					false,
+					false,
+					isBlocked()
+					);
 
-        final GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1.0;
-        c.gridy = 0;
-        this.panelPolicies.add(this.facturaePolicyPanel, c);
+			final GridBagConstraints c = new GridBagConstraints();
+			c.fill = GridBagConstraints.BOTH;
+			c.weightx = 1.0;
+			c.gridy = 0;
+			this.panelPolicies.add(this.facturaePolicyPanel, c);
+		}
 
         revalidate();
         repaint();
