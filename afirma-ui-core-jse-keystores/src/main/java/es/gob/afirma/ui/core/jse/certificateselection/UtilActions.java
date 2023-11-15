@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.core.misc.LoggerUtil;
 
 final class UtilActions {
 
@@ -88,6 +89,8 @@ final class UtilActions {
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}
+
+		LOGGER.info("Se cambia al almacen de certificados " + LoggerUtil.getTrimStr(ksName)); //$NON-NLS-1$
 
 		selectionDialog.changeKeyStore(keyStoreType, ksName, ksLibPath);
 

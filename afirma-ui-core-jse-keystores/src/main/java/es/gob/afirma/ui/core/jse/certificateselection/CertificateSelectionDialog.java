@@ -118,6 +118,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		String title = CertificateSelectionDialogMessages.getString(
 				"CertificateSelectionDialog.0", this.currentKeyStoreTypeName); //$NON-NLS-1$
 
+		LOGGER.info("Abrimos el dialogo de certificados para el almacen: " + this.currentKeyStoreTypeName); //$NON-NLS-1$
+
 		if (this.ksdm.getLibName() != null) {
 			title += " : " + this.ksdm.getLibName(); //$NON-NLS-1$
 		}

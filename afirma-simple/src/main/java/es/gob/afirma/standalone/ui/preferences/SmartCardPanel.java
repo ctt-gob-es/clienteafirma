@@ -35,9 +35,9 @@ final class SmartCardPanel extends JPanel {
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	final JLabel cardnameLbl = new JLabel(SimpleAfirmaMessages.getString("SmartCardDialog.1")); //$NON-NLS-1$
-	final JLabel controllerNameLbl = new JLabel(SimpleAfirmaMessages.getString("SmartCardDialog.2")); //$NON-NLS-1$
+	final JLabel controllerPathLbl = new JLabel(SimpleAfirmaMessages.getString("SmartCardDialog.2")); //$NON-NLS-1$
 	final JTextField cardNameTxt = new JTextField();
-	final JTextField controllerNameTxt = new JTextField();
+	final JTextField controllerPathTxt = new JTextField();
 
 	private SecureDomainsHandler eventsHandler;
 
@@ -52,12 +52,10 @@ final class SmartCardPanel extends JPanel {
 	private void createUI() {
 		setLayout(new GridBagLayout());
 		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
-
-		this.cardnameLbl.setFocusable(true);
+		this.cardnameLbl.setLabelFor(this.cardNameTxt);
 		this.cardNameTxt.setFocusable(true);
-		this.controllerNameLbl.setFocusable(true);
-		this.controllerNameLbl.setFocusable(true);
-		this.controllerNameTxt.setEditable(false);
+		this.controllerPathLbl.setLabelFor(this.controllerPathTxt);
+		this.controllerPathTxt.setEditable(false);
 
 		final JButton selectFileButton = new JButton(SimpleAfirmaMessages.getString("SmartCardDialog.3")); //$NON-NLS-1$
 		selectFileButton.setFocusable(true);
@@ -90,7 +88,7 @@ final class SmartCardPanel extends JPanel {
                  		null,
                  		this
              		)[0].getAbsolutePath();
-            	SmartCardPanel.this.controllerNameTxt.setText(driverPath);
+            	SmartCardPanel.this.controllerPathTxt.setText(driverPath);
             }
             });
 
@@ -105,11 +103,11 @@ final class SmartCardPanel extends JPanel {
 		c.gridy++;
 		this.add(this.cardNameTxt, c);
 		c.gridy++;
-		this.add(this.controllerNameLbl, c);
+		this.add(this.controllerPathLbl, c);
 		c.gridwidth = 1;
 		c.gridy++;
 		c.weightx = 1.0;
-		this.add(this.controllerNameTxt, c);
+		this.add(this.controllerPathTxt, c);
 		c.weightx = 0;
 		c.gridx = 2;
 		this.add(selectFileButton, c);
@@ -132,8 +130,8 @@ final class SmartCardPanel extends JPanel {
 		return this.cardNameTxt;
 	}
 
-	public JTextField getControllerNameTxt() {
-		return this.controllerNameTxt;
+	public JTextField getControllerPathTxt() {
+		return this.controllerPathTxt;
 	}
 
 }

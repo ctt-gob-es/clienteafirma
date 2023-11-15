@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -45,6 +46,8 @@ final class ConfirmImportCertDialog extends JDialog  {
 
 	private static final int PREFERRED_WIDTH = 600;
 	private static final int PREFERRED_HEIGHT = 600;
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private final List<X509Certificate> certsToImport;
 
@@ -216,6 +219,10 @@ final class ConfirmImportCertDialog extends JDialog  {
 
 		try {
 			final TrustStoreManager ts = TrustStoreManager.getInstance(parent);
+
+			for (final X509Certificate cert : this.certsToImport) {
+				LOGGER.info("Se importa en el almacen de confianza el certificado con el numero de serie: " + AOUtil.hexify(cert.getSerialNumber().toByteArray(), false)); //$NON-NLS-1$
+			}
 
 			ts.importCerts(this.certsToImport.toArray(new X509Certificate[0]));
 

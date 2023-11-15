@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -33,11 +34,14 @@ import es.gob.afirma.ui.core.jse.JSEUIManager;
 /** Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados. */
 public final class CertificateUtils {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String CERTIFICATE_DEFAULT_EXTENSION = ".cer"; //$NON-NLS-1$
+
     private CertificateUtils() {
         // No permitimos la instanciacion
     }
 
-    private static final String CERTIFICATE_DEFAULT_EXTENSION = ".cer"; //$NON-NLS-1$
 
 	/** Abre un certificado con la aplicaci&oacute;n por defecto del sistema. Si no
 	 * puede hacerlo, permite que el usuario lo almacene en la ruta que desee.
@@ -55,6 +59,7 @@ public final class CertificateUtils {
 		}
 
 		if (desktopClass != null) {
+			LOGGER.info("Se visualizan los datos del certificado con numero de serie: " + AOUtil.hexify(certificate.getSerialNumber().toByteArray(), false));  //$NON-NLS-1$
 			try {
 				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
 				final Method getDesktopMethod = desktopClass.getDeclaredMethod("getDesktop", (Class[]) null); //$NON-NLS-1$
@@ -64,26 +69,28 @@ public final class CertificateUtils {
 				return;
 			}
 			catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning("No ha sido posible abrir el certificado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("No ha sido posible abrir el certificado: " + e); //$NON-NLS-1$
 			}
 		}
 
 		// En entornos Java 5 intentamos abrirlo manualmente en Windows
 		if (Platform.getOS() == OS.WINDOWS) {
+			LOGGER.info("Se visualizan mediante una llamada al sistema los datos del certificado con numero de serie: " + AOUtil.hexify(certificate.getSerialNumber().toByteArray(), false));  //$NON-NLS-1$
 			try {
 				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
 				new ProcessBuilder(
-					"cmd", "/C", "start", "\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", "\"" + certFile.getAbsolutePath() + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+					"cmd", "/C", "start", "\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", "\"" + certFile.getAbsolutePath() + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 				).start();
 				return;
 			}
 			catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning("No ha sido posible abrir el certificado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("No ha sido posible abrir el certificado mediante llamada por consola: " + e); //$NON-NLS-1$
 			}
 		}
 
 		// Si no podemos abrirlo, lo guardamos en disco
 		try {
+			LOGGER.info("Se guarda en disco el certificado con numero de serie: " + AOUtil.hexify(certificate.getSerialNumber().toByteArray(), false));  //$NON-NLS-1$
 	    	AOUIFactory.getSaveDataToFile(
     			certificate.getEncoded(),
     			CertificateSelectionDialogMessages.getString("CertificateUtils.1"),  //$NON-NLS-1$

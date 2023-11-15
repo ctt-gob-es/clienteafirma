@@ -103,7 +103,7 @@ public final class MimeHelper {
             try {
                 final Class<?> magicMatchNotFoundException = Class.forName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
                 if (e.getCause() != null && magicMatchNotFoundException.isInstance(e.getCause())) {
-                    LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
+                    LOGGER.log(Level.WARNING, "No se pudo detectar el formato de los datos"); //$NON-NLS-1$
                 }
                 else {
                     LOGGER.log(Level.WARNING, "Error durante el analisis de la cabecera de los datos: " + e, e); //$NON-NLS-1$

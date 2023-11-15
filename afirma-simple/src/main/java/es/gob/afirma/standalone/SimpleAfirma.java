@@ -287,16 +287,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	}
 
     private void loadDefaultKeyStore() {
+
     	if (this.ksManager != null) {
 			LOGGER.info("Se omite la carga concurrente de almacen por haberse hecho una precarga previa"); //$NON-NLS-1$
     		return;
     	}
 
-    	// Al iniciar la aplicacion, el usuario no habra seleccionado ningun almacen de claves todavia
-    	KeyStorePreferencesManager.setLastSelectedKeystore(""); //$NON-NLS-1$
-    	KeyStorePreferencesManager.setLastSelectedKeystoreLib(""); //$NON-NLS-1$
-
-    	LOGGER.info("Cargamos el almacen de claves por defecto"); //$NON-NLS-1$
+    	LOGGER.info("Cargaremos el almacen de claves por defecto"); //$NON-NLS-1$
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
             new SimpleKeyStoreManagerWorker(this, null, false, false).execute();
@@ -499,9 +496,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	} else {
     		final String lastKeystoreSelected = KeyStorePreferencesManager.getLastSelectedKeystore();
     		// Si el usuario ha seleccionado otro almacen de claves en el dialogo de seleccion de certificados, se cargara ese
-    		if (!lastKeystoreSelected.isEmpty() && !lastKeystoreSelected.equals(this.ksManager.getType().getName())) {
+    		if (lastKeystoreSelected != null && !lastKeystoreSelected.equals(this.ksManager.getType().getName())) {
     			try {
-    	    		final AOKeyStore aoks = SimpleKeyStoreManager.getLastKeystoreSelected();
+    	    		final AOKeyStore aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
     	    		if (aoks.equals(AOKeyStore.PKCS12) || aoks.equals(AOKeyStore.PKCS11)) {
     	    			lib = KeyStorePreferencesManager.getLastSelectedKeystoreLib();
     	    		}
@@ -924,7 +921,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 			        JMulticardUtilities.configureJMulticard(enableJMulticard);
 
-					LOGGER.info("Se intenta una precarga temprana de NSS" //$NON-NLS-1$
+					LOGGER.info("Se intenta una precarga temprana del almacen de Mozilla" //$NON-NLS-1$
 					);
 					// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la
 					// inicializacion

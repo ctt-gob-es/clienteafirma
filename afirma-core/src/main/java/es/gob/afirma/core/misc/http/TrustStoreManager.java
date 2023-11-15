@@ -31,6 +31,8 @@ public class TrustStoreManager {
 
 	private static final char[] TRUSTED_KS_PWD = "changeit".toCharArray(); //$NON-NLS-1$
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private KeyStore ks;
 	private final File tsPath;
 
@@ -82,7 +84,7 @@ public class TrustStoreManager {
 					try {
 						Files.delete(this.tsPath.toPath());
 					} catch (final IOException e1) {
-						Logger.getLogger("es.gob.afirma").warning("No se pudo eliminar el TrustStore corrupto: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
+						LOGGER.warning("No se pudo eliminar el TrustStore corrupto: " + e1); //$NON-NLS-1$
 					}
 					this.ks = null;
 				}
@@ -192,7 +194,7 @@ public class TrustStoreManager {
 
 		final String alias = searchCert(cert);
 		if (alias == null) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+			LOGGER.warning(
 					"No se encontro en el almacen el certificado que desea eliminar"); //$NON-NLS-1$
 			return;
 		}

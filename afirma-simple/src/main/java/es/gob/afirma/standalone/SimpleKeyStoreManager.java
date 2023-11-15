@@ -57,6 +57,8 @@ public final class SimpleKeyStoreManager {
 
             JMulticardUtilities.configureJMulticard(true);
 
+            LOGGER.info("Cargando certificados del DNIe"); //$NON-NLS-1$
+
             try {
             	return getKeyStoreManager(AOKeyStore.DNIEJAVA, parent);
             }
@@ -263,46 +265,22 @@ public final class SimpleKeyStoreManager {
     /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
      * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */
     public static AOKeyStore getDefaultKeyStoreType() {
+    	AOKeyStore ks = null;
     	final String savedStoreName = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
-    	final OS os = Platform.getOS();
     	if (savedStoreName != null && !PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(savedStoreName)) {
-    		final AOKeyStore ks = AOKeyStore.getKeyStore(savedStoreName);
-    		if (ks != null) {
-    			// Si desinstalan Firefox que no se quede una seleccion mala
-    			if (AOKeyStore.MOZ_UNI.equals(ks)) {
-    				if (isFirefoxAvailable()) {
-    					return ks;
-    				}
-					return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
-    			}
-    			// No deberia pasar
-    			if (AOKeyStore.WINDOWS.equals(ks)) {
-    				if (OS.WINDOWS.equals(os)) {
-    					return ks;
-    				}
-    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
-    			}
-    			// No deberia pasar
-    			if (AOKeyStore.APPLE.equals(ks)) {
-    				if (OS.MACOSX.equals(os)) {
-    					return ks;
-    				}
-    				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
-    			}
-    			return ks;
-    		}
+    		ks = getValidKeyStoreType(savedStoreName);
     	}
-    	return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
+    	return ks != null ? ks : AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
     }
 
-    /** Obtiene el &uacuteltimo almac&eacute;n de claves seleccionado por el usuario en caso de que se haya seleccionado.
-     * @return Almac&eacute;n de claves seleccionado por el usuario. */
-    public static AOKeyStore getLastKeystoreSelected() {
-    	final String savedStoreName = KeyStorePreferencesManager.getLastSelectedKeystore();
-    	if (savedStoreName != null && !savedStoreName.isEmpty()) {
-    		final OS os = Platform.getOS();
-    		final AOKeyStore ks = AOKeyStore.getKeyStore(savedStoreName);
+    /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
+     * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */
+    private static AOKeyStore getValidKeyStoreType(final String keyStoreName) {
+    	AOKeyStore ks = null;
+    	if (keyStoreName != null && !keyStoreName.isEmpty()) {
+    		ks = AOKeyStore.getKeyStore(keyStoreName);
     		if (ks != null) {
+    			final OS os = Platform.getOS();
     			// Si desinstalan Firefox que no se quede una seleccion mala
     			if (AOKeyStore.MOZ_UNI.equals(ks)) {
     				if (isFirefoxAvailable()) {
@@ -327,7 +305,16 @@ public final class SimpleKeyStoreManager {
     			return ks;
     		}
     	}
-    	return null;
+    	return ks;
+    }
+
+    /**
+     * Obtiene el &uacuteltimo almac&eacute;n de claves seleccionado por el usuario. En caso de que no est&eacute;
+     * definido o no sea un almac&eacute;n v&aacute;lido, se haya seleccionado.
+     * @return Almac&eacute;n de claves seleccionado por el usuario. */
+    public static AOKeyStore getLastSelectedKeystore() {
+    	final String savedStoreName = KeyStorePreferencesManager.getLastSelectedKeystore();
+    	return getValidKeyStoreType(savedStoreName);
     }
 
     /**

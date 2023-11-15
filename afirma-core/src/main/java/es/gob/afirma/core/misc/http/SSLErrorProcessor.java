@@ -12,6 +12,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.CoreMessages;
 
@@ -27,12 +28,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 	private static final String PROPERTY_SSL_HEADLESS = "sslOmitImportationDialog"; //$NON-NLS-1$
 
+	private static boolean showingConfirmDialog = false;
+
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 
 	private boolean cancelled = false;
 	private boolean headless;
-
-	private boolean showingConfirmDialog = false;
 
 	public SSLErrorProcessor() {
 		this.headless = false;
@@ -80,30 +81,34 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			throw cause;
 		}
 
-		// Nos aseguramos de que solo
-		if (this.showingConfirmDialog) {
+		// Nos aseguramos de que solo se muestre el dialogo de confirmacion
+		// si no se esta mostrando ya
+
+		if (showingConfirmDialog) {
 			LOGGER.info("Ya se esta mostrando un dialogo de consulta para la importacion del certificado de confianza. Se omitira este."); //$NON-NLS-1$
 			throw cause;
 		}
 
 		int userResponse;
-		try {
-			this.showingConfirmDialog = true;
-			userResponse = AOUIFactory.showConfirmDialog(null,
-					CoreMessages.getString("SSLRequestPermissionDialog.2", new URL(url).getHost()), //$NON-NLS-1$
-					CoreMessages.getString("SSLRequestPermissionDialog.1"), //$NON-NLS-1$
-					AOUIFactory.YES_NO_OPTION,
-					AOUIFactory.WARNING_MESSAGE);
-		}
-		catch (final AOCancelledOperationException ex) {
-			this.cancelled = true;
-			throw cause;
-		}
-		catch (final Exception ex) {
-			throw cause;
-		}
-		finally {
-			this.showingConfirmDialog = false;
+		synchronized (LOGGER) {
+			try {
+				showingConfirmDialog = true;
+				userResponse = AOUIFactory.showConfirmDialog(null,
+						CoreMessages.getString("SSLRequestPermissionDialog.2", new URL(url).getHost()), //$NON-NLS-1$
+						CoreMessages.getString("SSLRequestPermissionDialog.1"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE);
+			}
+			catch (final AOCancelledOperationException ex) {
+				this.cancelled = true;
+				throw cause;
+			}
+			catch (final Exception ex) {
+				throw cause;
+			}
+			finally {
+				showingConfirmDialog = false;
+			}
 		}
 
 		if (userResponse != AOUIFactory.YES_OPTION) {
@@ -119,6 +124,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		} catch (final Exception e) {
 			LOGGER.severe("Error al descargar certificados SSL del servidor: " + e); //$NON-NLS-1$
 			throw new IOException(e);
+		}
+
+		// Mostramos en el log los certificado que se van a importar
+		for (final X509Certificate cert : serverCerts) {
+			LOGGER.info("Se importa en caliente en el almacen de confianza el certificado con el numero de serie: " //$NON-NLS-1$
+					+ AOUtil.hexify(cert.getSerialNumber().toByteArray(), false));
 		}
 
 		// Configuramos los certificados SSL en el almacen de confianza

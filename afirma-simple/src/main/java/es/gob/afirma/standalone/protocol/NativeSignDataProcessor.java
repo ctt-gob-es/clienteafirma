@@ -66,6 +66,7 @@ public class NativeSignDataProcessor extends SignDataProcessor {
 
 		// Si tenemos clave de cifrado, ciframos los datos
 		if (this.cipher != null) {
+			LOGGER.info("Se cifran los datos resultantes con la clave de cifrado proporcionada"); //$NON-NLS-1$
 			try {
 				// El CipherData devuelve los datos directamente en Base64
 				dataToSend.append(this.cipher.cipher(certEncoded));
@@ -83,9 +84,8 @@ public class NativeSignDataProcessor extends SignDataProcessor {
 			}
 		}
 		else {
-			LOGGER.warning(
-					"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
-					);
+			LOGGER.fine("Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado"); //$NON-NLS-1$
+
 			dataToSend.append(Base64.encode(certEncoded, true));
 			dataToSend.append(RESULT_SEPARATOR);
 			// Se hace una doble codificacion Base64, una de los datos y otras

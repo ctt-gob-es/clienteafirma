@@ -42,6 +42,7 @@ import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -627,15 +628,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
 	 * @param container Contenedor en el que se define el di&aacute;logo. */
     public void addSmartCardDlg(final Container container) {
 
-    	// Cursor en espera
-    	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
     	final SmartCardPanel smartCardPanel = new SmartCardPanel();
     	smartCardPanel.getAccessibleContext().setAccessibleDescription(
     			SimpleAfirmaMessages.getString("SmartCardDialog.0")); //$NON-NLS-1$
-
-    	// Cursor por defecto
-    	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
     	if(AOUIFactory.showConfirmDialog(
 				container,
@@ -645,8 +640,11 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				JOptionPane.DEFAULT_OPTION
 		) == JOptionPane.OK_OPTION) {
 
-    		if (smartCardPanel.getCardNameTxt().getText().isEmpty()
-    			|| smartCardPanel.getControllerNameTxt().getText().isEmpty() ) {
+        	final String smartCardName = smartCardPanel.getCardNameTxt().getText();
+        	final String smartCardP11Path = smartCardPanel.getControllerPathTxt().getText();
+
+    		if (smartCardName.isEmpty()
+    			|| smartCardP11Path.isEmpty() ) {
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     					AOUIFactory.ERROR_MESSAGE,
@@ -655,7 +653,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     			addSmartCardDlg(container);
 
-    		} else if (checkDuplicatedName(smartCardPanel.getCardNameTxt().getText())) {
+    		} else if (checkDuplicatedName(smartCardName)) {
 
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.34"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -665,7 +663,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     			addSmartCardDlg(container);
 
-    		} else if (checkDuplicatedLib(smartCardPanel.getControllerNameTxt().getText())) {
+    		} else if (checkDuplicatedLib(smartCardP11Path)) {
 
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -677,13 +675,18 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     		} else {
 
-    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToUserRec(smartCardPanel.getCardNameTxt().getText() ,
-    																					smartCardPanel.getControllerNameTxt().getText());
+            	// Cursor en espera
+            	container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
+    			LOGGER.info("Creamos almacen para la tarjeta inteligente: " + LoggerUtil.getTrimStr(smartCardName)); //$NON-NLS-1$
+
+    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToUserRec(
+    					smartCardName, smartCardP11Path);
 
     			if (regAdded) {
     				final RegisteredKeystore ks = new RegisteredKeystore();
-    				ks.setName(smartCardPanel.getCardNameTxt().getText());
-    				ks.setLib(smartCardPanel.getControllerNameTxt().getText());
+    				ks.setName(smartCardName);
+    				ks.setLib(smartCardP11Path);
     				ks.setProviderName(AOKeyStore.PKCS11.getProviderName());
     				this.smartCards.addItem(ks);
     				this.smartCards.setSelectedItem(ks);
@@ -698,6 +701,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
     				this.deleteCardButton.setEnabled(true);
     			}
 
+    	    	// Cursor por defecto
+    	    	container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     		}
     	}
     }
@@ -715,7 +720,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     	final String oldCardName = ((RegisteredKeystore) this.smartCards.getSelectedItem()).getName();
     	final String oldLibName = ((RegisteredKeystore) this.smartCards.getSelectedItem()).getLib();
     	smartCardPanel.getCardNameTxt().setText(oldCardName);
-    	smartCardPanel.getControllerNameTxt().setText(oldLibName);
+    	smartCardPanel.getControllerPathTxt().setText(oldLibName);
     	smartCardPanel.repaint();
 
     	// Cursor por defecto
@@ -730,7 +735,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		) == JOptionPane.OK_OPTION) {
 
     		if (smartCardPanel.getCardNameTxt().getText().isEmpty()
-        			|| smartCardPanel.getControllerNameTxt().getText().isEmpty() ) {
+        			|| smartCardPanel.getControllerPathTxt().getText().isEmpty() ) {
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     					AOUIFactory.ERROR_MESSAGE,
@@ -748,7 +753,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     			modifySmartCardDlg(container);
 
-    		} else if (checkDuplicatedLib(smartCardPanel.getControllerNameTxt().getText())) {
+    		} else if (checkDuplicatedLib(smartCardPanel.getControllerPathTxt().getText())) {
 
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.35"), //$NON-NLS-1$
     					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -778,12 +783,12 @@ final class PreferencesPanelKeystores extends JScrollPane {
     			this.keystores.repaint();
     			this.smartCards.repaint();
 
-    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToUserRec(smartCardPanel.getCardNameTxt().getText() , smartCardPanel.getControllerNameTxt().getText());
+    			final boolean regAdded = KeyStorePreferencesManager.addSmartCardToUserRec(smartCardPanel.getCardNameTxt().getText() , smartCardPanel.getControllerPathTxt().getText());
 
     			if (regAdded) {
     				final RegisteredKeystore ks = new RegisteredKeystore();
     				ks.setName(smartCardPanel.getCardNameTxt().getText());
-    				ks.setLib(smartCardPanel.getControllerNameTxt().getText());
+    				ks.setLib(smartCardPanel.getControllerPathTxt().getText());
     				ks.setProviderName(AOKeyStore.PKCS11.getProviderName());
     				this.smartCards.addItem(ks);
     				this.smartCards.setSelectedItem(ks);
@@ -814,6 +819,10 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.DEFAULT_OPTION
 		) == JOptionPane.OK_OPTION) {
+
+
+			LOGGER.info("Eliminamos el almacen de la tarjeta inteligente " //$NON-NLS-1$
+					+ LoggerUtil.getTrimStr(name));
 
 			final boolean regDeleted = KeyStorePreferencesManager.deleteSmartCardRec(name);
 

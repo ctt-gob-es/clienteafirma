@@ -269,10 +269,31 @@ public final class KeyStoreUtilities {
             	// Tabla para los certificados que si hay que mostrar
             	final Map<String, String> filteredAliases = new Hashtable<>();
                 for (final CertificateFilter cf : certFilters) {
-                	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()]), ksm)) {
+                	final String[] certAliases = aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()]);
+                	for (final String filteredAlias : cf.matches(certAliases, ksm)) {
                 		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));
+                		aliassesByFriendlyName.remove(filteredAlias);
                 	}
                 }
+
+                // Indicamos en el log que certficados no han superado los filtros
+                if (LOGGER.isLoggable(Level.INFO)) {
+                	for (final String alias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
+                		try {
+                			tmpCert = ksm.getCertificate(alias);
+                			LOGGER.info(String.format(
+                					"Se ha ocultado el certificado con numero de serie '%s' (emitido por '%s') por no ajustarse a los filtros proporcionados", //$NON-NLS-1$
+                					AOUtil.hexify(tmpCert.getSerialNumber().toByteArray(), false),
+                					AOUtil.getCN(tmpCert.getIssuerX500Principal().toString())));
+                		}
+                		catch (final Exception e) {
+                			LOGGER.info(String.format(
+                					"Se ha ocultado el certificado con alias '%s' por no ajustarse a los filtros proporcionados: " + e, //$NON-NLS-1$
+                					alias));
+                		}
+                	}
+                }
+
             	aliassesByFriendlyName.clear();
             	aliassesByFriendlyName.putAll(filteredAliases);
             }

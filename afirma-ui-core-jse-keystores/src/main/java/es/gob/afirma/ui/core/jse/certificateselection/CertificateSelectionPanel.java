@@ -235,45 +235,50 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 				final JPopupMenu keystoresMenu = new JPopupMenu();
 
+				// Opcion del almacen del sistema
 				if (contains(availablesKeyStoreTypes, 1)) {
-					final JMenuItem menuItemOpenSystemKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
-					menuItemOpenSystemKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1));
-					keystoresMenu.add(menuItemOpenSystemKs);
+					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1, menuItem.getText(), null));
+					keystoresMenu.add(menuItem);
 				}
 
+				// Opcion del almacen de Firefox
 				if (contains(availablesKeyStoreTypes, 2)) {
-					final JMenuItem menuItemOpenFirefoxKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
-					menuItemOpenFirefoxKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2));
-					keystoresMenu.add(menuItemOpenFirefoxKs);
+					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2, menuItem.getText(), null));
+					keystoresMenu.add(menuItem);
 				}
 
+				// Opcion de almacen PKCS#12
 				if (contains(availablesKeyStoreTypes, 3)) {
-					final JMenuItem menuItemOpenFileKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
-					menuItemOpenFileKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3));
-					keystoresMenu.add(menuItemOpenFileKs);
+					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3, menuItem.getText(), null));
+					keystoresMenu.add(menuItem);
 				}
 
+				// Opcion del DNIe
 				if (contains(availablesKeyStoreTypes, 4)) {
-					final JMenuItem menuItemOpenDnieKs = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
-					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4));
-					keystoresMenu.add(menuItemOpenDnieKs);
+					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4, menuItem.getText(), null));
+					keystoresMenu.add(menuItem);
 				}
 
-				//Se obtienen todas las tarjetas inteligentes configuradas como almacen de claves
+				// Opciones de los almacenes en tarjeta definidos por el usuario
 				final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
 				for (final String key : userRegResult.keySet()) {
 				    final String value = userRegResult.get(key);
-					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
-					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
-					keystoresMenu.add(menuItemOpenDnieKs);
+					final JMenuItem menuItem = new JMenuItem(key);
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
+					keystoresMenu.add(menuItem);
 				}
 
+				// Opciones de los almacenes en tarjeta definidos por el sistema
 				final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
 				for (final String key : systemRegResult.keySet()) {
 				    final String value = systemRegResult.get(key);
-					final JMenuItem menuItemOpenDnieKs = new JMenuItem(key);
-					menuItemOpenDnieKs.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
-					keystoresMenu.add(menuItemOpenDnieKs);
+					final JMenuItem menuItem = new JMenuItem(key);
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
+					keystoresMenu.add(menuItem);
 				}
 
 				URL openInBrowserImgResource;

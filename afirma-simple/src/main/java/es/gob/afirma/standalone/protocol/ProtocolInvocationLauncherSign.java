@@ -37,6 +37,7 @@ import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
@@ -54,8 +55,8 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -74,6 +75,8 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleKeyStoreManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -89,7 +92,6 @@ import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 final class ProtocolInvocationLauncherSign {
 
@@ -262,19 +264,29 @@ final class ProtocolInvocationLauncherSign {
 			}
 		}
 
+		final String lastSelectedKeyStore = KeyStorePreferencesManager.getLastSelectedKeystore();
 		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
+
+		// Si hay marcado un almacen como el ultimo seleccionado, lo usamos (este es el caso en el que se llaman
+		// varias operaciones de firma dentro de la misma invocacion a la aplicacion)
 		AOKeyStore aoks = null;
-		if (useDefaultStore) {
+		if (lastSelectedKeyStore != null && !lastSelectedKeyStore.isEmpty()) {
+			aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
+		}
+		// Si no, si el usuario definio un almacen por defecto para usarlo en las llamadas a la aplicacion, lo usamos
+		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
 				aoks = AOKeyStore.getKeyStore(defaultStore);
 			}
-		} else {
+		}
+		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
+		else {
 			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		}
 
+		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
 		if (aoks == null) {
-			// Si no se ha especificado almacen, se usara el del sistema operativo
 			aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
 		}
 

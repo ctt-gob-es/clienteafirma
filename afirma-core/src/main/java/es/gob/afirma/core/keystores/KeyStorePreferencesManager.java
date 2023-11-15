@@ -17,10 +17,11 @@ public final class KeyStorePreferencesManager {
 	private static final Properties PROPERTIES;
 
 	/** Indica cual fue el &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. */
-	public static final String PREFERENCE_LAST_KEYSTORE_SELECTED = "lastKeystoreSelected"; //$NON-NLS-1$
+	public static String lastSelectedKeystore = null;
 
 	/** Indica cual fue la libreria del &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. */
-	public static final String PREFERENCE_LAST_KEYSTORE_LIB_SELECTED = "lastKeystoreLibSelected"; //$NON-NLS-1$
+	public static String lastSelectedKeystoreLib = null;
+
 
 	/** Indica si omitir o no el certificado de autenticaci&oacute;n para DNIe. */
 	public static final String PREFERENCE_SKIP_AUTH_CERT_DNIE = "skipAuthCertDnie"; //$NON-NLS-1$
@@ -375,7 +376,7 @@ public final class KeyStorePreferencesManager {
 	 * @param ksName Nombre del almac&eacute;n
 	 */
 	public static void setLastSelectedKeystore(final String ksName) {
-		USER_PREFERENCES.put(PREFERENCE_LAST_KEYSTORE_SELECTED, ksName);
+		lastSelectedKeystore = ksName;
 	}
 
 	/**
@@ -383,7 +384,7 @@ public final class KeyStorePreferencesManager {
 	 * @return Nombre del &uacute;ltimo almac&eacute;n seleccionado por el usuario
 	 */
 	public static String getLastSelectedKeystore() {
-		return USER_PREFERENCES.get(PREFERENCE_LAST_KEYSTORE_SELECTED, ""); //$NON-NLS-1$
+		return lastSelectedKeystore;
 	}
 
 	/**
@@ -391,7 +392,7 @@ public final class KeyStorePreferencesManager {
 	 * @param lib Nombre de libreria
 	 */
 	public static void setLastSelectedKeystoreLib(final String lib) {
-		USER_PREFERENCES.put(PREFERENCE_LAST_KEYSTORE_LIB_SELECTED, lib);
+		lastSelectedKeystoreLib = lib;
 	}
 
 	/**
@@ -399,7 +400,7 @@ public final class KeyStorePreferencesManager {
 	 * @return Nombre de la librer&iacute;a del &uacute;ltimo almac&eacute;n seleccionado por el usuario
 	 */
 	public static String getLastSelectedKeystoreLib() {
-		return USER_PREFERENCES.get(PREFERENCE_LAST_KEYSTORE_LIB_SELECTED, ""); //$NON-NLS-1$
+		return lastSelectedKeystoreLib;
 	}
 
 	/**

@@ -228,6 +228,8 @@ final class TrustedCertificatesPanel extends JPanel  {
 
     			final X509Certificate cert = this.savedCerts.get(certIdx);
 
+    			LOGGER.info("Se elimina del almacen de confianza el certificado con el numero de serie: " + AOUtil.hexify(cert.getSerialNumber().toByteArray(), false)); //$NON-NLS-1$
+
     			TrustStoreManager.getInstance().deleteCert(cert);
 
     			// Actualizamos los Trust Managers al eliminar un certificado
