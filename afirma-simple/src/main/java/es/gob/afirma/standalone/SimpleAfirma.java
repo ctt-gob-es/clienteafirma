@@ -226,7 +226,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     }
 
 	void initGUI(final File preSelectedFile) {
-
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
@@ -288,10 +287,21 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     private void loadDefaultKeyStore() {
 
-    	if (this.ksManager != null) {
-			LOGGER.info("Se omite la carga concurrente de almacen por haberse hecho una precarga previa"); //$NON-NLS-1$
-    		return;
-    	}
+        // Si el almacen por defecto es el de Mozilla, intentamos una precarga temprana
+        final String defaultKeyStore = PreferencesManager.get(
+        		PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
+
+        // Si se ha hecho una precarga previa, puede darse el caso de que se haya cargado
+        // el almacen que debe o que el almacen por defecto sea distinto
+        if (this.ksManager != null) {
+        	// Si el almacen que se cargo era el correcto, se omite volver a cargar el almacen
+        	if (PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultKeyStore)) {
+        		LOGGER.info("Se omite la carga concurrente de almacen por haberse hecho una precarga previa"); //$NON-NLS-1$
+        		return;
+        	}
+        	// Si no era el correcto, lo borramos y continuamos con la carga
+        	this.ksManager = null;
+        }
 
     	LOGGER.info("Cargaremos el almacen de claves por defecto"); //$NON-NLS-1$
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -309,10 +319,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
+
     	if (DNIeWaitPanel.PROP_DNIE_REJECTED.equals(evt.getPropertyName())) {
-    		if (this.ksManager == null) {
-    			loadDefaultKeyStore();
-    		}
+   			loadDefaultKeyStore();
             loadMainApp();
     	}
     	else if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
@@ -919,28 +928,28 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 					final boolean enableJMulticard = PreferencesManager
 							.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
 
-			        JMulticardUtilities.configureJMulticard(enableJMulticard);
+					JMulticardUtilities.configureJMulticard(enableJMulticard);
 
-					LOGGER.info("Se intenta una precarga temprana del almacen de Mozilla" //$NON-NLS-1$
-					);
+					LOGGER.info("Se intenta una precarga temprana del almacen de Mozilla"); //$NON-NLS-1$
+
 					// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la
 					// inicializacion
 					// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve
 					// siempre
 					// un CKR_DEVICE_ERROR (directamente desde NSS).
-			    	try {
+					try {
 						final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-						    AOKeyStore.MOZ_UNI, // Store
-						    null, // Lib
-							"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
-							null, // PasswordCallback
-							null // Parent
-						);
+								AOKeyStore.MOZ_UNI, // Store
+								null, // Lib
+								"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
+								null, // PasswordCallback
+								null // Parent
+								);
 						saf.setKeyStoreManager(ksm);
 					} catch (final Exception e1) {
 						LOGGER.severe(
 								"Ha fallado la precarga temprana de NSS, se intentara la carga concurrente normal: " //$NON-NLS-1$
-										+ e1);
+								+ e1);
 					}
 				}
 
