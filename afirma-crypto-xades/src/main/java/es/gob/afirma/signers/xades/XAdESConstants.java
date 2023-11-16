@@ -15,7 +15,7 @@ public class XAdESConstants {
 
 	public static final String TAG_SIGNING_CERTIFICATE = "SigningCertificate"; //$NON-NLS-1$
 
-	static final String TAG_SIGNING_CERTIFICATE_V2 = "SigningCertificateV2"; //$NON-NLS-1$
+	public static final String TAG_SIGNING_CERTIFICATE_V2 = "SigningCertificateV2"; //$NON-NLS-1$
 
 	public static final String TAG_SIGNING_TIME = "SigningTime"; //$NON-NLS-1$
 

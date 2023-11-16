@@ -13,9 +13,12 @@ import java.util.logging.Logger;
 
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.CMSAttributes;
 import org.spongycastle.asn1.esf.SignaturePolicyId;
 import org.spongycastle.asn1.esf.SignerAttribute;
 import org.spongycastle.asn1.esf.SignerLocation;
+import org.spongycastle.asn1.ess.ContentHints;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.cms.CMSSignedData;
@@ -106,16 +109,28 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 	private void buildSignDetails(final SignerInformation signer) throws Exception {
 
 		final SignDetails cadesSignDetails = new SignDetails();
-		final ASN1ObjectIdentifier contentType = signer.getContentType();
+		final AttributeTable signedAttributes = signer.getSignedAttributes();
+		String mimeTypeOID = null;
+		final Attribute contentHintsAttr = signedAttributes.get(CMSAttributes.contentHint);
+		if (contentHintsAttr != null && contentHintsAttr.getAttributeValues() != null
+				&& contentHintsAttr.getAttributeValues().length >= 1) {
+			final ContentHints contentHints = ContentHints.getInstance(contentHintsAttr.getAttributeValues()[0]);
+			mimeTypeOID = contentHints.getContentType().getId();
+		}
 
 		// Perfil de firma
 		final String signProfile = SignatureFormatDetectorPadesCades.resolveASN1Format(this.cmsSignedData, signer);
 		cadesSignDetails.setSignProfile(signProfile);
 
 		// Mimetype
-		if (contentType != null) {
-			final String mimeType = (String) this.oidMimetypeProp.get(signer.getContentType().getId());
-			cadesSignDetails.getDataObjectFormats().add(new DataObjectFormat(mimeType));
+		Object mimeType = null;
+		if (mimeTypeOID != null) {
+			mimeType =  this.oidMimetypeProp.get(mimeTypeOID);
+			if (mimeType != null) {
+				cadesSignDetails.getDataObjectFormats().add(new DataObjectFormat((String) mimeType));
+			} else {
+				cadesSignDetails.getDataObjectFormats().add(new DataObjectFormat(mimeTypeOID));
+			}
 		}
 
 		// Algoritmo

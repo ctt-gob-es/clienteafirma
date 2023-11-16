@@ -143,6 +143,11 @@ public interface ISignatureFormatDetector {
     String FORMAT_CADES_B_LEVEL = "CAdES B-Level"; //$NON-NLS-1$
 
     /**
+     * Constant attribute that identifies CAdES B-B-Level signature format.
+     */
+    String FORMAT_CADES_B_B_LEVEL = "CAdES B-B-Level"; //$NON-NLS-1$
+
+    /**
      * Constant attribute that identifies CAdES T-Level signature format.
      */
     String FORMAT_CADES_T_LEVEL = "CAdES T-Level"; //$NON-NLS-1$
@@ -163,6 +168,11 @@ public interface ISignatureFormatDetector {
     String FORMAT_XADES_B_LEVEL = "XAdES B-Level"; //$NON-NLS-1$
 
     /**
+     * Constant attribute that identifies XAdES B-Level signature format.
+     */
+    String FORMAT_XADES_B_B_LEVEL = "XAdES B-B-Level"; //$NON-NLS-1$
+
+    /**
      * Constant attribute that identifies XAdES T-Level signature format.
      */
     String FORMAT_XADES_T_LEVEL = "XAdES T-Level"; //$NON-NLS-1$
@@ -181,6 +191,11 @@ public interface ISignatureFormatDetector {
      * Constant attribute that identifies PAdES B-Level signature format.
      */
     String FORMAT_PADES_B_LEVEL = "PAdES B-Level"; //$NON-NLS-1$
+
+    /**
+     * Constant attribute that identifies PAdES B-B-Level signature format.
+     */
+    String FORMAT_PADES_B_B_LEVEL = "PAdES B-B-Level"; //$NON-NLS-1$
 
     /**
      * Constant attribute that identifies PAdES T-Level signature format.

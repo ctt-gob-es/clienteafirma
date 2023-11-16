@@ -130,6 +130,53 @@ public class SignatureFormatDetectorPadesCades {
 	}
 
 	/**
+	 * Method that indicates if a signature dictionary refers to a PAdES B-B-Level
+	 * profile (true) or not (false).
+	 *
+	 * @param signatureDictionary Parameter that represents the signature
+	 *                            dictionary.
+	 * @return a boolean that indicates if a signature dictionary refers to a PAdES
+	 *         B-B-Level profile (true) or not (false).
+	 */
+	private static boolean isPAdESBBLevel(final PDFSignatureDictionary signatureDictionary) {
+		/*
+		 * Consideramos que una firma es PAdES B-Level si: > El nucleo de firma CAdES
+		 * contiene el elemento SignedData.certificates con, al menos, un certificado
+		 * (el firmante). > Contiene la entrada /M en el diccionario de firma. > La
+		 * entrada /SubFilter del diccionario de firma posee el valor
+		 * 'ETSI.CAdES.detached'.
+		 */
+		final PdfDictionary pdfDic = signatureDictionary.getDictionary();
+
+		// Accedemos a la entrada /SubFilter
+		final PdfName subFilterValue = signatureDictionary.getDictionary().getAsName(PdfName.SUBFILTER);
+
+		// Comprobamos que la entrada /SubFilter posee el valor
+		// 'ETSI.CAdES.detached' y que se encuentra la entrada /M en el
+		// diccionario de firma
+		if (subFilterValue.equals(CADES_SUBFILTER_VALUE) && pdfDic.get(PdfName.M) != null) {
+			try {
+				// Obtenemos los datos firmados
+				final CMSSignedData signedData = getCMSSignature(signatureDictionary);
+
+				// Accedemos al elemento SignedData.certificates y comprobamos
+				// que posee al menos un elemento
+				final Iterator<SignerInformation> it = signedData.getSignerInfos().getSigners().iterator();
+				while (it.hasNext()) {
+					final SignerInformation si = it.next();
+					final AttributeTable signedAttrs = si.getSignedAttributes();
+					if(signedAttrs.get(PKCSObjectIdentifiers.id_aa_signingCertificateV2) != null) {
+						return true;
+					}
+				}
+			} catch (final Exception e) {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Method that indicates if a signature dictionary refers to a PAdES T-Level
 	 * profile (true) or not (false).
 	 *
@@ -382,6 +429,9 @@ public class SignatureFormatDetectorPadesCades {
 
 			if (isPAdESBLevel(signatureDictionary)) {
 				format = ISignatureFormatDetector.FORMAT_PADES_B_LEVEL;
+				if (isPAdESBBLevel(signatureDictionary)) {
+					format = ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL;
+				}
 				if (isPAdESLTALevel(signatureDictionary, reader)) {
 					format = ISignatureFormatDetector.FORMAT_PADES_LTA_LEVEL;
 				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
@@ -389,7 +439,8 @@ public class SignatureFormatDetectorPadesCades {
 				} else if (isPAdESTLevel(signatureDictionary, reader)) {
 					format = ISignatureFormatDetector.FORMAT_PADES_T_LEVEL;
 				}
-			} else {
+			}
+			else{
 				return getFormatOfPAdESSignature(signatureDictionary, reader);
 			}
 		} catch (final Exception e) {
@@ -779,6 +830,10 @@ public class SignatureFormatDetectorPadesCades {
 				if (isCAdESBLevel(signature)) {
 					// Establecemos el formato a CAdES B-Level
 					format = ISignatureFormatDetector.FORMAT_CADES_B_LEVEL;
+					// Se comprueba si es CAdES B-B-Level
+					if (isCAdESBBLevel(signature)) {
+						format = ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL;
+					}
 					// Comprobamos si la firma posee signature-time-stamp en
 					// cuyo caso será CAdES T-Level
 					if (isCAdEST(signature)) {
@@ -795,13 +850,13 @@ public class SignatureFormatDetectorPadesCades {
 							format = resolveCAdESNoBaselineFormat(format, signature);
 						}
 					}
-				}
 				// Si la firma no es CAdES B-Level
 				else {
 					// Comprobamos si la firma es CAdES-T, CAdES-C, CAdES-X1,
 					// CAdES-X2, CAdES-XL1, CAdES-XL2 o CAdES-A
 					format = resolveCAdESNoBaselineFormat(format, signature);
 				}
+			}
 			}
 		} catch (final Exception e) {
 			format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
@@ -979,6 +1034,21 @@ public class SignatureFormatDetectorPadesCades {
 		return signedAttrs.get(PKCSObjectIdentifiers.id_aa_signingCertificate) != null
 				|| signedAttrs.get(PKCSObjectIdentifiers.id_aa_signingCertificateV2) != null
 				|| signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_otherSigCert) != null;
+	}
+
+	/**
+	 * Method that checks whether a signer has CAdES-B-B-Level format.
+	 *
+	 * @param signerInformation Parameter that represents the information about the
+	 *                          signer.
+	 * @return a boolean that indicates whether the signer has CAdES-B-B-Level format.
+	 */
+	private static boolean isCAdESBBLevel(final SignerInformation signerInformation) {
+		// Accedemos al conjunto de atributos firmados
+		final AttributeTable signedAttrs = signerInformation.getSignedAttributes();
+		// Se considera una firma con formato CAdES-B-B-Level si posee el
+		// atributo firmado id_aa_signingCertificateV2
+		return signedAttrs.get(PKCSObjectIdentifiers.id_aa_signingCertificateV2) != null;
 	}
 
 

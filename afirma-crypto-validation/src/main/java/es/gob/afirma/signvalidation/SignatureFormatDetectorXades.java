@@ -537,6 +537,46 @@ public final class SignatureFormatDetectorXades implements ISignatureFormatDetec
     }
 
     /**
+     * Method that indicates if at least one of a list of XML signatures contains at least one:
+     * <ul>
+     * <li>One <code>xades:SigningCertificateV2</code> element</li>
+     * and
+     * <li>One <code>xades:SigningTime</code> element</li>
+     * and
+     * <li>One <code>xades:DataObjectFormat</code> element</li>
+     * and it doesn't contain any:
+     * <li>One <code>xades:QualifyingPropertiesReference</code> element.</li>
+     * </ul>
+     * @param listSignatureElements Parameter that represents the list of signatures.
+     * @return a boolean that indicates if at least one of the list of XML signatures contains:
+     * <ul>
+     * <li>One <code>xades:SigningCertificate</code> element</li>
+     * and
+     * <li>One <code>xades:SigningTime</code> element</li>
+     * and
+     * <li>One <code>xades:DataObjectFormat</code> element</li>
+     * and it doesn't contain any:
+     * <li>One <code>xades:QualifyingPropertiesReference</code> element.</li>
+     * </ul>
+     */
+    private static boolean isXAdESBBLevel(final List<Element> listSignatureElements) {
+	/* Una firma se considerarÃ¡ XAdES B-B-Level si posee los elementos:
+	 * > xades:SigningCertificateV2
+	 * > xades:SigningTime
+	 * > xades:DataObjectFormat
+	 * Y si no posee el elemento:
+	 * > xades:QualifyingPropertiesReference
+	 */
+	if (!listSignatureElements.isEmpty()) {
+	    // Recorremos la lista de elementos ds:Signature
+	    for (final Element signatureElement: listSignatureElements) {
+		return isXAdESBBLevel(signatureElement);
+	    }
+	}
+	return false;
+    }
+
+    /**
      * Method that indicates if a signer has XAdES B-Level format.
      * @param signatureElement Parameter that represents the <code>ds:Signature</code> element.
      * @return a boolean that indicates if the signer has XAdES B-Level format.
@@ -599,6 +639,76 @@ public final class SignatureFormatDetectorXades implements ISignatureFormatDetec
 		    }
 		}
 		if (hasSigningTime && hasSigningCertificate && hasDataObjectFormat && hasMimeType) {
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
+    /**
+     * Method that indicates if a signer has XAdES B-B-Level format.
+     * @param signatureElement Parameter that represents the <code>ds:Signature</code> element.
+     * @return a boolean that indicates if the signer has XAdES B-Level format.
+     */
+    private static boolean isXAdESBBLevel(final Element signatureElement) {
+	/* Un firmante se considerarÃ¡ XAdES B-Level si posee los elementos:
+	 * > xades:SigningCertificateV2
+	 * > xades:SigningTime
+	 * > xades:DataObjectFormat (incluyendo el elemento xades:MimeType)
+	 * Y si no posee el elemento:
+	 * > xades:QualifyingPropertiesReference
+	 */
+	boolean hasSigningCertificateV2 = false;
+	boolean hasSigningTime = false;
+	boolean hasDataObjectFormat = false;
+	boolean hasMimeType = false;
+
+	// Comprobamos que la firma no contiene el elemento
+	// xades:QualifyingPropertiesReference
+	if (signatureElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_QUALIFYING_PROPERTIES_REFERENCE).getLength() == 0) {
+	    // Accedemos al elemento xades:SignedProperties
+	    Element signedPropertiesElement = null;
+	    if (signatureElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNED_PROPERTIES).getLength() > 0) {
+		signedPropertiesElement = (Element) signatureElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNED_PROPERTIES).item(0);
+
+		// Accedemos al elemento xades:SignedSignatureProperties
+		Element signedSignaturePropertiesElement = null;
+		if (signedPropertiesElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNED_SIGNATURE_PROPERTIES).getLength() > 0) {
+		    signedSignaturePropertiesElement = (Element) signatureElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNED_SIGNATURE_PROPERTIES).item(0);
+
+		    // Comprobamos si el elemento
+		    // xades:SignedSignatureProperties tiene
+		    // xades:SigningCertificate como uno de sus hijos
+		    hasSigningCertificateV2 = signedSignaturePropertiesElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNING_CERTIFICATE_V2).getLength() > 0;
+
+		    // Comprobamos si el elemento
+		    // xades:SignedSignatureProperties tiene
+		    // xades:SigningTime como uno de sus hijos
+		    hasSigningTime = signedSignaturePropertiesElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNING_TIME).getLength() > 0;
+		}
+		// Accedemos al elemento
+		// xades:SignedDataObjectProperties
+		Element signedDataObjectPropertiesElement = null;
+		if (signedPropertiesElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNED_DATA_OBJECT_PROPERTIES).getLength() > 0) {
+		    signedDataObjectPropertiesElement = (Element) signedPropertiesElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_SIGNED_DATA_OBJECT_PROPERTIES).item(0);
+
+		    // Comprobamos si el elemento
+		    // xades:SignedDataObjectProperties tiene
+		    // xades:DataObjectFormat como uno de sus hijos
+		    final Element dataObjectFormatElement = getXMLElement(signedDataObjectPropertiesElement, XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_DATA_OBJECT_FORMAT);
+
+		    hasDataObjectFormat = dataObjectFormatElement != null;
+		    if (dataObjectFormatElement != null) {
+			hasDataObjectFormat = true;
+
+			// Comprobamos si el elemento
+			// xades:DataObjectFormat tiene
+			// xades:MimeType como uno de sus hijos
+			hasMimeType = dataObjectFormatElement.getElementsByTagNameNS(XAdESConstants.NAMESPACE_XADES_1_3_2, XAdESConstants.TAG_MIME_TYPE).getLength() > 0;
+		    }
+		}
+		if (hasSigningTime && hasSigningCertificateV2 && hasDataObjectFormat && hasMimeType) {
 		    return true;
 		}
 	    }
@@ -1187,6 +1297,8 @@ public final class SignatureFormatDetectorXades implements ISignatureFormatDetec
 		}
 
 	    }
+	} else if (isXAdESBBLevel(signatureElement)) {
+		format = ISignatureFormatDetector.FORMAT_XADES_B_B_LEVEL;
 	}
 	return format;
     }

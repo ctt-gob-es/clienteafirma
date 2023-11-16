@@ -102,18 +102,6 @@ public final class ValidateXMLSignature extends SignValider {
         				nl.item(i)
         				);
 
-        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-        		if (!signature.validate(valContext) && !noMatchDataOcurred) {
-        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
-        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
-        			noMatchDataOcurred = true;
-        		}
-        		if (!signature.getSignatureValue().validate(valContext) && !noMatchDataOcurred) {
-        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
-        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
-        			noMatchDataOcurred = true;
-        		}
-
         		if (checkCertificates) {
         			final XMLSignatureFactory certs = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
         			final XMLSignature signature2 = certs.unmarshalXMLSignature(valContext);
@@ -149,6 +137,18 @@ public final class ValidateXMLSignature extends SignValider {
         			}
         		}
 
+        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+        		if (!signature.validate(valContext) && !noMatchDataOcurred) {
+        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
+        		}
+        		if (!signature.getSignatureValue().validate(valContext) && !noMatchDataOcurred) {
+        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
+        		}
+
         		// Ahora miramos las referencias una a una
         		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
         		boolean isKO = false;
@@ -165,6 +165,7 @@ public final class ValidateXMLSignature extends SignValider {
         		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signatureElement);
 
         		if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_XADES_B_B_LEVEL.equals(signProfile)
         				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
         				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
         				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));

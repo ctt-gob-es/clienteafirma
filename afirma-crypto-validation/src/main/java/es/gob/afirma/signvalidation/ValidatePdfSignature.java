@@ -244,6 +244,7 @@ public final class ValidatePdfSignature extends SignValider {
 		if (!ISignatureFormatDetector.FORMAT_PADES_BASIC.equals(signProfile)
 			&& !ISignatureFormatDetector.FORMAT_PADES_BES.equals(signProfile)
 			&& !ISignatureFormatDetector.FORMAT_PADES_B_LEVEL.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL.equals(signProfile)
 			&& !ISignatureFormatDetector.FORMAT_PADES_EPES.equals(signProfile)) {
 			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
 		}

@@ -17,19 +17,8 @@ public final class SignValidity {
 
 	@Override
 	public String toString() {
-		String ret = null;
-		if (this.validity.equals(SIGN_DETAIL_TYPE.OK) || this.validity.equals(SIGN_DETAIL_TYPE.GENERATED)) {
-			ret = "Firma valida"; //$NON-NLS-1$
-		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
-			ret = "Validaci\u00F3n incompleta"; //$NON-NLS-1$
-		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
-			ret = "Validez a confirmar por el usuario"; //$NON-NLS-1$
-		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.KO)) {
-			ret = "Firma no valida"; //$NON-NLS-1$
-		}
+		String ret;
+		ret = validityTypeToString();
 		if (this.error == null) {
 			return ret;
 		}
@@ -49,6 +38,8 @@ public final class SignValidity {
 				return ret + ": existe un certificado de firma caducado"; //$NON-NLS-1$
 			case CERTIFICATE_NOT_VALID_YET:
 				return ret + ": existe un certificado de firma que aun no es valido"; //$NON-NLS-1$
+			case CANT_VALIDATE_CERT:
+				return ret + ": no se ha podido validar el certificado correctamente"; //$NON-NLS-1$
 			case ALGORITHM_NOT_SUPPORTED:
 				return ret + ": la firma contiene un algoritmo no reconocido o no soportado"; //$NON-NLS-1$
 			case CA_NOT_SUPPORTED:
@@ -74,7 +65,7 @@ public final class SignValidity {
 			case SUSPECTED_SIGNATURE:
 				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
 			case SIGN_PROFILE_NOT_CHECKED:
-				return ret + ": el perfil de firma tiene un nivel superior al que se permite validar en AutoFirma"; //$NON-NLS-1$
+				return ret + ": La firma contiene atributos longevos que AutoFirma no puede validar"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
@@ -110,6 +101,8 @@ public final class SignValidity {
         CERTIFICATE_EXPIRED,
         /** Cuando existe un certificado de firma que aun no es v&aacute;lido. */
         CERTIFICATE_NOT_VALID_YET,
+        /** No se ha podido validar el certificado. */
+        CANT_VALIDATE_CERT,
         /** Cuando la firma contiene un algoritmo no reconocido o no soportado. */
         ALGORITHM_NOT_SUPPORTED,
         /** Cuando el emisor del certificado no es v&aacute;lido. */
@@ -183,5 +176,21 @@ public final class SignValidity {
      * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
     public Exception getErrorException() {
     	return this.errorException;
+    }
+
+    public String validityTypeToString() {
+		if (this.validity.equals(SIGN_DETAIL_TYPE.OK) || this.validity.equals(SIGN_DETAIL_TYPE.GENERATED)) {
+			return "Firma valida"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
+			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
+			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.KO)) {
+			return "Firma no valida"; //$NON-NLS-1$
+		}
+		return null;
     }
 }

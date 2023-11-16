@@ -108,6 +108,23 @@ public final class ValidateBinarySignature extends SignValider {
     	}
 
     	try {
+    		verifySignatures(
+				sign,
+				data != null ? data : new AOCAdESSigner().getData(sign),
+				checkCertificates,
+				validityList
+			);
+	    }
+    	catch (final CMSSignerDigestMismatchException e) {
+    		// La firma no es una firma binaria valida
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
+    	}
+    	catch (final Exception e) {
+            // La firma no es una firma binaria valida
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null, e));
+        }
+
+    	try {
 			if (data == null && signer.getData(sign) == null) {
 				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 					"Se ha pedido validar una firma explicita sin proporcionar los datos firmados" //$NON-NLS-1$
@@ -127,23 +144,6 @@ public final class ValidateBinarySignature extends SignValider {
 			);
     		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR));
 		}
-
-    	try {
-    		verifySignatures(
-				sign,
-				data != null ? data : new AOCAdESSigner().getData(sign),
-				checkCertificates,
-				validityList
-			);
-	    }
-    	catch (final CMSSignerDigestMismatchException e) {
-    		// La firma no es una firma binaria valida
-    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
-    	}
-    	catch (final Exception e) {
-            // La firma no es una firma binaria valida
-    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null, e));
-        }
 
     	return validityList;
     }
@@ -205,16 +205,16 @@ public final class ValidateBinarySignature extends SignValider {
 			);
 	    	if (checkCertificates) {
 	    		cert.checkValidity();
-	    	}
 
-	        if (!signer.verify(new SignerInformationVerifier(
-	        	new	DefaultCMSSignatureAlgorithmNameGenerator(),
-	        	new DefaultSignatureAlgorithmIdentifierFinder(),
-	    		new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
-	    		new BcDigestCalculatorProvider()
-			))) {
-	        	throw new CMSException("Firma no valida"); //$NON-NLS-1$
-	        }
+		        if (!signer.verify(new SignerInformationVerifier(
+		        	new	DefaultCMSSignatureAlgorithmNameGenerator(),
+		        	new DefaultSignatureAlgorithmIdentifierFinder(),
+		    		new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
+		    		new BcDigestCalculatorProvider()
+				))) {
+		        	throw new CMSException("Firma no valida"); //$NON-NLS-1$
+		        }
+	    	}
     	}
     	catch (final CertificateExpiredException e) {
     		// Certificado caducado
@@ -230,11 +230,12 @@ public final class ValidateBinarySignature extends SignValider {
     	}
     	catch (final Exception e) {
             // La firma no es una firma binaria valida
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, null, e);
+    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CANT_VALIDATE_CERT, e);
         }
 
 		if (!ISignatureFormatDetector.FORMAT_CADES_BES.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_CADES_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_CADES_EPES.equals(signProfile)) {
 				return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED);
 		}
