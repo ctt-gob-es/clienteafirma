@@ -31,26 +31,20 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	List <SignDetails> signDetailsList;
-	List<CertificateDetails> certDetailsList;
-	Document signDocument;
-	AOTreeModel signersTree;
-
-	private static final String FORMAT_XADES = "XAdES"; //$NON-NLS-1$s
-
     public static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
     private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
     private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
     private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
 
     public static final Map<String, String> SIGN_ALGOS_URI;
-    static {
-    	SIGN_ALGOS_URI = new HashMap<>();
-    	SIGN_ALGOS_URI.put(URL_SHA1_RSA, "SHA1withRSA"); //$NON-NLS-1$
-    	SIGN_ALGOS_URI.put(URL_SHA256_RSA, "SHA256withRSA"); //$NON-NLS-1$
-    	SIGN_ALGOS_URI.put(URL_SHA384_RSA, "SHA384withRSA"); //$NON-NLS-1$
-    	SIGN_ALGOS_URI.put(URL_SHA512_RSA, "SHA512withRSA"); //$NON-NLS-1$
-	}
+
+	List <SignDetails> signDetailsList;
+	List<CertificateDetails> certDetailsList;
+	Document signDocument;
+	AOTreeModel signersTree;
+	String dataLocation;
+
+	private static final String FORMAT_XADES = "XAdES"; //$NON-NLS-1$s
 
 	static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
 			XAdESConstants.NAMESPACE_XADES_NO_VERSION,
@@ -58,6 +52,14 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 		    XAdESConstants.NAMESPACE_XADES_1_3_2,
 		    XAdESConstants.NAMESPACE_XADES_1_4_1
 	};
+
+	static {
+		SIGN_ALGOS_URI = new HashMap<>();
+		SIGN_ALGOS_URI.put(URL_SHA1_RSA, "SHA1withRSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA256_RSA, "SHA256withRSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA384_RSA, "SHA384withRSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA512_RSA, "SHA512withRSA"); //$NON-NLS-1$
+	}
 
 	public XAdESSignAnalyzer(final byte [] data) throws Exception {
     	try {
@@ -69,6 +71,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     		this.signDetailsList = new ArrayList<SignDetails>();
     		this.certDetailsList = new ArrayList<CertificateDetails>();
     		this.signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data));
+    		this.dataLocation = obtainDataLocation();
     		final NodeList signaturesList = this.signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
     		createSignDetails(signaturesList);
     	}
@@ -94,33 +97,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 
 	@Override
 	public String getDataLocation() {
-        // Tomamos la raiz del documento
-        final Element rootSig = this.signDocument.getDocumentElement();
-
-        // Identificamos el tipo de la firma por medio de las referencias de la primera de ellas
-    	final Element signatureElement = XAdESUtil.getFirstSignatureElement(this.signDocument.getDocumentElement());
-
-    	// Obtenemos el listado de referencias a datos de la firma
-    	final List<Element> dataReferenceList = XAdESUtil.getSignatureDataReferenceList(signatureElement);
-
-        // Establecemos la variante de firma
-    	if (XAdESUtil.isSignatureElementEnveloped(signatureElement, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.12"); //$NON-NLS-1$
-        }
-    	else if (XAdESUtil.isSignatureWithManifest(dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.16"); //$NON-NLS-1$
-        }
-        else if (XAdESUtil.isSignatureElementExternallyDetached(dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.22"); //$NON-NLS-1$
-        }
-        else if (XAdESUtil.isSignatureElementInternallyDetached(rootSig, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.14"); //$NON-NLS-1$
-        }
-        else if (XAdESUtil.isSignatureElementEnveloping(signatureElement, dataReferenceList)) {
-        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.21"); //$NON-NLS-1$
-        }
-
-    	return ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+		return this.dataLocation;
 	}
 
 	/**
@@ -134,7 +111,11 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     			final Element signature = (Element) signaturesList.item(i);
     			final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signature);
     			final SignDetails signDetails = buildSignDetails(signature, signProfile);
-    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile);
+    			boolean isExternallyDetached = false;
+    			if (SimpleAfirmaMessages.getString("ValidationInfoDialog.22").equals(this.dataLocation)) { //$NON-NLS-1$
+    				isExternallyDetached = true;
+    			}
+    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile, isExternallyDetached);
     			signDetails.setValidityResult(validity);
     			this.signDetailsList.add(signDetails);
     		}
@@ -380,6 +361,40 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			}
     	}
     	return result;
+    }
+
+    /**
+     * Obtiene la localizaci&oacute;n de os datos.
+     * @return Localizaci&oacute;n de ls datos.
+     */
+    private String obtainDataLocation() {
+        // Tomamos la raiz del documento
+        final Element rootSig = this.signDocument.getDocumentElement();
+
+        // Identificamos el tipo de la firma por medio de las referencias de la primera de ellas
+    	final Element signatureElement = XAdESUtil.getFirstSignatureElement(this.signDocument.getDocumentElement());
+
+    	// Obtenemos el listado de referencias a datos de la firma
+    	final List<Element> dataReferenceList = XAdESUtil.getSignatureDataReferenceList(signatureElement);
+
+        // Establecemos la variante de firma
+    	if (XAdESUtil.isSignatureElementEnveloped(signatureElement, dataReferenceList)) {
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.12"); //$NON-NLS-1$
+        }
+    	else if (XAdESUtil.isSignatureWithManifest(dataReferenceList)) {
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.16"); //$NON-NLS-1$
+        }
+        else if (XAdESUtil.isSignatureElementExternallyDetached(dataReferenceList)) {
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.22"); //$NON-NLS-1$
+        }
+        else if (XAdESUtil.isSignatureElementInternallyDetached(rootSig, dataReferenceList)) {
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.14"); //$NON-NLS-1$
+        }
+        else if (XAdESUtil.isSignatureElementEnveloping(signatureElement, dataReferenceList)) {
+        	return SimpleAfirmaMessages.getString("ValidationInfoDialog.21"); //$NON-NLS-1$
+        }
+
+    	return ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
     }
 
 }

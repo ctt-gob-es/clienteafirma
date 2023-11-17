@@ -38,44 +38,37 @@ public class SignDetails {
 
 	static {
 
-		final ResourceBundle policyBundle = ResourceBundle
-				.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
+		final ResourceBundle policyBundle = ResourceBundle.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
 
-		POLICY_XADES_AGE_1_9  = new AdESPolicy(
-				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
+		POLICY_XADES_AGE_1_9 = new AdESPolicy(policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyIdentifierHash.XAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyQualifier") //$NON-NLS-1$
-			);
+		);
 
-
-		POLICY_XADES_AGE_1_8  = new AdESPolicy(
-				policyBundle.getString("FirmaAGE18.policyIdentifier"), //$NON-NLS-1$
+		POLICY_XADES_AGE_1_8 = new AdESPolicy(policyBundle.getString("FirmaAGE18.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE18.policyIdentifierHash.XAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE18.policyQualifier") //$NON-NLS-1$
-			);
+		);
 
-		POLICY_PADES_AGE_1_9  = new AdESPolicy(
-				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
+		POLICY_PADES_AGE_1_9 = new AdESPolicy(policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyIdentifierHash.PAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyQualifier") //$NON-NLS-1$
-			);
+		);
 
-		POLICY_CADES_AGE_1_9  = new AdESPolicy(
-				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
+		POLICY_CADES_AGE_1_9 = new AdESPolicy(policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyIdentifierHash.CAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyQualifier") //$NON-NLS-1$
-			);
+		);
 
-		POLICY_CADES_AGE_1_8  = new AdESPolicy(
-				policyBundle.getString("FirmaAGE18.policyIdentifier"), //$NON-NLS-1$
+		POLICY_CADES_AGE_1_8 = new AdESPolicy(policyBundle.getString("FirmaAGE18.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE18.policyIdentifierHash.CAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE18.policyQualifier") //$NON-NLS-1$
-			);
+		);
 	}
 
 	public String getSignProfile() {

@@ -119,8 +119,13 @@ public class SignatureFormatDetectorPadesCades {
 
 				// Accedemos al elemento SignedData.certificates y comprobamos
 				// que posee al menos un elemento
-				if (!signedData.getCertificates().getMatches(null).isEmpty()) {
-					return true;
+				final Iterator<SignerInformation> it = signedData.getSignerInfos().getSigners().iterator();
+				while (it.hasNext()) {
+					final SignerInformation si = it.next();
+					final AttributeTable signedAttrs = si.getSignedAttributes();
+					if(signedAttrs.get(PKCSObjectIdentifiers.id_aa_signingCertificate) != null) {
+						return true;
+					}
 				}
 			} catch (final Exception e) {
 				return false;
@@ -429,9 +434,6 @@ public class SignatureFormatDetectorPadesCades {
 
 			if (isPAdESBLevel(signatureDictionary)) {
 				format = ISignatureFormatDetector.FORMAT_PADES_B_LEVEL;
-				if (isPAdESBBLevel(signatureDictionary)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL;
-				}
 				if (isPAdESLTALevel(signatureDictionary, reader)) {
 					format = ISignatureFormatDetector.FORMAT_PADES_LTA_LEVEL;
 				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
@@ -439,6 +441,9 @@ public class SignatureFormatDetectorPadesCades {
 				} else if (isPAdESTLevel(signatureDictionary, reader)) {
 					format = ISignatureFormatDetector.FORMAT_PADES_T_LEVEL;
 				}
+			}
+			else if (isPAdESBBLevel(signatureDictionary)) {
+				format = ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL;
 			}
 			else{
 				return getFormatOfPAdESSignature(signatureDictionary, reader);
@@ -830,10 +835,6 @@ public class SignatureFormatDetectorPadesCades {
 				if (isCAdESBLevel(signature)) {
 					// Establecemos el formato a CAdES B-Level
 					format = ISignatureFormatDetector.FORMAT_CADES_B_LEVEL;
-					// Se comprueba si es CAdES B-B-Level
-					if (isCAdESBBLevel(signature)) {
-						format = ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL;
-					}
 					// Comprobamos si la firma posee signature-time-stamp en
 					// cuyo caso será CAdES T-Level
 					if (isCAdEST(signature)) {
@@ -850,13 +851,16 @@ public class SignatureFormatDetectorPadesCades {
 							format = resolveCAdESNoBaselineFormat(format, signature);
 						}
 					}
-				// Si la firma no es CAdES B-Level
-				else {
-					// Comprobamos si la firma es CAdES-T, CAdES-C, CAdES-X1,
-					// CAdES-X2, CAdES-XL1, CAdES-XL2 o CAdES-A
-					format = resolveCAdESNoBaselineFormat(format, signature);
+					// Si la firma no es CAdES B-Level
+					else {
+						// Comprobamos si la firma es CAdES-T, CAdES-C, CAdES-X1,
+						// CAdES-X2, CAdES-XL1, CAdES-XL2 o CAdES-A
+						format = resolveCAdESNoBaselineFormat(format, signature);
+					}
 				}
 			}
+			else if (isCAdESBBLevel(signature)) {
+				format = ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL;
 			}
 		} catch (final Exception e) {
 			format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;

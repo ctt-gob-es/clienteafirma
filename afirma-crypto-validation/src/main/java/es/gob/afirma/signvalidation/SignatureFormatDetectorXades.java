@@ -537,46 +537,6 @@ public final class SignatureFormatDetectorXades implements ISignatureFormatDetec
     }
 
     /**
-     * Method that indicates if at least one of a list of XML signatures contains at least one:
-     * <ul>
-     * <li>One <code>xades:SigningCertificateV2</code> element</li>
-     * and
-     * <li>One <code>xades:SigningTime</code> element</li>
-     * and
-     * <li>One <code>xades:DataObjectFormat</code> element</li>
-     * and it doesn't contain any:
-     * <li>One <code>xades:QualifyingPropertiesReference</code> element.</li>
-     * </ul>
-     * @param listSignatureElements Parameter that represents the list of signatures.
-     * @return a boolean that indicates if at least one of the list of XML signatures contains:
-     * <ul>
-     * <li>One <code>xades:SigningCertificate</code> element</li>
-     * and
-     * <li>One <code>xades:SigningTime</code> element</li>
-     * and
-     * <li>One <code>xades:DataObjectFormat</code> element</li>
-     * and it doesn't contain any:
-     * <li>One <code>xades:QualifyingPropertiesReference</code> element.</li>
-     * </ul>
-     */
-    private static boolean isXAdESBBLevel(final List<Element> listSignatureElements) {
-	/* Una firma se considerarÃ¡ XAdES B-B-Level si posee los elementos:
-	 * > xades:SigningCertificateV2
-	 * > xades:SigningTime
-	 * > xades:DataObjectFormat
-	 * Y si no posee el elemento:
-	 * > xades:QualifyingPropertiesReference
-	 */
-	if (!listSignatureElements.isEmpty()) {
-	    // Recorremos la lista de elementos ds:Signature
-	    for (final Element signatureElement: listSignatureElements) {
-		return isXAdESBBLevel(signatureElement);
-	    }
-	}
-	return false;
-    }
-
-    /**
      * Method that indicates if a signer has XAdES B-Level format.
      * @param signatureElement Parameter that represents the <code>ds:Signature</code> element.
      * @return a boolean that indicates if the signer has XAdES B-Level format.
@@ -652,7 +612,7 @@ public final class SignatureFormatDetectorXades implements ISignatureFormatDetec
      * @return a boolean that indicates if the signer has XAdES B-Level format.
      */
     private static boolean isXAdESBBLevel(final Element signatureElement) {
-	/* Un firmante se considerarÃ¡ XAdES B-Level si posee los elementos:
+	/* Un firmante se considerara XAdES B-Level si posee los elementos:
 	 * > xades:SigningCertificateV2
 	 * > xades:SigningTime
 	 * > xades:DataObjectFormat (incluyendo el elemento xades:MimeType)

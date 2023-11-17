@@ -66,6 +66,8 @@ public final class SignValidity {
 				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
 			case SIGN_PROFILE_NOT_CHECKED:
 				return ret + ": La firma contiene atributos longevos que AutoFirma no puede validar"; //$NON-NLS-1$
+			case CANT_VALIDATE_EXTERNALLY_DETACHED:
+				return ret + ": No se permite la validación de firmas con referencias externas"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
@@ -128,7 +130,9 @@ public final class SignValidity {
         /** El usuario debe confirmar la validez de la firma. */
         SUSPECTED_SIGNATURE,
         /** La firma no se ha comprobado completamente debido al nivel del perfil de firma. */
-        SIGN_PROFILE_NOT_CHECKED
+        SIGN_PROFILE_NOT_CHECKED,
+        /** No se permite la validacion de firmas con referencias externas. */
+        CANT_VALIDATE_EXTERNALLY_DETACHED
     }
 
     /** Validez de la firma. */

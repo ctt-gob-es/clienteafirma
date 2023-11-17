@@ -234,6 +234,7 @@ public final class ValidateBinarySignature extends SignValider {
         }
 
 		if (!ISignatureFormatDetector.FORMAT_CADES_BES.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_CADES_B_LEVEL.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_CADES_EPES.equals(signProfile)) {

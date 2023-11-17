@@ -119,7 +119,7 @@ public final class ValidatePdfSignature extends SignValider {
 		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
 
 		for (final String name : signNames) {
-			final List<SignValidity> validityListSign = validateSign(name, af, signProfile);
+			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, false);
 			for (final SignValidity sv : validityListSign) {
 				if (!validityList.contains(sv)) {
 					validityList.add(sv);
@@ -194,13 +194,14 @@ public final class ValidatePdfSignature extends SignValider {
      * @param signName Nombre de firma.
      * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
      * @param signProfile Perfil de firma.
+     * @param checkCert Indica si se comprueba la validez del certificado o no.
      * @return Lista con las validaciones realizadas en la firma.
      * @throws RuntimeConfigNeededException Cuando en la validaci&oacute;n laxa se puede considerar
      * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
      * usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
-	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields, final String signProfile)
+	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields, final String signProfile, final boolean checkCert)
 			throws RuntimeConfigNeededException, IOException {
 
 		final List<SignValidity> validityList = new ArrayList<SignValidity>();
@@ -230,18 +231,21 @@ public final class ValidatePdfSignature extends SignValider {
 			}
 		}
 
-		final X509Certificate signCert = pk.getSigningCertificate();
-		try {
-			signCert.checkValidity();
-		} catch (final CertificateExpiredException e) {
-			// Certificado caducado
-			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
-		} catch (final CertificateNotYetValidException e) {
-			// Certificado aun no valido
-			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+		if (checkCert) {
+			final X509Certificate signCert = pk.getSigningCertificate();
+			try {
+				signCert.checkValidity();
+			} catch (final CertificateExpiredException e) {
+				// Certificado caducado
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
+			} catch (final CertificateNotYetValidException e) {
+				// Certificado aun no valido
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+			}
 		}
 
 		if (!ISignatureFormatDetector.FORMAT_PADES_BASIC.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
 			&& !ISignatureFormatDetector.FORMAT_PADES_BES.equals(signProfile)
 			&& !ISignatureFormatDetector.FORMAT_PADES_B_LEVEL.equals(signProfile)
 			&& !ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL.equals(signProfile)

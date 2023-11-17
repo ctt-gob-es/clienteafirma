@@ -26,17 +26,22 @@ public class SignDetailsFormatter {
 
     static Integer signerIndex = new Integer(1);
 
+    private static String signFormat;
+
     public static final Map<String, String> MIMETYPE_MAPPER;
     static {
     	MIMETYPE_MAPPER = new HashMap<>();
     	MIMETYPE_MAPPER.put("data", SimpleAfirmaMessages.getString("ValidationInfoDialog.24")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("application/pdf", SimpleAfirmaMessages.getString("ValidationInfoDialog.25")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("text/xml", SimpleAfirmaMessages.getString("ValidationInfoDialog.26")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("plain/xml", SimpleAfirmaMessages.getString("ValidationInfoDialog.26")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("application-xml", SimpleAfirmaMessages.getString("ValidationInfoDialog.26")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("application/octet-stream", SimpleAfirmaMessages.getString("ValidationInfoDialog.24")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("application/postscript", SimpleAfirmaMessages.getString("ValidationInfoDialog.27")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("text/html", SimpleAfirmaMessages.getString("ValidationInfoDialog.28")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/tiff", SimpleAfirmaMessages.getString("ValidationInfoDialog.29")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/gif", SimpleAfirmaMessages.getString("ValidationInfoDialog.30")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("image/jpg", SimpleAfirmaMessages.getString("ValidationInfoDialog.39")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/jpeg", SimpleAfirmaMessages.getString("ValidationInfoDialog.31")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/png", SimpleAfirmaMessages.getString("ValidationInfoDialog.32")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("video/mpeg", SimpleAfirmaMessages.getString("ValidationInfoDialog.33")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -58,6 +63,7 @@ public class SignDetailsFormatter {
 		String result = ""; //$NON-NLS-1$
 		final List<SignDetails> signDetailsParent = analyzer.getAllSignDetails();
 		if (analyzer.getSignFormat() != null) {
+			signFormat = analyzer.getSignFormat();
 			result += "<p><b>Formato</b>: " + analyzer.getSignFormat() + "</p>";  //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		final String dataLocation = analyzer.getDataLocation();
@@ -65,9 +71,9 @@ public class SignDetailsFormatter {
 			result += "<p><b>Localizaci&oacute;n de los datos: </b>" + dataLocation + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (signDetailsParent.get(0).getDataObjectFormats() != null && signDetailsParent.get(0).getDataObjectFormats().size() > 0) {
-			result += "<br><b>Informaci&oacute;n sobre datos firmados:</b>"; //$NON-NLS-1$
+			result += "<div><p><b>Informaci&oacute;n sobre datos firmados:</b></p>"; //$NON-NLS-1$
+			result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 			for (int i = 0 ; i < signDetailsParent.get(0).getDataObjectFormats().size() ; i++) {
-				result += "<ul>"; //$NON-NLS-1$
 				if (signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() != null && !signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding().isEmpty()) {
 					result += "<li>Encoding: " + signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -78,13 +84,15 @@ public class SignDetailsFormatter {
 				if (MIMETYPE_MAPPER.containsKey(type)) {
 					type = MIMETYPE_MAPPER.get(type);
 				}
-				result += "<li>Tipo: " + type + "</li></ul>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<li>Tipo: " + type + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
+			result += "</ul></div>"; //$NON-NLS-1$
 		}
 		final AOTreeModel signersTree = analyzer.getSignersTree();
 		if (signersTree != null) {
-			result += "<br><b>&Aacute;rbol de firmantes:</b>";  //$NON-NLS-1$
+			result += "<div style=\"margin-bottom: 10;\"><p><b>&Aacute;rbol de firmantes:</b><ul style=\"margin-bottom: 0;\">";  //$NON-NLS-1$
 			result += parseSignersTree((AOTreeNode) signersTree.getRoot());
+			result += "</ul></p></div>"; //$NON-NLS-1$
 		}
 		signerIndex = new Integer(1);
 		String generalValidationDesc = null;
@@ -138,18 +146,21 @@ public class SignDetailsFormatter {
 		for (int i = 0; i < details.size() ; i++) {
 			final SignDetails detail = details.get(i);
 			result += "<h1>Firma " + (i+1) + "</h1>";  //$NON-NLS-1$//$NON-NLS-2$
-			result += "<div style=\"border:5px outset black;padding-left: 25px;\"><p><b>Perfil de firma</b>: " + detail.getSignProfile() + "</p>" //$NON-NLS-1$ //$NON-NLS-2$
-					+ "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			result += "<div style=\"border:5px outset black;padding-left: 25px;\">"; //$NON-NLS-1$
+			if (!FacturaESignAnalyzer.FACTURAE.equals(signFormat)) {
+				result += "<p><b>Perfil de firma</b>: " + detail.getSignProfile() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			result += "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 			if (detail.getValidityResult() != null
 				&& !detail.getValidityResult().get(0).getValidity().equals(SIGN_DETAIL_TYPE.OK)) {
-					result += "<br><b>Resultado de la validacion</b> :<ul>"; //$NON-NLS-1$
+					result += "<div><br><b>Resultado de la validacion</b> :<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 					for(final SignValidity validity : detail.getValidityResult()) {
 						result += "<li>" + validity + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 					}
-					result += "</ul>"; //$NON-NLS-1$
+					result += "</ul></div>"; //$NON-NLS-1$
 			}
 			if (detail.getPolicy() != null) {
-				result += "<p><b>Pol&iacute;tica de firma</b>" ; //$NON-NLS-1$
+				result += "<div><p><b>Pol&iacute;tica de firma</b></p>" ; //$NON-NLS-1$
 
 				if (AOFacturaESigner.POLICY_FACTURAE_30.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
 					|| AOFacturaESigner.POLICY_FACTURAE_31.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
@@ -158,17 +169,33 @@ public class SignDetailsFormatter {
 					|| SignDetails.POLICY_PADES_AGE_1_9.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())){
 					result += ": " + detail.getPolicy().getName() ; //$NON-NLS-1$
 				} else {
-					result += "<ul><li>Descripci&oacute;n: " + detail.getPolicy().getName() + "</li>" //$NON-NLS-1$//$NON-NLS-2$
-					+ "<li>Identificador: " + detail.getPolicy().getPolicy().getPolicyIdentifier() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-					+ "<li>Hash: " + detail.getPolicy().getPolicy().getPolicyIdentifierHash() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-					+ "<li>Algoritmo: " + detail.getPolicy().getPolicy().getPolicyIdentifierHashAlgorithm() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-					+ "<li>Calificador: " + detail.getPolicy().getPolicy().getPolicyQualifier() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+					result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
+					final String name = detail.getPolicy().getName();
+					if (name != null && !name.isEmpty()) {
+						result += "<li>Descripci&oacute;n: " + name + "</li>"; //$NON-NLS-1$//$NON-NLS-2$
+					}
+					final String polId = detail.getPolicy().getPolicy().getPolicyIdentifier();
+					if (polId != null && !polId.isEmpty()) {
+						result += "<li>Identificador: " + polId + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					final String polIdHash = detail.getPolicy().getPolicy().getPolicyIdentifierHash();
+					if (polIdHash != null && !polIdHash.isEmpty()) {
+						result += "<li>Hash: " + polIdHash + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					final String polIdHashAlgo = detail.getPolicy().getPolicy().getPolicyIdentifierHashAlgorithm();
+					if (polIdHashAlgo != null && !polIdHashAlgo.isEmpty()) {
+						result += "<li>Algoritmo: " + polIdHashAlgo + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					final String polQual = detail.getPolicy().getPolicy().getPolicyQualifier().toString();
+					if (polQual != null && !polQual.isEmpty()) {
+						result += "<li>Calificador: " + polQual + "</li>";//$NON-NLS-1$ //$NON-NLS-2$
+					}
 					result += "</ul>"; //$NON-NLS-1$
 				}
-				result += "</p>"; //$NON-NLS-1$
+				result += "</div>"; //$NON-NLS-1$
 			}
 			if (detail.getMetadata() != null && detail.getMetadata().size() > 0) {
-				result += "<p><b>Metadatos </b>:<ul>"; //$NON-NLS-1$
+				result += "<div><p><b>Metadatos </b>:</p><ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 				String claimedRoles = ""; //$NON-NLS-1$
 				String metadata = ""; //$NON-NLS-1$
 				for(final Object key : detail.getMetadata().keySet()) {
@@ -217,7 +244,7 @@ public class SignDetailsFormatter {
 					result += "<li>Roles: " + claimedRoles.substring(0, claimedRoles.length() - 1) + "</li>";  //$NON-NLS-1$//$NON-NLS-2$
 				}
 				result += metadata;
-				result += "</ul></p>"; //$NON-NLS-1$
+				result += "</ul></div>"; //$NON-NLS-1$
 			}
 
 			result += parseCertificatesToHTML(detail.getSigners());
@@ -234,7 +261,7 @@ public class SignDetailsFormatter {
 	 */
 	private static String parseCertificatesToHTML(final List <CertificateDetails> certsDetails) {
 		if (certsDetails.size() > 0) {
-			String result = "<br><b>Certificado</b><ul>"; //$NON-NLS-1$
+			String result = "<br><b>Certificado:</b><ul>"; //$NON-NLS-1$
 			for (final CertificateDetails cert : certsDetails) {
 				result += "<li>Nombre: " + cert.getName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
 						+ "<li>Emisor: " + cert.getIssuerName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
@@ -259,16 +286,17 @@ public class SignDetailsFormatter {
 	 * @return Cadena en HTML con el &aacuerbol.
 	 */
 	private static String parseSignersTree(final AOTreeNode signersNode) {
-		String result = "<ul>"; //$NON-NLS-1$
+		String result = ""; //$NON-NLS-1$
 		for (int i = 0; i < AOTreeModel.getChildCount(signersNode); i++) {
 			final AOTreeNode node = (AOTreeNode) AOTreeModel.getChild(signersNode, i);
 			result += "<li>Firma " + signerIndex + ": " + node.toString() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			signerIndex++;
 			if (node.getChildCount() > 0) {
+				result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 				result += parseSignersTree(node);
+				result += "</ul>"; //$NON-NLS-1$
 			}
 		}
-		result += "</ul>"; //$NON-NLS-1$
 		return result;
 	}
 

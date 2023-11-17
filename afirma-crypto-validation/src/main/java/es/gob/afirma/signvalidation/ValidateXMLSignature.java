@@ -188,60 +188,67 @@ public final class ValidateXMLSignature extends SignValider {
      * Valida la firma indicada en par&aacute;metro.
      * @param signElement Datos de la firma.
      * @param signProfile Perfil de firma.
+     * @param isExternalDetached Indica si la firma tiene referencias externas.
      * @return Lista de validaciones.
      */
-	public static List<SignValidity> validateSign(final Element signElement, final String signProfile) {
+	public static List<SignValidity> validateSign(final Element signElement, final String signProfile, final boolean isExternalDetached) {
 
 		final ArrayList<SignValidity> result = new ArrayList<SignValidity>();
-		boolean validSign = true;
 
-		try {
-			final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), signElement);
+		if (!isExternalDetached) {
+			boolean validSign = true;
 
-			boolean noMatchData = false;
+			try {
+				final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), signElement);
 
-			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-			if (!signature.validate(valContext)) {
-				LOGGER.info("La firma es invalida"); //$NON-NLS-1$
-				validSign = false;
-				noMatchData = true;
-			}
-			if (!signature.getSignatureValue().validate(valContext)) {
-				LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
-				validSign = false;
-				noMatchData = true;
-			}
+				boolean noMatchData = false;
 
-			// Ahora miramos las referencias una a una
-			final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
-			while (it.hasNext()) {
-				final Reference iNext = (Reference) it.next();
-				if (!iNext.validate(valContext)) {
-					LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+				final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+				if (!signature.validate(valContext)) {
+					LOGGER.info("La firma es invalida"); //$NON-NLS-1$
 					validSign = false;
 					noMatchData = true;
 				}
+				if (!signature.getSignatureValue().validate(valContext)) {
+					LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+					validSign = false;
+					noMatchData = true;
+				}
+
+				// Ahora miramos las referencias una a una
+				final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
+				while (it.hasNext()) {
+					final Reference iNext = (Reference) it.next();
+					if (!iNext.validate(valContext)) {
+						LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+						validSign = false;
+						noMatchData = true;
+					}
+				}
+
+				if (noMatchData) {
+					result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+				}
+
+			} catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
+				validSign = false;
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
 			}
 
-			if (noMatchData) {
-				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+			if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
+				validSign = false;
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
 			}
 
-		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
-			validSign = false;
-			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
-		}
-
-		if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
-			&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
-			&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
-			validSign = false;
-			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
-		}
-
-		if (validSign) {
-			result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+			if (validSign) {
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+			}
+		} else {
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED));
 		}
 
 		return result;

@@ -36,7 +36,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 	Document signDocument;
 	AOTreeModel signersTree;
 
-	private static final String FACTURAE = "Factura Electr&oacute;nica"; //$NON-NLS-1$s
+	public static final String FACTURAE = "Factura Electr&oacute;nica"; //$NON-NLS-1$s
 
     public static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
     private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
@@ -118,7 +118,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     			final Element signature = (Element) signaturesList.item(i);
     			final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signature);
     			final SignDetails signDetails = buildSignDetails(signature, signProfile);
-    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile);
+    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile, false);
     			signDetails.setValidityResult(validity);
     			this.signDetailsList.add(signDetails);
     		}
@@ -196,12 +196,12 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 
 				if (AOFacturaESigner.POLICY_FACTURAE_30.getPolicyIdentifier().equals(policyOID)) {
 					final SignaturePolicy facturaE30signPolicy = new SignaturePolicy(
-							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.0"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
 							AOFacturaESigner.POLICY_FACTURAE_30);
 					xadesSignDetails.setPolicy(facturaE30signPolicy);
 				} else if (AOFacturaESigner.POLICY_FACTURAE_31.getPolicyIdentifier().equals(policyOID))  {
 					final SignaturePolicy facturaE31signPolicy = new SignaturePolicy(
-							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
 							AOFacturaESigner.POLICY_FACTURAE_31);
 					xadesSignDetails.setPolicy(facturaE31signPolicy);
 				} else {

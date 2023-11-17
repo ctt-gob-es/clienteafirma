@@ -10,7 +10,7 @@ public interface ISignatureFormatDetector {
     /**
      * Constant attribute that identifies the unrecognized signature format.
      */
-    String FORMAT_UNRECOGNIZED = "UNRECOGNIZED"; //$NON-NLS-1$
+    String FORMAT_UNRECOGNIZED = "No reconocido"; //$NON-NLS-1$
 
     /**
      * Constant attribute that identifies CAdES-A signature format.

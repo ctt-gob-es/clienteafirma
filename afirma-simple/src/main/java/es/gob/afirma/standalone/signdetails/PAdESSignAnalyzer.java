@@ -204,7 +204,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		padesSignDetails.setMetadata(metadataMap);
 
 		//Validamos la firma
-		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af, signProfile);
+		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af, signProfile, false);
 		padesSignDetails.setValidityResult(listValidity);
 
 		return padesSignDetails;
