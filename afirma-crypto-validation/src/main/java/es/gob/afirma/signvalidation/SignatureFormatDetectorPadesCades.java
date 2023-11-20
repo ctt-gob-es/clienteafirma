@@ -444,6 +444,13 @@ public class SignatureFormatDetectorPadesCades {
 			}
 			else if (isPAdESBBLevel(signatureDictionary)) {
 				format = ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL;
+				if (isPAdESLTALevel(signatureDictionary, reader)) {
+					format = ISignatureFormatDetector.FORMAT_PADES_LTA_LEVEL;
+				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
+					format = ISignatureFormatDetector.FORMAT_PADES_LT_LEVEL;
+				} else if (isPAdESTLevel(signatureDictionary, reader)) {
+					format = ISignatureFormatDetector.FORMAT_PADES_T_LEVEL;
+				}
 			}
 			else{
 				return getFormatOfPAdESSignature(signatureDictionary, reader);
