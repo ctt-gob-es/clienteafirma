@@ -165,6 +165,7 @@ public final class ValidateXMLSignature extends SignValider {
         		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signatureElement);
 
         		if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
         				&& !ISignatureFormatDetector.FORMAT_XADES_B_B_LEVEL.equals(signProfile)
         				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
         				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
@@ -238,6 +239,7 @@ public final class ValidateXMLSignature extends SignValider {
 
 			if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_XADES_B_B_LEVEL.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
 				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
 				validSign = false;
