@@ -96,14 +96,24 @@ public class SignDetailsFormatter {
 			result += "</ul></p></div>"; //$NON-NLS-1$
 		}
 		signerIndex = new Integer(1);
-		String generalValidationDesc = null;
-		if (SIGN_DETAIL_TYPE.UNKNOWN.equals(generalValidation.get(0).getValidity())) {
-			generalValidationDesc = generalValidation.get(0).toString();
-		} else {
-			generalValidationDesc = generalValidation.get(0).validityTypeToString();
-		}
+		final String generalValidationDesc = generalValidation.get(0).validityTypeToString();
 		result += "<b>Resultado de la validaci&oacute;n</b>: " + generalValidationDesc;  //$NON-NLS-1$
 		boolean isULAdded = false;
+
+		for (int k = 0 ; k < generalValidation.size(); k++) {
+			if (generalValidation.get(k).getError() != null &&
+					(VALIDITY_ERROR.MODIFIED_FORM.equals(generalValidation.get(k).getError())
+					|| VALIDITY_ERROR.MODIFIED_DOCUMENT.equals(generalValidation.get(k).getError())
+					|| VALIDITY_ERROR.OVERLAPPING_SIGNATURE.equals(generalValidation.get(k).getError())
+					|| VALIDITY_ERROR.SUSPECTED_SIGNATURE.equals(generalValidation.get(k).getError())
+				)) {
+				if (!isULAdded) {
+					result += "<ul>"; //$NON-NLS-1$
+					isULAdded = true;
+				}
+				result += "<li>" + generalValidation.get(k) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 		for (int i = 0 ; i < signDetailsParent.size() ; i++) {
 			for (int j = 0 ; j < signDetailsParent.get(i).getSigners().size() ; j++) {
 				final String validation = (String) signDetailsParent.get(i).getSigners().get(j).getValidityResult().get("Validacion"); //$NON-NLS-1$
@@ -156,9 +166,11 @@ public class SignDetailsFormatter {
 			if (!FacturaESignAnalyzer.FACTURAE.equals(signFormat)) {
 				result += "<p><b>Perfil de firma</b>: " + detail.getSignProfile() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			result += "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			if (detail.getAlgorithm() != null && !detail.getAlgorithm().isEmpty()) {
+				result += "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			if (detail.getSigningTime() != null) {
-				result += "<p><b>Fecha y hora de firma</b>: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(detail.getSigningTime()) + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<p><b>Fecha y hora de firma</b>: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(detail.getSigningTime()) + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			if (detail.getValidityResult() != null
 				&& !detail.getValidityResult().get(0).getValidity().equals(SIGN_DETAIL_TYPE.OK)) {

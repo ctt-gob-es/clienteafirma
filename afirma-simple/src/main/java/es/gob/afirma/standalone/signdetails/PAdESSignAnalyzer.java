@@ -125,16 +125,20 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 				final PdfString contents = pdfDictionary.getAsString(PdfName.CONTENTS);
 				if (contents != null) {
 					final byte[] signBytes = pdfDictionary.getAsString(PdfName.CONTENTS).getOriginalBytes();
-					final CMSSignedData cmsSignedData = new CMSSignedData(signBytes);
-					final SignerInformationStore signerInformationStore = cmsSignedData.getSignerInfos();
-					final List<SignerInformation> listSignersSignature = (List<SignerInformation>) signerInformationStore
-							.getSigners();
-					for (final SignerInformation si : listSignersSignature) {
-						final SignaturePolicy policy = analyzePolicy(si);
-						if (policy != null) {
-							signDetails.setPolicy(policy);
-							break;
+					try {
+						final CMSSignedData cmsSignedData = new CMSSignedData(signBytes);
+						final SignerInformationStore signerInformationStore = cmsSignedData.getSignerInfos();
+						final List<SignerInformation> listSignersSignature = (List<SignerInformation>) signerInformationStore
+								.getSigners();
+						for (final SignerInformation si : listSignersSignature) {
+							final SignaturePolicy policy = analyzePolicy(si);
+							if (policy != null) {
+								signDetails.setPolicy(policy);
+								break;
+							}
 						}
+					} catch (final Exception e) {
+						LOGGER.severe("No se ha podido obtener la informacion de la politica correctamente: " + e); //$NON-NLS-1$
 					}
 				}
 

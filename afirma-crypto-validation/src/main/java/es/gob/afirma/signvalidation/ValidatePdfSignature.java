@@ -116,17 +116,6 @@ public final class ValidatePdfSignature extends SignValider {
 			return validityList;
 		}
 
-		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
-
-		for (final String name : signNames) {
-			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, false);
-			for (final SignValidity sv : validityListSign) {
-				if (!validityList.contains(sv)) {
-					validityList.add(sv);
-				}
-			}
-		}
-
 		// COMPROBACION DE CAMBIOS EN LOS FORMULARIOS PDF
 
 		final String allowSignModifiedFormProp = params.getProperty(PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM);
@@ -178,6 +167,18 @@ public final class ValidatePdfSignature extends SignValider {
 						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, validity.getError());
 					}
 					validityList.add(validity);
+				}
+			}
+		}
+
+		// Validacion individual de firmas
+		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
+
+		for (final String name : signNames) {
+			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, true);
+			for (final SignValidity sv : validityListSign) {
+				if (!validityList.contains(sv)) {
+					validityList.add(sv);
 				}
 			}
 		}
