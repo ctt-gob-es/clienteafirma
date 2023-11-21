@@ -68,6 +68,8 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
+import es.gob.afirma.signvalidation.SignValider;
+import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
@@ -595,8 +597,23 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
-    	final List<SignValidity> validityList = new ArrayList<SignValidity>();
-    	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null));
+    	List<SignValidity> validityList = new ArrayList<SignValidity>();
+    	List<SignValidity> validityListResult = new ArrayList<SignValidity>();
+    	final SignValider sv = SignValiderFactory.getSignValider(signature);
+        if (sv != null) {
+        	try {
+        		validityListResult = sv.validate(signature);
+        	}
+        	catch (final Exception e) {
+        		LOGGER.log(Level.SEVERE, "No se ha podido validar el documento correctamente", e); //$NON-NLS-1$
+			}
+        }
+        final SignValidity signValidity = validityListResult.get(0);
+        if (signValidity != null && (SIGN_DETAIL_TYPE.KO.equals(signValidity.getValidity()) || SIGN_DETAIL_TYPE.UNKNOWN.equals(signValidity.getValidity()))) {
+        	validityList = validityListResult;
+        } else {
+        	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null));
+        }
 
 		final JPanel newPanel = new SignDetailPanel(this, signature, signConfig, signingCert,
 				validityList, null);

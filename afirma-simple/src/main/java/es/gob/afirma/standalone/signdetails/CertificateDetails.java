@@ -28,7 +28,7 @@ public class CertificateDetails {
 		String validationMessage;
 		try {
 			x509Cert.checkValidity();
-			validationMessage = "OK"; //$NON-NLS-1$
+			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.40"); //$NON-NLS-1$
 		}
 		catch (final CertificateExpiredException e) {
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.2"); //$NON-NLS-1$

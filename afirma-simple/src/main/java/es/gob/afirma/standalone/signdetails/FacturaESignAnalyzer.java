@@ -2,10 +2,13 @@ package es.gob.afirma.standalone.signdetails;
 
 import java.io.ByteArrayInputStream;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -174,6 +177,10 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 						"Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
 			}
 
+			// SIGNING TIME
+			final Date signingTime = obtainSigningTime(qualifyingProps, namespaceUri);
+			xadesSignDetails.setSigningTime(signingTime);
+
 			// FIRMANTE
 			buildCertDetails(qualifyingProps.getElementsByTagNameNS(namespaceUri, "X509Data").item(0), //$NON-NLS-1$
 					xadesSignDetails.getSigners());
@@ -327,6 +334,12 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 
     }
 
+    /**
+     * Obtiene los datos sobre los roles.
+     * @param signerRole Elemento con los datos.
+     * @param namespaceUri URI del namespace.
+     * @return Array con los roles.
+     */
     private static String[] getClaimedRoleMetadata(final Element signerRole, final String namespaceUri) {
     	String [] result = null;
     	final NodeList claimedRolesNode = signerRole
@@ -340,6 +353,30 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 			}
     	}
     	return result;
+    }
+
+    /**
+     * Se obtiene la fecha y hora de firma.
+     * @param qualProps Elemento QualifyingProperties.
+     * @param namespace URL del namespace.
+     * @return Fecha y hora de firma.
+     */
+    private static Date obtainSigningTime(final Element qualProps, final String namespace) {
+    	final Element signingTimeElement = (Element) qualProps.getElementsByTagNameNS(namespace, "SigningTime").item(0); //$NON-NLS-1$
+    	if (signingTimeElement != null) {
+    		try {
+    			return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse( //$NON-NLS-1$
+    					signingTimeElement.getTextContent()
+    					);
+    		}
+    		catch (final Exception e) {
+    			LOGGER.log(Level.WARNING, "No se ha podido recuperar la fecha de firma", e); //$NON-NLS-1$
+    		}
+    	}
+    	else {
+    		LOGGER.info("No se ha encontrado la hora de firma de una firma"); //$NON-NLS-1$
+    	}
+    	return null;
     }
 
 

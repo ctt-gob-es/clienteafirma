@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.signdetails;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +20,7 @@ public class SignDetails {
 	public static final AdESPolicy POLICY_XADES_AGE_1_9;
 	public static final AdESPolicy POLICY_PADES_AGE_1_9;
 
+	protected Date signingTime;
 	protected String signProfile;
 	protected String algorithm;
 	protected SignaturePolicy policy;
@@ -124,6 +126,12 @@ public class SignDetails {
 	}
 	public void setSigners(final List<CertificateDetails> signers) {
 		this.signers = signers;
+	}
+	public Date getSigningTime() {
+		return this.signingTime;
+	}
+	public void setSigningTime(final Date signingTime) {
+		this.signingTime = signingTime;
 	}
 
 }

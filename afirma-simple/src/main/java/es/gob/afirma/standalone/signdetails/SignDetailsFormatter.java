@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.signdetails;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class SignDetailsFormatter {
 		for (int i = 0 ; i < signDetailsParent.size() ; i++) {
 			for (int j = 0 ; j < signDetailsParent.get(i).getSigners().size() ; j++) {
 				final String validation = (String) signDetailsParent.get(i).getSigners().get(j).getValidityResult().get("Validacion"); //$NON-NLS-1$
-				if (!"OK".equals(validation)) { //$NON-NLS-1$
+				if (!SimpleAfirmaMessages.getString("ValidationInfoDialog.40").equals(validation)) { //$NON-NLS-1$
 					if (!isULAdded) {
 						result += "<ul>"; //$NON-NLS-1$
 						isULAdded = true;
@@ -145,12 +146,20 @@ public class SignDetailsFormatter {
 		String result = ""; //$NON-NLS-1$
 		for (int i = 0; i < details.size() ; i++) {
 			final SignDetails detail = details.get(i);
-			result += "<h1>Firma " + (i+1) + "</h1>";  //$NON-NLS-1$//$NON-NLS-2$
+			result += "<h1>Firma " + (i+1);  //$NON-NLS-1$
+			final String certName = detail.getSigners().get(0).getName();
+			if (certName != null && !certName.isEmpty()) {
+				result += " : " + certName; //$NON-NLS-1$
+			}
+			result += "</h1>"; //$NON-NLS-1$
 			result += "<div style=\"border:5px outset black;padding-left: 25px;\">"; //$NON-NLS-1$
 			if (!FacturaESignAnalyzer.FACTURAE.equals(signFormat)) {
 				result += "<p><b>Perfil de firma</b>: " + detail.getSignProfile() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			result += "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			if (detail.getSigningTime() != null) {
+				result += "<p><b>Fecha y hora de firma</b>: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(detail.getSigningTime()) + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			if (detail.getValidityResult() != null
 				&& !detail.getValidityResult().get(0).getValidity().equals(SIGN_DETAIL_TYPE.OK)) {
 					result += "<div><br><b>Resultado de la validacion</b> :<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
@@ -160,14 +169,14 @@ public class SignDetailsFormatter {
 					result += "</ul></div>"; //$NON-NLS-1$
 			}
 			if (detail.getPolicy() != null) {
-				result += "<div><p><b>Pol&iacute;tica de firma</b></p>" ; //$NON-NLS-1$
+				result += "<div><p><b>Pol&iacute;tica de firma: </b>" ; //$NON-NLS-1$
 
 				if (AOFacturaESigner.POLICY_FACTURAE_30.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
 					|| AOFacturaESigner.POLICY_FACTURAE_31.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
 					|| SignDetails.POLICY_XADES_AGE_1_9.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
 					|| SignDetails.POLICY_CADES_AGE_1_9.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
 					|| SignDetails.POLICY_PADES_AGE_1_9.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())){
-					result += ": " + detail.getPolicy().getName() ; //$NON-NLS-1$
+					result += detail.getPolicy().getName() + "</p>"; //$NON-NLS-1$
 				} else {
 					result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 					final String name = detail.getPolicy().getName();
@@ -190,7 +199,7 @@ public class SignDetailsFormatter {
 					if (polQual != null && !polQual.isEmpty()) {
 						result += "<li>Calificador: " + polQual + "</li>";//$NON-NLS-1$ //$NON-NLS-2$
 					}
-					result += "</ul>"; //$NON-NLS-1$
+					result += "</ul></p>"; //$NON-NLS-1$
 				}
 				result += "</div>"; //$NON-NLS-1$
 			}

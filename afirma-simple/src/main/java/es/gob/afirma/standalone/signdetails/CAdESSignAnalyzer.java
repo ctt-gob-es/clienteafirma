@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +15,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1GeneralizedTime;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1UTCTime;
 import org.spongycastle.asn1.cms.Attribute;
 import org.spongycastle.asn1.cms.AttributeTable;
 import org.spongycastle.asn1.cms.CMSAttributes;
@@ -149,6 +155,13 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 			}
 		}
 
+		// Signing time
+		final Attribute signingTime = signedAttributes.get(CMSAttributes.signingTime);
+		if (signingTime != null) {
+			final Date signingTimeDate = parseSigningTime(signingTime);
+			cadesSignDetails.setSigningTime(signingTimeDate);
+		}
+
 		// Algoritmo
 		String algorithm = AOSignConstants.getDigestAlgorithmName(signer.getDigestAlgorithmID().getAlgorithm().toString());
 		algorithm = SIGN_ALGOS_URI.get(algorithm);
@@ -200,6 +213,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 
 		final X509Certificate x509Cert = (X509Certificate) certFactory
 				.generateCertificate(new ByteArrayInputStream(certIt.next().getEncoded()));
+
 
 		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
 		cadesSignDetails.getSigners().add(certDetails);
@@ -261,6 +275,40 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 				signDetails.setPolicy(new SignaturePolicy("", newPolicy)); //$NON-NLS-1$
 			}
 		}
+    }
+
+    /**
+     * Transforma el atributo con los datos sobre el signingTime en Date.
+     * @param data Atributo con los datos sobre la fecha y hora de la firma.
+     * @return Fecha y hora de la firma formateada como Date.
+     */
+    private static Date parseSigningTime(final Attribute data) {
+    	Date result = null;
+        final ASN1Set time = data.getAttrValues();
+        final ASN1Encodable timeObject = time.getObjectAt(0);
+        if (timeObject == null) {
+        	LOGGER.severe("El objeto no contiene una fecha"); //$NON-NLS-1$
+        }
+        else if (timeObject instanceof ASN1GeneralizedTime) {
+        	try {
+        		result = ((ASN1GeneralizedTime) timeObject).getDate();
+        	}
+            catch (final ParseException ex) {
+                LOGGER.severe("No es posible convertir la fecha: " + ex); //$NON-NLS-1$
+            }
+        }
+        else if (timeObject instanceof ASN1UTCTime) {
+        	try {
+        		result = ((ASN1UTCTime) timeObject).getDate();
+        	}
+            catch (final ParseException ex) {
+                LOGGER.severe("No es posible convertir la fecha: " + ex); //$NON-NLS-1$
+            }
+        }
+        else {
+        	LOGGER.severe("Formato de fecha deconocido: " + timeObject.getClass().getName()); //$NON-NLS-1$
+        }
+        return result;
     }
 
 }

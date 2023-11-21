@@ -172,6 +172,11 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 			throw e;
 		}
 
+		// Signing time
+		if (pkcs7.getSignDate() != null) {
+			padesSignDetails.setSigningTime(pkcs7.getSignDate().getTime());
+		}
+
 		// Obtenemos el algoritmo de firma
 		final String digestAlgorithm = pkcs7.getDigestAlgorithm();
 		if (digestAlgorithm != null) {
