@@ -359,7 +359,7 @@ public class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public final String showCertificateSelectionDialog(final Object parentComponent,
+	public String showCertificateSelectionDialog(final Object parentComponent,
     												   final KeyStoreDialogManager ksdm) {
 
     	final Component parent = parentComponent instanceof Component ? (Component) parentComponent : null;

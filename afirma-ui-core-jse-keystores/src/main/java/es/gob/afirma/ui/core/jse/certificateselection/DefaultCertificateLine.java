@@ -17,7 +17,6 @@ import javax.swing.JLabel;
 
 import es.gob.afirma.core.keystores.KeyUsage;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Platform;
 
 class DefaultCertificateLine extends CertificateLine {
 
@@ -128,15 +127,11 @@ class DefaultCertificateLine extends CertificateLine {
     	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
     	this.propertiesLink.setFont(font.deriveFont(attributes));
 
-		// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
-		// inicia su importacion
-		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			font = DETAILS_FONT;
-			attributes = font.getAttributes();
-			attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-			this.propertiesLink.setFont(font.deriveFont(attributes));
-			add(this.propertiesLink, c);
-		}
+    	font = DETAILS_FONT;
+    	attributes = font.getAttributes();
+    	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+    	this.propertiesLink.setFont(font.deriveFont(attributes));
+    	add(this.propertiesLink, c);
 
 		final String subjectCn = AOUtil.getCN(getCertificate());
 		final String validityText = CertificateUtils.isExpired(getCertificate()) ?

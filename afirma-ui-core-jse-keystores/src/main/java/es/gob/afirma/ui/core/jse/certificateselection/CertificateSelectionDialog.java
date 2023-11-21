@@ -114,6 +114,15 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
 	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
 	public String showDialog() throws  CertificatesNotFoundException {
+		return showDialog(true);
+	}
+
+	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	 * @return Alias del certificado seleccionado o {@code null} si el usuario
+	 * cancela el di&aacute;logo o cierra sin seleccionar.
+	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
+	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
+	public String showDialog(final boolean alwaysOnTop) throws  CertificatesNotFoundException {
 
 		String title = CertificateSelectionDialogMessages.getString(
 				"CertificateSelectionDialog.0", this.currentKeyStoreTypeName); //$NON-NLS-1$
@@ -131,7 +140,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		this.certDialog.setBackground(Color.WHITE);
 		this.certDialog.setModal(true);
-		this.certDialog.setAlwaysOnTop(true);
+		this.certDialog.setAlwaysOnTop(alwaysOnTop);
 
 		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
 			this.optionPane,
@@ -277,7 +286,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			if (o1 == null && o2 == null) {
 				return 0;
 			}
-			else if (o1 == null) {
+			if (o1 == null) {
 				return 1;
 			}
 			else if (o2 == null) {

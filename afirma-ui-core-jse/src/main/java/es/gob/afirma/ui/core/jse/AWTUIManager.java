@@ -9,6 +9,7 @@
 
 package es.gob.afirma.ui.core.jse;
 
+import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -16,14 +17,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.GenericFileFilter;
+import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
@@ -214,4 +221,95 @@ public final class AWTUIManager extends JSEUIManager {
 
         return files;
     }
+
+    /** {@inheritDoc} */
+    @Override
+	public String showCertificateSelectionDialog(final Object parentComponent,
+    												   final KeyStoreDialogManager ksdm) {
+
+    	final Component parent = parentComponent instanceof Component ? (Component) parentComponent : null;
+
+    	try {
+    		final Class<?> csdClass = Class.forName(
+				"es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog" //$NON-NLS-1$
+    		);
+    		final Constructor<?> csdConstructor = csdClass.getConstructor(
+				Component.class,
+				KeyStoreDialogManager.class
+			);
+    		final Object csd =  csdConstructor.newInstance(parent, ksdm);
+    		final Method showDialogMethod = csdClass.getMethod("showDialog", Boolean.TYPE); //$NON-NLS-1$
+
+    		// Si tenemos un componente padre sobre el que mostrarnos, no es necesario forzar que
+    		// se muestre arriba el dialogo
+    		final Object result = showDialogMethod.invoke(csd, Boolean.FALSE);
+    		focusApplication();
+
+
+    		return result instanceof String ? (String) result : null;
+    	}
+    	catch (final InvocationTargetException e) {
+    		LOGGER.severe("Se genero un error en el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
+    		if (e.getCause() instanceof RuntimeException) {
+    			throw (RuntimeException) e.getCause();
+    		}
+    		throw new IllegalStateException(
+				"No se encontraron certificados en el almacen o se produjo un error durante la extraccion del certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
+			);
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion: " + e); //$NON-NLS-1$
+    		throw new IllegalStateException(
+				"No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion u ocurrio un error durante su ejecucion: " + e, e //$NON-NLS-1$
+			);
+    	}
+    }
+
+	/** Coge el foco del sistema en macOS. En el resto de sistemas no hace nada. */
+	private static void focusApplication() {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			final String scriptCode = "tell me to activate"; //$NON-NLS-1$
+			try {
+				runAppleScript(scriptCode);
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Fallo cogiendo el foco en macOS: " + e); //$NON-NLS-1$
+			}
+		}
+	}
+
+	/**
+	 * Ejecuta el script.
+	 * @return Texto devuelto por el script o {@code null} si no se devolvi&oacute; nada.
+	 * @throws IOException Cuando falla la ejecuci&oacute;n del script.
+	 * @throws InterruptedException Cuando finaliza inesperadamente la ejecuci&oacute;n del script.
+	 */
+	private static String runAppleScript(final String script) throws IOException, InterruptedException {
+
+		final List<String> params = new ArrayList<>();
+		params.add("/usr/bin/osascript"); //$NON-NLS-1$
+		params.add("-e"); //$NON-NLS-1$
+		params.add(script);
+
+		LOGGER.fine("Ejecutando apple script: " + script); //$NON-NLS-1$
+
+		final ProcessBuilder processBuilder = new ProcessBuilder(params);
+		final Process process = processBuilder.start();
+		final int exitValue = process.waitFor();
+
+		if (exitValue != 0) {
+			byte[] errorOutput;
+			try (final InputStream errorStream = process.getErrorStream()) {
+				errorOutput = AOUtil.getDataFromInputStream(errorStream);
+			}
+			LOGGER.warning("Salida de error: " + (errorOutput != null ? new String(errorOutput) : "")); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IOException("La ejecucion del script devolvio el codigo de finalizacion: " + exitValue); //$NON-NLS-1$
+		}
+
+		byte[] output;
+		try (final InputStream inputStream = process.getInputStream()) {
+			output = AOUtil.getDataFromInputStream(inputStream);
+		}
+		return output != null ? new String(output, "utf-8") : null; //$NON-NLS-1$
+	}
 }

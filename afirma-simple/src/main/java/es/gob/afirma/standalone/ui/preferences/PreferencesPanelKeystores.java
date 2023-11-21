@@ -95,7 +95,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 	private final JCheckBox skipAuthCertDnie = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.32")); //$NON-NLS-1$
 
-	static final String[] EXTS_PKCS12 = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
+	static final String[] EXTS_PKCS12 = { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final String EXTS_DESC_PKCS12 = " (*.p12, *.pfx)"; //$NON-NLS-1$
 
@@ -283,7 +283,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 						false,
 						true
 					);
-					csd.showDialog();
+					csd.showDialog(false);
 				} catch (final AOCancelledOperationException acoe) {
 						return;
 				} catch (final Exception kse) {
@@ -1045,7 +1045,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				new MultipleCertificateFilter(filters.toArray(new CertificateFilter[0]))
 			);
     	}
-		else if (filters.size() == 1) {
+		if (filters.size() == 1) {
     		return filters;
     	}
     	return null;
