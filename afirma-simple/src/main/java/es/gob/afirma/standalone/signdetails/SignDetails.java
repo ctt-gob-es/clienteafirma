@@ -29,11 +29,10 @@ public class SignDetails {
 	protected String dataLocation;
 	protected List<SignValidity> validityResult;
 	protected List<DataObjectFormat> dataObjectFormats;
-	protected List<CertificateDetails> signers;
+	protected CertificateDetails signer;
 
 	public SignDetails() {
 		this.metadata = new HashMap<String, String>();
-		this.signers = new ArrayList<CertificateDetails>();
 		this.dataObjectFormats = new ArrayList<DataObjectFormat>();
 		this.validityResult = new ArrayList<SignValidity>();
 	}
@@ -121,11 +120,11 @@ public class SignDetails {
 	public void setDataObjectFormats(final List<DataObjectFormat> dataObjectFormats) {
 		this.dataObjectFormats = dataObjectFormats;
 	}
-	public List<CertificateDetails> getSigners() {
-		return this.signers;
+	public CertificateDetails getSigner() {
+		return this.signer;
 	}
-	public void setSigners(final List<CertificateDetails> signers) {
-		this.signers = signers;
+	public void setSigner(final CertificateDetails signer) {
+		this.signer = signer;
 	}
 	public Date getSigningTime() {
 		return this.signingTime;

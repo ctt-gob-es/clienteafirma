@@ -192,9 +192,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 
 		// Detalles del certificado
 		final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
-		final List <CertificateDetails> certDetailsList = new ArrayList<CertificateDetails>();
-		certDetailsList.add(certDetails);
-		padesSignDetails.setSigners(certDetailsList);
+		padesSignDetails.setSigner(certDetails);
 
 		// Metadatos
 		final Map<String, String> metadataMap = new HashMap<String, String>();
@@ -212,7 +210,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		}
 		padesSignDetails.setMetadata(metadataMap);
 
-		//Validamos la firma
+		// Validamos la firma
 		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af, signProfile, false);
 		padesSignDetails.setValidityResult(listValidity);
 

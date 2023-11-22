@@ -93,7 +93,7 @@ public final class ValidateBinarySignature extends SignValider {
     public static List<SignValidity> validate(final byte[] sign,
     		                            final byte[] data,
     		                            final boolean checkCertificates) throws IOException {
-    	final List<SignValidity> validityList = new ArrayList<SignValidity>();
+    	List<SignValidity> validityList = new ArrayList<SignValidity>();
     	if (sign == null) {
     		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
@@ -114,6 +114,8 @@ public final class ValidateBinarySignature extends SignValider {
 				checkCertificates,
 				validityList
 			);
+
+    		validityList = checkLongStandingValiditySign(validityList);
 	    }
     	catch (final CMSSignerDigestMismatchException e) {
     		// La firma no es una firma binaria valida
@@ -148,7 +150,7 @@ public final class ValidateBinarySignature extends SignValider {
     	return validityList;
     }
 
-    /** Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
+	/** Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
      * v&aacute;lida, lanza una excepci&oacute;n.
      * @param sign Firma que se desea validar.
      * @param data Datos para la comprobaci&oacute;n.
@@ -178,9 +180,22 @@ public final class ValidateBinarySignature extends SignValider {
 
         for (final Object si : s.getSignerInfos().getSigners()) {
         	final String signProfile = SignatureFormatDetectorPadesCades.resolveASN1Format(s, (SignerInformation) si);
+
         	final SignValidity validity = verifySign(si, store, certFactory, checkCertificates, signProfile);
         	signValidity.add(validity);
         }
+
+        String dataLocation;
+		if (s.getSignedContent() != null
+				&& s.getSignedContent().getContent() != null) {
+			dataLocation = ValidationMessages.getString("ValidationInfoDialog.1"); //$NON-NLS-1$
+		} else {
+			dataLocation = ValidationMessages.getString("ValidationInfoDialog.2"); //$NON-NLS-1$
+		}
+
+		if (ValidationMessages.getString("ValidationInfoDialog.2").equals(dataLocation)) { //$NON-NLS-1$
+			signValidity.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED));
+		}
 
     }
 
@@ -193,53 +208,48 @@ public final class ValidateBinarySignature extends SignValider {
      * @param signProfile Perfil de firma.
      * @return Validez de la firma.
      */
-    public static SignValidity verifySign(final Object si, final Store<X509CertificateHolder> store, final CertificateFactory certFactory, final boolean checkCertificates, final String signProfile) {
+    public static SignValidity verifySign(final Object si, final Store<X509CertificateHolder> store,
+    										final CertificateFactory certFactory, final boolean checkCertificates,
+    										final String signProfile) {
 
-    	try {
-    		final SignerInformation signer = (SignerInformation) si;
-			final Iterator<X509CertificateHolder> certIt = store.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
-	        final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
-	    		new ByteArrayInputStream(
-					certIt.next().getEncoded()
-				)
-			);
-	    	if (checkCertificates) {
-	    		cert.checkValidity();
+			try {
+				final SignerInformation signer = (SignerInformation) si;
+				final Iterator<X509CertificateHolder> certIt = store
+						.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
+				final X509Certificate cert = (X509Certificate) certFactory
+						.generateCertificate(new ByteArrayInputStream(certIt.next().getEncoded()));
+				if (checkCertificates) {
+					cert.checkValidity();
 
-		        if (!signer.verify(new SignerInformationVerifier(
-		        	new	DefaultCMSSignatureAlgorithmNameGenerator(),
-		        	new DefaultSignatureAlgorithmIdentifierFinder(),
-		    		new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
-		    		new BcDigestCalculatorProvider()
-				))) {
-		        	throw new CMSException("Firma no valida"); //$NON-NLS-1$
-		        }
-	    	}
-    	}
-    	catch (final CertificateExpiredException e) {
-    		// Certificado caducado
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e);
-        }
-    	catch (final CertificateNotYetValidException e) {
-    		// Certificado aun no valido
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e);
-        }
-    	catch (final CMSSignerDigestMismatchException e) {
-    		// La firma no es una firma binaria valida
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e);
-    	}
-    	catch (final Exception e) {
-            // La firma no es una firma binaria valida
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CANT_VALIDATE_CERT, e);
-        }
+					if (!signer.verify(new SignerInformationVerifier(new DefaultCMSSignatureAlgorithmNameGenerator(),
+							new DefaultSignatureAlgorithmIdentifierFinder(),
+							new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
+							new BcDigestCalculatorProvider()))) {
+						throw new CMSException("Firma no valida"); //$NON-NLS-1$
+					}
+				}
+			} catch (final CertificateExpiredException e) {
+				// Certificado caducado
+				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e);
+			} catch (final CertificateNotYetValidException e) {
+				// Certificado aun no valido
+				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e);
+			} catch (final CMSSignerDigestMismatchException e) {
+				// La firma no es una firma binaria valida
+				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e);
+			} catch (final Exception e) {
+				// La firma no es una firma binaria valida
+				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CANT_VALIDATE_CERT, e);
+			}
 
-		if (!ISignatureFormatDetector.FORMAT_CADES_BES.equals(signProfile)
-				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
-				&& !ISignatureFormatDetector.FORMAT_CADES_B_LEVEL.equals(signProfile)
-				&& !ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL.equals(signProfile)
-				&& !ISignatureFormatDetector.FORMAT_CADES_EPES.equals(signProfile)) {
+			if (!ISignatureFormatDetector.FORMAT_CADES_BES.equals(signProfile)
+					&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+					&& !ISignatureFormatDetector.FORMAT_CADES_B_LEVEL.equals(signProfile)
+					&& !ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL.equals(signProfile)
+					&& !ISignatureFormatDetector.FORMAT_CMS.equals(signProfile)
+					&& !ISignatureFormatDetector.FORMAT_CADES_EPES.equals(signProfile)) {
 				return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED);
-		}
+			}
 
     	return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
     }

@@ -135,7 +135,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	 * @return Detalles de la firma.
 	 * @throws AOInvalidFormatException Error formateando datos.
 	 */
-	private SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidFormatException {
+	private static SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidFormatException {
 		final SignDetails xadesSignDetails = new SignDetails();
 
 		xadesSignDetails.setSignProfile(signProfile);
@@ -150,9 +150,9 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			throw new AOInvalidFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
 		}
 
-		// ARBOL DE FIRMANTES
-		buildCertDetails(signElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Data").item(0), //$NON-NLS-1$
-				xadesSignDetails.getSigners());
+		// FIRMANTE
+		final CertificateDetails cert = buildCertDetails(signElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Data").item(0)); //$NON-NLS-1$
+		xadesSignDetails.setSigner(cert);
 
 		// QUALIFYING PROPERTIES
 		final NodeList qualifyingPropsNodeList = signElement
@@ -178,10 +178,6 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			// SIGNING TIME
 			final Date signingTime = obtainSigningTime(qualifyingProps, namespaceUri);
 			xadesSignDetails.setSigningTime(signingTime);
-
-			// FIRMANTE
-			buildCertDetails(qualifyingProps.getElementsByTagNameNS(namespaceUri, "X509Data").item(0), //$NON-NLS-1$
-					xadesSignDetails.getSigners());
 
 			// INFORMACION DECLARADA DE DATOS
 			final NodeList signedDataObjectPropertiesList = qualifyingProps.getElementsByTagNameNS(namespaceUri,
@@ -295,19 +291,16 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	/**
 	 * Construye los detalles del certificado indicado.
 	 * @param dataCertNode Datos del certificado.
-	 * @param signersList Lista de firmantes.
+	 * @return Detalles del certificado.
 	 */
-	private void buildCertDetails(final Node dataCertNode, final List<CertificateDetails> signersList) {
+	private static CertificateDetails buildCertDetails(final Node dataCertNode) {
 		if (dataCertNode != null) {
 			final Element certElement = (Element) ((Element) dataCertNode).getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_X509_CERTIFICATE).item(0);
 			final X509Certificate cert = Utils.getCertificate(certElement);
 			final CertificateDetails certDetails = new CertificateDetails(cert);
-			final Node childCertElement = certElement.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Data").item(0); //$NON-NLS-1$
-			if (childCertElement != null) {
-				buildCertDetails(childCertElement, certDetails.getSubCertDetails());
-			}
-			signersList.add(certDetails);
+			return certDetails;
 		}
+		return null;
 	}
 
 	/**

@@ -75,7 +75,7 @@ public final class ValidateXMLSignature extends SignValider {
     @Override
 	public List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) {
 
-    	final List<SignValidity> result = new ArrayList<SignValidity>();
+    	List<SignValidity> result = new ArrayList<SignValidity>();
         final Document doc;
         try {
             doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
@@ -177,6 +177,8 @@ public final class ValidateXMLSignature extends SignValider {
         	LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
         	result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
         }
+
+        result = checkLongStandingValiditySign(result);
 
         if (result.size() == 0) {
         	result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));

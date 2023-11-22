@@ -97,7 +97,7 @@ public final class ValidatePdfSignature extends SignValider {
 	@Override
 	public List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
 
-		final List<SignValidity> validityList = new ArrayList<SignValidity>();
+		List<SignValidity> validityList = new ArrayList<SignValidity>();
 		AcroFields af;
 		PdfReader reader;
 		try {
@@ -182,6 +182,8 @@ public final class ValidatePdfSignature extends SignValider {
 				}
 			}
 		}
+
+		validityList = checkLongStandingValiditySign(validityList);
 
 		if (validityList.size() == 0) {
 			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));

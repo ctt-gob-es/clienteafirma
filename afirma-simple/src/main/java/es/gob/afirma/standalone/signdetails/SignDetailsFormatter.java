@@ -71,7 +71,7 @@ public class SignDetailsFormatter {
 		if (dataLocation != null) {
 			result += "<p><b>Localizaci&oacute;n de los datos: </b>" + dataLocation + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (signDetailsParent.get(0).getDataObjectFormats() != null && signDetailsParent.get(0).getDataObjectFormats().size() > 0) {
+		if (signDetailsParent.size() > 0 && signDetailsParent.get(0).getDataObjectFormats() != null && signDetailsParent.get(0).getDataObjectFormats().size() > 0) {
 			result += "<div><p><b>Informaci&oacute;n sobre datos firmados:</b></p>"; //$NON-NLS-1$
 			result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 			for (int i = 0 ; i < signDetailsParent.get(0).getDataObjectFormats().size() ; i++) {
@@ -106,6 +106,7 @@ public class SignDetailsFormatter {
 					|| VALIDITY_ERROR.MODIFIED_DOCUMENT.equals(generalValidation.get(k).getError())
 					|| VALIDITY_ERROR.OVERLAPPING_SIGNATURE.equals(generalValidation.get(k).getError())
 					|| VALIDITY_ERROR.SUSPECTED_SIGNATURE.equals(generalValidation.get(k).getError())
+					|| VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED.equals(generalValidation.get(k).getError())
 				)) {
 				if (!isULAdded) {
 					result += "<ul>"; //$NON-NLS-1$
@@ -114,17 +115,16 @@ public class SignDetailsFormatter {
 				result += "<li>" + generalValidation.get(k) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		for (int i = 0 ; i < signDetailsParent.size() ; i++) {
-			for (int j = 0 ; j < signDetailsParent.get(i).getSigners().size() ; j++) {
-				final String validation = (String) signDetailsParent.get(i).getSigners().get(j).getValidityResult().get("Validacion"); //$NON-NLS-1$
-				if (!SimpleAfirmaMessages.getString("ValidationInfoDialog.40").equals(validation)) { //$NON-NLS-1$
-					if (!isULAdded) {
-						result += "<ul>"; //$NON-NLS-1$
-						isULAdded = true;
-					}
-					result += "<li>Firma " + (i+1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (int i = 0; i < signDetailsParent.size(); i++) {
+			final String validation = (String) signDetailsParent.get(i).getSigner().getValidityResult().get("Validacion"); //$NON-NLS-1$
+			if (!SimpleAfirmaMessages.getString("ValidationInfoDialog.40").equals(validation)) { //$NON-NLS-1$
+				if (!isULAdded) {
+					result += "<ul>"; //$NON-NLS-1$
+					isULAdded = true;
 				}
+				result += "<li>Firma " + (i + 1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
+
 			for (int m = 0 ; m < signDetailsParent.get(i).getValidityResult().size() ; m++) {
 				//Se evitan asi errores duplicados de certificados
 				if (signDetailsParent.get(i).getValidityResult().get(m).getError() != null
@@ -157,7 +157,7 @@ public class SignDetailsFormatter {
 		for (int i = 0; i < details.size() ; i++) {
 			final SignDetails detail = details.get(i);
 			result += "<h1>Firma " + (i+1);  //$NON-NLS-1$
-			final String certName = detail.getSigners().get(0).getName();
+			final String certName = detail.getSigner().getName();
 			if (certName != null && !certName.isEmpty()) {
 				result += " : " + certName; //$NON-NLS-1$
 			}
@@ -268,7 +268,7 @@ public class SignDetailsFormatter {
 				result += "</ul></div>"; //$NON-NLS-1$
 			}
 
-			result += parseCertificatesToHTML(detail.getSigners());
+			result += parseCertificatesToHTML(detail.getSigner());
 
 			result += "</ul></div>"; //$NON-NLS-1$
 		}
@@ -277,27 +277,22 @@ public class SignDetailsFormatter {
 
 	/**
 	 * Transforma los certificados a HTML.
-	 * @param certsDetails Certificados a transformar.
+	 * @param certDetail Certificado a transformar.
 	 * @return Cadena con los detalles de los certificados en HTML.
 	 */
-	private static String parseCertificatesToHTML(final List <CertificateDetails> certsDetails) {
-		if (certsDetails.size() > 0) {
-			String result = "<br><b>Certificado:</b><ul>"; //$NON-NLS-1$
-			for (final CertificateDetails cert : certsDetails) {
-				result += "<li>Nombre: " + cert.getName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-						+ "<li>Emisor: " + cert.getIssuerName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-						+ "<li>Fecha de caducidad: " + cert.getExpirationDate() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
-				if (cert.getValidityResult() != null) {
-					result += "<li>Resultado de la validacion :<ul>"; //$NON-NLS-1$
-					for(final Object key : cert.getValidityResult().keySet()) {
-					   result += "<li>" + key + ": " + cert.getValidityResult().getProperty((String) key) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					}
-					result += "</ul></li>"; //$NON-NLS-1$
-				}
+	private static String parseCertificatesToHTML(final CertificateDetails certDetail) {
+		String result = "<br><b>Certificado:</b><ul>"; //$NON-NLS-1$
+		result += "<li>Nombre: " + certDetail.getName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "<li>Emisor: " + certDetail.getIssuerName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "<li>Fecha de caducidad: " + certDetail.getExpirationDate() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+		if (certDetail.getValidityResult() != null) {
+			result += "<li>Resultado de la validacion :<ul>"; //$NON-NLS-1$
+			for (final Object key : certDetail.getValidityResult().keySet()) {
+				result += "<li>" + key + ": " + certDetail.getValidityResult().getProperty((String) key) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-			return result;
+			result += "</ul></li>"; //$NON-NLS-1$
 		}
-		return ""; //$NON-NLS-1$
+		return result;
 	}
 
 	/**

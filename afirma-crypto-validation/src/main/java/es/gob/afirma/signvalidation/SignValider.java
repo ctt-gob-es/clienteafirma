@@ -10,10 +10,13 @@
 package es.gob.afirma.signvalidation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 
 /** Valida una firma del tipo del validador instanciado.
  * @author Sergio Mart&iacute;nez Rico. */
@@ -69,4 +72,41 @@ public abstract class SignValider {
      * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
     public abstract List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
+
+    /**
+     * Reordena la lista de validaciones para que en caso de que una firma sea logeva y solo se encuentren errores de
+     * certificados caducados, se le de prioridad a la validación de tipo UNKNOWN.
+     * @param validityList Lista de validaciones.
+     * @return Lista de validaciones reordenada.
+     */
+    protected static List<SignValidity> checkLongStandingValiditySign(final List<SignValidity> validityList) {
+		final List<SignValidity> validityListResult = new ArrayList<SignValidity>(validityList);
+		int certKOIndex = -1;
+		SignValidity certKOsignValidity = null;
+		int longStandingWarningIndex = -1;
+		SignValidity notCheckedValidity = null;
+		boolean isAnotherKOType = false;
+		for (int i = 0 ; i < validityList.size() ; i++) {
+			if (SIGN_DETAIL_TYPE.KO.equals(validityList.get(i).getValidity())) {
+				if(VALIDITY_ERROR.CERTIFICATE_EXPIRED.equals(validityList.get(i).getError())) {
+					certKOIndex = i;
+					certKOsignValidity = validityList.get(i);
+				} else {
+					isAnotherKOType = true;
+				}
+			} else if (SIGN_DETAIL_TYPE.UNKNOWN.equals(validityList.get(i).getValidity())
+						&& VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED.equals(validityList.get(i).getError())) {
+				longStandingWarningIndex = i;
+				notCheckedValidity = validityList.get(i);
+			}
+		}
+
+		// Si se ha encontrado solo errores de certificado y un error de atributos longevos, se le dara prioridad a este ultimo
+		if (!isAnotherKOType && certKOIndex != -1 && longStandingWarningIndex != -1) {
+			validityListResult.set(0,validityList.get(longStandingWarningIndex));
+			validityListResult.set(longStandingWarningIndex, validityList.get(certKOIndex));
+		}
+
+		return validityListResult;
+	}
 }
