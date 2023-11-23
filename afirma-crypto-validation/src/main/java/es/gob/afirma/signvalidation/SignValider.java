@@ -83,7 +83,6 @@ public abstract class SignValider {
 		final List<SignValidity> validityListResult = new ArrayList<SignValidity>(validityList);
 		int certKOIndex = -1;
 		int longStandingWarningIndex = -1;
-		int noDataWarningIndex = -1;
 		boolean isAnotherKOType = false;
 		for (int i = 0 ; i < validityList.size() ; i++) {
 			if (SIGN_DETAIL_TYPE.KO.equals(validityList.get(i).getValidity())) {
@@ -95,23 +94,14 @@ public abstract class SignValider {
 			} else if (SIGN_DETAIL_TYPE.UNKNOWN.equals(validityList.get(i).getValidity())
 						&& VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED.equals(validityList.get(i).getError())) {
 				longStandingWarningIndex = i;
-			} else if (SIGN_DETAIL_TYPE.UNKNOWN.equals(validityList.get(i).getValidity())
-					&& VALIDITY_ERROR.NO_DATA.equals(validityList.get(i).getError())) {
-				noDataWarningIndex = i;
 			}
 		}
 
 		// Si se ha encontrado solo errores de certificado y un error de atributos longevos, se le dara prioridad a este ultimo
 		if (!isAnotherKOType && certKOIndex != -1 && longStandingWarningIndex != -1) {
-			// Si dentro este caso, se encuenra un error de datos no encontrados, se le dara prioridad.
-			SignValidity v = validityListResult.get(0);
+			final SignValidity v = validityListResult.get(0);
 			validityListResult.set(0, validityList.get(longStandingWarningIndex));
 			validityListResult.set(longStandingWarningIndex, v);
-			if (noDataWarningIndex != -1) {
-				v = validityListResult.get(0);
-				validityListResult.set(0, validityList.get(noDataWarningIndex));
-				validityListResult.set(noDataWarningIndex, v);
-			}
 		}
 
 		return validityListResult;
