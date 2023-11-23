@@ -42,8 +42,6 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.CAdESAttributes;
 import es.gob.afirma.signvalidation.CertHolderBySignerIdSelector;
 import es.gob.afirma.signvalidation.SignValidity;
-import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.signvalidation.SignatureFormatDetectorPadesCades;
 import es.gob.afirma.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -57,7 +55,6 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 	AOTreeModel signersTree;
 	private CMSSignedData cmsSignedData;
 	private Properties oidMimetypeProp;
-	private String dataLocation;
 
 	public static final Map<String, String> SIGN_ALGOS_URI;
 
@@ -119,13 +116,6 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 	private void createSignDetails(final byte [] data) throws Exception {
 
 		this.cmsSignedData = new CMSSignedData(data);
-
-		if (this.cmsSignedData.getSignedContent() != null
-				&& this.cmsSignedData.getSignedContent().getContent() != null) {
-			this.dataLocation = SimpleAfirmaMessages.getString("ValidationInfoDialog.21"); //$NON-NLS-1$
-		} else {
-			this.dataLocation = SimpleAfirmaMessages.getString("ValidationInfoDialog.22"); //$NON-NLS-1$
-		}
 
 		for (final Object si : this.cmsSignedData.getSignerInfos().getSigners()) {
 			final SignerInformation signer = (SignerInformation) si;
@@ -228,12 +218,10 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		cadesSignDetails.setSigner(certDetails);
 
 		// Validacion de firma
-        final SignValidity validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false, signProfile);
-        cadesSignDetails.getValidityResult().add(validity);
-
-		if (SimpleAfirmaMessages.getString("ValidationInfoDialog.22").equals(this.dataLocation)) { //$NON-NLS-1$
-			cadesSignDetails.getValidityResult().add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED));
-		}
+        final List<SignValidity> validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false, signProfile);
+        for (final SignValidity v : validity) {
+        	cadesSignDetails.getValidityResult().add(v);
+        }
 
 		this.signDetailsList.add(cadesSignDetails);
 

@@ -82,22 +82,18 @@ public abstract class SignValider {
     protected static List<SignValidity> checkLongStandingValiditySign(final List<SignValidity> validityList) {
 		final List<SignValidity> validityListResult = new ArrayList<SignValidity>(validityList);
 		int certKOIndex = -1;
-		SignValidity certKOsignValidity = null;
 		int longStandingWarningIndex = -1;
-		SignValidity notCheckedValidity = null;
 		boolean isAnotherKOType = false;
 		for (int i = 0 ; i < validityList.size() ; i++) {
 			if (SIGN_DETAIL_TYPE.KO.equals(validityList.get(i).getValidity())) {
 				if(VALIDITY_ERROR.CERTIFICATE_EXPIRED.equals(validityList.get(i).getError())) {
 					certKOIndex = i;
-					certKOsignValidity = validityList.get(i);
 				} else {
 					isAnotherKOType = true;
 				}
 			} else if (SIGN_DETAIL_TYPE.UNKNOWN.equals(validityList.get(i).getValidity())
 						&& VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED.equals(validityList.get(i).getError())) {
 				longStandingWarningIndex = i;
-				notCheckedValidity = validityList.get(i);
 			}
 		}
 

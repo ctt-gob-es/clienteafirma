@@ -107,6 +107,7 @@ public class SignDetailsFormatter {
 					|| VALIDITY_ERROR.OVERLAPPING_SIGNATURE.equals(generalValidation.get(k).getError())
 					|| VALIDITY_ERROR.SUSPECTED_SIGNATURE.equals(generalValidation.get(k).getError())
 					|| VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED.equals(generalValidation.get(k).getError())
+					|| VALIDITY_ERROR.NO_DATA.equals(generalValidation.get(k).getError())
 				)) {
 				if (!isULAdded) {
 					result += "<ul>"; //$NON-NLS-1$
