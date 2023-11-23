@@ -235,6 +235,8 @@ final class SignResultPanel extends JPanel {
                 if (validity.get(0).getError() != null) {
                     switch (validity.get(0).getError()) {
                     case NO_DATA: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
+                    case CANT_VALIDATE_EXTERNALLY_DETACHED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.39"); break; //$NON-NLS-1$
+                    case SIGN_PROFILE_NOT_CHECKED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.40"); break; //$NON-NLS-1$
                     case PDF_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.24"); break; //$NON-NLS-1$
                     case OOXML_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.25"); break; //$NON-NLS-1$
                     case ODF_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.26"); break; //$NON-NLS-1$

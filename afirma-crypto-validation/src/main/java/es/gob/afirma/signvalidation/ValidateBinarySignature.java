@@ -114,8 +114,6 @@ public final class ValidateBinarySignature extends SignValider {
 				checkCertificates,
 				validityList
 			);
-
-    		validityList = checkLongStandingValiditySign(validityList);
 	    }
     	catch (final CMSSignerDigestMismatchException e) {
     		// La firma no es una firma binaria valida
@@ -146,6 +144,8 @@ public final class ValidateBinarySignature extends SignValider {
 			);
     		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR));
 		}
+
+    	validityList = checkLongStandingValiditySign(validityList);
 
     	return validityList;
     }
@@ -186,18 +186,6 @@ public final class ValidateBinarySignature extends SignValider {
             	signValidity.add(v);
             }
         }
-
-        String dataLocation;
-		if (s.getSignedContent() != null
-				&& s.getSignedContent().getContent() != null) {
-			dataLocation = ValidationMessages.getString("ValidationInfoDialog.1"); //$NON-NLS-1$
-		} else {
-			dataLocation = ValidationMessages.getString("ValidationInfoDialog.2"); //$NON-NLS-1$
-		}
-
-		if (ValidationMessages.getString("ValidationInfoDialog.2").equals(dataLocation)) { //$NON-NLS-1$
-			signValidity.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED));
-		}
 
     }
 
