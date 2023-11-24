@@ -217,8 +217,10 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
 		cadesSignDetails.setSigner(certDetails);
 
+		final boolean signWithData = this.cmsSignedData.getSignedContent() != null;
+
 		// Validacion de firma
-        final List<SignValidity> validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false, signProfile);
+        final List<SignValidity> validity = ValidateBinarySignature.verifySign(signer, certsStore, certFactory, false, signProfile, signWithData);
         for (final SignValidity v : validity) {
         	cadesSignDetails.getValidityResult().add(v);
         }

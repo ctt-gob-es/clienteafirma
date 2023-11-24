@@ -108,23 +108,6 @@ public final class ValidateBinarySignature extends SignValider {
     	}
 
     	try {
-    		verifySignatures(
-				sign,
-				data != null ? data : new AOCAdESSigner().getData(sign),
-				checkCertificates,
-				validityList
-			);
-	    }
-    	catch (final CMSSignerDigestMismatchException e) {
-    		// La firma no es una firma binaria valida
-    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
-    	}
-    	catch (final Exception e) {
-            // La firma no es una firma binaria valida
-    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null, e));
-        }
-
-    	try {
 			if (data == null && signer.getData(sign) == null) {
 				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 					"Se ha pedido validar una firma explicita sin proporcionar los datos firmados" //$NON-NLS-1$
@@ -144,6 +127,23 @@ public final class ValidateBinarySignature extends SignValider {
 			);
     		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR));
 		}
+
+    	try {
+    		verifySignatures(
+				sign,
+				data != null ? data : new AOCAdESSigner().getData(sign),
+				checkCertificates,
+				validityList
+			);
+	    }
+    	catch (final CMSSignerDigestMismatchException e) {
+    		// La firma no es una firma binaria valida
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
+    	}
+    	catch (final Exception e) {
+            // La firma no es una firma binaria valida
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null, e));
+        }
 
     	validityList = checkLongStandingValiditySign(validityList);
 
@@ -176,12 +176,14 @@ public final class ValidateBinarySignature extends SignValider {
         }
         final Store<X509CertificateHolder> store = s.getCertificates();
 
+        final boolean signWithData = s.getSignedContent() != null;
+
         final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
         for (final Object si : s.getSignerInfos().getSigners()) {
         	final String signProfile = SignatureFormatDetectorPadesCades.resolveASN1Format(s, (SignerInformation) si);
 
-        	final List<SignValidity> validity = verifySign(si, store, certFactory, checkCertificates, signProfile);
+        	final List<SignValidity> validity = verifySign(si, store, certFactory, checkCertificates, signProfile, signWithData);
             for (final SignValidity v : validity) {
             	signValidity.add(v);
             }
@@ -196,16 +198,17 @@ public final class ValidateBinarySignature extends SignValider {
      * @param certFactory Factor&iacute;a de certificados.
      * @param checkCertificates Indica si se deben verificar certificados o no.
      * @param signProfile Perfil de firma.
+     * @param signWithData Indica si la firma contiene los datos o no.
      * @return Validez de la firma.
      */
     public static List<SignValidity> verifySign(final Object si, final Store<X509CertificateHolder> store,
     										final CertificateFactory certFactory, final boolean checkCertificates,
-    										final String signProfile) {
+    										final String signProfile, final boolean signWithData) {
 
     	final List<SignValidity> result = new ArrayList<SignValidity>();
-
+    	SignerInformation signer = null;
 		try {
-			final SignerInformation signer = (SignerInformation) si;
+			signer = (SignerInformation) si;
 			final Iterator<X509CertificateHolder> certIt = store
 					.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
 			final X509Certificate cert = (X509Certificate) certFactory
@@ -229,7 +232,9 @@ public final class ValidateBinarySignature extends SignValider {
 			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
 		} catch (final CMSSignerDigestMismatchException e) {
 			// La firma no es una firma binaria valida
-			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
+			if (signWithData) {
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
+			}
 		} catch (final Exception e) {
 			// La firma no es una firma binaria valida
 			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CANT_VALIDATE_CERT, e));

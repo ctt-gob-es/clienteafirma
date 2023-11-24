@@ -58,20 +58,25 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValider;
 import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
@@ -602,7 +607,20 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	final SignValider sv = SignValiderFactory.getSignValider(signature);
         if (sv != null) {
         	try {
-        		validityListResult = sv.validate(signature);
+        		if (sv instanceof ValidateBinarySignature) {
+        			try(final InputStream dataFileStream = new FileInputStream(signConfig.getDataFile())) {
+            	    	final AOSigner signer = new AOCAdESSigner();
+            	    	final byte [] dataFile = AOUtil.getDataFromInputStream(dataFileStream);
+            	    	if (signer.isSign(dataFile)) {
+            	    		final byte [] signedData = ObtainContentSignedData.obtainData(signature);
+            	    		validityListResult = ValidateBinarySignature.validate(signature, signedData);
+            	    	} else {
+            	    		validityListResult = ValidateBinarySignature.validate(signature, dataFile);
+            	    	}
+        			}
+        		} else {
+        			validityListResult = sv.validate(signature);
+        		}
         	}
         	catch (final Exception e) {
         		LOGGER.log(Level.SEVERE, "No se ha podido validar el documento correctamente", e); //$NON-NLS-1$
