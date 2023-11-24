@@ -185,7 +185,12 @@ public final class ValidateBinarySignature extends SignValider {
 
         	final List<SignValidity> validity = verifySign(si, store, certFactory, checkCertificates, signProfile, signWithData);
             for (final SignValidity v : validity) {
-            	signValidity.add(v);
+            	// Le damos prioridad a los KO
+            	if (SIGN_DETAIL_TYPE.KO.equals(v.getValidity())) {
+            		signValidity.add(0, v);
+            	} else {
+            		signValidity.add(v);
+            	}
             }
         }
 
