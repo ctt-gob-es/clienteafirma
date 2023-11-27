@@ -32,6 +32,7 @@ import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -173,6 +174,10 @@ public final class ValidateXMLSignature extends SignValider {
         		}
         	}
         }
+        catch (final XMLSignatureException xmle) {
+        	LOGGER.log(Level.WARNING, "La firma no esta formada correctamente: " + xmle, xmle); //$NON-NLS-1$
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.BAD_BUILD_SIGN, xmle));
+        }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
         	result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
@@ -233,7 +238,13 @@ public final class ValidateXMLSignature extends SignValider {
 					result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
 				}
 
-			} catch (final Exception e) {
+			}
+			catch (final XMLSignatureException xmle) {
+	        	LOGGER.log(Level.WARNING, "La firma no esta formada correctamente: " + xmle, xmle); //$NON-NLS-1$
+	        	validSign = false;
+	        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.BAD_BUILD_SIGN, xmle));
+	        }
+			catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
 				validSign = false;
 				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));

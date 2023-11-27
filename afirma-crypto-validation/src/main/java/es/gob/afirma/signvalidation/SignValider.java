@@ -106,4 +106,24 @@ public abstract class SignValider {
 
 		return validityListResult;
 	}
+
+    /**
+     * Ordena una lista a la que ya se le ha dado prioridad a validaciones incompletas
+     * para darle prioridad a validaciones KO pr encima de estas.
+     * @param validityList Lista con validaciones incompletas ya ordenadas.
+     * @return Lista con las prioridades KO e incompletas ordenadas.
+     */
+	protected static List<SignValidity> checkValidityKOPriority(final List<SignValidity> validityList) {
+		final List<SignValidity> signValidityResult = new ArrayList<SignValidity>();
+		for (final SignValidity sv : validityList) {
+			if (!signValidityResult.contains(sv)) {
+				if (SIGN_DETAIL_TYPE.KO.equals(sv.getValidity())) {
+					signValidityResult.add(0, sv);
+				} else {
+					signValidityResult.add(sv);
+				}
+			}
+		}
+		return signValidityResult;
+	}
 }

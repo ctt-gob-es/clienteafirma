@@ -145,6 +145,8 @@ public final class ValidateBinarySignature extends SignValider {
     		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null, e));
         }
 
+    	validityList = checkValidityKOPriority(validityList);
+
     	validityList = checkLongStandingValiditySign(validityList);
 
     	return validityList;
@@ -185,8 +187,8 @@ public final class ValidateBinarySignature extends SignValider {
 
         	final List<SignValidity> validity = verifySign(si, store, certFactory, checkCertificates, signProfile, signWithData);
             for (final SignValidity v : validity) {
-            	// Le damos prioridad a los KO
-            	if (SIGN_DETAIL_TYPE.KO.equals(v.getValidity())) {
+            	// Le damos prioridad a los desconocidos, mas tarde se le dara prioridad a los KO por encima de estos
+            	if (SIGN_DETAIL_TYPE.UNKNOWN.equals(v.getValidity())) {
             		signValidity.add(0, v);
             	} else {
             		signValidity.add(v);

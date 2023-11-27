@@ -258,7 +258,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Etiqueta de los nodos de sello de tiempo. */
-	private static final String TIMESTAMP_TAG = "Timestamp"; //$NON-NLS-1$
+	public static final String TIMESTAMP_TAG = "Timestamp"; //$NON-NLS-1$
 
     static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT"; //$NON-NLS-1$
     static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE"; //$NON-NLS-1$
@@ -1050,31 +1050,35 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	for (int i = 0; i < signatures.getLength(); i++) {
     		final Element signature = (Element) signatures.item(i);
 
-    		// Recogemos el identificador del nodo de firma
-    		arrayIds.add(signature.getAttribute(XAdESConstants.ID_IDENTIFIER));
+        	final Node parentNode = signatures.item(i).getParentNode();
+        	// Omitimos las firmas extraidas de sellos de tiempo
+        	if (parentNode == null || !TIMESTAMP_TAG.equals(parentNode.getLocalName())) {
+	    		// Recogemos el identificador del nodo de firma
+	    		arrayIds.add(signature.getAttribute(XAdESConstants.ID_IDENTIFIER));
 
-    		// Recogemos los objetos que identificaran a los nodos de firma
-    		if (asSimpleSignInfo) {
-    			String xadesNamespace = null;
-    			final Element signatureElement = XAdESUtil.getFirstSignatureElement(signDocument.getDocumentElement());
-    			final Element signedProperties = XAdESUtil.getSignedPropertiesElement(signatureElement);
-    			if (signedProperties != null) {
-    				xadesNamespace = signedProperties.getNamespaceURI();
-    			}
-    			arrayNodes.add(new AOTreeNode(Utils.getSimpleSignInfoNode(xadesNamespace, signature)));
-    		}
-    		else {
-    			arrayNodes.add(new AOTreeNode(Utils.getStringInfoNode(signature)));
-    		}
+	    		// Recogemos los objetos que identificaran a los nodos de firma
+	    		if (asSimpleSignInfo) {
+	    			String xadesNamespace = null;
+	    			final Element signatureElement = XAdESUtil.getFirstSignatureElement(signDocument.getDocumentElement());
+	    			final Element signedProperties = XAdESUtil.getSignedPropertiesElement(signatureElement);
+	    			if (signedProperties != null) {
+	    				xadesNamespace = signedProperties.getNamespaceURI();
+	    			}
+	    			arrayNodes.add(new AOTreeNode(Utils.getSimpleSignInfoNode(xadesNamespace, signature)));
+	    		}
+	    		else {
+	    			arrayNodes.add(new AOTreeNode(Utils.getStringInfoNode(signature)));
+	    		}
 
-    		// Recogemos el identificador de la firma a la que se referencia (si
-    		// no es contrafirma sera cadena vacia)
-    		if (signature.getParentNode() != null && "CounterSignature".equals(signature.getParentNode().getLocalName())) { //$NON-NLS-1$
-    			arrayRef.add(Utils.getCounterSignerReferenceId(signature, signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue"))); //$NON-NLS-1$
-    		}
-    		else {
-    			arrayRef.add(""); //$NON-NLS-1$
-    		}
+	    		// Recogemos el identificador de la firma a la que se referencia (si
+	    		// no es contrafirma sera cadena vacia)
+	    		if (signature.getParentNode() != null && "CounterSignature".equals(signature.getParentNode().getLocalName())) { //$NON-NLS-1$
+	    			arrayRef.add(Utils.getCounterSignerReferenceId(signature, signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue"))); //$NON-NLS-1$
+	    		}
+	    		else {
+	    			arrayRef.add(""); //$NON-NLS-1$
+	    		}
+        	}
     	}
 
     	// Se crea el que sera el nodo raiz del arbol
@@ -1084,7 +1088,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	// datos
     	for (int i = 0; i < arrayRef.size(); i++) {
     		if (arrayRef.get(i).equals("")) { //$NON-NLS-1$
-    			treeRoot.add(generateSignsTree(i, signatures.getLength() - 1, arrayNodes, arrayIds, arrayRef)[i]);
+    			treeRoot.add(generateSignsTree(i, arrayIds.size() - 1, arrayNodes, arrayIds, arrayRef)[i]);
     		}
     	}
     	return new AOTreeModel(treeRoot);

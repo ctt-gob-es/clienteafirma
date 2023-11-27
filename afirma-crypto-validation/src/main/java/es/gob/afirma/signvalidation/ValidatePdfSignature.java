@@ -178,10 +178,16 @@ public final class ValidatePdfSignature extends SignValider {
 			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, true);
 			for (final SignValidity sv : validityListSign) {
 				if (!validityList.contains(sv)) {
-					validityList.add(sv);
+					if (SIGN_DETAIL_TYPE.UNKNOWN.equals(sv.getValidity())) {
+						validityList.add(0, sv);
+					} else {
+						validityList.add(sv);
+					}
 				}
 			}
 		}
+
+		validityList = checkValidityKOPriority(validityList);
 
 		validityList = checkLongStandingValiditySign(validityList);
 
@@ -190,6 +196,8 @@ public final class ValidatePdfSignature extends SignValider {
 		}
 		return validityList;
 	}
+
+
 
 
 	/** Valida una firma PDF (PKCS#7/PAdES). En caso de validar los certificados de firma,

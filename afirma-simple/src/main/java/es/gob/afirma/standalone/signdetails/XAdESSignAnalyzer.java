@@ -19,6 +19,7 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
@@ -112,15 +113,18 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
     			final Element signature = (Element) signaturesList.item(i);
-    			final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signature);
-    			final SignDetails signDetails = buildSignDetails(signature, signProfile);
-    			boolean isExternallyDetached = false;
-    			if (SimpleAfirmaMessages.getString("ValidationInfoDialog.22").equals(this.dataLocation)) { //$NON-NLS-1$
-    				isExternallyDetached = true;
+    			final Node parentNode = signature.getParentNode();
+    			if (parentNode == null || !AOXAdESSigner.TIMESTAMP_TAG.equals(parentNode.getLocalName())) {
+	    			final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signature);
+	    			final SignDetails signDetails = buildSignDetails(signature, signProfile);
+	    			boolean isExternallyDetached = false;
+	    			if (SimpleAfirmaMessages.getString("ValidationInfoDialog.22").equals(this.dataLocation)) { //$NON-NLS-1$
+	    				isExternallyDetached = true;
+	    			}
+	    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile, isExternallyDetached);
+	    			signDetails.setValidityResult(validity);
+	    			this.signDetailsList.add(signDetails);
     			}
-    			final List<SignValidity> validity = ValidateXMLSignature.validateSign(signature, signProfile, isExternallyDetached);
-    			signDetails.setValidityResult(validity);
-    			this.signDetailsList.add(signDetails);
     		}
     	}
     	catch (final Exception e) {
@@ -223,6 +227,11 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 						final SignaturePolicy signPolicy = new SignaturePolicy(
 								SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 								SignDetails.POLICY_XADES_AGE_1_9);
+						xadesSignDetails.setPolicy(signPolicy);
+					} else if (SignDetails.POLICY_XADES_AGE_1_8.getPolicyIdentifier().equals(policyOID)) {
+						final SignaturePolicy signPolicy = new SignaturePolicy(
+								SimpleAfirmaMessages.getString("PreferencesPanel.25"), //$NON-NLS-1$
+								SignDetails.POLICY_XADES_AGE_1_8);
 						xadesSignDetails.setPolicy(signPolicy);
 					} else {
 						final String signElementNS = signElement.getNamespaceURI();
