@@ -288,7 +288,7 @@ public final class CertFilterManager {
 	/** Devuelve la lista de certificados definidos.
 	 * @return Listado de certificados. */
 	public List<CertificateFilter> getFilters() {
-		return this.filters != null ? new ArrayList<>(this.filters) : null;
+		return new ArrayList<>(this.filters);
 	}
 
 	/** Indica si se debe seleccionar autom&aacute;ticamente un certificado si es el &uacute;nico que

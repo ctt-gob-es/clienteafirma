@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.AGEPolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -135,6 +136,9 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 	/** Valor para la configuraci&oacute;n de la contrafirma de todos los nodos del &aacute;rbol. */
 	public static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
+
+	private static final String EXTRAPARAM_FORMAT = "format"; //$NON-NLS-1$
+	private static final String EXTRAPARAM_USE_MANIFEST = "useManifest"; //$NON-NLS-1$
 
 	private final String signFormat;
 
@@ -400,8 +404,6 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 			final String postUrl = urlBuffer.toString();
 
-			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
-
 			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 			try {
 				preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST, errorProcessor);
@@ -541,6 +543,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 				exception = new SigningLTSException(errorMsg);
 			} else if (SigningLTSException.REQUESTOR_POSSIBLE_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg, true);
+			} else if (AGEPolicyIncompatibilityException.REQUESTOR_SIGN_MSG_CODE.equals(errorCode)) {
+				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_SIGN);
+			} else if (AGEPolicyIncompatibilityException.REQUESTOR_COSIGN_MSG_CODE.equals(errorCode)) {
+				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_COSIGN);
+			} else if (AGEPolicyIncompatibilityException.REQUESTOR_COUNTERSIGN_MSG_CODE.equals(errorCode)) {
+				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_COUNTERSIGN);
 			}
 		}
 
@@ -558,9 +566,6 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 		return exception;
 	}
 
-	private static final String EXTRAPARAM_FORMAT = "format"; //$NON-NLS-1$
-	private static final String USE_MANIFEST = "useManifest"; //$NON-NLS-1$
-
     @Override
     public boolean needData(final String cryptoOperation, final Properties config) {
     	return isDataMandatory(cryptoOperation, config);
@@ -573,6 +578,6 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
     	return !CRYPTO_OPERATION_SIGN.equalsIgnoreCase(cryptoOperation)
     			|| config == null
     			|| !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(EXTRAPARAM_FORMAT))
-    					&& !Boolean.parseBoolean(config.getProperty(USE_MANIFEST));
+    					&& !Boolean.parseBoolean(config.getProperty(EXTRAPARAM_USE_MANIFEST));
     }
 }

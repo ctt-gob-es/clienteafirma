@@ -32,6 +32,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.CustomRuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
@@ -76,8 +77,7 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
@@ -226,7 +226,7 @@ final class ProtocolInvocationLauncherSign {
 									pluginInfo.getName()));
 							break;
 						}
-						if (processor != null && processor.checkTrigger(operation)) {
+						if (processor.checkTrigger(operation)) {
 							return processor;
 						}
 					}
@@ -413,7 +413,8 @@ final class ProtocolInvocationLauncherSign {
 
 				do {
 					try {
-						validity = validator.validate(data, extraParams);
+						final List<SignValidity> validityList = validator.validate(data, extraParams);
+						validity = validityList.get(0);
 					} catch (final IOException e) {
 						LOGGER.severe("Error al identificar la validez de la firma: " + e); //$NON-NLS-1$
 						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
@@ -728,7 +729,12 @@ final class ProtocolInvocationLauncherSign {
 				final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 						SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
 				if (result == JOptionPane.YES_OPTION) {
-					extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
+					if (e instanceof CustomRuntimeConfigNeededException) {
+						((CustomRuntimeConfigNeededException) e).prepareOperationWithConfirmation(extraParams);
+					}
+					else {
+						extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
+					}
 					return executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
 				}
 			}

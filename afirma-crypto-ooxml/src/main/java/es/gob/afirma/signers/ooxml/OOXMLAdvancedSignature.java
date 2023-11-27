@@ -65,11 +65,9 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 
       final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
-      if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certChain != null && certChain.length > 0) {
-    	  if (this.xades instanceof XadesWithBasicAttributes) {
-    		  ((XadesWithBasicAttributes) this.xades).setSigningCertificate(certChain[0]);
-    	  }
-      }
+      if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certChain != null && certChain.length > 0 && this.xades instanceof XadesWithBasicAttributes) {
+		  ((XadesWithBasicAttributes) this.xades).setSigningCertificate(certChain[0]);
+	  }
 
       addXMLObject(
   		marshalXMLSignature(
@@ -121,14 +119,16 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
     private KeyInfo newKeyInfo(final X509Certificate[] certChain, final String keyInfoId) throws KeyException {
     	final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
     	final List<X509Certificate> x509DataList = new ArrayList<>();
-    	if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
+    	if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo()) && certChain != null) {
     		for (final X509Certificate cert : certChain) {
     			x509DataList.add(cert);
     		}
     	}
     	final List<XMLStructure> newList = new ArrayList<>();
-    	newList.add(keyInfoFactory.newKeyValue(certChain[0].getPublicKey()));
-    	newList.add(keyInfoFactory.newX509Data(x509DataList));
+    	if (certChain != null) {
+	    	newList.add(keyInfoFactory.newKeyValue(certChain[0].getPublicKey()));
+	    	newList.add(keyInfoFactory.newX509Data(x509DataList));
+    	}
     	return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 

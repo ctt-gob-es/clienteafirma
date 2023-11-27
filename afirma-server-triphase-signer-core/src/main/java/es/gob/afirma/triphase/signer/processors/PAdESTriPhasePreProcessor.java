@@ -15,6 +15,7 @@ import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -73,13 +74,13 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Comprobamos la validez de la firma de entrada si se solicito
         if (checkSignatures && new AOPDFSigner().isSign(data)) {
-        	SignValidity validity;
+        	List<SignValidity> validity;
 			try {
 				final ValidatePdfSignature validator = new ValidatePdfSignature();
 				validator.setRelaxed(true);
 				validity = validator.validate(data, extraParams);
-	        	if (validity.getValidity() == SIGN_DETAIL_TYPE.KO) {
-	        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.getError().toString()); //$NON-NLS-1$
+	        	if (validity.get(0).getValidity() == SIGN_DETAIL_TYPE.KO) {
+	        		throw new InvalidSignatureException("Se encontraron firmas no validas en el PDF: " + validity.get(0).getError().toString()); //$NON-NLS-1$
 	        	}
 			} catch (final RuntimeConfigNeededException e) {
 				LOGGER.severe("Se detecta durante la validacion de la firma que la operacion requiere intervencion del usuario: " + e); //$NON-NLS-1$

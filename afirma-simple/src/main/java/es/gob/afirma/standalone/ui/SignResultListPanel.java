@@ -97,15 +97,21 @@ public final class SignResultListPanel extends JPanel implements PluginButtonsCo
     	// se mostrara el resultado de todo correcto; si hay alguna que haya fallado, no
     	// tendra definido cual es su fichero de salida y se mostrara que ha ocurrido un error
     	SignValidity validity = new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+    	final List<SignValidity> validityList = new ArrayList<SignValidity>();
     	for (int i = 0; i < signConfigList.size() && validity.getValidity() != SIGN_DETAIL_TYPE.KO; i++) {
     		final SignOperationConfig signConfig = signConfigList.get(i);
     		if (signConfig.getSignatureFile() == null) {
     			validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+    			validityList.add(validity);
     			break;
     		}
     	}
 
-        final SignResultPanel infoPanel = new SignResultPanel(validity, false, null);
+    	if (validityList.size() == 0) {
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+    	}
+
+        final SignResultPanel infoPanel = new SignResultPanel(validityList, false, null);
         final JPanel componentPanel = new MassiveResultProcessPanel(signConfigList, outDir, signingCert);
 
         final JPanel returnPanel = new JPanel(true);

@@ -16,7 +16,9 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -49,17 +51,17 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 public final class ValidateBinarySignature extends SignValider {
 
 	@Override
-	public SignValidity validate(final byte[] sign) throws IOException {
+	public List<SignValidity> validate(final byte[] sign) throws IOException {
 		return validate(sign, null, true);
 	}
 
 	@Override
-	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws IOException {
+	public List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) throws IOException {
 		return validate(sign, null, checkCertificates);
 	}
 
 	@Override
-	public SignValidity validate(final byte[] sign, final Properties params) throws IOException {
+	public List<SignValidity> validate(final byte[] sign, final Properties params) throws IOException {
 		return validate(sign, null, true);
 	}
 
@@ -73,7 +75,7 @@ public final class ValidateBinarySignature extends SignValider {
      *             en la firma.
      * @return Validez de la firma.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma o los datos. */
-	 public static SignValidity validate(final byte[] sign, final byte[] data) throws IOException {
+	 public static List<SignValidity> validate(final byte[] sign, final byte[] data) throws IOException {
 		 return validate(sign, data, true);
 	 }
 
@@ -88,9 +90,10 @@ public final class ValidateBinarySignature extends SignValider {
      * @param checkCertificates Indica si debe comprobarse o no el periodo de validez de los certificados.
      * @return Validez de la firma.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma o los datos. */
-    public static SignValidity validate(final byte[] sign,
+    public static List<SignValidity> validate(final byte[] sign,
     		                            final byte[] data,
     		                            final boolean checkCertificates) throws IOException {
+    	List<SignValidity> validityList = new ArrayList<SignValidity>();
     	if (sign == null) {
     		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
@@ -99,7 +102,8 @@ public final class ValidateBinarySignature extends SignValider {
     	if (!signer.isSign(sign)) {
     	    signer = new AOCMSSigner();
     	    if (!signer.isSign(sign)) {
-    	        return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+    	    	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+    	    	return validityList;
     	    }
     	}
 
@@ -108,50 +112,47 @@ public final class ValidateBinarySignature extends SignValider {
 				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 					"Se ha pedido validar una firma explicita sin proporcionar los datos firmados" //$NON-NLS-1$
 				);
-				return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA));
 			}
 		}
     	catch (final AOInvalidFormatException e1) {
     		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Se ha pedido validar una firma como CAdES, pero no es CAdES: " + e1  //$NON-NLS-1$
 			);
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN, e1);
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN, e1));
 		}
     	catch (final AOException e1) {
     		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Se encontraron datos en la firma y no se pudieron extraer: " + e1  //$NON-NLS-1$
 			);
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR);
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_ERROR));
 		}
 
     	try {
     		verifySignatures(
 				sign,
 				data != null ? data : new AOCAdESSigner().getData(sign),
-				checkCertificates
+				checkCertificates,
+				validityList
 			);
 	    }
-    	catch (final CertificateExpiredException e) {
-    		// Certificado caducado
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e);
-        }
-    	catch (final CertificateNotYetValidException e) {
-    		// Certificado aun no valido
-    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e);
-        }
     	catch (final CMSSignerDigestMismatchException e) {
     		// La firma no es una firma binaria valida
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e);
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
     	}
     	catch (final Exception e) {
             // La firma no es una firma binaria valida
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, null, e);
+    		validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null, e));
         }
 
-    	return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+    	validityList = checkValidityKOPriority(validityList);
+
+    	validityList = checkLongStandingValiditySign(validityList);
+
+    	return validityList;
     }
 
-    /** Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
+	/** Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
      * v&aacute;lida, lanza una excepci&oacute;n.
      * @param sign Firma que se desea validar.
      * @param data Datos para la comprobaci&oacute;n.
@@ -163,7 +164,8 @@ public final class ValidateBinarySignature extends SignValider {
      * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma. */
     private static void verifySignatures(final byte[] sign,
     		                             final byte[] data,
-    		                             final boolean checkCertificates) throws CMSException,
+    		                             final boolean checkCertificates,
+    		                             final List<SignValidity> signValidity) throws CMSException,
                                                                                  CertificateException,
                                                                                  IOException,
                                                                                  OperatorCreationException {
@@ -176,33 +178,89 @@ public final class ValidateBinarySignature extends SignValider {
         }
         final Store<X509CertificateHolder> store = s.getCertificates();
 
+        final boolean signWithData = s.getSignedContent() != null;
+
         final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
         for (final Object si : s.getSignerInfos().getSigners()) {
+        	final String signProfile = SignatureFormatDetectorPadesCades.resolveASN1Format(s, (SignerInformation) si);
 
-        	final SignerInformation signer = (SignerInformation) si;
-
-			final Iterator<X509CertificateHolder> certIt = store.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
-            final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
-        		new ByteArrayInputStream(
-    				certIt.next().getEncoded()
-				)
-    		);
-        	if (checkCertificates) {
-        		cert.checkValidity();
-        	}
-
-            if (!signer.verify(new SignerInformationVerifier(
-            	new	DefaultCMSSignatureAlgorithmNameGenerator(),
-            	new DefaultSignatureAlgorithmIdentifierFinder(),
-        		new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
-        		new BcDigestCalculatorProvider()
-    		))) {
-            	throw new CMSException("Firma no valida"); //$NON-NLS-1$
+        	final List<SignValidity> validity = verifySign(si, store, certFactory, checkCertificates, signProfile, signWithData);
+            for (final SignValidity v : validity) {
+            	// Le damos prioridad a los desconocidos, mas tarde se le dara prioridad a los KO por encima de estos
+            	if (SIGN_DETAIL_TYPE.UNKNOWN.equals(v.getValidity())) {
+            		signValidity.add(0, v);
+            	} else {
+            		signValidity.add(v);
+            	}
             }
-
         }
 
     }
+
+    /**
+     * Verifica la validez de la firma indicada.
+     * @param si Datos de la firma.
+     * @param store Certificados de la firma.
+     * @param certFactory Factor&iacute;a de certificados.
+     * @param checkCertificates Indica si se deben verificar certificados o no.
+     * @param signProfile Perfil de firma.
+     * @param signWithData Indica si la firma contiene los datos o no.
+     * @return Validez de la firma.
+     */
+    public static List<SignValidity> verifySign(final Object si, final Store<X509CertificateHolder> store,
+    										final CertificateFactory certFactory, final boolean checkCertificates,
+    										final String signProfile, final boolean signWithData) {
+
+    	final List<SignValidity> result = new ArrayList<SignValidity>();
+    	SignerInformation signer = null;
+		try {
+			signer = (SignerInformation) si;
+			final Iterator<X509CertificateHolder> certIt = store
+					.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
+			final X509Certificate cert = (X509Certificate) certFactory
+					.generateCertificate(new ByteArrayInputStream(certIt.next().getEncoded()));
+			if (checkCertificates) {
+				cert.checkValidity();
+
+				if (!signer
+						.verify(new SignerInformationVerifier(new DefaultCMSSignatureAlgorithmNameGenerator(),
+								new DefaultSignatureAlgorithmIdentifierFinder(), new JcaContentVerifierProviderBuilder()
+										.setProvider(new BouncyCastleProvider()).build(cert),
+								new BcDigestCalculatorProvider()))) {
+					throw new CMSException("Firma no valida"); //$NON-NLS-1$
+				}
+			}
+		} catch (final CertificateExpiredException e) {
+			// Certificado caducado
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
+		} catch (final CertificateNotYetValidException e) {
+			// Certificado aun no valido
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+		} catch (final CMSSignerDigestMismatchException e) {
+			// La firma no es una firma binaria valida
+			if (signWithData) {
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA, e));
+			}
+		} catch (final Exception e) {
+			// La firma no es una firma binaria valida
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CANT_VALIDATE_CERT, e));
+		}
+
+		if (!ISignatureFormatDetector.FORMAT_CADES_BES.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CADES_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CMS.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_CADES_EPES.equals(signProfile)) {
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
+		}
+
+		if (result.size() == 0) {
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+		}
+
+		return result;
+	}
 
 }

@@ -84,11 +84,11 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.DataProcessAction;
 import es.gob.afirma.standalone.plugins.InputData;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.pdf.VisiblePdfSignatureManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -214,7 +214,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	// se permite esto, se lanza un error
     	if (this.signOperationConfigs.size() == 1 &&
     			this.signOperationConfigs.get(0).getSignValidity() != null &&
-    			this.signOperationConfigs.get(0).getSignValidity().getValidity() == SIGN_DETAIL_TYPE.KO &&
+    			this.signOperationConfigs.get(0).getSignValidity().get(0).getValidity() == SIGN_DETAIL_TYPE.KO &&
     			!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ALLOW_INVALID_SIGNATURES)) {
 
     		AOUIFactory.showErrorMessage(
@@ -541,9 +541,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 if (config.getSigner().isSign(data)) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
-				 // Establecemos una validacion relajada para que nos informen cuando la firma presenta
-				 // problemas que requiririan la intervencion del usuario para operar con ella
-				 validator.setRelaxed(true);
 				 SignValidity validity = null;
 				 final Properties validationParams = new Properties();
 
@@ -556,23 +553,25 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
 
 				 String errorText = null;
+				 List<SignValidity> validityList = new ArrayList<SignValidity>();
 				 try {
-					validity = validator.validate(data, validationParams);
+					validityList = validator.validate(data, validationParams);
+					validity = validityList.get(0);
 					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
 							|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
 						errorText = buildErrorText(validity.getValidity(), validity.getError());
 					}
 				} catch (final RuntimeConfigNeededException e) {
-					validity = new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e);
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e));
 					errorText = e.getMessage();
 				} catch (final IOException e) {
 					throw e;
 				}
 
-				 config.setSignValidity(validity);
-				 if (errorText != null) {
-					 config.setInvalidSignatureText(errorText);
-				 }
+				config.setSignValidity(validityList);
+				if (errorText != null) {
+					config.setInvalidSignatureText(errorText);
+				}
 			 }
 		 }
 

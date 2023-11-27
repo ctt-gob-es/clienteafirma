@@ -495,14 +495,20 @@ public final class AOUtil {
 			return false;
 		}
 		try {
-			if (Integer.parseInt(ver.substring(0, 1)) > 8) {
-				return true;
+			// Valoramos si la version tiene el patron antiguo (1.X)
+			if (ver.startsWith("1.")) { //$NON-NLS-1$
+				return Integer.parseInt(ver.substring(2, 3)) > 8;
 			}
+
 			// En el nuevo esquema de versionado de Java se sigue el patron [1-9][0-9]*((\.0)*\.[1-9][0-9]*)*,
 			// en el que tenemos $MAJOR.$MINOR.$SECURITY (http://openjdk.java.net/jeps/223)
-			final String newVer = ver.substring(0, ver.indexOf(".")); //$NON-NLS-1$
-			if (isOnlyNumber(newVer)) {
-				return Integer.parseInt(newVer) > 8;
+			String majorVer = ver;
+			if (majorVer.indexOf(".") > -1) { //$NON-NLS-1$
+				majorVer = majorVer.substring(0, majorVer.indexOf(".")); //$NON-NLS-1$
+			}
+
+			if (isOnlyNumber(majorVer)) {
+				return Integer.parseInt(majorVer) > 8;
 			}
 		}
 		catch(final Exception e) {
@@ -510,6 +516,7 @@ public final class AOUtil {
 		}
 		return false;
 	}
+
 
 	/** Comprueba si el texto es un n&uacute;mero.
 	 * @param value Texto a comprobar.

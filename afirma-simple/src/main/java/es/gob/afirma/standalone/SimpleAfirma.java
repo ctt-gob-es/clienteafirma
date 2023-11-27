@@ -36,6 +36,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.FileHandler;
@@ -57,18 +58,25 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
+import es.gob.afirma.signvalidation.SignValider;
+import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
@@ -162,7 +170,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			"9.0", //$NON-NLS-1$
 			"10.0", //$NON-NLS-1$
 			"11.0", // Version LTS //$NON-NLS-1$
-			"17.0" // Version LTS //$NON-NLS-1$
+			"17.0", // Version LTS //$NON-NLS-1$
+			"21" // Version LTS //$NON-NLS-1$
 	};
 
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
@@ -599,8 +608,39 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
+    	List<SignValidity> validityList = new ArrayList<SignValidity>();
+    	List<SignValidity> validityListResult = new ArrayList<SignValidity>();
+    	final SignValider sv = SignValiderFactory.getSignValider(signature);
+        if (sv != null) {
+        	try {
+        		if (sv instanceof ValidateBinarySignature) {
+        			try(final InputStream dataFileStream = new FileInputStream(signConfig.getDataFile())) {
+            	    	final AOSigner signer = new AOCAdESSigner();
+            	    	final byte [] dataFile = AOUtil.getDataFromInputStream(dataFileStream);
+            	    	if (signer.isSign(dataFile)) {
+            	    		final byte [] signedData = ObtainContentSignedData.obtainData(signature);
+            	    		validityListResult = ValidateBinarySignature.validate(signature, signedData);
+            	    	} else {
+            	    		validityListResult = ValidateBinarySignature.validate(signature, dataFile);
+            	    	}
+        			}
+        		} else {
+        			validityListResult = sv.validate(signature);
+        		}
+        	}
+        	catch (final Exception e) {
+        		LOGGER.log(Level.SEVERE, "No se ha podido validar el documento correctamente", e); //$NON-NLS-1$
+			}
+        }
+        final SignValidity signValidity = validityListResult.get(0);
+        if (signValidity != null && (SIGN_DETAIL_TYPE.KO.equals(signValidity.getValidity()) || SIGN_DETAIL_TYPE.UNKNOWN.equals(signValidity.getValidity()))) {
+        	validityList = validityListResult;
+        } else {
+        	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null));
+        }
+
 		final JPanel newPanel = new SignDetailPanel(this, signature, signConfig, signingCert,
-				new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null), null);
+				validityList, null);
 
         if (this.container instanceof MainScreen) {
         	((MainScreen) this.container).replaceShowingPanel(newPanel);

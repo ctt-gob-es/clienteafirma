@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Factor&iacute;a para la creaci&oacute;n de los validadores de firma.
@@ -77,7 +78,7 @@ public final class SignValiderFactory {
 		if (signer instanceof AOCAdESSigner) {
 			validerClassName = SIGNER_VALIDER_CLASS_BINARY;
 		}
-		else if (signer instanceof AOXAdESSigner) {
+		else if (signer instanceof AOXAdESSigner || signer instanceof AOFacturaESigner) {
 			validerClassName = SIGNER_VALIDER_CLASS_XML;
 		}
 		else if (signer instanceof AOPDFSigner) {

@@ -17,6 +17,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -31,6 +32,7 @@ import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -38,6 +40,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.misc.SecureXmlBuilder;
@@ -57,12 +60,12 @@ public final class ValidateXMLSignature extends SignValider {
      * @param sign Firma a validar
      * @return Validez de la firma. */
     @Override
-	public SignValidity validate(final byte[] sign) {
+	public List<SignValidity> validate(final byte[] sign) {
     	return validate(sign, true);
     }
 
 	@Override
-	public SignValidity validate(final byte[] sign, final Properties params) {
+	public List<SignValidity> validate(final byte[] sign, final Properties params) {
 		return validate(sign, true);
 	}
 
@@ -71,38 +74,34 @@ public final class ValidateXMLSignature extends SignValider {
      * @param checkCertificates Indica si debe validarse la caducidad de los certificados.
      * @return Validez de la firma. */
     @Override
-	public SignValidity validate(final byte[] sign, final boolean checkCertificates) {
+	public List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) {
 
+    	List<SignValidity> result = new ArrayList<SignValidity>();
         final Document doc;
         try {
             doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-        	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+        	return result;
         }
 
         // Obtenemos el elemento Signature
         final NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+        	return result;
         }
 
         try {
+        	boolean noMatchDataOcurred = false;
+        	boolean certExpiredOcurred = false;
+        	final boolean certNotValidYetOcurred = false;
         	for (int i = 0; i < nl.getLength(); i++) {
         		final DOMValidateContext valContext = new DOMValidateContext(
         				new KeyValueKeySelector(),
         				nl.item(i)
         				);
-
-        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-        		if (!signature.validate(valContext)) {
-        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
-        			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-        		}
-        		if (!signature.getSignatureValue().validate(valContext)) {
-        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
-        			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-        		}
 
         		if (checkCertificates) {
         			final XMLSignatureFactory certs = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
@@ -123,10 +122,15 @@ public final class ValidateXMLSignature extends SignValider {
         								certImpl.checkValidity();
         							}
         							catch (final CertificateExpiredException expiredEx) {
-        								return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, expiredEx);
+        								if (!certExpiredOcurred) {
+	        								result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, expiredEx));
+	        								certExpiredOcurred = true;
+        								}
         							}
         							catch (final CertificateNotYetValidException notYetValidEx) {
-        								return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, notYetValidEx);
+        								if (!certNotValidYetOcurred) {
+        									result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, notYetValidEx));
+        								}
         							}
         						}
         					}
@@ -134,23 +138,135 @@ public final class ValidateXMLSignature extends SignValider {
         			}
         		}
 
+        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+        		if (!signature.validate(valContext) && !noMatchDataOcurred) {
+        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
+        		}
+        		if (!signature.getSignatureValue().validate(valContext) && !noMatchDataOcurred) {
+        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
+        		}
+
         		// Ahora miramos las referencias una a una
         		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
-        		while (it.hasNext()) {
+        		boolean isKO = false;
+        		while (it.hasNext() && !isKO && !noMatchDataOcurred) {
         			final Reference iNext = (Reference) it.next();
         			if (!iNext.validate(valContext)) {
         				LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
-        				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        				isKO = true;
         			}
+        		}
+
+        		final Element signatureElement = (Element) nl.item(i);
+        		final String signProfile = SignatureFormatDetectorXades.resolveSignerXAdESFormat(signatureElement);
+
+        		if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_XADES_B_B_LEVEL.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
+        				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
+        				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
         		}
         	}
         }
+        catch (final XMLSignatureException xmle) {
+        	LOGGER.log(Level.WARNING, "La firma no esta formada correctamente: " + xmle, xmle); //$NON-NLS-1$
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.BAD_BUILD_SIGN, xmle));
+        }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
-        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null, e);
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
         }
 
-        return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+        result = checkLongStandingValiditySign(result);
+
+        if (result.size() == 0) {
+        	result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+        }
+
+        return result;
+	}
+
+    /**
+     * Valida la firma indicada en par&aacute;metro.
+     * @param signElement Datos de la firma.
+     * @param signProfile Perfil de firma.
+     * @param isExternalDetached Indica si la firma tiene referencias externas.
+     * @return Lista de validaciones.
+     */
+	public static List<SignValidity> validateSign(final Element signElement, final String signProfile, final boolean isExternalDetached) {
+
+		final ArrayList<SignValidity> result = new ArrayList<SignValidity>();
+
+		if (!isExternalDetached) {
+			boolean validSign = true;
+
+			try {
+				final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), signElement);
+
+				boolean noMatchData = false;
+
+				final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+				if (!signature.validate(valContext)) {
+					LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+					validSign = false;
+					noMatchData = true;
+				}
+				if (!signature.getSignatureValue().validate(valContext)) {
+					LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+					validSign = false;
+					noMatchData = true;
+				}
+
+				// Ahora miramos las referencias una a una
+				final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
+				while (it.hasNext()) {
+					final Reference iNext = (Reference) it.next();
+					if (!iNext.validate(valContext)) {
+						LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+						validSign = false;
+						noMatchData = true;
+					}
+				}
+
+				if (noMatchData) {
+					result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+				}
+
+			}
+			catch (final XMLSignatureException xmle) {
+	        	LOGGER.log(Level.WARNING, "La firma no esta formada correctamente: " + xmle, xmle); //$NON-NLS-1$
+	        	validSign = false;
+	        	result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.BAD_BUILD_SIGN, xmle));
+	        }
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se ha podido validar la firma: " + e, e); //$NON-NLS-1$
+				validSign = false;
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_ERROR, e));
+			}
+
+			if (!ISignatureFormatDetector.FORMAT_XADES_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_XADES_B_B_LEVEL.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_XADES_BES.equals(signProfile)
+				&& !ISignatureFormatDetector.FORMAT_XADES_EPES.equals(signProfile)) {
+				validSign = false;
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
+			}
+
+			if (validSign) {
+				result.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+			}
+		} else {
+			result.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.CANT_VALIDATE_EXTERNALLY_DETACHED));
+		}
+
+		return result;
 	}
 
     static final class KeyValueKeySelector extends KeySelector {

@@ -50,7 +50,11 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	/** {@inheritDoc} */
 	@Override
     public boolean matches(final X509Certificate cert) {
-		return prepareSerialNumber(getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
+		final String certSN = getCertificateSN(cert);
+		if (certSN != null) {
+			return prepareSerialNumber(certSN).equalsIgnoreCase(this.serialNumber);
+		}
+		return false;
 	}
 
 	/** {@inheritDoc} */

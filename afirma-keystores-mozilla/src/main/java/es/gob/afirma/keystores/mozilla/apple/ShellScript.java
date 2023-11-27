@@ -122,7 +122,7 @@ public class ShellScript {
 			output = AOUtil.getDataFromInputStream(standardStream);
 		}
 
-		if (this.deleteFile) {
+		if (this.deleteFile && this.scriptFile != null) {
 			Files.delete(this.scriptFile.toPath());
 		}
 

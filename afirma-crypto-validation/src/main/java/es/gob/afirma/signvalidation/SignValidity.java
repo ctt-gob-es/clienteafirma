@@ -17,16 +17,8 @@ public final class SignValidity {
 
 	@Override
 	public String toString() {
-		if (this.validity.equals(SIGN_DETAIL_TYPE.OK)) {
-			return "Firma valida"; //$NON-NLS-1$
-		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
-			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
-		}
-		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
-			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
-		}
-		final String ret = "Firma no valida"; //$NON-NLS-1$
+		String ret;
+		ret = validityTypeToString();
 		if (this.error == null) {
 			return ret;
 		}
@@ -35,21 +27,23 @@ public final class SignValidity {
 			case NO_DATA:
 				return ret + ": no se puede comprobar la validez por no tener los datos firmados"; //$NON-NLS-1$
 			case CORRUPTED_SIGN:
-				return ret + ": la informacion contenida en la firma no es consistente (certificados corruptos, etc.)"; //$NON-NLS-1$
+				return ret + ": la informaci&oacute;n contenida en la firma no es consistente (certificados corruptos, etc.)"; //$NON-NLS-1$
 			case NO_MATCH_DATA:
 				return ret + ": la firma no se corresponde con los datos firmados"; //$NON-NLS-1$
 			case NO_SIGN:
 				return ret + ": no se encuentra la firma dentro del documento"; //$NON-NLS-1$
 			case CERTIFICATE_PROBLEM:
-				return ret + ": no se puede extraer un certificado o este no es valido"; //$NON-NLS-1$
+				return ret + ": no se puede extraer un certificado o este no es v&aacute;lido"; //$NON-NLS-1$
 			case CERTIFICATE_EXPIRED:
 				return ret + ": existe un certificado de firma caducado"; //$NON-NLS-1$
 			case CERTIFICATE_NOT_VALID_YET:
-				return ret + ": existe un certificado de firma que aun no es valido"; //$NON-NLS-1$
+				return ret + ": existe un certificado de firma que aun no es v&aacute;lido"; //$NON-NLS-1$
+			case CANT_VALIDATE_CERT:
+				return ret + ": no se ha podido validar el certificado correctamente"; //$NON-NLS-1$
 			case ALGORITHM_NOT_SUPPORTED:
 				return ret + ": la firma contiene un algoritmo no reconocido o no soportado"; //$NON-NLS-1$
 			case CA_NOT_SUPPORTED:
-				return ret + ": no se soporta la CA de expedicion"; //$NON-NLS-1$
+				return ret + ": no se soporta la CA de expedici&oacute;n"; //$NON-NLS-1$
 			case CRL_PROBLEM:
 				return ret + ": existe algun problema con las CRLs incrustadas en la firma"; //$NON-NLS-1$
 			case PDF_UNKOWN_VALIDITY:
@@ -61,15 +55,21 @@ public final class SignValidity {
 			case UNKOWN_ERROR:
 				return ret + ": no se puede comprobar la validez de la firma"; //$NON-NLS-1$
 			case UNKOWN_SIGNATURE_FORMAT:
-				return ret + ": los datos proporcionados no se corresponden con ningun formato de firma reconocido"; //$NON-NLS-1$
+				return ret + ": los datos proporcionados no se corresponden con ning&uacute;n formato de firma reconocido"; //$NON-NLS-1$
 			case MODIFIED_DOCUMENT:
 				return ret + ": el documento PDF es sospechoso de haberse modificado tras la firma"; //$NON-NLS-1$
 			case OVERLAPPING_SIGNATURE:
-				return ret + ": las firmas del documento se solapan pudiendo ocultar informacion"; //$NON-NLS-1$
+				return ret + ": las firmas del documento se solapan pudiendo ocultar informaci&oacute;n"; //$NON-NLS-1$
 			case MODIFIED_FORM:
 				return ret + ": un formulario del documento fue modificado tras la firma"; //$NON-NLS-1$
 			case SUSPECTED_SIGNATURE:
 				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
+			case SIGN_PROFILE_NOT_CHECKED:
+				return ret + ": la firma contiene atributos longevos que AutoFirma no puede validar. Para una validación completa recurrir a VALIDe."; //$NON-NLS-1$
+			case CANT_VALIDATE_EXTERNALLY_DETACHED:
+				return ret + ": no se permite la validaci&oacute;n de firmas con referencias externas"; //$NON-NLS-1$
+			case BAD_BUILD_SIGN:
+				return ret + ": la firma no est&aacute; correctamente formada"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
@@ -105,6 +105,8 @@ public final class SignValidity {
         CERTIFICATE_EXPIRED,
         /** Cuando existe un certificado de firma que aun no es v&aacute;lido. */
         CERTIFICATE_NOT_VALID_YET,
+        /** No se ha podido validar el certificado. */
+        CANT_VALIDATE_CERT,
         /** Cuando la firma contiene un algoritmo no reconocido o no soportado. */
         ALGORITHM_NOT_SUPPORTED,
         /** Cuando el emisor del certificado no es v&aacute;lido. */
@@ -128,7 +130,13 @@ public final class SignValidity {
         /** Cuando una firma est&aacute; solapando a otra en un documento PDF. */
         OVERLAPPING_SIGNATURE,
         /** El usuario debe confirmar la validez de la firma. */
-        SUSPECTED_SIGNATURE
+        SUSPECTED_SIGNATURE,
+        /** La firma no se ha comprobado completamente debido al nivel del perfil de firma. */
+        SIGN_PROFILE_NOT_CHECKED,
+        /** No se permite la validacion de firmas con referencias externas. */
+        CANT_VALIDATE_EXTERNALLY_DETACHED,
+        /** Cuando la firma es inv&aacute;lida porque no est&aacute; formada correctamente */
+        BAD_BUILD_SIGN,
     }
 
     /** Validez de la firma. */
@@ -176,5 +184,21 @@ public final class SignValidity {
      * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
     public Exception getErrorException() {
     	return this.errorException;
+    }
+
+    public String validityTypeToString() {
+		if (this.validity.equals(SIGN_DETAIL_TYPE.OK) || this.validity.equals(SIGN_DETAIL_TYPE.GENERATED)) {
+			return "Firma valida"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
+			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
+			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.KO)) {
+			return "Firma no valida"; //$NON-NLS-1$
+		}
+		return null;
     }
 }

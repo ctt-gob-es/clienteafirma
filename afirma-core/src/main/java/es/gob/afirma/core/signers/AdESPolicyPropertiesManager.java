@@ -9,6 +9,7 @@
 
 package es.gob.afirma.core.signers;
 
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
  * Si no se indic&oacute; el formato se buscar&aacute; el valor gen&eacute;rico de la propiedad,
  * (para una pol&iacute;tica de firma si se indic&oacute;n, o para cualquiera si no).
  * @author Carlos Gamuci. */
-final class AdESPolicyPropertiesManager {
+public final class AdESPolicyPropertiesManager {
 
 	/** Identificador de la &uacute;ltima versi&oacute;n de la pol&iacute;tica de firma de la AGE. */
 	static final String POLICY_ID_AGE = "FirmaAGE"; //$NON-NLS-1$
@@ -120,8 +121,8 @@ final class AdESPolicyPropertiesManager {
 		final String hash = getProperty(policyId, PROPERTY_POLICY_HASH, format);
 		if (hash == null || hash.trim().isEmpty()) {
 			final String identifier = getProperty(policyId, PROPERTY_POLICY_IDENTIFIER, format);
-			if (!identifier.toLowerCase().startsWith(HTTP_PREFIX) ||
-					!identifier.toLowerCase().startsWith(HTTPS_PREFIX)) {
+			if (identifier != null && (!identifier.toLowerCase().startsWith(HTTP_PREFIX) ||
+					!identifier.toLowerCase().startsWith(HTTPS_PREFIX))) {
 				return false;
 			}
 		}
@@ -178,5 +179,31 @@ final class AdESPolicyPropertiesManager {
 			LOGGER.warning("La siguiente propiedad se ignora en favor del valor derivado de la politica establecida: " + property);  //$NON-NLS-1$
 		}
 		config.setProperty(property, value);
+	}
+
+	/**
+	 * Comprueba que un identificador de pol&iacute;tica se corresponda con un identificador de
+	 * pol&iacute;tica de la AGE.
+	 * @param policyId Identificador de pol&iacute;tica.
+	 * @return {@code true} si el identificador coincide con uno de los identificadores de las
+	 * pol&iacute;ticas de firma de la AGE, {@code false} en caso contrario.
+	 */
+	public static boolean isAgePolicyConfigurated(final String policyId) {
+
+		if (policyId == null) {
+			return false;
+		}
+
+		final Enumeration<String> keys = RESOURCE_BUNDLE.getKeys();
+		while (keys.hasMoreElements()) {
+			final String key = keys.nextElement();
+			if (key.endsWith("." + PROPERTY_POLICY_IDENTIFIER)) { //$NON-NLS-1$
+				final String identifier = RESOURCE_BUNDLE.getString(key);
+				if (identifier.equals(policyId)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

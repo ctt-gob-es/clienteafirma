@@ -71,8 +71,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
-	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
+	public static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
+	public static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
 	/** Tama&ntilde;o m&iacute;nimo de un PDF.
 	 * <a href="https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf">

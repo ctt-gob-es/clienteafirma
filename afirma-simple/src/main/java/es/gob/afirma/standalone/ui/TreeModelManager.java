@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
@@ -16,20 +16,20 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 
 /** Operaciones para la gesti&oacute;n de objetos TreeModel.
  * @author Carlos Gamuci Mill&aacute;n */
-final class TreeModelManager {
+public final class TreeModelManager {
 
     private final AOTreeModel tree;
 
     /** Construye una clase de gesti&oacute;n de &aacute;rboles <code>Swing</code>
      * @param tree &Aacute;rbol <code>Swing</code> a gestionar */
-    TreeModelManager(final AOTreeModel tree) {
+    public TreeModelManager(final AOTreeModel tree) {
         this.tree = tree;
     }
 
     /** Recupera un &aacute;rbol Swing a partir de un TreeModel con los certificados
      * del Cliente @firma.
      * @return &Aacute;rbol Swing. */
-    DefaultMutableTreeNode getSwingTree() {
+    public DefaultMutableTreeNode getSwingTree() {
         final DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();
         copyBranch((AOTreeNode) this.tree.getRoot(), swingTreeRoot);
         return swingTreeRoot;

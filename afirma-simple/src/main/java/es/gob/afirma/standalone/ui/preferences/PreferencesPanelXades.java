@@ -56,7 +56,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
-final class PreferencesPanelXades extends JScrollPane {
+public final class PreferencesPanelXades extends JScrollPane {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -64,7 +64,7 @@ final class PreferencesPanelXades extends JScrollPane {
 
 	private static final String SIGN_FORMAT_XADES = "XAdES"; //$NON-NLS-1$
 
-	private static final AdESPolicy POLICY_XADES_AGE_1_9;
+	public static final AdESPolicy POLICY_XADES_AGE_1_9;
 
 	private static final String POLICY_BUNDLE_NAME = "policy"; //$NON-NLS-1$
 

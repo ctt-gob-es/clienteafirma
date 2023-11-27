@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,22 +141,24 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
             }
         }
 
-        SignValidity validity = new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
+        List<SignValidity> validityList = new ArrayList<SignValidity>();
         if (sign != null) {
             try {
-                validity = validateSign(sign);
+            	validityList = validateSign(sign);
             }
             catch (final Exception e) {
             	LOGGER.warning(
         			"No se ha podido comprobar la validez de la firma: " + e //$NON-NLS-1$
     			);
-                validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+            	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null));
             }
+        } else {
+        	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null));
         }
 
         final X509Certificate cert = getCertificate(sign);
 
-        final JPanel resultPanel = new SignResultPanel(validity, true, this);
+        final JPanel resultPanel = new SignResultPanel(validityList, true, this, sign);
         this.signDataPanel = new SignDataPanel(
     		signFile,
     		sign,
@@ -289,11 +292,12 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
      * @param sign Firma que se desea comprobar.
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
-    public static SignValidity validateSign(final byte[] sign) throws IOException {
+    public static List<SignValidity> validateSign(final byte[] sign) throws IOException {
+    	List<SignValidity> validityList = new ArrayList<SignValidity>();
     	final SignValider sv = SignValiderFactory.getSignValider(sign);
         if (sv != null) {
         	try {
-        		return sv.validate(sign);
+        		validityList = sv.validate(sign);
         	}
         	catch (final RuntimeConfigNeededException e) {
         		// No ocurrira nunca por no estar configurada la validacion laxa
@@ -301,12 +305,17 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
 			}
         }
         else if(DataAnalizerUtil.isSignedODF(sign)) {
-			return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.ODF_UNKOWN_VALIDITY);
+        	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.ODF_UNKOWN_VALIDITY));
 		}
 		else if(DataAnalizerUtil.isSignedOOXML(sign)) {
-			return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.OOXML_UNKOWN_VALIDITY);
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.OOXML_UNKOWN_VALIDITY));
 		}
-		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_SIGNATURE_FORMAT);
+
+        if (validityList.size() == 0) {
+        	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_SIGNATURE_FORMAT));
+        }
+
+		return validityList;
     }
 
 	@Override

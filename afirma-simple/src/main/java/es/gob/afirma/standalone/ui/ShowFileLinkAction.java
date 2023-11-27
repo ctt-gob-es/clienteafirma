@@ -31,7 +31,7 @@ import es.gob.afirma.standalone.ui.DataFileInfoDialog.Options;
  * Enlace para la apetura/guardado de un fichero.
  * @author Carlos Gamuci
  */
-final class ShowFileLinkAction {
+public final class ShowFileLinkAction {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -39,7 +39,7 @@ final class ShowFileLinkAction {
     private final byte[] data;
     private final Component parent;
 
-    ShowFileLinkAction(final String text, final byte[] data, final Component parent) {
+   public ShowFileLinkAction(final String text, final byte[] data, final Component parent) {
         this.text = text;
         this.data = data;
         this.parent = parent;

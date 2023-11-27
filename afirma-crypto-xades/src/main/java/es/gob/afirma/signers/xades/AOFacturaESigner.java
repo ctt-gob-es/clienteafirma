@@ -38,14 +38,14 @@ import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AOFacturaESigner implements AOSigner {
 
-	private static final AdESPolicy POLICY_FACTURAE_31 = new AdESPolicy(
+	public static final AdESPolicy POLICY_FACTURAE_31 = new AdESPolicy(
 		"http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf", //$NON-NLS-1$
 		"Ohixl6upD6av8N7pEvDABhEL6hM=", //$NON-NLS-1$
 		"SHA1", //$NON-NLS-1$
 		null
 	);
 
-	private static final AdESPolicy POLICY_FACTURAE_30 = new AdESPolicy(
+	public static final AdESPolicy POLICY_FACTURAE_30 = new AdESPolicy(
 		"http://www.facturae.es/politica de firma formato facturae/politica de firma formato facturae v3_0.pdf", //$NON-NLS-1$
 		"xmfh8D/Ec/hHeE1IB4zPd61zHIY=", //$NON-NLS-1$
 		"SHA1", //$NON-NLS-1$

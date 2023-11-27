@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -56,7 +57,7 @@ public final class ValidatePdfSignature extends SignValider {
      * encuentran firmas PDF en el documento o si se requiere m&aacute;s informacion para la validaci&oacute;n.
      */
 	@Override
-	public SignValidity validate(final byte[] sign) throws RuntimeConfigNeededException, IOException {
+	public List<SignValidity> validate(final byte[] sign) throws RuntimeConfigNeededException, IOException {
 		return validate(sign, true);
 	}
 
@@ -73,7 +74,7 @@ public final class ValidatePdfSignature extends SignValider {
      * encuentran firmas PDF en el documento o si se requiere m&aacute;s informacion para la validaci&oacute;n.
      */
 	@Override
-	public SignValidity validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException {
+	public List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) throws RuntimeConfigNeededException, IOException {
 		final Properties params = new Properties();
 		params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.toString(checkCertificates));
 		try {
@@ -94,8 +95,9 @@ public final class ValidatePdfSignature extends SignValider {
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
      * o si no se encuentran firmas PDF en el documento. */
 	@Override
-	public SignValidity validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
+	public List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
 
+		List<SignValidity> validityList = new ArrayList<SignValidity>();
 		AcroFields af;
 		PdfReader reader;
 		try {
@@ -103,58 +105,15 @@ public final class ValidatePdfSignature extends SignValider {
 			af = reader.getAcroFields();
 		}
 		catch (final Exception e) {
-			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+			return validityList;
 		}
 		final List<String> signNames = af.getSignatureNames();
 
 		// Si no hay firmas, no hay nada que comprobar
 		if (signNames.size() == 0) {
-			return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
-		}
-
-		for (final String name : signNames) {
-
-			// Valimamos la firma
-			final PdfPKCS7 pk = af.verifySignature(name);
-
-			// Comprobamos que el algoritmo de hash este bien declarado, supliendo asi la flexibilidad de iText que permite
-			// cargar firmas que usan algoritmos de firma como algoritmos de hash
-			if (pk.getStrictHashAlgorithm() == null) {
-				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
-			}
-
-    		// Comprobamos si es una firma o un sello
-    		final PdfDictionary pdfDictionary = af.getSignatureDictionary(name);
-
-    		// Si no es un sello, comprobamos el PKCS#1
-    		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER)) && !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
-				try {
-					if (!pk.verify()) {
-						return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-					}
-				}
-				catch (final Exception e) {
-					LOGGER.warning("Error validando una de las firmas del PDF: " + e); //$NON-NLS-1$
-					return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e);
-				}
-    		}
-
-    		final boolean checkCertificates = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString()));
-
-    		if (checkCertificates) {
-				final X509Certificate signCert = pk.getSigningCertificate();
-				try {
-					signCert.checkValidity();
-				}
-				catch (final CertificateExpiredException e) {
-					// Certificado caducado
-			        return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e);
-				}
-				catch (final CertificateNotYetValidException e) {
-					// Certificado aun no valido
-			        return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e);
-				}
-			}
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+			return validityList;
 		}
 
 		// COMPROBACION DE CAMBIOS EN LOS FORMULARIOS PDF
@@ -171,7 +130,7 @@ public final class ValidatePdfSignature extends SignValider {
 				if (allowSignModifiedFormProp == null && isRelaxed()) {
 					throw new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
 				}
-				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM);
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM));
 			}
 		}
 
@@ -207,14 +166,111 @@ public final class ValidatePdfSignature extends SignValider {
 					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
 						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, validity.getError());
 					}
-					return validity;
+					validityList.add(validity);
 				}
 			}
 		}
 
-		return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+		// Validacion individual de firmas
+		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
+
+		for (final String name : signNames) {
+			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, true);
+			for (final SignValidity sv : validityListSign) {
+				if (!validityList.contains(sv)) {
+					if (SIGN_DETAIL_TYPE.UNKNOWN.equals(sv.getValidity())) {
+						validityList.add(0, sv);
+					} else {
+						validityList.add(sv);
+					}
+				}
+			}
+		}
+
+		validityList = checkValidityKOPriority(validityList);
+
+		validityList = checkLongStandingValiditySign(validityList);
+
+		if (validityList.size() == 0) {
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+		}
+		return validityList;
 	}
 
+
+
+
+	/** Valida una firma PDF (PKCS#7/PAdES). En caso de validar los certificados de firma,
+	 * s&oacute;lo se validar&aacute; el periodo de caducidad.
+     * @param signName Nombre de firma.
+     * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
+     * @param signProfile Perfil de firma.
+     * @param checkCert Indica si se comprueba la validez del certificado o no.
+     * @return Lista con las validaciones realizadas en la firma.
+     * @throws RuntimeConfigNeededException Cuando en la validaci&oacute;n laxa se puede considerar
+     * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
+     * usuario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura del documento
+     * o si no se encuentran firmas PDF en el documento. */
+	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields, final String signProfile, final boolean checkCert)
+			throws RuntimeConfigNeededException, IOException {
+
+		final List<SignValidity> validityList = new ArrayList<SignValidity>();
+		// Valimamos la firma
+		final PdfPKCS7 pk = signAcrofields.verifySignature(signName);
+
+		// Comprobamos que el algoritmo de hash este bien declarado, supliendo asi la
+		// flexibilidad de iText que permite
+		// cargar firmas que usan algoritmos de firma como algoritmos de hash
+		if (pk.getStrictHashAlgorithm() == null) {
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED));
+		}
+
+		// Comprobamos si es una firma o un sello
+		final PdfDictionary pdfDictionary = signAcrofields.getSignatureDictionary(signName);
+
+		// Si no es un sello, comprobamos el PKCS#1
+		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
+				&& !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
+			try {
+				if (!pk.verify()) {
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+				}
+			} catch (final Exception e) {
+				LOGGER.warning("Error validando una de las firmas del PDF: " + e); //$NON-NLS-1$
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e));
+			}
+		}
+
+		if (checkCert) {
+			final X509Certificate signCert = pk.getSigningCertificate();
+			try {
+				signCert.checkValidity();
+			} catch (final CertificateExpiredException e) {
+				// Certificado caducado
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
+			} catch (final CertificateNotYetValidException e) {
+				// Certificado aun no valido
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+			}
+		}
+
+		if (!ISignatureFormatDetector.FORMAT_PADES_BASIC.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_UNRECOGNIZED.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_BES.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_B_LEVEL.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL.equals(signProfile)
+			&& !ISignatureFormatDetector.FORMAT_PADES_EPES.equals(signProfile)) {
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.SIGN_PROFILE_NOT_CHECKED));
+		}
+
+		if (validityList.size() == 0) {
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+		}
+
+		return validityList;
+
+	}
 
 
 }

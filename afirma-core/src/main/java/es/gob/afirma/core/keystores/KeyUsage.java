@@ -108,12 +108,14 @@ public final class KeyUsage {
 		}
 
 		// Comprobamos que ambos sean iguales
-		if (other.length != me.length) {
+		if (other != null && me != null && other.length != me.length) {
 			return false;
 		}
-		for (int i = 0; i < me.length; i++) {
-			if (other[i] != me[i]) {
-				return false;
+		if (me !=null && other != null) {
+			for (int i = 0; i < me.length; i++) {
+				if (other[i] != me[i]) {
+					return false;
+				}
 			}
 		}
 		return true;

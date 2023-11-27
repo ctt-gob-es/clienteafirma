@@ -105,17 +105,10 @@ public final class AOOOXMLSigner implements AOSigner {
     	try {
 
     		final List<ZipEntry> entryList = OOXMLUtil.getEntryList(data);
-    		// Se separa en varios "if" para simplificar la condicional
-    		if (!OOXMLUtil.hasEntry(entryList, "[Content_Types].xml")) { //$NON-NLS-1$
-    			result = false;
-    		}
-    		else if (!OOXMLUtil.hasEntry(entryList, "_rels/.rels") && !OOXMLUtil.hasEntry(entryList, "_rels\\.rels")) { //$NON-NLS-1$ //$NON-NLS-2$
-    			result = false;
-    		}
-    		else if (!OOXMLUtil.hasEntry(entryList, "docProps/app.xml") && !OOXMLUtil.hasEntry(entryList, "docProps\\app.xml")) { //$NON-NLS-1$ //$NON-NLS-2$
-    			result = false;
-    		}
-    		else if (!OOXMLUtil.hasEntry(entryList, "docProps/core.xml") && !OOXMLUtil.hasEntry(entryList, "docProps\\core.xml")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		if (!OOXMLUtil.hasEntry(entryList, "[Content_Types].xml") //$NON-NLS-1$
+    			|| !OOXMLUtil.hasEntry(entryList, "_rels/.rels") && !OOXMLUtil.hasEntry(entryList, "_rels\\.rels") //$NON-NLS-1$ //$NON-NLS-2$
+    			|| !OOXMLUtil.hasEntry(entryList, "docProps/app.xml") && !OOXMLUtil.hasEntry(entryList, "docProps\\app.xml") //$NON-NLS-1$ //$NON-NLS-2$
+    			|| !OOXMLUtil.hasEntry(entryList, "docProps/core.xml") && !OOXMLUtil.hasEntry(entryList, "docProps\\core.xml")) { //$NON-NLS-1$ //$NON-NLS-2$
     			result = false;
     		}
     	}

@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.io.File;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -17,7 +18,7 @@ public final class SignOperationConfig {
 	private AOSigner signer;
 	private Properties extraParams;
 	private String signatureFormatName;
-	private SignValidity signValidity;
+	private List<SignValidity> signValidity;
 	private String invalidSignatureText;
 
 	/** Construye la configuraci&oacute;n de firma. */
@@ -108,13 +109,13 @@ public final class SignOperationConfig {
 
 	/** Recupera la informaci&oacute;n de validaci&oacute;n de la firma.
 	 * @return Resultado de la validaci&oacute;n de la firma. */
-	public SignValidity getSignValidity() {
+	public List<SignValidity> getSignValidity() {
 		return this.signValidity;
 	}
 
 	/** Establece la informaci&oacute;n de validaci&oacute;n de la firma.
 	 * @param signValidity Resultado de la validaci&oacute;n de la firma. */
-	public void setSignValidity(final SignValidity signValidity) {
+	public void setSignValidity(final List<SignValidity> signValidity) {
 		this.signValidity = signValidity;
 	}
 
