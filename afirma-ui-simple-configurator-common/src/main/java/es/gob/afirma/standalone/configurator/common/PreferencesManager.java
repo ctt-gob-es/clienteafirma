@@ -106,7 +106,7 @@ public final class PreferencesManager {
 	private static final String PREFIX_HTTPS = "https://"; //$NON-NLS-1$
 
 	/** Origen del valor de las preferencias. */
-	public static enum PreferencesSource {
+	public enum PreferencesSource {
 		/** Preferencias establecidas por el usuario. */
 		USER,
 		/** Preferencias establecidas a nivel de sistema. */
@@ -554,6 +554,9 @@ public final class PreferencesManager {
 	 * disponibles. Un valor de <code>true</code> en esta preferencia permitir&aacute; usar solo  certificados de
 	 * seud&oacute;nimo cuando estos est&eacute;n disponibles.*/
 	public static final String PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS = "useOnlyAliasCertificates"; //$NON-NLS-1$
+
+	/** Indica si omitir o no el certificado de autenticaci&oacute;n para DNIe. */
+	public static final String PREFERENCE_KEYSTORE_SKIP_AUTH_CERT_DNIE = "skipAuthCertDnie"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************
