@@ -434,42 +434,11 @@ public final class PreferencesPanelXades extends JScrollPane {
 	void savePreferences() {
 		PreferencesManager.put(PREFERENCE_XADES_SIGN_FORMAT, this.xadesSignFormat.getSelectedItem().toString());
 
-		if ("".equals(this.xadesSignatureProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
-		}
-		if ("".equals(this.xadesSignatureProductionCountry.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
-		}
-		if ("".equals(this.xadesSignatureProductionPostalCode.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
-		}
-		if ("".equals(this.xadesSignatureProductionProvince.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
-		}
-		if ("".equals(this.xadesSignerClaimedRole.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
-		}
-		if ("".equals(this.xadesSignerClaimedRole.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
-		}
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
 
 		final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 		if (xadesPolicy != null) {

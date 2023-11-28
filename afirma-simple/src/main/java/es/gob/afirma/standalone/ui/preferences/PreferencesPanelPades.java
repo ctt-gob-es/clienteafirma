@@ -444,24 +444,9 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.put(PREFERENCE_PADES_STAMP, Boolean.toString(this.visiblePdfStamp.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, Boolean.toString(this.checkShadowAttack.isSelected()));
 
-		if ("".equals(this.padesSignerContact.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_PADES_SIGNER_CONTACT);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
-		}
-		if ("".equals(this.padesSignProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
-		}
-		if ("".equals(this.padesSignReason.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_PADES_SIGN_REASON);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
-		}
+		PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
+		PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
+		PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
 
 		final ComboBoxModel<Object> m = this.padesBasicFormat.getModel();
 		final Object o = m.getElementAt(this.padesBasicFormat.getSelectedIndex());
