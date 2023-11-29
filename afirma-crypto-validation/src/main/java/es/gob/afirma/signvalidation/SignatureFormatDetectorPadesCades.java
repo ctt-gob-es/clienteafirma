@@ -20,7 +20,7 @@ import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
 import com.aowagie.text.pdf.PdfReader;
 
-public class SignatureFormatDetectorPadesCades {
+public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetector {
 
 	/**
 	 * Constant attribute that represents the OID of the
@@ -422,7 +422,7 @@ public class SignatureFormatDetectorPadesCades {
 	 */
 	public static String resolvePDFFormat(final byte[] pdfDocument) {
 		// Por defecto establecemos el formato como no reconocido
-		String format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+		String format = FORMAT_UNRECOGNIZED;
 
 		try {
 			// Leemos el documento PDF
@@ -433,30 +433,30 @@ public class SignatureFormatDetectorPadesCades {
 			final PDFSignatureDictionary signatureDictionary = obtainLatestSignatureFromPDF(reader);
 
 			if (isPAdESBLevel(signatureDictionary)) {
-				format = ISignatureFormatDetector.FORMAT_PADES_B_LEVEL;
+				format = FORMAT_PADES_B_LEVEL;
 				if (isPAdESLTALevel(signatureDictionary, reader)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_LTA_LEVEL;
+					format = FORMAT_PADES_LTA_LEVEL;
 				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_LT_LEVEL;
+					format = FORMAT_PADES_LT_LEVEL;
 				} else if (isPAdESTLevel(signatureDictionary, reader)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_T_LEVEL;
+					format = FORMAT_PADES_T_LEVEL;
 				}
 			}
 			else if (isPAdESBBLevel(signatureDictionary)) {
-				format = ISignatureFormatDetector.FORMAT_PADES_B_B_LEVEL;
+				format = FORMAT_PADES_B_B_LEVEL;
 				if (isPAdESLTALevel(signatureDictionary, reader)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_LTA_LEVEL;
+					format = FORMAT_PADES_LTA_LEVEL;
 				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_LT_LEVEL;
+					format = FORMAT_PADES_LT_LEVEL;
 				} else if (isPAdESTLevel(signatureDictionary, reader)) {
-					format = ISignatureFormatDetector.FORMAT_PADES_T_LEVEL;
+					format = FORMAT_PADES_T_LEVEL;
 				}
 			}
 			else{
 				return getFormatOfPAdESSignature(signatureDictionary, reader);
 			}
 		} catch (final Exception e) {
-			format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+			format = FORMAT_UNRECOGNIZED;
 		}
 		return format;
 	}
@@ -481,20 +481,20 @@ public class SignatureFormatDetectorPadesCades {
 	private static String getFormatOfPAdESSignature(final PDFSignatureDictionary signatureDictionary,
 			final PdfReader reader) {
 		// Por defecto establecemos el formato como no reconocido
-		String format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+		String format = FORMAT_UNRECOGNIZED;
 
 		if (isPAdESLTV(reader)) {
-			format = ISignatureFormatDetector.FORMAT_PADES_LTV;
+			format = FORMAT_PADES_LTV;
 		} else {
 			// Comprobamos el formato especifico de la firma
 			if (isPAdESEPES(signatureDictionary)) {
-				format = ISignatureFormatDetector.FORMAT_PADES_EPES;
+				format = FORMAT_PADES_EPES;
 			} else if (isPAdESBES(signatureDictionary)) {
-				format = ISignatureFormatDetector.FORMAT_PADES_BES;
+				format = FORMAT_PADES_BES;
 			} else if (isPAdESBasic(signatureDictionary)) {
-				format = ISignatureFormatDetector.FORMAT_PADES_BASIC;
+				format = FORMAT_PADES_BASIC;
 			} else if (isPDF(signatureDictionary)) {
-				format = ISignatureFormatDetector.FORMAT_PDF;
+				format = FORMAT_PDF;
 			}
 		}
 
@@ -818,7 +818,7 @@ public class SignatureFormatDetectorPadesCades {
 	 */
 	public static String resolveASN1Format(final CMSSignedData signedData, final SignerInformation signature) {
 		// Inicialmente definidos que el formato no está reconocido
-		String format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+		String format = FORMAT_UNRECOGNIZED;
 		try {
 			// Comprobamos si la firma es CMS
 			if (isCMS(signature)) {
@@ -841,18 +841,18 @@ public class SignatureFormatDetectorPadesCades {
 				// el atributo firmado signing-time
 				if (isCAdESBLevel(signature)) {
 					// Establecemos el formato a CAdES B-Level
-					format = ISignatureFormatDetector.FORMAT_CADES_B_LEVEL;
+					format = FORMAT_CADES_B_LEVEL;
 					// Comprobamos si la firma posee signature-time-stamp en
 					// cuyo caso será CAdES T-Level
 					if (isCAdEST(signature)) {
 						// Establecemos el formato a CAdES T-Level
-						format = ISignatureFormatDetector.FORMAT_CADES_T_LEVEL;
+						format = FORMAT_CADES_T_LEVEL;
 						// Comprobamos si la firma es LT-Level
 						if (isCAdESLTLevel(signature, signedData)) {
-							format = ISignatureFormatDetector.FORMAT_CADES_LT_LEVEL;
+							format = FORMAT_CADES_LT_LEVEL;
 							// Comprobamos si la firma es LTA-Level
 							if (isCAdESLTALevel(signature)) {
-								format = ISignatureFormatDetector.FORMAT_CADES_LTA_LEVEL;
+								format = FORMAT_CADES_LTA_LEVEL;
 							}
 						} else {
 							format = resolveCAdESNoBaselineFormat(format, signature);
@@ -867,16 +867,16 @@ public class SignatureFormatDetectorPadesCades {
 				}
 			}
 			else if (isCAdESBBLevel(signature)) {
-				format = ISignatureFormatDetector.FORMAT_CADES_B_B_LEVEL;
+				format = FORMAT_CADES_B_B_LEVEL;
 				if (isCAdEST(signature)) {
 					// Establecemos el formato a CAdES T-Level
-					format = ISignatureFormatDetector.FORMAT_CADES_T_LEVEL;
+					format = FORMAT_CADES_T_LEVEL;
 					// Comprobamos si la firma es LT-Level
 					if (isCAdESLTLevel(signature, signedData)) {
-						format = ISignatureFormatDetector.FORMAT_CADES_LT_LEVEL;
+						format = FORMAT_CADES_LT_LEVEL;
 						// Comprobamos si la firma es LTA-Level
 						if (isCAdESLTALevel(signature)) {
-							format = ISignatureFormatDetector.FORMAT_CADES_LTA_LEVEL;
+							format = FORMAT_CADES_LTA_LEVEL;
 						}
 					} else {
 						format = resolveCAdESNoBaselineFormat(format, signature);
@@ -890,7 +890,7 @@ public class SignatureFormatDetectorPadesCades {
 				}
 			}
 		} catch (final Exception e) {
-			format = ISignatureFormatDetector.FORMAT_UNRECOGNIZED;
+			format = FORMAT_UNRECOGNIZED;
 		}
 		return format;
 	}
@@ -960,23 +960,23 @@ public class SignatureFormatDetectorPadesCades {
 	private static String resolveFormatOfCAdESEPESSignature(final CMSSignedData signedData,
 			final SignerInformation signature) {
 		// Establecemos el formato a CAdES-EPES
-		String format = ISignatureFormatDetector.FORMAT_CADES_EPES;
+		String format = FORMAT_CADES_EPES;
 		// Comprobamos si la firma es CAdES B-Level, esto es, si tiene
 		// el atributo firmado signing-time
 		if (isCAdESBLevel(signature)) {
 			// Establecemos el formato a CAdES B-Level
-			format = ISignatureFormatDetector.FORMAT_CADES_B_LEVEL;
+			format = FORMAT_CADES_B_LEVEL;
 			// Comprobamos si la firma posee signature-time-stamp en
 			// cuyo caso será CAdES T-Level
 			if (isCAdEST(signature)) {
 				// Establecemos el formato a CAdES T-Level
-				format = ISignatureFormatDetector.FORMAT_CADES_T_LEVEL;
+				format = FORMAT_CADES_T_LEVEL;
 				// Comprobamos si la firma es LT-Level
 				if (isCAdESLTLevel(signature, signedData)) {
-					format = ISignatureFormatDetector.FORMAT_CADES_LT_LEVEL;
+					format = FORMAT_CADES_LT_LEVEL;
 					// Comprobamos si la firma es LTA-Level
 					if (isCAdESLTALevel(signature)) {
-						format = ISignatureFormatDetector.FORMAT_CADES_LTA_LEVEL;
+						format = FORMAT_CADES_LTA_LEVEL;
 					}
 				}
 			}
@@ -1023,8 +1023,8 @@ public class SignatureFormatDetectorPadesCades {
 		String format = temporalFormat;
 
 		// Si la firma no es CAdES-T comprobamos si pudiera serlo
-		if (!format.equals(ISignatureFormatDetector.FORMAT_CADES_T_LEVEL) && isCAdEST(signature)) {
-			format = ISignatureFormatDetector.FORMAT_CADES_T;
+		if (!format.equals(FORMAT_CADES_T_LEVEL) && isCAdEST(signature)) {
+			format = FORMAT_CADES_T;
 		}
 
 		return format;

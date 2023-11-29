@@ -29,6 +29,7 @@ Spanish.lproj/gfx/menuplugins_mini.png
 Spanish.lproj/gfx/menurestaurar_mini.png
 Spanish.lproj/gfx/pantalladetalle2_mini.png
 Spanish.lproj/gfx/pantalladetalle_mini.png
+Spanish.lproj/gfx/pantalladetallesfirma.png
 Spanish.lproj/gfx/pantallaespera_mini.png
 Spanish.lproj/gfx/pantallafirma1_mini.png
 Spanish.lproj/gfx/pantallafirma2_mini.png
