@@ -57,7 +57,6 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -370,7 +369,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
-    	if (KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled()) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SKIP_AUTH_CERT_DNIE)) {
     		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
@@ -553,7 +552,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
 
 				 String errorText = null;
-				 List<SignValidity> validityList = new ArrayList<SignValidity>();
+				 List<SignValidity> validityList = new ArrayList<>();
 				 try {
 					validityList = validator.validate(data, validationParams);
 					validity = validityList.get(0);

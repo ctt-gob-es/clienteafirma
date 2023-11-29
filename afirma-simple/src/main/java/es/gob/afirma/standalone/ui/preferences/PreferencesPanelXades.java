@@ -434,42 +434,11 @@ public final class PreferencesPanelXades extends JScrollPane {
 	void savePreferences() {
 		PreferencesManager.put(PREFERENCE_XADES_SIGN_FORMAT, this.xadesSignFormat.getSelectedItem().toString());
 
-		if ("".equals(this.xadesSignatureProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
-		}
-		if ("".equals(this.xadesSignatureProductionCountry.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
-		}
-		if ("".equals(this.xadesSignatureProductionPostalCode.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
-		}
-		if ("".equals(this.xadesSignatureProductionProvince.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
-		}
-		if ("".equals(this.xadesSignerClaimedRole.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
-		}
-		if ("".equals(this.xadesSignerClaimedRole.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
-		}
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
+		PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
 
 		final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 		if (xadesPolicy != null) {
@@ -527,7 +496,7 @@ public final class PreferencesPanelXades extends JScrollPane {
 
         this.panelPolicies.removeAll();
 
-        final AdESPolicy currentPolicy = getCurrentPolicy();
+        final AdESPolicy currentPolicy = getXAdESPreferedPolicy();
         this.xadesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
@@ -643,24 +612,25 @@ public final class PreferencesPanelXades extends JScrollPane {
 
 	/** Obtiene la configuraci&oacute;n de politica de firma XAdES establecida actualmente.
 	 * @return Pol&iacute;tica de firma configurada. */
-	private static AdESPolicy getCurrentPolicy() {
+	private static AdESPolicy getXAdESPreferedPolicy() {
 
-		if (PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER) == null ||
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER).isEmpty()) {
-			return null;
+		AdESPolicy adesPolicy = null;
+
+		final String policyIdentifier = PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER);
+		if (policyIdentifier != null && !policyIdentifier.isEmpty()) {
+			try {
+				adesPolicy = new AdESPolicy(
+						policyIdentifier,
+						PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH),
+						PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
+						PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER)
+						);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
+			}
 		}
-		try {
-			return new AdESPolicy(
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER),
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH),
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
-				PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER)
-				);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
-			return null;
-		}
+		return adesPolicy;
 	}
 
 	/**
@@ -687,16 +657,17 @@ public final class PreferencesPanelXades extends JScrollPane {
 			PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 
 			try {
+
 				final String policyId = PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER);
-				if (policyId == null || policyId.isEmpty()) {
-					this.xadesPolicyDlg.loadPolicy(null);
-				} else {
-					this.xadesPolicyDlg.loadPolicy(new AdESPolicy(policyId,
+				if (policyId != null && !policyId.isEmpty()) {
+					adesPolicy = new AdESPolicy(policyId,
 							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH),
 							PreferencesManager.get(PREFERENCE_XADES_POLICY_HASH_ALGORITHM),
-							PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER)));
+							PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER));
 				}
-			} catch (final Exception e) {
+				this.xadesPolicyDlg.loadPolicy(adesPolicy);
+			}
+			catch (final Exception e) {
 				LOGGER.severe("Error al recuperar la politica XAdES guardada en preferencias: " + e); //$NON-NLS-1$
 			}
 		}
@@ -746,10 +717,11 @@ public final class PreferencesPanelXades extends JScrollPane {
 		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.xadesPolicyDlg == null) {
 			final List<PolicyItem> xadesPolicies = new ArrayList<>();
-			xadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-					POLICY_XADES_AGE_1_9));
+			xadesPolicies.add(
+					new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+							POLICY_XADES_AGE_1_9));
 
-			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getCurrentPolicy(), isBlocked());
+			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXAdESPreferedPolicy(), isBlocked());
 		}
 	}
 
@@ -764,25 +736,23 @@ public final class PreferencesPanelXades extends JScrollPane {
 		// Cargamos el dialogo
 		loadXadesPolicy();
 
-		if (AOUIFactory.showConfirmDialog(container, this.xadesPolicyDlg,
+		final int confirmDialog = AOUIFactory.showConfirmDialog(container, this.xadesPolicyDlg,
 				SimpleAfirmaMessages.getString("PolicyDialog.0"), //$NON-NLS-1$
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.DEFAULT_OPTION) == JOptionPane.OK_OPTION) {
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.DEFAULT_OPTION);
+
+		if (confirmDialog == JOptionPane.OK_OPTION) {
 
 			try {
 				checkPreferences();
 
 				this.currentPolicyValue.setText(this.xadesPolicyDlg.getSelectedPolicyName());
 				final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
-
 				if (xadesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
-					PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH,
-							xadesPolicy.getPolicyIdentifierHash());
-					PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH_ALGORITHM,
-							xadesPolicy.getPolicyIdentifierHashAlgorithm());
+					PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH, xadesPolicy.getPolicyIdentifierHash());
+					PreferencesManager.put(PREFERENCE_XADES_POLICY_HASH_ALGORITHM, xadesPolicy.getPolicyIdentifierHashAlgorithm());
 					if (xadesPolicy.getPolicyQualifier() != null) {
-						PreferencesManager.put(PREFERENCE_XADES_POLICY_QUALIFIER,
-								xadesPolicy.getPolicyQualifier().toString());
+						PreferencesManager.put(PREFERENCE_XADES_POLICY_QUALIFIER, xadesPolicy.getPolicyQualifier().toString());
 					} else {
 						PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 					}

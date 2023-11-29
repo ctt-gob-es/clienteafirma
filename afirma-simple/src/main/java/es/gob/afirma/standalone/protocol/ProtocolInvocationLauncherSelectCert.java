@@ -153,10 +153,10 @@ final class ProtocolInvocationLauncherSelectCert {
 						pwc, // PasswordCallback
 						null // Parent
 				);
-			} catch (final Exception e3) {
-				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
+			} catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Error obteniendo el AOKeyStoreManager", e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e3);
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 				if (!bySocket){
 					throw new SocketOperationException(errorCode);
 				}

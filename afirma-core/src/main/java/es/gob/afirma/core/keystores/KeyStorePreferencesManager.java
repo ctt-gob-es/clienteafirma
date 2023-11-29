@@ -2,7 +2,6 @@ package es.gob.afirma.core.keystores;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -14,17 +13,12 @@ public final class KeyStorePreferencesManager {
 
 	private static final Preferences USER_PREFERENCES;
 	private static Preferences SYSTEM_PREFERENCES;
-	private static final Properties PROPERTIES;
 
 	/** Indica cual fue el &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. */
 	public static String lastSelectedKeystore = null;
 
 	/** Indica cual fue la libreria del &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. */
 	public static String lastSelectedKeystoreLib = null;
-
-
-	/** Indica si omitir o no el certificado de autenticaci&oacute;n para DNIe. */
-	public static final String PREFERENCE_SKIP_AUTH_CERT_DNIE = "skipAuthCertDnie"; //$NON-NLS-1$
 
 	private static final String KEYSTORES_NODE = "/es/gob/afirma/core/keystores"; //$NON-NLS-1$
 	private static final String SYSTEM_UPDATED_KEYSTORES_NODE = "/es/gob/afirma/core/systemkeystores"; //$NON-NLS-1$
@@ -58,17 +52,6 @@ public final class KeyStorePreferencesManager {
 			systemPreferences = null;
 		}
 		SYSTEM_PREFERENCES = systemPreferences;
-
-		PROPERTIES = new Properties();
-		try {
-			PROPERTIES.load(KeyStorePreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-				"No han podido cargarse los valores por defecto del fichero de configuracion de preferencias, se usaran los valores por defecto: " //$NON-NLS-1$
-					+ e
-			);
-		}
 	}
 
 	private KeyStorePreferencesManager() {
@@ -401,67 +384,6 @@ public final class KeyStorePreferencesManager {
 	 */
 	public static String getLastSelectedKeystoreLib() {
 		return lastSelectedKeystoreLib;
-	}
-
-	/**
-	 * Asigna la preferencia para omitir o no el cerificado de autenticaci&oacute;n para DNIe
-	 * @param skipCert Valor para la preferencia
-	 */
-	public static void setSkipAuthCertDNIeEnabled(final boolean skipCert) {
-		// Si el valor que se le va a asignar a la propiedad es el mismo que el del sistema,
-		// se elimina en el registro del usuario y permanece la del sistema
-		final boolean systemValue = getBooleanSystemPreference(PREFERENCE_SKIP_AUTH_CERT_DNIE);
-		if (skipCert == systemValue) {
-			USER_PREFERENCES.remove(PREFERENCE_SKIP_AUTH_CERT_DNIE);
-		} else if (skipCert != isSkipAuthCertDNIeEnabled()) {
-			// Si la propiedad ha cambiado con respecto a la configurada en el sistema o por defecto, se guardara
-			USER_PREFERENCES.putBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, skipCert);
-		}
-	}
-
-	/**
-	 * Obtiene la preferencia para omitir o no el cerificado de autenticaci&oacute;n para DNIe
-	 * @return true si se va a omitir el certificado
-	 */
-	public static boolean isSkipAuthCertDNIeEnabled() {
-		return USER_PREFERENCES.getBoolean(PREFERENCE_SKIP_AUTH_CERT_DNIE, getBooleanSystemPreference(PREFERENCE_SKIP_AUTH_CERT_DNIE));
-	}
-
-	/**
-	 * Recupera el valor de una cadena de texto almacenada en las propiedades del sistema.
-	 * @param key Clave del valor que queremos recuperar.
-	 * @return La preferencia almacenada o la que se encuentra configurada por defecto si no se encontr&oacute;. */
-	public static boolean getBooleanSystemPreference(final String key) {
-		return SYSTEM_PREFERENCES == null ? false : SYSTEM_PREFERENCES.getBoolean(key, getBooleanDefaultPreference(key));
-	}
-
-	/**
-	 * Recupera el valor de una cadena de texto almacenada en un fichero de propiedades.
-	 *  @param key Clave del valor que queremos recuperar.
-	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
-	public static boolean getBooleanDefaultPreference(final String key) {
-		return Boolean.parseBoolean(PROPERTIES.getProperty(key));
-	}
-
-	/**
-	 * Se obtienen las preferencias a exportar que se hayan registrado en el sistema y en el usuario.
-	 * Si la preferencia existe en usuario y sistema, tendr&aacute; prioridad la del usuario.
-	 * @return Mapa con las claves y valores del sistema.
-	 */
-	public static Map<String, Object> getPrefsToExport() {
-
-		final Map<String, Object> result = new HashMap<>();
-
-		String skipAuth = SYSTEM_PREFERENCES == null ? null : SYSTEM_PREFERENCES.get(PREFERENCE_SKIP_AUTH_CERT_DNIE, null);
-		if (skipAuth != null) {
-			result.put(PREFERENCE_SKIP_AUTH_CERT_DNIE, Boolean.valueOf(skipAuth));
-		}
-		skipAuth = USER_PREFERENCES.get(PREFERENCE_SKIP_AUTH_CERT_DNIE, null);
-		if (skipAuth != null) {
-			result.put(PREFERENCE_SKIP_AUTH_CERT_DNIE, Boolean.valueOf(skipAuth));
-		}
-
-		return result;
 	}
 
 	/**

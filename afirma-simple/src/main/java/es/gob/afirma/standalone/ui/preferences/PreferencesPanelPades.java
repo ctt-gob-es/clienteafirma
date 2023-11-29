@@ -24,7 +24,6 @@ import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PR
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -445,24 +444,9 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.put(PREFERENCE_PADES_STAMP, Boolean.toString(this.visiblePdfStamp.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, Boolean.toString(this.checkShadowAttack.isSelected()));
 
-		if ("".equals(this.padesSignerContact.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_PADES_SIGNER_CONTACT);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
-		}
-		if ("".equals(this.padesSignProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
-		}
-		if ("".equals(this.padesSignReason.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_PADES_SIGN_REASON);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
-		}
+		PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
+		PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
+		PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
 
 		final ComboBoxModel<Object> m = this.padesBasicFormat.getModel();
 		final Object o = m.getElementAt(this.padesBasicFormat.getSelectedIndex());
@@ -602,22 +586,23 @@ final class PreferencesPanelPades extends JScrollPane {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getPadesPreferedPolicy() {
 
-		if (PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER) == null ||
-				PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER).isEmpty()) {
-			return null;
+		AdESPolicy adesPolicy = null;
+
+		final String policyIdentifier = PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER);
+		if (policyIdentifier != null && !policyIdentifier.isEmpty()) {
+			try {
+				adesPolicy = new AdESPolicy(
+						policyIdentifier,
+						PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH),
+						PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
+						PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER)
+						);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al recuperar la politica PAdES guardada en preferencias: " + e); //$NON-NLS-1$
+			}
 		}
-		try {
-			return new AdESPolicy(
-				PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER),
-				PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH),
-				PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
-				PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER)
-			);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error al recuperar la politica PAdES guardada en preferencias: " + e); //$NON-NLS-1$
-			return null;
-		}
+		return adesPolicy;
 	}
 
 	/** Obtiene la configuraci&oacute;n de pol&iacute;tica de firma PAdES por
@@ -633,28 +618,21 @@ final class PreferencesPanelPades extends JScrollPane {
 		if (isBlocked()) {
 			adesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 		}
-		// Si no, devolvemos la configuracion por defecto
+		// Si no, establecemos la configuracion por defecto
 		else {
 			try {
-				if (PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER) == null
-						|| PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER).isEmpty()) {
-					this.padesPolicyDlg.loadPolicy(null);
-				}
-				else {
-					this.padesPolicyDlg.loadPolicy(
-						new AdESPolicy(PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER),
+				final String policyIdentifier = PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER);
+				if (policyIdentifier != null && !policyIdentifier.isEmpty()) {
+					adesPolicy = new AdESPolicy(
+							policyIdentifier,
 							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH),
 							PreferencesManager.get(PREFERENCE_PADES_POLICY_HASH_ALGORITHM),
-							PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER)
-						)
-					);
+							PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER));
 				}
-
+				this.padesPolicyDlg.loadPolicy(adesPolicy);
 			}
 			catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
-					.severe("Error al recuperar la politica PAdES guardada en fichero de preferencias: " + e); //$NON-NLS-1$
-
+				LOGGER.severe("Error al recuperar la politica PAdES guardada en preferencias: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -681,9 +659,9 @@ final class PreferencesPanelPades extends JScrollPane {
 		if (this.padesPolicyDlg == null) {
 			final List<PolicyItem> padesPolicies = new ArrayList<>();
 			padesPolicies.add(
-				new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-				POLICY_PADES_AGE_1_9)
-			);
+					new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+							POLICY_PADES_AGE_1_9));
+
 			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(), isBlocked());
 		}
 	}
@@ -692,12 +670,7 @@ final class PreferencesPanelPades extends JScrollPane {
 	 * @param container Contenedor en el que se define el di&aacute;logo. */
 	public void changePadesPolicyDlg(final Container container) {
 
-		// Cursor en espera
-		container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-		// Cursor por defecto
-		container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
+		// Cargamos el dialogo
 		loadPadesPolicy();
 
 		final int confirmDialog = AOUIFactory.showConfirmDialog(container, this.padesPolicyDlg,
@@ -711,16 +684,12 @@ final class PreferencesPanelPades extends JScrollPane {
 
 				this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
 				final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
-
 				if (padesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
-					PreferencesManager.put(PREFERENCE_PADES_POLICY_HASH,
-							padesPolicy.getPolicyIdentifierHash());
-					PreferencesManager.put(PREFERENCE_PADES_POLICY_HASH_ALGORITHM,
-							padesPolicy.getPolicyIdentifierHashAlgorithm());
+					PreferencesManager.put(PREFERENCE_PADES_POLICY_HASH, padesPolicy.getPolicyIdentifierHash());
+					PreferencesManager.put(PREFERENCE_PADES_POLICY_HASH_ALGORITHM, padesPolicy.getPolicyIdentifierHashAlgorithm());
 					if (padesPolicy.getPolicyQualifier() != null) {
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_QUALIFIER,
-								padesPolicy.getPolicyQualifier().toString());
+						PreferencesManager.put(PREFERENCE_PADES_POLICY_QUALIFIER, padesPolicy.getPolicyQualifier().toString());
 					} else {
 						PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 					}

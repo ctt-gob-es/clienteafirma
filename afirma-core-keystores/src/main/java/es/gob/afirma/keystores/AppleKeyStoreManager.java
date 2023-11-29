@@ -140,14 +140,19 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 		final Set<BigInteger> addedSerials = new HashSet<>();
 		for (final String al : tmpAliasesWithPrivateKey) {
 			final X509Certificate tmpCert = getCertificate(al);
-			if (!addedSerials.contains(tmpCert.getSerialNumber())) {
-				addedSerials.add(tmpCert.getSerialNumber());
-				tmpAliases.add(al);
+			if (tmpCert != null) {
+				if (!addedSerials.contains(tmpCert.getSerialNumber())) {
+					addedSerials.add(tmpCert.getSerialNumber());
+					tmpAliases.add(al);
+				}
+				else {
+					LOGGER.info(
+							String.format("Se retira el certificado con numero de serie=%1s por estar duplicado", //$NON-NLS-1$
+									tmpCert.getSerialNumber()));
+				}
 			}
 			else {
-				LOGGER.info(
-					"Se retira el certificado con numero de serie=" + tmpCert.getSerialNumber() + " por estar duplicado" //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				LOGGER.warning(String.format("No se pudo cargar el certificado con alias '%1s'", al)); //$NON-NLS-1$
 			}
 		}
 		setCachedAliases(tmpAliases.toArray(new String[tmpAliases.size()]));

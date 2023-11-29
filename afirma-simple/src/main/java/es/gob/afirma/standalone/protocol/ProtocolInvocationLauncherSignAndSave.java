@@ -77,7 +77,8 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
@@ -518,7 +519,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 					null // Parent
 				);
 			} catch (final Exception e) {
-				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error obteniendo el AOKeyStoreManager", e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
 				throw new SocketOperationException(errorCode, e);
 			}

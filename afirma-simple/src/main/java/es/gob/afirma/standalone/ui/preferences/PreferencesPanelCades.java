@@ -18,7 +18,6 @@ import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PR
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -435,22 +434,23 @@ final class PreferencesPanelCades extends JScrollPane {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getCadesPreferedPolicy() {
 
-		if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER) == null ||
-				PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER).isEmpty()) {
-			return null;
+		AdESPolicy adesPolicy = null;
+
+		final String policyIdentifier = PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER);
+		if (policyIdentifier != null && !policyIdentifier.isEmpty()) {
+			try {
+				adesPolicy = new AdESPolicy(
+						policyIdentifier,
+						PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH),
+						PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
+						PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER)
+						);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al recuperar la politica CAdES guardada en preferencias: " + e); //$NON-NLS-1$
+			}
 		}
-		try {
-			return new AdESPolicy(
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER)
-					);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error al recuperar la politica CAdES guardada en preferencias: " + e); //$NON-NLS-1$
-			return null;
-		}
+		return adesPolicy;
 	}
 
 	/** Obtiene la configuraci&oacute;n de politica de firma CAdES por defecto.
@@ -468,27 +468,22 @@ final class PreferencesPanelCades extends JScrollPane {
 		// Si no, establecemos la configuracion por defecto
 		else {
 			try {
-				// Si, por defecto, no debe haber ninguna politica configurada, hacemos eso
-				if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER) == null
-						|| PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER).isEmpty()) {
-					this.cadesPolicyDlg.loadPolicy(null);
-				} else {
-
-					this.cadesPolicyDlg
-							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
-									PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER)));
+				final String policyIdentifier = PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER);
+				if (policyIdentifier != null && !policyIdentifier.isEmpty()) {
+					adesPolicy = new AdESPolicy(
+							policyIdentifier,
+							PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH),
+							PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM),
+							PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER));
 				}
-			} catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
-						.severe("Error al recuperar la politica CAdES guardada en preferencias: " + e); //$NON-NLS-1$
-
+				this.cadesPolicyDlg.loadPolicy(adesPolicy);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al recuperar la politica CAdES guardada en preferencias: " + e); //$NON-NLS-1$
 			}
 		}
 
 		return adesPolicy;
-
 	}
 
 
@@ -499,8 +494,9 @@ final class PreferencesPanelCades extends JScrollPane {
 		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.cadesPolicyDlg == null) {
 			final List<PolicyItem> cadesPolicies = new ArrayList<>();
-			cadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-					POLICY_CADES_AGE_1_9));
+			cadesPolicies.add(
+					new PolicyItem( SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+							POLICY_CADES_AGE_1_9));
 
 			this.cadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), isBlocked());
 		}
@@ -514,32 +510,26 @@ final class PreferencesPanelCades extends JScrollPane {
 	 */
 	public void changeCadesPolicyDlg(final Container container) {
 
-		// Cursor en espera
-		container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-		// Cursor por defecto
-		container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
+		// Cargamos el dialogo
 		loadCadesPolicy();
 
-		if (AOUIFactory.showConfirmDialog(container, this.cadesPolicyDlg,
+		final int confirmDialog = AOUIFactory.showConfirmDialog(container, this.cadesPolicyDlg,
 				SimpleAfirmaMessages.getString("PolicyDialog.0"), //$NON-NLS-1$
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.DEFAULT_OPTION) == JOptionPane.OK_OPTION) {
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.DEFAULT_OPTION);
+
+		if (confirmDialog == JOptionPane.OK_OPTION) {
 
 			try {
 				checkPreferences();
 
 				this.currentPolicyValue.setText(this.cadesPolicyDlg.getSelectedPolicyName());
-
 				final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
 				if (cadesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
 					PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH, cadesPolicy.getPolicyIdentifierHash());
-					PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH_ALGORITHM,
-							cadesPolicy.getPolicyIdentifierHashAlgorithm());
+					PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, cadesPolicy.getPolicyIdentifierHashAlgorithm());
 					if (cadesPolicy.getPolicyQualifier() != null) {
-						PreferencesManager.put(PREFERENCE_CADES_POLICY_QUALIFIER,
-								cadesPolicy.getPolicyQualifier().toString());
+						PreferencesManager.put(PREFERENCE_CADES_POLICY_QUALIFIER, cadesPolicy.getPolicyQualifier().toString());
 					} else {
 						PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 					}

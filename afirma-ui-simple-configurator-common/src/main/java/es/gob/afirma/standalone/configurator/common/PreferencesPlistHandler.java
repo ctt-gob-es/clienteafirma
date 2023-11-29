@@ -229,11 +229,6 @@ public final class PreferencesPlistHandler {
 			properties.remove(SMARTCARDS_KEY);
 		}
 
-		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
-			KeyStorePreferencesManager.setSkipAuthCertDNIeEnabled((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
-			properties.remove(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE);
-		}
-
 		checkPreferences(properties);
 		storeUserPreferences(properties, unprotected);
 	}
@@ -275,11 +270,6 @@ public final class PreferencesPlistHandler {
 			properties.remove(SMARTCARDS_KEY);
 		}
 
-		if (properties.containsKey(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE)) {
-			KeyStorePreferencesManager.setSkipAuthCertDNIeEnabled((Boolean) properties.get(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE));
-			properties.remove(KeyStorePreferencesManager.PREFERENCE_SKIP_AUTH_CERT_DNIE);
-		}
-
 		checkPreferences(properties);
 		storeSystemPreferences(properties);
 	}
@@ -290,8 +280,6 @@ public final class PreferencesPlistHandler {
 	 */
 	public static String exportPreferencesToXml() {
 		final Map<String, Object> userProperties = PreferencesManager.getPrefsToExport();
-
-		userProperties.putAll(KeyStorePreferencesManager.getPrefsToExport());
 
 		final Map<String, String> smartCardsPreferences = KeyStorePreferencesManager.getAllSmartCardsMap();
 		if (smartCardsPreferences.size() > 0) {

@@ -289,33 +289,10 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 
 		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNER_ROLE, this.facturaeRol.getSelectedItem().toString());
 
-		if ("".equals(this.facturaeSignatureProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY, this.facturaeSignatureProductionCity.getText());
-		}
-
-		if ("".equals(this.facturaeSignatureProductionCountry.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY, this.facturaeSignatureProductionCountry.getText());
-		}
-
-		if ("".equals(this.facturaeSignatureProductionPostalCode.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE, this.facturaeSignatureProductionPostalCode.getText());
-		}
-
-		if ("".equals(this.facturaeSignatureProductionProvince.getText())) { //$NON-NLS-1$
-			PreferencesManager.remove(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE);
-		}
-		else {
-			PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, this.facturaeSignatureProductionProvince.getText());
-		}
+		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY, this.facturaeSignatureProductionCity.getText());
+		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, this.facturaeSignatureProductionProvince.getText());
+		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE, this.facturaeSignatureProductionPostalCode.getText());
+		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY, this.facturaeSignatureProductionCountry.getText());
 
 		final AdESPolicy facturaePolicy = this.facturaePolicyPanel.getSelectedPolicy();
 		if (facturaePolicy != null) {

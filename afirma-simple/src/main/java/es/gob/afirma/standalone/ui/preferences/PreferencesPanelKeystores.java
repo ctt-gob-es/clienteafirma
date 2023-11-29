@@ -922,8 +922,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, this.onlySignature.isSelected());
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
-		KeyStorePreferencesManager.setSkipAuthCertDNIeEnabled(this.skipAuthCertDnie.isSelected());
-
+		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SKIP_AUTH_CERT_DNIE, this.skipAuthCertDnie.isSelected());
 	}
 
 	void loadPreferences() {
@@ -977,7 +976,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		this.showExpiredCerts.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS));
 		this.onlySignature.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS));
 		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS));
-		this.skipAuthCertDnie.setSelected(KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled());
+		this.skipAuthCertDnie.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SKIP_AUTH_CERT_DNIE));
 
         revalidate();
         repaint();
@@ -1016,6 +1015,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		PreferencesManager.remove(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS);
 		PreferencesManager.remove(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS);
 		PreferencesManager.remove(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS);
+		PreferencesManager.remove(PreferencesManager.PREFERENCE_KEYSTORE_SKIP_AUTH_CERT_DNIE);
 
 		try {
 			PreferencesManager.flush();
@@ -1034,7 +1034,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS)) {
     		filters.add(new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE));
     	}
-    	if (KeyStorePreferencesManager.isSkipAuthCertDNIeEnabled()) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SKIP_AUTH_CERT_DNIE)) {
     		filters.add(new SkipAuthDNIeFilter());
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS)) {
