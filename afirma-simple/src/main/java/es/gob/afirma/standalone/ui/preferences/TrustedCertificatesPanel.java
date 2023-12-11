@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -153,9 +154,17 @@ final class TrustedCertificatesPanel extends JPanel  {
 		  }
 
 		  this.table = new JTable(this.model);
+		  this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		  this.table.getSelectionModel().addListSelectionListener(event -> {
 			TrustedCertificatesPanel.this.viewCertButton.setEnabled(true);
 			TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
+		  });
+		  this.table.addMouseListener(new java.awt.event.MouseAdapter() {
+		      public void mouseClicked(java.awt.event.MouseEvent e) {
+		          if(e.getClickCount()==2){
+		        	  CertificateUtils.openCert(table, savedCerts.get(table.getSelectedRow()));
+		          }
+		      }
 		  });
 
 		  this.certsScrollPane = new JScrollPane();
@@ -220,13 +229,14 @@ final class TrustedCertificatesPanel extends JPanel  {
      * @param x509Certificate Certificado a eliminar
      */
     private void deleteCert(final int certIdx) {
-    	if (AOUIFactory.showConfirmDialog(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.29"), //$NON-NLS-1$
+    	
+    	final X509Certificate cert = this.savedCerts.get(certIdx);
+    	
+    	if (AOUIFactory.showConfirmDialog(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.29", AOUtil.getCN(cert.getSubjectX500Principal().toString())), //$NON-NLS-1$
     			SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
     			JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
     		try {
-
-    			final X509Certificate cert = this.savedCerts.get(certIdx);
 
     			LOGGER.info("Se elimina del almacen de confianza el certificado con el numero de serie: " + AOUtil.hexify(cert.getSerialNumber().toByteArray(), false)); //$NON-NLS-1$
 

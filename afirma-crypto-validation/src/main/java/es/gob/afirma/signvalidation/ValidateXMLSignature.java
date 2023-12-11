@@ -102,6 +102,30 @@ public final class ValidateXMLSignature extends SignValider {
         				new KeyValueKeySelector(),
         				nl.item(i)
         				);
+        		
+        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+        		if (!signature.validate(valContext) && !noMatchDataOcurred) {
+        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
+        		}
+        		if (!signature.getSignatureValue().validate(valContext) && !noMatchDataOcurred) {
+        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        			noMatchDataOcurred = true;
+        		}
+
+        		// Ahora miramos las referencias una a una
+        		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
+        		boolean isKO = false;
+        		while (it.hasNext() && !isKO && !noMatchDataOcurred) {
+        			final Reference iNext = (Reference) it.next();
+        			if (!iNext.validate(valContext)) {
+        				LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+        				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+        				isKO = true;
+        			}
+        		}
 
         		if (checkCertificates) {
         			final XMLSignatureFactory certs = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
@@ -135,30 +159,6 @@ public final class ValidateXMLSignature extends SignValider {
         						}
         					}
         				}
-        			}
-        		}
-
-        		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-        		if (!signature.validate(valContext) && !noMatchDataOcurred) {
-        			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
-        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
-        			noMatchDataOcurred = true;
-        		}
-        		if (!signature.getSignatureValue().validate(valContext) && !noMatchDataOcurred) {
-        			LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
-        			result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
-        			noMatchDataOcurred = true;
-        		}
-
-        		// Ahora miramos las referencias una a una
-        		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
-        		boolean isKO = false;
-        		while (it.hasNext() && !isKO && !noMatchDataOcurred) {
-        			final Reference iNext = (Reference) it.next();
-        			if (!iNext.validate(valContext)) {
-        				LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
-        				result.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
-        				isKO = true;
         			}
         		}
 

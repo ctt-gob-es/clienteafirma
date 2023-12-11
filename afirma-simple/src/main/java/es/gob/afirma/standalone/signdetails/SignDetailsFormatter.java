@@ -117,18 +117,6 @@ public class SignDetailsFormatter {
 			}
 		}
 		for (int i = 0; i < signDetailsParent.size(); i++) {
-			final CertificateDetails certDetails = signDetailsParent.get(i).getSigner();
-			if (certDetails != null) {
-				final String validation = (String) certDetails.getValidityResult().get("Validacion"); //$NON-NLS-1$
-				if (!SimpleAfirmaMessages.getString("ValidationInfoDialog.40").equals(validation)) { //$NON-NLS-1$
-					if (!isULAdded) {
-						result += "<ul>"; //$NON-NLS-1$
-						isULAdded = true;
-					}
-					result += "<li>Firma " + (i + 1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				}
-			}
-
 			for (int m = 0 ; m < signDetailsParent.get(i).getValidityResult().size() ; m++) {
 				//Se evitan asi errores duplicados de certificados
 				if (signDetailsParent.get(i).getValidityResult().get(m).getError() != null
@@ -141,6 +129,18 @@ public class SignDetailsFormatter {
 							isULAdded = true;
 						}
 						result += "<li>Firma " + (i+1) + ": " + signDetailsParent.get(i).getValidityResult().get(m) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+			}
+			
+			final CertificateDetails certDetails = signDetailsParent.get(i).getSigner();
+			if (certDetails != null) {
+				final String validation = (String) certDetails.getValidityResult().get("Validacion"); //$NON-NLS-1$
+				if (!SimpleAfirmaMessages.getString("ValidationInfoDialog.40").equals(validation)) { //$NON-NLS-1$
+					if (!isULAdded) {
+						result += "<ul>"; //$NON-NLS-1$
+						isULAdded = true;
+					}
+					result += "<li>Firma " + (i + 1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
 		}
