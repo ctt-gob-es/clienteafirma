@@ -26,13 +26,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.AgePolicy;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 public class SignatureConfigInfoPanel extends JPanel {
 
@@ -44,19 +46,35 @@ public class SignatureConfigInfoPanel extends JPanel {
     private JCheckBox pdfStamp = null;
 
     private String accesibleDescription;
+    
+    private JLabel signFormatLabel;
+    
+    private JPanel attributesPanel;
+    
+    private JPanel signOptionsPanel;
+    
+    private SignPanelFilePanel signPanelFile;
 
-	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor) {
+	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor, final SignPanelFilePanel signPanel) {
+		this.signPanelFile = signPanel;
 		createUI(signConfig, bgColor);
 	}
 
-	private void createUI(final SignOperationConfig signConfig, final Color bgColor) {
+	public SignatureConfigInfoPanel() {
+		
+	}
 
+	private SignatureConfigInfoPanel createUI(final SignOperationConfig signConfig, final Color bgColor) {
+
+		//Eliminamos los componentes anteriores si existieran por si se esta actualizando el panel
+		removeAll();
+		
 		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 			setBackground(bgColor);
 		}
 
 		// Formato de firma
-		final JLabel signFormatLabel = new JLabel(
+		this.signFormatLabel = new JLabel(
 				SimpleAfirmaMessages.getString("SignPanel.103", signConfig.getSignatureFormatName())); //$NON-NLS-1$
 		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.103", signConfig.getSignatureFormatName()); //$NON-NLS-1$
 
@@ -64,34 +82,39 @@ public class SignatureConfigInfoPanel extends JPanel {
 		final JLabel attrLabel = new JLabel(
 				SimpleAfirmaMessages.getString("SignPanel.143")); //$NON-NLS-1$
 		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.143"); //$NON-NLS-1$
-		final JPanel attrPanel = createAttributesPanel(signConfig);
+		this.attributesPanel = createAttributesPanel(signConfig);
 
 		// Opciones de firma
-		final JPanel optionsPanel = createOptionsPanel(signConfig, bgColor);
+		this.signOptionsPanel = createOptionsPanel(signConfig, bgColor);
+		
+		// Opciones de formato
+		final JPanel formatOptionsPanel = createFormatOptionsPanel(signConfig, bgColor);
 
 		// Agregamos los elementos al panel
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		add(Box.createRigidArea(new Dimension(0, 4)));
-		add(signFormatLabel);
-        if (attrPanel != null) {
+		add(formatOptionsPanel);
+		
+        if (this.attributesPanel != null) {
         	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-        		attrPanel.setBackground(bgColor);
+        		this.attributesPanel.setBackground(bgColor);
         	}
         	add(Box.createRigidArea(new Dimension(0, 4)));
         	add(attrLabel);
         	add(Box.createRigidArea(new Dimension(0, 4)));
-        	add(attrPanel);
+        	add(this.attributesPanel);
         }
-        if (optionsPanel != null) {
+        if (this.signOptionsPanel != null) {
         	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-        		optionsPanel.setBackground(bgColor);
+        		this.signOptionsPanel.setBackground(bgColor);
         	}
         	add(Box.createRigidArea(new Dimension(0, 4)));
-        	add(optionsPanel);
+        	add(this.signOptionsPanel);
         }
+        return this;
 	}
-
+	
 	private JPanel createAttributesPanel(final SignOperationConfig config) {
 
 		String policyId = null;
@@ -113,7 +136,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 		if (policyId == null && roles == null && !definedPlace) {
 			return null;
 		}
-
+		
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -169,6 +192,28 @@ public class SignatureConfigInfoPanel extends JPanel {
     	this.accesibleDescription += SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + text;  //$NON-NLS-1$//$NON-NLS-2$
 
 		final SignatureAttributesListener linkListener = new SignatureAttributesListener(signConfig);
+		hlLabel.addMouseListener(linkListener);
+		hlLabel.addFocusListener(linkListener);
+		hlLabel.addKeyListener(linkListener);
+
+		return hlLabel;
+	}
+
+	private JLabel createChangeFormatHiperlink(final String text, final SignOperationConfig signConfig, final Color bgColor) {
+
+		final JLabel hlLabel = new JLabel(text); 
+
+		hlLabel.setFocusable(true);
+		hlLabel.setForeground(LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.yellow : Color.blue);
+    	final Font font = hlLabel.getFont();
+    	final Map attributes = font.getAttributes();
+    	attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+    	hlLabel.setFont(font.deriveFont(attributes));
+
+    	hlLabel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + text);  //$NON-NLS-1$//$NON-NLS-2$
+    	this.accesibleDescription += SimpleAfirmaMessages.getString("SignDataPanel.46") + " " + text;  //$NON-NLS-1$//$NON-NLS-2$
+
+		final ChangeFormatListener linkListener = new ChangeFormatListener(this, signConfig, bgColor, this.signPanelFile);
 		hlLabel.addMouseListener(linkListener);
 		hlLabel.addFocusListener(linkListener);
 		hlLabel.addKeyListener(linkListener);
@@ -245,6 +290,25 @@ public class SignatureConfigInfoPanel extends JPanel {
 
         return panel;
 	}
+	
+	private JPanel createFormatOptionsPanel(final SignOperationConfig config, final Color bgColor) {
+
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		
+		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
+			panel.setBackground(bgColor);
+		}
+
+		panel.add(this.signFormatLabel);
+		panel.add(Box.createRigidArea(new Dimension(4, 0)));
+		if (CryptoOperation.SIGN.equals(config.getCryptoOperation())) {
+			panel.add(createChangeFormatHiperlink(SimpleAfirmaMessages.getString("SignPanel.157"), config, bgColor)); //$NON-NLS-1$
+			panel.add(Box.createRigidArea(new Dimension(4, 0)));
+		}
+		
+        return panel;
+	}
 
 	public boolean isPdfVisibleSignatureSelected() {
 		return this.pdfVisible != null && this.pdfVisible.isSelected();
@@ -256,6 +320,26 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	public String getAccesibleDescription() {
 		return this.accesibleDescription;
+	}
+	
+	public JLabel getSignFormatLabel() {
+		return this.signFormatLabel;
+	}
+
+	public JPanel getAttributesPanel() {
+		return this.attributesPanel;
+	}
+
+	public JPanel getSignOptionsPanel() {
+		return this.signOptionsPanel;
+	}
+
+	public void setAttributesPanel(final JPanel attributesPanel) {
+		this.attributesPanel = attributesPanel;
+	}
+
+	public void setSignOptionsPanel(final JPanel signOptionsPanel) {
+		this.signOptionsPanel = signOptionsPanel;
 	}
 
 	static class SignatureAttributesListener implements MouseListener, FocusListener, KeyListener {
@@ -313,6 +397,96 @@ public class SignatureConfigInfoPanel extends JPanel {
 		public void keyReleased(final KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
 				executeAction((Component) e.getSource(), this.signConfig);
+			}
+		}
+	}
+	
+	 class ChangeFormatListener implements MouseListener, FocusListener, KeyListener {
+
+		private final SignOperationConfig signConfig;
+		private final SignatureConfigInfoPanel panel;
+		private final SignPanelFilePanel signPanel;
+		private final Color bgColor;
+
+		public ChangeFormatListener(final SignatureConfigInfoPanel panel, final SignOperationConfig signConfig, final Color bgColor, final SignPanelFilePanel signPanel) {
+			this.panel = panel;
+			this.signConfig = signConfig;
+			this.bgColor = bgColor;
+			this.signPanel = signPanel;
+		}
+
+		@Override
+		public void mouseReleased(final MouseEvent e) { /* No hacemos nada */ }
+
+		@Override
+		public void mousePressed(final MouseEvent e) { /* No hacemos nada */ }
+
+		@Override
+		public void mouseExited(final MouseEvent e) {
+			e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}
+
+		@Override
+		public void mouseEntered(final MouseEvent e) {
+			e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		}
+
+		@Override
+		public void mouseClicked(final MouseEvent e) {
+			executeAction(this.signConfig);
+		}
+
+		@Override
+		public void focusGained(final FocusEvent e) {
+			((JComponent) e.getSource()).setBorder(BorderFactory.createDashedBorder(null, 1, 1));
+		}
+
+		@Override
+		public void focusLost(final FocusEvent e) {
+			((JComponent) e.getSource()).setBorder(null);
+		}
+
+		private void executeAction(final SignOperationConfig config) {
+			final ChangeFormatPanel changeFormatPanel = new ChangeFormatPanel(config);
+			this.panel.getAccessibleContext().setAccessibleDescription(ChangeFormatPanel.getAccessibleDescription());
+			if (AOUIFactory.showConfirmDialog(
+					null,
+					changeFormatPanel,
+					SimpleAfirmaMessages.getString("ChangeFormatDialog.0"), //$NON-NLS-1$
+					AOUIFactory.OK_CANCEL_OPTION,
+					AOUIFactory.PLAIN_MESSAGE
+			) == AOUIFactory.YES_OPTION) {
+				String selectedFormat = (String) changeFormatPanel.getUsedCombo().getSelectedItem();
+	
+				final String recommendedStr = " " + SimpleAfirmaMessages.getString("ChangeFormatDialog.2");  //$NON-NLS-1$//$NON-NLS-2$
+				
+				if (selectedFormat.contains(recommendedStr)) {
+					selectedFormat = selectedFormat.replace(recommendedStr, ""); //$NON-NLS-1$
+				}
+				
+				final AOSigner signer = AOSignerFactory.getSigner(selectedFormat);
+				this.signConfig.setSigner(signer);
+				final Properties extraParams = ExtraParamsHelper.loadExtraParamsForSigner(signer);
+				
+				this.signConfig.setExtraParams(extraParams);
+				this.signConfig.setSignatureFormatName(SignPanel.getSignatureName(config.getSigner()));
+
+				final SignatureConfigInfoPanel updatedPanel = createUI(this.signConfig, this.bgColor);
+				this.signPanel.setConfigInfoPanel(updatedPanel);
+				this.signPanel.updateUI();
+			}
+		}
+
+		@Override
+		public void keyTyped(final KeyEvent e) { /* No hacemos nada */ }
+
+		@Override
+		public void keyPressed(final KeyEvent e) { /* No hacemos nada */ }
+
+		@Override
+		public void keyReleased(final KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
+				executeAction(this.signConfig);
 			}
 		}
 	}

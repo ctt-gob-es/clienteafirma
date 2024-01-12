@@ -199,7 +199,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 		final JLabel signConfigLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.142")); //$NON-NLS-1$
 		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.142"); //$NON-NLS-1$
 		signConfigLabel.setFont(signConfigLabel.getFont().deriveFont(Font.BOLD));
-		this.configInfoPanel = new SignatureConfigInfoPanel(signConfig, bgColor);
+		this.configInfoPanel = new SignatureConfigInfoPanel(signConfig, bgColor, this);
 		this.accesibleDescription += this.configInfoPanel.getAccesibleDescription();
 
         // Componemos el panel
@@ -291,5 +291,14 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 	public boolean getScrollableTracksViewportHeight() {
 		return false;
 	}
+
+	public SignatureConfigInfoPanel getConfigInfoPanel() {
+		return this.configInfoPanel;
+	}
+
+	public void setConfigInfoPanel(final SignatureConfigInfoPanel configInfoPanel) {
+		this.configInfoPanel = configInfoPanel;
+	}
+	
 }
 

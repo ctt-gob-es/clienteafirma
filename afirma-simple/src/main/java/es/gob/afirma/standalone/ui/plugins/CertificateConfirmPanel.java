@@ -127,6 +127,7 @@ public class CertificateConfirmPanel extends JPanel {
 	    							fDescription
 	    							)
 	    					),
+	    			null,
 	    			this);
 		}
 	}

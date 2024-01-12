@@ -347,6 +347,7 @@ public final class HashUIHelper {
 						new String[] { REPORT_EXT },
 						Messages.getString("CheckHashFiles.11") + " (*." +  REPORT_EXT + ")" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 					)),
+				null,
 				parent
 			);
 	}

@@ -118,6 +118,7 @@ public final class CertificateUtils {
 						CertificateSelectionDialogMessages.getString("CertificateUtils.3") //$NON-NLS-1$
 					)
 				),
+    			null,
     			parent
 			);
 		}

@@ -302,6 +302,7 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 						outputFile.getName() :
 						FileUtils.getCanonicalFile(dir).getName() + "." + defaultExtension, //$NON-NLS-1$
 				buildFilterList(defaultExtension),
+				null,
 				parent
 			);
 

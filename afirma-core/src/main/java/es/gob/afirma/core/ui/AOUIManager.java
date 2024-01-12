@@ -190,6 +190,7 @@ public interface AOUIManager {
      * @param currentDir Directorio inicial del di&aacute;logo.
      * @param selectedFile Nombre de fichero por defecto.
      * @param filters Filtros del tipo de fichero a guardar.
+     * @param defaultFilter Filtro con un valor por defecto, si se indica como nulo, se ignora.
      * @param parent Componente padre sobre el que se mostrar&aacute; el
      *        di&aacute;logo de guardado.
      * @return Fichero guardado.
@@ -199,6 +200,7 @@ public interface AOUIManager {
     					final String currentDir,
     		            final String selectedFile,
     		            final List<GenericFileFilter> filters,
+    		            final DefaultFileFilter defaultFilter,
     		            final Object parent) throws IOException;
 
 }

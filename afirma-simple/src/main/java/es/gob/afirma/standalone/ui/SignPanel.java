@@ -631,7 +631,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	  * devuelte el tipo por defecto.
 	  * @param signer Firmador.
 	  * @return Tipo de firma que se debe ejecutar. */
-	 private static String getSignatureName(final AOSigner signer) {
+	 public static String getSignatureName(final AOSigner signer) {
 		 for (final String[] signatureType : signersTypeRelation) {
 			 final Class<?> c;
 			 try {
@@ -993,7 +993,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
       * Filtro de ficheros que s&oacute;lo admite ficheros (no directorios)
       * con permisos de lectura.
       */
-     class OnlyFileFilter implements FileFilter {
+     static class OnlyFileFilter implements FileFilter {
  		@Override
  		public boolean accept(final File pathname) {
  			return pathname.isFile() && pathname.canRead();

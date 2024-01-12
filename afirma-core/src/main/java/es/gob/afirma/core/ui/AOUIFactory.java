@@ -293,6 +293,7 @@ public final class AOUIFactory {
      * @param currentDir Directorio inicial del di&aacute;logo.
      * @param selectedFile Nombre por defecto del fichero.
      * @param filters Filtros del tipo de fichero a guardar.
+     * @param defaultFilter Filtro con un valor por defecto, si se indica como nulo, se ignora.
      * @param parent Componente padre (para la modalidad).
      * @return Fichero en el que se almacenan los datos.
      * @throws IOException Si no se puede guardar el fichero*/
@@ -301,6 +302,7 @@ public final class AOUIFactory {
     									 final String currentDir,
     		                             final String selectedFile,
     		                             final List<GenericFileFilter> filters,
+    		                             final DefaultFileFilter defaultFilter,
     		                             final Object parent) throws IOException {
         return uiManager.saveDataToFile(
     		data,
@@ -308,6 +310,7 @@ public final class AOUIFactory {
     		currentDir,
     		selectedFile,
     		filters,
+    		defaultFilter,
     		parent
 		);
     }

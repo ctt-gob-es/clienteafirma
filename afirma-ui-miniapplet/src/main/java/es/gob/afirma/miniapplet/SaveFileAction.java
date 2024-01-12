@@ -65,6 +65,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<File> {
 			null,
 			this.filename,
 			Collections.singletonList(new GenericFileFilter(this.exts, this.desc)),
+			null,
 			this.parent
 		);
 	}

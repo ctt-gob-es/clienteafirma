@@ -52,6 +52,7 @@ import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIManager;
+import es.gob.afirma.core.ui.DefaultFileFilter;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
 import es.gob.afirma.ui.core.jse.errors.ErrorManagementDialog;
@@ -697,6 +698,7 @@ public class JSEUIManager implements AOUIManager {
 							   final String currentDir,
 			                   final String selectedFile,
 			                   final List<GenericFileFilter> filters,
+			                   final DefaultFileFilter defaultFilter,
 			                   final Object parent) throws IOException {
 
         final Component parentComponent = parent instanceof Component ? (Component) parent : null;
@@ -724,18 +726,30 @@ public class JSEUIManager implements AOUIManager {
             	fileChooser.setAcceptAllFileFilterUsed(false);
             	for (final GenericFileFilter gff: filters) {
             		if (gff.getExtensions() != null && gff.getExtensions().length != 0) {
-            			fileChooser.addChoosableFileFilter(
-            					new FileNameExtensionFilter(
-            							gff.getDescription(),
-            							gff.getExtensions()
-            							)
-            					);
+            			// No se anade el filtro po defecto ya que se anadira luego
+            			if (defaultFilter != null && defaultFilter.getDescription() != null 
+            					&& !defaultFilter.getDescription().equals(gff.getDescription())) {
+                			fileChooser.addChoosableFileFilter(
+                					new FileNameExtensionFilter(
+                							gff.getDescription(),
+                							gff.getExtensions()
+                							)
+                					);
+            			}
             		}
             	}
             }
 
             // Configuramos el directorio y fichero por defecto
             configureDefaultDir(fileChooser, currentDir, selectedFile);
+            
+            if (defaultFilter != null) {
+            	FileFilter ff = new FileNameExtensionFilter(
+						defaultFilter.getDescription(),
+						defaultFilter.getExtensions()
+						);
+            	fileChooser.setFileFilter(new FileNameExtensionFilter(defaultFilter.getDescription(), defaultFilter.getExtensions()));
+            }
 
             int selectedOption = JOptionPane.YES_OPTION;
             final int returnCode = fileChooser.showSaveDialog(parentComponent);
@@ -747,6 +761,17 @@ public class JSEUIManager implements AOUIManager {
             	case JFileChooser.APPROVE_OPTION:
 
             		file = fileChooser.getSelectedFile();
+            		
+            		String fileName = file.getName();
+            		boolean hasExtension = false;
+            		
+            		// Si el usuario ha cambiado el nombre, comprobamos si le ha puesto alguna
+            		// extension distinta a la que tuviera por defecto.
+            		if (!selectedFile.equals(fileName)) {
+            			if (fileName.indexOf(".") != -1) {
+            				hasExtension = true;
+            			}
+            		}
 
 	                // El dialogo no anade una extension por defecto aunque haya filtro, asi que lo hacemos a mano
 	                // si el usuario no ha puesto extension
@@ -754,7 +779,7 @@ public class JSEUIManager implements AOUIManager {
             			final FileFilter ff = fileChooser.getFileFilter();
             			if (ff instanceof FileNameExtensionFilter && !ff.accept(file)) {
             				final String exts[] = ((FileNameExtensionFilter)ff).getExtensions();
-    	                	if (exts != null && exts.length > 0) {
+    	                	if (exts != null && exts.length > 0 && !hasExtension) {
     	                		if (!file.getName().toLowerCase().endsWith(exts[0].toLowerCase())) {
     	                			final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
     	                			file = new File(file.getParent(), file.getName() + extension);
@@ -936,7 +961,9 @@ public class JSEUIManager implements AOUIManager {
 								filename = filename.replace(extold, extnew);
 							}
 							else {
-								filename += extnew;
+								if (!filename.endsWith(extnew)) {
+									filename += extnew;
+								}
 							}
 							setSelectedFile(new File(filename));
 						}

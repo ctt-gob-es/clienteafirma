@@ -29,6 +29,7 @@ import java.util.List;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.DefaultFileFilter;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
@@ -45,6 +46,7 @@ public final class AWTUIManager extends JSEUIManager {
 							   final String currentDir,
 							   final String selectedFile,
 			                   final List<GenericFileFilter> filters,
+			                   final DefaultFileFilter defaultFilter,
 			                   final Object parent) throws IOException {
 
         final FileDialog fd;
