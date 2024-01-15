@@ -282,7 +282,7 @@ public final class AOUIFactory {
     		parentComponent
 		);
     }
-    
+
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
      * los datos y, si se proporcionan, los guarda en la misma.
      * Si ocurre un error durante el guardado, se vuelve a preguntar al usuario por una
@@ -331,7 +331,7 @@ public final class AOUIFactory {
     									 final String currentDir,
     		                             final String selectedFile,
     		                             final List<GenericFileFilter> filters,
-    		                             final DefaultFileFilter defaultFilter,
+    		                             final GenericFileFilter defaultFilter,
     		                             final Object parent) throws IOException {
         return uiManager.saveDataToFile(
     		data,

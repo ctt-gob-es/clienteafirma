@@ -178,7 +178,7 @@ public interface AOUIManager {
     		            boolean multiSelect,
     		            Object icon,
     		            Object parentComponent);
-    
+
     /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
      * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
@@ -222,7 +222,7 @@ public interface AOUIManager {
     					final String currentDir,
     		            final String selectedFile,
     		            final List<GenericFileFilter> filters,
-    		            final DefaultFileFilter defaultFilter,
+    		            final GenericFileFilter defaultFilter,
     		            final Object parent) throws IOException;
 
 }

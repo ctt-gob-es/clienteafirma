@@ -1,5 +1,8 @@
 package es.gob.afirma.core.ui;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /** Filtro de ficheros gen&eacute;rico.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class GenericFileFilter {
@@ -27,4 +30,19 @@ public final class GenericFileFilter {
 		return this.description;
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj instanceof GenericFileFilter) {
+			final String[] objExts = ((GenericFileFilter) obj).getExtensions();
+			final String objDesc = ((GenericFileFilter) obj).getDescription();
+			return Arrays.equals(this.exts, objExts)
+					&& Objects.equals(objDesc, this.description);
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }
