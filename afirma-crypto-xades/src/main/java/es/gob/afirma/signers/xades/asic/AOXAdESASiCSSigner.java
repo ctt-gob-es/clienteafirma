@@ -10,6 +10,8 @@
 package es.gob.afirma.signers.xades.asic;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Properties;
@@ -24,6 +26,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
@@ -57,8 +60,25 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 		final Properties extraParams = setASiCProperties(xParams, data);
 		extraParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
 
+		// Las firmas ASiC siempre son externally detached, lo que obliga a que al firmador XAdES le pasemos
+		// el hash de los datos en lugar de los propios datos
+		extraParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+
+		final String digestMethodAlgorithm = extraParams.getProperty(
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, XAdESConstants.DEFAULT_DIGEST_METHOD);
+		final String externalReferencesHashAlgorithm = extraParams.getProperty(
+		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM, digestMethodAlgorithm);
+
+		byte[] digestValue;
+		try {
+			digestValue = hash(data, externalReferencesHashAlgorithm);
+		}
+		catch (final Exception e) {
+			throw new AOException("No se reconoce el algoritmo de huella digital", e); //$NON-NLS-1$
+		}
+
 		final byte[] xadesSignature = new AOXAdESSigner().sign(
-			data,
+			digestValue,
 			algorithm,
 			key,
 			certChain,
@@ -73,6 +93,22 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 		);
 
 	}
+
+
+	/**
+	 * Calcula la huella digital de los datos proporcionados.
+	 * @param data Datos del que calcular el hash.
+	 * @param externalReferencesHashAlgorithm URL de definici&oacute;n del hash.
+	 * @return Huella digital de los datos.
+	 * @throws NoSuchAlgorithmException Cuando no se reconozca el algoritmo de hash.
+	 */
+	private static byte[] hash(final byte[] data, final String externalReferencesHashAlgorithm) throws NoSuchAlgorithmException {
+		final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(externalReferencesHashAlgorithm);
+		final MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
+		return md.digest(data);
+	}
+
+
 
 	@Override
 	public byte[] cosign(final byte[] data,
@@ -216,17 +252,11 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 				extraParams.getProperty(XAdESASiCExtraParams.ASICS_FILENAME) :
 					ASiCUtil.getASiCSDefaultDataFilename(data);
 
-		// Siempre con MANIFEST
-		extraParams.put(XAdESExtraParams.USE_MANIFEST, Boolean.TRUE.toString());
-
 		// Aprovechamos para anadir atributos utiles
 		extraParams.put(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.TRUE.toString());
 
 		// La URI de referencia es el nombre de fichero dentro del ASiC
 		extraParams.put(XAdESExtraParams.URI, dataFilename);
-
-		// Siempre <i>Externally Detached</i>
-		extraParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
 
 		// Raiz de ASiC
 		extraParams.put(XAdESExtraParams.ROOT_XML_NODE_NAME, "asic:XAdESSignatures"); //$NON-NLS-1$

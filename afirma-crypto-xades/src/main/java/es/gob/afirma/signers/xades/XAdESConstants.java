@@ -109,7 +109,7 @@ public class XAdESConstants {
     static final String DEFAULT_XADES_SIGNATURE_PREFIX = "xades"; //$NON-NLS-1$
 
     /** Algoritmo de huella digital por defecto para las referencias XML. */
-    static final String DEFAULT_DIGEST_METHOD = DigestMethod.SHA512;
+    public static final String DEFAULT_DIGEST_METHOD = DigestMethod.SHA512;
 
     /** URI que define el espacio d nombre de XAdES sin indicar la versi&oacute;n. */
     public static final String NAMESPACE_XADES_NO_VERSION = "http://uri.etsi.org/01903#"; //$NON-NLS-1$
