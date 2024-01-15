@@ -178,6 +178,28 @@ public interface AOUIManager {
     		            boolean multiSelect,
     		            Object icon,
     		            Object parentComponent);
+    
+    /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
+     * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
+     * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
+     * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
+     * se devolvera <code>null</code>, si la operaci&oacute;n finaliza correctamente se
+     * devolver&aacute; la ruta completa del fichero.
+     * @param data Datos que se desean almacenar.
+     * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado.
+     * @param currentDir Directorio inicial del di&aacute;logo.
+     * @param selectedFile Nombre de fichero por defecto.
+     * @param filters Filtros del tipo de fichero a guardar.
+     * @param parent Componente padre sobre el que se mostrar&aacute; el
+     *        di&aacute;logo de guardado.
+     * @return Fichero guardado.
+     * @throws IOException Si no se puede guardar el fichero */
+    File saveDataToFile(final byte[] data,
+    					final String dialogTitle,
+    					final String currentDir,
+    		            final String selectedFile,
+    		            final List<GenericFileFilter> filters,
+    		            final Object parent) throws IOException;
 
     /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que

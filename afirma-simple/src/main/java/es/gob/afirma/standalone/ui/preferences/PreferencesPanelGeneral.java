@@ -223,7 +223,6 @@ final class PreferencesPanelGeneral extends JScrollPane {
 				    								SimpleAfirmaMessages.getString("PreferencesPanel.111") //$NON-NLS-1$
 				    								)
 				    						),
-				    				null,
 									PreferencesPanelGeneral.this);
 							AOUIFactory.showMessageDialog(
 									getParent(),

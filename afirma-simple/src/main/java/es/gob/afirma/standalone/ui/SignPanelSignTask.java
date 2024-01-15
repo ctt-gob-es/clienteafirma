@@ -22,7 +22,6 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -43,8 +42,8 @@ import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.core.ui.DefaultFileFilter;
+import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -620,68 +619,57 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			"_signed" //$NON-NLS-1$
 		);
 
-    	List<GenericFileFilter> filters = new ArrayList<GenericFileFilter>();
-    	//PDF
-    	filters.add(new GenericFileFilter(new String[] {"pdf"}, SimpleAfirmaMessages.getString("SignPanel.72")));
-    	//XML
-    	filters.add(new GenericFileFilter(new String[] {"xsig", "xml"}, SimpleAfirmaMessages.getString("SignPanel.76")));
-    	//DOCX
-    	filters.add(new GenericFileFilter(new String[] {"docx"}, SimpleAfirmaMessages.getString("SignPanel.91")));
-    	//PPTX
-    	filters.add(new GenericFileFilter(new String[] {"pptx"}, SimpleAfirmaMessages.getString("SignPanel.92")));
-    	//XLSX
-    	filters.add(new GenericFileFilter(new String[] {"xlsx"}, SimpleAfirmaMessages.getString("SignPanel.93")));
-    	//OOXML
-    	filters.add(new GenericFileFilter(new String[] {"ooxml"}, SimpleAfirmaMessages.getString("SignPanel.94")));
-    	//ODT
-    	filters.add(new GenericFileFilter(new String[] {"odt"}, SimpleAfirmaMessages.getString("SignPanel.96")));
-    	//ODP
-    	filters.add(new GenericFileFilter(new String[] {"odp"}, SimpleAfirmaMessages.getString("SignPanel.97")));
-    	//ODS
-    	filters.add(new GenericFileFilter(new String[] {"ods"}, SimpleAfirmaMessages.getString("SignPanel.98")));
-    	//ODF
-    	filters.add(new GenericFileFilter(new String[] {"odf"}, SimpleAfirmaMessages.getString("SignPanel.99")));
-    	//XADES
-    	filters.add(new GenericFileFilter(new String[] {"csig", "p7s"}, SimpleAfirmaMessages.getString("SignPanel.80")));
+    	final List<GenericFileFilter> filters = new ArrayList<GenericFileFilter>();
     	
     	DefaultFileFilter defaultFilter = null;
     	
     	if (signer instanceof AOPDFSigner) {
-    		defaultFilter = new DefaultFileFilter (new String[] {"pdf"}, SimpleAfirmaMessages.getString("SignPanel.72"));
+    		defaultFilter = new DefaultFileFilter (new String[] {"pdf"}, SimpleAfirmaMessages.getString("SignPanel.72")); //$NON-NLS-1$ //$NON-NLS-2$
+    		filters.add(new GenericFileFilter(new String[] {"pdf"}, SimpleAfirmaMessages.getString("SignPanel.72"))); //$NON-NLS-1$ //$NON-NLS-2$
     	}
     	else if (signer instanceof AOXAdESSigner || signer instanceof AOFacturaESigner) {
-    		defaultFilter = new DefaultFileFilter(new String[] {"xsig", "xml"}, SimpleAfirmaMessages.getString("SignPanel.76"));
+    		defaultFilter = new DefaultFileFilter(new String[] {"xsig", "xml"}, SimpleAfirmaMessages.getString("SignPanel.76"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+        	filters.add(new GenericFileFilter(new String[] {"xsig", "xml"}, SimpleAfirmaMessages.getString("SignPanel.76")));   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     	}
     	else if (signer instanceof AOOOXMLSigner) {
     		if (newFileName.toLowerCase().endsWith("docx")) { //$NON-NLS-1$
-    			defaultFilter = new DefaultFileFilter(new String[] {"docx"}, SimpleAfirmaMessages.getString("SignPanel.91"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"docx"}, SimpleAfirmaMessages.getString("SignPanel.91")); //$NON-NLS-1$ //$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"docx"}, SimpleAfirmaMessages.getString("SignPanel.91")));  //$NON-NLS-1$//$NON-NLS-2$
     		}
     		else if (newFileName.toLowerCase().endsWith("pptx")) { //$NON-NLS-1$
-    			defaultFilter = new DefaultFileFilter(new String[] {"pptx"}, SimpleAfirmaMessages.getString("SignPanel.92"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"pptx"}, SimpleAfirmaMessages.getString("SignPanel.92"));  //$NON-NLS-1$//$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"pptx"}, SimpleAfirmaMessages.getString("SignPanel.92"))); //$NON-NLS-1$ //$NON-NLS-2$
     		}
     		else if (newFileName.toLowerCase().endsWith("xlsx")) { //$NON-NLS-1$
-    			defaultFilter = new DefaultFileFilter(new String[] {"xlsx"}, SimpleAfirmaMessages.getString("SignPanel.93"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"xlsx"}, SimpleAfirmaMessages.getString("SignPanel.93"));  //$NON-NLS-1$//$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"xlsx"}, SimpleAfirmaMessages.getString("SignPanel.93"))); //$NON-NLS-1$ //$NON-NLS-2$
     		}
     		else {
-    			defaultFilter = new DefaultFileFilter(new String[] {"ooxml"}, SimpleAfirmaMessages.getString("SignPanel.94"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"ooxml"}, SimpleAfirmaMessages.getString("SignPanel.94"));  //$NON-NLS-1$//$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"ooxml"}, SimpleAfirmaMessages.getString("SignPanel.94")));  //$NON-NLS-1$//$NON-NLS-2$
     		}
     	}
     	else if (signer instanceof AOODFSigner) {
     		if (newFileName.toLowerCase().endsWith("odt")) { //$NON-NLS-1$
-    			defaultFilter = new DefaultFileFilter(new String[] {"odt"}, SimpleAfirmaMessages.getString("SignPanel.96"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"odt"}, SimpleAfirmaMessages.getString("SignPanel.96")); //$NON-NLS-1$ //$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"odt"}, SimpleAfirmaMessages.getString("SignPanel.96"))); //$NON-NLS-1$ //$NON-NLS-2$
     		}
     		else if (newFileName.toLowerCase().endsWith("odp")) { //$NON-NLS-1$
-    			defaultFilter = new DefaultFileFilter(new String[] {"odp"}, SimpleAfirmaMessages.getString("SignPanel.97"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"odp"}, SimpleAfirmaMessages.getString("SignPanel.97")); //$NON-NLS-1$ //$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"odp"}, SimpleAfirmaMessages.getString("SignPanel.97")));  //$NON-NLS-1$//$NON-NLS-2$
     		}
     		else if (newFileName.toLowerCase().endsWith("ods")) { //$NON-NLS-1$
-    			defaultFilter = new DefaultFileFilter(new String[] {"ods"}, SimpleAfirmaMessages.getString("SignPanel.98"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"ods"}, SimpleAfirmaMessages.getString("SignPanel.98"));  //$NON-NLS-1$//$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"ods"}, SimpleAfirmaMessages.getString("SignPanel.98")));  //$NON-NLS-1$//$NON-NLS-2$
     		}
     		else {
-    			defaultFilter = new DefaultFileFilter(new String[] {"odf"}, SimpleAfirmaMessages.getString("SignPanel.99"));
+    			defaultFilter = new DefaultFileFilter(new String[] {"odf"}, SimpleAfirmaMessages.getString("SignPanel.99")); //$NON-NLS-1$ //$NON-NLS-2$
+    			filters.add(new GenericFileFilter(new String[] {"odf"}, SimpleAfirmaMessages.getString("SignPanel.99"))); //$NON-NLS-1$ //$NON-NLS-2$
     		}
     	}
     	else {
-    		defaultFilter = new DefaultFileFilter(new String[] {"csig", "p7s"}, SimpleAfirmaMessages.getString("SignPanel.80"));
+    		defaultFilter = new DefaultFileFilter(new String[] {"csig", "p7s"}, SimpleAfirmaMessages.getString("SignPanel.80")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    		filters.add(new GenericFileFilter(new String[] {"csig", "p7s"}, SimpleAfirmaMessages.getString("SignPanel.80")));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     	}
 
     	return AOUIFactory.getSaveDataToFile(

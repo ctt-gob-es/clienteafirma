@@ -595,7 +595,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 						fileDesc // Descripcion del fichero
 					)
 				),
-				null,
 				null // Padre para la modalidad
 			);
 		}

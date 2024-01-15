@@ -465,7 +465,6 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 									Messages.getString("CreateHashDialog.9") + " (*." + ext + ")"  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 									)
 							),
-					null,
 					parent
 					);
 		}

@@ -282,6 +282,35 @@ public final class AOUIFactory {
     		parentComponent
 		);
     }
+    
+    /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
+     * los datos y, si se proporcionan, los guarda en la misma.
+     * Si ocurre un error durante el guardado, se vuelve a preguntar al usuario por una
+     * localizaci&oacute;n,
+     * Si el usuario cancela el di&aacute;logo, se lanza <code>AOCancelledOperationException</code>.
+     * @param data Datos que se desean almacenar.
+     * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado.
+     * @param currentDir Directorio inicial del di&aacute;logo.
+     * @param selectedFile Nombre por defecto del fichero.
+     * @param filters Filtros del tipo de fichero a guardar.
+     * @param parent Componente padre (para la modalidad).
+     * @return Fichero en el que se almacenan los datos.
+     * @throws IOException Si no se puede guardar el fichero*/
+    public static File getSaveDataToFile(final byte[] data,
+    									 final String dialogTitle,
+    									 final String currentDir,
+    		                             final String selectedFile,
+    		                             final List<GenericFileFilter> filters,
+    		                             final Object parent) throws IOException {
+        return uiManager.saveDataToFile(
+    		data,
+    		dialogTitle,
+    		currentDir,
+    		selectedFile,
+    		filters,
+    		parent
+		);
+    }
 
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
      * los datos y, si se proporcionan, los guarda en la misma.

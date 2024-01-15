@@ -302,7 +302,6 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 						outputFile.getName() :
 						FileUtils.getCanonicalFile(dir).getName() + "." + defaultExtension, //$NON-NLS-1$
 				buildFilterList(defaultExtension),
-				null,
 				parent
 			);
 
@@ -312,15 +311,11 @@ public final class CreateHashDirDialog extends JDialog implements KeyListener {
 			final String ext = saveFile.getName().indexOf('.') == -1 ?
 					"" : //$NON-NLS-1$
 					saveFile.getName().substring(saveFile.getName().lastIndexOf('.'));
-			if (ext.equalsIgnoreCase("." + FILEEXT_CSV) || ext.equalsIgnoreCase("." + HashDocumentFactory.FORMAT_CSV)) { //$NON-NLS-1$ //$NON-NLS-2$
+			if ((ext.equalsIgnoreCase("." + FILEEXT_CSV) || ext.equalsIgnoreCase("." + HashDocumentFactory.FORMAT_CSV)) || (!ext.equalsIgnoreCase("." + FILEEXT_TXT) && !ext.equalsIgnoreCase("." + HashDocumentFactory.FORMAT_TXT))) { //$NON-NLS-1$ //$NON-NLS-2$
 //				format = HashDocumentFactory.FORMAT_CSV;
 				format = HashDocumentFactory.FORMAT_XML;
-			}
-			else if (ext.equalsIgnoreCase("." + FILEEXT_TXT) || ext.equalsIgnoreCase("." + HashDocumentFactory.FORMAT_TXT)) { //$NON-NLS-1$ //$NON-NLS-2$
+			} else { //$NON-NLS-1$ //$NON-NLS-2$
 				format = HashDocumentFactory.FORMAT_TXT;
-			}
-			else {
-				format = HashDocumentFactory.FORMAT_XML;
 			}
 
 			// Configuramos el documento de hashes

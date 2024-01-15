@@ -690,6 +690,138 @@ public class JSEUIManager implements AOUIManager {
         }
         throw new AOCancelledOperationException();
     }
+    
+    /** {@inheritDoc} */
+    @Override
+	public File saveDataToFile(final byte[] data,
+							   final String dialogTitle,
+							   final String currentDir,
+			                   final String selectedFile,
+			                   final List<GenericFileFilter> filters,
+			                   final Object parent) throws IOException {
+
+        final Component parentComponent = parent instanceof Component ? (Component) parent : null;
+
+        final File resultFile = null;
+        boolean tryAgain = true;
+        File file;
+        while (tryAgain) {
+
+            tryAgain = false;
+            final JFileChooser fileChooser = new CustomFileChooserForSave();
+
+            // Accesibilidad con textos fijos
+            fileChooser.getAccessibleContext().setAccessibleName(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
+            fileChooser.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("JSEUIManager.82")); //$NON-NLS-1$
+            fileChooser.setToolTipText(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
+
+            if (dialogTitle != null) {
+            	fileChooser.setDialogTitle(dialogTitle);
+            }
+
+            // Solo aplicamos filtros cuando esten definidos, para evitar que el
+            // desplegable de la ventana de guardado nos aparecezca vacio
+            if (filters != null) {
+            	fileChooser.setAcceptAllFileFilterUsed(false);
+            	for (final GenericFileFilter gff: filters) {
+            		if (gff.getExtensions() != null && gff.getExtensions().length != 0) {
+            			fileChooser.addChoosableFileFilter(
+            					new FileNameExtensionFilter(
+            							gff.getDescription(),
+            							gff.getExtensions()
+            							)
+            					);
+            		}
+            	}
+            }
+
+            // Configuramos el directorio y fichero por defecto
+            configureDefaultDir(fileChooser, currentDir, selectedFile);
+
+            int selectedOption = JOptionPane.YES_OPTION;
+            final int returnCode = fileChooser.showSaveDialog(parentComponent);
+            switch(returnCode) {
+
+            	case JFileChooser.CANCEL_OPTION:
+            		throw new AOCancelledOperationException();
+
+            	case JFileChooser.APPROVE_OPTION:
+
+            		file = fileChooser.getSelectedFile();
+
+	                // El dialogo no anade una extension por defecto aunque haya filtro, asi que lo hacemos a mano
+	                // si el usuario no ha puesto extension
+            		if (filters != null) {
+            			final FileFilter ff = fileChooser.getFileFilter();
+            			if (ff instanceof FileNameExtensionFilter && !ff.accept(file)) {
+            				final String exts[] = ((FileNameExtensionFilter)ff).getExtensions();
+    	                	if (exts != null && exts.length > 0) {
+    	                		if (!file.getName().toLowerCase().endsWith(exts[0].toLowerCase())) {
+    	                			final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
+    	                			file = new File(file.getParent(), file.getName() + extension);
+    	                		}
+    	                	}
+    	                	else {
+    	                		file = new File(file.getParent(), file.getName());
+    	                	}
+            			}
+            		}
+
+	                if (file.exists()) {
+	                	selectedOption = showConfirmDialog(parentComponent,
+	                						JSEUIMessages.getString("JSEUIManager.77", file.getAbsolutePath()),  //$NON-NLS-1$
+	                						JSEUIMessages.getString("JSEUIManager.85"),  //$NON-NLS-1$
+	                						JOptionPane.YES_NO_CANCEL_OPTION,
+	                						JOptionPane.INFORMATION_MESSAGE);
+
+	                    if (selectedOption == JOptionPane.CANCEL_OPTION) {
+	                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
+	                        throw new AOCancelledOperationException();
+	                    }
+	                    // Si se ha seleccionado la opcion YES (se desea
+	                    // sobreescribir) continuamos
+	                    // normalmente con el guardado del fichero
+	                }
+
+	                if (selectedOption == JOptionPane.NO_OPTION) {
+	                    tryAgain = true;
+	                    break;
+	                }
+
+	                // Si se proporcionan datos, se guardan y se devuelve el fichero donde se ha hecho.
+	                // Si no se proporcionan datos, se devuelve el fichero seleccionado, permitiendo que
+	                // el guardado se haga externamente.
+	                if (data != null) {
+		                try (
+	                		final OutputStream fos = new FileOutputStream(file)
+	            		) {
+	                        fos.write(data);
+	                        fos.flush();
+	                    }
+	                    catch (final Exception ex) {
+	                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
+	                        showErrorMessage(
+	                            JSEUIMessages.getString("JSEUIManager.88"), //$NON-NLS-1$
+	                            JSEUIMessages.getString("JSEUIManager.89"), //$NON-NLS-1$
+	                            JOptionPane.ERROR_MESSAGE,
+	                            ex
+	                        );
+	                        // Volvemos a intentar guardar
+	                        tryAgain = true;
+	                        continue;
+	                    }
+	                }
+                    put(PREFERENCE_DIRECTORY, fileChooser.getCurrentDirectory().getPath());
+                    return file;
+
+            	default:
+            		throw new IOException("Error al seleccionar el fichero: " + returnCode); //$NON-NLS-1$
+            }
+        }
+
+        // Devolvemos el path del fichero en el que se han guardado los datos
+        return resultFile;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -744,7 +876,7 @@ public class JSEUIManager implements AOUIManager {
             configureDefaultDir(fileChooser, currentDir, selectedFile);
             
             if (defaultFilter != null) {
-            	FileFilter ff = new FileNameExtensionFilter(
+            	final FileFilter ff = new FileNameExtensionFilter(
 						defaultFilter.getDescription(),
 						defaultFilter.getExtensions()
 						);
@@ -762,7 +894,7 @@ public class JSEUIManager implements AOUIManager {
 
             		file = fileChooser.getSelectedFile();
             		
-            		String fileName = file.getName();
+            		final String fileName = file.getName();
             		boolean hasExtension = false;
             		
             		// Si el usuario ha cambiado el nombre, comprobamos si le ha puesto alguna
@@ -959,11 +1091,8 @@ public class JSEUIManager implements AOUIManager {
 							String filename = getFile().getName();
 							if (filename.endsWith(extold)) {
 								filename = filename.replace(extold, extnew);
-							}
-							else {
-								if (!filename.endsWith(extnew)) {
-									filename += extnew;
-								}
+							} else if (!filename.endsWith(extnew)) {
+								filename += extnew;
 							}
 							setSelectedFile(new File(filename));
 						}
