@@ -133,17 +133,17 @@ public final class AOPkcs1Signer implements AOSigner {
 
 	@Override
 	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
-		throw new UnsupportedOperationException("No se pueden hacer cofirmas en PKCS#1"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de las firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
 	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
-		throw new UnsupportedOperationException("No se pueden hacer cofirmas en PKCS#1"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de las firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
 	public byte[] countersign(final byte[] sign, final String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
-		throw new UnsupportedOperationException("No se pueden hacer contrafirmas en PKCS#1"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de las firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override

@@ -123,7 +123,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			             final PrivateKey key,
 			             final Certificate[] certChain,
 			             final Properties xParams) throws AOException {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			             final PrivateKey key,
 			             final Certificate[] certChain,
 			             final Properties xParams) throws AOException {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
 
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */

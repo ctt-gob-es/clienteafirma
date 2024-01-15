@@ -32,7 +32,7 @@ public final class FacturaETriPhasePreProcessor extends XAdESTriPhasePreProcesso
 			                          final X509Certificate[] cert,
 			                          final Properties extraParams,
 			                          final boolean checkSignatures) throws IOException, AOException {
-		throw new UnsupportedOperationException("No se permiten multifirmas para formatos de tipo FacturaE"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas FacturaE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public final class FacturaETriPhasePreProcessor extends XAdESTriPhasePreProcesso
 			                               final CounterSignTarget targets,
 				                           final boolean checkSignatures) throws IOException,
 			                                                                       AOException {
-		throw new UnsupportedOperationException("No se permiten multifirmas para formatos de tipo FacturaE"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas FacturaE"); //$NON-NLS-1$
 	}
 
 }

@@ -41,7 +41,7 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final Certificate[] certChain,
 			             final Properties xParams) {
 		throw new UnsupportedOperationException(
-			"FacturaE no soporta cofirmas" //$NON-NLS-1$
+			"No se soporta la multifirma de las firmas FacturaE" //$NON-NLS-1$
 		);
 	}
 
@@ -54,7 +54,7 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
 			final Certificate[] certChain,
 			final Properties xParams) {
 		throw new UnsupportedOperationException(
-			"FacturaE no soporta contrafirmas" //$NON-NLS-1$
+			"No se soporta la multifirma de las firmas FacturaE" //$NON-NLS-1$
 		);
 	}
 

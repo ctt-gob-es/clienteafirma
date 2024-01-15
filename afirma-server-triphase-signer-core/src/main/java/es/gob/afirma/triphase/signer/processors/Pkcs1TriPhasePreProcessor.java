@@ -118,7 +118,7 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			final Properties params,
             final boolean checkSignatures) throws IOException, AOException {
 
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                           final Properties extraParams,
 			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
 
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                           final Properties extraParams,
 			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException, AOException, IOException {
 
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final CounterSignTarget targetType,
 				                           final boolean checkSignatures) throws IOException,
 			                                                                          AOException {
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -161,7 +161,7 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
 			                                                                           AOException,
 			                                                                           IOException {
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -173,6 +173,6 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
 			                                                                           AOException,
 			                                                                           IOException {
-		throw new AOException("Operacion no soportada"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
 }

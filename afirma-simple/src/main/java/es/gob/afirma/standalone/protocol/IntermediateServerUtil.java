@@ -31,23 +31,7 @@ public class IntermediateServerUtil {
 	 * @param storageServiceUrl URL del servicio de guardado.
 	 * @param id Identificador a asignar a los datos a subir al servidor.
 	 * @throws IOException Si hay problemas enviando los datos. */
-	public static void sendData(final StringBuilder data, final String storageServiceUrl, final String id) throws IOException {
-
-		final StringBuilder url = new StringBuilder(storageServiceUrl)
-		.append("?op=").append(METHOD_OP_PUT) //$NON-NLS-1$
-		.append("&v=").append(SYNTAX_VERSION) //$NON-NLS-1$
-		.append("&id=").append(id) //$NON-NLS-1$
-		.append("&dat=").append(data.toString()); //$NON-NLS-1$
-
-		send(url);
-	}
-
-	/** Env&iacute;a datos al servidor intermedio.
-	 * @param data Buffer con los datos a enviar.
-	 * @param storageServiceUrl URL del servicio de guardado.
-	 * @param id Identificador a asignar a los datos a subir al servidor.
-	 * @throws IOException Si hay problemas enviando los datos. */
-	public static void sendData(final String data, final String storageServiceUrl, final String id) throws IOException {
+	public static void sendData(final CharSequence data, final String storageServiceUrl, final String id) throws IOException {
 
 		final StringBuilder url = new StringBuilder(storageServiceUrl)
 		.append("?op=").append(METHOD_OP_PUT) //$NON-NLS-1$
