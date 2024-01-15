@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -46,13 +49,13 @@ public class SignatureConfigInfoPanel extends JPanel {
     private JCheckBox pdfStamp = null;
 
     private String accesibleDescription;
-    
+
     private JLabel signFormatLabel;
-    
+
     private JPanel attributesPanel;
-    
+
     private JPanel signOptionsPanel;
-    
+
     private SignPanelFilePanel signPanelFile;
 
 	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor, final SignPanelFilePanel signPanel) {
@@ -61,17 +64,25 @@ public class SignatureConfigInfoPanel extends JPanel {
 	}
 
 	public SignatureConfigInfoPanel() {
-		
+
 	}
 
 	private SignatureConfigInfoPanel createUI(final SignOperationConfig signConfig, final Color bgColor) {
 
 		//Eliminamos los componentes anteriores si existieran por si se esta actualizando el panel
 		removeAll();
-		
+
 		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 			setBackground(bgColor);
 		}
+
+		setLayout(new GridBagLayout());
+		setAlignmentY(Component.LEFT_ALIGNMENT);
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.gridy = 0;
+		c.insets = new Insets(2,  0,  2,  0);
+		c.anchor = GridBagConstraints.WEST;
 
 		// Formato de firma
 		this.signFormatLabel = new JLabel(
@@ -86,35 +97,33 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 		// Opciones de firma
 		this.signOptionsPanel = createOptionsPanel(signConfig, bgColor);
-		
+
 		// Opciones de formato
 		final JPanel formatOptionsPanel = createFormatOptionsPanel(signConfig, bgColor);
+		add(formatOptionsPanel, c);
+		c.gridy++;
 
-		// Agregamos los elementos al panel
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-		add(Box.createRigidArea(new Dimension(0, 4)));
-		add(formatOptionsPanel);
-		
         if (this.attributesPanel != null) {
         	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         		this.attributesPanel.setBackground(bgColor);
         	}
-        	add(Box.createRigidArea(new Dimension(0, 4)));
-        	add(attrLabel);
-        	add(Box.createRigidArea(new Dimension(0, 4)));
-        	add(this.attributesPanel);
+        	add(attrLabel, c);
+        	c.gridy++;
+
+        	add(this.attributesPanel, c);
+        	c.gridy++;
         }
+
         if (this.signOptionsPanel != null) {
         	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
         		this.signOptionsPanel.setBackground(bgColor);
         	}
-        	add(Box.createRigidArea(new Dimension(0, 4)));
-        	add(this.signOptionsPanel);
+        	add(this.signOptionsPanel, c);
+        	c.gridy++;
         }
         return this;
 	}
-	
+
 	private JPanel createAttributesPanel(final SignOperationConfig config) {
 
 		String policyId = null;
@@ -136,7 +145,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 		if (policyId == null && roles == null && !definedPlace) {
 			return null;
 		}
-		
+
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -201,7 +210,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	private JLabel createChangeFormatHiperlink(final String text, final SignOperationConfig signConfig, final Color bgColor) {
 
-		final JLabel hlLabel = new JLabel(text); 
+		final JLabel hlLabel = new JLabel(text);
 
 		hlLabel.setFocusable(true);
 		hlLabel.setForeground(LookAndFeelManager.WINDOWS_HIGH_CONTRAST ? Color.yellow : Color.blue);
@@ -290,12 +299,12 @@ public class SignatureConfigInfoPanel extends JPanel {
 
         return panel;
 	}
-	
+
 	private JPanel createFormatOptionsPanel(final SignOperationConfig config, final Color bgColor) {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		
+
 		if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
 			panel.setBackground(bgColor);
 		}
@@ -306,7 +315,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 			panel.add(createChangeFormatHiperlink(SimpleAfirmaMessages.getString("SignPanel.157"), config, bgColor)); //$NON-NLS-1$
 			panel.add(Box.createRigidArea(new Dimension(4, 0)));
 		}
-		
+
         return panel;
 	}
 
@@ -321,7 +330,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 	public String getAccesibleDescription() {
 		return this.accesibleDescription;
 	}
-	
+
 	public JLabel getSignFormatLabel() {
 		return this.signFormatLabel;
 	}
@@ -400,7 +409,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	 class ChangeFormatListener implements MouseListener, FocusListener, KeyListener {
 
 		private final SignOperationConfig signConfig;
@@ -457,17 +466,17 @@ public class SignatureConfigInfoPanel extends JPanel {
 					AOUIFactory.PLAIN_MESSAGE
 			) == AOUIFactory.YES_OPTION) {
 				String selectedFormat = (String) changeFormatPanel.getUsedCombo().getSelectedItem();
-	
+
 				final String recommendedStr = " " + SimpleAfirmaMessages.getString("ChangeFormatDialog.2");  //$NON-NLS-1$//$NON-NLS-2$
-				
+
 				if (selectedFormat.contains(recommendedStr)) {
 					selectedFormat = selectedFormat.replace(recommendedStr, ""); //$NON-NLS-1$
 				}
-				
+
 				final AOSigner signer = AOSignerFactory.getSigner(selectedFormat);
 				this.signConfig.setSigner(signer);
 				final Properties extraParams = ExtraParamsHelper.loadExtraParamsForSigner(signer);
-				
+
 				this.signConfig.setExtraParams(extraParams);
 				this.signConfig.setSignatureFormatName(SignPanel.getSignatureName(config.getSigner()));
 
