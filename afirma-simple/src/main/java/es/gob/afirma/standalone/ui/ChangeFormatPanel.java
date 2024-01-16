@@ -17,35 +17,42 @@ import javax.swing.JPanel;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.ui.preferences.FormatItem;
 
+/** Panel de selecci&oacute;n del formato con el que firmar */
 public class ChangeFormatPanel extends JPanel{
 
 	private static final long serialVersionUID = 8338298450770919501L;
 	
-	private static final String XADES = AOSignConstants.SIGN_FORMAT_XADES;
-	private static final String CADES = AOSignConstants.SIGN_FORMAT_CADES;
-	private static final String PADES = AOSignConstants.SIGN_FORMAT_PADES;
-	private static final String OOXML = AOSignConstants.SIGN_FORMAT_OOXML;
-	private static final String FACTURAE = AOSignConstants.SIGN_FORMAT_FACTURAE;
-	private static final String ODF = AOSignConstants.SIGN_FORMAT_ODF;
+	private FormatItem XADES;
+	private FormatItem CADES;
+	private FormatItem PADES;
+	private FormatItem OOXML;
+	private FormatItem FACTURAE;
+	private FormatItem ODF;
 	
-	private static String[] pdfFilesArray = new String[] { PADES, CADES, XADES };
-	private static String[] ooxmlFilesArray = new String[] { OOXML, CADES, XADES };
-	private static String[] facturaeFilesArray = new String[] { FACTURAE, XADES, CADES };
-	private static String[] xmlFilesArray = new String[] { XADES, CADES };
-	private static String[] binFilesArray = new String[] { CADES, XADES };
-	private static String[] odfFilesArray = new String[] { ODF, CADES, XADES };
+	private FormatItem[] pdfFilesArray;
+	private FormatItem[] ooxmlFilesArray;
+	private FormatItem[] facturaeFilesArray;
+	private FormatItem[] xmlFilesArray;
+	private FormatItem[] binFilesArray;
+	private FormatItem[] odfFilesArray;
 	
-	private final JComboBox<String> usedCombo;
+	private final JComboBox<FormatItem> usedCombo;
 
 	private static String accessibleDescription = ""; //$NON-NLS-1$
 
 	public ChangeFormatPanel(final SignOperationConfig config) {
-		this.usedCombo = new JComboBox<String>();
+		this.usedCombo = new JComboBox<FormatItem>();
+		initFormats();
 		accessibleDescription = SimpleAfirmaMessages.getString("ChangeFormatDialog.0"); //$NON-NLS-1$
 		createPanel(config);
 	}
 
+	/**
+	 * Crea el panel con los formatos posibles para el archivo a firmar.
+	 * @param config Configuraci&oacute;n de la firma.
+	 */
 	private void createPanel(final SignOperationConfig config) {
 
 		setLayout(new GridBagLayout());
@@ -63,38 +70,69 @@ public class ChangeFormatPanel extends JPanel{
 		
 		String defaultFormat = null;
 		
-		String[] formatsArray = null;
+		FormatItem[] formatsArray = null;
 
 		if (FileType.XML.equals(config.getFileType()) || FileType.SIGN_XADES.equals(config.getFileType())) {
-			formatsArray = xmlFilesArray;
+			formatsArray = this.xmlFilesArray;
 			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML);
 		} else if (FileType.PDF.equals(config.getFileType())) {
-			formatsArray = pdfFilesArray;
+			formatsArray = this.pdfFilesArray;
 			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF);
 		} else if (FileType.OOXML.equals(config.getFileType())) {
-			formatsArray = ooxmlFilesArray;
+			formatsArray = this.ooxmlFilesArray;
 			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML);
 		} else if (FileType.FACTURAE.equals(config.getFileType())) {
-			formatsArray = facturaeFilesArray;
+			formatsArray = this.facturaeFilesArray;
 			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE);
 		} else if (FileType.BINARY.equals(config.getFileType()) || FileType.SIGN_CADES.equals(config.getFileType())) {
-			formatsArray = binFilesArray;
+			formatsArray = this.binFilesArray;
 			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN);
 		} else if (FileType.ODF.equals(config.getFileType())) {
-			formatsArray = odfFilesArray;
+			formatsArray = this.odfFilesArray;
 			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF);
 		}
 		
 		createUsedCombo(defaultFormat, formatsArray);
+		for (int i = 0 ; i < this.usedCombo.getItemCount() ; i++) {
+			final FormatItem formatItem = this.usedCombo.getItemAt(i);
+			if (config.getSignatureFormatName().contains(formatItem.getName())) {
+				this.usedCombo.setSelectedIndex(i);
+			}
+		}
 		add(this.usedCombo, c);
 	
 	}
 	
-	private void createUsedCombo(final String preferenceDefaultFormat, final String[] formatsArray) {
+	/**
+	 * Inicializa los formatos existentes.
+	 */
+	private void initFormats() {
+		
+		this.XADES = new FormatItem(AOSignConstants.SIGN_FORMAT_XADES);
+		this.CADES = new FormatItem(AOSignConstants.SIGN_FORMAT_CADES);
+		this.PADES = new FormatItem(AOSignConstants.SIGN_FORMAT_PADES);
+		this.OOXML = new FormatItem(AOSignConstants.SIGN_FORMAT_OOXML);
+		this.FACTURAE = new FormatItem(AOSignConstants.SIGN_FORMAT_FACTURAE);
+		this.ODF = new FormatItem(AOSignConstants.SIGN_FORMAT_ODF);
+		
+		this.pdfFilesArray = new FormatItem[] { this.PADES, this.CADES, this.XADES };
+		this.ooxmlFilesArray = new FormatItem[] { this.OOXML, this.CADES, this.XADES };
+		this.facturaeFilesArray = new FormatItem[] { this.FACTURAE, this.XADES, this.CADES };
+		this.xmlFilesArray = new FormatItem[] { this.XADES, this.CADES };
+		this.binFilesArray = new FormatItem[] { this.CADES, this.XADES };
+		this.odfFilesArray = new FormatItem[] { this.ODF, this.CADES, this.XADES };
+	}
+	
+	/**
+	 * Crea el combobox con los formatos.
+	 * @param preferenceDefaultFormat Formato recomendado.
+	 * @param formatsArray Lista de formatos a utilizar.
+	 */
+	private void createUsedCombo(final String preferenceDefaultFormat, final FormatItem[] formatsArray) {
 		for (int i = 0 ; i < formatsArray.length ; i++) {
-			String format = formatsArray[i];
-			if (format.equals(preferenceDefaultFormat)) {
-				format += " " + SimpleAfirmaMessages.getString("ChangeFormatDialog.2"); //$NON-NLS-1$ //$NON-NLS-2$
+			final FormatItem format = formatsArray[i];
+			if (preferenceDefaultFormat.equals(format.getName())) {
+				format.setRecommended(true);
 			}
 			this.usedCombo.addItem(format);
 		}
@@ -104,7 +142,7 @@ public class ChangeFormatPanel extends JPanel{
 		return accessibleDescription;
 	}
 	
-	public JComboBox<String> getUsedCombo() {
+	public JComboBox<FormatItem> getUsedCombo() {
 		return this.usedCombo;
 	}
 

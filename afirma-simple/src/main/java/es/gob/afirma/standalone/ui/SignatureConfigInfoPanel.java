@@ -37,6 +37,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 import es.gob.afirma.standalone.ui.preferences.AgePolicy;
+import es.gob.afirma.standalone.ui.preferences.FormatItem;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 
 public class SignatureConfigInfoPanel extends JPanel {
@@ -465,15 +466,9 @@ public class SignatureConfigInfoPanel extends JPanel {
 					AOUIFactory.OK_CANCEL_OPTION,
 					AOUIFactory.PLAIN_MESSAGE
 			) == AOUIFactory.YES_OPTION) {
-				String selectedFormat = (String) changeFormatPanel.getUsedCombo().getSelectedItem();
+				final FormatItem selectedFormat = (FormatItem) changeFormatPanel.getUsedCombo().getSelectedItem();
 
-				final String recommendedStr = " " + SimpleAfirmaMessages.getString("ChangeFormatDialog.2");  //$NON-NLS-1$//$NON-NLS-2$
-
-				if (selectedFormat.contains(recommendedStr)) {
-					selectedFormat = selectedFormat.replace(recommendedStr, ""); //$NON-NLS-1$
-				}
-
-				final AOSigner signer = AOSignerFactory.getSigner(selectedFormat);
+				final AOSigner signer = AOSignerFactory.getSigner(selectedFormat.getName());
 				this.signConfig.setSigner(signer);
 				final Properties extraParams = ExtraParamsHelper.loadExtraParamsForSigner(signer);
 
