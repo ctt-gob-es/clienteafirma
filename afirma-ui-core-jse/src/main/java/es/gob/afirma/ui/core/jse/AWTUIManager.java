@@ -35,6 +35,7 @@ import es.gob.afirma.core.ui.KeyStoreDialogManager;
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
  * Esta clase usa AWT para los di&aacute;logos de apertura y guardado de ficheros.
+ * Su principal uso es en macOS, en donde permite usar los di&aacute;logos del sistema.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AWTUIManager extends JSEUIManager {
 
@@ -98,8 +99,9 @@ public final class AWTUIManager extends JSEUIManager {
             }
         }
 
-        // Este dialogo no soporta multiples filtros, asi que juntamos
-        // las extensiones de todos para crear un filtro unico
+        // En las versiones actuales de macOS, el dialogo de guardado no soporta filtros
+        // y en las antiguas solo soporta uno, asi que por compatibilidad, lo establecemos.
+        // Para hacerlo, juntamos las extensiones de todos para crear uno solo
     	final List<String> extensions = new ArrayList<>();
         if (filters != null) {
         	for (final GenericFileFilter gff : filters) {
@@ -109,6 +111,7 @@ public final class AWTUIManager extends JSEUIManager {
         		}
         	}
         }
+
         final String[] exts = extensions.toArray(new String[extensions.size()]);
     	if (exts != null) {
             fd.setFilenameFilter(
@@ -128,11 +131,11 @@ public final class AWTUIManager extends JSEUIManager {
 
         fd.setVisible(true);
 
-        final File file;
         if (fd.getFile() == null) {
         	throw new AOCancelledOperationException();
         }
-		file = new File(fd.getDirectory() + fd.getFile());
+
+		final File file = new File(fd.getDirectory(), fd.getFile());
 
         // Si se proporcionan datos, se guardan y se devuelve el fichero donde se ha hecho.
         // Si no se proporcionan datos, se devuelve el fichero seleccionado, permitiendo que
