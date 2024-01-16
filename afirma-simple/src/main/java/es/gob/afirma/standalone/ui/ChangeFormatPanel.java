@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 import es.gob.afirma.standalone.ui.preferences.FormatItem;
 
 /** Panel de selecci&oacute;n del formato con el que firmar */
@@ -74,22 +75,22 @@ public class ChangeFormatPanel extends JPanel{
 
 		if (FileType.XML.equals(config.getFileType()) || FileType.SIGN_XADES.equals(config.getFileType())) {
 			formatsArray = this.xmlFilesArray;
-			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML);
+			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, PreferencesSource.DEFAULT);
 		} else if (FileType.PDF.equals(config.getFileType())) {
 			formatsArray = this.pdfFilesArray;
-			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF);
+			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, PreferencesSource.DEFAULT);
 		} else if (FileType.OOXML.equals(config.getFileType())) {
 			formatsArray = this.ooxmlFilesArray;
-			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML);
+			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML, PreferencesSource.DEFAULT);
 		} else if (FileType.FACTURAE.equals(config.getFileType())) {
 			formatsArray = this.facturaeFilesArray;
-			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE);
+			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE, PreferencesSource.DEFAULT);
 		} else if (FileType.BINARY.equals(config.getFileType()) || FileType.SIGN_CADES.equals(config.getFileType())) {
 			formatsArray = this.binFilesArray;
-			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN);
+			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, PreferencesSource.DEFAULT);
 		} else if (FileType.ODF.equals(config.getFileType())) {
 			formatsArray = this.odfFilesArray;
-			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF);
+			defaultFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, PreferencesSource.DEFAULT);
 		}
 		
 		createUsedCombo(defaultFormat, formatsArray);
