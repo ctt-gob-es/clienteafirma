@@ -208,9 +208,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 		catch(final Exception e) {
 			return false;
 		}
-		return new AOXAdESSigner().isSign(
-			ASiCUtil.getASiCSXMLSignature(sign)
-		);
+		return new AOXAdESSigner().isSign(sign);
 	}
 
 	@Override
