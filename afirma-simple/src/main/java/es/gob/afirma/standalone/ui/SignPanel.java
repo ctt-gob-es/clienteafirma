@@ -563,8 +563,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				} catch (final RuntimeConfigNeededException e) {
 					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e));
 					errorText = e.getMessage();
-				} catch (final IOException e) {
-					throw e;
+				} catch (final Exception e) {
+					final SignValidity signValidity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e);
+					validityList.add(signValidity);
+					errorText = buildErrorText(signValidity.getValidity(), signValidity.getError());
 				}
 
 				config.setSignValidity(validityList);

@@ -97,7 +97,7 @@ public final class ValidatePdfSignature extends SignValider {
 	@Override
 	public List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
 
-		List<SignValidity> validityList = new ArrayList<SignValidity>();
+		List<SignValidity> validityList = new ArrayList<>();
 		AcroFields af;
 		PdfReader reader;
 		try {
@@ -215,7 +215,7 @@ public final class ValidatePdfSignature extends SignValider {
 	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields, final String signProfile, final boolean checkCert)
 			throws RuntimeConfigNeededException, IOException {
 
-		final List<SignValidity> validityList = new ArrayList<SignValidity>();
+		final List<SignValidity> validityList = new ArrayList<>();
 		// Valimamos la firma
 		final PdfPKCS7 pk = signAcrofields.verifySignature(signName);
 

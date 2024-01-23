@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -141,15 +142,16 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
             }
         }
 
-        List<SignValidity> validityList = new ArrayList<SignValidity>();
+        List<SignValidity> validityList = new ArrayList<>();
         if (sign != null) {
             try {
             	validityList = validateSign(sign);
             }
             catch (final Exception e) {
-            	LOGGER.warning(
-        			"No se ha podido comprobar la validez de la firma: " + e //$NON-NLS-1$
-    			);
+            	LOGGER.log(
+            			Level.WARNING,
+            			"No se ha podido comprobar la validez de la firma: " + e, e //$NON-NLS-1$
+            			);
             	validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, null));
             }
         } else {
@@ -293,7 +295,7 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
     public static List<SignValidity> validateSign(final byte[] sign) throws IOException {
-    	List<SignValidity> validityList = new ArrayList<SignValidity>();
+    	List<SignValidity> validityList = new ArrayList<>();
     	final SignValider sv = SignValiderFactory.getSignValider(sign);
         if (sv != null) {
         	try {
