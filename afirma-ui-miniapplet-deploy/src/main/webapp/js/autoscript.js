@@ -3771,13 +3771,13 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				// Se ha cancelado la operacion
-				if (html == "CANCEL" || html == "CANCEL\r\n") {
+				if (html == "CANCEL" || html == "CANCEL\r\n" || html == "CANCEL\n") {
 					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
 					return false;
 				}
 				
 				// La operacion ha finalizado correctamene (Funcion de guardado)
-				if (html == "OK" || html == "OK\r\n") {
+				if (html == "OK" || html == "OK\r\n" || html == "OK\n") {
 					successCallback();
 					return false;
 				}
