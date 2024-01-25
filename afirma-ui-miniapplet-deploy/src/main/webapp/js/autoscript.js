@@ -12,6 +12,14 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
+var SupportDialog;
+
+var execAppIntent;
+
+var waitAppAndProcessRequest;
+
+var sendEcho;
+
 var AutoScript = ( function ( window, undefined ) {
 
 		var VERSION = "1.8.2";
@@ -819,6 +827,184 @@ var AutoScript = ( function ( window, undefined ) {
 			};
 		})(window, undefined);
 		
+		/**
+		 * Dialogo para mostrar mensajes con posibles errores y con botones operables.
+		 */
+		SupportDialog = ( function (window, undefined) {
+			
+			var defaultDialogStyle = 'display:block;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: fixed; left: 0; top: 0;';
+			var pcDownloadURL = "https://firmaelectronica.gob.es/Home/Descargas.html";
+			var androidDownloadURL = "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descárgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>";
+			var iosDownloadURL = "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 250px; height: 83px;'></a>";
+			var enabled = true;
+			
+			function enableSupportDialog(isEnabled) {
+				enabled = isEnabled;
+			}
+			
+			function setBackgroundClass(customClass) {
+				document.getElementById("supportDialog").removeAttribute('style');
+				document.getElementById("supportDialog").setAttribute("class", customClass);
+			}
+			
+			function setDialogClass(customClass) {
+				document.getElementById("childDiv").removeAttribute('style');
+				document.getElementById("childDiv").setAttribute("class", customClass);
+			}
+			
+			function setTextClass(customClass) {
+				document.getElementById("spanSupportMessage").removeAttribute('style');
+				document.getElementById("spanSupportMessage").setAttribute("class", customClass);
+			}
+			
+			function setPlainText(plainText) {
+				document.getElementById("spanSupportMessage").textContent = plainText;
+			}
+			
+			function setAcceptButtonClass(customClass) {
+				document.getElementById("acceptButton").removeAttribute('style');
+				document.getElementById("acceptButton").setAttribute("class", customClass);
+			}
+			
+			function setCancelButtonClass(customClass) {
+				document.getElementById("cancelButton").removeAttribute('style');
+				document.getElementById("cancelButton").setAttribute("class", customClass);
+			}
+			
+			function setLogoClass(customClass) {
+				document.getElementById("dialogLogo").removeAttribute('style');
+				document.getElementById("dialogLogo").setAttribute("class", customClass);
+			}
+			
+			function setLogoSrc(logoSrc) {
+				document.getElementById("dialogLogo").setAttribute("src", logoSrc);
+			}
+			
+			function setCustomPCDownloadURL(url) {
+				pcDownloadURL = url;
+			}
+			
+			function getPCDownloadURL() {
+				return pcDownloadURL;
+			}
+			
+			function getIOSDownloadURL() {
+				return iosDownloadURL;
+			}
+			
+			function getAndroidDownloadURL() {
+				return androidDownloadURL;
+			}
+			
+			function showSupportDialog(messageType, button1Text, button1Callback, button2Text, button2Callback) {
+				
+				if (enabled) {
+					//DIV PADRE
+					var parentDiv = document.createElement("div");
+	
+					//DIV HIJO
+					var childDiv = document.createElement("div");
+	
+					//PANEL CON LOGO Y MENSAJE
+					var messagePanel = document.createElement("div");
+	
+					//IMG DIV
+					var imgDiv = document.createElement("div");
+	
+					//IMG CON ICONO
+					var imgTag = document.createElement("img");
+	
+					//MESSAGE DIV
+					var messageDiv = document.createElement("div");
+	
+					//SPAN CON MENSAJE
+					var spanSupportMessage = document.createElement("span");
+					
+					parentDiv.setAttribute('id', 'supportDialog');
+					parentDiv.setAttribute('style', defaultDialogStyle);
+	
+					childDiv.setAttribute('id', 'childDiv');
+					childDiv.setAttribute('style', 'background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;');
+	
+					messagePanel.setAttribute('id', 'messagePanel');
+	
+					imgDiv.setAttribute('id', 'imgDiv');
+					imgDiv.setAttribute('style', 'float:left; width:15%');
+					imgTag.setAttribute('id', 'dialogLogo');
+					imgTag.setAttribute('src', 'logo64.png');
+	
+					messageDiv.setAttribute('id', 'messageDiv');
+					messageDiv.setAttribute('style', 'vertical-align:top; float:right; width:85%;margin-bottom:5%; text-align: center;');
+					spanSupportMessage.setAttribute('id', 'spanSupportMessage');
+					spanSupportMessage.setAttribute('style', 'font-family: helvetica; font-weight: bold; font-size: 10pt; vertical-align: top;');
+					spanSupportMessage.innerHTML = messageType;
+					
+					imgDiv.appendChild(imgTag);
+					messagePanel.appendChild(imgDiv);
+					messageDiv.appendChild(spanSupportMessage);
+					messagePanel.appendChild(messageDiv);
+					childDiv.appendChild(messagePanel);
+					
+					//PANEL DE BOTONES ACEPTAR Y CANCELAR	
+					var buttonsPanel = document.createElement("div");
+	
+					if (button1Text !== undefined && button1Text != null) {
+	
+						//BOTON 1
+						var button1 = document.createElement("button");
+	
+						buttonsPanel.setAttribute('id', 'buttonsPanel');
+						buttonsPanel.setAttribute('style', 'float:right;text-align: right;width:50%;');
+						button1.setAttribute('id', 'acceptButton');
+						button1.setAttribute("onclick", button1Callback);
+						button1.textContent = button1Text;
+						
+						buttonsPanel.appendChild(button1);
+					}
+					
+					if (button2Text !== undefined && button2Text != null) {
+	
+						//BOTON 2
+						var button2 = document.createElement("button");
+						
+						button2.setAttribute('id', 'cancelButton');
+						button2.setAttribute("onclick", button2Callback);
+						button2.setAttribute('style', 'margin-left: 3%;');
+						button2.textContent = button2Text;
+						
+						buttonsPanel.appendChild(button2);
+					}
+					
+					childDiv.appendChild(buttonsPanel);
+					parentDiv.appendChild(childDiv);
+					document.body.appendChild(parentDiv);
+				}
+			}
+			
+			function disposeSupportDialog() {
+				if (document.getElementById("supportDialog") != null) {
+					document.getElementById("supportDialog").remove();
+				}
+			}
+			
+			return {
+				enableSupportDialog : enableSupportDialog,
+				setBackgroundClass : setBackgroundClass,
+				setDialogClass : setDialogClass,
+				setTextClass : setTextClass,
+				setPlainText : setPlainText,
+				setAcceptButtonClass : setAcceptButtonClass,
+				setCancelButtonClass : setCancelButtonClass,
+				setLogoClass : setLogoClass,
+				setLogoSrc : setLogoSrc,
+				setCustomPCDownloadURL : setCustomPCDownloadURL,
+				getPCDownloadURL : getPCDownloadURL,
+				getIOSDownloadURL : getIOSDownloadURL,
+				getAndroidDownloadURL : getAndroidDownloadURL,
+				showSupportDialog : showSupportDialog,
+				disposeSupportDialog : disposeSupportDialog
+			};
+		})(window, undefined);
 		
 		/**
 		 * Funciones de utilidad.
@@ -1347,7 +1533,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			/** Envia una peticion a la aplicacion de firma. Si no la encuentra abierta, la arranca. */
-			function execAppIntent (url) {
+			execAppIntent = function (url) {
 				
 				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada
 				// porque al invocar muchas peticiones consecutivas, en caso de introducir un
@@ -1361,11 +1547,25 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!isAppOpened()) {
 					// Definimos los puertos en los que intentar la conexion
 					var ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
-					// Invocamos a la aplicacion cliente
-					openNativeApp(ports);
-					// Intentamos conectar con la app despues de esperar un tiempo prudencial
-					console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
-					setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
+					try {
+						// Invocamos a la aplicacion cliente
+						openNativeApp(ports);
+						// Intentamos conectar con la app despues de esperar un tiempo prudencial
+						console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
+						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
+					} catch (e) {
+						var autoFirmaLink;
+						if (Platform.isAndroid()) {
+							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
+						} else if (Platform.isIOS()) {
+							autoFirmaLink = SupportDialog.getIOSDownloadURL();
+						} else {
+							autoFirmaLink = SupportDialog.getPCDownloadURL();
+							autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+						}
+						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+						"Reintentar operacion", "execAppIntent('" + url +"');SupportDialog.disposeSupportDialog();" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
+					}
 				}
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
 				else {
@@ -1401,10 +1601,10 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/** Comprobacion recursiva de la disponibilidad de la aplicacion en los distintos
 			 * puertos hasta un maximo del numero de intentos indicados. */ 
-			function waitAppAndProcessRequest (ports, retries) {
+			waitAppAndProcessRequest = function (ports, retries) {
 
 				if (!connected) {
-				
+					SupportDialog.showSupportDialog("Cargando...");
 					if (retries > 0) {
 						// Tratamos de conectar al websocket a traves de cualquiera de los posibles puertos
 						for (var i = 0; !connected && i < ports.length; i++) {
@@ -1412,10 +1612,26 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 
 						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1);
+						//Se cierra el dialogo de espera
+						SupportDialog.disposeSupportDialog();
 					}
 					else {
 						processErrorResponse("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
-					}
+						//Se cierra el dialogo de espera
+						SupportDialog.disposeSupportDialog();
+						var autoFirmaLink;
+						if (Platform.isAndroid()) {
+							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
+						} else if (Platform.isIOS()) {
+							autoFirmaLink = SupportDialog.getIOSDownloadURL();
+						} else {
+							autoFirmaLink = SupportDialog.getPCDownloadURL();
+							autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+						}
+						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+						"Reintentar operacion", "waitAppAndProcessRequest('" + ports +"," + retries + "');SupportDialog.disposeSupportDialog();" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
+			}
+					
 				}
 				else {
 					
@@ -1436,6 +1652,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				catch (e) {
 					console.log("Error estableciendo el WebSocket: " + e);
+					SupportDialog.showSupportDialog("Error estableciendo el WebSocket: " + e, "Cerrar", 'SupportDialog.disposeSupportDialog()');
 				}
 				
 				webSocket.onopen = function(arg0, arg1) {
@@ -1452,7 +1669,9 @@ var AutoScript = ( function ( window, undefined ) {
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
 						processErrorResponse("java.lang.InterruptedException", "AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion");
+						SupportDialog.showSupportDialog("AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					}
+					SupportDialog.disposeSupportDialog();
 				};
 
 				webSocket.onmessage = function(evt) {
@@ -1461,6 +1680,7 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				webSocket.onerror = function(evt) {
 					console.log("Procesado por defecto del error");
+					SupportDialog.disposeSupportDialog();
 				}
 				
 				return webSocket;
@@ -1502,10 +1722,22 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/** Envia una peticion de eco y, en caso de error, aplica un retardo y lo reintenta hasta
 			 * un determinado numero de veces */
-			function sendEcho(ws, idSession, retries) {
+			sendEcho = function (ws, idSession, retries) {
 				
 				if (retries <= 0) {
 					processErrorResponse("java.util.concurrent.TimeoutException", "AutoFirma no respondio al saludo.");
+					var autoFirmaLink;
+					if (Platform.isAndroid()) {
+						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
+					} else if (Platform.isIOS()) {
+						autoFirmaLink = SupportDialog.getIOSDownloadURL();
+					} else {
+						autoFirmaLink = SupportDialog.getPCDownloadURL();
+						autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+					}
+					SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+					"Reintentar operacion", "sendEcho(" + ws + "," + idSession + ",1);SupportDialog.disposeSupportDialog();", 
+					"Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 				
@@ -1538,18 +1770,21 @@ var AutoScript = ( function ( window, undefined ) {
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
 					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					SupportDialog.showSupportDialog("El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 				
 				// Se ha producido un error
 				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
 					processErrorResponse("java.lang.Exception", data);
+					SupportDialog.showSupportDialog(data, "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
 					processErrorResponse("java.lang.Exception", "Error desconocido");
+					SupportDialog.showSupportDialog("Error desconocido", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 
@@ -1614,6 +1849,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// separador ":"
 				if (data.indexOf(":") <= 0) {
 					processErrorResponse("java.lang.Exception", "Respuesta no valida");
+					SupportDialog.showSupportDialog("Respuesta no valida", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 
@@ -1682,6 +1918,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Termina mal
 				else {
 					processErrorResponse("java.lang.Exception", "Error desconocido al procesar los datos");
+					SupportDialog.showSupportDialog("Error desconocido al procesar los datos", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 				}
 			}
 
@@ -2159,16 +2396,30 @@ var AutoScript = ( function ( window, undefined ) {
 				return intentURL;
 			}
 			
-			function execAppIntent (url) {
+			execAppIntent = function (url) {
 				
 				// Primera ejecucion, no hay puerto definido
 				if (port == "") {
 					// Calculamos los puertos
 					var ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
-					// Invocamos a la aplicacion nativa
-					openNativeApp(ports);
-					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
-					setTimeout(executeEchoByServiceByPort, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, url);
+					try {
+						// Invocamos a la aplicacion nativa
+						openNativeApp(ports);
+						// Enviamos la peticion a la app despues de esperar un tiempo prudencial
+						setTimeout(executeEchoByServiceByPort, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, url);
+					} catch (e){
+						var autoFirmaLink;
+						if (Platform.isAndroid()) {
+							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
+						} else if (Platform.isIOS()) {
+							autoFirmaLink = SupportDialog.getIOSDownloadURL();
+						} else {
+							autoFirmaLink = SupportDialog.getPCDownloadURL();
+							autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+						}
+						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+						"Reintentar operacion", "execAppIntent(" + url +")" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
+					}
 				}
 				// Se ha ejecutado anteriormente y tenemos un puerto calculado.
 				else {
@@ -3594,7 +3845,6 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function () {
 					if (httpRequest.readyState == 4) {
 						 if (httpRequest.status == 200) {
-	
 							url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
 							if (isURLTooLong(url)) {
 								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
@@ -3604,6 +3854,7 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 						else {
 							console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
+							SupportDialog.showSupportDialog("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status, "Cerrar", 'SupportDialog.disposeSupportDialog()');
 							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
 						}
 					}
@@ -3611,6 +3862,7 @@ var AutoScript = ( function ( window, undefined ) {
 				try {
 					httpRequest.onerror = function(e) {
 						console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
+						SupportDialog.showSupportDialog("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message, "Cerrar", 'SupportDialog.disposeSupportDialog()');
 						errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
 					}
 				}
@@ -3631,6 +3883,7 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
+					SupportDialog.showSupportDialog("No se pudo conectar con el servidor remoto", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");
 				}
 			}
@@ -3647,7 +3900,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param successCallback Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
 			 * @param errorCallback Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
 			 */
-			function execAppIntent (intentURL, idSession, cipherKey, successCallback, errorCallback) {
+			execAppIntent = function (intentURL, idSession, cipherKey, successCallback, errorCallback) {
 
 				wrongInstallation = false;
 			
@@ -3658,6 +3911,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!!idSession && (!!successCallback || !!errorCallback)) {
 					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, intentURL, successCallback, errorCallback);
 				}
+				
 			}
 
 			/**
@@ -3837,6 +4091,8 @@ var AutoScript = ( function ( window, undefined ) {
 						result = AfirmaUtils.parseJSONData(result);
 					}
 					catch (e) {}
+					
+					SupportDialog.disposeSupportDialog();
 
 					successCallback(result, certificate);
 					return false;
@@ -3992,15 +4248,25 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, successCallback, errorCallback) {
-
+				
 				if (wrongInstallation) {
 					errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);
+					var autoFirmaLink;
+					if (Platform.isAndroid()) {
+						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
+					} else if (Platform.isIOS()) {
+						autoFirmaLink = SupportDialog.getIOSDownloadURL();
+					} else {
+						autoFirmaLink = SupportDialog.getPCDownloadURL();
+					}
+					SupportDialog.showSupportDialog("AutoFirma no se encuentra instalado en el sistema. Puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink, "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
 					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
+					SupportDialog.showSupportDialog("El tiempo para la recepcion de la firma por la pagina web ha expirado", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 				iterations++;
@@ -4020,12 +4286,14 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 						else {
 							errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
+							SupportDialog.showSupportDialog("El tiempo para la recepcion de la firma por la pagina web ha expirado", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function() {
 						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
+						SupportDialog.showSupportDialog("No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", "Cerrar", "SupportDialog.disposeSupportDialog()");
 					}
 				}
 				catch (e) {
@@ -4192,6 +4460,7 @@ var AutoScript = ( function ( window, undefined ) {
 			isIOS : Platform.isIOS
 		};
 })(window, undefined);
+
 
 /**
  * Mantenemos una copia del objeto de despliegue usando el nombre de variable anterior
