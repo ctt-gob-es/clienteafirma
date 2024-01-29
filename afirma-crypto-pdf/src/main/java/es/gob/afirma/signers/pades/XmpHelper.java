@@ -68,30 +68,62 @@ final class XmpHelper {
 			"  <stEvt:when>" + TAG_DATE + "</stEvt:when>\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"</rdf:li>"; //$NON-NLS-1$
 
-	private static String getOriginalCreationDateAsW3C(final byte[] inPdf) {
-		final String pdfStr = new String(inPdf);
-
-		int pos = pdfStr.indexOf("/CreationDate"); //$NON-NLS-1$
-		if (pos == -1) {
-			return null;
-		}
-		pos += "/CreationDate".length(); //$NON-NLS-1$
-
-		pos = pdfStr.indexOf("(", pos); //$NON-NLS-1$
-		if (pos == -1) {
-			return null;
-		}
-		pos += "(".length(); //$NON-NLS-1$
-		final int pos2 = pdfStr.indexOf(")", pos); //$NON-NLS-1$
-		if (pos2 == -1) {
-			return null;
-		}
-		final String pdfDateStr = pdfStr.substring(pos, pos2).trim();
-		return PdfDate.getW3CDate(
-			pdfDateStr
-		);
-	}
-
+	  /**
+	   *  B&uacute;squeda de texto con arrays de bytes. Similar a la funci&oacute;n indexOf de Gson.
+	   * 
+	   * @param array
+	   * @param target
+	   * @param start
+	   * @return 
+	   */
+	  public static int indexOf(byte[] array, byte[] target, int start) {
+	    if (target.length == 0) {
+	      return 0;
+	    }
+	
+	    for (int i = start; i < array.length - target.length + 1; i++) {
+	      for (int j = 0; j < target.length; j++) {
+	        if (array[i + j] != target[j]) {
+	          return -1;
+	        }
+	      }
+	      return i;
+	    }
+	    return -1;
+	  }
+	
+	  /**
+	   *  Obtener fecha de creaci&oacute;n del PDF optimizado para ficheros grandes.
+	   * 
+	   * @param inPdf
+	   * @return 
+	   */
+	  public static String getOriginalCreationDateAsW3C(final byte[] inPdf) {
+	    byte[] aCreation = "/CreationDate".getBytes();
+	    byte[] aOpen = "(".getBytes();
+	    byte[] aClose = ")".getBytes();
+	
+	    int pos = indexOf(inPdf, aCreation, 0);
+	    if (pos == -1) {
+	      return null;
+	    }
+	    pos += aCreation.length;
+	
+	    pos = indexOf(inPdf, aOpen, pos);
+	    if (pos == -1) {
+	      return null;
+	    }
+	    pos += aOpen.length;
+	
+	    final int pos2 = indexOf(inPdf, aClose, pos);
+	    if (pos2 == -1) {
+	      return null;
+	    }
+	
+	    final String pdfDateStr = new String(Arrays.copyOfRange(inPdf, pos, pos2)).trim();
+	    return PdfDate.getW3CDate(pdfDateStr);
+	  }
+	
 	/** A&ntilde;ade una entrada de firma al hist&oacute;rico XMP de un PDF.
 	 * Un ejemplo de hist&oacute;rico XML con entrada de firma podr&iacute;a ser:
 	 * <pre>
