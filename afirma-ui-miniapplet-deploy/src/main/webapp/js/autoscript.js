@@ -536,14 +536,96 @@ var AutoScript = ( function ( window, undefined ) {
 			return clienteFirma.getErrorType();
 		}
 		
-		var setServlets = function (storageServlet,  retrieverServlet) {
-			
+		var setServlets = function(storageServlet, retrieverServlet) {
+	
 			storageServletAddress = storageServlet;
 			retrieverServletAddress = retrieverServlet;
-
+	
+			checkComunicationServices(storageServletAddress, retrieverServletAddress);
+	
 			if (clienteFirma && clienteFirma.setServlets) {
-				clienteFirma.setServlets(storageServlet,  retrieverServlet);
+				clienteFirma.setServlets(storageServlet, retrieverServlet);
 			}
+		}
+		
+		/**
+		 * Comprueba que tanto el servicio de almacenamiento como el de recuperaci&oacute;n
+		 * funcionen correctamente. Devolver&aacute; true en caso de que se conecten correctamente
+		 * y false en caso contrario. Si es un dispositivo m&oacute;vil, se indicar&aacute; que es
+		 * un tr&aacute;mite incompatible.
+		 */
+		var checkComunicationServices = function (storageServletAddress, retrieverServletAddress, isMobileDev) {
+			
+			// Comprobamos la conexion con el servcio de almacenamiento
+			var httpStorageRequest = getHttpRequest();
+			if (!httpStorageRequest) {
+				throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+			}
+			httpStorageRequest.open("POST", storageServletAddress, true);
+			httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	
+			httpStorageRequest.onreadystatechange = function() {
+				if (httpStorageRequest.readyState == 4) {
+					if (httpStorageRequest.status == 200) {
+						console.log('Conexion correcta con el servicio de almacenamiento');
+					}
+					else {
+						if (isMobileDev == true) {
+							SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+						} else {
+							SupportDialog.showSupportDialog('Error al conectar con el servicio de almacenamiento.','Cerrar','SupportDialog.disposeSupportDialog();');
+						}
+					}
+				}
+			}
+			try {
+				httpStorageRequest.onerror = function() {
+					if (isMobileDev == true) {
+						SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+					} else {	
+						SupportDialog.showSupportDialog('Error al conectar con el servicio de almacenamiento.','Cerrar','SupportDialog.disposeSupportDialog();');
+					}
+				}
+			}
+			catch (e) {
+				SupportDialog.showSupportDialog('Error al conectar con el servicio de almacenamiento.','Cerrar','SupportDialog.disposeSupportDialog();');
+			}
+	
+			httpStorageRequest.send("");
+				
+			// Comprobamos la conexion con el servicio de recuperacion
+			var httpRetrieveRequest = getHttpRequest();
+			httpRetrieveRequest.open("POST", retrieverServletAddress, true);
+			httpRetrieveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	
+			httpRetrieveRequest.onreadystatechange = function() {
+				if (httpRetrieveRequest.readyState == 4) {
+					if (httpRetrieveRequest.status == 200) {
+						console.log('Conexion correcta con el servicio de recuperacion');
+					}
+					else {
+						if (isMobileDev == true) {
+							SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+						} else {
+							SupportDialog.showSupportDialog('Error al conectar con el servicio de recuperaci&oacute;n.','Cerrar','SupportDialog.disposeSupportDialog();');
+						}
+					}
+				}
+			}
+			try {
+				httpRetrieveRequest.onerror = function() {
+					if (isMobileDev == true) {
+						SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+					} else {					
+						SupportDialog.showSupportDialog('Error al conectar con el servicio de recuperaci&oacute;n.','Cerrar','SupportDialog.disposeSupportDialog();');
+					}
+				}
+			}
+			catch (e) {
+				SupportDialog.showSupportDialog('Error al conectar con el servicio de recuperaci&oacute;n.','Cerrar','SupportDialog.disposeSupportDialog();');
+			}
+
+			httpRetrieveRequest.send("");
 		}
 
 		/**
@@ -575,6 +657,8 @@ var AutoScript = ( function ( window, undefined ) {
 		 * @param url URL que se desea abrir.
 		 */
 		function openUrl (url) {
+			
+			SupportDialog.showSupportDialog("Cargando...");
 			
 			// Usamos el modo de invocacion mas apropiado segun el entorno
 			
@@ -616,6 +700,8 @@ var AutoScript = ( function ( window, undefined ) {
 					// Abrimos la URL por medio de un iframe
 					openUrlWithIframe(url);
 				}
+				
+				SupportDialog.disposeSupportDialog();
 			}
 		}
 
@@ -718,7 +804,7 @@ var AutoScript = ( function ( window, undefined ) {
 		/**
 		 * Funciones de comprobacion de entorno.
 		 */
-		var Platform = ( function (window, undefined) {
+		var Platform = ( function () {
 			/** Indica si el sistema operativo es Android. */
 			function isAndroid() {
 				return navigator.userAgent.toUpperCase().indexOf("ANDROID") != -1 ||
@@ -830,7 +916,7 @@ var AutoScript = ( function ( window, undefined ) {
 		/**
 		 * Dialogo para mostrar mensajes con posibles errores y con botones operables.
 		 */
-		SupportDialog = ( function (window, undefined) {
+		SupportDialog = ( function () {
 			
 			var defaultDialogStyle = 'display:block;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: fixed; left: 0; top: 0;';
 			var pcDownloadURL = "https://firmaelectronica.gob.es/Home/Descargas.html";
@@ -977,7 +1063,11 @@ var AutoScript = ( function ( window, undefined ) {
 					
 					childDiv.appendChild(buttonsPanel);
 					parentDiv.appendChild(childDiv);
-					document.body.appendChild(parentDiv);
+					if (document.getElementById("iframeAfirma") != null) {
+						document.getElementById("iframeAfirma").innerHTML += parentDiv;
+					}else {
+						document.body.appendChild(parentDiv);
+					}
 				}
 			}
 			
@@ -1604,7 +1694,6 @@ var AutoScript = ( function ( window, undefined ) {
 			waitAppAndProcessRequest = function (ports, retries) {
 
 				if (!connected) {
-					SupportDialog.showSupportDialog("Cargando...");
 					if (retries > 0) {
 						// Tratamos de conectar al websocket a traves de cualquiera de los posibles puertos
 						for (var i = 0; !connected && i < ports.length; i++) {
@@ -3311,6 +3400,7 @@ var AutoScript = ( function ( window, undefined ) {
 				} else {
 					retrieverServletAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
 					storageServletAddress = clientAddress + "/afirma-signature-storage/StorageService";
+					checkComunicationServices(storageServletAddress, retrieverServletAddress, (Platform.isAndroid() || Platform.isIOS));
 				}
 			}
 
@@ -4000,6 +4090,8 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			function successResponseFunction (html, cipherKey, successCallback, errorCallback) {
 				
+				SupportDialog.disposeSupportDialog();
+				
 				// Si se obtiene el mensaje de  error de que el identificador no existe, seguimos intentandolo
 				if (html.substr(0, 6).toLowerCase() == "err-06") {
 					return true;
@@ -4170,6 +4262,8 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			function errorResponseFunction (type, message, errorCallback) {
+				
+				SupportDialog.disposeSupportDialog();
 
 				errorType = (type != null && type.length > 0) ?
 						type : "java.lang.Exception";
