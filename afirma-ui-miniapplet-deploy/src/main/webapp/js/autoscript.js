@@ -571,7 +571,7 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 					else {
 						if (isMobileDev == true) {
-							SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+							SupportDialog.showSupportDialog('Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
 						} else {
 							SupportDialog.showSupportDialog('Error al conectar con el servicio de almacenamiento.','Cerrar','SupportDialog.disposeSupportDialog();');
 						}
@@ -581,7 +581,7 @@ var AutoScript = ( function ( window, undefined ) {
 			try {
 				httpStorageRequest.onerror = function() {
 					if (isMobileDev == true) {
-						SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+						SupportDialog.showSupportDialog('Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
 					} else {	
 						SupportDialog.showSupportDialog('Error al conectar con el servicio de almacenamiento.','Cerrar','SupportDialog.disposeSupportDialog();');
 					}
@@ -605,7 +605,7 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 					else {
 						if (isMobileDev == true) {
-							SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+							SupportDialog.showSupportDialog('Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
 						} else {
 							SupportDialog.showSupportDialog('Error al conectar con el servicio de recuperaci&oacute;n.','Cerrar','SupportDialog.disposeSupportDialog();');
 						}
@@ -615,7 +615,7 @@ var AutoScript = ( function ( window, undefined ) {
 			try {
 				httpRetrieveRequest.onerror = function() {
 					if (isMobileDev == true) {
-						SupportDialog.showSupportDialog('Tr&aacutemite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
+						SupportDialog.showSupportDialog('Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.','Cerrar','SupportDialog.disposeSupportDialog();');
 					} else {					
 						SupportDialog.showSupportDialog('Error al conectar con el servicio de recuperaci&oacute;n.','Cerrar','SupportDialog.disposeSupportDialog();');
 					}
@@ -1651,10 +1651,14 @@ var AutoScript = ( function ( window, undefined ) {
 							autoFirmaLink = SupportDialog.getIOSDownloadURL();
 						} else {
 							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+							autoFirmaLink += "<br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n";
+							if (Platform.isFirefox()) {
+								autoFirmaLink += ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.";
+							}
 						}
-						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
-						"Reintentar operacion", "execAppIntent('" + url +"');SupportDialog.disposeSupportDialog();" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
+						
+						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+						"Reintentar operaci&oacute;n", "execAppIntent('" + url +"');SupportDialog.disposeSupportDialog();" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					}
 				}
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
@@ -1715,10 +1719,13 @@ var AutoScript = ( function ( window, undefined ) {
 							autoFirmaLink = SupportDialog.getIOSDownloadURL();
 						} else {
 							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+							autoFirmaLink += "<br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n";
+							if (Platform.isFirefox()) {
+								autoFirmaLink += ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.";
+							}
 						}
-						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
-						"Reintentar operacion", "waitAppAndProcessRequest('" + ports +"," + retries + "');SupportDialog.disposeSupportDialog();" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
+						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+						"Reintentar operaci&oacute;n", "waitAppAndProcessRequest('" + ports +"," + retries + "');SupportDialog.disposeSupportDialog();" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
 			}
 					
 				}
@@ -1758,7 +1765,7 @@ var AutoScript = ( function ( window, undefined ) {
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
 						processErrorResponse("java.lang.InterruptedException", "AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion");
-						SupportDialog.showSupportDialog("AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion", "Cerrar", 'SupportDialog.disposeSupportDialog()');
+						SupportDialog.showSupportDialog("AutoFirma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					}
 					SupportDialog.disposeSupportDialog();
 				};
@@ -1822,10 +1829,13 @@ var AutoScript = ( function ( window, undefined ) {
 						autoFirmaLink = SupportDialog.getIOSDownloadURL();
 					} else {
 						autoFirmaLink = SupportDialog.getPCDownloadURL();
-						autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+						autoFirmaLink += "<br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n";
+						if (Platform.isFirefox()) {
+							autoFirmaLink += ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.";
+						}
 					}
-					SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
-					"Reintentar operacion", "sendEcho(" + ws + "," + idSession + ",1);SupportDialog.disposeSupportDialog();", 
+					SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+					"Reintentar operaci&oacute;n", "sendEcho(" + ws + "," + idSession + ",1);SupportDialog.disposeSupportDialog();", 
 					"Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
@@ -1859,7 +1869,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
 					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
-					SupportDialog.showSupportDialog("El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion", "Cerrar", 'SupportDialog.disposeSupportDialog()');
+					SupportDialog.showSupportDialog("El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicaci&oacute;n", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 				
@@ -1938,7 +1948,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// separador ":"
 				if (data.indexOf(":") <= 0) {
 					processErrorResponse("java.lang.Exception", "Respuesta no valida");
-					SupportDialog.showSupportDialog("Respuesta no valida", "Cerrar", 'SupportDialog.disposeSupportDialog()');
+					SupportDialog.showSupportDialog("Respuesta no v&aacute;lida", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 
@@ -2504,10 +2514,13 @@ var AutoScript = ( function ( window, undefined ) {
 							autoFirmaLink = SupportDialog.getIOSDownloadURL();
 						} else {
 							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += "<br>Tambien se puede restaurar la instalacion desde AutoFirma en Herramientas -> Restaurar instalacion";
+							autoFirmaLink += "<br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n";
+							if (Platform.isFirefox()) {
+								autoFirmaLink += ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.";
+							}
 						}
-						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicacion o de instalacion del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
-						"Reintentar operacion", "execAppIntent(" + url +")" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
+						SupportDialog.showSupportDialog("No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink,
+						"Reintentar operaci&oacute;n", "execAppIntent(" + url +")" , "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					}
 				}
 				// Se ha ejecutado anteriormente y tenemos un puerto calculado.
@@ -4352,6 +4365,10 @@ var AutoScript = ( function ( window, undefined ) {
 						autoFirmaLink = SupportDialog.getIOSDownloadURL();
 					} else {
 						autoFirmaLink = SupportDialog.getPCDownloadURL();
+						autoFirmaLink += "<br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n";
+						if (Platform.isFirefox()) {
+							autoFirmaLink += ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.";
+						}
 					}
 					SupportDialog.showSupportDialog("AutoFirma no se encuentra instalado en el sistema. Puede descargarse desde el siguiente enlace:<br>" + autoFirmaLink, "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
@@ -4360,7 +4377,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
 					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
-					SupportDialog.showSupportDialog("El tiempo para la recepcion de la firma por la pagina web ha expirado", "Cerrar", 'SupportDialog.disposeSupportDialog()');
+					SupportDialog.showSupportDialog("El tiempo para la recepci&oacute;n de la firma por la p&aacute;gina web ha expirado", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 					return;
 				}
 				iterations++;
@@ -4380,14 +4397,14 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 						else {
 							errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
-							SupportDialog.showSupportDialog("El tiempo para la recepcion de la firma por la pagina web ha expirado", "Cerrar", 'SupportDialog.disposeSupportDialog()');
+							SupportDialog.showSupportDialog("El tiempo para la recepci&oacute;n de la firma por la p&aacute;gina web ha expirado", "Cerrar", 'SupportDialog.disposeSupportDialog()');
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function() {
 						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
-						SupportDialog.showSupportDialog("No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", "Cerrar", "SupportDialog.disposeSupportDialog()");
+						SupportDialog.showSupportDialog("No se pudo conectar con el servidor intermedio para la recuperaci&oacute;n del resultado de la operaci&oacute;n (Status: " + httpRequest.status + ")", "Cerrar", "SupportDialog.disposeSupportDialog()");
 					}
 				}
 				catch (e) {
