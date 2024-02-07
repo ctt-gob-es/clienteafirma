@@ -56,7 +56,7 @@ var AutoScript = ( function ( window, undefined ) {
 				error_closing_autofirma: "AutoFirma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n",
 				error_connecting_autofirma: "No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>",
 				error_connecting_remote_server: "Error conectando al servidor remoto",
-				error_connecting_retrieve_service: "Error al conectar con el servicio de recuperaci&oacute;.",
+				error_connecting_retrieve_service: "Error al conectar con el servicio de recuperaci&oacute;n.",
 				error_connecting_server_recovering: "No se pudo conectar con el servidor intermedio para la recuperaci&oacute;n del resultado de la operaci&oacute;n",
 				error_connecting_storage_service: "Produciuse un erro ao conectarse ao servizo de almacenamento.",
 				error_file_size: "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicaci&oacute;n",
@@ -1858,7 +1858,6 @@ var AutoScript = ( function ( window, undefined ) {
 			sendEcho = function (ws, idSession, retries) {
 				
 				if (retries <= 0) {
-					processErrorResponse("java.util.concurrent.TimeoutException", "AutoFirma no respondio al saludo.");
 					var autoFirmaLink;
 					if (Platform.isAndroid()) {
 						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
@@ -1873,7 +1872,7 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 					SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + autoFirmaLink,
 					currentLocale.retry_operation, function (){sendEcho(ws, idSession, 1)}, 
-					currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+					currentLocale.close, function (){SupportDialog.disposeSupportDialog();processErrorResponse("java.util.concurrent.TimeoutException", "AutoFirma no respondio al saludo.");});
 					return;
 				}
 				
@@ -4411,7 +4410,6 @@ var AutoScript = ( function ( window, undefined ) {
 			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, successCallback, errorCallback) {
 				
 				if (wrongInstallation) {
-					errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);
 					var autoFirmaLink;
 					if (Platform.isAndroid()) {
 						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
@@ -4424,13 +4422,13 @@ var AutoScript = ( function ( window, undefined ) {
 							autoFirmaLink += firefox_reinstall_message;
 						}
 					}
-					SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + autoFirmaLink, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+					SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + autoFirmaLink,
+						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);});
 					return;
 				}
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
-					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
 					var autoFirmaLink;
 					if (Platform.isAndroid()) {
 						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
@@ -4444,7 +4442,7 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 					}
 					SupportDialog.showSupportDialog(currentLocale.timeout_receiving_sign + autoFirmaLink,
-						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog(); });
+						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);});
 					return;
 				}
 				iterations++;
@@ -4463,7 +4461,6 @@ var AutoScript = ( function ( window, undefined ) {
 							}
 						}
 						else {
-							errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
 							var autoFirmaLink;
 							if (Platform.isAndroid()) {
 								autoFirmaLink = SupportDialog.getAndroidDownloadURL();
@@ -4476,14 +4473,16 @@ var AutoScript = ( function ( window, undefined ) {
 									autoFirmaLink += firefox_reinstall_message;
 								}
 							}
-							SupportDialog.showSupportDialog(currentLocale.timeout_receiving_web + autoFirmaLink, currentLocale.close, function() { SupportDialog.disposeSupportDialog(); });
+							SupportDialog.showSupportDialog(currentLocale.timeout_receiving_web + autoFirmaLink,
+								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);});
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function() {
 						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_server_recovering + " (Status: " + httpRequest.status + ")", currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+						SupportDialog.showSupportDialog(currentLocale.error_connecting_server_recovering + " (Status: " + httpRequest.status + ")",
+								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 					}
 				}
 				catch (e) {
