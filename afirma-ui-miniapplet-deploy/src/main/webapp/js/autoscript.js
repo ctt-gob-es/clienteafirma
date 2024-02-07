@@ -3463,6 +3463,12 @@ var AutoScript = ( function ( window, undefined ) {
 			function setKeyStore (keystore) {
 				defaultKeyStore = keystore;
 			}
+			
+			/** Establece las funciones callback que gestionan el resultado de una operacion. */
+			function setCallbacks(successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+			}
 
 			/**
 			 * Inicia el proceso de seleccion de certificado.
