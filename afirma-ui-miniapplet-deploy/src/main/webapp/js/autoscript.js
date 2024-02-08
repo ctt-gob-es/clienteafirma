@@ -22,7 +22,7 @@ var sendEcho;
 
 var AutoScript = ( function ( window, undefined ) {
 
-		var VERSION = "1.8.2";
+		var VERSION = "1.9.0";
 		var VERSION_CODE = 2;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
@@ -64,15 +64,16 @@ var AutoScript = ( function ( window, undefined ) {
 				error_sending_data: "Error al enviar los datos al servidor intermedio.",
 				error_stablishing_websocket: "Error estableciendo el WebSocket",
 				firefox_reinstall_message: ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 250px; height: 83px;'></a>",
-				loading: "Cargando..",
+				install_mobile_client: "Si no se encuentra instalado el cliente m&oacute;vil, puede descargarse desde el siguiente enlace:<br>",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Cargando<img style='width:25px; height:25px; margin-left:20px;' src='spinner.gif'/>",
 				no_compatile_procedure: "Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.",
 				no_valid_response: "Respuesta no v&aacute;lida",
-				pc_download_url: "https://firmaelectronica.gob.es/Home/Descargas.html",
-				restore_installation: "<br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
+				restore_installation: "<br><br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n",
 				retry_operation: "Reintentar operaci\u00F3n",
-				timeout_receiving_sign: "El tiempo para la recepci&oacute;n de la firma por la p&aacute;gina web ha expirado.<br>",
-				timeout_receiving_web: "El tiempo para la recepci&oacute;n de la firma por la p&aacute;gina web ha expirado.<br>",
+				timeout_receiving_sign: "El tiempo para la recepci&oacute;n de la firma por la p&aacute;gina web ha expirado. Es posible que haya problemas con la instalaci&oacute;n del cliente de firma, puede volver a descargarse desde el siguiente enlace:<br>",
+				timeout_receiving_web: "Ha finalizado el tiempo para recibir la firma a través de la web. Es posible que haya problemas con la instalaci&oacute;n del cliente de firma, puede volver a descargarse desde el siguiente enlace:<br>",
 				unknown_error: "Error desconocido"
 		};
 		LOCALIZED_STRINGS["gl_ES"] = {
@@ -94,15 +95,16 @@ var AutoScript = ( function ( window, undefined ) {
 				error_sending_data: "Produciuse un erro ao enviar os datos ao servidor intermedio.",
 				error_stablishing_websocket: "Erro ao establecer WebSocket",
 				firefox_reinstall_message: ".<br>Para reinstalar ou restaurar AutoFirma ser&aacute; necesario pechar o navegador web e reiniciar o proceso.",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 250px; height: 83px;'></a>",
-				loading: "Cargando..",
+				install_mobile_client: "Si no se encuentra instalado el cliente m&oacute;vil, puede descargarse desde el siguiente enlace:<br>",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Cargando<img style='width:25px; height:25px; margin-left:20px;' src='spinner.gif'/>",
 				no_compatile_procedure: "Procedemento non compatible con dispositivos m&oacute;biles. Este procedemento debe realizarse desde un PC.",
-				no_valid_response: "Respuesta no v&aacute;lida",
-				pc_download_url: "https://firmaelectronica.gob.es/Home/Descargas.html",
-				restore_installation: "<br>Tam&eacute;n pode restaurar a instalaci&oacute;n desde AutoFirma en Ferramentas -> Restaurar instalaci&oacute;n",
+				no_valid_response: "Resposta non v&aacute;lida",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
+				restore_installation: "<br><br>Tam&eacute;n pode restaurar a instalaci&oacute;n desde AutoFirma en Ferramentas -> Restaurar instalaci&oacute;n",
 				retry_operation: "Reintento a operaci\u00F3n",
-				timeout_receiving_sign: "O tempo para recibir a sinatura a trav&eacute;s da p&aacute;xina web caducou.<br>",
-				timeout_receiving_web: "O tempo de recepci&oacute;n da sinatura a trav&eacute;s do sitio web rematou.<br>",
+				timeout_receiving_sign: "O tempo para recibir a sinatura a trav&eacute;s da p&aacute;xina web caducou. Pode haber problemas coa instalaci&oacute;n do cliente de sinatura, p&oacute;dese descargar de novo dende a seguinte ligaz&oacute;n:<br>",
+				timeout_receiving_web: "O tempo de recepci&oacute;n da sinatura a trav&eacute;s do sitio web rematou. Pode haber problemas coa instalaci&oacute;n do cliente de sinatura, p&oacute;dese descargar de novo dende a seguinte ligaz&oacute;n:<br>",
 				unknown_error: "Erro desco&ntilde;ecido"
 		};
 
@@ -1061,26 +1063,17 @@ var AutoScript = ( function ( window, undefined ) {
 					childDiv.setAttribute('style', 'background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;');
 	
 					messagePanel.setAttribute('id', 'messagePanel');
+					messagePanel.setAttribute('style', 'display: flex;align-items:center;justify-content: center;flex:auto;');
 	
 					imgDiv.setAttribute('id', 'imgDiv');
-					imgDiv.setAttribute('style', 'float:left; width:15%');
+					imgDiv.setAttribute('style', 'width:15%');
 					imgTag.setAttribute('id', 'dialogLogo');
 					imgTag.setAttribute('src', 'logo64.png');
-	
-					messageDiv.setAttribute('id', 'messageDiv');
-					messageDiv.setAttribute('style', 'vertical-align:top; float:right; width:85%;margin-bottom:5%; text-align: center;');
-					spanSupportMessage.setAttribute('id', 'spanSupportMessage');
-					spanSupportMessage.setAttribute('style', 'font-family: helvetica; font-weight: bold; font-size: 10pt; vertical-align: top;');
-					spanSupportMessage.innerHTML = messageType;
 					
-					imgDiv.appendChild(imgTag);
-					messagePanel.appendChild(imgDiv);
-					messageDiv.appendChild(spanSupportMessage);
-					messagePanel.appendChild(messageDiv);
-					childDiv.appendChild(messagePanel);
-					
-					//PANEL DE BOTONES ACEPTAR Y CANCELAR	
+					// Panel de botones para aceptar y cancelar
 					var buttonsPanel = document.createElement("div");
+					
+					var noButtons = true;
 	
 					if (button1Text !== undefined && button1Text != null) {
 	
@@ -1094,6 +1087,7 @@ var AutoScript = ( function ( window, undefined ) {
 						button1.textContent = button1Text;
 						
 						buttonsPanel.appendChild(button1);
+						noButtons = false;
 					}
 					
 					if (button2Text !== undefined && button2Text != null) {
@@ -1107,15 +1101,31 @@ var AutoScript = ( function ( window, undefined ) {
 						button2.textContent = button2Text;
 						
 						buttonsPanel.appendChild(button2);
+						noButtons = false;
+					}
+	
+					// Panel con mensaje a mostrar
+					messageDiv.setAttribute('id', 'messageDiv');
+					spanSupportMessage.setAttribute('id', 'spanSupportMessage');
+					spanSupportMessage.innerHTML = messageType;
+					
+					if (noButtons == true) {
+						spanSupportMessage.setAttribute('style', 'font-family: helvetica; font-weight: bold; font-size: 20pt; text-align:center;');
+						messageDiv.setAttribute('style', 'width:85%; display:flex; justify-content:center; align-items:center;');
+					} else {
+						spanSupportMessage.setAttribute('style', 'font-family: helvetica; font-weight: bold; font-size: 10pt; vertical-align: top;');
+						messageDiv.setAttribute('style', 'vertical-align:top; float:right; width:85%; margin:2%;');
 					}
 					
+					imgDiv.appendChild(imgTag);
+					messagePanel.appendChild(imgDiv);
+					messageDiv.appendChild(spanSupportMessage);
+					messagePanel.appendChild(messageDiv);
+					childDiv.appendChild(messagePanel);			
 					childDiv.appendChild(buttonsPanel);
 					parentDiv.appendChild(childDiv);
-					if (document.getElementById("iframeAfirma") != null) {
-						document.getElementById("iframeAfirma").innerHTML += parentDiv;
-					}else {
-						document.body.appendChild(parentDiv);
-					}
+
+					document.body.appendChild(parentDiv);			
 				}
 			}
 			
@@ -1284,6 +1294,25 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 				}
 				
+				/** Construye el enlace que se necesite segun el SO con el que se opere. */ 
+				function buildCustomUrl() { 
+						var autoFirmaLink;
+						if (Platform.isAndroid()) {
+							autoFirmaLink = currentLocale.install_mobile_client;
+							autoFirmaLink += SupportDialog.getAndroidDownloadURL();
+						} else if (Platform.isIOS()) {
+							autoFirmaLink = currentLocale.install_mobile_client;
+							autoFirmaLink += SupportDialog.getIOSDownloadURL();
+						} else {
+							autoFirmaLink = SupportDialog.getPCDownloadURL();
+							autoFirmaLink += currentLocale.restore_installation;
+							if (Platform.isFirefox()) {
+								autoFirmaLink += currentLocale.firefox_reinstall_message;
+							}
+						}
+						return autoFirmaLink;
+				}
+				
 				/* Metodos que publicamos del objeto */
 				return {
 					/** Genera un nuevo identificador de sesion aleatorio. */
@@ -1291,7 +1320,8 @@ var AutoScript = ( function ( window, undefined ) {
 					getRandomPorts : getRandomPorts,
 					parseJSONData : parseJSONData,
 					checkExistingId : checkExistingId,
-					getRandom : getRandom
+					getRandom : getRandom,
+					buildCustomUrl : buildCustomUrl
 				};
 		})(window, undefined);
 
@@ -1685,20 +1715,8 @@ var AutoScript = ( function ( window, undefined ) {
 						console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
 						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, url, successCB, errorCB);
 					} catch (e) {
-						var autoFirmaLink;
-						if (Platform.isAndroid()) {
-							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-						} else if (Platform.isIOS()) {
-							autoFirmaLink = SupportDialog.getIOSDownloadURL();
-						} else {
-							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += currentLocale.restore_installation;
-							if (Platform.isFirefox()) {
-								autoFirmaLink += firefox_reinstall_message;
-							}
-						}
-						
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + autoFirmaLink,
+
+						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
 						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 					}
 				}
@@ -1748,25 +1766,13 @@ var AutoScript = ( function ( window, undefined ) {
 						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1, url, successCB, errorCB);
 					}
 					else {
-						processErrorResponse("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
 						//Se cierra el dialogo de espera
 						SupportDialog.disposeSupportDialog();
-						var autoFirmaLink;
-						if (Platform.isAndroid()) {
-							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-						} else if (Platform.isIOS()) {
-							autoFirmaLink = SupportDialog.getIOSDownloadURL();
-						} else {
-							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += currentLocale.restore_installation;
-							if (Platform.isFirefox()) {
-								autoFirmaLink += firefox_reinstall_message;
-							}
-						}
+	
 						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 						
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + autoFirmaLink,
-						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
+						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();						processErrorResponse("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");});
 					}			
 				}
 				else {
@@ -1858,19 +1864,7 @@ var AutoScript = ( function ( window, undefined ) {
 			sendEcho = function (ws, idSession, retries) {
 				
 				if (retries <= 0) {
-					var autoFirmaLink;
-					if (Platform.isAndroid()) {
-						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-					} else if (Platform.isIOS()) {
-						autoFirmaLink = SupportDialog.getIOSDownloadURL();
-					} else {
-						autoFirmaLink = SupportDialog.getPCDownloadURL();
-						autoFirmaLink += currentLocale.restore_installation;
-						if (Platform.isFirefox()) {
-							autoFirmaLink += firefox_reinstall_message;
-						}
-					}
-					SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + autoFirmaLink,
+					SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
 					currentLocale.retry_operation, function (){sendEcho(ws, idSession, 1)}, 
 					currentLocale.close, function (){SupportDialog.disposeSupportDialog();processErrorResponse("java.util.concurrent.TimeoutException", "AutoFirma no respondio al saludo.");});
 					return;
@@ -2546,19 +2540,7 @@ var AutoScript = ( function ( window, undefined ) {
 						// Enviamos la peticion a la app despues de esperar un tiempo prudencial
 						setTimeout(executeEchoByServiceByPort, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, url);
 					} catch (e){
-						var autoFirmaLink;
-						if (Platform.isAndroid()) {
-							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-						} else if (Platform.isIOS()) {
-							autoFirmaLink = SupportDialog.getIOSDownloadURL();
-						} else {
-							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += currentLocale.restore_installation;
-							if (Platform.isFirefox()) {
-								autoFirmaLink += firefox_reinstall_message;
-							}
-						}
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + autoFirmaLink,
+						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
 						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 					}
 				}
@@ -4031,7 +4013,7 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					SupportDialog.showSupportDialog(currentLocale.error_connecting_remote_server, "Cerrar", function (){SupportDialog.disposeSupportDialog();});
+					SupportDialog.showSupportDialog(currentLocale.error_connecting_remote_server, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");
 				}
 			}
@@ -4410,38 +4392,14 @@ var AutoScript = ( function ( window, undefined ) {
 			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, successCallback, errorCallback) {
 				
 				if (wrongInstallation) {
-					var autoFirmaLink;
-					if (Platform.isAndroid()) {
-						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-					} else if (Platform.isIOS()) {
-						autoFirmaLink = SupportDialog.getIOSDownloadURL();
-					} else {
-						autoFirmaLink = SupportDialog.getPCDownloadURL();
-						autoFirmaLink += currentLocale.restore_installation;
-						if (Platform.isFirefox()) {
-							autoFirmaLink += firefox_reinstall_message;
-						}
-					}
-					SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + autoFirmaLink,
+					SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + AfirmaUtils.buildCustomUrl(),
 						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);});
 					return;
 				}
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
-					var autoFirmaLink;
-					if (Platform.isAndroid()) {
-						autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-					} else if (Platform.isIOS()) {
-						autoFirmaLink = SupportDialog.getIOSDownloadURL();
-					} else {
-						autoFirmaLink = SupportDialog.getPCDownloadURL();
-						autoFirmaLink += currentLocale.restore_installation;
-						if (Platform.isFirefox()) {
-							autoFirmaLink += firefox_reinstall_message;
-						}
-					}
-					SupportDialog.showSupportDialog(currentLocale.timeout_receiving_sign + autoFirmaLink,
+					SupportDialog.showSupportDialog(currentLocale.timeout_receiving_sign + AfirmaUtils.buildCustomUrl(),
 						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);});
 					return;
 				}
@@ -4461,19 +4419,7 @@ var AutoScript = ( function ( window, undefined ) {
 							}
 						}
 						else {
-							var autoFirmaLink;
-							if (Platform.isAndroid()) {
-								autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-							} else if (Platform.isIOS()) {
-								autoFirmaLink = SupportDialog.getIOSDownloadURL();
-							} else {
-								autoFirmaLink = SupportDialog.getPCDownloadURL();
-								autoFirmaLink += currentLocale.restore_installation;
-								if (Platform.isFirefox()) {
-									autoFirmaLink += firefox_reinstall_message;
-								}
-							}
-							SupportDialog.showSupportDialog(currentLocale.timeout_receiving_web + autoFirmaLink,
+							SupportDialog.showSupportDialog(currentLocale.timeout_receiving_web + AfirmaUtils.buildCustomUrl(),
 								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);});
 						}
 					}
