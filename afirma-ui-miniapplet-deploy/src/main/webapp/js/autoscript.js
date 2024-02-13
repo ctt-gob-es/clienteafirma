@@ -10,6 +10,86 @@ if (document.all && !window.setTimeout.isPolyfill) {
 	window.setTimeout.isPolyfill = true;
 }
 
+var styles = 
+		"@media all and (max-width: 1250px) {" +  
+	        "#messagePanel {" +
+	        	"display: flex;" +
+	        	"align-items: center;" +
+	        	"justify-content: center;" + 
+	        	"flex-direction: column;" +
+	        "}" +
+	        "#imgDiv {" +
+	        	"width: 50%;" +
+	        	"background-position: center;" +
+	        "}" +
+    	"}" +  
+    	".defaultDialogClass {" +
+		  "background-color: white;" +
+		  "position: fixed;" +
+		  "top: 30%;" +
+		  "left: 35%;" +
+		  "width: 30%;" +
+		  "padding: 20px;" +
+		  "border: 2px solid black;" +
+		  "border-radius: 15px;" +
+		"}" +
+	    ".defaultLoadingTextClass {" +
+		  "font-family: helvetica;" +
+		  "font-weight: bold;" +
+		  "font-size: 20pt;" +
+		  "text-align:center;" +
+		"}" +
+		".defaultErrorTextClass {" +
+		  "font-family: helvetica;" +
+		  "font-weight: bold;" +
+		  "font-size: 10pt;" +
+		  "vertical-align: top;" +
+		"}" +
+		".defaultButton1Class {" +
+		"}" +
+		".defaultButton2Class {" +
+		  "margin-left: 3%;" +
+		"}" +
+		".defaultLogoClass {" +
+			"background-image: url('logo64.png');" +
+			"background-repeat: no-repeat;" +
+			"display: block;" +
+			"width: 15%;" +
+			"height: 70px;" +
+		"}" +
+		".defaultBackgroundClass {" +
+		  "display:block;" +
+		  "background-color: rgba(50,50,50,0.3);" +
+		  "width: 100%;" +
+		  "height: 100%;" +
+		  "z-index: 9990;" +
+		  "position: fixed;" +
+		  "left: 0;" +
+		  "top: 0;" +
+		"}" +
+    	".spinner {" +
+		  "border: 4px solid rgba(0, 0, 0, 0.1);" +
+		  "width: 15px;" +
+		  "height: 15px;" +
+		  "float: right;" +
+		  "margin-left: 10px;" +
+		  "border-radius: 50%;" +
+		  "border-left-color: #96181C;" +
+		  "animation: spin 1s ease infinite;" +
+		"}" +
+		"@keyframes spin {" +
+		  "0% {" +
+		  	"transform: rotate(0deg);" +
+		  "}" +
+		  "100% {" +
+		  	"transform: rotate(360deg);" +
+		  "}" +
+		"}";
+
+var styleSheet = document.createElement("style")
+styleSheet.innerText = styles
+document.head.appendChild(styleSheet)
+
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var SupportDialog;
@@ -46,40 +126,38 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
-				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descárgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
 				autofirma_not_installed: "AutoFirma no se encuentra instalado en el sistema. Puede descargarse desde el siguiente enlace:<br>",
 				checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
-				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta página antes de continuar.",
+				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta p&aacute;gina antes de continuar.",
 				checktime_local_time: "Hora de su sistema",
 				checktime_server_time: "Hora del servidor",
 				close: "Cerrar",
 				error_closing_autofirma: "AutoFirma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n",
 				error_connecting_autofirma: "No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:<br>",
-				error_connecting_remote_server: "Error conectando al servidor remoto",
-				error_connecting_retrieve_service: "Error al conectar con el servicio de recuperaci&oacute;n.",
+				error_connecting_remote_server: "Error conectando al servidor remoto.",
+				error_connecting_service: "No se ha podido conectar con el servicio para la comunicacioacuten con la aplicaci&oacute;n de firma. Compruebe que el dominio sea de confianza y comun&iacute;quese con el administrador del servicio en ese caso.",
 				error_connecting_server_recovering: "No se pudo conectar con el servidor intermedio para la recuperaci&oacute;n del resultado de la operaci&oacute;n",
-				error_connecting_storage_service: "Produciuse un erro ao conectarse ao servizo de almacenamento.",
 				error_file_size: "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicaci&oacute;n",
 				error_processing_data: "Error desconocido al procesar los datos",
 				error_sending_data: "Error al enviar los datos al servidor intermedio.",
-				error_stablishing_websocket: "Error estableciendo el WebSocket",
-				firefox_reinstall_message: ".<br>La reinstalaci&oacute;n o restauraci&oacute;n de AutoFirma requerrir&aacute; cerrar el navegador web y reiniciar el tr&aacute;mite.",
-				install_mobile_client: "Si no se encuentra instalado el cliente m&oacute;vil, puede descargarse desde el siguiente enlace:<br>",
+				error_stablishing_websocket: "Error estableciendo el WebSocket.",
+				firefox_reinstall_message: ".<br>Instalar o restaurar AutoFirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
+				install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
-				loading: "Cargando<img style='width:25px; height:25px; margin-left:20px;' src='spinner.gif'/>",
-				no_compatile_procedure: "Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.",
+				loading: "Cargando<div class='spinner'></div>",
+				no_compatible_procedure: "Tr&aacute;mite no compatible con dispositivos m&oacute;viles. Este tr&aacute;mite debe de realizarse desde un PC.",
 				no_valid_response: "Respuesta no v&aacute;lida",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
-				restore_installation: "<br><br>Tambi&eacute;n se puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n",
+				restore_installation: "<br><br>Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n",
 				retry_operation: "Reintentar operaci\u00F3n",
-				timeout_receiving_sign: "El tiempo para la recepci&oacute;n de la firma por la p&aacute;gina web ha expirado. Es posible que haya problemas con la instalaci&oacute;n del cliente de firma, puede volver a descargarse desde el siguiente enlace:<br>",
-				timeout_receiving_web: "Ha finalizado el tiempo para recibir la firma a través de la web. Es posible que haya problemas con la instalaci&oacute;n del cliente de firma, puede volver a descargarse desde el siguiente enlace:<br>",
+				timeout_receiving_sign: "No se ha podido conectar con el cliente de firma. Si no lo tiene instalado, puede descargarlo desde:<br>",
 				unknown_error: "Error desconocido"
 		};
 		LOCALIZED_STRINGS["gl_ES"] = {
-				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descárgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
 				autofirma_not_installed: "AutoFirma non est&aacute; instalado no sistema. P&oacute;dese descargar na seguinte ligaz&oacute;n:<br>",
-				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recoméndase corrixilo antes de pulsar Aceptar para continuar.",
+				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom&eacute;ndase corrixilo antes de pulsar Aceptar para continuar.",
 				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor",
@@ -87,24 +165,22 @@ var AutoScript = ( function ( window, undefined ) {
 				error_closing_autofirma: "AutoFirma pechouse ou pechouse o websocket de comunicaci&oacute;n",
 				error_connecting_autofirma: "Non se puido conectar a AutoFirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:<br>",
 				error_connecting_remote_server: "Produciuse un erro ao conectarse ao servidor remoto",
-				error_connecting_retrieve_service: "Produciuse un erro ao conectarse ao servizo de recuperaci&oacute;.",
+				error_connecting_service: "Non se puido conectar ao servizo para comunicarse coa aplicaci&oacute;n de sinatura. Comproba que o dominio &eacute; de confianza e ponte en contacto co administrador do servizo se &eacute; o caso.",
 				error_connecting_server_recovering: "Non se puido conectar ao servidor intermedio para recuperar o resultado da operaci&oacute;n",
-				error_connecting_storage_service: "Produciuse un erro ao conectarse ao servizo de almacenamento.",
 				error_file_size: "O ficheiro que se vai asinar ou gardar supera a memoria dispoñible para a  aplicaci&oacute;n",
 				error_processing_data: "Error desco&ntilde;ecido ao procesar os datos",
 				error_sending_data: "Produciuse un erro ao enviar os datos ao servidor intermedio.",
 				error_stablishing_websocket: "Erro ao establecer WebSocket",
-				firefox_reinstall_message: ".<br>Para reinstalar ou restaurar AutoFirma ser&aacute; necesario pechar o navegador web e reiniciar o proceso.",
-				install_mobile_client: "Si no se encuentra instalado el cliente m&oacute;vil, puede descargarse desde el siguiente enlace:<br>",
+				firefox_reinstall_message: ".<br>Ser&aacute; necesario instalar ou restaurar AutoFirma pecha o navegador e reinicia o proceso.",
+				install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
-				loading: "Cargando<img style='width:25px; height:25px; margin-left:20px;' src='spinner.gif'/>",
-				no_compatile_procedure: "Procedemento non compatible con dispositivos m&oacute;biles. Este procedemento debe realizarse desde un PC.",
+				loading: "Cargando<div class='spinner'></div>",
+				no_compatible_procedure: "Procedemento non compatible con dispositivos m&oacute;biles. Este procedemento debe realizarse desde un PC.",
 				no_valid_response: "Resposta non v&aacute;lida",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
-				restore_installation: "<br><br>Tam&eacute;n pode restaurar a instalaci&oacute;n desde AutoFirma en Ferramentas -> Restaurar instalaci&oacute;n",
+				restore_installation: "<br><br>Se o tes instalado, podes restaurar a instalaci&oacute;n desde AutoFirma en Ferramentas -> Restaurar instalaci&oacute;n.",
 				retry_operation: "Reintento a operaci\u00F3n",
-				timeout_receiving_sign: "O tempo para recibir a sinatura a trav&eacute;s da p&aacute;xina web caducou. Pode haber problemas coa instalaci&oacute;n do cliente de sinatura, p&oacute;dese descargar de novo dende a seguinte ligaz&oacute;n:<br>",
-				timeout_receiving_web: "O tempo de recepci&oacute;n da sinatura a trav&eacute;s do sitio web rematou. Pode haber problemas coa instalaci&oacute;n do cliente de sinatura, p&oacute;dese descargar de novo dende a seguinte ligaz&oacute;n:<br>",
+				timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:<br>",
 				unknown_error: "Erro desco&ntilde;ecido"
 		};
 
@@ -604,43 +680,47 @@ var AutoScript = ( function ( window, undefined ) {
 		 * y false en caso contrario. Si es un dispositivo m&oacute;vil, se indicar&aacute; que es
 		 * un tr&aacute;mite incompatible.
 		 */
-		var checkComunicationServices = function (storageServletAddress, retrieverServletAddress, isMobileDev) {
+		var checkComunicationServices = function (storageServletAddress, retrieverServletAddress, isCheckingCompatibleProcedure) {
 			
 			// Comprobamos la conexion con el servcio de almacenamiento
 			var httpStorageRequest = getHttpRequest();
 			if (!httpStorageRequest) {
-				throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+				throw new Error("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
 			}
 			httpStorageRequest.open("POST", storageServletAddress, true);
 			httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	
+			
 			httpStorageRequest.onreadystatechange = function() {
 				if (httpStorageRequest.readyState == 4) {
 					if (httpStorageRequest.status == 200) {
 						console.log('Conexion correcta con el servicio de almacenamiento');
 					}
 					else {
-						if (isMobileDev == true) {
+						if (isCheckingCompatibleProcedure == true) {
 							SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 						} else {
-							SupportDialog.showSupportDialog(currentLocale.error_connecting_storage_service, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							SupportDialog.showSupportDialog(SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 						}
 					}
 				}
 			}
 			try {
 				httpStorageRequest.onerror = function() {
-					if (isMobileDev == true) {
-						SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
-					} else {	
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_storage_service, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+					if (isCheckingCompatibleProcedure == true) {
+						SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+					} else {
+						SupportDialog.showSupportDialog(SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
 				}
 			}
 			catch (e) {
-				SupportDialog.showSupportDialog(currentLocale.error_connecting_storage_service, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+				if (isCheckingCompatibleProcedure == true) {
+					SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+				} else {
+					SupportDialog.showSupportDialog(SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+				}
 			}
-	
+			
 			httpStorageRequest.send("");
 				
 			// Comprobamos la conexion con el servicio de recuperacion
@@ -654,28 +734,34 @@ var AutoScript = ( function ( window, undefined ) {
 						console.log('Conexion correcta con el servicio de recuperacion');
 					}
 					else {
-						if (isMobileDev == true) {
-							SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+						if (isCheckingCompatibleProcedure == true) {
+							SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						} else {
-							SupportDialog.showSupportDialog(currentLocale.error_connecting_retrieve_service, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							SupportDialog.showSupportDialog(SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						}
 					}
 				}
 			}
+			
 			try {
 				httpRetrieveRequest.onerror = function() {
-					if (isMobileDev == true) {
-						SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
-					} else {					
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_retrieve_service, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+					if (isCheckingCompatibleProcedure == true) {
+						SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+					} else {
+						SupportDialog.showSupportDialog(SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
 				}
 			}
 			catch (e) {
-				SupportDialog.showSupportDialog(currentLocale.error_connecting_retrieve_service, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+				if (isCheckingCompatibleProcedure == true) {
+					SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+				} else {
+					SupportDialog.showSupportDialog(SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+				}
 			}
 
-			httpRetrieveRequest.send("");
+			httpRetrieveRequest.send("");		
+			
 		}
 
 		/**
@@ -708,7 +794,7 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		function openUrl (url) {
 			
-			SupportDialog.showSupportDialog(currentLocale.loading);
+			SupportDialog.showSupportDialog(SupportDialog.getLoadingText());
 			
 			// Usamos el modo de invocacion mas apropiado segun el entorno
 			
@@ -808,6 +894,11 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				return;
 			}
+			
+			// Comprobamos que sea un tramite compatible
+			if (Platform.isIOS() || Platform.isAndroid()) {
+				setTimeout(checkServletsConfig, 2000, clientAddress);
+			}
 
 			// Si se fuerza el uso de servidor intermedio o estamos en un dispositivo movil,
 			// usamos servidor intermedio
@@ -848,6 +939,18 @@ var AutoScript = ( function ( window, undefined ) {
 				keystore = getDefaultKeystore();
 			}
 			clienteFirma.setKeyStore(keystore);
+		}
+		
+		function checkServletsConfig(clientAddress) {
+			if (storageServletAddress == null || retrieverServletAddress == null) {
+				try {
+					var retrieverServletDefaultAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
+					var storageServletDefaultAddress = clientAddress + "/afirma-signature-storage/StorageService";
+					checkComunicationServices(retrieverServletDefaultAddress, storageServletDefaultAddress, true);
+				} catch(e) {
+					SupportDialog.showSupportDialog(currentLocale.no_compatible_procedure, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+				}
+			}
 		}
 
 		/**
@@ -967,10 +1070,18 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		SupportDialog = ( function () {
 			
-			var defaultDialogStyle = 'display:block;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: fixed; left: 0; top: 0;';
 			var pcDownloadURL = currentLocale.pc_download_url;
 			var androidDownloadURL = currentLocale.android_download_url;
 			var iosDownloadURL = currentLocale.ios_download_url;
+			var backgroundClass = "defaultBackgroundClass";
+			var loadingTextClass = "defaultLoadingTextClass";
+			var errorTextClass = "defaultErrorTextClass";
+			var button1Class = "defaultButton1Class";
+			var button2Class = "defaultButton2Class";
+			var logoClass = "defaultLogoClass";
+			var dialogClass = "defaultDialogClass";
+			var errorConnectingServiceText = currentLocale.error_connecting_service;
+			var loadingText = currentLocale.loading;
 			var enabled = true;
 			
 			function enableSupportDialog(isEnabled) {
@@ -978,45 +1089,55 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			function setBackgroundClass(customClass) {
-				document.getElementById("supportDialog").removeAttribute('style');
-				document.getElementById("supportDialog").setAttribute("class", customClass);
+				backgroundClass = customClass;
 			}
 			
 			function setDialogClass(customClass) {
-				document.getElementById("childDiv").removeAttribute('style');
-				document.getElementById("childDiv").setAttribute("class", customClass);
+				dialogClass = customClass;
 			}
 			
-			function setTextClass(customClass) {
-				document.getElementById("spanSupportMessage").removeAttribute('style');
-				document.getElementById("spanSupportMessage").setAttribute("class", customClass);
+			function setLoadingTextClass(customClass) {
+				loadingTextClass = customClass;
+			}
+			
+			function setErrorTextClass(customClass) {
+				errorTextClass = customClass;
 			}
 			
 			function setPlainText(plainText) {
 				document.getElementById("spanSupportMessage").textContent = plainText;
 			}
 			
-			function setAcceptButtonClass(customClass) {
-				document.getElementById("acceptButton").removeAttribute('style');
-				document.getElementById("acceptButton").setAttribute("class", customClass);
+			function setButton1Class(customClass) {
+				button1Class = customClass;
 			}
 			
-			function setCancelButtonClass(customClass) {
-				document.getElementById("cancelButton").removeAttribute('style');
-				document.getElementById("cancelButton").setAttribute("class", customClass);
+			function setButton2Class(customClass) {
+				button2Class = customClass;
 			}
 			
 			function setLogoClass(customClass) {
-				document.getElementById("dialogLogo").removeAttribute('style');
-				document.getElementById("dialogLogo").setAttribute("class", customClass);
-			}
-			
-			function setLogoSrc(logoSrc) {
-				document.getElementById("dialogLogo").setAttribute("src", logoSrc);
+				logoClass = customClass;
 			}
 			
 			function setCustomPCDownloadURL(url) {
 				pcDownloadURL = url;
+			}
+			
+			function setErrorConnectingServiceText(text) {
+				errorConnectingServiceText = text;
+			}
+			
+			function setLoadingText(text) {
+				loadingText = text;
+			}
+			
+			function getErrorConnectingServiceText() {
+				return errorConnectingServiceText;
+			}
+			
+			function getLoadingText() {
+				return loadingText;
 			}
 			
 			function getPCDownloadURL() {
@@ -1025,6 +1146,10 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			function getIOSDownloadURL() {
 				return iosDownloadURL;
+			}
+			
+			function getAndroidDownloadURL() {
+				return androidDownloadURL;
 			}
 			
 			function getAndroidDownloadURL() {
@@ -1047,9 +1172,6 @@ var AutoScript = ( function ( window, undefined ) {
 					//IMG DIV
 					var imgDiv = document.createElement("div");
 	
-					//IMG CON ICONO
-					var imgTag = document.createElement("img");
-	
 					//MESSAGE DIV
 					var messageDiv = document.createElement("div");
 	
@@ -1057,18 +1179,16 @@ var AutoScript = ( function ( window, undefined ) {
 					var spanSupportMessage = document.createElement("span");
 					
 					parentDiv.setAttribute('id', 'supportDialog');
-					parentDiv.setAttribute('style', defaultDialogStyle);
+					parentDiv.setAttribute('class', backgroundClass);
 	
 					childDiv.setAttribute('id', 'childDiv');
-					childDiv.setAttribute('style', 'background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;');
+					childDiv.setAttribute('class', dialogClass);
 	
 					messagePanel.setAttribute('id', 'messagePanel');
-					messagePanel.setAttribute('style', 'display: flex;align-items:center;justify-content: center;flex:auto;');
+					messagePanel.setAttribute('style', 'display: flex; align-items:center; justify-content: center;');
 	
 					imgDiv.setAttribute('id', 'imgDiv');
-					imgDiv.setAttribute('style', 'width:15%');
-					imgTag.setAttribute('id', 'dialogLogo');
-					imgTag.setAttribute('src', 'logo64.png');
+					imgDiv.setAttribute('class', logoClass);
 					
 					// Panel de botones para aceptar y cancelar
 					var buttonsPanel = document.createElement("div");
@@ -1082,7 +1202,8 @@ var AutoScript = ( function ( window, undefined ) {
 	
 						buttonsPanel.setAttribute('id', 'buttonsPanel');
 						buttonsPanel.setAttribute('style', 'float:right;text-align: right;width:50%;');
-						button1.setAttribute('id', 'acceptButton');
+						button1.setAttribute('id', 'button1');
+						button1.setAttribute('class', button1Class);
 						button1.addEventListener('click', button1Callback);
 						button1.textContent = button1Text;
 						
@@ -1095,9 +1216,9 @@ var AutoScript = ( function ( window, undefined ) {
 						//BOTON 2
 						var button2 = document.createElement("button");
 						
-						button2.setAttribute('id', 'cancelButton');
+						button2.setAttribute('id', 'button2');
 						button2.addEventListener('click', button2Callback);
-						button2.setAttribute('style', 'margin-left: 3%;');
+						button2.setAttribute('class', button2Class);
 						button2.textContent = button2Text;
 						
 						buttonsPanel.appendChild(button2);
@@ -1110,14 +1231,13 @@ var AutoScript = ( function ( window, undefined ) {
 					spanSupportMessage.innerHTML = messageType;
 					
 					if (noButtons == true) {
-						spanSupportMessage.setAttribute('style', 'font-family: helvetica; font-weight: bold; font-size: 20pt; text-align:center;');
-						messageDiv.setAttribute('style', 'width:85%; display:flex; justify-content:center; align-items:center;');
+						spanSupportMessage.setAttribute('class', loadingTextClass);
+						messageDiv.setAttribute('style', 'width:85%; display:flex; justify-content:center; align-items:center;flex-direction:row;');
 					} else {
-						spanSupportMessage.setAttribute('style', 'font-family: helvetica; font-weight: bold; font-size: 10pt; vertical-align: top;');
-						messageDiv.setAttribute('style', 'vertical-align:top; float:right; width:85%; margin:2%;');
+						spanSupportMessage.setAttribute('class', errorTextClass);
+						messageDiv.setAttribute('style', 'vertical-align:top; float:right; width:85%;');
 					}
 					
-					imgDiv.appendChild(imgTag);
 					messagePanel.appendChild(imgDiv);
 					messageDiv.appendChild(spanSupportMessage);
 					messagePanel.appendChild(messageDiv);
@@ -1139,12 +1259,16 @@ var AutoScript = ( function ( window, undefined ) {
 				enableSupportDialog : enableSupportDialog,
 				setBackgroundClass : setBackgroundClass,
 				setDialogClass : setDialogClass,
-				setTextClass : setTextClass,
+				setLoadingTextClass : setLoadingTextClass,
+				setErrorTextClass : setErrorTextClass,
 				setPlainText : setPlainText,
-				setAcceptButtonClass : setAcceptButtonClass,
-				setCancelButtonClass : setCancelButtonClass,
+				setErrorConnectingServiceText : setErrorConnectingServiceText,
+				setLoadingText : setLoadingText,
+				getErrorConnectingServiceText : getErrorConnectingServiceText,
+				getLoadingText : getLoadingText,
+				setButton1Class : setButton1Class,
+				setButton2Class : setButton2Class,
 				setLogoClass : setLogoClass,
-				setLogoSrc : setLogoSrc,
 				setCustomPCDownloadURL : setCustomPCDownloadURL,
 				getPCDownloadURL : getPCDownloadURL,
 				getIOSDownloadURL : getIOSDownloadURL,
@@ -1298,11 +1422,11 @@ var AutoScript = ( function ( window, undefined ) {
 				function buildCustomUrl() { 
 						var autoFirmaLink;
 						if (Platform.isAndroid()) {
-							autoFirmaLink = currentLocale.install_mobile_client;
-							autoFirmaLink += SupportDialog.getAndroidDownloadURL();
+							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
+							autoFirmaLink += currentLocale.install_client;
 						} else if (Platform.isIOS()) {
-							autoFirmaLink = currentLocale.install_mobile_client;
-							autoFirmaLink += SupportDialog.getIOSDownloadURL();
+							autoFirmaLink = SupportDialog.getIOSDownloadURL();
+							autoFirmaLink += currentLocale.install_client;
 						} else {
 							autoFirmaLink = SupportDialog.getPCDownloadURL();
 							autoFirmaLink += currentLocale.restore_installation;
@@ -1717,7 +1841,7 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e) {
 
 						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
-						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorCB("java.lang.IOException", currentLocale.error_connecting_autofirma);});
 					}
 				}
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
@@ -1772,7 +1896,7 @@ var AutoScript = ( function ( window, undefined ) {
 						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 						
 						SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
-						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();						processErrorResponse("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");});
+						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma);});
 					}			
 				}
 				else {
@@ -1866,7 +1990,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (retries <= 0) {
 					SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + AfirmaUtils.buildCustomUrl(),
 					currentLocale.retry_operation, function (){sendEcho(ws, idSession, 1)}, 
-					currentLocale.close, function (){SupportDialog.disposeSupportDialog();processErrorResponse("java.util.concurrent.TimeoutException", "AutoFirma no respondio al saludo.");});
+					currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 					return;
 				}
 				
@@ -3434,7 +3558,6 @@ var AutoScript = ( function ( window, undefined ) {
 				} else {
 					retrieverServletAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
 					storageServletAddress = clientAddress + "/afirma-signature-storage/StorageService";
-					checkComunicationServices(storageServletAddress, retrieverServletAddress, (Platform.isAndroid() || Platform.isIOS));
 				}
 			}
 
@@ -3913,7 +4036,6 @@ var AutoScript = ( function ( window, undefined ) {
 				throw new Error();
 			}
 
-
 			/**
 			 * Comprueba si una URL es demasiado larga para ser usada en una llamada
 			 * GET en un Sistema/Navegador concreto.
@@ -3984,16 +4106,14 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 						else {
 							console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
-							SupportDialog.showSupportDialog(currentLocale.error_sending_data + " HTTP Status: " + httpRequest.status, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
+							SupportDialog.showSupportDialog(currentLocale.error_sending_data, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");});							
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function(e) {
 						console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-						SupportDialog.showSupportDialog(currentLocale.error_sending_data + " (HTTP Status: " + httpRequest.status + "): " + e.message, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
-						errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+						SupportDialog.showSupportDialog(currentLocale.error_sending_data, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");});
 					}
 				}
 				catch (e) {
@@ -4036,7 +4156,7 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				wrongInstallation = false;
 			
-				SupportDialog.showSupportDialog(currentLocale.loading);
+				SupportDialog.showSupportDialog(SupportDialog.getLoadingText());
 			
 				// Invocamos al cliente de firma
 				openUrl(intentURL);
@@ -4393,14 +4513,14 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				if (wrongInstallation) {
 					SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + AfirmaUtils.buildCustomUrl(),
-						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);});
+						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", currentLocale.autofirma_not_installed)});
 					return;
 				}
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
 					SupportDialog.showSupportDialog(currentLocale.timeout_receiving_sign + AfirmaUtils.buildCustomUrl(),
-						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);});
+						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", "No se ha podido conectar con el cliente de firma.")});
 					return;
 				}
 				iterations++;
@@ -4419,16 +4539,15 @@ var AutoScript = ( function ( window, undefined ) {
 							}
 						}
 						else {
-							SupportDialog.showSupportDialog(currentLocale.timeout_receiving_web + AfirmaUtils.buildCustomUrl(),
-								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);});
+							SupportDialog.showSupportDialog(currentLocale.timeout_receiving_sign + AfirmaUtils.buildCustomUrl(),
+								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", "No se ha podido conectar con el cliente de firma.")});
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function() {
-						errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
-						SupportDialog.showSupportDialog(currentLocale.error_connecting_server_recovering + " (Status: " + httpRequest.status + ")",
-								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+						SupportDialog.showSupportDialog(currentLocale.error_connecting_server_recovering,
+								currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCallback("java.lang.Exception","No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")")});
 					}
 				}
 				catch (e) {
