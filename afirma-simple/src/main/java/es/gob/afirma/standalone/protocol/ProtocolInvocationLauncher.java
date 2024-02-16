@@ -42,11 +42,11 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.signers.batch.client.TriphaseDataParser;
 import es.gob.afirma.standalone.JMulticardUtilities;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.AboutDialog;
 import es.gob.afirma.standalone.ui.OSXHandler;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /**
  * Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n por
@@ -327,11 +327,10 @@ public final class ProtocolInvocationLauncher {
 
                     if (params.isJsonBatch()) {
                     	paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
-                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     } else {
                     	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
-                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     }
+					params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -710,7 +709,9 @@ public final class ProtocolInvocationLauncher {
                     }
                     if (!bySocket) {
                     	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
-                    	sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    	if (params != null && params.getStorageServletUrl() != null) {
+                    		sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+                    	}
                     }
                     return msg;
                 }
@@ -718,7 +719,9 @@ public final class ProtocolInvocationLauncher {
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
                 // espera activa si se encontraba vigente
                 if (!bySocket) {
-                	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
+                	if (params != null && params.getStorageServletUrl() != null) {
+                		sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
+                	}
                 }
 
                 return dataToSend.toString();
