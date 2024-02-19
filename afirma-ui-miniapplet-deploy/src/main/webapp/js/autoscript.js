@@ -1303,6 +1303,14 @@ var AutoScript = ( function ( window, undefined ) {
 				pcDownloadURL = url;
 			}
 			
+			function setAndroidDownloadURL(url) {
+				androidDownloadURL = url;
+			}
+			
+			function setIOSDownloadURL(url) {
+				iosDownloadURL = url;
+			}
+			
 			function setErrorConnectingServiceText(text) {
 				errorConnectingServiceText = text;
 			}
@@ -1349,10 +1357,6 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			function getIOSDownloadURL() {
 				return iosDownloadURL;
-			}
-			
-			function getAndroidDownloadURL() {
-				return androidDownloadURL;
 			}
 			
 			function getAndroidDownloadURL() {
@@ -1492,6 +1496,8 @@ var AutoScript = ( function ( window, undefined ) {
 				setButton2Class : setButton2Class,
 				setLogoClass : setLogoClass,
 				setCustomPCDownloadURL : setCustomPCDownloadURL,
+				setAndroidDownloadURL : setAndroidDownloadURL,
+				setIOSDownloadURL : setIOSDownloadURL,
 				getPCDownloadURL : getPCDownloadURL,
 				getIOSDownloadURL : getIOSDownloadURL,
 				getAndroidDownloadURL : getAndroidDownloadURL,
