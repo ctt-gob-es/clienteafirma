@@ -31,8 +31,6 @@ var AutoScript = ( function ( window, undefined ) {
 		var retrieverServletAddress = null;
 
 		var severeTimeDelay = false;
-
-		var selectedLocale = null;
 		
 		var stickySignatory = false;
 		
@@ -242,7 +240,7 @@ var AutoScript = ( function ( window, undefined ) {
 				};
 			}
 
-			httpRequest.onload = function (evt) {
+			httpRequest.onload = function () {
 				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
 					if (downloadSuccessFunction) {
 
@@ -456,6 +454,9 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var coSign = function (signB64, dataB64, algorithm, format, params, successCallback, errorCallback) {
+			// El cliente de firma no soporta la cofirma en la que se proporcionan los datos. Esto impide
+			// que se pueda cofirmar una firma CAdES explicita con un algoritmo de firma distinto al de la
+			// firmar original
 			clienteFirma.coSign(signB64, algorithm, format, params, successCallback, errorCallback);
 			resetStickySignatory = false;
 		}
@@ -849,7 +850,9 @@ var AutoScript = ( function ( window, undefined ) {
 		 *  - El sistema operativo no sea iOS.
 		 *  - El navegador web soporte websocket.
 		 *  - No se fuerce el uso del servidor intermedio.
-		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
+		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio (salvo
+		 * con internet Explorer 10 y anteriores que trataran la comunicacion por sockets).
+		 * El parametro "avoidJnlpLoad" se mantiene por retrocompatibilidad, pero no se usa nunca.
 		 */
 		function cargarAppAfirma(clientAddress, keystore, avoidJnlpLoad) {
 			
@@ -1746,10 +1749,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/** URL de la peticion enviada. */
 			var currentOperationUrl = "";
-			
-			/** Puerto actualmente configurado. */
-			var port = '';
-			
+						
 			/** Indica si se ha establecido la conexion o no */
 			var connected = false;
 
@@ -2181,7 +2181,7 @@ var AutoScript = ( function ( window, undefined ) {
 					SupportDialog.showSupportDialog(currentLocale.error_stablishing_websocket + ": " + e, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 				}
 				
-				webSocket.onopen = function(arg0, arg1) {
+				webSocket.onopen = function() {
 					
 					// Indicamos que la conexion esta activa y que el WebSocket activo es el actual 
 					connected = true;
@@ -2199,11 +2199,11 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 				};
 
-				webSocket.onmessage = function(evt) {
+				webSocket.onmessage = function() {
 					console.log("Procesado por defecto del mensaje");
 				}
 				
-				webSocket.onerror = function(evt) {
+				webSocket.onerror = function() {
 					console.log("Procesado por defecto del error");
 				}
 				
@@ -2233,7 +2233,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/** Funcion que identifica la respuesta de una peticion de echo y envia a la aplicacion la operacion real. */
-			var onMessageEchoFunction = function(echoEvt) {
+			var onMessageEchoFunction = function() {
 				console.log("Respuesta de la peticion de eco");
 			
 				ws.onmessage = function (evt) {
@@ -2596,13 +2596,6 @@ var AutoScript = ( function ( window, undefined ) {
 				return errorType;
 			}
 
-			/**
-			 * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
-			 */
-			function getType () {
-				return "javascript";
-			}
-
 			/* Metodos que publicamos del objeto AppAfirmaWebSocketClient */
 			return {
 				echo : echo,
@@ -2661,10 +2654,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/* Variable de control para la operacion guardar */
 			var isSaveOperation = false;
-			
-			/* Variable de control para la operacion de ejecutar operacion criptografica y guardar */
-			var isOpAndSaveOperation = false;
-			
+						
 			/* Variable de control para la operacion batch */
 			var isBatchOperation = false;
 			
@@ -2914,9 +2904,7 @@ var AutoScript = ( function ( window, undefined ) {
 				return intentURL;
 			}
 			
-			execAppIntent = function (url, successCB, errorCB) {
-				
-				setCallbacks(successCB, errorCB);
+			execAppIntent = function (url) {
 				
 				// Primera ejecucion, no hay puerto definido
 				if (port == "") {
@@ -2929,9 +2917,9 @@ var AutoScript = ( function ( window, undefined ) {
 						setTimeout(executeEchoByServiceByPort, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, url);
 					} catch (e){
 						var enabled = SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + "<br>" + AfirmaUtils.buildCustomUrl(),
-						currentLocale.retry_operation, function (){execAppIntent(url, successCB, errorCB)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorCB("java.lang.IOException", currentLocale.error_connecting_autofirma);});
+						currentLocale.retry_operation, function (){execAppIntent(url)}, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorServiceResponseFunction("java.lang.IOException", currentLocale.error_connecting_autofirma);});
 						if (!enabled) {
-							errorCB("java.lang.IOException", currentLocale.error_connecting_autofirma);
+							errorServiceResponseFunction("java.lang.IOException", currentLocale.error_connecting_autofirma);
 						}
 					}
 				}
@@ -3063,8 +3051,6 @@ var AutoScript = ( function ( window, undefined ) {
 						isSaveOperation = currentOperationUrl.indexOf("afirma://save") > -1;
 						// Comprobamos si es una operacion de firma por lotes
 						isBatchOperation = currentOperationUrl.indexOf("afirma://batch") > -1;
-						// Comprobamos si es una operacion criptografica mas guardado del resultado
-						isOpAndSaveOperation = currentOperationUrl.indexOf("afirma://signandsave") > -1;
 						executeOperationByService();
 					}
 					else if ((!semaphore || !semaphore.locked) && !connection && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
@@ -3086,7 +3072,12 @@ var AutoScript = ( function ( window, undefined ) {
 								if (semaphore) {
 									semaphore.locked = true;
 								}
-								errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
+								var enabled = SupportDialog.showSupportDialog(currentLocale.error_connecting_autofirma + "<br>" + AfirmaUtils.buildCustomUrl(),
+									currentLocale.retry_operation, function (){execAppIntent(url)},
+									currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma + " " + AfirmaUtils.buildCustomUrl().replaceAll("<br>",""));});
+								if (!enabled) {
+									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma + " " + AfirmaUtils.buildCustomUrl().replaceAll("<br>",""));
+								}
 							}
 							return;
 						}
@@ -3194,7 +3185,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.open("POST", urlHttpRequest, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 				var urlToSend = url.substring(((i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
-				httpRequest.onreadystatechange = function (evt) {
+				httpRequest.onreadystatechange = function () {
 					if (httpRequest.status == 404) {
 						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
 						return;
@@ -3320,6 +3311,10 @@ var AutoScript = ( function ( window, undefined ) {
 						totalResponseRequest += Base64.decode(httpRequest.responseText, true);
 						// Si estan todas las partes llamamos al successcallback
 						if (part == totalParts) {
+
+							//Se cierra el dialogo de espera
+							SupportDialog.disposeSupportDialog();
+							
 							// Es una operacion de firma por lotes y tiene un callback propio
 							if (isBatchOperation) {
 								successBatchResponseFunction(totalResponseRequest);
@@ -3624,7 +3619,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/**
 			 * Convierte texto plano en texto base 64.
-			 * Implementada en el applet Java de firma.
+			 * El parameto charset no se utiliza. Se usa el de la web.
 			 */
 			function getBase64FromText (plainText, charset) {
 				return plainText != null ? Base64.encode(plainText) : null;
@@ -3632,7 +3627,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/**
 			 * Convierte texto base 64 en texto plano.
-			 * Implementada en el applet Java de firma.
+			 * El parameto charset no se utiliza. Sera el usado al generar el base 64.
 			 */
 			function getTextFromBase64 (base64Text, charset) {
 				return base64Text != null ? Base64.decode(base64Text) : null;
@@ -3733,22 +3728,6 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			function getErrorType () {
 				return errorType;
-			}
-
-			/**
-			 * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
-			 */
-			function getType () {
-				return "javascript";
-			}
-
-			/**
-			 * Establece el error indicado como error interno y lanza una excepcion.
-			 */
-			function throwException (type, message) {
-				errorType = type;
-				errorMessage = message;
-				throw new Error();
 			}
 
 			/* Metodos que publicamos del objeto AppAfirmaJSSocket */
@@ -4280,13 +4259,6 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
-			 */
-			function getType () {
-				return "javascript";
-			}
-
-			/**
 			 * Establece las rutas de los servlets encargados de almacenar y recuperar las firmas de los dispositivos moviles.
 			 */
 			function setServlets (storageServlet,  retrieverServlet) {
@@ -4790,7 +4762,7 @@ var AutoScript = ( function ( window, undefined ) {
 					var enabled = SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + "<br>" + AfirmaUtils.buildCustomUrl(),
 						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.autofirma_not_installed + " " + AfirmaUtils.buildCustomUrl().replaceAll("<br>",""), errorCallback);});
 					if (!enabled) {
-						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.autofirma_not_installed + " " + AfirmaUtils.buildCustomUrl().replaceAll("<br>",""), errorCallback);					}
+						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.autofirma_not_installed + " " + AfirmaUtils.buildCustomUrl().replaceAll("<br>",""), errorCallback); }
 					return;
 				}
 			
