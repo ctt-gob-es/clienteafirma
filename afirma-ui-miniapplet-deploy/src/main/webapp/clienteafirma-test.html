@@ -5,13 +5,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript">
-		
-		// En IE esta variable viene como indefinida, por lo que e da esta solucion para mantener la 
-		// compatibilidad
-		if (!window.location.origin) {
-  			window.location.origin = window.location.protocol + "//" + window.location.hostname 
-  			+ (window.location.port ? ':' + window.location.port: '');
-		}
 	
 		// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
 		// SI NO SE HACE ASI, AUTOFIRMA BLOQUEARA LA FIRMA POR SEGURIDAD

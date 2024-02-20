@@ -10,6 +10,13 @@ if (document.all && !window.setTimeout.isPolyfill) {
 	window.setTimeout.isPolyfill = true;
 }
 
+// En IE esta variable viene como indefinida, por lo que se da esta solucion para mantener la 
+// compatibilidad
+if (!window.location.origin) {
+	window.location.origin = window.location.protocol + "//" + window.location.hostname
+	+ (window.location.port ? ':' + window.location.port : '');
+}
+
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var SupportDialog;
@@ -644,7 +651,7 @@ var AutoScript = ( function ( window, undefined ) {
 							if (SupportDialog.getAdminContactInfo() != null) {
 								adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
 							}
-							SupportDialog.showSupportDialog("<u>" + currentLocale.warning + "</u> " + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 						}
 					}
 				}
@@ -661,7 +668,7 @@ var AutoScript = ( function ( window, undefined ) {
 						if (SupportDialog.getAdminContactInfo() != null) {
 							adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
 						}
-						SupportDialog.showSupportDialog("<u>" + currentLocale.warning + "</u> " + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+						SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
 				}
 			}
@@ -676,7 +683,7 @@ var AutoScript = ( function ( window, undefined ) {
 					if (SupportDialog.getAdminContactInfo() != null) {
 						adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
 					}
-					SupportDialog.showSupportDialog("<u>" + currentLocale.warning + "</u> " + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+					SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 				}
 			}
 			
@@ -701,7 +708,7 @@ var AutoScript = ( function ( window, undefined ) {
 							SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						} else {
 							isCompatibleProcedure = true;
-							SupportDialog.showSupportDialog("<u>" + currentLocale.warning + "</u> " + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+							SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						}
 					}
 				}
@@ -715,7 +722,7 @@ var AutoScript = ( function ( window, undefined ) {
 						SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					} else {
 						isCompatibleProcedure = true;
-						SupportDialog.showSupportDialog("<u>" + currentLocale.warning + "</u> " + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+						SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
 				}
 			}
@@ -726,7 +733,7 @@ var AutoScript = ( function ( window, undefined ) {
 					SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 				} else {
 					isCompatibleProcedure = true;
-					SupportDialog.showSupportDialog("<u>" + currentLocale.warning + "</u> " + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+					SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 				}
 			}
 
@@ -856,7 +863,66 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		function cargarAppAfirma(clientAddress, keystore, avoidJnlpLoad) {
 			
-			// Cargamos los estilos para el dialogo
+			if (!!SupportDialog.getIsEnabled()) {
+				loadSupportDialogStyles();
+			}			
+					
+			// Comprobamos que no haya un desfase horario declarado como grave y
+			// abortamos la carga en ese caso
+			if (severeTimeDelay) {
+				if (console && console.log) {
+					console.log("Se ha detectado un desfase grave entre la hora del sistema y la del servidor. " +
+							"Se cancela la carga del cliente de firma");
+				}
+				return;
+			}
+
+			// Si se fuerza el uso de servidor intermedio o estamos en un dispositivo movil,
+			// usamos servidor intermedio
+			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
+				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
+				if (!!storageServletAddress || !!retrieverServletAddress) {
+					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
+				}
+				setTimeout(checkServletsConfig, 2000, clientAddress);
+			}
+			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
+			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
+			// una opcion de red concreta), ni en un Firefox antiguo (con el que las llamadas
+			// multiples pueden dar problemas despues de los cambios para VDI) usamos WebSockets 
+			else if (isWebSocketsSupported() && !Platform.isInternetExplorer() && !Platform.isFirefox60orLower()) {
+				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
+				// Si se establecio un rango de puertos, lo trasladamos al cliente
+				if (!!minPort) {
+					clienteFirma.setPortRange(minPort, maxPort);
+				}
+			}
+			// Si no se esta en una version antigua de Internet Explorer, Firefox o Safari
+			else if (!Platform.isInternetExplorer10orLower() && !Platform.isSafari10()) {
+				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
+				// Si se establecio un rango de puertos, lo trasladamos al cliente
+				if (!!minPort) {
+					clienteFirma.setPortRange(minPort, maxPort);
+				}
+			}
+			// En cualquier otro caso, usaremos servidor intermedio
+			else {
+				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
+				if (!!storageServletAddress || !!retrieverServletAddress) {
+					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
+				}
+				setTimeout(checkServletsConfig, 2000, clientAddress);
+			}
+			
+			if (!keystore) {
+				keystore = getDefaultKeystore();
+			}
+			clienteFirma.setKeyStore(keystore);
+		}
+		
+		/* Metodo para cargar los estilos por defecto del dialogo */
+		function loadSupportDialogStyles() {
+						
 			var styles = 
 				"@media all and (max-width: 1200px) {" +  
 		        "#afirmaMessagePanel {" +
@@ -1054,64 +1120,19 @@ var AutoScript = ( function ( window, undefined ) {
 			var styleSheet = document.createElement("style")
 			styleSheet.innerText = styles
 			document.head.appendChild(styleSheet)
-					
-			// Comprobamos que no haya un desfase horario declarado como grave y
-			// abortamos la carga en ese caso
-			if (severeTimeDelay) {
-				if (console && console.log) {
-					console.log("Se ha detectado un desfase grave entre la hora del sistema y la del servidor. " +
-							"Se cancela la carga del cliente de firma");
-				}
-				return;
-			}
-
-			// Si se fuerza el uso de servidor intermedio o estamos en un dispositivo movil,
-			// usamos servidor intermedio
-			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
-				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
-				if (!!storageServletAddress || !!retrieverServletAddress) {
-					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
-				}
-				setTimeout(checkServletsConfig, 2000, clientAddress);
-			}
-			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
-			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
-			// una opcion de red concreta), ni en un Firefox antiguo (con el que las llamadas
-			// multiples pueden dar problemas despues de los cambios para VDI) usamos WebSockets 
-			else if (isWebSocketsSupported() && !Platform.isInternetExplorer() && !Platform.isFirefox60orLower()) {
-				clienteFirma = new AppAfirmaWebSocketClient(window, undefined);
-				// Si se establecio un rango de puertos, lo trasladamos al cliente
-				if (!!minPort) {
-					clienteFirma.setPortRange(minPort, maxPort);
-				}
-			}
-			// Si no se esta en una version antigua de Internet Explorer, Firefox o Safari
-			else if (!Platform.isInternetExplorer10orLower() && !Platform.isSafari10()) {
-				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
-				// Si se establecio un rango de puertos, lo trasladamos al cliente
-				if (!!minPort) {
-					clienteFirma.setPortRange(minPort, maxPort);
-				}
-			}
-			// En cualquier otro caso, usaremos servidor intermedio
-			else {
-				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
-				if (!!storageServletAddress || !!retrieverServletAddress) {
-					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
-				}
-				setTimeout(checkServletsConfig, 2000, clientAddress);
-			}
-			
-			if (!keystore) {
-				keystore = getDefaultKeystore();
-			}
-			clienteFirma.setKeyStore(keystore);
 		}
 		
 		function checkServletsConfig(clientAddress) {
 			if (storageServletAddress == null || retrieverServletAddress == null) {
-				var storageServletDefaultAddress = clientAddress + "/afirma-signature-storage/StorageService";
-				var retrieverServletDefaultAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
+				var storageServletDefaultAddress;
+				var retrieverServletDefaultAddress;
+				if (!!clientAddress) {
+					storageServletDefaultAddress = clientAddress + "/afirma-signature-storage/StorageService";
+					retrieverServletDefaultAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
+				} else {
+					storageServletDefaultAddress = window.location.origin + "/afirma-signature-storage/StorageService";
+					retrieverServletDefaultAddress = window.location.origin + "/afirma-signature-retriever/RetrieveService";
+				}
 				if (Platform.isIOS() || Platform.isAndroid()) {
 					checkComunicationServices(storageServletDefaultAddress, retrieverServletDefaultAddress, true);	
 				} else {
@@ -1257,6 +1278,7 @@ var AutoScript = ( function ( window, undefined ) {
 			var enabled = true;
 			var enabledLoading = true;
 			var enabledError = true;
+			var warningText = "<u>" + currentLocale.warning + "</u> ";
 			
 			function enableSupportDialog(isEnabled) {
 				enabled = isEnabled;
@@ -1334,6 +1356,14 @@ var AutoScript = ( function ( window, undefined ) {
 				alternativeiOSAppLink = text;
 			}
 			
+			function setWarningText(text) {
+				warningText = text;
+			}
+			
+			function getIsEnabled() {
+				return enabled;
+			}
+			
 			function getAlternativeAndroidAppLink() {
 				return alternativeAndroidAppLink;
 			}
@@ -1364,6 +1394,10 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			function getAndroidDownloadURL() {
 				return androidDownloadURL;
+			}
+			
+			function getWarningText() {
+				return warningText;
 			}
 			
 			function showSupportDialog(messageType, button1Text, button1Callback, button2Text, button2Callback) {
@@ -1440,15 +1474,15 @@ var AutoScript = ( function ( window, undefined ) {
 					spanSupportMessage.setAttribute('id', 'spanSupportMessage');
 					spanSupportMessage.innerHTML = messageType;
 					
-					if (isLoadingDialog == true) {
-						if (enabledLoading == true) {
+					if (!!isLoadingDialog) {
+						if (!!enabledLoading) {
 							spanSupportMessage.setAttribute('class', loadingTextClass);
 							messageDiv.setAttribute('class', 'afirmaDefaultLoadingMessageClass');
 						} else {
 							return false;
 						}
 					} else {
-						if (enabledError == true) {
+						if (!!enabledError) {
 							spanSupportMessage.setAttribute('class', errorTextClass);
 							messageDiv.setAttribute('class', 'afirmaDefaultErrorMessageClass');
 						} else {
@@ -1489,6 +1523,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setPlainText : setPlainText,
 				setErrorConnectingServiceText : setErrorConnectingServiceText,
 				setLoadingText : setLoadingText,
+				getIsEnabled : getIsEnabled,
 				getErrorConnectingServiceText : getErrorConnectingServiceText,
 				setAlternativeAndroidAppLink : setAlternativeAndroidAppLink,
 				setAlternativeiOSAppLink : setAlternativeiOSAppLink,
@@ -1506,6 +1541,8 @@ var AutoScript = ( function ( window, undefined ) {
 				getAndroidDownloadURL : getAndroidDownloadURL,
 				getAdminContactInfo : getAdminContactInfo,
 				setAdminContactInfo : setAdminContactInfo,
+				getWarningText : getWarningText,
+				setWarningText : setWarningText,
 				showSupportDialog : showSupportDialog,
 				disposeSupportDialog : disposeSupportDialog
 			};
@@ -1656,15 +1693,15 @@ var AutoScript = ( function ( window, undefined ) {
 						var autoFirmaLink;
 						if (Platform.isAndroid()) {
 							autoFirmaLink = SupportDialog.getAndroidDownloadURL();
-							autoFirmaLink += currentLocale.install_client;
+							autoFirmaLink += "<br>" + currentLocale.install_client;
 						} else if (Platform.isIOS()) {
 							autoFirmaLink = SupportDialog.getIOSDownloadURL();
-							autoFirmaLink += currentLocale.install_client;
+							autoFirmaLink += "<br>" + currentLocale.install_client;
 						} else {
 							autoFirmaLink = SupportDialog.getPCDownloadURL();
-							autoFirmaLink += currentLocale.restore_installation;
+							autoFirmaLink += "<br>" + currentLocale.restore_installation;
 							if (Platform.isFirefox()) {
-								autoFirmaLink += "<u>" + currentLocale.warning + "</u> " + currentLocale.firefox_reinstall_message;
+								autoFirmaLink += "<br>" + SupportDialog.getWarningText() + currentLocale.firefox_reinstall_message;
 							}
 						}
 						return autoFirmaLink;
@@ -1672,7 +1709,7 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				/** Construye el mensaje para tramites incompatibles que se necesite segun el SO con el que se opere. */ 
 				function buildCustomNoCompatibleProcedure() { 
-						var noCompatibleMsg = "<u>" + currentLocale.warning + "</u> " + currentLocale.no_compatible_procedure;
+						var noCompatibleMsg = SupportDialog.getWarningText() + currentLocale.no_compatible_procedure;
 						if (Platform.isAndroid() && SupportDialog.getAlternativeAndroidAppLink() != null) {
 							noCompatibleMsg += currentLocale.procedure_from_url + " " + SupportDialog.getAlternativeAndroidAppLink();
 						} else if (Platform.isIOS() && SupportDialog.getAlternativeiOSAppLink() != null) {
@@ -3805,6 +3842,9 @@ var AutoScript = ( function ( window, undefined ) {
 					retrieverServletAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
 					storageServletAddress = clientAddress + "/afirma-signature-storage/StorageService";
 				}
+			} else {
+				retrieverServletAddress = window.location.origin + "/afirma-signature-retriever/RetrieveService";
+				storageServletAddress = window.location.origin + "/afirma-signature-storage/StorageService";
 			}
 
 			/**
@@ -4353,9 +4393,9 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 				}
 				try {
-					httpRequest.onerror = function(e) {
+					httpRequest.onerror = function(e) {	
 						console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-						SupportDialog.showSupportDialog(currentLocale.error_sending_data, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");});
+						var enabled = SupportDialog.showSupportDialog(currentLocale.error_sending_data, currentLocale.close, function (){SupportDialog.disposeSupportDialog();errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");});
 						if (!enabled) {
 							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");	
 						}
@@ -4753,10 +4793,10 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				iterations = 0;
-				setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, intentURL, idDocument, successCallback, errorCallback);
+				setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, intentURL, idDocument, false, successCallback, errorCallback);
 			}
 
-			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, successCallback, errorCallback) {
+			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback) {
 				
 				if (wrongInstallation) {
 					var enabled = SupportDialog.showSupportDialog(currentLocale.autofirma_not_installed + "<br>" + AfirmaUtils.buildCustomUrl(),
@@ -4768,11 +4808,20 @@ var AutoScript = ( function ( window, undefined ) {
 			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
-					var errorMsg = AfirmaUtils.buildCustomErrorServerMsg();
-					var enabled = SupportDialog.showSupportDialog(errorMsg,
-						currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog(); errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);});
-					if (!enabled) {
-						errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);
+					if(!!afirmaConnected) {
+						var errorMsg = AfirmaUtils.buildCustomErrorServerMsg();
+						var enabled = SupportDialog.showSupportDialog(errorMsg,
+							currentLocale.retry_operation, function() { execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function() { SupportDialog.disposeSupportDialog(); errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);});
+						if (!enabled) {
+							errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);
+						}
+					} else {						
+						var errorMsg = currentLocale.error_connecting_autofirma + "<br>" + AfirmaUtils.buildCustomUrl();
+						var enabled = SupportDialog.showSupportDialog(errorMsg,
+						currentLocale.retry_operation, function (){ execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorCB("java.lang.IOException", errorMsg.replace("<br>",""));});
+						if(!enabled) {
+							errorResponseFunction("java.util.concurrent.TimeoutException", errorMsg.replace("<br>",""), errorCallback);
+						}
 					}
 					return;
 				}
@@ -4788,8 +4837,9 @@ var AutoScript = ( function ( window, undefined ) {
 								var oldIterations = iterations-1;
 								if (needContinue == "reset") {
 									iterations = 0;
+									afirmaConnected = true;
 								}
-								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + (oldIterations), "&it=" + iterations), cipherKey, intentURL, idDocument, successCallback, errorCallback);
+								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + (oldIterations), "&it=" + iterations), cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback);
 							}
 						}
 						else {
