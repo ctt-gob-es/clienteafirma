@@ -47,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
@@ -488,6 +489,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certListPanel.setBorder(null);
 
 		this.certList = new JList<>();
+		this.certList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.certList.setCellRenderer(new CertListCellRendered(windowColor, CertificateSelectionPanel.highContrast));
 
 		updateCertListInfo(this.certificateBeans);
@@ -863,7 +865,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 	}
 
-	private class ChangeViewActionListener implements ActionListener {
+	private static class ChangeViewActionListener implements ActionListener {
 
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;
