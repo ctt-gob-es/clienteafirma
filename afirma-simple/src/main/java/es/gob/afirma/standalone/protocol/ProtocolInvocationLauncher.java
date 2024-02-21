@@ -296,7 +296,7 @@ public final class ProtocolInvocationLauncher {
 
         	try {
                 UrlParametersForBatch params =
-                		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -330,7 +330,7 @@ public final class ProtocolInvocationLauncher {
                     } else {
                     	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
                     }
-					params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
+					params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap, !bySocket);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -373,7 +373,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSelectCert params =
-                		ProtocolInvocationUriParserUtil.getParametersToSelectCert(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSelectCert(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -446,7 +446,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSave params =
-                		ProtocolInvocationUriParserUtil.getParametersToSave(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSave(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -535,7 +535,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSignAndSave params =
-                		ProtocolInvocationUriParserUtil.getParametersToSignAndSave(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSignAndSave(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -648,7 +648,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSign params =
-                		ProtocolInvocationUriParserUtil.getParametersToSign(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSign(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -709,12 +709,7 @@ public final class ProtocolInvocationLauncher {
                     }
                     if (!bySocket) {
                     	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
-                    	if (params == null) {
-                    		throw new ParameterException("Los parametros para enviar al servidor no se han recibido correctamente"); //$NON-NLS-1$
-                    	} else if (params.getStorageServletUrl() == null) {
-                    		throw new ParameterException("No se ha proporcionado la URL para la comunicacion con el servido intermedio"); //$NON-NLS-1$
-                    	}
-						sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());           	
+						sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     }
                     return msg;
                 }
@@ -722,11 +717,6 @@ public final class ProtocolInvocationLauncher {
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
                 // espera activa si se encontraba vigente
                 if (!bySocket) {
-                	if (params == null) {
-                		throw new ParameterException("Los parametros para enviar al servidor no se han recibido correctamente"); //$NON-NLS-1$
-                	} else if (params.getStorageServletUrl() == null) {
-                		throw new ParameterException("No se ha proporcionado la URL para la comunicacion con el servido intermedio"); //$NON-NLS-1$
-                	}
                 	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
                 }
 
