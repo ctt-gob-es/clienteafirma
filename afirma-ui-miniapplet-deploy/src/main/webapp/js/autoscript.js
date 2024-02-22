@@ -623,41 +623,61 @@ var AutoScript = ( function ( window, undefined ) {
 		 * y false en caso contrario. Si es un dispositivo m&oacute;vil, se indicar&aacute; que es
 		 * un tr&aacute;mite incompatible.
 		 */
-		var checkComunicationServices = function (storageServletAddress, retrieverServletAddress, isCheckingCompatibleProcedure) {
+		var checkComunicationServices = function (storageAddress, retrieverAddress, isCheckingCompatibleProcedure) {
 			
-			// Comprobamos la conexion con el servcio de almacenamiento
-			var httpStorageRequest = getHttpRequest();
-			if (!httpStorageRequest) {
-				throw new Error("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
-			}
-			httpStorageRequest.open("POST", storageServletAddress, true);
-			httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			// Si ya se esta mostrando un dialogo quiere decir que ya se ha iniciado alguna operacion,
+			// por lo que no se realizara la validacion de los servicios para evitar confusiones al usuario
 			
-			httpStorageRequest.onreadystatechange = function() {
-				if (httpStorageRequest.readyState == 4) {
-					if (httpStorageRequest.status == 200) {
-						isErrorCheckingServices = false;
-						isCompatibleProcedure = true;
-						console.log('Conexion correcta con el servicio de almacenamiento');
+			if (document.getElementById("afirmaSupportDialog") == null) {
+		
+				// Comprobamos la conexion con el servcio de almacenamiento
+				var httpStorageRequest = getHttpRequest();
+				if (!httpStorageRequest) {
+					throw new Error("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+				}
+				httpStorageRequest.open("POST", storageAddress, true);
+				httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				
+				httpStorageRequest.onreadystatechange = function() {
+					if (httpStorageRequest.readyState == 4) {
+						if (httpStorageRequest.status == 200) {
+							isErrorCheckingServices = false;
+							isCompatibleProcedure = true;
+							console.log('Conexion correcta con el servicio de almacenamiento');
+						}
+						else {
+							isErrorCheckingServices = true;
+							if (!!isCheckingCompatibleProcedure) {
+								isCompatibleProcedure = false;
+								SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							} else {
+								isCompatibleProcedure = true;
+								var adminMsg = "";
+								if (SupportDialog.getAdminContactInfo() != null) {
+									adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
+								}
+								SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							}
+						}
 					}
-					else {
+				}
+				try {
+					httpStorageRequest.onerror = function() {
 						isErrorCheckingServices = true;
 						if (!!isCheckingCompatibleProcedure) {
 							isCompatibleProcedure = false;
-							SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						} else {
 							isCompatibleProcedure = true;
 							var adminMsg = "";
 							if (SupportDialog.getAdminContactInfo() != null) {
 								adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
 							}
-							SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
+							SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						}
 					}
 				}
-			}
-			try {
-				httpStorageRequest.onerror = function() {
+				catch (e) {
 					isErrorCheckingServices = true;
 					if (!!isCheckingCompatibleProcedure) {
 						isCompatibleProcedure = false;
@@ -671,37 +691,36 @@ var AutoScript = ( function ( window, undefined ) {
 						SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
 				}
-			}
-			catch (e) {
-				isErrorCheckingServices = true;
-				if (!!isCheckingCompatibleProcedure) {
-					isCompatibleProcedure = false;
-					SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
-				} else {
-					isCompatibleProcedure = true;
-					var adminMsg = "";
-					if (SupportDialog.getAdminContactInfo() != null) {
-						adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
-					}
-					SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
-				}
-			}
-			
-			httpStorageRequest.send("");
 				
-			// Comprobamos la conexion con el servicio de recuperacion
-			var httpRetrieveRequest = getHttpRequest();
-			httpRetrieveRequest.open("POST", retrieverServletAddress, true);
-			httpRetrieveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	
-			httpRetrieveRequest.onreadystatechange = function() {
-				if (httpRetrieveRequest.readyState == 4) {
-					if (httpRetrieveRequest.status == 200) {
-						isErrorCheckingServices = false;
-						isCompatibleProcedure = true;
-						console.log('Conexion correcta con el servicio de recuperacion');
+				httpStorageRequest.send("");
+					
+				// Comprobamos la conexion con el servicio de recuperacion
+				var httpRetrieveRequest = getHttpRequest();
+				httpRetrieveRequest.open("POST", retrieverAddress, true);
+				httpRetrieveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		
+				httpRetrieveRequest.onreadystatechange = function() {
+					if (httpRetrieveRequest.readyState == 4) {
+						if (httpRetrieveRequest.status == 200) {
+							isErrorCheckingServices = false;
+							isCompatibleProcedure = true;
+							console.log('Conexion correcta con el servicio de recuperacion');
+						}
+						else {
+							isErrorCheckingServices = true;
+							if (!!isCheckingCompatibleProcedure) {
+								isCompatibleProcedure = false;
+								SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+							} else {
+								isCompatibleProcedure = true;
+								SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
+							}
+						}
 					}
-					else {
+				}
+				
+				try {
+					httpRetrieveRequest.onerror = function() {
 						isErrorCheckingServices = true;
 						if (!!isCheckingCompatibleProcedure) {
 							isCompatibleProcedure = false;
@@ -712,10 +731,7 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 					}
 				}
-			}
-			
-			try {
-				httpRetrieveRequest.onerror = function() {
+				catch (e) {
 					isErrorCheckingServices = true;
 					if (!!isCheckingCompatibleProcedure) {
 						isCompatibleProcedure = false;
@@ -725,19 +741,10 @@ var AutoScript = ( function ( window, undefined ) {
 						SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
 				}
-			}
-			catch (e) {
-				isErrorCheckingServices = true;
-				if (!!isCheckingCompatibleProcedure) {
-					isCompatibleProcedure = false;
-					SupportDialog.showSupportDialog(AfirmaUtils.buildCustomNoCompatibleProcedure(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
-				} else {
-					isCompatibleProcedure = true;
-					SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText(), currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
-				}
-			}
-
-			httpRetrieveRequest.send("");					
+	
+				httpRetrieveRequest.send("");		
+			
+			}			
 		}
 
 		/**
@@ -863,7 +870,7 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		function cargarAppAfirma(clientAddress, keystore, avoidJnlpLoad) {
 			
-			if (!!SupportDialog.getIsEnabled()) {
+			if (!!SupportDialog.isEnabled()) {
 				loadSupportDialogStyles();
 			}			
 					
@@ -982,6 +989,9 @@ var AutoScript = ( function ( window, undefined ) {
 				".afirmaDefaultButton2Class {" +
 				  "margin-left: 3%;" +
 				  "margin-top: 3%;" +
+				"}" +
+				".afirmaDefaultWarningTextClass {" +
+				  "text-decoration: underline;" +
 				"}" +
 				".afirmaDefaultLogoClass {" +
 					"background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABe"+
@@ -1278,7 +1288,8 @@ var AutoScript = ( function ( window, undefined ) {
 			var enabled = true;
 			var enabledLoading = true;
 			var enabledError = true;
-			var warningText = "<u>" + currentLocale.warning + "</u> ";
+			var warningClass = 'afirmaDefaultWarningTextClass';
+			var warningText = "<span id='afirmaWarningText' class='"+ warningClass + "'>" + currentLocale.warning + "</span> ";
 			
 			function enableSupportDialog(isEnabled) {
 				enabled = isEnabled;
@@ -1306,10 +1317,6 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			function setErrorTextClass(customClass) {
 				errorTextClass = customClass;
-			}
-			
-			function setPlainText(plainText) {
-				document.getElementById("spanSupportMessage").textContent = plainText;
 			}
 			
 			function setButton1Class(customClass) {
@@ -1356,11 +1363,12 @@ var AutoScript = ( function ( window, undefined ) {
 				alternativeiOSAppLink = text;
 			}
 			
-			function setWarningText(text) {
-				warningText = text;
+			function setWarningClass(customClass) {
+				warningClass = customClass;
+				warningText = "<span id='afirmaWarningText' class='"+ warningClass + "'>" + currentLocale.warning + "</span> ";
 			}
 			
-			function getIsEnabled() {
+			function isEnabled() {
 				return enabled;
 			}
 			
@@ -1520,10 +1528,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setDialogClass : setDialogClass,
 				setLoadingTextClass : setLoadingTextClass,
 				setErrorTextClass : setErrorTextClass,
-				setPlainText : setPlainText,
 				setErrorConnectingServiceText : setErrorConnectingServiceText,
 				setLoadingText : setLoadingText,
-				getIsEnabled : getIsEnabled,
+				isEnabled : isEnabled,
 				getErrorConnectingServiceText : getErrorConnectingServiceText,
 				setAlternativeAndroidAppLink : setAlternativeAndroidAppLink,
 				setAlternativeiOSAppLink : setAlternativeiOSAppLink,
@@ -1542,7 +1549,7 @@ var AutoScript = ( function ( window, undefined ) {
 				getAdminContactInfo : getAdminContactInfo,
 				setAdminContactInfo : setAdminContactInfo,
 				getWarningText : getWarningText,
-				setWarningText : setWarningText,
+				setWarningClass : setWarningClass,
 				showSupportDialog : showSupportDialog,
 				disposeSupportDialog : disposeSupportDialog
 			};
@@ -4818,7 +4825,7 @@ var AutoScript = ( function ( window, undefined ) {
 					} else {						
 						var errorMsg = currentLocale.error_connecting_autofirma + "<br>" + AfirmaUtils.buildCustomUrl();
 						var enabled = SupportDialog.showSupportDialog(errorMsg,
-						currentLocale.retry_operation, function (){ execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorCB("java.lang.IOException", errorMsg.replace("<br>",""));});
+						currentLocale.retry_operation, function (){ execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorCallback("java.lang.IOException", errorMsg.replace("<br>",""));});
 						if(!enabled) {
 							errorResponseFunction("java.util.concurrent.TimeoutException", errorMsg.replace("<br>",""), errorCallback);
 						}
