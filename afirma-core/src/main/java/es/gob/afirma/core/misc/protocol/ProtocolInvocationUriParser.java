@@ -29,7 +29,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSign getParametersToSign(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSign(parserUri(uri));
+		return getParametersToSign(uri, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma.
+	 * @param uri URL de llamada.
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSign getParametersToSign(final String uri,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSign(
+				parserUri(uri), servicesRequired);
 	}
 
 	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
@@ -38,7 +51,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSign getParametersToSign(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSign(ProtocolInvocationUriParserUtil.parseXml(xml));
+		return getParametersToSign(xml, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma.
+	 * @param xml XML de entrada
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSign getParametersToSign(final byte[] xml,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSign(
+				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
 
 	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
@@ -47,7 +73,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSignAndSave getParametersToSignAndSave(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSignAndSave(parserUri(uri));
+		return getParametersToSignAndSave(uri, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma/multifirma y guardado de datos.
+	 * @param uri URL de llamada.
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSignAndSave getParametersToSignAndSave(final String uri,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSignAndSave(
+				parserUri(uri), servicesRequired);
 	}
 
 	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
@@ -56,7 +95,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSignAndSave getParametersToSignAndSave(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSignAndSave(ProtocolInvocationUriParserUtil.parseXml(xml));
+		return getParametersToSignAndSave(xml, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma/multifirma y guardado de datos.
+	 * @param xml XML de entrada
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSignAndSave getParametersToSignAndSave(final byte[] xml,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSignAndSave(
+				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
 
 	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
@@ -65,7 +117,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSelectCert getParametersToSelectCert(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(parserUri(uri));
+		return getParametersToSelectCert(uri, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de selecci&oacute;n de certificados.
+	 * @param uri URL de llamada.
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSelectCert getParametersToSelectCert(final String uri,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(
+				parserUri(uri), servicesRequired);
 	}
 
 	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
@@ -74,7 +139,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSelectCert getParametersToSelectCert(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(ProtocolInvocationUriParserUtil.parseXml(xml));
+		return getParametersToSelectCert(xml, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de selecci&oacute;n de certificados.
+	 * @param xml XML de entrada
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSelectCert getParametersToSelectCert(final byte[] xml,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(
+				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
 
 	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
@@ -84,7 +162,21 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSave getParametersToSave(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSave(ProtocolInvocationUriParserUtil.parseXml(xml));
+		return getParametersToSave(xml, false);
+	}
+
+	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param xml XML con los par&aacute;metros
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSave getParametersToSave(final byte[] xml,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSave(
+				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
 
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
@@ -94,7 +186,20 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToSave getParametersToSave(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri));
+		return getParametersToSave(uri, false);
+	}
+
+	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param uri Url de llamada
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSave getParametersToSave(final String uri,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri), servicesRequired);
 	}
 
 	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
@@ -104,7 +209,21 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersForBatch getParametersToBatch(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
+		return getParametersToBatch(xml, false);
+	}
+
+	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param xml XML con los par&aacute;metros
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersToBatch(final byte[] xml,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToBatch(
+				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
 
 	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
@@ -113,7 +232,19 @@ public final class ProtocolInvocationUriParser {
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersForBatch getParametersToBatch(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToBatch(parserUri(uri));
+		return getParametersToBatch(uri, false);
+	}
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes predefinidos.
+	 * @param uri URL de llamada.
+	 * @param servicesRequired Indica si entre los par&aacute;metros es obligatorio que
+	 * est&eacute;n los servicios de comunicaci%oacute;n.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersToBatch(final String uri,
+			final boolean servicesRequired) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToBatch(parserUri(uri), servicesRequired);
 	}
 
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una

@@ -68,6 +68,14 @@ public final class UrlParametersToSign extends UrlParameters {
 	private String operation;
 	private String signFormat;
 	private String signAlgorithm;
+
+	/** Indica si la operaci&oacute;n requiere de los servicios de comunicaci&oacute;n. */
+	private final boolean servicesRequired;
+
+	/**
+	 * Versi&oacute;n m&iacute;nima del protocolo que define los requisitos
+	 * de esta operaci&oacute;n.
+	 */
 	private String minimumProtocolVersion;
 
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
@@ -85,6 +93,18 @@ public final class UrlParametersToSign extends UrlParameters {
 	 * Construye el conjunto de par&aacute;metros vac&iacute;o.
 	 */
 	public UrlParametersToSign() {
+		this(false);
+	}
+
+	/**
+	 * Crea el conjunto de par&aacute;metros necesario para el uso de la operaci&acute;n
+	 * de firma indicando si es necesario proporcionar la URL del servicio para transmitir
+	 * el resultado.
+	 * @param servicesRequired Indica si es necesario proporcionar la URL del servicio de
+	 * guardado.
+	 */
+	public UrlParametersToSign(final boolean servicesRequired) {
+		this.servicesRequired = servicesRequired;
 		setData(null);
 		setFileId(null);
 		setRetrieveServletUrl(null);
@@ -208,21 +228,26 @@ public final class UrlParametersToSign extends UrlParameters {
 			return;
 		}
 
-		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse
-		if (params.containsKey(STORAGE_SERVLET_PARAM)) {
+		// Validamos la URL del servlet de guardado en caso de ser necesaria
+		if (this.servicesRequired) {
+			if (params.containsKey(STORAGE_SERVLET_PARAM)) {
 
-			// Comprobamos que la URL sea valida
-			URL storageServletUrl;
-			try {
-				storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
+				// Comprobamos que la URL sea valida
+				URL storageServletUrl;
+				try {
+					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
+				}
+				catch (final ParameterLocalAccessRequestedException e) {
+					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+				}
+				catch (final ParameterException e) {
+					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
+				}
+				setStorageServletUrl(storageServletUrl);
 			}
-			catch (final ParameterLocalAccessRequestedException e) {
-				throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+			else {
+				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
 			}
-			catch (final ParameterException e) {
-				throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
-			}
-			setStorageServletUrl(storageServletUrl);
 		}
 
 		// Comprobamos que se ha especificado el formato
