@@ -245,7 +245,9 @@ public final class ReadNodesTree {
     			//id_aa_ets_archiveTimestampV2
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa.branch("48")) && //$NON-NLS-1$
     			//id_aa_ets_archiveTimestampV3
-				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.4"));  //$NON-NLS-1$
+				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.4")) && //$NON-NLS-1$
+				//id_aa_ets_longTermValidation
+				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.2"));  //$NON-NLS-1$
     }
 
     /** Lee los nodos pertenecientes a un firmante.
