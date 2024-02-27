@@ -1347,10 +1347,6 @@ var AutoScript = ( function ( window, undefined ) {
 				errorConnectingServiceText = text;
 			}
 			
-			function setLoadingText(text) {
-				loadingText = text;
-			}
-			
 			function setAdminContactInfo(text) {
 				adminContactInfo = text;
 			}
@@ -1529,7 +1525,6 @@ var AutoScript = ( function ( window, undefined ) {
 				setLoadingTextClass : setLoadingTextClass,
 				setErrorTextClass : setErrorTextClass,
 				setErrorConnectingServiceText : setErrorConnectingServiceText,
-				setLoadingText : setLoadingText,
 				isEnabled : isEnabled,
 				getErrorConnectingServiceText : getErrorConnectingServiceText,
 				setAlternativeAndroidAppLink : setAlternativeAndroidAppLink,
@@ -4822,8 +4817,13 @@ var AutoScript = ( function ( window, undefined ) {
 						if (!enabled) {
 							errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);
 						}
-					} else {						
-						var errorMsg = currentLocale.error_connecting_autofirma + "<br>" + AfirmaUtils.buildCustomUrl();
+					} else {
+						var errorMsg;
+						if (!!isCompatibleProcedure) {
+							errorMsg = currentLocale.error_connecting_autofirma + "<br>" + AfirmaUtils.buildCustomUrl();
+						} else {
+							errorMsg = AfirmaUtils.buildCustomErrorServerMsg();
+						}
 						var enabled = SupportDialog.showSupportDialog(errorMsg,
 						currentLocale.retry_operation, function (){ execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) }, currentLocale.close, function (){SupportDialog.disposeSupportDialog(); errorCallback("java.lang.IOException", errorMsg.replace("<br>",""));});
 						if(!enabled) {
