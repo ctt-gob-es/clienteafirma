@@ -53,7 +53,7 @@ var AutoScript = ( function ( window, undefined ) {
 				checktime_local_time: "Hora de su sistema",
 				checktime_server_time: "Hora del servidor",
 				close: "Cerrar",
-				contact_admin: " Comunique el error al administrador del servicio si el problema se prolonga: ",
+				contact_admin: "Comunique el error al administrador del servicio si el problema se prolonga: ",
 				error_closing_autofirma: "AutoFirma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n",
 				error_connecting_autofirma: "No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
 				error_connecting_remote_server: "Error conectando al servidor remoto.",
@@ -86,7 +86,7 @@ var AutoScript = ( function ( window, undefined ) {
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor",
 				close: "Pechar",
-				contact_admin: " Por favor, informe do erro ao administrador do servizo se o problema persiste: ",
+				contact_admin: "Por favor, informe do erro ao administrador do servizo se o problema persiste: ",
 				error_closing_autofirma: "AutoFirma pechouse ou pechouse o websocket de comunicaci&oacute;n",
 				error_connecting_autofirma: "Non se puido conectar a AutoFirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
 				error_connecting_remote_server: "Produciuse un erro ao conectarse ao servidor remoto",
@@ -654,7 +654,7 @@ var AutoScript = ( function ( window, undefined ) {
 								isCompatibleProcedure = true;
 								var adminMsg = "";
 								if (SupportDialog.getAdminContactInfo() != null) {
-									adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
+									adminMsg = " " + currentLocale.contact_admin + " " + SupportDialog.getAdminContactInfo();
 								}
 								SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function (){SupportDialog.disposeSupportDialog();});
 							}
@@ -671,7 +671,7 @@ var AutoScript = ( function ( window, undefined ) {
 							isCompatibleProcedure = true;
 							var adminMsg = "";
 							if (SupportDialog.getAdminContactInfo() != null) {
-								adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
+								adminMsg = " " + currentLocale.contact_admin + " " + SupportDialog.getAdminContactInfo();
 							}
 							SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 						}
@@ -686,7 +686,7 @@ var AutoScript = ( function ( window, undefined ) {
 						isCompatibleProcedure = true;
 						var adminMsg = "";
 						if (SupportDialog.getAdminContactInfo() != null) {
-							adminMsg = currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
+							adminMsg = " " + currentLocale.contact_admin + " " + SupportDialog.getAdminContactInfo();
 						}
 						SupportDialog.showSupportDialog(SupportDialog.getWarningText() + SupportDialog.getErrorConnectingServiceText() + adminMsg, currentLocale.close, function() { SupportDialog.disposeSupportDialog();});
 					}
@@ -777,7 +777,7 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		function openUrl (url) {
 			
-			SupportDialog.showSupportDialog(SupportDialog.getLoadingText() + "<div class='afirmaSpinner'></div>");
+			SupportDialog.showLoadingDialog();
 			
 			// Usamos el modo de invocacion mas apropiado segun el entorno
 			
@@ -1108,7 +1108,7 @@ var AutoScript = ( function ( window, undefined ) {
 				  "left: 0;" +
 				  "top: 0;" +
 				"}" +
-		    	".afirmaSpinner {" +
+		    	".afirmaDefaultSpinner {" +
 				  "border: 4px solid rgba(0, 0, 0, 0.1);" +
 				  "width: 15px;" +
 				  "height: 15px;" +
@@ -1280,11 +1280,11 @@ var AutoScript = ( function ( window, undefined ) {
 			var button2Class = "afirmaDefaultButton2Class";
 			var logoClass = "afirmaDefaultLogoClass";
 			var dialogClass = "afirmaDefaultDialogClass";
+			var spinnerClass = "afirmaDefaultSpinner";
 			var adminContactInfo = null;
 			var alternativeAndroidAppLink = null;
 			var alternativeiOSAppLink = null;
 			var errorConnectingServiceText = currentLocale.error_connecting_service;
-			var loadingText = currentLocale.loading;
 			var enabled = true;
 			var enabledLoading = true;
 			var enabledError = true;
@@ -1331,7 +1331,11 @@ var AutoScript = ( function ( window, undefined ) {
 				logoClass = customClass;
 			}
 			
-			function setCustomPCDownloadURL(url) {
+			function setSpinnerClass(customClass) {
+				spinnerClass = customClass;
+			}
+			
+			function setPCDownloadURL(url) {
 				pcDownloadURL = url;
 			}
 			
@@ -1383,11 +1387,7 @@ var AutoScript = ( function ( window, undefined ) {
 			function getErrorConnectingServiceText() {
 				return errorConnectingServiceText;
 			}
-			
-			function getLoadingText() {
-				return loadingText;
-			}
-			
+						
 			function getPCDownloadURL() {
 				return pcDownloadURL;
 			}
@@ -1404,110 +1404,113 @@ var AutoScript = ( function ( window, undefined ) {
 				return warningText;
 			}
 			
+			function showLoadingDialog() {
+				showSupportDialog(currentLocale.loading + "<div class='" + spinnerClass + "'></div>");
+			}
+			
 			function showSupportDialog(messageType, button1Text, button1Callback, button2Text, button2Callback) {
 				
-				if (enabled) {
-					disposeSupportDialog();
-					//DIV PADRE
-					var parentDiv = document.createElement("div");
-	
-					//DIV HIJO
-					var childDiv = document.createElement("div");
-	
-					//PANEL CON LOGO Y MENSAJE
-					var messagePanel = document.createElement("div");
-	
-					//IMG DIV
-					var imgDiv = document.createElement("div");
-	
-					//MESSAGE DIV
-					var messageDiv = document.createElement("div");
-	
-					//SPAN CON MENSAJE
-					var spanSupportMessage = document.createElement("span");
-					
-					parentDiv.setAttribute('id', 'afirmaSupportDialog');
-					parentDiv.setAttribute('class', backgroundClass);
-	
-					childDiv.setAttribute('id', 'afirmaChildDiv');
-					childDiv.setAttribute('class', dialogClass);
-	
-					messagePanel.setAttribute('id', 'afirmaMessagePanel');
-					messagePanel.setAttribute('style', 'display: flex; align-items:center; justify-content: center;');
-	
-					imgDiv.setAttribute('id', 'afirmaImgDiv');
-					imgDiv.setAttribute('class', logoClass);
-					
-					// Panel de botones para aceptar y cancelar
-					var buttonsPanel = document.createElement("div");
-					
-					var isLoadingDialog = true;
-	
-					if (button1Text !== undefined && button1Text != null) {
-	
-						//BOTON 1
-						var button1 = document.createElement("button");
-	
-						buttonsPanel.setAttribute('id', 'afirmaButtonsPanel');
-						buttonsPanel.setAttribute('style', 'float: right; text-align: right; width: 100%;');
-						button1.setAttribute('id', 'afirmaButton1');
-						button1.setAttribute('class', button1Class);
-						button1.addEventListener('click', button1Callback);
-						button1.textContent = button1Text;
-						
-						buttonsPanel.appendChild(button1);
-						isLoadingDialog = false;
-					}
-					
-					if (button2Text !== undefined && button2Text != null) {
-	
-						//BOTON 2
-						var button2 = document.createElement("button");
-						
-						button2.setAttribute('id', 'afirmaButton2');
-						button2.addEventListener('click', button2Callback);
-						button2.setAttribute('class', button2Class);
-						button2.textContent = button2Text;
-						
-						buttonsPanel.appendChild(button2);
-						isLoadingDialog = false;
-					}
-	
-					// Panel con mensaje a mostrar
-					messageDiv.setAttribute('id', 'afirmaMessageDiv');
-					spanSupportMessage.setAttribute('id', 'spanSupportMessage');
-					spanSupportMessage.innerHTML = messageType;
-					
-					if (!!isLoadingDialog) {
-						if (!!enabledLoading) {
-							spanSupportMessage.setAttribute('class', loadingTextClass);
-							messageDiv.setAttribute('class', 'afirmaDefaultLoadingMessageClass');
-						} else {
-							return false;
-						}
-					} else {
-						if (!!enabledError) {
-							spanSupportMessage.setAttribute('class', errorTextClass);
-							messageDiv.setAttribute('class', 'afirmaDefaultErrorMessageClass');
-						} else {
-							return false;
-						}
-					}
-					
-					messagePanel.appendChild(imgDiv);
-					messageDiv.appendChild(spanSupportMessage);
-					messagePanel.appendChild(messageDiv);
-					childDiv.appendChild(messagePanel);			
-					childDiv.appendChild(buttonsPanel);
-					parentDiv.appendChild(childDiv);
-
-					document.body.appendChild(parentDiv);
-					
-					return true;	
-							
-				} else {
+				if (!enabled) {
 					return false;
 				}
+
+				disposeSupportDialog();
+				//DIV PADRE
+				var parentDiv = document.createElement("div");
+
+				//DIV HIJO
+				var childDiv = document.createElement("div");
+
+				//PANEL CON LOGO Y MENSAJE
+				var messagePanel = document.createElement("div");
+
+				//IMG DIV
+				var imgDiv = document.createElement("div");
+
+				//MESSAGE DIV
+				var messageDiv = document.createElement("div");
+
+				//SPAN CON MENSAJE
+				var spanSupportMessage = document.createElement("span");
+				
+				parentDiv.setAttribute('id', 'afirmaSupportDialog');
+				parentDiv.setAttribute('class', backgroundClass);
+
+				childDiv.setAttribute('id', 'afirmaChildDiv');
+				childDiv.setAttribute('class', dialogClass);
+
+				messagePanel.setAttribute('id', 'afirmaMessagePanel');
+				messagePanel.setAttribute('style', 'display: flex; align-items:center; justify-content: center;');
+
+				imgDiv.setAttribute('id', 'afirmaImgDiv');
+				imgDiv.setAttribute('class', logoClass);
+				
+				// Panel de botones para aceptar y cancelar
+				var buttonsPanel = document.createElement("div");
+				
+				var isLoadingDialog = true;
+
+				if (button1Text !== undefined && button1Text != null) {
+
+					//BOTON 1
+					var button1 = document.createElement("button");
+
+					buttonsPanel.setAttribute('id', 'afirmaButtonsPanel');
+					buttonsPanel.setAttribute('style', 'float: right; text-align: right; width: 100%;');
+					button1.setAttribute('id', 'afirmaButton1');
+					button1.setAttribute('class', button1Class);
+					button1.addEventListener('click', button1Callback);
+					button1.textContent = button1Text;
+					
+					buttonsPanel.appendChild(button1);
+					isLoadingDialog = false;
+				}
+				
+				if (button2Text !== undefined && button2Text != null) {
+
+					//BOTON 2
+					var button2 = document.createElement("button");
+					
+					button2.setAttribute('id', 'afirmaButton2');
+					button2.addEventListener('click', button2Callback);
+					button2.setAttribute('class', button2Class);
+					button2.textContent = button2Text;
+					
+					buttonsPanel.appendChild(button2);
+					isLoadingDialog = false;
+				}
+
+				// Panel con mensaje a mostrar
+				messageDiv.setAttribute('id', 'afirmaMessageDiv');
+				spanSupportMessage.setAttribute('id', 'spanSupportMessage');
+				spanSupportMessage.innerHTML = messageType;
+				
+				if (!!isLoadingDialog) {
+					if (!!enabledLoading) {
+						spanSupportMessage.setAttribute('class', loadingTextClass);
+						messageDiv.setAttribute('class', 'afirmaDefaultLoadingMessageClass');
+					} else {
+						return false;
+					}
+				} else {
+					if (!!enabledError) {
+						spanSupportMessage.setAttribute('class', errorTextClass);
+						messageDiv.setAttribute('class', 'afirmaDefaultErrorMessageClass');
+					} else {
+						return false;
+					}
+				}
+				
+				messagePanel.appendChild(imgDiv);
+				messageDiv.appendChild(spanSupportMessage);
+				messagePanel.appendChild(messageDiv);
+				childDiv.appendChild(messagePanel);			
+				childDiv.appendChild(buttonsPanel);
+				parentDiv.appendChild(childDiv);
+
+				document.body.appendChild(parentDiv);
+
+				return true;	
 			}
 			
 			function disposeSupportDialog() {
@@ -1524,6 +1527,11 @@ var AutoScript = ( function ( window, undefined ) {
 				setDialogClass : setDialogClass,
 				setLoadingTextClass : setLoadingTextClass,
 				setErrorTextClass : setErrorTextClass,
+				setWarningClass : setWarningClass,
+				setButton1Class : setButton1Class,
+				setButton2Class : setButton2Class,
+				setLogoClass : setLogoClass,
+				setSpinnerClass : setSpinnerClass,
 				setErrorConnectingServiceText : setErrorConnectingServiceText,
 				isEnabled : isEnabled,
 				getErrorConnectingServiceText : getErrorConnectingServiceText,
@@ -1531,11 +1539,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setAlternativeiOSAppLink : setAlternativeiOSAppLink,
 				getAlternativeAndroidAppLink : getAlternativeAndroidAppLink,
 				getAlternativeiOSAppLink : getAlternativeiOSAppLink,
-				getLoadingText : getLoadingText,
-				setButton1Class : setButton1Class,
-				setButton2Class : setButton2Class,
-				setLogoClass : setLogoClass,
-				setCustomPCDownloadURL : setCustomPCDownloadURL,
+				setPCDownloadURL : setPCDownloadURL,
 				setAndroidDownloadURL : setAndroidDownloadURL,
 				setIOSDownloadURL : setIOSDownloadURL,
 				getPCDownloadURL : getPCDownloadURL,
@@ -1544,8 +1548,8 @@ var AutoScript = ( function ( window, undefined ) {
 				getAdminContactInfo : getAdminContactInfo,
 				setAdminContactInfo : setAdminContactInfo,
 				getWarningText : getWarningText,
-				setWarningClass : setWarningClass,
 				showSupportDialog : showSupportDialog,
+				showLoadingDialog : showLoadingDialog,
 				disposeSupportDialog : disposeSupportDialog
 			};
 		})();
@@ -1727,8 +1731,8 @@ var AutoScript = ( function ( window, undefined ) {
 					var errorMsg = currentLocale.error_connecting_server_recovering;
 					if(!isCompatibleProcedure) {
 						errorMsg = buildCustomNoCompatibleProcedure();
-					} else if (isErrorCheckingServices && SupportDialog.getAdminContactInfo() != null) {
-						errorMsg += currentLocale.contact_admin + SupportDialog.getAdminContactInfo();
+					} else if (isErrorCheckingServices && !!SupportDialog.getAdminContactInfo()) {
+						errorMsg += " " + currentLocale.contact_admin + " " + SupportDialog.getAdminContactInfo();
 					}
 					return errorMsg;
 				}
@@ -4445,8 +4449,8 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				wrongInstallation = false;
 			
-				SupportDialog.showSupportDialog(SupportDialog.getLoadingText() + "<div class='afirmaSpinner'></div>");
-			
+				SupportDialog.showLoadingDialog();
+				
 				// Invocamos al cliente de firma
 				openUrl(intentURL);
 
