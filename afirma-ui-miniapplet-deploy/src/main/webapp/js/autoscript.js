@@ -47,18 +47,16 @@ var AutoScript = ( function ( window, undefined ) {
 		LOCALIZED_STRINGS["es_ES"] = {
 				access_from_pc: "Acceda desde un PC para realizar el tr&aacute;mite.",
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				autofirma_not_installed: "El cliente de firma no se encuentra instalado en el sistema. Puede descargarse desde el siguiente enlace:",
 				checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
 				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta p&aacute;gina antes de continuar.",
 				checktime_local_time: "Hora de su sistema",
 				checktime_server_time: "Hora del servidor",
 				close: "Cerrar",
 				contact_admin: "Comunique el error al administrador del servicio si el problema se prolonga: ",
-				error_closing_autofirma: "El cliente de firma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n",
-				error_connecting_autofirma: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
+				error_connecting_autofirma: "No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
+				error_connecting_client: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
 				error_connecting_service: "No se ha podido conectar con el servicio de la aplicaci&oacute;n de firma. Es probable que no pueda completar firmas electr&oacute;nicas desde esta p&aacute;gina.",
 				error_connecting_server_recovering: "No se pudo conectar con el servidor intermedio para la recuperaci&oacute;n del resultado de la operaci&oacute;n.",
-				error_sending_data: "Error al enviar los datos al servidor intermedio.",
 				firefox_reinstall_message: "Instalar o restaurar AutoFirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
 				install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
@@ -74,18 +72,16 @@ var AutoScript = ( function ( window, undefined ) {
 		LOCALIZED_STRINGS["gl_ES"] = {
 				access_from_pc: "Acceso desde un PC para realizar o tr&aacute;mite.",
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				autofirma_not_installed: "O cliente de sinatura non est&aacute; instalado no sistema. P&oacute;dese descargar na seguinte ligaz&oacute;n:",
 				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom&eacute;ndase corrixilo antes de pulsar Aceptar para continuar.",
 				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor",
 				close: "Pechar",
 				contact_admin: "Por favor, informe do erro ao administrador do servizo se o problema persiste: ",
-				error_closing_autofirma: "O cliente da sinatura pechouse ou pechouse o websocket de comunicaci&oacute;n",
-				error_connecting_autofirma: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
+				error_connecting_autofirma: "Non se puido conectar con AutoFirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
+				error_connecting_client: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
 				error_connecting_service: "Non se puido conectar ao servizo da aplicaci&oacute;n de sinatura. &Eacute; posible que non poida completar sinaturas electr&oacute;nicas desde esta p&aacute;xina.",
 				error_connecting_server_recovering: "Non se puido conectar ao servidor intermedio para recuperar o resultado da operaci&oacute;n",
-				error_sending_data: "Produciuse un erro ao enviar os datos ao servidor intermedio.",
 				firefox_reinstall_message: "Ser&aacute; necesario instalar ou restaurar AutoFirma pecha o navegador e reinicia o proceso.",
 				install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
@@ -198,11 +194,9 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		/* Tipos de errores para mostrar en los dialogos */
 		var ERROR_CONNECTING_AFIRMA = 1;
-		var ERROR_CLOSING_AFIRMA = 2;
-		var ERROR_SENDING_DATA = 3;
-		var ERROR_NO_COMPATIBLE_PROCEDURE = 4;
-		var ERROR_CONNECTING_SERVICE = 5;
-		var ERROR_CHECKING_SERVICE = 6;
+		var ERROR_NO_COMPATIBLE_PROCEDURE = 2;
+		var ERROR_CONNECTING_SERVICE = 3;
+		var ERROR_CHECKING_SERVICE = 4;
 		
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
@@ -1361,14 +1355,8 @@ var AutoScript = ( function ( window, undefined ) {
 				var closeButtonText = currentLocale.close;
 				switch (errorType){
 					case ERROR_CONNECTING_AFIRMA:
-						messageError = currentLocale.error_connecting_autofirma + "<br>" + Dialog.buildCustomUrl();
+						messageError = Dialog.buildErrorConnectingApplicationMsg();
 						actionButtonText = currentLocale.retry_operation;
-						break;
-					case ERROR_CLOSING_AFIRMA:
-						messageError = currentLocale.error_closing_autofirma;
-						break;
-					case ERROR_SENDING_DATA:
-						messageError = currentLocale.error_sending_data;
 						break;
 					case ERROR_NO_COMPATIBLE_PROCEDURE:
 						messageError = Dialog.buildCustomNoCompatibleProcedure();
@@ -1508,6 +1496,15 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 			}
 			
+			/* Construye el mensaje que debe mostrarse en un error de conexion con la aplicacion */
+			function buildErrorConnectingApplicationMsg() {
+				if (Platform.isAndroid() || Platform.isIOS()) {
+					return currentLocale.error_connecting_client + "<br>" + Dialog.buildCustomUrl();
+				} else {
+					return currentLocale.error_connecting_autofirma + "<br>" + Dialog.buildCustomUrl();
+				}
+			}
+			
 			/** Construye el enlace que se necesite segun el SO con el que se opere. */
 			function buildCustomUrl() {
 				var autoFirmaLink;
@@ -1552,6 +1549,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			return {
+				buildErrorConnectingApplicationMsg : buildErrorConnectingApplicationMsg,
 				buildCustomUrl : buildCustomUrl,
 				buildCustomNoCompatibleProcedure : buildCustomNoCompatibleProcedure,
 				buildCustomErrorServerMsg : buildCustomErrorServerMsg,
@@ -2146,9 +2144,9 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e) {
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA, 
 																		function (){execAppIntent(url, successCB, errorCB)} , 
-																		function (){ errorCB("java.lang.IOException", currentLocale.error_connecting_autofirma); });
+																		function (){errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," ")); });
 						if(!enabled) {
-							errorCB("java.lang.IOException", currentLocale.error_connecting_autofirma);
+							errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
 						}
 					}
 				}
@@ -2205,9 +2203,9 @@ var AutoScript = ( function ( window, undefined ) {
 						
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 															function (){execAppIntent(url, successCB, errorCB)}, 
-															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma + " " + Dialog.buildCustomUrl().replaceAll("<br>",""));});
+															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
 						if (!enabled) {
-							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma + " " + Dialog.buildCustomUrl().replaceAll("<br>",""));
+							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
 						}
 					}			
 				}
@@ -2246,7 +2244,6 @@ var AutoScript = ( function ( window, undefined ) {
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
 						processErrorResponse("java.lang.InterruptedException", "AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion");
-						Dialog.showErrorDialog(ERROR_CLOSING_AFIRMA);
 					}
 				};
 
@@ -2302,9 +2299,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (retries <= 0) {
 					var enabled =  Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																function (){sendEcho(ws, idSession, 1)}, 
-																function (){processErrorResponse("java.util.concurrent.TimeoutException", currentLocale.error_connecting_autofirma + " " + Dialog.buildCustomUrl().replaceAll("<br>",""));});
+																function (){processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
 					if (!enabled) {
-						processErrorResponse("java.util.concurrent.TimeoutException", currentLocale.error_connecting_autofirma + " " + Dialog.buildCustomUrl().replaceAll("<br>",""));
+						processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
 					}
 					return;
 				}
@@ -2964,9 +2961,9 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e){
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function (){execAppIntent(url);}, 
-																	function (){errorServiceResponseFunction("java.lang.IOException", currentLocale.error_connecting_autofirma);});
+																	function (){errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
 						if (!enabled) {
-							errorServiceResponseFunction("java.lang.IOException", currentLocale.error_connecting_autofirma);
+							errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
 						}
 					}
 				}
@@ -3121,9 +3118,9 @@ var AutoScript = ( function ( window, undefined ) {
 								}
 								var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																			function (){execAppIntent(url)},
-																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma + " " + Dialog.buildCustomUrl().replaceAll("<br>",""));});
+																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
 								if (!enabled) {
-									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.error_connecting_autofirma + " " + Dialog.buildCustomUrl().replaceAll("<br>",""));
+									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
 								}
 							}
 							return;
@@ -4395,20 +4392,14 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 						else {
 							console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
-							var enabled = Dialog.showErrorDialog(ERROR_SENDING_DATA, null, function (){errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");});							
-							if (!enabled) {
-								errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");	
-							}
+							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
 						}
 					}
 				}
 				try {
 					httpRequest.onerror = function(e) {	
 						console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-						var enabled = Dialog.showErrorDialog(ERROR_SENDING_DATA, null, function (){errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");});
-						if (!enabled) {
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");	
-						}
+						errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
 					}
 				}
 				catch (e) {
@@ -4428,10 +4419,7 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					var enabled = Dialog.showErrorDialog(ERROR_SENDING_DATA, null, function (){errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");});
-					if (!enabled) {
-						errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");	
-					}			
+					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");	
 				}
 			}
 			
@@ -4811,9 +4799,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (wrongInstallation) {
 					var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.autofirma_not_installed + " " + Dialog.buildCustomUrl().replaceAll("<br>",""), errorCallback);});
+																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);});
 					if (!enabled) {
-						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", currentLocale.autofirma_not_installed + " " + Dialog.buildCustomUrl().replaceAll("<br>",""), errorCallback); }
+						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback); }
 					return;
 				}
 			
@@ -4831,16 +4819,16 @@ var AutoScript = ( function ( window, undefined ) {
 						var errorCallbackMsg;
 						if (!!isCompatibleProcedure) {
 							errorMsg = ERROR_CONNECTING_AFIRMA;
-							errorCallbackMsg = currentLocale.error_connecting_autofirma + "<br>" + Dialog.buildCustomUrl();
+							errorCallbackMsg = Dialog.buildErrorConnectingApplicationMsg();
 						} else {
 							errorMsg = ERROR_CONNECTING_SERVICE;
 							errorCallbackMsg = Dialog.buildCustomErrorServerMsg();
 						}
 						var enabled = Dialog.showErrorDialog(errorMsg,
 																	function (){execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorCallback("java.lang.IOException", errorCallbackMsg.replace("<br>",""));});
+																	function (){errorCallback("java.lang.IOException", errorCallbackMsg.replace(/<br>/g,""));});
 						if(!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", errorCallbackMsg.replace("<br>",""), errorCallback);
+							errorResponseFunction("java.util.concurrent.TimeoutException", errorCallbackMsg.replace(/<br>/g,""), errorCallback);
 						}
 					}
 					return;
