@@ -1370,7 +1370,7 @@ var AutoScript = ( function ( window, undefined ) {
 						if (adminContactInfo != null) {
 							adminMsg = " " + currentLocale.contact_admin + " " + adminContactInfo;
 						}
-						messageError = warningText + currentLocale.error_connecting_service + adminMsg;
+						messageError = currentLocale.error_connecting_service + adminMsg;
 						break;
 				}
 				var enabled = showSupportDialog(messageError, actionButtonText, actionButtonCallback, 
@@ -1526,7 +1526,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/** Construye el mensaje para tramites incompatibles que se necesite segun el SO con el que se opere. */
 			function buildCustomNoCompatibleProcedure() {
-				var noCompatibleMsg = warningText + currentLocale.no_compatible_procedure;
+				var noCompatibleMsg = currentLocale.no_compatible_procedure;
 				if (Platform.isAndroid() && alternativeAndroidAppLink != null) {
 					noCompatibleMsg += currentLocale.procedure_from_url + " " + alternativeAndroidAppLink;
 				} else if (Platform.isIOS() && alternativeiOSAppLink != null) {
