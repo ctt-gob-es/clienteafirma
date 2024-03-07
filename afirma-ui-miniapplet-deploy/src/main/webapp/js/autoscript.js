@@ -47,67 +47,55 @@ var AutoScript = ( function ( window, undefined ) {
 		LOCALIZED_STRINGS["es_ES"] = {
 				access_from_pc: "Acceda desde un PC para realizar el tr&aacute;mite.",
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				autofirma_not_installed: "AutoFirma no se encuentra instalado en el sistema. Puede descargarse desde el siguiente enlace:",
+				autofirma_not_installed: "El cliente de firma no se encuentra instalado en el sistema. Puede descargarse desde el siguiente enlace:",
 				checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
 				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta p&aacute;gina antes de continuar.",
 				checktime_local_time: "Hora de su sistema",
 				checktime_server_time: "Hora del servidor",
 				close: "Cerrar",
 				contact_admin: "Comunique el error al administrador del servicio si el problema se prolonga: ",
-				error_closing_autofirma: "AutoFirma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n",
-				error_connecting_autofirma: "No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
-				error_connecting_remote_server: "Error conectando al servidor remoto.",
+				error_closing_autofirma: "El cliente de firma se ha cerrado o ha cerrado el websocket de comunicaci&oacute;n",
+				error_connecting_autofirma: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
 				error_connecting_service: "No se ha podido conectar con el servicio de la aplicaci&oacute;n de firma. Es probable que no pueda completar firmas electr&oacute;nicas desde esta p&aacute;gina.",
 				error_connecting_server_recovering: "No se pudo conectar con el servidor intermedio para la recuperaci&oacute;n del resultado de la operaci&oacute;n.",
-				error_file_size: "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicaci&oacute;n",
-				error_processing_data: "Error desconocido al procesar los datos",
 				error_sending_data: "Error al enviar los datos al servidor intermedio.",
-				error_stablishing_websocket: "Error estableciendo el WebSocket.",
 				firefox_reinstall_message: "Instalar o restaurar AutoFirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
 				install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
 				loading: "Cargando",
 				no_compatible_procedure: "Esta aplicaci&oacute;n no permite firmar desde el navegador en dispositivos m&oacute;viles. ",
-				no_valid_response: "Respuesta no v&aacute;lida",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
 				procedure_from_url: "Puede realizar el tr&aacute;mite desde la siguiente aplicaci&oacute;n:",
 				restore_installation: "Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde AutoFirma en Herramientas -> Restaurar instalaci&oacute;n",
 				retry_operation: "Reintentar operaci\u00F3n",
 				timeout_receiving_sign: "No se ha podido conectar con el cliente de firma. Si no lo tiene instalado, puede descargarlo desde:",
-				unknown_error: "Error desconocido",
 				warning: "Advertencia:"
 		};
 		LOCALIZED_STRINGS["gl_ES"] = {
 				access_from_pc: "Acceso desde un PC para realizar o tr&aacute;mite.",
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				autofirma_not_installed: "AutoFirma non est&aacute; instalado no sistema. P&oacute;dese descargar na seguinte ligaz&oacute;n:",
+				autofirma_not_installed: "O cliente de sinatura non est&aacute; instalado no sistema. P&oacute;dese descargar na seguinte ligaz&oacute;n:",
 				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom&eacute;ndase corrixilo antes de pulsar Aceptar para continuar.",
 				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor",
 				close: "Pechar",
 				contact_admin: "Por favor, informe do erro ao administrador do servizo se o problema persiste: ",
-				error_closing_autofirma: "AutoFirma pechouse ou pechouse o websocket de comunicaci&oacute;n",
-				error_connecting_autofirma: "Non se puido conectar a AutoFirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
-				error_connecting_remote_server: "Produciuse un erro ao conectarse ao servidor remoto",
+				error_closing_autofirma: "O cliente da sinatura pechouse ou pechouse o websocket de comunicaci&oacute;n",
+				error_connecting_autofirma: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
 				error_connecting_service: "Non se puido conectar ao servizo da aplicaci&oacute;n de sinatura. &Eacute; posible que non poida completar sinaturas electr&oacute;nicas desde esta p&aacute;xina.",
 				error_connecting_server_recovering: "Non se puido conectar ao servidor intermedio para recuperar o resultado da operaci&oacute;n",
-				error_file_size: "O ficheiro que se vai asinar ou gardar supera a memoria dispoñible para a  aplicaci&oacute;n",
-				error_processing_data: "Error desco&ntilde;ecido ao procesar os datos",
 				error_sending_data: "Produciuse un erro ao enviar os datos ao servidor intermedio.",
-				error_stablishing_websocket: "Erro ao establecer WebSocket",
 				firefox_reinstall_message: "Ser&aacute; necesario instalar ou restaurar AutoFirma pecha o navegador e reinicia o proceso.",
 				install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
 				loading: "Cargando",
 				no_compatible_procedure: "Esta aplicaci&oacute;n non permite asinar desde o navegador en dispositivos m&oacute;biles.",
-				no_valid_response: "Resposta non v&aacute;lida",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
 				procedure_from_url: "Podes realizar o tr&aacute;mite dende a seguinte aplicaci&oacute;n:",
 				restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde AutoFirma en Ferramentas -> Restaurar instalaci&oacute;n.",
 				retry_operation: "Reintento a operaci\u00F3n",
 				timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:",
-				unknown_error: "Erro desco&ntilde;ecido",
 				warning: "Aviso:"
 		};
 
@@ -210,17 +198,11 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		/* Tipos de errores para mostrar en los dialogos */
 		var ERROR_CONNECTING_AFIRMA = 1;
-		var ERROR_STABLISHING_WEBSOCKET = 2;
-		var ERROR_CLOSING_AFIRMA = 3;
-		var ERROR_FILE_SIZE = 4;
-		var ERROR_UNKNOWN_ERROR = 5;
-		var ERROR_INVALID_RESPONSE = 6;
-		var ERROR_PROCESSING_DATA = 7;
-		var ERROR_SENDING_DATA = 8;
-		var ERROR_CONNECTING_REMOTE_SERVER = 9;
-		var ERROR_NO_COMPATIBLE_PROCEDURE = 10;
-		var ERROR_CONNECTING_SERVICE = 11;
-		var ERROR_CHECKING_SERVICE = 12;
+		var ERROR_CLOSING_AFIRMA = 2;
+		var ERROR_SENDING_DATA = 3;
+		var ERROR_NO_COMPATIBLE_PROCEDURE = 4;
+		var ERROR_CONNECTING_SERVICE = 5;
+		var ERROR_CHECKING_SERVICE = 6;
 		
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
@@ -1382,27 +1364,11 @@ var AutoScript = ( function ( window, undefined ) {
 						messageError = currentLocale.error_connecting_autofirma + "<br>" + Dialog.buildCustomUrl();
 						actionButtonText = currentLocale.retry_operation;
 						break;
-					case ERROR_STABLISHING_WEBSOCKET:
-						messageError = currentLocale.error_stablishing_websocket;
-						break;
 					case ERROR_CLOSING_AFIRMA:
 						messageError = currentLocale.error_closing_autofirma;
 						break;
-					case ERROR_FILE_SIZE:
-						messageError = currentLocale.error_file_size;
-						break;
-					case ERROR_INVALID_RESPONSE:
-						messageError = currentLocale.no_valid_response;
-						break;
-					case ERROR_PROCESSING_DATA:
-						messageError = currentLocale.error_processing_data;
-						break;
 					case ERROR_SENDING_DATA:
 						messageError = currentLocale.error_sending_data;
-						break;
-					case ERROR_CONNECTING_REMOTE_SERVER:
-						messageError = Dialog.buildCustomErrorServerMsg();
-						actionButtonText = currentLocale.retry_operation;
 						break;
 					case ERROR_NO_COMPATIBLE_PROCEDURE:
 						messageError = Dialog.buildCustomNoCompatibleProcedure();
@@ -1417,12 +1383,6 @@ var AutoScript = ( function ( window, undefined ) {
 							adminMsg = " " + currentLocale.contact_admin + " " + adminContactInfo;
 						}
 						messageError = warningText + currentLocale.error_connecting_service + adminMsg;
-						break;
-					case ERROR_UNKNOWN_ERROR:
-						messageError = currentLocale.unknown_error;
-						break;
-					default:
-						messageError = "Error de tipo " + errorType;
 						break;
 				}
 				var enabled = showSupportDialog(messageError, actionButtonText, actionButtonCallback, 
@@ -2269,7 +2229,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				catch (e) {
 					console.log("Error estableciendo el WebSocket: " + e);
-					Dialog.showErrorDialog(ERROR_STABLISHING_WEBSOCKET, currentLocale.close);
+					Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA);
 				}
 				
 				webSocket.onopen = function() {
@@ -2286,7 +2246,7 @@ var AutoScript = ( function ( window, undefined ) {
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
 						processErrorResponse("java.lang.InterruptedException", "AutoFirma se ha cerrado o ha cerrado el websocket de comunicacion");
-						Dialog.showErrorDialog(ERROR_CLOSING_AFIRMA, currentLocale.close);
+						Dialog.showErrorDialog(ERROR_CLOSING_AFIRMA);
 					}
 				};
 
@@ -2379,21 +2339,18 @@ var AutoScript = ( function ( window, undefined ) {
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
 					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
-					Dialog.showErrorDialog(ERROR_FILE_SIZE);
 					return;
 				}
 				
 				// Se ha producido un error
 				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
 					processErrorResponse("java.lang.Exception", data);
-					Dialog.showErrorDialog(data);
 					return;
 				}
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
 					processErrorResponse("java.lang.Exception", "Error desconocido");
-					Dialog.showErrorDialog(ERROR_UNKNOWN_ERROR);
 					return;
 				}
 
@@ -2458,7 +2415,6 @@ var AutoScript = ( function ( window, undefined ) {
 				// separador ":"
 				if (data.indexOf(":") <= 0) {
 					processErrorResponse("java.lang.Exception", "Respuesta no valida");
-					Dialog.showErrorDialog(ERROR_INVALID_RESPONSE);
 					return;
 				}
 
@@ -2527,7 +2483,6 @@ var AutoScript = ( function ( window, undefined ) {
 				// Termina mal
 				else {
 					processErrorResponse("java.lang.Exception", "Error desconocido al procesar los datos");
-					Dialog.showErrorDialog(ERROR_PROCESSING_DATA);
 				}
 			}
 
@@ -4473,7 +4428,7 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_REMOTE_SERVER);
+					var enabled = Dialog.showErrorDialog(ERROR_SENDING_DATA, null, function (){errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");});
 					if (!enabled) {
 						errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");	
 					}			
