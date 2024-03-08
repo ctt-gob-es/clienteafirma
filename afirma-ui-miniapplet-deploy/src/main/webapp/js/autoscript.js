@@ -52,11 +52,11 @@ var AutoScript = ( function ( window, undefined ) {
 				checktime_local_time: "Hora de su sistema",
 				checktime_server_time: "Hora del servidor",
 				close: "Cerrar",
-				contact_admin: "Comunique el error al administrador del servicio si el problema se prolonga: ",
+				contact_admin: "Comunique el error del servicio si el problema se prolonga: ",
 				error_connecting_autofirma: "No es posible conectar con AutoFirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
 				error_connecting_client: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
 				error_connecting_service: "No se ha podido conectar con el servicio de la aplicaci&oacute;n de firma. Es probable que no pueda completar firmas electr&oacute;nicas desde esta p&aacute;gina.",
-				error_connecting_server_recovering: "No se pudo conectar con el servidor intermedio para la recuperaci&oacute;n del resultado de la operaci&oacute;n.",
+				error_connecting_server_recovering: "No se pudo conectar con el servicio de la aplicaci&oacute;n para la recuperaci&oacute;n del resultado de la operaci&oacute;n.",
 				firefox_reinstall_message: "Instalar o restaurar AutoFirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
 				install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
@@ -77,11 +77,11 @@ var AutoScript = ( function ( window, undefined ) {
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor",
 				close: "Pechar",
-				contact_admin: "Por favor, informe do erro ao administrador do servizo se o problema persiste: ",
+				contact_admin: "Por favor, informe dun erro de servizo se o problema persiste: ",
 				error_connecting_autofirma: "Non se puido conectar con AutoFirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
 				error_connecting_client: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
 				error_connecting_service: "Non se puido conectar ao servizo da aplicaci&oacute;n de sinatura. &Eacute; posible que non poida completar sinaturas electr&oacute;nicas desde esta p&aacute;xina.",
-				error_connecting_server_recovering: "Non se puido conectar ao servidor intermedio para recuperar o resultado da operaci&oacute;n",
+				error_connecting_server_recovering: "Non se puido conectar ao servizo de aplicaci&oacute;n para recuperar o resultado da operaci&oacute;n",
 				firefox_reinstall_message: "Ser&aacute; necesario instalar ou restaurar AutoFirma pecha o navegador e reinicia o proceso.",
 				install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
@@ -1363,7 +1363,9 @@ var AutoScript = ( function ( window, undefined ) {
 						break;
 					case ERROR_CONNECTING_SERVICE:
 						messageError = Dialog.buildCustomErrorServerMsg();
-						actionButtonText = currentLocale.retry_operation;
+						if (!!isCompatibleProcedure) {
+							actionButtonText = currentLocale.retry_operation;
+						}
 						break;
 					case ERROR_CHECKING_SERVICE:
 						var adminMsg = "";
