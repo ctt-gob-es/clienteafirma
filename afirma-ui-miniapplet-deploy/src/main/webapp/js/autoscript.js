@@ -4369,6 +4369,8 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			function sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
 
+				Dialog.showLoadingDialog();
+
 				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
 				var fileId = AfirmaUtils.generateNewIdSession(); 
 
@@ -4380,6 +4382,8 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.open("POST", storageServletAddress, true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
+				var errorOcurred = false;
+
 				httpRequest.onreadystatechange = function () {
 					if (httpRequest.readyState == 4) {
 						 if (httpRequest.status == 200) {
@@ -4390,16 +4394,24 @@ var AutoScript = ( function ( window, undefined ) {
 							}
 							execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
 						}
-						else {
-							console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
+					else {
+						errorOcurred = true;
+						console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
+						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
+								 function() { sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) },
+								 function() { errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");});
+						if (!enabled) {
 							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
 						}
+					}
 					}
 				}
 				try {
 					httpRequest.onerror = function(e) {	
-						console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-						errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+						if (!errorOcurred) {
+							console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
+							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+						}
 					}
 				}
 				catch (e) {
